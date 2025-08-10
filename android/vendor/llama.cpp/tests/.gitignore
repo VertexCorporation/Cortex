@@ -1,0 +1,4 @@
+test-c.c
+!*.*
+*.o
+ggml-common.h

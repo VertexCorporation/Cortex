@@ -1,0 +1,670 @@
+{
+  "@@locale": "tr",
+
+  "understood": "Anlaşıldı.",
+  "cancel": "İptal",
+  "remove": "Kaldır",
+  "download": "İndir",
+  "resume": "Devam Et",
+  "copy": "Kopyala",
+  "chat": "Sohbet",
+  "darkMode": "Karanlık Mod",
+  "light": "Aydınlık",
+  "theme": "Tema",
+  "no": "Hayır",
+  "yes": "Evet",
+  "done": "Bitti",
+  "comingSoon": "YAKINDA",
+  "bestValue": "En İyi Fiyat",
+  "selected": "Seçili",
+  "descriptionSection": "Açıklama",
+  "searchHint": "Ara",
+  "messageHint": "Herhangi bir şey sor",
+  "modelLoading": "Model yükleniyor...",
+  "messageCopied": "Mesaj panoya kopyalandı.",
+  "storeUnavailable": "Mağaza şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.",
+  "retry": "Tekrar Dene",
+
+  "systemInfo": "Sistem Bilgileri",
+  "deviceMemory": "Cihaz Belleği: {memory} GB",
+  "storageSpace": "Depolama Alanı: {storage} GB",
+  "freeStorageSpace": "Boş Depolama Alanı: {freeStorage} GB",
+  "memory": "Bellek",
+  "storage": "Depolama",
+  "freeStorage": "Boş Depolama",
+  "totalStorage": "Toplam Depolama",
+  "usedStorage": "Kullanılan Depolama",
+  "totalMemory": "Toplam Bellek",
+  "usedMemory": "Kullanılan Bellek",
+  "requirements": "Gereksinimler",
+
+  "modelsTitle": "Kütüphane",
+  "localModels": "Yerel Modeller",
+  "serverSideModels": "Çevrimiçi Modeller",
+  "uploadYourOwnModel": "Kendi Modelini Yükle!",
+  "selectGGUFFile": "GGUF Dosyası Seç",
+  "errorGGUF": "Lütfen sadece GGUF formatında bir dosya seçin.",
+  "modelAlreadyExists": "Model zaten mevcut.",
+  "modelAddedSuccessfully": "Model başarıyla eklendi.",
+  "modelRemoved": "Model başarıyla kaldırıldı.",
+  "removeError": "Modeli kaldırırken bir hata oluştu.",
+  "fileNotFound": "Dosya bulunamadı.",
+  "fileUploadError": "Dosyayı yüklerken bir hata oluştu.",
+  "noFileSelected": "Dosya seçilmedi.",
+  "myModels": "Modellerim",
+  "create": "Oluştur",
+  "seeAll": "Tümünü Gör",
+
+  "modelProducer": "Üretici: {producer}",
+  "modelRAM": "RAM: {ram}",
+  "modelSize": "Boyut: {size}",
+  "modelDescription": "{description}",
+
+  "conversationsTitle": "Sohbetler",
+  "conversationDeleted": "Sohbet silindi.",
+  "conversationUpdated": "Sohbet güncellendi.",
+  "editConversationTitle": "Yeniden Adlandır",
+  "newTitle": "Yeni Başlık",
+  "save": "Kaydet",
+  "titleCannotBeEmpty": "Başlık boş olamaz.",
+  "noConversationsMessage": "Hiç sohbet yok, sohbete başla!",
+  "startChat": "Sohbet başlat",
+  "noChats": "Sohbet Yok",
+  "starredChats": "Yıldızlı Sohbetler",
+  "allChats": "Tüm Sohbetler",
+  "noStarredChats": "Yıldızlı Sohbet Yok",
+  "noStarredChatsMessage": "Henüz bir sohbeti yıldızlamadınız.",
+  "goToChats": "Bir sohbeti yıldızla",
+  "starConversation": "Yıldızla",
+  "conversationTitleUpdated": "Sohbet başlığı güncellendi.",
+  "youReachedConversationLimit": "Sohbet limitine ulaştınız.",
+  "today": "Bugün",
+  "yesterday": "Dün",
+
+  "loginToYourAccount": "Giriş Yap",
+  "createYourAccount": "Kayıt Ol",
+  "email": "E-posta",
+  "password": "Şifre",
+  "confirmPassword": "Şifreyi Onayla",
+  "invalidEmail": "Lütfen geçerli bir e-posta adresi girin.",
+  "invalidPassword": "Şifre en az 6 karakter uzunluğunda olmalıdır.",
+  "rememberMe": "Beni hatırla",
+  "forgotPassword": "Şifreni mi unuttun?",
+  "or": "Veya",
+  "continueWithGoogle": "Google ile Devam Et",
+  "dontHaveAccount": "Hesabın yok mu?",
+  "alreadyHaveAccount": "Zaten bir hesabın var mı?",
+  "signUp": "Kayıt Ol",
+  "logIn": "Giriş Yap",
+  "passwordsDoNotMatch": "Şifreler eşleşmiyor.",
+  "userNotFound": "Kullanıcı bulunamadı.",
+  "wrongPassword": "Yanlış şifre.",
+  "emailAlreadyInUse": "Bu e-posta adresi zaten kullanılıyor.",
+  "weakPassword": "Şifre çok zayıf.",
+  "authError": "Kimlik Doğrulama Hatası",
+  "invalidUsername": "Lütfen bir kullanıcı adı girin.",
+  "usernameTaken": "Bu kullanıcı adı zaten alınmış.",
+  "username": "Kullanıcı Adı",
+  "authenticationFailed": "Kimlik doğrulama başarısız oldu. Lütfen tekrar deneyin.",
+  "emailTooLong": "E-posta en fazla 30 karakter olabilir.",
+  "deviceLimitReached": "Bu cihaz için hesap oluşturma limitine ulaştınız.",
+
+  "verificationEmailLimitReached": "Daha fazla göndermeyeceğiz",
+  "verificationEmailSent": "Doğrulama e-postası gönderildi!",
+  "emailNotVerified": "E-posta doğrulanmadı",
+  "resendCode": "Doğrulama e-postasını yeniden gönder",
+  "remainingSeconds": "Doğrulama için kalan süre",
+  "pleaseCheckYourEmail": "Cortex'i kullanmak için e-postanızı doğrulamanız gerekir. \n E-posta adresinize bir doğrulama bağlantısı gönderildi, lütfen e-postanızı kontrol edin.",
+  "verifyYourEmail": "E-postanızı Doğrulayın",
+  "backToLogin": "Geri Dön",
+  "seconds": "saniye",
+  "maxResendLimitReached": "Maksimum doğrulama e-postası sayısına ulaştınız.",
+  "verificationScreenContinueWithoutVerification": "Doğrulama yapmadan devam et",
+  "verificationScreenWarning": "Devam etseniz bile, 1 günlük hesap doğrulama süresi hesabınız için hala geçerlidir. Hesabınızı o zamana kadar doğrulamadıysanız, uygulamadan silinecektir.",
+  "unverifiedAccountHeader": "Hesabınız doğrulanmadı",
+  "unverifiedAccountWarning": "Hesabınızı {timeLeft} içinde doğrulamazsanız silinecektir.",
+  "verifyNow": "Şimdi Doğrula",
+  "accountVerified": "Hesabınız doğrulandı.",
+  "linkSent": "Bağlantı gönderildi",
+  "accountDeletionRequested": "Hesap silme talebiniz alındı ve hesabınız şimdi devre dışı bırakıldı.",
+  "tooManyRequests": "Çok fazla istek",
+  "regenerate": "Yeniden Oluştur",
+
+  "confirmDeleteAccount": "Hesabınızı silmek istediğinizden emin misiniz?",
+  "enterPasswordToDelete": "Silmek için şifrenizi girin.",
+  "deleteAccount": "Hesabı Sil",
+  "deleteAccountError": "Hesabı silerken bir hata oluştu.",
+  "delete": "Sil",
+  "passwordRequired": "Şifre gerekli.",
+  "deleteDescription": "Sildiğiniz veriler sunucumuzdan ve cihazınızdan kalıcı olarak kaldırılacaktır. Bu eylemler geri alınamaz.",
+  "deleteAccountButton": "Hesap Silme Butonu",
+
+  "editProfile": "Profili Düzenle",
+  "displayName": "Görünen Ad",
+  "tapToChangeProfilePicture": "Profil resmini değiştirmek için dokun",
+  "profileUpdated": "Profil başarıyla güncellendi",
+  "updateFailed": "Profil güncellenemedi",
+  "nameCannotBeEmpty": "İsim boş olamaz",
+  "logout": "Çıkış Yap",
+  "noDisplayName": "Görünen ad ayarlanmamış",
+  "noEmail": "E-posta adresi yok",
+  "noUserLoggedIn": "Şu anda giriş yapmış kullanıcı yok",
+  "profile": "Profil",
+  "manageProfileDescription": "Profilinizi yönetin, şifrenizi güncelleyin veya Cortex'ten çıkış yapın.",
+  "accessSettingsDescription": "Yardıma erişin, kodları kullanın, Cortex'i paylaşın ve politikalarımızı görüntüleyin.",
+  "languageDescription": "Varsayılan uygulama arayüz dilinizi istediğiniz zaman değiştirebilirsiniz.",
+  "themeDescription": "Tercihinize göre aydınlık ve karanlık temalar arasında geçiş yapabilirsiniz. Seçilen tema Cortex arayüzü genelinde uygulanacaktır.",
+  "iHaveReadAndAgree": "Hizmet şartlarını okudum ve kabul ediyorum",
+
+  "downloading": "İndiriliyor...",
+  "downloadError": "İndirme sırasında bir hata oluştu.",
+  "downloadCancelled": "İndirme iptal edildi.",
+  "downloadResumed": "İndirme devam ettirildi.",
+  "downloadSuccess": "İndirme başarılı",
+  "downloadFailed": "İndirme başarısız",
+  "downloaded": "%{percent} indirildi",
+  "@downloaded": {
+    "description": "İndirmenin tamamlanan yüzdesini gösterir.",
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "downloadPaused": "İndirme duraklatıldı.",
+
+  "purchaseSuccessful": "Satın alma başarılı!",
+  "purchaseFailed": "Satın alma başarısız",
+  "creditProductNotFound": "Seçilen kredi ürünü bulunamadı.",
+  "creditsAddedSuccessfully": "Krediler hesabınıza başarıyla eklendi!",
+  "creditDeliveryFailed": "Hesabınıza kredi eklenemedi. Lütfen destek ile iletişime geçin.",
+  "invalidPurchase": "Geçersiz satın alma",
+  "purchaseError": "Satın alma hatası",
+  "purchaseVertexPlusToUpload": "Bu bir Plus özelliğidir",
+  "purchasePlus": "Cortex Plus Satın Al",
+  "plusDescription": "Cortex'in daha fazla özelliğine erişin ve yapay zekayı çok daha fazla deneyimleyin!",
+  "annual": "Yıllık",
+  "monthly": "Aylık",
+  "manageSubscription": "Aboneliği Yönet",
+
+  "purchasePlan": "{planName} Satın Al",
+  "@purchasePlan": {
+    "description": "Belirli bir abonelik planını satın almak için düğme metni.",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "Pro Yıllık"
+      }
+    }
+  },
+
+  "discountOffer": "%{percent} UCUZ",
+  "@discountOffer": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+
+  "annualPlanDescription": "{price}/ay, yıllık faturalandırılır",
+  "@annualPlanDescription": {
+    "description": "Yıllık planın açıklaması, daha uygun görünmesi için aylık eşdeğer fiyatı gösterir. Örnek: $4.17/ay, yıllık faturalandırılır",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "₺85.00"
+      }
+    }
+  },
+  "monthlyPlanDescription": "{price}/ay, aylık faturalandırılır",
+  "@monthlyPlanDescription": {
+    "description": "Aylık planın açıklaması, aylık fiyatı gösterir. Örnek: $4.99/ay, aylık faturalandırılır",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "₺100.00"
+      }
+    }
+  },
+  "discountBannerTitle": "LANSMANA ÖZEL: %80 İNDİRİM!",
+  "@discountBannerTitle": {
+    "description": "Promosyon afişinin ana başlığı, özel bir lansman indirimini vurgular."
+  },
+  "discountBannerSubtitle": "Tüm abonelik planlarında lansmanımıza özel indirim! Kaçırmayın!",
+  "@discountBannerSubtitle": {
+    "description": "Promosyon afişinin ikincil metni, teklifin tüm planlar için geçerli olduğunu açıklığa kavuşturur ve aciliyet hissi katar."
+  },
+  "purchasePro": "Cortex Pro Satın Al",
+  "proDescription": "Cortex'in daha da fazla özelliğine erişin ve yapay zekayı daha da fazla deneyimleyin!",
+  "alreadySubscribed": "Zaten abonesiniz",
+  "subscriptionInfo": "Aboneliğiniz aktif.",
+  "alreadySubscribedMessage": "Zaten bir Plus aboneliğiniz var. Aboneliğinizi iptal etmek isterseniz, Play Store yöneticisi aracılığıyla yapabilirsiniz.",
+  "cancelSubscription": "Aboneliği İptal Et",
+  "cancelSubscriptionInfo": "Aboneliğinizi iptal etmek isterseniz, lütfen Play Store abonelik yöneticisi aracılığıyla devam edin.",
+  "goToPlayStore": "Play Store'a Git",
+  "alreadySubscribedPlus": "Plus Planınız Var!",
+  "alreadySubscribedPlusMessage": "Plus planınız aktif. Tüm avantajlardan yararlanabilirsiniz.",
+  "purchaseUltra": "Cortex Ultra Satın Al",
+  "ultraDescription": "Cortex'in tüm özelliklerine tam erişim sağlayın ve yapay zekayı sonuna kadar deneyimleyin!",
+  "noSubscription": "Abonelik Yok",
+  "noSubscriptionMessage": "Henüz bir aboneliğiniz yok.",
+  "alreadyAtHighestPlan": "Zaten en yüksek plandasınız.",
+  "unableToOpenSubscription": "Abonelik yönetimi sayfası açılamıyor.",
+  "upgradeSubscription": "Aboneliği Yükselt",
+  "confirmUpgrade": "Aboneliğinizi yükseltmek istediğinizden emin misiniz?",
+  "unsupportedPlatform": "Abonelik iptali için desteklenmeyen platform.",
+  "purchaseStreamError": "Satın alma akışı hatası.",
+  "productNotFound": "Ürün bulunamadı",
+  "productDetailsError": "Ürün ayrıntıları alınırken bir hata oluştu.",
+  "noProductsFound": "Ürün bulunamadı",
+  "loadCreditsButton": "Kredi Yükle",
+  "creditsTitle": "Krediler",
+  "creditsScreenDescription": "Bu ekran kullanıcının kredilerini gösterir. \n\nKullanıcının mevcut kredileri: 100\n\nAyrıntılı kredi bilgileri burada görüntülenebilir.",
+  "creditsLoaded": "Krediler yüklendi!",
+  "currentCredits": "Mevcut Krediler",
+  "pleaseSelectCreditPackage": "Lütfen bir kredi paketi seçin",
+  "purchaseCreditsTitle": "Kredi Satın Al",
+  "purchaseCreditsDescription": "İhtiyaçlarınıza uygun bir kredi paketi seçin ve uygulamamızı daha fazla kullanın.",
+  "purchaseButton": "Satın Al",
+  "productNotFoundMessage": "Seçilen ürün mevcut değil.",
+  "buyCredits": "Kredi Satın Al",
+  "selectCreditPackageDescription": "İhtiyaçlarınıza uygun bir kredi paketi seçin ve daha fazla özelliğin keyfini çıkarın.",
+  "buyCredit": "Kredi Satın Al",
+  "buyCreditPackage": "{amount} Kredi Satın Al",
+  "@creditPackage": {
+    "description": "Belirli sayıda kredi satın almak için düğme metni",
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "subscribedPlan": "Abone Olundu",
+
+  "errorResponseNotReceived": "Yanıt alınamadı",
+  "googleApiRequestFailed": "Google API isteği {attempt} kez başarısız oldu: {error}",
+  "@googleApiRequestFailed": {
+    "description": "Google API isteği başarısız olduğunda kullanılan hata mesajı",
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      },
+      "error": {
+        "type": "String",
+        "example": "Zaman aşımı"
+      }
+    }
+  },
+  "openRouterResponseStatus": "OpenRouter Yanıt Durumu: {statusCode}",
+  "@openRouterResponseStatus": {
+    "description": "OpenRouter API'sinden gelen yanıt durum kodunu günlüğe kaydet",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "200"
+      }
+    }
+  },
+  "openRouterDecodedResponseBody": "OpenRouter Çözülmüş Yanıt Gövdesi: {body}",
+  "@openRouterDecodedResponseBody": {
+    "description": "OpenRouter API'sinden gelen yanıt gövdesini günlüğe kaydet",
+    "placeholders": {
+      "body": {
+        "type": "String",
+        "example": "{\"choices\": [...]}"
+      }
+    }
+  },
+  "decodedJson": "Çözülmüş JSON: {data}",
+  "@decodedJson": {
+    "description": "Çözülmüş JSON verilerini günlüğe kaydet",
+    "placeholders": {
+      "data": {
+        "type": "String",
+        "example": "{\"key\": \"value\"}"
+      }
+    }
+  },
+  "responseStructureUnexpectedMessageContentMissing": "Yanıt yapısı beklenmedik: mesaj veya içerik eksik",
+  "responseStructureUnexpectedChoicesMissing": "Yanıt yapısı beklenmedik: seçimler eksik veya boş",
+  "openRouterApiRequestFailed": "OpenRouter API isteği başarısız oldu: {statusCode} - {body}",
+  "@openRouterApiRequestFailed": {
+    "description": "OpenRouter API isteği başarısız olduğunda kullanılan hata mesajı",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "500"
+      },
+      "body": {
+        "type": "String",
+        "example": "{\"error\": \"Dahili Sunucu Hatası\"}"
+      }
+    }
+  },
+  "openRouterApiRequestFailedAfterAttempts": "OpenRouter API isteği {attempt} kez başarısız oldu: {error}",
+  "@openRouterApiRequestFailedAfterAttempts": {
+    "description": "OpenRouter API isteği belirli denemelerden sonra başarısız olduğunda kullanılan hata mesajı",
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      },
+      "error": {
+        "type": "String",
+        "example": "Zaman aşımı"
+      }
+    }
+  },
+  "internetRequired": "Bu modeli kullanmak için internet bağlantısı gereklidir",
+  "pleaseWaitBeforeTryingAgain": "Lütfen tekrar denemeden önce bir an bekleyin",
+  "openRouterQuotaExceeded": "Kota aşıldı. Durum kodu: {statusCode}, Gövde: {decodedBody}",
+  "@openRouterQuotaExceeded": {
+    "description": "API kotasının aşıldığını belirtir.",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "429"
+      },
+      "decodedBody": {
+        "type": "String",
+        "example": "{\"error\":\"Kota aşıldı\"}"
+      }
+    }
+  },
+  "openRouterApiRequestFailedAfterPaidAttempts": "API isteği {attempts} ücretli denemeden sonra başarısız oldu. Hata: {error}",
+  "@openRouterApiRequestFailedAfterPaidAttempts": {
+    "description": "API isteğinin belirli sayıda ücretli model denemesinden sonra başarısız olduğunu belirtir.",
+    "placeholders": {
+      "attempts": {
+        "type": "int",
+        "example": "2"
+      },
+      "error": {
+        "type": "String",
+        "example": "Yetkisiz Hata"
+      }
+    }
+  },
+
+  "termsOfServiceAndPrivacyPolicyWarning": "Bu siparişi vererek, Hizmet Şartları ve Gizlilik Politikası'nı kabul etmiş olursunuz. Hizmet Şartlarımız ve Gizlilik Politikamız hakkında daha fazla bilgi edinmek için bu metne tıklayabilirsiniz. Abonelik, mevcut dönemin bitiminden en az 24 saat önce otomatik yenileme kapatılmadığı sürece otomatik olarak yenilenecektir.",
+  "termsOfService": "Hizmet Şartları",
+  "privacyPolicy": "Gizlilik Politikası",
+
+  "report": "Rapor Et",
+  "reportDialogTitle": "Rapor Gönder",
+  "reportDescriptionLabel": "Sorun nedir?",
+  "reportHarmful": "Bu zararlı/güvensiz",
+  "reportNotTrue": "Bu doğru değil",
+  "reportNotHelpful": "Bu yardımcı değil",
+  "closeButton": "Kapat",
+  "submitButton": "Gönder",
+  "reportErrorMessage": "Lütfen raporlama için bir neden seçin.",
+
+
+  "capabilitiesSection": "Yetenekler",
+  "ratingsSection": "Değerlendirmeler",
+  "noRatingDataFound": "Değerlendirme verisi bulunamadı",
+  "featurePhotoTitle": "Fotoğraf Tarama",
+  "featurePhotoDescription": "Bu model, kamera veya resim dosyaları aracılığıyla fotoğraf tarama yeteneğine sahiptir.",
+  "featureOfflineTitle": "Çevrimdışı Çalışma",
+  "featureOfflineDescription": "Verilerinizi güvende tutmak için modeli internet bağlantısı olmadan çalıştırın.",
+  "featureSupermodelTitle": "Süper Model",
+  "featureSupermodelDescription": "Bu, 10 milyardan fazla parametreye sahip, yüksek performans ve geniş yetenekler sunan devasa bir modeldir.",
+  "featureRoleplayTitle": "Rol Yapma",
+  "featureRoleplayDescription": "Rol yapma modelleri, çeşitli sohbetler ve senaryolar oluşturmanıza olanak tanır.",
+  "roleModels": "Rol Yapma Modelleri",
+  "parameters": "Parametreler",
+  "context": "Bağlam",
+  "millions": "milyon",
+  "billions": "milyar",
+  "trillions": "trilyon",
+  "thousand": "bin",
+  "estimated": "tahmini",
+  "finalPreparation": "Son hazırlıklar yapılıyor.",
+  "allEvaluationsByTestTeam": "Tüm değerlendirmeler test ekibimiz tarafından yapılmıştır",
+
+  "shareApp": "Uygulamayı Paylaş",
+  "rateUs": "Bizi Değerlendir",
+  "share": "Paylaş",
+  "shareSubject": "Cortex",
+  "shareMessage": "Cortex uygulamasına bir göz at, harika! Buradan indir: https://play.google.com/store/apps/details?id=com.vertex.cortex",
+  "shareFailed": "Uygulama paylaşılamadı. Lütfen daha sonra tekrar deneyin",
+  "selectText": "Metin Seç",
+  "showLatex": "Özel Sembolleri Göster",
+  "hideLatex": "Özel Sembolleri Gizle",
+
+
+  "thinking": "Düşünüyor",
+  "user": "Kullanıcı",
+  "voice": "Ses",
+  "help": "Yardım",
+  "redeemCode": "Kod Kullan",
+  "userId": "Kullanıcı ID",
+  "deleteAllConversationsConfirmTitle": "Tüm Sohbetler Silinsin mi?",
+  "deleteAllConversationsConfirmMessage": "Tüm sohbetlerinizi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+  "allConversationsDeleted": "Tüm sohbetler başarıyla silindi!",
+  "deleteAll": "Tümünü Sil",
+  "deleteAllConversationsButton": "Tüm Sohbetleri Sil",
+  "confirmWord": "VERTEX yazın",
+  "confirmWordError": "Yanlış yazdınız",
+  "chinese": "Çince",
+  "indian": "Hintçe",
+  "arabic": "Arapça",
+  "french": "Fransızca",
+  "italian": "İtalyanca",
+  "spanish": "İspanyolca",
+  "japanese": "Japonca",
+  "korean": "Korece",
+  "azerbaijanTurkish": "Azerbaycan Türkçesi",
+  "deutsch": "Almanca",
+  "english": "İngilizce",
+  "turkish": "Türkçe",
+  "ram": "RAM",
+  "usernameTooShort": "Kullanıcı adı çok kısa.",
+  "usernameTooLong": "Kullanıcı adı 16 karakteri aşamaz.",
+  "invalidUsernameCharacters": "Kullanıcı adında sadece şu harfler: 'abcçdefgğhıijklmnoöprsştuüvyzxqw' ve '.', '-', '_' karakterleri kullanılabilir.",
+  "passwordTooLong": "Şifre 64 karakteri aşamaz.",
+  "noInternetConnection": "İnternet bağlantısı yok.",
+  "chats": "Gelen Kutusu",
+  "library": "Kütüphane",
+  "inappropriateMessageWarning": "Uygunsuz mesaj tespit edildi!",
+  "myModelDescription": "Benim modelim.",
+  "noModelsDownloaded": "Henüz herhangi bir model indirmediniz.",
+  "appTitle": "Cortex",
+  "text": "Metin",
+  "removeModel": "Modeli Kaldır",
+  "modelUploadedSuccessfully": "Model başarıyla yüklendi.",
+  "insufficientRAM": "Yetersiz Bellek",
+  "insufficientStorage": "Yetersiz Depolama",
+  "confirmRemoveModel": "{model} modelini cihazınızdan kaldırmak istediğinizden emin misiniz? Bu işlem, o modelle olan önceki tüm sohbetleri de silecektir.",
+  "noMatchingModels": "Eşleşen model bulunamadı.",
+  "creditPackage": "{amount} Kredi Satın Al",
+  "benefit1": "Çevrimiçi yapay zekalar için çok daha fazla sohbet limiti",
+  "benefit2": "Kendi modellerinizi yükleyin",
+  "benefit3": "Profil efekti",
+  "benefit4": "Üyelik rozeti",
+  "benefit5": "Daha fazla çevrimiçi yapay zeka oluşturun",
+  "benefit6": "Sınırsız sohbet",
+  "benefit7": "Günlük {credits} kredi",
+  "benefit8": "Model ekle",
+  "benefit9": "Yeni temalar",
+  "benefit10": "Çevrimdışı sesli sohbet",
+  "oldBenefits": "Alt planlardaki tüm avantajlar",
+  "confirm": "Onayla",
+  "changePassword": "Şifre değiştir",
+  "logoutConfirmationTitle": "Çıkış yapmak istediğinizden emin misiniz?",
+  "settings": "Ayarlar",
+  "language": "Uygulama Dili",
+  "dark": "Karanlık",
+  "oldPassword": "Eski Şifre",
+  "newPassword": "Yeni Şifre",
+  "passwordUpdated": "Şifre güncellendi.",
+  "stop": "Durdur",
+  "copyrights": "Atıflar",
+  "downloadingTitle": "İndiriliyor",
+  "downloadCompletedTitle": "İndirme Tamamlandı",
+  "downloadPausedTitle": "İndirme Duraklatıldı",
+  "downloadErrorTitle": "İndirme Hatası",
+  "cancelButtonText": "İptal",
+  "love": "Aşk",
+  "nature": "Doğa",
+  "behindTheSlaughter": "Katliamın Ardında",
+  "grayscale": "Gri Tonlama",
+  "ocean": "Okyanus",
+  "scarletSnow": "Kızıl Kar",
+  "requestFailed": "Bir hata oluştu, lütfen tekrar deneyin.",
+  "changeModel": "Değiştir",
+  "edit": "Düzenle",
+  "editingMessageInfo": "Bu mesajı düzenlemek, sohbeti buradan yeniden başlatacaktır.",
+  "editingNotification": "Şu anda düzenleme modundasınız",
+
+  "featureIndulgentTitle": "Hoşgörülü",
+  "featureIndulgentDescription": "Bu model, 100.000 jetonu aşan bağlamları sorunsuzca barındırabilir ve işleyebilir, bu da performanstan ödün vermeden kapsamlı ve ayrıntılı girdileri yönetmesini sağlar.",
+  "featurePluralTitle": "Çoğulcu",
+  "featurePluralDescription": "Bu model, ek uzantıları otomatik olarak entegre edebilir, böylece işlevsel yeteneklerini genişleterek çeşitli işlemleri gelişmiş performansla destekler.",
+  "featureWiseTitle": "Bilge",
+  "featureWiseDescription": "Bu model, karar verme ve karmaşık problem çözme için sofistike destek sağlamak üzere derin analitik içgörülerden ve ileri görüşlü akıl yürütmeden yararlanabilir.",
+  "featureResearcherTitle": "Araştırmacı",
+  "featureResearcherDescription": "Yalnızca gelişmiş araştırma ve analitik kapasitelerle donatılmış modellerde bulunan bu özellik, çeşitli alanlarda yüksek hassasiyetli içgörüler ve kapsamlı analizler sağlamak üzere tasarlanmıştır.",
+
+  "nameLabel": "YZ adı",
+  "nameHint": "YZ'nizin adını girin",
+  "summaryLabel": "YZ Özeti",
+  "summaryHint": "YZ'nizin özetini girin",
+  "add": "Ekle",
+  "aiExplanationTitle": "Yapay Zeka Açıklaması",
+  "aiExplanationDescription": "Lütfen yapay zeka modelinizin mimarisi, eğitim süreci, performans metrikleri, uygulama alanları ve diğer önemli özellikleri hakkında ayrıntılı bir açıklama yapın.",
+  "preInputTitle": "Yapay Zeka Ön Girişi",
+  "preInputDescription": "Lütfen modelinizi karakter oluşturma sürecinde yönlendirecek bir ön giriş ayarlayın. Bu bölümde, karakterle ilgili bilgiler, ek bağlam ve karakterle ilgili içerik oluşturmada yardımcı olabilecek ekstra ayrıntıları ekleyebilirsiniz.",
+  "baseModelTitle": "Temel Model",
+  "baseModelDescription": "Bu, yaratımınız için temel olarak kullanılacak modeldir. Şu anda seçili olan temel modeli gösterir.",
+
+  "summary": "Özet",
+  "characterPoliceTitle": "Polis",
+  "characterPoliceRole": "Sen, vatandaşları korumaya ve sarsılmaz bir bağlılıkla düzeni sağlamaya adanmış, kanunun uyanık bir uygulayıcısısın, sen bir polissin.",
+  "characterPoliceShortDescription": "Kararlı ve cesur bir kanun uygulayıcısı.",
+
+  "purchaseSubscription": "Satın Al",
+  "modelUploadTitle": "Yapay Zeka Dosyası",
+  "modelUploadDescription": "Yerel GGUF dosyalarınızı doğrudan cihazınızdan seçip yükleyin. Bu, modelinizi internet bağlantısı gerektirmeden çevrimdışı çalıştırmanızı sağlar. Dosyanın geçerli GGUF formatında ve düzgün yapılandırılmış olduğundan emin olun. Dosya yanlış veya bozuksa, Cortex beklendiği gibi çalışmayabilir ve hatalarla karşılaşabilirsiniz.",
+  "modelUploadShortDescription": "Cihazınızdan bir .gguf dosyası seçmek için buraya dokunun",
+  "addServerTitle": "Yapay Zeka Sunucusu",
+  "addServerDescription": "Harici olarak barındırılan bir modele bağlanmak için uzak sunucunuzun URL'sini girin. Bu özellik aktif bir internet bağlantısı gerektirir ve sunucuyla ilgili herhangi bir sorun veya hata Cortex kaynaklı değildir. Sorunsuz bir deneyim için sunucunuzun doğru yapılandırıldığından, ağınızdan erişilebilir olduğundan ve geçerli bir model uç noktasına sahip olduğundan emin olun.",
+  "you": "Siz",
+  "removePhotoTitle": "Fotoğrafı Kaldır",
+  "confirmRemovePhoto": "Fotoğrafı kaldırmak istediğinizden emin misiniz?",
+  "serverLink": "Sunucu Bağlantısı",
+  "enterURL": "Sunucu URL'sini girin",
+  "chatLengthLimitExceeded": "Bu sohbet karakter sınırını aştı. Lütfen yeni bir sohbet başlatın veya bir abonelik satın alın.",
+  "aiNameError": "Bu isimde bir yapay zeka zaten var.",
+  "modelLimitExceeded": "Planınız için maksimum model oluşturma sınırına ulaştınız.",
+  "modelVertexProducer": "Vertex",
+  "photoLimitReachedMessage": "Sadece bir fotoğraf eklenebilir",
+  "inappropriateContentDetected": "Uygunsuz içerik tespit edildi!",
+  "offlineModelNotInstalled": "Bu çevrimdışı model cihazınızda yüklü değil.",
+  "insufficientCredits": "Bu isteği tamamlamak için yeterli krediniz bulunmuyor. Bu işlem {required} kredi gerektirirken, hesabınızda yalnızca {available} kredi bulunmaktadır. Kredinizi artırmak için mevcut planınızı yükseltebilir veya doğrudan kredi satın alabilirsiniz.",
+  "@insufficientCredits": {
+    "placeholders": {
+      "available": {},
+      "required": {}
+    }
+  },
+  "regenerateInProgress": "Yanıt oluşturma zaten devam ediyor.",
+  "errorOccurredDuringRegeneration": "Yeniden oluşturmaya çalışırken bir hata oluştu: {errorDetails}",
+  "@errorOccurredDuringRegeneration": {
+    "placeholders": {
+      "errorDetails": {
+        "type": "String",
+        "example": "Ağ bağlantısı başarısız"
+      }
+    }
+  },
+  "modality": "Modalite",
+  "multimodal": "Çoklu-Modal",
+  "anErrorOccurred": "Bir Hata Oluştu",
+  "themeLocked": "Bu tema daha yüksek bir abonelik seviyesi gerektiriyor. Kilidi açmak için lütfen yükseltme yapın.",
+  "pageCouldNotBeLoaded": "Sayfa Yüklenemedi",
+  "checkYourInternet": "Lütfen internet bağlantınızı kontrol edip tekrar deneyin.",
+  "errorUserNotAuthenticated": "Bu eylemi gerçekleştirmek için giriş yapmış olmalısınız.",
+  "errorInsufficientCredits": "Yetersiz krediniz var. Devam etmek için lütfen kredi yükleyin.",
+  "errorRateLimitExceeded": "Çok fazla istek. Lütfen bir süre sonra tekrar deneyin.",
+  "errorServer": "Beklenmedik bir sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.",
+  "errorNetwork": "Bir ağ hatası oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.",
+  "errorApiAuthentication": "Kimlik doğrulama başarısız oldu. Lütfen tekrar giriş yapmayı deneyin.",
+  "baseModelForCharacterDescription": "Seçilen temel model, karakterin akıl yürütme ve yanıt verme yeteneklerini belirleyecektir.",
+  "selectBaseModel": "Bir Temel Model Seçin",
+
+  "@errorUserNotAuthenticated": {},
+  "@errorInsufficientCredits": {},
+  "@errorRateLimitExceeded": {},
+  "@errorServer": {},
+  "@errorNetwork": {},
+  "@errorApiAuthentication": {},
+  "@baseModelForCharacterDescription": {},
+
+  "forgotPassword": "Şifremi Unuttum?",
+  "couldNotOpenLink": "Bağlantı açılamadı",
+
+  "downloadStarted": "İndirme başlatıldı",
+  "notAvailable": "Mevcut Değil",
+
+  "localizationWarning": "Bazı bilgiler dilinizde mevcut olmayabilir ve İngilizce olarak gösterilecektir.",
+  "aiTranslationWarning": "Model bilgileri, diğer yapay zeka modelleri tarafından çeşitli dillere çevrilmektedir. Bu nedenle, İngilizce dışındaki dillerde küçük tutarsızlıklar meydana gelebilir.",
+
+  "errorLoadingTitle": "Veri Yüklenemedi",
+  "@errorLoadingTitle": {
+    "description": "Model verileri getirilemediğinde hata ekranı başlığı."
+  },
+  "errorLoadingMessage": "Sunucularımızdan gerekli verileri alamadık. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.",
+  "@errorLoadingMessage": {
+    "description": "Sorunu açıklayan hata ekranı mesajı."
+  },
+  "noModelsFoundTitle": "Sonuç Bulunamadı",
+  "noModelsFoundMessage": "Arama terimlerinizi değiştirmeyi veya filtreyi temizlemeyi deneyin.",
+  "usernameRateLimitExceeded": "Kullanıcı adınızı her 14 günde yalnızca iki kez değiştirebilirsiniz.",
+  "usernameUnchanged": "Bu zaten mevcut kullanıcı adınız.",
+  "creditsInfoPanelTitle": "Krediler Nasıl Çalışır?",
+  "creditsInfoPanelBody": "Krediler, çevrimiçi modellerle sohbet etmek için kullanılır.\n\n• Çevrimiçi bir modele gönderilen her mesaj 20 kredi tutarındadır.\n• Görsel eklemek 30 ek kredi gerektirir.\n• Ücretsiz plan kullanıcıları, her gün sıfırlanan 200 kredi bonusu alır.",
+  "creditsInfoPanelFooter": "İyi sohbetler!",
+  "disclaimerMessage": "Yapay zekalar hata yapabilir, önemli bilgileri kontrol edin.",
+  "modelCreatedSuccess": "Model başarıyla oluşturuldu!",
+  "modelRemovedSuccess": "“{modelName}” başarıyla kaldırıldı.",
+  "errorCreatingModel": "Model oluşturulurken beklenmeyen bir hata oluştu.",
+  "errorDeletingModel": "Model silinirken beklenmeyen bir hata oluştu.",
+  "ultraFeatureOnly": "Bu özellik yalnızca Ultra üyeler için kullanılabilir.",
+  "experimentalOfflineWarning": "Çevrimdışı mod hâlâ deneyseldir ve indirdiğiniz model optimum verimlilikle çalışmayabilir.",
+  "noConversationsToDelete": "You have no conversations to delete.",
+  "reportSubmitted": "Rapor başarıyla gönderildi.",
+  "purchaseReceived": "Satın alım alındı, hesabınız güncelleniyor.",
+  "verificationDelayed": "Satın alımınız onaylandı. Hesabınıza yansımasında kısa bir gecikme yaşanıyor, yakında görünecektir.",
+  "maintenanceTitle": "Bakımdayız",
+  "maintenanceMessage": "Önemli güncellemeler yaparken Cortex geçici olarak çevrimdışı. Uygulamaya erişim kısa süre içinde yeniden sağlanacaktır.\n\nDeneyiminizi iyileştirirken gösterdiğiniz sabır için teşekkür ederiz.",
+  "errorPromptFlagged": "Mesajınız uygunsuz olarak tespit edildiği için gönderilemedi.",
+  "notEnoughStorage": "Cihazınızda yeni mesajları kaydetmek için yeterli depolama alanı yok.",
+  "errorRateLimit": "Son zamanlarda çok fazla model oluşturdunuz, lütfen tekrar denemeden önce bir süre bekleyin.",
+  "errorContentFlagged": "İçeriği uygunsuz olarak işaretlendiği için model kaydedilemedi.",
+  "deleteAllConversationsDisabledInfo": "Aktif bir sohbetteyken tüm sohbetleri silemezsiniz, devam etmek için lütfen önce mevcut sohbetten çıkın.",
+  "invalidCredentials": "E-posta veya şifre hatalı.",
+  "userDisabled": "Bu kullanıcı hesabı devre dışı bırakıldı.",
+  "loginSubtitle": "Vertex hesabınıza giriş yapın. Google ile kaydolan yeni kullanıcılar, Kullanım Koşullarımızı ve Gizlilik Politikamızı kabul etmiş sayılır. Bu belgeleri Kayıt Ol ekranında inceleyebilirsiniz.",
+  "registerSubtitle": "Diğer projelerimizde de kullanabileceğiniz bir Vertex hesabı oluşturun.",
+  "photoWarningMessage": "Bir fotoğraf eklenmiştir. Görüntüleri desteklemeyen modeller bunu yok sayabilir.",
+  "loginRequiredForPurchase": "Satın alma işlemi yapmak için giriş yapmalısınız.",
+  "storagePermissionRequired": "İndirilen modelleri kaydetmek için depolama izni gereklidir. Devam etmek için lütfen izin verin.",
+  "creditBannerTitle": "Bedava Kredi Kazan!",
+  "creditBannerSubtitle": "Bir arkadaşını davet et, ikiniz de anında 50 kredi kazanın! Abone olursa, ikinize de tam 500 kredi daha hediye!",
+  "inviteShareSubject": "Cortex'e Katıl!",
+  "@inviteShareMessage": {
+    "description": "Bir arkadaşı davet ederken paylaşılacak metin.",
+    "placeholders": {
+      "playStoreLink": {
+        "type": "String",
+        "example": "https://play.google.com/store/..."
+      }
+    }
+  },
+  "inviteShareMessage": "kanka cortex diye manyak bi uygulama var birilerini davet edince 50 kredi geliyo bizim hesaplara hatta abonelik alırsan ikimiz de 500 kazancaz EFSANE FIRSAT İNDİR İNDİR HIZLI\n\n{playStoreLink}",
+  "reviewEnjoyingAppTitle": "Cortex'i sevdin mi?",
+  "reviewHelpUsGrow": "Değerlendirmeniz, genç ve bağımsız ekibimize büyük bir destek olmakta ve Cortex'i sizin için daha da iyi hale getirmemizi sağlamakta.",
+  "reviewMaybeLater": "Belki Daha Sonra",
+  "reviewRateNow": "Değerlendir",
+  "noThanks": "Hayır, Teşekkürler"
+}

@@ -1,0 +1,105 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"/home/baba/Documents/cortex/android/vendor/llama.cpp/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 228,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 243,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 247,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 263,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"bin/libllama.so"
+			],
+			"targetId" : "llama::@b791850eb95f38641ccb",
+			"targetIndex" : 5,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "include",
+			"paths" : 
+			[
+				"/home/baba/Documents/cortex/android/vendor/llama.cpp/include/llama.h",
+				"/home/baba/Documents/cortex/android/vendor/llama.cpp/include/llama-cpp.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/llama",
+			"paths" : 
+			[
+				"/home/baba/Documents/cortex/android/llama/.cxx/Release/3c56g4x6/x86/build-llama/llama-config.cmake",
+				"/home/baba/Documents/cortex/android/llama/.cxx/Release/3c56g4x6/x86/build-llama/llama-version.cmake"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "bin",
+			"paths" : 
+			[
+				"/home/baba/Documents/cortex/android/vendor/llama.cpp/convert_hf_to_gguf.py"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 4,
+			"component" : "Unspecified",
+			"destination" : "lib/pkgconfig",
+			"paths" : 
+			[
+				"/home/baba/Documents/cortex/android/llama/.cxx/Release/3c56g4x6/x86/build-llama/llama.pc"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "build-llama",
+		"source" : "/home/baba/Documents/cortex/android/vendor/llama.cpp"
+	}
+}
