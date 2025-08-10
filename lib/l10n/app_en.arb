@@ -1,0 +1,671 @@
+{
+  "@@locale": "en",
+
+  "understood": "Understood.",
+  "cancel": "Cancel",
+  "remove": "Remove",
+  "download": "Download",
+  "resume": "Resume",
+  "copy": "Copy",
+  "chat": "Chat",
+  "darkMode": "Dark Mode",
+  "light": "Light",
+  "theme": "Theme",
+  "no": "No",
+  "yes": "Yes",
+  "done": "Done",
+  "comingSoon": "COMING SOON",
+  "bestValue": "Best Value",
+  "selected": "Selected",
+  "descriptionSection": "Description",
+  "searchHint": "Search",
+  "messageHint": "Ask anything",
+  "modelLoading": "Model is loading...",
+  "messageCopied": "Message copied to clipboard.",
+  "storeUnavailable": "Store is currently unavailable. Please try again later",
+  "retry": "Retry",
+
+  "systemInfo": "System Information",
+  "deviceMemory": "Device Memory: {memory} GB",
+  "storageSpace": "Storage Space: {storage} GB",
+  "freeStorageSpace": "Free Storage Space: {freeStorage} GB",
+  "memory": "Memory",
+  "storage": "Storage",
+  "freeStorage": "Free Storage",
+  "totalStorage": "Total Storage",
+  "usedStorage": "Used Storage",
+  "totalMemory": "Total Memory",
+  "usedMemory": "Used Memory",
+  "requirements": "Requirements",
+
+  "modelsTitle": "Library",
+  "localModels": "Local Models",
+  "serverSideModels": "Online Models",
+  "uploadYourOwnModel": "Upload Your Own Model!",
+  "selectGGUFFile": "Select GGUF File",
+  "errorGGUF": "Please select a file in GGUF format only.",
+  "modelAlreadyExists": "Model already exists.",
+  "modelAddedSuccessfully": "Model added successfully.",
+  "modelRemoved": "Model removed successfully.",
+  "removeError": "An error occurred while removing the model.",
+  "fileNotFound": "File not found.",
+  "fileUploadError": "An error occurred while uploading the file.",
+  "noFileSelected": "No file selected.",
+  "myModels": "My Models",
+  "create": "Create",
+  "seeAll": "See All",
+
+  "modelProducer": "Producer: {producer}",
+  "modelRAM": "RAM: {ram}",
+  "modelSize": "Size: {size}",
+  "modelDescription": "{description}",
+
+  "conversationsTitle": "Conversations",
+  "conversationDeleted": "Conversation deleted.",
+  "conversationUpdated": "Conversation updated.",
+  "editConversationTitle": "Rename",
+  "newTitle": "New Title",
+  "save": "Save",
+  "titleCannotBeEmpty": "Title cannot be empty.",
+  "noConversationsMessage": "No conversations, start chatting!",
+  "startChat": "Start a chat",
+  "noChats": "No Chats",
+  "starredChats": "Starred Chats",
+  "allChats": "All Chats",
+  "noStarredChats": "No Starred Chats",
+  "noStarredChatsMessage": "You didn't starred a chat yet.",
+  "goToChats": "Star a chat",
+  "starConversation": "Star",
+  "conversationTitleUpdated": "Conversation title updated",
+  "youReachedConversationLimit": "You have reached the conversation limit.",
+  "today": "Today",
+  "yesterday": "Yesterday",
+
+  "loginToYourAccount": "Login",
+  "createYourAccount": "Register",
+  "email": "Email",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "invalidEmail": "Please enter a valid email address.",
+  "invalidPassword": "Password must be at least 6 characters long.",
+  "rememberMe": "Remember me",
+  "forgotPassword": "Forgot password?",
+  "or": "Or",
+  "continueWithGoogle": "Continue with Google",
+  "dontHaveAccount": "Don't have an account?",
+  "alreadyHaveAccount": "Already have an account?",
+  "signUp": "Sign Up",
+  "logIn": "Log In",
+  "passwordsDoNotMatch": "Passwords do not match.",
+  "userNotFound": "User not found.",
+  "wrongPassword": "Incorrect password.",
+  "emailAlreadyInUse": "This email is already in use.",
+  "weakPassword": "The password is too weak.",
+  "authError": "Authentication Error",
+  "invalidUsername": "Please enter a username.",
+  "usernameTaken": "This username is already taken.",
+  "username": "Username",
+  "authenticationFailed": "Authentication failed. Please try again.",
+  "emailTooLong": "Email can be at most 30 characters.",
+  "deviceLimitReached": "You have reached the account creation limit for this device.",
+
+  "verificationEmailLimitReached": "We wont send anymore",
+  "verificationEmailSent": "Verification e-mail sent!",
+  "emailNotVerified": "E-mail has not verified",
+  "resendCode": "Resend verification e-mail",
+  "remainingSeconds": "Remaining time for verification",
+  "pleaseCheckYourEmail": "To use Cortex, you need to verify your email. \n A verification link has been sent to your email address, please check your email.",
+  "verifyYourEmail": "Verify Your Email",
+  "backToLogin": "Go Back",
+  "seconds": "seconds",
+  "maxResendLimitReached": "You have reached the maximum number of verification emails",
+  "verificationScreenContinueWithoutVerification": "Continue without verification",
+  "verificationScreenWarning": "Even if you continue, the 1-day account verification period is still in effect for your account. If you haven't verified your account by then, it will be deleted from the app.",
+  "unverifiedAccountHeader": "Your account is not verified",
+  "unverifiedAccountWarning": "If you do not verify your account within {timeLeft}, it will be deleted",
+  "verifyNow": "Verify Now",
+  "accountVerified": "Your account has been verified.",
+  "linkSent": "Link sent",
+  "accountDeletionRequested": "Your account deletion request has been received and your account is now disabled.",
+  "tooManyRequests": "Too many requests",
+  "regenerate": "Regenerate",
+
+  "confirmDeleteAccount": "Are you sure you want to delete your account?",
+  "enterPasswordToDelete": "Enter your password to delete.",
+  "deleteAccount": "Delete Account",
+  "deleteAccountError": "An error occurred while deleting the account.",
+  "delete": "Delete",
+  "passwordRequired": "Password is required.",
+  "deleteDescription": "The data you delete will be permanently removed from our server and your device. This actions cannot be undone.",
+  "deleteAccountButton": "Account Deletion Button",
+
+  "editProfile": "Edit Profile",
+  "displayName": "Display Name",
+  "tapToChangeProfilePicture": "Tap to change profile picture",
+  "profileUpdated": "Profile updated successfully",
+  "updateFailed": "Failed to update profile",
+  "nameCannotBeEmpty": "Name cannot be empty",
+  "logout": "Logout",
+  "noDisplayName": "No display name set",
+  "noEmail": "No email address",
+  "noUserLoggedIn": "No user is currently logged in",
+  "profile": "Profile",
+  "manageProfileDescription": "Manage your profile, update your password, or log out from Cortex.",
+  "accessSettingsDescription": "Access help, redeem codes, share Cortex, and view our policies.",
+  "languageDescription": "You can change your default app interface language at any time.",
+  "themeDescription": "You can switch between light and dark themes as preferred. The selected theme will apply across the Cortex interface.",
+  "iHaveReadAndAgree": "I have read and agree to the terms of service",
+
+  "downloading": "Downloading...",
+  "downloadError": "An error occurred during download.",
+  "downloadCancelled": "Download cancelled.",
+  "downloadResumed": "Download resumed.",
+  "downloadSuccess": "Download success",
+  "downloadFailed": "Download failed",
+  "downloaded": "{percent}% downloaded",
+  "@downloaded": {
+    "description": "Indicates the percentage of the download completed.",
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "downloadPaused": "Download paused.",
+
+  "purchaseSuccessful": "Purchase succesful!",
+  "purchaseFailed": "Purchase unsuccesful",
+  "creditProductNotFound": "The selected credit product could not be found.",
+  "creditsAddedSuccessfully": "Credits were added to your account successfully!",
+  "creditDeliveryFailed": "Failed to add credits to your account. Please contact support.",
+  "invalidPurchase": "Invalid purchase",
+  "purchaseError": "Purchasing error",
+  "purchaseVertexPlusToUpload": "This is a Plus feature",
+  "purchasePlus": "Buy Cortex Plus",
+  "plusDescription": "Access more features of Cortex and experience AI much more!",
+  "annual": "Annual",
+  "monthly": "Monthly",
+  "manageSubscription": "Manage Subscription",
+
+  "purchasePlan": "Purchase {planName}",
+  "@purchasePlan": {
+      "description": "Button text for purchasing a specific subscription plan.",
+      "placeholders": {
+          "planName": {
+              "type": "String",
+              "example": "Pro Annual"
+          }
+      }
+  },
+
+  "discountOffer": "{percent}% OFF",
+    "@discountOffer": {
+      "placeholders": {
+        "percent": {
+          "type": "int"
+        }
+      }
+    },
+
+  "annualPlanDescription": "{price}/mo, billed annually",
+  "@annualPlanDescription": {
+    "description": "The description for the annual plan, showing the monthly equivalent price to make it seem more affordable. Example: $4.17/mo, billed annually",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$4.17"
+      }
+    }
+  },
+  "monthlyPlanDescription": "{price}/mo, billed monthly",
+  "@monthlyPlanDescription": {
+    "description": "The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "discountBannerTitle": "LAUNCH SPECIAL: 80% OFF!",
+  "@discountBannerTitle": {
+    "description": "The main headline for the promotional banner, emphasizing a special launch discount."
+  },
+  "discountBannerSubtitle": "Exclusive discount on ALL subscription plans to celebrate our launch. Don't miss out!",
+  "@discountBannerSubtitle": {
+    "description": "The secondary text for the promotional banner, clarifying the offer applies to all plans and adding a sense of urgency."
+  },
+  "purchasePro": "Buy Cortex Pro",
+  "proDescription": "Access even more features of Cortex and experience AI even more!",
+  "alreadySubscribed": "You are already subscribed",
+  "subscriptionInfo": "Your subscription is active.",
+  "alreadySubscribedMessage": "You already have a Plus subscription. If you want to cancel your subscription, you can do so through the Play Store manager.",
+  "cancelSubscription": "Cancel Subscription",
+  "cancelSubscriptionInfo": "If you want to cancel your subscription, please proceed through the Play Store subscription manager.",
+  "goToPlayStore": "Go to Play Store",
+  "alreadySubscribedPlus": "You Have the Plus Plan!",
+  "alreadySubscribedPlusMessage": "Your Plus plan is active. You can enjoy all the benefits.",
+  "purchaseUltra": "Buy Cortex Ultra",
+  "ultraDescription": "Gain full access to all features of Cortex and experience AI to the fullest!",
+  "noSubscription": "No Subscription",
+  "noSubscriptionMessage": "You do not have a subscription yet.",
+  "alreadyAtHighestPlan": "You are already on the highest plan.",
+  "unableToOpenSubscription": "Unable to open the subscription management page.",
+  "upgradeSubscription": "Upgrade Subscription",
+  "confirmUpgrade": "Are you sure you want to upgrade your subscription?",
+  "unsupportedPlatform": "Unsupported platform for subscription cancellation.",
+  "purchaseStreamError": "Purchase stream error.",
+  "productNotFound": "Product not found",
+  "productDetailsError": "An error occurred while fetching product details.",
+  "noProductsFound": "No products found",
+  "loadCreditsButton": "Load Credits",
+  "creditsTitle": "Credits",
+  "creditsScreenDescription": "This screen shows the user's credits. \n\nUser's current credits: 100\n\nDetailed credit information can be displayed here.",
+  "creditsLoaded": "Credits loaded!",
+  "currentCredits": "Current Credits",
+  "pleaseSelectCreditPackage": "Please select a credit package",
+  "purchaseCreditsTitle": "Buy Credits",
+  "purchaseCreditsDescription": "Select a credit package that suits your needs and use our app more.",
+  "purchaseButton": "Buy",
+  "productNotFoundMessage": "The selected product does not exist.",
+  "buyCredits": "Buy Credits",
+  "selectCreditPackageDescription": "Select a credit package that suits your needs and enjoy more features.",
+  "buyCredit": "Buy Credits",
+  "buyCreditPackage": "Buy {amount} Credits",
+  "@creditPackage": {
+    "description": "Button text to buy a specific number of credits",
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "subscribedPlan": "Subsrcibed",
+
+  "errorResponseNotReceived": "Response not received",
+  "googleApiRequestFailed": "Google API request failed {attempt} times: {error}",
+  "@googleApiRequestFailed": {
+    "description": "Error message used when Google API request fails",
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      },
+      "error": {
+        "type": "String",
+        "example": "Timeout"
+      }
+    }
+  },
+  "openRouterResponseStatus": "OpenRouter Response Status: {statusCode}",
+  "@openRouterResponseStatus": {
+    "description": "Log the response status code from OpenRouter API",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "200"
+      }
+    }
+  },
+  "openRouterDecodedResponseBody": "OpenRouter Decoded Response Body: {body}",
+  "@openRouterDecodedResponseBody": {
+    "description": "Log the response body from OpenRouter API",
+    "placeholders": {
+      "body": {
+        "type": "String",
+        "example": "{\"choices\": [...]}"
+      }
+    }
+  },
+  "decodedJson": "Decoded JSON: {data}",
+  "@decodedJson": {
+    "description": "Log the decoded JSON data",
+    "placeholders": {
+      "data": {
+        "type": "String",
+        "example": "{\"key\": \"value\"}"
+      }
+    }
+  },
+  "responseStructureUnexpectedMessageContentMissing": "Response structure is unexpected: message or content missing",
+  "responseStructureUnexpectedChoicesMissing": "Response structure is unexpected: choices missing or empty",
+  "openRouterApiRequestFailed": "OpenRouter API request failed: {statusCode} - {body}",
+  "@openRouterApiRequestFailed": {
+    "description": "Error message used when OpenRouter API request fails",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "500"
+      },
+      "body": {
+        "type": "String",
+        "example": "{\"error\": \"Internal Server Error\"}"
+      }
+    }
+  },
+  "openRouterApiRequestFailedAfterAttempts": "OpenRouter API request failed {attempt} times: {error}",
+  "@openRouterApiRequestFailedAfterAttempts": {
+    "description": "Error message used when OpenRouter API request fails after certain attempts",
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      },
+      "error": {
+        "type": "String",
+        "example": "Timeout"
+      }
+    }
+  },
+  "internetRequired": "Internet connection is required to use this model",
+  "pleaseWaitBeforeTryingAgain": "Please wait a moment before trying again",
+  "openRouterQuotaExceeded": "Quota exceeded. Status code: {statusCode}, Body: {decodedBody}",
+  "@openRouterQuotaExceeded": {
+    "description": "Indicates that the API quota has been exceeded.",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "429"
+      },
+      "decodedBody": {
+        "type": "String",
+        "example": "{\"error\":\"Quota exceeded\"}"
+      }
+    }
+  },
+  "openRouterApiRequestFailedAfterPaidAttempts": "API request failed after {attempts} paid attempts. Error: {error}",
+  "@openRouterApiRequestFailedAfterPaidAttempts": {
+    "description": "Indicates that the API request failed after a certain number of paid model attempts.",
+    "placeholders": {
+      "attempts": {
+        "type": "int",
+        "example": "2"
+      },
+      "error": {
+        "type": "String",
+        "example": "Unauthorized Error"
+      }
+    }
+  },
+
+  "termsOfServiceAndPrivacyPolicyWarning": "By placing this order, you agree to the Terms of Service and Privacy Policy. You can click this text to learn more about our Terms of Service and Privacy Policy. The subscription will automatically renew unless auto-renew is turned off at least 24 hours before the end of the current period.",
+  "termsOfService": "Terms of Service",
+  "privacyPolicy": "Privacy Policy",
+
+  "report": "Report",
+  "reportDialogTitle": "Submit Report",
+  "reportDescriptionLabel": "What is the issue?",
+  "reportHarmful": "This is harmful/unsafe",
+  "reportNotTrue": "This isn't true",
+  "reportNotHelpful": "This isn't helpful",
+  "closeButton": "Close",
+  "submitButton": "Submit",
+  "reportErrorMessage": "Please select one reason for reporting.",
+
+
+  "capabilitiesSection": "Capabilities",
+  "ratingsSection": "Ratings",
+  "noRatingDataFound": "No rating data found",
+  "featurePhotoTitle": "Photo Scanning",
+  "featurePhotoDescription": "This model has the ability to scan photos through camera or image files.",
+  "featureOfflineTitle": "Offline Operation",
+  "featureOfflineDescription": "Run the model without an internet connection to keep your data safe.",
+  "featureSupermodelTitle": "Super Model",
+  "featureSupermodelDescription": "This is a massive model with over 10 billion parameters, offering high performance and extensive capabilities.",
+  "featureRoleplayTitle": "Role Play",
+  "featureRoleplayDescription": "Role-playing models allow you to create various chats and scenarios.",
+  "roleModels": "Roleplay Models",
+  "parameters": "Parameters",
+  "context": "Context",
+  "millions": "million",
+  "billions": "billion",
+  "trillions": "trillion",
+  "thousand": "thousand",
+  "estimated": "estimated",
+  "finalPreparation": "Final preparations are being made.",
+  "allEvaluationsByTestTeam": "All evaluations were made by our testing team",
+
+
+  "shareApp": "Share the App",
+  "rateUs": "Rate Us",
+  "share": "Share",
+  "shareSubject": "Cortex",
+  "shareMessage": "Check out the Cortex app, it is so amazing! Download it here: https://play.google.com/store/apps/details?id=com.vertex.cortex",
+  "shareFailed": "Failed to share the app. Please try again later",
+  "selectText": "Select Text",
+  "showLatex": "Show Special Symbols",
+  "hideLatex": "Hide Special Symbols",
+
+
+  "thinking": "Thinking",
+  "user": "User",
+  "voice": "Voice",
+  "help": "Help",
+  "redeemCode": "Redeem Code",
+  "userId": "User ID",
+  "deleteAllConversationsConfirmTitle": "Delete All Chats?",
+  "deleteAllConversationsConfirmMessage": "Are you sure you want to delete all of your chats? This cannot be undone.",
+  "allConversationsDeleted": "All conversations were deleted successfully!",
+  "deleteAll": "Delete All",
+  "deleteAllConversationsButton": "Delete All Conversations",
+  "confirmWord": "Type VERTEX",
+  "confirmWordError": "You typed it wrong",
+  "chinese": "Chinese",
+  "indian": "Indian",
+  "arabic": "Arabic",
+  "french": "French",
+  "italian": "Italian",
+  "spanish": "Spanish",
+  "japanese": "Japanese",
+  "korean": "Korean",
+  "azerbaijanTurkish": "Azerbaijan Turkish",
+  "deutsch": "Deutsch",
+  "english": "English",
+  "turkish": "Turkish",
+  "ram": "RAM",
+  "usernameTooShort": "Username is too short.",
+  "usernameTooLong": "Username cannot exceed 16 characters.",
+  "invalidUsernameCharacters": "Only these letters: 'abcçdefgğhıijklmnoöprsştuüvyzxqw' and the characters '.', '-', '_' can be used in the username.",
+  "passwordTooLong": "Password cannot exceed 64 characters.",
+  "noInternetConnection": "No internet connection.",
+  "chats": "Inbox",
+  "library": "Library",
+  "inappropriateMessageWarning": "Inappropriate message detected!",
+  "myModelDescription": "My model.",
+  "noModelsDownloaded": "You haven't downloaded any models yet.",
+  "appTitle": "Cortex",
+  "text": "Text",
+  "removeModel": "Remove Model",
+  "modelUploadedSuccessfully": "Model uploaded successfully.",
+  "insufficientRAM": "Low Memory",
+  "insufficientStorage": "Low Storage",
+  "confirmRemoveModel": "Are you sure you want to remove the {model} model from your device? Doing so will also delete any previous conversations with that model.",
+  "noMatchingModels": "No matching models found.",
+  "creditPackage": "Buy {amount} Credits",
+  "benefit1": "Many more conversation limit for online AIs",
+  "benefit2": "Upload your own models",
+  "benefit3": "Profile effect",
+  "benefit4": "Membership badge",
+  "benefit5": "Create more online artificial intelligences",
+  "benefit6": "Unlimited chat",
+  "benefit7": "{credits} daily credits",
+  "benefit8": "Add models",
+  "benefit9": "New themes",
+  "benefit10": "Offline voice chat",
+  "oldBenefits": "All benefits from lower plans",
+  "confirm": "Confirm",
+  "changePassword": "Change password",
+  "logoutConfirmationTitle": "Are you sure you want to log out?",
+  "settings": "Settings",
+  "language": "App Language",
+  "dark": "Dark",
+  "oldPassword": "Old Password",
+  "newPassword": "New Password",
+  "passwordUpdated": "Password updated.",
+  "stop": "Stop",
+  "copyrights": "Attributions",
+  "downloadingTitle": "Downloading",
+  "downloadCompletedTitle": "Download Completed",
+  "downloadPausedTitle": "Download Paused",
+  "downloadErrorTitle": "Download Error",
+  "cancelButtonText": "Cancel",
+  "love": "Love",
+  "nature": "Nature",
+  "behindTheSlaughter": "Behind the Slaughter",
+  "grayscale": "Grayscale",
+  "ocean": "Ocean",
+  "scarletSnow": "Scarlet Snow",
+  "requestFailed": "An error occurred, please try again.",
+  "changeModel": "Change",
+  "edit": "Edit",
+  "editingMessageInfo": "Editing this message will restart the conversation from here.",
+  "editingNotification": "You are in editing mode now",
+
+  "featureIndulgentTitle": "Indulgent",
+  "featureIndulgentDescription": "This model can seamlessly accommodate and process contexts exceeding 100,000 tokens, enabling it to handle extensive and detailed inputs without compromising performance.",
+  "featurePluralTitle": "Plural",
+  "featurePluralDescription": "This model can automatically integrate additional extensions, thereby expanding its functional capabilities to support a diverse range of operations with enhanced performance.",
+  "featureWiseTitle": "Wise",
+  "featureWiseDescription": "This model can leverage deep analytical insights and forward-thinking reasoning to deliver sophisticated support for decision-making and complex problem-solving.",
+  "featureResearcherTitle": "Researcher",
+  "featureResearcherDescription": "Exclusively available in models equipped with advanced research and analytical capacities, this feature is designed to provide high-precision insights and comprehensive analysis across diverse domains.",
+
+  "nameLabel": "AI name",
+  "nameHint": "Enter your AI's name",
+  "summaryLabel": "AI Summary",
+  "summaryHint": "Enter your AI's summary",
+  "add": "Add",
+  "aiExplanationTitle": "Artificial Intelligence Description",
+  "aiExplanationDescription": "Please provide a detailed description of your AI model's architecture, training process, performance metrics, application areas, and other important features.",
+  "preInputTitle": "Artificial Intelligence Pre-Input",
+  "preInputDescription": "Please set an pre-input that will guide your model in the character creation process. In this section, you can include character-related information, additional context, and any extra details that may assist in generating content related to the character.",
+  "baseModelTitle": "Base Model",
+  "baseModelDescription": "This is the model that will be used as the foundation for your creation. It displays the currently selected base model.",
+
+  "summary": "Summary",
+  "characterPoliceTitle": "Police",
+  "characterPoliceRole": "You are a vigilant enforcer of the law, dedicated to protecting citizens and maintaining order with unwavering commitment, you are a police",
+  "characterPoliceShortDescription": "A steadfast and courageous law enforcer.",
+
+  "purchaseSubscription": "Purchase",
+  "modelUploadTitle": "Artificial Intelligence File",
+  "modelUploadDescription": "Select and upload your local GGUF files directly from your device. This lets you run your model offline without needing an internet connection. Make sure the file is in valid GGUF format and properly structured. If the file is incorrect or corrupted, Cortex may not work as expected, and you could encounter errors.",
+  "modelUploadShortDescription": "Tap here to pick a .gguf file from your device",
+  "addServerTitle": "Artificial Intelligence Server",
+  "addServerDescription": "Enter the URL of your remote server to connect with an externally hosted model. This feature requires an active internet connection, and any server-related issues or errors are not caused by Cortex. Ensure your server is correctly configured, accessible from your network, and has a valid model endpoint for a smooth experience.",
+  "you": "You",
+  "removePhotoTitle": "Remove Photo",
+  "confirmRemovePhoto": "Are you sure you want to remove the photo?",
+  "serverLink": "Server Link",
+  "enterURL": "Enter server URL",
+  "chatLengthLimitExceeded": "This chat has exceeded the character limit. Please start a new chat or purchase a subscription.",
+  "aiNameError": "An AI with this name already exists.",
+  "modelLimitExceeded": "You have reached the maximum model creation limit for your plan.",
+  "modelVertexProducer": "Vertex",
+  "photoLimitReachedMessage": "Only one photo can be added",
+  "inappropriateContentDetected": "Inappropriate content detected!",
+  "offlineModelNotInstalled": "This offline model is not installed on your device.",
+  "insufficientCredits": "You do not have enough credits to complete this request. This action requires {required} credits, but you only have {available}. To gain more credits, you can upgrade your plan or purchase them directly.",
+  "@insufficientCredits": {
+    "placeholders": {
+      "available": {},
+      "required": {}
+    }
+  },
+  "regenerateInProgress": "Answer generation is already in progress.",
+  "errorOccurredDuringRegeneration": "An error occurred while trying to regenerate: {errorDetails}",
+  "@errorOccurredDuringRegeneration": {
+    "placeholders": {
+      "errorDetails": {
+        "type": "String",
+        "example": "Network connection failed"
+      }
+    }
+  },
+  "modality": "Modality",
+  "multimodal": "Multimodal",
+  "anErrorOccurred": "An Error Occurred",
+  "themeLocked": "This theme requires a higher subscription level. Please upgrade to unlock.",
+  "pageCouldNotBeLoaded": "Page Could Not Be Loaded",
+  "checkYourInternet": "Please check your internet connection and try again.",
+  "errorUserNotAuthenticated": "You must be logged in to perform this action.",
+  "errorInsufficientCredits": "You have insufficient credits. Please top up to continue.",
+  "errorRateLimitExceeded": "Too many requests. Please try again in a moment.",
+  "errorServer": "An unexpected server error occurred. Please try again later.",
+  "errorNetwork": "A network error occurred. Please check your connection and try again.",
+  "errorApiAuthentication": "Authentication failed. Please try logging in again.",
+  "baseModelForCharacterDescription": "The selected base model will determine the character's reasoning and response capabilities.",
+  "selectBaseModel": "Select a Base Model",
+
+  "@errorUserNotAuthenticated": {},
+  "@errorInsufficientCredits": {},
+  "@errorRateLimitExceeded": {},
+  "@errorServer": {},
+  "@errorNetwork": {},
+  "@errorApiAuthentication": {},
+  "@baseModelForCharacterDescription": {},
+
+  "forgotPassword": "Forgot Password?",
+  "couldNotOpenLink": "Could not open the link",
+
+  "downloadStarted": "Download started",
+  "notAvailable": "Not Available",
+
+  "localizationWarning": "Some information may not be available in your language and will be displayed in English.",
+  "aiTranslationWarning": "Model information is translated into various languages by other AI models. Therefore, minor inconsistencies may occur in languages other than English.",
+
+  "errorLoadingTitle": "Failed to Load Data",
+  "@errorLoadingTitle": {
+    "description": "Title for the error screen when model data cannot be fetched."
+  },
+  "errorLoadingMessage": "We couldn't retrieve the necessary data from our servers. Please check your internet connection and try again.",
+  "@errorLoadingMessage": {
+    "description": "Message for the error screen explaining the issue."
+  },
+  "noModelsFoundTitle": "No Results",
+  "noModelsFoundMessage": "Try adjusting your search terms or clearing the filter.",
+  "usernameRateLimitExceeded": "You can only change your username twice every 14 days.",
+  "usernameUnchanged": "This is already your current username.",
+  "creditsInfoPanelTitle": "How Credits Work",
+  "creditsInfoPanelBody": "Credits are used to chat with online models.\n\n• Each message to an online model costs 20 credits.\n• Including an image adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.",
+  "creditsInfoPanelFooter": "Happy chatting!",
+  "disclaimerMessage": "Artificial Intelligences can make mistakes, check important information.",
+  "modelCreatedSuccess": "Model created successfully!",
+  "modelRemovedSuccess": "“{modelName}” was successfully removed.",
+  "errorCreatingModel": "An unexpected error occurred while creating the model.",
+  "errorDeletingModel": "An unexpected error occurred while deleting the model.",
+  "ultraFeatureOnly": "This feature is only available for Ultra members.",
+  "experimentalOfflineWarning": "The offline mode is still experimental and the model you download may not perform with optimal efficiency.",
+  "noConversationsToDelete": "You have no conversations to delete.",
+  "reportSubmitted": "Report submitted successfully",
+  "purchaseReceived": "Purchase received, updating your account.",
+  "verificationDelayed": "Your purchase is confirmed. There is a slight delay in updating your account, it will appear shortly.",
+  "maintenanceTitle": "Under Maintenance",
+  "maintenanceMessage": "Cortex is temporarily offline while we roll out some important updates. Access to the app will be restored shortly.\n\nThank you for your patience as we improve your experience.",
+  "errorPromptFlagged": "Your message was detected as inappropriate and could not be sent.",
+  "notEnoughStorage": "Not enough storage space on your device to save new messages.",
+  "errorRateLimit": "You have created too many models recently, please wait a while before trying again.",
+  "errorContentFlagged": "The model could not be saved because its content was flagged as inappropriate.",
+  "deleteAllConversationsDisabledInfo": "You cannot delete all conversations while in an active chat, please exit the current chat first to proceed.",
+  "invalidCredentials": "Incorrect email or password.",
+  "userDisabled": "This user account has been disabled.",
+  "loginSubtitle": "Log in to your Vertex account. New users signing up via Google agree to our Terms & Privacy Policy. You can review them on the Sign Up screen.",
+  "registerSubtitle": "Create a Vertex account, which you can also use for our other projects.",
+  "photoWarningMessage": "A photo is included. Models that don't support images may ignore it.",
+  "loginRequiredForPurchase": "You must be logged in to make a purchase.",
+  "storagePermissionRequired": "Storage permission is required to save downloaded models. Please grant permission to continue.",
+  "creditBannerTitle": "Get Free Credits!",
+  "creditBannerSubtitle": "Invite a friend and you both get 50 credits on sign-up! If they subscribe, you both get an extra 500!",
+  "inviteShareSubject": "Join me on Cortex!",
+  "@inviteShareMessage": {
+    "description": "The text message to share with a friend for an invite.",
+    "placeholders": {
+      "playStoreLink": {
+        "type": "String",
+        "example": "https://play.google.com/store/..."
+      }
+    }
+  },
+  "inviteShareMessage": "yo you gotta check out this app cortex its actually insane if you use my link we both get 50 credits and if you sub we both get an extra 500 its a crazy deal download it asap\n\n{playStoreLink}",
+  "reviewEnjoyingAppTitle": "Enjoying Cortex?",
+  "reviewHelpUsGrow": "Your rating is a huge support for our young indie team and helps us make Cortex even better for you.",
+  "reviewMaybeLater": "Maybe Later",
+  "reviewRateNow": "Rate Now",
+  "noThanks": "No, Thanks"
+}
