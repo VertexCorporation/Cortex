@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight.dart' as highlight;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 
 const oneDarkProTheme = {
   'comment': TextStyle(color: Color(0xff5c6370)), // Gri (yorumlar)

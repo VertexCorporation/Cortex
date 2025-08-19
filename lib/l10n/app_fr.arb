@@ -412,7 +412,7 @@
   "photoLimitReachedMessage": "Une seule photo peut être ajoutée",
   "inappropriateContentDetected": "Contenu inapproprié détecté !",
   "offlineModelNotInstalled": "Ce modèle hors ligne n'est pas installé sur votre appareil.",
-  "insufficientCredits": "Vous n'avez pas assez de crédits pour effectuer cette demande. Cette action nécessite {required} crédits, mais vous n'en disposez que de {available}. Pour obtenir plus de crédits, vous pouvez mettre à niveau votre abonnement ou en acheter directement.",
+  "insufficientCredits": "Vous n'avez pas assez de crédits pour compléter cette requête. Cette action nécessite {required} crédits, mais vous n'en avez que {available}. Pour obtenir plus de crédits, vous pouvez améliorer votre forfait ou en acheter directement. hé on comprend tout à fait manquer de crédits ça peut être un peu relou mais sérieusement obtenir ces super réponses de nos modèles c'est pas gratuit donc ces crédits nous aident vraiment à ce que tout continue de bien tourner et écoutez si plus de monde se lance et prend des crédits on pourra carrément augmenter ces limites quotidiennes gratuites pour tout le monde",
   "@insufficientCredits": {
     "placeholders": {
       "available": {},
@@ -452,7 +452,7 @@
   "usernameRateLimitExceeded": "Vous ne pouvez changer votre nom d'utilisateur que deux fois tous les 14 jours.",
   "usernameUnchanged": "C'est déjà votre nom d'utilisateur actuel.",
   "creditsInfoPanelTitle": "Comment fonctionnent les crédits",
-  "creditsInfoPanelBody": "Les crédits sont utilisés pour discuter avec les modèles en ligne.\n\n• Chaque message envoyé à un modèle en ligne coûte 20 crédits.\n• L'inclusion d'une image ajoute 30 crédits supplémentaires.\n• Les utilisateurs du plan gratuit reçoivent un bonus de 200 crédits qui se réinitialise chaque jour.",
+  "creditsInfoPanelBody": "Les crédits sont utilisés pour discuter avec des modèles en ligne. Juste pour que vous le sachiez, chaque message que vous leur envoyez nous coûte de l'argent.\n\n• Chaque message envoyé à un modèle en ligne coûte 20 crédits.\n• Inclure une image ajoute 30 crédits supplémentaires.\n• Les utilisateurs du plan gratuit reçoivent un bonus de 200 crédits qui se réinitialise quotidiennement.",
   "creditsInfoPanelFooter": "Bonnes discussions !",
   "disclaimerMessage": "Les intelligences artificielles peuvent faire des erreurs, vérifiez les informations importantes.",
 

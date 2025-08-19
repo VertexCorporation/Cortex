@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart'; // For kDebugModes
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // For SVG icons
 import 'package:google_fonts/google_fonts.dart'; // For custom fonts
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 
 import '../../darkener.dart';
 import '../../models/backend/data.dart'; // For localization

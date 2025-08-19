@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -95,8 +95,6 @@ class _CreateScreenState extends State<CreateScreen> with TickerProviderStateMix
   String? _selectedBaseModelDisplayTitle;
   bool _isBaseModelPanelExpanded = false;
   bool _isSaving = false;
-  // NOTE: _hasCortexSubscription is kept for potential future use or consistency, but not used for navigation logic anymore.
-  int _hasCortexSubscription = 0;
 
   // Shake animations
   late AnimationController _nameShakeController;
@@ -144,10 +142,6 @@ class _CreateScreenState extends State<CreateScreen> with TickerProviderStateMix
       return;
     }
     try {
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      if (userDoc.exists && mounted) {
-        _hasCortexSubscription = userDoc.data()?['hasCortexSubscription'] ?? 0;
-      }
     } catch (e) {
       debugPrint("Error fetching user subscription: $e");
     } finally {

@@ -14,7 +14,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -562,6 +562,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final NotificationService notificationService = _notificationService;
     final bool isMounted = mounted;
+    User? userToDeleteOnError;
 
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -584,6 +585,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         throw Exception("Firebase sign in returned a null user.");
       }
       final String uid = user.uid;
+      userToDeleteOnError = user;
 
       final bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
 
@@ -592,24 +594,15 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         dev.log('[Auth.Google] New Google user detected. Posting referrer suggestion if available.', name: 'LoginScreen');
         final String? referrerId = await ReferralHandler.getSavedReferrerId();
 
-        try {
-          await _firestore.collection('usernameSuggestions').doc(uid).set({
-            'username': null, // Explicitly send null for consistency.
-            'invitedBy': referrerId,
-          }).timeout(const Duration(seconds: 10));
+        await _firestore.collection('usernameSuggestions').doc(uid).set({
+          'username': null, // Explicitly send null for consistency.
+          'invitedBy': referrerId,
+        }).timeout(const Duration(seconds: 10));
 
-          dev.log('[Auth.Google] Referrer suggestion posted for new Google user $uid with consistent data structure.', name: 'LoginScreen');
+        dev.log('[Auth.Google] Referrer suggestion posted for new Google user $uid.', name: 'LoginScreen');
 
-          if (referrerId != null) {
-            await ReferralHandler.clearSavedReferrerId();
-          }
-        } catch (e) {
-          dev.log(
-              '[Auth.Google] WARNING: Failed to post referrer suggestion. The referral bonus may be missed, but login will proceed.',
-              name: 'LoginScreen',
-              error: e
-          );
-          // This is a non-fatal error for Google Sign-In. The user profile will still be created correctly by the backend.
+        if (referrerId != null) {
+          await ReferralHandler.clearSavedReferrerId();
         }
       }
 
@@ -631,12 +624,19 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
     } catch (e, st) {
       dev.log('[Auth.Google] Fatal error during Google Sign-In', name: 'LoginScreen', error: e, stackTrace: st);
+
+      if (userToDeleteOnError != null) {
+        dev.log('[Auth.Google] Rolling back Auth user creation due to a downstream error.', name: 'LoginScreen');
+        await userToDeleteOnError.delete();
+        dev.log('[Auth.Google] CLEANUP SUCCESS: Orphaned Auth user ${userToDeleteOnError.uid} deleted.', name: 'LoginScreen');
+      }
+
+      await _googleSignIn.signOut();
+      await _auth.signOut();
+
       if (isMounted) {
         notificationService.showNotification(message: l10n.anErrorOccurred, isSuccess: false);
       }
-      // Clean up any partial sign-in states on failure.
-      await _googleSignIn.signOut();
-      await _auth.signOut();
 
     } finally {
       if (mounted) {

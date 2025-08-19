@@ -13,7 +13,7 @@ import '../../../recognizer.dart';
 import '../../../theme.dart';
 import '../../chat.dart';
 import '../options.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import '../parser.dart';
 
 class AIMessageTile extends StatefulWidget {

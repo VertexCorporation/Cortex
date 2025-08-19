@@ -70,3 +70,4 @@
 20	59	1753605326704653936	build-llama/src/CMakeFiles/llama.dir/llama-memory-hybrid.cpp.o	d165dc2a03a867cd
 57	102	1753605326740653419	build-llama/src/CMakeFiles/llama.dir/llama-model-saver.cpp.o	b72e94ba0ee133b0
 7	19	1753605326677654324	build-llama/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o	56322b2901fcc5dc
+450	2478	1755180754167080968	/home/baba/Documents/cortex/build/llama/intermediates/cxx/Release/3c56g4x6/obj/armeabi-v7a/libllama-android.so	9a23e09445cef245

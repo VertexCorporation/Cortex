@@ -16,7 +16,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:mime/mime.dart';
 
 /// Represents an exception thrown when the user intentionally cancels an API request.
@@ -32,13 +32,13 @@ class UserCancelledException implements Exception {
 class ApiException implements Exception {
   final String message;
   final int? statusCode;
+  final String? code;
 
-  ApiException(this.message, {this.statusCode});
+  ApiException(this.message, {this.statusCode, this.code});
 
   @override
   String toString() => message;
 }
-
 
 /// The primary service for interacting with AI models via the backend proxy.
 class ApiService {
@@ -88,16 +88,23 @@ class ApiService {
     return null;
   }
 
-  /// The core private method that communicates with the secure backend proxy.
-  /// It handles request creation, response streaming, and all error conditions.
+  /// This version correctly handles the hybrid SSE stream from the server.
+  /// 1.  It uses a `Completer` to wait for a definitive success (`event: moderation`)
+  ///     or failure (`event: error`) signal from the server.
+  /// 2.  It uses a custom line-by-line processing logic that can distinguish
+  ///     between our custom control events and the raw, piped data from the AI provider.
+  /// 3.  It fully implements the pre-flight error handling for immediate feedback.
   Future<String> _getResponse({
     required List<Map<String, dynamic>> messages,
     required String model,
     Function(String chunk)? onStreamChunk,
   }) async {
-    // At the beginning of every new request, reset the cancellation state and create a new client.
     _isCancelled = false;
     _client = http.Client();
+
+    final completer = Completer<String>();
+    final finalContent = StringBuffer();
+    String currentEvent = 'message'; // Default event type is raw message content
 
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -119,36 +126,12 @@ class ApiService {
 
       final streamedResponse = await _client!.send(request);
 
-      if (streamedResponse.statusCode == 200) {
-        final finalContent = StringBuffer();
-        final stream = streamedResponse.stream.transform(utf8.decoder).transform(const LineSplitter());
-
-        await for (final line in stream) {
-          if (line.startsWith("data: ")) {
-            final jsonString = line.substring(6).trim();
-            if (jsonString == "[DONE]") break;
-            try {
-              final Map<String, dynamic> event = jsonDecode(jsonString);
-              final delta = event['choices']?[0]?['delta'];
-              if (delta?['content'] != null) {
-                final String contentChunk = delta['content'];
-                onStreamChunk?.call(contentChunk);
-                finalContent.write(contentChunk);
-              }
-            } catch (e) {
-              debugPrint("Stream JSON parse error: $e, on line: $jsonString");
-            }
-          }
-        }
-        return finalContent.toString();
-      }       else {
-        // --- ROBUST ERROR HANDLING LOGIC ---
-        // This logic is enhanced to parse nested errors from different providers.
+      if (streamedResponse.statusCode != 200) {
+        // --- FIX: The complete pre-flight error handling logic is now included. ---
         final errorBodyString = await streamedResponse.stream.bytesToString();
-        debugPrint("Proxy Error [${streamedResponse.statusCode}]: $errorBodyString");
+        debugPrint("Proxy Pre-flight Error [${streamedResponse.statusCode}]: $errorBodyString");
 
         String? errorCode;
-        // Start with a generic default error message.
         String finalErrorMessage = localizations.errorServer;
 
         try {
@@ -156,85 +139,121 @@ class ApiService {
           if (errorJson['error'] is Map) {
             final errorObject = errorJson['error'];
             errorCode = errorObject['code']?.toString();
-
-            // --- NEW: LAYERED ERROR MESSAGE PARSING ---
-            // 1. Attempt to find a more specific error message nested inside 'raw' metadata.
-            // This handles cases where the proxy wraps the original provider's error.
-            bool foundSpecificError = false;
-            if (errorObject['metadata']?['raw'] is String) {
-              try {
-                final rawErrorString = errorObject['metadata']['raw'];
-                final nestedErrorJson = jsonDecode(rawErrorString);
-                if (nestedErrorJson['error']?['message'] is String) {
-                  finalErrorMessage = nestedErrorJson['error']['message'];
-                  foundSpecificError = true;
-                  debugPrint("[ApiService] Parsed a specific error from metadata: $finalErrorMessage");
-                }
-              } catch (e) {
-                // The 'raw' string was not valid JSON or didn't have the expected structure.
-                // This is not a critical failure; we'll just fall back.
-                debugPrint("[ApiService] Could not parse nested raw error. Falling back. Error: $e");
-              }
-            }
-
-            // 2. If no specific error was found, fall back to the top-level error message.
-            if (!foundSpecificError && errorObject['message'] is String) {
-              finalErrorMessage = errorObject['message'];
-            }
+            finalErrorMessage = errorObject['message'] ?? finalErrorMessage;
           }
         } catch (e) {
-          // The entire response was not valid JSON. Use the default message.
-          debugPrint("Could not parse error JSON from proxy: $e. Body: $errorBodyString");
-          throw ApiException(finalErrorMessage, statusCode: streamedResponse.statusCode);
+          // Ignore parse error, use defaults.
         }
 
-        // Now, use the final determined error message to throw the correct ApiException.
         switch (errorCode) {
           case 'TOKEN_MISSING':
           case 'TOKEN_INVALID':
-          case '401':
-          case '403':
-            throw ApiException(localizations.errorApiAuthentication, statusCode: streamedResponse.statusCode);
+            throw ApiException(localizations.errorApiAuthentication, statusCode: streamedResponse.statusCode, code: errorCode);
           case 'INSUFFICIENT_USER_CREDITS':
-          case '402':
-            throw ApiException(localizations.errorInsufficientCredits, statusCode: streamedResponse.statusCode);
-          case 'RATE_LIMIT_EXCEEDED':
-          case '429':
-            throw ApiException(localizations.errorRateLimitExceeded, statusCode: streamedResponse.statusCode);
-          case 'CONTENT_FLAGGED':
-          case 'PROMPT_FLAGGED':
-          case '422':
-            throw ApiException(localizations.errorPromptFlagged, statusCode: streamedResponse.statusCode);
+            throw ApiException(localizations.errorInsufficientCredits, statusCode: streamedResponse.statusCode, code: errorCode);
+        // Add other specific cases if needed
           default:
-          // For all other errors, use the message we worked hard to find.
-            throw ApiException(finalErrorMessage, statusCode: streamedResponse.statusCode);
+            throw ApiException(finalErrorMessage, statusCode: streamedResponse.statusCode, code: errorCode);
         }
       }
+
+      // --- FIX: Correctly process a mixed SSE stream line by line. ---
+      streamedResponse.stream
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())
+          .listen(
+            (line) {
+          if (completer.isCompleted) return;
+
+          if (line.startsWith('event: ')) {
+            currentEvent = line.substring(7).trim();
+            return; // The next line will be the data for this event.
+          }
+
+          if (line.startsWith('data: ')) {
+            final dataString = line.substring(6).trim();
+
+            switch (currentEvent) {
+              case 'moderation':
+                try {
+                  final data = jsonDecode(dataString);
+                  if (data['flagged'] == true) {
+                    debugPrint("[ApiService] Received moderation event: FLAGGED.");
+                    final message = data['message'] ?? localizations.errorPromptFlagged;
+                    completer.completeError(ApiException(message, code: data['code']?.toString()));
+                  } else {
+                    debugPrint("[ApiService] Received moderation event: PASSED.");
+                    completer.complete(finalContent.toString());
+                  }
+                } catch (e) {
+                  completer.completeError(ApiException(localizations.errorServer, code: 'CLIENT_PARSE_ERROR'));
+                }
+                break;
+
+              case 'error':
+                try {
+                  final data = jsonDecode(dataString);
+                  final message = data['message'] ?? localizations.errorServer;
+                  completer.completeError(ApiException(message, code: data['code']?.toString()));
+                } catch (e) {
+                  completer.completeError(ApiException(localizations.errorServer, code: 'CLIENT_PARSE_ERROR'));
+                }
+                break;
+
+            // Default case handles the raw AI content stream
+              default: // 'message'
+                if (dataString == "[DONE]") return; // Ignore OpenRouter's done signal
+                try {
+                  final chunkData = jsonDecode(dataString);
+                  final delta = chunkData['choices']?[0]?['delta'];
+                  if (delta?['content'] != null) {
+                    final String contentChunk = delta['content'];
+                    onStreamChunk?.call(contentChunk);
+                    finalContent.write(contentChunk);
+                  }
+                } catch(e) {
+                  debugPrint("Could not parse AI content chunk, ignoring. Chunk: $dataString");
+                }
+                break;
+            }
+            // Reset event to default after processing data
+            currentEvent = 'message';
+          }
+        },
+        onError: (error) {
+          if (!completer.isCompleted) {
+            if (_isCancelled) {
+              completer.completeError(UserCancelledException());
+            } else {
+              completer.completeError(ApiException(localizations.errorNetwork));
+            }
+          }
+        },
+        onDone: () {
+          if (!completer.isCompleted) {
+            debugPrint("[ApiService] Stream ended prematurely without a final confirmation event.");
+            completer.completeError(ApiException(localizations.errorNetwork, code: 'PREMATURE_CLOSE'));
+          }
+        },
+        cancelOnError: true,
+      );
+
+      return completer.future;
+
     } catch (e) {
-      // --- ROBUST CANCELLATION & ERROR HANDLING ---
-      // This is the most critical part of the error logic.
-      if (_isCancelled) {
-        // If an exception occurs *after* a cancellation was requested, it's almost certainly
-        // a `ClientException` from closing the connection. We treat this as an intentional
-        // stop, not an error. We throw a special exception that the UI knows to ignore.
-        debugPrint("[ApiService] Caught exception, identified as user cancellation. Throwing UserCancelledException.");
-        throw UserCancelledException();
-      }
-
-      // If the exception is already one of our specific types, just pass it up.
-      if (e is ApiException || e is UserCancelledException) rethrow;
-
-      // For any other exception (e.g., SocketException for no internet, ClientException
-      // for other reasons), wrap it in a generic, user-friendly network error.
+      if (_isCancelled) throw UserCancelledException();
+      if (e is ApiException) rethrow;
       debugPrint("Unhandled client-side API error in _getResponse: $e");
       throw ApiException(localizations.errorNetwork);
     } finally {
-      // Always close the client and reset the cancellation flag to ensure the
-      // service is in a clean state for the next request.
-      _client?.close();
-      _isCancelled = false;
+      completer.future.whenComplete(() {
+        _client?.close();
+        _isCancelled = false;
+        debugPrint("[ApiService] Request lifecycle complete. Client closed.");
+      });
     }
   }
+
 
   /// A public method to get a response for a character-based model.
   Future<String> getCharacterResponse({

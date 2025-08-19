@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For Clipboard and SystemChrome
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart'; // For NotificationService
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // For localizations
+import 'package:cortex/l10n/app_localizations.dart'; // For localizations
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 // Ensure these import paths are correct for your project structure
@@ -19,7 +19,6 @@ import '../../notifications.dart';
 import '../../theme.dart'; // For AppColors
 import '../../models/backend/data.dart'; // For ModelData
 import '../messages/select.dart'; // For SelectTextScreen
-import 'report.dart'; // For ReportDialog
 
 // Durations for animations used within this file.
 const Duration _kShortAnimationDuration = Duration(milliseconds: 100);
@@ -520,49 +519,6 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     return {};
   }
 
-  /// Retrieves model data for a given [modelId] (expected to be a base series ID)
-  /// from the synchronized cache in [ModelData].
-  Map<String, dynamic> _getModelDataFromId(String modelId) {
-    const String logPrefix = "[AnimatedMessageOptionsPanel._getModelDataFromId]";
-    if (!mounted) {
-      debugPrint("$logPrefix Not mounted. Requested model ID: '$modelId'. Returning empty map.");
-      return {};
-    }
-    if (modelId == _kDefaultModelId) {
-      debugPrint("$logPrefix Requested model ID is the default ID. Returning empty map.");
-      return {};
-    }
-
-    final allCachedModels = ModelData.getCachedModelsSync();
-    if (allCachedModels.isEmpty) {
-      debugPrint("$logPrefix ModelData cache is empty. Requested model ID: '$modelId'. Returning empty map.");
-      return {};
-    }
-
-    try {
-      final model = allCachedModels.firstWhere(
-            (m) => m['id'] == modelId, // Comparing against base series IDs in the cache
-        orElse: () {
-          debugPrint("$logPrefix Model with base series ID '$modelId' NOT FOUND in cache (size: ${allCachedModels.length}).");
-          // Optional: Log all available series IDs for diagnosis
-          // final allSeriesIdsInCache = allCachedModels.map((m) => m['id'] ?? 'NO_ID_IN_CACHE_ENTRY').toList();
-          // debugPrint("$logPrefix Available base series IDs in cache: $allSeriesIdsInCache");
-          return <String, dynamic>{}; // Return an empty map if not found
-        },
-      );
-
-      if (model.isEmpty) {
-        // This means orElse was triggered. The log above already covers it.
-      } else {
-        debugPrint("$logPrefix Successfully found model data for base series ID '$modelId'. Title: '${model['title']}', Keys: ${model.keys.join(', ')}");
-      }
-      return model;
-    } catch (e) {
-      debugPrint("$logPrefix Error during firstWhere for model ID '$modelId': $e. Returning empty map.");
-      return {};
-    }
-  }
-
   int _validExtensionCountForChangingModel(Map<String, dynamic> parentSeriesData) {
     const String logPrefix = "[AnimatedMessageOptionsPanel._validExtensionCountForChangingModel]";
 
@@ -585,7 +541,6 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     // The rest of the logic is correct and remains the same.
     int count = 0;
     extMap.entries.forEach((entry) {
-      // ... bu kısım aynı kalır ...
       final dynamic extensionData = entry.value;
       bool isValidForChange = false;
 

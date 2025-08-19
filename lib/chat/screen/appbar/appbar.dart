@@ -16,12 +16,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 
 import '../../../hexagons.dart';
 import '../../../server/credits.dart';
-import '../../../server/fetch.dart';
-import '../../../theme.dart'; // Provides HexagonClipper, HexagonBorderPainter
+import '../../../theme.dart'; // Provides HexagonClipper
 
 class Appbar extends StatefulWidget implements PreferredSizeWidget {
   final bool isModelSelected;
@@ -243,11 +242,6 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
 
   Widget _buildUserAvatar(
       BuildContext context, double screenWidth, double screenHeight) {
-    // --- FIX: Replaced FutureBuilder with direct data handling ---s
-    // The Appbar is now a "dumb" widget. It receives user data and displays it.
-    // The logic for fetching and listening to data has been moved up to ChatScreenState
-    // for better state management and to resolve race conditions.
-
     String initial = '?'; // Default initial
     if (widget.userData != null) {
       // Prioritize 'username', fall back to 'displayName', then to 'email'.
@@ -283,8 +277,6 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
           child: CircleAvatar(
             radius: screenWidth * 0.05,
             backgroundColor: AppColors.quaternaryColor,
-            // The AnimatedSwitcher provides a smooth transition when the initial
-            // changes from '?' to the actual letter.
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
               transitionBuilder: (child, animation) {
@@ -292,7 +284,6 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
               },
               child: Text(
                 initial,
-                // The key ensures the AnimatedSwitcher correctly detects a change.
                 key: ValueKey<String>(initial),
                 style: TextStyle(
                   fontSize: screenWidth * 0.045,
@@ -305,52 +296,32 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
       ),
     );
   }
-  
-  /// Layering Logic:
-  /// - Layer 1 (Bottom): A 'catch-all' `GestureDetector` that fills the entire
-  ///   space. It is set to `HitTestBehavior.opaque` to ensure it captures all
-  ///   taps within its bounds, even in visually transparent areas. It triggers
-  ///   the info panel.
-  /// - Layer 2 (Middle): `IgnorePointer` containing all visual (non-interactive)
-  ///   elements like the background bar, text, and credit icon. Clicks pass
-  ///   through this layer to Layer 1.
-  /// - Layer 3 (Top): The interactive hexagon button. It sits on top and
-  ///   intercepts its own clicks, preventing them from reaching the background
-  ///   GestureDetector.
+
   Widget _buildCreditsHexagonRow(
       BuildContext context, double screenWidth, double screenHeight) {
     return ValueListenableBuilder<int>(
       valueListenable: CreditsManager.instance.totalCreditsNotifier,
       builder: (context, totalCredits, child) {
-        // The Stack now correctly fills the expanded `leading` area.
         return Stack(
           alignment: Alignment.centerLeft,
           children: [
-            // LAYER 1: THE 'CATCH-ALL' CLICK AREA
             Positioned.fill(
               child: GestureDetector(
                 onTap: _toggleCreditsInfo,
-                // CRITICAL: Makes the GestureDetector capture taps in its entire
-                // rectangular area, not just where there are visible children.
                 behavior: HitTestBehavior.opaque,
-                // A transparent container is needed for the behavior to apply.
                 child: Container(color: Colors.transparent),
               ),
             ),
-
-            // LAYER 2: VISUAL, NON-INTERACTIVE ELEMENTS
             IgnorePointer(
               child: Stack(
-                // We don't clip here to avoid any visual cut-offs if needed.
                 clipBehavior: Clip.none,
                 alignment: Alignment.centerLeft,
                 children: [
-                  // Visual background bar for the credits display
                   Positioned(
                     top: screenHeight * 0.0129,
                     left: screenWidth * 0.05,
                     child: Container(
-                      key: _creditsInfoKey, // Key for positioning the overlay
+                      key: _creditsInfoKey,
                       width: screenWidth * 0.26,
                       height: screenHeight * 0.045,
                       decoration: BoxDecoration(
@@ -360,7 +331,6 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  // Visual text and icon overlaying the bar
                   Positioned(
                     top: screenHeight * 0.0129,
                     left: screenWidth * 0.05,
@@ -404,8 +374,6 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
                 ],
               ),
             ),
-
-            // LAYER 3: INTERACTIVE HEXAGON BUTTON (CLICK INTERCEPTOR)
             Positioned(
               top: screenHeight * 0.0129,
               left: screenWidth * 0.02,
@@ -417,51 +385,21 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
     );
   }
 
-
   /// Builds the hexagon button widget that navigates to the Premium screen.
   Widget _buildHexagonButton(
       BuildContext context, double screenWidth, double screenHeight) {
-    return ClipPath(
-      clipper: HexagonClipper(),
-      child: SizedBox(
-        width: screenWidth * 0.1,
-        height: screenHeight * 0.045,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              _closeAllPanels();
-              navigateToScreen(context, PremiumScreen(),
-                  direction: const Offset(0.0, 1.0));
-            },
-            child: CustomPaint(
-              painter: HexagonBorderPainter(
-                fillColor: AppColors.quaternaryColor,
-                borderColor: AppColors.border,
-                strokeWidth: 1.5,
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(screenWidth * 0.02),
-                child: SvgPicture.asset(
-                  'assets/icons/sparkle.svg',
-                  color: AppColors.primaryColor.inverted,
-                  width: screenWidth * 0.05,
-                  height: screenWidth * 0.05,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+    return AnimatedHexagonButton(
+      screenWidth: screenWidth,
+      screenHeight: screenHeight,
+      onTap: () {
+        _closeAllPanels();
+        navigateToScreen(context, PremiumScreen(),
+            direction: const Offset(0.0, 1.0));
+      },
     );
   }
 
-  // --- NEW AND UPDATED METHODS FOR ANIMATED CREDITS INFO PANEL ---
-
-  /// Toggles the visibility of the credits information panel with animation.
   void _toggleCreditsInfo() {
-    // NEW: When the user toggles the info panel, we also trigger the callback
-    // to notify the parent screen, allowing it to show the promotional banner.
     widget.onCreditsInfoTapped();
 
     if (_animationController.isDismissed) {
@@ -470,9 +408,9 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
       _hideCreditsInfo();
     }
   }
-  /// Hides the credits information panel with a reverse animation.
+
   void _hideCreditsInfo({bool isDisposing = false}) {
-    if (_overlayEntry == null) return; // Do nothing if already hidden.
+    if (_overlayEntry == null) return;
 
     if (isDisposing) {
       _overlayEntry?.remove();
@@ -488,7 +426,6 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
     });
   }
 
-  /// Creates and displays the credits information panel using an Overlay and animation.
   void _showCreditsInfo() {
     if (_overlayEntry != null) return;
 
@@ -523,11 +460,13 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
                         onTap: () {}, // Swallow taps on the panel itself.
                         child: Container(
                           width: panelWidth,
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 12.0),
                           decoration: BoxDecoration(
                             color: AppColors.quaternaryColor,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.border, width: 0.8),
+                            border: Border.all(
+                                color: AppColors.border, width: 0.8),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.25),
@@ -538,15 +477,13 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
                           ),
                           child: Stack(
                             children: [
-                              // The main content of the panel
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min, // Important for Stack
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  // Added padding to the right of the title
-                                  // to prevent it from overlapping with the icon.
                                   Padding(
-                                    padding: const EdgeInsets.only(right: 24.0),
+                                    padding:
+                                    const EdgeInsets.only(right: 24.0),
                                     child: Text(
                                       localizations.creditsInfoPanelTitle,
                                       style: GoogleFonts.heebo(
@@ -561,7 +498,8 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
                                   Text(
                                     localizations.creditsInfoPanelBody,
                                     style: GoogleFonts.heebo(
-                                      color: AppColors.primaryColor.inverted.withOpacity(0.9),
+                                      color: AppColors.primaryColor.inverted
+                                          .withOpacity(0.9),
                                       fontSize: 13,
                                       height: 1.5,
                                       decoration: TextDecoration.none,
@@ -571,7 +509,8 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
                                   Text(
                                     localizations.creditsInfoPanelFooter,
                                     style: GoogleFonts.heebo(
-                                      color: AppColors.primaryColor.inverted.withOpacity(0.7),
+                                      color: AppColors.primaryColor.inverted
+                                          .withOpacity(0.7),
                                       fontSize: 13,
                                       fontStyle: FontStyle.italic,
                                       decoration: TextDecoration.none,
@@ -579,7 +518,6 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
                                   ),
                                 ],
                               ),
-                              // The icon positioned in the top-right corner.
                               Positioned(
                                 top: 0,
                                 right: 0,
@@ -587,7 +525,8 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
                                   'assets/icons/credit.svg',
                                   width: 18,
                                   height: 18,
-                                  color: AppColors.primaryColor.inverted.withOpacity(0.6),
+                                  color: AppColors.primaryColor.inverted
+                                      .withOpacity(0.6),
                                 ),
                               ),
                             ],
@@ -606,5 +545,196 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
 
     Overlay.of(context).insert(_overlayEntry!);
     _animationController.forward();
+  }
+}
+
+// --- NEW WIDGET: A hexagon button with a continuous "pulsing" animation and a premium look ---
+class AnimatedHexagonButton extends StatefulWidget {
+  final VoidCallback onTap;
+  final double screenWidth;
+  final double screenHeight;
+
+  const AnimatedHexagonButton({
+    Key? key,
+    required this.onTap,
+    required this.screenWidth,
+    required this.screenHeight,
+  }) : super(key: key);
+
+  @override
+  _AnimatedHexagonButtonState createState() => _AnimatedHexagonButtonState();
+}
+
+class _AnimatedHexagonButtonState extends State<AnimatedHexagonButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+
+    // The animation will scale between 1.0 (normal) and 1.08 (8% larger).
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+
+    // Make the animation loop back and forth.
+    _controller.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Gradient for the vibrant, multi-colored border.
+    const Gradient borderGradient = SweepGradient(
+      center: FractionalOffset.center,
+      colors: <Color>[
+        Color(0xFF405DE6), // Blue
+        Color(0xFF833AB4), // Purple
+        Color(0xFFE1306C), // Red
+        Color(0xFFF77737), // Orange
+        Color(0xFFFFDC80), // Yellow
+        Color(0xFF405DE6), // Blue to complete the loop
+      ],
+    );
+
+    // Subtle gradient for the button's fill to give it depth.
+    final Gradient fillGradient = RadialGradient(
+      center: Alignment.center,
+      radius: 0.8,
+      colors: [
+        AppColors.quaternaryColor.withOpacity(0.9),
+        AppColors.quaternaryColor,
+      ],
+    );
+
+    // The ScaleTransition widget applies the continuous pulsing animation.
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: SizedBox(
+          width: widget.screenWidth * 0.1,
+          height: widget.screenHeight * 0.045,
+          child: CustomPaint(
+            painter: HexagonBorderPainter(
+              fillColor: AppColors.quaternaryColor,
+              fillGradient: fillGradient, // Apply the inner gradient.
+              strokeWidth: 2.5, // Thicker border for more visual impact.
+              gradient: borderGradient,
+              hasGlow: true, // Enable the premium glow effect.
+            ),
+            child: Center(
+              child: SvgPicture.asset(
+                'assets/icons/sparkle.svg',
+                color: AppColors.primaryColor.inverted,
+                width: widget.screenWidth * 0.045,
+                height: widget.screenWidth * 0.045,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// --- UPDATED CustomPainter to support a "glow" effect and inner gradient ---
+class HexagonBorderPainter extends CustomPainter {
+  final Color fillColor;
+  final Gradient? fillGradient;
+  final double strokeWidth;
+  final Color? borderColor;
+  final Gradient? gradient;
+  final bool hasGlow; // Replaced hasShadow with hasGlow for clarity
+
+  HexagonBorderPainter({
+    required this.fillColor,
+    this.fillGradient,
+    this.strokeWidth = 1.5,
+    this.borderColor,
+    this.gradient,
+    this.hasGlow = false,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Path path = _getHexagonPath(size);
+
+    // 1. DRAW THE GLOW (if enabled)
+    // Uses a key color from the gradient for a more thematic, premium feel.
+    if (hasGlow) {
+      final Paint glowPaint = Paint()
+        ..color = const Color(0xFF833AB4).withOpacity(0.6) // Vibrant purple glow
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+      canvas.drawPath(path.shift(const Offset(0, 2)), glowPaint);
+    }
+
+    // 2. DRAW THE FILL (using gradient if provided, otherwise solid color)
+    final Paint fillPaint = Paint();
+    if (fillGradient != null) {
+      fillPaint.shader = fillGradient!
+          .createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+    } else {
+      fillPaint.color = fillColor;
+    }
+    canvas.drawPath(path, fillPaint);
+
+    // 3. DRAW THE BORDER (only if a style is provided)
+    if (gradient != null || borderColor != null) {
+      final Paint strokePaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth;
+
+      if (gradient != null) {
+        strokePaint.shader = gradient!.createShader(
+          Rect.fromCenter(
+            center: size.center(Offset.zero),
+            width: size.width,
+            height: size.height,
+          ),
+        );
+      } else {
+        strokePaint.color = borderColor!;
+      }
+      canvas.drawPath(path, strokePaint);
+    }
+  }
+
+  Path _getHexagonPath(Size size) {
+    final Path path = Path();
+    double w = size.width;
+    double h = size.height;
+
+    path.moveTo(w * 0.25, 0);
+    path.lineTo(w * 0.75, 0);
+    path.lineTo(w, h * 0.5);
+    path.lineTo(w * 0.75, h);
+    path.lineTo(w * 0.25, h);
+    path.lineTo(0, h * 0.5);
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldRepaint(covariant HexagonBorderPainter oldDelegate) {
+    // Repaint only if properties have actually changed for better performance.
+    return oldDelegate.fillColor != fillColor ||
+        oldDelegate.fillGradient != fillGradient ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.borderColor != borderColor ||
+        oldDelegate.gradient != gradient ||
+        oldDelegate.hasGlow != hasGlow;
   }
 }

@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'package:cortex/main.dart'; // Assuming this is your project's main entry
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 
 // Assuming these are local project imports
 import '../../theme.dart'; // Your app's theme

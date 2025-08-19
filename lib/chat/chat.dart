@@ -41,7 +41,7 @@ import '../navigation.dart';
 import '../server/credits.dart';
 import '../settings/settings.dart';
 import '../main.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'messages/options.dart';
 import 'messages/report.dart';
 import 'services/api.dart';

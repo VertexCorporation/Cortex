@@ -560,7 +560,7 @@
   "photoLimitReachedMessage": "Sadece bir fotoğraf eklenebilir",
   "inappropriateContentDetected": "Uygunsuz içerik tespit edildi!",
   "offlineModelNotInstalled": "Bu çevrimdışı model cihazınızda yüklü değil.",
-  "insufficientCredits": "Bu isteği tamamlamak için yeterli krediniz bulunmuyor. Bu işlem {required} kredi gerektirirken, hesabınızda yalnızca {available} kredi bulunmaktadır. Kredinizi artırmak için mevcut planınızı yükseltebilir veya doğrudan kredi satın alabilirsiniz.",
+  "insufficientCredits": "Bu isteği tamamlamak için yeterli krediniz yok. Bu eylem {required} kredi gerektiriyor, ancak sizde yalnızca {available} var. Daha fazla kredi kazanmak için planınızı yükseltebilir veya doğrudan satın alabilirsiniz. kanka biliyoruz bu kredi mevzusu can sıkıcı ama modellerden cevap almak biraz pahalı yani bu krediler aslında gerekli yoksaBata.rizOglum satın alım yapanlar fazla olursa az para kazanırsak limitleri de artırabiliriz o zamana kadar aynı devam",
   "@insufficientCredits": {
     "placeholders": {
       "available": {},
@@ -622,7 +622,7 @@
   "usernameRateLimitExceeded": "Kullanıcı adınızı her 14 günde yalnızca iki kez değiştirebilirsiniz.",
   "usernameUnchanged": "Bu zaten mevcut kullanıcı adınız.",
   "creditsInfoPanelTitle": "Krediler Nasıl Çalışır?",
-  "creditsInfoPanelBody": "Krediler, çevrimiçi modellerle sohbet etmek için kullanılır.\n\n• Çevrimiçi bir modele gönderilen her mesaj 20 kredi tutarındadır.\n• Görsel eklemek 30 ek kredi gerektirir.\n• Ücretsiz plan kullanıcıları, her gün sıfırlanan 200 kredi bonusu alır.",
+  "creditsInfoPanelBody": "Krediler, çevrimiçi modellerle sohbet etmek için kullanılır. Bilgin olsun, onlara gönderdiğin her mesaj bizden para götürüyor.\n\n• Çevrimiçi bir modele gönderilen her mesaj 20 kredidir.\n• Bir görsel eklemek 30 ek kredi daha gerektirir.\n• Ücretsiz plan kullanıcıları, günlük olarak yenilenen 200 kredi bonusu alırlar.",
   "creditsInfoPanelFooter": "İyi sohbetler!",
   "disclaimerMessage": "Yapay zekalar hata yapabilir, önemli bilgileri kontrol edin.",
   "modelCreatedSuccess": "Model başarıyla oluşturuldu!",

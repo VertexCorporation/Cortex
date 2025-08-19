@@ -31,7 +31,7 @@ import '../backend/download.dart';
 import '../../main.dart';
 import '../backend/system_info.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 
 /// A data class to hold the results from the background isolate.
 class _ProcessedStateData {
