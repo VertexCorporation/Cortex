@@ -5,7 +5,7 @@ import 'package:cortex/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/theme.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import '../../../models/backend/data.dart';
 
 /// A card widget that displays a single model in the selection grid.

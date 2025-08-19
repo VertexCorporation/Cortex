@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:cortex/chat/messages/messages.dart';
 import 'package:cortex/chat/messages/viewer.dart';
 import 'package:cortex/theme.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 
 import '../../../models/backend/data.dart';
 import '../../messages/tiles/ai.dart';

@@ -1,7 +1,7 @@
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 
 /// An enum to define the different types of content the banner can display.
 enum BannerType {

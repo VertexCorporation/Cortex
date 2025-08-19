@@ -15,7 +15,7 @@ import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import '../cache.dart';
 import '../internet.dart';
 import '../language.dart';

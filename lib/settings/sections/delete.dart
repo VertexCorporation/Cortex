@@ -6,9 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
@@ -46,7 +45,7 @@ class DeleteSection extends StatefulWidget {
 }
 
 class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMixin {
-  late AnimationController _deleteAccountPasswordShakeController;
+  late AnimationController _deleteAccountConfirmShakeController;
   late AnimationController _deleteAllConversationsConfirmShakeController;
   bool _isDialogCurrentlyOpen = false;
   late NotificationService _notificationService;
@@ -66,7 +65,7 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
     });
 
     const shakeDuration = Duration(milliseconds: 500);
-    _deleteAccountPasswordShakeController = AnimationController(vsync: this, duration: shakeDuration);
+    _deleteAccountConfirmShakeController = AnimationController(vsync: this, duration: shakeDuration);
     _deleteAllConversationsConfirmShakeController = AnimationController(vsync: this, duration: shakeDuration);
     debugPrint("$_className: AnimationControllers initialized.");
   }
@@ -74,7 +73,7 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
   @override
   void dispose() {
     debugPrint("$_className: dispose called.");
-    _deleteAccountPasswordShakeController.dispose();
+    _deleteAccountConfirmShakeController.dispose();
     _deleteAllConversationsConfirmShakeController.dispose();
     super.dispose();
   }
@@ -282,6 +281,7 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
 
   /// Displays a confirmation dialog for deleting the user's account.
   /// This is a server-dependent operation that calls a secure Cloud Function.
+  /// User confirms by typing 'VERTEX', removing the need for a password.
   Future<void> _showDeleteAccountDialog(AppLocalizations appLocalizations) async {
     final String methodName = "$_className: _showDeleteAccountDialog";
     debugPrint("$methodName: Called for server-side account deletion.");
@@ -296,8 +296,9 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
     }
     _setDialogState(true);
 
-    final TextEditingController passwordController = TextEditingController();
-    String? passwordError;
+    // --- CHANGE: Replaced passwordController with confirmController. ---
+    final TextEditingController confirmController = TextEditingController();
+    String? confirmError;
     final RestoreCallback restoreNavBar = Darkener.darken();
 
     await showGeneralDialog(
@@ -326,21 +327,22 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
                           padding: const EdgeInsets.all(20),
                           child: Column(
                             children: [
-                              Text(appLocalizations.confirmDeleteAccount, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted,), textAlign: TextAlign.center,),
+                              Text(appLocalizations.deleteAccount, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted,), textAlign: TextAlign.center,),
                               const SizedBox(height: 12),
-                              Text(appLocalizations.enterPasswordToDelete, style: TextStyle(color: AppColors.quinaryColor, fontSize: 14,), textAlign: TextAlign.center,),
+                              Text(appLocalizations.confirmDeleteAccount, style: TextStyle(color: AppColors.quinaryColor, fontSize: 14,), textAlign: TextAlign.center,),
                               const SizedBox(height: 20),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ShakeWidget(
-                                    controller: _deleteAccountPasswordShakeController,
+                                    // --- CHANGE: Using the renamed shake controller. ---
+                                    controller: _deleteAccountConfirmShakeController,
                                     child: TextField(
-                                      controller: passwordController,
-                                      obscureText: true,
+                                      controller: confirmController,
+                                      // --- CHANGE: obscureText is removed. ---
                                       style: TextStyle(color: AppColors.primaryColor.inverted),
                                       decoration: InputDecoration(
-                                        labelText: appLocalizations.password,
+                                        labelText: appLocalizations.confirmWord,
                                         labelStyle: TextStyle(color: AppColors.primaryColor.inverted),
                                         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.quinaryColor), borderRadius: BorderRadius.circular(10.0),),
                                         focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor.inverted), borderRadius: BorderRadius.circular(10.0),),
@@ -349,12 +351,12 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
                                   ),
                                   AnimatedSwitcher(
                                     duration: const Duration(milliseconds: 300),
-                                    child: passwordError != null
+                                    child: confirmError != null
                                         ? Padding(
                                       padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(passwordError!, style: const TextStyle(color: Colors.red), key: ValueKey(passwordError),),
+                                      child: Text(confirmError!, style: const TextStyle(color: Colors.red), key: ValueKey(confirmError),),
                                     )
-                                        : const SizedBox.shrink(key: ValueKey("emptyPasswordError")),
+                                        : const SizedBox.shrink(key: ValueKey("emptyConfirmError")),
                                   ),
                                 ],
                               ),
@@ -365,6 +367,7 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
                         IntrinsicHeight(
                           child: Row(
                             children: [
+                              // ... (Cancel button remains the same)
                               Expanded(
                                 child: Material(
                                   color: Colors.transparent,
@@ -386,10 +389,11 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
                                     splashColor: Colors.red.withOpacity(0.3),
                                     highlightColor: Colors.red.withOpacity(0.1),
                                     onTap: () async {
-                                      final password = passwordController.text.trim();
-                                      if (password.isEmpty) {
-                                        setDialogInnerState(() => passwordError = appLocalizations.passwordRequired);
-                                        _deleteAccountPasswordShakeController.forward(from: 0);
+                                      // --- CORE LOGIC CHANGE: Validate 'VERTEX' instead of password. ---
+                                      final confirmationText = confirmController.text.trim();
+                                      if (confirmationText != "VERTEX") {
+                                        setDialogInnerState(() => confirmError = appLocalizations.confirmWordError);
+                                        _deleteAccountConfirmShakeController.forward(from: 0);
                                         return;
                                       }
 
@@ -400,13 +404,9 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
                                       }
 
                                       try {
-                                        final credential = EmailAuthProvider.credential(
-                                          email: user.email!,
-                                          password: password,
-                                        );
-                                        await user.reauthenticateWithCredential(credential);
+                                        // --- CRITICAL: User re-authentication with password has been removed. ---
 
-                                        debugPrint("$methodName: Re-authentication successful. Calling 'requestAccountDeletion' function...");
+                                        debugPrint("$methodName: Confirmation successful. Calling 'requestAccountDeletion' function...");
                                         final functions = FirebaseFunctions.instanceFor(region: 'europe-west1');
                                         await functions.httpsCallable('requestAccountDeletion').call();
                                         debugPrint("$methodName: 'requestAccountDeletion' function call completed successfully.");
@@ -427,26 +427,18 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
                                             bottomOffset: 0.02
                                         );
 
-                                      } on FirebaseAuthException catch (e) {
-                                        if (!dialogPageContext.mounted) return;
-                                        debugPrint("$methodName: FirebaseAuthException: ${e.code}");
-                                        if (e.code == 'wrong-password' || e.code == 'invalid-credential' || e.code == 'invalid-password') {
-                                          setDialogInnerState(() => passwordError = appLocalizations.wrongPassword);
-                                        } else {
-                                          setDialogInnerState(() => passwordError = appLocalizations.anErrorOccurred);
-                                        }
-                                        _deleteAccountPasswordShakeController.forward(from: 0);
+                                        // --- CHANGE: Removed FirebaseAuthException catch block for wrong password. ---
                                       } on FirebaseFunctionsException catch (e) {
                                         if (!dialogPageContext.mounted) return;
                                         debugPrint("$methodName: FirebaseFunctionsException: ${e.code} - ${e.message}");
-                                        setDialogInnerState(() => passwordError = appLocalizations.anErrorOccurred);
-                                        _deleteAccountPasswordShakeController.forward(from: 0);
+                                        setDialogInnerState(() => confirmError = appLocalizations.anErrorOccurred);
+                                        _deleteAccountConfirmShakeController.forward(from: 0);
                                       }
                                       catch (e) {
                                         if (!dialogPageContext.mounted) return;
                                         debugPrint("$methodName: An unexpected error occurred: $e");
-                                        setDialogInnerState(() => passwordError = appLocalizations.anErrorOccurred);
-                                        _deleteAccountPasswordShakeController.forward(from: 0);
+                                        setDialogInnerState(() => confirmError = appLocalizations.anErrorOccurred);
+                                        _deleteAccountConfirmShakeController.forward(from: 0);
                                       }
                                     },
                                     child: Container(

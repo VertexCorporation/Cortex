@@ -561,7 +561,7 @@
   "photoLimitReachedMessage": "只能添加一张照片",
   "inappropriateContentDetected": "检测到不当内容！",
   "offlineModelNotInstalled": "此离线模型未安装在您的设备上。",
-  "insufficientCredits": "您的信用点不足，无法完成此请求。此操作需要 {required} 个信用点，但您只有 {available} 个。如需获取更多信用点，您可以升级您的套餐或直接购买。",
+  "insufficientCredits": "您没有足够的积分来完成此请求。此操作需要 {required} 积分，但您只有 {available}。要获得更多积分，您可以升级您的套餐或直接购买。嘿 我们完全理解积分用完确实有点烦但说真的从模特那里得到那些超棒的回复可不是免费的所以这些积分实际上帮助我们保持一切顺利进行听着如果更多人加入并购买积分我们完全可以考虑为所有人提高免费每日额度",
   "@insufficientCredits": {
     "placeholders": {
       "available": {},
@@ -623,7 +623,7 @@
   "usernameRateLimitExceeded": "您每14天只能更改两次用户名。",
   "usernameUnchanged": "这已经是您当前的用户名。",
   "creditsInfoPanelTitle": "积分如何运作",
-  "creditsInfoPanelBody": "积分用于与在线模型聊天。\n\n• 发送给在线模型的每条消息花费20积分。\n• 添加图片会额外增加30积分。\n• 免费套餐用户每天可获得200积分奖励，该奖励每日重置。",
+  "creditsInfoPanelBody": "积分用于与在线模特聊天。告诉你一声，你发送给她们的每一条消息都会让我们付出成本。\n\n• 发送给在线模特每条消息花费20积分。\n• 包含一张图片额外增加30积分。\n• 免费计划用户每天可获得200积分奖励，每日重置。",
   "creditsInfoPanelFooter": "聊天愉快！",
   "disclaimerMessage": "人工智能可能会犯错，请核对重要信息。",
 

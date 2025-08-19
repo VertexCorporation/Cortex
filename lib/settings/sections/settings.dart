@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart'; // For kDebugMode and Factory
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // For SVG icons
 import 'package:google_fonts/google_fonts.dart'; // For custom fonts
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // For localization
+import 'package:cortex/l10n/app_localizations.dart'; // For localization
 import 'package:provider/provider.dart'; // To access NotificationService
 import 'package:share_plus/share_plus.dart'; // For sharing functionality
 import 'package:url_launcher/url_launcher.dart'; // For launching external URLs

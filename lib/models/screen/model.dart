@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../darkener.dart';
 import '../../extensions.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import '../../internet.dart';
 import '../../notifications.dart';
 import '../../theme.dart';

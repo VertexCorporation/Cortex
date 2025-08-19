@@ -9,7 +9,7 @@ import '../../../../funds/subscriptions/subscriptions.dart';
 import '../../../../navigation.dart';
 import '../../../../notifications.dart';
 import '../../../../theme.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 
 /// A widget that represents the chat input area including
 /// a text field for message input, photo selection with preview,

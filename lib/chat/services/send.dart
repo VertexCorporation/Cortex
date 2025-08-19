@@ -10,7 +10,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:cortex/chat/services/review.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 import '../../cache.dart';
 import '../../models/backend/data.dart';
@@ -166,6 +166,26 @@ class SendService {
           localizations,
           aiMessageIndex,
         );
+
+        if (state.mounted && !state.responseStopped) {
+          final int targetIndex = isRegenerate && regenerateAiIndex != null
+              ? regenerateAiIndex
+              : (aiMessageIndex);
+
+          if (targetIndex >= 0 && targetIndex < state.messages.length) {
+            state.setState(() {
+              final msg = state.messages[targetIndex];
+              msg.isThinking = false;
+              msg.includeInContext = true;
+              state.isWaitingForResponse = false;
+            });
+
+            if (state.conversationID != null) {
+              await ChatStorageService.upsertMessage(
+                  state.conversationID!, targetIndex, state.messages[targetIndex]);
+            }
+          }
+        }
         if (!isRegenerate) {
           debugPrint("[SendService] Successful server response. Triggering review check.");
           unawaited(ReviewService().triggerReviewPromptIfNeeded(state.context));
@@ -429,21 +449,6 @@ class SendService {
         photoPath: photoPath,
         onStreamChunk: onStreamChunk,
       );
-    }
-
-    // This part will only be reached if the API call is successful.
-    if (state.mounted && !state.responseStopped) {
-      state.setState(() {
-        final msg = state.messages[targetIndex];
-        msg.isThinking = false;
-        msg.includeInContext = true;
-        state.isWaitingForResponse = false;
-      });
-
-      if (state.conversationID != null) {
-        await ChatStorageService.upsertMessage(
-            state.conversationID!, targetIndex, state.messages[targetIndex]);
-      }
     }
   }
 

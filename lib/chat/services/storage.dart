@@ -148,18 +148,6 @@ class ChatStorageService {
     return rows.isNotEmpty ? rows.first : null;
   }
 
-  static Stream<Map<String, dynamic>> watchLastMessage(String convId) async* {
-    Map<String, dynamic>? previous;
-    while (true) {
-      final current = await getLastMessage(convId);
-      if (current != null && current != previous) {
-        yield current;
-        previous = current;
-      }
-      await Future.delayed(const Duration(milliseconds: 200));
-    }
-  }
-
   static Future<void> upsertMessage(
       String convId, int idx, Message m) async {
     final db = await DbHelper().db;

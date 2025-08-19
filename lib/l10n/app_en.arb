@@ -561,7 +561,7 @@
   "photoLimitReachedMessage": "Only one photo can be added",
   "inappropriateContentDetected": "Inappropriate content detected!",
   "offlineModelNotInstalled": "This offline model is not installed on your device.",
-  "insufficientCredits": "You do not have enough credits to complete this request. This action requires {required} credits, but you only have {available}. To gain more credits, you can upgrade your plan or purchase them directly.",
+  "insufficientCredits": "You do not have enough credits to complete this request. This action requires {required} credits, but you only have {available}. To gain more credits, you can upgrade your plan or purchase them directly. hey we totally get it running out of credits can be a bit of a bummer but seriously getting those awesome replies from our models isnt free so these credits actually help us keep the good times rolling and listen if more of you guys jump in and get credits we can totally look at bumping up those free daily limits for everyone",
   "@insufficientCredits": {
     "placeholders": {
       "available": {},
@@ -623,7 +623,7 @@
   "usernameRateLimitExceeded": "You can only change your username twice every 14 days.",
   "usernameUnchanged": "This is already your current username.",
   "creditsInfoPanelTitle": "How Credits Work",
-  "creditsInfoPanelBody": "Credits are used to chat with online models.\n\n• Each message to an online model costs 20 credits.\n• Including an image adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.",
+  "creditsInfoPanelBody": "Credits are used to chat with online models. Just so you know, every message you send to them costs us money.\n\n• Each message to an online model costs 20 credits.\n• Including an image adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.",
   "creditsInfoPanelFooter": "Happy chatting!",
   "disclaimerMessage": "Artificial Intelligences can make mistakes, check important information.",
   "modelCreatedSuccess": "Model created successfully!",

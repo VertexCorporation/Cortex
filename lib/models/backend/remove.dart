@@ -4,11 +4,10 @@ import 'dart:io';
 import 'dart:developer' as dev;
 import 'package:flutter/material.dart'; // For BuildContext
 import 'package:provider/provider.dart'; // For Provider
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // For localizations
+import 'package:cortex/l10n/app_localizations.dart'; // For localizations
 import 'package:cortex/models/backend/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import '../../cache.dart';
 import '../../chat/services/storage.dart';
 import '../../notifications.dart'; // For NotificationService
 import 'data.dart';

@@ -6,7 +6,7 @@ import 'package:cortex/theme.dart'; // Provides access to the app's color scheme
 import 'package:flutter/foundation.dart'; // Provides kDebugMode for conditional logging.
 import 'package:flutter/gestures.dart'; // Required for custom gesture recognizers in WebView.
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // For localization strings.
+import 'package:cortex/l10n/app_localizations.dart'; // For localization strings.
 import 'package:flutter_svg/flutter_svg.dart'; // For rendering SVG assets.
 import 'package:google_fonts/google_fonts.dart'; // For custom fonts.
 import 'package:webview_flutter/webview_flutter.dart'; // The core WebView widget.

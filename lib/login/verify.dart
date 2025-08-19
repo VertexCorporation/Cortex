@@ -13,7 +13,7 @@ import '../initialization.dart';
 import '../main.dart';
 import '../notifications.dart';
 import '../theme.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   final String email;

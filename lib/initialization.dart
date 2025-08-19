@@ -19,6 +19,7 @@ import 'package:cortex/referral.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
@@ -100,8 +101,6 @@ class _InitializationScreenState extends State<InitializationScreen> with Single
     // --- STEP 3: Now, await the completion of the lightweight tasks. ---
     final (prefs, isConnected) = await coreServicesFuture;
     debugPrint('Initialization: Core Services are ready.');
-
-    // --- The rest of the logic remains exactly the same ---
 
     await OfflineModeratorService().initialize();
 
@@ -350,17 +349,19 @@ Future<void> reconcileAndSyncPurchases() async {
   }
 }
 
-/// Reconciles the number of local user-created models with the counts stored on the server.
+/// This self-healing mechanism handles data discrepancies. Its logic is now aligned
+/// with the secure server-side function which ONLY allows INCREASING the count.
 ///
-/// This function is a critical self-healing mechanism that corrects data discrepancies
-/// which can arise if a user manually clears the app's storage or reinstalls the app.
-/// It treats the local database as the "source of truth" and updates the server to match,
-/// ensuring users are never unfairly blocked from creating new models due to "ghost data".
+/// 1.  If `localCount > serverCount`: This is a legitimate sync-up. The user may have
+///     created models offline. We call the Cloud Function to update the server.
+/// 2.  If `localCount < serverCount`: This indicates local data loss (e.g., app data cleared).
+///     We DO NOT call the function, as decreasing the server count is forbidden.
+///     The server remains the "source of truth" for the user's limits.
+/// 3.  If `localCount == serverCount`: Everything is in sync. No action is needed.
 Future<void> _reconcileLocalAndRemoteModelCounts() async {
   debugPrint('Reconciliation: Starting model count consistency check...');
   final user = FirebaseAuth.instance.currentUser;
 
-  // This check can only run for an authenticated user.
   if (user == null) {
     debugPrint('Reconciliation: No user logged in. Skipping.');
     return;
@@ -368,7 +369,6 @@ Future<void> _reconcileLocalAndRemoteModelCounts() async {
 
   try {
     // STEP 1: Get LOCAL state (The Device's Ground Truth)
-    // We query the local DB directly for the most accurate current state of user models.
     final db = await DatabaseHelper.instance.database;
     final localRoleplayModels = await db.query('models', where: "id LIKE 'self_%'");
     final localOfflineModels = await db.query('models', where: "id LIKE 'local_%'");
@@ -387,28 +387,34 @@ Future<void> _reconcileLocalAndRemoteModelCounts() async {
     final int remoteOfflineCount = remoteData['offlineModelCount'] ?? 0;
     debugPrint('Reconciliation: Remote state -> Roleplay: $remoteRoleplayCount, Offline: $remoteOfflineCount');
 
-    // STEP 3: Compare and Act if a Discrepancy Exists
-    // If the local and remote counts do not match, we trigger the secure Cloud Function.
-    if (localRoleplayCount != remoteRoleplayCount || localOfflineCount != remoteOfflineCount) {
-      debugPrint('Reconciliation: Discrepancy detected! Initiating server-side reconciliation.');
+    // --- STEP 3 (REVISED): Compare and Act SECURELY ---
+    bool needsSyncUp = localRoleplayCount > remoteRoleplayCount || localOfflineCount > remoteOfflineCount;
+
+    if (needsSyncUp) {
+      debugPrint('Reconciliation: Local count is higher. Initiating server-side sync-up.');
 
       final callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable('reconcileModelCounts');
+      // We still send both counts, the server will decide which one to update.
       await callable.call({
         'localRoleplayCount': localRoleplayCount,
         'localOfflineCount': localOfflineCount,
       });
 
       debugPrint('Reconciliation: Server counts successfully updated to match local state.');
-    } else {
+    } else if (localRoleplayCount < remoteRoleplayCount || localOfflineCount < remoteOfflineCount) {
+      debugPrint('Reconciliation: Server count is higher. This indicates local data loss. No action taken to prevent exploiting limits.');
+      // This is a good place to log an analytics event to monitor how often this happens.
+    }
+    else {
       debugPrint('Reconciliation: Local and remote model counts are in sync. No action needed.');
     }
   } on FirebaseFunctionsException catch (e) {
-    // It's safe to fail gracefully here. The check will run again on the next app launch.
     debugPrint("Reconciliation: Failed to call Cloud Function. It will be retried on next launch. Error: ${e.code} - ${e.message}");
   } catch (e) {
     debugPrint("Reconciliation: An unexpected error occurred during the process: $e");
   }
 }
+
 
 /// Initializes core services in the correct order to prevent race conditions,
 /// while still parallelizing independent tasks to optimize startup time.
@@ -465,30 +471,32 @@ Future<Widget> _determineStartupScreen(SharedPreferences prefs, bool isConnected
   if (user == null) {
     debugPrint('Startup: No active Firebase session found. Checking secure storage for auto-login...');
     const secureStorage = FlutterSecureStorage();
-    final rememberMe = await secureStorage.read(key: 'remember_me');
 
-    if (rememberMe == 'true') {
-      final email = await secureStorage.read(key: 'email');
-      final password = await secureStorage.read(key: 'password');
+    try {
+      final rememberMe = await secureStorage.read(key: 'remember_me');
 
-      // Check for email/password combo (Google Sign-In won't have a password)
-      if (email != null && password != null) {
-        try {
+      if (rememberMe == 'true') {
+        final email = await secureStorage.read(key: 'email');
+        final password = await secureStorage.read(key: 'password');
+
+        if (email != null && password != null) {
           debugPrint('Startup: Credentials found. Attempting silent auto-login...');
           final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-          user = userCredential.user; // Success! We have a user now.
+          user = userCredential.user;
           debugPrint('Startup: Auto-login successful for UID: ${user!.uid}');
-        } catch (e) {
-          debugPrint('Startup: Auto-login failed (credentials might be outdated). Clearing secure storage. Error: $e');
-          await secureStorage.deleteAll();
-          return const LoginScreen(); // Navigate to login after failure.
+        } else if (email != null) {
+          debugPrint('Startup: Remembered user is likely a Google user. Proceeding to LoginScreen for re-authentication.');
+          return const LoginScreen();
         }
-      } else if (email != null) {
-        // This case handles Google Sign-In where only email and remember_me flag exist.
-        // We can't auto-login, but we also shouldn't block the user. We'll proceed to LoginScreen.
-        debugPrint('Startup: Remembered user is likely a Google user. Proceeding to LoginScreen for re-authentication.');
-        return const LoginScreen();
       }
+    } on PlatformException catch (e) {
+      debugPrint("Startup: Secure storage could not be read (likely corrupted or key changed). Wiping storage. Error: ${e.message}");
+      await secureStorage.deleteAll();
+      return const LoginScreen();
+    } catch (e) {
+      debugPrint('Startup: Auto-login failed (credentials might be outdated). Clearing secure storage. Error: $e');
+      await secureStorage.deleteAll();
+      return const LoginScreen();
     }
   }
 

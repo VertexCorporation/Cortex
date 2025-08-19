@@ -13,7 +13,7 @@ import 'package:intl/intl.dart';
 import '../darkener.dart';
 import '../overflow.dart';
 import '../theme.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'manager.dart';
 
 class ConversationTile extends StatefulWidget {
