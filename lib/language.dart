@@ -6,10 +6,18 @@ class LocaleProvider extends ChangeNotifier {
   Locale _locale;
 
   final List<String> _allowedLanguageCodes = [
-    'en',
-    'tr',
-    'zh',
-    'fr',
+    'en', // English
+    'tr', // Turkish
+    'zh', // Chinese
+    'fr', // French
+    'hi', // Hindi
+    'pt', // Portuguese
+    'id', // Indonesian
+    'az', // Azerbaijani
+    'de', // German
+    'es', // Spanish
+    'it', // Italian
+    'ja', // Japanese
   ];
 
   LocaleProvider() : _locale = const Locale('en') {

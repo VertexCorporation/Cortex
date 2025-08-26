@@ -186,6 +186,7 @@ List<InlineSpan> _processInlineElements(
     Map<String, RegExp> patterns,
     double fs,
     ) {
+  // If the text is just whitespace, return it immediately.
   if (text.trim().isEmpty) {
     return [
       TextSpan(
@@ -198,43 +199,26 @@ List<InlineSpan> _processInlineElements(
     ];
   }
 
-  final matchedRanges = <_MatchRange>[];
-
-  patterns.forEach((type, pattern) {
-    final matches = pattern.allMatches(text);
-    for (final match in matches) {
-      matchedRanges.add(_MatchRange(
-        start: match.start,
-        end: match.end,
-        text: match.group(0)!,
-        type: type,
-      ));
-    }
-  });
-
-  matchedRanges.sort((a, b) => a.start - b.start);
-
-  final finalMatches = <_MatchRange>[];
-  for (final match in matchedRanges) {
-    bool shouldAdd = true;
-    for (final existing in finalMatches) {
-      if (match.start < existing.end && match.end > existing.start) {
-        shouldAdd = false;
-        break;
-      }
-    }
-    if (shouldAdd) finalMatches.add(match);
-  }
-
-  finalMatches.sort((a, b) => a.start - b.start);
+  // --- PERFORMANCE OPTIMIZATION ---
+  // Instead of running each RegExp separately, we combine them into one.
+  // Each pattern is wrapped in a "named capture group" `(?<name>...)`.
+  // This allows us to check which specific pattern was matched in a single pass.
+  //
+  // CORRECTED LINE: Used `e.value.pattern` instead of the non-existent `e.value.source`.
+  final combinedPattern = RegExp(
+    patterns.entries.map((e) => '(?<${e.key}>${e.value.pattern})').join('|'),
+    dotAll: true,
+  );
 
   final spans = <InlineSpan>[];
   int currentIndex = 0;
   bool isThinking = false; // State to track if we are inside <think> tags
 
-  for (final match in finalMatches) {
+  // We now iterate through the matches of our single, combined RegExp.
+  // This is far more efficient than the previous multi-pass approach.
+  for (final match in combinedPattern.allMatches(text)) {
+    // 1. Add any plain text that came before this match.
     if (match.start > currentIndex) {
-      // Process text between matches
       final subText = text.substring(currentIndex, match.start);
       spans.add(TextSpan(
         text: subText,
@@ -246,23 +230,42 @@ List<InlineSpan> _processInlineElements(
       ));
     }
 
-    // Process the match itself
-    if (match.type == 'thinkStart') {
-      isThinking = true;
-      // The tag is hidden by not adding any visible span for it.
-    } else if (match.type == 'thinkEnd') {
-      isThinking = false;
-      // The tag is hidden.
-    } else {
-      // For other markdown, process it normally but pass the current thinking state.
-      spans.add(_processInlineMatch(match, fs, isThinking: isThinking));
+    // 2. Process the match itself.
+    // We find which named group was successful to determine the match type.
+    String? matchType;
+    for (final key in patterns.keys) {
+      if (match.namedGroup(key) != null) {
+        matchType = key;
+        break;
+      }
+    }
+
+    if (matchType != null) {
+      // Handle the state for <think> tags.
+      if (matchType == 'thinkStart') {
+        isThinking = true;
+        // The tag itself is not rendered.
+      } else if (matchType == 'thinkEnd') {
+        isThinking = false;
+        // The tag itself is not rendered.
+      } else {
+        // For all other markdown types, process them using the existing function.
+        // We create a temporary _MatchRange to reuse the logic.
+        final inlineMatch = _MatchRange(
+          start: match.start,
+          end: match.end,
+          text: match.group(0)!,
+          type: matchType,
+        );
+        spans.add(_processInlineMatch(inlineMatch, fs, isThinking: isThinking));
+      }
     }
 
     currentIndex = match.end;
   }
 
+  // 3. Add any final plain text that remains after the last match.
   if (currentIndex < text.length) {
-    // Process any remaining text after the last match
     spans.add(TextSpan(
       text: text.substring(currentIndex),
       style: TextStyle(
@@ -276,248 +279,184 @@ List<InlineSpan> _processInlineElements(
   return spans;
 }
 
+// =================================================================
+// _processBlockMatch
+// =================================================================
+
 InlineSpan _processBlockMatch(_MatchRange match, double fs) {
-  final matchText = match.text;
+  try { // <-- ADDED for overall protection
+    final matchText = match.text;
 
-  switch (match.type) {
-    case 'horizontalRule':
-      return WidgetSpan(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
-          child: Divider(color: Colors.grey, thickness: 1),
-        ),
-      );
-
-    case 'codeBlock':
-      if (matchText.length >= 6) {
-        final content = matchText.substring(3, matchText.length - 3).trim();
+    switch (match.type) {
+      case 'horizontalRule':
         return WidgetSpan(
-          alignment: PlaceholderAlignment.baseline,
-          baseline: TextBaseline.alphabetic,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: CodeBlockWidget(code: content),
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+            child: Divider(color: Colors.grey, thickness: 1),
           ),
         );
-      }
-      return TextSpan(
-        text: matchText,
-        style: TextStyle(
-          color: AppColors.primaryColor.inverted,
-          fontSize: fs,
-        ),
-      );
 
-    case 'table':
-      final lines = matchText.trimRight().split(RegExp(r'\r?\n'));
-      if (lines.length < 3) {
-        return TextSpan(
-          text: matchText,
-          style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs),
-        );
-      }
+      case 'codeBlock':
+        if (matchText.length >= 6) {
+          final content = matchText.substring(3, matchText.length - 3).trim();
+          return WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: CodeBlockWidget(code: content),
+            ),
+          );
+        }
+        // Fallback for invalid code block
+        return TextSpan(text: matchText, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs));
 
-      List<String> _splitRow(String row) => row
-          .split('|')
-          .where((c) => c.trim().isNotEmpty)
-          .map((c) => c.trim())
-          .toList();
+      case 'table':
+        final lines = matchText.trimRight().split(RegExp(r'\r?\n'));
+        if (lines.length < 3) {
+          // Fallback for invalid table
+          return TextSpan(text: matchText, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs));
+        }
 
-      final header      = _splitRow(lines.first);
-      final dataRowsRaw = lines.skip(2);
-      final dataRows    = dataRowsRaw.map(_splitRow).toList();
-
-      final colCount = header.length;                    // ⬅️ referans uzunluk
+        List<String> _splitRow(String row) => row.split('|').where((c) => c.trim().isNotEmpty).map((c) => c.trim()).toList();
+        final header = _splitRow(lines.first);
+        final dataRowsRaw = lines.skip(2);
+        final dataRows = dataRowsRaw.map(_splitRow).toList();
+        final colCount = header.length;
         List<Widget> _padStr(List<String> cells, Widget Function(String) builder) {
-            final padded = [...cells];
-            while (padded.length < colCount) padded.add('');                    // ⬅️ eksikler boş
-            return padded.map(builder).toList();
-          }
+          final padded = [...cells];
+          while (padded.length < colCount) padded.add('');
+          return padded.map(builder).toList();
+        }
 
-      Widget _th(String txt) =>
-          Padding(padding: const EdgeInsets.all(8), child: Text(txt, style: const TextStyle(fontWeight: FontWeight.bold)));
-      Widget _td(String txt) =>
-          Padding(padding: const EdgeInsets.all(8), child: Text(txt));
+        Widget _th(String txt) => Padding(padding: const EdgeInsets.all(8), child: Text(txt, style: const TextStyle(fontWeight: FontWeight.bold)));
+        Widget _td(String txt) => Padding(padding: const EdgeInsets.all(8), child: Text(txt));
 
-      return WidgetSpan(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Table(
-            border: TableBorder.all(color: Colors.grey),
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            children: [
-              TableRow(children: _padStr(header, _th)),
-              for (final row in dataRows) TableRow(children: _padStr(row, _td)),
-            ],
-          ),
-        ),
-      );
-
-    case 'heading':
-      final level = matchText.indexOf(' ');
-      if (level > 0 && level <= 6) {
-        final content = matchText.substring(level + 1);
-        final headingSize = fs * (1 + (6 - level) * 0.15);
-        return TextSpan(
-          text: content + '\n',
-          style: TextStyle(
-            color: AppColors.primaryColor.inverted,
-            fontSize: headingSize,
-            fontWeight: FontWeight.bold,
+        return WidgetSpan(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Table(
+              border: TableBorder.all(color: Colors.grey),
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: [
+                TableRow(children: _padStr(header, _th)),
+                for (final row in dataRows) TableRow(children: _padStr(row, _td)),
+              ],
+            ),
           ),
         );
-      }
-      return TextSpan(
-        text: matchText,
-        style: TextStyle(
-          color: AppColors.primaryColor.inverted,
-          fontSize: fs,
-        ),
-      );
 
-    default:
-      return TextSpan(
-        text: matchText,
-        style: TextStyle(
-          color: AppColors.primaryColor.inverted,
-          fontSize: fs,
-        ),
-      );
+      case 'heading':
+        final level = matchText.indexOf(' ');
+        if (level > 0 && level <= 6) {
+          final content = matchText.substring(level + 1);
+          final headingSize = fs * (1 + (6 - level) * 0.15);
+          return TextSpan(
+            text: content + '\n',
+            style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: headingSize, fontWeight: FontWeight.bold),
+          );
+        }
+        // Fallback for invalid heading
+        return TextSpan(text: matchText, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs));
+
+      default:
+        return TextSpan(text: matchText, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs));
+    }
+  } catch (e) {
+    // IF ANY UNEXPECTED ERROR OCCURS, SAFELY RENDER THE SEGMENT AS PLAIN TEXT
+    print('Error processing block match: ${match.text}, Error: $e');
+    return TextSpan(text: match.text, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs));
   }
 }
 
+
+// =================================================================
+// _processInlineMatch
+// =================================================================
+
 InlineSpan _processInlineMatch(_MatchRange match, double fs, {bool isThinking = false}) {
-  final matchText = match.text;
+  try { // <-- ADDED for overall protection
+    final matchText = match.text;
+    final baseStyle = TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs, fontStyle: isThinking ? FontStyle.italic : FontStyle.normal);
 
-  // This base style will be used for text that should inherit the thinking state (italic)
-  final baseStyle = TextStyle(
-    color: AppColors.primaryColor.inverted,
-    fontSize: fs,
-    fontStyle: isThinking ? FontStyle.italic : FontStyle.normal,
-  );
-
-  switch (match.type) {
-  // The 'think' case is removed as it's now handled by the state machine above.
-
-    case 'latex':
-      String latex = matchText;
-      if (latex.startsWith('\\begin{') && latex.endsWith('\\end{')) {
-        latex = latex.trim();
-      } else if ((latex.startsWith(r'$$') && latex.endsWith(r'$$')) ||
-          (latex.startsWith('\\[') && latex.endsWith('\\]'))) {
-        latex = latex.substring(2, latex.length - 2).trim();
-      } else if ((latex.startsWith(r'$') && latex.endsWith(r'$')) ||
-          (latex.startsWith('\\(') && latex.endsWith('\\)'))) {
-        latex = latex.substring(1, latex.length - 1).trim();
-      }
-
-      // If the stripped content is empty (e.g., from "$$"), or otherwise invalid,
-      // fall back to rendering it as plain text to prevent crashes.
-      if (latex.isEmpty) {
-        return TextSpan(
-          text: matchText,
-          style: baseStyle,
+    switch (match.type) {
+      case 'latex':
+        String latex = matchText;
+        if (latex.startsWith('\\begin{') && latex.endsWith('\\end{')) {
+          latex = latex.trim();
+        } else if ((latex.startsWith(r'$$') && latex.endsWith(r'$$')) || (latex.startsWith('\\[') && latex.endsWith('\\]'))) {
+          latex = latex.substring(2, latex.length - 2).trim();
+        } else if ((latex.startsWith(r'$') && latex.endsWith(r'$')) || (latex.startsWith('\\(') && latex.endsWith('\\)'))) {
+          latex = latex.substring(1, latex.length - 1).trim();
+        }
+        if (latex.isEmpty) {
+          return TextSpan(text: matchText, style: baseStyle);
+        }
+        return WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: SafeMathTex(
+            latex: latex,
+            textStyle: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs),
+          ),
         );
-      }
 
-      return WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        child: SafeMathTex(
-          latex: latex,
-          textStyle: TextStyle( // LaTeX has its own style, doesn't become italic
-            color: AppColors.primaryColor.inverted,
-            fontSize: fs,
-          ),
-        ),
-      );
-
-    case 'inlineCode':
-      final content = matchText.substring(1, matchText.length - 1);
-      return WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.0),
-            decoration: BoxDecoration(
-              color: AppColors.secondaryColor,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              content,
-              style: TextStyle( // Code has its own style
-                color: AppColors.primaryColor.inverted,
-                fontSize: fs * 0.9,
-                fontFamily: 'monospace',
-              ),
-              softWrap: true,
-              overflow: TextOverflow.visible,
+      case 'inlineCode':
+        final content = matchText.substring(1, matchText.length - 1);
+        return WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.0),
+              decoration: BoxDecoration(color: AppColors.secondaryColor, borderRadius: BorderRadius.circular(4)),
+              child: Text(content, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs * 0.9, fontFamily: 'monospace'), softWrap: true, overflow: TextOverflow.visible),
             ),
           ),
-        ),
-      );
+        );
 
-    case 'link':
-      final m = RegExp(r'\[([^\]]+)\]\(([^)]+)\)').firstMatch(matchText)!;
-      final label = m.group(1)!;
-      final url = m.group(2)!;
-      return WidgetSpan(
-        child: Builder(
-          builder: (ctx) => GestureDetector(
-            onTap: () => _openLink(ctx, url),
-            child: Text(
-              label,
-              style: baseStyle.copyWith( // Link inherits base style (like italic) but color is blue
-                color: Colors.blue,
-                decoration: TextDecoration.underline,
-              ),
+      case 'link':
+        final m = RegExp(r'\[([^\]]+)\]\(([^)]+)\)').firstMatch(matchText)!;
+        final label = m.group(1)!;
+        final url = m.group(2)!;
+        return WidgetSpan(
+          child: Builder(
+            builder: (ctx) => GestureDetector(
+              onTap: () => _openLink(ctx, url),
+              child: Text(label, style: baseStyle.copyWith(color: Colors.blue, decoration: TextDecoration.underline)),
             ),
           ),
-        ),
-      );
+        );
 
-    case 'boldItalic':
-      final content = matchText.substring(3, matchText.length - 3).trim();
-      return TextSpan(
-        text: content,
-        style: baseStyle.copyWith( // Merges with base style
-          fontWeight: FontWeight.bold,
-          fontStyle: FontStyle.italic,
-        ),
-      );
+      case 'boldItalic':
+        final content = matchText.substring(3, matchText.length - 3).trim();
+        return TextSpan(text: content, style: baseStyle.copyWith(fontWeight: FontWeight.bold, fontStyle: FontStyle.italic));
 
-    case 'bold':
-      final content = matchText.substring(2, matchText.length - 2).trim();
-      return TextSpan(
-        text: content,
-        style: baseStyle.copyWith( // Merges with base style
-          fontWeight: FontWeight.bold,
-        ),
-      );
+      case 'bold':
+        final content = matchText.substring(2, matchText.length - 2).trim();
+        return TextSpan(text: content, style: baseStyle.copyWith(fontWeight: FontWeight.bold));
 
-    case 'italic':
-      final content = matchText.substring(1, matchText.length - 1).trim();
-      return TextSpan(
-        text: content,
-        style: baseStyle.copyWith( // Merges with base style
-          fontStyle: FontStyle.italic,
-        ),
-      );
+      case 'italic':
+        final content = matchText.substring(1, matchText.length - 1).trim();
+        return TextSpan(text: content, style: baseStyle.copyWith(fontStyle: FontStyle.italic));
 
-    case 'strikethrough':
-      final content = matchText.substring(2, matchText.length - 2).trim();
-      return TextSpan(
-        text: content,
-        style: baseStyle.copyWith( // Merges with base style
-          decoration: TextDecoration.lineThrough,
-        ),
-      );
+      case 'strikethrough':
+        final content = matchText.substring(2, matchText.length - 2).trim();
+        return TextSpan(text: content, style: baseStyle.copyWith(decoration: TextDecoration.lineThrough));
 
-    default:
-      return TextSpan(
-        text: matchText,
-        style: baseStyle,
-      );
+      default:
+        return TextSpan(text: matchText, style: baseStyle);
+    }
+  } catch (e) {
+    // IF ANY UNEXPECTED ERROR OCCURS, SAFELY RENDER THE SEGMENT AS PLAIN TEXT
+    print('Error processing inline match: ${match.text}, Error: $e');
+    return TextSpan(
+      text: match.text,
+      style: TextStyle(
+        color: AppColors.primaryColor.inverted,
+        fontSize: fs,
+        fontStyle: isThinking ? FontStyle.italic : FontStyle.normal,
+      ),
+    );
   }
 }
 

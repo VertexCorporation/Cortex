@@ -423,68 +423,80 @@ class SettingsScreenState extends State<SettingsScreen> with TickerProviderState
 
   Widget _buildSkeletonLoader() => const SkeletonLoader(key: ValueKey('skeletonLoader'));
 
-
   Widget _buildContent(AppLocalizations appLocalizations) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final String displayName = _userData?['username'] as String? ?? FirebaseAuth.instance.currentUser?.email?.split('@')[0] ?? appLocalizations.user;
     final String email = FirebaseAuth.instance.currentUser?.email ?? appLocalizations.emailAlreadyInUse;
 
-    return ListView(
+    final List<Widget> settingsItems = [
+      if (_userData != null)
+        ProfileHeaderSection(
+          displayName: displayName,
+          email: email,
+          userSubscriptionLevel: _hasCortexSubscription,
+          subscriptionExpiresAt: _subscriptionExpiresAt,
+          isAlphaUser: _isAlphaUser,
+        ),
+
+      if (_userData != null)
+        SizedBox(height: screenHeight * 0.02),
+
+      AnimatedOpacity(
+        duration: const Duration(milliseconds: 300),
+        opacity: (_userData != null && !_isVerified && _hasInternet) ? 1.0 : 0.0,
+        child: (_userData != null && !_isVerified && _hasInternet) ? _buildUnverifiedPanel(appLocalizations) : const SizedBox.shrink(),
+      ),
+
+      if (_userData != null && _hasInternet)
+        UserSection(
+          appLocalizations: appLocalizations,
+          notificationService: _notificationService,
+          userData: _userData!,
+          fetchUserDataCallback: _fetchUserData,
+          usernameRegExp: _usernameRegExp,
+          editProfileShakeController: _editProfileShakeController,
+          oldPasswordShakeController: _oldPasswordShakeController,
+          newPasswordShakeController: _newPasswordShakeController,
+          confirmPasswordShakeController: _confirmPasswordShakeController,
+          isDialogOpen: _isDialogOpen,
+          onDialogStateChanged: (isOpen) => setState(() => _isDialogOpen = isOpen),
+          hasInternetConnectionCallback: () async => _internetService.hasInternet(),
+        ),
+
+      if (_userData != null && _hasInternet)
+        SizedBox(height: screenHeight * 0.03),
+
+      AppLanguageSection(appLocalizations: appLocalizations, selectedLanguageCode: _selectedLanguageCode, onLanguageChanged: _changeLanguage, isDialogOpen: _isDialogOpen, onDialogStateChanged: (isOpen) => setState(() => _isDialogOpen = isOpen)),
+      SizedBox(height: screenHeight * 0.025),
+
+      AppThemeSection(appLocalizations: appLocalizations, userSubscriptionLevel: _hasCortexSubscription, isDialogOpen: _isDialogOpen,
+          subscriptionExpiresAt: _subscriptionExpiresAt, onDialogStateChanged: (isOpen) => setState(() => _isDialogOpen = isOpen), notificationService: _notificationService),
+      SizedBox(height: screenHeight * 0.025),
+
+      SettingsSection(
+        appLocalizations: appLocalizations,
+        isDialogOpen: _isDialogOpen,
+        onDialogStateChanged: (isOpen) => setState(() => _isDialogOpen = isOpen),
+        onDataNeedsRefresh: _fetchUserData,
+      ),
+      SizedBox(height: screenHeight * 0.025),
+
+      DeleteSection(
+        userData: _userData,
+        hasInternet: _hasInternet,
+        isFromActiveChat: widget.isFromActiveChat,
+      ),
+      SizedBox(height: screenHeight * 0.02),
+    ];
+
+    return ListView.builder(
       key: const ValueKey('settingsContent'),
       padding: EdgeInsets.all(screenWidth * 0.04),
-      children: [
-        if (_userData != null)
-          ProfileHeaderSection(
-            displayName: displayName,
-            email: email,
-            // Now passing both required pieces of data for a reliable check
-            userSubscriptionLevel: _hasCortexSubscription,
-            subscriptionExpiresAt: _subscriptionExpiresAt, // This parameter is new
-            isAlphaUser: _isAlphaUser,
-          ),
-        if (_userData != null) SizedBox(height: screenHeight * 0.02),
-
-        AnimatedOpacity(
-          duration: const Duration(milliseconds: 300),
-          opacity: (_userData != null && !_isVerified && _hasInternet) ? 1.0 : 0.0,
-          child: (_userData != null && !_isVerified && _hasInternet) ? _buildUnverifiedPanel(appLocalizations) : const SizedBox.shrink(),
-        ),
-
-        if (_userData != null && _hasInternet)
-          UserSection(
-            appLocalizations: appLocalizations,
-            notificationService: _notificationService,
-            userData: _userData!,
-            fetchUserDataCallback: _fetchUserData,
-            usernameRegExp: _usernameRegExp,
-            editProfileShakeController: _editProfileShakeController,
-            oldPasswordShakeController: _oldPasswordShakeController,
-            newPasswordShakeController: _newPasswordShakeController,
-            confirmPasswordShakeController: _confirmPasswordShakeController,
-            isDialogOpen: _isDialogOpen,
-            onDialogStateChanged: (isOpen) => setState(() => _isDialogOpen = isOpen),
-            hasInternetConnectionCallback: () async => _internetService.hasInternet(),
-          ),
-        if (_userData != null && _hasInternet) SizedBox(height: screenHeight * 0.03),
-
-        AppLanguageSection(appLocalizations: appLocalizations, selectedLanguageCode: _selectedLanguageCode, onLanguageChanged: _changeLanguage, isDialogOpen: _isDialogOpen, onDialogStateChanged: (isOpen) => setState(() => _isDialogOpen = isOpen)),
-        SizedBox(height: screenHeight * 0.025),
-
-        AppThemeSection(appLocalizations: appLocalizations, userSubscriptionLevel: _hasCortexSubscription, isDialogOpen: _isDialogOpen,   // This gives the widget the data it needs to check if the subscription is active.
-            subscriptionExpiresAt: _subscriptionExpiresAt, onDialogStateChanged: (isOpen) => setState(() => _isDialogOpen = isOpen), notificationService: _notificationService),
-        SizedBox(height: screenHeight * 0.025),
-
-        SettingsSection(appLocalizations: appLocalizations),
-        SizedBox(height: screenHeight * 0.025),
-
-        DeleteSection(
-          userData: _userData,
-          hasInternet: _hasInternet,
-          isFromActiveChat: widget.isFromActiveChat,
-        ),
-        SizedBox(height: screenHeight * 0.02),
-      ],
+      itemCount: settingsItems.length,
+      itemBuilder: (context, index) {
+        return settingsItems[index];
+      },
     );
   }
 

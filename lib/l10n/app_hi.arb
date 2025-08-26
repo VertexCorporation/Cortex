@@ -1,0 +1,680 @@
+{
+  "@@locale": "hi",
+
+  "understood": "समझ गया।",
+  "cancel": "रद्द करें",
+  "remove": "हटाएं",
+  "download": "डाउनलोड करें",
+  "resume": "फिर से शुरू करें",
+  "copy": "कॉपी करें",
+  "chat": "चैट",
+  "darkMode": "डार्क मोड",
+  "light": "लाइट",
+  "theme": "थीम",
+  "no": "नहीं",
+  "yes": "हाँ",
+  "done": "हो गया",
+  "comingSoon": "जल्द आ रहा है",
+  "bestValue": "सबसे अच्छा मूल्य",
+  "selected": "चुना हुआ",
+  "descriptionSection": "विवरण",
+  "searchHint": "खोजें",
+  "messageHint": "कुछ भी पूछें",
+  "modelLoading": "मॉडल लोड हो रहा है...",
+  "messageCopied": "संदेश क्लिपबोर्ड पर कॉपी किया गया।",
+  "storeUnavailable": "स्टोर वर्तमान में अनुपलब्ध है। कृपया बाद में पुनः प्रयास करें",
+  "retry": "पुनः प्रयास करें",
+
+  "systemInfo": "सिस्टम जानकारी",
+  "deviceMemory": "डिवाइस मेमोरी: {memory} GB",
+  "storageSpace": "स्टोरेज स्पेस: {storage} GB",
+  "freeStorageSpace": "फ्री स्टोरेज स्पेस: {freeStorage} GB",
+  "memory": "मेमोरी",
+  "storage": "स्टोरेज",
+  "freeStorage": "फ्री स्टोरेज",
+  "totalStorage": "कुल स्टोरेज",
+  "usedStorage": "प्रयुक्त स्टोरेज",
+  "totalMemory": "कुल मेमोरी",
+  "usedMemory": "प्रयुक्त मेमोरी",
+  "requirements": "आवश्यकताएँ",
+
+  "modelsTitle": "लाइब्रेरी",
+  "localModels": "स्थानीय मॉडल",
+  "serverSideModels": "ऑनलाइन मॉडल",
+  "uploadYourOwnModel": "अपना खुद का मॉडल अपलोड करें!",
+  "selectGGUFFile": "GGUF फ़ाइल चुनें",
+  "errorGGUF": "कृपया केवल GGUF प्रारूप में एक फ़ाइल चुनें।",
+  "modelAlreadyExists": "मॉडल पहले से मौजूद है।",
+  "modelAddedSuccessfully": "मॉडल सफलतापूर्वक जोड़ा गया।",
+  "modelRemoved": "मॉडल सफलतापूर्वक हटा दिया गया।",
+  "removeError": "मॉडल हटाते समय एक त्रुटि हुई।",
+  "fileNotFound": "फ़ाइल नहीं मिली।",
+  "fileUploadError": "फ़ाइल अपलोड करते समय एक त्रुटि हुई।",
+  "noFileSelected": "कोई फ़ाइल नहीं चुनी गई।",
+  "myModels": "मेरे मॉडल",
+  "create": "बनाएं",
+  "seeAll": "सभी देखें",
+
+  "modelProducer": "निर्माता: {producer}",
+  "modelRAM": "रैम: {ram}",
+  "modelSize": "आकार: {size}",
+  "modelDescription": "{description}",
+
+  "conversationsTitle": "बातचीत",
+  "conversationDeleted": "बातचीत हटा दी गई।",
+  "conversationUpdated": "बातचीत अपडेट की गई।",
+  "editConversationTitle": "नाम बदलें",
+  "newTitle": "नया शीर्षक",
+  "save": "सहेजें",
+  "titleCannotBeEmpty": "शीर्षक खाली नहीं हो सकता।",
+  "noConversationsMessage": "कोई बातचीत नहीं, चैट करना शुरू करें!",
+  "startChat": "एक चैट शुरू करें",
+  "noChats": "कोई चैट नहीं",
+  "starredChats": "तारांकित चैट",
+  "allChats": "सभी चैट",
+  "noStarredChats": "कोई तारांकित चैट नहीं",
+  "noStarredChatsMessage": "आपने अभी तक किसी चैट को तारांकित नहीं किया है।",
+  "goToChats": "एक चैट को तारांकित करें",
+  "starConversation": "तारांकित करें",
+  "conversationTitleUpdated": "बातचीत का शीर्षक अपडेट किया गया",
+  "youReachedConversationLimit": "आप बातचीत की सीमा तक पहुंच गए हैं।",
+  "today": "आज",
+  "yesterday": "कल",
+
+  "loginToYourAccount": "लॉगिन करें",
+  "createYourAccount": "रजिस्टर करें",
+  "email": "ईमेल",
+  "password": "पासवर्ड",
+  "confirmPassword": "पासवर्ड की पुष्टि कीजिये",
+  "invalidEmail": "कृपया एक मान्य ईमेल पता दर्ज करें।",
+  "invalidPassword": "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।",
+  "rememberMe": "मुझे याद रखना",
+  "forgotPassword": "पासवर्ड भूल गए?",
+  "or": "या",
+  "continueWithGoogle": "Google के साथ जारी रखें",
+  "dontHaveAccount": "खाता नहीं है?",
+  "alreadyHaveAccount": "पहले से ही एक खाता है?",
+  "signUp": "साइन अप करें",
+  "logIn": "लॉग इन करें",
+  "passwordsDoNotMatch": "पासवर्ड मेल नहीं खाते।",
+  "userNotFound": "उपयोगकर्ता नहीं मिला।",
+  "wrongPassword": "गलत पासवर्ड।",
+  "emailAlreadyInUse": "यह ईमेल पहले से ही उपयोग में है।",
+  "weakPassword": "पासवर्ड बहुत कमजोर है।",
+  "authError": "प्रमाणीकरण त्रुटि",
+  "invalidUsername": "कृपया एक उपयोगकर्ता नाम दर्ज करें।",
+  "usernameTaken": "यह उपयोगकर्ता नाम पहले ही ले लिया गया है।",
+  "username": "उपयोगकर्ता नाम",
+  "authenticationFailed": "प्रमाणीकरण विफल। कृपया पुनः प्रयास करें।",
+  "emailTooLong": "ईमेल अधिकतम 30 अक्षरों का हो सकता है।",
+  "deviceLimitReached": "आप इस डिवाइस के लिए खाता निर्माण सीमा तक पहुंच गए हैं।",
+
+  "verificationEmailLimitReached": "हम और नहीं भेजेंगे",
+  "verificationEmailSent": "सत्यापन ई-मेल भेजा गया!",
+  "emailNotVerified": "ई-मेल सत्यापित नहीं किया गया है",
+  "resendCode": "सत्यापन ई-मेल पुनः भेजें",
+  "remainingSeconds": "सत्यापन के लिए शेष समय",
+  "pleaseCheckYourEmail": "Cortex का उपयोग करने के लिए, आपको अपना ईमेल सत्यापित करना होगा। \n आपके ईमेल पते पर एक सत्यापन लिंक भेजा गया है, कृपया अपना ईमेल जांचें।",
+  "verifyYourEmail": "अपना ईमेल सत्यापित करें",
+  "backToLogin": "वापस जाएं",
+  "seconds": "सेकंड",
+  "maxResendLimitReached": "आप सत्यापन ईमेल की अधिकतम संख्या तक पहुंच गए हैं",
+  "verificationScreenContinueWithoutVerification": "सत्यापन के बिना जारी रखें",
+  "verificationScreenWarning": "भले ही आप जारी रखें, आपके खाते के लिए 1-दिवसीय खाता सत्यापन अवधि अभी भी प्रभावी है। यदि आपने तब तक अपना खाता सत्यापित नहीं किया है, तो इसे ऐप से हटा दिया जाएगा।",
+  "unverifiedAccountHeader": "आपका खाता सत्यापित नहीं है",
+  "unverifiedAccountWarning": "यदि आप {timeLeft} के भीतर अपने खाते को सत्यापित नहीं करते हैं, तो इसे हटा दिया जाएगा",
+  "verifyNow": "अभी सत्यापित करें",
+  "accountVerified": "आपका खाता सत्यापित हो गया है।",
+  "linkSent": "लिंक भेजा गया",
+  "accountDeletionRequested": "आपके खाते को हटाने का अनुरोध प्राप्त हो गया है और आपका खाता अब अक्षम है।",
+  "tooManyRequests": "बहुत सारे अनुरोध",
+  "regenerate": "पुनः उत्पन्न करें",
+
+  "confirmDeleteAccount": "क्या आप वाकई अपना खाता हटाना चाहते हैं?",
+  "enterPasswordToDelete": "हटाने के लिए अपना पासवर्ड दर्ज करें।",
+  "deleteAccount": "खाता हटाएं",
+  "deleteAccountError": "खाता हटाते समय एक त्रुटि हुई।",
+  "delete": "हटाएं",
+  "passwordRequired": "पासवर्ड आवश्यक है।",
+  "deleteDescription": "आपके द्वारा हटाया गया डेटा हमारे सर्वर और आपके डिवाइस से स्थायी रूप से हटा दिया जाएगा। यह कार्रवाई पूर्ववत नहीं की जा सकती।",
+  "deleteAccountButton": "खाता विलोपन बटन",
+
+  "editProfile": "प्रोफ़ाइल संपादित करें",
+  "displayName": "प्रदर्शित होने वाला नाम",
+  "tapToChangeProfilePicture": "प्रोफ़ाइल चित्र बदलने के लिए टैप करें",
+  "profileUpdated": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
+  "updateFailed": "प्रोफ़ाइल अपडेट करने में विफल",
+  "nameCannotBeEmpty": "नाम खाली नहीं हो सकता",
+  "logout": "लॉगआउट",
+  "noDisplayName": "कोई प्रदर्शन नाम सेट नहीं है",
+  "noEmail": "कोई ईमेल पता नहीं",
+  "noUserLoggedIn": "वर्तमान में कोई उपयोगकर्ता लॉग इन नहीं है",
+  "profile": "प्रोफ़ाइल",
+  "manageProfileDescription": "अपनी प्रोफ़ाइल प्रबंधित करें, अपना पासवर्ड अपडेट करें, या Cortex से लॉग आउट करें।",
+  "accessSettingsDescription": "सहायता तक पहुंचें, कोड रिडीम करें, Cortex साझा करें, और हमारी नीतियां देखें।",
+  "languageDescription": "आप किसी भी समय अपनी डिफ़ॉल्ट ऐप इंटरफ़ेस भाषा बदल सकते हैं।",
+  "themeDescription": "आप पसंद के अनुसार लाइट और डार्क थीम के बीच स्विच कर सकते हैं। चयनित थीम Cortex इंटरफ़ेस पर लागू होगी।",
+  "iHaveReadAndAgree": "मैंने सेवा की शर्तों को पढ़ लिया है और उनसे सहमत हूं",
+
+  "downloading": "डाउनलोड हो रहा है...",
+  "downloadError": "डाउनलोड के दौरान एक त्रुटि हुई।",
+  "downloadCancelled": "डाउनलोड रद्द कर दिया गया।",
+  "downloadResumed": "डाउनलोड फिर से शुरू हो गया।",
+  "downloadSuccess": "डाउनलोड सफल",
+  "downloadFailed": "डाउनलोड विफल",
+  "downloaded": "{percent}% डाउनलोड किया गया",
+  "@downloaded": {
+    "description": "डाउनलोड के पूरे होने का प्रतिशत इंगित करता है।",
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "downloadPaused": "डाउनलोड रोक दिया गया।",
+
+  "purchaseSuccessful": "खरीद सफल!",
+  "purchaseFailed": "खरीद असफल",
+  "creditProductNotFound": "चयनित क्रेडिट उत्पाद नहीं मिला।",
+  "creditsAddedSuccessfully": "क्रेडिट आपके खाते में सफलतापूर्वक जोड़ दिए गए!",
+  "creditDeliveryFailed": "आपके खाते में क्रेडिट जोड़ने में विफल। कृपया सहायता से संपर्क करें।",
+  "invalidPurchase": "अमान्य खरीद",
+  "purchaseError": "खरीद त्रुटि",
+  "purchaseVertexPlusToUpload": "यह एक प्लस सुविधा है",
+  "purchasePlus": "Cortex प्लस खरीदें",
+  "plusDescription": "Cortex की अधिक सुविधाओं तक पहुँचें और AI का और भी अधिक अनुभव करें!",
+  "annual": "वार्षिक",
+  "monthly": "मासिक",
+  "manageSubscription": "सदस्यता प्रबंधित करें",
+
+  "purchasePlan": "{planName} खरीदें",
+  "@purchasePlan": {
+      "description": "एक विशिष्ट सदस्यता योजना खरीदने के लिए बटन टेक्स्ट।",
+      "placeholders": {
+          "planName": {
+              "type": "String",
+              "example": "प्रो वार्षिक"
+          }
+      }
+  },
+
+  "discountOffer": "{percent}% की छूट",
+    "@discountOffer": {
+      "placeholders": {
+        "percent": {
+          "type": "int"
+        }
+      }
+    },
+
+  "annualPlanDescription": "{price}/माह, सालाना बिल किया गया",
+  "@annualPlanDescription": {
+    "description": "वार्षिक योजना के लिए विवरण, इसे और अधिक किफायती बनाने के लिए मासिक समकक्ष मूल्य दिखा रहा है। उदाहरण: $4.17/माह, सालाना बिल किया गया",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$4.17"
+      }
+    }
+  },
+  "monthlyPlanDescription": "{price}/माह, मासिक बिल किया गया",
+  "@monthlyPlanDescription": {
+    "description": "मासिक योजना के लिए विवरण, प्रति माह मूल्य दिखा रहा है। उदाहरण: $4.99/माह, मासिक बिल किया गया",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "discountBannerTitle": "लॉन्च स्पेशल: 80% की छूट!",
+  "@discountBannerTitle": {
+    "description": "प्रचार बैनर के लिए मुख्य शीर्षक, एक विशेष लॉन्च छूट पर जोर देता है।"
+  },
+  "discountBannerSubtitle": "हमारे लॉन्च का जश्न मनाने के लिए सभी सदस्यता योजनाओं पर विशेष छूट। मौका न चूकें!",
+  "@discountBannerSubtitle": {
+    "description": "प्रचार बैनर के लिए द्वितीयक पाठ, यह स्पष्ट करता है कि प्रस्ताव सभी योजनाओं पर लागू होता है और तात्कालिकता की भावना जोड़ता है।"
+  },
+  "purchasePro": "Cortex प्रो खरीदें",
+  "proDescription": "Cortex की और भी अधिक सुविधाओं तक पहुँचें और AI का और भी अधिक अनुभव करें!",
+  "alreadySubscribed": "आप पहले से ही सदस्य हैं",
+  "subscriptionInfo": "आपकी सदस्यता सक्रिय है।",
+  "alreadySubscribedMessage": "आपके पास पहले से ही एक प्लस सदस्यता है। यदि आप अपनी सदस्यता रद्द करना चाहते हैं, तो आप इसे प्ले स्टोर प्रबंधक के माध्यम से कर सकते हैं।",
+  "cancelSubscription": "सदस्यता रद्द",
+  "cancelSubscriptionInfo": "यदि आप अपनी सदस्यता रद्द करना चाहते हैं, तो कृपया प्ले स्टोर सदस्यता प्रबंधक के माध्यम से आगे बढ़ें।",
+  "goToPlayStore": "प्ले स्टोर पर जाएं",
+  "alreadySubscribedPlus": "आपके पास प्लस प्लान है!",
+  "alreadySubscribedPlusMessage": "आपकी प्लस योजना सक्रिय है। आप सभी लाभों का आनंद ले सकते हैं।",
+  "purchaseUltra": "Cortex अल्ट्रा खरीदें",
+  "ultraDescription": "Cortex की सभी सुविधाओं तक पूरी पहुँच प्राप्त करें और AI का पूरा अनुभव करें!",
+  "noSubscription": "कोई सदस्यता नहीं",
+  "noSubscriptionMessage": "आपके पास अभी तक कोई सदस्यता नहीं है।",
+  "alreadyAtHighestPlan": "आप पहले से ही उच्चतम योजना पर हैं।",
+  "unableToOpenSubscription": "सदस्यता प्रबंधन पृष्ठ खोलने में असमर्थ।",
+  "upgradeSubscription": "सदस्यता अपग्रेड करें",
+  "confirmUpgrade": "क्या आप वाकई अपनी सदस्यता अपग्रेड करना चाहते हैं?",
+  "unsupportedPlatform": "सदस्यता रद्द करने के लिए असमर्थित प्लेटफ़ॉर्म।",
+  "purchaseStreamError": "खरीद स्ट्रीम त्रुटि।",
+  "productNotFound": "उत्पाद नहीं मिला",
+  "productDetailsError": "उत्पाद विवरण प्राप्त करते समय एक त्रुटि हुई।",
+  "noProductsFound": "कोई उत्पाद नहीं मिला",
+  "loadCreditsButton": "क्रेडिट लोड करें",
+  "creditsTitle": "क्रेडिट",
+  "creditsScreenDescription": "यह स्क्रीन उपयोगकर्ता के क्रेडिट दिखाती है। \n\nउपयोगकर्ता के वर्तमान क्रेडिट: 100\n\nविस्तृत क्रेडिट जानकारी यहां प्रदर्शित की जा सकती है।",
+  "creditsLoaded": "क्रेडिट लोड हो गए!",
+  "currentCredits": "वर्तमान क्रेडिट",
+  "pleaseSelectCreditPackage": "कृपया एक क्रेडिट पैकेज चुनें",
+  "purchaseCreditsTitle": "क्रेडिट खरीदें",
+  "purchaseCreditsDescription": "एक क्रेडिट पैकेज चुनें जो आपकी आवश्यकताओं के अनुरूप हो और हमारे ऐप का अधिक उपयोग करें।",
+  "purchaseButton": "खरीदें",
+  "productNotFoundMessage": "चयनित उत्पाद मौजूद नहीं है।",
+  "buyCredits": "क्रेडिट खरीदें",
+  "selectCreditPackageDescription": "एक क्रेडिट पैकेज चुनें जो आपकी आवश्यकताओं के अनुरूप हो और अधिक सुविधाओं का आनंद लें।",
+  "buyCredit": "क्रेडिट खरीदें",
+  "buyCreditPackage": "{amount} क्रेडिट खरीदें",
+  "@creditPackage": {
+    "description": "क्रेडिट की एक विशिष्ट संख्या खरीदने के लिए बटन टेक्स्ट",
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "subscribedPlan": "सदस्यता ली",
+
+  "errorResponseNotReceived": "प्रतिक्रिया प्राप्त नहीं हुई",
+  "googleApiRequestFailed": "Google API अनुरोध {attempt} बार विफल रहा: {error}",
+  "@googleApiRequestFailed": {
+    "description": "जब Google API अनुरोध विफल होता है तो उपयोग किया जाने वाला त्रुटि संदेश",
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      },
+      "error": {
+        "type": "String",
+        "example": "टाइमआउट"
+      }
+    }
+  },
+  "openRouterResponseStatus": "OpenRouter प्रतिक्रिया स्थिति: {statusCode}",
+  "@openRouterResponseStatus": {
+    "description": "OpenRouter API से प्रतिक्रिया स्थिति कोड लॉग करें",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "200"
+      }
+    }
+  },
+  "openRouterDecodedResponseBody": "OpenRouter डिकोडेड प्रतिक्रिया निकाय: {body}",
+  "@openRouterDecodedResponseBody": {
+    "description": "OpenRouter API से प्रतिक्रिया निकाय लॉग करें",
+    "placeholders": {
+      "body": {
+        "type": "String",
+        "example": "{\"choices\": [...]}"
+      }
+    }
+  },
+  "decodedJson": "डिकोडेड JSON: {data}",
+  "@decodedJson": {
+    "description": "डिकोडेड JSON डेटा लॉग करें",
+    "placeholders": {
+      "data": {
+        "type": "String",
+        "example": "{\"key\": \"value\"}"
+      }
+    }
+  },
+  "responseStructureUnexpectedMessageContentMissing": "प्रतिक्रिया संरचना अप्रत्याशित है: संदेश या सामग्री गायब है",
+  "responseStructureUnexpectedChoicesMissing": "प्रतिक्रिया संरचना अप्रत्याशित है: विकल्प गायब या खाली हैं",
+  "openRouterApiRequestFailed": "OpenRouter API अनुरोध विफल: {statusCode} - {body}",
+  "@openRouterApiRequestFailed": {
+    "description": "जब OpenRouter API अनुरोध विफल होता है तो उपयोग किया जाने वाला त्रुटि संदेश",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "500"
+      },
+      "body": {
+        "type": "String",
+        "example": "{\"error\": \"आंतरिक सर्वर त्रुटि\"}"
+      }
+    }
+  },
+  "openRouterApiRequestFailedAfterAttempts": "OpenRouter API अनुरोध {attempt} बार विफल रहा: {error}",
+  "@openRouterApiRequestFailedAfterAttempts": {
+    "description": "जब OpenRouter API अनुरोध कुछ प्रयासों के बाद विफल होता है तो उपयोग किया जाने वाला त्रुटि संदेश",
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      },
+      "error": {
+        "type": "String",
+        "example": "टाइमआउट"
+      }
+    }
+  },
+  "internetRequired": "इस मॉडल का उपयोग करने के लिए इंटरनेट कनेक्शन आवश्यक है",
+  "pleaseWaitBeforeTryingAgain": "कृपया पुनः प्रयास करने से पहले कुछ क्षण प्रतीक्षा करें",
+  "openRouterQuotaExceeded": "कोटा पार हो गया। स्थिति कोड: {statusCode}, निकाय: {decodedBody}",
+  "@openRouterQuotaExceeded": {
+    "description": "इंगित करता है कि API कोटा पार हो गया है।",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "429"
+      },
+      "decodedBody": {
+        "type": "String",
+        "example": "{\"error\":\"कोटा पार हो गया\"}"
+      }
+    }
+  },
+  "openRouterApiRequestFailedAfterPaidAttempts": "API अनुरोध {attempts} भुगतान किए गए प्रयासों के बाद विफल रहा। त्रुटि: {error}",
+  "@openRouterApiRequestFailedAfterPaidAttempts": {
+    "description": "इंगित करता है कि API अनुरोध भुगतान किए गए मॉडल प्रयासों की एक निश्चित संख्या के बाद विफल हो गया।",
+    "placeholders": {
+      "attempts": {
+        "type": "int",
+        "example": "2"
+      },
+      "error": {
+        "type": "String",
+        "example": "अनधिकृत त्रुटि"
+      }
+    }
+  },
+
+  "termsOfServiceAndPrivacyPolicyWarning": "इस आदेश को देकर, आप सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं। आप हमारी सेवा की शर्तों और गोपनीयता नीति के बारे में अधिक जानने के लिए इस टेक्स्ट पर क्लिक कर सकते हैं। सदस्यता स्वचालित रूप से नवीनीकृत हो जाएगी जब तक कि वर्तमान अवधि के अंत से कम से कम 24 घंटे पहले स्वतः-नवीनीकरण बंद न हो।",
+  "termsOfService": "सेवा की शर्तें",
+  "privacyPolicy": "गोपनीयता नीति",
+
+  "report": "रिपोर्ट",
+  "reportDialogTitle": "रिपोर्ट सबमिट करें",
+  "reportDescriptionLabel": "समस्या क्या है?",
+  "reportHarmful": "यह हानिकारक/असुरक्षित है",
+  "reportNotTrue": "यह सच नहीं है",
+  "reportNotHelpful": "यह मददगार नहीं है",
+  "closeButton": "बंद करें",
+  "submitButton": "सबमिट करें",
+  "reportErrorMessage": "कृपया रिपोर्ट करने के लिए एक कारण चुनें।",
+
+  "capabilitiesSection": "क्षमताएं",
+  "ratingsSection": "रेटिंग",
+  "noRatingDataFound": "कोई रेटिंग डेटा नहीं मिला",
+  "featurePhotoTitle": "फोटो स्कैनिंग",
+  "featurePhotoDescription": "इस मॉडल में कैमरे या छवि फ़ाइलों के माध्यम से फ़ोटो को स्कैन करने की क्षमता है।",
+  "featureOfflineTitle": "ऑफ़लाइन ऑपरेशन",
+  "featureOfflineDescription": "अपने डेटा को सुरक्षित रखने के लिए इंटरनेट कनेक्शन के बिना मॉडल चलाएं।",
+  "featureSupermodelTitle": "सुपर मॉडल",
+  "featureSupermodelDescription": "यह 10 बिलियन से अधिक मापदंडों वाला एक विशाल मॉडल है, जो उच्च प्रदर्शन और व्यापक क्षमताएं प्रदान करता है।",
+  "featureRoleplayTitle": "रोल प्ले",
+  "featureRoleplayDescription": "रोल-प्लेइंग मॉडल आपको विभिन्न चैट और परिदृश्य बनाने की अनुमति देते हैं।",
+  "roleModels": "रोलप्ले मॉडल",
+  "parameters": "पैरामीटर",
+  "context": "संदर्भ",
+  "millions": "मिलियन",
+  "billions": "बिलियन",
+  "trillions": "ट्रिलियन",
+  "thousand": "हजार",
+  "estimated": "अनुमानित",
+  "finalPreparation": "अंतिम तैयारी की जा रही है।",
+  "allEvaluationsByTestTeam": "सभी मूल्यांकन हमारी परीक्षण टीम द्वारा किए गए थे",
+
+
+  "shareApp": "ऐप साझा करें",
+  "rateUs": "हमें रेट करें",
+  "share": "साझा करें",
+  "shareSubject": "Cortex",
+  "shareMessage": "Cortex ऐप देखें, यह बहुत अद्भुत है! इसे यहाँ डाउनलोड करें: https://play.google.com/store/apps/details?id=com.vertex.cortex",
+  "shareFailed": "ऐप साझा करने में विफल। कृपया बाद में पुनः प्रयास करें",
+  "selectText": "टेक्स्ट चुनें",
+  "showLatex": "विशेष प्रतीक दिखाएं",
+  "hideLatex": "विशेष प्रतीक छिपाएं",
+
+  "thinking": "सोच रहा है",
+  "user": "उपयोगकर्ता",
+  "voice": "आवाज़",
+  "help": "मदद",
+  "redeemCode": "कोड रिडीम करें",
+  "enterYourCode": "अपने पसंदीदा रचनाकारों का समर्थन करें! अपनी Cortex खरीद का एक हिस्सा उन्हें देने के लिए नीचे उनका अद्वितीय कोड दर्ज करें।",
+  "code": "कोड",
+  "redeem": "रिडीम",
+  "codeCannotBeEmpty": "कोड खाली नहीं हो सकता",
+  "userId": "उपयोगकर्ता आईडी",
+  "deleteAllConversationsConfirmTitle": "सभी चैट हटाएं?",
+  "deleteAllConversationsConfirmMessage": "क्या आप वाकई अपनी सभी चैट हटाना चाहते हैं? यह पूर्ववत नहीं किया जा सकता।",
+  "allConversationsDeleted": "सभी बातचीत सफलतापूर्वक हटा दी गई!",
+  "deleteAll": "सभी को हटा दें",
+  "deleteAllConversationsButton": "सभी बातचीत हटाएं",
+  "confirmWord": "VERTEX टाइप करें",
+  "confirmWordError": "आपने इसे गलत टाइप किया है",
+  "chinese": "चीनी",
+  "arabic": "अरबी",
+  "french": "फ्रेंच",
+  "japanese": "जापानी",
+  "korean": "कोरियाई",
+  "deutsch": "Deutsch",
+  "english": "अंग्रेज़ी",
+  "turkish": "तुर्की",
+  "hindi": "हिन्दी",
+  "portuguese": "पुर्तगाली",
+  "indonesian": "इन्डोनेशियाई",
+  "azerbaijani": "अज़रबैजानी",
+  "german": "जर्मन",
+  "spanish": "स्पेनिश",
+  "italian": "इतालवी",
+  "ram": "रैम",
+  "usernameTooShort": "उपयोगकर्ता नाम बहुत छोटा है।",
+  "usernameTooLong": "उपयोगकर्ता नाम 16 अक्षरों से अधिक नहीं हो सकता।",
+  "invalidUsernameCharacters": "उपयोगकर्ता नाम में केवल ये अक्षर: 'abcçdefgğhıijklmnoöprsştuüvyzxqw' और वर्ण '.', '-', '_' का उपयोग किया जा सकता है।",
+  "passwordTooLong": "पासवर्ड 64 अक्षरों से अधिक नहीं हो सकता।",
+  "noInternetConnection": "कोई इंटरनेट कनेक्शन नहीं।",
+  "chats": "इनबॉक्स",
+  "library": "लाइब्रेरी",
+  "inappropriateMessageWarning": "अनुचित संदेश का पता चला!",
+  "myModelDescription": "मेरा मॉडल।",
+  "noModelsDownloaded": "आपने अभी तक कोई मॉडल डाउनलोड नहीं किया है।",
+  "appTitle": "Cortex",
+  "text": "टेक्स्ट",
+  "removeModel": "मॉडल हटाएं",
+  "modelUploadedSuccessfully": "मॉडल सफलतापूर्वक अपलोड किया गया।",
+  "insufficientRAM": "कम मेमोरी",
+  "insufficientStorage": "कम स्टोरेज",
+  "confirmRemoveModel": "क्या आप वाकई अपने डिवाइस से {model} मॉडल हटाना चाहते हैं? ऐसा करने से उस मॉडल के साथ कोई भी पिछली बातचीत भी हट जाएगी।",
+  "noMatchingModels": "कोई मेल खाने वाला मॉडल नहीं मिला।",
+  "creditPackage": "{amount} क्रेडिट खरीदें",
+  "benefit1": "ऑनलाइन एआई के लिए और भी बहुत कुछ बातचीत की सीमा",
+  "benefit2": "अपने खुद के मॉडल अपलोड करें",
+  "benefit3": "प्रोफ़ाइल प्रभाव",
+  "benefit4": "सदस्यता बिल्ला",
+  "benefit5": "और अधिक ऑनलाइन कृत्रिम बुद्धिमत्ता बनाएं",
+  "benefit6": "असीमित चैट",
+  "benefit7": "{credits} दैनिक क्रेडिट",
+  "benefit8": "मॉडल जोड़ें",
+  "benefit9": "नई थीम",
+  "benefit10": "ऑफ़लाइन वॉयस चैट",
+  "oldBenefits": "निचली योजनाओं से सभी लाभ",
+  "confirm": "पुष्टि करें",
+  "changePassword": "पासवर्ड बदलें",
+  "logoutConfirmationTitle": "क्या आप वाकई लॉग आउट करना चाहते हैं?",
+  "settings": "सेटिंग्स",
+  "language": "ऐप भाषा",
+  "dark": "डार्क",
+  "oldPassword": "पुराना पासवर्ड",
+  "newPassword": "नया पासवर्ड",
+  "passwordUpdated": "पासवर्ड अपडेट किया गया।",
+  "stop": "रोकें",
+  "copyrights": "योगदान",
+  "downloadingTitle": "डाउनलोड हो रहा है",
+  "downloadCompletedTitle": "डाउनलोड पूरा हुआ",
+  "downloadPausedTitle": "डाउनलोड रुका",
+  "downloadErrorTitle": "डाउनलोड त्रुटि",
+  "cancelButtonText": "रद्द करें",
+  "love": "प्यार",
+  "nature": "प्रकृति",
+  "behindTheSlaughter": "कत्लेआम के पीछे",
+  "grayscale": "ग्रेस्केल",
+  "ocean": "महासागर",
+  "scarletSnow": "स्कार्लेट स्नो",
+  "requestFailed": "एक त्रुटि हुई, कृपया पुनः प्रयास करें।",
+  "changeModel": "बदलें",
+  "edit": "संपादित करें",
+  "editingMessageInfo": "इस संदेश को संपादित करने से बातचीत यहीं से फिर से शुरू हो जाएगी।",
+  "editingNotification": "आप अभी संपादन मोड में हैं",
+
+  "featureIndulgentTitle": "अनुग्रहशील",
+  "featureIndulgentDescription": "यह मॉडल 100,000 से अधिक टोकन वाले संदर्भों को सहजता से समायोजित और संसाधित कर सकता है, जिससे यह प्रदर्शन से समझौता किए बिना व्यापक और विस्तृत इनपुट को संभालने में सक्षम होता है।",
+  "featurePluralTitle": "बहुल",
+  "featurePluralDescription": "यह मॉडल स्वचालित रूप से अतिरिक्त एक्सटेंशन को एकीकृत कर सकता है, जिससे इसकी कार्यात्मक क्षमताओं का विस्तार हो सकता है ताकि उन्नत प्रदर्शन के साथ विविध प्रकार के संचालन का समर्थन किया जा सके।",
+  "featureWiseTitle": "बुद्धिमान",
+  "featureWiseDescription": "यह मॉडल निर्णय लेने और जटिल समस्या-समाधान के लिए परिष्कृत समर्थन प्रदान करने के लिए गहरी विश्लेषणात्मक अंतर्दृष्टि और दूरंदेशी तर्क का लाभ उठा सकता है।",
+  "featureResearcherTitle": "शोधकर्ता",
+  "featureResearcherDescription": "उन्नत अनुसंधान और विश्लेषणात्मक क्षमताओं से लैस मॉडलों में विशेष रूप से उपलब्ध, यह सुविधा विविध डोमेन में उच्च-सटीक अंतर्दृष्टि और व्यापक विश्लेषण प्रदान करने के लिए डिज़ाइन की गई है।",
+
+  "nameLabel": "एआई नाम",
+  "nameHint": "अपने एआई का नाम दर्ज करें",
+  "summaryLabel": "एआई सारांश",
+  "summaryHint": "अपने एआई का सारांश दर्ज करें",
+  "add": "जोड़ें",
+  "aiExplanationTitle": "कृत्रिम बुद्धिमत्ता विवरण",
+  "aiExplanationDescription": "कृपया अपने एआई मॉडल की वास्तुकला, प्रशिक्षण प्रक्रिया, प्रदर्शन मेट्रिक्स, अनुप्रयोग क्षेत्रों और अन्य महत्वपूर्ण विशेषताओं का विस्तृत विवरण प्रदान करें।",
+  "preInputTitle": "कृत्रिम बुद्धिमत्ता पूर्व-इनपुट",
+  "preInputDescription": "कृपया एक पूर्व-इनपुट सेट करें जो चरित्र निर्माण प्रक्रिया में आपके मॉडल का मार्गदर्शन करेगा। इस खंड में, आप चरित्र-संबंधी जानकारी, अतिरिक्त संदर्भ, और कोई भी अतिरिक्त विवरण शामिल कर सकते हैं जो चरित्र से संबंधित सामग्री उत्पन्न करने में सहायता कर सकता है।",
+  "baseModelTitle": "आधार मॉडल",
+  "baseModelDescription": "यह वह मॉडल है जिसका उपयोग आपकी रचना के लिए नींव के रूप में किया जाएगा। यह वर्तमान में चयनित आधार मॉडल को प्रदर्शित करता है।",
+
+  "summary": "सारांश",
+  "characterPoliceTitle": "पुलिस",
+  "characterPoliceRole": "आप कानून के एक सतर्क प्रवर्तक हैं, जो नागरिकों की रक्षा करने और अटूट प्रतिबद्धता के साथ व्यवस्था बनाए रखने के लिए समर्पित हैं, आप एक पुलिस हैं",
+  "characterPoliceShortDescription": "एक दृढ़ और साहसी कानून प्रवर्तक।",
+
+  "purchaseSubscription": "खरीदें",
+  "modelUploadTitle": "कृत्रिम बुद्धिमत्ता फ़ाइल",
+  "modelUploadDescription": "अपने डिवाइस से सीधे अपनी स्थानीय GGUF फ़ाइलों का चयन और अपलोड करें। यह आपको इंटरनेट कनेक्शन की आवश्यकता के बिना अपने मॉडल को ऑफ़लाइन चलाने देता है। सुनिश्चित करें कि फ़ाइल मान्य GGUF प्रारूप में है और ठीक से संरचित है। यदि फ़ाइल गलत या दूषित है, तो Cortex अपेक्षा के अनुरूप काम नहीं कर सकता है, और आपको त्रुटियों का सामना करना पड़ सकता है।",
+  "modelUploadShortDescription": "अपने डिवाइस से .gguf फ़ाइल चुनने के लिए यहां टैप करें",
+  "addServerTitle": "कृत्रिम बुद्धिमत्ता सर्वर",
+  "addServerDescription": "बाहरी रूप से होस्ट किए गए मॉडल से जुड़ने के लिए अपने रिमोट सर्वर का URL दर्ज करें। इस सुविधा के लिए एक सक्रिय इंटरनेट कनेक्शन की आवश्यकता है, और किसी भी सर्वर-संबंधी समस्या या त्रुटि का कारण Cortex नहीं है। सुनिश्चित करें कि आपका सर्वर सही ढंग से कॉन्फ़िगर किया गया है, आपके नेटवर्क से सुलभ है, और एक सहज अनुभव के लिए एक मान्य मॉडल एंडपॉइंट है।",
+  "you": "आप",
+  "removePhotoTitle": "फोटो हटाएं",
+  "confirmRemovePhoto": "क्या आप वाकई फोटो हटाना चाहते हैं?",
+  "serverLink": "सर्वर लिंक",
+  "enterURL": "सर्वर URL दर्ज करें",
+  "chatLengthLimitExceeded": "यह चैट वर्ण सीमा को पार कर गई है। कृपया एक नई चैट शुरू करें या सदस्यता खरीदें।",
+  "aiNameError": "इस नाम का एक एआई पहले से मौजूद है।",
+  "modelLimitExceeded": "आप अपनी योजना के लिए अधिकतम मॉडल निर्माण सीमा तक पहुंच गए हैं।",
+  "modelVertexProducer": "वर्टेक्स",
+  "photoLimitReachedMessage": "केवल एक फोटो जोड़ा जा सकता है",
+  "inappropriateContentDetected": "अनुचित सामग्री का पता चला!",
+  "offlineModelNotInstalled": "यह ऑफ़लाइन मॉडल आपके डिवाइस पर स्थापित नहीं है।",
+  "insufficientCredits": "इस अनुरोध को पूरा करने के लिए आपके पास पर्याप्त क्रेडिट नहीं हैं। इस कार्रवाई के लिए {required} क्रेडिट की आवश्यकता है, लेकिन आपके पास केवल {available} हैं। अधिक क्रेडिट प्राप्त करने के लिए, आप अपनी योजना को अपग्रेड कर सकते हैं या उन्हें सीधे खरीद सकते हैं। हे हम पूरी तरह से समझते हैं कि क्रेडिट खत्म होना थोड़ा निराशाजनक हो सकता है लेकिन गंभीरता से हमारे मॉडल से वे भयानक उत्तर प्राप्त करना मुफ्त नहीं है इसलिए ये क्रेडिट वास्तव में हमें अच्छे समय को जारी रखने में मदद करते हैं और सुनो अगर आप में से अधिक लोग इसमें शामिल होते हैं और क्रेडिट प्राप्त करते हैं तो हम पूरी तरह से सभी के लिए उन मुफ्त दैनिक सीमाओं को बढ़ाने पर विचार कर सकते हैं",
+  "@insufficientCredits": {
+    "placeholders": {
+      "available": {},
+      "required": {}
+    }
+  },
+  "regenerateInProgress": "उत्तर निर्माण पहले से ही प्रगति पर है।",
+  "errorOccurredDuringRegeneration": "पुनः उत्पन्न करने का प्रयास करते समय एक त्रुटि हुई: {errorDetails}",
+  "@errorOccurredDuringRegeneration": {
+    "placeholders": {
+      "errorDetails": {
+        "type": "String",
+        "example": "नेटवर्क कनेक्शन विफल"
+      }
+    }
+  },
+  "modality": "मोडैलिटी",
+  "multimodal": "मल्टीमॉडल",
+  "anErrorOccurred": "एक त्रुटि हुई",
+  "themeLocked": "इस थीम के लिए उच्च सदस्यता स्तर की आवश्यकता है। अनलॉक करने के लिए कृपया अपग्रेड करें।",
+  "pageCouldNotBeLoaded": "पेज लोड नहीं हो सका",
+  "checkYourInternet": "कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।",
+  "errorUserNotAuthenticated": "इस क्रिया को करने के लिए आपको लॉग इन होना चाहिए।",
+  "errorInsufficientCredits": "आपके पास अपर्याप्त क्रेडिट हैं। जारी रखने के लिए कृपया टॉप अप करें।",
+  "errorRateLimitExceeded": "बहुत सारे अनुरोध। कृपया कुछ क्षण में पुनः प्रयास करें।",
+  "errorServer": "एक अप्रत्याशित सर्वर त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।",
+  "errorNetwork": "एक नेटवर्क त्रुटि हुई। कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।",
+  "errorApiAuthentication": "प्रमाणीकरण विफल। कृपया पुनः लॉग इन करने का प्रयास करें।",
+  "baseModelForCharacterDescription": "चयनित आधार मॉडल चरित्र के तर्क और प्रतिक्रिया क्षमताओं को निर्धारित करेगा।",
+  "selectBaseModel": "एक आधार मॉडल चुनें",
+
+  "@errorUserNotAuthenticated": {},
+  "@errorInsufficientCredits": {},
+  "@errorRateLimitExceeded": {},
+  "@errorServer": {},
+  "@errorNetwork": {},
+  "@errorApiAuthentication": {},
+  "@baseModelForCharacterDescription": {},
+
+  "forgotPassword": "पासवर्ड भूल गए?",
+  "couldNotOpenLink": "लिंक नहीं खोल सका",
+
+  "downloadStarted": "डाउनलोड शुरू हो गया",
+  "notAvailable": "उपलब्ध नहीं है",
+
+  "localizationWarning": "कुछ जानकारी आपकी भाषा में उपलब्ध नहीं हो सकती है और अंग्रेजी में प्रदर्शित की जाएगी।",
+  "aiTranslationWarning": "मॉडल की जानकारी अन्य एआई मॉडल द्वारा विभिन्न भाषाओं में अनुवादित की जाती है। इसलिए, अंग्रेजी के अलावा अन्य भाषाओं में मामूली विसंगतियां हो सकती हैं।",
+
+  "errorLoadingTitle": "डेटा लोड करने में विफल",
+  "@errorLoadingTitle": {
+    "description": "त्रुटि स्क्रीन के लिए शीर्षक जब मॉडल डेटा प्राप्त नहीं किया जा सकता है।"
+  },
+  "errorLoadingMessage": "हम अपने सर्वर से आवश्यक डेटा प्राप्त नहीं कर सके। कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।",
+  "@errorLoadingMessage": {
+    "description": "समस्या की व्याख्या करने वाली त्रुटि स्क्रीन के लिए संदेश।"
+  },
+  "noModelsFoundTitle": "कोई परिणाम नहीं",
+  "noModelsFoundMessage": "अपनी खोज शब्दों को समायोजित करने या फ़िल्टर को साफ़ करने का प्रयास करें।",
+  "usernameRateLimitExceeded": "आप हर 14 दिनों में केवल दो बार अपना उपयोगकर्ता नाम बदल सकते हैं।",
+  "usernameUnchanged": "यह पहले से ही आपका वर्तमान उपयोगकर्ता नाम है।",
+  "creditsInfoPanelTitle": "क्रेडिट कैसे काम करते हैं",
+  "creditsInfoPanelBody": "क्रेडिट का उपयोग ऑनलाइन मॉडल के साथ चैट करने के लिए किया जाता है। बस आपको पता हो, आपके द्वारा उन्हें भेजे गए प्रत्येक संदेश पर हमें पैसे खर्च करने पड़ते हैं।\n\n• ऑनलाइन मॉडल को प्रत्येक संदेश पर 20 क्रेडिट खर्च होते हैं।\n• एक छवि शामिल करने पर 30 और क्रेडिट जुड़ जाते हैं।\n• मुफ्त योजना के उपयोगकर्ताओं को 200 क्रेडिट बोनस मिलता है जो दैनिक रूप से रीसेट होता है।",
+  "creditsInfoPanelFooter": "हैप्पी चैटिंग!",
+  "disclaimerMessage": "कृत्रिम बुद्धिमत्ता गलतियाँ कर सकती है, महत्वपूर्ण जानकारी की जाँच करें।",
+  "modelCreatedSuccess": "मॉडल सफलतापूर्वक बनाया गया!",
+  "modelRemovedSuccess": "“{modelName}” सफलतापूर्वक हटा दिया गया था।",
+  "errorCreatingModel": "मॉडल बनाते समय एक अप्रत्याशित त्रुटि हुई।",
+  "errorDeletingModel": "मॉडल हटाते समय एक अप्रत्याशित त्रुटि हुई।",
+  "ultraFeatureOnly": "यह सुविधा केवल अल्ट्रा सदस्यों के लिए उपलब्ध है।",
+  "experimentalOfflineWarning": "ऑफ़लाइन मोड अभी भी प्रायोगिक है और आपके द्वारा डाउनलोड किया गया मॉडल इष्टतम दक्षता के साथ प्रदर्शन नहीं कर सकता है।",
+  "noConversationsToDelete": "आपके पास हटाने के लिए कोई बातचीत नहीं है।",
+  "reportSubmitted": "रिपोर्ट सफलतापूर्वक सबमिट की गई",
+  "purchaseReceived": "खरीद प्राप्त हुई, आपके खाते को अपडेट किया जा रहा है।",
+  "verificationDelayed": "आपकी खरीद की पुष्टि हो गई है। आपके खाते को अपडेट करने में थोड़ी देरी हो रही है, यह जल्द ही दिखाई देगा।",
+  "maintenanceTitle": "रखरखाव के अधीन",
+  "maintenanceMessage": "जब हम कुछ महत्वपूर्ण अपडेट रोल आउट कर रहे हैं तो Cortex अस्थायी रूप से ऑफ़लाइन है। ऐप तक पहुंच जल्द ही बहाल कर दी जाएगी।\n\nजब हम आपके अनुभव को बेहतर बनाते हैं तो आपके धैर्य के लिए धन्यवाद।",
+  "errorPromptFlagged": "आपका संदेश अनुचित के रूप में पता चला और नहीं भेजा जा सका।",
+  "notEnoughStorage": "नए संदेशों को सहेजने के लिए आपके डिवाइस पर पर्याप्त स्टोरेज स्थान नहीं है।",
+  "errorRateLimit": "आपने हाल ही में बहुत सारे मॉडल बनाए हैं, कृपया पुनः प्रयास करने से पहले थोड़ी देर प्रतीक्षा करें।",
+  "errorContentFlagged": "मॉडल को सहेजा नहीं जा सका क्योंकि इसकी सामग्री को अनुचित के रूप में फ़्लैग किया गया था।",
+  "deleteAllConversationsDisabledInfo": "आप एक सक्रिय चैट में रहते हुए सभी बातचीत नहीं हटा सकते, कृपया आगे बढ़ने के लिए पहले वर्तमान चैट से बाहर निकलें।",
+  "invalidCredentials": "गलत ईमेल या पासवर्ड।",
+  "userDisabled": "यह उपयोगकर्ता खाता अक्षम कर दिया गया है।",
+  "loginSubtitle": "अपने वर्टेक्स खाते में लॉग इन करें। Google के माध्यम से साइन अप करने वाले नए उपयोगकर्ता हमारी शर्तों और गोपनीयता नीति से सहमत हैं। आप उन्हें साइन अप स्क्रीन पर समीक्षा कर सकते हैं।",
+  "registerSubtitle": "एक वर्टेक्स खाता बनाएं, जिसका उपयोग आप हमारी अन्य परियोजनाओं के लिए भी कर सकते हैं।",
+  "photoWarningMessage": "एक फोटो शामिल है। जो मॉडल छवियों का समर्थन नहीं करते हैं, वे इसे अनदेखा कर सकते हैं।",
+  "loginRequiredForPurchase": "खरीदारी करने के लिए आपको लॉग इन होना चाहिए।",
+  "storagePermissionRequired": "डाउनलोड किए गए मॉडल को सहेजने के लिए स्टोरेज अनुमति की आवश्यकता है। जारी रखने के लिए कृपया अनुमति दें।",
+  "creditBannerTitle": "मुफ्त क्रेडिट प्राप्त करें!",
+  "creditBannerSubtitle": "एक दोस्त को आमंत्रित करें और आप दोनों को साइन-अप पर 50 क्रेडिट मिलते हैं! यदि वे सदस्यता लेते हैं, तो आप दोनों को अतिरिक्त 500 मिलते हैं!",
+  "inviteShareSubject": "Cortex पर मेरे साथ जुड़ें!",
+  "@inviteShareMessage": {
+    "description": "एक दोस्त के साथ एक आमंत्रण के लिए साझा करने के लिए पाठ संदेश।",
+    "placeholders": {
+      "playStoreLink": {
+        "type": "String",
+        "example": "https://play.google.com/store/..."
+      }
+    }
+  },
+  "inviteShareMessage": "अरे यार तुम्हें यह ऐप कॉर्टेक्स देखना होगा यह वास्तव में पागल है यदि आप मेरे लिंक का उपयोग करते हैं तो हम दोनों को 50 क्रेडिट मिलते हैं और यदि आप सदस्यता लेते हैं तो हम दोनों को अतिरिक्त 500 मिलते हैं यह एक पागल सौदा है इसे जल्द से जल्द डाउनलोड करें\n\n{playStoreLink}",
+  "reviewEnjoyingAppTitle": "Cortex का आनंद ले रहे हैं?",
+  "reviewHelpUsGrow": "आपकी रेटिंग हमारी युवा इंडी टीम के लिए एक बहुत बड़ा समर्थन है और हमें आपके लिए Cortex को और भी बेहतर बनाने में मदद करती है।",
+  "reviewMaybeLater": "शायद बाद में",
+  "reviewRateNow": "अभी रेट करें",
+  "noThanks": "नहीं, धन्यवाद",
+  "updateRequiredTitle": "अपडेट आवश्यक है",
+  "updateRequiredMessage": "Cortex का उपयोग जारी रखने के लिए, कृपया नई सुविधाओं और महत्वपूर्ण सुधारों के लिए ऐप को नवीनतम संस्करण में अपडेट करें।",
+  "updateNowButton": "अभी अपडेट करें",
+  "creatorSupportedSuccess": "निर्माता का सफलतापूर्वक समर्थन किया गया! आपकी भविष्य की खरीदारी उन्हें योगदान देगी।"
+}

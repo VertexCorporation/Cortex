@@ -874,6 +874,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get redeemCode => '兑换代码';
 
   @override
+  String get enterYourCode => '支持您喜爱的创作者！在下方输入他们的专属代码，让他们从您的 Cortex 购买中获得分成。';
+
+  @override
+  String get code => '代码';
+
+  @override
+  String get redeem => '兑换';
+
+  @override
+  String get codeCannotBeEmpty => '代码不能为空';
+
+  @override
   String get userId => '用户 ID';
 
   @override
@@ -901,19 +913,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chinese => '中文';
 
   @override
-  String get indian => '印度语';
-
-  @override
   String get arabic => '阿拉伯语';
 
   @override
   String get french => '法语';
-
-  @override
-  String get italian => '意大利语';
-
-  @override
-  String get spanish => '西班牙语';
 
   @override
   String get japanese => '日语';
@@ -922,16 +925,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get korean => '韩语';
 
   @override
-  String get azerbaijanTurkish => '阿塞拜疆土耳其语';
-
-  @override
-  String get deutsch => '德语';
+  String get deutsch => '德语 (Deutsch)';
 
   @override
   String get english => '英语';
 
   @override
   String get turkish => '土耳其语';
+
+  @override
+  String get hindi => '印地语';
+
+  @override
+  String get portuguese => '葡萄牙语';
+
+  @override
+  String get indonesian => '印尼语';
+
+  @override
+  String get azerbaijani => '阿塞拜疆语';
+
+  @override
+  String get german => '德语';
+
+  @override
+  String get spanish => '西班牙语';
+
+  @override
+  String get italian => '意大利语';
 
   @override
   String get ram => '内存';
@@ -1453,4 +1474,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noThanks => '不用了，谢谢';
+
+  @override
+  String get updateRequiredTitle => '需要更新';
+
+  @override
+  String get updateRequiredMessage => '为继续使用 Cortex，请将应用更新至最新版本以获取新功能和重要改进。';
+
+  @override
+  String get updateNowButton => '立即更新';
+
+  @override
+  String get creatorSupportedSuccess => '成功支持了创作者！您未来的购买将为他们提供支持。';
 }

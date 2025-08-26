@@ -34,14 +34,14 @@ class ModelInfo {
   final String title;
   final String imagePath;
   final String producer;
-  final String? path; // Path to the downloaded model file
+  final String? path;
   final String? role;
-  final bool canHandleImage;
+  final Map<String, dynamic> modalities;
   final String? category;
   final Map<String, dynamic>? extensions;
   final String? baseModelId;
-  final int? size; // Model size in MB
-  final int? ram;  // Required RAM in MB
+  final int? size;
+  final int? ram;
 
   ModelInfo({
     required this.id,
@@ -50,7 +50,7 @@ class ModelInfo {
     required this.producer,
     this.path,
     this.role,
-    this.canHandleImage = false,
+    this.modalities = const {},
     this.category,
     this.extensions,
     this.baseModelId,
@@ -58,7 +58,6 @@ class ModelInfo {
     this.ram,
   });
 }
-
 
 // --- NEW: Encryption Helper Class (Add this class to data.dart) ---
 // This class centralizes all cryptographic operations for the app.
@@ -778,7 +777,7 @@ class ModelData {
   }) {
     final String serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
     final String modelId = variantData['id'] as String? ?? seriesName;
-
+    final Map<String, dynamic> modalities = variantData['modalities'] as Map<String, dynamic>? ?? {};
     // 1. Get the main 'details' object.
     final details = variantData['details'] as Map<String, dynamic>? ?? {};
     if (details.isEmpty) {
@@ -843,7 +842,7 @@ class ModelData {
       'description': description,
       'baseModelId': finalBaseModelId,
       'imagePath': variantData['imagePath'],
-      'canHandleImage': (variantData['modality'] == 'multimodal'),
+      'modalities': modalities,
       'extensions': null,
       'size': variantData['size'],
       'ram': variantData['ram'],
@@ -884,6 +883,7 @@ class ModelData {
 
       final descriptionMap = variantData['description'] as Map<String,
           dynamic>? ?? {};
+      final Map<String, dynamic> modalities = variantData['modalities'] as Map<String, dynamic>? ?? {};
 
       // Get the specific, detailed description for this variant.
       final String localizedVariantDesc = descriptionMap[serverLangKey] as String? ??
@@ -898,12 +898,9 @@ class ModelData {
       extensions[variantData['id'] as String] = {
         'id': variantData['id'],
         'title': variantData['title'] ?? variantKey,
-        // --- FIX: Step 2 ---
-        // Assign the shared series summary to this variant's 'summary' field.
         'summary': localizedSeriesSummary,
-        // The 'description' field correctly holds the variant's own specific, detailed description.
         'description': localizedVariantDesc,
-        'canHandleImage': (variantData['modality'] == 'multimodal'),
+        'modalities': modalities,
         'reasoning': variantData['reasoning'] ?? false,
         'webSearch': variantData['webSearch'] ?? false,
         ...variantData,
@@ -1196,35 +1193,6 @@ class ModelData {
     return needsUpdate;
   }
 
-  /// PUBLIC: Gets the definitive 'canHandleImage' capability for a given model ID.
-  /// For character/self models, this intelligently checks the base model's capabilities.
-  static bool getDefinitiveImageHandling(String modelId) {
-    final modelData = getPreciseModelData(modelId);
-
-    // If the model itself can handle images, the answer is simple.
-    if (modelData['canHandleImage'] == true) {
-      return true;
-    }
-
-    // Check if it's a character/self model with a base model assigned.
-    final category = modelData['category'] as String?;
-    final isCharacter = category == 'roleplay' || category == 'self';
-    final baseModelId = modelData['baseModelId'] as String?;
-
-    if (isCharacter && baseModelId != null && baseModelId.isNotEmpty) {
-      // It's a character, so the real capability comes from its base model.
-      final baseModelData = getPreciseModelData(baseModelId);
-      final canBaseHandleImage = baseModelData['canHandleImage'] as bool? ??
-          false;
-      debugPrint(
-          "[ModelData] Checking base model '$baseModelId' for image handling: $canBaseHandleImage");
-      return canBaseHandleImage;
-    }
-
-    // Otherwise, the model cannot handle images.
-    return false;
-  }
-
   /// Helper to remove cached images.
   /// This requires the function signature from the previous response.
   static Future<void> remove(Iterable<String> modelIds) async {
@@ -1345,6 +1313,62 @@ class ModelData {
     return 'assets/icons/self.svg';
   }
 
+  /// This function is now more flexible.
+  ///
+  /// - If called with one argument `hasModality(modelId)`:
+  ///   Returns `true` if the model has ANY special modalities (i.e., the modalities map is not empty).
+  ///
+  /// - If called with two arguments `hasModality(modelId, 'image')`:
+  ///   Returns `true` only if the model has the SPECIFIC 'image' modality.
+  ///
+  /// For character/self models, it intelligently checks the base model's capabilities as a fallback.
+  static bool hasModality(String modelId, [String? modality]) {
+    final modelData = getPreciseModelData(modelId);
+    final modelModalities = modelData['modalities'] as Map<String, dynamic>? ?? {};
+
+    // A helper function to perform the actual check.
+    // This avoids code duplication for the fallback logic.
+    bool check(Map<String, dynamic> modalitiesMap) {
+      if (modality == null) {
+        // Case 1: No specific modality was requested.
+        // Check if the map is not empty.
+        return modalitiesMap.isNotEmpty;
+      } else {
+        // Case 2: A specific modality was requested.
+        // Check for that specific key.
+        return modalitiesMap[modality] == true;
+      }
+    }
+
+    // 1. Check the model directly.
+    if (check(modelModalities)) {
+      return true;
+    }
+
+    // 2. If it's a character, check its base model as a fallback.
+    final category = modelData['category'] as String?;
+    final isCharacter = category == 'roleplay' || category == 'self';
+    final baseModelId = modelData['baseModelId'] as String?;
+
+    if (isCharacter && baseModelId != null && baseModelId.isNotEmpty) {
+      // The capability comes from its base model.
+      final baseModelData = getPreciseModelData(baseModelId);
+      final baseModalities = baseModelData['modalities'] as Map<String, dynamic>? ?? {};
+
+      final bool baseHasModality = check(baseModalities);
+
+      // Only print debug info if we're checking for a specific modality.
+      if (modality != null) {
+        debugPrint(
+            "[ModelData] Checking base model '$baseModelId' for '$modality' handling: $baseHasModality");
+      }
+
+      return baseHasModality;
+    }
+
+    // Otherwise, the model does not have this capability.
+    return false;
+  }
 
   /// PUBLIC: Removes cached images for the given model IDs.
   /// This is the correct way to expose the functionality of the private _ModelImageCache.
@@ -1414,7 +1438,7 @@ class ModelData {
       'producer': 'Unknown',
       'imagePath': 'assets/icons/self.svg', // Always use the SVG for fallbacks
       'type': 'online',
-      'canHandleImage': false,
+      'modalities': {},
       'extensions': null,
     };
   }

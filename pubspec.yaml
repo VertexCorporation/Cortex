@@ -3,7 +3,7 @@ description: "Peak of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 1.2.5+125
+version: 1.2.7+127
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -64,6 +64,7 @@ dependencies:
   cloud_functions: ^5.6.0
   flutter_secure_storage: ^9.2.4
   in_app_review: ^2.0.10
+  upgrader: ^11.5.0
 
 dev_dependencies:
   flutter_test:

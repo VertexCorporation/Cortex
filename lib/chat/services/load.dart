@@ -69,8 +69,7 @@ class LoadService {
   }
 
   Future<void> _processAndPopulateModels(List<Map<String, dynamic>> allModelsData) async {
-    // Bu metodun içeriği, senin orijinal loadModels() fonksiyonundan alındı
-    // ve merkezileştirildi.
+
     final downloadedPaths = await UserModels.loadDownloadedModelPaths();
 
     List<ModelInfo> categorizedModels = [];
@@ -85,7 +84,7 @@ class LoadService {
 
       if (!isOffline || downloadedPaths.containsKey(id)) {
         final String? finalRole = modelData['role'] as String?; // ModelData already prepares the role.
-        final bool definitiveCanHandleImage = ModelData.getDefinitiveImageHandling(id);
+        final modalities = modelData['modalities'] as Map<String, dynamic>? ?? const {};
 
         categorizedModels.add(ModelInfo(
           id: id,
@@ -94,7 +93,7 @@ class LoadService {
           producer: modelData['producer'] ?? 'Unknown',
           path: isOffline ? downloadedPaths[id] : null,
           role: finalRole,
-          canHandleImage: definitiveCanHandleImage,
+          modalities: modalities,
           category: modelData['category'] as String? ?? type,
           extensions: modelData['extensions'],
         ));
@@ -123,7 +122,7 @@ class LoadService {
           imagePath: 'assets/icons/self.svg',
           producer: 'User',
           path: file.path,
-          canHandleImage: false,
+          modalities: const {},
           category: 'self',
         ));
         addedIds.add(id);
@@ -151,13 +150,13 @@ class LoadService {
     if (!state.mounted || state.modelId == null) return;
     final modelData = ModelData.getPreciseModelData(state.modelId!);
     if (modelData.isNotEmpty) {
-      final bool definitiveCanHandleImage = ModelData.getDefinitiveImageHandling(state.modelId!);
+      final bool hasImageModality = ModelData.hasModality(state.modelId!, 'image');
       state.setState(() {
         state.modelTitle = modelData['title'] ?? 'Unknown Model';
         state.modelDescription = modelData['description'] ?? '';
         state.modelImagePath = modelData['imagePath'] ?? 'assets/icons/self.svg';
         state.modelProducer = modelData['producer'] ?? 'Unknown';
-        state.canHandleImage = definitiveCanHandleImage;
+        state.canHandleImage = hasImageModality;
       });
     }
     final String mainId = ModelData.getBaseIdFromFullId(state.modelId!);

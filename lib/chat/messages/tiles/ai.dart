@@ -1,6 +1,7 @@
+// =================================================================
 // ai.dart
+// =================================================================
 
-import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -62,14 +63,18 @@ class _AIMessageTileState extends State<AIMessageTile>
   static const int _fadeDur = 200;
   static const int _minBatch = 5;
 
+  final StringBuffer _chunkBuffer = StringBuffer();
+  int _totalTextLength = 0;
+
   String _text = '';
   late final ValueNotifier<bool> _thinkNtf;
   late String _curModelId;
+
+  // `_staticCharCount` holds the number of characters that have finished
+  // animating and should be permanently displayed on the screen. This is the
+  // most critical variable in fixing the reset bug.
   int _staticCharCount = 0;
   List<String> _batches = [];
-
-  Timer? _parseTimer;
-  String _chunkBuffer = '';
 
   bool _isExpanded = false;
   bool _showText = false;
@@ -99,7 +104,8 @@ class _AIMessageTileState extends State<AIMessageTile>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _fadeOutAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_fadeOutController);
+    _fadeOutAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_fadeOutController);
 
     _fadeCtl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200));
@@ -119,6 +125,7 @@ class _AIMessageTileState extends State<AIMessageTile>
 
     _typeCtl = AnimationController(vsync: this);
     _text = widget.text;
+    _totalTextLength = widget.text.length;
     _staticCharCount = _text.length;
     _thinkNtf = ValueNotifier(widget.isThinking);
 
@@ -127,79 +134,78 @@ class _AIMessageTileState extends State<AIMessageTile>
       _typeCtl.value = 1;
     }
 
-    _parseTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      if (_typeCtl.isAnimating || _chunkBuffer.isNotEmpty) {
-        if (mounted) {
-          setState(() {});
+    _typeCtl.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _staticCharCount = _text.length;
+        _batches.clear();
+
+        if (_chunkBuffer.isNotEmpty) {
+          _processBufferAndAnimate();
+        } else {
+          if (mounted) {
+            setState(() {});
+          }
         }
       }
     });
-
-    _typeCtl.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        if (mounted) setState(() {});
-      }
-    });
-
-    if (_text.isNotEmpty) _recomputeBatches();
   }
 
-  void _recomputeBatches() {
-    _batches = [];
-    if (_text.isEmpty) return;
-    for (var i = 0; i < _text.length; i += _minBatch) {
-      _batches.add(_text.substring(i, math.min(i + _minBatch, _text.length)));
-    }
-  }
-
+  // This method's responsibility is simplified. It no longer manages state.
   void _onChunk(String textToAdd) {
     if (textToAdd.isEmpty || widget.isError) return;
 
-    final bool wasAnimating = _typeCtl.isAnimating;
-
-    if (!wasAnimating) {
-      _staticCharCount = _text.length;
-      _batches.clear();
-    }
-
     _text += textToAdd;
 
+    // Create animation batches only for the NEW incoming text.
     final newBatchSize = (textToAdd.length / 2).ceil().clamp(_minBatch, 100);
     final List<String> newBatches = [];
     for (var i = 0; i < textToAdd.length; i += newBatchSize) {
       newBatches.add(
-          textToAdd.substring(i, math.min(i + newBatchSize, textToAdd.length))
-      );
+          textToAdd.substring(i, math.min(i + newBatchSize, textToAdd.length)));
     }
 
-    _batches.addAll(newBatches);
+    _batches = newBatches; // Overwrite previous batches, do not append.
 
     final newDur = (_batches.length * _durPerBatch) + _fadeDur;
     _typeCtl.duration = Duration(milliseconds: newDur);
 
-    if (!wasAnimating) {
-      _typeCtl.forward(from: 0);
-    }
+    // Start the animation from the beginning. The `_content` method will
+    // instantly draw the old text thanks to `_staticCharCount`.
+    _typeCtl.forward(from: 0);
   }
 
-  void _flushRemaining() {
-    _parseTimer?.cancel();
-    if (_chunkBuffer.isNotEmpty) {
-      _onChunk(_chunkBuffer);
-      _chunkBuffer = '';
+  void _processBufferAndAnimate() {
+    if (_chunkBuffer.isEmpty) {
+      return;
     }
 
-    if (!_typeCtl.isAnimating) return;
-    final remain = ((1 - _typeCtl.value) * (_typeCtl.duration!.inMilliseconds))
-        .clamp(0, 120)
-        .toInt();
-    _typeCtl.animateTo(
-        1, duration: Duration(milliseconds: remain), curve: Curves.easeOut);
+    final String textToAdd = _chunkBuffer.toString();
+    _chunkBuffer.clear();
+    _onChunk(textToAdd);
+  }
+
+  /// Finishes the animation instantly.
+  void _flushRemaining() {
+    // If there is any text waiting in the buffer, append it to the main text immediately.
+    if (_chunkBuffer.isNotEmpty) {
+      _text += _chunkBuffer.toString();
+      _chunkBuffer.clear();
+    }
+
+    // Mark all text as static and stop the animation.
+    _staticCharCount = _text.length;
+    _batches.clear();
+    if (_typeCtl.isAnimating) {
+      _typeCtl.stop();
+    }
+    _typeCtl.value = 1.0; // Set the animation as completed.
+
+    // Rerender to show the final state.
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
-    _parseTimer?.cancel();
     _fadeCtl.dispose();
     _typeCtl.dispose();
     _thinkNtf.dispose();
@@ -212,14 +218,14 @@ class _AIMessageTileState extends State<AIMessageTile>
   void didUpdateWidget(covariant AIMessageTile old) {
     super.didUpdateWidget(old);
 
-    if (!old.isThinking && widget.isThinking) {
-      _parseTimer?.cancel();
-      _chunkBuffer = '';
+    if (old.isThinking && !widget.isThinking) {
+      _flushRemaining(); // Show the final state before clearing everything.
+      _chunkBuffer.clear();
       _text = '';
+      _totalTextLength = 0;
       _staticCharCount = 0;
       _batches.clear();
-      if(_typeCtl.isAnimating) _typeCtl.stop();
-      _typeCtl.value = 1;
+      _typeCtl.value = 0;
     }
 
     if (old.isThinking != widget.isThinking) {
@@ -230,34 +236,23 @@ class _AIMessageTileState extends State<AIMessageTile>
       _curModelId = widget.modelId;
     }
 
-    if (!widget.isError && widget.text.length > _text.length) {
-      final newChunk = widget.text.substring(_text.length);
+    if (!widget.isError && widget.text.length > _totalTextLength) {
+      final newChunk = widget.text.substring(_totalTextLength);
+      _chunkBuffer.write(newChunk);
+      _totalTextLength = widget.text.length;
 
-      if (old.isThinking && !widget.isThinking) {
-        _parseTimer?.cancel();
-        _chunkBuffer = '';
-        _onChunk(newChunk);
-      }
-      else if (!widget.isThinking) {
-        _chunkBuffer += newChunk;
-        _parseTimer?.cancel();
-        _parseTimer = Timer(const Duration(milliseconds: 50), () {
-          if (_chunkBuffer.isNotEmpty && mounted) {
-            final textToProcess = _chunkBuffer;
-            _chunkBuffer = '';
-            _onChunk(textToProcess);
-          }
-        });
+      // If the animation is not running, start the loop.
+      // If it is running, the `StatusListener` will take over.
+      if (!_typeCtl.isAnimating) {
+        _processBufferAndAnimate();
       }
     }
 
     if (old.isError != widget.isError) {
       if (widget.isError) {
-        _parseTimer?.cancel();
-        _chunkBuffer = '';
+        _flushRemaining();
         _fadeCtl.reverse();
         _fadeOutController.forward();
-        if (_typeCtl.isAnimating) _typeCtl.stop();
         if (widget.isThinking) _thinkNtf.value = false;
       } else {
         _fadeOutController.reverse();
@@ -265,8 +260,15 @@ class _AIMessageTileState extends State<AIMessageTile>
 
         if (widget.text.isNotEmpty && !widget.isThinking) {
           _text = '';
-          _staticCharCount = 0;
-          _onChunk(widget.text);
+          _totalTextLength = 0;
+
+          final newChunk = widget.text.substring(_totalTextLength);
+          _chunkBuffer.write(newChunk);
+          _totalTextLength = widget.text.length;
+
+          if (!_typeCtl.isAnimating) {
+            _processBufferAndAnimate();
+          }
         }
       }
     } else if (old.opacity != widget.opacity) {
@@ -279,16 +281,20 @@ class _AIMessageTileState extends State<AIMessageTile>
     }
   }
 
+  // ... [ All other methods after _onLongPress and build remain the same ] ...
+  // ... [ No changes are needed in these methods ] ...
+
   void _onLongPress(BuildContext ctx, Offset pos) {
     final chatState = ctx.findAncestorStateOfType<ChatScreenState>();
     if (chatState == null) return;
 
-    final conversationHasPhoto = chatState.messages.any((m) =>
-    m.photoPath?.isNotEmpty ?? false);
+    final conversationHasPhoto =
+    chatState.messages.any((m) => m.photoPath?.isNotEmpty ?? false);
 
     final aiMessageOptions = [MessageOption.copy, MessageOption.select];
     if (!widget.isError) {
-      aiMessageOptions.addAll([MessageOption.regenerate, MessageOption.changeModel]);
+      aiMessageOptions
+          .addAll([MessageOption.regenerate, MessageOption.changeModel]);
       if (!widget.isReported) aiMessageOptions.add(MessageOption.report);
     } else {
       aiMessageOptions.add(MessageOption.regenerate);
@@ -326,13 +332,13 @@ class _AIMessageTileState extends State<AIMessageTile>
         child: RawGestureDetector(
           behavior: HitTestBehavior.deferToChild,
           gestures: {
-            ShortLongPressGestureRecognizer: GestureRecognizerFactoryWithHandlers<
+            ShortLongPressGestureRecognizer:
+            GestureRecognizerFactoryWithHandlers<
                 ShortLongPressGestureRecognizer>(
-                  () =>
-                  ShortLongPressGestureRecognizer(debugOwner: this,
-                      shortPressDuration: const Duration(milliseconds: 330)),
-                  (inst) =>
-              inst.onLongPressStart =
+                  () => ShortLongPressGestureRecognizer(
+                  debugOwner: this,
+                  shortPressDuration: const Duration(milliseconds: 330)),
+                  (inst) => inst.onLongPressStart =
                   (d) => _onLongPress(context, d.globalPosition),
             ),
           },
@@ -347,15 +353,14 @@ class _AIMessageTileState extends State<AIMessageTile>
                 padding: const EdgeInsets.fromLTRB(6, 8, 6, 0),
                 child: AnimatedBuilder(
                   animation: Listenable.merge([_typeCtl, _thinkNtf]),
-                  builder: (ctx, _) =>
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _avatar(scale),
-                          SizedBox(width: screenWidth * 0.04),
-                          Expanded(child: _content(context, scale)),
-                        ],
-                      ),
+                  builder: (ctx, _) => Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _avatar(scale),
+                      SizedBox(width: screenWidth * 0.04),
+                      Expanded(child: _content(context, scale)),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -405,12 +410,15 @@ class _AIMessageTileState extends State<AIMessageTile>
               children: [
                 Row(
                   children: [
-                    Icon(Icons.error_outline, color: AppColors.septenaryColor, size: iconSize),
+                    Icon(Icons.error_outline,
+                        color: AppColors.septenaryColor, size: iconSize),
                     SizedBox(width: screenWidth * 0.02),
                     Expanded(
                       child: Text(
                         AppLocalizations.of(context)!.requestFailed,
-                        style: TextStyle(color: AppColors.septenaryColor, fontSize: dynamicFontSize),
+                        style: TextStyle(
+                            color: AppColors.septenaryColor,
+                            fontSize: dynamicFontSize),
                       ),
                     ),
                     SizedBox(width: screenWidth * 0.02),
@@ -418,7 +426,10 @@ class _AIMessageTileState extends State<AIMessageTile>
                       turns: _isExpanded ? 0.50 : 0.0,
                       duration: const Duration(milliseconds: 500),
                       curve: Curves.easeOutQuad,
-                      child: SvgPicture.asset('assets/icons/arrov.svg', width: iconSize, height: iconSize, color: AppColors.septenaryColor),
+                      child: SvgPicture.asset('assets/icons/arrov.svg',
+                          width: iconSize,
+                          height: iconSize,
+                          color: AppColors.septenaryColor),
                     ),
                   ],
                 ),
@@ -434,10 +445,13 @@ class _AIMessageTileState extends State<AIMessageTile>
                       child: SlideTransition(
                         position: _slideAnimation,
                         child: Padding(
-                          padding: EdgeInsets.only(top: screenWidth * 0.02),
+                          padding:
+                          EdgeInsets.only(top: screenWidth * 0.02),
                           child: SelectableText(
                             widget.text,
-                            style: TextStyle(color: AppColors.septenaryColor, fontSize: dynamicFontSize * 0.9),
+                            style: TextStyle(
+                                color: AppColors.septenaryColor,
+                                fontSize: dynamicFontSize * 0.9),
                           ),
                         ),
                       ),
@@ -456,10 +470,6 @@ class _AIMessageTileState extends State<AIMessageTile>
   Widget _avatar(double s) {
     final containerSize = 30 * s;
     final iconSize = 24 * s;
-
-    // --- THE PERFECT FIX IS HERE ---
-
-    // 1. Create the correctly colored fallback widget ONCE.
     final fallbackWidget = Container(
       width: containerSize,
       height: containerSize,
@@ -473,26 +483,32 @@ class _AIMessageTileState extends State<AIMessageTile>
         width: iconSize,
         height: iconSize,
         fit: BoxFit.contain,
-        colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+        colorFilter:
+        ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
       ),
     );
-
-    // 2. Handle the logic to decide which widget to show.
     Widget imageWidget;
     if (widget.imagePath.isEmpty || widget.imagePath.endsWith('self.svg')) {
-      // If path is empty OR it's the self.svg, ALWAYS use our colored fallback.
       imageWidget = fallbackWidget;
     } else {
-      // For any other image path, try to load it.
       final isSvg = widget.imagePath.toLowerCase().endsWith('.svg');
       final isAsset = widget.imagePath.startsWith('assets/');
-
       if (isSvg) {
         imageWidget = isAsset
-            ? SvgPicture.asset(widget.imagePath, width: iconSize, height: iconSize, fit: BoxFit.contain, placeholderBuilder: (_) => fallbackWidget)
-            : SvgPicture.file(File(widget.imagePath), width: iconSize, height: iconSize, fit: BoxFit.contain, placeholderBuilder: (_) => fallbackWidget);
+            ? SvgPicture.asset(widget.imagePath,
+            width: iconSize,
+            height: iconSize,
+            fit: BoxFit.contain,
+            placeholderBuilder: (_) => fallbackWidget)
+            : SvgPicture.file(File(widget.imagePath),
+            width: iconSize,
+            height: iconSize,
+            fit: BoxFit.contain,
+            placeholderBuilder: (_) => fallbackWidget);
       } else {
-        final imageProvider = isAsset ? AssetImage(widget.imagePath) as ImageProvider : FileImage(File(widget.imagePath));
+        final imageProvider = isAsset
+            ? AssetImage(widget.imagePath) as ImageProvider
+            : FileImage(File(widget.imagePath));
         imageWidget = Image(
           image: imageProvider,
           width: containerSize,
@@ -502,9 +518,6 @@ class _AIMessageTileState extends State<AIMessageTile>
         );
       }
     }
-    // --- END OF FIX ---
-
-    // 3. Return the final widget inside the main container.
     return Container(
       width: containerSize,
       height: containerSize,
@@ -522,12 +535,15 @@ class _AIMessageTileState extends State<AIMessageTile>
     if (span is TextSpan) {
       final basePaint = Paint()
         ..style = PaintingStyle.fill
-        ..color = (span.style?.color ?? AppColors.primaryColor.inverted).withOpacity(op)
-        ..maskFilter = sigma > 0 ? MaskFilter.blur(BlurStyle.normal, sigma) : null;
+        ..color =
+        (span.style?.color ?? AppColors.primaryColor.inverted).withOpacity(op)
+        ..maskFilter =
+        sigma > 0 ? MaskFilter.blur(BlurStyle.normal, sigma) : null;
       return TextSpan(
         text: span.text,
         children: span.children,
-        style: span.style?.copyWith(foreground: basePaint) ?? TextStyle(foreground: basePaint),
+        style: span.style?.copyWith(foreground: basePaint) ??
+            TextStyle(foreground: basePaint),
       );
     } else if (span is WidgetSpan) {
       return WidgetSpan(
@@ -540,13 +556,15 @@ class _AIMessageTileState extends State<AIMessageTile>
   }
 
   Widget _content(BuildContext ctx, double s) {
-    final base = TextStyle(fontSize: 16 * s, height: 1.35, color: AppColors.primaryColor.inverted);
+    final base = TextStyle(
+        fontSize: 16 * s, height: 1.35, color: AppColors.primaryColor.inverted);
 
     if (_thinkNtf.value && _text.isEmpty && !widget.isError) {
       return Shimmer.fromColors(
         baseColor: base.color!,
         highlightColor: AppColors.quaternaryColor,
-        child: Text(AppLocalizations.of(ctx)!.thinking, style: base.copyWith(fontWeight: FontWeight.bold)),
+        child: Text(AppLocalizations.of(ctx)!.thinking,
+            style: base.copyWith(fontWeight: FontWeight.bold)),
       );
     }
 
@@ -559,18 +577,23 @@ class _AIMessageTileState extends State<AIMessageTile>
       return spans;
     }
 
-    if (!_typeCtl.isAnimating && _text.isNotEmpty) {
+    // When the animation is finished (value == 1.0) and the text is not empty,
+    // draw the entire text as a RichText. This is the most stable state.
+    if (_typeCtl.value == 1.0 && _text.isNotEmpty) {
       return RichText(text: TextSpan(children: parseText(_text), style: base));
     }
 
-    final tot = _typeCtl.duration!.inMilliseconds;
+    final tot = _typeCtl.duration?.inMilliseconds ?? 0;
     final t = _typeCtl.value * tot;
     final spans = <InlineSpan>[];
 
+    // The part of the text that has finished animating (`_staticCharCount`) is
+    // always drawn instantly and without animation.
     if (_staticCharCount > 0) {
       spans.addAll(getParsedSpans(_text.substring(0, _staticCharCount)));
     }
 
+    // Only the current new part of the text (`_batches`) is animated.
     for (var idx = 0; idx < _batches.length; idx++) {
       final seg = _batches[idx];
       final start = idx * _durPerBatch;

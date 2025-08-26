@@ -43,7 +43,7 @@ class SelectionService {
     final Map<String, dynamic> preciseModelData = ModelData.getPreciseModelData(finalApiModelId);
 
     // This is the single, authoritative calculation.
-    final bool finalCanHandleImage = ModelData.getDefinitiveImageHandling(finalApiModelId);
+    final bool finalCanHandleImage = ModelData.hasModality(finalApiModelId, 'image');
     debugPrint("$logPrefix: Calculated definitive 'canHandleImage': $finalCanHandleImage");
 
     final String? finalModelPath = modelInfo.path;
