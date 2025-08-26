@@ -925,6 +925,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get redeemCode => 'Utiliser un code';
 
   @override
+  String get enterYourCode =>
+      'Soutenez vos créateurs préférés ! Saisissez leur code unique ci-dessous pour leur donner une part de vos achats Cortex.';
+
+  @override
+  String get code => 'Code';
+
+  @override
+  String get redeem => 'Utiliser';
+
+  @override
+  String get codeCannotBeEmpty => 'Le code ne peut pas être vide';
+
+  @override
   String get userId => 'ID Utilisateur';
 
   @override
@@ -956,19 +969,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chinese => 'Chinois';
 
   @override
-  String get indian => 'Indien';
-
-  @override
   String get arabic => 'Arabe';
 
   @override
   String get french => 'Français';
-
-  @override
-  String get italian => 'Italien';
-
-  @override
-  String get spanish => 'Espagnol';
 
   @override
   String get japanese => 'Japonais';
@@ -977,16 +981,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get korean => 'Coréen';
 
   @override
-  String get azerbaijanTurkish => 'Turc d\'Azerbaïdjan';
-
-  @override
-  String get deutsch => 'Allemand';
+  String get deutsch => 'Allemand (Deutsch)';
 
   @override
   String get english => 'Anglais';
 
   @override
   String get turkish => 'Turc';
+
+  @override
+  String get hindi => 'Hindi';
+
+  @override
+  String get portuguese => 'Portugais';
+
+  @override
+  String get indonesian => 'Indonésien';
+
+  @override
+  String get azerbaijani => 'Azerbaïdjanais';
+
+  @override
+  String get german => 'Allemand';
+
+  @override
+  String get spanish => 'Espagnol';
+
+  @override
+  String get italian => 'Italien';
 
   @override
   String get ram => 'RAM';
@@ -1555,4 +1577,18 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noThanks => 'Non, merci';
+
+  @override
+  String get updateRequiredTitle => 'Mise à jour requise';
+
+  @override
+  String get updateRequiredMessage =>
+      'Pour continuer à utiliser Cortex, veuillez mettre à jour l\'application vers la dernière version pour bénéficier de nouvelles fonctionnalités et d\'améliorations importantes.';
+
+  @override
+  String get updateNowButton => 'Mettre à jour';
+
+  @override
+  String get creatorSupportedSuccess =>
+      'Créateur soutenu avec succès ! Vos futurs achats contribueront à le soutenir.';
 }

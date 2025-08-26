@@ -1,0 +1,681 @@
+{
+  "@@locale": "ja",
+
+  "understood": "了解",
+  "cancel": "キャンセル",
+  "remove": "削除",
+  "download": "ダウンロード",
+  "resume": "再開",
+  "copy": "コピー",
+  "chat": "チャット",
+  "darkMode": "ダークモード",
+  "light": "ライト",
+  "theme": "テーマ",
+  "no": "いいえ",
+  "yes": "はい",
+  "done": "完了",
+  "comingSoon": "近日公開",
+  "bestValue": "ベストバリュー",
+  "selected": "選択済み",
+  "descriptionSection": "説明",
+  "searchHint": "検索",
+  "messageHint": "何でも聞いてください",
+  "modelLoading": "モデルを読み込み中...",
+  "messageCopied": "メッセージをクリップボードにコピーしました。",
+  "storeUnavailable": "ストアは現在利用できません。後でもう一度お試しください",
+  "retry": "再試行",
+
+  "systemInfo": "システム情報",
+  "deviceMemory": "デバイスメモリ: {memory} GB",
+  "storageSpace": "ストレージ容量: {storage} GB",
+  "freeStorageSpace": "空きストレージ容量: {freeStorage} GB",
+  "memory": "メモリ",
+  "storage": "ストレージ",
+  "freeStorage": "空き容量",
+  "totalStorage": "合計ストレージ",
+  "usedStorage": "使用済みストレージ",
+  "totalMemory": "合計メモリ",
+  "usedMemory": "使用済みメモリ",
+  "requirements": "要件",
+
+  "modelsTitle": "ライブラリ",
+  "localModels": "ローカルモデル",
+  "serverSideModels": "オンラインモデル",
+  "uploadYourOwnModel": "独自のモデルをアップロード！",
+  "selectGGUFFile": "GGUFファイルを選択",
+  "errorGGUF": "GGUF形式のファイルのみを選択してください。",
+  "modelAlreadyExists": "モデルは既に存在します。",
+  "modelAddedSuccessfully": "モデルが正常に追加されました。",
+  "modelRemoved": "モデルが正常に削除されました。",
+  "removeError": "モデルの削除中にエラーが発生しました。",
+  "fileNotFound": "ファイルが見つかりません。",
+  "fileUploadError": "ファイルのアップロード中にエラーが発生しました。",
+  "noFileSelected": "ファイルが選択されていません。",
+  "myModels": "マイモデル",
+  "create": "作成",
+  "seeAll": "すべて表示",
+
+  "modelProducer": "プロデューサー: {producer}",
+  "modelRAM": "RAM: {ram}",
+  "modelSize": "サイズ: {size}",
+  "modelDescription": "{description}",
+
+  "conversationsTitle": "会話",
+  "conversationDeleted": "会話を削除しました。",
+  "conversationUpdated": "会話を更新しました。",
+  "editConversationTitle": "名前を変更",
+  "newTitle": "新しいタイトル",
+  "save": "保存",
+  "titleCannotBeEmpty": "タイトルを空にすることはできません。",
+  "noConversationsMessage": "会話がありません、チャットを始めましょう！",
+  "startChat": "チャットを開始",
+  "noChats": "チャットがありません",
+  "starredChats": "スター付きチャット",
+  "allChats": "すべてのチャット",
+  "noStarredChats": "スター付きチャットがありません",
+  "noStarredChatsMessage": "まだスターを付けたチャットがありません。",
+  "goToChats": "チャットにスターを付ける",
+  "starConversation": "スター",
+  "conversationTitleUpdated": "会話のタイトルを更新しました",
+  "youReachedConversationLimit": "会話の上限に達しました。",
+  "today": "今日",
+  "yesterday": "昨日",
+
+  "loginToYourAccount": "ログイン",
+  "createYourAccount": "登録",
+  "email": "メールアドレス",
+  "password": "パスワード",
+  "confirmPassword": "パスワードの確認",
+  "invalidEmail": "有効なメールアドレスを入力してください。",
+  "invalidPassword": "パスワードは6文字以上である必要があります。",
+  "rememberMe": "ログイン状態を維持する",
+  "forgotPassword": "パスワードをお忘れですか？",
+  "or": "または",
+  "continueWithGoogle": "Googleで続行",
+  "dontHaveAccount": "アカウントをお持ちでないですか？",
+  "alreadyHaveAccount": "既にアカウントをお持ちですか？",
+  "signUp": "サインアップ",
+  "logIn": "ログイン",
+  "passwordsDoNotMatch": "パスワードが一致しません。",
+  "userNotFound": "ユーザーが見つかりません。",
+  "wrongPassword": "パスワードが正しくありません。",
+  "emailAlreadyInUse": "このメールアドレスは既に使用されています。",
+  "weakPassword": "パスワードが弱すぎます。",
+  "authError": "認証エラー",
+  "invalidUsername": "ユーザー名を入力してください。",
+  "usernameTaken": "このユーザー名は既に使用されています。",
+  "username": "ユーザー名",
+  "authenticationFailed": "認証に失敗しました。もう一度お試しください。",
+  "emailTooLong": "メールアドレスは最大30文字です。",
+  "deviceLimitReached": "このデバイスのアカウント作成上限に達しました。",
+
+  "verificationEmailLimitReached": "これ以上は送信しません",
+  "verificationEmailSent": "確認メールを送信しました！",
+  "emailNotVerified": "メールアドレスが確認されていません",
+  "resendCode": "確認メールを再送信",
+  "remainingSeconds": "確認までの残り時間",
+  "pleaseCheckYourEmail": "Cortexを使用するには、メールアドレスの確認が必要です。\n確認リンクがあなたのメールアドレスに送信されました。メールを確認してください。",
+  "verifyYourEmail": "メールアドレスを確認",
+  "backToLogin": "戻る",
+  "seconds": "秒",
+  "maxResendLimitReached": "確認メールの最大送信回数に達しました",
+  "verificationScreenContinueWithoutVerification": "確認せずに続行",
+  "verificationScreenWarning": "続行しても、アカウントの1日間の確認期間は有効です。それまでにアカウントを確認しない場合、アプリから削除されます。",
+  "unverifiedAccountHeader": "あなたのアカウントは確認されていません",
+  "unverifiedAccountWarning": "{timeLeft}以内にアカウントを確認しない場合、削除されます",
+  "verifyNow": "今すぐ確認",
+  "accountVerified": "アカウントが確認されました。",
+  "linkSent": "リンクを送信しました",
+  "accountDeletionRequested": "アカウントの削除リクエストが受信され、アカウントは現在無効になっています。",
+  "tooManyRequests": "リクエストが多すぎます",
+  "regenerate": "再生成",
+
+  "confirmDeleteAccount": "本当にアカウントを削除しますか？",
+  "enterPasswordToDelete": "削除するにはパスワードを入力してください。",
+  "deleteAccount": "アカウントを削除",
+  "deleteAccountError": "アカウントの削除中にエラーが発生しました。",
+  "delete": "削除",
+  "passwordRequired": "パスワードが必要です。",
+  "deleteDescription": "削除したデータは、当社のサーバーとあなたのデバイスから永久に削除されます。この操作は元に戻せません。",
+  "deleteAccountButton": "アカウント削除ボタン",
+
+  "editProfile": "プロフィールを編集",
+  "displayName": "表示名",
+  "tapToChangeProfilePicture": "タップしてプロフィール写真を変更",
+  "profileUpdated": "プロフィールが正常に更新されました",
+  "updateFailed": "プロフィールの更新に失敗しました",
+  "nameCannotBeEmpty": "名前を空にすることはできません",
+  "logout": "ログアウト",
+  "noDisplayName": "表示名が設定されていません",
+  "noEmail": "メールアドレスがありません",
+  "noUserLoggedIn": "現在ログインしているユーザーがいません",
+  "profile": "プロフィール",
+  "manageProfileDescription": "あなたのプロフィールを管理し、パスワードを更新したり、Cortexからログアウトしたりします。",
+  "accessSettingsDescription": "ヘルプへのアクセス、コードの引き換え、Cortexの共有、および当社のポリシーの表示。",
+  "languageDescription": "いつでもデフォルトのアプリインターフェース言語を変更できます。",
+  "themeDescription": "好みに応じてライトテーマとダークテーマを切り替えることができます。選択したテーマはCortexインターフェース全体に適用されます。",
+  "iHaveReadAndAgree": "利用規約に同意します",
+
+  "downloading": "ダウンロード中...",
+  "downloadError": "ダウンロード中にエラーが発生しました。",
+  "downloadCancelled": "ダウンロードがキャンセルされました。",
+  "downloadResumed": "ダウンロードが再開されました。",
+  "downloadSuccess": "ダウンロード成功",
+  "downloadFailed": "ダウンロード失敗",
+  "downloaded": "{percent}% ダウンロード済み",
+  "@downloaded": {
+    "description": "ダウンロードの完了率を示します。",
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "downloadPaused": "ダウンロードが一時停止しました。",
+
+  "purchaseSuccessful": "購入成功！",
+  "purchaseFailed": "購入に失敗しました",
+  "creditProductNotFound": "選択されたクレジット商品が見つかりませんでした。",
+  "creditsAddedSuccessfully": "クレジットがアカウントに正常に追加されました！",
+  "creditDeliveryFailed": "アカウントへのクレジット追加に失敗しました。サポートにお問い合わせください。",
+  "invalidPurchase": "無効な購入",
+  "purchaseError": "購入エラー",
+  "purchaseVertexPlusToUpload": "これはPlusの機能です",
+  "purchasePlus": "Cortex Plusを購入",
+  "plusDescription": "Cortexのさらに多くの機能にアクセスし、AIをさらに体験してください！",
+  "annual": "年間",
+  "monthly": "月間",
+  "manageSubscription": "サブスクリプションを管理",
+
+  "purchasePlan": "{planName}を購入",
+  "@purchasePlan": {
+    "description": "特定のサブスクリプションプランを購入するためのボタンテキスト。",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "Pro Annual"
+      }
+    }
+  },
+
+  "discountOffer": "{percent}% OFF",
+  "@discountOffer": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+
+  "annualPlanDescription": "{price}/月、年間請求",
+  "@annualPlanDescription": {
+    "description": "年間プランの説明。月額換算価格を表示して手頃に見せる。例：$4.17/月、年間請求",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$4.17"
+      }
+    }
+  },
+  "monthlyPlanDescription": "{price}/月、月間請求",
+  "@monthlyPlanDescription": {
+    "description": "月間プランの説明。月額価格を表示。例：$4.99/月、月間請求",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "discountBannerTitle": "ローンチスペシャル：80% OFF！",
+  "@discountBannerTitle": {
+    "description": "プロモーションバナーのメイン見出し。特別なローンチ割引を強調する。"
+  },
+  "discountBannerSubtitle": "ローンチを記念して、すべてのサブスクリプションプランが特別割引。お見逃しなく！",
+  "@discountBannerSubtitle": {
+    "description": "プロモーションバナーの副次的なテキスト。オファーがすべてのプランに適用されることを明確にし、緊急性を加える。"
+  },
+  "purchasePro": "Cortex Proを購入",
+  "proDescription": "Cortexのさらに多くの機能にアクセスし、AIをさらに体験してください！",
+  "alreadySubscribed": "すでに登録済みです",
+  "subscriptionInfo": "あなたのサブスクリプションは有効です。",
+  "alreadySubscribedMessage": "すでにPlusサブスクリプションをお持ちです。サブスクリプションをキャンセルしたい場合は、Playストアマネージャーから行うことができます。",
+  "cancelSubscription": "サブスクリプションをキャンセル",
+  "cancelSubscriptionInfo": "サブスクリプションをキャンセルしたい場合は、Playストアのサブスクリプションマネージャーから手続きを進めてください。",
+  "goToPlayStore": "Playストアに移動",
+  "alreadySubscribedPlus": "Plusプランをご利用中です！",
+  "alreadySubscribedPlusMessage": "あなたのPlusプランは有効です。すべての特典をお楽しみいただけます。",
+  "purchaseUltra": "Cortex Ultraを購入",
+  "ultraDescription": "Cortexのすべての機能へのフルアクセス権を獲得し、AIを最大限に体験してください！",
+  "noSubscription": "サブスクリプションがありません",
+  "noSubscriptionMessage": "まだサブスクリプションがありません。",
+  "alreadyAtHighestPlan": "すでに最上位のプランです。",
+  "unableToOpenSubscription": "サブスクリプション管理ページを開けませんでした。",
+  "upgradeSubscription": "サブスクリプションをアップグレード",
+  "confirmUpgrade": "サブスクリプションをアップグレードしてもよろしいですか？",
+  "unsupportedPlatform": "サブスクリプションのキャンセルに対応していないプラットフォームです。",
+  "purchaseStreamError": "購入ストリームエラー。",
+  "productNotFound": "製品が見つかりません",
+  "productDetailsError": "製品詳細の取得中にエラーが発生しました。",
+  "noProductsFound": "製品が見つかりません",
+  "loadCreditsButton": "クレジットをロード",
+  "creditsTitle": "クレジット",
+  "creditsScreenDescription": "この画面にはユーザーのクレジットが表示されます。\n\nユーザーの現在のクレジット: 100\n\n詳細なクレジット情報をここに表示できます。",
+  "creditsLoaded": "クレジットがロードされました！",
+  "currentCredits": "現在のクレジット",
+  "pleaseSelectCreditPackage": "クレジットパッケージを選択してください",
+  "purchaseCreditsTitle": "クレジットを購入",
+  "purchaseCreditsDescription": "あなたのニーズに合ったクレジットパッケージを選択し、アプリをさらに活用してください。",
+  "purchaseButton": "購入",
+  "productNotFoundMessage": "選択された製品は存在しません。",
+  "buyCredits": "クレジットを購入",
+  "selectCreditPackageDescription": "あなたのニーズに合ったクレジットパッケージを選択し、より多くの機能をお楽しみください。",
+  "buyCredit": "クレジットを購入",
+  "buyCreditPackage": "{amount}クレジットを購入",
+  "@creditPackage": {
+    "description": "特定の数のクレジットを購入するためのボタンテキスト",
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "subscribedPlan": "登録済み",
+
+  "errorResponseNotReceived": "応答が受信されませんでした",
+  "googleApiRequestFailed": "Google APIリクエストが{attempt}回失敗しました: {error}",
+  "@googleApiRequestFailed": {
+    "description": "Google APIリクエストが失敗したときに使用されるエラーメッセージ",
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      },
+      "error": {
+        "type": "String",
+        "example": "Timeout"
+      }
+    }
+  },
+  "openRouterResponseStatus": "OpenRouter応答ステータス: {statusCode}",
+  "@openRouterResponseStatus": {
+    "description": "OpenRouter APIからの応答ステータスコードをログに記録する",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "200"
+      }
+    }
+  },
+  "openRouterDecodedResponseBody": "OpenRouterデコード済み応答本文: {body}",
+  "@openRouterDecodedResponseBody": {
+    "description": "OpenRouter APIからの応答本文をログに記録する",
+    "placeholders": {
+      "body": {
+        "type": "String",
+        "example": "{\"choices\": [...]}"
+      }
+    }
+  },
+  "decodedJson": "デコード済みJSON: {data}",
+  "@decodedJson": {
+    "description": "デコードされたJSONデータをログに記録する",
+    "placeholders": {
+      "data": {
+        "type": "String",
+        "example": "{\"key\": \"value\"}"
+      }
+    }
+  },
+  "responseStructureUnexpectedMessageContentMissing": "応答構造が予期せぬものです：メッセージまたはコンテンツがありません",
+  "responseStructureUnexpectedChoicesMissing": "応答構造が予期せぬものです：choicesがないか空です",
+  "openRouterApiRequestFailed": "OpenRouter APIリクエストが失敗しました: {statusCode} - {body}",
+  "@openRouterApiRequestFailed": {
+    "description": "OpenRouter APIリクエストが失敗したときに使用されるエラーメッセージ",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "500"
+      },
+      "body": {
+        "type": "String",
+        "example": "{\"error\": \"Internal Server Error\"}"
+      }
+    }
+  },
+  "openRouterApiRequestFailedAfterAttempts": "OpenRouter APIリクエストが{attempt}回失敗しました: {error}",
+  "@openRouterApiRequestFailedAfterAttempts": {
+    "description": "特定の試行回数の後でOpenRouter APIリクエストが失敗したときに使用されるエラーメッセージ",
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      },
+      "error": {
+        "type": "String",
+        "example": "Timeout"
+      }
+    }
+  },
+  "internetRequired": "このモデルを使用するにはインターネット接続が必要です",
+  "pleaseWaitBeforeTryingAgain": "しばらく待ってからもう一度お試しください",
+  "openRouterQuotaExceeded": "クォータを超えました。ステータスコード: {statusCode}, 本文: {decodedBody}",
+  "@openRouterQuotaExceeded": {
+    "description": "APIクォータを超えたことを示します。",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "429"
+      },
+      "decodedBody": {
+        "type": "String",
+        "example": "{\"error\":\"Quota exceeded\"}"
+      }
+    }
+  },
+  "openRouterApiRequestFailedAfterPaidAttempts": "APIリクエストが{attempts}回の有料試行の後に失敗しました。エラー: {error}",
+  "@openRouterApiRequestFailedAfterPaidAttempts": {
+    "description": "特定の回数の有料モデル試行の後にAPIリクエストが失敗したことを示します。",
+    "placeholders": {
+      "attempts": {
+        "type": "int",
+        "example": "2"
+      },
+      "error": {
+        "type": "String",
+        "example": "Unauthorized Error"
+      }
+    }
+  },
+
+  "termsOfServiceAndPrivacyPolicyWarning": "この注文を行うことにより、利用規約およびプライバシーポリシーに同意したことになります。このテキストをクリックすると、当社の利用規約およびプライバシーポリシーについて詳しく知ることができます。現在の期間が終了する少なくとも24時間前に自動更新がオフにされない限り、サブスクリプションは自動的に更新されます。",
+  "termsOfService": "利用規約",
+  "privacyPolicy": "プライバシーポリシー",
+
+  "report": "報告",
+  "reportDialogTitle": "報告を送信",
+  "reportDescriptionLabel": "問題は何ですか？",
+  "reportHarmful": "これは有害/安全ではありません",
+  "reportNotTrue": "これは真実ではありません",
+  "reportNotHelpful": "これは役に立ちません",
+  "closeButton": "閉じる",
+  "submitButton": "送信",
+  "reportErrorMessage": "報告する理由を1つ選択してください。",
+
+
+  "capabilitiesSection": "能力",
+  "ratingsSection": "評価",
+  "noRatingDataFound": "評価データが見つかりません",
+  "featurePhotoTitle": "写真スキャン",
+  "featurePhotoDescription": "このモデルは、カメラや画像ファイルを通じて写真をスキャンする能力を持っています。",
+  "featureOfflineTitle": "オフライン操作",
+  "featureOfflineDescription": "インターネット接続なしでモデルを実行し、データを安全に保ちます。",
+  "featureSupermodelTitle": "スーパーモデル",
+  "featureSupermodelDescription": "これは100億以上のパラメータを持つ巨大なモデルで、高いパフォーマンスと広範な能力を提供します。",
+  "featureRoleplayTitle": "ロールプレイ",
+  "featureRoleplayDescription": "ロールプレイングモデルを使用すると、さまざまなチャットやシナリオを作成できます。",
+  "roleModels": "ロールプレイモデル",
+  "parameters": "パラメータ",
+  "context": "コンテキスト",
+  "millions": "百万",
+  "billions": "十億",
+  "trillions": "兆",
+  "thousand": "千",
+  "estimated": "推定",
+  "finalPreparation": "最終準備が行われています。",
+  "allEvaluationsByTestTeam": "すべての評価は当社のテストチームによって行われました",
+
+
+  "shareApp": "アプリを共有",
+  "rateUs": "評価する",
+  "share": "共有",
+  "shareSubject": "Cortex",
+  "shareMessage": "Cortexアプリをチェックしてみてください、とても素晴らしいです！ここからダウンロードしてください: https://play.google.com/store/apps/details?id=com.vertex.cortex",
+  "shareFailed": "アプリの共有に失敗しました。後でもう一度お試しください",
+  "selectText": "テキストを選択",
+  "showLatex": "特殊記号を表示",
+  "hideLatex": "特殊記号を非表示",
+
+
+  "thinking": "考え中",
+  "user": "ユーザー",
+  "voice": "音声",
+  "help": "ヘルプ",
+  "redeemCode": "コードを引き換える",
+  "enterYourCode": "お気に入りのクリエイターをサポートしよう！Cortexでの購入の一部を彼らに還元するために、以下のユニークなコードを入力してください。",
+  "code": "コード",
+  "redeem": "引き換える",
+  "codeCannotBeEmpty": "コードを空にすることはできません",
+  "userId": "ユーザーID",
+  "deleteAllConversationsConfirmTitle": "すべてのチャットを削除しますか？",
+  "deleteAllConversationsConfirmMessage": "本当にすべてのチャットを削除してもよろしいですか？この操作は元に戻せません。",
+  "allConversationsDeleted": "すべての会話が正常に削除されました！",
+  "deleteAll": "すべて削除",
+  "deleteAllConversationsButton": "すべての会話を削除",
+  "confirmWord": "VERTEXと入力",
+  "confirmWordError": "入力が間違っています",
+  "chinese": "中国語",
+  "arabic": "アラビア語",
+  "french": "フランス語",
+  "japanese": "日本語",
+  "korean": "韓国語",
+  "deutsch": "ドイツ語",
+  "english": "英語",
+  "turkish": "トルコ語",
+  "hindi": "ヒンディー語",
+  "portuguese": "ポルトガル語",
+  "indonesian": "インドネシア語",
+  "azerbaijani": "アゼルバイジャン語",
+  "german": "ドイツ語",
+  "spanish": "スペイン語",
+  "italian": "イタリア語",
+  "ram": "RAM",
+  "usernameTooShort": "ユーザー名が短すぎます。",
+  "usernameTooLong": "ユーザー名は16文字を超えることはできません。",
+  "invalidUsernameCharacters": "ユーザー名には、'abcçdefgğhıijklmnoöprsştuüvyzxqw'の文字と、'.'、'-'、'_'の記号のみ使用できます。",
+  "passwordTooLong": "パスワードは64文字を超えることはできません。",
+  "noInternetConnection": "インターネット接続がありません。",
+  "chats": "受信トレイ",
+  "library": "ライブラリ",
+  "inappropriateMessageWarning": "不適切なメッセージが検出されました！",
+  "myModelDescription": "私のモデル。",
+  "noModelsDownloaded": "まだどのモデルもダウンロードしていません。",
+  "appTitle": "Cortex",
+  "text": "テキスト",
+  "removeModel": "モデルを削除",
+  "modelUploadedSuccessfully": "モデルが正常にアップロードされました。",
+  "insufficientRAM": "メモリ不足",
+  "insufficientStorage": "ストレージ不足",
+  "confirmRemoveModel": "本当に{model}モデルをデバイスから削除しますか？そうすると、そのモデルとの以前の会話もすべて削除されます。",
+  "noMatchingModels": "一致するモデルが見つかりませんでした。",
+  "creditPackage": "{amount}クレジットを購入",
+  "benefit1": "オンラインAIの会話制限が大幅に増加",
+  "benefit2": "独自のモデルをアップロード",
+  "benefit3": "プロフィールエフェクト",
+  "benefit4": "メンバーシップバッジ",
+  "benefit5": "より多くのオンラインAIを作成",
+  "benefit6": "無制限のチャット",
+  "benefit7": "毎日{credits}クレジット",
+  "benefit8": "モデルを追加",
+  "benefit9": "新しいテーマ",
+  "benefit10": "オフライン音声チャット",
+  "oldBenefits": "下位プランのすべての特典",
+  "confirm": "確認",
+  "changePassword": "パスワードを変更",
+  "logoutConfirmationTitle": "本当にログアウトしますか？",
+  "settings": "設定",
+  "language": "アプリ言語",
+  "dark": "ダーク",
+  "oldPassword": "古いパスワード",
+  "newPassword": "新しいパスワード",
+  "passwordUpdated": "パスワードが更新されました。",
+  "stop": "停止",
+  "copyrights": "帰属",
+  "downloadingTitle": "ダウンロード中",
+  "downloadCompletedTitle": "ダウンロード完了",
+  "downloadPausedTitle": "ダウンロード一時停止",
+  "downloadErrorTitle": "ダウンロードエラー",
+  "cancelButtonText": "キャンセル",
+  "love": "愛",
+  "nature": "自然",
+  "behindTheSlaughter": "虐殺の裏側",
+  "grayscale": "グレースケール",
+  "ocean": "海",
+  "scarletSnow": "緋色の雪",
+  "requestFailed": "エラーが発生しました。もう一度お試しください。",
+  "changeModel": "変更",
+  "edit": "編集",
+  "editingMessageInfo": "このメッセージを編集すると、ここから会話が再開されます。",
+  "editingNotification": "現在編集モードです",
+
+  "featureIndulgentTitle": "寛容",
+  "featureIndulgentDescription": "このモデルは10万トークンを超えるコンテキストをシームレスに受け入れ、処理することができ、パフォーマンスを損なうことなく広範で詳細な入力を処理できます。",
+  "featurePluralTitle": "複数",
+  "featurePluralDescription": "このモデルは追加の拡張機能を自動的に統合し、それによって機能的能力を拡張して、多様な操作を強化されたパフォーマンスでサポートします。",
+  "featureWiseTitle": "賢明",
+  "featureWiseDescription": "このモデルは、深い分析的洞察と先進的な推論を活用して、意思決定と複雑な問題解決のための洗練されたサポートを提供できます。",
+  "featureResearcherTitle": "研究者",
+  "featureResearcherDescription": "高度な研究および分析能力を備えたモデルでのみ利用可能なこの機能は、多様なドメインにわたって高精度の洞察と包括的な分析を提供するように設計されています。",
+
+  "nameLabel": "AIの名前",
+  "nameHint": "AIの名前を入力",
+  "summaryLabel": "AIの概要",
+  "summaryHint": "AIの概要を入力",
+  "add": "追加",
+  "aiExplanationTitle": "AIの説明",
+  "aiExplanationDescription": "AIモデルのアーキテクチャ、トレーニングプロセス、パフォーマンスメトリクス、応用分野、その他の重要な特徴について詳細な説明を提供してください。",
+  "preInputTitle": "AIの事前入力",
+  "preInputDescription": "キャラクター作成プロセスでモデルをガイドする事前入力を設定してください。このセクションでは、キャラクター関連の情報、追加のコンテキスト、およびキャラクターに関連するコンテンツの生成に役立つ可能性のある追加の詳細を含めることができます。",
+  "baseModelTitle": "ベースモデル",
+  "baseModelDescription": "これはあなたの創造物の基盤として使用されるモデルです。現在選択されているベースモデルを表示します。",
+
+  "summary": "概要",
+  "characterPoliceTitle": "警察官",
+  "characterPoliceRole": "あなたは法の用心深い執行者であり、市民を守り、揺るぎない献身で秩序を維持することに専念している、あなたは警察官です",
+  "characterPoliceShortDescription": "不動で勇敢な法の執行者。",
+
+  "purchaseSubscription": "購入",
+  "modelUploadTitle": "AIファイル",
+  "modelUploadDescription": "デバイスから直接ローカルのGGUFファイルを選択してアップロードします。これにより、インターネット接続なしでモデルをオフラインで実行できます。ファイルが有効なGGUF形式であり、適切に構造化されていることを確認してください。ファイルが正しくないか破損している場合、Cortexは期待どおりに機能しない可能性があり、エラーが発生する可能性があります。",
+  "modelUploadShortDescription": "ここをタップしてデバイスから.ggufファイルを選択",
+  "addServerTitle": "AIサーバー",
+  "addServerDescription": "リモートサーバーのURLを入力して、外部でホストされているモデルに接続します。この機能にはアクティブなインターネット接続が必要であり、サーバー関連の問題やエラーはCortexが原因ではありません。サーバーが正しく設定され、ネットワークからアクセス可能であり、スムーズな体験のために有効なモデルエンドポイントがあることを確認してください。",
+  "you": "あなた",
+  "removePhotoTitle": "写真を削除",
+  "confirmRemovePhoto": "本当に写真を削除しますか？",
+  "serverLink": "サーバーリンク",
+  "enterURL": "サーバーURLを入力",
+  "chatLengthLimitExceeded": "このチャットは文字数制限を超えました。新しいチャットを開始するか、サブスクリプションを購入してください。",
+  "aiNameError": "この名前のAIは既に存在します。",
+  "modelLimitExceeded": "プランのモデル作成上限に達しました。",
+  "modelVertexProducer": "Vertex",
+  "photoLimitReachedMessage": "追加できる写真は1枚だけです",
+  "inappropriateContentDetected": "不適切なコンテンツが検出されました！",
+  "offlineModelNotInstalled": "このオフラインモデルはデバイスにインストールされていません。",
+  "insufficientCredits": "このリクエストを完了するのに十分なクレジットがありません。このアクションには{required}クレジットが必要ですが、あなたは{available}しか持っていません。さらにクレジットを取得するには、プランをアップグレードするか、直接購入することができます。ねえ、クレジットがなくなるのがちょっと残念なのはよくわかります。でも、真面目な話、私たちのモデルから素晴らしい返信をもらうのは無料じゃないんです。だから、このクレジットが、この素晴らしい体験を続けるのに役立っているんです。そして、もしもっと多くの人がクレジットを手に入れてくれたら、みんなの無料デイリーリミットを引き上げることも検討できるんです。",
+  "@insufficientCredits": {
+    "placeholders": {
+      "available": {},
+      "required": {}
+    }
+  },
+  "regenerateInProgress": "回答の生成は既に進行中です。",
+  "errorOccurredDuringRegeneration": "再生成中にエラーが発生しました: {errorDetails}",
+  "@errorOccurredDuringRegeneration": {
+    "placeholders": {
+      "errorDetails": {
+        "type": "String",
+        "example": "Network connection failed"
+      }
+    }
+  },
+  "modality": "モダリティ",
+  "multimodal": "マルチモーダル",
+  "anErrorOccurred": "エラーが発生しました",
+  "themeLocked": "このテーマにはより高いサブスクリプションレベルが必要です。ロックを解除するにはアップグレードしてください。",
+  "pageCouldNotBeLoaded": "ページを読み込めませんでした",
+  "checkYourInternet": "インターネット接続を確認して、もう一度お試しください。",
+  "errorUserNotAuthenticated": "この操作を実行するにはログインする必要があります。",
+  "errorInsufficientCredits": "クレジットが不足しています。続行するにはチャージしてください。",
+  "errorRateLimitExceeded": "リクエストが多すぎます。しばらくしてからもう一度お試しください。",
+  "errorServer": "予期せぬサーバーエラーが発生しました。後でもう一度お試しください。",
+  "errorNetwork": "ネットワークエラーが発生しました。接続を確認してもう一度お試しください。",
+  "errorApiAuthentication": "認証に失敗しました。もう一度ログインしてみてください。",
+  "baseModelForCharacterDescription": "選択されたベースモデルが、キャラクターの推論および応答能力を決定します。",
+
+  "@errorUserNotAuthenticated": {},
+  "@errorInsufficientCredits": {},
+  "@errorRateLimitExceeded": {},
+  "@errorServer": {},
+  "@errorNetwork": {},
+  "@errorApiAuthentication": {},
+  "@baseModelForCharacterDescription": {},
+
+  "forgotPassword": "パスワードをお忘れですか？",
+  "couldNotOpenLink": "リンクを開けませんでした",
+
+  "downloadStarted": "ダウンロードを開始しました",
+  "notAvailable": "利用不可",
+
+  "localizationWarning": "一部の情報はあなたの言語で利用できない場合があり、英語で表示されます。",
+  "aiTranslationWarning": "モデル情報は他のAIモデルによって様々な言語に翻訳されています。そのため、英語以外の言語では軽微な不一致が生じる可能性があります。",
+
+  "errorLoadingTitle": "データの読み込みに失敗しました",
+  "@errorLoadingTitle": {
+    "description": "モデルデータを取得できない場合のエラー画面のタイトル。"
+  },
+  "errorLoadingMessage": "サーバーから必要なデータを取得できませんでした。インターネット接続を確認して、もう一度お試しください。",
+  "@errorLoadingMessage": {
+    "description": "問題を説明するエラー画面のメッセージ。"
+  },
+  "noModelsFoundTitle": "結果がありません",
+  "noModelsFoundMessage": "検索語を調整するか、フィルターをクリアしてみてください。",
+  "usernameRateLimitExceeded": "ユーザー名は14日間に2回しか変更できません。",
+  "usernameUnchanged": "これは既に現在のユーザー名です。",
+  "creditsInfoPanelTitle": "クレジットの仕組み",
+  "creditsInfoPanelBody": "クレジットはオンラインモデルとのチャットに使用されます。ご存知の通り、あなたが彼らに送るすべてのメッセージには費用がかかります。\n\n• オンラインモデルへの各メッセージは20クレジットかかります。\n• 画像を含めるとさらに30クレジットが追加されます。\n• 無料プランのユーザーは、毎日リセットされる200クレジットのボーナスを受け取ります。",
+  "creditsInfoPanelFooter": "楽しいチャットを！",
+  "disclaimerMessage": "AIは間違いを犯すことがあります。重要な情報は確認してください。",
+  "modelCreatedSuccess": "モデルが正常に作成されました！",
+  "modelRemovedSuccess": "「{modelName}」は正常に削除されました。",
+  "errorCreatingModel": "モデルの作成中に予期せぬエラーが発生しました。",
+  "errorDeletingModel": "モデルの削除中に予期せぬエラーが発生しました。",
+  "ultraFeatureOnly": "この機能はUltraメンバーのみが利用できます。",
+  "experimentalOfflineWarning": "オフラインモードはまだ実験段階であり、ダウンロードしたモデルが最適な効率で動作しない可能性があります。",
+  "noConversationsToDelete": "削除する会話がありません。",
+  "reportSubmitted": "報告が正常に送信されました",
+  "purchaseReceived": "購入を受け付けました。アカウントを更新しています。",
+  "verificationDelayed": "購入は確認されました。アカウントの更新に若干の遅延がありますが、まもなく反映されます。",
+  "maintenanceTitle": "メンテナンス中",
+  "maintenanceMessage": "Cortexは重要なアップデートを展開中のため、一時的にオフラインです。アプリへのアクセスはまもなく復旧します。\n\nエクスペリエンス向上のためのご協力に感謝いたします。",
+  "errorPromptFlagged": "あなたのメッセージは不適切と検出されたため、送信できませんでした。",
+  "notEnoughStorage": "新しいメッセージを保存するのに十分なストレージ容量がデバイスにありません。",
+  "errorRateLimit": "最近モデルを作成しすぎました。しばらく待ってからもう一度お試しください。",
+  "errorContentFlagged": "コンテンツが不適切と判断されたため、モデルを保存できませんでした。",
+  "deleteAllConversationsDisabledInfo": "アクティブなチャット中はすべての会話を削除できません。続行するにはまず現在のチャットを終了してください。",
+  "invalidCredentials": "メールアドレスまたはパスワードが正しくありません。",
+  "userDisabled": "このユーザーアカウントは無効になっています。",
+  "loginSubtitle": "あなたのVertexアカウントにログインしてください。Google経由で新規登録するユーザーは、当社の利用規約とプライバシーポリシーに同意したことになります。これらはサインアップ画面で確認できます。",
+  "registerSubtitle": "Vertexアカウントを作成してください。これは当社の他のプロジェクトでも使用できます。",
+  "photoWarningMessage": "写真が含まれています。画像をサポートしていないモデルはそれを無視する場合があります。",
+  "loginRequiredForPurchase": "購入するにはログインする必要があります。",
+  "storagePermissionRequired": "ダウンロードしたモデルを保存するにはストレージの許可が必要です。続行するには許可を与えてください。",
+  "creditBannerTitle": "無料クレジットをゲット！",
+  "creditBannerSubtitle": "友達を招待すると、サインアップ時に二人とも50クレジットをゲット！もし彼らがサブスクリプションに登録したら、二人ともさらに500クレジットをゲット！",
+  "inviteShareSubject": "Cortexで一緒にやろう！",
+  "@inviteShareMessage": {
+    "description": "招待のために友達と共有するテキストメッセージ。",
+    "placeholders": {
+      "playStoreLink": {
+        "type": "String",
+        "example": "https://play.google.com/store/..."
+      }
+    }
+  },
+  "inviteShareMessage": "よう このcortexってアプリマジでやばいからチェックしてみて 俺のリンク使ったら俺ら二人とも50クレジットもらえるし もしサブスクしたらさらに500クレジットもらえるんだ これマジでやばい取引だよ すぐダウンロードして\n\n{playStoreLink}",
+  "reviewEnjoyingAppTitle": "Cortexを楽しんでいますか？",
+  "reviewHelpUsGrow": "あなたの評価は、私たちの若いインディーチームにとって大きな支えとなり、Cortexをさらに良くするのに役立ちます。",
+  "reviewMaybeLater": "後で",
+  "reviewRateNow": "今すぐ評価",
+  "noThanks": "いいえ、結構です",
+  "updateRequiredTitle": "アップデートが必要です",
+  "updateRequiredMessage": "Cortexを引き続き使用するには、新機能や重要な改善のためにアプリを最新バージョンにアップデートしてください。",
+  "updateNowButton": "今すぐアップデート",
+  "creatorSupportedSuccess": "クリエイターのサポートが完了しました！今後のご購入は、そのクリエイターに貢献します。"
+}

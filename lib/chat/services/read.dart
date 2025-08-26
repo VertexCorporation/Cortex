@@ -75,7 +75,7 @@ class ReadService {
     // For online models, `finalModelPath` will correctly remain null.
     // --- END OF FIX ---
 
-    final bool definitiveCanHandleImage = ModelData.getDefinitiveImageHandling(conversationSpecificModelId);
+    final bool definitiveCanHandleImage = ModelData.hasModality(conversationSpecificModelId, 'image');
 
     // Set the ChatScreen's state with the correct, resolved data
     state.setState(() {

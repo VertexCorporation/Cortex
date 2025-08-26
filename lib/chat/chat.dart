@@ -525,6 +525,7 @@ class ChatScreenState extends State<ChatScreen>
 
     if (widget.modelId != null) {
       isModelSelected = true;
+      canHandleImage = ModelData.hasModality(widget.modelId!, 'image');
       final modelData = ModelData.getPreciseModelData(widget.modelId!);
       if (modelData['type'] != 'offline') {
         isModelLoaded = true; // Server-side models are always "loaded".
@@ -901,7 +902,7 @@ class ChatScreenState extends State<ChatScreen>
     // We once again use the definitive helper to ensure that switching to a
     // different model variant correctly updates the image handling capability.
     final bool definitiveCanHandleImage =
-        ModelData.getDefinitiveImageHandling(newFullModelId);
+        ModelData.hasModality(newFullModelId, 'image');
 
     setState(() {
       modelId = newFullModelId;

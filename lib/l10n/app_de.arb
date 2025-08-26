@@ -1,0 +1,679 @@
+{
+  "@@locale": "de",
+
+  "understood": "Verstanden.",
+  "cancel": "Abbrechen",
+  "remove": "Entfernen",
+  "download": "Herunterladen",
+  "resume": "Fortsetzen",
+  "copy": "Kopieren",
+  "chat": "Chat",
+  "darkMode": "Dunkelmodus",
+  "light": "Hell",
+  "theme": "Thema",
+  "no": "Nein",
+  "yes": "Ja",
+  "done": "Fertig",
+  "comingSoon": "KOMMT BALD",
+  "bestValue": "Bestes Preis-Leistungs-Verhältnis",
+  "selected": "Ausgewählt",
+  "descriptionSection": "Beschreibung",
+  "searchHint": "Suchen",
+  "messageHint": "Frag alles",
+  "modelLoading": "Modell wird geladen...",
+  "messageCopied": "Nachricht in die Zwischenablage kopiert.",
+  "storeUnavailable": "Der Store ist derzeit nicht verfügbar. Bitte versuche es später erneut.",
+  "retry": "Erneut versuchen",
+
+  "systemInfo": "Systeminformationen",
+  "deviceMemory": "Gerätespeicher: {memory} GB",
+  "storageSpace": "Speicherplatz: {storage} GB",
+  "freeStorageSpace": "Freier Speicherplatz: {freeStorage} GB",
+  "memory": "Arbeitsspeicher",
+  "storage": "Speicher",
+  "freeStorage": "Freier Speicher",
+  "totalStorage": "Gesamtspeicher",
+  "usedStorage": "Belegter Speicher",
+  "totalMemory": "Gesamter Arbeitsspeicher",
+  "usedMemory": "Genutzter Arbeitsspeicher",
+  "requirements": "Anforderungen",
+
+  "modelsTitle": "Bibliothek",
+  "localModels": "Lokale Modelle",
+  "serverSideModels": "Online-Modelle",
+  "uploadYourOwnModel": "Lade dein eigenes Modell hoch!",
+  "selectGGUFFile": "GGUF-Datei auswählen",
+  "errorGGUF": "Bitte wähle nur eine Datei im GGUF-Format aus.",
+  "modelAlreadyExists": "Modell existiert bereits.",
+  "modelAddedSuccessfully": "Modell erfolgreich hinzugefügt.",
+  "modelRemoved": "Modell erfolgreich entfernt.",
+  "removeError": "Beim Entfernen des Modells ist ein Fehler aufgetreten.",
+  "fileNotFound": "Datei nicht gefunden.",
+  "fileUploadError": "Beim Hochladen der Datei ist ein Fehler aufgetreten.",
+  "noFileSelected": "Keine Datei ausgewählt.",
+  "myModels": "Meine Modelle",
+  "create": "Erstellen",
+  "seeAll": "Alle ansehen",
+
+  "modelProducer": "Hersteller: {producer}",
+  "modelRAM": "RAM: {ram}",
+  "modelSize": "Größe: {size}",
+  "modelDescription": "{description}",
+
+  "conversationsTitle": "Unterhaltungen",
+  "conversationDeleted": "Unterhaltung gelöscht.",
+  "conversationUpdated": "Unterhaltung aktualisiert.",
+  "editConversationTitle": "Umbenennen",
+  "newTitle": "Neuer Titel",
+  "save": "Speichern",
+  "titleCannotBeEmpty": "Titel darf nicht leer sein.",
+  "noConversationsMessage": "Keine Unterhaltungen, fang an zu chatten!",
+  "startChat": "Einen Chat starten",
+  "noChats": "Keine Chats",
+  "starredChats": "Markierte Chats",
+  "allChats": "Alle Chats",
+  "noStarredChats": "Keine markierten Chats",
+  "noStarredChatsMessage": "Du hast noch keinen Chat markiert.",
+  "goToChats": "Einen Chat markieren",
+  "starConversation": "Markieren",
+  "conversationTitleUpdated": "Titel der Unterhaltung aktualisiert",
+  "youReachedConversationLimit": "Du hast das Unterhaltungslimit erreicht.",
+  "today": "Heute",
+  "yesterday": "Gestern",
+
+  "loginToYourAccount": "Anmelden",
+  "createYourAccount": "Registrieren",
+  "email": "E-Mail",
+  "password": "Passwort",
+  "confirmPassword": "Passwort bestätigen",
+  "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+  "invalidPassword": "Das Passwort muss mindestens 6 Zeichen lang sein.",
+  "rememberMe": "Angemeldet bleiben",
+  "forgotPassword": "Passwort vergessen?",
+  "or": "Oder",
+  "continueWithGoogle": "Mit Google fortfahren",
+  "dontHaveAccount": "Du hast noch kein Konto?",
+  "alreadyHaveAccount": "Du hast bereits ein Konto?",
+  "signUp": "Registrieren",
+  "logIn": "Anmelden",
+  "passwordsDoNotMatch": "Die Passwörter stimmen nicht überein.",
+  "userNotFound": "Benutzer nicht gefunden.",
+  "wrongPassword": "Falsches Passwort.",
+  "emailAlreadyInUse": "Diese E-Mail wird bereits verwendet.",
+  "weakPassword": "Das Passwort ist zu schwach.",
+  "authError": "Authentifizierungsfehler",
+  "invalidUsername": "Bitte gib einen Benutzernamen ein.",
+  "usernameTaken": "Dieser Benutzername ist bereits vergeben.",
+  "username": "Benutzername",
+  "authenticationFailed": "Authentifizierung fehlgeschlagen. Bitte versuche es erneut.",
+  "emailTooLong": "Die E-Mail darf höchstens 30 Zeichen lang sein.",
+  "deviceLimitReached": "Du hast das Kontoerstellungslimit für dieses Gerät erreicht.",
+
+  "verificationEmailLimitReached": "Wir werden keine weiteren E-Mails senden",
+  "verificationEmailSent": "Bestätigungs-E-Mail gesendet!",
+  "emailNotVerified": "E-Mail wurde nicht bestätigt",
+  "resendCode": "Bestätigungs-E-Mail erneut senden",
+  "remainingSeconds": "Verbleibende Zeit für die Bestätigung",
+  "pleaseCheckYourEmail": "Um Cortex zu nutzen, musst du deine E-Mail bestätigen. \n Ein Bestätigungslink wurde an deine E-Mail-Adresse gesendet, bitte überprüfe deine E-Mails.",
+  "verifyYourEmail": "Bestätige deine E-Mail",
+  "backToLogin": "Zurück zum Login",
+  "seconds": "Sekunden",
+  "maxResendLimitReached": "Du hast die maximale Anzahl an Bestätigungs-E-Mails erreicht",
+  "verificationScreenContinueWithoutVerification": "Ohne Bestätigung fortfahren",
+  "verificationScreenWarning": "Auch wenn du fortfährst, gilt die 1-tägige Kontobestätigungsfrist weiterhin für dein Konto. Wenn du dein Konto bis dahin nicht bestätigt hast, wird es aus der App gelöscht.",
+  "unverifiedAccountHeader": "Dein Konto ist nicht bestätigt",
+  "unverifiedAccountWarning": "Wenn du dein Konto nicht innerhalb von {timeLeft} bestätigst, wird es gelöscht",
+  "verifyNow": "Jetzt bestätigen",
+  "accountVerified": "Dein Konto wurde bestätigt.",
+  "linkSent": "Link gesendet",
+  "accountDeletionRequested": "Deine Anfrage zur Kontolöschung wurde erhalten und dein Konto ist jetzt deaktiviert.",
+  "tooManyRequests": "Zu viele Anfragen",
+  "regenerate": "Erneut generieren",
+
+  "confirmDeleteAccount": "Bist du sicher, dass du dein Konto löschen möchtest?",
+  "enterPasswordToDelete": "Gib dein Passwort ein, um es zu löschen.",
+  "deleteAccount": "Konto löschen",
+  "deleteAccountError": "Beim Löschen des Kontos ist ein Fehler aufgetreten.",
+  "delete": "Löschen",
+  "passwordRequired": "Passwort ist erforderlich.",
+  "deleteDescription": "Die von dir gelöschten Daten werden dauerhaft von unserem Server und deinem Gerät entfernt. Diese Aktionen können nicht rückgängig gemacht werden.",
+  "deleteAccountButton": "Button zur Kontolöschung",
+
+  "editProfile": "Profil bearbeiten",
+  "displayName": "Anzeigename",
+  "tapToChangeProfilePicture": "Tippe, um das Profilbild zu ändern",
+  "profileUpdated": "Profil erfolgreich aktualisiert",
+  "updateFailed": "Profilaktualisierung fehlgeschlagen",
+  "nameCannotBeEmpty": "Name darf nicht leer sein",
+  "logout": "Abmelden",
+  "noDisplayName": "Kein Anzeigename festgelegt",
+  "noEmail": "Keine E-Mail-Adresse",
+  "noUserLoggedIn": "Derzeit ist kein Benutzer angemeldet",
+  "profile": "Profil",
+  "manageProfileDescription": "Verwalte dein Profil, aktualisiere dein Passwort oder melde dich von Cortex ab.",
+  "accessSettingsDescription": "Greife auf Hilfe zu, löse Codes ein, teile Cortex und sieh dir unsere Richtlinien an.",
+  "languageDescription": "Du kannst die Standardsprache der App-Oberfläche jederzeit ändern.",
+  "themeDescription": "Du kannst je nach Vorliebe zwischen hellen und dunklen Themen wechseln. Das ausgewählte Thema wird auf die gesamte Cortex-Oberfläche angewendet.",
+  "iHaveReadAndAgree": "Ich habe die Nutzungsbedingungen gelesen und stimme ihnen zu",
+
+  "downloading": "Wird heruntergeladen...",
+  "downloadError": "Während des Downloads ist ein Fehler aufgetreten.",
+  "downloadCancelled": "Download abgebrochen.",
+  "downloadResumed": "Download fortgesetzt.",
+  "downloadSuccess": "Download erfolgreich",
+  "downloadFailed": "Download fehlgeschlagen",
+  "downloaded": "{percent}% heruntergeladen",
+  "@downloaded": {
+    "description": "Indicates the percentage of the download completed.",
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "downloadPaused": "Download pausiert.",
+
+  "purchaseSuccessful": "Kauf erfolgreich!",
+  "purchaseFailed": "Kauf fehlgeschlagen",
+  "creditProductNotFound": "Das ausgewählte Guthabenprodukt konnte nicht gefunden werden.",
+  "creditsAddedSuccessfully": "Guthaben wurde deinem Konto erfolgreich hinzugefügt!",
+  "creditDeliveryFailed": "Guthaben konnte deinem Konto nicht hinzugefügt werden. Bitte kontaktiere den Support.",
+  "invalidPurchase": "Ungültiger Kauf",
+  "purchaseError": "Fehler beim Kauf",
+  "purchaseVertexPlusToUpload": "Dies ist eine Plus-Funktion",
+  "purchasePlus": "Cortex Plus kaufen",
+  "plusDescription": "Greife auf mehr Funktionen von Cortex zu und erlebe KI noch intensiver!",
+  "annual": "Jährlich",
+  "monthly": "Monatlich",
+  "manageSubscription": "Abonnement verwalten",
+
+  "purchasePlan": "{planName} kaufen",
+  "@purchasePlan": {
+    "description": "Button text for purchasing a specific subscription plan.",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "Pro Annual"
+      }
+    }
+  },
+
+  "discountOffer": "{percent}% RABATT",
+  "@discountOffer": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+
+  "annualPlanDescription": "{price}/Monat, jährlich abgerechnet",
+  "@annualPlanDescription": {
+    "description": "The description for the annual plan, showing the monthly equivalent price to make it seem more affordable. Example: $4.17/mo, billed annually",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$4.17"
+      }
+    }
+  },
+  "monthlyPlanDescription": "{price}/Monat, monatlich abgerechnet",
+  "@monthlyPlanDescription": {
+    "description": "The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "discountBannerTitle": "EINFÜHRUNGSANGEBOT: 80 % RABATT!",
+  "@discountBannerTitle": {
+    "description": "The main headline for the promotional banner, emphasizing a special launch discount."
+  },
+  "discountBannerSubtitle": "Exklusiver Rabatt auf ALLE Abonnements zur Feier unseres Starts. Nicht verpassen!",
+  "@discountBannerSubtitle": {
+    "description": "The secondary text for the promotional banner, clarifying the offer applies to all plans and adding a sense of urgency."
+  },
+  "purchasePro": "Cortex Pro kaufen",
+  "proDescription": "Greife auf noch mehr Funktionen von Cortex zu und erlebe KI noch intensiver!",
+  "alreadySubscribed": "Du hast bereits ein Abonnement",
+  "subscriptionInfo": "Dein Abonnement ist aktiv.",
+  "alreadySubscribedMessage": "Du hast bereits ein Plus-Abonnement. Wenn du dein Abonnement kündigen möchtest, kannst du dies über den Play Store Manager tun.",
+  "cancelSubscription": "Abonnement kündigen",
+  "cancelSubscriptionInfo": "Wenn du dein Abonnement kündigen möchtest, fahre bitte über den Abonnement-Manager des Play Stores fort.",
+  "goToPlayStore": "Zum Play Store",
+  "alreadySubscribedPlus": "Du hast den Plus-Plan!",
+  "alreadySubscribedPlusMessage": "Dein Plus-Plan ist aktiv. Du kannst alle Vorteile genießen.",
+  "purchaseUltra": "Cortex Ultra kaufen",
+  "ultraDescription": "Erhalte vollen Zugriff auf alle Funktionen von Cortex und erlebe KI in vollen Zügen!",
+  "noSubscription": "Kein Abonnement",
+  "noSubscriptionMessage": "Du hast noch kein Abonnement.",
+  "alreadyAtHighestPlan": "Du bist bereits auf dem höchsten Plan.",
+  "unableToOpenSubscription": "Die Seite zur Abonnementverwaltung konnte nicht geöffnet werden.",
+  "upgradeSubscription": "Abonnement upgraden",
+  "confirmUpgrade": "Bist du sicher, dass du dein Abonnement upgraden möchtest?",
+  "unsupportedPlatform": "Nicht unterstützte Plattform für die Abonnementkündigung.",
+  "purchaseStreamError": "Fehler im Kauf-Stream.",
+  "productNotFound": "Produkt nicht gefunden",
+  "productDetailsError": "Beim Abrufen der Produktdetails ist ein Fehler aufgetreten.",
+  "noProductsFound": "Keine Produkte gefunden",
+  "loadCreditsButton": "Guthaben aufladen",
+  "creditsTitle": "Guthaben",
+  "creditsScreenDescription": "Dieser Bildschirm zeigt das Guthaben des Benutzers. \n\nAktuelles Guthaben des Benutzers: 100\n\nDetaillierte Guthabeninformationen können hier angezeigt werden.",
+  "creditsLoaded": "Guthaben geladen!",
+  "currentCredits": "Aktuelles Guthaben",
+  "pleaseSelectCreditPackage": "Bitte wähle ein Guthabenpaket aus",
+  "purchaseCreditsTitle": "Guthaben kaufen",
+  "purchaseCreditsDescription": "Wähle ein Guthabenpaket, das deinen Bedürfnissen entspricht, und nutze unsere App mehr.",
+  "purchaseButton": "Kaufen",
+  "productNotFoundMessage": "Das ausgewählte Produkt existiert nicht.",
+  "buyCredits": "Guthaben kaufen",
+  "selectCreditPackageDescription": "Wähle ein Guthabenpaket, das deinen Bedürfnissen entspricht, und genieße mehr Funktionen.",
+  "buyCredit": "Guthaben kaufen",
+  "buyCreditPackage": "{amount} Guthaben kaufen",
+  "@creditPackage": {
+    "description": "Button text to buy a specific number of credits",
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "subscribedPlan": "Abonniert",
+
+  "errorResponseNotReceived": "Antwort nicht erhalten",
+  "googleApiRequestFailed": "Google API-Anfrage ist {attempt} Mal fehlgeschlagen: {error}",
+  "@googleApiRequestFailed": {
+    "description": "Error message used when Google API request fails",
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      },
+      "error": {
+        "type": "String",
+        "example": "Timeout"
+      }
+    }
+  },
+  "openRouterResponseStatus": "OpenRouter-Antwortstatus: {statusCode}",
+  "@openRouterResponseStatus": {
+    "description": "Log the response status code from OpenRouter API",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "200"
+      }
+    }
+  },
+  "openRouterDecodedResponseBody": "Dekodierter OpenRouter-Antworttext: {body}",
+  "@openRouterDecodedResponseBody": {
+    "description": "Log the response body from OpenRouter API",
+    "placeholders": {
+      "body": {
+        "type": "String",
+        "example": "{\"choices\": [...]}"
+      }
+    }
+  },
+  "decodedJson": "Dekodiertes JSON: {data}",
+  "@decodedJson": {
+    "description": "Log the decoded JSON data",
+    "placeholders": {
+      "data": {
+        "type": "String",
+        "example": "{\"key\": \"value\"}"
+      }
+    }
+  },
+  "responseStructureUnexpectedMessageContentMissing": "Antwortstruktur ist unerwartet: Nachricht oder Inhalt fehlt",
+  "responseStructureUnexpectedChoicesMissing": "Antwortstruktur ist unerwartet: 'choices' fehlt oder ist leer",
+  "openRouterApiRequestFailed": "OpenRouter API-Anfrage fehlgeschlagen: {statusCode} - {body}",
+  "@openRouterApiRequestFailed": {
+    "description": "Error message used when OpenRouter API request fails",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "500"
+      },
+      "body": {
+        "type": "String",
+        "example": "{\"error\": \"Internal Server Error\"}"
+      }
+    }
+  },
+  "openRouterApiRequestFailedAfterAttempts": "OpenRouter API-Anfrage ist {attempt} Mal fehlgeschlagen: {error}",
+  "@openRouterApiRequestFailedAfterAttempts": {
+    "description": "Error message used when OpenRouter API request fails after certain attempts",
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      },
+      "error": {
+        "type": "String",
+        "example": "Timeout"
+      }
+    }
+  },
+  "internetRequired": "Für die Nutzung dieses Modells ist eine Internetverbindung erforderlich",
+  "pleaseWaitBeforeTryingAgain": "Bitte warte einen Moment, bevor du es erneut versuchst",
+  "openRouterQuotaExceeded": "Kontingent überschritten. Statuscode: {statusCode}, Body: {decodedBody}",
+  "@openRouterQuotaExceeded": {
+    "description": "Indicates that the API quota has been exceeded.",
+    "placeholders": {
+      "statusCode": {
+        "type": "int",
+        "example": "429"
+      },
+      "decodedBody": {
+        "type": "String",
+        "example": "{\"error\":\"Quota exceeded\"}"
+      }
+    }
+  },
+  "openRouterApiRequestFailedAfterPaidAttempts": "API-Anfrage nach {attempts} bezahlten Versuchen fehlgeschlagen. Fehler: {error}",
+  "@openRouterApiRequestFailedAfterPaidAttempts": {
+    "description": "Indicates that the API request failed after a certain number of paid model attempts.",
+    "placeholders": {
+      "attempts": {
+        "type": "int",
+        "example": "2"
+      },
+      "error": {
+        "type": "String",
+        "example": "Unauthorized Error"
+      }
+    }
+  },
+
+  "termsOfServiceAndPrivacyPolicyWarning": "Mit der Aufgabe dieser Bestellung stimmst du den Nutzungsbedingungen und der Datenschutzrichtlinie zu. Du kannst auf diesen Text klicken, um mehr über unsere Nutzungsbedingungen und Datenschutzrichtlinie zu erfahren. Das Abonnement verlängert sich automatisch, es sei denn, die automatische Verlängerung wird mindestens 24 Stunden vor dem Ende des aktuellen Zeitraums deaktiviert.",
+  "termsOfService": "Nutzungsbedingungen",
+  "privacyPolicy": "Datenschutzrichtlinie",
+
+  "report": "Melden",
+  "reportDialogTitle": "Meldung einreichen",
+  "reportDescriptionLabel": "Was ist das Problem?",
+  "reportHarmful": "Dies ist schädlich/unsicher",
+  "reportNotTrue": "Dies ist nicht wahr",
+  "reportNotHelpful": "Dies ist nicht hilfreich",
+  "closeButton": "Schließen",
+  "submitButton": "Senden",
+  "reportErrorMessage": "Bitte wähle einen Grund für die Meldung aus.",
+
+  "capabilitiesSection": "Fähigkeiten",
+  "ratingsSection": "Bewertungen",
+  "noRatingDataFound": "Keine Bewertungsdaten gefunden",
+  "featurePhotoTitle": "Foto-Scanning",
+  "featurePhotoDescription": "Dieses Modell kann Fotos über die Kamera oder Bilddateien scannen.",
+  "featureOfflineTitle": "Offline-Betrieb",
+  "featureOfflineDescription": "Führe das Modell ohne Internetverbindung aus, um deine Daten zu schützen.",
+  "featureSupermodelTitle": "Supermodell",
+  "featureSupermodelDescription": "Dies ist ein riesiges Modell mit über 10 Milliarden Parametern, das hohe Leistung und umfangreiche Fähigkeiten bietet.",
+  "featureRoleplayTitle": "Rollenspiel",
+  "featureRoleplayDescription": "Rollenspielmodelle ermöglichen es dir, verschiedene Chats und Szenarien zu erstellen.",
+  "roleModels": "Rollenspiel-Modelle",
+  "parameters": "Parameter",
+  "context": "Kontext",
+  "millions": "Millionen",
+  "billions": "Milliarden",
+  "trillions": "Billionen",
+  "thousand": "Tausend",
+  "estimated": "geschätzt",
+  "finalPreparation": "Die letzten Vorbereitungen werden getroffen.",
+  "allEvaluationsByTestTeam": "Alle Bewertungen wurden von unserem Testteam vorgenommen",
+
+  "shareApp": "App teilen",
+  "rateUs": "Bewerte uns",
+  "share": "Teilen",
+  "shareSubject": "Cortex",
+  "shareMessage": "Schau dir die Cortex-App an, sie ist der Hammer! Lade sie hier herunter: https://play.google.com/store/apps/details?id=com.vertex.cortex",
+  "shareFailed": "Teilen der App fehlgeschlagen. Bitte versuche es später erneut.",
+  "selectText": "Text auswählen",
+  "showLatex": "Sonderzeichen anzeigen",
+  "hideLatex": "Sonderzeichen ausblenden",
+
+  "thinking": "Denke nach",
+  "user": "Benutzer",
+  "voice": "Stimme",
+  "help": "Hilfe",
+  "redeemCode": "Code einlösen",
+  "enterYourCode": "Unterstütze deine Lieblings-Creator! Gib unten ihren einzigartigen Code ein, um ihnen einen Anteil an deinen Cortex-Käufen zu geben.",
+  "code": "Code",
+  "redeem": "Einlösen",
+  "codeCannotBeEmpty": "Code darf nicht leer sein",
+  "userId": "Benutzer-ID",
+  "deleteAllConversationsConfirmTitle": "Alle Chats löschen?",
+  "deleteAllConversationsConfirmMessage": "Bist du sicher, dass du alle deine Chats löschen möchtest? Dies kann nicht rückgängig gemacht werden.",
+  "allConversationsDeleted": "Alle Unterhaltungen wurden erfolgreich gelöscht!",
+  "deleteAll": "Alle löschen",
+  "deleteAllConversationsButton": "Alle Unterhaltungen löschen",
+  "confirmWord": "Tippe VERTEX",
+  "confirmWordError": "Du hast es falsch eingegeben",
+  "chinese": "Chinesisch",
+  "arabic": "Arabisch",
+  "french": "Französisch",
+  "japanese": "Japanisch",
+  "korean": "Koreanisch",
+  "deutsch": "Deutsch",
+  "english": "Englisch",
+  "turkish": "Türkisch",
+  "hindi": "Hindi",
+  "portuguese": "Portugiesisch",
+  "indonesian": "Indonesisch",
+  "azerbaijani": "Aserbaidschanisch",
+  "german": "Deutsch",
+  "spanish": "Spanisch",
+  "italian": "Italienisch",
+  "ram": "RAM",
+  "usernameTooShort": "Benutzername ist zu kurz.",
+  "usernameTooLong": "Benutzername darf 16 Zeichen nicht überschreiten.",
+  "invalidUsernameCharacters": "Im Benutzernamen dürfen nur diese Buchstaben: 'abcçdefgğhıijklmnoöprsştuüvyzxqw' und die Zeichen '.', '-', '_' verwendet werden.",
+  "passwordTooLong": "Das Passwort darf 64 Zeichen nicht überschreiten.",
+  "noInternetConnection": "Keine Internetverbindung.",
+  "chats": "Posteingang",
+  "library": "Bibliothek",
+  "inappropriateMessageWarning": "Unangemessene Nachricht erkannt!",
+  "myModelDescription": "Mein Modell.",
+  "noModelsDownloaded": "Du hast noch keine Modelle heruntergeladen.",
+  "appTitle": "Cortex",
+  "text": "Text",
+  "removeModel": "Modell entfernen",
+  "modelUploadedSuccessfully": "Modell erfolgreich hochgeladen.",
+  "insufficientRAM": "Wenig Arbeitsspeicher",
+  "insufficientStorage": "Wenig Speicherplatz",
+  "confirmRemoveModel": "Bist du sicher, dass du das Modell {model} von deinem Gerät entfernen möchtest? Dadurch werden auch alle früheren Unterhaltungen mit diesem Modell gelöscht.",
+  "noMatchingModels": "Keine passenden Modelle gefunden.",
+  "creditPackage": "{amount} Guthaben kaufen",
+  "benefit1": "Viel höheres Konversationslimit für Online-KIs",
+  "benefit2": "Eigene Modelle hochladen",
+  "benefit3": "Profileffekt",
+  "benefit4": "Mitgliedschaftsabzeichen",
+  "benefit5": "Mehr online künstliche Intelligenzen erstellen",
+  "benefit6": "Unbegrenzter Chat",
+  "benefit7": "{credits} tägliches Guthaben",
+  "benefit8": "Modelle hinzufügen",
+  "benefit9": "Neue Themes",
+  "benefit10": "Offline-Sprachchat",
+  "oldBenefits": "Alle Vorteile aus niedrigeren Plänen",
+  "confirm": "Bestätigen",
+  "changePassword": "Passwort ändern",
+  "logoutConfirmationTitle": "Bist du sicher, dass du dich abmelden möchtest?",
+  "settings": "Einstellungen",
+  "language": "App-Sprache",
+  "dark": "Dunkel",
+  "oldPassword": "Altes Passwort",
+  "newPassword": "Neues Passwort",
+  "passwordUpdated": "Passwort aktualisiert.",
+  "stop": "Stopp",
+  "copyrights": "Namensnennungen",
+  "downloadingTitle": "Wird heruntergeladen",
+  "downloadCompletedTitle": "Download abgeschlossen",
+  "downloadPausedTitle": "Download pausiert",
+  "downloadErrorTitle": "Download-Fehler",
+  "cancelButtonText": "Abbrechen",
+  "love": "Liebe",
+  "nature": "Natur",
+  "behindTheSlaughter": "Hinter dem Gemetzel",
+  "grayscale": "Graustufen",
+  "ocean": "Ozean",
+  "scarletSnow": "Scharlachroter Schnee",
+  "requestFailed": "Ein Fehler ist aufgetreten, bitte versuche es erneut.",
+  "changeModel": "Ändern",
+  "edit": "Bearbeiten",
+  "editingMessageInfo": "Das Bearbeiten dieser Nachricht startet die Unterhaltung von hier aus neu.",
+  "editingNotification": "Du befindest dich jetzt im Bearbeitungsmodus",
+
+  "featureIndulgentTitle": "Nachsichtig",
+  "featureIndulgentDescription": "Dieses Modell kann Kontexte von über 100.000 Token nahtlos aufnehmen und verarbeiten, wodurch es umfangreiche und detaillierte Eingaben ohne Leistungseinbußen bewältigen kann.",
+  "featurePluralTitle": "Plural",
+  "featurePluralDescription": "Dieses Modell kann automatisch zusätzliche Erweiterungen integrieren und so seine funktionalen Fähigkeiten erweitern, um eine Vielzahl von Operationen mit verbesserter Leistung zu unterstützen.",
+  "featureWiseTitle": "Weise",
+  "featureWiseDescription": "Dieses Modell kann tiefgreifende analytische Einblicke und vorausschauendes Denken nutzen, um anspruchsvolle Unterstützung bei der Entscheidungsfindung und komplexen Problemlösungen zu bieten.",
+  "featureResearcherTitle": "Forscher",
+  "featureResearcherDescription": "Diese Funktion ist ausschließlich in Modellen mit fortgeschrittenen Forschungs- und Analysekapazitäten verfügbar und wurde entwickelt, um hochpräzise Einblicke und umfassende Analysen in verschiedenen Bereichen zu liefern.",
+
+  "nameLabel": "KI-Name",
+  "nameHint": "Gib den Namen deiner KI ein",
+  "summaryLabel": "KI-Zusammenfassung",
+  "summaryHint": "Gib die Zusammenfassung deiner KI ein",
+  "add": "Hinzufügen",
+  "aiExplanationTitle": "Beschreibung der künstlichen Intelligenz",
+  "aiExplanationDescription": "Bitte gib eine detaillierte Beschreibung der Architektur, des Trainingsprozesses, der Leistungsmetriken, der Anwendungsbereiche und anderer wichtiger Merkmale deines KI-Modells an.",
+  "preInputTitle": "Voreingabe für künstliche Intelligenz",
+  "preInputDescription": "Bitte lege eine Voreingabe fest, die dein Modell bei der Charaktererstellung leitet. In diesem Abschnitt kannst du charakterbezogene Informationen, zusätzlichen Kontext und alle weiteren Details einfügen, die bei der Generierung von Inhalten im Zusammenhang mit dem Charakter helfen könnten.",
+  "baseModelTitle": "Basismodell",
+  "baseModelDescription": "Dies ist das Modell, das als Grundlage für deine Kreation verwendet wird. Es zeigt das aktuell ausgewählte Basismodell an.",
+
+  "summary": "Zusammenfassung",
+  "characterPoliceTitle": "Polizei",
+  "characterPoliceRole": "Du bist ein wachsamer Gesetzeshüter, der sich dem Schutz der Bürger und der Aufrechterhaltung der Ordnung mit unerschütterlichem Engagement verschrieben hat, du bist ein Polizist",
+  "characterPoliceShortDescription": "Ein standhafter und mutiger Gesetzeshüter.",
+
+  "purchaseSubscription": "Kaufen",
+  "modelUploadTitle": "Datei der künstlichen Intelligenz",
+  "modelUploadDescription": "Wähle und lade deine lokalen GGUF-Dateien direkt von deinem Gerät hoch. So kannst du dein Modell offline ausführen, ohne eine Internetverbindung zu benötigen. Stelle sicher, dass die Datei im gültigen GGUF-Format vorliegt und ordnungsgemäß strukturiert ist. Wenn die Datei fehlerhaft oder beschädigt ist, funktioniert Cortex möglicherweise nicht wie erwartet, und es können Fehler auftreten.",
+  "modelUploadShortDescription": "Tippe hier, um eine .gguf-Datei von deinem Gerät auszuwählen",
+  "addServerTitle": "Server der künstlichen Intelligenz",
+  "addServerDescription": "Gib die URL deines Remote-Servers ein, um dich mit einem extern gehosteten Modell zu verbinden. Diese Funktion erfordert eine aktive Internetverbindung, und serverbezogene Probleme oder Fehler werden nicht von Cortex verursacht. Stelle sicher, dass dein Server korrekt konfiguriert, von deinem Netzwerk aus erreichbar ist und einen gültigen Modell-Endpunkt für ein reibungsloses Erlebnis hat.",
+  "you": "Du",
+  "removePhotoTitle": "Foto entfernen",
+  "confirmRemovePhoto": "Bist du sicher, dass du das Foto entfernen möchtest?",
+  "serverLink": "Server-Link",
+  "enterURL": "Server-URL eingeben",
+  "chatLengthLimitExceeded": "Dieser Chat hat das Zeichenlimit überschritten. Bitte starte einen neuen Chat oder kaufe ein Abonnement.",
+  "aiNameError": "Eine KI mit diesem Namen existiert bereits.",
+  "modelLimitExceeded": "Du hast das maximale Modellerstellungslimit für deinen Plan erreicht.",
+  "modelVertexProducer": "Vertex",
+  "photoLimitReachedMessage": "Es kann nur ein Foto hinzugefügt werden",
+  "inappropriateContentDetected": "Unangemessener Inhalt erkannt!",
+  "offlineModelNotInstalled": "Dieses Offline-Modell ist nicht auf deinem Gerät installiert.",
+  "insufficientCredits": "Du hast nicht genügend Guthaben, um diese Anfrage abzuschließen. Diese Aktion erfordert {required} Guthaben, aber du hast nur {available}. Um mehr Guthaben zu erhalten, kannst du deinen Plan upgraden oder sie direkt kaufen. hey wir verstehen das total wenn das guthaben ausgeht kann das echt nerven aber im ernst die tollen antworten von unseren modellen sind nicht umsonst diese guthaben helfen uns also dabei den spaß am laufen zu halten und hör zu wenn mehr von euch mitmachen und guthaben holen können wir uns total überlegen die kostenlosen täglichen limits für alle zu erhöhen",
+  "@insufficientCredits": {
+    "placeholders": {
+      "available": {},
+      "required": {}
+    }
+  },
+  "regenerateInProgress": "Die Antwortgenerierung ist bereits im Gange.",
+  "errorOccurredDuringRegeneration": "Beim Versuch der Neugenerierung ist ein Fehler aufgetreten: {errorDetails}",
+  "@errorOccurredDuringRegeneration": {
+    "placeholders": {
+      "errorDetails": {
+        "type": "String",
+        "example": "Network connection failed"
+      }
+    }
+  },
+  "modality": "Modalität",
+  "multimodal": "Multimodal",
+  "anErrorOccurred": "Ein Fehler ist aufgetreten",
+  "themeLocked": "Dieses Thema erfordert eine höhere Abonnementstufe. Bitte upgrade, um es freizuschalten.",
+  "pageCouldNotBeLoaded": "Seite konnte nicht geladen werden",
+  "checkYourInternet": "Bitte überprüfe deine Internetverbindung und versuche es erneut.",
+  "errorUserNotAuthenticated": "Du musst angemeldet sein, um diese Aktion durchzuführen.",
+  "errorInsufficientCredits": "Du hast nicht genügend Guthaben. Bitte lade auf, um fortzufahren.",
+  "errorRateLimitExceeded": "Zu viele Anfragen. Bitte versuche es in einem Moment erneut.",
+  "errorServer": "Ein unerwarteter Serverfehler ist aufgetreten. Bitte versuche es später erneut.",
+  "errorNetwork": "Ein Netzwerkfehler ist aufgetreten. Bitte überprüfe deine Verbindung und versuche es erneut.",
+  "errorApiAuthentication": "Authentifizierung fehlgeschlagen. Bitte versuche, dich erneut anzumelden.",
+  "baseModelForCharacterDescription": "Das ausgewählte Basismodell bestimmt die Denk- und Antwortfähigkeiten des Charakters.",
+  "selectBaseModel": "Wähle ein Basismodell",
+
+  "@errorUserNotAuthenticated": {},
+  "@errorInsufficientCredits": {},
+  "@errorRateLimitExceeded": {},
+  "@errorServer": {},
+  "@errorNetwork": {},
+  "@errorApiAuthentication": {},
+  "@baseModelForCharacterDescription": {},
+
+  "forgotPassword": "Passwort vergessen?",
+  "couldNotOpenLink": "Der Link konnte nicht geöffnet werden",
+
+  "downloadStarted": "Download gestartet",
+  "notAvailable": "Nicht verfügbar",
+
+  "localizationWarning": "Einige Informationen sind möglicherweise nicht in deiner Sprache verfügbar und werden auf Englisch angezeigt.",
+  "aiTranslationWarning": "Modellinformationen werden von anderen KI-Modellen in verschiedene Sprachen übersetzt. Daher können in anderen Sprachen als Englisch geringfügige Unstimmigkeiten auftreten.",
+
+  "errorLoadingTitle": "Laden der Daten fehlgeschlagen",
+  "@errorLoadingTitle": {
+    "description": "Title for the error screen when model data cannot be fetched."
+  },
+  "errorLoadingMessage": "Wir konnten die notwendigen Daten nicht von unseren Servern abrufen. Bitte überprüfe deine Internetverbindung und versuche es erneut.",
+  "@errorLoadingMessage": {
+    "description": "Message for the error screen explaining the issue."
+  },
+  "noModelsFoundTitle": "Keine Ergebnisse",
+  "noModelsFoundMessage": "Versuche, deine Suchbegriffe anzupassen oder den Filter zu löschen.",
+  "usernameRateLimitExceeded": "Du kannst deinen Benutzernamen nur zweimal alle 14 Tage ändern.",
+  "usernameUnchanged": "Dies ist bereits dein aktueller Benutzername.",
+  "creditsInfoPanelTitle": "Wie Guthaben funktioniert",
+  "creditsInfoPanelBody": "Guthaben wird verwendet, um mit Online-Modellen zu chatten. Nur damit du es weißt, jede Nachricht, die du an sie sendest, kostet uns Geld.\n\n• Jede Nachricht an ein Online-Modell kostet 20 Guthaben.\n• Das Hinzufügen eines Bildes kostet zusätzlich 30 Guthaben.\n• Nutzer des kostenlosen Plans erhalten einen Bonus von 200 Guthaben, der täglich zurückgesetzt wird.",
+  "creditsInfoPanelFooter": "Viel Spaß beim Chatten!",
+  "disclaimerMessage": "Künstliche Intelligenzen können Fehler machen, überprüfe wichtige Informationen.",
+  "modelCreatedSuccess": "Modell erfolgreich erstellt!",
+  "modelRemovedSuccess": "„{modelName}“ wurde erfolgreich entfernt.",
+  "errorCreatingModel": "Beim Erstellen des Modells ist ein unerwarteter Fehler aufgetreten.",
+  "errorDeletingModel": "Beim Löschen des Modells ist ein unerwarteter Fehler aufgetreten.",
+  "ultraFeatureOnly": "Diese Funktion ist nur für Ultra-Mitglieder verfügbar.",
+  "experimentalOfflineWarning": "Der Offline-Modus ist noch experimentell und das heruntergeladene Modell funktioniert möglicherweise nicht mit optimaler Effizienz.",
+  "noConversationsToDelete": "Du hast keine Unterhaltungen zum Löschen.",
+  "reportSubmitted": "Meldung erfolgreich eingereicht",
+  "purchaseReceived": "Kauf erhalten, dein Konto wird aktualisiert.",
+  "verificationDelayed": "Dein Kauf ist bestätigt. Es gibt eine leichte Verzögerung bei der Aktualisierung deines Kontos, es wird in Kürze erscheinen.",
+  "maintenanceTitle": "Wartungsarbeiten",
+  "maintenanceMessage": "Cortex ist vorübergehend offline, während wir einige wichtige Updates durchführen. Der Zugriff auf die App wird in Kürze wiederhergestellt.\n\nVielen Dank für deine Geduld, während wir dein Erlebnis verbessern.",
+  "errorPromptFlagged": "Deine Nachricht wurde als unangemessen erkannt und konnte nicht gesendet werden.",
+  "notEnoughStorage": "Nicht genügend Speicherplatz auf deinem Gerät, um neue Nachrichten zu speichern.",
+  "errorRateLimit": "Du hast in letzter Zeit zu viele Modelle erstellt, bitte warte eine Weile, bevor du es erneut versuchst.",
+  "errorContentFlagged": "Das Modell konnte nicht gespeichert werden, da sein Inhalt als unangemessen eingestuft wurde.",
+  "deleteAllConversationsDisabledInfo": "Du kannst nicht alle Unterhaltungen löschen, während du dich in einem aktiven Chat befindest. Bitte verlasse zuerst den aktuellen Chat, um fortzufahren.",
+  "invalidCredentials": "Falsche E-Mail oder falsches Passwort.",
+  "userDisabled": "Dieses Benutzerkonto wurde deaktiviert.",
+  "loginSubtitle": "Melde dich bei deinem Vertex-Konto an. Neue Benutzer, die sich über Google anmelden, stimmen unseren Nutzungs- und Datenschutzbestimmungen zu. Du kannst sie auf dem Registrierungsbildschirm einsehen.",
+  "registerSubtitle": "Erstelle ein Vertex-Konto, das du auch für unsere anderen Projekte verwenden kannst.",
+  "photoWarningMessage": "Ein Foto ist enthalten. Modelle, die keine Bilder unterstützen, ignorieren es möglicherweise.",
+  "loginRequiredForPurchase": "Du musst angemeldet sein, um einen Kauf zu tätigen.",
+  "storagePermissionRequired": "Die Speicherberechtigung ist erforderlich, um heruntergeladene Modelle zu speichern. Bitte erteile die Berechtigung, um fortzufahren.",
+  "creditBannerTitle": "Hol dir kostenloses Guthaben!",
+  "creditBannerSubtitle": "Lade einen Freund ein und ihr beide erhaltet 50 Guthaben bei der Anmeldung! Wenn er abonniert, erhaltet ihr beide zusätzlich 500!",
+  "inviteShareSubject": "Komm zu mir auf Cortex!",
+  "@inviteShareMessage": {
+    "description": "The text message to share with a friend for an invite.",
+    "placeholders": {
+      "playStoreLink": {
+        "type": "String",
+        "example": "https://play.google.com/store/..."
+      }
+    }
+  },
+  "inviteShareMessage": "yo du musst dir unbedingt die app cortex reinziehen die is echt der wahnsinn wenn du meinen link benutzt kriegen wir beide 50 credits und wenn du n abo abschließt kriegen wir beide nochmal 500 extra is n krasser deal lad sie dir sofort runter\n\n{playStoreLink}",
+  "reviewEnjoyingAppTitle": "Gefällt dir Cortex?",
+  "reviewHelpUsGrow": "Deine Bewertung ist eine große Unterstützung für unser junges Indie-Team und hilft uns, Cortex für dich noch besser zu machen.",
+  "reviewMaybeLater": "Vielleicht später",
+  "reviewRateNow": "Jetzt bewerten",
+  "noThanks": "Nein, danke",
+  "updateRequiredTitle": "Update Erforderlich",
+  "updateRequiredMessage": "Um Cortex weiterhin zu nutzen, aktualisieren Sie bitte die App auf die neueste Version, um neue Funktionen und wichtige Verbesserungen zu erhalten.",
+  "updateNowButton": "Jetzt Aktualisieren",
+  "creatorSupportedSuccess": "Creator erfolgreich unterstützt! Deine zukünftigen Käufe werden ihn unterstützen."
+}

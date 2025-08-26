@@ -911,6 +911,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get redeemCode => 'Redeem Code';
 
   @override
+  String get enterYourCode =>
+      'Support your favorite creators! Enter their unique code below to give them a share of your Cortex purchases.';
+
+  @override
+  String get code => 'Code';
+
+  @override
+  String get redeem => 'Redeem';
+
+  @override
+  String get codeCannotBeEmpty => 'Code cannot be empty';
+
+  @override
   String get userId => 'User ID';
 
   @override
@@ -940,28 +953,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chinese => 'Chinese';
 
   @override
-  String get indian => 'Indian';
-
-  @override
   String get arabic => 'Arabic';
 
   @override
   String get french => 'French';
 
   @override
-  String get italian => 'Italian';
-
-  @override
-  String get spanish => 'Spanish';
-
-  @override
   String get japanese => 'Japanese';
 
   @override
   String get korean => 'Korean';
-
-  @override
-  String get azerbaijanTurkish => 'Azerbaijan Turkish';
 
   @override
   String get deutsch => 'Deutsch';
@@ -971,6 +972,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get turkish => 'Turkish';
+
+  @override
+  String get hindi => 'Hindi';
+
+  @override
+  String get portuguese => 'Portuguese';
+
+  @override
+  String get indonesian => 'Indonesian';
+
+  @override
+  String get azerbaijani => 'Azerbaijani';
+
+  @override
+  String get german => 'German';
+
+  @override
+  String get spanish => 'Spanish';
+
+  @override
+  String get italian => 'Italian';
 
   @override
   String get ram => 'RAM';
@@ -1529,4 +1551,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noThanks => 'No, Thanks';
+
+  @override
+  String get updateRequiredTitle => 'Update Required';
+
+  @override
+  String get updateRequiredMessage =>
+      'To continue using Cortex, please update the app to the latest version for new features and important improvements.';
+
+  @override
+  String get updateNowButton => 'Update Now';
+
+  @override
+  String get creatorSupportedSuccess =>
+      'Creator supported successfully! Your future purchases will contribute to them.';
 }

@@ -157,12 +157,14 @@ class ApiService {
         }
       }
 
-      // --- FIX: Correctly process a mixed SSE stream line by line. ---
       streamedResponse.stream
           .transform(utf8.decoder)
           .transform(const LineSplitter())
           .listen(
             (line) {
+
+          debugPrint("[CLIENT_LINE_RECEIVER] Received line: $line");
+
           if (completer.isCompleted) return;
 
           if (line.startsWith('event: ')) {

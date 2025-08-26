@@ -663,7 +663,7 @@ class _ModelsScreenState extends State<ModelsScreen>
         producer: modelData['producer'] ?? 'Unknown',
         path: modelData['type'] == 'offline' ? _getFilePathById(id) : null,
         category: modelData['category'] as String?,
-        canHandleImage: modelData['canHandleImage'] as bool? ?? false,
+        modalities: modelData['modalities'] as Map<String, dynamic>? ?? const {},
         role: modelData['role'] as String?
     );
 
@@ -927,7 +927,7 @@ class _ModelsScreenState extends State<ModelsScreen>
             onCancelPressed: () => _dl.cancelDownload(id),
             downloadManager: _downloadManagers[id],
             category: modelData['category'] as String? ?? '',
-            canHandleImage: modelData['canHandleImage'] as bool? ?? false,
+            modalities: modelData['modalities'] as Map<String, dynamic>? ?? const {},
             context: modelData['context']?.toString() ?? '',
             extensions: (modelData['extensions'] as Map?)?.cast<String, Map<String, dynamic>>(),
             baseModelId: modelData['baseModelId'] as String?),

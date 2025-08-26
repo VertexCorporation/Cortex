@@ -7,6 +7,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cortex/theme.dart';
 
+import 'models/backend/data.dart';
+
 /// Manages the UI and data for model extensions (variants of a base model).
 ///
 /// This class is designed as a UI/utility helper. It is responsible for:
@@ -70,8 +72,6 @@ class Extensions {
       extensionDisplayNames = {};
       currentBaseSeries = '';
       displayedExtensionLabel = '';
-      // The line below was removed as it was causing the bug by incorrectly resetting the state.
-      // updateCanHandleImage(modelData['canHandleImage'] as bool? ?? false);
       return;
     }
 
@@ -91,8 +91,7 @@ class Extensions {
     currentBaseSeries = mainId;
     displayedExtensionLabel = chosenExt;
 
-    final extData = extMap[chosenExt] is Map<String, dynamic> ? extMap[chosenExt] : {};
-    final canImage = (extData['canHandleImage'] as bool?) ?? false;
+    final canImage = ModelData.hasModality(chosenExt, 'image');
     updateCanHandleImage(canImage);
   }
 

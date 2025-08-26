@@ -910,6 +910,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get redeemCode => 'Kod Kullan';
 
   @override
+  String get enterYourCode =>
+      'Favori içerik üreticilerinizi destekleyin! Cortex satın alımlarınızdan pay almalarını sağlamak için benzersiz kodlarını aşağıya girin.';
+
+  @override
+  String get code => 'Kod';
+
+  @override
+  String get redeem => 'Kullan';
+
+  @override
+  String get codeCannotBeEmpty => 'Kod boş olamaz';
+
+  @override
   String get userId => 'Kullanıcı ID';
 
   @override
@@ -938,19 +951,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get chinese => 'Çince';
 
   @override
-  String get indian => 'Hintçe';
-
-  @override
   String get arabic => 'Arapça';
 
   @override
   String get french => 'Fransızca';
-
-  @override
-  String get italian => 'İtalyanca';
-
-  @override
-  String get spanish => 'İspanyolca';
 
   @override
   String get japanese => 'Japonca';
@@ -959,16 +963,34 @@ class AppLocalizationsTr extends AppLocalizations {
   String get korean => 'Korece';
 
   @override
-  String get azerbaijanTurkish => 'Azerbaycan Türkçesi';
-
-  @override
-  String get deutsch => 'Almanca';
+  String get deutsch => 'Almanca (Deutsch)';
 
   @override
   String get english => 'İngilizce';
 
   @override
   String get turkish => 'Türkçe';
+
+  @override
+  String get hindi => 'Hintçe';
+
+  @override
+  String get portuguese => 'Portekizce';
+
+  @override
+  String get indonesian => 'Endonezyaca';
+
+  @override
+  String get azerbaijani => 'Azerbaycan Türkçesi';
+
+  @override
+  String get german => 'Almanca';
+
+  @override
+  String get spanish => 'İspanyolca';
+
+  @override
+  String get italian => 'İtalyanca';
 
   @override
   String get ram => 'RAM';
@@ -1529,4 +1551,18 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get noThanks => 'Hayır, Teşekkürler';
+
+  @override
+  String get updateRequiredTitle => 'Güncelleme Var';
+
+  @override
+  String get updateRequiredMessage =>
+      'Cortex\'i kullanmaya devam etmek için lütfen uygulamayı yeni özellikler ve önemli iyileştirmeler içeren en son sürüme güncelleyin.';
+
+  @override
+  String get updateNowButton => 'Şimdi Güncelle';
+
+  @override
+  String get creatorSupportedSuccess =>
+      'İçerik üretici başarıyla desteklendi! Gelecekteki satın alımlarınızla ona katkıda bulunacaksınız.';
 }

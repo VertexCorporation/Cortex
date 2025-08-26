@@ -44,7 +44,7 @@ class ModelDetailPage extends StatefulWidget {
   final VoidCallback? onCancelPressed;
   final DownloadManager? downloadManager;
   final String category;
-  final bool canHandleImage;
+  final Map<String, dynamic> modalities;
   final String context;
   final Map<String, Map<String, dynamic>>? extensions;
   final String? baseModelId;
@@ -71,7 +71,7 @@ class ModelDetailPage extends StatefulWidget {
     this.onCancelPressed,
     this.downloadManager,
     required this.category,
-    required this.canHandleImage,
+    this.modalities = const {},
     this.context = '',
     this.extensions,
     required this.summary,
@@ -212,7 +212,8 @@ class _ModelDetailPageState extends State<ModelDetailPage>
   void _parseFeaturesData() {
     List<String> features = [];
     final category = _modelData['category']?.toString().toLowerCase() ?? '';
-    final canHandleImage = _modelData['canHandleImage'] as bool? ?? false;
+    final modalities = _modelData['modalities'] as Map<String, dynamic>? ?? {};
+    final bool canHandleImage = modalities['image'] == true;
     final isServerSide = _modelData['type'] != 'offline';
     final extensions = _modelData['extensions'] as Map?;
 
@@ -564,19 +565,19 @@ class _ModelDetailPageState extends State<ModelDetailPage>
       // If so, get context and modality from the CURRENT base model
       final baseModel = _selectedBaseModelData!;
       contextValue = baseModel['context']?.toString() ?? '...';
-      modalityValue = (baseModel['canHandleImage'] as bool? ?? false)
+      final baseModalities = baseModel['modalities'] as Map<String, dynamic>? ?? {};
+      modalityValue = (baseModalities['image'] == true)
           ? localizations.multimodal
           : localizations.text;
     } else {
       // Otherwise, get data from the primary model or its extension
-      contextValue = _selectedExtensionData.isNotEmpty
-          ? (_selectedExtensionData['context']?.toString() ?? '')
-          : (_modelData['context']?.toString() ?? '');
-      modalityValue = (_modelData['canHandleImage'] as bool? ?? false)
+      final currentData = _selectedExtensionData.isNotEmpty ? _selectedExtensionData : _modelData;
+      contextValue = currentData['context']?.toString() ?? '';
+      final modelModalities = currentData['modalities'] as Map<String, dynamic>? ?? {};
+      modalityValue = (modelModalities['image'] == true)
           ? localizations.multimodal
           : localizations.text;
     }
-    // --- END OF FIX ---
 
     // The rest of the image rendering logic is unchanged and correct.
     final svgColorFilter = ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn);

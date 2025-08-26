@@ -68,6 +68,11 @@ Future<void> main() async {
   // This is a mandatory first step.
   WidgetsFlutterBinding.ensureInitialized();
 
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   // Fetching theme settings is quick and necessary for the ThemeProvider.
   // We do this here to avoid a flash of the wrong theme.
   final prefs = await SharedPreferences.getInstance();
@@ -179,10 +184,19 @@ class Cortex extends StatelessWidget {
 
       locale: Provider.of<LocaleProvider>(context).locale,
       supportedLocales: const [
-        Locale('en'),
-        Locale('tr'),
-        Locale('zh'),
-        Locale('fr'),
+        Locale('en'), // English
+        Locale('tr'), // Turkish
+        Locale('zh'), // Chinese
+        Locale('fr'), // French
+        Locale('hi'), // Hindi
+        Locale('pt'), // Portuguese
+        Locale('id'), // Indonesian
+        Locale('az'), // Azerbaijani
+        Locale('de'), // German
+        Locale('es'), // Spanish
+        Locale('it'), // Italian
+        Locale('ja'), // Japanese
+
       ],
       localizationsDelegates: const [
         AppLocalizations.delegate,

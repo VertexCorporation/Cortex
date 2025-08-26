@@ -5,8 +5,16 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_az.dart';
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
 import 'app_localizations_fr.dart';
+import 'app_localizations_hi.dart';
+import 'app_localizations_id.dart';
+import 'app_localizations_it.dart';
+import 'app_localizations_ja.dart';
+import 'app_localizations_pt.dart';
 import 'app_localizations_tr.dart';
 import 'app_localizations_zh.dart';
 
@@ -98,7 +106,15 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
     Locale('tr'),
+    Locale('az'),
+    Locale('de'),
+    Locale('es'),
     Locale('fr'),
+    Locale('hi'),
+    Locale('id'),
+    Locale('it'),
+    Locale('ja'),
+    Locale('pt'),
     Locale('zh')
   ];
 
@@ -1729,6 +1745,30 @@ abstract class AppLocalizations {
   /// **'Redeem Code'**
   String get redeemCode;
 
+  /// No description provided for @enterYourCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Support your favorite creators! Enter their unique code below to give them a share of your Cortex purchases.'**
+  String get enterYourCode;
+
+  /// No description provided for @code.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get code;
+
+  /// No description provided for @redeem.
+  ///
+  /// In en, this message translates to:
+  /// **'Redeem'**
+  String get redeem;
+
+  /// No description provided for @codeCannotBeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Code cannot be empty'**
+  String get codeCannotBeEmpty;
+
   /// No description provided for @userId.
   ///
   /// In en, this message translates to:
@@ -1783,12 +1823,6 @@ abstract class AppLocalizations {
   /// **'Chinese'**
   String get chinese;
 
-  /// No description provided for @indian.
-  ///
-  /// In en, this message translates to:
-  /// **'Indian'**
-  String get indian;
-
   /// No description provided for @arabic.
   ///
   /// In en, this message translates to:
@@ -1801,18 +1835,6 @@ abstract class AppLocalizations {
   /// **'French'**
   String get french;
 
-  /// No description provided for @italian.
-  ///
-  /// In en, this message translates to:
-  /// **'Italian'**
-  String get italian;
-
-  /// No description provided for @spanish.
-  ///
-  /// In en, this message translates to:
-  /// **'Spanish'**
-  String get spanish;
-
   /// No description provided for @japanese.
   ///
   /// In en, this message translates to:
@@ -1824,12 +1846,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Korean'**
   String get korean;
-
-  /// No description provided for @azerbaijanTurkish.
-  ///
-  /// In en, this message translates to:
-  /// **'Azerbaijan Turkish'**
-  String get azerbaijanTurkish;
 
   /// No description provided for @deutsch.
   ///
@@ -1848,6 +1864,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Turkish'**
   String get turkish;
+
+  /// No description provided for @hindi.
+  ///
+  /// In en, this message translates to:
+  /// **'Hindi'**
+  String get hindi;
+
+  /// No description provided for @portuguese.
+  ///
+  /// In en, this message translates to:
+  /// **'Portuguese'**
+  String get portuguese;
+
+  /// No description provided for @indonesian.
+  ///
+  /// In en, this message translates to:
+  /// **'Indonesian'**
+  String get indonesian;
+
+  /// No description provided for @azerbaijani.
+  ///
+  /// In en, this message translates to:
+  /// **'Azerbaijani'**
+  String get azerbaijani;
+
+  /// No description provided for @german.
+  ///
+  /// In en, this message translates to:
+  /// **'German'**
+  String get german;
+
+  /// No description provided for @spanish.
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish'**
+  String get spanish;
+
+  /// No description provided for @italian.
+  ///
+  /// In en, this message translates to:
+  /// **'Italian'**
+  String get italian;
 
   /// No description provided for @ram.
   ///
@@ -2832,6 +2890,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No, Thanks'**
   String get noThanks;
+
+  /// No description provided for @updateRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Required'**
+  String get updateRequiredTitle;
+
+  /// No description provided for @updateRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'To continue using Cortex, please update the app to the latest version for new features and important improvements.'**
+  String get updateRequiredMessage;
+
+  /// No description provided for @updateNowButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Now'**
+  String get updateNowButton;
+
+  /// No description provided for @creatorSupportedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Creator supported successfully! Your future purchases will contribute to them.'**
+  String get creatorSupportedSuccess;
 }
 
 class _AppLocalizationsDelegate
@@ -2844,8 +2926,20 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'fr', 'tr', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+        'az',
+        'de',
+        'en',
+        'es',
+        'fr',
+        'hi',
+        'id',
+        'it',
+        'ja',
+        'pt',
+        'tr',
+        'zh'
+      ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -2854,10 +2948,26 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'az':
+      return AppLocalizationsAz();
+    case 'de':
+      return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
     case 'fr':
       return AppLocalizationsFr();
+    case 'hi':
+      return AppLocalizationsHi();
+    case 'id':
+      return AppLocalizationsId();
+    case 'it':
+      return AppLocalizationsIt();
+    case 'ja':
+      return AppLocalizationsJa();
+    case 'pt':
+      return AppLocalizationsPt();
     case 'tr':
       return AppLocalizationsTr();
     case 'zh':

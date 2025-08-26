@@ -48,6 +48,7 @@ class AppLanguageSection extends StatefulWidget {
 
 class AppLanguageSectionState extends State<AppLanguageSection> {
   /// Returns the localized language name corresponding to the given language code.
+  /// Returns the localized language name corresponding to the given language code.
   String _getLocalizedLanguageName(String code) {
     if (kDebugMode) {
       print('[AppLanguageSection] _getLocalizedLanguageName called for code: $code');
@@ -61,13 +62,31 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
         return widget.appLocalizations.chinese;
       case 'fr':
         return widget.appLocalizations.french;
+    // --- NEW CASES ADDED HERE ---
+      case 'hi':
+        return widget.appLocalizations.hindi;
+      case 'pt':
+        return widget.appLocalizations.portuguese;
+      case 'id':
+        return widget.appLocalizations.indonesian;
+      case 'az':
+        return widget.appLocalizations.azerbaijani;
+      case 'de':
+        return widget.appLocalizations.german;
+      case 'es':
+        return widget.appLocalizations.spanish;
+      case 'it':
+        return widget.appLocalizations.italian;
+      case 'ja':
+        return widget.appLocalizations.japanese;
       default:
         if (kDebugMode) {
           print('[AppLanguageSection] Unknown language code: $code, returning code itself.');
         }
-        return code; // Fallback: return the code itself for unknown codes
+        return code; // Fallback for any unknown codes
     }
   }
+
 
   /// Displays the language selection dialog.
   Future<void> _showLanguageSelectionDialog() async {
@@ -89,9 +108,17 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
     // List of supported languages. Each entry contains a code and its localized name.
     final languages = [
       {'code': 'en', 'name': appLocalizations.english},
-      {'code': 'tr', 'name': "${appLocalizations.turkish} (Beta)"}, // Added Beta tag
+      {'code': 'tr', 'name': "${appLocalizations.turkish} (Beta)"},
       {'code': 'zh', 'name': "${appLocalizations.chinese} (Beta)"},
       {'code': 'fr', 'name': "${appLocalizations.french} (Beta)"},
+      {'code': 'hi', 'name': "${appLocalizations.hindi} (Beta)"},
+      {'code': 'pt', 'name': "${appLocalizations.portuguese} (Beta)"},
+      {'code': 'id', 'name': "${appLocalizations.indonesian} (Beta)"},
+      {'code': 'az', 'name': "${appLocalizations.azerbaijani} (Beta)"},
+      {'code': 'de', 'name': "${appLocalizations.german} (Beta)"},
+      {'code': 'es', 'name': "${appLocalizations.spanish} (Beta)"},
+      {'code': 'it', 'name': "${appLocalizations.italian} (Beta)"},
+      {'code': 'ja', 'name': "${appLocalizations.japanese} (Beta)"},
     ];
 
     String tempSelectedLanguageCode = widget.selectedLanguageCode; // Temporarily selected language
