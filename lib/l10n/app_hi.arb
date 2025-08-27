@@ -1,6 +1,5 @@
 {
   "@@locale": "hi",
-
   "understood": "समझ गया।",
   "cancel": "रद्द करें",
   "remove": "हटाएं",
@@ -24,7 +23,6 @@
   "messageCopied": "संदेश क्लिपबोर्ड पर कॉपी किया गया।",
   "storeUnavailable": "स्टोर वर्तमान में अनुपलब्ध है। कृपया बाद में पुनः प्रयास करें",
   "retry": "पुनः प्रयास करें",
-
   "systemInfo": "सिस्टम जानकारी",
   "deviceMemory": "डिवाइस मेमोरी: {memory} GB",
   "storageSpace": "स्टोरेज स्पेस: {storage} GB",
@@ -37,7 +35,6 @@
   "totalMemory": "कुल मेमोरी",
   "usedMemory": "प्रयुक्त मेमोरी",
   "requirements": "आवश्यकताएँ",
-
   "modelsTitle": "लाइब्रेरी",
   "localModels": "स्थानीय मॉडल",
   "serverSideModels": "ऑनलाइन मॉडल",
@@ -54,12 +51,10 @@
   "myModels": "मेरे मॉडल",
   "create": "बनाएं",
   "seeAll": "सभी देखें",
-
   "modelProducer": "निर्माता: {producer}",
   "modelRAM": "रैम: {ram}",
   "modelSize": "आकार: {size}",
   "modelDescription": "{description}",
-
   "conversationsTitle": "बातचीत",
   "conversationDeleted": "बातचीत हटा दी गई।",
   "conversationUpdated": "बातचीत अपडेट की गई।",
@@ -80,7 +75,6 @@
   "youReachedConversationLimit": "आप बातचीत की सीमा तक पहुंच गए हैं।",
   "today": "आज",
   "yesterday": "कल",
-
   "loginToYourAccount": "लॉगिन करें",
   "createYourAccount": "रजिस्टर करें",
   "email": "ईमेल",
@@ -108,7 +102,6 @@
   "authenticationFailed": "प्रमाणीकरण विफल। कृपया पुनः प्रयास करें।",
   "emailTooLong": "ईमेल अधिकतम 30 अक्षरों का हो सकता है।",
   "deviceLimitReached": "आप इस डिवाइस के लिए खाता निर्माण सीमा तक पहुंच गए हैं।",
-
   "verificationEmailLimitReached": "हम और नहीं भेजेंगे",
   "verificationEmailSent": "सत्यापन ई-मेल भेजा गया!",
   "emailNotVerified": "ई-मेल सत्यापित नहीं किया गया है",
@@ -129,7 +122,6 @@
   "accountDeletionRequested": "आपके खाते को हटाने का अनुरोध प्राप्त हो गया है और आपका खाता अब अक्षम है।",
   "tooManyRequests": "बहुत सारे अनुरोध",
   "regenerate": "पुनः उत्पन्न करें",
-
   "confirmDeleteAccount": "क्या आप वाकई अपना खाता हटाना चाहते हैं?",
   "enterPasswordToDelete": "हटाने के लिए अपना पासवर्ड दर्ज करें।",
   "deleteAccount": "खाता हटाएं",
@@ -138,7 +130,6 @@
   "passwordRequired": "पासवर्ड आवश्यक है।",
   "deleteDescription": "आपके द्वारा हटाया गया डेटा हमारे सर्वर और आपके डिवाइस से स्थायी रूप से हटा दिया जाएगा। यह कार्रवाई पूर्ववत नहीं की जा सकती।",
   "deleteAccountButton": "खाता विलोपन बटन",
-
   "editProfile": "प्रोफ़ाइल संपादित करें",
   "displayName": "प्रदर्शित होने वाला नाम",
   "tapToChangeProfilePicture": "प्रोफ़ाइल चित्र बदलने के लिए टैप करें",
@@ -155,7 +146,6 @@
   "languageDescription": "आप किसी भी समय अपनी डिफ़ॉल्ट ऐप इंटरफ़ेस भाषा बदल सकते हैं।",
   "themeDescription": "आप पसंद के अनुसार लाइट और डार्क थीम के बीच स्विच कर सकते हैं। चयनित थीम Cortex इंटरफ़ेस पर लागू होगी।",
   "iHaveReadAndAgree": "मैंने सेवा की शर्तों को पढ़ लिया है और उनसे सहमत हूं",
-
   "downloading": "डाउनलोड हो रहा है...",
   "downloadError": "डाउनलोड के दौरान एक त्रुटि हुई।",
   "downloadCancelled": "डाउनलोड रद्द कर दिया गया।",
@@ -170,7 +160,6 @@
     }
   },
   "downloadPaused": "डाउनलोड रोक दिया गया।",
-
   "purchaseSuccessful": "खरीद सफल!",
   "purchaseFailed": "खरीद असफल",
   "creditProductNotFound": "चयनित क्रेडिट उत्पाद नहीं मिला।",
@@ -184,27 +173,24 @@
   "annual": "वार्षिक",
   "monthly": "मासिक",
   "manageSubscription": "सदस्यता प्रबंधित करें",
-
   "purchasePlan": "{planName} खरीदें",
   "@purchasePlan": {
-      "description": "एक विशिष्ट सदस्यता योजना खरीदने के लिए बटन टेक्स्ट।",
-      "placeholders": {
-          "planName": {
-              "type": "String",
-              "example": "प्रो वार्षिक"
-          }
+    "description": "एक विशिष्ट सदस्यता योजना खरीदने के लिए बटन टेक्स्ट।",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "प्रो वार्षिक"
       }
+    }
   },
-
   "discountOffer": "{percent}% की छूट",
-    "@discountOffer": {
-      "placeholders": {
-        "percent": {
-          "type": "int"
-        }
+  "@discountOffer": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
       }
-    },
-
+    }
+  },
   "annualPlanDescription": "{price}/माह, सालाना बिल किया गया",
   "@annualPlanDescription": {
     "description": "वार्षिक योजना के लिए विवरण, इसे और अधिक किफायती बनाने के लिए मासिक समकक्ष मूल्य दिखा रहा है। उदाहरण: $4.17/माह, सालाना बिल किया गया",
@@ -277,7 +263,6 @@
     }
   },
   "subscribedPlan": "सदस्यता ली",
-
   "errorResponseNotReceived": "प्रतिक्रिया प्राप्त नहीं हुई",
   "googleApiRequestFailed": "Google API अनुरोध {attempt} बार विफल रहा: {error}",
   "@googleApiRequestFailed": {
@@ -383,11 +368,9 @@
       }
     }
   },
-
   "termsOfServiceAndPrivacyPolicyWarning": "इस आदेश को देकर, आप सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं। आप हमारी सेवा की शर्तों और गोपनीयता नीति के बारे में अधिक जानने के लिए इस टेक्स्ट पर क्लिक कर सकते हैं। सदस्यता स्वचालित रूप से नवीनीकृत हो जाएगी जब तक कि वर्तमान अवधि के अंत से कम से कम 24 घंटे पहले स्वतः-नवीनीकरण बंद न हो।",
   "termsOfService": "सेवा की शर्तें",
   "privacyPolicy": "गोपनीयता नीति",
-
   "report": "रिपोर्ट",
   "reportDialogTitle": "रिपोर्ट सबमिट करें",
   "reportDescriptionLabel": "समस्या क्या है?",
@@ -397,7 +380,6 @@
   "closeButton": "बंद करें",
   "submitButton": "सबमिट करें",
   "reportErrorMessage": "कृपया रिपोर्ट करने के लिए एक कारण चुनें।",
-
   "capabilitiesSection": "क्षमताएं",
   "ratingsSection": "रेटिंग",
   "noRatingDataFound": "कोई रेटिंग डेटा नहीं मिला",
@@ -419,8 +401,6 @@
   "estimated": "अनुमानित",
   "finalPreparation": "अंतिम तैयारी की जा रही है।",
   "allEvaluationsByTestTeam": "सभी मूल्यांकन हमारी परीक्षण टीम द्वारा किए गए थे",
-
-
   "shareApp": "ऐप साझा करें",
   "rateUs": "हमें रेट करें",
   "share": "साझा करें",
@@ -430,7 +410,6 @@
   "selectText": "टेक्स्ट चुनें",
   "showLatex": "विशेष प्रतीक दिखाएं",
   "hideLatex": "विशेष प्रतीक छिपाएं",
-
   "thinking": "सोच रहा है",
   "user": "उपयोगकर्ता",
   "voice": "आवाज़",
@@ -521,7 +500,6 @@
   "edit": "संपादित करें",
   "editingMessageInfo": "इस संदेश को संपादित करने से बातचीत यहीं से फिर से शुरू हो जाएगी।",
   "editingNotification": "आप अभी संपादन मोड में हैं",
-
   "featureIndulgentTitle": "अनुग्रहशील",
   "featureIndulgentDescription": "यह मॉडल 100,000 से अधिक टोकन वाले संदर्भों को सहजता से समायोजित और संसाधित कर सकता है, जिससे यह प्रदर्शन से समझौता किए बिना व्यापक और विस्तृत इनपुट को संभालने में सक्षम होता है।",
   "featurePluralTitle": "बहुल",
@@ -530,7 +508,6 @@
   "featureWiseDescription": "यह मॉडल निर्णय लेने और जटिल समस्या-समाधान के लिए परिष्कृत समर्थन प्रदान करने के लिए गहरी विश्लेषणात्मक अंतर्दृष्टि और दूरंदेशी तर्क का लाभ उठा सकता है।",
   "featureResearcherTitle": "शोधकर्ता",
   "featureResearcherDescription": "उन्नत अनुसंधान और विश्लेषणात्मक क्षमताओं से लैस मॉडलों में विशेष रूप से उपलब्ध, यह सुविधा विविध डोमेन में उच्च-सटीक अंतर्दृष्टि और व्यापक विश्लेषण प्रदान करने के लिए डिज़ाइन की गई है।",
-
   "nameLabel": "एआई नाम",
   "nameHint": "अपने एआई का नाम दर्ज करें",
   "summaryLabel": "एआई सारांश",
@@ -542,12 +519,10 @@
   "preInputDescription": "कृपया एक पूर्व-इनपुट सेट करें जो चरित्र निर्माण प्रक्रिया में आपके मॉडल का मार्गदर्शन करेगा। इस खंड में, आप चरित्र-संबंधी जानकारी, अतिरिक्त संदर्भ, और कोई भी अतिरिक्त विवरण शामिल कर सकते हैं जो चरित्र से संबंधित सामग्री उत्पन्न करने में सहायता कर सकता है।",
   "baseModelTitle": "आधार मॉडल",
   "baseModelDescription": "यह वह मॉडल है जिसका उपयोग आपकी रचना के लिए नींव के रूप में किया जाएगा। यह वर्तमान में चयनित आधार मॉडल को प्रदर्शित करता है।",
-
   "summary": "सारांश",
   "characterPoliceTitle": "पुलिस",
   "characterPoliceRole": "आप कानून के एक सतर्क प्रवर्तक हैं, जो नागरिकों की रक्षा करने और अटूट प्रतिबद्धता के साथ व्यवस्था बनाए रखने के लिए समर्पित हैं, आप एक पुलिस हैं",
   "characterPoliceShortDescription": "एक दृढ़ और साहसी कानून प्रवर्तक।",
-
   "purchaseSubscription": "खरीदें",
   "modelUploadTitle": "कृत्रिम बुद्धिमत्ता फ़ाइल",
   "modelUploadDescription": "अपने डिवाइस से सीधे अपनी स्थानीय GGUF फ़ाइलों का चयन और अपलोड करें। यह आपको इंटरनेट कनेक्शन की आवश्यकता के बिना अपने मॉडल को ऑफ़लाइन चलाने देता है। सुनिश्चित करें कि फ़ाइल मान्य GGUF प्रारूप में है और ठीक से संरचित है। यदि फ़ाइल गलत या दूषित है, तो Cortex अपेक्षा के अनुरूप काम नहीं कर सकता है, और आपको त्रुटियों का सामना करना पड़ सकता है।",
@@ -597,7 +572,6 @@
   "errorApiAuthentication": "प्रमाणीकरण विफल। कृपया पुनः लॉग इन करने का प्रयास करें।",
   "baseModelForCharacterDescription": "चयनित आधार मॉडल चरित्र के तर्क और प्रतिक्रिया क्षमताओं को निर्धारित करेगा।",
   "selectBaseModel": "एक आधार मॉडल चुनें",
-
   "@errorUserNotAuthenticated": {},
   "@errorInsufficientCredits": {},
   "@errorRateLimitExceeded": {},
@@ -605,16 +579,11 @@
   "@errorNetwork": {},
   "@errorApiAuthentication": {},
   "@baseModelForCharacterDescription": {},
-
-  "forgotPassword": "पासवर्ड भूल गए?",
   "couldNotOpenLink": "लिंक नहीं खोल सका",
-
   "downloadStarted": "डाउनलोड शुरू हो गया",
   "notAvailable": "उपलब्ध नहीं है",
-
   "localizationWarning": "कुछ जानकारी आपकी भाषा में उपलब्ध नहीं हो सकती है और अंग्रेजी में प्रदर्शित की जाएगी।",
   "aiTranslationWarning": "मॉडल की जानकारी अन्य एआई मॉडल द्वारा विभिन्न भाषाओं में अनुवादित की जाती है। इसलिए, अंग्रेजी के अलावा अन्य भाषाओं में मामूली विसंगतियां हो सकती हैं।",
-
   "errorLoadingTitle": "डेटा लोड करने में विफल",
   "@errorLoadingTitle": {
     "description": "त्रुटि स्क्रीन के लिए शीर्षक जब मॉडल डेटा प्राप्त नहीं किया जा सकता है।"
@@ -676,5 +645,8 @@
   "updateRequiredTitle": "अपडेट आवश्यक है",
   "updateRequiredMessage": "Cortex का उपयोग जारी रखने के लिए, कृपया नई सुविधाओं और महत्वपूर्ण सुधारों के लिए ऐप को नवीनतम संस्करण में अपडेट करें।",
   "updateNowButton": "अभी अपडेट करें",
-  "creatorSupportedSuccess": "निर्माता का सफलतापूर्वक समर्थन किया गया! आपकी भविष्य की खरीदारी उन्हें योगदान देगी।"
+  "creatorSupportedSuccess": "निर्माता का सफलतापूर्वक समर्थन किया गया! आपकी भविष्य की खरीदारी उन्हें योगदान देगी।",
+  "kurdish": "Kurdish",
+  "dutch": "Dutch",
+  "russian": "Russian"
 }

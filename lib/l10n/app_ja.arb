@@ -1,6 +1,5 @@
 {
   "@@locale": "ja",
-
   "understood": "了解",
   "cancel": "キャンセル",
   "remove": "削除",
@@ -24,7 +23,6 @@
   "messageCopied": "メッセージをクリップボードにコピーしました。",
   "storeUnavailable": "ストアは現在利用できません。後でもう一度お試しください",
   "retry": "再試行",
-
   "systemInfo": "システム情報",
   "deviceMemory": "デバイスメモリ: {memory} GB",
   "storageSpace": "ストレージ容量: {storage} GB",
@@ -37,7 +35,6 @@
   "totalMemory": "合計メモリ",
   "usedMemory": "使用済みメモリ",
   "requirements": "要件",
-
   "modelsTitle": "ライブラリ",
   "localModels": "ローカルモデル",
   "serverSideModels": "オンラインモデル",
@@ -54,12 +51,10 @@
   "myModels": "マイモデル",
   "create": "作成",
   "seeAll": "すべて表示",
-
   "modelProducer": "プロデューサー: {producer}",
   "modelRAM": "RAM: {ram}",
   "modelSize": "サイズ: {size}",
   "modelDescription": "{description}",
-
   "conversationsTitle": "会話",
   "conversationDeleted": "会話を削除しました。",
   "conversationUpdated": "会話を更新しました。",
@@ -80,7 +75,6 @@
   "youReachedConversationLimit": "会話の上限に達しました。",
   "today": "今日",
   "yesterday": "昨日",
-
   "loginToYourAccount": "ログイン",
   "createYourAccount": "登録",
   "email": "メールアドレス",
@@ -108,7 +102,6 @@
   "authenticationFailed": "認証に失敗しました。もう一度お試しください。",
   "emailTooLong": "メールアドレスは最大30文字です。",
   "deviceLimitReached": "このデバイスのアカウント作成上限に達しました。",
-
   "verificationEmailLimitReached": "これ以上は送信しません",
   "verificationEmailSent": "確認メールを送信しました！",
   "emailNotVerified": "メールアドレスが確認されていません",
@@ -129,7 +122,6 @@
   "accountDeletionRequested": "アカウントの削除リクエストが受信され、アカウントは現在無効になっています。",
   "tooManyRequests": "リクエストが多すぎます",
   "regenerate": "再生成",
-
   "confirmDeleteAccount": "本当にアカウントを削除しますか？",
   "enterPasswordToDelete": "削除するにはパスワードを入力してください。",
   "deleteAccount": "アカウントを削除",
@@ -138,7 +130,6 @@
   "passwordRequired": "パスワードが必要です。",
   "deleteDescription": "削除したデータは、当社のサーバーとあなたのデバイスから永久に削除されます。この操作は元に戻せません。",
   "deleteAccountButton": "アカウント削除ボタン",
-
   "editProfile": "プロフィールを編集",
   "displayName": "表示名",
   "tapToChangeProfilePicture": "タップしてプロフィール写真を変更",
@@ -155,7 +146,6 @@
   "languageDescription": "いつでもデフォルトのアプリインターフェース言語を変更できます。",
   "themeDescription": "好みに応じてライトテーマとダークテーマを切り替えることができます。選択したテーマはCortexインターフェース全体に適用されます。",
   "iHaveReadAndAgree": "利用規約に同意します",
-
   "downloading": "ダウンロード中...",
   "downloadError": "ダウンロード中にエラーが発生しました。",
   "downloadCancelled": "ダウンロードがキャンセルされました。",
@@ -170,7 +160,6 @@
     }
   },
   "downloadPaused": "ダウンロードが一時停止しました。",
-
   "purchaseSuccessful": "購入成功！",
   "purchaseFailed": "購入に失敗しました",
   "creditProductNotFound": "選択されたクレジット商品が見つかりませんでした。",
@@ -184,7 +173,6 @@
   "annual": "年間",
   "monthly": "月間",
   "manageSubscription": "サブスクリプションを管理",
-
   "purchasePlan": "{planName}を購入",
   "@purchasePlan": {
     "description": "特定のサブスクリプションプランを購入するためのボタンテキスト。",
@@ -195,7 +183,6 @@
       }
     }
   },
-
   "discountOffer": "{percent}% OFF",
   "@discountOffer": {
     "placeholders": {
@@ -204,7 +191,6 @@
       }
     }
   },
-
   "annualPlanDescription": "{price}/月、年間請求",
   "@annualPlanDescription": {
     "description": "年間プランの説明。月額換算価格を表示して手頃に見せる。例：$4.17/月、年間請求",
@@ -277,7 +263,6 @@
     }
   },
   "subscribedPlan": "登録済み",
-
   "errorResponseNotReceived": "応答が受信されませんでした",
   "googleApiRequestFailed": "Google APIリクエストが{attempt}回失敗しました: {error}",
   "@googleApiRequestFailed": {
@@ -383,11 +368,9 @@
       }
     }
   },
-
   "termsOfServiceAndPrivacyPolicyWarning": "この注文を行うことにより、利用規約およびプライバシーポリシーに同意したことになります。このテキストをクリックすると、当社の利用規約およびプライバシーポリシーについて詳しく知ることができます。現在の期間が終了する少なくとも24時間前に自動更新がオフにされない限り、サブスクリプションは自動的に更新されます。",
   "termsOfService": "利用規約",
   "privacyPolicy": "プライバシーポリシー",
-
   "report": "報告",
   "reportDialogTitle": "報告を送信",
   "reportDescriptionLabel": "問題は何ですか？",
@@ -397,8 +380,6 @@
   "closeButton": "閉じる",
   "submitButton": "送信",
   "reportErrorMessage": "報告する理由を1つ選択してください。",
-
-
   "capabilitiesSection": "能力",
   "ratingsSection": "評価",
   "noRatingDataFound": "評価データが見つかりません",
@@ -420,8 +401,6 @@
   "estimated": "推定",
   "finalPreparation": "最終準備が行われています。",
   "allEvaluationsByTestTeam": "すべての評価は当社のテストチームによって行われました",
-
-
   "shareApp": "アプリを共有",
   "rateUs": "評価する",
   "share": "共有",
@@ -431,8 +410,6 @@
   "selectText": "テキストを選択",
   "showLatex": "特殊記号を表示",
   "hideLatex": "特殊記号を非表示",
-
-
   "thinking": "考え中",
   "user": "ユーザー",
   "voice": "音声",
@@ -523,7 +500,6 @@
   "edit": "編集",
   "editingMessageInfo": "このメッセージを編集すると、ここから会話が再開されます。",
   "editingNotification": "現在編集モードです",
-
   "featureIndulgentTitle": "寛容",
   "featureIndulgentDescription": "このモデルは10万トークンを超えるコンテキストをシームレスに受け入れ、処理することができ、パフォーマンスを損なうことなく広範で詳細な入力を処理できます。",
   "featurePluralTitle": "複数",
@@ -532,7 +508,6 @@
   "featureWiseDescription": "このモデルは、深い分析的洞察と先進的な推論を活用して、意思決定と複雑な問題解決のための洗練されたサポートを提供できます。",
   "featureResearcherTitle": "研究者",
   "featureResearcherDescription": "高度な研究および分析能力を備えたモデルでのみ利用可能なこの機能は、多様なドメインにわたって高精度の洞察と包括的な分析を提供するように設計されています。",
-
   "nameLabel": "AIの名前",
   "nameHint": "AIの名前を入力",
   "summaryLabel": "AIの概要",
@@ -544,12 +519,10 @@
   "preInputDescription": "キャラクター作成プロセスでモデルをガイドする事前入力を設定してください。このセクションでは、キャラクター関連の情報、追加のコンテキスト、およびキャラクターに関連するコンテンツの生成に役立つ可能性のある追加の詳細を含めることができます。",
   "baseModelTitle": "ベースモデル",
   "baseModelDescription": "これはあなたの創造物の基盤として使用されるモデルです。現在選択されているベースモデルを表示します。",
-
   "summary": "概要",
   "characterPoliceTitle": "警察官",
   "characterPoliceRole": "あなたは法の用心深い執行者であり、市民を守り、揺るぎない献身で秩序を維持することに専念している、あなたは警察官です",
   "characterPoliceShortDescription": "不動で勇敢な法の執行者。",
-
   "purchaseSubscription": "購入",
   "modelUploadTitle": "AIファイル",
   "modelUploadDescription": "デバイスから直接ローカルのGGUFファイルを選択してアップロードします。これにより、インターネット接続なしでモデルをオフラインで実行できます。ファイルが有効なGGUF形式であり、適切に構造化されていることを確認してください。ファイルが正しくないか破損している場合、Cortexは期待どおりに機能しない可能性があり、エラーが発生する可能性があります。",
@@ -598,7 +571,6 @@
   "errorNetwork": "ネットワークエラーが発生しました。接続を確認してもう一度お試しください。",
   "errorApiAuthentication": "認証に失敗しました。もう一度ログインしてみてください。",
   "baseModelForCharacterDescription": "選択されたベースモデルが、キャラクターの推論および応答能力を決定します。",
-
   "@errorUserNotAuthenticated": {},
   "@errorInsufficientCredits": {},
   "@errorRateLimitExceeded": {},
@@ -606,16 +578,11 @@
   "@errorNetwork": {},
   "@errorApiAuthentication": {},
   "@baseModelForCharacterDescription": {},
-
-  "forgotPassword": "パスワードをお忘れですか？",
   "couldNotOpenLink": "リンクを開けませんでした",
-
   "downloadStarted": "ダウンロードを開始しました",
   "notAvailable": "利用不可",
-
   "localizationWarning": "一部の情報はあなたの言語で利用できない場合があり、英語で表示されます。",
   "aiTranslationWarning": "モデル情報は他のAIモデルによって様々な言語に翻訳されています。そのため、英語以外の言語では軽微な不一致が生じる可能性があります。",
-
   "errorLoadingTitle": "データの読み込みに失敗しました",
   "@errorLoadingTitle": {
     "description": "モデルデータを取得できない場合のエラー画面のタイトル。"
@@ -677,5 +644,9 @@
   "updateRequiredTitle": "アップデートが必要です",
   "updateRequiredMessage": "Cortexを引き続き使用するには、新機能や重要な改善のためにアプリを最新バージョンにアップデートしてください。",
   "updateNowButton": "今すぐアップデート",
-  "creatorSupportedSuccess": "クリエイターのサポートが完了しました！今後のご購入は、そのクリエイターに貢献します。"
+  "creatorSupportedSuccess": "クリエイターのサポートが完了しました！今後のご購入は、そのクリエイターに貢献します。",
+  "selectBaseModel": "ベースモデルを選択",
+  "kurdish": "Kurdish",
+  "dutch": "Dutch",
+  "russian": "Russian"
 }

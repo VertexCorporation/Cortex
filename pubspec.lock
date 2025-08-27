@@ -33,6 +33,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.7"
+  argos_translator_offline:
+    dependency: "direct dev"
+    description:
+      name: argos_translator_offline
+      sha256: "6b8643d6d63d589672fedb1fb932d2e180e3a4d2d6a6de5eb74635d36e3e6fa6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   args:
     dependency: transitive
     description:
@@ -949,6 +957,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
+  package_config:
+    dependency: transitive
+    description:
+      name: package_config
+      sha256: f096c55ebb7deb7e384101542bfba8c52696c1b56fca2eb62827989ef2353bbc
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   package_info_plus:
     dependency: transitive
     description:

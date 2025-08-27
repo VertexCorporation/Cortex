@@ -237,6 +237,90 @@ Now you can set up the project on your local machine.
     flutter run
     ```
 
+### 4. Automatic Translation Setup (Optional)
+
+This project uses a semi-automated script to translate new localization keys into all supported languages using the Google Translate API. This is an optional but highly recommended step if you plan to contribute to the app's localization.
+
+Follow these one-time setup steps to enable the `translate` command on your local machine.
+
+#### Step 4.1: Prerequisites
+
+- **Python 3:** Ensure you have a modern version of Python 3 installed. You can check with `python3 --version`.
+- **Google Cloud API Key:** You need an active API Key from a Google Cloud project with the **"Cloud Translation API"** enabled. This project must have a billing account attached. The API has a generous free tier, but a billing account is required for activation.
+
+#### Step 4.2: Install Python Library
+
+Open your standard system terminal and run the following command to install the Google Translate library globally for your user.
+
+```bash
+pip3 install --user google-cloud-translate
+```
+
+#### Step 4.3: Configure the `translate` Command
+
+This custom shell function automates the entire translation process.
+
+1.  Open your shell's configuration file (e.g., `~/.bashrc` or `~/.zshrc`).
+    ```bash
+    # For Bash users (most common on Linux)
+    nano ~/.bashrc
+
+    # For Zsh users (common on macOS)
+    nano ~/.zshrc
+    ```
+2.  Paste the entire function below at the very end of the file.
+3.  **Crucially, replace `"YOUR_GOOGLE_API_KEY_HERE"` with your actual API Key.**
+
+    ```bash
+    #
+    # --- Cortex Project: Automatic Translation Command ---
+    #
+    function translate() {
+        echo "--- Cortex Translation using Google API v2 ---"
+        
+        # 1. Navigate to the project directory.
+        #    Update this path if your project is located elsewhere.
+        cd ~/Documents/cortex || { echo "Error: Failed to navigate to project directory."; return 1; }
+
+        # 2. Set the API Key for this terminal session.
+        export GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY_HERE"
+        if [ -z "$GOOGLE_API_KEY" ]; then
+            echo "Error: GOOGLE_API_KEY is not set. Please edit your shell configuration file."
+            return 1
+        fi
+
+        # 3. Run the master Dart script that handles all the logic.
+        echo "-> Running the master translation script..."
+        dart run scripts/translate.dart
+        
+        echo "--- Translation Process Finished ---"
+    }
+    ```
+4.  Save the file (`Ctrl+X`, `Y`, `Enter`) and refresh your terminal configuration by closing and reopening it, or by running `source ~/.bashrc` (or `source ~/.zshrc`).
+
+#### Step 4.4: Authenticate gCloud (One-Time Command)
+
+To ensure the API correctly associates usage with your project for billing and quotas, you need to set your "quota project".
+
+1.  Find your **Project ID** from the [GCP Console Dashboard](https://console.cloud.google.com/home/dashboard).
+2.  Run the following command in your terminal, replacing `YOUR_PROJECT_ID_HERE` with your actual Project ID.
+    ```bash
+    gcloud auth application-default set-quota-project YOUR_PROJECT_ID_HERE
+    ```
+
+#### How to Use
+
+Your setup is complete! To translate new keys:
+
+1.  Add your new English strings to the `lib/l10n/app_en.arb` file.
+2.  Open a **new System Terminal**.
+3.  Simply run the command:
+    ```bash
+    translate
+    ```
+
+The script will automatically find the new keys and translate them.
+
 This is a complex setup, but once completed, you will have a fully functional, independent version of Cortex. Happy coding!
 
 ---

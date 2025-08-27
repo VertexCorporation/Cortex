@@ -18,6 +18,11 @@ class LocaleProvider extends ChangeNotifier {
     'es', // Spanish
     'it', // Italian
     'ja', // Japanese
+    'ar', // Arabic
+    'ku', // Kurdish
+    'nl', // Dutch
+    'ru', // Russian
+    'ko', // Korean
   ];
 
   LocaleProvider() : _locale = const Locale('en') {
