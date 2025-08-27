@@ -108,17 +108,22 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
     // List of supported languages. Each entry contains a code and its localized name.
     final languages = [
       {'code': 'en', 'name': appLocalizations.english},
-      {'code': 'tr', 'name': "${appLocalizations.turkish} (Beta)"},
-      {'code': 'zh', 'name': "${appLocalizations.chinese} (Beta)"},
-      {'code': 'fr', 'name': "${appLocalizations.french} (Beta)"},
-      {'code': 'hi', 'name': "${appLocalizations.hindi} (Beta)"},
-      {'code': 'pt', 'name': "${appLocalizations.portuguese} (Beta)"},
-      {'code': 'id', 'name': "${appLocalizations.indonesian} (Beta)"},
-      {'code': 'az', 'name': "${appLocalizations.azerbaijani} (Beta)"},
-      {'code': 'de', 'name': "${appLocalizations.german} (Beta)"},
-      {'code': 'es', 'name': "${appLocalizations.spanish} (Beta)"},
-      {'code': 'it', 'name': "${appLocalizations.italian} (Beta)"},
-      {'code': 'ja', 'name': "${appLocalizations.japanese} (Beta)"},
+      {'code': 'tr', 'name': appLocalizations.turkish},
+      {'code': 'zh', 'name': appLocalizations.chinese},
+      {'code': 'fr', 'name': appLocalizations.french},
+      {'code': 'hi', 'name': appLocalizations.hindi},
+      {'code': 'pt', 'name': appLocalizations.portuguese},
+      {'code': 'id', 'name': appLocalizations.indonesian},
+      {'code': 'az', 'name': appLocalizations.azerbaijani},
+      {'code': 'de', 'name': appLocalizations.german},
+      {'code': 'es', 'name': appLocalizations.spanish},
+      {'code': 'it', 'name': appLocalizations.italian},
+      {'code': 'ja', 'name': appLocalizations.japanese},
+      {'code': 'ar', 'name': appLocalizations.arabic},
+      {'code': 'ku', 'name': appLocalizations.kurdish},
+      {'code': 'nl', 'name': appLocalizations.dutch},
+      {'code': 'ru', 'name': appLocalizations.russian},
+      {'code': 'ko', 'name': appLocalizations.korean},
     ];
 
     String tempSelectedLanguageCode = widget.selectedLanguageCode; // Temporarily selected language

@@ -1,6 +1,5 @@
 {
   "@@locale": "az",
-
   "understood": "Anlaşıldı.",
   "cancel": "Ləğv et",
   "remove": "Sil",
@@ -24,7 +23,6 @@
   "messageCopied": "Mesaj mübadilə buferinə kopyalandı.",
   "storeUnavailable": "Mağaza hazırda əlçatan deyil. Zəhmət olmasa, daha sonra yenidən cəhd edin",
   "retry": "Yenidən cəhd et",
-
   "systemInfo": "Sistem Məlumatı",
   "deviceMemory": "Cihaz Yaddaşı: {memory} GB",
   "storageSpace": "Yaddaş Sahəsi: {storage} GB",
@@ -37,7 +35,6 @@
   "totalMemory": "Ümumi Yaddaş",
   "usedMemory": "İstifadə Edilən Yaddaş",
   "requirements": "Tələblər",
-
   "modelsTitle": "Kitabxana",
   "localModels": "Lokal Modellər",
   "serverSideModels": "Onlayn Modellər",
@@ -54,12 +51,10 @@
   "myModels": "Modellərim",
   "create": "Yarat",
   "seeAll": "Hamısına Bax",
-
   "modelProducer": "İstehsalçı: {producer}",
   "modelRAM": "RAM: {ram}",
   "modelSize": "Ölçü: {size}",
   "modelDescription": "{description}",
-
   "conversationsTitle": "Söhbətlər",
   "conversationDeleted": "Söhbət silindi.",
   "conversationUpdated": "Söhbət yeniləndi.",
@@ -80,7 +75,6 @@
   "youReachedConversationLimit": "Söhbət limitinə çatdınız.",
   "today": "Bu gün",
   "yesterday": "Dünən",
-
   "loginToYourAccount": "Daxil ol",
   "createYourAccount": "Qeydiyyatdan keç",
   "email": "E-poçt",
@@ -108,7 +102,6 @@
   "authenticationFailed": "Doğrulama uğursuz oldu. Zəhmət olmasa, yenidən cəhd edin.",
   "emailTooLong": "E-poçt ən çox 30 simvol ola bilər.",
   "deviceLimitReached": "Bu cihaz üçün hesab yaratma limitinə çatdınız.",
-
   "verificationEmailLimitReached": "Daha çox göndərməyəcəyik",
   "verificationEmailSent": "Təsdiq e-poçtu göndərildi!",
   "emailNotVerified": "E-poçt təsdiqlənməyib",
@@ -129,7 +122,6 @@
   "accountDeletionRequested": "Hesabınızın silinməsi tələbi qəbul edildi və hesabınız indi deaktiv edilib.",
   "tooManyRequests": "Həddindən artıq sorğu",
   "regenerate": "Yenidən yarat",
-
   "confirmDeleteAccount": "Hesabınızı silmək istədiyinizə əminsinizmi?",
   "enterPasswordToDelete": "Silmək üçün şifrənizi daxil edin.",
   "deleteAccount": "Hesabı Sil",
@@ -138,7 +130,6 @@
   "passwordRequired": "Şifrə tələb olunur.",
   "deleteDescription": "Sildiyiniz məlumatlar serverimizdən və cihazınızdan qalıcı olaraq silinəcək. Bu əməliyyatlar geri qaytarıla bilməz.",
   "deleteAccountButton": "Hesab Silmə Düyməsi",
-
   "editProfile": "Profili Redaktə et",
   "displayName": "Görünən Ad",
   "tapToChangeProfilePicture": "Profil şəklini dəyişmək üçün toxunun",
@@ -155,7 +146,6 @@
   "languageDescription": "İstənilən vaxt standart tətbiq interfeys dilinizi dəyişə bilərsiniz.",
   "themeDescription": "İstəyinizə uyğun olaraq işıqlı və qaranlıq mövzular arasında keçid edə bilərsiniz. Seçilmiş mövzu bütün Cortex interfeysində tətbiq olunacaq.",
   "iHaveReadAndAgree": "Xidmət şərtlərini oxudum və qəbul edirəm",
-
   "downloading": "Yüklənir...",
   "downloadError": "Yükləmə zamanı xəta baş verdi.",
   "downloadCancelled": "Yükləmə ləğv edildi.",
@@ -164,7 +154,6 @@
   "downloadFailed": "Yükləmə uğursuz oldu",
   "downloaded": "{percent}% yükləndi",
   "downloadPaused": "Yükləmə dayandırıldı.",
-
   "purchaseSuccessful": "Alış uğurlu oldu!",
   "purchaseFailed": "Alış uğursuz oldu",
   "creditProductNotFound": "Seçilmiş kredit məhsulu tapılmadı.",
@@ -178,7 +167,6 @@
   "annual": "İllik",
   "monthly": "Aylıq",
   "manageSubscription": "Abunəliyi İdarə et",
-
   "purchasePlan": "{planName} al",
   "discountOffer": "{percent}% ENDİRİM",
   "annualPlanDescription": "{price}/ay, illik hesablanır",
@@ -223,7 +211,6 @@
   "buyCredit": "Kredit Al",
   "buyCreditPackage": "{amount} Kredit Al",
   "subscribedPlan": "Abunə olundu",
-
   "errorResponseNotReceived": "Cavab alınmadı",
   "googleApiRequestFailed": "Google API sorğusu {attempt} dəfə uğursuz oldu: {error}",
   "openRouterResponseStatus": "OpenRouter Cavab Statusu: {statusCode}",
@@ -237,11 +224,9 @@
   "pleaseWaitBeforeTryingAgain": "Zəhmət olmasa, yenidən cəhd etməzdən əvvəl bir az gözləyin",
   "openRouterQuotaExceeded": "Kvota aşıldı. Status kodu: {statusCode}, Gövdə: {decodedBody}",
   "openRouterApiRequestFailedAfterPaidAttempts": "API sorğusu {attempts} ödənişli cəhddən sonra uğursuz oldu. Xəta: {error}",
-
   "termsOfServiceAndPrivacyPolicyWarning": "Bu sifarişi yerləşdirməklə, Xidmət Şərtləri və Məxfilik Siyasəti ilə razılaşırsınız. Xidmət Şərtlərimiz və Məxfilik Siyasətimiz haqqında daha çox məlumat əldə etmək üçün bu mətnə klikləyə bilərsiniz. Cari dövrün bitməsindən ən azı 24 saat əvvəl avtomatik yeniləmə söndürülmədikcə, abunəlik avtomatik olaraq yenilənəcək.",
   "termsOfService": "Xidmət Şərtləri",
   "privacyPolicy": "Məxfilik Siyasəti",
-
   "report": "Şikayət et",
   "reportDialogTitle": "Şikayət Göndər",
   "reportDescriptionLabel": "Problem nədir?",
@@ -251,7 +236,6 @@
   "closeButton": "Bağla",
   "submitButton": "Göndər",
   "reportErrorMessage": "Zəhmət olmasa, şikayət üçün bir səbəb seçin.",
-
   "capabilitiesSection": "Bacarıqlar",
   "ratingsSection": "Reytinqlər",
   "noRatingDataFound": "Reytinq məlumatı tapılmadı",
@@ -273,7 +257,6 @@
   "estimated": "təxmini",
   "finalPreparation": "Son hazırlıqlar görülür.",
   "allEvaluationsByTestTeam": "Bütün qiymətləndirmələr sınaq komandamız tərəfindən aparılmışdır",
-
   "shareApp": "Tətbiqi Paylaş",
   "rateUs": "Bizi Qiymətləndir",
   "share": "Paylaş",
@@ -283,7 +266,6 @@
   "selectText": "Mətni Seç",
   "showLatex": "Xüsusi Simvolları Göstər",
   "hideLatex": "Xüsusi Simvolları Gizlət",
-
   "thinking": "Düşünür",
   "user": "İstifadəçi",
   "voice": "Səs",
@@ -374,7 +356,6 @@
   "edit": "Redaktə et",
   "editingMessageInfo": "Bu mesajı redaktə etmək söhbəti buradan yenidən başladacaq.",
   "editingNotification": "Siz indi redaktə rejimindəsiniz",
-
   "featureIndulgentTitle": "Geniş Həcmli",
   "featureIndulgentDescription": "Bu model 100,000-dən çox tokeni aşan kontekstləri problemsiz şəkildə qəbul edə və emal edə bilir, bu da performansdan ödün vermədən geniş və ətraflı daxiletmələri idarə etməyə imkan verir.",
   "featurePluralTitle": "Çoxşaxəli",
@@ -383,7 +364,6 @@
   "featureWiseDescription": "Bu model dərin analitik məlumatlardan və irəliyə dönük mülahizələrdən istifadə edərək qərar vermə və mürəkkəb problemlərin həlli üçün yüksək səviyyəli dəstək təmin edə bilir.",
   "featureResearcherTitle": "Tədqiqatçı",
   "featureResearcherDescription": "Yalnız inkişaf etmiş tədqiqat və analitik imkanlara malik modellərdə mövcud olan bu xüsusiyyət, müxtəlif sahələrdə yüksək dəqiqlikli məlumatlar və hərtərəfli təhlil təmin etmək üçün nəzərdə tutulmuşdur.",
-
   "nameLabel": "Sİ adı",
   "nameHint": "Sİ-nizin adını daxil edin",
   "summaryLabel": "Sİ Xülasəsi",
@@ -395,12 +375,10 @@
   "preInputDescription": "Zəhmət olmasa, modelinizi xarakter yaratma prosesində istiqamətləndirəcək bir ilkin giriş təyin edin. Bu bölmədə, xarakterlə bağlı məlumatları, əlavə konteksti və xarakterlə bağlı məzmunun yaradılmasına kömək edə biləcək hər hansı əlavə detalları daxil edə bilərsiniz.",
   "baseModelTitle": "Əsas Model",
   "baseModelDescription": "Bu, yaratdığınız işin əsası kimi istifadə ediləcək modeldir. Hazırda seçilmiş əsas modeli göstərir.",
-
   "summary": "Xülasə",
   "characterPoliceTitle": "Polis",
   "characterPoliceRole": "Sən qanunun sayıq bir keşikçisisən, vətəndaşları qorumağa və nizam-intizamı sarsılmaz bir qətiyyətlə qorumağa həsr olunmusan, sən bir polissən",
   "characterPoliceShortDescription": "Sarsılmaz və cəsur bir qanun keşikçisi.",
-
   "purchaseSubscription": "Satın al",
   "modelUploadTitle": "Süni İntellekt Faylı",
   "modelUploadDescription": "Yerli GGUF fayllarınızı birbaşa cihazınızdan seçin və yükləyin. Bu, modelinizi internet bağlantısı olmadan oflayn rejimdə işlətməyə imkan verir. Faylın etibarlı GGUF formatında və düzgün strukturda olduğundan əmin olun. Fayl səhv və ya zədələnmiş olarsa, Cortex gözlənildiyi kimi işləməyə bilər və xətalarla qarşılaşa bilərsiniz.",
@@ -436,16 +414,11 @@
   "errorApiAuthentication": "Doğrulama uğursuz oldu. Zəhmət olmasa yenidən daxil olmağa cəhd edin.",
   "baseModelForCharacterDescription": "Seçilmiş əsas model xarakterin mühakimə və cavab vermə qabiliyyətlərini müəyyən edəcək.",
   "selectBaseModel": "Əsas Model Seçin",
-
-  "forgotPassword": "Şifrəni unutmusunuz?",
   "couldNotOpenLink": "Link açıla bilmədi",
-
   "downloadStarted": "Yükləmə başladı",
   "notAvailable": "Mövcud Deyil",
-
   "localizationWarning": "Bəzi məlumatlar sizin dilinizdə mövcud olmaya bilər və ingilis dilində göstəriləcək.",
   "aiTranslationWarning": "Model məlumatları digər Sİ modelləri tərəfindən müxtəlif dillərə tərcümə edilir. Buna görə də, ingilis dilindən başqa dillərdə kiçik uyğunsuzluqlar ola bilər.",
-
   "errorLoadingTitle": "Məlumatlar Yüklənə Bilmədi",
   "errorLoadingMessage": "Serverlərimizdən lazımi məlumatları ala bilmədik. Zəhmət olmasa internet bağlantınızı yoxlayın və yenidən cəhd edin.",
   "noModelsFoundTitle": "Nəticə Yoxdur",
@@ -491,6 +464,9 @@
   "updateRequiredTitle": "Yeniləmə Tələb Olunur",
   "updateRequiredMessage": "Cortex'i istifadə etməyə davam etmək üçün lütfən, tətbiqi yeni funksiyalar və vacib təkmilləşdirmələr üçün ən son versiyaya yeniləyin.",
   "updateNowButton": "İndi Yenilə",
-  "creatorSupportedSuccess": "Yaradıcı uğurla dəstəkləndi! Gələcək alış-verişləriniz ona töhfə verəcək."
-
+  "creatorSupportedSuccess": "Yaradıcı uğurla dəstəkləndi! Gələcək alış-verişləriniz ona töhfə verəcək.",
+  "inviteShareSubject": "Cortex üzrə qoşulun!",
+  "kurdish": "Kurdish",
+  "dutch": "Dutch",
+  "russian": "Russian"
 }

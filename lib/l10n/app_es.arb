@@ -1,6 +1,5 @@
 {
   "@@locale": "es",
-
   "understood": "Entendido.",
   "cancel": "Cancelar",
   "remove": "Eliminar",
@@ -24,7 +23,6 @@
   "messageCopied": "Mensaje copiado al portapapeles.",
   "storeUnavailable": "La tienda no está disponible actualmente. Por favor, inténtalo de nuevo más tarde.",
   "retry": "Reintentar",
-
   "systemInfo": "Información del Sistema",
   "deviceMemory": "Memoria del Dispositivo: {memory} GB",
   "storageSpace": "Espacio de Almacenamiento: {storage} GB",
@@ -37,7 +35,6 @@
   "totalMemory": "Memoria Total",
   "usedMemory": "Memoria Usada",
   "requirements": "Requisitos",
-
   "modelsTitle": "Biblioteca",
   "localModels": "Modelos Locales",
   "serverSideModels": "Modelos en Línea",
@@ -54,12 +51,10 @@
   "myModels": "Mis Modelos",
   "create": "Crear",
   "seeAll": "Ver Todo",
-
   "modelProducer": "Productor: {producer}",
   "modelRAM": "RAM: {ram}",
   "modelSize": "Tamaño: {size}",
   "modelDescription": "{description}",
-
   "conversationsTitle": "Conversaciones",
   "conversationDeleted": "Conversación eliminada.",
   "conversationUpdated": "Conversación actualizada.",
@@ -80,7 +75,6 @@
   "youReachedConversationLimit": "Has alcanzado el límite de conversaciones.",
   "today": "Hoy",
   "yesterday": "Ayer",
-
   "loginToYourAccount": "Iniciar Sesión",
   "createYourAccount": "Registrarse",
   "email": "Correo Electrónico",
@@ -89,7 +83,7 @@
   "invalidEmail": "Por favor, introduce una dirección de correo electrónico válida.",
   "invalidPassword": "La contraseña debe tener al menos 6 caracteres.",
   "rememberMe": "Recordarme",
-  "forgotPassword": "¿Olvidaste la contraseña?",
+  "forgotPassword": "¿Olvidaste la Contraseña?",
   "or": "O",
   "continueWithGoogle": "Continuar con Google",
   "dontHaveAccount": "¿No tienes una cuenta?",
@@ -108,7 +102,6 @@
   "authenticationFailed": "Falló la autenticación. Por favor, inténtalo de nuevo.",
   "emailTooLong": "El correo electrónico puede tener como máximo 30 caracteres.",
   "deviceLimitReached": "Has alcanzado el límite de creación de cuentas para este dispositivo.",
-
   "verificationEmailLimitReached": "No enviaremos más",
   "verificationEmailSent": "¡Correo electrónico de verificación enviado!",
   "emailNotVerified": "El correo electrónico no ha sido verificado",
@@ -129,7 +122,6 @@
   "accountDeletionRequested": "Tu solicitud de eliminación de cuenta ha sido recibida y tu cuenta está ahora deshabilitada.",
   "tooManyRequests": "Demasiadas solicitudes",
   "regenerate": "Regenerar",
-
   "confirmDeleteAccount": "¿Estás seguro de que quieres eliminar tu cuenta?",
   "enterPasswordToDelete": "Introduce tu contraseña para eliminar.",
   "deleteAccount": "Eliminar Cuenta",
@@ -138,7 +130,6 @@
   "passwordRequired": "Se requiere la contraseña.",
   "deleteDescription": "Los datos que elimines se borrarán permanentemente de nuestro servidor y de tu dispositivo. Estas acciones no se pueden deshacer.",
   "deleteAccountButton": "Botón de Eliminación de Cuenta",
-
   "editProfile": "Editar Perfil",
   "displayName": "Nombre a Mostrar",
   "tapToChangeProfilePicture": "Toca para cambiar la foto de perfil",
@@ -155,7 +146,6 @@
   "languageDescription": "Puedes cambiar el idioma de la interfaz de tu aplicación predeterminada en cualquier momento.",
   "themeDescription": "Puedes cambiar entre temas claros y oscuros según prefieras. El tema seleccionado se aplicará en toda la interfaz de Cortex.",
   "iHaveReadAndAgree": "He leído y acepto los términos de servicio",
-
   "downloading": "Descargando...",
   "downloadError": "Ocurrió un error durante la descarga.",
   "downloadCancelled": "Descarga cancelada.",
@@ -170,7 +160,6 @@
     }
   },
   "downloadPaused": "Descarga en pausa.",
-
   "purchaseSuccessful": "¡Compra exitosa!",
   "purchaseFailed": "Compra no exitosa",
   "creditProductNotFound": "No se pudo encontrar el producto de crédito seleccionado.",
@@ -184,7 +173,6 @@
   "annual": "Anual",
   "monthly": "Mensual",
   "manageSubscription": "Gestionar Suscripción",
-
   "purchasePlan": "Comprar {planName}",
   "@purchasePlan": {
     "description": "Texto del botón para comprar un plan de suscripción específico.",
@@ -195,7 +183,6 @@
       }
     }
   },
-
   "discountOffer": "{percent}% DE DESCUENTO",
   "@discountOffer": {
     "placeholders": {
@@ -204,7 +191,6 @@
       }
     }
   },
-
   "annualPlanDescription": "{price}/mes, facturado anualmente",
   "@annualPlanDescription": {
     "description": "La descripción para el plan anual, mostrando el precio mensual equivalente para que parezca más asequible. Ejemplo: 4,17 $/mes, facturado anualmente",
@@ -277,7 +263,6 @@
     }
   },
   "subscribedPlan": "Suscrito",
-
   "errorResponseNotReceived": "No se recibió respuesta",
   "googleApiRequestFailed": "La solicitud a la API de Google falló {attempt} veces: {error}",
   "@googleApiRequestFailed": {
@@ -383,11 +368,9 @@
       }
     }
   },
-
   "termsOfServiceAndPrivacyPolicyWarning": "Al realizar este pedido, aceptas los Términos de Servicio y la Política de Privacidad. Puedes hacer clic en este texto para obtener más información sobre nuestros Términos de Servicio y Política de Privacidad. La suscripción se renovará automáticamente a menos que la renovación automática se desactive al menos 24 horas antes del final del período actual.",
   "termsOfService": "Términos de Servicio",
   "privacyPolicy": "Política de Privacidad",
-
   "report": "Reportar",
   "reportDialogTitle": "Enviar Reporte",
   "reportDescriptionLabel": "¿Cuál es el problema?",
@@ -397,7 +380,6 @@
   "closeButton": "Cerrar",
   "submitButton": "Enviar",
   "reportErrorMessage": "Por favor, selecciona una razón para reportar.",
-
   "capabilitiesSection": "Capacidades",
   "ratingsSection": "Calificaciones",
   "noRatingDataFound": "No se encontraron datos de calificación",
@@ -419,7 +401,6 @@
   "estimated": "estimado",
   "finalPreparation": "Se están realizando los preparativos finales.",
   "allEvaluationsByTestTeam": "Todas las evaluaciones fueron realizadas por nuestro equipo de pruebas",
-
   "shareApp": "Compartir la App",
   "rateUs": "Califícanos",
   "share": "Compartir",
@@ -429,7 +410,6 @@
   "selectText": "Seleccionar Texto",
   "showLatex": "Mostrar Símbolos Especiales",
   "hideLatex": "Ocultar Símbolos Especiales",
-
   "thinking": "Pensando",
   "user": "Usuario",
   "voice": "Voz",
@@ -520,7 +500,6 @@
   "edit": "Editar",
   "editingMessageInfo": "Editar este mensaje reiniciará la conversación desde aquí.",
   "editingNotification": "Ahora estás en modo de edición",
-
   "featureIndulgentTitle": "Indulgente",
   "featureIndulgentDescription": "Este modelo puede acomodar y procesar sin problemas contextos que superan los 100,000 tokens, lo que le permite manejar entradas extensas y detalladas sin comprometer el rendimiento.",
   "featurePluralTitle": "Plural",
@@ -529,7 +508,6 @@
   "featureWiseDescription": "Este modelo puede aprovechar conocimientos analíticos profundos y un razonamiento prospectivo para ofrecer un soporte sofisticado en la toma de decisiones y la resolución de problemas complejos.",
   "featureResearcherTitle": "Investigador",
   "featureResearcherDescription": "Disponible exclusivamente en modelos equipados con capacidades avanzadas de investigación y análisis, esta característica está diseñada para proporcionar conocimientos de alta precisión y análisis exhaustivos en diversos dominios.",
-
   "nameLabel": "Nombre de la IA",
   "nameHint": "Introduce el nombre de tu IA",
   "summaryLabel": "Resumen de la IA",
@@ -541,12 +519,10 @@
   "preInputDescription": "Por favor, establece una entrada previa que guiará a tu modelo en el proceso de creación de personajes. En esta sección, puedes incluir información relacionada con el personaje, contexto adicional y cualquier detalle extra que pueda ayudar a generar contenido relacionado con el personaje.",
   "baseModelTitle": "Modelo Base",
   "baseModelDescription": "Este es el modelo que se utilizará como base para tu creación. Muestra el modelo base actualmente seleccionado.",
-
   "summary": "Resumen",
   "characterPoliceTitle": "Policía",
   "characterPoliceRole": "Eres un vigilante ejecutor de la ley, dedicado a proteger a los ciudadanos y mantener el orden con un compromiso inquebrantable, eres un policía",
   "characterPoliceShortDescription": "Un agente de la ley firme y valiente.",
-
   "purchaseSubscription": "Comprar",
   "modelUploadTitle": "Archivo de Inteligencia Artificial",
   "modelUploadDescription": "Selecciona y sube tus archivos GGUF locales directamente desde tu dispositivo. Esto te permite ejecutar tu modelo sin conexión a internet. Asegúrate de que el archivo esté en formato GGUF válido y estructurado correctamente. Si el archivo es incorrecto o está corrupto, Cortex podría no funcionar como se espera y podrías encontrar errores.",
@@ -596,7 +572,6 @@
   "errorApiAuthentication": "Falló la autenticación. Por favor, intenta iniciar sesión de nuevo.",
   "baseModelForCharacterDescription": "El modelo base seleccionado determinará las capacidades de razonamiento y respuesta del personaje.",
   "selectBaseModel": "Selecciona un Modelo Base",
-
   "@errorUserNotAuthenticated": {},
   "@errorInsufficientCredits": {},
   "@errorRateLimitExceeded": {},
@@ -604,16 +579,11 @@
   "@errorNetwork": {},
   "@errorApiAuthentication": {},
   "@baseModelForCharacterDescription": {},
-
-  "forgotPassword": "¿Olvidaste la Contraseña?",
   "couldNotOpenLink": "No se pudo abrir el enlace",
-
   "downloadStarted": "Descarga iniciada",
   "notAvailable": "No Disponible",
-
   "localizationWarning": "Parte de la información puede no estar disponible en tu idioma y se mostrará en inglés.",
   "aiTranslationWarning": "La información del modelo es traducida a varios idiomas por otros modelos de IA. Por lo tanto, pueden ocurrir pequeñas inconsistencias en idiomas distintos al inglés.",
-
   "errorLoadingTitle": "Error al Cargar los Datos",
   "@errorLoadingTitle": {
     "description": "Título para la pantalla de error cuando no se pueden obtener los datos del modelo."
@@ -675,5 +645,8 @@
   "updateRequiredTitle": "Actualización Requerida",
   "updateRequiredMessage": "Para continuar usando Cortex, actualiza la aplicación a la última versión para obtener nuevas funciones y mejoras importantes.",
   "updateNowButton": "Actualizar Ahora",
-  "creatorSupportedSuccess": "¡Creador apoyado con éxito! Tus futuras compras le darán apoyo."
+  "creatorSupportedSuccess": "¡Creador apoyado con éxito! Tus futuras compras le darán apoyo.",
+  "kurdish": "Kurdish",
+  "dutch": "Dutch",
+  "russian": "Russian"
 }

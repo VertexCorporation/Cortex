@@ -1,6 +1,5 @@
 {
   "@@locale": "de",
-
   "understood": "Verstanden.",
   "cancel": "Abbrechen",
   "remove": "Entfernen",
@@ -24,7 +23,6 @@
   "messageCopied": "Nachricht in die Zwischenablage kopiert.",
   "storeUnavailable": "Der Store ist derzeit nicht verfügbar. Bitte versuche es später erneut.",
   "retry": "Erneut versuchen",
-
   "systemInfo": "Systeminformationen",
   "deviceMemory": "Gerätespeicher: {memory} GB",
   "storageSpace": "Speicherplatz: {storage} GB",
@@ -37,7 +35,6 @@
   "totalMemory": "Gesamter Arbeitsspeicher",
   "usedMemory": "Genutzter Arbeitsspeicher",
   "requirements": "Anforderungen",
-
   "modelsTitle": "Bibliothek",
   "localModels": "Lokale Modelle",
   "serverSideModels": "Online-Modelle",
@@ -54,12 +51,10 @@
   "myModels": "Meine Modelle",
   "create": "Erstellen",
   "seeAll": "Alle ansehen",
-
   "modelProducer": "Hersteller: {producer}",
   "modelRAM": "RAM: {ram}",
   "modelSize": "Größe: {size}",
   "modelDescription": "{description}",
-
   "conversationsTitle": "Unterhaltungen",
   "conversationDeleted": "Unterhaltung gelöscht.",
   "conversationUpdated": "Unterhaltung aktualisiert.",
@@ -80,7 +75,6 @@
   "youReachedConversationLimit": "Du hast das Unterhaltungslimit erreicht.",
   "today": "Heute",
   "yesterday": "Gestern",
-
   "loginToYourAccount": "Anmelden",
   "createYourAccount": "Registrieren",
   "email": "E-Mail",
@@ -108,7 +102,6 @@
   "authenticationFailed": "Authentifizierung fehlgeschlagen. Bitte versuche es erneut.",
   "emailTooLong": "Die E-Mail darf höchstens 30 Zeichen lang sein.",
   "deviceLimitReached": "Du hast das Kontoerstellungslimit für dieses Gerät erreicht.",
-
   "verificationEmailLimitReached": "Wir werden keine weiteren E-Mails senden",
   "verificationEmailSent": "Bestätigungs-E-Mail gesendet!",
   "emailNotVerified": "E-Mail wurde nicht bestätigt",
@@ -129,7 +122,6 @@
   "accountDeletionRequested": "Deine Anfrage zur Kontolöschung wurde erhalten und dein Konto ist jetzt deaktiviert.",
   "tooManyRequests": "Zu viele Anfragen",
   "regenerate": "Erneut generieren",
-
   "confirmDeleteAccount": "Bist du sicher, dass du dein Konto löschen möchtest?",
   "enterPasswordToDelete": "Gib dein Passwort ein, um es zu löschen.",
   "deleteAccount": "Konto löschen",
@@ -138,7 +130,6 @@
   "passwordRequired": "Passwort ist erforderlich.",
   "deleteDescription": "Die von dir gelöschten Daten werden dauerhaft von unserem Server und deinem Gerät entfernt. Diese Aktionen können nicht rückgängig gemacht werden.",
   "deleteAccountButton": "Button zur Kontolöschung",
-
   "editProfile": "Profil bearbeiten",
   "displayName": "Anzeigename",
   "tapToChangeProfilePicture": "Tippe, um das Profilbild zu ändern",
@@ -155,7 +146,6 @@
   "languageDescription": "Du kannst die Standardsprache der App-Oberfläche jederzeit ändern.",
   "themeDescription": "Du kannst je nach Vorliebe zwischen hellen und dunklen Themen wechseln. Das ausgewählte Thema wird auf die gesamte Cortex-Oberfläche angewendet.",
   "iHaveReadAndAgree": "Ich habe die Nutzungsbedingungen gelesen und stimme ihnen zu",
-
   "downloading": "Wird heruntergeladen...",
   "downloadError": "Während des Downloads ist ein Fehler aufgetreten.",
   "downloadCancelled": "Download abgebrochen.",
@@ -170,7 +160,6 @@
     }
   },
   "downloadPaused": "Download pausiert.",
-
   "purchaseSuccessful": "Kauf erfolgreich!",
   "purchaseFailed": "Kauf fehlgeschlagen",
   "creditProductNotFound": "Das ausgewählte Guthabenprodukt konnte nicht gefunden werden.",
@@ -184,7 +173,6 @@
   "annual": "Jährlich",
   "monthly": "Monatlich",
   "manageSubscription": "Abonnement verwalten",
-
   "purchasePlan": "{planName} kaufen",
   "@purchasePlan": {
     "description": "Button text for purchasing a specific subscription plan.",
@@ -195,7 +183,6 @@
       }
     }
   },
-
   "discountOffer": "{percent}% RABATT",
   "@discountOffer": {
     "placeholders": {
@@ -204,7 +191,6 @@
       }
     }
   },
-
   "annualPlanDescription": "{price}/Monat, jährlich abgerechnet",
   "@annualPlanDescription": {
     "description": "The description for the annual plan, showing the monthly equivalent price to make it seem more affordable. Example: $4.17/mo, billed annually",
@@ -277,7 +263,6 @@
     }
   },
   "subscribedPlan": "Abonniert",
-
   "errorResponseNotReceived": "Antwort nicht erhalten",
   "googleApiRequestFailed": "Google API-Anfrage ist {attempt} Mal fehlgeschlagen: {error}",
   "@googleApiRequestFailed": {
@@ -383,11 +368,9 @@
       }
     }
   },
-
   "termsOfServiceAndPrivacyPolicyWarning": "Mit der Aufgabe dieser Bestellung stimmst du den Nutzungsbedingungen und der Datenschutzrichtlinie zu. Du kannst auf diesen Text klicken, um mehr über unsere Nutzungsbedingungen und Datenschutzrichtlinie zu erfahren. Das Abonnement verlängert sich automatisch, es sei denn, die automatische Verlängerung wird mindestens 24 Stunden vor dem Ende des aktuellen Zeitraums deaktiviert.",
   "termsOfService": "Nutzungsbedingungen",
   "privacyPolicy": "Datenschutzrichtlinie",
-
   "report": "Melden",
   "reportDialogTitle": "Meldung einreichen",
   "reportDescriptionLabel": "Was ist das Problem?",
@@ -397,7 +380,6 @@
   "closeButton": "Schließen",
   "submitButton": "Senden",
   "reportErrorMessage": "Bitte wähle einen Grund für die Meldung aus.",
-
   "capabilitiesSection": "Fähigkeiten",
   "ratingsSection": "Bewertungen",
   "noRatingDataFound": "Keine Bewertungsdaten gefunden",
@@ -419,7 +401,6 @@
   "estimated": "geschätzt",
   "finalPreparation": "Die letzten Vorbereitungen werden getroffen.",
   "allEvaluationsByTestTeam": "Alle Bewertungen wurden von unserem Testteam vorgenommen",
-
   "shareApp": "App teilen",
   "rateUs": "Bewerte uns",
   "share": "Teilen",
@@ -429,7 +410,6 @@
   "selectText": "Text auswählen",
   "showLatex": "Sonderzeichen anzeigen",
   "hideLatex": "Sonderzeichen ausblenden",
-
   "thinking": "Denke nach",
   "user": "Benutzer",
   "voice": "Stimme",
@@ -520,7 +500,6 @@
   "edit": "Bearbeiten",
   "editingMessageInfo": "Das Bearbeiten dieser Nachricht startet die Unterhaltung von hier aus neu.",
   "editingNotification": "Du befindest dich jetzt im Bearbeitungsmodus",
-
   "featureIndulgentTitle": "Nachsichtig",
   "featureIndulgentDescription": "Dieses Modell kann Kontexte von über 100.000 Token nahtlos aufnehmen und verarbeiten, wodurch es umfangreiche und detaillierte Eingaben ohne Leistungseinbußen bewältigen kann.",
   "featurePluralTitle": "Plural",
@@ -529,7 +508,6 @@
   "featureWiseDescription": "Dieses Modell kann tiefgreifende analytische Einblicke und vorausschauendes Denken nutzen, um anspruchsvolle Unterstützung bei der Entscheidungsfindung und komplexen Problemlösungen zu bieten.",
   "featureResearcherTitle": "Forscher",
   "featureResearcherDescription": "Diese Funktion ist ausschließlich in Modellen mit fortgeschrittenen Forschungs- und Analysekapazitäten verfügbar und wurde entwickelt, um hochpräzise Einblicke und umfassende Analysen in verschiedenen Bereichen zu liefern.",
-
   "nameLabel": "KI-Name",
   "nameHint": "Gib den Namen deiner KI ein",
   "summaryLabel": "KI-Zusammenfassung",
@@ -541,12 +519,10 @@
   "preInputDescription": "Bitte lege eine Voreingabe fest, die dein Modell bei der Charaktererstellung leitet. In diesem Abschnitt kannst du charakterbezogene Informationen, zusätzlichen Kontext und alle weiteren Details einfügen, die bei der Generierung von Inhalten im Zusammenhang mit dem Charakter helfen könnten.",
   "baseModelTitle": "Basismodell",
   "baseModelDescription": "Dies ist das Modell, das als Grundlage für deine Kreation verwendet wird. Es zeigt das aktuell ausgewählte Basismodell an.",
-
   "summary": "Zusammenfassung",
   "characterPoliceTitle": "Polizei",
   "characterPoliceRole": "Du bist ein wachsamer Gesetzeshüter, der sich dem Schutz der Bürger und der Aufrechterhaltung der Ordnung mit unerschütterlichem Engagement verschrieben hat, du bist ein Polizist",
   "characterPoliceShortDescription": "Ein standhafter und mutiger Gesetzeshüter.",
-
   "purchaseSubscription": "Kaufen",
   "modelUploadTitle": "Datei der künstlichen Intelligenz",
   "modelUploadDescription": "Wähle und lade deine lokalen GGUF-Dateien direkt von deinem Gerät hoch. So kannst du dein Modell offline ausführen, ohne eine Internetverbindung zu benötigen. Stelle sicher, dass die Datei im gültigen GGUF-Format vorliegt und ordnungsgemäß strukturiert ist. Wenn die Datei fehlerhaft oder beschädigt ist, funktioniert Cortex möglicherweise nicht wie erwartet, und es können Fehler auftreten.",
@@ -596,7 +572,6 @@
   "errorApiAuthentication": "Authentifizierung fehlgeschlagen. Bitte versuche, dich erneut anzumelden.",
   "baseModelForCharacterDescription": "Das ausgewählte Basismodell bestimmt die Denk- und Antwortfähigkeiten des Charakters.",
   "selectBaseModel": "Wähle ein Basismodell",
-
   "@errorUserNotAuthenticated": {},
   "@errorInsufficientCredits": {},
   "@errorRateLimitExceeded": {},
@@ -604,16 +579,11 @@
   "@errorNetwork": {},
   "@errorApiAuthentication": {},
   "@baseModelForCharacterDescription": {},
-
-  "forgotPassword": "Passwort vergessen?",
   "couldNotOpenLink": "Der Link konnte nicht geöffnet werden",
-
   "downloadStarted": "Download gestartet",
   "notAvailable": "Nicht verfügbar",
-
   "localizationWarning": "Einige Informationen sind möglicherweise nicht in deiner Sprache verfügbar und werden auf Englisch angezeigt.",
   "aiTranslationWarning": "Modellinformationen werden von anderen KI-Modellen in verschiedene Sprachen übersetzt. Daher können in anderen Sprachen als Englisch geringfügige Unstimmigkeiten auftreten.",
-
   "errorLoadingTitle": "Laden der Daten fehlgeschlagen",
   "@errorLoadingTitle": {
     "description": "Title for the error screen when model data cannot be fetched."
@@ -675,5 +645,8 @@
   "updateRequiredTitle": "Update Erforderlich",
   "updateRequiredMessage": "Um Cortex weiterhin zu nutzen, aktualisieren Sie bitte die App auf die neueste Version, um neue Funktionen und wichtige Verbesserungen zu erhalten.",
   "updateNowButton": "Jetzt Aktualisieren",
-  "creatorSupportedSuccess": "Creator erfolgreich unterstützt! Deine zukünftigen Käufe werden ihn unterstützen."
+  "creatorSupportedSuccess": "Creator erfolgreich unterstützt! Deine zukünftigen Käufe werden ihn unterstützen.",
+  "kurdish": "Kurdish",
+  "dutch": "Dutch",
+  "russian": "Russian"
 }

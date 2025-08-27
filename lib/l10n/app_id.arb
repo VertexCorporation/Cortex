@@ -1,6 +1,5 @@
 {
   "@@locale": "id",
-
   "understood": "Mengerti.",
   "cancel": "Batal",
   "remove": "Hapus",
@@ -24,7 +23,6 @@
   "messageCopied": "Pesan disalin ke papan klip.",
   "storeUnavailable": "Toko saat ini tidak tersedia. Silakan coba lagi nanti",
   "retry": "Coba Lagi",
-
   "systemInfo": "Informasi Sistem",
   "deviceMemory": "Memori Perangkat: {memory} GB",
   "storageSpace": "Ruang Penyimpanan: {storage} GB",
@@ -37,7 +35,6 @@
   "totalMemory": "Total Memori",
   "usedMemory": "Memori Terpakai",
   "requirements": "Persyaratan",
-
   "modelsTitle": "Perpustakaan",
   "localModels": "Model Lokal",
   "serverSideModels": "Model Online",
@@ -54,12 +51,10 @@
   "myModels": "Model Saya",
   "create": "Buat",
   "seeAll": "Lihat Semua",
-
   "modelProducer": "Produsen: {producer}",
   "modelRAM": "RAM: {ram}",
   "modelSize": "Ukuran: {size}",
   "modelDescription": "{description}",
-
   "conversationsTitle": "Percakapan",
   "conversationDeleted": "Percakapan dihapus.",
   "conversationUpdated": "Percakapan diperbarui.",
@@ -80,7 +75,6 @@
   "youReachedConversationLimit": "Anda telah mencapai batas percakapan.",
   "today": "Hari Ini",
   "yesterday": "Kemarin",
-
   "loginToYourAccount": "Masuk",
   "createYourAccount": "Daftar",
   "email": "Email",
@@ -89,7 +83,7 @@
   "invalidEmail": "Harap masukkan alamat email yang valid.",
   "invalidPassword": "Kata sandi harus terdiri dari minimal 6 karakter.",
   "rememberMe": "Ingat saya",
-  "forgotPassword": "Lupa kata sandi?",
+  "forgotPassword": "Lupa Kata Sandi?",
   "or": "Atau",
   "continueWithGoogle": "Lanjutkan dengan Google",
   "dontHaveAccount": "Belum punya akun?",
@@ -108,7 +102,6 @@
   "authenticationFailed": "Otentikasi gagal. Silakan coba lagi.",
   "emailTooLong": "Email maksimal 30 karakter.",
   "deviceLimitReached": "Anda telah mencapai batas pembuatan akun untuk perangkat ini.",
-
   "verificationEmailLimitReached": "Kami tidak akan mengirim lagi",
   "verificationEmailSent": "Email verifikasi terkirim!",
   "emailNotVerified": "Email belum diverifikasi",
@@ -129,7 +122,6 @@
   "accountDeletionRequested": "Permintaan penghapusan akun Anda telah diterima dan akun Anda sekarang dinonaktifkan.",
   "tooManyRequests": "Terlalu banyak permintaan",
   "regenerate": "Buat Ulang",
-
   "confirmDeleteAccount": "Apakah Anda yakin ingin menghapus akun Anda?",
   "enterPasswordToDelete": "Masukkan kata sandi Anda untuk menghapus.",
   "deleteAccount": "Hapus Akun",
@@ -138,7 +130,6 @@
   "passwordRequired": "Kata sandi diperlukan.",
   "deleteDescription": "Data yang Anda hapus akan dihapus secara permanen dari server dan perangkat Anda. Tindakan ini tidak dapat dibatalkan.",
   "deleteAccountButton": "Tombol Hapus Akun",
-
   "editProfile": "Edit Profil",
   "displayName": "Nama Tampilan",
   "tapToChangeProfilePicture": "Ketuk untuk mengubah gambar profil",
@@ -155,7 +146,6 @@
   "languageDescription": "Anda dapat mengubah bahasa antarmuka aplikasi default kapan saja.",
   "themeDescription": "Anda dapat beralih antara tema terang dan gelap sesuai preferensi. Tema yang dipilih akan berlaku di seluruh antarmuka Cortex.",
   "iHaveReadAndAgree": "Saya telah membaca dan menyetujui persyaratan layanan",
-
   "downloading": "Mengunduh...",
   "downloadError": "Terjadi kesalahan saat mengunduh.",
   "downloadCancelled": "Pengunduhan dibatalkan.",
@@ -170,7 +160,6 @@
     }
   },
   "downloadPaused": "Pengunduhan dijeda.",
-
   "purchaseSuccessful": "Pembelian berhasil!",
   "purchaseFailed": "Pembelian tidak berhasil",
   "creditProductNotFound": "Produk kredit yang dipilih tidak dapat ditemukan.",
@@ -184,27 +173,24 @@
   "annual": "Tahunan",
   "monthly": "Bulanan",
   "manageSubscription": "Kelola Langganan",
-
   "purchasePlan": "Beli {planName}",
   "@purchasePlan": {
-      "description": "Teks tombol untuk membeli paket langganan tertentu.",
-      "placeholders": {
-          "planName": {
-              "type": "String",
-              "example": "Pro Tahunan"
-          }
+    "description": "Teks tombol untuk membeli paket langganan tertentu.",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "Pro Tahunan"
       }
+    }
   },
-
   "discountOffer": "DISKON {percent}%",
-    "@discountOffer": {
-      "placeholders": {
-        "percent": {
-          "type": "int"
-        }
+  "@discountOffer": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
       }
-    },
-
+    }
+  },
   "annualPlanDescription": "{price}/bln, ditagih tahunan",
   "@annualPlanDescription": {
     "description": "Deskripsi untuk paket tahunan, menunjukkan harga bulanan yang setara agar terlihat lebih terjangkau. Contoh: $4.17/bln, ditagih tahunan",
@@ -277,7 +263,6 @@
     }
   },
   "subscribedPlan": "Berlangganan",
-
   "errorResponseNotReceived": "Respons tidak diterima",
   "googleApiRequestFailed": "Permintaan Google API gagal {attempt} kali: {error}",
   "@googleApiRequestFailed": {
@@ -383,11 +368,9 @@
       }
     }
   },
-
   "termsOfServiceAndPrivacyPolicyWarning": "Dengan menempatkan pesanan ini, Anda menyetujui Persyaratan Layanan dan Kebijakan Privasi. Anda dapat mengklik teks ini untuk mempelajari lebih lanjut tentang Persyaratan Layanan dan Kebijakan Privasi kami. Langganan akan diperpanjang secara otomatis kecuali perpanjangan otomatis dimatikan setidaknya 24 jam sebelum akhir periode berjalan.",
   "termsOfService": "Persyaratan Layanan",
   "privacyPolicy": "Kebijakan Privasi",
-
   "report": "Laporkan",
   "reportDialogTitle": "Kirim Laporan",
   "reportDescriptionLabel": "Apa masalahnya?",
@@ -397,7 +380,6 @@
   "closeButton": "Tutup",
   "submitButton": "Kirim",
   "reportErrorMessage": "Harap pilih satu alasan untuk melaporkan.",
-
   "capabilitiesSection": "Kemampuan",
   "ratingsSection": "Peringkat",
   "noRatingDataFound": "Tidak ada data peringkat yang ditemukan",
@@ -419,7 +401,6 @@
   "estimated": "diperkirakan",
   "finalPreparation": "Persiapan akhir sedang dilakukan.",
   "allEvaluationsByTestTeam": "Semua evaluasi dilakukan oleh tim penguji kami",
-
   "shareApp": "Bagikan Aplikasi",
   "rateUs": "Beri Kami Nilai",
   "share": "Bagikan",
@@ -429,7 +410,6 @@
   "selectText": "Pilih Teks",
   "showLatex": "Tampilkan Simbol Khusus",
   "hideLatex": "Sembunyikan Simbol Khusus",
-
   "thinking": "Berpikir",
   "user": "Pengguna",
   "voice": "Suara",
@@ -520,7 +500,6 @@
   "edit": "Edit",
   "editingMessageInfo": "Mengedit pesan ini akan memulai ulang percakapan dari sini.",
   "editingNotification": "Anda sekarang dalam mode edit",
-
   "featureIndulgentTitle": "Memanjakan",
   "featureIndulgentDescription": "Model ini dapat dengan lancar mengakomodasi dan memproses konteks yang melebihi 100.000 token, memungkinkannya menangani input yang luas dan mendetail tanpa mengorbankan kinerja.",
   "featurePluralTitle": "Jamak",
@@ -529,7 +508,6 @@
   "featureWiseDescription": "Model ini dapat memanfaatkan wawasan analitis yang mendalam dan penalaran yang berwawasan ke depan untuk memberikan dukungan canggih untuk pengambilan keputusan dan pemecahan masalah yang kompleks.",
   "featureResearcherTitle": "Peneliti",
   "featureResearcherDescription": "Tersedia secara eksklusif dalam model yang dilengkapi dengan kapasitas penelitian dan analitis tingkat lanjut, fitur ini dirancang untuk memberikan wawasan presisi tinggi dan analisis komprehensif di berbagai domain.",
-
   "nameLabel": "Nama AI",
   "nameHint": "Masukkan nama AI Anda",
   "summaryLabel": "Ringkasan AI",
@@ -541,12 +519,10 @@
   "preInputDescription": "Harap atur pra-input yang akan memandu model Anda dalam proses pembuatan karakter. Di bagian ini, Anda dapat menyertakan informasi terkait karakter, konteks tambahan, dan detail ekstra apa pun yang dapat membantu dalam menghasilkan konten yang terkait dengan karakter.",
   "baseModelTitle": "Model Dasar",
   "baseModelDescription": "Ini adalah model yang akan digunakan sebagai dasar untuk kreasi Anda. Ini menampilkan model dasar yang saat ini dipilih.",
-
   "summary": "Ringkasan",
   "characterPoliceTitle": "Polisi",
   "characterPoliceRole": "Anda adalah penegak hukum yang waspada, berdedikasi untuk melindungi warga dan menjaga ketertiban dengan komitmen yang tak tergoyahkan, Anda adalah seorang polisi",
   "characterPoliceShortDescription": "Seorang penegak hukum yang teguh dan berani.",
-
   "purchaseSubscription": "Beli",
   "modelUploadTitle": "File Kecerdasan Buatan",
   "modelUploadDescription": "Pilih dan unggah file GGUF lokal Anda langsung dari perangkat Anda. Ini memungkinkan Anda menjalankan model Anda secara offline tanpa memerlukan koneksi internet. Pastikan file dalam format GGUF yang valid dan terstruktur dengan baik. Jika file salah atau rusak, Cortex mungkin tidak berfungsi seperti yang diharapkan, dan Anda bisa mengalami kesalahan.",
@@ -596,7 +572,6 @@
   "errorApiAuthentication": "Otentikasi gagal. Silakan coba masuk lagi.",
   "baseModelForCharacterDescription": "Model dasar yang dipilih akan menentukan kemampuan penalaran dan respons karakter.",
   "selectBaseModel": "Pilih Model Dasar",
-
   "@errorUserNotAuthenticated": {},
   "@errorInsufficientCredits": {},
   "@errorRateLimitExceeded": {},
@@ -604,16 +579,11 @@
   "@errorNetwork": {},
   "@errorApiAuthentication": {},
   "@baseModelForCharacterDescription": {},
-
-  "forgotPassword": "Lupa Kata Sandi?",
   "couldNotOpenLink": "Tidak dapat membuka tautan",
-
   "downloadStarted": "Pengunduhan dimulai",
   "notAvailable": "Tidak Tersedia",
-
   "localizationWarning": "Beberapa informasi mungkin tidak tersedia dalam bahasa Anda dan akan ditampilkan dalam bahasa Inggris.",
   "aiTranslationWarning": "Informasi model diterjemahkan ke dalam berbagai bahasa oleh model AI lain. Oleh karena itu, mungkin terjadi sedikit ketidakkonsistenan dalam bahasa selain bahasa Inggris.",
-
   "errorLoadingTitle": "Gagal Memuat Data",
   "@errorLoadingTitle": {
     "description": "Judul untuk layar kesalahan ketika data model tidak dapat diambil."
@@ -675,5 +645,8 @@
   "updateRequiredTitle": "Pembaruan Diperlukan",
   "updateRequiredMessage": "Untuk terus menggunakan Cortex, harap perbarui aplikasi ke versi terbaru untuk fitur baru dan peningkatan penting.",
   "updateNowButton": "Perbarui Sekarang",
-  "creatorSupportedSuccess": "Kreator berhasil didukung! Pembelian Anda di masa mendatang akan berkontribusi untuk mereka."
+  "creatorSupportedSuccess": "Kreator berhasil didukung! Pembelian Anda di masa mendatang akan berkontribusi untuk mereka.",
+  "kurdish": "Kurdish",
+  "dutch": "Dutch",
+  "russian": "Russian"
 }

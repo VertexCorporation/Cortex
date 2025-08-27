@@ -1,6 +1,5 @@
 {
   "@@locale": "zh",
-
   "understood": "已了解。",
   "cancel": "取消",
   "remove": "移除",
@@ -24,7 +23,6 @@
   "messageCopied": "消息已复制到剪贴板。",
   "storeUnavailable": "商店当前不可用。请稍后再试",
   "retry": "重试",
-
   "systemInfo": "系统信息",
   "deviceMemory": "设备内存: {memory} GB",
   "storageSpace": "存储空间: {storage} GB",
@@ -37,7 +35,6 @@
   "totalMemory": "总内存",
   "usedMemory": "已用内存",
   "requirements": "要求",
-
   "modelsTitle": "库",
   "localModels": "本地模型",
   "serverSideModels": "在线模型",
@@ -54,12 +51,10 @@
   "myModels": "我的模型",
   "create": "创建",
   "seeAll": "查看全部",
-
   "modelProducer": "开发者: {producer}",
   "modelRAM": "内存: {ram}",
   "modelSize": "大小: {size}",
   "modelDescription": "{description}",
-
   "conversationsTitle": "对话",
   "conversationDeleted": "对话已删除。",
   "conversationUpdated": "对话已更新。",
@@ -80,7 +75,6 @@
   "youReachedConversationLimit": "您已达到对话数量上限。",
   "today": "今天",
   "yesterday": "昨天",
-
   "loginToYourAccount": "登录",
   "createYourAccount": "注册",
   "email": "邮箱",
@@ -89,7 +83,7 @@
   "invalidEmail": "请输入有效的邮箱地址。",
   "invalidPassword": "密码长度至少为6个字符。",
   "rememberMe": "记住我",
-  "forgotPassword": "忘记密码?",
+  "forgotPassword": "忘记密码？",
   "or": "或",
   "continueWithGoogle": "使用 Google 继续",
   "dontHaveAccount": "还没有账户？",
@@ -108,7 +102,6 @@
   "authenticationFailed": "认证失败。请重试。",
   "emailTooLong": "邮箱最多可包含30个字符。",
   "deviceLimitReached": "您已达到此设备的账户创建上限。",
-
   "verificationEmailLimitReached": "我们不会再发送邮件",
   "verificationEmailSent": "验证邮件已发送！",
   "emailNotVerified": "邮箱尚未验证",
@@ -129,7 +122,6 @@
   "accountDeletionRequested": "您的帐户删除请求已收到，您的帐户现已被禁用。",
   "tooManyRequests": "请求过于频繁",
   "regenerate": "重新生成",
-
   "confirmDeleteAccount": "您确定要删除您的账户吗？",
   "enterPasswordToDelete": "输入您的密码以删除。",
   "deleteAccount": "删除账户",
@@ -138,7 +130,6 @@
   "passwordRequired": "需要密码。",
   "deleteDescription": "您删除的数据将从我们的服务器和您的设备中永久移除。此操作无法撤销。",
   "deleteAccountButton": "账户删除按钮",
-
   "editProfile": "编辑个人资料",
   "displayName": "显示名称",
   "tapToChangeProfilePicture": "点击更换头像",
@@ -155,7 +146,6 @@
   "languageDescription": "您可以随时更改您的默认应用界面语言。",
   "themeDescription": "您可以根据偏好在浅色和深色主题之间切换。所选主题将应用于整个 Cortex 界面。",
   "iHaveReadAndAgree": "我已阅读并同意服务条款",
-
   "downloading": "下载中...",
   "downloadError": "下载过程中出错。",
   "downloadCancelled": "下载已取消。",
@@ -170,7 +160,6 @@
     }
   },
   "downloadPaused": "下载已暂停。",
-
   "purchaseSuccessful": "购买成功！",
   "purchaseFailed": "购买失败",
   "creditProductNotFound": "找不到所选的积分产品。",
@@ -184,7 +173,6 @@
   "annual": "年度",
   "monthly": "月度",
   "manageSubscription": "管理订阅",
-
   "purchasePlan": "购买 {planName}",
   "@purchasePlan": {
     "description": "用于购买特定订阅计划的按钮文本。",
@@ -195,7 +183,6 @@
       }
     }
   },
-
   "discountOffer": "优惠 {percent}%",
   "@discountOffer": {
     "placeholders": {
@@ -204,7 +191,6 @@
       }
     }
   },
-
   "annualPlanDescription": "每月{price}，按年计费",
   "@annualPlanDescription": {
     "description": "年度计划的描述，显示等效的月度价格以使其看起来更实惠。例如：$4.17/月，按年计费",
@@ -277,7 +263,6 @@
     }
   },
   "subscribedPlan": "已订阅",
-
   "errorResponseNotReceived": "未收到响应",
   "googleApiRequestFailed": "Google API 请求失败 {attempt} 次: {error}",
   "@googleApiRequestFailed": {
@@ -383,11 +368,9 @@
       }
     }
   },
-
   "termsOfServiceAndPrivacyPolicyWarning": "下订单即表示您同意服务条款和隐私政策。您可以点击此文本以了解有关我们服务条款和隐私政策的更多信息。订阅将自动续订，除非在当前周期结束前至少24小时关闭自动续订。",
   "termsOfService": "服务条款",
   "privacyPolicy": "隐私政策",
-
   "report": "举报",
   "reportDialogTitle": "提交举报",
   "reportDescriptionLabel": "问题是什么？",
@@ -397,8 +380,6 @@
   "closeButton": "关闭",
   "submitButton": "提交",
   "reportErrorMessage": "请选择一个举报原因。",
-
-
   "capabilitiesSection": "能力",
   "ratingsSection": "评级",
   "noRatingDataFound": "未找到评级数据",
@@ -420,8 +401,6 @@
   "estimated": "估计",
   "finalPreparation": "正在进行最后的准备。",
   "allEvaluationsByTestTeam": "所有评估均由我们的测试团队进行",
-
-
   "shareApp": "分享应用",
   "rateUs": "给我们评分",
   "share": "分享",
@@ -431,8 +410,6 @@
   "selectText": "选择文本",
   "showLatex": "显示特殊符号",
   "hideLatex": "隐藏特殊符号",
-
-
   "thinking": "思考中",
   "user": "用户",
   "voice": "语音",
@@ -523,7 +500,6 @@
   "edit": "编辑",
   "editingMessageInfo": "编辑此消息将从这里重新开始对话。",
   "editingNotification": "您现在处于编辑模式",
-
   "featureIndulgentTitle": "宽容",
   "featureIndulgentDescription": "该模型可以无缝容纳和处理超过100,000个令牌的上下文，使其能够处理大量详细的输入而不会影响性能。",
   "featurePluralTitle": "多元",
@@ -532,7 +508,6 @@
   "featureWiseDescription": "该模型可以利用深入的分析见解和前瞻性推理，为决策和复杂问题解决提供复杂的支持。",
   "featureResearcherTitle": "研究员",
   "featureResearcherDescription": "此功能专为配备先进研究和分析能力的模型提供，旨在在不同领域提供高精度的见解和全面的分析。",
-
   "nameLabel": "AI 名称",
   "nameHint": "输入您的 AI 名称",
   "summaryLabel": "AI 摘要",
@@ -544,12 +519,10 @@
   "preInputDescription": "请设置一个预输入，以指导您的模型进行角色创建过程。在本节中，您可以包含与角色相关的信息、其他上下文以及任何可能有助于生成与角色相关内容的其他细节。",
   "baseModelTitle": "基础模型",
   "baseModelDescription": "这是将用作您创作基础的模型。它显示当前选定的基础模型。",
-
   "summary": "摘要",
   "characterPoliceTitle": "警察",
   "characterPoliceRole": "你是一名警惕的执法者，致力于保护公民和维护秩序，以坚定不移的承诺，你是一名警察",
   "characterPoliceShortDescription": "一名坚定而勇敢的执法者。",
-
   "purchaseSubscription": "购买",
   "modelUploadTitle": "人工智能文件",
   "modelUploadDescription": "直接从您的设备选择并上传本地 GGUF 文件。这使您可以在没有互联网连接的情况下离线运行模型。请确保文件是有效的 GGUF 格式且结构正确。如果文件不正确或损坏，Cortex 可能无法正常工作，您可能会遇到错误。",
@@ -599,7 +572,6 @@
   "errorApiAuthentication": "认证失败。请尝试重新登录。",
   "baseModelForCharacterDescription": "所选的基础模型将决定角色的推理和响应能力。",
   "selectBaseModel": "选择基础模型",
-
   "@errorUserNotAuthenticated": {},
   "@errorInsufficientCredits": {},
   "@errorRateLimitExceeded": {},
@@ -607,16 +579,11 @@
   "@errorNetwork": {},
   "@errorApiAuthentication": {},
   "@baseModelForCharacterDescription": {},
-
-  "forgotPassword": "忘记密码？",
   "couldNotOpenLink": "无法打开链接",
-
   "downloadStarted": "下载已开始",
   "notAvailable": "不可用",
-
   "localizationWarning": "某些信息可能没有您的语言版本，将以英语显示。",
   "aiTranslationWarning": "模型信息由其他 AI 模型翻译成多种语言。因此，除英语外，其他语言版本可能会出现细微不一致。",
-
   "errorLoadingTitle": "加载数据失败",
   "@errorLoadingTitle": {
     "description": "模型数据无法获取时错误屏幕的标题。"
@@ -633,7 +600,6 @@
   "creditsInfoPanelBody": "积分用于与在线模特聊天。告诉你一声，你发送给她们的每一条消息都会让我们付出成本。\n\n• 发送给在线模特每条消息花费20积分。\n• 包含一张图片额外增加30积分。\n• 免费计划用户每天可获得200积分奖励，每日重置。",
   "creditsInfoPanelFooter": "聊天愉快！",
   "disclaimerMessage": "人工智能可能会犯错，请核对重要信息。",
-
   "modelCreatedSuccess": "模型创建成功！",
   "modelRemovedSuccess": "“{modelName}”已成功删除。",
   "errorCreatingModel": "创建模型时发生了意外错误。",
@@ -679,5 +645,8 @@
   "updateRequiredTitle": "需要更新",
   "updateRequiredMessage": "为继续使用 Cortex，请将应用更新至最新版本以获取新功能和重要改进。",
   "updateNowButton": "立即更新",
-  "creatorSupportedSuccess": "成功支持了创作者！您未来的购买将为他们提供支持。"
+  "creatorSupportedSuccess": "成功支持了创作者！您未来的购买将为他们提供支持。",
+  "kurdish": "Kurdish",
+  "dutch": "Dutch",
+  "russian": "Russian"
 }

@@ -196,7 +196,11 @@ class Cortex extends StatelessWidget {
         Locale('es'), // Spanish
         Locale('it'), // Italian
         Locale('ja'), // Japanese
-
+        Locale('ar'), // Arabic
+        Locale('ku'), // Kurdish
+        Locale('nl'), // Dutch
+        Locale('ru'), // Russian
+        Locale('ko'), // Korean
       ],
       localizationsDelegates: const [
         AppLocalizations.delegate,

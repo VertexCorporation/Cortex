@@ -1,6 +1,5 @@
 {
   "@@locale": "fr",
-
   "understood": "Compris.",
   "cancel": "Annuler",
   "remove": "Supprimer",
@@ -24,7 +23,6 @@
   "messageCopied": "Message copié dans le presse-papiers.",
   "storeUnavailable": "La boutique est actuellement indisponible. Veuillez réessayer plus tard",
   "retry": "Réessayer",
-
   "systemInfo": "Informations système",
   "deviceMemory": "Mémoire de l'appareil : {memory} Go",
   "storageSpace": "Espace de stockage : {storage} Go",
@@ -37,7 +35,6 @@
   "totalMemory": "Mémoire totale",
   "usedMemory": "Mémoire utilisée",
   "requirements": "Prérequis",
-
   "modelsTitle": "Bibliothèque",
   "localModels": "Modèles Locaux",
   "serverSideModels": "Modèles en Ligne",
@@ -54,12 +51,10 @@
   "myModels": "Mes Modèles",
   "create": "Créer",
   "seeAll": "Voir Tout",
-
   "modelProducer": "Producteur : {producer}",
   "modelRAM": "RAM : {ram}",
   "modelSize": "Taille : {size}",
   "modelDescription": "{description}",
-
   "conversationsTitle": "Conversations",
   "conversationDeleted": "Conversation supprimée.",
   "conversationUpdated": "Conversation mise à jour.",
@@ -80,7 +75,6 @@
   "youReachedConversationLimit": "Vous avez atteint la limite de conversations.",
   "today": "Aujourd'hui",
   "yesterday": "Hier",
-
   "loginToYourAccount": "Connexion",
   "createYourAccount": "S'inscrire",
   "email": "E-mail",
@@ -108,7 +102,6 @@
   "authenticationFailed": "Échec de l'authentification. Veuillez réessayer.",
   "emailTooLong": "L'e-mail ne peut pas dépasser 30 caractères.",
   "deviceLimitReached": "Vous avez atteint la limite de création de comptes pour cet appareil.",
-
   "verificationEmailLimitReached": "Nous n'en enverrons plus",
   "verificationEmailSent": "E-mail de vérification envoyé !",
   "emailNotVerified": "L'e-mail n'a pas été vérifié",
@@ -129,7 +122,6 @@
   "accountDeletionRequested": "Votre demande de suppression de compte a été reçue et votre compte est maintenant désactivé.",
   "tooManyRequests": "Trop de requêtes",
   "regenerate": "Régénérer",
-
   "confirmDeleteAccount": "Êtes-vous sûr de vouloir supprimer votre compte ?",
   "enterPasswordToDelete": "Entrez votre mot de passe pour supprimer.",
   "deleteAccount": "Supprimer le Compte",
@@ -138,7 +130,6 @@
   "passwordRequired": "Le mot de passe est requis.",
   "deleteDescription": "Les données que vous supprimez seront définitivement retirées de notre serveur et de votre appareil. Cette action est irréversible.",
   "deleteAccountButton": "Bouton de suppression de compte",
-
   "editProfile": "Modifier le Profil",
   "displayName": "Nom d'affichage",
   "tapToChangeProfilePicture": "Appuyez pour changer la photo de profil",
@@ -155,7 +146,6 @@
   "languageDescription": "Vous pouvez changer la langue par défaut de l'interface de l'application à tout moment.",
   "themeDescription": "Vous pouvez basculer entre les thèmes clair et sombre selon vos préférences. Le thème sélectionné s'appliquera à toute l'interface de Cortex.",
   "iHaveReadAndAgree": "J'ai lu et j'accepte les conditions d'utilisation",
-
   "downloading": "Téléchargement en cours...",
   "downloadError": "Une erreur est survenue pendant le téléchargement.",
   "downloadCancelled": "Téléchargement annulé.",
@@ -164,7 +154,6 @@
   "downloadFailed": "Échec du téléchargement",
   "downloaded": "{percent}% téléchargé",
   "downloadPaused": "Téléchargement en pause.",
-
   "purchaseSuccessful": "Achat réussi !",
   "purchaseFailed": "Achat échoué",
   "creditProductNotFound": "Le produit de crédit sélectionné n'a pas pu être trouvé.",
@@ -178,7 +167,6 @@
   "annual": "Annuel",
   "monthly": "Mensuel",
   "manageSubscription": "Gérer l'abonnement",
-
   "purchasePlan": "Acheter {planName}",
   "discountOffer": "{percent}% DE RÉDUCTION",
   "annualPlanDescription": "{price}/mois, facturé annuellement",
@@ -223,7 +211,6 @@
   "buyCredit": "Acheter des Crédits",
   "buyCreditPackage": "Acheter {amount} Crédits",
   "subscribedPlan": "Abonné",
-
   "errorResponseNotReceived": "Réponse non reçue",
   "googleApiRequestFailed": "La requête à l'API Google a échoué {attempt} fois : {error}",
   "openRouterResponseStatus": "Statut de la réponse OpenRouter : {statusCode}",
@@ -237,11 +224,9 @@
   "pleaseWaitBeforeTryingAgain": "Veuillez patienter un moment avant de réessayer",
   "openRouterQuotaExceeded": "Quota dépassé. Code de statut : {statusCode}, Corps : {decodedBody}",
   "openRouterApiRequestFailedAfterPaidAttempts": "La requête API a échoué après {attempts} tentatives payantes. Erreur : {error}",
-
   "termsOfServiceAndPrivacyPolicyWarning": "En passant cette commande, vous acceptez les Conditions d'Utilisation et la Politique de Confidentialité. Vous pouvez cliquer sur ce texte pour en savoir plus sur nos Conditions d'Utilisation et notre Politique de Confidentialité. L'abonnement se renouvellera automatiquement sauf si le renouvellement automatique est désactivé au moins 24 heures avant la fin de la période en cours.",
   "termsOfService": "Conditions d'Utilisation",
   "privacyPolicy": "Politique de Confidentialité",
-
   "report": "Signaler",
   "reportDialogTitle": "Soumettre un signalement",
   "reportDescriptionLabel": "Quel est le problème ?",
@@ -251,7 +236,6 @@
   "closeButton": "Fermer",
   "submitButton": "Soumettre",
   "reportErrorMessage": "Veuillez sélectionner une raison pour le signalement.",
-
   "capabilitiesSection": "Capacités",
   "ratingsSection": "Évaluations",
   "noRatingDataFound": "Aucune donnée d'évaluation trouvée",
@@ -273,7 +257,6 @@
   "estimated": "estimé",
   "finalPreparation": "Les derniers préparatifs sont en cours.",
   "allEvaluationsByTestTeam": "Toutes les évaluations ont été faites par notre équipe de test",
-
   "shareApp": "Partager l'application",
   "rateUs": "Nous évaluer",
   "share": "Partager",
@@ -283,7 +266,6 @@
   "selectText": "Sélectionner le texte",
   "showLatex": "Afficher les symboles spéciaux",
   "hideLatex": "Masquer les symboles spéciaux",
-
   "thinking": "Réflexion en cours",
   "user": "Utilisateur",
   "voice": "Voix",
@@ -374,7 +356,6 @@
   "edit": "Modifier",
   "editingMessageInfo": "La modification de ce message redémarrera la conversation à partir d'ici.",
   "editingNotification": "Vous êtes maintenant en mode édition",
-
   "featureIndulgentTitle": "Indulgent",
   "featureIndulgentDescription": "Ce modèle peut gérer et traiter de manière transparente des contextes dépassant 100 000 tokens, lui permettant de traiter des entrées volumineuses et détaillées sans compromettre les performances.",
   "featurePluralTitle": "Pluriel",
@@ -383,7 +364,6 @@
   "featureWiseDescription": "Ce modèle peut s'appuyer sur des analyses approfondies et un raisonnement visionnaire pour fournir un soutien sophistiqué à la prise de décision et à la résolution de problèmes complexes.",
   "featureResearcherTitle": "Chercheur",
   "featureResearcherDescription": "Disponible exclusivement dans les modèles dotés de capacités de recherche et d'analyse avancées, cette fonctionnalité est conçue pour fournir des informations de haute précision et une analyse complète dans divers domaines.",
-
   "nameLabel": "Nom de l'IA",
   "nameHint": "Entrez le nom de votre IA",
   "summaryLabel": "Résumé de l'IA",
@@ -395,12 +375,10 @@
   "preInputDescription": "Veuillez définir une pré-saisie qui guidera votre modèle dans le processus de création de personnage. Dans cette section, vous pouvez inclure des informations relatives au personnage, un contexte supplémentaire et tout autre détail pouvant aider à générer du contenu lié au personnage.",
   "baseModelTitle": "Modèle de Base",
   "baseModelDescription": "C'est le modèle qui sera utilisé comme base pour votre création. Il affiche le modèle de base actuellement sélectionné.",
-
   "summary": "Résumé",
   "characterPoliceTitle": "Police",
   "characterPoliceRole": "Vous êtes un agent de la loi vigilant, dévoué à la protection des citoyens et au maintien de l'ordre avec un engagement sans faille, vous êtes un policier",
   "characterPoliceShortDescription": "Un agent de la loi loyal et courageux.",
-
   "purchaseSubscription": "Acheter",
   "modelUploadTitle": "Fichier d'Intelligence Artificielle",
   "modelUploadDescription": "Sélectionnez et téléversez vos fichiers GGUF locaux directement depuis votre appareil. Cela vous permet d'exécuter votre modèle hors ligne sans avoir besoin d'une connexion Internet. Assurez-vous que le fichier est au format GGUF valide et correctement structuré. Si le fichier est incorrect ou corrompu, Cortex pourrait ne pas fonctionner comme prévu et vous pourriez rencontrer des erreurs.",
@@ -442,16 +420,11 @@
   "errorApiAuthentication": "L'authentification a échoué. Veuillez essayer de vous reconnecter.",
   "baseModelForCharacterDescription": "Le modèle de base sélectionné déterminera les capacités de raisonnement et de réponse du personnage.",
   "selectBaseModel": "Sélectionner un Modèle de Base",
-
-  "forgotPassword": "Mot de passe oublié ?",
   "couldNotOpenLink": "Impossible d'ouvrir le lien",
-
   "downloadStarted": "Téléchargement démarré",
   "notAvailable": "Non disponible",
-
   "localizationWarning": "Certaines informations peuvent ne pas être disponibles dans votre langue et seront affichées en anglais.",
   "aiTranslationWarning": "Les informations sur le modèle sont traduites dans différentes langues par d'autres modèles d'IA. Par conséquent, des incohérences mineures peuvent survenir dans les langues autres que l'anglais.",
-
   "errorLoadingTitle": "Échec du chargement des données",
   "errorLoadingMessage": "Nous n'avons pas pu récupérer les données nécessaires de nos serveurs. Veuillez vérifier votre connexion Internet et réessayer.",
   "noModelsFoundTitle": "Aucun résultat",
@@ -462,7 +435,6 @@
   "creditsInfoPanelBody": "Les crédits sont utilisés pour discuter avec des modèles en ligne. Juste pour que vous le sachiez, chaque message que vous leur envoyez nous coûte de l'argent.\n\n• Chaque message envoyé à un modèle en ligne coûte 20 crédits.\n• Inclure une image ajoute 30 crédits supplémentaires.\n• Les utilisateurs du plan gratuit reçoivent un bonus de 200 crédits qui se réinitialise quotidiennement.",
   "creditsInfoPanelFooter": "Bonnes discussions !",
   "disclaimerMessage": "Les intelligences artificielles peuvent faire des erreurs, vérifiez les informations importantes.",
-
   "modelCreatedSuccess": "Modèle créé avec succès !",
   "modelRemovedSuccess": "« {modelName} » a été supprimé avec succès.",
   "errorCreatingModel": "Une erreur inattendue s'est produite lors de la création du modèle.",
@@ -475,9 +447,8 @@
   "verificationDelayed": "Votre achat est confirmé. Il y a un léger retard dans la mise à jour de votre compte, il apparaîtra sous peu.",
   "maintenanceTitle": "En Maintenance",
   "maintenanceMessage": "Cortex est temporairement hors ligne pendant que nous déployons d'importantes mises à jour. L'accès à l'application sera rétabli sous peu.\n\nNous vous remercions de votre patience pendant que nous améliorons votre expérience.",
-  "errorPromptFlagged": "Votre message n'a pas pu être envoyé car il a été détecté comme enfreignant les règles de la communauté.",
-  "notEnoughStorage": "Pas assez d'espace de stockage sur votre appareil pour enregistrer de nouveaux messages.",
   "errorPromptFlagged": "Votre message a été détecté comme inapproprié et n'a pas pu être envoyé.",
+  "notEnoughStorage": "Pas assez d'espace de stockage sur votre appareil pour enregistrer de nouveaux messages.",
   "errorRateLimit": "Vous avez créé trop de modèles récemment, veuillez patienter un moment avant de réessayer.",
   "errorContentFlagged": "Le modèle n'a pas pu être sauvegardé car son contenu a été signalé comme inapproprié.",
   "deleteAllConversationsDisabledInfo": "Vous ne pouvez pas supprimer toutes les conversations pendant une discussion active, veuillez d'abord quitter la discussion en cours pour continuer.",
@@ -509,5 +480,8 @@
   "updateRequiredTitle": "Mise à jour requise",
   "updateRequiredMessage": "Pour continuer à utiliser Cortex, veuillez mettre à jour l'application vers la dernière version pour bénéficier de nouvelles fonctionnalités et d'améliorations importantes.",
   "updateNowButton": "Mettre à jour",
-  "creatorSupportedSuccess": "Créateur soutenu avec succès ! Vos futurs achats contribueront à le soutenir."
+  "creatorSupportedSuccess": "Créateur soutenu avec succès ! Vos futurs achats contribueront à le soutenir.",
+  "kurdish": "Kurdish",
+  "dutch": "Dutch",
+  "russian": "Russian"
 }

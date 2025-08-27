@@ -1,6 +1,5 @@
 {
   "@@locale": "pt",
-
   "understood": "Entendido.",
   "cancel": "Cancelar",
   "remove": "Remover",
@@ -24,7 +23,6 @@
   "messageCopied": "Mensagem copiada para a área de transferência.",
   "storeUnavailable": "A loja está indisponível no momento. Por favor, tente novamente mais tarde",
   "retry": "Tentar Novamente",
-
   "systemInfo": "Informações do Sistema",
   "deviceMemory": "Memória do Dispositivo: {memory} GB",
   "storageSpace": "Espaço de Armazenamento: {storage} GB",
@@ -37,7 +35,6 @@
   "totalMemory": "Memória Total",
   "usedMemory": "Memória Usada",
   "requirements": "Requisitos",
-
   "modelsTitle": "Biblioteca",
   "localModels": "Modelos Locais",
   "serverSideModels": "Modelos Online",
@@ -54,12 +51,10 @@
   "myModels": "Os Meus Modelos",
   "create": "Criar",
   "seeAll": "Ver Todos",
-
   "modelProducer": "Produtor: {producer}",
   "modelRAM": "RAM: {ram}",
   "modelSize": "Tamanho: {size}",
   "modelDescription": "{description}",
-
   "conversationsTitle": "Conversas",
   "conversationDeleted": "Conversa eliminada.",
   "conversationUpdated": "Conversa atualizada.",
@@ -80,7 +75,6 @@
   "youReachedConversationLimit": "Atingiu o limite de conversas.",
   "today": "Hoje",
   "yesterday": "Ontem",
-
   "loginToYourAccount": "Iniciar Sessão",
   "createYourAccount": "Registar",
   "email": "Email",
@@ -89,7 +83,7 @@
   "invalidEmail": "Por favor, introduza um endereço de email válido.",
   "invalidPassword": "A palavra-passe deve ter pelo menos 6 caracteres.",
   "rememberMe": "Lembrar-me",
-  "forgotPassword": "Esqueceu-se da palavra-passe?",
+  "forgotPassword": "Esqueceu-se da Palavra-passe?",
   "or": "Ou",
   "continueWithGoogle": "Continuar com o Google",
   "dontHaveAccount": "Não tem uma conta?",
@@ -108,7 +102,6 @@
   "authenticationFailed": "A autenticação falhou. Por favor, tente novamente.",
   "emailTooLong": "O email pode ter no máximo 30 caracteres.",
   "deviceLimitReached": "Atingiu o limite de criação de contas para este dispositivo.",
-
   "verificationEmailLimitReached": "Não enviaremos mais",
   "verificationEmailSent": "E-mail de verificação enviado!",
   "emailNotVerified": "O e-mail não foi verificado",
@@ -129,7 +122,6 @@
   "accountDeletionRequested": "O seu pedido de eliminação de conta foi recebido e a sua conta está agora desativada.",
   "tooManyRequests": "Demasiados pedidos",
   "regenerate": "Regenerar",
-
   "confirmDeleteAccount": "Tem a certeza de que quer eliminar a sua conta?",
   "enterPasswordToDelete": "Introduza a sua palavra-passe para eliminar.",
   "deleteAccount": "Eliminar Conta",
@@ -138,7 +130,6 @@
   "passwordRequired": "A palavra-passe é obrigatória.",
   "deleteDescription": "Os dados que eliminar serão removidos permanentemente do nosso servidor e do seu dispositivo. Estas ações não podem ser desfeitas.",
   "deleteAccountButton": "Botão de Eliminação de Conta",
-
   "editProfile": "Editar Perfil",
   "displayName": "Nome de Exibição",
   "tapToChangeProfilePicture": "Toque para alterar a foto de perfil",
@@ -155,7 +146,6 @@
   "languageDescription": "Pode alterar o idioma de interface padrão da aplicação a qualquer momento.",
   "themeDescription": "Pode alternar entre os temas claro e escuro conforme preferir. O tema selecionado será aplicado em toda a interface do Cortex.",
   "iHaveReadAndAgree": "Li e concordo com os termos de serviço",
-
   "downloading": "A baixar...",
   "downloadError": "Ocorreu um erro durante o download.",
   "downloadCancelled": "Download cancelado.",
@@ -170,7 +160,6 @@
     }
   },
   "downloadPaused": "Download em pausa.",
-
   "purchaseSuccessful": "Compra bem-sucedida!",
   "purchaseFailed": "Compra sem sucesso",
   "creditProductNotFound": "O produto de crédito selecionado não pôde ser encontrado.",
@@ -184,27 +173,24 @@
   "annual": "Anual",
   "monthly": "Mensal",
   "manageSubscription": "Gerir Subscrição",
-
   "purchasePlan": "Comprar {planName}",
   "@purchasePlan": {
-      "description": "Texto do botão para comprar um plano de subscrição específico.",
-      "placeholders": {
-          "planName": {
-              "type": "String",
-              "example": "Pro Anual"
-          }
+    "description": "Texto do botão para comprar um plano de subscrição específico.",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "Pro Anual"
       }
+    }
   },
-
   "discountOffer": "{percent}% DE DESCONTO",
-    "@discountOffer": {
-      "placeholders": {
-        "percent": {
-          "type": "int"
-        }
+  "@discountOffer": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
       }
-    },
-
+    }
+  },
   "annualPlanDescription": "{price}/mês, faturado anualmente",
   "@annualPlanDescription": {
     "description": "A descrição para o plano anual, mostrando o preço mensal equivalente para parecer mais acessível. Exemplo: 4,17€/mês, faturado anualmente",
@@ -277,7 +263,6 @@
     }
   },
   "subscribedPlan": "Subscrito",
-
   "errorResponseNotReceived": "Resposta não recebida",
   "googleApiRequestFailed": "O pedido à API da Google falhou {attempt} vezes: {error}",
   "@googleApiRequestFailed": {
@@ -383,11 +368,9 @@
       }
     }
   },
-
   "termsOfServiceAndPrivacyPolicyWarning": "Ao fazer este pedido, concorda com os Termos de Serviço e a Política de Privacidade. Pode clicar neste texto para saber mais sobre os nossos Termos de Serviço e Política de Privacidade. A subscrição será renovada automaticamente, a menos que a renovação automática seja desativada pelo menos 24 horas antes do final do período atual.",
   "termsOfService": "Termos de Serviço",
   "privacyPolicy": "Política de Privacidade",
-
   "report": "Reportar",
   "reportDialogTitle": "Enviar Relatório",
   "reportDescriptionLabel": "Qual é o problema?",
@@ -397,8 +380,6 @@
   "closeButton": "Fechar",
   "submitButton": "Enviar",
   "reportErrorMessage": "Por favor, selecione um motivo para o relatório.",
-
-
   "capabilitiesSection": "Capacidades",
   "ratingsSection": "Avaliações",
   "noRatingDataFound": "Nenhum dado de avaliação encontrado",
@@ -420,8 +401,6 @@
   "estimated": "estimado",
   "finalPreparation": "Os preparativos finais estão a ser feitos.",
   "allEvaluationsByTestTeam": "Todas as avaliações foram feitas pela nossa equipa de testes",
-
-
   "shareApp": "Partilhar a App",
   "rateUs": "Avalie-nos",
   "share": "Partilhar",
@@ -431,8 +410,6 @@
   "selectText": "Selecionar Texto",
   "showLatex": "Mostrar Símbolos Especiais",
   "hideLatex": "Ocultar Símbolos Especiais",
-
-
   "thinking": "A pensar",
   "user": "Utilizador",
   "voice": "Voz",
@@ -523,7 +500,6 @@
   "edit": "Editar",
   "editingMessageInfo": "Editar esta mensagem irá reiniciar a conversa a partir daqui.",
   "editingNotification": "Está agora em modo de edição",
-
   "featureIndulgentTitle": "Indulgente",
   "featureIndulgentDescription": "Este modelo pode acomodar e processar contextos que excedem 100.000 tokens, permitindo-lhe lidar com entradas extensas e detalhadas sem comprometer o desempenho.",
   "featurePluralTitle": "Plural",
@@ -532,7 +508,6 @@
   "featureWiseDescription": "Este modelo pode alavancar insights analíticos profundos e raciocínio prospetivo para fornecer suporte sofisticado para a tomada de decisões e resolução de problemas complexos.",
   "featureResearcherTitle": "Pesquisador",
   "featureResearcherDescription": "Disponível exclusivamente em modelos equipados com capacidades avançadas de pesquisa e análise, esta funcionalidade foi concebida para fornecer insights de alta precisão e análise abrangente em diversos domínios.",
-
   "nameLabel": "Nome da IA",
   "nameHint": "Introduza o nome da sua IA",
   "summaryLabel": "Resumo da IA",
@@ -544,12 +519,10 @@
   "preInputDescription": "Por favor, defina uma pré-entrada que guiará o seu modelo no processo de criação de personagens. Nesta secção, pode incluir informações relacionadas com o personagem, contexto adicional e quaisquer detalhes extras que possam ajudar a gerar conteúdo relacionado com o personagem.",
   "baseModelTitle": "Modelo Base",
   "baseModelDescription": "Este é o modelo que será usado como base para a sua criação. Exibe o modelo base atualmente selecionado.",
-
   "summary": "Resumo",
   "characterPoliceTitle": "Polícia",
   "characterPoliceRole": "Você é um vigilante aplicador da lei, dedicado a proteger os cidadãos e a manter a ordem com um compromisso inabalável, você é um polícia",
   "characterPoliceShortDescription": "Um aplicador da lei firme e corajoso.",
-
   "purchaseSubscription": "Comprar",
   "modelUploadTitle": "Ficheiro de Inteligência Artificial",
   "modelUploadDescription": "Selecione e envie os seus ficheiros GGUF locais diretamente do seu dispositivo. Isto permite-lhe executar o seu modelo offline sem necessitar de uma ligação à internet. Certifique-se de que o ficheiro está no formato GGUF válido e devidamente estruturado. Se o ficheiro estiver incorreto ou corrompido, o Cortex pode não funcionar como esperado, e poderá encontrar erros.",
@@ -599,7 +572,6 @@
   "errorApiAuthentication": "A autenticação falhou. Por favor, tente iniciar sessão novamente.",
   "baseModelForCharacterDescription": "O modelo base selecionado determinará as capacidades de raciocínio e resposta do personagem.",
   "selectBaseModel": "Selecione um Modelo Base",
-
   "@errorUserNotAuthenticated": {},
   "@errorInsufficientCredits": {},
   "@errorRateLimitExceeded": {},
@@ -607,16 +579,11 @@
   "@errorNetwork": {},
   "@errorApiAuthentication": {},
   "@baseModelForCharacterDescription": {},
-
-  "forgotPassword": "Esqueceu-se da Palavra-passe?",
   "couldNotOpenLink": "Não foi possível abrir o link",
-
   "downloadStarted": "Download iniciado",
   "notAvailable": "Não Disponível",
-
   "localizationWarning": "Algumas informações podem não estar disponíveis no seu idioma e serão exibidas em inglês.",
   "aiTranslationWarning": "As informações do modelo são traduzidas para vários idiomas por outros modelos de IA. Portanto, podem ocorrer pequenas inconsistências em idiomas que não o inglês.",
-
   "errorLoadingTitle": "Falha ao Carregar Dados",
   "@errorLoadingTitle": {
     "description": "Título para o ecrã de erro quando os dados do modelo não podem ser obtidos."
@@ -678,5 +645,8 @@
   "updateRequiredTitle": "Atualização Necessária",
   "updateRequiredMessage": "Para continuar usando o Cortex, atualize o aplicativo para a versão mais recente para obter novos recursos e melhorias importantes.",
   "updateNowButton": "Atualizar Agora",
-  "creatorSupportedSuccess": "Criador apoiado com sucesso! Suas compras futuras irão contribuir para ele."
+  "creatorSupportedSuccess": "Criador apoiado com sucesso! Suas compras futuras irão contribuir para ele.",
+  "kurdish": "Kurdish",
+  "dutch": "Dutch",
+  "russian": "Russian"
 }

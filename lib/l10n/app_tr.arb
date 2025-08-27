@@ -1,6 +1,5 @@
 {
   "@@locale": "tr",
-
   "understood": "Anlaşıldı.",
   "cancel": "İptal",
   "remove": "Kaldır",
@@ -24,7 +23,6 @@
   "messageCopied": "Mesaj panoya kopyalandı.",
   "storeUnavailable": "Mağaza şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.",
   "retry": "Tekrar Dene",
-
   "systemInfo": "Sistem Bilgileri",
   "deviceMemory": "Cihaz Belleği: {memory} GB",
   "storageSpace": "Depolama Alanı: {storage} GB",
@@ -37,7 +35,6 @@
   "totalMemory": "Toplam Bellek",
   "usedMemory": "Kullanılan Bellek",
   "requirements": "Gereksinimler",
-
   "modelsTitle": "Kütüphane",
   "localModels": "Yerel Modeller",
   "serverSideModels": "Çevrimiçi Modeller",
@@ -54,12 +51,10 @@
   "myModels": "Modellerim",
   "create": "Oluştur",
   "seeAll": "Tümünü Gör",
-
   "modelProducer": "Üretici: {producer}",
   "modelRAM": "RAM: {ram}",
   "modelSize": "Boyut: {size}",
   "modelDescription": "{description}",
-
   "conversationsTitle": "Sohbetler",
   "conversationDeleted": "Sohbet silindi.",
   "conversationUpdated": "Sohbet güncellendi.",
@@ -80,7 +75,6 @@
   "youReachedConversationLimit": "Sohbet limitine ulaştınız.",
   "today": "Bugün",
   "yesterday": "Dün",
-
   "loginToYourAccount": "Giriş Yap",
   "createYourAccount": "Kayıt Ol",
   "email": "E-posta",
@@ -89,7 +83,7 @@
   "invalidEmail": "Lütfen geçerli bir e-posta adresi girin.",
   "invalidPassword": "Şifre en az 6 karakter uzunluğunda olmalıdır.",
   "rememberMe": "Beni hatırla",
-  "forgotPassword": "Şifreni mi unuttun?",
+  "forgotPassword": "Şifremi Unuttum?",
   "or": "Veya",
   "continueWithGoogle": "Google ile Devam Et",
   "dontHaveAccount": "Hesabın yok mu?",
@@ -108,7 +102,6 @@
   "authenticationFailed": "Kimlik doğrulama başarısız oldu. Lütfen tekrar deneyin.",
   "emailTooLong": "E-posta en fazla 30 karakter olabilir.",
   "deviceLimitReached": "Bu cihaz için hesap oluşturma limitine ulaştınız.",
-
   "verificationEmailLimitReached": "Daha fazla göndermeyeceğiz",
   "verificationEmailSent": "Doğrulama e-postası gönderildi!",
   "emailNotVerified": "E-posta doğrulanmadı",
@@ -129,7 +122,6 @@
   "accountDeletionRequested": "Hesap silme talebiniz alındı ve hesabınız şimdi devre dışı bırakıldı.",
   "tooManyRequests": "Çok fazla istek",
   "regenerate": "Yeniden Oluştur",
-
   "confirmDeleteAccount": "Hesabınızı silmek istediğinizden emin misiniz?",
   "enterPasswordToDelete": "Silmek için şifrenizi girin.",
   "deleteAccount": "Hesabı Sil",
@@ -138,7 +130,6 @@
   "passwordRequired": "Şifre gerekli.",
   "deleteDescription": "Sildiğiniz veriler sunucumuzdan ve cihazınızdan kalıcı olarak kaldırılacaktır. Bu eylemler geri alınamaz.",
   "deleteAccountButton": "Hesap Silme Butonu",
-
   "editProfile": "Profili Düzenle",
   "displayName": "Görünen Ad",
   "tapToChangeProfilePicture": "Profil resmini değiştirmek için dokun",
@@ -155,7 +146,6 @@
   "languageDescription": "Varsayılan uygulama arayüz dilinizi istediğiniz zaman değiştirebilirsiniz.",
   "themeDescription": "Tercihinize göre aydınlık ve karanlık temalar arasında geçiş yapabilirsiniz. Seçilen tema Cortex arayüzü genelinde uygulanacaktır.",
   "iHaveReadAndAgree": "Hizmet şartlarını okudum ve kabul ediyorum",
-
   "downloading": "İndiriliyor...",
   "downloadError": "İndirme sırasında bir hata oluştu.",
   "downloadCancelled": "İndirme iptal edildi.",
@@ -170,7 +160,6 @@
     }
   },
   "downloadPaused": "İndirme duraklatıldı.",
-
   "purchaseSuccessful": "Satın alma başarılı!",
   "purchaseFailed": "Satın alma başarısız",
   "creditProductNotFound": "Seçilen kredi ürünü bulunamadı.",
@@ -184,7 +173,6 @@
   "annual": "Yıllık",
   "monthly": "Aylık",
   "manageSubscription": "Aboneliği Yönet",
-
   "purchasePlan": "{planName} Satın Al",
   "@purchasePlan": {
     "description": "Belirli bir abonelik planını satın almak için düğme metni.",
@@ -195,7 +183,6 @@
       }
     }
   },
-
   "discountOffer": "%{percent} UCUZ",
   "@discountOffer": {
     "placeholders": {
@@ -204,7 +191,6 @@
       }
     }
   },
-
   "annualPlanDescription": "{price}/ay, yıllık faturalandırılır",
   "@annualPlanDescription": {
     "description": "Yıllık planın açıklaması, daha uygun görünmesi için aylık eşdeğer fiyatı gösterir. Örnek: $4.17/ay, yıllık faturalandırılır",
@@ -277,7 +263,6 @@
     }
   },
   "subscribedPlan": "Abone Olundu",
-
   "errorResponseNotReceived": "Yanıt alınamadı",
   "googleApiRequestFailed": "Google API isteği {attempt} kez başarısız oldu: {error}",
   "@googleApiRequestFailed": {
@@ -383,11 +368,9 @@
       }
     }
   },
-
   "termsOfServiceAndPrivacyPolicyWarning": "Bu siparişi vererek, Hizmet Şartları ve Gizlilik Politikası'nı kabul etmiş olursunuz. Hizmet Şartlarımız ve Gizlilik Politikamız hakkında daha fazla bilgi edinmek için bu metne tıklayabilirsiniz. Abonelik, mevcut dönemin bitiminden en az 24 saat önce otomatik yenileme kapatılmadığı sürece otomatik olarak yenilenecektir.",
   "termsOfService": "Hizmet Şartları",
   "privacyPolicy": "Gizlilik Politikası",
-
   "report": "Rapor Et",
   "reportDialogTitle": "Rapor Gönder",
   "reportDescriptionLabel": "Sorun nedir?",
@@ -397,8 +380,6 @@
   "closeButton": "Kapat",
   "submitButton": "Gönder",
   "reportErrorMessage": "Lütfen raporlama için bir neden seçin.",
-
-
   "capabilitiesSection": "Yetenekler",
   "ratingsSection": "Değerlendirmeler",
   "noRatingDataFound": "Değerlendirme verisi bulunamadı",
@@ -420,7 +401,6 @@
   "estimated": "tahmini",
   "finalPreparation": "Son hazırlıklar yapılıyor.",
   "allEvaluationsByTestTeam": "Tüm değerlendirmeler test ekibimiz tarafından yapılmıştır",
-
   "shareApp": "Uygulamayı Paylaş",
   "rateUs": "Bizi Değerlendir",
   "share": "Paylaş",
@@ -430,8 +410,6 @@
   "selectText": "Metin Seç",
   "showLatex": "Özel Sembolleri Göster",
   "hideLatex": "Özel Sembolleri Gizle",
-
-
   "thinking": "Düşünüyor",
   "user": "Kullanıcı",
   "voice": "Ses",
@@ -522,7 +500,6 @@
   "edit": "Düzenle",
   "editingMessageInfo": "Bu mesajı düzenlemek, sohbeti buradan yeniden başlatacaktır.",
   "editingNotification": "Şu anda düzenleme modundasınız",
-
   "featureIndulgentTitle": "Hoşgörülü",
   "featureIndulgentDescription": "Bu model, 100.000 jetonu aşan bağlamları sorunsuzca barındırabilir ve işleyebilir, bu da performanstan ödün vermeden kapsamlı ve ayrıntılı girdileri yönetmesini sağlar.",
   "featurePluralTitle": "Çoğulcu",
@@ -531,7 +508,6 @@
   "featureWiseDescription": "Bu model, karar verme ve karmaşık problem çözme için sofistike destek sağlamak üzere derin analitik içgörülerden ve ileri görüşlü akıl yürütmeden yararlanabilir.",
   "featureResearcherTitle": "Araştırmacı",
   "featureResearcherDescription": "Yalnızca gelişmiş araştırma ve analitik kapasitelerle donatılmış modellerde bulunan bu özellik, çeşitli alanlarda yüksek hassasiyetli içgörüler ve kapsamlı analizler sağlamak üzere tasarlanmıştır.",
-
   "nameLabel": "YZ adı",
   "nameHint": "YZ'nizin adını girin",
   "summaryLabel": "YZ Özeti",
@@ -543,12 +519,10 @@
   "preInputDescription": "Lütfen modelinizi karakter oluşturma sürecinde yönlendirecek bir ön giriş ayarlayın. Bu bölümde, karakterle ilgili bilgiler, ek bağlam ve karakterle ilgili içerik oluşturmada yardımcı olabilecek ekstra ayrıntıları ekleyebilirsiniz.",
   "baseModelTitle": "Temel Model",
   "baseModelDescription": "Bu, yaratımınız için temel olarak kullanılacak modeldir. Şu anda seçili olan temel modeli gösterir.",
-
   "summary": "Özet",
   "characterPoliceTitle": "Polis",
   "characterPoliceRole": "Sen, vatandaşları korumaya ve sarsılmaz bir bağlılıkla düzeni sağlamaya adanmış, kanunun uyanık bir uygulayıcısısın, sen bir polissin.",
   "characterPoliceShortDescription": "Kararlı ve cesur bir kanun uygulayıcısı.",
-
   "purchaseSubscription": "Satın Al",
   "modelUploadTitle": "Yapay Zeka Dosyası",
   "modelUploadDescription": "Yerel GGUF dosyalarınızı doğrudan cihazınızdan seçip yükleyin. Bu, modelinizi internet bağlantısı gerektirmeden çevrimdışı çalıştırmanızı sağlar. Dosyanın geçerli GGUF formatında ve düzgün yapılandırılmış olduğundan emin olun. Dosya yanlış veya bozuksa, Cortex beklendiği gibi çalışmayabilir ve hatalarla karşılaşabilirsiniz.",
@@ -598,7 +572,6 @@
   "errorApiAuthentication": "Kimlik doğrulama başarısız oldu. Lütfen tekrar giriş yapmayı deneyin.",
   "baseModelForCharacterDescription": "Seçilen temel model, karakterin akıl yürütme ve yanıt verme yeteneklerini belirleyecektir.",
   "selectBaseModel": "Bir Temel Model Seçin",
-
   "@errorUserNotAuthenticated": {},
   "@errorInsufficientCredits": {},
   "@errorRateLimitExceeded": {},
@@ -606,16 +579,11 @@
   "@errorNetwork": {},
   "@errorApiAuthentication": {},
   "@baseModelForCharacterDescription": {},
-
-  "forgotPassword": "Şifremi Unuttum?",
   "couldNotOpenLink": "Bağlantı açılamadı",
-
   "downloadStarted": "İndirme başlatıldı",
   "notAvailable": "Mevcut Değil",
-
   "localizationWarning": "Bazı bilgiler dilinizde mevcut olmayabilir ve İngilizce olarak gösterilecektir.",
   "aiTranslationWarning": "Model bilgileri, diğer yapay zeka modelleri tarafından çeşitli dillere çevrilmektedir. Bu nedenle, İngilizce dışındaki dillerde küçük tutarsızlıklar meydana gelebilir.",
-
   "errorLoadingTitle": "Veri Yüklenemedi",
   "@errorLoadingTitle": {
     "description": "Model verileri getirilemediğinde hata ekranı başlığı."
@@ -677,5 +645,8 @@
   "updateRequiredTitle": "Güncelleme Var",
   "updateRequiredMessage": "Cortex'i kullanmaya devam etmek için lütfen uygulamayı yeni özellikler ve önemli iyileştirmeler içeren en son sürüme güncelleyin.",
   "updateNowButton": "Şimdi Güncelle",
-  "creatorSupportedSuccess": "İçerik üretici başarıyla desteklendi! Gelecekteki satın alımlarınızla ona katkıda bulunacaksınız."
+  "creatorSupportedSuccess": "İçerik üretici başarıyla desteklendi! Gelecekteki satın alımlarınızla ona katkıda bulunacaksınız.",
+  "kurdish": "Kurdish",
+  "dutch": "Dutch",
+  "russian": "Russian"
 }

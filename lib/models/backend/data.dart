@@ -37,6 +37,7 @@ class ModelInfo {
   final String? path;
   final String? role;
   final Map<String, dynamic> modalities;
+  final Map<String, dynamic> outputs;
   final String? category;
   final Map<String, dynamic>? extensions;
   final String? baseModelId;
@@ -51,6 +52,7 @@ class ModelInfo {
     this.path,
     this.role,
     this.modalities = const {},
+    this.outputs = const {},
     this.category,
     this.extensions,
     this.baseModelId,
@@ -778,6 +780,7 @@ class ModelData {
     final String serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
     final String modelId = variantData['id'] as String? ?? seriesName;
     final Map<String, dynamic> modalities = variantData['modalities'] as Map<String, dynamic>? ?? {};
+    final Map<String, dynamic> outputs = variantData['outputs'] as Map<String, dynamic>? ?? {};
     // 1. Get the main 'details' object.
     final details = variantData['details'] as Map<String, dynamic>? ?? {};
     if (details.isEmpty) {
@@ -843,6 +846,7 @@ class ModelData {
       'baseModelId': finalBaseModelId,
       'imagePath': variantData['imagePath'],
       'modalities': modalities,
+      'outputs': outputs,
       'extensions': null,
       'size': variantData['size'],
       'ram': variantData['ram'],
@@ -884,6 +888,7 @@ class ModelData {
       final descriptionMap = variantData['description'] as Map<String,
           dynamic>? ?? {};
       final Map<String, dynamic> modalities = variantData['modalities'] as Map<String, dynamic>? ?? {};
+      final Map<String, dynamic> outputs = variantData['outputs'] as Map<String, dynamic>? ?? {};
 
       // Get the specific, detailed description for this variant.
       final String localizedVariantDesc = descriptionMap[serverLangKey] as String? ??
@@ -901,6 +906,7 @@ class ModelData {
         'summary': localizedSeriesSummary,
         'description': localizedVariantDesc,
         'modalities': modalities,
+        'outputs': outputs,
         'reasoning': variantData['reasoning'] ?? false,
         'webSearch': variantData['webSearch'] ?? false,
         ...variantData,
@@ -1370,6 +1376,48 @@ class ModelData {
     return false;
   }
 
+  /// - If called with one argument `canProduce(modelId)`:
+  ///   Returns `true` if the model can produce ANYTHING other than the default (i.e., the outputs map is not empty).
+  ///
+  /// - If called with two arguments `canProduce(modelId, 'image')`:
+  ///   Returns `true` only if the model has the SPECIFIC 'image' output capability.
+  ///
+  /// For character/self models, it intelligently checks the base model's capabilities.
+  static bool canProduce(String modelId, [String? outputType]) {
+    final modelData = getPreciseModelData(modelId);
+    final modelOutputs = modelData['outputs'] as Map<String, dynamic>? ?? {};
+
+    // Helper function to perform the actual check.
+    bool check(Map<String, dynamic> outputsMap) {
+      if (outputType == null) {
+        // Case 1: No specific output type requested. Check if the map is not empty.
+        return outputsMap.isNotEmpty;
+      } else {
+        // Case 2: A specific output type was requested. Check for that key.
+        return outputsMap[outputType] == true;
+      }
+    }
+
+    // 1. Check the model directly.
+    if (check(modelOutputs)) {
+      return true;
+    }
+
+    // 2. If it's a character, check its base model as a fallback.
+    final category = modelData['category'] as String?;
+    final isCharacter = category == 'roleplay' || category == 'self';
+    final baseModelId = modelData['baseModelId'] as String?;
+
+    if (isCharacter && baseModelId != null && baseModelId.isNotEmpty) {
+      final baseModelData = getPreciseModelData(baseModelId);
+      final baseOutputs = baseModelData['outputs'] as Map<String, dynamic>? ?? {};
+      return check(baseOutputs);
+    }
+
+    // Otherwise, the model does not have this capability.
+    return false;
+  }
+
   /// PUBLIC: Removes cached images for the given model IDs.
   /// This is the correct way to expose the functionality of the private _ModelImageCache.
   static Future<void> removeCachedImages(Iterable<String> modelIds) async {
@@ -1439,6 +1487,7 @@ class ModelData {
       'imagePath': 'assets/icons/self.svg', // Always use the SVG for fallbacks
       'type': 'online',
       'modalities': {},
+      'outputs': {},
       'extensions': null,
     };
   }

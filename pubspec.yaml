@@ -69,6 +69,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  argos_translator_offline: ^1.2.0
   flutter_launcher_icons: ^0.14.3
 
 flutter_icons:
