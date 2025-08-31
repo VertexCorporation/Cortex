@@ -633,7 +633,7 @@
   "usernameRateLimitExceeded": "You can only change your username twice every 14 days.",
   "usernameUnchanged": "This is already your current username.",
   "creditsInfoPanelTitle": "How Credits Work",
-  "creditsInfoPanelBody": "Credits are used to chat with online models. Just so you know, every message you send to them costs us money.\n\n• Each message to an online model costs 20 credits.\n• Including an image adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.",
+  "creditsInfoPanelBody": "Credits are used to chat with online models. every single message costs us cash and these credits keepin us from going broke now lets explain the system \n\n• Each message to a free online model costs 10 credits.\n• Each message to an online premium model costs 20 credits.\n• Including an attachment adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.",
   "creditsInfoPanelFooter": "Happy chatting!",
   "disclaimerMessage": "Artificial Intelligences can make mistakes, check important information.",
   "modelCreatedSuccess": "Model created successfully!",
@@ -681,5 +681,50 @@
   "updateRequiredTitle": "Update Required",
   "updateRequiredMessage": "To continue using Cortex, please update the app to the latest version for new features and important improvements.",
   "updateNowButton": "Update Now",
-  "creatorSupportedSuccess": "Creator supported successfully! Your future purchases will contribute to them."
+  "creatorSupportedSuccess": "Creator supported successfully! Your future purchases will contribute to them.",
+  "featureDocumentTitle": "Document Support",
+  "@featureDocumentTitle": {
+    "description": "Title for the feature indicating the model can process documents."
+  },
+  "featureDocumentDescription": "This model can analyze and answer questions about uploaded documents such as PDFs and text files.",
+  "@featureDocumentDescription": {
+    "description": "Description for the document support feature."
+  },
+  "featureAudioTitle": "Voice Input",
+  "@featureAudioTitle": {
+    "description": "Title for the feature indicating the model can process audio/voice."
+  },
+  "featureAudioDescription": "This model can understand and process spoken audio inputs.",
+  "@featureAudioDescription": {
+    "description": "Description for the voice input feature."
+  },
+  "featureImageGenerationTitle": "Image Generation",
+  "@featureImageGenerationTitle": {
+    "description": "Title for the feature indicating the model can create images."
+  },
+  "featureImageGenerationDescription": "This model can create original images based on your text descriptions.",
+  "@featureImageGenerationDescription": {
+    "description": "Description for the image generation feature."
+  },
+  "errorImageLoad": "Failed to load the generated image.",
+  "@errorImageLoad": {
+    "description": "Error message shown in an AI message bubble when the generated image data is corrupt or cannot be saved to the device."
+  },
+  "extensionInfoPanelTitle": "Explore Models",
+  "extensionInfoPanelBody1": "This arrow lets you switch between different models within this series.",
+  "extensionInfoPanelBody2": "When you first start a chat with this series, the default model is automatically selected and you can change your selection at any time during a chat.",
+  "extensionInfoPanelFooter": "To view detailed information about each model or to manually select a different model, please go to the Library; select this model series from there and tap the arrow at the top of its detail page.",
+  "premiumModelNoticeTitle": "Premium Model",
+  "@premiumModelNoticeTitle": {
+  "description": "Title for the notice banner shown on a premium model's detail page."
+  },
+  "premiumModelNoticeDescription": "This model is a premium model, free users are limited to 3 messages per day with premium models; subscribe to unlock unlimited access!",
+  "@premiumModelNoticeDescription": {
+  "description": "Description for the notice banner on a premium model's detail page, explaining the limitation for free users."
+  },
+  "benefitPremiumModels": "Access to premium models",
+  "@benefitPremiumModels": {
+    "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
+  },
+  "premiumTrialExhaustedMessage": "You have used all your free daily messages for premium models, please upgrade for unlimited access."
 }

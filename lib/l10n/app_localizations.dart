@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_ar.dart';
 import 'app_localizations_az.dart';
 import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
@@ -14,7 +15,11 @@ import 'app_localizations_hi.dart';
 import 'app_localizations_id.dart';
 import 'app_localizations_it.dart';
 import 'app_localizations_ja.dart';
+import 'app_localizations_ko.dart';
+import 'app_localizations_ku.dart';
+import 'app_localizations_nl.dart';
 import 'app_localizations_pt.dart';
+import 'app_localizations_ru.dart';
 import 'app_localizations_tr.dart';
 import 'app_localizations_zh.dart';
 
@@ -106,6 +111,7 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
     Locale('tr'),
+    Locale('ar'),
     Locale('az'),
     Locale('de'),
     Locale('es'),
@@ -114,7 +120,11 @@ abstract class AppLocalizations {
     Locale('id'),
     Locale('it'),
     Locale('ja'),
+    Locale('ko'),
+    Locale('ku'),
+    Locale('nl'),
     Locale('pt'),
+    Locale('ru'),
     Locale('zh')
   ];
 
@@ -1841,6 +1851,24 @@ abstract class AppLocalizations {
   /// **'Japanese'**
   String get japanese;
 
+  /// No description provided for @kurdish.
+  ///
+  /// In en, this message translates to:
+  /// **'Kurdish'**
+  String get kurdish;
+
+  /// No description provided for @dutch.
+  ///
+  /// In en, this message translates to:
+  /// **'Dutch'**
+  String get dutch;
+
+  /// No description provided for @russian.
+  ///
+  /// In en, this message translates to:
+  /// **'Russian'**
+  String get russian;
+
   /// No description provided for @korean.
   ///
   /// In en, this message translates to:
@@ -2678,7 +2706,7 @@ abstract class AppLocalizations {
   /// No description provided for @creditsInfoPanelBody.
   ///
   /// In en, this message translates to:
-  /// **'Credits are used to chat with online models. Just so you know, every message you send to them costs us money.\n\n• Each message to an online model costs 20 credits.\n• Including an image adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.'**
+  /// **'Credits are used to chat with online models. every single message costs us cash and these credits keepin us from going broke now lets explain the system \n\n• Each message to a free online model costs 10 credits.\n• Each message to an online premium model costs 20 credits.\n• Including an attachment adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.'**
   String get creditsInfoPanelBody;
 
   /// No description provided for @creditsInfoPanelFooter.
@@ -2914,6 +2942,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Creator supported successfully! Your future purchases will contribute to them.'**
   String get creatorSupportedSuccess;
+
+  /// Title for the feature indicating the model can process documents.
+  ///
+  /// In en, this message translates to:
+  /// **'Document Support'**
+  String get featureDocumentTitle;
+
+  /// Description for the document support feature.
+  ///
+  /// In en, this message translates to:
+  /// **'This model can analyze and answer questions about uploaded documents such as PDFs and text files.'**
+  String get featureDocumentDescription;
+
+  /// Title for the feature indicating the model can process audio/voice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Input'**
+  String get featureAudioTitle;
+
+  /// Description for the voice input feature.
+  ///
+  /// In en, this message translates to:
+  /// **'This model can understand and process spoken audio inputs.'**
+  String get featureAudioDescription;
+
+  /// Title for the feature indicating the model can create images.
+  ///
+  /// In en, this message translates to:
+  /// **'Image Generation'**
+  String get featureImageGenerationTitle;
+
+  /// Description for the image generation feature.
+  ///
+  /// In en, this message translates to:
+  /// **'This model can create original images based on your text descriptions.'**
+  String get featureImageGenerationDescription;
+
+  /// Error message shown in an AI message bubble when the generated image data is corrupt or cannot be saved to the device.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load the generated image.'**
+  String get errorImageLoad;
+
+  /// No description provided for @extensionInfoPanelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore Models'**
+  String get extensionInfoPanelTitle;
+
+  /// No description provided for @extensionInfoPanelBody1.
+  ///
+  /// In en, this message translates to:
+  /// **'This arrow lets you switch between different models within this series.'**
+  String get extensionInfoPanelBody1;
+
+  /// No description provided for @extensionInfoPanelBody2.
+  ///
+  /// In en, this message translates to:
+  /// **'When you first start a chat with this series, the default model is automatically selected and you can change your selection at any time during a chat.'**
+  String get extensionInfoPanelBody2;
+
+  /// No description provided for @extensionInfoPanelFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'To view detailed information about each model or to manually select a different model, please go to the Library; select this model series from there and tap the arrow at the top of its detail page.'**
+  String get extensionInfoPanelFooter;
+
+  /// Title for the notice banner shown on a premium model's detail page.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Model'**
+  String get premiumModelNoticeTitle;
+
+  /// Description for the notice banner on a premium model's detail page, explaining the limitation for free users.
+  ///
+  /// In en, this message translates to:
+  /// **'This model is a premium model, free users are limited to 3 messages per day with premium models; subscribe to unlock unlimited access!'**
+  String get premiumModelNoticeDescription;
+
+  /// A feature highlighting that the user gets access to higher-quality, premium models with this subscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Access to premium models'**
+  String get benefitPremiumModels;
+
+  /// No description provided for @premiumTrialExhaustedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have used all your free daily messages for premium models, please upgrade for unlimited access.'**
+  String get premiumTrialExhaustedMessage;
 }
 
 class _AppLocalizationsDelegate
@@ -2927,6 +3045,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) => <String>[
+        'ar',
         'az',
         'de',
         'en',
@@ -2936,7 +3055,11 @@ class _AppLocalizationsDelegate
         'id',
         'it',
         'ja',
+        'ko',
+        'ku',
+        'nl',
         'pt',
+        'ru',
         'tr',
         'zh'
       ].contains(locale.languageCode);
@@ -2948,6 +3071,8 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'ar':
+      return AppLocalizationsAr();
     case 'az':
       return AppLocalizationsAz();
     case 'de':
@@ -2966,8 +3091,16 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsIt();
     case 'ja':
       return AppLocalizationsJa();
+    case 'ko':
+      return AppLocalizationsKo();
+    case 'ku':
+      return AppLocalizationsKu();
+    case 'nl':
+      return AppLocalizationsNl();
     case 'pt':
       return AppLocalizationsPt();
+    case 'ru':
+      return AppLocalizationsRu();
     case 'tr':
       return AppLocalizationsTr();
     case 'zh':

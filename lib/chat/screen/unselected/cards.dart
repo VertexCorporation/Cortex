@@ -61,7 +61,7 @@ class ModelCard extends StatelessWidget {
     final totalHorizontalSpacing = 8.0 * 2;
     final w = (MediaQuery.of(context).size.width - totalHorizontalPadding - totalHorizontalSpacing) / 3;
     final imgSize = w * 0.7;
-    final radiusOuter = imgSize * 0.15;
+    final radiusOuter = imgSize * 0.2;
     final radiusInner = imgSize * 0.10;
     final borderW = w * 0.01;
     final gapBig = imgSize * 0.10;
@@ -133,7 +133,7 @@ class ModelCard extends StatelessWidget {
         opacity: offlineAlpha,
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.secondaryColor,
+            color: AppColors.background,
             borderRadius: BorderRadius.circular(radiusOuter),
             border: Border.all(color: AppColors.border, width: borderW),
           ),

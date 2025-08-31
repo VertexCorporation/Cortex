@@ -61,6 +61,7 @@ class ChatStorageService {
     await db.update(
       'messages',
       {
+        'uuid': m.id,
         'text': m.text,
         'isUser': m.isUserMessage ? 1 : 0,
         'isReported': m.isReported ? 1 : 0,
@@ -84,6 +85,7 @@ class ChatStorageService {
     for (int i = 0; i < msgs.length; i++) {
       final m = msgs[i];
       batch.insert('messages', {
+        'uuid': m.id,
         'conversationId': convId,
         'idx': i,
         'isUser': m.isUserMessage ? 1 : 0,
@@ -105,7 +107,6 @@ class ChatStorageService {
         'text': lastMessage.text,
         'ts': DateTime.now().millisecondsSinceEpoch,
       });
-      // --- END FIX ---
     }
   }
 
@@ -151,44 +152,34 @@ class ChatStorageService {
   static Future<void> upsertMessage(
       String convId, int idx, Message m) async {
     final db = await DbHelper().db;
+    // --- CONSOLIDATED MAP FOR UPSERT ---
+    final messageData = {
+      'uuid': m.id, // --- ADD: Include the ID in the data map
+      'conversationId': convId,
+      'idx': idx,
+      'isUser': m.isUserMessage ? 1 : 0,
+      'text': m.text,
+      'photoPath': m.photoPath,
+      'isReported': m.isReported ? 1 : 0,
+      'model': m.model,
+      'includeInContext': m.includeInContext ? 1 : 0,
+      'ts': DateTime.now().millisecondsSinceEpoch,
+    };
+
     final updated = await db.update(
       'messages',
-      {
-        'text': m.text,
-        'isUser': m.isUserMessage ? 1 : 0,
-        'photoPath': m.photoPath,
-        'isReported': m.isReported ? 1 : 0,
-        'model': m.model,
-        'includeInContext': m.includeInContext ? 1 : 0,
-        'ts': DateTime
-            .now()
-            .millisecondsSinceEpoch,
-      },
+      messageData,
       where: 'conversationId = ? AND idx = ?',
       whereArgs: [convId, idx],
     );
     if (updated == 0) {
       await db.insert(
         'messages',
-        {
-          'conversationId': convId,
-          'idx': idx,
-          'isUser': m.isUserMessage ? 1 : 0,
-          'text': m.text,
-          'photoPath': m.photoPath,
-          'isReported': m.isReported ? 1 : 0,
-          'model': m.model,
-          'includeInContext': m.includeInContext ? 1 : 0,
-          'ts': DateTime
-              .now()
-              .millisecondsSinceEpoch,
-        },
+        messageData,
       );
     }
     _updateConversationTimestamp(convId, db);
-    final now = DateTime
-        .now()
-        .millisecondsSinceEpoch;
+    final now = DateTime.now().millisecondsSinceEpoch;
     _lastMsgController.add({
       'convId': convId,
       'text': m.text,

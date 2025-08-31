@@ -961,6 +961,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get japanese => 'जापानी';
 
   @override
+  String get kurdish => 'कुर्द';
+
+  @override
+  String get dutch => 'डच';
+
+  @override
+  String get russian => 'रूसी';
+
+  @override
   String get korean => 'कोरियाई';
 
   @override
@@ -1422,7 +1431,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'क्रेडिट का उपयोग ऑनलाइन मॉडल के साथ चैट करने के लिए किया जाता है। बस आपको पता हो, आपके द्वारा उन्हें भेजे गए प्रत्येक संदेश पर हमें पैसे खर्च करने पड़ते हैं।\n\n• ऑनलाइन मॉडल को प्रत्येक संदेश पर 20 क्रेडिट खर्च होते हैं।\n• एक छवि शामिल करने पर 30 और क्रेडिट जुड़ जाते हैं।\n• मुफ्त योजना के उपयोगकर्ताओं को 200 क्रेडिट बोनस मिलता है जो दैनिक रूप से रीसेट होता है।';
+      'क्रेडिट का उपयोग ऑनलाइन मॉडल के साथ चैट करने के लिए किया जाता है। हर मेसेज में हमारा पैसा लगता है और ये क्रेडिट्स ही हमें डूबने से बचा रहे हैं तो अब चलो सिस्टम समझाते हैं\n\n• एक मुफ्त ऑनलाइन मॉडल को हर मेसेज 10 क्रेडिट का पड़ता है।\n• एक ऑनलाइन प्रीमियम मॉडल को हर मेसेज 20 क्रेडिट का पड़ता है।\n• एक अटैचमेंट शामिल करने पर 30 और क्रेडिट जुड़ते हैं।\n• मुफ्त प्लान वाले यूजर्स को रोज रीसेट होने वाला 200 क्रेडिट बोनस मिलता है।';
 
   @override
   String get creditsInfoPanelFooter => 'हैप्पी चैटिंग!';
@@ -1565,4 +1574,57 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get creatorSupportedSuccess =>
       'निर्माता का सफलतापूर्वक समर्थन किया गया! आपकी भविष्य की खरीदारी उन्हें योगदान देगी।';
+
+  @override
+  String get featureDocumentTitle => 'दस्तावेज़ समर्थन';
+
+  @override
+  String get featureDocumentDescription =>
+      'यह मॉडल अपलोड किए गए दस्तावेजों जैसे कि पीडीएफ और टेक्स्ट फाइलों के बारे में विश्लेषण और प्रश्नों के उत्तर दे सकता है।';
+
+  @override
+  String get featureAudioTitle => 'ध्वनि इनपुट';
+
+  @override
+  String get featureAudioDescription =>
+      'यह मॉडल बोले गए ऑडियो इनपुट को समझ और संसाधित कर सकता है।';
+
+  @override
+  String get featureImageGenerationTitle => 'छवि निर्माण';
+
+  @override
+  String get featureImageGenerationDescription =>
+      'यह मॉडल आपके पाठ विवरण के आधार पर मूल चित्र बना सकता है।';
+
+  @override
+  String get errorImageLoad => 'उत्पन्न छवि लोड करने में विफल.';
+
+  @override
+  String get extensionInfoPanelTitle => 'मॉडल देखें';
+
+  @override
+  String get extensionInfoPanelBody1 =>
+      'यह तीर आपको इस श्रृंखला के विभिन्न मॉडलों के बीच स्विच करने की सुविधा देता है।';
+
+  @override
+  String get extensionInfoPanelBody2 =>
+      'जब आप पहली बार इस श्रृंखला के साथ चैट शुरू करते हैं, तो डिफ़ॉल्ट मॉडल स्वचालित रूप से चयनित हो जाता है और आप चैट के दौरान किसी भी समय अपना चयन बदल सकते हैं।';
+
+  @override
+  String get extensionInfoPanelFooter =>
+      'प्रत्येक मॉडल के बारे में विस्तृत जानकारी देखने या मैन्युअल रूप से एक अलग मॉडल का चयन करने के लिए, कृपया लाइब्रेरी पर जाएं; वहां से इस मॉडल श्रृंखला का चयन करें और इसके विवरण पृष्ठ के शीर्ष पर स्थित तीर पर टैप करें।';
+
+  @override
+  String get premiumModelNoticeTitle => 'प्रीमियम मॉडल';
+
+  @override
+  String get premiumModelNoticeDescription =>
+      'यह मॉडल एक प्रीमियम मॉडल है, प्रीमियम मॉडल के साथ मुफ्त उपयोगकर्ता प्रति दिन 3 संदेशों तक सीमित हैं; असीमित पहुंच अनलॉक करने के लिए सदस्यता लें!';
+
+  @override
+  String get benefitPremiumModels => 'प्रीमियम मॉडल तक पहुंच';
+
+  @override
+  String get premiumTrialExhaustedMessage =>
+      'आपने प्रीमियम मॉडल के लिए अपने सभी निःशुल्क दैनिक संदेशों का उपयोग कर लिया है, कृपया असीमित पहुंच के लिए अपग्रेड करें।';
 }

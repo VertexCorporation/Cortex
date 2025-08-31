@@ -123,7 +123,7 @@ class _InitializationScreenState extends State<InitializationScreen> with Single
     if (isConnected) {
       debugPrint('Initialization: Online. Checking server status...');
       // We only need to check for maintenance mode now. Upgrader handles its own logic.
-      final isServerInMaintenance = await _checkMaintenanceMode();
+      final isServerInMaintenance = kDebugMode ? false : await _checkMaintenanceMode();
 
       await prefs.setBool('is_in_maintenance', isServerInMaintenance);
       await prefs.setInt('maintenance_last_checked', DateTime.now().millisecondsSinceEpoch);

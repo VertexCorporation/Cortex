@@ -535,6 +535,7 @@ class MenuScreenState extends State<MenuScreen>
     // This gives the user instant feedback that their action was registered.
     _notificationService.showNotification(
       message: AppLocalizations.of(context)!.conversationDeleted,
+      bottomOffset: 0.12,
       isSuccess: true,
     );
 

@@ -965,6 +965,15 @@ class AppLocalizationsId extends AppLocalizations {
   String get japanese => 'Jepang';
 
   @override
+  String get kurdish => 'Kurdi';
+
+  @override
+  String get dutch => 'Belanda';
+
+  @override
+  String get russian => 'Rusia';
+
+  @override
   String get korean => 'Korea';
 
   @override
@@ -1430,7 +1439,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Kredit digunakan untuk mengobrol dengan model online. Sekadar informasi, setiap pesan yang Anda kirimkan kepada mereka membebani kami biaya.\n\n• Setiap pesan ke model online berharga 20 kredit.\n• Menyertakan gambar menambah 30 kredit lagi.\n• Pengguna paket gratis mendapatkan bonus 200 kredit yang diatur ulang setiap hari.';
+      'Kredit digunakan untuk mengobrol dengan model online. tiap pesan itu butuh biaya dan kredit ini yang bikin kita gak bangkrut yaudah sekarang gini sistemnya\n\n• Setiap pesan ke model online gratis biayanya 10 kredit.\n• Setiap pesan ke model online premium biayanya 20 kredit.\n• Termasuk lampiran nambah 30 kredit lagi.\n• Pengguna paket gratis dapet bonus 200 kredit yang direset tiap hari.';
 
   @override
   String get creditsInfoPanelFooter => 'Selamat mengobrol!';
@@ -1574,4 +1583,57 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get creatorSupportedSuccess =>
       'Kreator berhasil didukung! Pembelian Anda di masa mendatang akan berkontribusi untuk mereka.';
+
+  @override
+  String get featureDocumentTitle => 'Dukungan Dokumen';
+
+  @override
+  String get featureDocumentDescription =>
+      'Model ini dapat menganalisis dan menjawab pertanyaan tentang dokumen yang diunggah seperti PDF dan berkas teks.';
+
+  @override
+  String get featureAudioTitle => 'Masukan Suara';
+
+  @override
+  String get featureAudioDescription =>
+      'Model ini dapat memahami dan memproses masukan audio lisan.';
+
+  @override
+  String get featureImageGenerationTitle => 'Pembuatan Gambar';
+
+  @override
+  String get featureImageGenerationDescription =>
+      'Model ini dapat membuat gambar asli berdasarkan deskripsi teks Anda.';
+
+  @override
+  String get errorImageLoad => 'Gagal memuat gambar yang dihasilkan.';
+
+  @override
+  String get extensionInfoPanelTitle => 'Jelajahi Model';
+
+  @override
+  String get extensionInfoPanelBody1 =>
+      'Panah ini memungkinkan Anda beralih di antara berbagai model dalam seri ini.';
+
+  @override
+  String get extensionInfoPanelBody2 =>
+      'Saat pertama kali memulai obrolan dengan seri ini, model default dipilih secara otomatis dan Anda dapat mengubah pilihan kapan saja selama obrolan.';
+
+  @override
+  String get extensionInfoPanelFooter =>
+      'Untuk melihat informasi terperinci tentang setiap model atau memilih model lain secara manual, silakan buka Perpustakaan; pilih seri model ini dari sana dan ketuk tanda panah di bagian atas halaman detailnya.';
+
+  @override
+  String get premiumModelNoticeTitle => 'Model Premium';
+
+  @override
+  String get premiumModelNoticeDescription =>
+      'Model ini adalah model premium, pengguna gratis dibatasi hingga 3 pesan per hari dengan model premium; berlangganan untuk membuka akses tak terbatas!';
+
+  @override
+  String get benefitPremiumModels => 'Akses ke model premium';
+
+  @override
+  String get premiumTrialExhaustedMessage =>
+      'Anda telah menggunakan semua pesan harian gratis untuk model premium, silakan tingkatkan untuk akses tak terbatas.';
 }

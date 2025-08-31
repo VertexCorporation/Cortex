@@ -77,7 +77,6 @@ class Tiles {
     );
   }
 
-  /// Normal içerikli kullanıcı mesajı için içerik (fotoğraf ve metin) oluşturur.
   static Widget buildNormalContent({
     required BuildContext context,
     required Message message,
@@ -144,78 +143,102 @@ class Tiles {
     required Message message,
     required int index,
     Key? key,
-    required String modelId, // This is the chat's CURRENT model ID, used as a fallback.
+    required String modelId,
     required VoidCallback onReport,
     required VoidCallback onRegenerate,
     required VoidCallback onStop,
     required Function(String newExtension) onChangeModel,
-    // THE FIX: screenWidth and screenHeight are no longer needed here as AIMessageTile is self-sizing.
+    required double screenWidth,
+    required double screenHeight,
   }) {
-    // REASONING: Each message knows which model created it (`message.model`).
-    // We must look up the data for THAT specific model to get the correct image.
-    // We use the overall chat's `modelId` only as a last resort if `message.model` is null.
     final preciseModelId = message.model ?? modelId;
     final modelData = ModelData.getPreciseModelData(preciseModelId);
     final correctImagePath = modelData['imagePath'] as String? ?? 'assets/icons/self.svg';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (message.photoPath != null)
-          Padding(
-            padding: EdgeInsets.only(
-              left: MediaQuery.of(context).size.width * 0.04,
-              bottom: MediaQuery.of(context).size.height * 0.006,
-            ),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  PhotoViewer.route(File(message.photoPath!)),
-                );
-              },
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.file(
-                  File(message.photoPath!),
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  height: MediaQuery.of(context).size.width * 0.4,
-                  fit: BoxFit.cover,
-                ),
+    // --- THE PERFECT FIX: Handle both text and photo visibility logically ---
+
+    // Determine if there is visible content.
+    final bool hasPhoto = message.photoPath != null && message.photoPath!.isNotEmpty;
+    final bool hasText = message.text.trim().isNotEmpty;
+    final bool isThinkingWithoutContent = message.isThinking && !hasPhoto && !hasText;
+
+    // The main widget to display text content or the "thinking" animation.
+    final aiMessageContentWidget = AIMessageTile(
+      // The key should be on the parent-most widget for this message if possible,
+      // but putting it here is also effective.
+      key: key,
+      text: message.text,
+      avatarPath: correctImagePath,
+      opacity: message.opacity,
+      modelId: preciseModelId,
+      isReported: message.isReported,
+      isError: message.isError,
+      onReport: onReport,
+      onRegenerate: onRegenerate,
+      onStop: onStop,
+      onChangeModel: onChangeModel,
+      parsedSpans: message.parsedSpans,
+      isThinking: message.isThinking,
+    );
+
+    // The widget to display the generated photo.
+    final photoWidget = hasPhoto ? Padding(
+      padding: EdgeInsets.only(
+        left: screenWidth * 0.04,
+        // Add bottom padding only if there is text below it.
+        bottom: (hasText || isThinkingWithoutContent) ? screenHeight * 0.006 : 0,
+      ),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              PhotoViewer.route(File(message.photoPath!)),
+            );
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 200),
+              builder: (context, opacity, child) =>
+                  Opacity(opacity: opacity, child: child),
+              child: Image.file(
+                File(message.photoPath!),
+                width: screenWidth * 0.4,
+                height: screenWidth * 0.4,
+                fit: BoxFit.cover,
               ),
             ),
           ),
-        AIMessageTile(
-          key: key,
-          text: message.text,
-          imagePath: correctImagePath,
-          opacity: message.opacity,
-          modelId: preciseModelId,
-          isReported: message.isReported,
-          isError: message.isError,
-          onReport: onReport,
-          onRegenerate: onRegenerate,
-          onStop: onStop,
-          onChangeModel: onChangeModel,
-          parsedSpans: message.parsedSpans,
-          isThinking: message.isThinking,
         ),
+      ),
+    ) : const SizedBox.shrink(); // If no photo, render nothing.
+
+    // Combine them in a Column.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Always display the photo first if it exists.
+        photoWidget,
+
+        // Display the text/thinking bubble if there is text OR if it's in a thinking state.
+        if (hasText || isThinkingWithoutContent)
+          aiMessageContentWidget,
       ],
     );
   }
 
-  /// Mesaj tile’ını genel olarak oluşturur (mesajın kullanıcı mı yoksa AI mı olduğuna göre ayrım yapar).
   static Widget buildMessageTile({
     required BuildContext context,
     required Message message,
     required int index,
     Key? key,
-    // Kullanıcı mesajı için:
     required bool isEditingMode,
     required int? editingMessageIndex,
     required VoidCallback onEdit,
     VoidCallback? onFadeOutComplete,
-    // AI mesajı için:
     required double screenWidth,
     required double screenHeight,
     required String modelId,
@@ -249,11 +272,12 @@ class Tiles {
         onRegenerate: onRegenerate,
         onStop: onStop,
         onChangeModel: onChangeModel,
+        screenWidth: screenWidth,
+        screenHeight: screenHeight,
       );
     }
   }
 
-  /// Mesaj listesini oluşturan ListView widget'ını döndürür.
   static Widget buildMessagesList({
     required BuildContext context,
     required List<Message> messages,
@@ -269,14 +293,8 @@ class Tiles {
     required Function(int index, String newExtension) onChangeModel,
     required Function(int index) onReport,
   }) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return ListView.separated(
       controller: scrollController,
@@ -295,7 +313,7 @@ class Tiles {
           context: context,
           message: message,
           index: index,
-          key: ValueKey(index),
+          key: ValueKey(message.id),
           isEditingMode: isEditingMode,
           editingMessageIndex: editingMessageIndex,
           onEdit: () => onEdit(index),

@@ -79,6 +79,14 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
         return widget.appLocalizations.italian;
       case 'ja':
         return widget.appLocalizations.japanese;
+      case 'ku':
+        return widget.appLocalizations.kurdish;
+      case 'nl':
+        return widget.appLocalizations.dutch;
+      case 'ru':
+        return widget.appLocalizations.russian;
+      case 'ko':
+        return widget.appLocalizations.korean;
       default:
         if (kDebugMode) {
           print('[AppLanguageSection] Unknown language code: $code, returning code itself.');
@@ -119,7 +127,6 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
       {'code': 'es', 'name': appLocalizations.spanish},
       {'code': 'it', 'name': appLocalizations.italian},
       {'code': 'ja', 'name': appLocalizations.japanese},
-      {'code': 'ar', 'name': appLocalizations.arabic},
       {'code': 'ku', 'name': appLocalizations.kurdish},
       {'code': 'nl', 'name': appLocalizations.dutch},
       {'code': 'ru', 'name': appLocalizations.russian},

@@ -17,10 +17,250 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../hexagons.dart';
 import '../../../server/credits.dart';
 import '../../../theme.dart'; // Provides HexagonClipper
+
+/// A banner that appears below the AppBar to notify the user that a premium model is selected.
+/// It features an animated RGB border, navigates to the premium screen on tap,
+/// and can be dismissed by swiping it up.
+class PremiumModelBanner extends StatefulWidget {
+  final bool isVisible;
+  final VoidCallback onTap;
+
+  const PremiumModelBanner({
+    Key? key,
+    required this.isVisible,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  State<PremiumModelBanner> createState() => PremiumModelBannerState();
+}
+
+class PremiumModelBannerState extends State<PremiumModelBanner>
+    with TickerProviderStateMixin {
+  late final AnimationController _rgbController;
+  late final AnimationController _slideController;
+  late final Animation<Offset> _slideAnimation;
+
+  // State to track if the user has dismissed the banner in this session.
+  // This is set to true only after the dismiss animation completes.
+  bool _isDismissedByUser = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _rgbController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat();
+
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -1.5), // Start fully off-screen above
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut));
+
+    // If the banner should be visible from the start, set the controller value.
+    if (widget.isVisible) {
+      _slideController.value = 1.0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant PremiumModelBanner oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // If the banner should become visible (and wasn't before).
+    if (widget.isVisible && !oldWidget.isVisible) {
+      // When the parent makes the banner relevant again (e.g., new model selected),
+      // we must reset the user's dismissal flag and animate it in.
+      setState(() {
+        _isDismissedByUser = false;
+      });
+      _slideController.forward(from: 0.0);
+    }
+    // If the banner should become hidden (and was visible before).
+    else if (!widget.isVisible && oldWidget.isVisible) {
+      // The parent wants to hide it. Just play the reverse animation.
+      // The build method's logic will handle removing it from the tree
+      // once the animation completes.
+      _slideController.reverse();
+    }
+  }
+
+  @override
+  void dispose() {
+    _rgbController.dispose();
+    _slideController.dispose();
+    super.dispose();
+  }
+
+  /// Handles user-initiated dismissal (e.g., via swipe).
+  void _handleDismiss() {
+    // Animate the banner sliding out.
+    _slideController.reverse().then((_) {
+      // AFTER the animation is complete, set the state flag.
+      // This will cause a rebuild where the build method returns SizedBox.shrink().
+      if (mounted) {
+        setState(() {
+          _isDismissedByUser = true;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // --- DYNAMIC SIZING CONSTANTS ---
+    final double borderRadius = screenWidth * 0.03;
+    final double borderThickness = screenWidth * 0.005;
+    final double internalPaddingVertical = screenWidth * 0.03;
+    final double internalPaddingHorizontal = screenWidth * 0.04;
+    final double iconSize = screenWidth * 0.07;
+    final double gapBetweenIconAndText = screenWidth * 0.03;
+    final double gapBetweenTitleAndDesc = screenWidth * 0.01;
+    final double titleFontSize = screenWidth * 0.038;
+    final double descriptionFontSize = screenWidth * 0.033;
+    final double maxBannerHeight = screenHeight * 0.2;
+
+    // --- 🔥 REVISED LOGIC FOR VISIBILITY & ANIMATION 🔥 ---
+    // This logic ensures the widget stays in the tree during its exit animation.
+    final bool shouldBeVisible = widget.isVisible && !_isDismissedByUser;
+
+    // We use an AnimatedBuilder to listen for animation ticks. This ensures that
+    // when the animation stops, we get one final rebuild to remove the widget.
+    return AnimatedBuilder(
+      animation: _slideController,
+      builder: (context, child) {
+        // If the banner is not supposed to be visible AND it's done animating out,
+        // then we can remove it from the widget tree completely.
+        if (!shouldBeVisible && !_slideController.isAnimating) {
+          return const SizedBox.shrink();
+        }
+
+        // Otherwise, we return the banner content, allowing the SlideTransition
+        // to control its position, including animating it off-screen.
+        return child!;
+      },
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 0),
+            child: GestureDetector(
+              onVerticalDragEnd: (details) {
+                if (details.primaryVelocity != null &&
+                    details.primaryVelocity! < 0) {
+                  _handleDismiss();
+                }
+              },
+              child: AnimatedBuilder(
+                animation: _rgbController,
+                builder: (context, child) {
+                  return Container(
+                    padding: EdgeInsets.all(borderThickness),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      gradient: SweepGradient(
+                        center: Alignment.center,
+                        colors: const [
+                          Colors.red, Colors.yellow, Colors.green, Colors.cyan,
+                          Colors.blue, Colors.purple, Colors.red,
+                        ],
+                        transform:
+                        GradientRotation(_rgbController.value * 2 * pi),
+                      ),
+                    ),
+                    child: child,
+                  );
+                },
+                child: Material(
+                  color: AppColors.primaryColor,
+                  borderRadius: BorderRadius.circular(borderRadius * 0.8),
+                  child: InkWell(
+                    onTap: widget.onTap,
+                    borderRadius: BorderRadius.circular(borderRadius * 0.8),
+                    splashColor: AppColors.primaryColor.withOpacity(0.1),
+                    highlightColor: AppColors.primaryColor.withOpacity(0.05),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: maxBannerHeight,
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: internalPaddingVertical,
+                          horizontal: internalPaddingHorizontal,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2.0),
+                              child: SvgPicture.asset(
+                                'assets/icons/sparkle.svg',
+                                colorFilter: ColorFilter.mode(
+                                    AppColors.primaryColor.inverted,
+                                    BlendMode.srcIn),
+                                width: iconSize,
+                                height: iconSize,
+                              ),
+                            ),
+                            SizedBox(width: gapBetweenIconAndText),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      localizations.premiumModelNoticeTitle,
+                                      style: TextStyle(
+                                        fontSize: titleFontSize,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryColor.inverted,
+                                      ),
+                                    ),
+                                    SizedBox(height: gapBetweenTitleAndDesc),
+                                    Text(
+                                      localizations
+                                          .premiumModelNoticeDescription,
+                                      style: TextStyle(
+                                        fontSize: descriptionFontSize,
+                                        color: AppColors.primaryColor.inverted
+                                            .withOpacity(0.8),
+                                      ),
+                                      softWrap: true,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class Appbar extends StatefulWidget implements PreferredSizeWidget {
   final bool isModelSelected;
@@ -37,6 +277,10 @@ class Appbar extends StatefulWidget implements PreferredSizeWidget {
   final GlobalKey extensionKey;
   final dynamic extensions;
   final VoidCallback onCreditsInfoTapped;
+  final VoidCallback? onInfoPanelWillShow;
+  final VoidCallback? onInfoPanelDidHide;
+  static bool extensionInfoShownThisSession = false;
+  static const String extensionInfoCountKey = 'extensionInfoPanelShowCount';
 
   const Appbar({
     Key? key,
@@ -54,6 +298,8 @@ class Appbar extends StatefulWidget implements PreferredSizeWidget {
     required this.extensionKey,
     required this.extensions,
     required this.onCreditsInfoTapped,
+    this.onInfoPanelWillShow,
+    this.onInfoPanelDidHide,
   }) : super(key: key);
 
   @override
@@ -63,9 +309,15 @@ class Appbar extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
+class _AppbarState extends State<Appbar> with TickerProviderStateMixin { // --- MODIFIED --- Changed from SingleTickerProviderStateMixin
   final GlobalKey _creditsInfoKey = GlobalKey();
   OverlayEntry? _overlayEntry;
+
+  // --- NEW --- State variables for the new extension info panel
+  OverlayEntry? _extensionOverlayEntry;
+  late AnimationController _extensionAnimationController;
+  late Animation<double> _extensionAnimation;
+  // --- END NEW ---
 
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -81,12 +333,37 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
       parent: _animationController,
       curve: Curves.fastOutSlowIn,
     );
+
+    // --- NEW --- Initialize animation controller for the new panel
+    _extensionAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+    _extensionAnimation = CurvedAnimation(
+      parent: _extensionAnimationController,
+      curve: Curves.fastOutSlowIn,
+    );
+    // --- END NEW ---
   }
+
+  // --- NEW --- This lifecycle method detects when a model is selected.
+  @override
+  void didUpdateWidget(Appbar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If we transitioned from "not selected" to "selected" and the model has extensions,
+    // we trigger the tutorial panel logic.
+    if (!oldWidget.isModelSelected && widget.isModelSelected && widget.extensions.currentExtensions.isNotEmpty) {
+      _showExtensionInfoIfNeeded();
+    }
+  }
+  // --- END NEW ---
 
   @override
   void dispose() {
     _animationController.dispose();
+    _extensionAnimationController.dispose(); // --- NEW --- Dispose new controller
     _hideCreditsInfo(isDisposing: true); // Ensure overlay is removed.
+    _hideExtensionInfo(isDisposing: true); // --- NEW --- Ensure new overlay is removed
     super.dispose();
   }
 
@@ -96,6 +373,7 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
       widget.extensions.closePanel();
     }
     _hideCreditsInfo();
+    _hideExtensionInfo(); // --- NEW --- Also hide the new panel
   }
 
   @override
@@ -213,14 +491,17 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
     );
   }
 
-  /// Builds the extension-selector icon (arrow).
+  // --- ALL THE REMAINING CODE FROM THE ORIGINAL FILE IS UNCHANGED ---
+  // --- (e.g., _buildModelExtensionSelector, _buildUserAvatar, _buildCreditsHexagonRow, etc.) ---
+  // --- The new methods for the extension panel are added at the end. ---
+
   Widget _buildModelExtensionSelector(BuildContext context) {
     if (widget.extensions.currentExtensions.isEmpty) {
       return const SizedBox.shrink();
     }
 
     return GestureDetector(
-      key: widget.extensionKey,
+      key: widget.extensionKey, // This key is crucial for positioning the new panel
       onTap: () {
         if (widget.extensions.isPanelVisible) {
           widget.extensions.closePanel();
@@ -385,7 +666,6 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
     );
   }
 
-  /// Builds the hexagon button widget that navigates to the Premium screen.
   Widget _buildHexagonButton(
       BuildContext context, double screenWidth, double screenHeight) {
     return AnimatedHexagonButton(
@@ -546,6 +826,157 @@ class _AppbarState extends State<Appbar> with SingleTickerProviderStateMixin {
     Overlay.of(context).insert(_overlayEntry!);
     _animationController.forward();
   }
+
+  /// Checks if the extension info panel should be shown and displays it.
+  /// It only shows once per session and a maximum of 3 times in total.
+  Future<void> _showExtensionInfoIfNeeded() async {
+    if (Appbar.extensionInfoShownThisSession) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    int showCount = prefs.getInt(Appbar.extensionInfoCountKey) ?? 0;
+
+    if (showCount < 3) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _showExtensionInfo();
+          prefs.setInt(Appbar.extensionInfoCountKey, showCount + 1);
+          Appbar.extensionInfoShownThisSession = true;
+        }
+      });
+    }
+  }
+
+  /// Hides the extension info panel with an animation.
+  void _hideExtensionInfo({bool isDisposing = false}) {
+    if (_extensionOverlayEntry == null) return;
+
+    if (isDisposing) {
+      _extensionOverlayEntry?.remove();
+      _extensionOverlayEntry = null;
+      return;
+    }
+
+    _extensionAnimationController.reverse().then((_) {
+      if (mounted) {
+        _extensionOverlayEntry?.remove();
+        _extensionOverlayEntry = null;
+      }
+    });
+  }
+
+  /// Creates and displays the extension info panel as an overlay.
+  void _showExtensionInfo() {
+    if (_extensionOverlayEntry != null || widget.extensionKey.currentContext == null) return;
+
+    final RenderBox renderBox = widget.extensionKey.currentContext!.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final localizations = AppLocalizations.of(context)!;
+
+    final double panelWidth = screenWidth * 0.8;
+    // Center the panel horizontally under the arrow icon
+    final double panelLeft = offset.dx + size.width / 2 - (panelWidth / 2);
+
+    _extensionOverlayEntry = OverlayEntry(
+      builder: (context) {
+        return Material(
+          color: Colors.transparent,
+          child: Stack(
+            children: [
+              // Full-screen scrim with a tap-to-dismiss gesture detector
+              GestureDetector(
+                onTap: _hideExtensionInfo,
+                child: Container(
+                  color: Colors.black.withOpacity(0.6),
+                ),
+              ),
+              Positioned(
+                // Position the panel below the arrow icon
+                top: offset.dy + size.height + 12,
+                left: max(16.0, min(panelLeft, screenWidth - panelWidth - 16.0)),
+                child: FadeTransition(
+                  opacity: _extensionAnimation,
+                  child: ScaleTransition(
+                    scale: _extensionAnimation,
+                    alignment: Alignment.topCenter,
+                    child: GestureDetector(
+                      onTap: _hideExtensionInfo, // Also dismiss by tapping the panel
+                      child: Container(
+                        width: panelWidth,
+                        padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 14.0),
+                        decoration: BoxDecoration(
+                          color: AppColors.quaternaryColor,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.border, width: 0.8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            )
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              localizations.extensionInfoPanelTitle,
+                              style: GoogleFonts.heebo(
+                                color: AppColors.primaryColor.inverted,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              localizations.extensionInfoPanelBody1,
+                              style: GoogleFonts.heebo(
+                                color: AppColors.primaryColor.inverted.withOpacity(0.9),
+                                fontSize: 14,
+                                height: 1.5,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              localizations.extensionInfoPanelBody2,
+                              style: GoogleFonts.heebo(
+                                color: AppColors.primaryColor.inverted.withOpacity(0.9),
+                                fontSize: 14,
+                                height: 1.5,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              localizations.extensionInfoPanelFooter,
+                              style: GoogleFonts.heebo(
+                                color: AppColors.primaryColor.inverted.withOpacity(0.7),
+                                fontSize: 13,
+                                fontStyle: FontStyle.italic,
+                                decoration: TextDecoration.none,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    Overlay.of(context).insert(_extensionOverlayEntry!);
+    _extensionAnimationController.forward();
+  }
+// --- END NEW ---
 }
 
 // --- NEW WIDGET: A hexagon button with a continuous "pulsing" animation and a premium look ---

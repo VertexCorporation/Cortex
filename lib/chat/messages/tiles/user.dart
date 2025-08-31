@@ -1,5 +1,4 @@
 import 'package:cortex/main.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../recognizer.dart';
@@ -73,8 +72,9 @@ class _UserMessageTileState extends State<UserMessageTile> with TickerProviderSt
 
   void _handleLongPress(BuildContext context, Offset tapPosition) {
     final chatState = context.findAncestorStateOfType<ChatScreenState>();
+    if (chatState == null) return;
     bool conversationHasPhoto =
-        chatState?.messages.any((msg) => msg.photoPath != null && msg.photoPath!.isNotEmpty) ?? false;
+        chatState.messages.any((msg) => msg.photoPath != null && msg.photoPath!.isNotEmpty);
 
     showMessageOptions(
       context: context,
@@ -83,6 +83,8 @@ class _UserMessageTileState extends State<UserMessageTile> with TickerProviderSt
       options: [MessageOption.copy, MessageOption.edit, MessageOption.select],
       onEdit: widget.onEdit,
       conversationHasPhoto: conversationHasPhoto,
+      isSubscribed: chatState.isUserSubscribed,
+      premiumTrialUses: chatState.premiumTrialUses,
     );
   }
 

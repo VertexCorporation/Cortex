@@ -76,6 +76,11 @@ class _PremiumScreenState extends State<PremiumScreen>
   List<ProductDetails> _availableProducts = [];
   int _hasCortexSubscription = 0;
   String? _activeSubscriptionOption;
+  late AnimationController _shineController;
+  late Animation<double> _shineAnimation;
+  bool _isContentLoaded = false;
+  bool _hasAnyBenefitListAnimated = false;
+  Offset _contentOffset = const Offset(0.0, 0.03);
 
   // --- Product Identifiers (Single Source of Truth) ---
   static const String _logName = 'PremiumScreen';
@@ -114,23 +119,43 @@ class _PremiumScreenState extends State<PremiumScreen>
     ProductDetails(id: 'cortex_ultra_annual', title: 'Ultra Annual', description: 'Test', price: '\$199.99', rawPrice: 199.99, currencyCode: 'USD'),
   ];
 
+  late List<ScrollController> _scrollControllers;
+  bool _showScrollFog = false;
+
   @override
   void initState() {
     super.initState();
 
-    // >>> KEY TO THE FIX IS HERE <<<
-    // Synchronously check the cache before any async operations.
-    // If data exists, set the initial `_loading` state to `false` and populate the data.
     final bool hasCachedData = CacheService.cachedPremiumProducts != null && CacheService.cachedPremiumProducts!.isNotEmpty;
 
-    _loading = !hasCachedData; // If cache is full, loading=false. If empty, loading=true.
+    _scrollControllers = List.generate(4, (_) => ScrollController());
+    _scrollControllers[_currentPage].addListener(_updateFogVisibility);
+
+    _shineController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+
+    _shineAnimation = Tween<double>(begin: -1.5, end: 1.5).animate(
+        CurvedAnimation(parent: _shineController, curve: Curves.linear)
+    );
+
+    _shineController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            _shineController.forward(from: 0.0);
+          }
+        });
+      }
+    });
+
+    _loading = !hasCachedData;
 
     if (hasCachedData) {
-      // Directly assign the cached data to the state variable.
       _availableProducts = CacheService.cachedPremiumProducts!;
       log('Cache hit! Initializing with cached product data.', name: _logName);
     }
-    // >>> END OF FIX <<<
 
     _pageController = PageController(initialPage: _currentPage);
     _pageController.addListener(_onPageChanged);
@@ -143,30 +168,46 @@ class _PremiumScreenState extends State<PremiumScreen>
     _internetSubscription =
         InternetService().onConnectivityChanged.listen((connected) {
           if (mounted) setState(() {});
-          // If an error occurred due to no internet and connection is restored,
-          // and we still don't have data, trigger a retry.
           if (connected && _errorOccurred && _availableProducts.isEmpty) {
             _initializeStore();
           }
         });
 
-    CacheService.touchPremiumCache(); // Reset the cache expiration timer
-
-    // Only call initializeStore if data actually needs to be loaded
-    // (i.e., if the cache was empty or needs a refresh).
+    CacheService.touchPremiumCache();
     _initializeStore();
     _listenToUserChanges();
+
+    // --- FIX & ACTIVATION: Start the shine animation after a brief delay ---
+    // This was missing before, which is why the effect wasn't visible.
+    // It waits 2 seconds for the user to settle, then starts the recurring shine.
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        _shineController.forward();
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateFogVisibility());
   }
 
   /// Initializes the connection to the store and fetches product details IF NEEDED.
   Future<void> _initializeStore() async {
-    // AppDataState signals that this screen's data must be forcibly refreshed
-    // due to a purchase or action on another screen.
+    // --- Helper function to trigger the screen's entry animation ---
+    void triggerEntryAnimation() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _isContentLoaded = true;
+            _contentOffset = Offset.zero;
+          });
+          _updateFogVisibility();
+        }
+      });
+    }
+
     if (AppDataState().needsRefresh) {
       CacheService.invalidatePremiumCache();
       log('AppDataState requires refresh. Invalidating premium cache.', name: _logName);
       if (mounted) {
-        // If we invalidated the cache, we must return to a loading state.
         setState(() {
           _loading = true;
           _availableProducts = [];
@@ -174,14 +215,12 @@ class _PremiumScreenState extends State<PremiumScreen>
       }
     }
 
-    // IF DATA IS ALREADY LOADED (from initState or a previous fetch), DO NOTHING.
-    // This check prevents unnecessary network requests.
     if (!_loading && _availableProducts.isNotEmpty) {
       log('Products already loaded. Skipping initialization.', name: _logName);
+      triggerEntryAnimation(); // Trigger animation even for cached data
       return;
     }
 
-    // The test mode always uses mock data, so no network check is needed.
     if (_isTesting) {
       log('Running in Test Mode. Using mock product data.', name: _logName);
       if (mounted) {
@@ -190,11 +229,11 @@ class _PremiumScreenState extends State<PremiumScreen>
           _loading = false;
           _errorOccurred = false;
         });
+        triggerEntryAnimation(); // Trigger animation for mock data
       }
       return;
     }
 
-    // The rest of this function will only run if `_loading = true` (i.e., cache was empty).
     log('Cache is empty or invalidated. Fetching product details from the store.', name: _logName);
 
     if (!await InternetService().hasInternet()) {
@@ -222,10 +261,11 @@ class _PremiumScreenState extends State<PremiumScreen>
       if (mounted) {
         setState(() {
           _availableProducts = response.productDetails;
-          CacheService.cachedPremiumProducts = response.productDetails; // Update the cache
+          CacheService.cachedPremiumProducts = response.productDetails;
           _loading = false;
           _errorOccurred = false;
         });
+        triggerEntryAnimation(); // Trigger animation after fetching real data
       }
     } catch (e) {
       log('Error fetching product details: $e', name: _logName, error: e);
@@ -239,6 +279,10 @@ class _PremiumScreenState extends State<PremiumScreen>
     _pageController.dispose();
     _purchaseStreamSubscription.cancel();
     _internetSubscription.cancel();
+    for (var controller in _scrollControllers) {
+      controller.dispose();
+    }
+    _shineController.dispose();
     _userSubscription?.cancel();
     CacheService.startPremiumCacheTimer();
     super.dispose();
@@ -621,26 +665,61 @@ class _PremiumScreenState extends State<PremiumScreen>
 
     if (_currentPage != newPageIndex) {
       if (mounted) {
+        // --- NEW: Switch scroll listeners ---
+        // 1. Remove the listener from the old page's controller.
+        _scrollControllers[_currentPage].removeListener(_updateFogVisibility);
+        // 2. Add a listener to the new page's controller.
+        _scrollControllers[newPageIndex].addListener(_updateFogVisibility);
+
         setState(() {
-          // 1. Update the current page index for UI tracking.
           _currentPage = newPageIndex;
 
-          // 2. Check if the new page is a subscription plan (not credits page at index 0).
           if (_currentPage > 0 && _currentPage <= planTypes.length) {
             final planIndex = _currentPage - 1;
             final planType = planTypes[planIndex];
             final planLevel = _currentPage;
 
-            // 3. If the user has an active subscription for this exact plan level...
             if (_hasCortexSubscription == planLevel && _activeSubscriptionOption != null) {
-              // ...then update the `selectedOptions` map to match the active plan.
-              // This correctly pre-selects 'Annual' if the user has an annual plan.
               selectedOptions[planType] = _activeSubscriptionOption!;
               log("Page changed to $planType. Active sub found. Setting selected option to: ${_activeSubscriptionOption!}", name: _logName);
             }
           }
         });
+
+        // --- NEW: Immediately check and update fog for the new page ---
+        _updateFogVisibility();
       }
+    }
+  }
+
+  /// Checks the current scroll controller's state to determine if the fog
+  /// effect at the bottom of the screen should be visible.
+  void _updateFogVisibility() {
+    if (!mounted) return;
+
+    final controller = _scrollControllers[_currentPage];
+
+    // Safety check: ensure the controller is attached to a scroll view.
+    if (!controller.hasClients) {
+      // If not attached, it means the content isn't scrollable, so hide the fog.
+      if (_showScrollFog) {
+        setState(() => _showScrollFog = false);
+      }
+      return;
+    }
+
+    final maxScroll = controller.position.maxScrollExtent;
+    final currentScroll = controller.position.pixels;
+
+    // The fog should only be shown if the content is scrollable (maxScroll > 0)
+    // AND the user has not scrolled to the very bottom.
+    final bool shouldShow = maxScroll > 0 && currentScroll < maxScroll;
+
+    // Only update the state if the visibility has actually changed.
+    if (shouldShow != _showScrollFog) {
+      setState(() {
+        _showScrollFog = shouldShow;
+      });
     }
   }
 
@@ -672,10 +751,12 @@ class _PremiumScreenState extends State<PremiumScreen>
 
   // --- Build Methods ---
 
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final bool disablePurchaseButton = (_hasCortexSubscription >= 4);
 
     return Scaffold(
@@ -686,120 +767,168 @@ class _PremiumScreenState extends State<PremiumScreen>
             ? _buildErrorScreen(context, localizations)
             : _loading
             ? const SkeletonLoader(key: ValueKey('skeleton'))
-            : Stack(
-          children: [
-            SafeArea(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: IconButton(
-                        icon: Icon(Icons.close, color: AppColors.primaryColor.inverted, size: 28),
-                        onPressed: () => Navigator.of(context).pop(),
+            : AnimatedSlide(
+          offset: _contentOffset,
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutCubic,
+          child: AnimatedOpacity(
+            opacity: _isContentLoaded ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 500),
+            child: Stack(
+              children: [
+                SafeArea(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: IconButton(
+                            icon: Icon(Icons.close, color: AppColors.primaryColor.inverted, size: screenWidth * 0.07),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: PageView(
-                      controller: _pageController,
-                      children: [
-                        CreditContentWidget(
-                          onCreditPackageSelected: (package) {
-                            if (mounted) setState(() => _selectedCreditPackage = package);
-                          },
-                          availableProducts: _availableProducts.where((p) => _creditProductIds.contains(p.id)).toList(),
-                        ),
-                        _buildPremiumPage(context: context, localizations: localizations, planType: 'plus'),
-                        _buildPremiumPage(context: context, localizations: localizations, planType: 'pro'),
-                        _buildPremiumPage(context: context, localizations: localizations, planType: 'ultra'),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            4,
-                                (index) => AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: _currentPage == index ? 12 : 8,
-                              height: _currentPage == index ? 12 : 8,
-                              decoration: BoxDecoration(
-                                color: _currentPage == index
-                                    ? AppColors.primaryColor.inverted
-                                    : AppColors.primaryColor.inverted.withOpacity(0.7),
-                                shape: BoxShape.circle,
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            PageView(
+                              controller: _pageController,
+                              children: [
+                                CreditContentWidget(
+                                  onCreditPackageSelected: (package) {
+                                    if (mounted) setState(() => _selectedCreditPackage = package);
+                                  },
+                                  availableProducts: _availableProducts.where((p) => _creditProductIds.contains(p.id)).toList(),
+                                  scrollController: _scrollControllers[0],
+                                ),
+                                _buildPremiumPage(context: context, localizations: localizations, planType: 'plus', scrollController: _scrollControllers[1]),
+                                _buildPremiumPage(context: context, localizations: localizations, planType: 'pro', scrollController: _scrollControllers[2]),
+                                _buildPremiumPage(context: context, localizations: localizations, planType: 'ultra', scrollController: _scrollControllers[3]),
+                              ],
+                            ),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: IgnorePointer(
+                                child: AnimatedOpacity(
+                                  opacity: _showScrollFog ? 1.0 : 0.0,
+                                  duration: const Duration(milliseconds: 250),
+                                  child: Container(
+                                    height: screenHeight * 0.07,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          AppColors.background.withOpacity(0.0),
+                                          AppColors.background,
+                                        ],
+                                        stops: const [0.0, 0.9],
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        AnimatedOpacity(
-                          duration: const Duration(milliseconds: 500),
-                          opacity: disablePurchaseButton ? 0.5 : 1.0,
-                          child: ElevatedButton(
-                            onPressed: (_purchasePending || _loading || disablePurchaseButton)
-                                ? null
-                                : _onPrimaryButtonPressed,
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: AppColors.primaryColor,
-                              backgroundColor: AppColors.primaryColor.inverted,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              minimumSize: Size(screenWidth * 0.8, 50),
-                            ),
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 250),
-                              transitionBuilder: (child, animation) =>
-                                  FadeTransition(opacity: animation, child: ScaleTransition(scale: animation, child: child)),
-                              child: _purchasePending
-                                  ? SizedBox(
-                                  key: const ValueKey('loader'),
-                                  height: 22.0,
-                                  width: 22.0,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor)))
-                                  : AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 300),
-                                transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-                                child: _buildButtonText(context, localizations),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(screenWidth * 0.06, screenHeight * 0.01, screenWidth * 0.06, screenHeight * 0.02),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(
+                                4,
+                                    (index) {
+                                  final bool isSelected = _currentPage == index;
+                                  final double dotSize = screenWidth * 0.022;
+                                  final double selectedWidth = screenWidth * 0.06;
+
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 350),
+                                    curve: Curves.easeOutCubic,
+                                    margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
+                                    width: isSelected ? selectedWidth : dotSize,
+                                    height: dotSize,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(dotSize),
+                                      color: isSelected
+                                          ? AppColors.primaryColor.inverted
+                                          : AppColors.primaryColor.inverted.withOpacity(0.5),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
-                          ),
+                            SizedBox(height: screenHeight * 0.02),
+                            AnimatedOpacity(
+                              duration: const Duration(milliseconds: 500),
+                              opacity: disablePurchaseButton ? 0.5 : 1.0,
+                              child: ElevatedButton(
+                                onPressed: (_purchasePending || _loading || disablePurchaseButton)
+                                    ? null
+                                    : _onPrimaryButtonPressed,
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: AppColors.primaryColor,
+                                  backgroundColor: AppColors.primaryColor.inverted,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                  padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                                  minimumSize: Size(screenWidth * 0.8, screenHeight * 0.06),
+                                ),
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 250),
+                                  transitionBuilder: (child, animation) =>
+                                      FadeTransition(opacity: animation, child: ScaleTransition(scale: animation, child: child)),
+                                  child: _purchasePending
+                                      ? SizedBox(
+                                      key: const ValueKey('loader'),
+                                      height: screenHeight * 0.025,
+                                      width: screenHeight * 0.025,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor)))
+                                      : AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 300),
+                                    transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                                    child: _buildButtonText(context, localizations),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: screenHeight * 0.01),
+                            TextButton(
+                              onPressed: () => _showTermsAndConditions(context),
+                              child: Text(
+                                localizations.termsOfServiceAndPrivacyPolicyWarning,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: AppColors.tertiaryColor,
+                                  fontSize: screenWidth * 0.025,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        TextButton(
-                          onPressed: () => _showTermsAndConditions(context),
-                          child: Text(localizations.termsOfServiceAndPrivacyPolicyWarning,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: AppColors.tertiaryColor, fontSize: 10)),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                FloatingInfoBanner(
+                  key: const ValueKey('discount_banner'),
+                  bannerType: BannerType.discount,
+                ),
+              ],
             ),
-            FloatingInfoBanner(
-              key: const ValueKey('discount_banner'),
-              bannerType: BannerType.discount,
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildErrorScreen(BuildContext context, AppLocalizations localizations) {
-    final screenWidth = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -813,40 +942,43 @@ class _PremiumScreenState extends State<PremiumScreen>
               ),
             ),
             Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.error_outline, color: AppColors.septenaryColor, size: 80),
-                    const SizedBox(height: 24),
-                    Text(
-                      _errorMessage,
-                      style: TextStyle(fontSize: 16, color: AppColors.primaryColor.inverted),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          _loading = true;
-                          _errorOccurred = false;
-                          _errorMessage = '';
-                        });
-                        _initializeStore();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: AppColors.primaryColor,
-                        backgroundColor: AppColors.primaryColor.inverted,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                        padding: EdgeInsets.symmetric(vertical: 16, horizontal: screenWidth * 0.2),
+              child: Stack(
+                children: [
+                  PageView(
+                    controller: _pageController,
+                    children: [
+                      CreditContentWidget(
+                        onCreditPackageSelected: (package) {
+                          if (mounted) setState(() => _selectedCreditPackage = package);
+                        },
+                        availableProducts: _availableProducts.where((p) => _creditProductIds.contains(p.id)).toList(),
                       ),
-                      child: Text(
-                        localizations.retry,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+                      _buildPremiumPage(context: context, localizations: localizations, planType: 'plus', scrollController: _scrollControllers[1]),
+                      _buildPremiumPage(context: context, localizations: localizations, planType: 'pro', scrollController: _scrollControllers[2]),
+                      _buildPremiumPage(context: context, localizations: localizations, planType: 'ultra', scrollController: _scrollControllers[3]),
+                    ],
+                  ),
+                  // --- NEW: Fading "fog" effect, correctly positioned ---
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: IgnorePointer(
+                      child: Container(
+                        height: 500.0, // The height/intensity of the fade effect
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              AppColors.secondaryColor.withOpacity(0.0),  // Start transparent
+                              AppColors.secondaryColor.withOpacity(0.5),  // Peak shine color
+                              AppColors.secondaryColor.withOpacity(0.0),  // End transparent
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -911,8 +1043,8 @@ class _PremiumScreenState extends State<PremiumScreen>
     required BuildContext context,
     required AppLocalizations localizations,
     required String planType,
+    required ScrollController scrollController,
   }) {
-    // ... [This widget's content remains unchanged as it was already well-structured]
     // The following is a direct copy of the original _buildPremiumPage and its helpers,
     // as they correctly display data passed to them. The fixes were in the state that
     // controls what data gets passed.
@@ -956,6 +1088,7 @@ class _PremiumScreenState extends State<PremiumScreen>
     }
     final bool isActivePlan = (planType == 'plus' && _hasCortexSubscription == 1) || (planType == 'pro' && _hasCortexSubscription == 2) || (planType == 'ultra' && _hasCortexSubscription == 3);
     return SingleChildScrollView(
+      controller: scrollController,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
@@ -984,73 +1117,122 @@ class _PremiumScreenState extends State<PremiumScreen>
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(6)),
-        child: Text(text, style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.bold)),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            text,
+            style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.bold),
+            maxLines: 1,
+            softWrap: false,
+          ),
+        ),
       );
     }
+
+    // The core widget content that will be put inside the Stack
+    final content = AnimatedContainer(
+      width: double.infinity,
+      duration: const Duration(milliseconds: 300),
+      decoration: BoxDecoration(
+        color: AppColors.background, // Assuming this was the intended color, not AppColors.background
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isSelected ? AppColors.primaryColor.inverted : AppColors.border, // Use AppColors.border for unselected state
+          width: isSelected ? 2.0 : 1.0, // Make border thicker when selected for better feedback
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted)),
+                  const SizedBox(height: 4),
+                  Text(description, style: TextStyle(fontSize: 16, color: AppColors.tertiaryColor)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              child: showCheckmark
+                  ? Container(
+                key: const ValueKey('checkmark'),
+                alignment: Alignment.center,
+                width: 70,
+                child: SvgPicture.asset('assets/icons/checkmark.svg', colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn), width: 36, height: 36),
+              )
+                  : Container(
+                key: const ValueKey('badges'),
+                width: 70,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Visibility(
+                      visible: isBestValue,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: buildBadge(backgroundColor: Colors.green, textColor: Colors.white, text: localizations.bestValue),
+                    ),
+                    buildBadge(backgroundColor: AppColors.primaryColor.inverted, textColor: AppColors.primaryColor, text: localizations.discountOffer(80)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 300),
       opacity: isEffectivelyDisabled ? 0.4 : 1.0,
       child: GestureDetector(
         onTap: isEffectivelyDisabled ? null : () => setState(() => selectedOptions[planType] = option),
-        child: AnimatedContainer(
-          width: double.infinity,
-          duration: const Duration(milliseconds: 300),
-          decoration: BoxDecoration(
-            color: AppColors.quaternaryColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: isSelected ? AppColors.primaryColor.inverted : Colors.transparent, width: 2.0),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: IntrinsicHeight(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted)),
-                      const SizedBox(height: 4),
-                      Text(description, style: TextStyle(fontSize: 16, color: AppColors.tertiaryColor)),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  transitionBuilder: (Widget child, Animation<double> animation) {
-                    return FadeTransition(opacity: animation, child: child);
+        child: Stack(
+          children: [
+            content, // The original widget
+            // --- MODIFICATION: The 'if (isBestValue)' condition is removed. ---
+            // The shine effect now applies to ALL subscription options.
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: AnimatedBuilder(
+                  animation: _shineAnimation,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(MediaQuery.of(context).size.width * _shineAnimation.value, 0),
+                      child: child,
+                    );
                   },
-                  child: showCheckmark
-                      ? Container(
-                    key: const ValueKey('checkmark'),
-                    alignment: Alignment.center,
-                    width: 70,
-                    child: SvgPicture.asset('assets/icons/checkmark.svg', colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn), width: 36, height: 36),
-                  )
-                      : Container(
-                    key: const ValueKey('badges'),
-                    width: 70,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Visibility(
-                          visible: isBestValue,
-                          maintainSize: true,
-                          maintainAnimation: true,
-                          maintainState: true,
-                          child: buildBadge(backgroundColor: Colors.green, textColor: Colors.white, text: localizations.bestValue),
-                        ),
-                        buildBadge(backgroundColor: AppColors.primaryColor.inverted, textColor: AppColors.primaryColor, text: localizations.discountOffer(80)),
-                      ],
+                  child: Container(
+                    width: 100, // Width of the shine gradient
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          AppColors.secondaryColor.withOpacity(0.0),  // Start transparent
+                          AppColors.secondaryColor.withOpacity(0.5),  // Peak shine color
+                          AppColors.secondaryColor.withOpacity(0.0),  // End transparent
+                        ],
+                        stops: const [0.4, 0.5, 0.6],
+                      ),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -1060,25 +1242,120 @@ class _PremiumScreenState extends State<PremiumScreen>
     String benefit7Text = localizations.benefit7(planType == 'plus' ? '500' : planType == 'pro' ? '1000' : '2000');
     List<String> benefits = [];
     if (planType == 'plus')
-      benefits = [localizations.benefit1, localizations.benefit3, localizations.benefit5, localizations.benefit4, benefit7Text, localizations.benefit9];
+      benefits = [
+        localizations.benefit1,
+        localizations.benefit3,
+        localizations.benefit5,
+        localizations.benefit4,
+        benefit7Text,
+        localizations.benefit9,
+        localizations.benefitPremiumModels,
+      ];
     else if (planType == 'pro')
       benefits = [localizations.oldBenefits, localizations.benefit5, localizations.benefit1, benefit7Text];
     else if (planType == 'ultra')
       benefits = [localizations.oldBenefits, localizations.benefit8, localizations.benefit1, localizations.benefit5, benefit7Text];
+
+    // --- CORRECTED LOGIC: Determine if animation should run only ONCE per screen lifecycle ---
+    final bool shouldAnimate = !_hasAnyBenefitListAnimated;
+
+    // If this is the first time animating, set the flag so it never runs again.
+    // A post-frame callback is safest to prevent setState errors during a build.
+    if (shouldAnimate) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _hasAnyBenefitListAnimated = true;
+        }
+      });
+    }
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: benefits.map((benefit) => SizedBox(
-        width: (MediaQuery.of(context).size.width - 48 - 8) / 2,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SvgPicture.asset('assets/icons/checkmark.svg', width: 20, height: 20, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn)),
-            const SizedBox(width: 8),
-            Expanded(child: Text(benefit, style: TextStyle(fontSize: 14, color: AppColors.primaryColor.inverted))),
-          ],
-        ),
-      )).toList(),
+      children: benefits.asMap().entries.map((entry) {
+        final int index = entry.key;
+        final String benefit = entry.value;
+
+        final benefitContent = SizedBox(
+          width: (MediaQuery.of(context).size.width - 48 - 8) / 2,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SvgPicture.asset('assets/icons/checkmark.svg', width: 20, height: 20, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn)),
+              const SizedBox(width: 8),
+              Expanded(child: Text(benefit, style: TextStyle(fontSize: 14, color: AppColors.primaryColor.inverted))),
+            ],
+          ),
+        );
+
+        // The logic is now simple: create the animator and tell it whether to animate or not.
+        return _FadingBenefitItem(
+          animate: shouldAnimate,
+          delay: Duration(milliseconds: 200 + (index * 120)),
+          child: benefitContent,
+        );
+      }).toList(),
+    );
+  }
+}
+
+
+/// A custom stateful widget for staggered fade-in animation of benefit items.
+/// It MUST be a StatefulWidget to manage its own animation timer.
+class _FadingBenefitItem extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
+  final bool animate; // This flag will control if the timer starts
+
+  const _FadingBenefitItem({
+    required this.child,
+    required this.delay,
+    required this.animate,
+  });
+
+  @override
+  State<_FadingBenefitItem> createState() => _FadingBenefitItemState();
+}
+
+class _FadingBenefitItemState extends State<_FadingBenefitItem> {
+  // Initial state: invisible and slightly offset down
+  bool _isVisible = false;
+  double _yOffset = 10.0;
+
+  @override
+  void initState() {
+    super.initState();
+    // --- CORRECTED LOGIC ---
+    // Only start the animation timer if the `animate` flag is true.
+    if (widget.animate) {
+      Timer(widget.delay, () {
+        if (mounted) {
+          setState(() {
+            _isVisible = true;
+            _yOffset = 0.0; // Animate to final position
+          });
+        }
+      });
+    } else {
+      // If not animating, set the final state immediately.
+      _isVisible = true;
+      _yOffset = 0.0;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // These animation widgets are driven by the internal state variables,
+    // which are controlled by the logic in initState.
+    return AnimatedOpacity(
+      opacity: _isVisible ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 500),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOut,
+        transform: Matrix4.translationValues(0, _yOffset, 0),
+        child: widget.child,
+      ),
     );
   }
 }

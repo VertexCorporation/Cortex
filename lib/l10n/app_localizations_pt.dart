@@ -967,6 +967,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get japanese => 'Japonês';
 
   @override
+  String get kurdish => 'Curdo';
+
+  @override
+  String get dutch => 'Holandês';
+
+  @override
+  String get russian => 'Russo';
+
+  @override
   String get korean => 'Coreano';
 
   @override
@@ -1430,7 +1439,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Os créditos são usados para conversar com modelos online. Para que saiba, cada mensagem que lhes envia custa-nos dinheiro.\n\n• Cada mensagem para um modelo online custa 20 créditos.\n• Incluir uma imagem adiciona mais 30 créditos.\n• Os utilizadores do plano gratuito recebem um bónus de 200 créditos que é reposto diariamente.';
+      'Créditos são usados para conversar com modelos online. cada mensagem custa uma grana pra gente e esses créditos que tão segurando a barra pra gente não quebrar então agora vamo explicar o sistema\n\n• Cada mensagem pra um modelo online grátis custa 10 créditos.\n• Cada mensagem pra um modelo premium online custa 20 créditos.\n• Incluir um anexo adiciona mais 30 créditos.\n• Usuários do plano grátis ganham um bônus de 200 créditos que reseta todo dia.';
 
   @override
   String get creditsInfoPanelFooter => 'Boas conversas!';
@@ -1573,4 +1582,57 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get creatorSupportedSuccess =>
       'Criador apoiado com sucesso! Suas compras futuras irão contribuir para ele.';
+
+  @override
+  String get featureDocumentTitle => 'Suporte a documentos';
+
+  @override
+  String get featureDocumentDescription =>
+      'Este modelo pode analisar e responder perguntas sobre documentos enviados, como PDFs e arquivos de texto.';
+
+  @override
+  String get featureAudioTitle => 'Entrada de voz';
+
+  @override
+  String get featureAudioDescription =>
+      'Este modelo pode entender e processar entradas de áudio faladas.';
+
+  @override
+  String get featureImageGenerationTitle => 'Geração de Imagem';
+
+  @override
+  String get featureImageGenerationDescription =>
+      'Este modelo pode criar imagens originais com base nas suas descrições de texto.';
+
+  @override
+  String get errorImageLoad => 'Falha ao carregar a imagem gerada.';
+
+  @override
+  String get extensionInfoPanelTitle => 'Explorar modelos';
+
+  @override
+  String get extensionInfoPanelBody1 =>
+      'Esta seta permite alternar entre diferentes modelos dentro desta série.';
+
+  @override
+  String get extensionInfoPanelBody2 =>
+      'Quando você inicia um bate-papo com esta série, o modelo padrão é selecionado automaticamente e você pode alterar sua seleção a qualquer momento durante o bate-papo.';
+
+  @override
+  String get extensionInfoPanelFooter =>
+      'Para ver informações detalhadas sobre cada modelo ou selecionar manualmente um modelo diferente, acesse a Biblioteca; selecione a série do modelo e toque na seta na parte superior da página de detalhes.';
+
+  @override
+  String get premiumModelNoticeTitle => 'Modelo Premium';
+
+  @override
+  String get premiumModelNoticeDescription =>
+      'Este é um modelo premium, usuários gratuitos são limitados a 3 mensagens por dia com modelos premium; assine para desbloquear acesso ilimitado!';
+
+  @override
+  String get benefitPremiumModels => 'Acesso a modelos premium';
+
+  @override
+  String get premiumTrialExhaustedMessage =>
+      'Você usou todas as suas mensagens diárias gratuitas para modelos premium. Faça upgrade para ter acesso ilimitado.';
 }

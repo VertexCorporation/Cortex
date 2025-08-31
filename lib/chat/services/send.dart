@@ -7,10 +7,12 @@
 // comments explain the workflow and helper methods.
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:cortex/chat/services/review.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../cache.dart';
 import '../../models/backend/data.dart';
@@ -34,26 +36,37 @@ class SendService {
     _isSending = false;
   }
 
-  /// Sends a new message.
-  /// It handles various modes including editing, regenerate, or standard message sending.
+  /// Sends a message.
+  ///
+  /// This method's logic has been refactored for clarity and reliability,
+  /// especially for the regeneration flow.
+  ///
+  /// - **New Message:** Appends a user message and a "thinking" AI message to the list.
+  /// - **Regenerate:** Trusts that `RegenerateService` has already prepared the
+  ///   message list correctly. It simply identifies the "thinking" placeholder
+  ///   at `regenerateAiIndex` and starts the API call. It no longer modifies
+  ///   the message list itself during regeneration.
+  /// - **Edit:** Handles editing flow as before.
   Future<void> sendMessage({
     String? textFromButton,
     bool isRegenerate = false,
     int? regenerateAiIndex,
     String? regeneratePhotoPath,
-  }) async
-  {
+  }) async {
     final localizations = AppLocalizations.of(state.context)!;
     if (!state.canHandleImage) {
       selectedPhoto = null;
     }
 
     final String messageText = textFromButton ?? state.controller.text.trim();
-    if (messageText.isEmpty && selectedPhoto == null && regeneratePhotoPath == null) return;
+    if (messageText.isEmpty &&
+        selectedPhoto == null &&
+        regeneratePhotoPath == null) return;
     if (_isSending) return;
-    final bool photoAllowed   = state.canHandleImage;
-    final File? photoForSend   = photoAllowed ? selectedPhoto : null;
+
     _isSending = true;
+    final bool photoAllowed = state.canHandleImage;
+    final File? photoForSend = photoAllowed ? selectedPhoto : null;
     String apiModelIdForSend = state.modelId!;
 
     if (state.modelId == 'trash') {
@@ -62,13 +75,11 @@ class SendService {
       return;
     }
 
-    // Dismiss the keyboard and attempt to fetch user data in the background.
     FocusScope.of(state.context).unfocus();
     FetchService.fetchUserData().catchError((error) {
       debugPrint("FetchUserData error: $error");
     });
 
-    // If modelId is missing, log an error and abort sending.
     if (state.modelId == null || state.modelId!.isEmpty) {
       debugPrint("Error: modelId is null or empty in sendMessage");
       _isSending = false;
@@ -77,37 +88,31 @@ class SendService {
 
     int? aiMessageIndex;
 
-    // If editing an existing message.
+    // --- RESTRUCTURED LOGIC FOR CLARITY ---
+
     if (state.editingMessageIndex != null) {
-      final int editingIndex = state.editingMessageIndex!;
-      state.setState(() {
-        state.messages[editingIndex].text = messageText;
-        state.messages = state.messages.sublist(0, editingIndex + 1);
-        state.editingMessageIndex = null;
-        state.originalMessageText = null;
-        state.controller.clear();
-        state.textFieldFocusNode.unfocus();
-      });
+      // Handle message editing flow.
       await _handleEditingMessage(messageText);
       _isSending = false;
       return;
-    } else if (isRegenerate && regenerateAiIndex != null) {
-      // Regenerate mode: update the corresponding message to show a thinking status.
+    } else if (isRegenerate) {
+      // Handle regeneration flow.
+      // The message list is already perfectly prepared by RegenerateService.
+      // We just need to set the state flags and identify the AI message index.
+      aiMessageIndex = regenerateAiIndex;
       state.setState(() {
-        state.messages[regenerateAiIndex].isThinking = true;
-        state.messages[regenerateAiIndex].includeInContext = false;
         state.isWaitingForResponse = true;
         state.isSendButtonVisible = false;
         state.responseStopped = false;
       });
-      aiMessageIndex = regenerateAiIndex;
-      _prepareForRegenerate(regenerateAiIndex, localizations);
     } else {
-      // New conversation start vs. continuing conversation.
+      // Handle new message flow.
       if (state.conversationID == null) {
-        await _startNewConversation(messageText, selectedPhoto != null, apiModelIdForSend, localizations);
+        await _startNewConversation(messageText, selectedPhoto != null,
+            apiModelIdForSend, localizations);
         aiMessageIndex = state.messages.length - 1;
       } else {
+        // Combine state updates for adding user and AI messages into one call.
         state.setState(() {
           state.messages.add(Message(
             text: messageText,
@@ -116,13 +121,6 @@ class SendService {
             isPhotoUploading: true,
             model: apiModelIdForSend,
           ));
-          state.controller.clear();
-          state.isWaitingForResponse = true;
-          state.isSendButtonVisible = false;
-          state.responseStopped = false;
-        });
-        aiMessageIndex = state.messages.length;
-        state.setState(() {
           state.messages.add(Message(
             text: "",
             isUserMessage: false,
@@ -130,12 +128,18 @@ class SendService {
             isThinking: true,
             model: apiModelIdForSend,
           ));
+          state.controller.clear();
+          state.isWaitingForResponse = true;
+          state.isSendButtonVisible = false;
+          state.responseStopped = false;
         });
-        await _appendNewMessage(messageText, selectedPhoto != null, apiModelIdForSend, localizations);
+        aiMessageIndex = state.messages.length - 1;
+        await _appendNewMessage(
+            messageText, selectedPhoto != null, apiModelIdForSend, localizations);
       }
     }
 
-    // Handle photo selection.
+    // Common logic for handling photo and sending the message
     String? photoPath = await _handlePhoto(
       photoForSend != null,
       regeneratePhotoPath,
@@ -170,7 +174,7 @@ class SendService {
         if (state.mounted && !state.responseStopped) {
           final int targetIndex = isRegenerate && regenerateAiIndex != null
               ? regenerateAiIndex
-              : (aiMessageIndex);
+              : (aiMessageIndex ?? state.messages.length - 1);
 
           if (targetIndex >= 0 && targetIndex < state.messages.length) {
             state.setState(() {
@@ -181,34 +185,35 @@ class SendService {
             });
 
             if (state.conversationID != null) {
-              await ChatStorageService.upsertMessage(
-                  state.conversationID!, targetIndex, state.messages[targetIndex]);
+              await ChatStorageService.upsertMessage(state.conversationID!,
+                  targetIndex, state.messages[targetIndex]);
             }
           }
         }
         if (!isRegenerate) {
-          debugPrint("[SendService] Successful server response. Triggering review check.");
+          debugPrint(
+              "[SendService] Successful server response. Triggering review check.");
           unawaited(ReviewService().triggerReviewPromptIfNeeded(state.context));
         }
       }
 
       if (state.conversationID != null) {
-        await ChatStorageService.updateConversationModelId(state.conversationID!, state.modelId!);
-        debugPrint("[SendService] Committed model change. Conv '${state.conversationID}' now permanently uses '${state.modelId}'.");
+        await ChatStorageService.updateConversationModelId(
+            state.conversationID!, state.modelId!);
+        debugPrint(
+            "[SendService] Committed model change. Conv '${state.conversationID}' now permanently uses '${state.modelId}'.");
       }
-
     } catch (e) {
       if (e is UserCancelledException) {
-        // This was an intentional cancellation by the user (via Stop button).
-        // The StopService has already handled the UI cleanup. We do nothing here
-        // and just let the function end gracefully.
-        debugPrint("[SendService] Caught UserCancelledException. Suppressing error UI.");
+        debugPrint(
+            "[SendService] Caught UserCancelledException. Suppressing error UI.");
       } else {
-        // This is a real, unexpected error. Show it to the user.
         _handleSendError(e, isRegenerate, regenerateAiIndex, localizations);
       }
     } finally {
-      _isSending = false;
+      if (state.mounted) {
+        _isSending = false;
+      }
     }
   }
 
@@ -408,20 +413,59 @@ class SendService {
     // NOTE: The try-catch block that was here has been REMOVED.
     // All exceptions (ApiException, UserCancelledException, etc.) will now
     // bubble up to the `catch` block in `sendMessage`.
-
+    final modelData = ModelData.getPreciseModelData(modelIdInState);
+    final bool isPremium = (modelData['tier'] as String? ?? 'free') == 'premium';
+    debugPrint("[SendService] Sending request for model '$modelIdInState'. Is Premium: $isPremium");
     final memory = await state.contextService.buildContextMessages(
       includeLastUser: false,
       targetModelId: modelIdInState,
     );
     final bool isCharacterModel = state.selectedModelCategory == 'roleplay' || state.selectedModelCategory == 'self';
 
-    final onStreamChunk = (String chunk) {
+    final onTextChunk = (String textChunk) {
       if (!state.mounted || state.responseStopped) return;
       state.setState(() {
-        state.messages[targetIndex].text += chunk;
+        state.messages[targetIndex].text += textChunk;
       });
       if (state.scrollService.isUserAtBottom()) {
         state.scrollService.scrollToBottom();
+      }
+    };
+
+    final onImageReceived = (String imageUrl) async {
+      if (!state.mounted || state.responseStopped) return;
+
+      try {
+        final imageBytes = base64Decode(imageUrl.split(',').last);
+        final tempDir = await getTemporaryDirectory();
+        final filePath = '${tempDir.path}/${const Uuid().v4()}.png';
+        final file = File(filePath);
+        await file.writeAsBytes(imageBytes);
+
+        if (state.mounted) {
+          state.setState(() {
+            state.messages[targetIndex].photoPath = filePath;
+          });
+
+          if (state.conversationID != null) {
+            await ChatStorageService.upsertMessage(
+              state.conversationID!,
+              targetIndex,
+              state.messages[targetIndex],
+            );
+          }
+        }
+      } catch (e) {
+        debugPrint("[SendService] Error saving received image: $e");
+        if (state.mounted) {
+          state.setState(() {
+            final aiMessage = state.messages[targetIndex];
+            aiMessage
+              ..text = localizations.errorImageLoad
+              ..isError = true
+              ..isThinking = false;
+          });
+        }
       }
     };
 
@@ -438,16 +482,20 @@ class SendService {
         context: memory,
         characterId: modelIdInState,
         baseModelId: baseModelId,
+        isPremium: isPremium,
         photoPath: photoPath,
-        onStreamChunk: onStreamChunk,
+        onTextChunk: onTextChunk,
+        onImageReceived: onImageReceived,
       );
     } else {
       await state.apiService.getOnlineModelResponse(
         modelId: modelIdInState,
         userInput: text,
         context: memory,
+        isPremium: isPremium,
         photoPath: photoPath,
-        onStreamChunk: onStreamChunk,
+        onTextChunk: onTextChunk,
+        onImageReceived: onImageReceived,
       );
     }
   }

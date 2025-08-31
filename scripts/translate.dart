@@ -1,9 +1,40 @@
 // scripts/translate.dart
+
 import 'dart:io';
 import 'dart:convert';
 import 'package:path/path.dart' as p;
 
-Future<void> main() async {
+Future<void> main(List<String> args) async {
+  // =========================================================================
+  // === MANUAL OVERRIDE SYSTEM ==============================================
+  // =========================================================================
+  // For keys that require a perfect, culturally nuanced translation,
+  // define them here. The script will use these instead of calling the API.
+  //
+  // Structure:
+  // 'arb_key': {
+  //   'locale_code': 'The perfect, hand-crafted translation string.',
+  // },
+  // =========================================================================
+  final Map<String, Map<String, String>> manualOverrides = {
+    // Here is the manuel translation system wow
+    // 'key': {
+    //   'fr': 'Une autre traduction parfaite.'
+    // }
+  };
+
+  List<String> keysToUpdate = [];
+  final keyArg = args.firstWhere((arg) => arg.startsWith('--key='), orElse: () => '');
+
+  if (keyArg.isNotEmpty) {
+    final keysString = keyArg.split('=')[1];
+    if (keysString.isEmpty) {
+      stderr.writeln('❌ Error: The --key argument must have a value. e.g.: --key=key1,key2');
+      exit(1);
+    }
+    keysToUpdate = keysString.split(',').map((k) => k.trim()).toList();
+  }
+
   final scriptPath = Platform.script.toFilePath();
   final projectRoot = p.dirname(p.dirname(scriptPath));
 
@@ -14,13 +45,17 @@ Future<void> main() async {
     'tr', 'zh', 'fr', 'hi', 'pt', 'id', 'az', 'de', 'es', 'it', 'ja', 'ko', 'ku', 'ru', 'ar', 'nl'
   ];
 
-  print('Starting ARB synchronization and translation process...');
+  if (keysToUpdate.isNotEmpty) {
+    print('🟢 Force update mode activated for specific keys: "$keysToUpdate"');
+  } else {
+    print('🔵 Starting standard synchronization and translation process...');
+  }
 
   final templateArbFile = p.join(arbDir, templateArbFileName);
   final File templateFile = File(templateArbFile);
 
   if (!await templateFile.exists()) {
-    stderr.writeln('❌ Error: Template ARB file not found at: $templateArbFile');
+    stderr.writeln('❌ Error: Template ARB file not found: $templateArbFile');
     exit(1);
   }
 
@@ -33,6 +68,15 @@ Future<void> main() async {
   });
 
   print('Found ${sourceKeys.length} keys in the template file ($templateArbFileName).');
+
+  if (keysToUpdate.isNotEmpty) {
+    for (final key in keysToUpdate) {
+      if (!sourceKeys.containsKey(key)) {
+        stderr.writeln('❌ Error: The key to be updated "$key" was not found in the template file ($templateArbFileName).');
+        exit(1);
+      }
+    }
+  }
 
   for (final locale in targetLocales) {
     print('\n--- Processing locale: $locale ---');
@@ -49,29 +93,52 @@ Future<void> main() async {
     }
 
     bool wasModified = false;
-    for (final key in sourceKeys.keys) {
-      if (!targetContent.containsKey(key)) {
-        wasModified = true;
-        final sourceText = sourceKeys[key];
-        print('-> Found missing key "$key". Translating text: "$sourceText"');
+    final keysToProcess = keysToUpdate.isNotEmpty ? keysToUpdate : sourceKeys.keys.toList();
 
-        // --- THE NEW GOOGLE TRANSLATE v2 ENGINE ---
+    for (final key in keysToProcess) {
+      final shouldTranslate = !targetContent.containsKey(key) || keysToUpdate.contains(key);
+
+      if (shouldTranslate) {
+        wasModified = true;
+
+        // Check for a manual override before attempting to translate.
+        if (manualOverrides.containsKey(key) && manualOverrides[key]!.containsKey(locale)) {
+          final overriddenText = manualOverrides[key]![locale]!;
+          targetContent[key] = overriddenText;
+          print('   ✍️ Manual override applied: "$overriddenText"');
+          continue; // Skip the API call and move to the next key.
+        }
+
+        const placeholder = 'CORTEXNEWLINE';
+        final originalText = sourceKeys[key] as String;
+        final textToSend = originalText.replaceAll('\n', placeholder);
+
+        if (keysToUpdate.contains(key)) {
+          print('-> Force update: "$key". Translating text: "$textToSend"');
+        } else {
+          print('-> Found missing key "$key". Translating text: "$textToSend"');
+        }
+
         final result = await Process.run(
-          'python', // Just needs a python from the activated venv
+          'python',
           [
             p.join(projectRoot, 'scripts', 'translate.py'),
             sourceLocale,
             locale,
-            sourceText,
+            textToSend,
           ],
         );
 
         if (result.exitCode == 0) {
-          String translatedText = result.stdout.toString().trim();
+          String translatedText = result.stdout.toString().trim().replaceAll(placeholder, '\n');
+
+          final instructionRegex = RegExp(r'\[.*?\]\s*');
+          translatedText = translatedText.replaceAll(instructionRegex, '');
+
           targetContent[key] = translatedText;
           print('   ✅ Translation successful: "$translatedText"');
         } else {
-          targetContent[key] = sourceText;
+          targetContent[key] = originalText;
           stderr.writeln('   ❌ Error translating key "$key". Using source text as fallback.');
           stderr.writeln('   Tool Error: ${result.stderr}');
         }
@@ -81,8 +148,10 @@ Future<void> main() async {
     if (wasModified) {
       await targetFile.writeAsString(JsonEncoder.withIndent('  ').convert(targetContent));
       print('Saved updated file: $targetArbFileName');
-    } else {
+    } else if (keysToUpdate.isEmpty) {
       print('Sync: No new keys to add. File is up to date.');
+    } else {
+      print('No changes were made. The keys might already be up to date.');
     }
   }
 

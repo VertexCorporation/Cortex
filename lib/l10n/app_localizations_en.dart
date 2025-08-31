@@ -962,6 +962,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get japanese => 'Japanese';
 
   @override
+  String get kurdish => 'Kurdish';
+
+  @override
+  String get dutch => 'Dutch';
+
+  @override
+  String get russian => 'Russian';
+
+  @override
   String get korean => 'Korean';
 
   @override
@@ -1422,7 +1431,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Credits are used to chat with online models. Just so you know, every message you send to them costs us money.\n\n• Each message to an online model costs 20 credits.\n• Including an image adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.';
+      'Credits are used to chat with online models. every single message costs us cash and these credits keepin us from going broke now lets explain the system \n\n• Each message to a free online model costs 10 credits.\n• Each message to an online premium model costs 20 credits.\n• Including an attachment adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.';
 
   @override
   String get creditsInfoPanelFooter => 'Happy chatting!';
@@ -1565,4 +1574,57 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get creatorSupportedSuccess =>
       'Creator supported successfully! Your future purchases will contribute to them.';
+
+  @override
+  String get featureDocumentTitle => 'Document Support';
+
+  @override
+  String get featureDocumentDescription =>
+      'This model can analyze and answer questions about uploaded documents such as PDFs and text files.';
+
+  @override
+  String get featureAudioTitle => 'Voice Input';
+
+  @override
+  String get featureAudioDescription =>
+      'This model can understand and process spoken audio inputs.';
+
+  @override
+  String get featureImageGenerationTitle => 'Image Generation';
+
+  @override
+  String get featureImageGenerationDescription =>
+      'This model can create original images based on your text descriptions.';
+
+  @override
+  String get errorImageLoad => 'Failed to load the generated image.';
+
+  @override
+  String get extensionInfoPanelTitle => 'Explore Models';
+
+  @override
+  String get extensionInfoPanelBody1 =>
+      'This arrow lets you switch between different models within this series.';
+
+  @override
+  String get extensionInfoPanelBody2 =>
+      'When you first start a chat with this series, the default model is automatically selected and you can change your selection at any time during a chat.';
+
+  @override
+  String get extensionInfoPanelFooter =>
+      'To view detailed information about each model or to manually select a different model, please go to the Library; select this model series from there and tap the arrow at the top of its detail page.';
+
+  @override
+  String get premiumModelNoticeTitle => 'Premium Model';
+
+  @override
+  String get premiumModelNoticeDescription =>
+      'This model is a premium model, free users are limited to 3 messages per day with premium models; subscribe to unlock unlimited access!';
+
+  @override
+  String get benefitPremiumModels => 'Access to premium models';
+
+  @override
+  String get premiumTrialExhaustedMessage =>
+      'You have used all your free daily messages for premium models, please upgrade for unlimited access.';
 }

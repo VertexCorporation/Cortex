@@ -127,6 +127,8 @@ extension InvertedColor on Color {
   Color get inverted => Color.fromARGB(alpha, 255 - red, 255 - green, 255 - blue);
 }
 
+const List<String> kUnsupportedMaterialLocales = ['ku'];
+
 /// Main application widget that handles theming and localization
 /// Sets up MaterialApp with proper theme configuration and navigation
 class Cortex extends StatelessWidget {
@@ -210,8 +212,15 @@ class Cortex extends StatelessWidget {
       ],
       localeResolutionCallback: (locale, supportedLocales) {
         final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
-        debugPrint('Cortex: Resolving locale to: ${localeProvider.locale}');
-        return localeProvider.locale;
+        final chosenLocale = localeProvider.locale;
+
+        if (kUnsupportedMaterialLocales.contains(chosenLocale.languageCode)) {
+          debugPrint('Cortex: Unsupported Material locale detected (${chosenLocale.languageCode}). Falling back to English for Material components.');
+          return const Locale('en');
+        }
+
+        debugPrint('Cortex: Resolving locale to: ${chosenLocale.languageCode}');
+        return chosenLocale;
       },
       home: startupScreen,
     );

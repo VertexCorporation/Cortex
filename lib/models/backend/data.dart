@@ -43,6 +43,7 @@ class ModelInfo {
   final String? baseModelId;
   final int? size;
   final int? ram;
+  final String tier;
 
   ModelInfo({
     required this.id,
@@ -58,6 +59,7 @@ class ModelInfo {
     this.baseModelId,
     this.size,
     this.ram,
+    this.tier = 'free',
   });
 }
 
@@ -422,7 +424,7 @@ class ModelData {
     'nova': 'assets/models/online/ministral.jpg',
     'wizardlm': 'assets/models/online/wizardlm.jpg',
     'mai': 'assets/models/online/mai.jpg',
-    'codex': 'assets/models/online/codex.png',
+    'codex': 'assets/models/online/codex.jpg',
     'deepseek': 'assets/models/both/deepseek.jpg',
     'mistral': 'assets/models/both/mistral.jpg',
     'phi': 'assets/models/both/phi.png',
@@ -804,10 +806,11 @@ class ModelData {
         ?? englishDetails['description'] as String?
         ?? '';
 
-    // --- THIS IS THE CRITICAL FIX for client-side parsing ---
     // Extract the 'role' (system prompt) as a STRING using the localized fallback logic.
     final String? role = localizedDetails['role'] as String?
         ?? englishDetails['role'] as String?;
+
+    final String tier = variantData['tier'] as String? ?? 'free';
 
     if (role != null) {
       debugPrint("[_parseSingleVariantModel] LOG: Successfully extracted role for '$modelId' as a String: '${role.substring(0, (role.length > 50) ? 50 : role.length)}...'");
@@ -845,6 +848,7 @@ class ModelData {
       'description': description,
       'baseModelId': finalBaseModelId,
       'imagePath': variantData['imagePath'],
+      'tier': tier,
       'modalities': modalities,
       'outputs': outputs,
       'extensions': null,
@@ -905,6 +909,7 @@ class ModelData {
         'title': variantData['title'] ?? variantKey,
         'summary': localizedSeriesSummary,
         'description': localizedVariantDesc,
+        'tier': variantData['tier'] as String? ?? 'free',
         'modalities': modalities,
         'outputs': outputs,
         'reasoning': variantData['reasoning'] ?? false,
@@ -931,6 +936,7 @@ class ModelData {
       'category': seriesValue['category'] ?? 'online',
       'summary': localizedSeriesSummary,
       'description': localizedSeriesSummary,
+      'tier': 'free',
       // It's acceptable for the container to have the same summary/description.
       'imagePath': seriesValue['imagePath'],
       'extensions': extensions,
@@ -1063,43 +1069,80 @@ class ModelData {
   }
 
   /// Finds the best default online model from a GIVEN LIST of models.
-  /// THIS IS THE FINAL, CORRECTED VERSION. It is now a pure function
-  /// that no longer depends on the potentially stale global cache.
+  /// THIS IS THE FINAL, REFINED VERSION.
+  /// It now inspects variants *within* each series, allowing mixed series (like Gemini)
+  /// to be candidates as long as they contain at least one text-only variant.
+  /// It still prioritizes the Gemini series first.
   static String? findDefaultBaseModel(List<Map<String, dynamic>> models) {
     if (models.isEmpty) {
-      debugPrint(
-          "[ModelData] findDefaultBaseModel called with an empty list. Cannot find a default.");
+      debugPrint("[ModelData] findDefaultBaseModel called with an empty list. Cannot find a default.");
       return null;
     }
 
-    // Priority 1: Find the 'gemini' model series.
-    final geminiModel = models.firstWhere((m) => m['id'] == 'gemini',
-        orElse: () => {});
-    if (geminiModel.isNotEmpty && geminiModel['extensions'] is Map) {
-      final extensions = geminiModel['extensions'] as Map<String, dynamic>;
-      // Find the first variant that is NOT a Pro model, preferring Flash or others.
-      final nonProVariant = extensions.entries.firstWhere(
-              (e) =>
-          e.value['title'] is String &&
-              !(e.value['title'] as String).toLowerCase().contains('pro'),
-          orElse: () =>
-          extensions.entries
-              .first // Fallback to the very first variant if none match
+    String? defaultBaseModelId;
+
+    // A reusable helper function to find the best text-only variant within a given series' extensions.
+    String? findBestSafeVariant(Map<String, dynamic> extensions) {
+      // Step 1: Filter the extensions to get a map of ONLY text-only variants.
+      final textOnlyVariants = Map.fromEntries(
+        extensions.entries.where((entry) {
+          final variantData = entry.value;
+          if (variantData is Map<String, dynamic>) {
+            final outputs = variantData['outputs'] as Map<String, dynamic>?;
+            // A variant is safe if it does NOT have "image": true.
+            return !(outputs != null && outputs['image'] == true);
+          }
+          return false; // Exclude malformed entries.
+        }),
       );
-      return nonProVariant.key;
+
+      // Step 2: If there are any safe variants, pick the best one.
+      if (textOnlyVariants.isNotEmpty) {
+        // Prefer a non-pro model from the safe list.
+        final nonProEntry = textOnlyVariants.entries.firstWhere(
+              (e) => e.value['title'] is String && !(e.value['title'] as String).toLowerCase().contains('pro'),
+          orElse: () => textOnlyVariants.entries.first, // Fallback to the first safe variant.
+        );
+        return nonProEntry.key;
+      }
+
+      // If no safe variants were found in this series, return null.
+      return null;
     }
 
-    // Priority 2 (Fallback): Find the first available online model with any extensions.
-    final firstOnlineModel = models.firstWhere((m) =>
-    m['type'] == 'online' && m['extensions'] is Map &&
-        (m['extensions'] as Map).isNotEmpty, orElse: () => {});
-    if (firstOnlineModel.isNotEmpty) {
-      return (firstOnlineModel['extensions'] as Map<String, dynamic>).keys
-          .first;
+    // --- Attempt 1: Prioritize the Gemini Series ---
+    final geminiModel = models.firstWhere((m) => m['id'] == 'gemini', orElse: () => {});
+    if (geminiModel.isNotEmpty && geminiModel['extensions'] is Map) {
+      debugPrint("[ModelData] Attempt 1: Searching for a safe variant within the Gemini series.");
+      final extensions = geminiModel['extensions'] as Map<String, dynamic>;
+      defaultBaseModelId = findBestSafeVariant(extensions);
     }
 
-    debugPrint("[ModelData] Could not find any suitable default base model.");
-    return null;
+    // --- Attempt 2 (Fallback): If no suitable Gemini variant was found, search other series ---
+    if (defaultBaseModelId == null) {
+      debugPrint("[ModelData] Attempt 1 Failed. Attempt 2: Searching other online series.");
+      final otherModels = models.where((m) => m['type'] == 'online' && m['id'] != 'gemini');
+
+      for (final model in otherModels) {
+        if (model['extensions'] is Map<String, dynamic>) {
+          final extensions = model['extensions'] as Map<String, dynamic>;
+          defaultBaseModelId = findBestSafeVariant(extensions);
+          if (defaultBaseModelId != null) {
+            // Found a suitable model in another series, so we can stop searching.
+            break;
+          }
+        }
+      }
+    }
+
+    // Final logging
+    if (defaultBaseModelId != null) {
+      debugPrint("[ModelData] Selected '$defaultBaseModelId' as the final default base model.");
+    } else {
+      debugPrint("[ModelData] CRITICAL: Could not find any suitable text-only variant in any series.");
+    }
+
+    return defaultBaseModelId;
   }
 
   /// It is now a self-contained utility that updates the database directly
@@ -1486,8 +1529,9 @@ class ModelData {
       'producer': 'Unknown',
       'imagePath': 'assets/icons/self.svg', // Always use the SVG for fallbacks
       'type': 'online',
-      'modalities': {},
-      'outputs': {},
+      'tier': 'free',
+      'modalities': <String, dynamic>{},
+      'outputs': <String, dynamic>{},
       'extensions': null,
     };
   }

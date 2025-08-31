@@ -1,6 +1,7 @@
 // read.dart
 
 import 'dart:math';
+import 'package:cortex/chat/services/storage.dart';
 import 'package:cortex/models/backend/utils.dart'; // <-- REQUIRED IMPORT
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
@@ -20,13 +21,13 @@ class ReadService {
 
   ReadService(this.state);
 
-  /// --- THE FINAL, UNIFIED FIX for loading conversations ---
-  /// This function now robustly handles all model types and correctly
-  /// resolves the file path for offline models when loading a conversation.
+  /// This function now robustly handles all model types, correctly resolves file paths,
+  /// and, most importantly, accurately determines the premium status of any conversation
+  /// being loaded, ensuring the premium banner appears consistently.
   Future<void> loadConversation(ConversationManager manager) async {
     const String logPrefix = "[ReadService.loadConversation]";
     final String conversationSpecificModelId = manager.modelId;
-    debugPrint("$logPrefix: Loading conversation. Specific modelId from manager: '$conversationSpecificModelId'");
+    debugPrint("$logPrefix: Loading conversation. ModelId from manager: '$conversationSpecificModelId'");
 
     // Ensure model data is available
     await state.loadService.loadModels();
@@ -34,7 +35,6 @@ class ReadService {
 
     // Prepare necessary variables
     Map<String, dynamic> uiSeriesData;
-    Map<String, dynamic> technicalVariantData = preciseModelData;
     String parentSeriesId;
     String activeExtensionId = conversationSpecificModelId;
 
@@ -56,49 +56,62 @@ class ReadService {
       activeExtensionId = baseModelId;
     }
 
-    // --- THE PERFECT FIX IS HERE ---
-    // 1. Check if the model is supposed to be offline.
-    final bool isOffline = (technicalVariantData['type'] as String?) == 'offline';
+    final bool isOffline = (preciseModelData['type'] as String?) == 'offline';
     String? finalModelPath;
 
     if (isOffline) {
-      // 2. If it's offline, actively fetch the downloaded paths from SharedPreferences.
       final downloadedPaths = await UserModels.loadDownloadedModelPaths();
-
-      // 3. Use the model's base ID to look up its actual, current file path on disk.
-      // This handles variants correctly, e.g., getting the path for 'phi-3-mini-instruct'
-      // even if the full ID is 'phi-3-mini-instruct-128k'.
       final baseId = ModelData.getBaseIdFromFullId(conversationSpecificModelId);
       finalModelPath = downloadedPaths[baseId];
       debugPrint("$logPrefix: Offline model detected. Base ID: '$baseId'. Resolved path: '$finalModelPath'");
     }
-    // For online models, `finalModelPath` will correctly remain null.
-    // --- END OF FIX ---
 
     final bool definitiveCanHandleImage = ModelData.hasModality(conversationSpecificModelId, 'image');
 
-    // Set the ChatScreen's state with the correct, resolved data
+    // --- THE DEFINITIVE FIX IS HERE ---
+    // This logic robustly calculates the premium status by checking the base model
+    // for characters, ensuring consistency with the model selection flow.
+    bool isPremium = false;
+    final category = preciseModelData['category'] as String?;
+
+    if (category == 'self' || category == 'roleplay') {
+      // For characters, premium status is determined by their base model.
+      final String? baseModelId = preciseModelData['baseModelId'] as String?;
+      if (baseModelId != null && baseModelId.isNotEmpty) {
+        final Map<String, dynamic> baseModelData = ModelData.getPreciseModelData(baseModelId);
+        isPremium = (baseModelData['tier'] as String? ?? 'free') == 'premium';
+        debugPrint("$logPrefix: Character model. Premium status from base '$baseModelId': $isPremium");
+      }
+    } else {
+      // For all other models, check the tier of the model/extension itself.
+      isPremium = (preciseModelData['tier'] as String? ?? 'free') == 'premium';
+      debugPrint("$logPrefix: Standard model. Premium status: $isPremium");
+    }
+    // --- END OF FIX ---
+
+
+    // Set the ChatScreen's state with all correct, resolved data
     state.setState(() {
       state.modelTitle = uiSeriesData['title'] as String?;
-      state.modelImagePath = ModelData.getModelImagePath(uiSeriesData); // Use helper for safety
+      state.modelImagePath = ModelData.getModelImagePath(uiSeriesData);
       state.modelProducer = uiSeriesData['producer'] as String?;
-      state.modelId = technicalVariantData['id'] as String;
-      state.selectedModelCategory = technicalVariantData['category'] as String?;
-      state.role = technicalVariantData['role'] as String?;
-
-      // 4. Set the ChatScreen's `modelPath` to the correctly resolved path.
-      // This will be null for online models and the correct disk path for offline models.
+      state.modelId = preciseModelData['id'] as String;
+      state.selectedModelCategory = preciseModelData['category'] as String?;
+      state.role = preciseModelData['role'] as String?;
       state.modelPath = finalModelPath;
-
       state.isCurrentModelServerSide = !isOffline;
       state.canHandleImage = definitiveCanHandleImage;
-      state.currentModelHasWise = (technicalVariantData['features'] as String?)?.split('/').contains('wise') ?? false;
+      state.currentModelHasWise = (preciseModelData['features'] as String?)?.split('/').contains('wise') ?? false;
       state.isModelSelected = true;
       state.isModelLoaded = state.isCurrentModelServerSide;
       state.openedFromMenu = true;
       state.conversationID = manager.conversationID;
       state.conversationTitle = manager.conversationTitle;
-      debugPrint("$logPrefix: State configured: modelId='${state.modelId}', title='${state.modelTitle}', category='${state.selectedModelCategory}', path='${state.modelPath}'");
+
+      // Set the premium briefing visibility with the correctly calculated value.
+      state.showPremiumBriefing = isPremium;
+
+      debugPrint("$logPrefix: State configured: modelId='${state.modelId}', title='${state.modelTitle}', isPremium='${state.showPremiumBriefing}'");
     });
 
     // Initialize the extensions panel
@@ -117,7 +130,6 @@ class ReadService {
     await loadPreviousMessages(manager.conversationID);
   }
 
-  // ... (The rest of the code in the file remains unchanged)
   int _toInt(dynamic v, [int def = 0]) =>
       v is int ? v : int.tryParse(v?.toString() ?? '') ?? def;
 
@@ -150,29 +162,38 @@ class ReadService {
           break;
         } on DatabaseException catch (e) {
           if (e.toString().toLowerCase().contains('database is locked')) {
-            debugPrint(
-                "$logPrefix: Database locked on attempt ${i + 1} for convId '$convId'. Retrying after $wait...");
+            debugPrint("$logPrefix: Database locked on attempt ${i + 1} for convId '$convId'. Retrying after $wait...");
             await Future.delayed(wait);
             continue;
           }
-          debugPrint(
-              "$logPrefix: DatabaseException (not a lock) for convId '$convId': $e");
+          debugPrint("$logPrefix: DatabaseException (not a lock) for convId '$convId': $e");
           rethrow;
         }
       }
 
+      // --- LAZY MIGRATION & BULLETPROOF LOADING ---
+      bool needsDbUpdate = false;
+      final List<Message> loadedMessages = rows.map((r) {
+        // If 'uuid' is null, it's an old message that needs an upgrade.
+        if (r['uuid'] == null) {
+          needsDbUpdate = true; // Mark that we need to save changes back to the DB.
+        }
+        return Message(
+          id: r['uuid'] as String?, // Constructor handles null by creating a new UUID
+          text: (r['text'] ?? '') as String,
+          isUserMessage: (r['isUser'] as int? ?? 0) == 1,
+          opacity: 1.0,
+          isReported: (r['isReported'] as int? ?? 0) == 1,
+          photoPath: r['photoPath'] as String?,
+          model: r['model'] as String?,
+          includeInContext: (r['includeInContext'] as int? ?? 1) == 1,
+        );
+      }).toList();
+
       if (state.mounted) {
         state.messages
           ..clear()
-          ..addAll(rows.map((r) => Message(
-            text: (r['text'] ?? '') as String,
-            isUserMessage: _toBool(r['isUser']),
-            opacity: 1.0,
-            isReported: _toBool(r['isReported']),
-            photoPath: r['photoPath'] as String?,
-            model: r['model'] as String?,
-            includeInContext: _toBool(r['includeInContext']),
-          )));
+          ..addAll(loadedMessages);
 
         if (state.messages.isNotEmpty) {
           final lastMessage = state.messages.last;
@@ -181,17 +202,22 @@ class ReadService {
               (lastMessage.photoPath ?? '').isEmpty &&
               state.messages.length > 1) {
             state.messages.removeLast();
-            debugPrint(
-                "$logPrefix: Removed trailing empty AI message for convId '$convId'.");
+            debugPrint("$logPrefix: Removed trailing empty AI message for convId '$convId'.");
           }
         }
       }
+
+      // If we found any old messages, save the newly generated UUIDs back to the database.
+      if (needsDbUpdate) {
+        debugPrint("$logPrefix: Old messages without UUIDs found for convId '$convId'. Performing lazy migration to update them in the database.");
+        // This function overwrites all messages for the conversation with the new, corrected ones.
+        await ChatStorageService.saveCurrentMessages(convId, state.messages);
+      }
+
       success = true;
-      debugPrint(
-          "$logPrefix: Successfully loaded ${rows.length} messages for convId: '$convId'.");
+      debugPrint("$logPrefix: Successfully loaded and validated ${rows.length} messages for convId: '$convId'.");
     } catch (e, stacktrace) {
-      debugPrint(
-          "$logPrefix: Error loading previous messages for convId '$convId': $e\n$stacktrace");
+      debugPrint("$logPrefix: Error loading previous messages for convId '$convId': $e\n$stacktrace");
       success = false;
     } finally {
       if (state.mounted) {

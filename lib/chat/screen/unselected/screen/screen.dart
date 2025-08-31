@@ -181,7 +181,7 @@ class ShimmerModelCard extends StatelessWidget {
         3;
 
     final imgSize = w * 0.7;
-    final radiusOuter = imgSize * 0.15;
+    final radiusOuter = imgSize * 0.2;
     final radiusInner = imgSize * 0.10;
     final borderW = w * 0.01;
     final gapBig = imgSize * 0.10;

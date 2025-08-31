@@ -313,7 +313,6 @@ class _CreateScreenState extends State<CreateScreen> with TickerProviderStateMix
     }
   }
 
-  // --- THE FIX: This widget also uses the guaranteed data now ---
   Widget _buildBaseModelSection() {
     final screenWidth = MediaQuery.of(context).size.width;
     final localizations = AppLocalizations.of(context)!;
@@ -339,7 +338,20 @@ class _CreateScreenState extends State<CreateScreen> with TickerProviderStateMix
       );
     }
 
-    // The rest of the widget's rendering logic is unchanged, as it now operates on a reliable list.
+    // --- ADDED: Find the data for the currently selected model to check if it's premium ---
+    Map<String, dynamic>? selectedModelData;
+    if (_selectedBaseModelId != null) {
+      for (var series in availableBaseModels) {
+        final extensions = series['extensions'] as Map<String, dynamic>?;
+        if (extensions != null && extensions.containsKey(_selectedBaseModelId)) {
+          selectedModelData = extensions[_selectedBaseModelId];
+          break;
+        }
+      }
+    }
+    final bool isCurrentlySelectedPremium = (selectedModelData?['tier'] as String? ?? 'free') == 'premium';
+
+    // The rest of the widget's rendering logic is updated with premium indicators.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -365,6 +377,20 @@ class _CreateScreenState extends State<CreateScreen> with TickerProviderStateMix
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  // --- ADDED: Sparkle icon for the currently selected premium model ---
+                  if (isCurrentlySelectedPremium)
+                    Padding(
+                      padding: EdgeInsets.only(right: screenWidth * 0.02),
+                      child: SvgPicture.asset(
+                        'assets/icons/sparkle.svg',
+                        width: screenWidth * 0.05,
+                        height: screenWidth * 0.05,
+                        colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted.withOpacity(0.8),
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
                   AnimatedRotation(
                     turns: _isBaseModelPanelExpanded ? 0.5 : 0.0,
                     duration: const Duration(milliseconds: 200),
@@ -388,12 +414,29 @@ class _CreateScreenState extends State<CreateScreen> with TickerProviderStateMix
                 final extensions = series['extensions'] as Map<String, dynamic>;
                 return extensions.entries.map((ext) {
                   final modelId = ext.key;
-                  final modelTitle = ext.value['title'] ?? modelId;
+                  final variantData = ext.value; // Get the full data for the variant
+                  final modelTitle = variantData['title'] as String? ?? modelId;
                   final String imagePath = ModelData.getModelImagePath(series);
                   final ImageProvider imageProvider = imagePath.startsWith('assets/') ? AssetImage(imagePath) as ImageProvider : FileImage(File(imagePath));
+
+                  // --- ADDED: Check if this specific variant is premium ---
+                  final bool isVariantPremium = (variantData['tier'] as String? ?? 'free') == 'premium';
+
                   return ListTile(
                     leading: CircleAvatar(backgroundImage: imageProvider, backgroundColor: Colors.transparent),
                     title: Text(modelTitle, style: TextStyle(color: AppColors.primaryColor.inverted)),
+                    // --- ADDED: Show sparkle icon for premium variants in the list ---
+                    trailing: isVariantPremium
+                        ? SvgPicture.asset(
+                      'assets/icons/sparkle.svg',
+                      width: screenWidth * 0.05,
+                      height: screenWidth * 0.05,
+                      colorFilter: ColorFilter.mode(
+                        AppColors.primaryColor.inverted.withOpacity(0.8),
+                        BlendMode.srcIn,
+                      ),
+                    )
+                        : null,
                     onTap: () {
                       setState(() {
                         _selectedBaseModelId = modelId;

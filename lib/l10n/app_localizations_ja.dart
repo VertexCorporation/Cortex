@@ -938,6 +938,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get japanese => '日本語';
 
   @override
+  String get kurdish => 'クルド';
+
+  @override
+  String get dutch => 'オランダ語';
+
+  @override
+  String get russian => 'ロシア';
+
+  @override
   String get korean => '韓国語';
 
   @override
@@ -1340,7 +1349,7 @@ class AppLocalizationsJa extends AppLocalizations {
       '選択されたベースモデルが、キャラクターの推論および応答能力を決定します。';
 
   @override
-  String get selectBaseModel => 'Select a Base Model';
+  String get selectBaseModel => 'ベースモデルを選択';
 
   @override
   String get couldNotOpenLink => 'リンクを開けませんでした';
@@ -1382,7 +1391,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'クレジットはオンラインモデルとのチャットに使用されます。ご存知の通り、あなたが彼らに送るすべてのメッセージには費用がかかります。\n\n• オンラインモデルへの各メッセージは20クレジットかかります。\n• 画像を含めるとさらに30クレジットが追加されます。\n• 無料プランのユーザーは、毎日リセットされる200クレジットのボーナスを受け取ります。';
+      'クレジットはオンラインモデルとのチャットに使用されます。メッセージには金がかかってんだ このクレジットのおかげで俺たちは潰れずに済んでる じゃあシステムを説明するぜ\n\n• 無料のオンラインモデルへの各メッセージは10クレジット。\n• オンラインのプレミアムモデルへの各メッセージは20クレジット。\n• 添付ファイルを含めるとさらに30クレジットが追加される。\n• 無料プランのユーザーは毎日リセットされる200クレジットのボーナスがもらえる。';
 
   @override
   String get creditsInfoPanelFooter => '楽しいチャットを！';
@@ -1515,4 +1524,56 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get creatorSupportedSuccess =>
       'クリエイターのサポートが完了しました！今後のご購入は、そのクリエイターに貢献します。';
+
+  @override
+  String get featureDocumentTitle => 'ドキュメントサポート';
+
+  @override
+  String get featureDocumentDescription =>
+      'このモデルは、PDF やテキスト ファイルなどのアップロードされたドキュメントを分析し、質問に回答できます。';
+
+  @override
+  String get featureAudioTitle => '音声入力';
+
+  @override
+  String get featureAudioDescription => 'このモデルは、音声入力を理解して処理できます。';
+
+  @override
+  String get featureImageGenerationTitle => '画像生成';
+
+  @override
+  String get featureImageGenerationDescription =>
+      'このモデルは、テキストの説明に基づいてオリジナルの画像を作成できます。';
+
+  @override
+  String get errorImageLoad => '生成された画像の読み込みに失敗しました。';
+
+  @override
+  String get extensionInfoPanelTitle => 'モデルを探索する';
+
+  @override
+  String get extensionInfoPanelBody1 =>
+      'この矢印を使用すると、このシリーズ内のさまざまなモデルを切り替えることができます。';
+
+  @override
+  String get extensionInfoPanelBody2 =>
+      'このシリーズで初めてチャットを開始すると、デフォルトのモデルが自動的に選択されますが、チャット中にいつでも選択を変更できます。';
+
+  @override
+  String get extensionInfoPanelFooter =>
+      'To view detailed information about each model or to manually select a different model, please go to the Library; select this model series from there and tap the arrow at the top of its detail page.';
+
+  @override
+  String get premiumModelNoticeTitle => 'プレミアムモデル';
+
+  @override
+  String get premiumModelNoticeDescription =>
+      'このモデルはプレミアムモデルです。無料ユーザーはプレミアムモデルとのメッセージ送信が 1 日 3 件に制限されています。登録すると無制限にアクセスできます。';
+
+  @override
+  String get benefitPremiumModels => 'プレミアムモデルへのアクセス';
+
+  @override
+  String get premiumTrialExhaustedMessage =>
+      'プレミアムモデルへの無料の毎日のメッセージをすべて使い切りました。無制限にアクセスするにはアップグレードしてください。';
 }
