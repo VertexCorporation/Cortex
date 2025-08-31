@@ -15,7 +15,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../darkener.dart';
 import '../../extensions.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import '../../funds/subscriptions/subscriptions.dart';
 import '../../internet.dart';
+import '../../navigation.dart';
 import '../../notifications.dart';
 import '../../theme.dart';
 import 'package:shimmer/shimmer.dart';
@@ -117,6 +119,9 @@ class _ModelDetailPageState extends State<ModelDetailPage>
   List<Map<String, dynamic>> _availableBaseModels = [];
   bool _isInitialized = false;
 
+  bool _isPremiumModelSelected = false;
+  late final AnimationController _rgbController;
+
   @override
   void initState() {
     super.initState();
@@ -129,6 +134,11 @@ class _ModelDetailPageState extends State<ModelDetailPage>
 
     _fadeController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
     widget.downloadManager?.addListener(_onDownloadStateChanged);
+
+    _rgbController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1), // Speed of one full color cycle
+    )..repeat();
   }
 
   @override
@@ -167,23 +177,45 @@ class _ModelDetailPageState extends State<ModelDetailPage>
 
     final isSelfOrRoleplay = ['self', 'roleplay'].contains((_modelData['category'] as String?)?.toLowerCase());
 
-    _selectedBaseModelId = _modelData['baseModelId'] as String?;
-    if (isSelfOrRoleplay && _selectedBaseModelId != null && _selectedBaseModelId!.isNotEmpty) {
-      _selectedBaseModelData = ModelData.getPreciseModelData(_selectedBaseModelId!);
-    }
+    Map<String, dynamic>? capabilitiesSource;
+    Map<String, dynamic>? dataSourceForTierCheck; // This will hold the model data used to determine 'tier'
 
-    if (_modelData['type'] == 'online' && _modelData['extensions'] is Map && (_modelData['extensions'] as Map).isNotEmpty) {
+    // Determine the source of capabilities and the data for tier check.
+    if (isSelfOrRoleplay) {
+      _selectedBaseModelId = _modelData['baseModelId'] as String?;
+      if (_selectedBaseModelId != null && _selectedBaseModelId!.isNotEmpty) {
+        _selectedBaseModelData = ModelData.getPreciseModelData(_selectedBaseModelId!);
+        capabilitiesSource = _selectedBaseModelData; // Capabilities from base model
+        dataSourceForTierCheck = _selectedBaseModelData; // Tier from base model
+      } else {
+        // If no base model is selected for a character, its own tier isn't really relevant
+        // for chat capabilities, so we default to free or main model's tier if available.
+        dataSourceForTierCheck = _modelData;
+      }
+    } else if (_modelData['type'] == 'online' && _modelData['extensions'] is Map && (_modelData['extensions'] as Map).isNotEmpty) {
       final extensions = _modelData['extensions'] as Map<String, dynamic>;
       final firstKey = extensions.keys.first;
       _selectedExtensionName = firstKey;
       _selectedExtensionData = extensions[firstKey] ?? {};
+      capabilitiesSource = _selectedExtensionData; // Capabilities from selected extension
+      dataSourceForTierCheck = _selectedExtensionData; // Tier from selected extension
+    } else {
+      // For single online/offline models without extensions, the tier comes from the model itself
+      dataSourceForTierCheck = _modelData;
     }
 
+    // --- UPDATED: Set the premium status based on the determined data source ---
+    _isPremiumModelSelected = (dataSourceForTierCheck?['tier'] as String? ?? 'free') == 'premium';
+    dev.log("[ModelDetailPage._loadAndProcessData] Initial _isPremiumModelSelected: $_isPremiumModelSelected (from ID: ${dataSourceForTierCheck?['id'] ?? 'N/A'})", name: 'ModelDetail');
+
+
+    // Now, call the new parse function with the correct data.
+    _parsedFeatures = _parseFeaturesData(_modelData, capabilitiesSource);
+
+    // This part remains for the UI to build the selection panel.
     _availableBaseModels = ModelData.getCachedModelsSync()
         .where((model) => model['type'] == 'online' && model['extensions'] is Map && (model['extensions'] as Map).isNotEmpty)
         .toList();
-
-    _parseFeaturesData();
   }
 
   @override
@@ -191,6 +223,7 @@ class _ModelDetailPageState extends State<ModelDetailPage>
     widget.downloadManager?.removeListener(_onDownloadStateChanged);
     _fadeController.dispose();
     _extensionOverlayController?.dispose();
+    _rgbController.dispose();
     super.dispose();
   }
 
@@ -208,26 +241,50 @@ class _ModelDetailPageState extends State<ModelDetailPage>
     }
   }
 
-  /// Parses model features based on the authoritative `_modelData`.
-  void _parseFeaturesData() {
+  /// Parses model features based on a SPECIFIC data source.
+  /// This function is now a pure utility, making it predictable and testable.
+  List<String> _parseFeaturesData(Map<String, dynamic> mainModelData, Map<String, dynamic>? sourceForCapabilities) {
+    // Determine the primary source for capability checks (modalities, outputs).
+    // If a specific source is provided (like a base model or an extension), use it.
+    // Otherwise, fall back to the main model's own data.
+    final capabilitiesData = sourceForCapabilities ?? mainModelData;
+
+    final modalities = capabilitiesData['modalities'] as Map<String, dynamic>? ?? {};
+    final outputs = capabilitiesData['outputs'] as Map<String, dynamic>? ?? {};
+
+    dev.log("[ModelDetailPage] Parsing features using capabilities from: '${capabilitiesData['title'] ?? capabilitiesData['id']}'", name: 'ModelDetail');
+
+    // --- Build the final feature list ---
     List<String> features = [];
-    final category = _modelData['category']?.toString().toLowerCase() ?? '';
-    final modalities = _modelData['modalities'] as Map<String, dynamic>? ?? {};
-    final bool canHandleImage = modalities['image'] == true;
-    final isServerSide = _modelData['type'] != 'offline';
-    final extensions = _modelData['extensions'] as Map?;
 
-    if (category == 'roleplay' || category == 'self') features.add('roleplay');
-    if (canHandleImage) features.add('photo');
-    if (!isServerSide) features.add('offline');
-    if (isServerSide && extensions != null && extensions.isNotEmpty)
+    // 1. Add general features based on the MAIN model's properties.
+    final category = mainModelData['category']?.toString().toLowerCase() ?? '';
+    if (category == 'roleplay' || category == 'self') {
+      features.add('roleplay');
+    }
+
+    final isServerSide = mainModelData['type'] != 'offline';
+    if (!isServerSide) {
+      features.add('offline');
+    }
+
+    final extensions = mainModelData['extensions'] as Map?;
+    if (isServerSide && extensions != null && extensions.isNotEmpty) {
       features.add('plural');
+    }
 
-    _parsedFeatures = features;
+    // 2. Add specific capability features from the determined source data.
+    if (modalities['image'] == true) features.add('photo');
+    if (modalities['file'] == true) features.add('document');
+    if (modalities['audio'] == true) features.add('audio');
+    if (outputs['image'] == true) features.add('image_generation');
+
+    return features;
   }
 
   /// Orchestrates the entire base model change process.
   /// Provides an instant UI update, handles background persistence, and locks the UI.
+  /// Now also updates the premium status based on the new base model's tier.
   Future<void> _handleBaseModelChange(String newBaseModelId) async {
     if (_isButtonLocked) return;
     setState(() => _isButtonLocked = true);
@@ -237,6 +294,12 @@ class _ModelDetailPageState extends State<ModelDetailPage>
       if (newBaseModelData['title'] == 'Unknown Model') {
         debugPrint(
             "[ModelDetailPage] ERROR: Could not get data for new base model '$newBaseModelId'. Aborting.");
+        if (mounted) {
+          Provider.of<NotificationService>(context, listen: false).showNotification(
+              message: AppLocalizations.of(context)!.anErrorOccurred,
+              isSuccess: false
+          );
+        }
         return;
       }
 
@@ -244,20 +307,21 @@ class _ModelDetailPageState extends State<ModelDetailPage>
       setState(() {
         _selectedBaseModelId = newBaseModelId;
         _selectedBaseModelData = newBaseModelData;
-        _modelData['baseModelId'] = newBaseModelId; // Update the local model data map
+        _modelData['baseModelId'] = newBaseModelId; // Update the internal _modelData
         _didBaseModelChange = true;
         _isBaseModelPanelExpanded = false;
+
+        // --- ADDED: Update premium status based on the new base model's tier ---
+        _isPremiumModelSelected = (newBaseModelData['tier'] as String? ?? 'free') == 'premium';
+        dev.log("[ModelDetailPage._handleBaseModelChange] New base model '$newBaseModelId' is premium: $_isPremiumModelSelected", name: 'ModelDetail');
+
+        // Re-parse features based on the new base model's capabilities.
+        // For characters, capabilities come from the base model, not _selectedExtensionData.
+        _parsedFeatures = _parseFeaturesData(_modelData, newBaseModelData);
       });
 
-      // Second, persist this change to the database for future sessions.
       await _updateBaseModelInDatabase(widget.id, newBaseModelId);
-
-      // --- THE FIX ---
-      // Finally, "hot-patch" the central in-memory cache. This makes the change
-      // instantly available to other parts of the app (like the chat service)
-      // without needing a full, asynchronous data reload. This is crucial for
-      // starting a chat from this page immediately after a change.
-      ModelData.updateCachedModel(_modelData);
+      ModelData.updateCachedModel(_modelData); // Update the cache with the new _modelData
 
     } finally {
       if (mounted) {
@@ -438,7 +502,9 @@ class _ModelDetailPageState extends State<ModelDetailPage>
     // Calculate the number of warnings and the necessary bottom padding for the scroll view.
     // This ensures that the scrollable content does not get hidden behind the fixed warning banners.
     final warningCount =
-        (!_isFullyLocalized ? 1 : 0) + (!widget.isServerSide ? 1 : 0);
+        (!_isFullyLocalized ? 1 : 0) +
+            (!widget.isServerSide ? 1 : 0) +
+            (_isPremiumModelSelected ? 1 : 0);
 
     // Estimate the height needed for the warning banners.
     // Approx. 60px per banner + 8px spacing between them + 12px margin from the bottom.
@@ -566,7 +632,7 @@ class _ModelDetailPageState extends State<ModelDetailPage>
       final baseModel = _selectedBaseModelData!;
       contextValue = baseModel['context']?.toString() ?? '...';
       final baseModalities = baseModel['modalities'] as Map<String, dynamic>? ?? {};
-      modalityValue = (baseModalities['image'] == true)
+      modalityValue = baseModalities.isNotEmpty
           ? localizations.multimodal
           : localizations.text;
     } else {
@@ -670,7 +736,7 @@ class _ModelDetailPageState extends State<ModelDetailPage>
     );
   }
 
-  /// REFACTORED: The section for selecting a base model, now visible for 'self' models.
+  /// This section is now updated to show the sparkle icon next to premium base models.
   Widget _buildBaseModelSelectionSection(
       AppLocalizations localizations, double screenWidth) {
     final category = (_modelData['category'] as String?)?.toLowerCase();
@@ -689,6 +755,10 @@ class _ModelDetailPageState extends State<ModelDetailPage>
       selectedModelDisplayTitle =
           modelData['title'] as String? ?? _selectedBaseModelId!;
     }
+
+    // --- ADDED: Check if the currently selected base model is premium ---
+    final bool isCurrentlySelectedBaseModelPremium = (_selectedBaseModelData?['tier'] as String? ?? 'free') == 'premium';
+
 
     return _buildSectionContainer(
       Column(
@@ -720,6 +790,20 @@ class _ModelDetailPageState extends State<ModelDetailPage>
                                 color: AppColors.primaryColor.inverted,
                                 fontSize: screenWidth * 0.04),
                             overflow: TextOverflow.ellipsis)),
+                    // --- ADDED: Sparkle icon for currently selected premium base model ---
+                    if (isCurrentlySelectedBaseModelPremium)
+                      Padding(
+                        padding: EdgeInsets.only(right: screenWidth * 0.02),
+                        child: SvgPicture.asset(
+                          'assets/icons/sparkle.svg',
+                          width: screenWidth * 0.05,
+                          height: screenWidth * 0.05,
+                          colorFilter: ColorFilter.mode(
+                            AppColors.primaryColor.inverted.withOpacity(0.8),
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
                     AnimatedRotation(
                         turns: _isBaseModelPanelExpanded ? 0.5 : 0,
                         duration: const Duration(milliseconds: 200),
@@ -748,12 +832,16 @@ class _ModelDetailPageState extends State<ModelDetailPage>
                   series['extensions'] as Map<String, dynamic>;
                   return extensions.entries.map((ext) {
                     final variantId = ext.key;
-                    final variantTitle =
-                        ext.value['title'] as String? ?? variantId;
+                    final variantData = ext.value; // Get the full variant data
+                    final variantTitle = variantData['title'] as String? ?? variantId;
                     final imagePath = ModelData.getModelImagePath(series);
                     final imageProvider = imagePath.startsWith('assets/')
                         ? AssetImage(imagePath) as ImageProvider
                         : FileImage(File(imagePath));
+
+                    // --- ADDED: Check if this specific variant is premium ---
+                    final bool isVariantPremium = (variantData['tier'] as String? ?? 'free') == 'premium';
+
                     return ListTile(
                       leading: CircleAvatar(
                           backgroundImage: imageProvider,
@@ -761,7 +849,24 @@ class _ModelDetailPageState extends State<ModelDetailPage>
                       title: Text(variantTitle,
                           style: TextStyle(
                               color: AppColors.primaryColor.inverted)),
-                      onTap: () => _handleBaseModelChange(variantId),
+                      // --- ADDED: Show sparkle icon for premium variants in the list ---
+                      trailing: isVariantPremium
+                          ? SvgPicture.asset(
+                        'assets/icons/sparkle.svg',
+                        width: screenWidth * 0.05,
+                        height: screenWidth * 0.05,
+                        colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted.withOpacity(0.8),
+                          BlendMode.srcIn,
+                        ),
+                      )
+                          : null,
+                      onTap: () {
+                        _handleBaseModelChange(variantId);
+                        setState(() {
+                          _isBaseModelPanelExpanded = false; // Close panel after selection
+                        });
+                      },
                     );
                   });
                 }).toList(),
@@ -776,13 +881,6 @@ class _ModelDetailPageState extends State<ModelDetailPage>
     );
   }
 
-  // --- Other helper and build methods (unchanged) ---
-  // The following methods are included for completeness but contain no new logical changes.
-
-  // (The user has provided the rest of the file, so I will copy it here ensuring no regressions.)
-
-  // ... (Pasting the remaining unchanged build helpers from the original file)
-
   OverlayEntry? _extensionOverlayEntry;
   AnimationController? _extensionOverlayController;
 
@@ -791,22 +889,29 @@ class _ModelDetailPageState extends State<ModelDetailPage>
     _extensionOverlayController?.dispose();
     _extensionOverlayEntry = null;
     _extensionOverlayController = null;
-    final options = widget.extensions!.entries
-        .map((e) => MapEntry(e.key, (e.value['title'] as String? ?? e.key)))
-        .toList();
+
+    // This aligns with the new data structure required by buildExtensionPanelWidget.
+    // We iterate through the values of the extensions map and ensure each is a valid map.
+    final List<Map<String, dynamic>> options =
+        widget.extensions?.values.toList() ?? [];
+
+    if (options.isEmpty) return; // Do not show the panel if there are no valid options.
+
     final overlay = Overlay.of(context, rootOverlay: true);
     _extensionOverlayController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 50));
     final scaleAnimation = CurvedAnimation(
         parent: _extensionOverlayController!, curve: Curves.easeOut);
+
     double calcPanelWidth() {
       final w = MediaQuery.of(context).size.width;
       final iconPx = w * .04, padPx = w * .04, spacePx = padPx * .5;
       double longest = 0;
       final ts = TextStyle(fontSize: w * .04, fontFamily: 'Roboto');
-      for (final e in options) {
+      for (final optionData in options) {
+        final text = optionData['title'] as String? ?? optionData['id'];
         final tp = TextPainter(
-            text: TextSpan(text: e.value, style: ts),
+            text: TextSpan(text: text, style: ts),
             maxLines: 1,
             textDirection: TextDirection.ltr)
           ..layout();
@@ -820,6 +925,7 @@ class _ModelDetailPageState extends State<ModelDetailPage>
     final marginPx = screenW * .02;
     final topPx = MediaQuery.of(context).size.height * .12;
     final bool overflowRight = (marginPx + panelW) > (screenW - marginPx);
+
     void dismiss() {
       _extensionOverlayController!.reverse().then((_) {
         _extensionOverlayEntry?.remove();
@@ -830,37 +936,53 @@ class _ModelDetailPageState extends State<ModelDetailPage>
     }
 
     _extensionOverlayEntry = OverlayEntry(
-        builder: (_) => Material(
-            color: Colors.transparent,
-            child: Stack(children: [
-              Positioned.fill(child: GestureDetector(onTap: dismiss)),
-              Positioned(
-                top: topPx,
-                left: overflowRight ? null : marginPx,
-                right: overflowRight ? marginPx : null,
-                child: GestureDetector(
-                    onTap: () {},
-                    child: ScaleTransition(
-                        scale: scaleAnimation,
-                        child: SizedBox(
-                            width: panelW,
-                            child: Extensions.buildExtensionPanelWidget(
-                                context: context,
-                                options: options,
-                                selectedExtension: _selectedExtensionName,
-                                modelTitle: widget.title,
-                                onDismiss: dismiss,
-                                onSelect: (opt) {
-                                  setState(() {
-                                    _selectedExtensionName = opt.key;
-                                    _selectedExtensionData =
-                                    widget.extensions![opt.key]!;
-                                    _parseFeaturesData();
-                                  });
-                                  dismiss();
-                                })))),
+      builder: (_) => Material(
+        color: Colors.transparent,
+        child: Stack(
+          children: [
+            Positioned.fill(child: GestureDetector(onTap: dismiss)),
+            Positioned(
+              top: topPx,
+              left: overflowRight ? null : marginPx,
+              right: overflowRight ? marginPx : null,
+              child: GestureDetector(
+                onTap: () {}, // Prevents taps inside the panel from dismissing it.
+                child: ScaleTransition(
+                  scale: scaleAnimation,
+                  child: SizedBox(
+                    width: panelW,
+                    child: Extensions.buildExtensionPanelWidget(
+                      context: context,
+                      // --- FIX: Pass the correctly typed list ---
+                      options: options,
+                      selectedExtension: _selectedExtensionName,
+                      modelTitle: widget.title,
+                      onDismiss: dismiss,
+                      // --- MODIFIED: The 'selectedOption' parameter is now a Map ---
+                      onSelect: (selectedOption) {
+                        setState(() {
+                          // Access 'id' from the map to get the extension name.
+                          _selectedExtensionName = selectedOption['id'] as String;
+
+                          // The 'selectedOption' map itself is the new extension data.
+                          _selectedExtensionData = selectedOption;
+
+                          // Re-parse features with the newly selected data.
+                          _parsedFeatures = _parseFeaturesData(_modelData, _selectedExtensionData);
+
+                          _isPremiumModelSelected = (selectedOption['tier'] as String? ?? 'free') == 'premium';
+                        });
+                        dismiss();
+                      },
+                    ),
+                  ),
+                ),
               ),
-            ])));
+            ),
+          ],
+        ),
+      ),
+    );
     overlay.insert(_extensionOverlayEntry!);
     _extensionOverlayController!.forward();
   }
@@ -1587,12 +1709,22 @@ class _ModelDetailPageState extends State<ModelDetailPage>
 
   Widget _buildWarningOverlayDispatcher(AppLocalizations localizations) {
     if (_isLoading) return const SizedBox.shrink();
+
     final warningWidgets = <Widget>[];
-    if (!_isFullyLocalized)
+
+    // --- ADDED: Premium banner is added first to appear at the top of the stack ---
+    if (_isPremiumModelSelected) {
+      warningWidgets.add(_buildPremiumWarningBanner(localizations));
+    }
+    if (!_isFullyLocalized) {
       warningWidgets.add(_buildLocalizationWarningBanner(localizations));
-    if (!widget.isServerSide)
+    }
+    if (!widget.isServerSide) {
       warningWidgets.add(_buildExperimentalWarningBanner(localizations));
+    }
+
     if (warningWidgets.isEmpty) return const SizedBox.shrink();
+
     return Positioned(
         bottom: 12,
         left: 16,
@@ -1604,6 +1736,108 @@ class _ModelDetailPageState extends State<ModelDetailPage>
                     (index) => Padding(
                     padding: EdgeInsets.only(top: index > 0 ? 8.0 : 0.0),
                     child: warningWidgets[index]))));
+  }
+
+  /// This method has been modified to make the premium banner tappable,
+  /// navigating the user to the premium screen, just like the banner in the AppBar.
+  /// The visual style with the animated RGB border is preserved.
+  Widget _buildPremiumWarningBanner(AppLocalizations localizations) {
+    // Get the screen width once to use for all calculations.
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // --- DYNAMIC SIZING CONSTANTS ---
+    final double borderRadius = screenWidth * 0.025; // e.g., ~10px on a 400px wide screen
+    final double borderThickness = screenWidth * 0.005; // e.g., ~2px
+    final double internalPaddingVertical = screenWidth * 0.03; // e.g., ~12px
+    final double internalPaddingHorizontal = screenWidth * 0.04; // e.g., ~16px
+    final double iconSize = screenWidth * 0.07; // e.g., ~28px
+    final double gapBetweenIconAndText = screenWidth * 0.03; // e.g., ~12px
+    final double gapBetweenTitleAndDesc = screenWidth * 0.01; // e.g., ~4px
+    final double titleFontSize = screenWidth * 0.038; // e.g., ~15px
+    final double descriptionFontSize = screenWidth * 0.033; // e.g., ~13px
+
+    return AnimatedBuilder(
+      animation: _rgbController,
+      builder: (context, child) {
+        return Container(
+          padding: EdgeInsets.all(borderThickness), // Padding for the border
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(borderRadius),
+            gradient: SweepGradient(
+              center: Alignment.center,
+              startAngle: 0.0,
+              endAngle: 6.28, // 2 * PI
+              colors: const [
+                Colors.red,
+                Colors.yellow,
+                Colors.green,
+                Colors.cyan,
+                Colors.blue,
+                Colors.purple,
+                Colors.red,
+              ],
+              transform: GradientRotation(_rgbController.value * 6.28), // 2 * PI
+            ),
+          ),
+          child: child,
+        );
+      },
+      child: Material(
+        color: AppColors.secondaryColor,
+        borderRadius: BorderRadius.circular(borderRadius * 0.8),
+        child: InkWell(
+          onTap: () {
+            navigateToScreen(context, PremiumScreen(), direction: const Offset(0.0, 1.0));
+          },
+          borderRadius: BorderRadius.circular(borderRadius * 0.8),
+          splashColor: AppColors.primaryColor.withOpacity(0.1),
+          highlightColor: AppColors.primaryColor.withOpacity(0.05),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              vertical: internalPaddingVertical,
+              horizontal: internalPaddingHorizontal,
+            ),
+            // The decoration is now on the Material widget for the InkWell to work correctly.
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/sparkle.svg',
+                  colorFilter: ColorFilter.mode(
+                      AppColors.primaryColor.inverted, BlendMode.srcIn),
+                  width: iconSize,
+                  height: iconSize,
+                ),
+                SizedBox(width: gapBetweenIconAndText),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        localizations.premiumModelNoticeTitle,
+                        style: TextStyle(
+                          fontSize: titleFontSize,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryColor.inverted,
+                        ),
+                      ),
+                      SizedBox(height: gapBetweenTitleAndDesc),
+                      Text(
+                        localizations.premiumModelNoticeDescription,
+                        style: TextStyle(
+                          fontSize: descriptionFontSize,
+                          color: AppColors.primaryColor.inverted.withOpacity(0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildLocalizationWarningBanner(AppLocalizations localizations) =>
@@ -1728,26 +1962,37 @@ class _ModelDetailPageState extends State<ModelDetailPage>
   Widget _buildFeaturesSection(
       AppLocalizations localizations, bool isDarkTheme, double screenWidth) {
     if (_parsedFeatures.isEmpty) return const SizedBox.shrink();
+
+    // --- NEW: Add new keys and map them to the new ARB strings ---
     final featureTitles = {
       'photo': localizations.featurePhotoTitle,
       'offline': localizations.featureOfflineTitle,
-      'supermodel': localizations.featureSupermodelTitle,
       'roleplay': localizations.featureRoleplayTitle,
-      'indulgent': localizations.featureIndulgentTitle,
       'plural': localizations.featurePluralTitle,
+      'document': localizations.featureDocumentTitle,
+      'audio': localizations.featureAudioTitle,
+      'image_generation': localizations.featureImageGenerationTitle,
+      // Existing optional features
+      'supermodel': localizations.featureSupermodelTitle,
+      'indulgent': localizations.featureIndulgentTitle,
       'wise': localizations.featureWiseTitle,
       'researcher': localizations.featureResearcherTitle
     };
     final featureDescriptions = {
       'photo': localizations.featurePhotoDescription,
       'offline': localizations.featureOfflineDescription,
-      'supermodel': localizations.featureSupermodelDescription,
       'roleplay': localizations.featureRoleplayDescription,
-      'indulgent': localizations.featureIndulgentDescription,
       'plural': localizations.featurePluralDescription,
+      'document': localizations.featureDocumentDescription,
+      'audio': localizations.featureAudioDescription,
+      'image_generation': localizations.featureImageGenerationDescription,
+      // Existing optional features
+      'supermodel': localizations.featureSupermodelDescription,
+      'indulgent': localizations.featureIndulgentDescription,
       'wise': localizations.featureWiseDescription,
       'researcher': localizations.featureResearcherDescription
     };
+    // The rest of the function remains unchanged as it's data-driven.
     List<Widget> items = [];
     for (int i = 0; i < _parsedFeatures.length; i++) {
       final featureKey = _parsedFeatures[i];

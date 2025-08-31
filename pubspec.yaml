@@ -3,7 +3,7 @@ description: "Peak of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 1.2.7+127
+version: 1.5.0+150
 
 environment:
   sdk: '>=3.4.3 <4.0.0'

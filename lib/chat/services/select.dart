@@ -52,7 +52,33 @@ class SelectionService {
     final String? finalModelTitle = seriesData['title'] as String?;
     final String? finalModelProducer = seriesData['producer'] as String?;
     final String finalModelImagePath = ModelData.getModelImagePath(seriesData);
-    final String? finalSelectedCategory = seriesData['category'] as String?;
+    final String? category = seriesData['category'] as String?;
+    final bool hasExtensions = (seriesData['extensions'] as Map<String, dynamic>? ?? {}).isNotEmpty;
+    bool isPremium = (preciseModelData['tier'] as String? ?? 'free') == 'premium';
+    final bool willPanelShow = hasExtensions && await state.willInfoPanelShowOnNextSelect();
+    debugPrint("$logPrefix: Panel will show on select: $willPanelShow");
+
+    if (category == 'self' || category == 'roleplay') {
+      // For characters, the "premium-ness" is determined by their base model.
+      final String? baseModelId = preciseModelData['baseModelId'] as String?;
+      if (baseModelId != null && baseModelId.isNotEmpty) {
+        final Map<String, dynamic> baseModelData = ModelData.getPreciseModelData(baseModelId);
+        isPremium = (baseModelData['tier'] as String? ?? 'free') == 'premium';
+        debugPrint("$logPrefix: Character model detected. Premium status based on base model '$baseModelId': $isPremium");
+      } else {
+        isPremium = false; // No base model, so not premium.
+      }
+    } else {
+      // For all other models, check the tier of the model/extension itself.
+      isPremium = (preciseModelData['tier'] as String? ?? 'free') == 'premium';
+      debugPrint("$logPrefix: Standard model detected. Premium status: $isPremium");
+    }
+
+    if (willPanelShow) {
+      state.shouldAutofocus = false;
+    } else {
+      state.shouldAutofocus = true;
+    }
 
     // --- 🕵️ LOGGING POINT #2 ---
     // Let's see what role we are about to commit to the state.
@@ -70,9 +96,10 @@ class SelectionService {
       state.modelTitle = finalModelTitle;
       state.modelProducer = finalModelProducer;
       state.modelImagePath = finalModelImagePath;
-      state.selectedModelCategory = finalSelectedCategory;
+      state.selectedModelCategory = category;
       state.isModelSelected = true;
       state.isModelLoaded = finalIsServerSide;
+      state.showPremiumBriefing = isPremium;
 
       // Also mark messages as loaded here if it's a new chat.
       if (state.messages.isEmpty) {
@@ -82,7 +109,7 @@ class SelectionService {
 
     debugPrint("$logPrefix: Atomic setState complete. Final state for 'canHandleImage' is: ${state.canHandleImage}");
 
-    // --- STEP 3: RUN POST-UPDATE LOGIC (NOW THAT THE STATE IS SAFE) ---
+    // --- STEP 3: RUN POST-UPDATE LOGIC ---
 
     state.widget.onModelSelectionChanged?.call(true);
     debugPrint("$logPrefix: Notified parent to hide BottomAppBar.");

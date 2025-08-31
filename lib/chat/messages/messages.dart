@@ -1,8 +1,10 @@
 // messages.dart
 
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class Message {
+  final String id;
   String text;
   late final bool isUserMessage;
   double opacity;
@@ -28,5 +30,7 @@ class Message {
     this.includeInContext = true,
     this.model,
     this.isThinking = false,
-  }) : notifier = ValueNotifier(text);
+    String? id,
+  }) : id = id ?? const Uuid().v4(),
+        notifier = ValueNotifier(text);
 }

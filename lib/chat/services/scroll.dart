@@ -1,8 +1,8 @@
-// lib/chat/services/scroll.dart
+// lib/chat/services/scroll.dart (The Final, Corrected Version)
 
-import 'package:cortex/theme.dart'; // Make sure this import points to your theme file
+import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 
 /// A service class to manage all scrolling-related logic for a ScrollController.
 /// It provides robust methods for checking scroll position and programmatically scrolling.
@@ -16,7 +16,7 @@ class ScrollService {
   /// [threshold] defines the distance from the bottom (in pixels) to be considered "at the bottom".
   /// Returns `true` if the current scroll offset is within the threshold of the max scroll extent.
   bool isUserAtBottom({double threshold = 100.0}) {
-    if (!scrollController.hasClients) return false;
+    if (!scrollController.hasClients) return true; // If no clients, conceptually at bottom
     final maxScroll = scrollController.position.maxScrollExtent;
     final currentScroll = scrollController.offset;
     // If there's nothing to scroll, we are always at the bottom.
@@ -26,18 +26,17 @@ class ScrollService {
 
   /// Smoothly animates the scroll position to the very bottom of the list.
   ///
-  /// This method waits for the end of the current frame to ensure the layout
-  /// (and `maxScrollExtent`) is fully updated before initiating the scroll.
-  /// This is crucial for reliability when new items are added to the list.
+  /// This method is safe to call at any time. It waits for the UI to settle
+  /// before attempting to scroll, preventing crashes.
   Future<void> scrollToBottom({
     double threshold = 10.0,
     Duration duration = const Duration(milliseconds: 300),
   }) async {
-    if (!scrollController.hasClients) return;
-
-    // Wait for the UI to settle before calculating scroll position.
+    // Wait for the end of the current frame to ensure layout is complete.
     await WidgetsBinding.instance.endOfFrame;
-    if (!scrollController.hasClients) return; // Re-check after await
+
+    // After waiting, we can safely check for clients and scroll.
+    if (!scrollController.hasClients) return;
 
     final targetOffset = scrollController.position.maxScrollExtent;
     final currentOffset = scrollController.offset;
@@ -53,44 +52,29 @@ class ScrollService {
       );
     } catch (e) {
       // Catch potential errors if the scroll view is disposed during animation.
-      debugPrint("Could not complete scrollToBottom: $e");
+      debugPrint("[ScrollService] Could not complete scrollToBottom: $e");
     }
   }
 
-  /// Forcefully scrolls to the bottom, typically used when the content size might be changing dynamically.
-  ///
-  /// It performs a series of quick, linear animations to ensure it reaches the
-  /// final bottom position, even if the content is still growing (e.g., images loading).
-  Future<void> jumpToBottom({
-    int maxIterations = 10,
-    double threshold = 10.0,
-    Duration iterationDelay = const Duration(milliseconds: 100),
-  }) async {
-    if (!scrollController.hasClients) return;
-
-    // Wait for the UI to settle before starting.
-    await WidgetsBinding.instance.endOfFrame;
-    if (!scrollController.hasClients) return;
-
-    int iterations = 0;
-    while (iterations < maxIterations) {
-      final targetOffset = scrollController.position.maxScrollExtent;
-      final currentOffset = scrollController.offset;
-      if ((targetOffset - currentOffset).abs() < threshold) break;
-
-      try {
-        await scrollController.animateTo(
-          targetOffset,
-          duration: iterationDelay,
-          curve: Curves.linear,
-        );
-      } catch (e) {
-        debugPrint("Could not complete jumpToBottom iteration: $e");
-        break; // Exit loop on error
+  /// This function is now completely safe. It uses a post-frame callback
+  /// to ensure that the jump operation is only attempted *after* the widget
+  /// tree has been fully built and the ScrollController is attached to a list.
+  /// This prevents the 'hasClients' error and null check exceptions.
+  void jumpToBottom() {
+    // Use WidgetsBinding to schedule the jump for the end of the current frame.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // By the time this callback executes, the UI is stable.
+      // We still check 'hasClients' as a final safety measure.
+      if (scrollController.hasClients) {
+        final maxScroll = scrollController.position.maxScrollExtent;
+        scrollController.jumpTo(maxScroll);
+        debugPrint("[ScrollService] Safely jumped to bottom (max: $maxScroll).");
+      } else {
+        debugPrint("[ScrollService] Jump to bottom skipped: ScrollController has no clients.");
       }
-      iterations++;
-    }
+    });
   }
+
 
   /// If the user is already near the bottom, this scrolls to the absolute bottom.
   ///
@@ -109,31 +93,25 @@ class ScrollService {
   ///
   /// The visibility and positioning are controlled by the parent widget.
   /// This widget just handles its own appearance animations (fade, scale).
-  /// It now uses the AppColors class to determine icon color, removing the need for BuildContext.
+  /// It now correctly uses the static `AppColors` class to determine icon color
+  /// without needing a BuildContext.
   Widget buildScrollDownButton({
     required double screenWidth,
     required double inputFieldHeight,
     required bool showScrollDownButton,
   }) {
-    // --- CORRECTED LOGIC ---
-    // Get the color definitions for the currently active theme from your static class.
+    // --- THE DEFINITIVE FIX FOR COLOR LOGIC (WITHOUT CHANGING theme.dart) ---
+    // 1. Get the full ThemeColors object for the currently active theme.
     final themeColors = AppColors.getThemeColors(AppColors.currentTheme);
 
-    // Determine the icon color based on the theme's overall brightness.
-    // If status bar icons are light (meaning a dark theme), use a light icon color.
-    // If status bar icons are dark (meaning a light theme), use a dark icon color.
-    final Color iconColor =
-    themeColors.statusBarIconBrightness == Brightness.light
-        ? Colors.white
-        : Colors.black;
+    // 2. Determine the icon color based on the theme's status bar brightness.
+    //    This correctly infers if the theme is light or dark.
+    final Color iconColor = themeColors.statusBarIconBrightness == Brightness.light
+        ? Colors.white.withOpacity(0.8)
+        : Colors.black.withOpacity(0.7);
 
-    return AnimatedPositioned(
-      duration: const Duration(milliseconds: 200), // Slightly smoother animation
-      curve: Curves.easeOutCubic,
-      right: screenWidth * 0.025,
-      // The position is calculated relative to the input field container.
-      // The parent widget (ChatScreen) is responsible for hiding this
-      // when the keyboard is open to prevent UI glitches.
+    return Positioned(
+      right: screenWidth * 0.04,
       bottom: inputFieldHeight + 16.0,
       child: AnimatedOpacity(
         opacity: showScrollDownButton ? 1.0 : 0.0,
@@ -146,30 +124,27 @@ class ScrollService {
           child: IgnorePointer(
             ignoring: !showScrollDownButton,
             child: GestureDetector(
-              onTap: () => scrollToBottom(),
+              onTap: scrollToBottom, // Directly call the safe method
               child: Container(
-                width: screenWidth * 0.08,
-                height: screenWidth * 0.08,
+                padding: EdgeInsets.all(screenWidth * 0.02),
                 decoration: BoxDecoration(
-                  // This correctly uses the background color from your AppColors class.
-                  color: AppColors.background,
+                  color: AppColors.background.withOpacity(0.9),
                   shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.border.withOpacity(0.5), width: 1),
                   boxShadow: const [
                     BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
+                      color: Colors.black38,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
                     )
                   ],
                 ),
-                child: Center(
-                  child: SvgPicture.asset(
-                    'assets/icons/arrov.svg',
-                    // Apply the dynamically determined icon color here.
-                    colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-                    width: screenWidth * 0.08 * 0.7, // Adjusted size for better padding
-                    height: screenWidth * 0.08 * 0.7,
-                  ),
+                child: SvgPicture.asset(
+                  'assets/icons/arrov.svg',
+                  // Apply the dynamically determined icon color here.
+                  colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                  width: screenWidth * 0.05,
+                  height: screenWidth * 0.05,
                 ),
               ),
             ),

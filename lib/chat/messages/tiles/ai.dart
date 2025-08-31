@@ -21,7 +21,7 @@ class AIMessageTile extends StatefulWidget {
   const AIMessageTile({
     super.key,
     required this.text,
-    required this.imagePath,
+    required this.avatarPath,
     required this.opacity,
     required this.modelId,
     required this.isReported,
@@ -36,7 +36,7 @@ class AIMessageTile extends StatefulWidget {
   });
 
   final String text;
-  final String imagePath;
+  final String avatarPath;
   final double opacity;
   final String modelId;
   final bool isReported;
@@ -219,16 +219,11 @@ class _AIMessageTileState extends State<AIMessageTile>
     super.didUpdateWidget(old);
 
     if (old.isThinking && !widget.isThinking) {
-      _flushRemaining(); // Show the final state before clearing everything.
-      _chunkBuffer.clear();
-      _text = '';
-      _totalTextLength = 0;
-      _staticCharCount = 0;
-      _batches.clear();
-      _typeCtl.value = 0;
+      _flushRemaining();
+      _thinkNtf.value = false;
     }
 
-    if (old.isThinking != widget.isThinking) {
+    if (old.isThinking != widget.isThinking && _thinkNtf.value != widget.isThinking) {
       _thinkNtf.value = widget.isThinking;
     }
 
@@ -236,16 +231,25 @@ class _AIMessageTileState extends State<AIMessageTile>
       _curModelId = widget.modelId;
     }
 
-    if (!widget.isError && widget.text.length > _totalTextLength) {
+    if (widget.isThinking && !widget.isError && widget.text.length > _totalTextLength) {
       final newChunk = widget.text.substring(_totalTextLength);
       _chunkBuffer.write(newChunk);
       _totalTextLength = widget.text.length;
 
-      // If the animation is not running, start the loop.
-      // If it is running, the `StatusListener` will take over.
       if (!_typeCtl.isAnimating) {
         _processBufferAndAnimate();
       }
+    }
+
+    if (!widget.isThinking && old.text != widget.text) {
+      _chunkBuffer.clear();
+      _batches.clear();
+      if (_typeCtl.isAnimating) _typeCtl.stop();
+
+      _text = widget.text;
+      _totalTextLength = widget.text.length;
+      _staticCharCount = widget.text.length;
+      _typeCtl.value = 1.0;
     }
 
     if (old.isError != widget.isError) {
@@ -259,16 +263,10 @@ class _AIMessageTileState extends State<AIMessageTile>
         _fadeCtl.forward();
 
         if (widget.text.isNotEmpty && !widget.isThinking) {
-          _text = '';
-          _totalTextLength = 0;
-
-          final newChunk = widget.text.substring(_totalTextLength);
-          _chunkBuffer.write(newChunk);
+          _text = widget.text;
           _totalTextLength = widget.text.length;
-
-          if (!_typeCtl.isAnimating) {
-            _processBufferAndAnimate();
-          }
+          _staticCharCount = widget.text.length;
+          _typeCtl.value = 1.0;
         }
       }
     } else if (old.opacity != widget.opacity) {
@@ -280,9 +278,6 @@ class _AIMessageTileState extends State<AIMessageTile>
       }
     }
   }
-
-  // ... [ All other methods after _onLongPress and build remain the same ] ...
-  // ... [ No changes are needed in these methods ] ...
 
   void _onLongPress(BuildContext ctx, Offset pos) {
     final chatState = ctx.findAncestorStateOfType<ChatScreenState>();
@@ -313,6 +308,8 @@ class _AIMessageTileState extends State<AIMessageTile>
       onChangeModel: widget.onChangeModel,
       modelIdAndExtension: _curModelId,
       conversationHasPhoto: conversationHasPhoto,
+      isSubscribed: chatState.isUserSubscribed,
+      premiumTrialUses: chatState.premiumTrialUses,
     );
   }
 
@@ -488,27 +485,27 @@ class _AIMessageTileState extends State<AIMessageTile>
       ),
     );
     Widget imageWidget;
-    if (widget.imagePath.isEmpty || widget.imagePath.endsWith('self.svg')) {
+    if (widget.avatarPath.isEmpty || widget.avatarPath.endsWith('self.svg')) {
       imageWidget = fallbackWidget;
     } else {
-      final isSvg = widget.imagePath.toLowerCase().endsWith('.svg');
-      final isAsset = widget.imagePath.startsWith('assets/');
+      final isSvg = widget.avatarPath.toLowerCase().endsWith('.svg');
+      final isAsset = widget.avatarPath.startsWith('assets/');
       if (isSvg) {
         imageWidget = isAsset
-            ? SvgPicture.asset(widget.imagePath,
+            ? SvgPicture.asset(widget.avatarPath,
             width: iconSize,
             height: iconSize,
             fit: BoxFit.contain,
             placeholderBuilder: (_) => fallbackWidget)
-            : SvgPicture.file(File(widget.imagePath),
+            : SvgPicture.file(File(widget.avatarPath),
             width: iconSize,
             height: iconSize,
             fit: BoxFit.contain,
             placeholderBuilder: (_) => fallbackWidget);
       } else {
         final imageProvider = isAsset
-            ? AssetImage(widget.imagePath) as ImageProvider
-            : FileImage(File(widget.imagePath));
+            ? AssetImage(widget.avatarPath) as ImageProvider
+            : FileImage(File(widget.avatarPath));
         imageWidget = Image(
           image: imageProvider,
           width: containerSize,

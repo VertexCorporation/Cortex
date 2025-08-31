@@ -4,11 +4,10 @@
 // response streaming, providing a clean and secure interface for the rest of the application.
 //
 // Key Features:
-// - Handles communication with a secure backend proxy.
-// - Supports streaming responses for real-time message updates.
+// - Handles communication with the secure backend proxy (v2.2+).
+// - Natively supports streaming of both text chunks and image data.
 // - Implements robust error handling for various API and network issues.
-// - Includes a mechanism to gracefully handle user-initiated request cancellations
-//   without showing an error message.
+// - Includes a mechanism to gracefully handle user-initiated request cancellations.
 
 import 'dart:convert';
 import 'dart:async';
@@ -20,8 +19,6 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:mime/mime.dart';
 
 /// Represents an exception thrown when the user intentionally cancels an API request.
-/// This is NOT treated as an error by the UI, but as a controlled flow interruption.
-/// It allows the application to stop processing without displaying a scary error dialog.
 class UserCancelledException implements Exception {
   final String message = "Request was cancelled by the user.";
   @override
@@ -46,15 +43,11 @@ class ApiService {
   final String _proxyBaseUrl = "https://proxyopenrouterrequest-o5h7dmtija-ew.a.run.app";
 
   http.Client? _client;
-  /// A state flag to distinguish between a genuine network error and a
-  /// user-initiated cancellation.
   bool _isCancelled = false;
 
   ApiService({required this.localizations});
 
   /// Cancels any ongoing HTTP request.
-  /// It sets a flag and immediately closes the HTTP client, which will cause
-  /// the ongoing network operation to throw an exception.
   void cancelRequests() {
     debugPrint("[ApiService] Cancellation requested. Setting flag and closing client.");
     _isCancelled = true;
@@ -63,9 +56,6 @@ class ApiService {
 
   /// A static utility function to read an image file, encode it to Base64,
   /// and format it as a data URL string.
-  ///
-  /// This method is pure and has no side effects, making it ideal as a static function.
-  /// It can be called from anywhere without needing an `ApiService` instance.
   static Future<String?> formatBase64Image(String photoPath) async {
     try {
       final imageFile = File(photoPath);
@@ -73,7 +63,6 @@ class ApiService {
         final imageBytes = await imageFile.readAsBytes();
         final mimeType = lookupMimeType(photoPath, headerBytes: imageBytes);
 
-        // Ensure the image is of a supported type before sending.
         if (mimeType == null || !['image/png', 'image/jpeg', 'image/webp'].contains(mimeType)) {
           debugPrint("Unsupported image type '$mimeType' for file: $photoPath");
           return null;
@@ -88,23 +77,21 @@ class ApiService {
     return null;
   }
 
-  /// This version correctly handles the hybrid SSE stream from the server.
-  /// 1.  It uses a `Completer` to wait for a definitive success (`event: moderation`)
-  ///     or failure (`event: error`) signal from the server.
-  /// 2.  It uses a custom line-by-line processing logic that can distinguish
-  ///     between our custom control events and the raw, piped data from the AI provider.
-  /// 3.  It fully implements the pre-flight error handling for immediate feedback.
+  /// It now accepts an `isPremium` flag and sends it to the backend for
+  /// correct credit deduction and trial management.
   Future<String> _getResponse({
     required List<Map<String, dynamic>> messages,
     required String model,
-    Function(String chunk)? onStreamChunk,
+    required bool isPremium,
+    Function(String textChunk)? onTextChunk,
+    Function(String imageUrl)? onImageReceived,
   }) async {
     _isCancelled = false;
     _client = http.Client();
 
     final completer = Completer<String>();
     final finalContent = StringBuffer();
-    String currentEvent = 'message'; // Default event type is raw message content
+    String currentEvent = '';
 
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -122,39 +109,43 @@ class ApiService {
         ..body = jsonEncode({
           "model": model,
           "messages": messages,
+          "isPremiumModel": isPremium,
         });
 
       final streamedResponse = await _client!.send(request);
 
       if (streamedResponse.statusCode != 200) {
-        // --- FIX: The complete pre-flight error handling logic is now included. ---
         final errorBodyString = await streamedResponse.stream.bytesToString();
         debugPrint("Proxy Pre-flight Error [${streamedResponse.statusCode}]: $errorBodyString");
 
         String? errorCode;
-        String finalErrorMessage = localizations.errorServer;
+        String serverMessage = localizations.errorServer;
 
         try {
           final errorJson = jsonDecode(errorBodyString);
           if (errorJson['error'] is Map) {
             final errorObject = errorJson['error'];
             errorCode = errorObject['code']?.toString();
-            finalErrorMessage = errorObject['message'] ?? finalErrorMessage;
+            serverMessage = errorObject['message'] ?? serverMessage;
           }
-        } catch (e) {
-          // Ignore parse error, use defaults.
-        }
+        } catch (e) { /* Ignore parse error, use defaults. */ }
 
+        String finalUserMessage;
         switch (errorCode) {
           case 'TOKEN_MISSING':
           case 'TOKEN_INVALID':
-            throw ApiException(localizations.errorApiAuthentication, statusCode: streamedResponse.statusCode, code: errorCode);
+            finalUserMessage = localizations.errorApiAuthentication;
+            break;
           case 'INSUFFICIENT_USER_CREDITS':
-            throw ApiException(localizations.errorInsufficientCredits, statusCode: streamedResponse.statusCode, code: errorCode);
-        // Add other specific cases if needed
+            finalUserMessage = localizations.errorInsufficientCredits;
+            break;
+          case 'PREMIUM_TRIAL_EXHAUSTED':
+            finalUserMessage = localizations.premiumTrialExhaustedMessage;
+            break;
           default:
-            throw ApiException(finalErrorMessage, statusCode: streamedResponse.statusCode, code: errorCode);
+            finalUserMessage = serverMessage;
         }
+        throw ApiException(finalUserMessage, statusCode: streamedResponse.statusCode, code: errorCode);
       }
 
       streamedResponse.stream
@@ -162,7 +153,6 @@ class ApiService {
           .transform(const LineSplitter())
           .listen(
             (line) {
-
           debugPrint("[CLIENT_LINE_RECEIVER] Received line: $line");
 
           if (completer.isCompleted) return;
@@ -174,6 +164,7 @@ class ApiService {
 
           if (line.startsWith('data: ')) {
             final dataString = line.substring(6).trim();
+            if (dataString.isEmpty) return;
 
             switch (currentEvent) {
               case 'moderation':
@@ -195,31 +186,64 @@ class ApiService {
               case 'error':
                 try {
                   final data = jsonDecode(dataString);
-                  final message = data['message'] ?? localizations.errorServer;
-                  completer.completeError(ApiException(message, code: data['code']?.toString()));
+                  final code = data['code']?.toString();
+                  final serverMessage = data['message']?.toString();
+                  String finalMessage;
+
+                  switch (code) {
+                    case 'PREMIUM_TRIAL_EXHAUSTED':
+                      finalMessage = localizations.premiumTrialExhaustedMessage;
+                      break;
+                    case 'INSUFFICIENT_USER_CREDITS':
+                      finalMessage = localizations.errorInsufficientCredits;
+                      break;
+                    case 'CONTENT_FLAGGED':
+                      finalMessage = localizations.errorPromptFlagged;
+                      break;
+                    case 'TOKEN_MISSING':
+                    case 'TOKEN_INVALID':
+                      finalMessage = localizations.errorApiAuthentication;
+                      break;
+                    default:
+                      finalMessage = serverMessage ?? localizations.errorServer;
+                  }
+                  completer.completeError(ApiException(finalMessage, code: code));
                 } catch (e) {
                   completer.completeError(ApiException(localizations.errorServer, code: 'CLIENT_PARSE_ERROR'));
                 }
                 break;
 
-            // Default case handles the raw AI content stream
-              default: // 'message'
-                if (dataString == "[DONE]") return; // Ignore OpenRouter's done signal
+              case 'text_chunk':
                 try {
-                  final chunkData = jsonDecode(dataString);
-                  final delta = chunkData['choices']?[0]?['delta'];
-                  if (delta?['content'] != null) {
-                    final String contentChunk = delta['content'];
-                    onStreamChunk?.call(contentChunk);
-                    finalContent.write(contentChunk);
+                  final data = jsonDecode(dataString);
+                  final text = data['text'] as String?;
+                  if (text != null) {
+                    onTextChunk?.call(text);
+                    finalContent.write(text);
                   }
-                } catch(e) {
-                  debugPrint("Could not parse AI content chunk, ignoring. Chunk: $dataString");
+                } catch (e) {
+                  debugPrint("[ApiService] Could not parse text_chunk, ignoring. Chunk: $dataString");
                 }
                 break;
+
+              case 'image_chunk':
+                try {
+                  final data = jsonDecode(dataString);
+                  final url = data['url'] as String?;
+                  if (url != null) {
+                    onImageReceived?.call(url);
+                  }
+                } catch (e) {
+                  debugPrint("[ApiService] Could not parse image_chunk, ignoring. Chunk: $dataString");
+                }
+                break;
+
+              default:
+              // Ignore any unknown or empty events.
+                break;
             }
-            // Reset event to default after processing data
-            currentEvent = 'message';
+            // Reset event name after processing data
+            currentEvent = '';
           }
         },
         onError: (error) {
@@ -256,15 +280,16 @@ class ApiService {
     }
   }
 
-
-  /// A public method to get a response for a character-based model.
+  /// Public method for character-based models, now supporting image outputs.
   Future<String> getCharacterResponse({
     required String userInput,
     required List<Map<String, dynamic>> context,
     required String characterId,
+    required bool isPremium,
     required String baseModelId,
     String? photoPath,
-    Function(String chunk)? onStreamChunk,
+    Function(String textChunk)? onTextChunk,
+    Function(String imageUrl)? onImageReceived,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
     List<Map<String, dynamic>> userMessageContent = [];
@@ -284,18 +309,22 @@ class ApiService {
 
     return _getResponse(
       messages: messages,
-      model: baseModelId, // Use the base model for the actual API call.
-      onStreamChunk: onStreamChunk,
+      model: baseModelId,
+      isPremium: isPremium,
+      onTextChunk: onTextChunk,
+      onImageReceived: onImageReceived,
     );
   }
 
-  /// A public method to get a response for a standard online model.
+  /// Public method for standard online models, now supporting image outputs.
   Future<String> getOnlineModelResponse({
     required String modelId,
+    required bool isPremium,
     required String userInput,
     required List<Map<String, dynamic>> context,
     String? photoPath,
-    Function(String chunk)? onStreamChunk,
+    Function(String textChunk)? onTextChunk,
+    Function(String imageUrl)? onImageReceived,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
     List<Map<String, dynamic>> userMessageContent = [];
@@ -316,7 +345,9 @@ class ApiService {
     return _getResponse(
       messages: messages,
       model: modelId,
-      onStreamChunk: onStreamChunk,
+      isPremium: isPremium,
+      onTextChunk: onTextChunk,
+      onImageReceived: onImageReceived,
     );
   }
 }

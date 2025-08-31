@@ -26,21 +26,25 @@ class CreditPackage {
 /// All logic for fetching and buying is handled by the parent widget.
 class CreditContentWidget extends StatefulWidget {
   final ValueChanged<CreditPackage>? onCreditPackageSelected;
-  final List<ProductDetails> availableProducts; // Receives products from the parent
+  final List<ProductDetails> availableProducts;
+  final ScrollController? scrollController;
 
   const CreditContentWidget({
     Key? key,
     this.onCreditPackageSelected,
-    required this.availableProducts, // This is now a required parameter
+    required this.availableProducts,
+    this.scrollController,
   }) : super(key: key);
 
   @override
   State<CreditContentWidget> createState() => _CreditContentWidgetState();
 }
 
-class _CreditContentWidgetState extends State<CreditContentWidget> {
+class _CreditContentWidgetState extends State<CreditContentWidget> with SingleTickerProviderStateMixin {
   int? _selectedCardIndex;
   final List<CreditPackage> _creditPackages = [];
+  late AnimationController _shineController;
+  late Animation<double> _shineAnimation;
 
   // --- REMOVED: InAppPurchase instance and purchase logic ---
   // This widget is now purely for presentation. The parent handles all purchases.
@@ -51,6 +55,36 @@ class _CreditContentWidgetState extends State<CreditContentWidget> {
   @override
   void initState() {
     super.initState();
+
+    // --- NEW: Initialize the shine animation ---
+    _shineController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000), // Slower, more subtle shine
+    );
+
+    _shineAnimation = Tween<double>(begin: -1.5, end: 1.5).animate(
+        CurvedAnimation(parent: _shineController, curve: Curves.linear)
+    );
+
+    _shineController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        // Wait for a few seconds before the next shine
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            _shineController.forward(from: 0.0);
+          }
+        });
+      }
+    });
+
+    // Start the first animation after a short delay
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        _shineController.forward();
+      }
+    });
+
+
     _buildPackagesFromProps();
     _selectedCardIndex = 0;
 
@@ -60,6 +94,12 @@ class _CreditContentWidgetState extends State<CreditContentWidget> {
         widget.onCreditPackageSelected!(_creditPackages[0]);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _shineController.dispose();
+    super.dispose();
   }
 
   @override
@@ -126,11 +166,9 @@ class _CreditContentWidgetState extends State<CreditContentWidget> {
     final double spacingAfterDescription = screenHeight * 0.02;
     final double cardMarginVertical = screenHeight * 0.0075;
     final double cardInnerPadding = screenWidth * 0.04;
-    final double cardBorderRadius = screenWidth * 0.04;
     final double iconSize = screenWidth * 0.1;
     final double spacingBetweenIconAndText = screenWidth * 0.04;
     final double spacingInCardText = screenHeight * 0.005;
-    const double cardBorderWidth = 2.0;
 
     // --- DYNAMIC FONT SIZES ---
     final double titleFontSize = screenWidth * 0.07;
@@ -165,6 +203,7 @@ class _CreditContentWidgetState extends State<CreditContentWidget> {
           SizedBox(height: spacingAfterDescription),
           Expanded(
             child: ListView.builder(
+              controller: widget.scrollController,
               itemCount: _creditPackages.length,
               itemBuilder: (context, index) {
                 final package = _creditPackages[index];
@@ -184,54 +223,93 @@ class _CreditContentWidgetState extends State<CreditContentWidget> {
                 final String title = productDetail?.title ?? localizations.creditPackage(package.amount);
                 final String price = productDetail?.price ?? package.price;
 
+                final cardContent = AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  padding: EdgeInsets.all(cardInnerPadding),
+                  decoration: BoxDecoration(
+                    // --- MODIFIED VALUES ---
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isSelected ? AppColors.primaryColor.inverted : AppColors.border,
+                      width: isSelected ? 2.0 : 1.0,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/icons/credit.svg',
+                        width: iconSize,
+                        height: iconSize,
+                        colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                      ),
+                      SizedBox(width: spacingBetweenIconAndText),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: TextStyle(
+                                fontSize: cardTitleFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryColor.inverted,
+                              ),
+                            ),
+                            SizedBox(height: spacingInCardText),
+                            Text(
+                              price,
+                              style: TextStyle(
+                                fontSize: cardPriceFontSize,
+                                color: AppColors.tertiaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+
                 return GestureDetector(
                   onTap: () {
                     if (mounted) setState(() => _selectedCardIndex = index);
                     widget.onCreditPackageSelected?.call(package);
                   },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeInOut,
+                  // --- WRAP with Margin & Stack for Shine Effect ---
+                  child: Container(
                     margin: EdgeInsets.symmetric(vertical: cardMarginVertical),
-                    padding: EdgeInsets.all(cardInnerPadding),
-                    decoration: BoxDecoration(
-                      color: AppColors.quaternaryColor,
-                      borderRadius: BorderRadius.circular(cardBorderRadius),
-                      border: Border.all(
-                        color: isSelected ? AppColors.primaryColor.inverted : Colors.transparent,
-                        width: cardBorderWidth,
-                      ),
-                    ),
-                    child: Row(
+                    child: Stack(
                       children: [
-                        SvgPicture.asset(
-                          'assets/icons/credit.svg',
-                          width: iconSize,
-                          height: iconSize,
-                          colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-                        ),
-                        SizedBox(width: spacingBetweenIconAndText),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                title,
-                                style: TextStyle(
-                                  fontSize: cardTitleFontSize,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryColor.inverted,
+                        cardContent,
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20.0),
+                            child: AnimatedBuilder(
+                              animation: _shineAnimation,
+                              builder: (context, child) {
+                                return Transform.translate(
+                                  offset: Offset(MediaQuery.of(context).size.width * _shineAnimation.value, 0),
+                                  child: child,
+                                );
+                              },
+                              child: Container(
+                                width: screenWidth * 0.25,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      AppColors.secondaryColor.withOpacity(0.0),
+                                      AppColors.secondaryColor.withOpacity(0.5),
+                                      AppColors.secondaryColor.withOpacity(0.0),
+                                    ],
+                                    stops: const [0.4, 0.5, 0.6],
+                                  ),
                                 ),
                               ),
-                              SizedBox(height: spacingInCardText),
-                              Text(
-                                price,
-                                style: TextStyle(
-                                  fontSize: cardPriceFontSize,
-                                  color: AppColors.tertiaryColor,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ],

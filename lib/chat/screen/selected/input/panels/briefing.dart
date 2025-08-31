@@ -1,28 +1,31 @@
 // briefing.dart
 
 import 'dart:io';
-import 'dart:math';
 import 'package:cortex/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import '../../../../../theme.dart';
 
+/// An overlay widget that displays contextual warnings and information
+/// to the user, such as insufficient credits, storage warnings, or disclaimers.
+/// It intelligently handles the animated transition of one single, high-priority
+/// message at a time.
 class BriefingOverlay extends StatefulWidget {
   final double inputFieldHeight;
-
-  // raw data
-  final int  availableCredits;
+  final int availableCredits;
   final bool photoSelected;
   final bool isOfflineModel;
   final String? modelPath;
   final bool inappropriate;
   final bool limitReached;
   final bool isStorageSufficient;
-  // Disclaimer-specific properties
   final bool showDisclaimer;
   final VoidCallback onDisclaimerDismissed;
   final bool showPhotoWarning;
+  final bool isPremiumModel;
+  final bool isSubscribed;
+  final int premiumTrialUses;
 
   const BriefingOverlay({
     super.key,
@@ -37,291 +40,217 @@ class BriefingOverlay extends StatefulWidget {
     required this.onDisclaimerDismissed,
     required this.isStorageSufficient,
     required this.showPhotoWarning,
+    required this.isPremiumModel,
+    required this.isSubscribed,
+    required this.premiumTrialUses,
   });
 
   @override
   State<BriefingOverlay> createState() => _BriefingOverlayState();
 }
 
-class _BriefingOverlayState extends State<BriefingOverlay>
-    with TickerProviderStateMixin {
+class _BriefingOverlayState extends State<BriefingOverlay> with TickerProviderStateMixin {
+  // --- Animation Controllers ---
+  /// Controls the primary slide-in and slide-out animation of the briefing panel.
+  late final AnimationController _slideController;
 
-  // Animation controllers
-  late final AnimationController _entryController;
-  AnimationController? _releaseController;
+  /// Controls the user-driven drag-to-dismiss and snap-back animation.
+  late final AnimationController _dragController;
 
-  // Animations
-  late Animation<Offset> _slideInAnimation;
-  late Animation<double> _fadeInAnimation;
+  // --- Animations ---
+  late final Animation<Offset> _slideAnimation;
+  late final Animation<double> _fadeAnimation;
+  late Animation<Offset> _dragAnimation;
 
-  // State for interactive dragging
+  // --- State Management ---
+  /// Holds the text of the message currently displayed or animating.
+  String? _currentMessageText;
+  /// Tracks if the current message can be dismissed by the user.
+  bool _isCurrentMessageDismissible = false;
+  /// The current drag offset for the dismissible panel.
   Offset _dragOffset = Offset.zero;
-  double _releaseOpacity = 1.0;
 
-  // Message state
-  String? _msg;
-  bool _isDismissible = false;
-
-  // ------------ Lifecycle Methods ------------
+  // --- Constants ---
+  static const Duration _animationDuration = Duration(milliseconds: 300);
 
   @override
   void initState() {
     super.initState();
-    debugPrint('[BriefingOverlay] initState');
+    _slideController = AnimationController(vsync: this, duration: _animationDuration);
+    _dragController = AnimationController(vsync: this, duration: _animationDuration);
 
-    _entryController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
+    final curvedAnimation = CurvedAnimation(parent: _slideController, curve: Curves.easeOut);
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(curvedAnimation);
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(curvedAnimation);
 
-    _slideInAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _entryController, curve: Curves.easeOut));
-
-    _fadeInAnimation = Tween<double>(begin: 0.0, end: 1.0)
-        .animate(CurvedAnimation(parent: _entryController, curve: Curves.easeIn));
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _evaluate();
+    // Initial evaluation happens after the first frame when the context is fully available.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _evaluateAndAnimate();
+      }
+    });
   }
 
   @override
   void didUpdateWidget(covariant BriefingOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _evaluate();
+    // On every update from the parent, re-evaluate which message should be shown.
+    _evaluateAndAnimate();
   }
 
   @override
   void dispose() {
-    debugPrint('[BriefingOverlay] dispose');
-    _entryController.dispose();
-    _releaseController?.dispose();
+    _slideController.dispose();
+    _dragController.dispose();
     super.dispose();
   }
 
-
-
-  // ------------ Helper & Evaluation Logic ------------
-
-  /// Determines which message, if any, should be displayed based on widget properties.
-  /// It checks for messages in a specific order of priority.
-  void _evaluate() {
-    final loc = AppLocalizations.of(context)!;
-    String? next;
-    // --- MODIFIED ---
-    bool nextIsDismissible = false;
-
-    // The order of these checks defines message priority.
-    if (widget.inappropriate) {
-      next = loc.inappropriateContentDetected;
-    } else if (widget.limitReached) {
-      next = loc.chatLengthLimitExceeded;
-    } else if (!widget.isStorageSufficient) {
-      next = loc.notEnoughStorage;
-    } else if (_modelMissing) {
-      next = loc.offlineModelNotInstalled;
-    } else if (_requiredCredits() > widget.availableCredits) {
-      next = loc.insufficientCredits(
-        widget.availableCredits,
-        _requiredCredits(),
-      );
-    } else if (widget.showPhotoWarning) {
-      next = loc.photoWarningMessage; // You need to add this key to your .arb file
-      nextIsDismissible = true;
-    } else if (widget.showDisclaimer) {
-      next = loc.disclaimerMessage;
-      nextIsDismissible = true;
+  /// Determines the highest priority message to display based on the current app state.
+  /// The order of checks establishes the priority.
+  String? _evaluateMessageText(AppLocalizations loc) {
+    if (widget.isPremiumModel && !widget.isSubscribed && widget.premiumTrialUses >= 3) {
+      return loc.premiumTrialExhaustedMessage;
     }
+    if (widget.inappropriate) {
+      return loc.inappropriateContentDetected;
+    }
+    if (widget.limitReached) {
+      return loc.chatLengthLimitExceeded;
+    }
+    if (!widget.isStorageSufficient) {
+      return loc.notEnoughStorage;
+    }
+    if (_modelMissing) {
+      return loc.offlineModelNotInstalled;
+    }
+    if (_requiredCredits() > widget.availableCredits) {
+      return loc.insufficientCredits(widget.availableCredits, _requiredCredits());
+    }
+    if (widget.showPhotoWarning) {
+      return loc.photoWarningMessage;
+    }
+    if (widget.showDisclaimer) {
+      return loc.disclaimerMessage;
+    }
+    return null; // No message to show
+  }
 
-    // Only update state and trigger animations if the message has changed.
-    if (next != _msg) {
-      debugPrint('[BriefingOverlay] Evaluated state. New message: "$next". Is Dismissible: $nextIsDismissible');
-      setState(() {
-        _msg = next;
-        _isDismissible = nextIsDismissible;
-        _dragOffset = Offset.zero; // Reset drag position for the new message.
-      });
+  /// Checks if a given message text corresponds to a dismissible message type.
+  bool _isMessageDismissible(String? messageText, AppLocalizations loc) {
+    if (messageText == null) return false;
+    // These specific messages are user-dismissible.
+    return messageText == loc.photoWarningMessage || messageText == loc.disclaimerMessage;
+  }
 
-      // Control the entry/exit animation based on whether there's a message.
-      if (_msg == null) {
-        if (_entryController.isCompleted) _entryController.reverse();
-      } else {
-        if (_entryController.isDismissed) _entryController.forward(from: 0);
+  /// The core logic hub. It compares the next message with the current one and
+  /// orchestrates the required animations for a smooth transition.
+  void _evaluateAndAnimate() {
+    final loc = AppLocalizations.of(context)!;
+    final nextMessageText = _evaluateMessageText(loc);
+
+    // Only act if the message content has actually changed.
+    if (nextMessageText != _currentMessageText) {
+      final nextIsDismissible = _isMessageDismissible(nextMessageText, loc);
+
+      // --- Transition Logic ---
+      final bool isShowingMessage = _slideController.isCompleted;
+      final bool hasNewMessage = nextMessageText != null;
+
+      // Case 1: A message is currently shown, and we need to transition to another or none.
+      if (isShowingMessage) {
+        _slideController.reverse().then((_) {
+          if (mounted && hasNewMessage) {
+            // After hiding the old one, update state for the new one and show it.
+            setState(() {
+              _currentMessageText = nextMessageText;
+              _isCurrentMessageDismissible = nextIsDismissible;
+              _dragOffset = Offset.zero; // Reset drag for the new panel
+            });
+            _slideController.forward(from: 0.0);
+          } else if (mounted) {
+            // If there's no new message, just clear the state after hiding.
+            setState(() {
+              _currentMessageText = null;
+            });
+          }
+        });
+      }
+      // Case 2: No message is shown, but a new one needs to appear.
+      else if (hasNewMessage) {
+        setState(() {
+          _currentMessageText = nextMessageText;
+          _isCurrentMessageDismissible = nextIsDismissible;
+        });
+        _slideController.forward(from: 0.0);
       }
     }
   }
 
-  // ------------ Drag & Dismissal Animation Logic (ONLY for the disclaimer) ------------
+  // --- User Interaction Handlers for Dismissible Panels ---
 
-  /// Handles the end of a drag gesture.
-  /// This function is gated by the `_isDisclaimer` check in the GestureDetector's `onPanEnd`.
+  /// Called when the user lifts their finger after a drag gesture.
   void _handlePanEnd(DragEndDetails details) {
     final screenSize = MediaQuery.of(context).size;
-    final velocityObject = details.velocity;
-    final pixelsPerSecond = velocityObject.pixelsPerSecond;
-    final offset = _dragOffset;
+    final flingVelocity = details.velocity.pixelsPerSecond.distance;
+    final dragDistance = _dragOffset.distance;
 
-    // Dismissal thresholds
-    final dismissThreshold = screenSize.width / 4;
-    final velocityThreshold = 750.0;
-
-    // Condition to dismiss: drag far enough OR fling fast enough.
-    if (offset.distance > dismissThreshold || pixelsPerSecond.distance > velocityThreshold) {
-      debugPrint('[BriefingOverlay] Disclaimer dismissal threshold met. Flinging off-screen.');
-      _animateFling(velocityObject);
+    // Dismiss if dragged far enough or flung fast enough.
+    if (dragDistance > screenSize.width * 0.3 || flingVelocity > 750) {
+      _handleDismiss();
     } else {
-      debugPrint('[BriefingOverlay] Disclaimer dismissal threshold not met. Snapping back.');
-      _animateSnapBack();
+      // Animate the panel snapping back to its original position.
+      _animateDrag(from: _dragOffset, to: Offset.zero);
     }
   }
 
-  /// Animates the card off-screen in the direction of the fling, now with a fade-out effect.
-  void _animateFling(Velocity velocity) {
-    // Calculate a realistic end offset based on the current drag position and fling direction.
-    final direction = _dragOffset.direction;
-    final endOffset = Offset(cos(direction), sin(direction)) * MediaQuery.of(context).size.width;
+  /// Triggers the parent callback to update the app state, which will in turn
+  /// cause this widget to animate out via `didUpdateWidget`.
+  void _handleDismiss() {
+    if (_isCurrentMessageDismissible) {
+      widget.onDisclaimerDismissed();
+    }
+  }
 
-    _startReleaseAnimation(
-      from: _dragOffset,
-      to: endOffset,
-      shouldFadeOut: true,
-      onComplete: () {
-        debugPrint('[BriefingOverlay] Fling animation complete. Notifying parent to dismiss disclaimer.');
-        // This is the crucial callback to the parent widget.
-        widget.onDisclaimerDismissed();
-      },
+  /// Helper to animate the drag offset, e.g., for the snap-back effect.
+  void _animateDrag({required Offset from, required Offset to}) {
+    _dragAnimation = Tween<Offset>(begin: from, end: to).animate(
+      CurvedAnimation(parent: _dragController, curve: Curves.easeOut),
     );
+    _dragController.forward(from: 0.0);
   }
-
-  /// Animates the card back to its original centered position if not dismissed.
-  void _animateSnapBack() {
-    _startReleaseAnimation(
-        from: _dragOffset,
-        to: Offset.zero,
-        shouldFadeOut: false, // <-- Tell the animation NOT to fade
-        onComplete: () {
-          debugPrint('[BriefingOverlay] Snap-back animation complete.');
-          // Reset drag offset state after animation finishes to be clean.
-          setState(() {
-            _dragOffset = Offset.zero;
-          });
-        });
-  }
-
-  /// A generic method to start the post-drag animation (either fling or snap-back).
-  /// It now orchestrates both position and opacity animations.
-  void _startReleaseAnimation({
-    required Offset from,
-    required Offset to,
-    required bool shouldFadeOut, // New parameter to control fading
-    required VoidCallback onComplete
-  }) {
-    _releaseController?.dispose(); // Dispose of any existing controller.
-    _releaseController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
-
-    // Animation for the card's position (fling or snap-back)
-    final positionAnimation = Tween<Offset>(begin: from, end: to).animate(
-      CurvedAnimation(parent: _releaseController!, curve: Curves.easeOut),
-    );
-
-    // NEW: Animation for the card's opacity (fade-out or stay opaque)
-    final opacityAnimation = Tween<double>(begin: 1.0, end: shouldFadeOut ? 0.0 : 1.0).animate(
-      CurvedAnimation(parent: _releaseController!, curve: Curves.easeOut),
-    );
-
-    _releaseController!
-      ..addListener(() {
-        // Update both position and opacity state on each animation frame
-        setState(() {
-          _dragOffset = positionAnimation.value;
-          _releaseOpacity = opacityAnimation.value;
-        });
-      })
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          onComplete();
-        }
-      });
-
-    _releaseController!.forward();
-  }
-
-  /// Dismisses the disclaimer with a simple tap, animating it downwards.
-  void _handleTapDismiss() {
-    debugPrint('[BriefingOverlay] Dismissing disclaimer via tap.');
-    // Fling downwards with a fixed velocity to trigger the dismiss animation.
-    _animateFling(const Velocity(pixelsPerSecond: Offset(0, 1000)));
-  }
-
-  // ------------ Build Method ------------
 
   @override
   Widget build(BuildContext context) {
-    if (_msg == null) return const SizedBox.shrink();
+    return AnimatedBuilder(
+      animation: Listenable.merge([_slideController, _dragController]),
+      builder: (context, child) {
+        // The panel should only be removed from the widget tree if it's
+        // meant to be hidden AND it has finished its exit animation.
+        final bool shouldBeVisible = _currentMessageText != null || _slideController.isAnimating;
+        if (!shouldBeVisible) {
+          return const SizedBox.shrink();
+        }
 
-    // The icon is now conditional. We can use a different icon for the photo warning.
-    final String iconAsset = 'assets/icons/warning.svg';
-
-    return Positioned(
-      bottom: widget.inputFieldHeight + 12,
-      left: 16,
-      right: 16,
-      child: GestureDetector(
-        // The gestures are now enabled if the message is dismissible.
-        onTap: _isDismissible ? _handleTapDismiss : null,
-        onPanUpdate: _isDismissible ? (details) {
-          setState(() {
-            _dragOffset += details.delta;
-            _releaseOpacity = 1.0;
-          });
-        } : null,
-        onPanEnd: _isDismissible ? _handlePanEnd : null,
+        return Positioned(
+          bottom: widget.inputFieldHeight + 12,
+          left: 16,
+          right: 16,
+          child: child!,
+        );
+      },
+      child: FadeTransition(
+        opacity: _fadeAnimation,
         child: SlideTransition(
-          position: _slideInAnimation,
-          child: FadeTransition(
-            opacity: _fadeInAnimation,
+          position: _slideAnimation,
+          child: GestureDetector(
+            onPanUpdate: _isCurrentMessageDismissible
+                ? (details) => setState(() => _dragOffset += details.delta)
+                : null,
+            onPanEnd: _isCurrentMessageDismissible ? _handlePanEnd : null,
+            onTap: _isCurrentMessageDismissible ? _handleDismiss : null,
             child: Transform.translate(
               offset: _dragOffset,
-              child: Opacity(
-                opacity: _releaseOpacity,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    border: Border.all(color: AppColors.border),
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 8,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        iconAsset,
-                        colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-                        width: 24,
-                        height: 24,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          _msg!,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.primaryColor.inverted,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              child: _BriefingPanelContent(message: _currentMessageText ?? ''),
             ),
           ),
         ),
@@ -329,19 +258,69 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     );
   }
 
-
-  /// Calculates the number of credits required for a server-side model action.
+  // --- Helper Methods ---
   int _requiredCredits() {
-    if (widget.isOfflineModel) return 0; // Offline models don't use credits.
-    final base  = 20;
+    if (widget.isOfflineModel) return 0;
+    final base = widget.isPremiumModel ? 20 : 10;
     final photo = widget.photoSelected ? 30 : 0;
     return base + photo;
   }
 
-  /// Checks if an offline model's file is missing from the device storage.
   bool get _modelMissing {
-    if (!widget.isOfflineModel) return false; // Not applicable for server-side models.
-    if (widget.modelPath == null || widget.modelPath!.isEmpty) return true; // Path is null or empty.
-    return !File(widget.modelPath!).existsSync(); // Check if the file exists at the path.
+    if (!widget.isOfflineModel) return false;
+    if (widget.modelPath == null || widget.modelPath!.isEmpty) return true;
+    return !File(widget.modelPath!).existsSync();
+  }
+}
+
+/// A stateless widget for the panel's visual content.
+/// This improves performance by preventing the panel's decoration and layout
+/// from rebuilding on every animation frame.
+class _BriefingPanelContent extends StatelessWidget {
+  final String message;
+
+  const _BriefingPanelContent({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final boxDecoration = BoxDecoration(
+      color: AppColors.background,
+      border: Border.fromBorderSide(BorderSide(color: AppColors.border)),
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
+      boxShadow: const [
+        BoxShadow(
+          color: Colors.black12,
+          blurRadius: 8,
+          offset: Offset(0, 4),
+        ),
+      ],
+    );
+
+    final textStyle = TextStyle(
+      fontSize: 14,
+      color: AppColors.primaryColor.inverted,
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      decoration: boxDecoration,
+      child: Row(
+        children: [
+          SvgPicture.asset(
+            'assets/icons/warning.svg',
+            colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+            width: 24,
+            height: 24,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: textStyle,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

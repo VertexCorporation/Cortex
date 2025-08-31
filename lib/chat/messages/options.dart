@@ -12,6 +12,50 @@ import 'package:provider/provider.dart'; // For NotificationService
 import 'package:cortex/l10n/app_localizations.dart'; // For localizations
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+
 // Ensure these import paths are correct for your project structure
 // import '../../main.dart'; // Assuming main.dart exports necessary globals like mainScreenKey or similar.
 // If main.dart is not needed here directly, consider removing to reduce coupling.
@@ -147,6 +191,10 @@ class AnimatedMessageOptionsPanel extends StatefulWidget {
   /// A [ValueNotifier] indicating if the chat screen is globally waiting for a response.
   /// This can influence the visibility of options like 'Regenerate' or 'Change Model'.
   final ValueNotifier<bool>? isWaitingForResponseNotifier;
+  final bool isSubscribed;
+  /// The number of premium model trial uses for the current day.
+  final int premiumTrialUses;
+
 
   const AnimatedMessageOptionsPanel({
     Key? key,
@@ -166,6 +214,8 @@ class AnimatedMessageOptionsPanel extends StatefulWidget {
     this.isThinkingNotifier,
     required this.conversationHasPhoto,
     this.isWaitingForResponseNotifier,
+    required this.isSubscribed,
+    required this.premiumTrialUses,
   }) : super(key: key);
 
   @override
@@ -408,69 +458,55 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
       return [];
     }
 
-    final Map<String, dynamic> modelSeriesData = _findParentSeriesData();
+    final modelSeriesData = _findParentSeriesData();
     final bool isOfflineModel = (modelSeriesData['type'] as String? ?? 'online') == 'offline';
+    final bool currentModelCanHandleImages = ModelData.hasModality(_currentModelId, 'image');
+
+    final bool hasPremiumAccess = widget.isSubscribed || widget.premiumTrialUses < 3;
+
+    final bool isCurrentModelPremium = (ModelData.getPreciseModelData(_currentModelId)['tier'] as String? ?? 'free') == 'premium';
+
 
     return widget.options.where((option) {
       String reason = ""; // For debugging
       bool shouldShow = true;
 
-      if (option == MessageOption.edit) {
-        if (kDebugMode) {
-          debugPrint("$logPrefix   Option $option WILL NOT be shown. Reason: Temporarily disabled system-wide.");
-        }
-        return false;
-      }
-
-      // Filter 1: General waiting state. Don't allow new requests while one is pending.
       if (isChatScreenWaiting &&
           (option == MessageOption.regenerate || option == MessageOption.changeModel || option == MessageOption.edit)) {
         shouldShow = false;
         reason = "Chat screen is globally waiting for a response.";
       }
 
-      // Filter 2: 'Stop' option is only for a message that is actively streaming/thinking.
       if (shouldShow && option == MessageOption.stop && !isMessageCurrentlyThinking) {
         shouldShow = false;
         reason = "Message is not currently thinking.";
       }
 
-      // Filter 3: Options that depend on image handling capability.
-      if (shouldShow && widget.conversationHasPhoto) {
-        if (option == MessageOption.regenerate || option == MessageOption.edit) {
-          // --- FIX: Pass the parent data to the helper function. ---
-          if (!_currentExtCanHandleImage(modelSeriesData)) {
-            shouldShow = false;
-            reason = "Conversation has a photo, but the current model/extension '$_currentModelId' cannot handle images.";
-          }
-        }
-        if (option == MessageOption.changeModel) {
-          // --- FIX: Pass the parent data to the helper function. ---
-          final int validExtCount = _validExtensionCountForChangingModel(modelSeriesData);
-          if (validExtCount <= 1) { // Need >1 to have something to "change to".
-            shouldShow = false;
-            reason = "Conversation has a photo, but there are not enough other extensions that can handle images to switch to (found $validExtCount).";
-          }
+      if (shouldShow && option == MessageOption.regenerate) {
+        if (isCurrentModelPremium && !hasPremiumAccess) {
+          shouldShow = false;
+          reason = "Regenerate is hidden. The model is premium and the user has no subscription or trial uses left.";
+        } else if (isOfflineModel || !_hasInternet) {
+          shouldShow = false;
+          reason = "Regenerate is not supported for offline models or without an internet connection.";
         }
       }
 
-      // Filter 4: 'Change Model' in a non-photo chat.
-      if (shouldShow && !widget.conversationHasPhoto && option == MessageOption.changeModel) {
-        // --- FIX: Pass the parent data to the helper function. ---
+      if (shouldShow && widget.conversationHasPhoto && !currentModelCanHandleImages) {
+        if (option == MessageOption.regenerate || option == MessageOption.edit || option == MessageOption.changeModel) {
+          shouldShow = false;
+          reason = "Conversation contains a photo, but the current model ('$_currentModelId') cannot process images, so destructive actions are disabled.";
+        }
+      }
+
+      if (shouldShow && option == MessageOption.changeModel) {
         final int validExtCount = _validExtensionCountForChangingModel(modelSeriesData);
         if (validExtCount <= 1) {
           shouldShow = false;
-          reason = "Not enough extensions to change to (found $validExtCount).";
+          reason = "Not enough other extensions to change to (found $validExtCount).";
         }
       }
 
-      // Filter 5: 'Regenerate' is not available for offline models or when there's no internet.
-      if (shouldShow && option == MessageOption.regenerate && (isOfflineModel || !_hasInternet)) {
-        shouldShow = false;
-        reason = "Regenerate is not supported for offline models or without an internet connection.";
-      }
-
-      // Filter 6: Don't show 'Report' if already reported.
       if (shouldShow && option == MessageOption.report && widget.isReported) {
         shouldShow = false;
         reason = "Message has already been reported.";
@@ -765,65 +801,73 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
   Future<String?> _showModelExtensionsDialog(BuildContext context, String currentFullModelId) async {
     const String logPrefix = "[AnimatedMessageOptionsPanel._showModelExtensionsDialog]";
 
-    // --- FIX: Use the new robust method to get the parent series data. ---
     final modelSeriesData = _findParentSeriesData();
     final seriesId = modelSeriesData['id'] ?? 'unknown_series';
     debugPrint("$logPrefix Showing dialog for series '$seriesId', current full ID: '$currentFullModelId'");
 
-    List<Map<String, dynamic>> extensionsListForDialog = []; // List of extensions to show in the dialog
+    final bool hasPremiumAccess = widget.isSubscribed || widget.premiumTrialUses < 3;
+    debugPrint("$logPrefix User premium access status: $hasPremiumAccess (Subscribed: ${widget.isSubscribed}, Trials Used: ${widget.premiumTrialUses})");
 
-    if (modelSeriesData.isNotEmpty && modelSeriesData.containsKey('extensions')) {
-      final Map<String, dynamic> allExtensionsMap = modelSeriesData['extensions'];
+    List<Map<String, dynamic>> extensionsListForDialog = [];
+    final allExtensionsMap = modelSeriesData['extensions'] as Map<String, dynamic>?;
+
+    if (allExtensionsMap != null) {
       debugPrint("$logPrefix Found ${allExtensionsMap.length} extensions in model data for '$seriesId'. Filtering for dialog...");
 
       extensionsListForDialog = allExtensionsMap.entries.where((entry) {
-        // Filter extensions based on conversation content (e.g., if it has a photo)
         final dynamic extData = entry.value;
         if (extData is Map) {
+          final bool isExtensionPremium = (extData['tier'] as String? ?? 'free') == 'premium';
+          if (isExtensionPremium && !hasPremiumAccess) {
+            debugPrint("$logPrefix   - Excluding premium extension '${entry.key}' due to lack of access.");
+            return false;
+          }
+
           if (widget.conversationHasPhoto) {
             return (extData['canHandleImage'] as bool?) == true;
           }
-          return true; // No photo, or extension can handle it / doesn't specify
+          return true;
         }
         debugPrint("$logPrefix   Extension entry '${entry.key}' has non-Map value: $extData. Excluding.");
         return false;
       }).map((entry) {
-        // Format each valid extension for the dialog list
-        final String extensionKey = entry.key; // This is the full ID like "google/gemini-1.5-pro"
+        final String extensionKey = entry.key;
         final Map<String,dynamic> extensionData = entry.value as Map<String,dynamic>;
-        // Display name for the dialog: try extension's title, fallback to formatted key
         final String displayName = extensionData['title'] as String? ?? formatModelId(extensionKey);
-        debugPrint("$logPrefix   Adding to dialog: code='$extensionKey', name='$displayName'");
-        return {
-          'code': extensionKey, // The full ID of the extension
-          'name': displayName, // User-friendly name
-          'enabled': true, // Assuming all filtered extensions are selectable by default
-        };
+        debugPrint("$logPrefix   + Adding to dialog: code='$extensionKey', name='$displayName'");
+        return { 'code': extensionKey, 'name': displayName, 'enabled': true };
       }).toList();
       debugPrint("$logPrefix Filtered ${extensionsListForDialog.length} extensions for dialog display.");
     } else {
       debugPrint("$logPrefix No 'extensions' found in model data for '$seriesId', or model data is empty.");
     }
 
-    // If less than 2 options (current one + at least one other), no point showing dialog.
     if (extensionsListForDialog.length < 2) {
       debugPrint("$logPrefix Less than 2 suitable extensions (${extensionsListForDialog.length}). Dialog not shown.");
       return null;
     }
 
-    // Determine initial selection in the dialog.
-    String initialSelectedExtensionCodeInDialog = currentFullModelId;
+    String initialSelectedExtensionCodeInDialog;
 
-    // Validate if the currentFullModelId is actually in the list of options we're about to show.
-    bool currentSelectionIsValidForDialog = extensionsListForDialog.any((ext) => ext['code'] == initialSelectedExtensionCodeInDialog);
+    final currentModelData = allExtensionsMap?[currentFullModelId] as Map<String, dynamic>?;
+    final bool isCurrentModelPremium = (currentModelData?['tier'] as String? ?? 'free') == 'premium';
 
-    if (!currentSelectionIsValidForDialog && extensionsListForDialog.isNotEmpty) {
-      debugPrint("$logPrefix Current selection '$initialSelectedExtensionCodeInDialog' is not in the valid dialog list. Picking first available.");
+    if (isCurrentModelPremium && !hasPremiumAccess) {
+      debugPrint("$logPrefix Current model '$currentFullModelId' is premium and user lacks access. Forcing a different initial selection.");
       initialSelectedExtensionCodeInDialog = extensionsListForDialog.first['code'] as String;
-    } else if (!currentSelectionIsValidForDialog && extensionsListForDialog.isEmpty) {
-      debugPrint("$logPrefix CRITICAL: Current selection invalid and dialog list is empty after filter. Aborting dialog.");
-      return null;
+    } else {
+      initialSelectedExtensionCodeInDialog = currentFullModelId;
+      bool currentSelectionIsValidForDialog = extensionsListForDialog.any((ext) => ext['code'] == initialSelectedExtensionCodeInDialog);
+
+      if (!currentSelectionIsValidForDialog && extensionsListForDialog.isNotEmpty) {
+        debugPrint("$logPrefix Current selection '$initialSelectedExtensionCodeInDialog' is not in the valid dialog list. Picking first available.");
+        initialSelectedExtensionCodeInDialog = extensionsListForDialog.first['code'] as String;
+      } else if (extensionsListForDialog.isEmpty) {
+        debugPrint("$logPrefix CRITICAL: No valid options available in dialog after filter. Aborting dialog.");
+        return null;
+      }
     }
+
     debugPrint("$logPrefix Initial selected extension code for dialog: '$initialSelectedExtensionCodeInDialog'");
 
     String tempSelectedExtensionInDialog = initialSelectedExtensionCodeInDialog; // For StatefulBuilder
@@ -1284,6 +1328,7 @@ void dismissCurrentMessageOptions() {
 /// - `isThinking`: Direct flag for AI thinking state.
 /// - `isThinkingNotifier`: Reactive notifier for AI thinking state.
 /// - `isWaitingForResponseNotifier`: Reactive notifier for global chat response waiting state.
+/// Shows a panel with context-specific options for a given message.
 Future<void> showMessageOptions({
   required BuildContext context,
   required Offset tapPosition,
@@ -1301,28 +1346,28 @@ Future<void> showMessageOptions({
   bool? isThinking,
   ValueListenable<bool>? isThinkingNotifier,
   ValueNotifier<bool>? isWaitingForResponseNotifier,
+  required bool isSubscribed,
+  required int premiumTrialUses,
 }) async {
   const String functionName = "[Global.showMessageOptions]"; // For logging
   debugPrint(
       "$functionName CALLED. Message (start): '${messageText.substring(0, math.min(20, messageText.length))}', "
-          "ModelID: '$modelIdAndExtension', Options provided: ${options.length}, Photo: $conversationHasPhoto, Thinking: $isThinking");
+          "ModelID: '$modelIdAndExtension', Options provided: ${options.length}, Photo: $conversationHasPhoto, Thinking: $isThinking, "
+          "Subscribed: $isSubscribed, Trials: $premiumTrialUses"); // Log'a eklendi
 
   dismissCurrentMessageOptions(); // Ensure any previous panel is dismissed first
 
-  // Use provided notifier or create a new one if message text is static for this panel's lifetime.
   final resolvedMessageNotifier = messageNotifier ?? ValueNotifier<String>(messageText);
-  final overlay = Overlay.of(context); // Get the OverlayState
+  final overlay = Overlay.of(context);
 
-  // Get the RenderBox of the overlay to convert global tap position to local.
   final RenderBox? overlayBox = overlay.context.findRenderObject() as RenderBox?;
   if (overlayBox == null) {
     debugPrint("$functionName ERROR: overlayBox is null. Cannot determine local position or show options.");
-    return; // Cannot proceed without the overlay's RenderBox
+    return;
   }
   final Offset localPosition = overlayBox.globalToLocal(tapPosition);
   debugPrint("$functionName Tap position (global): $tapPosition, Converted to local: $localPosition");
 
-  // Create the OverlayEntry that will build the AnimatedMessageOptionsPanel.
   _currentMessageOptionsEntry = OverlayEntry(
     builder: (overlayContext) {
       debugPrint("$functionName OverlayEntry builder CALLED. Creating AnimatedMessageOptionsPanel instance.");
@@ -1332,8 +1377,8 @@ Future<void> showMessageOptions({
         options: options,
         isReported: isReported,
         onReport: onReport,
-        onDismiss: dismissCurrentMessageOptions, // Crucial: Panel calls this to remove itself
-        position: localPosition, // Use the calculated local position
+        onDismiss: dismissCurrentMessageOptions,
+        position: localPosition,
         modelIdAndExtension: modelIdAndExtension,
         onRegenerate: onRegenerate,
         onChangeModel: onChangeModel,
@@ -1343,13 +1388,16 @@ Future<void> showMessageOptions({
         isThinking: isThinking,
         isThinkingNotifier: isThinkingNotifier,
         isWaitingForResponseNotifier: isWaitingForResponseNotifier,
+        isSubscribed: isSubscribed,
+        premiumTrialUses: premiumTrialUses,
       );
     },
   );
 
-  overlay.insert(_currentMessageOptionsEntry!); // Insert the new panel into the overlay
+  overlay.insert(_currentMessageOptionsEntry!);
   debugPrint("$functionName New OverlayEntry inserted into the overlay.");
 }
+
 
 // Helper extension for logging list of strings or providing empty string if null/empty
 extension _StringListLogHelper on List<String>? {

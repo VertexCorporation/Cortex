@@ -922,6 +922,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get japanese => '日语';
 
   @override
+  String get kurdish => '库尔德';
+
+  @override
+  String get dutch => '荷兰语';
+
+  @override
+  String get russian => '俄语';
+
+  @override
   String get korean => '韩语';
 
   @override
@@ -1360,7 +1369,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      '积分用于与在线模特聊天。告诉你一声，你发送给她们的每一条消息都会让我们付出成本。\n\n• 发送给在线模特每条消息花费20积分。\n• 包含一张图片额外增加30积分。\n• 免费计划用户每天可获得200积分奖励，每日重置。';
+      '点数用于与在线模型聊天。 每条信息我们都得花钱 这些点数能让我们撑下去 好吧现在来解释下这个系统\n\n• 给免费在线模型发一条消息花费10点数。\n• 给在线高级模型发一条消息花费20点数。\n• 加个附件会多花30点数。\n• 免费用户每天有200点数重置奖励。';
 
   @override
   String get creditsInfoPanelFooter => '聊天愉快！';
@@ -1486,4 +1495,52 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get creatorSupportedSuccess => '成功支持了创作者！您未来的购买将为他们提供支持。';
+
+  @override
+  String get featureDocumentTitle => '文档支持';
+
+  @override
+  String get featureDocumentDescription => '该模型可以分析和回答有关上传的文档（如 PDF 和文本文件）的问题。';
+
+  @override
+  String get featureAudioTitle => '语音输入';
+
+  @override
+  String get featureAudioDescription => '该模型可以理解和处理语音输入。';
+
+  @override
+  String get featureImageGenerationTitle => '图像生成';
+
+  @override
+  String get featureImageGenerationDescription => '该模型可以根据您的文本描述创建原始图像。';
+
+  @override
+  String get errorImageLoad => '无法加载生成的图像。';
+
+  @override
+  String get extensionInfoPanelTitle => '探索模型';
+
+  @override
+  String get extensionInfoPanelBody1 => '此箭头可让您在此系列内的不同模型之间切换。';
+
+  @override
+  String get extensionInfoPanelBody2 =>
+      '当您第一次开始与该系列聊天时，会自动选择默认模型，并且您可以在聊天过程中随时更改您的选择。';
+
+  @override
+  String get extensionInfoPanelFooter =>
+      '要查看每个模型的详细信息或手动选择不同的模型，请前往库；从那里选择此模型系列，然后点击其详细信息页面顶部的箭头。';
+
+  @override
+  String get premiumModelNoticeTitle => '高级型号';
+
+  @override
+  String get premiumModelNoticeDescription =>
+      '此模特为高级模特，免费用户每天仅限向高级模特发送 3 条消息；订阅即可解锁无限访问权限！';
+
+  @override
+  String get benefitPremiumModels => '访问高级模型';
+
+  @override
+  String get premiumTrialExhaustedMessage => '您已使用高级模型的所有免费每日消息，请升级以获得无限制访问权限。';
 }

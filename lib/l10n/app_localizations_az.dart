@@ -963,6 +963,15 @@ class AppLocalizationsAz extends AppLocalizations {
   String get japanese => 'Yapon dili';
 
   @override
+  String get kurdish => 'Kürd dili';
+
+  @override
+  String get dutch => 'Holland dili';
+
+  @override
+  String get russian => 'Rus dili';
+
+  @override
   String get korean => 'Koreya dili';
 
   @override
@@ -1424,7 +1433,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Kreditlər onlayn modellərlə söhbət etmək üçün istifadə olunur. Bilməlisiniz ki, onlara göndərdiyiniz hər mesaj bizə pula başa gəlir.\n\n• Onlayn modelə hər mesaj 20 kreditdir.\n• Şəkil daxil etmək əlavə 30 kreditdir.\n• Pulsuz plan istifadəçiləri gündəlik yenilənən 200 kredit bonusu əldə edirlər.';
+      'Kreditlər onlayn modellərlə söhbət etmək üçün istifadə olunur. hər mesaj bizə pula başa gəlir və bu kreditlər bizi batmağa qoymur indi gəlin sistemi başa salım\n\n• Pulsuz onlayn modelə hər mesaj 10 kreditdir.\n• Premium onlayn modelə hər mesaj 20 kreditdir.\n• Bir əlavə daxil etmək 30 kredit daha artırır.\n• Pulsuz plan istifadəçiləri hər gün sıfırlanan 200 kredit bonusu əldə edir.';
 
   @override
   String get creditsInfoPanelFooter => 'Xoş söhbətlər!';
@@ -1530,7 +1539,7 @@ class AppLocalizationsAz extends AppLocalizations {
       'Bir dostunuzu dəvət edin və hər ikiniz qeydiyyatdan keçdikdə 50 kredit qazanın! Əgər abunə olsalar, hər ikiniz əlavə 500 kredit qazanacaqsınız!';
 
   @override
-  String get inviteShareSubject => 'Join me on Cortex!';
+  String get inviteShareSubject => 'Cortex üzrə qoşulun!';
 
   @override
   String inviteShareMessage(String playStoreLink) {
@@ -1566,4 +1575,57 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get creatorSupportedSuccess =>
       'Yaradıcı uğurla dəstəkləndi! Gələcək alış-verişləriniz ona töhfə verəcək.';
+
+  @override
+  String get featureDocumentTitle => 'Sənəd Dəstəyi';
+
+  @override
+  String get featureDocumentDescription =>
+      'Bu model PDF və mətn faylları kimi yüklənmiş sənədləri təhlil edə və suallara cavab verə bilər.';
+
+  @override
+  String get featureAudioTitle => 'Səs daxiletmə';
+
+  @override
+  String get featureAudioDescription =>
+      'Bu model şifahi audio daxiletmələri başa düşə və emal edə bilər.';
+
+  @override
+  String get featureImageGenerationTitle => 'Şəkil Yaradılması';
+
+  @override
+  String get featureImageGenerationDescription =>
+      'Bu model mətn təsvirləriniz əsasında orijinal şəkillər yarada bilər.';
+
+  @override
+  String get errorImageLoad => 'Yaradılmış şəkli yükləmək alınmadı.';
+
+  @override
+  String get extensionInfoPanelTitle => 'Modelləri araşdırın';
+
+  @override
+  String get extensionInfoPanelBody1 =>
+      'Bu ox bu seriyada müxtəlif modellər arasında keçid etməyə imkan verir.';
+
+  @override
+  String get extensionInfoPanelBody2 =>
+      'Bu seriya ilə ilk söhbətə başladığınız zaman defolt model avtomatik seçilir və siz söhbət zamanı istənilən vaxt seçiminizi dəyişə bilərsiniz.';
+
+  @override
+  String get extensionInfoPanelFooter =>
+      'Hər bir model haqqında ətraflı məlumatı görmək və ya fərqli modeli əl ilə seçmək üçün Kitabxanaya daxil olun; oradan bu model seriyasını seçin və onun ətraflı səhifəsinin yuxarısındakı oka toxunun.';
+
+  @override
+  String get premiumModelNoticeTitle => 'Premium Model';
+
+  @override
+  String get premiumModelNoticeDescription =>
+      'Bu model premium modeldir, pulsuz istifadəçilər premium modellərlə gündə 3 mesajla məhdudlaşır; limitsiz girişi açmaq üçün abunə olun!';
+
+  @override
+  String get benefitPremiumModels => 'Premium modellərə giriş';
+
+  @override
+  String get premiumTrialExhaustedMessage =>
+      'Siz bütün pulsuz gündəlik mesajlarınızı premium modellər üçün istifadə etmisiniz, lütfən, limitsiz giriş üçün təkmilləşdirin.';
 }

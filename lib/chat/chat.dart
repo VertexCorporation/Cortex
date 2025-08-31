@@ -2,6 +2,30 @@
 //
 // This file defines the ChatScreen widget, which manages all chat-related functionality.
 // Displaying/sending/editing messages, model loading, response management, and UI state control are handled here.
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
+// wow
 
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -33,6 +57,7 @@ import '../banner.dart';
 import '../cache.dart';
 import '../errorview.dart';
 import '../extensions.dart';
+import '../funds/subscriptions/subscriptions.dart';
 import '../invite.dart';
 import '../models/backend/data.dart';
 import '../models/backend/download.dart';
@@ -107,6 +132,8 @@ class ChatScreenState extends State<ChatScreen>
   String? modelId;
   bool _showInappropriateMessageWarning = false;
 
+  bool shouldAutofocus = true;
+
   bool _modelsLoadError = false;
   bool _areModelsLoading = true; // Start in loading state.
 
@@ -149,7 +176,6 @@ class ChatScreenState extends State<ChatScreen>
 
   final GlobalKey _exitButtonKey = GlobalKey();
   final GlobalKey _accountButtonKey = GlobalKey();
-
   static const MethodChannel llamaChannel =
       MethodChannel('com.vertex.cortex/llama');
   final ScrollController _scrollController = ScrollController();
@@ -159,6 +185,7 @@ class ChatScreenState extends State<ChatScreen>
   final GlobalKey _extensionKey = GlobalKey();
   GlobalKey<InputFieldState> inputFieldKey = GlobalKey<InputFieldState>();
   final GlobalKey _inputSectionKey = GlobalKey();
+  final GlobalKey _briefingOverlayKey = GlobalKey();
   double _inputSectionHeight = 0.0;
   late CreditsManager creditsManager;
   bool isEditingMode = false;
@@ -202,6 +229,12 @@ class ChatScreenState extends State<ChatScreen>
   // This flag ensures the heavy context-dependent setup runs only once.
   bool _isInitialSetupComplete = false;
 
+  // --- NEW STATE for Premium Banner ---
+  bool showPremiumBriefing = false;
+
+  bool isUserSubscribed = false;
+  int premiumTrialUses = 0;
+  
   // This listener now correctly handles data changes by re-syncing its local
   // state from the single source of truth (ModelData), bypassing any stale caches.
   void _handleModelDataChange() {
@@ -220,6 +253,21 @@ class ChatScreenState extends State<ChatScreen>
     }
   }
 
+  Future<bool> willInfoPanelShowOnNextSelect() async {
+    if (Appbar.extensionInfoShownThisSession) {
+      return false;
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      int showCount = prefs.getInt(Appbar.extensionInfoCountKey) ?? 0;
+      return showCount < 3;
+    } catch (e) {
+      debugPrint("SharedPreferences error: $e");
+      return false;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -233,7 +281,7 @@ class ChatScreenState extends State<ChatScreen>
     // Initialize services
     creditsManager = Provider.of<CreditsManager>(context, listen: false);
     _downloadedModelsManager = Provider.of<DownloadedModelsManager>(context,
-        listen: false); // <-- This line was already here and is correct
+        listen: false);
     chatLimitManager = const ChatLimitManager(
       cortexSubscription: 0,
       subscriptionExpiresAt: null,
@@ -248,7 +296,6 @@ class ChatScreenState extends State<ChatScreen>
     sendService = SendService(this);
     readService = ReadService(this);
     responseService = ResponseService(this);
-
     // Initialize the LoadService and attempt a synchronous cache load.
     loadService = LoadService(this);
     loadService.initializeFromCache();
@@ -256,11 +303,63 @@ class ChatScreenState extends State<ChatScreen>
     // Initialize controllers and listeners
     searchController.addListener(_onSearchChanged);
     _initializeAnimationControllers();
-    _initializeListeners(); // This function will now contain the new listener setup
+    _initializeListeners();
 
     // Initialize state from widget properties
     _initializeFromWidget();
     _checkAndTriggerInviteBanner();
+
+    // --- FIX IS APPLIED HERE ---
+    // The call to the now-robust function ensures premium status is checked correctly on initial load.
+    _updatePremiumBriefingVisibility(widget.modelId);
+  }
+
+  /// --- THE DEFINITIVE FIX ---
+  /// This function now robustly checks if a model is premium, correctly handling
+  /// character models by inspecting their base model's tier. This logic is now
+  /// consistent with SelectionService, fixing the bug where the banner wouldn't
+  /// show when opening conversations from the inbox.
+  void _updatePremiumBriefingVisibility(String? modelIdToCheck) {
+    if (modelIdToCheck == null) {
+      if (showPremiumBriefing) setState(() => showPremiumBriefing = false);
+      return;
+    }
+
+    bool isPremium = false; // Default to not premium
+    final preciseModelData = ModelData.getPreciseModelData(modelIdToCheck);
+    final category = preciseModelData['category'] as String?;
+
+    if (category == 'self' || category == 'roleplay') {
+      // For characters, premium status is determined by their base model.
+      final String? baseModelId = preciseModelData['baseModelId'] as String?;
+      if (baseModelId != null && baseModelId.isNotEmpty) {
+        final Map<String, dynamic> baseModelData = ModelData.getPreciseModelData(baseModelId);
+        isPremium = (baseModelData['tier'] as String? ?? 'free') == 'premium';
+        debugPrint("[ChatScreen] Character model detected. Premium status based on base model '$baseModelId': $isPremium");
+      }
+    } else {
+      // For all other models, check the tier of the model/extension itself.
+      isPremium = (preciseModelData['tier'] as String? ?? 'free') == 'premium';
+    }
+
+    // Only call setState if the value has actually changed to avoid unnecessary rebuilds.
+    if (isPremium != showPremiumBriefing) {
+      setState(() {
+        showPremiumBriefing = isPremium;
+      });
+    }
+  }
+
+  void _navigateToPremiumScreen() {
+    if (extensions.isPanelVisible) {
+      extensions.closePanel();
+    }
+    FocusScope.of(context).unfocus();
+    navigateToScreen(
+      context,
+      PremiumScreen(),
+      direction: const Offset(0.0, 1.0),
+    );
   }
 
   Future<void> _checkAndTriggerInviteBanner() async {
@@ -314,18 +413,11 @@ class ChatScreenState extends State<ChatScreen>
   /// A public method to allow external widgets (like the Appbar) to request the banner to be shown.
   /// It respects the "already shown" logic by only setting the state if the banner is not already visible.
   void showInviteBanner() {
-    // Only trigger a state change if the banner is not already being shown.
-    // This prevents unnecessary rebuilds if the button is tapped multiple times.
     if (mounted && !_showInviteBanner) {
       debugPrint("[ChatScreen] A manual request was made to show the invite banner.");
       setState(() {
         _showInviteBanner = true;
       });
-      // Note: We don't update the timestamp here because the main check in initState
-      // already handles the timestamp logic. This method is just for manually
-      // revealing the banner if it's currently hidden. If you want a manual tap to
-      // ALWAYS show it, regardless of the 24h rule, the logic would need to change.
-      // For now, this is the safest approach.
     }
   }
 
@@ -333,11 +425,6 @@ class ChatScreenState extends State<ChatScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    // --- 2. CONTEXT-DEPENDENT INITIALIZATION & CHANGE DETECTION ---
-
-    // Get the new locale from the context. This will change when the user
-    // selects a new language in settings.
     final newLocale = Localizations.localeOf(context);
 
     // Run the main setup only once, the first time this method is called.
@@ -356,21 +443,15 @@ class ChatScreenState extends State<ChatScreen>
       return; // Exit after initial setup.
     }
 
-    // --- RELIABLE LANGUAGE CHANGE DETECTION ---
     // On subsequent runs, if the new locale is different from the one we have
     // stored, it means the user has changed the language in settings.
     if (_currentLocale != null && _currentLocale != newLocale) {
       debugPrint(
           "[ChatScreenState] Language change detected via locale. From '$_currentLocale' to '$newLocale'.");
-
-      // Update our stored locale to the new one.
       _currentLocale = newLocale;
 
-      // The cache was already cleared in `language.dart`, but clearing it
-      // again here is a safe fallback.
       ModelData.clearCache();
 
-      // Trigger the method to reload all model data with the new language.
       _reloadAllModelsForLanguageChange();
     }
   }
@@ -516,6 +597,7 @@ class ChatScreenState extends State<ChatScreen>
       debugPrint(
           "✅ [LOG 3 - chat.dart] Model ID '${widget.modelId}' exists. Re-fetching precise model data to ensure role is loaded.");
       final preciseModelData = ModelData.getPreciseModelData(widget.modelId!);
+
       role = preciseModelData['role'] as String?;
       debugPrint(
           "✅ [LOG 3 - chat.dart] Role re-fetched. The correct role is: ${role != null ? "'${role?.substring(0, (role!.length > 40) ? 40 : role?.length)}...'" : "NULL"}");
@@ -540,32 +622,42 @@ class ChatScreenState extends State<ChatScreen>
   }
 
   /// Instead of a one-time fetch, it subscribes to the user's document in Firestore.
-  /// Any changes to the document (like a username being added after sign-up)
-  /// will trigger a state update, ensuring the UI is always in sync.
+  /// It now also parses and manages the state for daily premium trials and subscription status.
   Future<void> _loadUserData() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      // No user, nothing to listen to.
-      return;
-    }
+    if (user == null) return;
 
-    // Cancel any previous subscription to avoid leaks if this is called again.
     await _userDataSubscription?.cancel();
 
-    // Set up the new stream listener.
     _userDataSubscription = FirebaseFirestore.instance
         .collection('users')
         .doc(user.uid)
         .snapshots()
         .listen((snapshot) {
       if (snapshot.exists && mounted) {
-        // When data is received, update the state.
         final data = snapshot.data();
         setState(() {
           _userData = data;
           final int subscriptionLevel = data?['hasCortexSubscription'] ?? 0;
           final Timestamp? expiresAt =
-              data?['subscriptionExpiresAt'] as Timestamp?;
+          data?['subscriptionExpiresAt'] as Timestamp?;
+
+          isUserSubscribed = subscriptionLevel > 0;
+
+          final Timestamp? lastResetTimestamp = data?['premiumModelTrialLastReset'] as Timestamp?;
+          int trialUses = data?['premiumModelTrialUses'] as int? ?? 0;
+
+          if (lastResetTimestamp != null) {
+            final lastResetDate = lastResetTimestamp.toDate();
+            final now = DateTime.now();
+            if (lastResetDate.year != now.year ||
+                lastResetDate.month != now.month ||
+                lastResetDate.day != now.day) {
+              trialUses = 0;
+            }
+          }
+          premiumTrialUses = trialUses;
+          debugPrint("[ChatScreen] User data updated. Subscribed: $isUserSubscribed, Trials used: $premiumTrialUses");
 
           chatLimitManager = ChatLimitManager(
             cortexSubscription: subscriptionLevel,
@@ -575,24 +667,29 @@ class ChatScreenState extends State<ChatScreen>
       }
     }, onError: (error) {
       debugPrint("Error listening to user data: $error");
-      // Optionally handle errors, e.g., if permissions change.
     });
   }
 
   Future<void> _fetchSystemInfo() async {
     try {
       SystemInfoData info = await SystemInfoProvider.fetchSystemInfo();
+
+      if (!mounted) return; // If not, exit the function immediately.
+
       setState(() {
         _systemInfo = info;
         isStorageSufficient = _systemInfo!.freeStorage >= requiredSizeMB;
       });
     } catch (e) {
       print("Error fetching system info: $e");
+      if (!mounted) return;
+
       setState(() {
         isStorageSufficient = false;
       });
     }
   }
+
 
   /// Listener for the scroll controller.
   /// This now ONLY updates the state based on scroll position.
@@ -706,7 +803,6 @@ class ChatScreenState extends State<ChatScreen>
 
     await resetConversation(resetModel: true);
 
-    // --- FIX: Call the callback to tell MainScreen to SHOW the bottom bar ---
     // We are exiting model selection, so we send 'false'.
     widget.onModelSelectionChanged?.call(false);
     debugPrint(
@@ -726,6 +822,7 @@ class ChatScreenState extends State<ChatScreen>
       modelPath = null;
       role = null;
       openedFromMenu = false;
+      showPremiumBriefing = false;
     });
   }
 
@@ -799,11 +896,7 @@ class ChatScreenState extends State<ChatScreen>
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    // Use a post-frame callback to ensure that the layout has been updated
-    // after the keyboard status changes, before we check the scroll position.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Re-evaluate the scroll position, just as if the user had scrolled.
-      // This will correctly update the visibility of the "scroll to bottom" button.
       _scrollListener();
     });
   }
@@ -856,6 +949,7 @@ class ChatScreenState extends State<ChatScreen>
   /// 1. Update the active chat's state for the NEXT message.
   /// 2. Persist the user's choice as the NEW GLOBAL DEFAULT for the model series.
   /// It NO LONGER writes to the conversation's database record.
+  /// This is the single, authoritative function for changing an extension within an active chat.
   Future<void> _handleChangeModelExtension(String newFullModelId) async {
     final String logPrefix = "[ChatScreen._handleChangeModelExtension]";
     final String? currentModelId = modelId;
@@ -873,7 +967,6 @@ class ChatScreenState extends State<ChatScreen>
 
     await loadService.loadModels();
 
-    // --- STATE & DATA UPDATE ---
     final parentModelInfo = loadService.allModels.firstWhere((modelInfo) {
       final modelData = ModelData.getPreciseModelData(modelInfo.id);
       final extensionsMap = modelData['extensions'] as Map<String, dynamic>?;
@@ -887,31 +980,25 @@ class ChatScreenState extends State<ChatScreen>
 
     if (parentModelInfo.id == "fallback") return;
 
-    debugPrint(
-        "$logPrefix Found parent series '${parentModelInfo.id}' for extension '$newFullModelId'.");
-
-    // 1. Persist the new choice as the default for THIS model series.
     await Extensions.setLastSelectedExtension(
         parentModelInfo.id, newFullModelId);
     debugPrint(
         "$logPrefix SUCCESS: Set '$newFullModelId' as the new default for series '${parentModelInfo.id}'.");
 
-    // 2. Update the active chat's state using a temporary, non-persisted model change.
     final preciseModelData = ModelData.getPreciseModelData(newFullModelId);
-
-    // We once again use the definitive helper to ensure that switching to a
-    // different model variant correctly updates the image handling capability.
     final bool definitiveCanHandleImage =
-        ModelData.hasModality(newFullModelId, 'image');
+    ModelData.hasModality(newFullModelId, 'image');
 
     setState(() {
       modelId = newFullModelId;
       role = preciseModelData['role'] as String? ?? role;
-      canHandleImage = definitiveCanHandleImage; // Using the definitive value
+      canHandleImage = definitiveCanHandleImage;
     });
 
+    _updatePremiumBriefingVisibility(newFullModelId);
+
     debugPrint(
-        "$logPrefix Active chat state transiently updated to use '$newFullModelId'. Change will be committed on next send/regenerate.");
+        "$logPrefix Active chat state transiently updated to use '$newFullModelId'.");
   }
 
   final InviteService _inviteService = InviteService();
@@ -998,6 +1085,12 @@ class ChatScreenState extends State<ChatScreen>
               SettingsScreen(isFromActiveChat: isModelSelected),
               direction: const Offset(1.0, 0.0),
             );
+          },
+          onInfoPanelWillShow: () {
+            FocusScope.of(context).unfocus();
+          },
+          onInfoPanelDidHide: () {
+            textFieldFocusNode.requestFocus();
           },
           onTitleTap: () async {
             if (!extensions.isPanelVisible) {
@@ -1137,6 +1230,11 @@ class ChatScreenState extends State<ChatScreen>
                 ],
               ),
 
+              PremiumModelBanner(
+                isVisible: showPremiumBriefing && isModelSelected && !isUserSubscribed,
+                onTap: _navigateToPremiumScreen,
+              ),
+
               // --- OVERLAYS (Positioned on top of the Column) ---
               // These widgets are direct children of the Stack, allowing them to be
               // placed anywhere on the screen, independent of the Column's flow.
@@ -1152,16 +1250,20 @@ class ChatScreenState extends State<ChatScreen>
               // OVERLAY 2: Credits, warnings, and disclaimers.
               if (isModelSelected)
                 BriefingOverlay(
+                  key: _briefingOverlayKey,
                   inputFieldHeight: _inputSectionHeight,
                   availableCredits: creditsManager.totalCreditsNotifier.value,
                   photoSelected: sendService.selectedPhoto != null,
                   isOfflineModel: isLocalModel(modelId),
                   modelPath: modelPath,
                   inappropriate: _showInappropriateMessageWarning,
+                  isPremiumModel: showPremiumBriefing,
                   limitReached: chatLimitManager.isLimitExceeded(messages),
                   isStorageSufficient: isStorageSufficient,
                   showDisclaimer: _showDisclaimerOverlay,
                   showPhotoWarning: _showPhotoWarningOverlay,
+                  isSubscribed: isUserSubscribed,
+                  premiumTrialUses: premiumTrialUses,
                   onDisclaimerDismissed: () {
                     if (mounted) {
                       debugPrint("[ChatScreen] Disclaimer overlay dismissed by user.");
@@ -1232,6 +1334,7 @@ class ChatScreenState extends State<ChatScreen>
           child: InputField(
             key: inputFieldKey,
             localizations: AppLocalizations.of(context)!,
+            autofocus: shouldAutofocus,
             isModelSelected: isModelSelected,
             isLimitExceeded: chatLimitManager.isLimitExceeded(messages),
             controller: controller,
@@ -1254,7 +1357,7 @@ class ChatScreenState extends State<ChatScreen>
               }
             },
             onApplyEditedMessage: () async =>
-                await editService.applyEditedMessage(),
+            await editService.applyEditedMessage(),
             isPhotoLoading: _isPhotoLoading,
             slideAnimation: _slideAnimation,
             fadeAnimation: _warningFadeAnimation,
@@ -1273,8 +1376,8 @@ class ChatScreenState extends State<ChatScreen>
             isEditingMode: isEditingMode,
             originalMessageText: originalMessageText,
             preselectedPhoto: (isEditingMode &&
-                    editingMessageIndex != null &&
-                    messages[editingMessageIndex!].photoPath != null)
+                editingMessageIndex != null &&
+                messages[editingMessageIndex!].photoPath != null)
                 ? File(messages[editingMessageIndex!].photoPath!)
                 : null,
             isStorageSufficient: isStorageSufficient,
@@ -1284,6 +1387,9 @@ class ChatScreenState extends State<ChatScreen>
             modelMissing: modelMissing,
             wiseEnabled: hasWise,
             role: role,
+            isPremiumModel: showPremiumBriefing,
+            isSubscribed: isUserSubscribed,
+            premiumTrialUses: premiumTrialUses,
           ),
         ),
       ],

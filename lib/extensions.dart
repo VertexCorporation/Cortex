@@ -141,25 +141,28 @@ class Extensions {
 
   /// Displays the extension selection panel overlay.
   ///
-  /// The complex `onInitialized` callback has been removed. It now uses a single,
-  /// clean `updateModelId` callback that expects the full ID of the selected extension.
-  /// This delegates the state management responsibility back to the calling widget (`ChatScreen`),
-  /// promoting better separation of concerns.
+  /// This method now prepares a rich list of data for each extension and
+  /// uses a simple `updateModelId` callback that expects the full ID of the
+  /// selected extension. This delegates state management responsibility back
+  /// to the calling widget (`ChatScreen`).
   void showExtensionPanel({
     required BuildContext context,
     required GlobalKey extensionKey,
     required String modelTitle,
-    required Function(String) updateModelId, // Now a simple callback with the selected extension ID.
+    required Function(String) updateModelId, // A simple callback with the selected extension ID.
   }) {
     if (currentExtensions.isEmpty) return;
     _panelIsClosing = false;
     const String logPrefix = "[Extensions.showExtensionPanel]";
     debugPrint("$logPrefix Panel opened for model series '$currentBaseSeries'.");
 
-
-    final options = currentExtensions
-        .map((ext) => MapEntry(ext, extensionDisplayNames[ext]!))
+    // Prepare a list of full data maps for each option to pass to the UI builder.
+    final allModelData = ModelData.getPreciseModelData(currentBaseSeries);
+    final extensionsMap = allModelData['extensions'] as Map<String, dynamic>? ?? {};
+    final List<Map<String, dynamic>> options = currentExtensions
+        .map((extId) => extensionsMap[extId] as Map<String, dynamic>? ?? {'id': extId, 'title': extId})
         .toList();
+
     final overlay = Overlay.of(context);
     final RenderBox? renderBox = extensionKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
@@ -226,15 +229,12 @@ class Extensions {
                           _panelIsClosing = true;
                         });
                       },
-                      onSelect: (selectedEntry) async {
-                        // --- CORE LOGIC CHANGE ---
-                        // Instead of complex internal state changes, we now simply
-                        // invoke the provided callback with the selected key.
-                        debugPrint("$logPrefix User selected extension: '${selectedEntry.key}'. Invoking callback.");
-                        displayedExtensionLabel = selectedEntry.key;
-                        await updateModelId(selectedEntry.key);
-                        // The panel is now closed by the parent widget's logic,
-                        // ensuring the state update completes first.
+                      onSelect: (selectedOption) async {
+                        // The 'selectedOption' is now a Map, not a MapEntry.
+                        final selectedId = selectedOption['id'] as String;
+                        debugPrint("$logPrefix User selected extension: '$selectedId'. Invoking callback.");
+                        displayedExtensionLabel = selectedId;
+                        await updateModelId(selectedId);
                       },
                     ),
                   ),
@@ -292,13 +292,17 @@ class Extensions {
     );
   }
 
+  /// Builds the main panel container with a list of extension options.
+  ///
+  /// Its function signature has been updated to accept a list of maps,
+  /// allowing it to handle rich data for each extension, including the 'tier'.
   static Widget buildExtensionPanelWidget({
     required BuildContext context,
-    required List<MapEntry<String, String>> options,
+    required List<Map<String, dynamic>> options,
     required String selectedExtension,
-    required String modelTitle, // Not used
-    required VoidCallback onDismiss, // Not used
-    required Function(MapEntry<String, String>) onSelect,
+    required String modelTitle,
+    required VoidCallback onDismiss,
+    required Function(Map<String, dynamic>) onSelect,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
     final panelMaxWidth = screenWidth * 0.9;
@@ -315,10 +319,10 @@ class Extensions {
       fontSize: screenWidth * 0.04,
     );
 
-    // Her seçenek için text genişliğini hesapla
+    // Calculate text width based on the 'title' field from each map.
     double longestTextWidth = 0;
     for (var entry in options) {
-      final text = entry.value;
+      final text = entry['title'] as String? ?? entry['id'];
       final TextPainter tp = TextPainter(
         text: TextSpan(text: text, style: textStyle),
         maxLines: 1,
@@ -330,25 +334,23 @@ class Extensions {
       }
     }
 
-    // Panel için gerekli minimum genişlik: icon + boşluk + en uzun text + padding'ler
     double requiredPanelWidth = iconSize + spaceBetweenIconAndText + longestTextWidth + (horizontalPadding * 2);
-
     double finalPanelWidth = requiredPanelWidth.clamp(80.0, panelMaxWidth);
 
-    // Generate all extension rows
+    // Generate all extension rows.
     List<Widget> itemWidgets = List.generate(options.length, (i) {
+      final optionData = options[i];
       return _buildExtensionButtonRow(
         context: context,
-        option: options[i],
-        isSelected: options[i].key == selectedExtension,
-        variantTitle: options[i].value,
+        option: optionData,
+        isSelected: optionData['id'] == selectedExtension,
         iconSize: iconSize,
         horizontalPadding: horizontalPadding,
         verticalPadding: verticalPadding,
         minHeight: optionMinHeight,
         borderRadius: getItemBorderRadius(i, options.length, itemRadius),
         textStyle: textStyle,
-        onTap: () => onSelect(options[i]),
+        onTap: () => onSelect(optionData),
         showBottomBorder: i < options.length - 1,
       );
     });
@@ -393,11 +395,15 @@ class Extensions {
   }
 
   // 👉 extensions.dart
+  /// Builds a single clickable row for an extension in the panel.
+  ///
+  /// This method now reads the 'tier' and 'title' from the provided map.
+  /// It conditionally renders the sparkle icon and wraps the row in the
+  /// shine animation if the tier is 'premium'.
   static Widget _buildExtensionButtonRow({
     required BuildContext context,
-    required MapEntry<String, String> option,
+    required Map<String, dynamic> option,
     required bool isSelected,
-    required String variantTitle,
     required double iconSize,
     required double horizontalPadding,
     required double verticalPadding,
@@ -407,66 +413,85 @@ class Extensions {
     required VoidCallback onTap,
     required bool showBottomBorder,
   }) {
-    return ClipRRect(
-      borderRadius: borderRadius,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: borderRadius,
-          onTap: onTap,
-          child: Container(
-            constraints: BoxConstraints(minHeight: minHeight),
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.symmetric(
-              horizontal: horizontalPadding,
-              vertical: verticalPadding,
-            ),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? AppColors.quaternaryColor.withOpacity(0.5)
-                  : Colors.transparent,
-              border: showBottomBorder
-                  ? Border(
-                bottom: BorderSide(
-                  color: AppColors.primaryColor.withOpacity(0.1),
-                  width: 1.0,
-                ),
-              )
-                  : null,
-            ),
-            child: Row(
-              children: [
-                // ikon
-                Transform.scale(
-                  scale: isSelected ? 1.2 : 1.0,
-                  child: SvgPicture.asset(
-                    'assets/icons/extension.svg',
-                    width: iconSize,
-                    height: iconSize,
-                    colorFilter: ColorFilter.mode(
-                      AppColors.primaryColor.inverted,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                ),
-                SizedBox(width: horizontalPadding * 0.5),
-                // metin
-                Expanded(
-                  child: _buildScrollableText(
-                    text: variantTitle,
-                    textStyle: textStyle.copyWith(
-                      fontWeight:
-                      isSelected ? FontWeight.w500 : FontWeight.normal,
-                      color: AppColors.primaryColor.inverted,
-                    ),
-                  ),
-                ),
-              ],
+    // Extract tier and determine if the extension is premium.
+    final String tier = option['tier'] as String? ?? 'free';
+    final bool isPremium = tier == 'premium';
+    final String variantTitle = option['title'] as String? ?? option['id'];
+
+    // The base UI for the row content.
+    Widget rowContent = Row(
+      children: [
+        Transform.scale(
+          scale: isSelected ? 1.2 : 1.0,
+          child: SvgPicture.asset(
+            'assets/icons/extension.svg',
+            width: iconSize,
+            height: iconSize,
+            colorFilter: ColorFilter.mode(
+              AppColors.primaryColor.inverted,
+              BlendMode.srcIn,
             ),
           ),
         ),
+        SizedBox(width: horizontalPadding * 0.5),
+        Expanded(
+          child: _buildScrollableText(
+            text: variantTitle,
+            textStyle: textStyle.copyWith(
+              fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+              color: AppColors.primaryColor.inverted,
+            ),
+          ),
+        ),
+        // Conditionally display the sparkle icon for premium models.
+        if (isPremium) ...[
+          SizedBox(width: horizontalPadding * 0.25),
+          SvgPicture.asset(
+            'assets/icons/sparkle.svg',
+            width: iconSize * 0.8,
+            height: iconSize * 0.8,
+            colorFilter: ColorFilter.mode(
+              AppColors.primaryColor.inverted.withOpacity(0.8),
+              BlendMode.srcIn,
+            ),
+          ),
+        ],
+      ],
+    );
+
+    // The clickable container for the row.
+    Widget clickableContainer = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: borderRadius,
+        onTap: onTap,
+        child: Container(
+          constraints: BoxConstraints(minHeight: minHeight),
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: verticalPadding,
+          ),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.quaternaryColor.withOpacity(0.5) : Colors.transparent,
+            border: showBottomBorder
+                ? Border(bottom: BorderSide(color: AppColors.primaryColor.withOpacity(0.1), width: 1.0))
+                : null,
+          ),
+          child: rowContent,
+        ),
       ),
     );
+
+    // Conditionally wrap the entire row in the shine animation widget.
+    final finalWidget = ClipRRect(
+      borderRadius: borderRadius,
+      child: isPremium
+          ? _ShineAnimationWrapper(child: clickableContainer)
+          : clickableContainer,
+    );
+
+    return finalWidget;
   }
 
   static Widget _buildScrollableText({
@@ -548,15 +573,108 @@ class Extensions {
   }) async {
     if (modelId.isEmpty || newExtension.isEmpty) return modelId;
 
-    // 1️⃣  Konuşma meta verisini güncelle
     await updateConversationModelId(newExtension);
 
-    // 2️⃣  Uzantıyı kalıcı olarak kaydet  (EKLENDİ)
     await setLastSelectedExtension(modelId, newExtension);
 
-    // 3️⃣  Extensions instance’ını tazele
     initializeExtensions(modelId, newExtension);
 
-    return newExtension;          // Seçilen *tam* model-ID’yi döndür
+    return newExtension;
+  }
+}
+
+/// A stateful widget that wraps its child with a recurring shine animation.
+/// This logic is adapted from `credits.dart` to be reusable and is used
+/// to highlight premium extension options.
+class _ShineAnimationWrapper extends StatefulWidget {
+  final Widget child;
+
+  const _ShineAnimationWrapper({Key? key, required this.child}) : super(key: key);
+
+  @override
+  State<_ShineAnimationWrapper> createState() => _ShineAnimationWrapperState();
+}
+
+class _ShineAnimationWrapperState extends State<_ShineAnimationWrapper> with SingleTickerProviderStateMixin {
+  late AnimationController _shineController;
+  late Animation<double> _shineAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _shineController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    );
+
+    _shineAnimation = Tween<double>(begin: -2, end: 2).animate(
+        CurvedAnimation(parent: _shineController, curve: Curves.linear)
+    );
+
+    _shineController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        // Wait for a few seconds before the next shine.
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            _shineController.forward(from: 0.0);
+          }
+        });
+      }
+    });
+
+    // Start the first animation after a short delay.
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        _shineController.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _shineController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return Stack(
+      children: [
+        // The original content (the extension row).
+        widget.child,
+        // The animated shine effect on top.
+        Positioned.fill(
+          child: IgnorePointer( // The shine effect should not capture touch events.
+            child: AnimatedBuilder(
+              animation: _shineAnimation,
+              builder: (context, child) {
+                return Transform.translate(
+                  // The panel width is 90% of the screen, so we adjust the translate distance.
+                  offset: Offset(screenWidth * 0.9 * _shineAnimation.value, 0),
+                  child: child,
+                );
+              },
+              child: Container(
+                width: screenWidth * 0.25, // The width of the shine itself.
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      AppColors.secondaryColor.withOpacity(0.0),
+                      AppColors.secondaryColor.withOpacity(0.5),
+                      AppColors.secondaryColor.withOpacity(0.0),
+                    ],
+                    stops: const [0.4, 0.5, 0.6],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

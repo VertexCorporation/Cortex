@@ -44,7 +44,6 @@ class _ProcessedStateData {
   });
 }
 
-
 /// TOP-LEVEL FUNCTION: This runs in a separate isolate to avoid freezing the UI.
 /// It performs all the heavy file I/O and data processing.
 Future<_ProcessedStateData> _processModelStatesInBackground(Map<String, dynamic> args) async {

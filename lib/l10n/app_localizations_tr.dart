@@ -960,6 +960,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get japanese => 'Japonca';
 
   @override
+  String get kurdish => 'Kürtçe';
+
+  @override
+  String get dutch => 'Flemenkçe';
+
+  @override
+  String get russian => 'Rusça';
+
+  @override
   String get korean => 'Korece';
 
   @override
@@ -1422,7 +1431,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Krediler, çevrimiçi modellerle sohbet etmek için kullanılır. Bilgin olsun, onlara gönderdiğin her mesaj bizden para götürüyor.\n\n• Çevrimiçi bir modele gönderilen her mesaj 20 kredidir.\n• Bir görsel eklemek 30 ek kredi daha gerektirir.\n• Ücretsiz plan kullanıcıları, günlük olarak yenilenen 200 kredi bonusu alırlar.';
+      'Krediler, çevrimiçi modellerle sohbet etmek için kullanılır. her mesajın bize bi maliyeti var ve bu krediler batmamızı engelliyo neyse hadi sistemi anlatalım\n\n• Ücretsiz bir çevrimiçi modele her mesaj 10 kredi.\n• Premium bir online modele her mesaj 20 kredi.\n• Bir ek dahil etmek 30 kredi daha ekler.\n• Ücretsiz plan kullanıcıları her gün sıfırlanan 200 kredi bonusu alır.';
 
   @override
   String get creditsInfoPanelFooter => 'İyi sohbetler!';
@@ -1565,4 +1574,57 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get creatorSupportedSuccess =>
       'İçerik üretici başarıyla desteklendi! Gelecekteki satın alımlarınızla ona katkıda bulunacaksınız.';
+
+  @override
+  String get featureDocumentTitle => 'Belge Desteği';
+
+  @override
+  String get featureDocumentDescription =>
+      'Bu model, PDF ve metin dosyaları gibi yüklenen belgelerle ilgili soruları analiz edebilir ve yanıtlayabilir.';
+
+  @override
+  String get featureAudioTitle => 'Ses Girişi';
+
+  @override
+  String get featureAudioDescription =>
+      'Bu model konuşulan ses girdilerini anlayabilir ve işleyebilir.';
+
+  @override
+  String get featureImageGenerationTitle => 'Görüntü Oluşturma';
+
+  @override
+  String get featureImageGenerationDescription =>
+      'Bu model, metin açıklamalarınıza dayanarak orijinal görseller oluşturabilir.';
+
+  @override
+  String get errorImageLoad => 'Oluşturulan görüntü yüklenemedi.';
+
+  @override
+  String get extensionInfoPanelTitle => 'Modelleri Keşfedin';
+
+  @override
+  String get extensionInfoPanelBody1 =>
+      'Bu ok, bu serideki farklı modeller arasında geçiş yapmanızı sağlar.';
+
+  @override
+  String get extensionInfoPanelBody2 =>
+      'Bu seriyle ilk kez sohbete başladığınızda varsayılan model otomatik olarak seçilir ve sohbet sırasında seçiminizi istediğiniz zaman değiştirebilirsiniz.';
+
+  @override
+  String get extensionInfoPanelFooter =>
+      'Her model hakkında detaylı bilgi görüntülemek veya farklı bir modeli manuel olarak seçmek için lütfen Kütüphane&#39;ye gidin; oradan bu model serisini seçin ve detay sayfasının üst kısmındaki oka dokunun.';
+
+  @override
+  String get premiumModelNoticeTitle => 'Premium Model';
+
+  @override
+  String get premiumModelNoticeDescription =>
+      'Bu model premium bir modeldir, premium modellerde ücretsiz kullanıcılar günde 3 mesajla sınırlıdır; sınırsız erişimin kilidini açmak için abone olun!';
+
+  @override
+  String get benefitPremiumModels => 'Premium modellere erişim';
+
+  @override
+  String get premiumTrialExhaustedMessage =>
+      'Premium modeller için tüm ücretsiz günlük mesajlarınızı kullandınız, sınırsız erişim için lütfen yükseltin.';
 }
