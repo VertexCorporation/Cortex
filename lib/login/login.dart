@@ -378,9 +378,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         if (isMounted) {
           Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MainScreen(key: mainScreenKey)));
         }
-
       } else {
-        // --- RE-ARCHITECTED AND COMPLETE REGISTRATION FLOW ---
+        // --- V16 "FIRE AND FORGET" REGISTRATION FLOW ---
         dev.log('[Auth.Submit.Register] Starting registration for username: $_username', name: 'LoginScreen');
 
         // Step 1: Pre-flight check for username availability.
@@ -391,9 +390,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             _registerUsernameError = l10n.usernameTaken;
             _registerUsernameShakeController.forward(from: 0);
             _registerFormKey.currentState?.validate();
+            _isLoading = false;
           });
-          // Stop the loading indicator and exit the function.
-          setState(() => _isLoading = false);
           return;
         }
 
@@ -408,51 +406,28 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         final String uid = user.uid;
         dev.log('[Auth.Submit.Register] Firebase Auth user created successfully. UID: $uid', name: 'LoginScreen');
 
-        // Step 3: Fulfill the client-side of the "contract" by posting the suggestion document.
+        // Step 3: "Fire and Forget" - Attempt to post the suggestion document.
+        // We no longer need to handle the failure of this call, as the V16 backend will self-heal.
+        // We also add the `expireAt` field for the TTL policy.
         final String? referrerId = await ReferralHandler.getSavedReferrerId();
-        try {
-          dev.log('[Auth.Submit.Register] Posting suggestion for UID: $uid with referrer: $referrerId', name: 'LoginScreen');
+        final expirationTime = DateTime.now().add(const Duration(hours: 1)); // Set document to expire in 1 hour
 
-          await _firestore.collection('usernameSuggestions').doc(uid).set({
-            'username': _username,
-            'invitedBy': referrerId,
-          }).timeout(const Duration(seconds: 10));
-
-          dev.log('[Auth.Submit.Register] Suggestion posted successfully. Backend will now process it.', name: 'LoginScreen');
+        _firestore.collection('usernameSuggestions').doc(uid).set({
+          'username': _username,
+          'invitedBy': referrerId,
+          'expireAt': Timestamp.fromDate(expirationTime), // <-- THE TTL FIELD
+        }).then((_) {
+          dev.log('[Auth.Submit.Register] Suggestion document posted successfully.', name: 'LoginScreen');
           if (referrerId != null) {
-            await ReferralHandler.clearSavedReferrerId();
+            ReferralHandler.clearSavedReferrerId();
           }
-        } catch (e) {
-          dev.log(
-            '[Auth.Submit.Register] CRITICAL ERROR: Failed to post username suggestion. Rolling back Auth user creation.',
-            name: 'LoginScreen',
-            error: e,
-          );
+        }).catchError((error) {
+          // We only log the error. We DO NOT delete the user or stop the flow.
+          dev.log('[Auth.Submit.Register] WARNING: Failed to post username suggestion. The backend will handle this.', name: 'LoginScreen', error: error);
+        });
 
-          await user.delete();
-
-          dev.log(
-            '[Auth.Submit.Register] CLEANUP SUCCESS: Orphaned Auth user $uid deleted.',
-            name: 'LoginScreen',
-          );
-
-          notificationService.showNotification(message: l10n.authError, isSuccess: false);
-          setState(() => _isLoading = false);
-          return;
-        }
-
-        try {
-          await _waitForUserDocument(uid, l10n);
-        } catch (e) {
-          dev.log('[Auth.Submit.Register] Timeout waiting for user document. Backend function likely failed.', name: 'LoginScreen', error: e);
-          notificationService.showNotification(message: l10n.authError, isSuccess: false);
-          await _auth.signOut();
-          setState(() => _isLoading = false);
-          return;
-        }
-
-        // Step 5: Contract fulfilled
-        dev.log('[Auth.Submit.Register] User document is ready. Sending verification email and navigating.', name: 'LoginScreen');
+        // Step 4: Immediately send verification and navigate. NO MORE WAITING.
+        dev.log('[Auth.Submit.Register] Proceeding immediately to verification screen.', name: 'LoginScreen');
         await user.sendEmailVerification();
         if (isMounted) {
           Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -553,7 +528,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     dev.log('[Auth] User document found for UID: $uid! Proceeding.', name: 'LoginScreen');
   }
 
-
   /// Handles the entire Google Sign-In flow using the perfected, robust protocol.
   Future<void> _signInWithGoogle() async {
     if (_isLoading) return;
@@ -562,7 +536,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final NotificationService notificationService = _notificationService;
     final bool isMounted = mounted;
-    User? userToDeleteOnError;
 
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -585,35 +558,31 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         throw Exception("Firebase sign in returned a null user.");
       }
       final String uid = user.uid;
-      userToDeleteOnError = user;
-
       final bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
 
-      // Step 1 (Conditional): If the user is new, fulfill the client-side of the contract.
+      // Step 1 (Conditional): If the user is new, "Fire and Forget" the suggestion doc.
       if (isNewUser) {
-        dev.log('[Auth.Google] New Google user detected. Posting referrer suggestion if available.', name: 'LoginScreen');
+        dev.log('[Auth.Google] New Google user detected. Posting suggestion with TTL.', name: 'LoginScreen');
         final String? referrerId = await ReferralHandler.getSavedReferrerId();
+        final expirationTime = DateTime.now().add(const Duration(hours: 1));
 
-        await _firestore.collection('usernameSuggestions').doc(uid).set({
-          'username': null, // Explicitly send null for consistency.
+        _firestore.collection('usernameSuggestions').doc(uid).set({
+          'username': null, // Explicitly send null for Google users.
           'invitedBy': referrerId,
-        }).timeout(const Duration(seconds: 10));
-
-        dev.log('[Auth.Google] Referrer suggestion posted for new Google user $uid.', name: 'LoginScreen');
-
-        if (referrerId != null) {
-          await ReferralHandler.clearSavedReferrerId();
-        }
+          'expireAt': Timestamp.fromDate(expirationTime), // <-- THE TTL FIELD
+        }).then((_) {
+          dev.log('[Auth.Google] Suggestion posted for new Google user $uid.', name: 'LoginScreen');
+          if (referrerId != null) {
+            ReferralHandler.clearSavedReferrerId();
+          }
+        }).catchError((error) {
+          dev.log('[Auth.Google] WARNING: Failed to post suggestion. Backend will self-heal.', name: 'LoginScreen', error: error);
+        });
       }
 
-      // Step 2: Wait for confirmation from the backend.
-      await _waitForUserDocument(uid, l10n);
-
-      // Step 3: Contract fulfilled. Proceed with standard post-login tasks.
-      dev.log('[Auth.Google] User document confirmed. Running purchase reconciliation.', name: 'LoginScreen');
+      // Step 2: No more waiting! The backend handles it. Proceed directly.
+      dev.log('[Auth.Google] Proceeding with post-login tasks immediately.', name: 'LoginScreen');
       await reconcileAndSyncPurchases();
-
-      dev.log('[Auth.Google] Sign-In successful. Storing remember_me flag securely.');
       await _secureStorage.write(key: 'remember_me', value: 'true');
       await _secureStorage.write(key: 'email', value: user.email);
 
@@ -624,16 +593,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
     } catch (e, st) {
       dev.log('[Auth.Google] Fatal error during Google Sign-In', name: 'LoginScreen', error: e, stackTrace: st);
-
-      if (userToDeleteOnError != null) {
-        dev.log('[Auth.Google] Rolling back Auth user creation due to a downstream error.', name: 'LoginScreen');
-        await userToDeleteOnError.delete();
-        dev.log('[Auth.Google] CLEANUP SUCCESS: Orphaned Auth user ${userToDeleteOnError.uid} deleted.', name: 'LoginScreen');
-      }
-
+      // We no longer need to delete the user on error, because the backend is robust.
+      // We just sign them out to be safe.
       await _googleSignIn.signOut();
       await _auth.signOut();
-
       if (isMounted) {
         notificationService.showNotification(message: l10n.anErrorOccurred, isSuccess: false);
       }

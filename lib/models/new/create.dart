@@ -193,6 +193,7 @@ class _CreateScreenState extends State<CreateScreen> with TickerProviderStateMix
     final localizations = AppLocalizations.of(context)!;
     final user = FirebaseAuth.instance.currentUser;
     final internetService = Provider.of<InternetService>(context, listen: false);
+    final modelId = 'self_${user!.uid}_${DateTime.now().millisecondsSinceEpoch}'; // Generate ID beforehand
 
     if (!internetService.currentStatus) {
       notificationService.showNotification(message: localizations.noInternetConnection, isSuccess: false);
@@ -200,17 +201,19 @@ class _CreateScreenState extends State<CreateScreen> with TickerProviderStateMix
       return;
     }
 
-    if (user == null) {
-      notificationService.showNotification(message: localizations.anErrorOccurred, isSuccess: false);
-      if (mounted) setState(() => _isSaving = false);
-      return;
-    }
+    // --- NEW: Define the Cloud Function callable with a longer timeout ---
+    final HttpsCallable authCallable = FirebaseFunctions.instanceFor(region: 'europe-west1')
+        .httpsCallable(
+      'createCustomModel',
+      options: HttpsCallableOptions(timeout: const Duration(seconds: 30)), // 30-second timeout
+    );
 
     try {
       debugPrint("[CreateScreen] Preparing model data for authorization and moderation...");
       final String? base64Image = await _imageFileToBase64(_pickedImage);
 
-      final authCallable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable('createCustomModel');
+      // --- STEP 1: SERVER-SIDE AUTHORIZATION ---
+      // This call now reserves the slot and performs all checks.
       await authCallable.call({
         'modelType': 'roleplay',
         'name': _nameController.text.trim(),
@@ -218,69 +221,62 @@ class _CreateScreenState extends State<CreateScreen> with TickerProviderStateMix
         'description': _modelExplanationController.text.trim(),
         'prompt': _aiPromptController.text.trim(),
         'base64Image': base64Image,
+        'clientModelId': modelId, // Pass the ID for better logging/future use
       });
 
       debugPrint("[CreateScreen] Authorization successful. Proceeding with local DB creation.");
 
-      try {
-        final dbHelper = DatabaseHelper.instance;
-        final modelId = 'self_${user.uid}_${DateTime.now().millisecondsSinceEpoch}';
-        final String? imagePath = _pickedImage?.path;
-        final Map<String, dynamic> modelData = {
-          'id': modelId,
-          'title': _nameController.text.trim(),
-          'summary': _summaryController.text.trim(),
-          'description': _modelExplanationController.text.trim(),
-          'role': _aiPromptController.text.trim(),
-          'baseModelId': _selectedBaseModelId,
-          'imagePath': imagePath,
-          'type': 'roleplay',
-          'category': 'self',
-          'producer': '_USER_',
-          'createdAt': DateTime.now().toIso8601String(),
-        };
-        await dbHelper.insert('models', {
-          'id': modelId, 'producer': modelData['producer'], 'title': modelData['title'],
-          'is_server_side': 0, 'type': modelData['type'], 'raw_json': json.encode(modelData),
-        },
-          conflictAlgorithm: ConflictAlgorithm.replace,
-          userId: user.uid,
-        );
+      // --- STEP 2: LOCAL DATABASE CREATION ---
+      // This step only runs if the server authorization was successful.
+      final dbHelper = DatabaseHelper.instance;
+      final String? imagePath = _pickedImage?.path;
+      final Map<String, dynamic> modelData = {
+        'id': modelId,
+        'title': _nameController.text.trim(),
+        'summary': _summaryController.text.trim(),
+        'description': _modelExplanationController.text.trim(),
+        'role': _aiPromptController.text.trim(),
+        'baseModelId': _selectedBaseModelId,
+        'imagePath': imagePath,
+        'type': 'roleplay',
+        'category': 'self',
+        'producer': '_USER_',
+        'createdAt': DateTime.now().toIso8601String(),
+      };
+      await dbHelper.insert('models', {
+        'id': modelId, 'producer': modelData['producer'], 'title': modelData['title'],
+        'is_server_side': 0, 'type': modelData['type'], 'raw_json': json.encode(modelData),
+      },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+        userId: user.uid,
+      );
 
-        debugPrint("[CreateScreen] Successfully saved new model to local SQLite DB with ID: $modelId");
-        notificationService.showNotification(message: localizations.modelCreatedSuccess, isSuccess: true);
-        _cache.clearCreateData();
-        ModelData.addModelToCache(modelData);
-        if (mounted) Navigator.pop(context, true);
-
-      } catch (localDbError) {
-        debugPrint("[CreateScreen] CRITICAL: Local SQLite write failed. Rolling back server counter. Error: $localDbError");
-        notificationService.showNotification(message: localizations.errorCreatingModel, isSuccess: false);
-        final rollbackCallable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable('deleteCustomModel');
-        await rollbackCallable.call({'modelType': 'roleplay'});
-        debugPrint("[CreateScreen] Server counter successfully rolled back.");
-      }
+      debugPrint("[CreateScreen] Successfully saved new model to local SQLite DB with ID: $modelId");
+      notificationService.showNotification(message: localizations.modelCreatedSuccess, isSuccess: true);
+      _cache.clearCreateData();
+      ModelData.addModelToCache(modelData);
+      if (mounted) Navigator.pop(context, true);
 
     } on FirebaseFunctionsException catch (e) {
       debugPrint("[CreateScreen] Firebase Functions Error: ${e.code} - ${e.message}");
 
-      // --- THE FIX: Safer error handling and more specific user messages ---
       String errorMessage = e.message ?? localizations.anErrorOccurred;
 
-      // Check for our custom error codes first.
-      if (e.code == 'resource-exhausted') {
-        errorMessage = localizations.errorRateLimit; // "You have created too many models recently."
+      if (e.code == 'deadline-exceeded') {
+        errorMessage = localizations.anErrorOccurred; // "Request timed out. Please try again."
+      } else if (e.code == 'resource-exhausted') {
+        errorMessage = localizations.errorRateLimit;
       } else if (e.code == 'invalid-argument') {
-        // This is our moderation error.
-        errorMessage = localizations.errorContentFlagged; // "The content was flagged as inappropriate."
+        errorMessage = localizations.errorContentFlagged;
       } else if (e.code == 'permission-denied') {
-        // This is the user limit error.
         _nameShakeController.forward(from: 0.0);
-        // The default e.message is good here ("You have reached your limit...").
       }
 
       notificationService.showNotification(message: errorMessage, isSuccess: false);
-      // --- END OF FIX ---
+
+      // --- CRITICAL: NO ROLLBACK NEEDED ---
+      // If the function call fails (timeout, limit, etc.), the server's counter was never incremented.
+      // So, there is nothing to roll back. The system stays in sync.
 
     } catch (e) {
       notificationService.showNotification(message: localizations.errorCreatingModel, isSuccess: false);

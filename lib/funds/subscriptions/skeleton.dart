@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:cortex/theme.dart';
 
-/// A standalone skeleton loader widget extracted from PremiumScreen.
+/// A standalone skeleton loader widget extracted from FundsScreen.
 class SkeletonLoader extends StatelessWidget {
   const SkeletonLoader({Key? key}) : super(key: key);
 

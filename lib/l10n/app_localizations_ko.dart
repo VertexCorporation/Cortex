@@ -1573,4 +1573,27 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get premiumTrialExhaustedMessage =>
       '프리미엄 모델의 무료 일일 메시지를 모두 사용했습니다. 무제한 액세스를 원하시면 업그레이드하세요.';
+
+  @override
+  String selectionScreenGreetingUser(String userName) {
+    return 'How may I help you today, $userName?';
+  }
+
+  @override
+  String get selectionScreenGreetingGeneric => 'How can I help you today?';
+
+  @override
+  String get selectionScreenRecentModels => 'Recent Models';
+
+  @override
+  String get selectionScreenFeatureDynamicChat => 'Dynamic Chat';
+
+  @override
+  String get selectionScreenFeatureOffline => 'Use without Internet';
+
+  @override
+  String get selectionScreenFeatureSelectModel => 'Select Model';
+
+  @override
+  String get explore => 'Explore';
 }

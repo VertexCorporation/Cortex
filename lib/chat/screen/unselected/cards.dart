@@ -1,36 +1,36 @@
 // lib/chat/screen/unselected/cards.dart
 
 import 'dart:io';
+
 import 'package:cortex/main.dart';
+
+import 'package:cortex/models/backend/data.dart';
+import 'package:cortex/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import '../../../models/backend/data.dart';
+import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
-/// A card widget that displays a single model in the selection grid.
+/// A robust card widget that displays a single model, designed to prevent UI overflows.
 ///
-/// This widget is responsible for displaying the model's image, title, and producer.
-/// It uses a robust image-handling mechanism to display local assets, downloaded files,
-/// or a fallback SVG icon, all while correctly handling internet connectivity status for server-side models.
+/// This card uses a combination of dynamic sizing and flexible widgets (`Flexible`, `FittedBox`)
+/// to ensure its content gracefully adapts to all screen sizes, aspect ratios, and
+/// user-defined font scaling settings.
 class ModelCard extends StatelessWidget {
   final ModelInfo model;
   final VoidCallback? onTap;
   final bool hasInternet;
 
   const ModelCard({
-    Key? key,
+    super.key,
     required this.model,
     required this.hasInternet,
     this.onTap,
-  }) : super(key: key);
+  });
 
   /// Resolves the definitive image path for the model.
-  ///
-  /// This delegates the complex logic of finding the correct image to the
-  /// `ModelData.getModelImagePath` function, which acts as the single source of truth
-  /// for all model images in the application. This ensures consistency and simplifies
-  /// the UI code.
   String _resolveImagePath() {
     return ModelData.getModelImagePath({
       'id': model.id,
@@ -41,85 +41,64 @@ class ModelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
     final bool isServerModel = model.path == null;
-    // Reduce opacity for server-side models when there's no internet to indicate they are unavailable.
     final double offlineAlpha = (isServerModel && !hasInternet) ? 0.5 : 1.0;
 
     final String imagePath = _resolveImagePath();
     final bool isSvg = imagePath.toLowerCase().endsWith('.svg');
 
-    // Localize the producer name if it's the special `_USER_` key.
-    String displayProducer = model.producer;
-    if (model.producer == '_USER_') {
-      displayProducer = localizations.you;
-    }
+    // --- Dynamic Layout Calculations for Robustness ---
+    final screenWidth = MediaQuery.of(context).size.width;
+    // These values must match the parent GridView for accurate calculations.
+    final totalHorizontalScreenPadding = screenWidth * 0.04 * 2;
+    final gridCrossAxisSpacing = screenWidth * 0.03;
+    final totalHorizontalGridSpacing = gridCrossAxisSpacing * 2; // 2 gaps for 3 columns
+    final cardWidth = (screenWidth - totalHorizontalScreenPadding - totalHorizontalGridSpacing) / 3;
 
-    // --- Responsive Layout Calculations ---
-    // These calculations ensure the card scales gracefully on different screen sizes.
-    final totalHorizontalPadding = 12.0 * 2;
-    final totalHorizontalSpacing = 8.0 * 2;
-    final w = (MediaQuery.of(context).size.width - totalHorizontalPadding - totalHorizontalSpacing) / 3;
-    final imgSize = w * 0.7;
-    final radiusOuter = imgSize * 0.2;
-    final radiusInner = imgSize * 0.10;
-    final borderW = w * 0.01;
-    final gapBig = imgSize * 0.10;
-    final gapSmall = imgSize * 0.05;
-    final titleSize = imgSize * 0.165;
-    final producerSize = imgSize * 0.15;
+    // Use a fixed aspect ratio defined by the parent grid to calculate height.
+    const childAspectRatio = 1.1;
+    final cardHeight = cardWidth / childAspectRatio;
+    final imageSize = cardWidth * 0.45;
+    final titleSize = cardWidth * 0.12;
     // --- End of Layout Calculations ---
 
     // --- Robust Image Rendering Logic ---
-    // This block ensures that a valid image is always displayed, with multiple fallbacks.
-
-    // 1. Create the correctly colored fallback image ONCE to be reused.
-    // This is the ultimate fallback if any other image loading fails.
     final fallbackImage = SvgPicture.asset(
       'assets/icons/self.svg',
-      width: imgSize,
-      height: imgSize,
+      width: imageSize,
+      height: imageSize,
       fit: BoxFit.contain,
       colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
     );
 
     Widget imageWidget;
-
-    // 2. Check if the final resolved path is our specific fallback SVG.
-    // This avoids unnecessary file checks for a known asset.
     if (imagePath.endsWith('self.svg')) {
       imageWidget = fallbackImage;
     } else {
-      // 3. For any other path, attempt to load it.
       if (isSvg) {
-        // Handle vector graphics (SVG).
         if (imagePath.startsWith('assets/')) {
-          imageWidget = SvgPicture.asset(imagePath, width: imgSize, height: imgSize, fit: BoxFit.contain);
+          imageWidget = SvgPicture.asset(imagePath, width: imageSize, height: imageSize, fit: BoxFit.contain);
         } else {
           final file = File(imagePath);
           imageWidget = file.existsSync()
-              ? SvgPicture.file(file, width: imgSize, height: imgSize, fit: BoxFit.contain)
-              : fallbackImage; // Use fallback if the SVG file is missing.
+              ? SvgPicture.file(file, width: imageSize, height: imageSize, fit: BoxFit.contain)
+              : fallbackImage;
         }
       } else {
-        // Handle raster graphics (PNG, JPG, etc.).
         ImageProvider provider;
         if (imagePath.startsWith('assets/')) {
           provider = AssetImage(imagePath);
         } else {
           final file = File(imagePath);
-          // Use a transparent image as an intermediate fallback before the errorBuilder is called.
           provider = file.existsSync()
               ? FileImage(file) as ImageProvider
               : const AssetImage('assets/icons/transparent.png');
         }
         imageWidget = Image(
           image: provider,
-          width: imgSize,
-          height: imgSize,
+          width: imageSize,
+          height: imageSize,
           fit: BoxFit.cover,
-          // The `errorBuilder` is the final safety net for raster images,
-          // ensuring the fallback is shown if loading fails for any reason.
           errorBuilder: (context, error, stackTrace) => fallbackImage,
         );
       }
@@ -132,51 +111,180 @@ class ModelCard extends StatelessWidget {
         duration: const Duration(milliseconds: 300),
         opacity: offlineAlpha,
         child: Container(
+          padding: EdgeInsets.all(cardWidth * 0.1), // Dynamic padding
           decoration: BoxDecoration(
             color: AppColors.background,
-            borderRadius: BorderRadius.circular(radiusOuter),
-            border: Border.all(color: AppColors.border, width: borderW),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.border, width: 1.0),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // --- Image Container ---
               Container(
-                width: imgSize,
-                height: imgSize,
-                clipBehavior: Clip.antiAlias, // Ensures the image respects the border radius.
+                width: imageSize,
+                height: imageSize,
+                clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(radiusInner),
+                  borderRadius: BorderRadius.circular(imageSize * 0.3),
                 ),
                 alignment: Alignment.center,
-                child: imageWidget, // The final, resolved image widget is placed here.
+                child: imageWidget,
               ),
-              SizedBox(height: gapBig),
-              Text(
-                model.title,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: AppColors.primaryColor.inverted,
-                  fontSize: titleSize,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: gapSmall),
-              Text(
-                displayProducer,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: AppColors.primaryColor.inverted.withOpacity(.6),
-                  fontSize: producerSize,
+              // --- Dynamic Spacer ---
+              SizedBox(height: cardHeight * 0.08),
+              // --- BULLETPROOF TEXT WIDGET ---
+              // This combination ensures the text never overflows.
+              // `Flexible` gives it a bounded space, and `FittedBox`
+              // scales the text down if it's too large for that space.
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    model.title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.primaryColor.inverted,
+                      fontSize: titleSize, // This acts as the max font size.
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// A centralized, reusable grid for displaying a list of models.
+class ModelGridView extends StatelessWidget {
+  final List<ModelInfo> models;
+  final bool hasInternetConnection;
+  final bool conversationLimitReached;
+  final Function(ModelInfo) onSelectModel;
+  final Key? gridKey;
+  final ScrollPhysics physics;
+  final bool shrinkWrap;
+
+  const ModelGridView({
+    super.key,
+    required this.models,
+    required this.hasInternetConnection,
+    required this.conversationLimitReached,
+    required this.onSelectModel,
+    this.gridKey,
+    this.physics = const AlwaysScrollableScrollPhysics(),
+    this.shrinkWrap = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final notificationService = Provider.of<NotificationService>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return GridView.builder(
+      key: gridKey,
+      shrinkWrap: shrinkWrap,
+      physics: physics,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: screenWidth * 0.03, // Consistent spacing
+        mainAxisSpacing: screenWidth * 0.03,  // Consistent spacing
+        childAspectRatio: 1.1, // A balanced aspect ratio
+      ),
+      itemCount: models.length,
+      itemBuilder: (context, index) {
+        final model = models[index];
+        final isServerModel = model.path == null;
+        return ModelCard(
+          model: model,
+          hasInternet: hasInternetConnection,
+          onTap: () {
+            if (conversationLimitReached) return;
+
+            if (isServerModel && !hasInternetConnection) {
+              notificationService.showNotification(
+                message: localizations.internetRequired,
+                isSuccess: false,
+              );
+            } else {
+              onSelectModel(model);
+            }
+          },
+        );
+      },
+    );
+  }
+}
+
+/// A shimmer placeholder that mimics the appearance of a [ModelCard].
+class ShimmerModelCard extends StatelessWidget {
+  final bool isDetailed;
+  const ShimmerModelCard({super.key, this.isDetailed = true});
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.secondaryColor,
+          borderRadius: BorderRadius.circular(isDetailed ? 16 : 24),
+        ),
+        child: isDetailed
+            ? Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(width: 56, height: 56, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12))),
+            const SizedBox(height: 12),
+            Container(height: 14, width: 70, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
+            const SizedBox(height: 6),
+            Container(height: 12, width: 50, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
+          ],
+        )
+            : null,
+      ),
+    );
+  }
+}
+
+/// A reusable shimmer grid placeholder for loading states.
+class ShimmerModelGridView extends StatelessWidget {
+  final int itemCount;
+  final bool isDetailed;
+  final bool shrinkWrap;
+  final Key? gridKey;
+
+  const ShimmerModelGridView({
+    super.key,
+    required this.itemCount,
+    this.isDetailed = true,
+    this.shrinkWrap = false,
+    this.gridKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return GridView.builder(
+      key: gridKey,
+      shrinkWrap: shrinkWrap,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: screenWidth * 0.03, // Consistent spacing
+        mainAxisSpacing: screenWidth * 0.03,  // Consistent spacing
+        childAspectRatio: isDetailed ? 0.75 : 1.1, // Consistent aspect ratio
+      ),
+      itemCount: itemCount,
+      itemBuilder: (context, index) => ShimmerModelCard(isDetailed: isDetailed),
     );
   }
 }

@@ -1,15 +1,7 @@
-/*  cache.dart (FINAL, COMPLETE, AND CORRECTED)
+/*  cache.dart (FINAL, UPDATED FOR NEWS IMAGES)
  *───────────────────────────────────────────────────────────────────────────
  *  Lightweight in-memory cache helper.
- *  - Keeps frequently-used data structures alive between screen switches
- *    to avoid expensive database / disk reads.
- *  - Automatically expires each cache after a configurable timeout.
- *  - Five independent sections:
- *      ① Model Selection screen      (SelectionScreen)
- *      ② Conversation list / Inbox   (MenuScreen)
- *      ③ User Settings screen        (SettingsScreen)
- *      ④ Premium Products screen     (PremiumScreen)
- *      ⑤ Models Discovery screen     (ModelsScreen)
+ *  - Added Section ⑥ for caching temporary news image URLs to prevent shimmer.
  *───────────────────────────────────────────────────────────────────────────*/
 
 import 'dart:async';
@@ -19,8 +11,6 @@ import '../conversations/manager.dart';
 import '../models/backend/data.dart';
 
 /// A singleton class to track the state of app-wide data.
-/// It provides a simple flag to signal when critical data, like user
-/// subscriptions, has changed and a refresh is required.
 class AppDataState {
   static final AppDataState _instance = AppDataState._internal();
   factory AppDataState() => _instance;
@@ -28,20 +18,15 @@ class AppDataState {
 
   bool _hasUserDataChanged = false;
 
-  /// Call this method after any action that changes user data on the server,
-  /// such as a purchase, profile update, or deletion.
   void markUserDataAsChanged() {
     debugPrint("[AppDataState] User data has been marked as changed. A refresh will be forced on next relevant screen load.");
     _hasUserDataChanged = true;
   }
 
-  /// Screens should check this property before loading data.
-  /// If it returns true, they must bypass the cache and fetch fresh data.
-  /// The flag is automatically reset after being checked.
   bool get needsRefresh {
     if (_hasUserDataChanged) {
       debugPrint("[AppDataState] Change flag was checked and is TRUE. Resetting flag and reporting need for refresh.");
-      _hasUserDataChanged = false; // Reset after checking
+      _hasUserDataChanged = false;
       return true;
     }
     return false;
@@ -50,54 +35,44 @@ class AppDataState {
 
 
 class CacheService {
-  /*───────────────────────────────
-   * SECTION ① – Model Selection
-   *──────────────────────────────*/
+  /* SECTION ① – Model Selection */
   static List<ModelInfo>? cachedAllModels;
   static List<ModelInfo>? cachedFilteredModels;
 
-  /*───────────────────────────────
-   * SECTION ② – Conversation Inbox
-   *──────────────────────────────*/
+  /* SECTION ② – Conversation Inbox */
   static Map<String, ConversationManager>? cachedConversationManagers;
   static List<String>?                     cachedConversationOrder;
   static List<String>?                     cachedStarredIds;
   static List<Map<String, dynamic>>?       cachedUserModels;
 
-  /*───────────────────────────────
-   * SECTION ③ – User Settings
-   *──────────────────────────────*/
+  /* SECTION ③ – User Settings */
   static Map<String, dynamic>? cachedSettingsUserData;
 
-  /*───────────────────────────────────
-   * SECTION ④ – Premium Products (IAP)
-   *───────────────────────────────────*/
+  /* SECTION ④ – Premium Products (IAP) */
   static List<ProductDetails>? cachedPremiumProducts;
 
-  /*───────────────────────────────────
-   * SECTION ⑤ – Models Discovery Screen
-   *───────────────────────────────────*/
+  /* SECTION ⑤ – Models Discovery Screen */
   static List<Map<String, dynamic>>? cachedModelsScreenData;
 
-
   /*───────────────────────────────
-   * Internal timers – one per section
+   * SECTION ⑥ – News Image URLs (NEW!)
+   * Caches the signed URLs for news cover images to prevent re-fetching
+   * and eliminate the shimmer effect on screen transitions.
    *──────────────────────────────*/
-  static Timer? _modelCacheTimer; // RESTORED ORIGINAL NAME
+  static Map<String, String>? cachedNewsImageUrls;
+
+
+  /* Internal timers – one per section */
+  static Timer? _modelCacheTimer;
   static Timer? _conversationCacheTimer;
   static Timer? _settingsCacheTimer;
   static Timer? _premiumCacheTimer;
-  static Timer? _modelsScreenCacheTimer; // NEW for ModelsScreen
+  static Timer? _modelsScreenCacheTimer;
+  static Timer? _newsImageCacheTimer; // NEW for News Image URLs
 
-  // ──────────────────────────────────────────────────────────
-  // MODEL CACHING – public helpers (RESTORED)
-  // ──────────────────────────────────────────────────────────
+  // MODEL CACHING
   static void touchModelCache() => _modelCacheTimer?.cancel();
-
-  static void startModelCacheTimer({
-    Duration?   timeout,
-    VoidCallback? onClear,
-  }) {
+  static void startModelCacheTimer({ Duration? timeout, VoidCallback? onClear }) {
     _modelCacheTimer?.cancel();
     _modelCacheTimer = Timer(timeout ?? const Duration(minutes: 2), () {
       cachedAllModels      = null;
@@ -107,11 +82,8 @@ class CacheService {
     });
   }
 
-  // ──────────────────────────────────────────────────────────
-  // CONVERSATION CACHING – public helpers
-  // ──────────────────────────────────────────────────────────
+  // CONVERSATION CACHING
   static void touchConversationCache() => _conversationCacheTimer?.cancel();
-
   static void startConversationCacheTimer({ Duration? timeout, VoidCallback? onClear }) {
     _conversationCacheTimer?.cancel();
     _conversationCacheTimer = Timer(timeout ?? const Duration(minutes: 2), () {
@@ -120,7 +92,6 @@ class CacheService {
       onClear?.call();
     });
   }
-
   static void invalidateConversationCache() {
     cachedConversationManagers = null;
     cachedConversationOrder    = null;
@@ -128,11 +99,8 @@ class CacheService {
     cachedUserModels           = null;
   }
 
-  // ──────────────────────────────────────────────────────────
-  // SETTINGS CACHING – public helpers
-  // ──────────────────────────────────────────────────────────
+  // SETTINGS CACHING
   static void touchSettingsCache() => _settingsCacheTimer?.cancel();
-
   static void startSettingsCacheTimer({ Duration? timeout, VoidCallback? onClear }) {
     _settingsCacheTimer?.cancel();
     _settingsCacheTimer = Timer(timeout ?? const Duration(minutes: 3), () {
@@ -141,21 +109,16 @@ class CacheService {
       onClear?.call();
     });
   }
-
   static void invalidateSettingsCache() {
     cachedSettingsUserData = null;
   }
-
   static void updateSettingsCache(Map<String, dynamic> data) {
     cachedSettingsUserData = data;
     debugPrint('CacheService ▸ Settings cache was updated with new data.');
   }
 
-  // ──────────────────────────────────────────────────────────
-  // PREMIUM PRODUCTS CACHING – public helpers
-  // ──────────────────────────────────────────────────────────
+  // PREMIUM PRODUCTS CACHING
   static void touchPremiumCache() => _premiumCacheTimer?.cancel();
-
   static void startPremiumCacheTimer({ Duration? timeout, VoidCallback? onClear }) {
     _premiumCacheTimer?.cancel();
     _premiumCacheTimer = Timer(timeout ?? const Duration(minutes: 10), () {
@@ -164,21 +127,14 @@ class CacheService {
       onClear?.call();
     });
   }
-
   static void invalidatePremiumCache() {
     cachedPremiumProducts = null;
     debugPrint('CacheService ▸ Premium products cache invalidated.');
   }
 
-  // ──────────────────────────────────────────────────────────
-  // MODELS SCREEN CACHING – public helpers (NEW)
-  // ──────────────────────────────────────────────────────────
+  // MODELS SCREEN CACHING
   static void touchModelsScreenCache() => _modelsScreenCacheTimer?.cancel();
-
-  static void startModelsScreenCacheTimer({
-    Duration?   timeout,
-    VoidCallback? onClear,
-  }) {
+  static void startModelsScreenCacheTimer({ Duration? timeout, VoidCallback? onClear }) {
     _modelsScreenCacheTimer?.cancel();
     _modelsScreenCacheTimer = Timer(timeout ?? const Duration(minutes: 5), () {
       invalidateModelsScreenCache();
@@ -186,42 +142,60 @@ class CacheService {
       onClear?.call();
     });
   }
-
   static void invalidateModelsScreenCache() {
     cachedModelsScreenData = null;
     debugPrint('CacheService ▸ ModelsScreen cache invalidated.');
   }
 
   // ──────────────────────────────────────────────────────────
-  // MISC – wipe everything (used on logout etc.)
+  // NEWS IMAGE URL CACHING – public helpers (NEW!)
   // ──────────────────────────────────────────────────────────
-  static void clearAll() {
-    // Section 1
-    cachedAllModels            = null;
-    cachedFilteredModels       = null;
-    // Section 2
-    cachedConversationManagers = null;
-    cachedConversationOrder    = null;
-    cachedStarredIds           = null;
-    cachedUserModels           = null;
-    // Section 3
-    cachedSettingsUserData     = null;
-    // Section 4
-    cachedPremiumProducts      = null;
-    // Section 5
-    cachedModelsScreenData     = null;
+  static void touchNewsImageCache() => _newsImageCacheTimer?.cancel();
 
-    // Timers
-    _modelCacheTimer?.cancel(); // RESTORED
+  static void startNewsImageCacheTimer({
+    Duration?   timeout,
+    VoidCallback? onClear,
+  }) {
+    _newsImageCacheTimer?.cancel();
+    // URLs expire in 10 mins, so we clear our cache in 8 to be safe.
+    _newsImageCacheTimer = Timer(timeout ?? const Duration(minutes: 8), () {
+      invalidateNewsImageCache();
+      debugPrint('CacheService ▸ News image URL cache cleared due to timeout.');
+      onClear?.call();
+    });
+  }
+
+  static void invalidateNewsImageCache() {
+    cachedNewsImageUrls = null;
+    debugPrint('CacheService ▸ News image URL cache invalidated.');
+  }
+
+
+  // MISC – wipe everything (used on logout etc.)
+  static void clearAll() {
+    cachedAllModels = null;
+    cachedFilteredModels = null;
+    cachedConversationManagers = null;
+    cachedConversationOrder = null;
+    cachedStarredIds = null;
+    cachedUserModels = null;
+    cachedSettingsUserData = null;
+    cachedPremiumProducts = null;
+    cachedModelsScreenData = null;
+    cachedNewsImageUrls = null; // NEW
+
+    _modelCacheTimer?.cancel();
     _conversationCacheTimer?.cancel();
     _settingsCacheTimer?.cancel();
     _premiumCacheTimer?.cancel();
     _modelsScreenCacheTimer?.cancel();
+    _newsImageCacheTimer?.cancel(); // NEW
 
-    _modelCacheTimer        = null; // RESTORED
+    _modelCacheTimer = null;
     _conversationCacheTimer = null;
-    _settingsCacheTimer     = null;
-    _premiumCacheTimer      = null;
+    _settingsCacheTimer = null;
+    _premiumCacheTimer = null;
     _modelsScreenCacheTimer = null;
+    _newsImageCacheTimer = null; // NEW
   }
 }
