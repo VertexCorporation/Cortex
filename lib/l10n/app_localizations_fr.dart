@@ -1653,4 +1653,27 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get premiumTrialExhaustedMessage =>
       'Vous avez utilisé tous vos messages quotidiens gratuits pour les modèles premium, veuillez effectuer une mise à niveau pour un accès illimité.';
+
+  @override
+  String selectionScreenGreetingUser(String userName) {
+    return 'How may I help you today, $userName?';
+  }
+
+  @override
+  String get selectionScreenGreetingGeneric => 'How can I help you today?';
+
+  @override
+  String get selectionScreenRecentModels => 'Recent Models';
+
+  @override
+  String get selectionScreenFeatureDynamicChat => 'Dynamic Chat';
+
+  @override
+  String get selectionScreenFeatureOffline => 'Use without Internet';
+
+  @override
+  String get selectionScreenFeatureSelectModel => 'Select Model';
+
+  @override
+  String get explore => 'Explore';
 }

@@ -726,5 +726,39 @@
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
-  "premiumTrialExhaustedMessage": "You have used all your free daily messages for premium models, please upgrade for unlimited access."
+  "premiumTrialExhaustedMessage": "You have used all your free daily messages for premium models, please upgrade for unlimited access.",
+  "selectionScreenGreetingUser": "How may I help you today, {userName}?",
+  "@selectionScreenGreetingUser": {
+    "description": "Greeting on the selection screen when the user's name is known.",
+    "placeholders": {
+      "userName": {
+        "type": "String",
+        "example": "Alex"
+      }
+    }
+  },
+  "selectionScreenGreetingGeneric": "How can I help you today?",
+  "@selectionScreenGreetingGeneric": {
+    "description": "Generic greeting on the selection screen when the user's name is not available."
+  },
+  "selectionScreenRecentModels": "Recent Models",
+  "@selectionScreenRecentModels": {
+    "description": "The header text for the recent models section on the selection screen."
+  },
+  "selectionScreenFeatureDynamicChat": "Dynamic Chat",
+  "@selectionScreenFeatureDynamicChat": {
+    "description": "Text for the 'Dynamic Chat' feature card. The newline is intentional."
+  },
+  "selectionScreenFeatureOffline": "Use without Internet",
+  "@selectionScreenFeatureOffline": {
+    "description": "Text for the 'Use without Internet' feature card. The newline is intentional."
+  },
+  "selectionScreenFeatureSelectModel": "Select Model",
+  "@selectionScreenFeatureSelectModel": {
+    "description": "Text for the 'Select Model' feature card. The newline is intentional."
+  },
+  "explore": "Explore",
+  "@explore": {
+    "description": "It's so clear i think."
+  }
 }

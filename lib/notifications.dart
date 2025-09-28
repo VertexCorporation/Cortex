@@ -32,7 +32,6 @@ class NotificationService {
     );
   }
 
-  // _showOverlayNotification metodunda
   void _showOverlayNotification({
     required String message,
     required Color backgroundColor,
@@ -73,12 +72,11 @@ class NotificationService {
           textColor: textColor,
           duration: duration,
           fontSize: actualFontSize,
-          // Piksel cinsinden font boyutu
           oneLine: oneLine,
           // Pass it to the widget
           onRemove: () {
             overlayEntry.remove();
-            print("Overlay kaldırıldı");
+            print("Overlay removed");
           },
           onTap: () {
             notificationKey.currentState?.dismiss();
@@ -124,7 +122,7 @@ class NotificationService {
   final IconData? icon;
   final Color textColor;
   final Duration duration;
-  final double fontSize; // Piksel cinsinden font boyutu
+  final double fontSize;
   final bool oneLine; // New parameter
   final VoidCallback onRemove;
   final VoidCallback onTap;
@@ -152,13 +150,10 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
 
-  // Maksimum genişlik sınırı
   double get maxWidth => MediaQuery.of(context).size.width * 0.9;
 
-  // Minimum font boyutu
   double get minFontSize => widget.fontSize * 0.7;
 
-  // Mevcut font boyutunu hesaplamak için
   double calculateFontSize(String text, double initialFontSize, double maxWidth, IconData? icon) {
     double fontSize = initialFontSize;
     final TextPainter textPainter = TextPainter(
@@ -172,13 +167,10 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
 
     textPainter.layout();
 
-    // İkon varsa, ikonu da hesaba kat
-    double iconWidth = icon != null ? fontSize + 8.0 : 0.0; // İkon boyutu + boşluk
+    double iconWidth = icon != null ? fontSize + 8.0 : 0.0;
 
-    // Metnin genişliği + ikon genişliği
-    double totalWidth = textPainter.size.width + iconWidth + 32.0; // 16 padding sol ve sağ
+    double totalWidth = textPainter.size.width + iconWidth + 32.0;
 
-    // Eğer toplam genişlik maksimum genişliği aşıyorsa, font boyutunu küçült
     while (widget.oneLine && totalWidth > maxWidth && fontSize > minFontSize) {
       fontSize -= 1.0;
       textPainter.text = TextSpan(
@@ -200,7 +192,6 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
       vsync: this,
     );
 
-    // Bildirim animasyonu (aşağıdan yukarıya)
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 1.0),
       end: const Offset(0, 0),
@@ -211,7 +202,6 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
       ),
     );
 
-    // Opaklık animasyonu
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
@@ -224,7 +214,6 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
 
     _controller.forward();
 
-    // Bildirimi belirli süre sonra kapatma
     Future.delayed(widget.duration, () {
       _startExitAnimation();
     });
@@ -284,11 +273,10 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
                     Icon(
                       widget.icon,
                       color: widget.textColor,
-                      size: iconSize, // İkon boyutu font boyutuyla aynı
+                      size: iconSize,
                     ),
                     const SizedBox(width: 8.0),
                   ],
-                  // Expanded widget'ını kaldırdık
                   Flexible(
                     child: Text(
                       widget.message,

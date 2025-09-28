@@ -1645,4 +1645,27 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get premiumTrialExhaustedMessage =>
       'Je hebt al je gratis dagelijkse berichten voor premiummodellen gebruikt. Upgrade voor onbeperkte toegang.';
+
+  @override
+  String selectionScreenGreetingUser(String userName) {
+    return 'How may I help you today, $userName?';
+  }
+
+  @override
+  String get selectionScreenGreetingGeneric => 'How can I help you today?';
+
+  @override
+  String get selectionScreenRecentModels => 'Recent Models';
+
+  @override
+  String get selectionScreenFeatureDynamicChat => 'Dynamic Chat';
+
+  @override
+  String get selectionScreenFeatureOffline => 'Use without Internet';
+
+  @override
+  String get selectionScreenFeatureSelectModel => 'Select Model';
+
+  @override
+  String get explore => 'Explore';
 }

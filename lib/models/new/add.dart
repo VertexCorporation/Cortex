@@ -142,21 +142,34 @@ class _AddScreenState extends State<AddScreen> with TickerProviderStateMixin {
     }
   }
 
+  /// Saves a new offline model using the robust "Server-First Authorization" protocol.
+  ///
+  /// --- WORKFLOW ---
+  /// 1.  **Pre-flight Checks**: Verifies user subscription, save state, and internet connection.
+  /// 2.  **Server Authorization FIRST**: Calls the `createCustomModel` Cloud Function.
+  ///     The server performs all checks (moderation, rate limits, subscription limits) and
+  ///     atomically increments the user's `offlineModelCount` if successful. This reserves a "slot".
+  /// 3.  **Local Operations LAST**: Only if the server authorization succeeds, the client
+  ///     proceeds to copy the GGUF file and write the model's metadata to the local SQLite database.
+  /// 4.  **Critical Rollback**: In the rare case that the local operations fail AFTER the
+  ///     server has already granted a slot, this function calls a `deleteCustomModel`
+  ///     Cloud Function to decrement the server counter, keeping the system perfectly synchronized.
   Future<void> _saveModel() async {
     final localizations = AppLocalizations.of(context)!;
     final notificationService = Provider.of<NotificationService>(context, listen: false);
     final internetService = Provider.of<InternetService>(context, listen: false);
 
-    if (!internetService.currentStatus) {
-      notificationService.showNotification(message: localizations.noInternetConnection, isSuccess: false);
-      return;
-    }
+    // --- STEP 0: PRE-FLIGHT CHECKS ---
     final bool isUltra = [3, 6].contains(_hasCortexSubscription);
     if (!isUltra) {
       notificationService.showNotification(message: localizations.ultraFeatureOnly, isSuccess: false);
       return;
     }
     if (!_isSaveEnabled) return;
+    if (!internetService.currentStatus) {
+      notificationService.showNotification(message: localizations.noInternetConnection, isSuccess: false);
+      return;
+    }
 
     if (mounted) setState(() => _isSaving = true);
 
@@ -167,24 +180,45 @@ class _AddScreenState extends State<AddScreen> with TickerProviderStateMixin {
       return;
     }
 
-    File? finalGgufFile;
-    String? modelId;
-    final dbHelper = DatabaseHelper.instance;
+    final modelId = 'local_${user.uid}_${DateTime.now().millisecondsSinceEpoch}';
+
+    // Define the Cloud Function callable with a generous 30-second timeout to handle cold starts.
+    final HttpsCallable authCallable = FirebaseFunctions.instanceFor(region: 'europe-west1')
+        .httpsCallable(
+      'createCustomModel',
+      options: HttpsCallableOptions(timeout: const Duration(seconds: 30)),
+    );
 
     try {
+      // --- STEP 1: SERVER-SIDE AUTHORIZATION FIRST! ---
+      // We ask the server for permission BEFORE performing any heavy local file operations.
+      debugPrint("[AddScreen] Authorizing with server before any local changes...");
+      final String? base64Image = await _imageFileToBase64(_pickedImage);
+      await authCallable.call({
+        'modelType': 'offline',
+        'name': _nameController.text.trim(),
+        'summary': _summaryController.text.trim(),
+        'description': _modelExplanationController.text.trim(),
+        'prompt': '', // Not used for offline models but required by the function signature.
+        'base64Image': base64Image,
+      });
+      debugPrint("[AddScreen] Server authorization successful. A slot has been reserved.");
+
+      // --- STEP 2: LOCAL OPERATIONS ONLY AFTER SERVER APPROVAL ---
+      // If the code reaches this point, it's guaranteed that the user has a valid, available slot.
       debugPrint("[AddScreen] Starting background file copy...");
       final appDir = await getApplicationDocumentsDirectory();
       final ggufFileName = path.basename(_ggufFile!.path);
       final destinationPath = path.join(appDir.path, ggufFileName);
 
+      // Perform heavy file I/O in a separate isolate to keep the UI responsive.
       final copiedFilePath = await compute(copyFileInIsolate, {
         'sourcePath': _ggufFile!.path,
         'destPath': destinationPath,
       });
-      finalGgufFile = File(copiedFilePath);
+      final finalGgufFile = File(copiedFilePath);
       debugPrint("[AddScreen] File copy successful. Path: ${finalGgufFile.path}");
 
-      modelId = 'local_${user.uid}_${DateTime.now().millisecondsSinceEpoch}';
       final Map<String, dynamic> modelData = {
         'id': modelId,
         'title': _nameController.text.trim(),
@@ -197,58 +231,61 @@ class _AddScreenState extends State<AddScreen> with TickerProviderStateMixin {
         'producer': '_USER_',
         'createdAt': DateTime.now().toIso8601String(),
       };
+
+      final dbHelper = DatabaseHelper.instance;
       await dbHelper.insert('models', {
         'id': modelId,
         'producer': modelData['producer'],
         'title': modelData['title'],
-        'is_server_side': 0,
+        'is_server_side': 0, // 0 for local/offline
         'type': modelData['type'],
         'raw_json': json.encode(modelData),
       },
         conflictAlgorithm: ConflictAlgorithm.replace,
-        userId: user.uid,
+        userId: user.uid, // Pass userId for encryption
       );
-      debugPrint("[AddScreen] Successfully saved model to local DB with ID: $modelId. Now contacting server.");
-
-      final String? base64Image = await _imageFileToBase64(_pickedImage);
-      final authCallable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable('createCustomModel');
-      await authCallable.call({
-        'modelType': 'offline',
-        'name': _nameController.text.trim(),
-        'summary': _summaryController.text.trim(),
-        'description': _modelExplanationController.text.trim(),
-        'prompt': '',
-        'base64Image': base64Image,
-      });
-      debugPrint("[AddScreen] Server authorization successful. Process complete.");
+      debugPrint("[AddScreen] Successfully saved model to local DB. Process complete.");
 
       notificationService.showNotification(message: localizations.modelCreatedSuccess, isSuccess: true);
       _cache.clearAddData();
       ModelData.addModelToCache(modelData);
       if (mounted) Navigator.pop(context, true);
 
+    } on FirebaseFunctionsException catch (e) {
+      // Server rejected the request (limit, moderation, timeout, etc.).
+      // NO local changes were made, so NO rollback is needed. The system is still in sync.
+      debugPrint("[AddScreen] Server Error: ${e.code} - ${e.message}");
+      String errorMessage = e.message ?? localizations.anErrorOccurred;
+
+      if (e.code == 'deadline-exceeded') {
+        errorMessage = localizations.anErrorOccurred;
+      } else if (e.code == 'resource-exhausted') {
+        errorMessage = localizations.errorRateLimit;
+      } else if (e.code == 'invalid-argument') {
+        errorMessage = localizations.errorContentFlagged;
+      } else if (e.code == 'permission-denied') {
+        // The default message from the server ("You have reached your limit...") is good.
+      }
+
+      notificationService.showNotification(message: errorMessage, isSuccess: false, oneLine: false);
+
     } catch (e) {
-      debugPrint("[AddScreen] An error occurred during the save process: $e");
+      // This block catches local errors (e.g., file copy failed, SQLite error).
+      // This is the CRITICAL case where we MUST roll back the server counter.
+      debugPrint("[AddScreen] CRITICAL: Local operation failed after server approval. Rolling back server counter. Error: $e");
 
-      if (finalGgufFile != null && await finalGgufFile.exists()) {
-        await finalGgufFile.delete();
-        debugPrint("[AddScreen] Rollback: Deleted copied file.");
-      }
-      if (modelId != null) {
-        await dbHelper.delete('models', where: 'id = ?', whereArgs: [modelId]);
-        debugPrint("[AddScreen] Rollback: Deleted DB entry.");
+      String errorMessage;
+      final rollbackCallable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable('deleteCustomModel');
+
+      try {
+        await rollbackCallable.call({'modelType': 'offline'});
+        debugPrint("[AddScreen] Server counter successfully rolled back.");
+        errorMessage = localizations.errorCreatingModel; // e.g., "A local error occurred..."
+      } catch (rollbackError) {
+        debugPrint("[AddScreen] ULTIMATE FAILURE: Failed to roll back server counter. Manual sync needed. Error: $rollbackError");
+        errorMessage = localizations.anErrorOccurred; // e.g., "A critical sync error occurred..."
       }
 
-      String errorMessage = localizations.errorCreatingModel;
-      if (e is FirebaseFunctionsException) {
-        if (e.code == 'resource-exhausted') {
-          errorMessage = localizations.errorRateLimit;
-        } else if (e.code == 'invalid-argument') {
-          errorMessage = localizations.errorContentFlagged;
-        } else {
-          errorMessage = e.message ?? localizations.anErrorOccurred;
-        }
-      }
       notificationService.showNotification(message: errorMessage, isSuccess: false, oneLine: false);
 
     } finally {

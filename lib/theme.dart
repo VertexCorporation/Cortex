@@ -86,7 +86,7 @@ class AppColors {
         senaryColor: const Color(0xFF0D62FE),
         septenaryColor: const Color(0xFFFA2626),
         background: const Color(0xFFFFFFFF),
-        border: const Color(0xFF7E7E7E),
+        border: const Color(0xFFBFBFBF),
         navigationBarColor: Colors.white,
         statusBarColor: Colors.transparent,
         navigationBarIconBrightness: Brightness.dark,

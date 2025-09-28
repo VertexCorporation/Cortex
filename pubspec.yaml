@@ -3,68 +3,89 @@ description: "Peak of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 1.5.0+150
+version: 1.5.5+155
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
 
 dependencies:
-  flutter_downloader: ^1.11.8
-  sqflite: ^2.4.1
-  flutter_native_splash: ^2.4.4
-  permission_handler: ^11.3.1
-  path_provider: ^2.0.11
-  shared_preferences: ^2.3.2
-  uuid: ^4.5.1
-  flutter_localizations:
-    sdk: flutter
-  intl: ^0.20.2
-  provider: ^6.1.2
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # --- CORE FLUTTER & UI ---
+  provider: ^6.1.2
   google_fonts: ^6.2.1
-  url_launcher: ^6.3.1
-  firebase_core: ^3.7.0
-  firebase_auth: ^5.3.2
-  flutter_markdown: ^0.7.4+1
-  font_awesome_flutter: ^10.8.0
-  file_picker: ^9.0.2
-  cloud_firestore: ^5.4.5
-  image_picker: ^1.1.2
-  flutter_highlight: ^0.7.0
-  visibility_detector: ^0.4.0+2
-  safe_text: ^1.0.7
-  in_app_purchase: ^3.2.0
-  device_info_plus: ^11.3.0
-  email_validator: ^3.0.0
-  shimmer: ^3.0.0
-  dio: ^5.7.0
-  firebase_analytics: ^11.3.6
   flutter_svg: ^2.0.15
+  shimmer: ^3.0.0
+  cached_network_image: ^3.4.1
+  flutter_markdown: ^0.7.4+1
+  flutter_math_fork: ^0.7.4
+  font_awesome_flutter: ^10.8.0
+  fl_chart: ^0.70.2
+  intl: ^0.20.2
   collection: ^1.18.0
+
+  # --- FIREBASE (UPDATED FOR COMPATIBILITY) ---
+  firebase_core: ^3.2.0                # Updated
+  firebase_auth: ^5.1.2                # Updated
+  cloud_firestore: ^5.1.0              # Updated to resolve conflict
+  firebase_analytics: ^11.1.0            # Updated
+  firebase_remote_config: ^5.1.0       # Updated
+  cloud_functions: ^5.1.0              # Updated
+  firebase_crashlytics: ^4.0.2           # Updated
+  google_sign_in: ^6.3.0
+
+  # --- IN-APP PURCHASE ---
+  in_app_purchase: ^3.2.0
+  in_app_purchase_android: ^0.4.0
+  in_app_review: ^2.0.10
+
+  # --- DEVICE & UTILITIES ---
+  url_launcher: ^6.3.1
+  path_provider: ^2.0.11
+  shared_preferences: ^2.3.2
+  permission_handler: ^11.3.1
+  device_info_plus: ^11.3.0
+  uuid: ^4.5.1
   mutex: ^3.1.0
   retry: ^3.1.2
   http: any
-  path: any
-  fl_chart: ^0.70.2
+  dio: ^5.7.0
   internet_connection_checker_plus: any
-  mime: any
-  highlight: any
-  share_plus: ^10.1.4
+  upgrader: ^11.5.0
+
+  # --- FILE & DATA HANDLING ---
+  sqflite: ^2.4.1
+  path: any
+  file_picker: ^9.0.2
+  image_picker: ^1.1.2
   gallery_saver_plus: ^3.2.1
-  in_app_purchase_android: ^0.4.0
-  flutter_local_notifications: ^18.0.1
-  google_sign_in: ^6.3.0
+  mime: any
+  share_plus: ^10.1.4
+  flutter_downloader: ^1.11.8
+
+  # --- SECURITY & MISC ---
+  flutter_secure_storage: ^9.2.4
   crypto: ^3.0.6
   encrypt: ^5.0.3
+  email_validator: ^3.0.0
+  safe_text: ^1.0.7
+  visibility_detector: ^0.4.0+2
+
+  # --- NATIVE INTEGRATIONS ---
+  flutter_native_splash: ^2.4.4
   webview_flutter: ^4.13.0
-  firebase_remote_config: ^5.4.7
-  flutter_math_fork: ^0.7.4
+  flutter_local_notifications: ^18.0.1
   android_play_install_referrer: ^0.4.0
-  cloud_functions: ^5.6.0
-  flutter_secure_storage: ^9.2.4
-  in_app_review: ^2.0.10
-  upgrader: ^11.5.0
+
+  # --- SYNTAX HIGHLIGHTING ---
+  flutter_highlight: ^0.7.0
+
+  # --- CONFETTI ---
+  confetti: ^0.8.0
+  highlight: any
 
 dev_dependencies:
   flutter_test:

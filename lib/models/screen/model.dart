@@ -15,7 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../darkener.dart';
 import '../../extensions.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import '../../funds/subscriptions/subscriptions.dart';
+import '../../funds/funds.dart';
 import '../../internet.dart';
 import '../../navigation.dart';
 import '../../notifications.dart';
@@ -1787,7 +1787,7 @@ class _ModelDetailPageState extends State<ModelDetailPage>
         borderRadius: BorderRadius.circular(borderRadius * 0.8),
         child: InkWell(
           onTap: () {
-            navigateToScreen(context, PremiumScreen(), direction: const Offset(0.0, 1.0));
+            navigateToScreen(context, FundsScreen(), direction: const Offset(0.0, 1.0));
           },
           borderRadius: BorderRadius.circular(borderRadius * 0.8),
           splashColor: AppColors.primaryColor.withOpacity(0.1),

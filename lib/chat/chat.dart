@@ -2,38 +2,17 @@
 //
 // This file defines the ChatScreen widget, which manages all chat-related functionality.
 // Displaying/sending/editing messages, model loading, response management, and UI state control are handled here.
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
 
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/chat/screen/appbar/appbar.dart';
+import 'package:cortex/chat/screen/appbar/chat.dart';
+import 'package:cortex/chat/screen/appbar/premium.dart';
 import 'package:cortex/chat/screen/selected/input/input.dart';
 import 'package:cortex/chat/screen/selected/input/panels/briefing.dart';
 import 'package:cortex/chat/screen/selected/input/panels/edit.dart';
 import 'package:cortex/chat/screen/selected/screen.dart';
+import 'package:cortex/chat/screen/unselected/news.dart';
 import 'package:cortex/chat/screen/unselected/screen/screen.dart';
 import 'package:cortex/chat/services/context.dart';
 import 'package:cortex/chat/services/edit.dart';
@@ -57,7 +36,8 @@ import '../banner.dart';
 import '../cache.dart';
 import '../errorview.dart';
 import '../extensions.dart';
-import '../funds/subscriptions/subscriptions.dart';
+import '../funds/funds.dart';
+import '../initialization.dart';
 import '../invite.dart';
 import '../models/backend/data.dart';
 import '../models/backend/download.dart';
@@ -67,12 +47,19 @@ import '../server/credits.dart';
 import '../settings/settings.dart';
 import '../main.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import '../theme.dart';
 import 'messages/options.dart';
 import 'messages/report.dart';
 import 'services/api.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'services/limit.dart';
 import 'messages/messages.dart';
+
+enum AppBarMode {
+  notSelected, // Shows "Cortex" and Credits Bar
+  inSelection, // Shows "Explore" and a Back Button
+  modelSelected, // Shows Model Name and a Back Button
+}
 
 /// The ChatScreen widget builds the chat UI and manages its state.
 class ChatScreen extends StatefulWidget {
@@ -193,6 +180,7 @@ class ChatScreenState extends State<ChatScreen>
   late Animation<Offset> _slideAnimation;
   DownloadedModelsManager? _downloadedModelsManager;
   ValueNotifier<bool> streamingNotifier = ValueNotifier<bool>(false);
+  final GlobalKey<SelectionScreenState> selectionScreenKey = GlobalKey<SelectionScreenState>();
 
   late final Extensions extensions;
   late final LoadService loadService;
@@ -234,7 +222,16 @@ class ChatScreenState extends State<ChatScreen>
 
   bool isUserSubscribed = false;
   int premiumTrialUses = 0;
-  
+
+  final ValueNotifier<AppBarMode> appBarModeNotifier =
+  ValueNotifier<AppBarMode>(AppBarMode.notSelected);
+
+  /// This notifier will directly control the AppBar's appearance, solving
+  /// the state synchronization issue between ChatScreen and AppBar.
+  /// `true` = Show Model Title & Exit Button
+  /// `false` = Show "Explore" & Credits Bar
+  final ValueNotifier<bool> isAppBarInChatModeNotifier = ValueNotifier<bool>(false);
+
   // This listener now correctly handles data changes by re-syncing its local
   // state from the single source of truth (ModelData), bypassing any stale caches.
   void _handleModelDataChange() {
@@ -254,13 +251,13 @@ class ChatScreenState extends State<ChatScreen>
   }
 
   Future<bool> willInfoPanelShowOnNextSelect() async {
-    if (Appbar.extensionInfoShownThisSession) {
+    if (ChatTitle.extensionInfoShownThisSession) {
       return false;
     }
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      int showCount = prefs.getInt(Appbar.extensionInfoCountKey) ?? 0;
+      int showCount = prefs.getInt(ChatTitle.extensionInfoCountKey) ?? 0;
       return showCount < 3;
     } catch (e) {
       debugPrint("SharedPreferences error: $e");
@@ -309,9 +306,17 @@ class ChatScreenState extends State<ChatScreen>
     _initializeFromWidget();
     _checkAndTriggerInviteBanner();
 
-    // --- FIX IS APPLIED HERE ---
+    if (widget.modelId != null) {
+      isModelSelected = true;
+      appBarModeNotifier.value = AppBarMode.modelSelected;
+    } else {
+      isModelSelected = false;
+      appBarModeNotifier.value = AppBarMode.notSelected;
+    }
+
     // The call to the now-robust function ensures premium status is checked correctly on initial load.
     _updatePremiumBriefingVisibility(widget.modelId);
+    isAppBarInChatModeNotifier.value = widget.modelId != null;
   }
 
   /// --- THE DEFINITIVE FIX ---
@@ -357,7 +362,7 @@ class ChatScreenState extends State<ChatScreen>
     FocusScope.of(context).unfocus();
     navigateToScreen(
       context,
-      PremiumScreen(),
+      const FundsScreen(),
       direction: const Offset(0.0, 1.0),
     );
   }
@@ -446,40 +451,50 @@ class ChatScreenState extends State<ChatScreen>
     // On subsequent runs, if the new locale is different from the one we have
     // stored, it means the user has changed the language in settings.
     if (_currentLocale != null && _currentLocale != newLocale) {
-      debugPrint(
-          "[ChatScreenState] Language change detected via locale. From '$_currentLocale' to '$newLocale'.");
+      debugPrint("[ChatScreenState] Language change detected via locale. From '$_currentLocale' to '$newLocale'.");
       _currentLocale = newLocale;
 
       ModelData.clearCache();
-
       _reloadAllModelsForLanguageChange();
+
+      Provider.of<NewsService>(context, listen: false).forceRefresh(context);
     }
   }
 
-  /// This function is now safely called from `didChangeDependencies`.
-  /// It now correctly returns a Future<void>.
+  /// This function now contains the "safety lock". It ensures that core services,
+  /// especially Firebase, are fully initialized before it proceeds to load
+  /// model data, which depends on Firebase services.
   Future<void> _performInitialAsyncSetup() async {
+    // 1. --- SAFETY LOCK ---
+    // Access the AppInitializer service.
+    final appInitializer = Provider.of<AppInitializer>(context, listen: false);
 
+    // Await the signal that core services are ready. This line is the crucial fix.
+    // It will pause execution here until Firebase.initializeApp() and other
+    // critical tasks in AppInitializer.initialize() are complete.
+    debugPrint("[ChatScreenState] Waiting for core services to be ready...");
+    await appInitializer.onCoreServicesReady;
+    debugPrint("[ChatScreenState] Core services are ready. Proceeding with data fetch.");
+
+    // 2. --- PROCEED WITH ORIGINAL LOGIC ---
+    // Now that we know Firebase is ready, the rest of the code can run safely.
     if (loadService.modelsLoaded) {
-      debugPrint(
-          "[ChatScreenState] Models already loaded from cache. UI is ready.");
+      debugPrint("[ChatScreenState] Models already loaded from cache. UI is ready.");
       if (mounted) {
         setState(() {
           _areModelsLoading = false;
         });
       }
     } else {
-      debugPrint(
-          "[ChatScreenState] Cache was empty. Performing full model load.");
-      // This 'await' is now valid because the function returns a Future.
+      debugPrint("[ChatScreenState] Cache was empty. Performing full model load.");
       await _reloadAllModelsForLanguageChange();
     }
 
-    // Other async setup tasks can run after models are loaded
+    // Other async setup tasks can also run safely now.
     await Future.wait([
       _updateInternetStatus(),
       _fetchSystemInfo(),
-      _loadUserData(),
+      _loadUserData(), // This function also uses Firebase and is now safe.
     ]);
   }
 
@@ -488,6 +503,10 @@ class ChatScreenState extends State<ChatScreen>
   Future<void> _reloadAllModelsForLanguageChange() async {
     debugPrint(
         "[ChatScreen] Reloading all models due to a trigger (e.g., download complete, language change, retry button).");
+
+    final appInitializer = Provider.of<AppInitializer>(context, listen: false);
+    await appInitializer.onCoreServicesReady;
+    debugPrint("[ChatScreen.reload] Core services are ready. Proceeding with model load.");
 
     if (mounted) {
       setState(() {
@@ -793,6 +812,7 @@ class ChatScreenState extends State<ChatScreen>
         conversationID!, messages[index], index);
   }
 
+
   Future<void> _handleExit() async {
     dismissCurrentMessageOptions();
 
@@ -803,15 +823,11 @@ class ChatScreenState extends State<ChatScreen>
 
     await resetConversation(resetModel: true);
 
-    // We are exiting model selection, so we send 'false'.
     widget.onModelSelectionChanged?.call(false);
-    debugPrint(
-        "[ChatScreen._handleExit] Callback called with 'false' to show BottomAppBar.");
 
     if (openedFromMenu) {
       mainScreenKey.currentState?.onItemTapped(2);
     }
-    // The direct call to mainScreenKey.currentState?.updateBottomAppBarVisibility is no longer needed.
 
     setState(() {
       isModelSelected = false;
@@ -824,13 +840,21 @@ class ChatScreenState extends State<ChatScreen>
       openedFromMenu = false;
       showPremiumBriefing = false;
     });
+
+    // --- UPDATED: After exiting a chat, we land on the main selection screen. ---
+    appBarModeNotifier.value = AppBarMode.notSelected;
   }
 
+  // --- REWRITTEN: This logic now correctly handles the three-stage navigation flow. ---
   Future<bool> _onWillPop() async {
-    if (isModelSelected) {
+    // If we are in a chat, the back button should take us to the main selection screen.
+    if (appBarModeNotifier.value == AppBarMode.modelSelected) {
       await _handleExit();
-      return false;
+      return false; // Prevent closing the app.
     }
+    // If we are in the model grid view (pushed via Navigator), this WillPopScope won't be triggered.
+    // The Navigator's own back button handling will work.
+    // If we are on the main screen, allow the app to close.
     return true;
   }
 
@@ -865,6 +889,7 @@ class ChatScreenState extends State<ChatScreen>
     textFieldFocusNode.unfocus();
     textFieldFocusNode.dispose();
     showScrollDownButtonByPosition = false;
+    appBarModeNotifier.dispose();
     super.dispose();
   }
 
@@ -1020,47 +1045,44 @@ class ChatScreenState extends State<ChatScreen>
     }
   }
 
-  /// Builds the main UI for the ChatScreen.
-  ///
-  /// This method uses a `Stack` as its core layout to allow for overlaying widgets
-  /// like the scroll-down button, informational banners, and credit displays on top
-  /// of the main chat content.
-  ///
   @override
   Widget build(BuildContext context) {
+    // A debug print to confirm the build method is being called, which helps in tracking UI updates.
     debugPrint("[ChatScreen Build] Starting UI build process.");
 
-    // --- Dynamic UI State Calculation ---
-    // These variables are calculated on every build to ensure the UI reacts
-    // correctly to changes like keyboard visibility or new messages.
+    // --- Layout & State Variables ---
+    // These variables are calculated once per build to optimize performance.
     final screenWidth = MediaQuery.of(context).size.width;
     final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
-    // The final decision for the scroll-down button depends on both scroll position AND keyboard visibility.
+    // The final decision to show the scroll-down button depends on both scroll position and keyboard visibility.
     final bool showScrollDownButtonFinal = showScrollDownButtonByPosition && !isKeyboardVisible;
-    debugPrint('[ChatScreen Build] Rendering UI. Scroll button will be ${showScrollDownButtonFinal ? 'visible' : 'hidden'}.');
 
-    // Determine if the photo warning overlay should be shown. It appears only when a photo is present
-    // AND the main disclaimer isn't already taking precedence.
+    // Determines if the photo warning overlay should be displayed.
     final bool isPhotoPresentInChat = messages.any((m) => m.photoPath != null && m.photoPath!.isNotEmpty) || (sendService.selectedPhoto != null);
     _showPhotoWarningOverlay = isPhotoPresentInChat && !_showDisclaimerOverlay;
 
-    // Filter the list of models based on the search controller's text for the selection screen.
+    // This filtering logic is still required for the deprecated 'filteredModels' property
+    // in the SelectionScreen widget provided.
     final List<ModelInfo> filteredModels = searchController.text.isEmpty
         ? loadService.allModels
         : loadService.allModels
         .where((model) => model.title.toLowerCase().startsWith(searchController.text.toLowerCase()))
         .toList();
 
-    // Ensure the input section height is measured after the frame is rendered.
+    // Ensures the input section's height is updated after the frame is rendered.
+    // This is crucial for positioning overlays correctly.
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateInputSectionHeight());
 
+    // --- Widget Tree ---
     return WillPopScope(
+      // Handles the Android back button, intelligently moving between UI states.
       onWillPop: _onWillPop,
       child: Scaffold(
-        extendBody: true,
+        extendBodyBehindAppBar: true,
+        // The custom AppBar's state is now driven by the `appBarModeNotifier`,
+        // ensuring perfect synchronization between the screen's state and the AppBar's appearance.
         appBar: Appbar(
-          isModelSelected: isModelSelected,
           modelTitle: modelTitle,
           modelImagePath: modelImagePath,
           exitButtonKey: _exitButtonKey,
@@ -1068,11 +1090,11 @@ class ChatScreenState extends State<ChatScreen>
           userData: _userData,
           extensionKey: _extensionKey,
           onExit: () async {
-            if (extensions.isPanelVisible) {
-              extensions.closePanel();
-              await Future.delayed(const Duration(milliseconds: 300));
+            if (appBarModeNotifier.value == AppBarMode.modelSelected) {
+              await _handleExit();
+            } else if (appBarModeNotifier.value == AppBarMode.inSelection) {
+              selectionScreenKey.currentState?.showSelectionView();
             }
-            await _handleExit();
           },
           onAccountTap: () async {
             if (extensions.isPanelVisible) {
@@ -1086,27 +1108,12 @@ class ChatScreenState extends State<ChatScreen>
               direction: const Offset(1.0, 0.0),
             );
           },
-          onInfoPanelWillShow: () {
-            FocusScope.of(context).unfocus();
-          },
-          onInfoPanelDidHide: () {
-            textFieldFocusNode.requestFocus();
-          },
+          onInfoPanelWillShow: () => FocusScope.of(context).unfocus(),
+          onInfoPanelDidHide: () => textFieldFocusNode.requestFocus(),
+          // --- CORRECTED ---
+          // The onTitleTap callback now correctly handles showing/hiding the extension panel.
+          // The redundant `onExtensionTap` parameter is removed.
           onTitleTap: () async {
-            if (!extensions.isPanelVisible) {
-              extensions.showExtensionPanel(
-                context: context,
-                extensionKey: _extensionKey,
-                modelTitle: modelTitle ?? "",
-                updateModelId: (selectedEntryKey) async {
-                  await _handleChangeModelExtension(selectedEntryKey);
-                },
-              );
-            } else {
-              extensions.closePanel();
-            }
-          },
-          onExtensionTap: () async {
             if (!extensions.isPanelVisible) {
               extensions.showExtensionPanel(
                 context: context,
@@ -1123,182 +1130,174 @@ class ChatScreenState extends State<ChatScreen>
           appTitle: AppLocalizations.of(context)!.appTitle,
           extensions: extensions,
           onCreditsInfoTapped: showInviteBanner,
+          appBarModeNotifier: appBarModeNotifier, // The single source of truth for the AppBar's state.
         ),
-        body: SafeArea(
-          child: Stack(
-            children: [
-              // --- LAYER 1: Main Content Column ---
-              // This Column holds the core content that scrolls (messages) and the input field.
-              // It is the base layer of our Stack.
-              Column(
-                children: [
-                  // This is the main content area that expands to fill available space.
-                  Expanded(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 150),
-                      transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-                      child: !isModelSelected
-                          ? _modelsLoadError
-                          ? ErrorView(
-                        key: const ValueKey('chat_error'),
-                        title: AppLocalizations.of(context)!.errorLoadingTitle,
-                        message: AppLocalizations.of(context)!.errorLoadingMessage,
-                        buttonText: AppLocalizations.of(context)!.retry,
-                        onRetry: _reloadAllModelsForLanguageChange,
-                      )
-                          : SelectionScreen(
-                        key: const ValueKey('selection'),
-                        isLoading: _areModelsLoading,
-                        searchController: searchController,
-                        allModels: loadService.allModels,
-                        filteredModels: filteredModels,
-                        onReloadModels: _reloadAllModelsForLanguageChange,
-                        hasInternetConnection: hasInternetConnection,
-                        conversationLimitReached: _conversationLimitReached,
-                        onSelectModel: selectionService.selectModel,
-                        onScrollToBottom: scrollService.scrollToBottom,
-                        localizations: AppLocalizations.of(context)!,
-                        isServerSideModel: isServerSideModel(modelId),
-                      )
-                          : (!readService.areMessagesLoaded
-                          ? readService.buildSkeletonChatMessages()
-                          : SelectedScreen(
-                        key: const ValueKey('selected'),
-                        messages: messages,
-                        scrollController: _scrollController,
-                        isEditingMode: isEditingMode,
-                        editingMessageIndex: editingMessageIndex,
-                        streamingNotifier: streamingNotifier,
-                        modelImagePath: modelImagePath,
-                        modelTitle: modelTitle,
-                        selectedModelCategory: selectedModelCategory,
-                        modelId: modelId,
-                        onStop: stopService.stopResponse,
-                        onEdit: (index) => editService.startEditingMessage(index),
-                        onFadeOutComplete: (index) {
-                          setState(() {
-                            messages.removeAt(index);
-                          });
-                        },
-                        onRegenerate: (index) => regenerateService.onRegenerate(index),
-                        onChangeModel: (index, newFullId) async {
-                          await regenerateService.onRegenerate(
-                            index,
-                            newModelId: newFullId,
-                          );
-                        },
-                        onReport: (index) {
-                          final String messageToReport = messages[index].text;
-                          final String? currentModelId = modelId;
-                          if (currentModelId == null) return;
-                          ReportDialog.show(
-                            context,
-                            aiMessage: messageToReport,
-                            modelId: currentModelId,
-                            onReportSuccess: () {
-                              if (mounted) {
-                                setState(() {
-                                  messages[index].isReported = true;
-                                });
-                                ChatStorageService.updateStoredMessage(
-                                  conversationID!,
-                                  messages[index],
-                                  index,
-                                );
-                              }
-                            },
-                          );
-                        },
-                        localizations: AppLocalizations.of(context)!,
-                      )),
+        body: Container(
+          decoration: BoxDecoration(
+            color: isModelSelected ? AppColors.background : null,
+            gradient: !isModelSelected
+                ? LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                AppColors.background,
+                AppColors.background.withOpacity(0.0),
+              ],
+              stops: const [0.12, 0.20],
+            )
+                : null,
+          ),
+          child: SafeArea(
+            bottom: false,
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    Expanded(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 150),
+                        transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                        child: !isModelSelected
+                            ? _modelsLoadError
+                            ? ErrorView(
+                          key: const ValueKey('chat_error'),
+                          title: AppLocalizations.of(context)!.errorLoadingTitle,
+                          message: AppLocalizations.of(context)!.errorLoadingMessage,
+                          buttonText: AppLocalizations.of(context)!.retry,
+                          onRetry: _reloadAllModelsForLanguageChange,
+                        )
+                            : SelectionScreen(
+                          key: selectionScreenKey,
+                          isLoading: _areModelsLoading,
+                          searchController: searchController,
+                          allModels: loadService.allModels,
+                          onReloadModels: _reloadAllModelsForLanguageChange,
+                          hasInternetConnection: hasInternetConnection,
+                          conversationLimitReached: _conversationLimitReached,
+                          onSelectModel: (model) {
+                            // Correctly trigger model selection logic
+                            selectionService.selectModel(model);
+                            // Explicitly set the app bar to chat mode
+                            appBarModeNotifier.value = AppBarMode.modelSelected;
+                          },
+                          onScrollToBottom: scrollService.scrollToBottom,
+                          localizations: AppLocalizations.of(context)!,
+                          userData: _userData,
+                          // This new callback is the communication channel to update the AppBar.
+                          onViewModeChanged: (isShowingAllModels) {
+                            setState(() {
+                              appBarModeNotifier.value = isShowingAllModels
+                                  ? AppBarMode.inSelection // "Explore" title with back button
+                                  : AppBarMode.notSelected; // Default "Cortex" title with credits
+                            });
+                          },
+                          pinnedModels: [],
+                        )
+                            : (!readService.areMessagesLoaded
+                            ? readService.buildSkeletonChatMessages()
+                            : SelectedScreen(
+                          key: const ValueKey('selected'),
+                          messages: messages,
+                          scrollController: _scrollController,
+                          isEditingMode: isEditingMode,
+                          editingMessageIndex: editingMessageIndex,
+                          streamingNotifier: streamingNotifier,
+                          modelImagePath: modelImagePath,
+                          modelTitle: modelTitle,
+                          selectedModelCategory: selectedModelCategory,
+                          modelId: modelId,
+                          onStop: stopService.stopResponse,
+                          onEdit: (index) => editService.startEditingMessage(index),
+                          onFadeOutComplete: (index) {
+                            setState(() {
+                              messages.removeAt(index);
+                            });
+                          },
+                          onRegenerate: (index) => regenerateService.onRegenerate(index),
+                          onChangeModel: (index, newFullId) async {
+                            await regenerateService.onRegenerate(
+                              index,
+                              newModelId: newFullId,
+                            );
+                          },
+                          onReport: (index) {
+                            ReportDialog.show(
+                              context,
+                              aiMessage: messages[index].text,
+                              modelId: modelId!,
+                              onReportSuccess: () {
+                                if (mounted) {
+                                  setState(() => messages[index].isReported = true);
+                                  ChatStorageService.updateStoredMessage(conversationID!, messages[index], index);
+                                }
+                              },
+                            );
+                          },
+                          localizations: AppLocalizations.of(context)!,
+                        )),
+                      ),
                     ),
+                    NotificationListener<SizeChangedLayoutNotification>(
+                      onNotification: (notification) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) => _updateInputSectionHeight());
+                        return true;
+                      },
+                      child: SizeChangedLayoutNotifier(
+                        key: _inputSectionKey,
+                        child: _buildInputSection(),
+                      ),
+                    ),
+                  ],
+                ),
+                PremiumModelBanner(
+                  isVisible: showPremiumBriefing && isModelSelected && !isUserSubscribed,
+                  onTap: _navigateToPremiumScreen,
+                ),
+                if (isModelSelected && messages.isNotEmpty)
+                  scrollService.buildScrollDownButton(
+                    screenWidth: screenWidth,
+                    inputFieldHeight: _inputSectionHeight,
+                    showScrollDownButton: showScrollDownButtonFinal,
                   ),
-
-                  // The input section at the very bottom of the column.
-                  NotificationListener<SizeChangedLayoutNotification>(
-                    onNotification: (notification) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        _updateInputSectionHeight();
-                      });
-                      return true;
+                if (isModelSelected)
+                  BriefingOverlay(
+                    key: _briefingOverlayKey,
+                    inputFieldHeight: _inputSectionHeight,
+                    availableCredits: creditsManager.totalCreditsNotifier.value,
+                    photoSelected: sendService.selectedPhoto != null,
+                    isOfflineModel: isLocalModel(modelId),
+                    modelPath: modelPath,
+                    inappropriate: _showInappropriateMessageWarning,
+                    isPremiumModel: showPremiumBriefing,
+                    limitReached: chatLimitManager.isLimitExceeded(messages),
+                    isStorageSufficient: isStorageSufficient,
+                    showDisclaimer: _showDisclaimerOverlay,
+                    showPhotoWarning: _showPhotoWarningOverlay,
+                    isSubscribed: isUserSubscribed,
+                    premiumTrialUses: premiumTrialUses,
+                    onDisclaimerDismissed: () {
+                      if (mounted) {
+                        setState(() {
+                          _showDisclaimerOverlay = false;
+                          _disclaimerHasBeenShownThisSession = true;
+                        });
+                      }
                     },
-                    child: SizeChangedLayoutNotifier(
-                      key: _inputSectionKey,
-                      child: _buildInputSection(),
-                    ),
                   ),
-                ],
-              ),
-
-              PremiumModelBanner(
-                isVisible: showPremiumBriefing && isModelSelected && !isUserSubscribed,
-                onTap: _navigateToPremiumScreen,
-              ),
-
-              // --- OVERLAYS (Positioned on top of the Column) ---
-              // These widgets are direct children of the Stack, allowing them to be
-              // placed anywhere on the screen, independent of the Column's flow.
-
-              // OVERLAY 1: The scroll-down button.
-              if (isModelSelected && messages.isNotEmpty)
-                scrollService.buildScrollDownButton(
-                  screenWidth: screenWidth,
-                  inputFieldHeight: _inputSectionHeight,
-                  showScrollDownButton: showScrollDownButtonFinal,
-                ),
-
-              // OVERLAY 2: Credits, warnings, and disclaimers.
-              if (isModelSelected)
-                BriefingOverlay(
-                  key: _briefingOverlayKey,
-                  inputFieldHeight: _inputSectionHeight,
-                  availableCredits: creditsManager.totalCreditsNotifier.value,
-                  photoSelected: sendService.selectedPhoto != null,
-                  isOfflineModel: isLocalModel(modelId),
-                  modelPath: modelPath,
-                  inappropriate: _showInappropriateMessageWarning,
-                  isPremiumModel: showPremiumBriefing,
-                  limitReached: chatLimitManager.isLimitExceeded(messages),
-                  isStorageSufficient: isStorageSufficient,
-                  showDisclaimer: _showDisclaimerOverlay,
-                  showPhotoWarning: _showPhotoWarningOverlay,
-                  isSubscribed: isUserSubscribed,
-                  premiumTrialUses: premiumTrialUses,
-                  onDisclaimerDismissed: () {
-                    if (mounted) {
-                      debugPrint("[ChatScreen] Disclaimer overlay dismissed by user.");
-                      setState(() {
-                        _showDisclaimerOverlay = false;
-                        _disclaimerHasBeenShownThisSession = true;
-                      });
-                    }
-                  },
-                ),
-
-              // --- OVERLAY 3: The Floating Banner (DEFINITIVE FIX) ---
-              // By using a simple `if` condition, the `FloatingInfoBanner` is only added
-              // to the widget tree when `_showInviteBanner` is true. When it is added,
-              // it becomes a DIRECT child of the `Stack`, which is the correct way
-              // to use the `AnimatedPositioned` inside it. All wrapper animation
-              // widgets have been removed.
-              if (_showInviteBanner && !isModelSelected)
-                FloatingInfoBanner(
-                  key: const ValueKey('invite_banner'), // Add a key for stability
-                  bannerType: BannerType.inviteCredits,
-                  // The banner will call this function AFTER its exit animation completes.
-                  onDismissed: () {
-                    _startTimestampCooldown();
-
-                    if (mounted) {
-                      debugPrint("[ChatScreen] Banner dismissed. Removing from tree.");
-                      setState(() {
-                        _showInviteBanner = false;
-                      });
-                    }
-                  },
-                  onTap: _generateAndShareInviteLink,
-                ),
-            ],
+                if (_showInviteBanner && !isModelSelected)
+                  FloatingInfoBanner(
+                    key: const ValueKey('invite_banner'),
+                    bannerType: BannerType.inviteCredits,
+                    onDismissed: () {
+                      _startTimestampCooldown();
+                      if (mounted) {
+                        setState(() => _showInviteBanner = false);
+                      }
+                    },
+                    onTap: _generateAndShareInviteLink,
+                  ),
+              ],
+            ),
           ),
         ),
       ),

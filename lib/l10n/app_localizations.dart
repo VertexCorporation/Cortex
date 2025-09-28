@@ -3032,6 +3032,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You have used all your free daily messages for premium models, please upgrade for unlimited access.'**
   String get premiumTrialExhaustedMessage;
+
+  /// Greeting on the selection screen when the user's name is known.
+  ///
+  /// In en, this message translates to:
+  /// **'How may I help you today, {userName}?'**
+  String selectionScreenGreetingUser(String userName);
+
+  /// Generic greeting on the selection screen when the user's name is not available.
+  ///
+  /// In en, this message translates to:
+  /// **'How can I help you today?'**
+  String get selectionScreenGreetingGeneric;
+
+  /// The header text for the recent models section on the selection screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Models'**
+  String get selectionScreenRecentModels;
+
+  /// Text for the 'Dynamic Chat' feature card. The newline is intentional.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamic Chat'**
+  String get selectionScreenFeatureDynamicChat;
+
+  /// Text for the 'Use without Internet' feature card. The newline is intentional.
+  ///
+  /// In en, this message translates to:
+  /// **'Use without Internet'**
+  String get selectionScreenFeatureOffline;
+
+  /// Text for the 'Select Model' feature card. The newline is intentional.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Model'**
+  String get selectionScreenFeatureSelectModel;
+
+  /// It's so clear i think.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get explore;
 }
 
 class _AppLocalizationsDelegate
