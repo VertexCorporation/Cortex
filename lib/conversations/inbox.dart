@@ -145,7 +145,8 @@ class MenuScreenState extends State<MenuScreen>
   bool _isCurrentlyLoading = false;
 
   /// This function now filters conversations based on a single source of truth:
-  /// the list of models currently visible to the logged-in user.
+  /// the list of models currently visible to the logged-in user, WITH AN
+  /// EXCEPTION FOR DYNAMIC CHATS.
   Future<void> _loadConversations() async {
     if (_isCurrentlyLoading) {
       debugPrint("[MenuScreen] Load already in progress. Skipping.");
@@ -161,8 +162,6 @@ class MenuScreenState extends State<MenuScreen>
       await ModelData.getModels(langCode: langCode);
 
       // --- SECURITY GATE STEP 1: Create the definitive "allow list" ---
-      // This set contains every single model ID (series, variant, and private)
-      // that the current user is allowed to see.
       final allUserVisibleModels = ModelData.getCachedModelsSync();
       final Set<String> userVisibleModelIds = {};
       for (final model in allUserVisibleModels) {
@@ -185,9 +184,11 @@ class MenuScreenState extends State<MenuScreen>
         final modelId = row['modelId'] as String? ?? '';
         final convID = row['id'] as String;
 
-        // The logic is now beautifully simple:
-        // If the conversation's model ID exists in the user's visible set, show it. Otherwise, hide it.
-        if (userVisibleModelIds.contains(modelId)) {
+        // --- THE PERFECT FIX IS HERE ---
+        // A conversation is visible if:
+        // 1. Its model ID is in the user's visible set, OR
+        // 2. Its model ID is exactly 'dynamic'.
+        if (userVisibleModelIds.contains(modelId) || modelId == 'dynamic') {
           currentVisibleDbIds.add(convID);
 
           if (_conversationManagers.containsKey(convID)) {
@@ -493,7 +494,7 @@ class MenuScreenState extends State<MenuScreen>
     return downloadedPaths.containsKey(baseId);
   }
 
-  /// Tekrar yüklemek isterseniz
+  /// If we want reload
   Future<void> reloadConversations({bool preserveList = false}) async {
     CacheService.touchConversationCache();
 

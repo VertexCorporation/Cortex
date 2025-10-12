@@ -220,6 +220,8 @@ class _ModelDetailPageState extends State<ModelDetailPage>
 
   @override
   void dispose() {
+    _extensionOverlayEntry?.remove();
+    _extensionOverlayEntry = null;
     widget.downloadManager?.removeListener(_onDownloadStateChanged);
     _fadeController.dispose();
     _extensionOverlayController?.dispose();
@@ -455,16 +457,29 @@ class _ModelDetailPageState extends State<ModelDetailPage>
   }
 
   /// Handles the back button press, ensuring safe navigation.
-  void _onBackButtonPressed() {
+  /// This is the single source of truth for all "back" actions.
+  Future<void> _onBackButtonPressed() async {
+    // If the extension panel is open, handle the combined dismissal.
     if (_extensionOverlayEntry != null) {
-      _dismissExtensionOverlay();
+      // First, wait for the panel to finish its closing animation.
+      await _dismissExtensionOverlay();
+
+      // IMPORTANT: After an await, always check if the widget is still in the tree.
+      if (!mounted) return;
+
+      // Then, pop the page. This creates a seamless sequential animation
+      // that feels like a single action to the user.
+      Navigator.pop(context, _didBaseModelChange ? 'model_updated' : null);
       return;
     }
+
+    // If a model save is in progress, block navigation.
     if (_isButtonLocked) {
-      debugPrint(
-          "[ModelDetailPage] Back navigation blocked: async save in progress.");
+      debugPrint("[ModelDetailPage] Back navigation blocked: async save in progress.");
       return;
     }
+
+    // Default case: If the panel is not open, just pop the page immediately.
     Navigator.pop(context, _didBaseModelChange ? 'model_updated' : null);
   }
 
@@ -515,7 +530,16 @@ class _ModelDetailPageState extends State<ModelDetailPage>
     // The total bottom padding for the SingleChildScrollView.
     final double scrollViewBottomPadding = screenWidth * 0.04 + requiredPaddingForWarnings;
 
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        // Delegate all back navigation logic to our improved, async method.
+        await _onBackButtonPressed();
+
+        // Always return 'false'. This prevents the system's default back action.
+        // Our method now handles everything, including the final Navigator.pop().
+        return false;
+      },
+      child: Scaffold(
       backgroundColor: AppColors.background,
       appBar: _buildAppBarWrapper(localizations, isDarkTheme, screenWidth),
       bottomNavigationBar: _buildBottomActionButtons(
@@ -606,6 +630,7 @@ class _ModelDetailPageState extends State<ModelDetailPage>
             _buildWarningOverlayDispatcher(localizations),
           ],
         ),
+      ),
       ),
     );
   }

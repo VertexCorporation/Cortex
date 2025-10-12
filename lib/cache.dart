@@ -33,7 +33,6 @@ class AppDataState {
   }
 }
 
-
 class CacheService {
   /* SECTION ① – Model Selection */
   static List<ModelInfo>? cachedAllModels;
@@ -61,6 +60,12 @@ class CacheService {
    *──────────────────────────────*/
   static Map<String, String>? cachedNewsImageUrls;
 
+  /*───────────────────────────────
+   * SECTION ⑦ – Recent Models (NEW!)
+   * Caches the list of recently used models to avoid frequent database queries
+   * on the main selection screen.
+   *──────────────────────────────*/
+  static List<ModelInfo>? cachedRecentModels;
 
   /* Internal timers – one per section */
   static Timer? _modelCacheTimer;
@@ -69,6 +74,7 @@ class CacheService {
   static Timer? _premiumCacheTimer;
   static Timer? _modelsScreenCacheTimer;
   static Timer? _newsImageCacheTimer; // NEW for News Image URLs
+  static Timer? _recentModelsCacheTimer;
 
   // MODEL CACHING
   static void touchModelCache() => _modelCacheTimer?.cancel();
@@ -145,6 +151,28 @@ class CacheService {
   static void invalidateModelsScreenCache() {
     cachedModelsScreenData = null;
     debugPrint('CacheService ▸ ModelsScreen cache invalidated.');
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // RECENT MODELS CACHING – public helpers (NEW!)
+  // ──────────────────────────────────────────────────────────
+  static void touchRecentModelsCache() => _recentModelsCacheTimer?.cancel();
+
+  static void startRecentModelsCacheTimer({
+    Duration?   timeout,
+    VoidCallback? onClear,
+  }) {
+    _recentModelsCacheTimer?.cancel();
+    _recentModelsCacheTimer = Timer(timeout ?? const Duration(minutes: 10), () {
+      invalidateRecentModelsCache();
+      debugPrint('CacheService ▸ Recent models cache cleared due to timeout.');
+      onClear?.call();
+    });
+  }
+
+  static void invalidateRecentModelsCache() {
+    cachedRecentModels = null;
+    debugPrint('CacheService ▸ Recent models cache invalidated.');
   }
 
   // ──────────────────────────────────────────────────────────

@@ -1,4 +1,5 @@
 // errors.dart
+
 import 'package:flutter/foundation.dart';
 
 class ChatErrorState extends ChangeNotifier {
@@ -8,7 +9,7 @@ class ChatErrorState extends ChangeNotifier {
   bool get internetError => _internetError;
   bool get conversationLimitExceeded => _conversationLimitExceeded;
 
-  /// İnternet hatası var mı?
+  /// Internet error
   void setInternetError(bool value) {
     if (_internetError != value) {
       _internetError = value;
@@ -16,7 +17,7 @@ class ChatErrorState extends ChangeNotifier {
     }
   }
 
-  /// Sohbet limiti aşıldı hatası var mı?
+  /// Conversation limit error
   void setConversationLimitExceeded(bool value) {
     if (_conversationLimitExceeded != value) {
       _conversationLimitExceeded = value;
@@ -24,7 +25,7 @@ class ChatErrorState extends ChangeNotifier {
     }
   }
 
-  /// Hata durumlarını sıfırlamak için
+  /// Reset error states
   void reset() {
     _internetError = false;
     _conversationLimitExceeded = false;

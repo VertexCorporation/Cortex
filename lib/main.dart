@@ -12,12 +12,16 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/login/login.dart';
 import 'package:cortex/login/verify.dart';
 import 'package:cortex/server/credits.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:upgrader/upgrader.dart';
@@ -29,11 +33,11 @@ import 'errorview.dart';
 import 'initialization.dart';
 import 'internet.dart';
 import 'language.dart';
-import 'models/backend/data.dart';
 import 'models/backend/download.dart';
 import 'models/screen/models.dart';
 import 'notifications.dart';
 import 'theme.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 
 // Global keys for accessing specific widget states across the application.
 final GlobalKey<MainScreenState> mainScreenKey = GlobalKey<MainScreenState>();
@@ -44,6 +48,16 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void downloadCallback(String id, int status, int progress) {
   final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
   send?.send([id, status, progress]);
+}
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  debugPrint("--- Background Message Handler ---");
+  debugPrint("Handling a background message: ${message.messageId}");
+  debugPrint("Title: ${message.notification?.title}");
+  debugPrint("Body: ${message.notification?.body}");
+  debugPrint("Data: ${message.data}");
 }
 
 /// Manages the selected tab index for the bottom navigation bar.
@@ -60,34 +74,54 @@ class TabProvider with ChangeNotifier {
 }
 
 /// The main entry point of the application.
-/// Its role is minimal: initialize bindings, set up providers, and run the app.
-/// It avoids any heavy async operations to ensure the native splash screen
-/// transitions smoothly to the first Flutter frame.
+/// It now performs a rapid, synchronous check for a cached user session
+/// to prevent a UI flash on startup. Heavy async operations are still
+/// delegated to the AppInitializer service.
 Future<void> main() async {
-  debugPrint("App: Starting minimal application setup.");
+  debugPrint("App: Starting application setup.");
+  tz.initializeTimeZones();
+
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initializing Firebase here is essential to safely check for a current user
+  // and to set up the background message handler before the app runs.
+  await Firebase.initializeApp();
+
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+
+  // Point to the new, centralized background handler in notifications.dart
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  // This is a very fast, synchronous check of the locally cached user token.
+  // It does NOT involve a network request.
+  final initialUser = FirebaseAuth.instance.currentUser;
+  final initialStatus = initialUser == null
+      ? AppStatus.needsLogin
+      : AppStatus.initializing;
+  debugPrint("App: Pre-runApp check complete. Initial status: $initialStatus");
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // Pre-fetching the theme is a quick I/O operation that prevents a theme flash on startup.
   final prefs = await SharedPreferences.getInstance();
   final savedTheme = prefs.getString('selectedTheme');
   final initialTheme = savedTheme ?? (WidgetsBinding.instance.window.platformBrightness == Brightness.dark ? 'dark' : 'light');
   debugPrint("App: Using theme: $initialTheme");
+  await GoogleSignIn.instance.initialize();
 
   runApp(
     MultiProvider(
       providers: [
-        // --- Service Providers (Singleton-like access) ---
         Provider<InternetService>(create: (_) => InternetService()),
         Provider<NotificationService>(create: (_) => NotificationService(navigatorKey: navigatorKey)),
         Provider<CreditsManager>.value(value: CreditsManager.instance),
-
-        // --- State Management Providers (Change Notifiers) ---
-        ChangeNotifierProvider(create: (_) => AppInitializer()), // The new brain for app state.
+        ChangeNotifierProvider(create: (_) => AppInitializer(initialStatus)),
         ChangeNotifierProvider(create: (_) => NewsService()),
         ChangeNotifierProvider(create: (_) => FileDownloadHelper()),
         ChangeNotifierProvider(create: (_) => ThemeProvider(initialTheme)),
@@ -97,7 +131,6 @@ Future<void> main() async {
       ],
       child: Cortex(
         navigatorKey: navigatorKey,
-        // The app now starts with a smart manager widget instead of a loading screen.
         startupScreen: const AppLifecycleManager(),
       ),
     ),
@@ -116,15 +149,30 @@ class AppLifecycleManager extends StatefulWidget {
   State<AppLifecycleManager> createState() => _AppLifecycleManagerState();
 }
 
-class _AppLifecycleManagerState extends State<AppLifecycleManager> {
+class _AppLifecycleManagerState extends State<AppLifecycleManager> with WidgetsBindingObserver {
+
   @override
   void initState() {
     super.initState();
-    // After the first frame is built, we kick off the asynchronous initialization process.
-    // This happens in the background and does not block the UI.
+    WidgetsBinding.instance.addObserver(this);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<AppInitializer>(context, listen: false).initialize();
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    context.read<NotificationService>().handleAppLifecycleStateChange(state);
+    debugPrint("IGNITION HAS BEEN TURNED! New State: $state");
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -265,7 +313,6 @@ class MaintenanceScreen extends StatelessWidget {
   }
 }
 
-
 /// The main screen containing the bottom navigation and primary app views.
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -278,43 +325,32 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
   final GlobalKey<ChatScreenState> chatScreenKey = GlobalKey<ChatScreenState>();
   final GlobalKey<MenuScreenState> menuScreenKey = GlobalKey<MenuScreenState>();
 
-  late final List<Widget> _screens;
   bool hideBottomAppBar = false;
+  bool _showOfflinePulse = false;
 
   @override
   void initState() {
     super.initState();
     debugPrint("MainScreen: Initializing state.");
-
-    // NOTE: The initial ModelData.getModels call is now correctly handled
-    // within the ChatScreen's own lifecycle (didChangeDependencies),
-    // which is more robust as it's the screen that actually needs the data.
-
-    _screens = [
-      KeyedSubtree(
-        key: const ValueKey('Chat'),
-        child: ChatScreen(
-          key: chatScreenKey,
-          onModelSelectionChanged: (isSelected) {
-            updateBottomAppBarVisibility(isSelected);
-          },
-        ),
-      ),
-      KeyedSubtree(
-        key: const ValueKey('Models'),
-        child: const ModelsScreen(key: ValueKey('Models')),
-      ),
-      KeyedSubtree(
-        key: const ValueKey('Menu'),
-        child: MenuScreen(key: menuScreenKey),
-      ),
-    ];
   }
 
-  void onItemTapped(int index) {
+  // Now informs the ChatScreen when its tab is tapped.
+  void onItemTapped(int index, {bool pulseOffline = false}) {
+    // If the user is tapping on the Chat tab (index 0),
+    // we notify the ChatScreenState to re-evaluate its status.
+    if (index == 0) {
+      chatScreenKey.currentState?.onReactivated();
+    }
+
+    if (mounted && index == 1 && pulseOffline) {
+      setState(() {
+        _showOfflinePulse = true;
+      });
+    }
     Provider.of<TabProvider>(context, listen: false).setSelectedIndex(index);
   }
 
+  // MODIFIED: This is now the single source of truth for visibility.
   void updateBottomAppBarVisibility([bool value = false]) {
     if (hideBottomAppBar == value) return;
     setState(() {
@@ -327,14 +363,22 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
     Provider.of<TabProvider>(context, listen: false).setSelectedIndex(0);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       chatScreenKey.currentState?.readService.loadConversation(manager);
-      updateBottomAppBarVisibility(true);
+      // Let the ChatScreen decide the visibility. It's usually true here.
+      // updateBottomAppBarVisibility(true);
     });
   }
 
-  void startNewConversation() {
+  // MODIFIED: This method now correctly defers visibility logic to the ChatScreen.
+  void startNewConversation({bool isDynamic = false}) {
     Provider.of<TabProvider>(context, listen: false).setSelectedIndex(0);
-    chatScreenKey.currentState?.resetConversation();
-    updateBottomAppBarVisibility(false);
+    if (isDynamic) {
+      chatScreenKey.currentState?.resetAndStartDynamicConversation();
+    } else {
+      chatScreenKey.currentState?.resetConversation();
+    }
+    // The visibility will be handled by the methods called above,
+    // so we remove the direct call from here.
+    // updateBottomAppBarVisibility(false);
   }
 
   @override
@@ -344,6 +388,32 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
+    final List<Widget> screens = [
+      ChatScreen(
+        key: chatScreenKey,
+        onModelSelectionChanged: (isSelected) {
+          // This callback is now less critical as ChatScreen manages visibility directly,
+          // but we can keep it for consistency.
+          updateBottomAppBarVisibility(isSelected);
+        },
+      ),
+      ModelsScreen(
+        key: const ValueKey('Models'),
+        showOfflineModelsPulse: _showOfflinePulse,
+      ),
+      MenuScreen(key: menuScreenKey),
+    ];
+
+    if (_showOfflinePulse) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _showOfflinePulse = false;
+          });
+        }
+      });
+    }
+
     SystemChrome.setApplicationSwitcherDescription(
       ApplicationSwitcherDescription(
         label: 'Cortex',
@@ -351,7 +421,6 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
       ),
     );
 
-    // Dynamic sizing calculations for UI elements.
     final bottomBarHeight = screenHeight * 0.09;
     final iconBaseSize = screenHeight * 0.028;
     final libraryIconSize = screenHeight * 0.022;
@@ -360,7 +429,8 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
     final shadowBlurRadius = screenWidth * 0.02;
     final borderRadius = screenWidth * 0.04;
 
-    bool shouldHideBottomAppBar = tabProvider.selectedIndex == 0 && hideBottomAppBar;
+    // SIMPLIFIED: The `hideBottomAppBar` state is now the only factor.
+    final bool shouldHideBottomAppBar = hideBottomAppBar;
 
     return Scaffold(
       body: AnimatedSwitcher(
@@ -368,10 +438,7 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
         transitionBuilder: (Widget child, Animation<double> animation) {
           return FadeTransition(opacity: animation, child: child);
         },
-        child: KeyedSubtree(
-          key: ValueKey(tabProvider.selectedIndex),
-          child: _screens[tabProvider.selectedIndex],
-        ),
+        child: screens[tabProvider.selectedIndex],
       ),
       bottomNavigationBar: shouldHideBottomAppBar
           ? null

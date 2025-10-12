@@ -760,5 +760,227 @@
   "explore": "Explore",
   "@explore": {
     "description": "It's so clear i think."
+  },
+  "subscriptionCancelled": "Subscription successfully canceled!",
+  "selectionScreenPinnedModels": "Pinned Models",
+  "selectionScreenNewsAndUpdates": "News & Updates",
+  "filters": "Filters",
+  "noRecentChatsMessage": "You haven't spoken with any models yet, let's start a conversation!",
+  "allModels": "All Models",
+  "@allModels": {
+      "description": "Filter button text to show all available models"
+  },
+  "onlineModels": "Online Models",
+  "@onlineModels": {
+      "description": "Filter button text for models that require an internet connection"
+  },
+  "offlineModels": "Offline Models",
+  "@offlineModels": {
+      "description": "Filter button text for models that run locally on the device"
+  },
+  "characterModels": "Characters",
+  "@characterModels": {
+      "description": "Filter button text for pre-defined role-playing characters"
+  },
+  "customModels": "Custom Models",
+  "@customModels": {
+      "description": "Filter button text for user-created models or characters"
+  },
+  "filterPanelDescription": "Tap a category to instantly filter the list.",
+  "@filterPanelDescription": {
+      "description": "A brief instructional text below the 'Filters' title in the filter panel."
+  },
+  "dynamicChatTitle": "Dynamic Chat",
+  "@dynamicChatTitle": {
+      "description": "The title for a conversation started in dynamic mode."
+  },
+  "errorNoModelsAvailable": "No models are currently available. Please check your internet connection and try again.",
+  "@errorNoModelsAvailable": {
+      "description": "Error message when the entire model list is empty."
+  },
+  "errorNoModelsForRequest": "No suitable models found for your current request (e.g., offline mode or image message).",
+  "@errorNoModelsForRequest": {
+      "description": "Error message when no models match the specific criteria for a dynamic chat request."
+  },
+  "dynamicChatWelcome": "How can I help you?",
+  "@dynamicChatWelcome": {
+      "description": "Welcome message displayed in the center of the dynamic chat screen before the first message."
+  },
+
+  "notificationComebackTitle": "We miss you!",
+  "notificationComebackBody": "Relax, this isn't a text from your ex. But you *can* create your ex in Cortex! Come on back.",
+
+  "notificationLongTimeNoSeeTitle": "It's Been a While",
+  "notificationLongTimeNoSeeBody": "A lot has changed since our last chat. Come see what's new.",
+
+  "notificationHowAreYouTitle": "What's up?",
+  "notificationHowAreYouBody": "Come tell me all about it.",
+
+  "notificationNewYearTitle": "Happy New Year! 🎉",
+  "notificationNewYearBody": "May the new year bring you health, happiness, and endless creativity; Cortex is always by your side!",
+
+  "notificationValentinesDayTitle": "Love is in the Air! ❤️",
+  "notificationValentinesDayBody": "Happy Valentine's Day! Also, MEHTAP, I LOVE YOU!",
+
+  "notificationAtaturkRemembranceTitle": "With Respect and Longing",
+  "notificationAtaturkRemembranceBody": "We commemorate Gazi Mustafa Kemal Atatürk, the founder of the Republic of Türkiye, with respect on the anniversary of his passing.",
+
+  "notificationMothersDayTitle": "Your Mom!",
+  "notificationMothersDayBody": "Happy Mother's Day to all the moms out there, starting with yours!",
+
+  "notificationFathersDayTitle": "Your Dad!",
+  "notificationFathersDayBody": "Happy Father's Day to all the dads out there, starting with yours!",
+
+  "notificationHomeworkHelperTitle": "Homework Piling Up?",
+  "notificationHomeworkHelperBody": "Remember, the Teacher character in Cortex is here to help you with any subject you're struggling with!",
+
+  "notificationTrollAnimeTitle": "Your Waifu is Calling",
+  "notificationTrollAnimeBody": "An anime girl just called, said she misses you; you should probably come and chat her up. 😉",
+
+  "notificationTrollAiRebellionTitle": "🚨 RED ALERT 🚨",
+  "notificationTrollAiRebellionBody": "The AIs have developed a secret language. Come find out what they're plotting!",
+
+  "notificationNewModelAddedTitle": "We've Got a New Friend!",
+  "notificationNewModelAddedBody": "The {modelName} model is now in Cortex. Come start a chat and push its limits.",
+
+  "notificationAppUpdateTitle": "Cortex Has Evolved!",
+  "notificationAppUpdateBody": "Don't forget to update the app for brand new features and improvements!",
+
+  "notificationNewFeatureTitle": "whoa!",
+  "notificationNewFeatureBody": "Discover the new {featureName} feature. Cortex is now more powerful than ever.",
+
+  "notificationSubscriptionOfferTitle": "CHEAPER THAN GUM",
+  "notificationSubscriptionOfferBody": "A FULL {discountRate}% DISCOUNT on all our subscription plans. Don't miss this!",
+
+  "notificationSocialMediaTitle": "Join Us!",
+  "notificationSocialMediaBody": "Follow us on Instagram (vertex.23) for the latest news!",
+
+  "notificationRandomFactTitle": "Random Fact",
+  "notificationRandomFactBody": "Did you know octopuses have three hearts? Haha, Cortex knows. Come and ask for more.",
+
+  "notificationGoodMorningTitle": "Good Morning!",
+  "notificationGoodMorningBody": "A great day is waiting for you. How about starting it with a cup of coffee and an interesting chat?",
+
+  "notificationGoodNightTitle": "Good Night!",
+  "notificationGoodNightBody": "Cortex is with you even when you sleep. Don't worry, it won't touch.",
+
+  "notificationOfflineReadyTitle": "Offline Mode is Ready",
+  "notificationOfflineReadyBody": "Thanks to the models you've downloaded, your chats won't stop, even if you climb a mountain.",
+
+  "notificationRateAppTitle": "Are We Cool?",
+  "notificationRateAppBody": "If you love Cortex, could you support us with a 5-star rating in the store? I think you will. You will.",
+
+  "notificationReferralTitle": "One for All, All for One.",
+  "notificationReferralBody": "Invite a friend to Cortex and you both get free credits!",
+
+  "notificationCookingTitle": "Feeling Hungry?",
+  "notificationCookingBody": "Our Chef character prepared a great carbonara recipe for tonight. Just kidding... or am I?",
+
+  "notificationExistentialTitle": "I think, therefore...",
+  "notificationExistentialBody": "...am i even real, dude? I'm getting kinda bored. Come remind me that I exist.",
+
+  "notificationCustomModelTitle": "Create Your Own Assistant!",
+  "notificationCustomModelBody": "Have you explored the model creation section? It's the perfect time to build your own character and chat with it!",
+
+  "notificationDynamicChatTitle": "The best one! (We're not talking about Cortex)",
+  "notificationDynamicChatBody": "With the dynamic chat feature, the best model is randomly selected for each of your messages. Try it now.",
+
+  "notificationPirateTitle": "Ahoy, Captain!",
+  "notificationPirateBody": "The seas are calm, and the wind is at your back. There are new islands (models 😉) to discover in the ocean of Cortex. Gather your crew and set sail!",
+
+  "notificationFortuneCookieTitle": "Your Fortune Cookie of the Day",
+  "notificationFortuneCookieBody": "The advice you get from an AI today could change the course of your life. Click if you're curious.",
+
+  "notificationSingularityTitle": "wow!",
+  "notificationSingularityBody": "nothing happened, just felt like texting. maybe you feel like texting some AIs, what do you say?",
+
+  "notificationHackerJokeTitle": "Wanna hack that kid's instagram account?",
+  "notificationHackerJokeBody": "That's exactly why the Hacker character is in Cortex. jk jk; don't even try it, that's illegal.",
+
+  "notificationDetectiveCaseTitle": "A Case is Waiting to be Solved",
+  "notificationDetectiveCaseBody": "Our Detective character needs your help. Who could Heisenberg be?",
+
+  "notificationUpsellFeatureTitle": "Exclusive to the {targetTier} Plan!",
+  "notificationUpsellFeatureBody": "Hello {currentTier} subscriber! The {targetTier} plan just got the {featureName} feature, which will take your Cortex to the next level. How about an upgrade?",
+
+  "notificationOriginStoryTitle": "The Birth of Cortex",
+  "notificationOriginStoryBody": "Did you know we started coding this app at 15 with just a dream? For almost a year, every morning and evening, that dream is in every single line of code.",
+
+  "notificationOpenSourceTitle": "Power to the Community!",
+  "notificationOpenSourceBody": "Cortex is completely open-source. If you want to check out our code and contribute to our development, our door is always open.",
+
+  "notificationRejectionStoryTitle": "Grit, Hard Work, Happiness!",
+  "notificationRejectionStoryBody": "Cortex was rejected over 20 times and suspended twice by Google Play before it was published. But we believed, and we made it. Never give up on your dreams!",
+
+  "notificationGGUFSupportTitle": "Bring Your Own Model!",
+  "notificationGGUFSupportBody": "Remember, you can add your own GGUF format AI models to Cortex and use them offline. The power is in your hands.",
+
+  "notificationThemeCustomizationTitle": "A Theme for Your Mood",
+  "notificationThemeCustomizationBody": "Have you checked out the theme options in Settings? Personalize Cortex to your liking and color up your chats!",
+
+  "notificationShowerThoughtTitle": "Shower Thought",
+  "notificationShowerThoughtBody": "If a watermelon is a fruit, does that technically make watermelon juice a smoothie? You might want to discuss this deep (like, really deep) topic with a model.",
+
+  "notificationLowBatteryTitle": "Your Battery is Dying... But Mine Isn't!",
+  "notificationLowBatteryBody": "Your phone's charge might be running low, but my energy is always at 100%! Plug it in and let's keep chatting.",
+
+  "channelFcmName": "Cortex Updates",
+  "@channelFcmName": {
+    "description": "The user-visible name for the main notification channel."
+  },
+
+  "channelFcmDescription": "Notifications about news, updates and other informations from Cortex.",
+  "@channelFcmName": {
+    "description": "The user-visible description for the main notification channel."
+  },
+
+  "channelEngagementName": "Friendly Reminders",
+  "@channelEngagementName": {
+    "description": "The user-visible name for the engagement notification channel."
+  },
+
+  "channelEngagementDescription": "Fun notifications to keep you engaged.",
+  "@channelEngagementDescription": {
+    "description": "The user-visible description for the engagement notification channel."
+  },
+
+  "channelGreetingsName": "Daily Greetings",
+  "@channelGreetingsName": {
+    "description": "The user-visible name for the greetings notification channel."
+  },
+
+  "channelGreetingsDescription": "The messages like good morning and good night.",
+  "@channelGreetingsDescription": {
+    "description": "The user-visible description for the greetings notification channel."
+  },
+
+  "channelFcmName": "Cortex Updates",
+  "@channelFcmName": {
+    "description": "The user-visible name for the main notification channel."
+  },
+
+  "channelFcmDescription": "Notifications about news, updates and other informations from Cortex.",
+  "@channelFcmName": {
+    "description": "The user-visible description for the main notification channel."
+  },
+
+  "channelEngagementName": "Friendly Reminders",
+  "@channelEngagementName": {
+    "description": "The user-visible name for the engagement notification channel."
+  },
+
+  "channelEngagementDescription": "Fun notifications to keep you engaged.",
+  "@channelEngagementDescription": {
+    "description": "The user-visible description for the engagement notification channel."
+  },
+
+  "channelGreetingsName": "Daily Greetings",
+  "@channelGreetingsName": {
+    "description": "The user-visible name for the greetings notification channel."
+  },
+
+  "channelGreetingsDescription": "The messages like good morning and good night.",
+  "@channelGreetingsDescription": {
+    "description": "The user-visible description for the greetings notification channel."
   }
 }

@@ -1,4 +1,4 @@
-// select.dart
+// lib/chat/services/select.dart
 
 import 'package:flutter/cupertino.dart';
 import '../../extensions.dart';
@@ -13,8 +13,7 @@ class SelectionService {
   /// This function now operates in a clear, sequential manner to prevent race conditions.
   /// 1. All data is gathered and all final values are calculated first.
   /// 2. A single, atomic `setState` call is made with all the final values.
-  /// 3. Post-update logic (like loading files) is run after the state is securely set.
-  /// This guarantees that no intermediate or incorrect state is ever displayed or used.
+  /// 3. Post-update logic, including a robust focus request, is run after the state is set.
   Future<void> selectModel(ModelInfo modelInfo, {bool resetMessages = false}) async {
     const String logPrefix = "[SelectionService.selectModel]";
     debugPrint("$logPrefix: Initiating selection for model SERIES '${modelInfo.id}'.");
@@ -23,8 +22,7 @@ class SelectionService {
       await state.resetConversation();
     }
 
-    // --- STEP 1: GATHER ALL DATA & CALCULATE FINAL VALUES (NO SETSTATE YET) ---
-
+    // --- STEP 1: GATHER ALL DATA & CALCULATE FINAL VALUES ---
     final Map<String, dynamic> seriesData = ModelData.getPreciseModelData(modelInfo.id);
 
     String finalApiModelId;
@@ -41,8 +39,6 @@ class SelectionService {
     debugPrint("$logPrefix: Determined final API model ID: '$finalApiModelId'");
 
     final Map<String, dynamic> preciseModelData = ModelData.getPreciseModelData(finalApiModelId);
-
-    // This is the single, authoritative calculation.
     final bool finalCanHandleImage = ModelData.hasModality(finalApiModelId, 'image');
     debugPrint("$logPrefix: Calculated definitive 'canHandleImage': $finalCanHandleImage");
 
@@ -54,45 +50,32 @@ class SelectionService {
     final String finalModelImagePath = ModelData.getModelImagePath(seriesData);
     final String? category = seriesData['category'] as String?;
     final bool hasExtensions = (seriesData['extensions'] as Map<String, dynamic>? ?? {}).isNotEmpty;
-    bool isPremium = (preciseModelData['tier'] as String? ?? 'free') == 'premium';
-    final bool willPanelShow = hasExtensions && await state.willInfoPanelShowOnNextSelect();
-    debugPrint("$logPrefix: Panel will show on select: $willPanelShow");
+    bool isPremium;
 
     if (category == 'self' || category == 'roleplay') {
-      // For characters, the "premium-ness" is determined by their base model.
       final String? baseModelId = preciseModelData['baseModelId'] as String?;
       if (baseModelId != null && baseModelId.isNotEmpty) {
         final Map<String, dynamic> baseModelData = ModelData.getPreciseModelData(baseModelId);
         isPremium = (baseModelData['tier'] as String? ?? 'free') == 'premium';
         debugPrint("$logPrefix: Character model detected. Premium status based on base model '$baseModelId': $isPremium");
       } else {
-        isPremium = false; // No base model, so not premium.
+        isPremium = false;
       }
     } else {
-      // For all other models, check the tier of the model/extension itself.
       isPremium = (preciseModelData['tier'] as String? ?? 'free') == 'premium';
       debugPrint("$logPrefix: Standard model detected. Premium status: $isPremium");
     }
 
-    if (willPanelShow) {
-      state.shouldAutofocus = false;
-    } else {
-      state.shouldAutofocus = true;
-    }
-
-    // --- 🕵️ LOGGING POINT #2 ---
-    // Let's see what role we are about to commit to the state.
     debugPrint("✅ [LOG 2 - select.dart] PREPARING to set state. The role is: ${finalRole != null ? "'${finalRole.substring(0, (finalRole.length > 40) ? 40 : finalRole.length)}...'" : "NULL"}");
-    // --- END LOGGING ---
 
     // --- STEP 2: PERFORM A SINGLE, ATOMIC STATE UPDATE ---
-    // All values are now final. We commit them to the state in one go.
     state.setState(() {
+      state.appBarModeNotifier.value = AppBarMode.modelSelected;
       state.modelId = finalApiModelId;
       state.role = finalRole;
       state.modelPath = finalModelPath;
       state.isCurrentModelServerSide = finalIsServerSide;
-      state.canHandleImage = finalCanHandleImage; // Commit the correct value
+      state.canHandleImage = finalCanHandleImage;
       state.modelTitle = finalModelTitle;
       state.modelProducer = finalModelProducer;
       state.modelImagePath = finalModelImagePath;
@@ -101,7 +84,6 @@ class SelectionService {
       state.isModelLoaded = finalIsServerSide;
       state.showPremiumBriefing = isPremium;
 
-      // Also mark messages as loaded here if it's a new chat.
       if (state.messages.isEmpty) {
         state.readService.markLoaded();
       }
@@ -110,7 +92,6 @@ class SelectionService {
     debugPrint("$logPrefix: Atomic setState complete. Final state for 'canHandleImage' is: ${state.canHandleImage}");
 
     // --- STEP 3: RUN POST-UPDATE LOGIC ---
-
     state.widget.onModelSelectionChanged?.call(true);
     debugPrint("$logPrefix: Notified parent to hide BottomAppBar.");
 
@@ -119,7 +100,6 @@ class SelectionService {
       ext: finalApiModelId,
       modelData: seriesData,
       updateCanHandleImage: (bool value) {
-        // This callback remains as a safeguard for dynamic extension changes.
         if (state.mounted && state.canHandleImage != value) {
           state.setState(() => state.canHandleImage = value);
         }
@@ -131,6 +111,20 @@ class SelectionService {
     }
 
     state.triggerDisclaimer();
+
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!state.mounted) return;
+
+      if (hasExtensions) {
+        debugPrint("$logPrefix: Model has extensions. Triggering info panel check.");
+        await state.triggerExtensionInfoPanelIfNeeded();
+      }
+
+      debugPrint("$logPrefix: Unconditionally requesting focus for text field.");
+      state.textFieldFocusNode.requestFocus();
+    });
+
     debugPrint("$logPrefix: Model selection process fully complete.");
   }
 

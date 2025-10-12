@@ -13,7 +13,16 @@ class ConversationManager extends ChangeNotifier {
   late Map<String, dynamic> _modelData;
 
   String get modelId => _modelData['id'] as String? ?? '';
-  String get modelTitle => _modelData['title'] as String? ?? 'Unknown Model';
+  String get modelTitle {
+    // If it's a dynamic chat, the title is handled by the UI layer.
+    // The manager itself doesn't know the localized text.
+    if (_modelData['id'] == 'dynamic') {
+      // We can return the hardcoded English text as a last-resort fallback.
+      return _modelData['title'] as String? ?? 'Dynamic Chat';
+    }
+    // For all other models, return their actual title.
+    return _modelData['title'] as String? ?? 'Unknown Model';
+  }
   String get modelImagePath => _modelData['imagePath'] as String? ?? 'assets/icons/self.svg';
   String get modelDescription => _modelData['description'] as String? ?? '';
   String get modelProducer => _modelData['producer'] as String? ?? 'Unknown';
@@ -41,7 +50,24 @@ class ConversationManager extends ChangeNotifier {
         _lastMessageDate = lastMessageDate,
         _lastMessagePhotoPath = lastMessagePhotoPath {
 
-    _modelData = ModelData.getPreciseModelData(initialModelId);
+    // --- DYNAMIC CHAT IDENTIFICATION LOGIC ---
+    // If the ID from the database is 'dynamic', we create a special
+    // placeholder model data map for it. This ensures it has a consistent
+    // and recognizable appearance in the inbox.
+    if (initialModelId == 'dynamic') {
+      _modelData = {
+        'id': 'dynamic',
+        'title': 'Dynamic Chat',
+        'imagePath': 'assets/cortex.svg', // Special icon for dynamic chats
+        'producer': 'Cortex',
+        'canHandleImage': true, // Assume capable for UI purposes
+        'type': 'online',
+        'category': 'dynamic',
+      };
+    } else {
+      // For any other ID, use the standard method to get real model data.
+      _modelData = ModelData.getPreciseModelData(initialModelId);
+    }
 
     _sub = ChatStorageService.lastMsgStream
         .where((e) => e['convId'] == conversationID)

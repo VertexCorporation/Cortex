@@ -33,6 +33,60 @@ class ChatStorageService {
     );
   }
 
+  /// This function is called after a successful message send to mark a model as "used".
+  /// Using `ConflictAlgorithm.replace` provides an efficient "upsert" operation.
+  static Future<void> addRecentModel(String modelSeriesId) async {
+    final db = await DbHelper().db;
+    await db.insert(
+      'recent_models',
+      {
+        'model_id': modelSeriesId,
+        'last_used': DateTime.now().millisecondsSinceEpoch,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    // Invalidate the cache to ensure the UI re-fetches the updated list.
+    CacheService.invalidateRecentModelsCache();
+    debugPrint("[Storage] Added/Updated '$modelSeriesId' in recent models.");
+  }
+
+  /// It fetches the top 3 most recently used model IDs directly from the new
+  /// 'recent_models' table and validates them against the currently available models.
+  static Future<List<String>> getRecentModelSeriesIds() async {
+    final db = await DbHelper().db;
+    // Query the new table, ordered by the last used timestamp.
+    final List<Map<String, dynamic>> rows = await db.query(
+      'recent_models',
+      columns: ['model_id'],
+      orderBy: 'last_used DESC',
+      limit: 10, // Fetch a few extra to account for potentially deleted models.
+    );
+
+    final recentSeriesIds = <String>{};
+    final allAvailableModels = ModelData.getCachedModelsSync();
+    // Create a set of available series IDs for efficient lookup.
+    final availableSeriesIds = allAvailableModels.map((m) => m['id'] as String).toSet();
+
+    for (final row in rows) {
+      final modelIdFromDb = row['model_id'] as String?;
+      if (modelIdFromDb == null) continue;
+
+      // VALIDATION: Ensure the model still exists in the master list.
+      if (availableSeriesIds.contains(modelIdFromDb)) {
+        recentSeriesIds.add(modelIdFromDb);
+      } else {
+        debugPrint("[Storage] Ignoring recent model '$modelIdFromDb' because it no longer exists.");
+      }
+
+      // Stop when we have found 3 valid recent models.
+      if (recentSeriesIds.length >= 3) {
+        break;
+      }
+    }
+
+    return recentSeriesIds.toList();
+  }
+
   static Future<void> _updateConversationTimestamp(String convId, Database db) async {
     await db.update(
       'conversations',
@@ -192,6 +246,7 @@ class ChatStorageService {
     await db.delete('messages', where: 'conversationId = ?', whereArgs: [id]);
     await db.delete('conversations', where: 'id = ?', whereArgs: [id]);
     CacheService.invalidateConversationCache();
+    CacheService.invalidateRecentModelsCache();
   }
 
   /// Atomically deletes all conversations (and their messages) associated with a specific model ID.
@@ -228,8 +283,9 @@ class ChatStorageService {
         whereArgs: convIds,
       );
     });
-    // After deletion, invalidate the inbox cache to force a UI refresh.
+    // After deletion, invalidate the caches to force a UI refresh.
     CacheService.invalidateConversationCache();
+    CacheService.invalidateRecentModelsCache();
   }
 
   static Future<void> setStarred(String id, bool starred) async {

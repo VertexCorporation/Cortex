@@ -82,9 +82,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   // Firebase Services
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    serverClientId: '561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com',
-  );
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
   // Form Keys
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
@@ -503,31 +501,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     }
   }
 
-  /// Waits for the user's Firestore document to be created by the backend trigger.
-  /// This prevents a race condition where the user is redirected to the main screen
-  /// before their profile is ready, which would cause them to be logged out again.
-  ///
-  /// This version uses a real-time stream listener, which is more efficient
-  /// than polling, and has a robust timeout.
-  ///
-  /// @param uid The user's ID to listen for.
-  /// @param l10n The localization object for error messages.
-  /// @throws TimeoutException if the document isn't created within the specified time.
-  Future<void> _waitForUserDocument(String uid, AppLocalizations l10n) async {
-    dev.log('[Auth] Listening for user document creation for UID: $uid', name: 'LoginScreen');
-
-    final userDocRef = _firestore.collection('users').doc(uid);
-
-    await userDocRef.snapshots()
-        .firstWhere((snapshot) => snapshot.exists)
-        .timeout(const Duration(seconds: 15), onTimeout: () {
-      dev.log('[Auth] CRITICAL: Timed out waiting for user document creation for UID: $uid.', name: 'LoginScreen');
-      throw TimeoutException(l10n.authError);
-    });
-
-    dev.log('[Auth] User document found for UID: $uid! Proceeding.', name: 'LoginScreen');
-  }
-
   /// Handles the entire Google Sign-In flow using the perfected, robust protocol.
   Future<void> _signInWithGoogle() async {
     if (_isLoading) return;
@@ -538,7 +511,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     final bool isMounted = mounted;
 
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate();
       if (googleUser == null) {
         dev.log('[Auth.Google] Google Sign-In was cancelled by the user.', name: 'LoginScreen');
         if (isMounted) setState(() => _isLoading = false);
@@ -547,7 +520,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 

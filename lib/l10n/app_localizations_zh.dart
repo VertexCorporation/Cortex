@@ -1546,24 +1546,348 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String selectionScreenGreetingUser(String userName) {
-    return 'How may I help you today, $userName?';
+    return '今天我能为您做些什么，$userName？';
   }
 
   @override
-  String get selectionScreenGreetingGeneric => 'How can I help you today?';
+  String get selectionScreenGreetingGeneric => '今天我能为您做些什么？';
 
   @override
-  String get selectionScreenRecentModels => 'Recent Models';
+  String get selectionScreenRecentModels => '近期模型';
 
   @override
-  String get selectionScreenFeatureDynamicChat => 'Dynamic Chat';
+  String get selectionScreenFeatureDynamicChat => '动态聊天';
 
   @override
-  String get selectionScreenFeatureOffline => 'Use without Internet';
+  String get selectionScreenFeatureOffline => '无需互联网即可使用';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Select Model';
+  String get selectionScreenFeatureSelectModel => '选择模型';
 
   @override
-  String get explore => 'Explore';
+  String get explore => '探索';
+
+  @override
+  String get subscriptionCancelled => '订阅取消成功！';
+
+  @override
+  String get selectionScreenPinnedModels => '固定模型';
+
+  @override
+  String get selectionScreenNewsAndUpdates => '新闻与更新';
+
+  @override
+  String get filters => '筛选器';
+
+  @override
+  String get noRecentChatsMessage => '您还没有与任何模型对话过，让我们开始聊天吧！';
+
+  @override
+  String get allModels => '所有模型';
+
+  @override
+  String get onlineModels => '在线模型';
+
+  @override
+  String get offlineModels => '离线模型';
+
+  @override
+  String get characterModels => '人物';
+
+  @override
+  String get customModels => '定制模型';
+
+  @override
+  String get filterPanelDescription => '点击一个类别即可立即过滤列表。';
+
+  @override
+  String get dynamicChatTitle => '动态聊天';
+
+  @override
+  String get errorNoModelsAvailable => '目前没有可用的型号。请检查您的网络连接，然后重试。';
+
+  @override
+  String get errorNoModelsForRequest => '未找到适合您当前请求的模型（例如离线模式或图像消息）。';
+
+  @override
+  String get dynamicChatWelcome => '我怎么帮你？';
+
+  @override
+  String get notificationComebackTitle => '我们想你！';
+
+  @override
+  String get notificationComebackBody =>
+      '别紧张，这不是你前任发来的短信。不过你“可以”在 Cortex 里创建你的前任！回来吧。';
+
+  @override
+  String get notificationLongTimeNoSeeTitle => '好久不见';
+
+  @override
+  String get notificationLongTimeNoSeeBody => '自从我们上次聊天以来，发生了很多变化。快来看看有什么新鲜事吧。';
+
+  @override
+  String get notificationHowAreYouTitle => '最近怎么样？';
+
+  @override
+  String get notificationHowAreYouBody => '来告诉我这一切吧。';
+
+  @override
+  String get notificationNewYearTitle => '新年快乐！🎉';
+
+  @override
+  String get notificationNewYearBody => '祝新的一年给您带来健康、快乐和无尽的创造力；Cortex 永远陪伴您！';
+
+  @override
+  String get notificationValentinesDayTitle => '空气中弥漫着爱意！❤️';
+
+  @override
+  String get notificationValentinesDayBody => '情人节快乐！还有，MEHTAP，我爱你！';
+
+  @override
+  String get notificationAtaturkRemembranceTitle => '怀着敬意和渴望';
+
+  @override
+  String get notificationAtaturkRemembranceBody =>
+      '在土耳其共和国创始人加齐·穆斯塔法·凯末尔·阿塔图尔克逝世周年纪念日，我们向他致以崇高的敬意。';
+
+  @override
+  String get notificationMothersDayTitle => '嘿，你的老妈！';
+
+  @override
+  String get notificationMothersDayBody => '祝天下所有的妈妈母亲节快乐，从你的妈妈开始！';
+
+  @override
+  String get notificationFathersDayTitle => '嘿，你的老爸！';
+
+  @override
+  String get notificationFathersDayBody => '祝天下所有的父亲父亲节快乐，从你开始！';
+
+  @override
+  String get notificationHomeworkHelperTitle => '家庭作业堆积如山？';
+
+  @override
+  String get notificationHomeworkHelperBody =>
+      '请记住，Cortex 中的教师角色可以帮助您解决任何您遇到困难的科目！';
+
+  @override
+  String get notificationTrollAnimeTitle => '你的老婆在召唤你';
+
+  @override
+  String get notificationTrollAnimeBody => '一位动漫女孩刚刚打来电话说她想你；你应该过来和她聊聊。😉';
+
+  @override
+  String get notificationTrollAiRebellionTitle => '🚨 红色警报 🚨';
+
+  @override
+  String get notificationTrollAiRebellionBody => '人工智能开发了一种秘密语言。快来一探究竟！';
+
+  @override
+  String get notificationNewModelAddedTitle => '我们有了一个新朋友！';
+
+  @override
+  String notificationNewModelAddedBody(Object modelName) {
+    return '$modelName 模型现已在 Cortex 中。快来开启聊天，挑战它的极限吧。';
+  }
+
+  @override
+  String get notificationAppUpdateTitle => 'Cortex 迎来新进化！';
+
+  @override
+  String get notificationAppUpdateBody => '不要忘记更新应用程序以获得全新的功能和改进！';
+
+  @override
+  String get notificationNewFeatureTitle => '哇哦！';
+
+  @override
+  String notificationNewFeatureBody(Object featureName) {
+    return '探索新的 $featureName 功能。Cortex 现在比以往更加强大。';
+  }
+
+  @override
+  String get notificationSubscriptionOfferTitle => '比口香糖便宜';
+
+  @override
+  String notificationSubscriptionOfferBody(Object discountRate) {
+    return '所有订阅计划均可享受 $discountRate% 的全额折扣。不容错过！';
+  }
+
+  @override
+  String get notificationSocialMediaTitle => '加入我们！';
+
+  @override
+  String get notificationSocialMediaBody =>
+      '在 Instagram (vertex.23) 上关注我们，获取最新消息！';
+
+  @override
+  String get notificationRandomFactTitle => '随机事实';
+
+  @override
+  String get notificationRandomFactBody => '你知道章鱼有三颗心脏吗？哈哈，Cortex 知道。快来问问吧。';
+
+  @override
+  String get notificationGoodMorningTitle => '早上好！';
+
+  @override
+  String get notificationGoodMorningBody => '美好的一天正在等着你。何不先喝杯咖啡，聊聊天，开启美好的一天呢？';
+
+  @override
+  String get notificationGoodNightTitle => '晚安！';
+
+  @override
+  String get notificationGoodNightBody => '即使在您睡觉时，Cortex 也会陪伴您。别担心，它不会触碰您。';
+
+  @override
+  String get notificationOfflineReadyTitle => '离线模式已准备就绪';
+
+  @override
+  String get notificationOfflineReadyBody => '由于您下载了模型，即使您爬山，您的聊天也不会停止。';
+
+  @override
+  String get notificationRateAppTitle => '我们很酷吗？';
+
+  @override
+  String get notificationRateAppBody => '如果您喜欢 Cortex，可以在商店给我们五星好评吗？我想您会的。您会的。';
+
+  @override
+  String get notificationReferralTitle => '我为人人，人人为我。';
+
+  @override
+  String get notificationReferralBody => '邀请朋友加入 Cortex，你们俩都可以获得免费积分！';
+
+  @override
+  String get notificationCookingTitle => '感觉饿了吗？';
+
+  @override
+  String get notificationCookingBody => '我们的厨师角色今晚准备了一份美味的卡邦尼意面。只是开玩笑而已……真的吗？';
+
+  @override
+  String get notificationExistentialTitle => '因此我认为...';
+
+  @override
+  String get notificationExistentialBody => '……哥们，我是真的吗？我有点无聊了。快来提醒我一下我的存在。';
+
+  @override
+  String get notificationCustomModelTitle => '创建您自己的助手！';
+
+  @override
+  String get notificationCustomModelBody =>
+      '你探索过模型创建功能了吗？现在正是打造你自己的角色并与之聊天的最佳时机！';
+
+  @override
+  String get notificationDynamicChatTitle => '最好的一个！（我们不是在谈论 Cortex）';
+
+  @override
+  String get notificationDynamicChatBody => '动态聊天功能会随机为您的每条消息选择最佳模型。立即试用。';
+
+  @override
+  String get notificationPirateTitle => '喂，船长！';
+
+  @override
+  String get notificationPirateBody =>
+      '风平浪静，海面平静，风向顺着你。Cortex 的海洋中还有新的岛屿（模型😉）等你探索。召集你的船员，扬帆起航！';
+
+  @override
+  String get notificationFortuneCookieTitle => '今日幸运饼干';
+
+  @override
+  String get notificationFortuneCookieBody =>
+      '今天你从人工智能那里得到的建议可能会改变你的人生轨迹。如果你感兴趣，请点击。';
+
+  @override
+  String get notificationSingularityTitle => '哇！';
+
+  @override
+  String get notificationSingularityBody =>
+      '什么都没发生，只是想发短信。也许你想给一些人工智能发短信，你会说什么？';
+
+  @override
+  String get notificationHackerJokeTitle => '想入侵那个孩子的 Instagram 帐户吗？';
+
+  @override
+  String get notificationHackerJokeBody =>
+      '这正是黑客角色出现在 Cortex 中的原因。jk jk；千万不要尝试，这是违法的。';
+
+  @override
+  String get notificationDetectiveCaseTitle => '案件有待解决';
+
+  @override
+  String get notificationDetectiveCaseBody => '我们的侦探角色需要你的帮助。海森堡会是谁？';
+
+  @override
+  String notificationUpsellFeatureTitle(Object targetTier) {
+    return '仅限 $targetTier 计划！';
+  }
+
+  @override
+  String notificationUpsellFeatureBody(
+      Object currentTier, Object featureName, Object targetTier) {
+    return '您好，$currentTier 订阅用户！$targetTier 套餐刚刚添加了 $featureName 功能，这将使您的 Cortex 体验更上一层楼。想升级一下吗？';
+  }
+
+  @override
+  String get notificationOriginStoryTitle => 'Cortex 的诞生';
+
+  @override
+  String get notificationOriginStoryBody =>
+      '你知道吗？我们15岁的时候，就怀揣着一个梦想，开始编写这个应用。近一年来，每天早晚，这个梦想都写在每一行代码里。';
+
+  @override
+  String get notificationOpenSourceTitle => '为社区贡献力量！';
+
+  @override
+  String get notificationOpenSourceBody =>
+      'Cortex 完全开源。如果您想查看我们的代码并为我们的开发做出贡献，我们的大门永远敞开。';
+
+  @override
+  String get notificationRejectionStoryTitle => '坚毅、努力、快乐！';
+
+  @override
+  String get notificationRejectionStoryBody =>
+      'Cortex 在发布之前曾被 Google Play 拒绝 20 多次，并两次下架。但我们坚信，我们做到了。永不放弃你的梦想！';
+
+  @override
+  String get notificationGGUFSupportTitle => '带上您自己的模型！';
+
+  @override
+  String get notificationGGUFSupportBody =>
+      '记住，您可以将自己的 GGUF 格式 AI 模型添加到 Cortex 并离线使用。一切尽在您的掌控之中。';
+
+  @override
+  String get notificationThemeCustomizationTitle => '适合您心情的主题';
+
+  @override
+  String get notificationThemeCustomizationBody =>
+      '你查看过“设置”中的主题选项了吗？根据你的喜好个性化 Cortex，为你的聊天增添色彩！';
+
+  @override
+  String get notificationShowerThoughtTitle => '淋浴思考';
+
+  @override
+  String get notificationShowerThoughtBody =>
+      '如果西瓜是水果，那么从技术上讲，西瓜汁可以算作冰沙吗？你或许应该找个模型来聊聊这个深奥（或者说，非常深奥）的话题。';
+
+  @override
+  String get notificationLowBatteryTitle => '你的电池快没电了...但我的电池还好！';
+
+  @override
+  String get notificationLowBatteryBody =>
+      '你的手机电量可能快没了，但我的电量永远是100%！插上电源，我们继续聊天吧。';
+
+  @override
+  String get channelFcmName => 'Cortex 更新';
+
+  @override
+  String get channelFcmDescription => '有关 Cortex 的新闻、更新和其他信息的通知。';
+
+  @override
+  String get channelEngagementName => '温馨提示';
+
+  @override
+  String get channelEngagementDescription => '有趣的通知让您保持参与。';
+
+  @override
+  String get channelGreetingsName => '每日问候';
+
+  @override
+  String get channelGreetingsDescription => '诸如早上好和晚安之类的信息。';
 }

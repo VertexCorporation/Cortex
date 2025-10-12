@@ -83,7 +83,9 @@ Future<_ProcessedStateData> _processModelStatesInBackground(Map<String, dynamic>
 }
 
 class ModelsScreen extends StatefulWidget {
-  const ModelsScreen({Key? key}) : super(key: key);
+  final bool showOfflineModelsPulse;
+
+  const ModelsScreen({Key? key, this.showOfflineModelsPulse = false}) : super(key: key);
 
   @override
   _ModelsScreenState createState() => _ModelsScreenState();
@@ -204,33 +206,77 @@ class _ModelsScreenState extends State<ModelsScreen>
     _refreshStateAfterFileChange();
   }
 
-  /// --- THIS LISTENER'S ROLE IS NOW MORE SPECIFIC ---
-  /// This listener is now ONLY for destructive changes (model created/deleted).
-  /// It forces a full data reload because the list of models itself has changed.
+  /// This listener for destructive changes (create/delete) now correctly calls the
+  /// new, intelligent refresh function, ensuring a full reload.
   void _onModelsChanged() {
     if (!mounted) {
-      debugPrint("[ModelsScreen.Listener] Received a model data notification, but screen is not mounted. Aborting.");
+      debugPrint("[ModelsScreen.Listener] Aborting model change handler, not mounted.");
       return;
     }
-    debugPrint("[ModelsScreen.Listener] Received a global notification from ModelData. Forcing a full UI reload.");
+    debugPrint("[ModelsScreen.Listener] Received a global model data notification. Forcing a full UI reload.");
 
-    // Invalidate the screen's cache because the underlying data source (ModelData) has changed.
+    // Invalidate the screen's cache.
     CacheService.invalidateModelsScreenCache();
-    // This triggers a full reload, which will fetch the fresh list from ModelData's cache.
-    _loadDataAndInitialize();
+    // Show the loading screen as we are about to fetch everything from scratch.
+    setState(() => _isLoading = true);
+    // Trigger the full, forced refresh.
+    _triggerAsyncLoadOrRefresh(forceNetwork: true);
   }
 
   Locale? _currentLocale;
+
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
 
   @override
   void initState() {
     super.initState();
     debugPrint("[ModelsScreen.initState] Initializing state...");
 
+    // --- NEW: Initialize animation controller for the pulse effect ---
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    // Default animation that does nothing (scale of 1.0)
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.0).animate(_pulseController);
+
+    // If the pulse is requested, set up the actual pulsing animation
+    if (widget.showOfflineModelsPulse) {
+      _pulseAnimation = TweenSequence<double>([
+        TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.10), weight: 50),
+        TweenSequenceItem(tween: Tween(begin: 1.10, end: 1.0), weight: 50),
+      ]).animate(CurvedAnimation(
+        parent: _pulseController,
+        curve: Curves.easeInOut,
+      ));
+
+      _pulseController.repeat();
+
+      // Stop the animation after a few seconds to avoid distraction
+      Timer(const Duration(seconds: 3), () {
+        if (mounted && _pulseController.isAnimating) {
+          _pulseController.stop();
+          // Animate back to the default state smoothly
+          _pulseController.animateTo(0.0, duration: const Duration(milliseconds: 400), curve: Curves.easeOut);
+        }
+      });
+    }
+
+    // --- STRATEGY: SYNCHRONOUS CACHE INITIALIZATION ---
+    // (rest of the initState method is unchanged)
+    final cachedData = CacheService.cachedModelsScreenData;
+    if (cachedData != null) {
+      debugPrint("[ModelsScreen.initState] Cache HIT. Performing synchronous initial render.");
+      _allModels = cachedData;
+      _isLoading = false; // <-- CRITICAL: Prevents skeleton screen.
+    }
+
     WidgetsBinding.instance.addObserver(this);
     _downloadCompleted = {};
 
-    // This listener handles DESTRUCTIVE changes (model created/deleted).
+    // This listener handles DESTRUCTIVE changes (model created/deleted), forcing a full reload.
     _modelDataListener = _onModelsChanged;
     ModelData.addListener(_modelDataListener);
 
@@ -238,6 +284,7 @@ class _ModelsScreenState extends State<ModelsScreen>
     _downloadedModelsManagerListener = _onDownloadedModelsChanged;
     _downloadedModelsManager.addListener(_downloadedModelsManagerListener);
 
+    // Initialize the download controller service.
     _dl = ModelDownloadController(
       context: context,
       managers: _downloadManagers,
@@ -245,10 +292,10 @@ class _ModelsScreenState extends State<ModelsScreen>
       getFilePathById: _getFilePathById,
     );
 
-    // ... (rest of initState is unchanged and correct) ...
+    // Initialize the search controller service with either cached or empty data.
     _searchCtrl = ModelsSearchController(
       context: context,
-      allModels: [],
+      allModels: _allModels, // Use data from cache if available, otherwise it's an empty list.
       downloadManagers: _downloadManagers,
       getCompatibilityStatus: _compatCheckWrapper,
       openModelDetail: ({
@@ -297,44 +344,31 @@ class _ModelsScreenState extends State<ModelsScreen>
       downloadedFileStates: _downloadCompleted,
     );
 
-    if (!_hasWarningBeenShownThisSession) {
-      Future.delayed(const Duration(milliseconds: 700), () {
-        if (mounted) {
-          setState(() => _showLocalizationWarning = true);
-          _hasWarningBeenShownThisSession = true;
-          debugPrint("Localization warning shown for the first time this session.");
+    // The rest of the async setup happens after the first frame is built,
+    // ensuring the UI is never blocked on startup.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        // This will either trigger a full network load (if cache was empty)
+        // or a silent background refresh of file states (if loaded from cache).
+        _triggerAsyncLoadOrRefresh();
+
+        // Show the localization warning panel after a short delay, but only once per session.
+        if (!_hasWarningBeenShownThisSession) {
+          Future.delayed(const Duration(milliseconds: 700), () {
+            if (mounted) {
+              setState(() => _showLocalizationWarning = true);
+              _hasWarningBeenShownThisSession = true;
+              debugPrint("Localization warning shown for the first time this session.");
+            }
+          });
         }
-      });
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final newLocale = Localizations.localeOf(context);
-
-    // This logic now correctly handles both the initial build and any subsequent
-    // rebuilds caused by a language change.
-    // If the locale is new, we always reload. The cache invalidation in settings.dart
-    // guarantees that this reload will fetch fresh data.
-    if (_currentLocale != newLocale) {
-      debugPrint("[ModelsScreen] Locale change detected (or initial load). New locale: '${newLocale.languageCode}'. Forcing data reload.");
-      _currentLocale = newLocale;
-
-      // We still set isLoading to true to show the skeleton screen during the reload,
-      // which is visually much smoother.
-      setState(() {
-        _isLoading = true;
-      });
-
-      // This will now always work as intended.
-      _loadDataAndInitialize();
-    }
+      }
+    });
   }
 
   @override
   void dispose() {
+    _pulseController.dispose(); // Dispose the animation controller
     // Unsubscribe from both listeners to prevent memory leaks.
     ModelData.removeListener(_modelDataListener);
     _downloadedModelsManager.removeListener(_downloadedModelsManagerListener);
@@ -342,6 +376,33 @@ class _ModelsScreenState extends State<ModelsScreen>
     WidgetsBinding.instance.removeObserver(this);
     _searchCtrl?.dispose();
     super.dispose();
+  }
+
+  /// This method now correctly distinguishes between the initial load and a subsequent language change.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newLocale = Localizations.localeOf(context);
+
+    // If _currentLocale is null, it's the very first time this method is running.
+    if (_currentLocale == null) {
+      debugPrint("[ModelsScreen] didChangeDependencies: Initial run. Storing locale: '${newLocale.languageCode}'.");
+      // We just store the initial locale. We DO NOT trigger any data loading here.
+      // The postFrameCallback in initState already handles the initial load correctly.
+      _currentLocale = newLocale;
+    }
+    // If it's not the first run AND the locale has changed, it's a real language change.
+    else if (_currentLocale != newLocale) {
+      debugPrint("[ModelsScreen] Language change detected. Forcing full data reload.");
+      _currentLocale = newLocale;
+
+      // Now it's correct to show the skeleton screen because we need to fetch new data.
+      setState(() {
+        _isLoading = true;
+      });
+      // Force a full network fetch for the new language.
+      _triggerAsyncLoadOrRefresh(forceNetwork: true);
+    }
   }
 
   void _dismissWarningPanel() {
@@ -459,10 +520,14 @@ class _ModelsScreenState extends State<ModelsScreen>
     return true;
   }
 
+  /// Processes newly fetched models, determines their download states in a background
+  /// isolate to prevent UI jank, and then updates the screen's state.
+  /// This is now primarily used for the "cache miss" scenario.
   Future<void> _updateStateWithNewModels(List<Map<String, dynamic>> models) async {
     debugPrint("[ModelsScreen] Starting UI update process for ${models.length} models.");
 
-    // <-- DÜZELTME (Adım 2): Arka plan isolate'i için iletişim jetonunu al.
+    // Get the token required for platform channel communication in the background isolate.
+    // This is crucial for things like path_provider to work correctly off the main thread.
     final token = RootIsolateToken.instance!;
 
     // The data is now available.
@@ -471,12 +536,11 @@ class _ModelsScreenState extends State<ModelsScreen>
     final processedData = await compute(_processModelStatesInBackground, {
       'models': models,
       'filesDirectoryPath': _filesDirectoryPath,
-      'token': token, // <-- DÜZELTME: Jetonu argüman olarak ekle.
+      'token': token, // Pass the token as an argument.
     });
 
     // By the time we get here, the UI has remained responsive.
     // Now we can safely update the state with the pre-processed data.
-
     if (!mounted) return; // Always check if the widget is still in the tree.
 
     _downloadCompleted = processedData.downloadCompleted;
@@ -485,6 +549,7 @@ class _ModelsScreenState extends State<ModelsScreen>
       _searchCtrl!.downloadedFileStates = _downloadCompleted;
     }
 
+    // Synchronize DownloadManager instances with the new model list.
     final newModelIds = processedData.allModels.map((m) => m['id'] as String).toSet();
     _downloadManagers.removeWhere((id, manager) => !newModelIds.contains(id));
 
@@ -501,6 +566,7 @@ class _ModelsScreenState extends State<ModelsScreen>
       _loadError = false;
     });
 
+    // Perform post-render tasks like image precaching and checking download statuses.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _precacheModelImages();
@@ -509,8 +575,20 @@ class _ModelsScreenState extends State<ModelsScreen>
     });
   }
 
+  /// The primary data loading and initialization orchestrator for the screen.
+  /// It employs a "stale-while-revalidate" caching strategy for an optimal user experience.
+  ///
+  /// 1.  **Cache-First Approach:** It first checks the screen-level `CacheService`.
+  ///     - If a **cache hit** occurs, the UI is rendered instantly with the cached data,
+  ///       completely eliminating the skeleton loading screen. A silent, non-blocking
+  ///       background task is then dispatched to refresh file download states.
+  ///
+  /// 2.  **Fallback to Network:**
+  ///     - If it's a **cache miss** (e.g., first app launch), it falls back to the
+  ///       traditional loading path, showing the skeleton screen while fetching data
+  ///       from the `ModelData` service. The fetched data is then cached for future use.
   Future<void> _loadDataAndInitialize() async {
-    // Step 1: Initialize prerequisites. This is always needed.
+    // Step 1: Initialize prerequisites. This is always needed and very fast.
     await Future.wait([
       _initializeDirectory(),
       _loadSystemInfo(),
@@ -522,9 +600,9 @@ class _ModelsScreenState extends State<ModelsScreen>
     final cachedModels = CacheService.cachedModelsScreenData;
 
     if (cachedModels != null) {
-      // --- CACHE HIT PATH (The new, fast path) ---
+      // --- CACHE HIT PATH (The fast path that eliminates the skeleton screen) ---
       debugPrint("[ModelsScreen] Cache HIT. Performing fast initial render.");
-      CacheService.touchModelsScreenCache();
+      CacheService.touchModelsScreenCache(); // Keep the cache alive
 
       // IMPORTANT: Immediately update the UI with the cached data.
       // This makes the screen appear instantly without a loading skeleton.
@@ -536,14 +614,14 @@ class _ModelsScreenState extends State<ModelsScreen>
       });
 
       // Now, run the heavy file check in the background WITHOUT blocking the UI.
-      // We don't `await` this call. It runs silently.
+      // We don't `await` this call. It runs silently and updates the state when done.
       _updateFileStatesInBackground(cachedModels);
 
       // The function ends here for the cache hit scenario.
       return;
     }
 
-    // --- CACHE MISS PATH (The original, slower path for first load) ---
+    // --- CACHE MISS PATH (The original, slower path for the very first load) ---
     debugPrint("[ModelsScreen] Cache MISS. Fetching data from source with loading screen.");
 
     // This is the only place where we now explicitly set isLoading to true.
@@ -561,11 +639,11 @@ class _ModelsScreenState extends State<ModelsScreen>
     if (modelsFromData == null) {
       if (mounted) setState(() { _isLoading = false; _loadError = true; });
     } else {
-      // Cache the new data
+      // Cache the new data for subsequent visits.
       CacheService.cachedModelsScreenData = modelsFromData;
       CacheService.startModelsScreenCacheTimer();
 
-      // Use the full update path which includes background processing
+      // Use the full update path which includes background processing.
       await _updateStateWithNewModels(modelsFromData);
     }
   }
@@ -574,13 +652,13 @@ class _ModelsScreenState extends State<ModelsScreen>
   Future<void> _updateFileStatesInBackground(List<Map<String, dynamic>> models) async {
     debugPrint("[ModelsScreen] Starting silent background refresh of file states.");
 
-    // <-- DÜZELTME (Adım 3): Arka plan isolate'i için iletişim jetonunu al.
+    // Get the token required for platform channel communication in the background isolate.
     final token = RootIsolateToken.instance!;
 
     final processedData = await compute(_processModelStatesInBackground, {
       'models': models,
       'filesDirectoryPath': _filesDirectoryPath,
-      'token': token, // <-- DÜZELTME: Jetonu argüman olarak ekle.
+      'token': token,
     });
 
     if (!mounted) return;
@@ -776,7 +854,11 @@ class _ModelsScreenState extends State<ModelsScreen>
     }
   }
 
-  List<Widget> _buildModelColumns(List<Map<String, dynamic>> models, String section, double screenWidth) {
+  List<Widget> _buildModelColumns(
+      List<Map<String, dynamic>> models,
+      String section,
+      double screenWidth,
+      ) {
     List<Widget> columns = [];
     const int modelsPerColumn = 3;
     int totalModels = models.length;
@@ -788,8 +870,11 @@ class _ModelsScreenState extends State<ModelsScreen>
 
     for (int i = 0; i < totalColumns; i++) {
       int startIndex = i * modelsPerColumn;
-      int endIndex = (startIndex + modelsPerColumn > totalModels) ? totalModels : startIndex + modelsPerColumn;
-      List<Map<String, dynamic>> columnModels = models.sublist(startIndex, endIndex);
+      int endIndex = (startIndex + modelsPerColumn > totalModels)
+          ? totalModels
+          : startIndex + modelsPerColumn;
+      List<Map<String, dynamic>> columnModels =
+      models.sublist(startIndex, endIndex);
       GlobalKey key = GlobalKey();
       columnKeys.add(key);
 
@@ -807,13 +892,22 @@ class _ModelsScreenState extends State<ModelsScreen>
               final String? url = model['url'] as String?;
               final int? size = model['size'] as int?;
               final int? ram = model['ram'] as int?;
-              final bool isFullyLocalized = model['isFullyLocalized'] as bool? ?? false;
-              final manager = _downloadManagers.putIfAbsent(id, () => DownloadManager());
-              final bool isCustomModel = id.startsWith('self_') || id.startsWith('local_');
+              final bool isFullyLocalized =
+                  model['isFullyLocalized'] as bool? ?? false;
 
-              final String title = ModelData.getLocalizedText(model, 'title', langCode);
-              final String summary = ModelData.getLocalizedText(model, 'summary', langCode);
-              final String fullDescription = ModelData.getLocalizedText(model, 'description', langCode);
+              final DownloadManager? manager = isServerSide
+                  ? null
+                  : _downloadManagers.putIfAbsent(id, () => DownloadManager());
+
+              final bool isCustomModel =
+                  id.startsWith('self_') || id.startsWith('local_');
+
+              final String title =
+              ModelData.getLocalizedText(model, 'title', langCode);
+              final String summary =
+              ModelData.getLocalizedText(model, 'summary', langCode);
+              final String fullDescription =
+              ModelData.getLocalizedText(model, 'description', langCode);
 
               final bool isDownloaded = _downloadCompleted[id] ?? false;
 
@@ -825,47 +919,49 @@ class _ModelsScreenState extends State<ModelsScreen>
               }
 
               return ModelTile(
-                  id: id,
-                  title: title,
-                  description: summary,
-                  imagePath: imagePath,
-                  producer: producer,
-                  url: url,
-                  size: size?.toString(),
-                  requirements: ram?.toString(),
-                  modelPath: modelPath,
-                  isServerSide: isServerSide,
-                  isCustomModel: isCustomModel,
-                  isLastInColumn: model == columnModels.last,
-                  isSeeAll: false,
-                  manager: manager,
-                  isDownloaded: isDownloaded,
-                  compatibilityStatus: compatibilityStatus,
-                  onTileTap: () {
-                    _openModelDetail(
-                        id,
-                        fullDescription,
-                        imagePath,
-                        size,
-                        ram,
-                        producer,
-                        isServerSide,
-                        isDownloaded,
-                        manager.isDownloading,
-                        compatibilityStatus,
-                        url,
-                        isFullyLocalized,
-                        isCustomModel: isCustomModel,
-                        modelPath: modelPath);
-                  },
-                  onRemoveRequested: () async {
-                    HapticFeedback.mediumImpact();
-                    await _handleRemoveFromList(id, title);
-                  },
-                  onChatPressed: () => _startChatWithModel(id, isServerSide, isCustomModel: isCustomModel, modelPath: modelPath),
-                  onDownloadPressed: () => _requestPermissionAndStartDownload(id: id, url: url, title: title),
-                  onCancelDownload: () => _dl.cancelDownload(id),
-                  onResumeDownload: () => _dl.resumeDownload(id)
+                id: id,
+                title: title,
+                description: summary,
+                imagePath: imagePath,
+                producer: producer,
+                url: url,
+                size: size?.toString(),
+                requirements: ram?.toString(),
+                modelPath: modelPath,
+                isServerSide: isServerSide,
+                isCustomModel: isCustomModel,
+                isLastInColumn: model == columnModels.last,
+                isSeeAll: false,
+                manager: manager,
+                isDownloaded: isDownloaded,
+                compatibilityStatus: compatibilityStatus,
+                onTileTap: () {
+                  _openModelDetail(
+                      id,
+                      fullDescription,
+                      imagePath,
+                      size,
+                      ram,
+                      producer,
+                      isServerSide,
+                      isDownloaded,
+                      manager?.isDownloading ?? false,
+                      compatibilityStatus,
+                      url,
+                      isFullyLocalized,
+                      isCustomModel: isCustomModel,
+                      modelPath: modelPath);
+                },
+                onRemoveRequested: () async {
+                  HapticFeedback.mediumImpact();
+                  await _handleRemoveFromList(id, title);
+                },
+                onChatPressed: () => _startChatWithModel(id, isServerSide,
+                    isCustomModel: isCustomModel, modelPath: modelPath),
+                onDownloadPressed: () => _requestPermissionAndStartDownload(
+                    id: id, url: url, title: title),
+                onCancelDownload: () => _dl.cancelDownload(id),
+                onResumeDownload: () => _dl.resumeDownload(id),
               );
             }).toList(),
           ),
@@ -874,6 +970,133 @@ class _ModelsScreenState extends State<ModelsScreen>
     }
     columnKeysMap[section] = columnKeys;
     return columns;
+  }
+
+  Widget _buildDefaultStuff(double screenWidth, double screenHeight) {
+    final loc = AppLocalizations.of(context)!;
+
+    final self = _allModels.where((m) => m['category'] == 'self').toList();
+    final serverSide = _allModels.where((m) => m['type'] == 'online' && m['category'] != 'self').toList();
+    final local = _allModels.where((m) => m['type'] == 'offline' && m['category'] != 'self').toList();
+    final role = _allModels.where((m) => m['type'] == 'roleplay' && m['category'] != 'self').toList();
+
+    return Padding(
+      key: const ValueKey('defaultView'),
+      padding: EdgeInsets.only(
+          left: screenWidth * 0.04,
+          right: screenWidth * 0.04,
+          bottom: screenWidth * 0.04),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: screenHeight * 0.01),
+
+          if (local.isNotEmpty)
+            AnimatedBuilder(
+              animation: _pulseAnimation,
+              builder: (context, child) {
+                // --- DYNAMIC SCALE CALCULATION ---
+
+                // 1. Define the maximum desired expansion in pixels. This makes the effect consistent.
+                const double maxExpansionInPixels = 7.0;
+
+                // 2. Calculate the original width of the content being scaled.
+                final double originalContentWidth = screenWidth - 2 * (screenWidth * 0.04);
+
+                // 3. Determine the absolute maximum width it can expand to without looking cheap.
+                final double maxDesiredWidth = originalContentWidth + maxExpansionInPixels;
+
+                // 4. Determine the final target width by respecting the screen boundary.
+                // It will be the smaller value between our desired width and the actual screen width.
+                final double targetWidth = (maxDesiredWidth < screenWidth) ? maxDesiredWidth : screenWidth;
+
+                // 5. Calculate the maximum scale factor needed to reach the target width.
+                // This prevents division by zero if width is somehow 0.
+                final double maxTargetScale = (originalContentWidth > 0) ? targetWidth / originalContentWidth : 1.0;
+
+                // 6. Map the current animation value (which goes from 1.0 to 1.1) to our new dynamic range.
+                // First, normalize the animation's progress to a 0.0-1.0 range.
+                final double animationProgress = (_pulseAnimation.value - 1.0) / 0.10;
+                // Then, calculate the actual scale to apply for this frame.
+                final double finalAppliedScale = 1.0 + (animationProgress * (maxTargetScale - 1.0));
+
+                // --- DYNAMIC SPACER CALCULATION ---
+                final double headerApproxHeight = screenWidth * 0.08;
+                final double contentOriginalHeight = _calculateCategoryHeight(local, screenWidth) + headerApproxHeight;
+                final double extraHeight = (contentOriginalHeight * finalAppliedScale) - contentOriginalHeight;
+                final double bottomSpacerHeight = extraHeight / 2.0;
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Transform.scale(
+                      scale: finalAppliedScale, // Use our newly calculated dynamic scale
+                      child: child,
+                    ),
+                    SizedBox(height: bottomSpacerHeight > 0 ? bottomSpacerHeight : 0),
+                  ],
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionHeader(loc.localModels, 'localModels', local, screenWidth),
+                  SizedBox(
+                    height: _calculateCategoryHeight(local, screenWidth),
+                    child: Container(
+                      clipBehavior: Clip.none,
+                      child: PageView(
+                        clipBehavior: Clip.none,
+                        children: _buildModelColumns(local, 'localModels', screenWidth),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          // --- FINAL REFINED FIX END ---
+
+          if (serverSide.isNotEmpty) ...[
+            _buildSectionHeader(
+                loc.serverSideModels, 'serverSide', serverSide, screenWidth),
+            SizedBox(
+                height: _calculateCategoryHeight(serverSide, screenWidth),
+                child: PageView(
+                    children:
+                    _buildModelColumns(serverSide, 'serverSide', screenWidth))),
+          ],
+          if (role.isNotEmpty) ...[
+            _buildSectionHeader(loc.roleModels, 'roleModels', role, screenWidth),
+            SizedBox(
+                height: _calculateCategoryHeight(role, screenWidth),
+                child: PageView(
+                    children: _buildModelColumns(role, 'roleModels', screenWidth))),
+          ],
+          if (self.isNotEmpty) ...[
+            _buildSectionHeader(loc.myModels, 'self', self, screenWidth),
+            SizedBox(
+                height: _calculateCategoryHeight(self, screenWidth),
+                child: PageView(
+                    children: _buildModelColumns(self, 'self', screenWidth))),
+          ],
+          if (_systemInfo != null) ...[
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: screenWidth * 0.015),
+              child: Text(loc.systemInfo,
+                  style: TextStyle(
+                      color: AppColors.primaryColor.inverted,
+                      fontSize: screenWidth * 0.05,
+                      fontWeight: FontWeight.bold)),
+            ),
+            SystemInfoChart(
+                totalStorage: _systemInfo!.totalStorage,
+                usedStorage: _systemInfo!.totalStorage - _systemInfo!.freeStorage,
+                totalMemory: _systemInfo!.deviceMemory,
+                usedMemory: _systemInfo!.usedMemory),
+          ],
+        ],
+      ),
+    );
   }
 
 // Handles navigation to the Model Detail page and processes the result.
@@ -977,107 +1200,6 @@ class _ModelsScreenState extends State<ModelsScreen>
       return true;
     }).toList();
     await prefs.setStringList('conversations', conversations);
-  }
-
-  Widget _buildDefaultStuff(double screenWidth, double screenHeight) {
-    final loc = AppLocalizations.of(context)!;
-
-    // First, get all models that belong to the user. This is the highest priority category.
-    // It correctly includes models created from both the CreateScreen and AddScreen.
-    final self = _allModels.where((m) => m['category'] == 'self').toList();
-
-    // Now, for the public categories, filter them as before, but ADD a condition
-    // to EXCLUDE any model that is already in the 'self' category. This prevents duplication.
-    final serverSide = _allModels.where((m) => m['type'] == 'online' && m['category'] != 'self').toList();
-    final local = _allModels.where((m) => m['type'] == 'offline' && m['category'] != 'self').toList();
-    final role = _allModels.where((m) => m['type'] == 'roleplay' && m['category'] != 'self').toList();
-
-    return Padding(
-      key: const ValueKey('defaultView'),
-      padding: EdgeInsets.only(
-          left: screenWidth * 0.04,
-          right: screenWidth * 0.04,
-          bottom: screenWidth * 0.04),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: screenHeight * 0.01),
-          // The rest of the build logic remains the same.
-          // It now operates on correctly filtered, non-overlapping lists.
-          if (local.isNotEmpty) ...[
-            _buildSectionHeader(loc.localModels, 'localModels', local, screenWidth),
-            SizedBox(
-                height: _calculateCategoryHeight(local, screenWidth),
-                child: PageView(
-                    children: _buildModelColumns(local, 'localModels', screenWidth))),
-          ],
-          if (serverSide.isNotEmpty) ...[
-            _buildSectionHeader(
-                loc.serverSideModels, 'serverSide', serverSide, screenWidth),
-            SizedBox(
-                height: _calculateCategoryHeight(serverSide, screenWidth),
-                child: PageView(
-                    children:
-                    _buildModelColumns(serverSide, 'serverSide', screenWidth))),
-          ],
-          if (role.isNotEmpty) ...[
-            _buildSectionHeader(loc.roleModels, 'roleModels', role, screenWidth),
-            SizedBox(
-                height: _calculateCategoryHeight(role, screenWidth),
-                child: PageView(
-                    children: _buildModelColumns(role, 'roleModels', screenWidth))),
-          ],
-          if (self.isNotEmpty) ...[
-            _buildSectionHeader(loc.myModels, 'self', self, screenWidth),
-            SizedBox(
-                height: _calculateCategoryHeight(self, screenWidth),
-                child: PageView(
-                    children: _buildModelColumns(self, 'self', screenWidth))),
-          ],
-          if (_systemInfo != null) ...[
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: screenWidth * 0.015),
-              child: Text(loc.systemInfo,
-                  style: TextStyle(
-                      color: AppColors.primaryColor.inverted,
-                      fontSize: screenWidth * 0.05,
-                      fontWeight: FontWeight.bold)),
-            ),
-            SystemInfoChart(
-                totalStorage: _systemInfo!.totalStorage,
-                usedStorage: _systemInfo!.totalStorage - _systemInfo!.freeStorage,
-                totalMemory: _systemInfo!.deviceMemory,
-                usedMemory: _systemInfo!.usedMemory),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRealContent(double w, double h, {required ValueKey<String> key}) {
-    if (_searchCtrl == null) {
-      return const SizedBox.shrink();
-    }
-    final bool isSearchActive = _searchCtrl!.textController.text.trim().isNotEmpty;
-    final Widget bodyContent = isSearchActive ? _searchCtrl!.buildSearchBody(w) : _buildDefaultStuff(w, h);
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(child: _searchCtrl!.buildSearchBar(w)),
-        SliverToBoxAdapter(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 260),
-            switchInCurve: Curves.easeOutCubic,
-            switchOutCurve: Curves.easeInCubic,
-            layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) => currentChild ?? const SizedBox.shrink(),
-            transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-            child: KeyedSubtree(
-              key: ValueKey(isSearchActive ? 'search' : 'default'),
-              child: bodyContent,
-            ),
-          ),
-        ),
-      ],
-    );
   }
 
   Widget _buildSectionHeader(String title, String section, List<Map<String, dynamic>> models, double screenWidth) {
@@ -1195,6 +1317,8 @@ class _ModelsScreenState extends State<ModelsScreen>
   /// 3. `Success`: Displays the main content via the `_buildContent` method.
   ///
   /// This architecture ensures a clean separation of concerns and a polished user experience.
+  /// The main build method, now lean and focused on orchestration.
+  /// It delegates the construction of complex UI parts to specialized helper methods.
   @override
   Widget build(BuildContext context) {
     super.build(context); // Required for AutomaticKeepAliveClientMixin
@@ -1205,141 +1329,186 @@ class _ModelsScreenState extends State<ModelsScreen>
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        title: Text(
-          localizations.modelsTitle,
-          style: TextStyle(
-            fontFamily: 'Roboto',
-            color: AppColors.primaryColor.inverted,
-            fontSize: screenWidth * 0.07,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        actions: [
-          SizedBox(
-            width: screenWidth * 0.37,
-            height: screenHeight * 0.1,
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.topLeft,
-              children: [
-                Positioned(
-                  top: screenHeight * 0.0129,
-                  left: screenWidth * 0.082,
-                  child: Container(
-                    width: screenWidth * 0.26,
-                    height: screenHeight * 0.045,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.016,
-                      vertical: screenHeight * 0.005,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.senaryColor.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Stack(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Container(
-                            padding: EdgeInsets.all(screenWidth * 0.01),
-                          ),
-                        ),
-                        Positioned(
-                          top: screenWidth * 0.012,
-                          right: screenWidth * 0.094,
-                          child: Text(
-                            localizations.create,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: screenWidth * 0.036,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: screenHeight * 0.0129,
-                  left: screenWidth * 0.25,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => _openCreateScreen(context),
-                      borderRadius: BorderRadius.circular(100),
-                      child: Container(
-                        width: screenWidth * 0.1,
-                        height: screenHeight * 0.045,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.senaryColor,
-                        ),
-                        padding: EdgeInsets.all(screenWidth * 0.026),
-                        child: SvgPicture.asset(
-                          'assets/icons/plus.svg',
-                          colorFilter:
-                          const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                          width: screenWidth * 0.02,
-                          height: screenWidth * 0.02,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned.fill(
-                  left: screenWidth * 0.07,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => _openCreateScreen(context),
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(context, localizations, screenWidth, screenHeight),
       body: Stack(
         children: [
-          // The main content area, which reacts to the current state.
-          GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () => FocusScope.of(context).unfocus(), // Dismiss keyboard on tap.
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                // Use a fade transition for smooth state changes.
-                return FadeTransition(opacity: animation, child: child);
-              },
-              // The core logic that determines which widget to display based on state flags.
-              child: _isLoading
-                  ? const SkeletonScreen(key: ValueKey('skeleton'))
-                  : _loadError
-                  ? ErrorView(
-                key: const ValueKey('error'),
-                title: localizations.errorLoadingTitle,
-                message: localizations.errorLoadingMessage,
-                buttonText: localizations.retry,
-                onRetry: _loadDataAndInitialize,
-              )
-                  : _buildContent(screenWidth, screenHeight),
-            ),
-          ),
-
-          // The localization warning panel is a separate layer on top of the main content.
+          _buildBody(context, localizations, screenWidth, screenHeight),
           _buildLocalizationWarningPanel(localizations),
         ],
       ),
     );
+  }
+
+  /// Builds the AppBar. By isolating it, we prevent it from rebuilding unnecessarily.
+  PreferredSizeWidget _buildAppBar(BuildContext context, AppLocalizations localizations, double screenWidth, double screenHeight) {
+    return AppBar(
+      scrolledUnderElevation: 0,
+      title: Text(
+        localizations.modelsTitle,
+        style: TextStyle(
+          fontFamily: 'Roboto',
+          color: AppColors.primaryColor.inverted,
+          fontSize: screenWidth * 0.07,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      backgroundColor: AppColors.background,
+      elevation: 0,
+      actions: [
+        // The "Create" button logic remains the same.
+        SizedBox(
+          width: screenWidth * 0.37,
+          height: screenHeight * 0.1,
+          child: Stack(
+            // ... (rest of the button code)
+            children: [
+              Positioned(
+                top: screenHeight * 0.0129,
+                left: screenWidth * 0.082,
+                child: Container(
+                  width: screenWidth * 0.26,
+                  height: screenHeight * 0.045,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.016,
+                    vertical: screenHeight * 0.005,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.senaryColor.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Container(
+                          padding: EdgeInsets.all(screenWidth * 0.01),
+                        ),
+                      ),
+                      Positioned(
+                        top: screenWidth * 0.012,
+                        right: screenWidth * 0.094,
+                        child: Text(
+                          localizations.create,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: screenWidth * 0.036,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: screenHeight * 0.0129,
+                left: screenWidth * 0.25,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _openCreateScreen(context),
+                    borderRadius: BorderRadius.circular(100),
+                    child: Container(
+                      width: screenWidth * 0.1,
+                      height: screenHeight * 0.045,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.senaryColor,
+                      ),
+                      padding: EdgeInsets.all(screenWidth * 0.026),
+                      child: SvgPicture.asset(
+                        'assets/icons/plus.svg',
+                        colorFilter:
+                        const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        width: screenWidth * 0.02,
+                        height: screenWidth * 0.02,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned.fill(
+                left: screenWidth * 0.07,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _openCreateScreen(context),
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Builds the main body of the screen, handling state transitions.
+  Widget _buildBody(BuildContext context, AppLocalizations localizations, double screenWidth, double screenHeight) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        child: _isLoading
+            ? const SkeletonScreen(key: ValueKey('skeleton'))
+            : _loadError
+            ? ErrorView(
+          key: const ValueKey('error'),
+          title: localizations.errorLoadingTitle,
+          message: localizations.errorLoadingMessage,
+          buttonText: localizations.retry,
+          onRetry: () {
+            setState(() => _isLoading = true);
+            _triggerAsyncLoadOrRefresh(forceNetwork: true);
+          },
+        )
+            : _buildContent(screenWidth, screenHeight),
+      ),
+    );
+  }
+
+  /// The single, intelligent async data handler. It decides whether to fetch from the network
+  /// or just update file states based on the current state.
+  Future<void> _triggerAsyncLoadOrRefresh({bool forceNetwork = false}) async {
+    // Step 1: Initialize prerequisites (directory paths, system info). This is always fast.
+    await Future.wait([
+      _initializeDirectory(),
+      _loadSystemInfo(),
+    ]);
+
+    if (!mounted) return;
+
+    final bool hasCachedData = CacheService.cachedModelsScreenData != null;
+
+    // Condition to fetch from network:
+    // 1. We are forced to (e.g., language change, model deletion).
+    // 2. We don't have any cached data to begin with (first launch).
+    if (forceNetwork || !hasCachedData) {
+      debugPrint("[ModelsScreen] Triggering full network fetch. Force: $forceNetwork, No Cache: ${!hasCachedData}");
+      final langCode = Localizations.localeOf(context).languageCode;
+      final modelsFromData = await ModelData.getModels(langCode: langCode);
+
+      if (!mounted) return;
+
+      if (modelsFromData == null) {
+        setState(() { _isLoading = false; _loadError = true; });
+      } else {
+        CacheService.cachedModelsScreenData = modelsFromData;
+        CacheService.startModelsScreenCacheTimer();
+        await _updateStateWithNewModels(modelsFromData);
+      }
+    } else {
+      // If we already have data (from initState), just run the silent background refresh for file states.
+      debugPrint("[ModelsScreen] Triggering silent background file state refresh.");
+      await _updateFileStatesInBackground(CacheService.cachedModelsScreenData!);
+    }
   }
 }
 

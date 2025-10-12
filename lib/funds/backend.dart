@@ -16,6 +16,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import '../cache.dart'; // For caching product details
 import '../internet.dart';
+import '../l10n/app_localizations.dart';
+import '../notifications.dart';
 
 class FundsBackend with ChangeNotifier {
   // --- Service Instances ---
@@ -61,8 +63,11 @@ class FundsBackend with ChangeNotifier {
   static const Set<String> _subscriptionIds = { monthlySubscriptionPlus, annualSubscriptionPlus, monthlySubscriptionPro, annualSubscriptionPro, monthlySubscriptionUltra, annualSubscriptionUltra };
   static const Set<String> _creditProductIds = { 'cortex_credits_250', 'credits_500', 'credits_1000', 'credits_2500', 'credits_5000' };
 
-  final _purchaseCompletedController = StreamController<void>.broadcast();
-  Stream<void> get onPurchaseCompleted => _purchaseCompletedController.stream;
+  final _purchaseCompletedController = StreamController<String>.broadcast();
+  Stream<String> get onPurchaseCompleted => _purchaseCompletedController.stream;
+
+  late NotificationService _notificationService;
+  late AppLocalizations _localizations;
 
   static final List<ProductDetails> _mockProducts = [
     ProductDetails(id: 'cortex_credits_250', title: '250 Credits', description: 'Test', price: '\$2.49', rawPrice: 2.49, currencyCode: 'USD'),
@@ -78,9 +83,16 @@ class FundsBackend with ChangeNotifier {
     ProductDetails(id: 'cortex_ultra_annual', title: 'Ultra Annual', description: 'Test', price: '\$199.99', rawPrice: 199.99, currencyCode: 'USD'),
   ];
 
-  Future<void> initialize() async {
+  Future<void> initialize({
+    required NotificationService notificationService,
+    required AppLocalizations localizations,
+  }) async {
     if (_initialized) return;
     _initialized = true;
+
+    // Store the services for later use in the purchase flow
+    _notificationService = notificationService;
+    _localizations = localizations;
 
     CacheService.touchPremiumCache();
 
@@ -92,6 +104,7 @@ class FundsBackend with ChangeNotifier {
     _listenToUserChanges();
     await _fetchProductDetails();
   }
+
 
   Future<void> _fetchProductDetails() async {
     if (AppDataState().needsRefresh) {
@@ -161,17 +174,85 @@ class FundsBackend with ChangeNotifier {
   }
 
   Future<void> purchase(ProductDetails product) async {
-    if (_isPurchasePending) return;
+    if (_isPurchasePending) {
+      log('Purchase attempt ignored: Another purchase is already pending.', name: _logName);
+      return;
+    }
+
     final user = _auth.currentUser;
     if (user == null) {
       log('Purchase blocked: User is not authenticated.', name: _logName);
       return;
     }
 
+    final isDesignatedTester = user.email == "mustawtfa@gmail.com";
+
+    // --- PATH 1: DESIGNATED TESTER ---
+    if (isDesignatedTester) {
+      log('Initiating DIRECT test purchase for tester: ${product.id}', name: _logName);
+      _setPurchasePending(true);
+
+      try {
+        final callable = _functions.httpsCallable('verifyPurchase');
+        await callable.call<dynamic>({
+          'productId': product.id,
+          'platform': defaultTargetPlatform.name.toLowerCase(),
+        });
+
+        log('Test purchase for ${product.id} successfully processed by server.', name: _logName);
+
+        // THE FIX: Check if this is a cancellation and show a specific notification.
+        if (product.id == 'cancel_subscription_test') {
+          _notificationService.showNotification(
+            message: _localizations.subscriptionCancelled, // Assuming you have this localization key
+            isSuccess: true,
+            oneLine: false,
+          );
+        } else {
+          _notificationService.showNotification(
+            message: _localizations.purchaseSuccessful,
+            isSuccess: true,
+            oneLine: false,
+          );
+        }
+
+        // Only trigger confetti for actual purchases, not cancellations.
+        if (product.id != 'cancel_subscription_test') {
+          _purchaseCompletedController.add(product.id);
+        }
+
+        AppDataState().markUserDataAsChanged();
+      } on FirebaseFunctionsException catch (e) {
+        log('Test purchase failed: ${e.message}', name: _logName, error: e);
+        _setError('Test purchase failed: ${e.message}');
+        _notificationService.showNotification(
+          message: e.message ?? _localizations.purchaseError,
+          isSuccess: false,
+          oneLine: false,
+        );
+      } catch (e, stack) {
+        log('An unexpected client error occurred during test purchase.', name: _logName, error: e);
+        await _crashlytics.recordError(e, stack, reason: 'Client-side error during test purchase for ${product.id}', fatal: true);
+        _setError("An unexpected error occurred.");
+        _notificationService.showNotification(
+          message: _localizations.anErrorOccurred,
+          isSuccess: false,
+          oneLine: false,
+        );
+      } finally {
+        _setPurchasePending(false);
+      }
+      return;
+    }
+
+    // --- PATH 2: REGULAR USER ---
+    // (This part remains unchanged)
     await _crashlytics.setUserIdentifier(user.uid);
     _setPurchasePending(true);
-    final purchaseParam = PurchaseParam(productDetails: product);
-
+    final purchaseParam = PurchaseParam(
+      productDetails: product,
+      applicationUserName: user.uid,
+    );
     try {
       if (_creditProductIds.contains(product.id)) {
         await _inAppPurchase.buyConsumable(purchaseParam: purchaseParam);
@@ -187,7 +268,33 @@ class FundsBackend with ChangeNotifier {
     }
   }
 
+  /// THE CORE FIX: This function now also checks if the user is the designated
+  /// tester and routes them to a special test purchase instead of the Play Store.
   Future<void> manageSubscription() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    final isDesignatedTester = user.email == "mustawtfa@gmail.com";
+
+    // --- PATH 1: DESIGNATED TESTER CANCELLATION ---
+    if (isDesignatedTester) {
+      log('Designated tester is managing subscription. Triggering test cancellation.', name: _logName);
+      // To cancel, the tester "purchases" a special, non-existent product ID.
+      // The server recognizes this ID and processes a cancellation.
+      final cancelProduct = ProductDetails(
+        id: 'cancel_subscription_test',
+        title: 'Cancel Test Subscription',
+        description: 'A virtual product to cancel a test subscription.',
+        price: '',
+        rawPrice: 0.0,
+        currencyCode: '',
+      );
+      // We reuse the main purchase function, which already has the tester logic.
+      await purchase(cancelProduct);
+      return;
+    }
+
+    // --- PATH 2: REGULAR USER MANAGEMENT ---
     final Uri url = Uri.parse('https://play.google.com/store/account/subscriptions?package=com.vertex.cortex');
     try {
       if (await canLaunchUrl(url)) {
@@ -214,6 +321,13 @@ class FundsBackend with ChangeNotifier {
   }
 
   Future<void> _verifyAndCompletePurchase(PurchaseDetails purchaseDetails) async {
+    // THE FIX: Show an immediate "verifying" notification.
+    _notificationService.showNotification(
+      message: _localizations.purchaseReceived,
+      isSuccess: null, // Neutral color
+      oneLine: false,
+    );
+
     try {
       final callable = _functions.httpsCallable('verifyPurchase');
       await callable.call<dynamic>({
@@ -225,12 +339,25 @@ class FundsBackend with ChangeNotifier {
       if (purchaseDetails.pendingCompletePurchase) {
         await _inAppPurchase.completePurchase(purchaseDetails);
       }
+
+      _notificationService.showNotification(
+        message: _localizations.purchaseSuccessful,
+        isSuccess: true,
+        oneLine: false,
+      );
+
       AppDataState().markUserDataAsChanged();
-      _purchaseCompletedController.add(null);
+      _purchaseCompletedController.add(purchaseDetails.productID); // Triggers confetti
     } catch (e, stack) {
       log('Server verification or client completion failed: $e', name: _logName, error: e);
       await _crashlytics.recordError(
         e, stack, reason: 'Failed to verify or complete purchase for ${purchaseDetails.productID}', information: [ 'Purchase Status: ${purchaseDetails.status}' ], fatal: true,
+      );
+      // THE FIX: Show a "verification delayed" error notification.
+      _notificationService.showNotification(
+        message: _localizations.verificationDelayed,
+        isSuccess: false,
+        oneLine: false,
       );
     } finally {
       _setPurchasePending(false);
@@ -242,12 +369,16 @@ class FundsBackend with ChangeNotifier {
     _crashlytics.recordError(
       purchaseDetails.error ?? 'Unknown Purchase Error', StackTrace.current, reason: 'Purchase failed for product ${purchaseDetails.productID}', fatal: false,
     );
-    if (purchaseDetails.pendingCompletePurchase) _inAppPurchase.completePurchase(purchaseDetails);
-    _setPurchasePending(false);
-  }
 
-  void _handleCanceledPurchase(PurchaseDetails d) {
-    if (d.pendingCompletePurchase) _inAppPurchase.completePurchase(d);
+    // THE FIX: Show a user-friendly error notification from the store.
+    final errorMessage = purchaseDetails.error?.message ?? _localizations.purchaseStreamError;
+    _notificationService.showNotification(
+      message: errorMessage,
+      isSuccess: false,
+      oneLine: false,
+    );
+
+    if (purchaseDetails.pendingCompletePurchase) _inAppPurchase.completePurchase(purchaseDetails);
     _setPurchasePending(false);
   }
 
@@ -256,6 +387,20 @@ class FundsBackend with ChangeNotifier {
     _crashlytics.recordError(
       error, stack, reason: 'An error occurred in the global purchase stream.', fatal: true,
     );
+
+    // THE FIX: Show a generic error notification for stream-level failures.
+    _notificationService.showNotification(
+      message: _localizations.purchaseStreamError,
+      isSuccess: false,
+      oneLine: false,
+    );
+
+    _setPurchasePending(false);
+  }
+
+
+  void _handleCanceledPurchase(PurchaseDetails d) {
+    if (d.pendingCompletePurchase) _inAppPurchase.completePurchase(d);
     _setPurchasePending(false);
   }
 

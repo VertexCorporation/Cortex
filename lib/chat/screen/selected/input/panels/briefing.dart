@@ -267,8 +267,9 @@ class _BriefingOverlayState extends State<BriefingOverlay> with TickerProviderSt
   }
 
   bool get _modelMissing {
-    if (!widget.isOfflineModel) return false;
-    if (widget.modelPath == null || widget.modelPath!.isEmpty) return true;
+    if (widget.isOfflineModel == false || widget.modelPath == null || widget.modelPath!.isEmpty) {
+      return false;
+    }
     return !File(widget.modelPath!).existsSync();
   }
 }

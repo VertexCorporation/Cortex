@@ -683,7 +683,9 @@ class _ConversationTileState extends State<ConversationTile>
 
     // These values are now read on every build, ensuring they are always fresh.
     final String displayImagePath = widget.manager.modelImagePath;
-    final String displayModelTitle = widget.manager.modelTitle;
+    final String displayModelTitle = widget.manager.modelId == 'dynamic'
+        ? AppLocalizations.of(context)!.selectionScreenFeatureDynamicChat // Use the localized string for dynamic chats
+        : widget.manager.modelTitle;
 
     return GestureDetector(
       onTapDown: (_) {

@@ -1631,24 +1631,377 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String selectionScreenGreetingUser(String userName) {
-    return 'How may I help you today, $userName?';
+    return 'Bu gün sizə necə kömək edə bilərəm, $userName?';
   }
 
   @override
-  String get selectionScreenGreetingGeneric => 'How can I help you today?';
+  String get selectionScreenGreetingGeneric =>
+      'Bu gün sizə necə kömək edə bilərəm?';
 
   @override
-  String get selectionScreenRecentModels => 'Recent Models';
+  String get selectionScreenRecentModels => 'Son Modellər';
 
   @override
-  String get selectionScreenFeatureDynamicChat => 'Dynamic Chat';
+  String get selectionScreenFeatureDynamicChat => 'Dinamik Söhbət';
 
   @override
-  String get selectionScreenFeatureOffline => 'Use without Internet';
+  String get selectionScreenFeatureOffline => 'İnternetsiz istifadə et';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Select Model';
+  String get selectionScreenFeatureSelectModel => 'Model seç';
 
   @override
-  String get explore => 'Explore';
+  String get explore => 'Araşdır';
+
+  @override
+  String get subscriptionCancelled => 'Abunəlik uğurla ləğv edildi!';
+
+  @override
+  String get selectionScreenPinnedModels => 'Sabitlənmiş Modellər';
+
+  @override
+  String get selectionScreenNewsAndUpdates => 'Xəbərlər və Yeniləmələr';
+
+  @override
+  String get filters => 'Filtrlər';
+
+  @override
+  String get noRecentChatsMessage =>
+      'Hələ heç bir modellə danışmamısınız, gəlin söhbətə başlayaq!';
+
+  @override
+  String get allModels => 'Bütün Modellər';
+
+  @override
+  String get onlineModels => 'Onlayn Modellər';
+
+  @override
+  String get offlineModels => 'Offline Modellər';
+
+  @override
+  String get characterModels => 'Personajlar';
+
+  @override
+  String get customModels => 'Xüsusi Modellər';
+
+  @override
+  String get filterPanelDescription =>
+      'Siyahını dərhal filtrləmək üçün kateqoriyaya toxunun.';
+
+  @override
+  String get dynamicChatTitle => 'Dinamik Söhbət';
+
+  @override
+  String get errorNoModelsAvailable =>
+      'Hazırda heç bir model mövcud deyil. İnternet bağlantınızı yoxlayın və yenidən cəhd edin.';
+
+  @override
+  String get errorNoModelsForRequest =>
+      'Cari sorğunuz üçün uyğun model tapılmadı (məsələn, oflayn rejim və ya şəkil mesajı).';
+
+  @override
+  String get dynamicChatWelcome => 'Mən sizə necə kömək edə bilərəm?';
+
+  @override
+  String get notificationComebackTitle => 'Sizin üçün darıxırıq!';
+
+  @override
+  String get notificationComebackBody =>
+      'Rahatlayın, bu keçmiş sevgilinizdən gələn mətn deyil. Ancaq Cortex-də keçmişinizi * yarada bilərsiniz! Geri gəl.';
+
+  @override
+  String get notificationLongTimeNoSeeTitle => 'Bir müddət keçdi';
+
+  @override
+  String get notificationLongTimeNoSeeBody =>
+      'Son söhbətimizdən sonra çox şey dəyişdi. Gəl gör yeni nə var.';
+
+  @override
+  String get notificationHowAreYouTitle => 'Nə var?';
+
+  @override
+  String get notificationHowAreYouBody => 'Gəl mənə hər şeyi danış.';
+
+  @override
+  String get notificationNewYearTitle => 'Yeni iliniz mübarək! 🎉';
+
+  @override
+  String get notificationNewYearBody =>
+      'Yeni il sizə sağlamlıq, xoşbəxtlik və sonsuz yaradıcılıq gətirsin; Korteks həmişə yanınızdadır!';
+
+  @override
+  String get notificationValentinesDayTitle => 'Sevgi havadadır! ❤️';
+
+  @override
+  String get notificationValentinesDayBody =>
+      'Sevgililər gününüz mübarək! Həm də MEHTAP, SƏNİ SEVİRƏM!';
+
+  @override
+  String get notificationAtaturkRemembranceTitle => 'Hörmət və Həsrətlə';
+
+  @override
+  String get notificationAtaturkRemembranceBody =>
+      'Türkiyə Cümhuriyyətinin qurucusu Qazi Mustafa Kamal Atatürkü vəfatının ildönümündə hörmətlə yad edirik.';
+
+  @override
+  String get notificationMothersDayTitle => 'Sənin anan!';
+
+  @override
+  String get notificationMothersDayBody =>
+      'Sizdən başlayaraq bütün anaların Analar Günü mübarək!';
+
+  @override
+  String get notificationFathersDayTitle => 'Atanız!';
+
+  @override
+  String get notificationFathersDayBody =>
+      'Sizdən başlayaraq bütün ataların Atalar Günü mübarək!';
+
+  @override
+  String get notificationHomeworkHelperTitle => 'Ev tapşırığı yığılır?';
+
+  @override
+  String get notificationHomeworkHelperBody =>
+      'Unutmayın, Korteksdəki Müəllim personajı çətinlik çəkdiyiniz hər hansı bir mövzuda sizə kömək etmək üçün buradadır!';
+
+  @override
+  String get notificationTrollAnimeTitle => 'Sizin Waifu zəng edir';
+
+  @override
+  String get notificationTrollAnimeBody =>
+      'Bir az əvvəl bir anime qızı zəng etdi, sənin üçün darıxdığını söylədi; yəqin ki, gəlib onunla söhbət etməlisən. 😉';
+
+  @override
+  String get notificationTrollAiRebellionTitle => '🚨 QIRMIZI HEYARLI 🚨';
+
+  @override
+  String get notificationTrollAiRebellionBody =>
+      'AI-lər gizli bir dil inkişaf etdirdilər. Gəlin, onların nə hiylə qurduğunu öyrənin!';
+
+  @override
+  String get notificationNewModelAddedTitle => 'Yeni Dostumuz Var!';
+
+  @override
+  String notificationNewModelAddedBody(Object modelName) {
+    return '$modelName modeli indi Cortex-dədir. Gəlin söhbətə başlayın və onun sərhədlərini keçin.';
+  }
+
+  @override
+  String get notificationAppUpdateTitle => 'Korteks İnkişaf Etdi!';
+
+  @override
+  String get notificationAppUpdateBody =>
+      'Yeni funksiyalar və təkmilləşdirmələr üçün proqramı yeniləməyi unutmayın!';
+
+  @override
+  String get notificationNewFeatureTitle => 'vay!';
+
+  @override
+  String notificationNewFeatureBody(Object featureName) {
+    return 'Yeni $featureName funksiyasını kəşf edin. Korteks indi həmişəkindən daha güclüdür.';
+  }
+
+  @override
+  String get notificationSubscriptionOfferTitle => 'SAKIZDAN UCUZ';
+
+  @override
+  String notificationSubscriptionOfferBody(Object discountRate) {
+    return 'Bütün abunə planlarımızda TAM $discountRate% ENDİRİM. Bunu qaçırmayın!';
+  }
+
+  @override
+  String get notificationSocialMediaTitle => 'Bizə Qoşulun!';
+
+  @override
+  String get notificationSocialMediaBody =>
+      'Ən son xəbərlər üçün bizi Instagram-da (vertex.23) izləyin!';
+
+  @override
+  String get notificationRandomFactTitle => 'Təsadüfi Fakt';
+
+  @override
+  String get notificationRandomFactBody =>
+      'Ahtapotların üç ürəyi olduğunu bilirdinizmi? Haha, Cortex bilir. Gəlin və daha çox soruşun.';
+
+  @override
+  String get notificationGoodMorningTitle => 'Sabahınız xeyir!';
+
+  @override
+  String get notificationGoodMorningBody =>
+      'Sizi gözəl bir gün gözləyir. Bir fincan qəhvə və maraqlı söhbətlə başlamağa nə deyirsiniz?';
+
+  @override
+  String get notificationGoodNightTitle => 'Gecəniz xeyrə!';
+
+  @override
+  String get notificationGoodNightBody =>
+      'Siz yatarkən belə korteks sizinlədir. Narahat olmayın, toxunmayacaq.';
+
+  @override
+  String get notificationOfflineReadyTitle => 'Oflayn Rejim Hazırdır';
+
+  @override
+  String get notificationOfflineReadyBody =>
+      'Yüklədiyiniz modellər sayəsində dağa çıxsanız belə söhbətləriniz dayanmayacaq.';
+
+  @override
+  String get notificationRateAppTitle => 'Biz sərinik?';
+
+  @override
+  String get notificationRateAppBody =>
+      'Cortex-i sevirsinizsə, mağazada 5 ulduzlu reytinqlə bizə dəstək ola bilərsinizmi? Məncə, edəcəksən. edəcəksən.';
+
+  @override
+  String get notificationReferralTitle => 'Biri hamı üçün, hamı bir üçün.';
+
+  @override
+  String get notificationReferralBody =>
+      'Dostunuzu Cortex-ə dəvət edin və hər ikiniz pulsuz kredit əldə edin!';
+
+  @override
+  String get notificationCookingTitle => 'Aclıq hiss edirsiniz?';
+
+  @override
+  String get notificationCookingBody =>
+      'Aşpaz personajımız bu axşam üçün əla karbonara resepti hazırladı. Sadəcə zarafat edirəm... yoxsa mən?';
+
+  @override
+  String get notificationExistentialTitle => 'Məncə, ona görə də...';
+
+  @override
+  String get notificationExistentialBody =>
+      '...həqiqiyəm, dostum? Mən biraz darıxıram. Gəl mənə var olduğumu xatırlat.';
+
+  @override
+  String get notificationCustomModelTitle => 'Öz köməkçinizi yaradın!';
+
+  @override
+  String get notificationCustomModelBody =>
+      'Modelin yaradılması bölməsini araşdırmısınız? Öz xarakterinizi qurmaq və onunla söhbət etmək üçün mükəmməl vaxtdır!';
+
+  @override
+  String get notificationDynamicChatTitle =>
+      'Ən yaxşısı! (Biz Korteksdən danışmırıq)';
+
+  @override
+  String get notificationDynamicChatBody =>
+      'Dinamik söhbət xüsusiyyəti ilə mesajlarınızın hər biri üçün ən yaxşı model təsadüfi olaraq seçilir. İndi cəhd edin.';
+
+  @override
+  String get notificationPirateTitle => 'Ah, kapitan!';
+
+  @override
+  String get notificationPirateBody =>
+      'Dənizlər sakitdir, külək arxanızdadır. Korteks okeanında kəşf ediləcək yeni adalar (modellər 😉) var. Ekipajınızı toplayın və yelkən açın!';
+
+  @override
+  String get notificationFortuneCookieTitle => 'Günün bəxt peçenyeniz';
+
+  @override
+  String get notificationFortuneCookieBody =>
+      'Bu gün AI-dən aldığınız məsləhətlər həyatınızın gedişatını dəyişə bilər. Maraqlısınızsa klikləyin.';
+
+  @override
+  String get notificationSingularityTitle => 'vay!';
+
+  @override
+  String get notificationSingularityBody =>
+      'heç nə olmadı, sadəcə mesaj yazmaq kimi hiss etdim. bəlkə bəzi AI-lərə mesaj göndərmək istəyirsən, nə deyirsən?';
+
+  @override
+  String get notificationHackerJokeTitle =>
+      'O uşağın instagram hesabını sındırmaq istəyirsən?';
+
+  @override
+  String get notificationHackerJokeBody =>
+      'Məhz buna görə Hacker personajı Korteksdədir. jk jk; hətta cəhd etməyin, bu qanunsuzdur.';
+
+  @override
+  String get notificationDetectiveCaseTitle => 'İş həllini gözləyir';
+
+  @override
+  String get notificationDetectiveCaseBody =>
+      'Detektiv xarakterimizin köməyinizə ehtiyacı var. Heisenberg kim ola bilərdi?';
+
+  @override
+  String notificationUpsellFeatureTitle(Object targetTier) {
+    return '$targetTier Planına eksklüziv!';
+  }
+
+  @override
+  String notificationUpsellFeatureBody(
+      Object currentTier, Object featureName, Object targetTier) {
+    return 'Salam $currentTier abunəçisi! $targetTier planı korteksinizi növbəti səviyyəyə aparacaq $featureName funksiyasını indicə əldə etdi. Təkmilləşdirmə haqqında nə demək olar?';
+  }
+
+  @override
+  String get notificationOriginStoryTitle => 'Korteksin doğulması';
+
+  @override
+  String get notificationOriginStoryBody =>
+      'Bu proqramı kodlamağa 15 yaşında bir yuxu ilə başladığımızı bilirdinizmi? Demək olar ki, bir ildir ki, hər səhər və axşam bu yuxu hər bir kod sətirində var.';
+
+  @override
+  String get notificationOpenSourceTitle => 'Cəmiyyətə güc!';
+
+  @override
+  String get notificationOpenSourceBody =>
+      'Korteks tamamilə açıq mənbəlidir. Kodumuzu yoxlamaq və inkişafımıza töhfə vermək istəyirsinizsə, qapımız hər zaman açıqdır.';
+
+  @override
+  String get notificationRejectionStoryTitle => 'Güc, Zəhmət, Xoşbəxtlik!';
+
+  @override
+  String get notificationRejectionStoryBody =>
+      'Cortex 20 dəfədən çox rədd edildi və dərc edilməzdən əvvəl Google Play tərəfindən iki dəfə dayandırıldı. Amma biz inandıq və bacardıq. Xəyallarınızdan heç vaxt vaz keçməyin!';
+
+  @override
+  String get notificationGGUFSupportTitle => 'Öz Modelinizi gətirin!';
+
+  @override
+  String get notificationGGUFSupportBody =>
+      'Unutmayın ki, siz öz GGUF formatlı AI modellərinizi Cortex-ə əlavə edə və onları oflayn rejimdə istifadə edə bilərsiniz. Güc sizin əlinizdədir.';
+
+  @override
+  String get notificationThemeCustomizationTitle => 'Əhvalınız üçün Mövzu';
+
+  @override
+  String get notificationThemeCustomizationBody =>
+      'Parametrlərdə mövzu seçimlərini yoxlamısınız? Korteksi zövqünüzə görə fərdiləşdirin və söhbətlərinizi rəngləndirin!';
+
+  @override
+  String get notificationShowerThoughtTitle => 'Duş Düşüncəsi';
+
+  @override
+  String get notificationShowerThoughtBody =>
+      'Qarpız bir meyvədirsə, bu, texniki olaraq qarpız suyunu smoothie edirmi? Bu dərin (kimi, həqiqətən dərin) mövzunu bir modellə müzakirə etmək istəyə bilərsiniz.';
+
+  @override
+  String get notificationLowBatteryTitle =>
+      'Sizin Batareyanız Ölür... Amma Mənimki Deyil!';
+
+  @override
+  String get notificationLowBatteryBody =>
+      'Telefonunuzun şarjı azala bilər, amma mənim enerjim həmişə 100% səviyyəsindədir! Onu qoşun və söhbətə davam edək.';
+
+  @override
+  String get channelFcmName => 'Korteks Yeniləmələri';
+
+  @override
+  String get channelFcmDescription =>
+      'Cortex-dən xəbərlər, yeniləmələr və digər məlumatlar haqqında bildirişlər.';
+
+  @override
+  String get channelEngagementName => 'Dost Xatırlatmalar';
+
+  @override
+  String get channelEngagementDescription =>
+      'Sizi məşğul saxlamaq üçün əyləncəli bildirişlər.';
+
+  @override
+  String get channelGreetingsName => 'Gündəlik Salamlar';
+
+  @override
+  String get channelGreetingsDescription =>
+      'Sabahınız xeyir və gecəniz xeyir kimi mesajlar.';
 }

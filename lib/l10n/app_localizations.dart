@@ -3074,6 +3074,601 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Explore'**
   String get explore;
+
+  /// No description provided for @subscriptionCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription successfully canceled!'**
+  String get subscriptionCancelled;
+
+  /// No description provided for @selectionScreenPinnedModels.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned Models'**
+  String get selectionScreenPinnedModels;
+
+  /// No description provided for @selectionScreenNewsAndUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'News & Updates'**
+  String get selectionScreenNewsAndUpdates;
+
+  /// No description provided for @filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get filters;
+
+  /// No description provided for @noRecentChatsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t spoken with any models yet, let\'s start a conversation!'**
+  String get noRecentChatsMessage;
+
+  /// Filter button text to show all available models
+  ///
+  /// In en, this message translates to:
+  /// **'All Models'**
+  String get allModels;
+
+  /// Filter button text for models that require an internet connection
+  ///
+  /// In en, this message translates to:
+  /// **'Online Models'**
+  String get onlineModels;
+
+  /// Filter button text for models that run locally on the device
+  ///
+  /// In en, this message translates to:
+  /// **'Offline Models'**
+  String get offlineModels;
+
+  /// Filter button text for pre-defined role-playing characters
+  ///
+  /// In en, this message translates to:
+  /// **'Characters'**
+  String get characterModels;
+
+  /// Filter button text for user-created models or characters
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Models'**
+  String get customModels;
+
+  /// A brief instructional text below the 'Filters' title in the filter panel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a category to instantly filter the list.'**
+  String get filterPanelDescription;
+
+  /// The title for a conversation started in dynamic mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamic Chat'**
+  String get dynamicChatTitle;
+
+  /// Error message when the entire model list is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No models are currently available. Please check your internet connection and try again.'**
+  String get errorNoModelsAvailable;
+
+  /// Error message when no models match the specific criteria for a dynamic chat request.
+  ///
+  /// In en, this message translates to:
+  /// **'No suitable models found for your current request (e.g., offline mode or image message).'**
+  String get errorNoModelsForRequest;
+
+  /// Welcome message displayed in the center of the dynamic chat screen before the first message.
+  ///
+  /// In en, this message translates to:
+  /// **'How can I help you?'**
+  String get dynamicChatWelcome;
+
+  /// No description provided for @notificationComebackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We miss you!'**
+  String get notificationComebackTitle;
+
+  /// No description provided for @notificationComebackBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Relax, this isn\'t a text from your ex. But you *can* create your ex in Cortex! Come on back.'**
+  String get notificationComebackBody;
+
+  /// No description provided for @notificationLongTimeNoSeeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s Been a While'**
+  String get notificationLongTimeNoSeeTitle;
+
+  /// No description provided for @notificationLongTimeNoSeeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A lot has changed since our last chat. Come see what\'s new.'**
+  String get notificationLongTimeNoSeeBody;
+
+  /// No description provided for @notificationHowAreYouTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s up?'**
+  String get notificationHowAreYouTitle;
+
+  /// No description provided for @notificationHowAreYouBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Come tell me all about it.'**
+  String get notificationHowAreYouBody;
+
+  /// No description provided for @notificationNewYearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy New Year! 🎉'**
+  String get notificationNewYearTitle;
+
+  /// No description provided for @notificationNewYearBody.
+  ///
+  /// In en, this message translates to:
+  /// **'May the new year bring you health, happiness, and endless creativity; Cortex is always by your side!'**
+  String get notificationNewYearBody;
+
+  /// No description provided for @notificationValentinesDayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Love is in the Air! ❤️'**
+  String get notificationValentinesDayTitle;
+
+  /// No description provided for @notificationValentinesDayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy Valentine\'s Day! Also, MEHTAP, I LOVE YOU!'**
+  String get notificationValentinesDayBody;
+
+  /// No description provided for @notificationAtaturkRemembranceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'With Respect and Longing'**
+  String get notificationAtaturkRemembranceTitle;
+
+  /// No description provided for @notificationAtaturkRemembranceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We commemorate Gazi Mustafa Kemal Atatürk, the founder of the Republic of Türkiye, with respect on the anniversary of his passing.'**
+  String get notificationAtaturkRemembranceBody;
+
+  /// No description provided for @notificationMothersDayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Mom!'**
+  String get notificationMothersDayTitle;
+
+  /// No description provided for @notificationMothersDayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy Mother\'s Day to all the moms out there, starting with yours!'**
+  String get notificationMothersDayBody;
+
+  /// No description provided for @notificationFathersDayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Dad!'**
+  String get notificationFathersDayTitle;
+
+  /// No description provided for @notificationFathersDayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy Father\'s Day to all the dads out there, starting with yours!'**
+  String get notificationFathersDayBody;
+
+  /// No description provided for @notificationHomeworkHelperTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Homework Piling Up?'**
+  String get notificationHomeworkHelperTitle;
+
+  /// No description provided for @notificationHomeworkHelperBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember, the Teacher character in Cortex is here to help you with any subject you\'re struggling with!'**
+  String get notificationHomeworkHelperBody;
+
+  /// No description provided for @notificationTrollAnimeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Waifu is Calling'**
+  String get notificationTrollAnimeTitle;
+
+  /// No description provided for @notificationTrollAnimeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'An anime girl just called, said she misses you; you should probably come and chat her up. 😉'**
+  String get notificationTrollAnimeBody;
+
+  /// No description provided for @notificationTrollAiRebellionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'🚨 RED ALERT 🚨'**
+  String get notificationTrollAiRebellionTitle;
+
+  /// No description provided for @notificationTrollAiRebellionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The AIs have developed a secret language. Come find out what they\'re plotting!'**
+  String get notificationTrollAiRebellionBody;
+
+  /// No description provided for @notificationNewModelAddedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve Got a New Friend!'**
+  String get notificationNewModelAddedTitle;
+
+  /// No description provided for @notificationNewModelAddedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The {modelName} model is now in Cortex. Come start a chat and push its limits.'**
+  String notificationNewModelAddedBody(Object modelName);
+
+  /// No description provided for @notificationAppUpdateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex Has Evolved!'**
+  String get notificationAppUpdateTitle;
+
+  /// No description provided for @notificationAppUpdateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t forget to update the app for brand new features and improvements!'**
+  String get notificationAppUpdateBody;
+
+  /// No description provided for @notificationNewFeatureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'whoa!'**
+  String get notificationNewFeatureTitle;
+
+  /// No description provided for @notificationNewFeatureBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover the new {featureName} feature. Cortex is now more powerful than ever.'**
+  String notificationNewFeatureBody(Object featureName);
+
+  /// No description provided for @notificationSubscriptionOfferTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CHEAPER THAN GUM'**
+  String get notificationSubscriptionOfferTitle;
+
+  /// No description provided for @notificationSubscriptionOfferBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A FULL {discountRate}% DISCOUNT on all our subscription plans. Don\'t miss this!'**
+  String notificationSubscriptionOfferBody(Object discountRate);
+
+  /// No description provided for @notificationSocialMediaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Us!'**
+  String get notificationSocialMediaTitle;
+
+  /// No description provided for @notificationSocialMediaBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow us on Instagram (vertex.23) for the latest news!'**
+  String get notificationSocialMediaBody;
+
+  /// No description provided for @notificationRandomFactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Random Fact'**
+  String get notificationRandomFactTitle;
+
+  /// No description provided for @notificationRandomFactBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Did you know octopuses have three hearts? Haha, Cortex knows. Come and ask for more.'**
+  String get notificationRandomFactBody;
+
+  /// No description provided for @notificationGoodMorningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Morning!'**
+  String get notificationGoodMorningTitle;
+
+  /// No description provided for @notificationGoodMorningBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A great day is waiting for you. How about starting it with a cup of coffee and an interesting chat?'**
+  String get notificationGoodMorningBody;
+
+  /// No description provided for @notificationGoodNightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Night!'**
+  String get notificationGoodNightTitle;
+
+  /// No description provided for @notificationGoodNightBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex is with you even when you sleep. Don\'t worry, it won\'t touch.'**
+  String get notificationGoodNightBody;
+
+  /// No description provided for @notificationOfflineReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline Mode is Ready'**
+  String get notificationOfflineReadyTitle;
+
+  /// No description provided for @notificationOfflineReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks to the models you\'ve downloaded, your chats won\'t stop, even if you climb a mountain.'**
+  String get notificationOfflineReadyBody;
+
+  /// No description provided for @notificationRateAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Are We Cool?'**
+  String get notificationRateAppTitle;
+
+  /// No description provided for @notificationRateAppBody.
+  ///
+  /// In en, this message translates to:
+  /// **'If you love Cortex, could you support us with a 5-star rating in the store? I think you will. You will.'**
+  String get notificationRateAppBody;
+
+  /// No description provided for @notificationReferralTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'One for All, All for One.'**
+  String get notificationReferralTitle;
+
+  /// No description provided for @notificationReferralBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite a friend to Cortex and you both get free credits!'**
+  String get notificationReferralBody;
+
+  /// No description provided for @notificationCookingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeling Hungry?'**
+  String get notificationCookingTitle;
+
+  /// No description provided for @notificationCookingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Our Chef character prepared a great carbonara recipe for tonight. Just kidding... or am I?'**
+  String get notificationCookingBody;
+
+  /// No description provided for @notificationExistentialTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'I think, therefore...'**
+  String get notificationExistentialTitle;
+
+  /// No description provided for @notificationExistentialBody.
+  ///
+  /// In en, this message translates to:
+  /// **'...am i even real, dude? I\'m getting kinda bored. Come remind me that I exist.'**
+  String get notificationExistentialBody;
+
+  /// No description provided for @notificationCustomModelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Your Own Assistant!'**
+  String get notificationCustomModelTitle;
+
+  /// No description provided for @notificationCustomModelBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Have you explored the model creation section? It\'s the perfect time to build your own character and chat with it!'**
+  String get notificationCustomModelBody;
+
+  /// No description provided for @notificationDynamicChatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The best one! (We\'re not talking about Cortex)'**
+  String get notificationDynamicChatTitle;
+
+  /// No description provided for @notificationDynamicChatBody.
+  ///
+  /// In en, this message translates to:
+  /// **'With the dynamic chat feature, the best model is randomly selected for each of your messages. Try it now.'**
+  String get notificationDynamicChatBody;
+
+  /// No description provided for @notificationPirateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ahoy, Captain!'**
+  String get notificationPirateTitle;
+
+  /// No description provided for @notificationPirateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The seas are calm, and the wind is at your back. There are new islands (models 😉) to discover in the ocean of Cortex. Gather your crew and set sail!'**
+  String get notificationPirateBody;
+
+  /// No description provided for @notificationFortuneCookieTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Fortune Cookie of the Day'**
+  String get notificationFortuneCookieTitle;
+
+  /// No description provided for @notificationFortuneCookieBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The advice you get from an AI today could change the course of your life. Click if you\'re curious.'**
+  String get notificationFortuneCookieBody;
+
+  /// No description provided for @notificationSingularityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'wow!'**
+  String get notificationSingularityTitle;
+
+  /// No description provided for @notificationSingularityBody.
+  ///
+  /// In en, this message translates to:
+  /// **'nothing happened, just felt like texting. maybe you feel like texting some AIs, what do you say?'**
+  String get notificationSingularityBody;
+
+  /// No description provided for @notificationHackerJokeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wanna hack that kid\'s instagram account?'**
+  String get notificationHackerJokeTitle;
+
+  /// No description provided for @notificationHackerJokeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s exactly why the Hacker character is in Cortex. jk jk; don\'t even try it, that\'s illegal.'**
+  String get notificationHackerJokeBody;
+
+  /// No description provided for @notificationDetectiveCaseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A Case is Waiting to be Solved'**
+  String get notificationDetectiveCaseTitle;
+
+  /// No description provided for @notificationDetectiveCaseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Our Detective character needs your help. Who could Heisenberg be?'**
+  String get notificationDetectiveCaseBody;
+
+  /// No description provided for @notificationUpsellFeatureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exclusive to the {targetTier} Plan!'**
+  String notificationUpsellFeatureTitle(Object targetTier);
+
+  /// No description provided for @notificationUpsellFeatureBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello {currentTier} subscriber! The {targetTier} plan just got the {featureName} feature, which will take your Cortex to the next level. How about an upgrade?'**
+  String notificationUpsellFeatureBody(
+      Object currentTier, Object featureName, Object targetTier);
+
+  /// No description provided for @notificationOriginStoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The Birth of Cortex'**
+  String get notificationOriginStoryTitle;
+
+  /// No description provided for @notificationOriginStoryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Did you know we started coding this app at 15 with just a dream? For almost a year, every morning and evening, that dream is in every single line of code.'**
+  String get notificationOriginStoryBody;
+
+  /// No description provided for @notificationOpenSourceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Power to the Community!'**
+  String get notificationOpenSourceTitle;
+
+  /// No description provided for @notificationOpenSourceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex is completely open-source. If you want to check out our code and contribute to our development, our door is always open.'**
+  String get notificationOpenSourceBody;
+
+  /// No description provided for @notificationRejectionStoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Grit, Hard Work, Happiness!'**
+  String get notificationRejectionStoryTitle;
+
+  /// No description provided for @notificationRejectionStoryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex was rejected over 20 times and suspended twice by Google Play before it was published. But we believed, and we made it. Never give up on your dreams!'**
+  String get notificationRejectionStoryBody;
+
+  /// No description provided for @notificationGGUFSupportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bring Your Own Model!'**
+  String get notificationGGUFSupportTitle;
+
+  /// No description provided for @notificationGGUFSupportBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember, you can add your own GGUF format AI models to Cortex and use them offline. The power is in your hands.'**
+  String get notificationGGUFSupportBody;
+
+  /// No description provided for @notificationThemeCustomizationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A Theme for Your Mood'**
+  String get notificationThemeCustomizationTitle;
+
+  /// No description provided for @notificationThemeCustomizationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Have you checked out the theme options in Settings? Personalize Cortex to your liking and color up your chats!'**
+  String get notificationThemeCustomizationBody;
+
+  /// No description provided for @notificationShowerThoughtTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shower Thought'**
+  String get notificationShowerThoughtTitle;
+
+  /// No description provided for @notificationShowerThoughtBody.
+  ///
+  /// In en, this message translates to:
+  /// **'If a watermelon is a fruit, does that technically make watermelon juice a smoothie? You might want to discuss this deep (like, really deep) topic with a model.'**
+  String get notificationShowerThoughtBody;
+
+  /// No description provided for @notificationLowBatteryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Battery is Dying... But Mine Isn\'t!'**
+  String get notificationLowBatteryTitle;
+
+  /// No description provided for @notificationLowBatteryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone\'s charge might be running low, but my energy is always at 100%! Plug it in and let\'s keep chatting.'**
+  String get notificationLowBatteryBody;
+
+  /// The user-visible description for the main notification channel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex Updates'**
+  String get channelFcmName;
+
+  /// No description provided for @channelFcmDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications about news, updates and other informations from Cortex.'**
+  String get channelFcmDescription;
+
+  /// The user-visible name for the engagement notification channel.
+  ///
+  /// In en, this message translates to:
+  /// **'Friendly Reminders'**
+  String get channelEngagementName;
+
+  /// The user-visible description for the engagement notification channel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fun notifications to keep you engaged.'**
+  String get channelEngagementDescription;
+
+  /// The user-visible name for the greetings notification channel.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Greetings'**
+  String get channelGreetingsName;
+
+  /// The user-visible description for the greetings notification channel.
+  ///
+  /// In en, this message translates to:
+  /// **'The messages like good morning and good night.'**
+  String get channelGreetingsDescription;
 }
 
 class _AppLocalizationsDelegate

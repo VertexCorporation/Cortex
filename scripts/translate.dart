@@ -5,6 +5,66 @@ import 'dart:convert';
 import 'package:path/path.dart' as p;
 
 Future<void> main(List<String> args) async {
+
+  final renameArg = args.firstWhere((arg) => arg.startsWith('--rename='), orElse: () => '');
+
+  if (renameArg.isNotEmpty) {
+    final pairsString = renameArg.split('=')[1];
+    if (pairsString.isEmpty) {
+      stderr.writeln('❌ Error: --rename argument have to take a value. Örn: --rename=old:new');
+      exit(1);
+    }
+
+    final Map<String, String> renameMap = {};
+    for (final pair in pairsString.split(',')) {
+      final parts = pair.split(':');
+      if (parts.length != 2 || parts[0].isEmpty || parts[1].isEmpty) {
+        stderr.writeln('❌ Error: Invalid Format. Use: --rename=old1:new1,old2:new2');
+        exit(1);
+      }
+      renameMap[parts[0].trim()] = parts[1].trim();
+    }
+
+    print('🔄 Key renaming mode is active.');
+    print('Keys that will be changed: $renameMap');
+
+    final scriptPath = Platform.script.toFilePath();
+    final projectRoot = p.dirname(p.dirname(scriptPath));
+    final arbDir = p.join(projectRoot, 'lib', 'l10n');
+    final arbFiles = Directory(arbDir).listSync().where((f) => f.path.endsWith('.arb'));
+
+    int filesChanged = 0;
+    for (final fileEntity in arbFiles) {
+      final file = File(fileEntity.path);
+      String content = await file.readAsString();
+
+
+      bool fileModified = false;
+      renameMap.forEach((oldKey, newKey) {
+
+        final oldKeyPattern = '"$oldKey"';
+        final newKeyPattern = '"$newKey"';
+        final oldMetaPattern = '"@$oldKey"';
+        final newMetaPattern = '"@$newKey"';
+
+        if (content.contains(oldKeyPattern)) {
+          content = content.replaceAll(oldKeyPattern, newKeyPattern);
+          content = content.replaceAll(oldMetaPattern, newMetaPattern);
+          fileModified = true;
+        }
+      });
+
+      if (fileModified) {
+        await file.writeAsString(content);
+        print('✅ Updated: ${p.basename(file.path)}');
+        filesChanged++;
+      }
+    }
+
+    print('\n✨ Renaming completed. Total $filesChanged files updated.');
+    return;
+  }
+  
   // =========================================================================
   // === MANUAL OVERRIDE SYSTEM ==============================================
   // =========================================================================
@@ -131,6 +191,13 @@ Future<void> main(List<String> args) async {
 
         if (result.exitCode == 0) {
           String translatedText = result.stdout.toString().trim().replaceAll(placeholder, '\n');
+
+          translatedText = translatedText
+              .replaceAll('&#39;', "'")
+              .replaceAll('&quot;', '"')
+              .replaceAll('&amp;', '&')
+              .replaceAll('&lt;', '<')
+              .replaceAll('&gt;', '>');
 
           final instructionRegex = RegExp(r'\[.*?\]\s*');
           translatedText = translatedText.replaceAll(instructionRegex, '');

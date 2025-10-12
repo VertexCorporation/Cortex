@@ -3,7 +3,7 @@ description: "Peak of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 1.5.5+155
+version: 1.7.4+174
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -23,47 +23,49 @@ dependencies:
   flutter_markdown: ^0.7.4+1
   flutter_math_fork: ^0.7.4
   font_awesome_flutter: ^10.8.0
-  fl_chart: ^0.70.2
+  fl_chart: ^1.1.1
   intl: ^0.20.2
   collection: ^1.18.0
 
   # --- FIREBASE (UPDATED FOR COMPATIBILITY) ---
-  firebase_core: ^3.2.0                # Updated
-  firebase_auth: ^5.1.2                # Updated
-  cloud_firestore: ^5.1.0              # Updated to resolve conflict
-  firebase_analytics: ^11.1.0            # Updated
-  firebase_remote_config: ^5.1.0       # Updated
-  cloud_functions: ^5.1.0              # Updated
-  firebase_crashlytics: ^4.0.2           # Updated
-  google_sign_in: ^6.3.0
+  firebase_core: ^4.1.1                # Updated
+  firebase_auth: ^6.1.0                # Updated
+  cloud_firestore: ^6.0.2              # Updated
+  firebase_analytics: ^12.0.2          # Updated
+  firebase_remote_config: ^6.0.2       # Updated
+  cloud_functions: ^6.0.2              # Updated
+  firebase_crashlytics: ^5.0.2         # Updated
+  google_sign_in: ^7.2.0               # Updated
+  firebase_messaging: ^16.0.2          # Added
 
   # --- IN-APP PURCHASE ---
   in_app_purchase: ^3.2.0
   in_app_purchase_android: ^0.4.0
+  in_app_purchase_storekit: ^0.4.6
   in_app_review: ^2.0.10
 
   # --- DEVICE & UTILITIES ---
   url_launcher: ^6.3.1
   path_provider: ^2.0.11
   shared_preferences: ^2.3.2
-  permission_handler: ^11.3.1
-  device_info_plus: ^11.3.0
+  permission_handler: ^12.0.1
+  device_info_plus: ^12.1.0
   uuid: ^4.5.1
   mutex: ^3.1.0
   retry: ^3.1.2
   http: any
   dio: ^5.7.0
   internet_connection_checker_plus: any
-  upgrader: ^11.5.0
+  upgrader: ^12.1.0
 
   # --- FILE & DATA HANDLING ---
   sqflite: ^2.4.1
   path: any
-  file_picker: ^9.0.2
+  file_picker: ^10.3.3
   image_picker: ^1.1.2
   gallery_saver_plus: ^3.2.1
   mime: any
-  share_plus: ^10.1.4
+  share_plus: ^12.0.0
   flutter_downloader: ^1.11.8
 
   # --- SECURITY & MISC ---
@@ -77,8 +79,9 @@ dependencies:
   # --- NATIVE INTEGRATIONS ---
   flutter_native_splash: ^2.4.4
   webview_flutter: ^4.13.0
-  flutter_local_notifications: ^18.0.1
+  flutter_local_notifications: ^19.4.2
   android_play_install_referrer: ^0.4.0
+  battery_plus: ^7.0.0
 
   # --- SYNTAX HIGHLIGHTING ---
   flutter_highlight: ^0.7.0
@@ -95,7 +98,7 @@ dev_dependencies:
 
 flutter_icons:
   android: true
-  ios: false
+  ios: true
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/cortex.png"
   image_path: "assets/cortex.png"

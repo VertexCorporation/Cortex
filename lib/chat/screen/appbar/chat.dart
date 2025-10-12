@@ -3,12 +3,13 @@
 import 'dart:math';
 import 'package:cortex/extensions.dart';
 import 'package:cortex/main.dart';
-import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../l10n/app_localizations.dart';
 
 /// A reusable, stateful widget that displays the model's title and a dropdown
 /// arrow for selecting extensions. It also manages the logic for showing
@@ -39,6 +40,8 @@ class ChatTitleState extends State<ChatTitle> with TickerProviderStateMixin {
   OverlayEntry? _extensionOverlayEntry;
   late AnimationController _extensionAnimationController;
   late Animation<double> _extensionAnimation;
+  bool get isPanelVisible => _extensionOverlayEntry != null;
+  VoidCallback? _onPanelClosed;
 
   @override
   void initState() {
@@ -64,102 +67,118 @@ class ChatTitleState extends State<ChatTitle> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final bool hasExtensions = widget.extensions.currentExtensions.isNotEmpty;
-
-    // Define all dynamic sizes once for consistency.
     final double fontSize = screenWidth * 0.056;
 
-    // Create the arrow widget once to be reused.
-    final Widget arrowIcon = _buildModelExtensionSelector(context, fontSize);
-
-    // --- THE FLAWLESS SYMMETRICAL ROW SOLUTION ---
-    return Row(
+    // The core content: a Row that grows naturally with its text content.
+    final Widget titleContent = Row(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min, // Crucial: makes the Row as wide as its children.
       children: [
-        // 1. THE GHOST SPACER: An invisible clone of the arrow on the left.
-        //    This creates perfect symmetry for centering the text.
-        //    'maintainSize: true' is critical for it to occupy space.
+        // 1. THE GHOST SPACER: For perfect symmetrical alignment.
         if (hasExtensions)
           Opacity(
             opacity: 0.0,
-            child: arrowIcon,
+            child: _buildArrowIcon(fontSize),
           ),
 
-        // 2. THE DYNAMIC TEXT: The text is now allowed to be flexible
-        //    and will scale down gracefully if it's too long to fit.
-        Flexible(
-          child: Padding(
-            // Add horizontal padding to prevent text from touching the arrows.
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.015),
-            child: FittedBox(
-              fit: BoxFit.scaleDown, // Only shrinks the text if it's too large.
-              child: Text(
-                widget.modelTitle ?? '',
-                style: GoogleFonts.mavenPro(
-                  fontSize: fontSize,
-                  color: AppColors.primaryColor.inverted,
-                  fontWeight: FontWeight.w600,
-                ),
-                maxLines: 1,
-              ),
+        // 2. THE DYNAMIC TEXT: Now allowed to be its full size.
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.015),
+          child: Text(
+            widget.modelTitle ?? '',
+            style: GoogleFonts.mavenPro(
+              fontSize: fontSize,
+              color: AppColors.primaryColor.inverted,
+              fontWeight: FontWeight.w600,
             ),
+            maxLines: 1,
+            // No overflow handling here; the parent FittedBox will handle it.
           ),
         ),
 
-        // 3. THE REAL ARROW: The visible arrow on the right.
+        // 3. THE REAL ARROW: The visible, interactive counterpart.
         if (hasExtensions)
-          arrowIcon,
+          _buildArrowIcon(fontSize),
       ],
     );
-  }
 
-  /// Builds the extension selector arrow icon, sized relative to the title's font size.
-  Widget _buildModelExtensionSelector(BuildContext context, double fontSize) {
-    // The arrow's size is now equal to the font size of the title.
-    final double arrowSize = MediaQuery.of(context).size.width * 0.056;
-
+    // This is the wrapper that applies the sophisticated sizing rules.
     return GestureDetector(
       key: widget.extensionKey,
-      onTap: widget.onTitleTap,
-      // No vertical translation needed anymore, as Row handles vertical alignment perfectly.
-      child: Transform.rotate(
-        angle: -pi / 2,
-        child: SvgPicture.asset(
-          'assets/icons/arrov.svg',
-          width: arrowSize,
-          height: arrowSize,
-          colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+      onTap: hasExtensions ? widget.onTitleTap : null,
+      behavior: HitTestBehavior.opaque,
+      child: ConstrainedBox(
+        // Rule 1: The entire title area can be at most 65% of the screen width.
+        constraints: BoxConstraints(
+          maxWidth: screenWidth * 0.65,
+        ),
+        // Rule 2: If the child (titleContent) is WIDER than the maxWidth,
+        //         proportionally scale it down until it fits. If it's smaller,
+        //         do nothing and let it render at its natural size.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: titleContent,
         ),
       ),
     );
   }
 
-  // --- METHODS MOVED FROM AppbarState ---
+  /// Helper method to build just the visual arrow icon, without any interactivity.
+  Widget _buildArrowIcon(double fontSize) {
+    // Match arrow size to font size for visual harmony.
+    final double arrowSize = fontSize;
+
+    return Transform.rotate(
+      angle: -pi / 2,
+      child: SvgPicture.asset(
+        'assets/icons/arrov.svg',
+        width: arrowSize,
+        height: arrowSize,
+        colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+      ),
+    );
+  }
 
   /// Checks if the extension info panel should be shown and displays it.
-  /// It only shows once per session and a maximum of 3 times in total.
-  /// This method is now public to be called from the parent AppBar.
-  Future<void> showExtensionInfoIfNeeded() async {
-    if (ChatTitle.extensionInfoShownThisSession) return;
+  Future<void> showExtensionInfoIfNeeded({VoidCallback? onPanelClosed}) async {
+    // Prevent re-showing if already shown in this session.
+    if (ChatTitle.extensionInfoShownThisSession) {
+      // If the panel won't be shown, call the callback immediately.
+      onPanelClosed?.call();
+      return;
+    }
 
     final prefs = await SharedPreferences.getInstance();
     int showCount = prefs.getInt(ChatTitle.extensionInfoCountKey) ?? 0;
 
     if (showCount < 3) {
-      // Use addPostFrameCallback to ensure the widget is laid out.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _showExtensionInfo();
-          prefs.setInt(ChatTitle.extensionInfoCountKey, showCount + 1);
-          ChatTitle.extensionInfoShownThisSession = true;
-        }
-      });
+      if (mounted) {
+        // Store the callback to be used when the panel is dismissed.
+        _onPanelClosed = onPanelClosed;
+        _showExtensionInfo(); // Attempt to show directly.
+        await prefs.setInt(ChatTitle.extensionInfoCountKey, showCount + 1);
+        ChatTitle.extensionInfoShownThisSession = true;
+      }
+    } else {
+      // If the panel won't be shown, call the callback immediately.
+      onPanelClosed?.call();
     }
   }
 
   /// Hides the extension info panel with an animation.
-  /// This method is now public to be called from the parent AppBar.
   void hideExtensionInfo({bool isDisposing = false}) {
     if (_extensionOverlayEntry == null) return;
+
+    // A local function to handle cleanup and trigger the callback.
+    void cleanup() {
+      if (mounted) {
+        _extensionOverlayEntry?.remove();
+        _extensionOverlayEntry = null;
+        // Trigger the callback to notify the parent that the panel is closed.
+        _onPanelClosed?.call();
+        _onPanelClosed = null; // Clear the callback after use.
+      }
+    }
 
     if (isDisposing) {
       _extensionOverlayEntry?.remove();
@@ -168,10 +187,7 @@ class ChatTitleState extends State<ChatTitle> with TickerProviderStateMixin {
     }
 
     _extensionAnimationController.reverse().then((_) {
-      if (mounted && _extensionOverlayEntry != null) {
-        _extensionOverlayEntry?.remove();
-        _extensionOverlayEntry = null;
-      }
+      cleanup();
     });
   }
 
@@ -186,6 +202,7 @@ class ChatTitleState extends State<ChatTitle> with TickerProviderStateMixin {
     final screenHeight = MediaQuery.of(context).size.height;
     final localizations = AppLocalizations.of(context)!;
 
+    // --- Sizing and positioning variables remain the same ---
     final double panelWidth = screenWidth * 0.8;
     final double panelLeft = offset.dx + size.width / 2 - (panelWidth / 2);
     final double minHorizontalMargin = screenWidth * 0.04;
@@ -204,16 +221,22 @@ class ChatTitleState extends State<ChatTitle> with TickerProviderStateMixin {
 
     _extensionOverlayEntry = OverlayEntry(
       builder: (context) {
+        // --- MODIFICATION START ---
+        // Wrap the entire overlay in a Material widget to ensure text styles and
+        // theming are applied correctly.
         return Material(
           color: Colors.transparent,
           child: Stack(
             children: [
+              // 1. THE BACKGROUND: A full-screen GestureDetector to catch taps and dismiss the panel.
               GestureDetector(
                 onTap: hideExtensionInfo,
                 child: Container(
-                  color: Colors.black.withOpacity(0.6),
+                  // Animate the background color for a smoother appearance.
+                  color: Colors.black.withOpacity(0.6 * _extensionAnimation.value),
                 ),
               ),
+              // 2. THE PANEL: Positioned on top of the background.
               Positioned(
                 top: offset.dy + size.height + topMargin,
                 left: max(minHorizontalMargin, min(panelLeft, screenWidth - panelWidth - minHorizontalMargin)),
@@ -222,8 +245,10 @@ class ChatTitleState extends State<ChatTitle> with TickerProviderStateMixin {
                   child: ScaleTransition(
                     scale: _extensionAnimation,
                     alignment: Alignment.topCenter,
+                    // This inner GestureDetector prevents taps on the panel itself
+                    // from propagating to the background detector and closing it.
                     child: GestureDetector(
-                      onTap: hideExtensionInfo,
+                      onTap: () {}, // Absorb the tap
                       child: Container(
                         width: panelWidth,
                         padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
@@ -239,6 +264,7 @@ class ChatTitleState extends State<ChatTitle> with TickerProviderStateMixin {
                             )
                           ],
                         ),
+                        // The content of the panel (Column with Text widgets) remains unchanged.
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
@@ -280,10 +306,15 @@ class ChatTitleState extends State<ChatTitle> with TickerProviderStateMixin {
             ],
           ),
         );
+        // --- MODIFICATION END ---
       },
     );
 
     Overlay.of(context).insert(_extensionOverlayEntry!);
+    // We need to rebuild the overlay as the animation progresses.
+    _extensionAnimationController.addListener(() {
+      _extensionOverlayEntry?.markNeedsBuild();
+    });
     _extensionAnimationController.forward();
   }
 }

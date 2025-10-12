@@ -1,3 +1,5 @@
+// chat/screen/selected/input/input.dart
+
 import 'dart:io';
 import 'package:cortex/chat/screen/selected/input/buttons.dart';
 import 'package:cortex/main.dart';
@@ -27,6 +29,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 class InputField extends StatefulWidget {
   final AppLocalizations localizations;
   final bool isModelSelected;
+  final bool isDynamicChatMode;
   final bool isLimitExceeded;
   final TextEditingController controller;
   final FocusNode textFieldFocusNode;
@@ -55,12 +58,12 @@ class InputField extends StatefulWidget {
   final File? preselectedPhoto;
   final bool modelMissing;
   final bool wiseEnabled;
-  final bool autofocus;
 
   const InputField({
     Key? key,
     required this.localizations,
     required this.isModelSelected,
+    required this.isDynamicChatMode,
     required this.isLimitExceeded,
     required this.controller,
     required this.textFieldFocusNode,
@@ -78,7 +81,6 @@ class InputField extends StatefulWidget {
     this.originalMessageText,
     required this.isStorageSufficient,
     required this.totalCredits,
-    this.autofocus = true,
     this.role,
     required this.isServerSideModel,
     required this.onStop,
@@ -192,7 +194,9 @@ class InputFieldState extends State<InputField> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    if (!widget.isModelSelected) return const SizedBox.shrink();
+    if (!widget.isModelSelected && !widget.isDynamicChatMode) {
+      return const SizedBox.shrink();
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -297,7 +301,6 @@ class InputFieldState extends State<InputField> {
   Widget _buildTextField(double screenWidth) {
     return TextField(
       key: ValueKey(widget.editSessionCounter),
-      autofocus: widget.autofocus,
       focusNode: widget.textFieldFocusNode,
       cursorColor: AppColors.primaryColor.inverted,
       controller: widget.controller,
@@ -461,10 +464,17 @@ class InputFieldState extends State<InputField> {
   }
 
   int _requiredCredits() {
-    if (widget.isServerSideModel == false) return 0;
-    final base  = widget.isPremiumModel ? 20 : 10;
-    final photo = (_selectedPhoto != null) ? 30 : 0;
-    return base + photo;
+    if (widget.isDynamicChatMode) {
+      return 0;
+    }
+
+    if (widget.isServerSideModel) {
+      final base = widget.isPremiumModel ? 20 : 10;
+      final photo = (_selectedPhoto != null) ? 30 : 0;
+      return base + photo;
+    }
+
+    return 0;
   }
 
   /// Determines whether the send button should be enabled, with detailed logging.
@@ -475,22 +485,19 @@ class InputFieldState extends State<InputField> {
       return false;
     }
 
-    // --- 🔥 THE FIX & ADDITION IS HERE 🔥 ---
     // If it's a premium model, the user is NOT subscribed, AND their trials are used up, disable the button.
     if (widget.isPremiumModel && !widget.isSubscribed && widget.premiumTrialUses >= 3) {
       return false;
     }
-    // --- END OF FIX ---
 
     final String currentText = widget.controller.text.trim();
     final bool hasPhoto = _selectedPhoto != null;
 
     final needed = _requiredCredits();
-    if (widget.isServerSideModel && widget.totalCredits < needed) {
+    if ((widget.isDynamicChatMode || widget.isServerSideModel) && widget.totalCredits < needed) {
       return false;
     }
 
-    // ... (editing vs. mantığı aynı kalıyor) ...
     if (widget.isEditingMode) {
       final String originalText = widget.originalMessageText ?? '';
       final bool textChanged = currentText != originalText;

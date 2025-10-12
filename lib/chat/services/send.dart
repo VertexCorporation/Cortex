@@ -9,9 +9,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:cortex/chat/services/review.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../cache.dart';
@@ -36,17 +38,71 @@ class SendService {
     _isSending = false;
   }
 
-  /// Sends a message.
-  ///
-  /// This method's logic has been refactored for clarity and reliability,
-  /// especially for the regeneration flow.
-  ///
-  /// - **New Message:** Appends a user message and a "thinking" AI message to the list.
-  /// - **Regenerate:** Trusts that `RegenerateService` has already prepared the
-  ///   message list correctly. It simply identifies the "thinking" placeholder
-  ///   at `regenerateAiIndex` and starts the API call. It no longer modifies
-  ///   the message list itself during regeneration.
-  /// - **Edit:** Handles editing flow as before.
+  /// This method analyzes the user's input and context to pick a random, appropriate model.
+  /// It NO LONGER calls setState. It only selects and returns the definitive model ID.
+  Future<String> _selectAndAssignDynamicModel() async {
+    debugPrint("[SendService] Dynamic mode: Selecting a model...");
+    final allModels = ModelData.getCachedModelsSync();
+    final hasPhoto = selectedPhoto != null;
+    final hasInternet = await InternetConnection().hasInternetAccess;
+
+    List<Map<String, dynamic>> suitableModels;
+
+    if (!hasInternet) {
+      final downloadedPaths = await UserModels.loadDownloadedModelPaths();
+      suitableModels = allModels.where((m) {
+        final modelData = ModelData.getPreciseModelData(m['id']);
+        return modelData['type'] == 'offline' && downloadedPaths.containsKey(m['id']);
+      }).toList();
+      debugPrint("[SendService] Offline. Found ${suitableModels.length} suitable DOWNLOADED offline models.");
+    } else {
+      suitableModels = allModels.where((m) {
+        final modelData = ModelData.getPreciseModelData(m['id']);
+        final type = modelData['type'] as String?;
+        final category = modelData['category'] as String?;
+
+        if (category == 'roleplay' || category == 'self') {
+          return false;
+        }
+        if (type == 'offline' && modelData['id'].startsWith('local_')) {
+          return false;
+        }
+        if (hasPhoto) {
+          return ModelData.hasModality(m['id'], 'image');
+        }
+        return true;
+      }).toList();
+      debugPrint("[SendService] Online. Has photo: $hasPhoto. Found ${suitableModels.length} suitable models (excluding characters/self).");
+    }
+
+    if (suitableModels.isEmpty) {
+      throw ApiException(AppLocalizations.of(state.context)!.errorNoModelsAvailable);
+    }
+
+    final selectedModelData = suitableModels[math.Random().nextInt(suitableModels.length)];
+    final selectedModelId = selectedModelData['id'] as String;
+
+    String finalApiModelId;
+    final extensionsMap = selectedModelData['extensions'] as Map<String, dynamic>?;
+
+    if (extensionsMap != null && extensionsMap.isNotEmpty) {
+      finalApiModelId = extensionsMap.keys.first;
+      debugPrint("[SendService] Selected model series '${selectedModelId}' has extensions. Choosing first variant: '$finalApiModelId'");
+    } else {
+      finalApiModelId = selectedModelId;
+    }
+
+    debugPrint("[SendService] Dynamically selected model ID: $finalApiModelId. Returning to sendMessage for state update.");
+    return finalApiModelId;
+  }
+
+  /// This function now checks the `isPersistentlyDynamic` flag.
+  /// 1. If `isPersistentlyDynamic` is TRUE:
+  ///    - It calls `_selectAndAssignDynamicModel` to get a NEW random model for every message.
+  ///    - The chat remains identified as "dynamic".
+  /// 2. If `isPersistentlyDynamic` is FALSE (meaning an assistant is pinned):
+  ///    - It uses the currently set `state.modelId` as the definitive target.
+  ///    - It DOES NOT call `_selectAndAssignDynamicModel`, ensuring the message goes to the pinned assistant.
   Future<void> sendMessage({
     String? textFromButton,
     bool isRegenerate = false,
@@ -54,105 +110,112 @@ class SendService {
     String? regeneratePhotoPath,
   }) async {
     final localizations = AppLocalizations.of(state.context)!;
-    if (!state.canHandleImage) {
-      selectedPhoto = null;
-    }
-
-    final String messageText = textFromButton ?? state.controller.text.trim();
-    if (messageText.isEmpty &&
-        selectedPhoto == null &&
-        regeneratePhotoPath == null) return;
     if (_isSending) return;
 
+    final String messageText = textFromButton ?? state.controller.text.trim();
+    if (messageText.isEmpty && selectedPhoto == null && regeneratePhotoPath == null) return;
+
     _isSending = true;
-    final bool photoAllowed = state.canHandleImage;
-    final File? photoForSend = photoAllowed ? selectedPhoto : null;
-    String apiModelIdForSend = state.modelId!;
-
-    if (state.modelId == 'trash') {
-      await _handleTrashMessage(messageText);
-      _isSending = false;
-      return;
-    }
-
     FocusScope.of(state.context).unfocus();
-    FetchService.fetchUserData().catchError((error) {
-      debugPrint("FetchUserData error: $error");
-    });
 
-    if (state.modelId == null || state.modelId!.isEmpty) {
-      debugPrint("Error: modelId is null or empty in sendMessage");
-      _isSending = false;
-      return;
-    }
+    String apiModelIdForSend;
 
-    int? aiMessageIndex;
-
-    // --- RESTRUCTURED LOGIC FOR CLARITY ---
-
-    if (state.editingMessageIndex != null) {
-      // Handle message editing flow.
-      await _handleEditingMessage(messageText);
-      _isSending = false;
-      return;
-    } else if (isRegenerate) {
-      // Handle regeneration flow.
-      // The message list is already perfectly prepared by RegenerateService.
-      // We just need to set the state flags and identify the AI message index.
-      aiMessageIndex = regenerateAiIndex;
-      state.setState(() {
-        state.isWaitingForResponse = true;
-        state.isSendButtonVisible = false;
-        state.responseStopped = false;
-      });
-    } else {
-      // Handle new message flow.
-      if (state.conversationID == null) {
-        await _startNewConversation(messageText, selectedPhoto != null,
-            apiModelIdForSend, localizations);
-        aiMessageIndex = state.messages.length - 1;
+    try {
+      // --- CORE LOGIC CHANGE FOR OBJECTIVE 1 ---
+      // If the session is a persistent dynamic chat AND the user has NOT pinned an assistant, select a new model every time.
+      if (state.isPersistentlyDynamic) {
+        apiModelIdForSend = await _selectAndAssignDynamicModel();
       } else {
-        // Combine state updates for adding user and AI messages into one call.
+        // If an assistant IS pinned (`isPersistentlyDynamic` is false), or if it's a normal chat,
+        // we MUST use the modelId from the state.
+        apiModelIdForSend = state.modelId!;
+      }
+      // --- END OF CORE LOGIC CHANGE ---
+
+      if (apiModelIdForSend.isEmpty) {
+        throw ApiException("No valid model ID could be determined for sending.");
+      }
+
+      if (apiModelIdForSend == 'trash') {
+        await _handleTrashMessage(messageText);
+        _isSending = false;
+        return;
+      }
+
+      FetchService.fetchUserData().catchError((error) {
+        debugPrint("FetchUserData error: $error");
+      });
+
+      int? aiMessageIndex;
+
+      if (state.editingMessageIndex != null) {
+        await _handleEditingMessage(messageText);
+        _isSending = false;
+        return;
+      } else if (isRegenerate) {
+        // Regeneration in dynamic chat will also pick a new model if no assistant is pinned.
+        if (state.isPersistentlyDynamic) {
+          apiModelIdForSend = await _selectAndAssignDynamicModel();
+        }
+        aiMessageIndex = regenerateAiIndex;
         state.setState(() {
-          state.messages.add(Message(
-            text: messageText,
-            isUserMessage: true,
-            photoPath: selectedPhoto != null ? selectedPhoto!.path : null,
-            isPhotoUploading: true,
-            model: apiModelIdForSend,
-          ));
-          state.messages.add(Message(
-            text: "",
-            isUserMessage: false,
-            includeInContext: false,
-            isThinking: true,
-            model: apiModelIdForSend,
-          ));
+          if(state.isDynamicChatMode && aiMessageIndex != null) {
+            state.messages[aiMessageIndex].model = apiModelIdForSend;
+          }
+          state.isWaitingForResponse = true;
+          state.isSendButtonVisible = false;
+          state.responseStopped = false;
+        });
+      } else {
+        final userMessage = Message(
+          text: messageText,
+          isUserMessage: true,
+          photoPath: selectedPhoto != null ? selectedPhoto!.path : null,
+          isPhotoUploading: true,
+          model: apiModelIdForSend,
+        );
+        final aiThinkingMessage = Message(
+          text: "",
+          isUserMessage: false,
+          includeInContext: false,
+          isThinking: true,
+          model: apiModelIdForSend,
+        );
+
+        state.setState(() {
+          state.messages.add(userMessage);
+          state.messages.add(aiThinkingMessage);
           state.controller.clear();
           state.isWaitingForResponse = true;
           state.isSendButtonVisible = false;
           state.responseStopped = false;
         });
+
+        state.readService.markLoaded();
         aiMessageIndex = state.messages.length - 1;
-        await _appendNewMessage(
-            messageText, selectedPhoto != null, apiModelIdForSend, localizations);
+
+        if (state.conversationID == null) {
+          // A chat is "dynamic" if it was initiated without a pre-selected model.
+          // This is now determined by the `isDynamicChatMode` flag which is set on initState.
+          await _startNewConversation(userMessage, state.isDynamicChatMode, apiModelIdForSend, localizations);
+        } else {
+          await _appendNewMessage(userMessage, localizations);
+        }
       }
-    }
 
-    // Common logic for handling photo and sending the message
-    String? photoPath = await _handlePhoto(
-      photoForSend != null,
-      regeneratePhotoPath,
-    );
-    state.inputFieldKey.currentState?.clearPhotoPanel();
-
-    if (!photoAllowed && selectedPhoto != null) {
+      final bool photoAllowed = state.canHandleImage;
+      final File? photoForSend = photoAllowed ? selectedPhoto : null;
+      String? photoPath = await _handlePhoto(
+        photoForSend != null,
+        regeneratePhotoPath,
+      );
       state.inputFieldKey.currentState?.clearPhotoPanel();
-      selectedPhoto = null;
-    }
 
-    try {
-      if (!state.isServerSideModel(state.modelId)) {
+      if (!photoAllowed && selectedPhoto != null) {
+        selectedPhoto = null;
+      }
+
+      if (!state.isServerSideModel(apiModelIdForSend)) {
         final offlineModerator = OfflineModeratorService();
         if (offlineModerator.isPromptAcceptable(messageText)) {
           unawaited(_sendLocalMessage(messageText, photoPath));
@@ -191,22 +254,27 @@ class SendService {
           }
         }
         if (!isRegenerate) {
-          debugPrint(
-              "[SendService] Successful server response. Triggering review check.");
+          debugPrint("[SendService] Successful server response. Triggering review check.");
           unawaited(ReviewService().triggerReviewPromptIfNeeded(state.context));
         }
       }
 
-      if (state.conversationID != null) {
-        await ChatStorageService.updateConversationModelId(
-            state.conversationID!, state.modelId!);
-        debugPrint(
-            "[SendService] Committed model change. Conv '${state.conversationID}' now permanently uses '${state.modelId}'.");
+      String modelSeriesId;
+      try {
+        final parentModel = state.loadService.allModels.firstWhere((model) {
+          if (model.id == apiModelIdForSend) return true;
+          return model.extensions?.containsKey(apiModelIdForSend) ?? false;
+        });
+        modelSeriesId = parentModel.id;
+        debugPrint("[SendService] Found parent series '$modelSeriesId' for variant '$apiModelIdForSend'. Storing in recents.");
+        await ChatStorageService.addRecentModel(modelSeriesId);
+      } catch (e) {
+        debugPrint("[SendService] Could not find parent series for '$apiModelIdForSend'. Could not update recent models. Error: $e");
       }
+
     } catch (e) {
       if (e is UserCancelledException) {
-        debugPrint(
-            "[SendService] Caught UserCancelledException. Suppressing error UI.");
+        debugPrint("[SendService] Caught UserCancelledException. Suppressing error UI.");
       } else {
         _handleSendError(e, isRegenerate, regenerateAiIndex, localizations);
       }
@@ -256,68 +324,33 @@ class SendService {
     });
   }
 
-  /// Starts a new conversation by setting conversation ID,
-  /// conversation title and saving the initial messages.
-  /// Starts a new conversation by setting conversation ID,
-  /// conversation title and saving the initial messages.
-  /// --- REFACTORED FOR RELIABILITY ---
-  /// This function now correctly handles saving the first user message,
-  /// even when a system prompt or other messages already exist in the state.
-  /// It no longer makes unsafe assumptions about the message list's initial state.
+  /// Starts a new conversation, correctly tagging it as 'dynamic' in the database.
   Future<void> _startNewConversation(
-      String text,
-      bool hasNewPhoto,
+      Message userMessage,
+      bool isDynamicConversation, // This flag is true if the chat was started from the generic "Cortex" screen
       String fullModelId,
       AppLocalizations localizations,
       ) async {
     state.conversationID = uuid.v4();
-    state.conversationTitle = (text.trim().isEmpty && hasNewPhoto)
-        ? "🖼"
-        : (text.length > 28 ? text.substring(0, 28) : text);
+    state.conversationTitle = (userMessage.text.trim().isEmpty && userMessage.photoPath != null)
+        ? "🖼️"
+        : (userMessage.text.length > 28 ? userMessage.text.substring(0, 28) : userMessage.text);
 
-    // First, save the conversation metadata. The messages themselves will be saved next.
+    // If the conversation is dynamic, its permanent ID in the database is ALWAYS 'dynamic',
+    // regardless of which model (random or pinned) was used for the first message.
+    // This ensures it reloads correctly from the inbox.
+    final modelIdForStorage = isDynamicConversation ? 'dynamic' : fullModelId;
+
     await ChatStorageService.saveConversation(
       state.conversationID!,
       state.conversationTitle!,
-      [], // Message list is no longer passed here; it's handled by upsert.
-      modelId: state.modelId,
+      [],
+      modelId: modelIdForStorage,
     );
     CacheService.invalidateConversationCache();
 
-    // --- THE FIX ---
-    // 1. Create the message objects *before* adding them to the state.
-    final userMessage = Message(
-      text: text,
-      isUserMessage: true,
-      photoPath: hasNewPhoto ? selectedPhoto!.path : null,
-      isPhotoUploading: true,
-      // The user message should adopt the currently selected model
-      model: fullModelId,
-    );
-    final aiThinkingMessage = Message(
-      text: '',
-      isThinking: true,
-      isUserMessage: false,
-      includeInContext: false,
-      model: fullModelId,
-    );
+    final userMessageIndex = state.messages.length - 2;
 
-    // 2. Determine the correct index for the new user message.
-    final userMessageIndex = state.messages.length;
-
-    // 3. Update the UI state atomically.
-    state.setState(() {
-      state.messages.add(userMessage);
-      state.messages.add(aiThinkingMessage);
-      state.controller.clear();
-      state.isWaitingForResponse = true;
-      state.isSendButtonVisible = false;
-      state.responseStopped = false;
-    });
-
-    // 4. Save the user's message to storage at its precise index, using the
-    //    object we just created. This avoids any race conditions or incorrect
-    //    assumptions about `state.messages.first`.
     await ChatStorageService.upsertMessage(
       state.conversationID!,
       userMessageIndex,
@@ -327,16 +360,15 @@ class SendService {
 
   /// Appends a new message to an existing conversation.
   Future<void> _appendNewMessage(
-      String text,
-      bool hasNewPhoto,
-      String fullModelId,
+      Message userMessage,
       AppLocalizations localizations,
       ) async {
+    // The user message is now the second to last element in the list, right before the thinking bubble.
     final idx = state.messages.length - 2;
     await ChatStorageService.upsertMessage(
       state.conversationID!,
       idx,
-      state.messages[idx],
+      userMessage,
     );
   }
 
