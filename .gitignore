@@ -1,3 +1,9 @@
+# Build artifacts
+build/
+android/.cxx/
+android/.gradle/
+android/app/build/
+
 # Miscellaneous
 *.class
 *.log
