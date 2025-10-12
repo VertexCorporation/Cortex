@@ -2,7 +2,6 @@
 
 import 'dart:ui' as ui; // For ImageFilter.blur
 import 'dart:math' as math; // For math.min
-
 import 'package:cortex/main.dart';
 import 'package:flutter/foundation.dart'; // For ValueListenable and kDebugMode
 import 'package:flutter/material.dart';
@@ -11,50 +10,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart'; // For NotificationService
 import 'package:cortex/l10n/app_localizations.dart'; // For localizations
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
-// wow
 
 // Ensure these import paths are correct for your project structure
 // import '../../main.dart'; // Assuming main.dart exports necessary globals like mainScreenKey or similar.
@@ -794,85 +749,162 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     return Color.fromARGB(color.alpha, r, g, b);
   }
 
-  /// Shows a dialog for selecting a model extension (variant) for the current base model series.
+  /// Shows a dialog for selecting a model.
+  ///
+  /// DUAL MODE OPERATION:
+  /// 1. STANDARD MODE: If a parent model series is found, it lists the extensions of that series.
+  /// 2. DYNAMIC MODE: If no parent series is found (typical for dynamic chat), it lists ALL
+  ///    available models, categorized and sorted alphabetically, consistent with the main assistant panel.
   ///
   /// [currentFullModelId] is the ID of the currently active model/extension.
-  /// Returns the ID of the selected extension, or null if cancelled.
+  /// Returns the ID of the selected model/extension, or null if cancelled.
   Future<String?> _showModelExtensionsDialog(BuildContext context, String currentFullModelId) async {
     const String logPrefix = "[AnimatedMessageOptionsPanel._showModelExtensionsDialog]";
 
     final modelSeriesData = _findParentSeriesData();
-    final seriesId = modelSeriesData['id'] ?? 'unknown_series';
-    debugPrint("$logPrefix Showing dialog for series '$seriesId', current full ID: '$currentFullModelId'");
+    // A dialog is for "dynamic mode" if it's not a standard model with multiple extensions.
+    final bool isDynamicModeDialog = modelSeriesData.isEmpty || (modelSeriesData['extensions'] as Map? ?? {}).isEmpty;
+    final String dialogTitle = AppLocalizations.of(context)!.changeModel;
+
+    debugPrint("$logPrefix Showing dialog. Is Dynamic Mode: $isDynamicModeDialog. Current full ID: '$currentFullModelId'");
 
     final bool hasPremiumAccess = widget.isSubscribed || widget.premiumTrialUses < 3;
     debugPrint("$logPrefix User premium access status: $hasPremiumAccess (Subscribed: ${widget.isSubscribed}, Trials Used: ${widget.premiumTrialUses})");
 
-    List<Map<String, dynamic>> extensionsListForDialog = [];
-    final allExtensionsMap = modelSeriesData['extensions'] as Map<String, dynamic>?;
+    List<Map<String, dynamic>> itemsForDialog = [];
 
-    if (allExtensionsMap != null) {
-      debugPrint("$logPrefix Found ${allExtensionsMap.length} extensions in model data for '$seriesId'. Filtering for dialog...");
+    if (isDynamicModeDialog) {
+      // --- DYNAMIC MODE: BUILD LIST OF ALL MODELS (Corrected Sorting & Grouping) ---
+      debugPrint("$logPrefix Dynamic Mode: Building list of all available models with correct sorting.");
+      final allModelInfos = ModelData.getCachedModelsSync();
+      final List<Map<String, dynamic>> onlineOptions = [];
+      final List<Map<String, dynamic>> offlineOptions = [];
+      final List<Map<String, dynamic>> characterOptions = [];
+      final List<Map<String, dynamic>> selfOptions = [];
+      final localizations = AppLocalizations.of(context)!;
 
-      extensionsListForDialog = allExtensionsMap.entries.where((entry) {
-        final dynamic extData = entry.value;
-        if (extData is Map) {
-          final bool isExtensionPremium = (extData['tier'] as String? ?? 'free') == 'premium';
-          if (isExtensionPremium && !hasPremiumAccess) {
-            debugPrint("$logPrefix   - Excluding premium extension '${entry.key}' due to lack of access.");
-            return false;
+      for (final modelMap in allModelInfos) {
+        final preciseData = ModelData.getPreciseModelData(modelMap['id'] as String);
+        final String category = preciseData['category'] as String? ?? 'online';
+        final String type = preciseData['type'] as String? ?? 'online';
+
+        if (category == 'roleplay') {
+          characterOptions.add(preciseData);
+        } else if (category == 'self') {
+          selfOptions.add(preciseData);
+        } else if (type == 'offline') {
+          offlineOptions.add(preciseData);
+        } else if (type == 'online') {
+          // *** CRITICAL LOGIC FROM CHAT.DART ***
+          // If it's a series with extensions, add each extension individually.
+          final extensions = preciseData['extensions'] as Map<String, dynamic>?;
+          if (extensions != null && extensions.isNotEmpty) {
+            for (final extId in extensions.keys) {
+              onlineOptions.add(ModelData.getPreciseModelData(extId));
+            }
+          } else {
+            // Otherwise, it's a standalone online model.
+            onlineOptions.add(preciseData);
           }
-
-          if (widget.conversationHasPhoto) {
-            return (extData['canHandleImage'] as bool?) == true;
-          }
-          return true;
         }
-        debugPrint("$logPrefix   Extension entry '${entry.key}' has non-Map value: $extData. Excluding.");
-        return false;
-      }).map((entry) {
-        final String extensionKey = entry.key;
-        final Map<String,dynamic> extensionData = entry.value as Map<String,dynamic>;
-        final String displayName = extensionData['title'] as String? ?? formatModelId(extensionKey);
-        debugPrint("$logPrefix   + Adding to dialog: code='$extensionKey', name='$displayName'");
-        return { 'code': extensionKey, 'name': displayName, 'enabled': true };
-      }).toList();
-      debugPrint("$logPrefix Filtered ${extensionsListForDialog.length} extensions for dialog display.");
+      }
+
+      final sorter = (Map<String, dynamic> a, Map<String, dynamic> b) =>
+          (a['title'] as String).toLowerCase().compareTo((b['title'] as String).toLowerCase());
+
+      onlineOptions.sort(sorter);
+      offlineOptions.sort(sorter);
+      characterOptions.sort(sorter);
+      selfOptions.sort(sorter);
+
+      void addCategory(String title, List<Map<String, dynamic>> models) {
+        if (models.isNotEmpty) {
+          itemsForDialog.add({'isHeader': true, 'name': title});
+          itemsForDialog.addAll(models.map((m) => {
+            'code': m['id'],
+            'name': m['title'],
+            'isPremium': (m['tier'] as String? ?? 'free') == 'premium',
+            'canHandleImage': ModelData.hasModality(m['id'], 'image'),
+          }));
+        }
+      }
+
+      addCategory(localizations.onlineModels, onlineOptions);
+      addCategory(localizations.offlineModels, offlineOptions);
+      addCategory(localizations.characterModels, characterOptions);
+      addCategory(localizations.customModels, selfOptions);
+
     } else {
-      debugPrint("$logPrefix No 'extensions' found in model data for '$seriesId', or model data is empty.");
-    }
+      // --- STANDARD MODE: LIST EXTENSIONS OF A SERIES ---
+      debugPrint("$logPrefix Standard Mode: Listing extensions for series '${modelSeriesData['id']}'.");
+      final allExtensionsMap = modelSeriesData['extensions'] as Map<String, dynamic>?;
+      if (allExtensionsMap != null) {
+        itemsForDialog = allExtensionsMap.entries.map((entry) {
+          final String extensionKey = entry.key;
+          final Map<String, dynamic> extensionData = entry.value as Map<String, dynamic>;
+          return {
+            'code': extensionKey,
+            'name': extensionData['title'] as String? ?? formatModelId(extensionKey),
+            'isPremium': (extensionData['tier'] as String? ?? 'free') == 'premium',
+            'canHandleImage': ModelData.hasModality(extensionKey, 'image'),
+          };
+        }).toList();
 
-    if (extensionsListForDialog.length < 2) {
-      debugPrint("$logPrefix Less than 2 suitable extensions (${extensionsListForDialog.length}). Dialog not shown.");
-      return null;
-    }
-
-    String initialSelectedExtensionCodeInDialog;
-
-    final currentModelData = allExtensionsMap?[currentFullModelId] as Map<String, dynamic>?;
-    final bool isCurrentModelPremium = (currentModelData?['tier'] as String? ?? 'free') == 'premium';
-
-    if (isCurrentModelPremium && !hasPremiumAccess) {
-      debugPrint("$logPrefix Current model '$currentFullModelId' is premium and user lacks access. Forcing a different initial selection.");
-      initialSelectedExtensionCodeInDialog = extensionsListForDialog.first['code'] as String;
-    } else {
-      initialSelectedExtensionCodeInDialog = currentFullModelId;
-      bool currentSelectionIsValidForDialog = extensionsListForDialog.any((ext) => ext['code'] == initialSelectedExtensionCodeInDialog);
-
-      if (!currentSelectionIsValidForDialog && extensionsListForDialog.isNotEmpty) {
-        debugPrint("$logPrefix Current selection '$initialSelectedExtensionCodeInDialog' is not in the valid dialog list. Picking first available.");
-        initialSelectedExtensionCodeInDialog = extensionsListForDialog.first['code'] as String;
-      } else if (extensionsListForDialog.isEmpty) {
-        debugPrint("$logPrefix CRITICAL: No valid options available in dialog after filter. Aborting dialog.");
-        return null;
+        // Also sort extensions alphabetically by title
+        itemsForDialog.sort((a, b) => (a['name'] as String).toLowerCase().compareTo((b['name'] as String).toLowerCase()));
       }
     }
 
-    debugPrint("$logPrefix Initial selected extension code for dialog: '$initialSelectedExtensionCodeInDialog'");
+    // --- UNIVERSAL FILTERING & DIALOG PRESENTATION LOGIC (UNCHANGED) ---
+    final List<Map<String, dynamic>> filteredItemsForDialog = itemsForDialog.where((item) {
+      if (item['isHeader'] == true) return true;
 
-    String tempSelectedExtensionInDialog = initialSelectedExtensionCodeInDialog; // For StatefulBuilder
+      final bool isItemPremium = item['isPremium'] as bool? ?? false;
+      if (isItemPremium && !hasPremiumAccess) {
+        debugPrint("$logPrefix   - Excluding premium model '${item['code']}' due to lack of access.");
+        return false;
+      }
 
-    // --- System UI for Dialog ---
+      final bool canItemHandleImage = item['canHandleImage'] as bool? ?? false;
+      if (widget.conversationHasPhoto && !canItemHandleImage) {
+        debugPrint("$logPrefix   - Excluding model '${item['code']}' because conversation has a photo and model cannot handle images.");
+        return false;
+      }
+
+      return true;
+    }).toList();
+
+    // Remove headers that have no items under them after filtering
+    for (int i = filteredItemsForDialog.length - 1; i >= 0; i--) {
+      if (filteredItemsForDialog[i]['isHeader'] == true) {
+        // Check if the next item is also a header or if it's the end of the list
+        if (i == filteredItemsForDialog.length - 1 || filteredItemsForDialog[i + 1]['isHeader'] == true) {
+          filteredItemsForDialog.removeAt(i);
+        }
+      }
+    }
+
+    if (filteredItemsForDialog.where((i) => i['isHeader'] != true).length < 2) {
+      debugPrint("$logPrefix Less than 2 suitable models/extensions after filtering. Dialog not shown.");
+      return null;
+    }
+
+    String initialSelectedCode = currentFullModelId;
+    bool currentSelectionIsValid = filteredItemsForDialog.any((ext) => ext['code'] == initialSelectedCode);
+
+    if (!currentSelectionIsValid && filteredItemsForDialog.isNotEmpty) {
+      final firstSelectableItem = filteredItemsForDialog.firstWhere((i) => i['isHeader'] != true, orElse: () => {});
+      if(firstSelectableItem.isNotEmpty) {
+        initialSelectedCode = firstSelectableItem['code'] as String;
+      } else {
+        return null; // No selectable items at all.
+      }
+    }
+
+    debugPrint("$logPrefix Initial selected code for dialog: '$initialSelectedCode'");
+
+    String tempSelectedCode = initialSelectedCode;
+
     final themeSettings = AppColors.getSystemUIOverlayStyleForTheme(AppColors.currentTheme);
     final Color originalNavBarColor = themeSettings['navigationBarColor'] as Color;
     final Brightness originalIconBrightness = themeSettings['navigationBarIconBrightness'] as Brightness;
@@ -884,7 +916,6 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
       systemNavigationBarColor: darkenedNavBarColor,
       systemNavigationBarIconBrightness: darkenedIconBrightness,
     ));
-    // --- End System UI ---
 
     bool? confirmed = await showGeneralDialog<bool>(
       context: context,
@@ -892,7 +923,7 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
       transitionDuration: _kMediumAnimationDuration,
       pageBuilder: (dialogContext, animation, secondaryAnimation) {
-        final AppLocalizations innerL10n = AppLocalizations.of(dialogContext)!;
+        final innerL10n = AppLocalizations.of(dialogContext)!;
         final dialogScreenSize = MediaQuery.of(dialogContext).size;
         final dialogScreenWidth = dialogScreenSize.width;
         final dialogScreenHeight = dialogScreenSize.height;
@@ -903,26 +934,26 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
             child: Container(
               width: dialogScreenWidth * _UIFactors.dialogWidthFactor,
               decoration: BoxDecoration(
-                color: AppColors.secondaryColor, // Dialog background
+                color: AppColors.secondaryColor,
                 borderRadius: BorderRadius.circular(dialogScreenWidth * _UIFactors.borderRadiusFactor * 1.5),
               ),
-              child: ClipRRect( // Clip content to rounded corners
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(dialogScreenWidth * _UIFactors.borderRadiusFactor * 1.5),
-                child: StatefulBuilder( // To manage radio button selection state within the dialog
+                child: StatefulBuilder(
                   builder: (innerDialogCtx, setDialogState) {
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(height: dialogScreenHeight * _UIFactors.dialogVerticalSpacingFactor),
-                        SvgPicture.asset( // Dialog icon
+                        SvgPicture.asset(
                           'assets/icons/extension.svg',
                           width: dialogScreenWidth * _UIFactors.dialogIconSizeFactor,
                           height: dialogScreenWidth * _UIFactors.dialogIconSizeFactor,
                           colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
                         ),
                         SizedBox(height: dialogScreenHeight * _UIFactors.dialogSmallVerticalSpacingFactor),
-                        Text( // Dialog title
-                          innerL10n.changeModel,
+                        Text(
+                          dialogTitle,
                           style: TextStyle(
                             fontSize: dialogScreenWidth * _UIFactors.dialogTitleFontSizeFactor,
                             fontWeight: FontWeight.bold,
@@ -930,18 +961,33 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        Divider(thickness: 0.5, color: AppColors.border.withOpacity(0.5)), // Separator
-                        ConstrainedBox( // Limit height of the scrollable list
+                        Divider(thickness: 0.5, color: AppColors.border.withOpacity(0.5)),
+                        ConstrainedBox(
                           constraints: BoxConstraints(maxHeight: dialogScreenHeight * _UIFactors.dialogMaxContentHeightFactor),
-                          child: ListView.separated(
+                          child: ListView.builder(
                             shrinkWrap: true,
                             padding: EdgeInsets.zero,
-                            itemCount: extensionsListForDialog.length,
-                            separatorBuilder: (_, __) => SizedBox(height: dialogScreenHeight * _UIFactors.dialogItemVerticalSpacingFactor / 2), // Reduced separator
+                            itemCount: filteredItemsForDialog.length,
                             itemBuilder: (_, index) {
-                              final item = extensionsListForDialog[index];
-                              final bool isEnabled = item['enabled'] as bool? ?? true;
-                              return Theme( // Remove splash/highlight from RadioListTile
+                              final item = filteredItemsForDialog[index];
+                              if (item['isHeader'] == true) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                    left: dialogScreenWidth * _UIFactors.dialogHorizontalPaddingFactor * 1.5,
+                                    top: dialogScreenHeight * _UIFactors.dialogItemVerticalSpacingFactor * (index == 0 ? 0.5 : 1.5),
+                                    bottom: dialogScreenHeight * _UIFactors.dialogItemVerticalSpacingFactor * 0.5,
+                                  ),
+                                  child: Text(
+                                    item['name'] as String,
+                                    style: TextStyle(
+                                      color: AppColors.tertiaryColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: dialogScreenWidth * _UIFactors.dialogItemFontSizeFactor * 0.9,
+                                    ),
+                                  ),
+                                );
+                              }
+                              return Theme(
                                 data: Theme.of(innerDialogCtx).copyWith(
                                   splashColor: Colors.transparent,
                                   highlightColor: Colors.transparent,
@@ -951,17 +997,17 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
                                     item['name'] as String,
                                     style: TextStyle(
                                       fontSize: dialogScreenWidth * _UIFactors.dialogItemFontSizeFactor,
-                                      color: isEnabled ? AppColors.primaryColor.inverted : Colors.grey,
+                                      color: AppColors.primaryColor.inverted,
                                     ),
                                   ),
                                   value: item['code'] as String,
-                                  groupValue: tempSelectedExtensionInDialog,
-                                  onChanged: isEnabled ? (String? value) {
+                                  groupValue: tempSelectedCode,
+                                  onChanged: (String? value) {
                                     if (value != null) {
-                                      debugPrint("$logPrefix Dialog: User selected extension: '$value'");
-                                      setDialogState(() => tempSelectedExtensionInDialog = value);
+                                      debugPrint("$logPrefix Dialog: User selected: '$value'");
+                                      setDialogState(() => tempSelectedCode = value);
                                     }
-                                  } : null,
+                                  },
                                   activeColor: AppColors.primaryColor.inverted,
                                   controlAffinity: ListTileControlAffinity.leading,
                                   contentPadding: EdgeInsets.symmetric(horizontal: dialogScreenWidth * _UIFactors.dialogHorizontalPaddingFactor),
@@ -970,21 +1016,21 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
                             },
                           ),
                         ),
-                        Material( // For InkWell splash on the confirm button
+                        Material(
                           color: Colors.transparent,
                           child: InkWell(
                             splashColor: AppColors.senaryColor.withOpacity(0.1),
                             highlightColor: AppColors.senaryColor.withOpacity(0.1),
                             onTap: () {
-                              debugPrint("$logPrefix Dialog: Confirm button tapped. Returning selected: '$tempSelectedExtensionInDialog'");
-                              Navigator.of(innerDialogCtx).pop(true); // Confirm selection
+                              debugPrint("$logPrefix Dialog: Confirm tapped. Returning: '$tempSelectedCode'");
+                              Navigator.of(innerDialogCtx).pop(true);
                             },
                             child: Container(
                               alignment: Alignment.center,
                               padding: EdgeInsets.symmetric(vertical: dialogScreenHeight * _UIFactors.dialogButtonVerticalPaddingFactor),
                               decoration: BoxDecoration(border: Border(top: BorderSide(color: AppColors.border.withOpacity(0.5), width: 0.5))),
                               child: Text(
-                                innerL10n.changeModel, // Confirm button text
+                                innerL10n.changeModel,
                                 style: TextStyle(
                                   fontSize: dialogScreenWidth * _UIFactors.dialogItemFontSizeFactor,
                                   color: AppColors.senaryColor,
@@ -1006,16 +1052,15 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
     ).then((value) {
-      // Restore original system UI overlay style for navigation bar when dialog closes.
       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
         systemNavigationBarColor: originalNavBarColor,
         systemNavigationBarIconBrightness: originalIconBrightness,
       ));
-      debugPrint("$logPrefix Dialog closed. Confirmed: $value. Selected extension if confirmed: '$tempSelectedExtensionInDialog'");
-      return value; // Propagate the dialog's result (true if confirmed)
+      debugPrint("$logPrefix Dialog closed. Confirmed: $value. Selected code if confirmed: '$tempSelectedCode'");
+      return value;
     });
 
-    return confirmed == true ? tempSelectedExtensionInDialog : null;
+    return confirmed == true ? tempSelectedCode : null;
   }
 
   /// Builds a generic base widget for an option item in the panel.

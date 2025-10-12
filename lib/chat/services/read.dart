@@ -2,7 +2,6 @@
 
 import 'dart:math';
 import 'package:cortex/chat/services/storage.dart';
-import 'package:cortex/models/backend/utils.dart'; // <-- REQUIRED IMPORT
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:shimmer/shimmer.dart';
@@ -21,24 +20,65 @@ class ReadService {
 
   ReadService(this.state);
 
-  /// This function now robustly handles all model types, correctly resolves file paths,
-  /// and, most importantly, accurately determines the premium status of any conversation
-  /// being loaded, ensuring the premium banner appears consistently.
+  /// This function now robustly handles all model types, and crucially,
+  /// notifies its parent (`MainScreen`) to hide the BottomAppBar when a
+  /// conversation is successfully loaded from the inbox.
   Future<void> loadConversation(ConversationManager manager) async {
     const String logPrefix = "[ReadService.loadConversation]";
     final String conversationSpecificModelId = manager.modelId;
     debugPrint("$logPrefix: Loading conversation. ModelId from manager: '$conversationSpecificModelId'");
 
-    // Ensure model data is available
+    // If the conversation being loaded is a dynamic chat, handle it with a
+    // special setup process and exit early.
+    if (conversationSpecificModelId == 'dynamic') {
+      debugPrint("$logPrefix: Dynamic conversation detected. Initializing in persistent dynamic mode.");
+
+      state.setState(() {
+        // Set all the flags required for a persistent dynamic session
+        state.isDynamicChatMode = true;
+        state.isPersistentlyDynamic = true;
+        state.isModelSelected = false; // No specific model is selected
+        state.appBarModeNotifier.value = AppBarMode.dynamicChat;
+
+        // Load conversation details from the manager
+        state.conversationID = manager.conversationID;
+        state.conversationTitle = manager.conversationTitle;
+        state.openedFromMenu = true;
+
+        // Clear any previous model's data
+        state.modelTitle = null;
+        state.modelImagePath = null;
+        state.modelProducer = null;
+        state.modelId = null; // Important: modelId is null in this mode
+      });
+
+      // After setting up the dynamic mode, immediately check if there's a
+      // pinned assistant that should override the default random behavior.
+      await state.dynamicChatService.loadDynamicAssistantPreference();
+
+      // Notify the MainScreen that a selection change has occurred,
+      // which will trigger the BottomAppBar to hide.
+      state.widget.onModelSelectionChanged?.call(true);
+
+      // Load the chat history and finish.
+      await loadPreviousMessages(manager.conversationID);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (state.mounted) {
+          state.textFieldFocusNode.requestFocus();
+        }
+      });
+      return; // Exit the function to prevent normal model loading logic.
+    }
+
+    // The rest of the function is the logic for loading a NORMAL, model-specific chat.
+    // It will only be executed if the modelId is NOT 'dynamic'.
     await state.loadService.loadModels();
     final preciseModelData = ModelData.getPreciseModelData(conversationSpecificModelId);
 
-    // Prepare necessary variables
     Map<String, dynamic> uiSeriesData;
     String parentSeriesId;
     String activeExtensionId = conversationSpecificModelId;
 
-    // Check if the model is an extension of a parent series
     final parentSeriesCandidate = state.loadService.allModels.firstWhere(
           (m) => (m.extensions?.containsKey(conversationSpecificModelId) ?? false),
       orElse: () => ModelInfo(id: '', title: '', imagePath: '', producer: ''),
@@ -68,14 +108,10 @@ class ReadService {
 
     final bool definitiveCanHandleImage = ModelData.hasModality(conversationSpecificModelId, 'image');
 
-    // --- THE DEFINITIVE FIX IS HERE ---
-    // This logic robustly calculates the premium status by checking the base model
-    // for characters, ensuring consistency with the model selection flow.
     bool isPremium = false;
     final category = preciseModelData['category'] as String?;
 
     if (category == 'self' || category == 'roleplay') {
-      // For characters, premium status is determined by their base model.
       final String? baseModelId = preciseModelData['baseModelId'] as String?;
       if (baseModelId != null && baseModelId.isNotEmpty) {
         final Map<String, dynamic> baseModelData = ModelData.getPreciseModelData(baseModelId);
@@ -83,15 +119,12 @@ class ReadService {
         debugPrint("$logPrefix: Character model. Premium status from base '$baseModelId': $isPremium");
       }
     } else {
-      // For all other models, check the tier of the model/extension itself.
       isPremium = (preciseModelData['tier'] as String? ?? 'free') == 'premium';
       debugPrint("$logPrefix: Standard model. Premium status: $isPremium");
     }
-    // --- END OF FIX ---
 
-
-    // Set the ChatScreen's state with all correct, resolved data
     state.setState(() {
+      state.appBarModeNotifier.value = AppBarMode.modelSelected;
       state.modelTitle = uiSeriesData['title'] as String?;
       state.modelImagePath = ModelData.getModelImagePath(uiSeriesData);
       state.modelProducer = uiSeriesData['producer'] as String?;
@@ -107,14 +140,14 @@ class ReadService {
       state.openedFromMenu = true;
       state.conversationID = manager.conversationID;
       state.conversationTitle = manager.conversationTitle;
-
-      // Set the premium briefing visibility with the correctly calculated value.
       state.showPremiumBriefing = isPremium;
-
       debugPrint("$logPrefix: State configured: modelId='${state.modelId}', title='${state.modelTitle}', isPremium='${state.showPremiumBriefing}'");
     });
 
-    // Initialize the extensions panel
+    // Notify the MainScreen that a selection change has occurred,
+    // which will trigger the BottomAppBar to hide.
+    state.widget.onModelSelectionChanged?.call(true);
+
     state.extensions.initialize(
       mainId: parentSeriesId,
       ext: activeExtensionId,
@@ -128,6 +161,11 @@ class ReadService {
 
     debugPrint("$logPrefix: Chat state successfully configured for conversation '${manager.conversationID}' with model '$conversationSpecificModelId'.");
     await loadPreviousMessages(manager.conversationID);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (state.mounted) {
+        state.textFieldFocusNode.requestFocus();
+      }
+    });
   }
 
   int _toInt(dynamic v, [int def = 0]) =>
@@ -283,9 +321,14 @@ class ReadService {
     );
   }
 
+  /// Explicitly marks the messages as loaded. This is called by SendService
+  /// when a new conversation is started to prevent the skeleton loader from
+  /// appearing unnecessarily.
   void markLoaded() {
     if (!_areMessagesLoaded) {
       _areMessagesLoaded = true;
+      // This setState is a safeguard to ensure the UI rebuilds if any other
+      // part of the app was depending on the loading state.
       if (state.mounted) {
         state.setState(() {});
       }

@@ -89,15 +89,12 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
     final screenWidth = MediaQuery.of(context).size.width;
     final localizations = AppLocalizations.of(context)!;
 
-    // --- MODIFICATION ---
-    // Make panel sizing and fonts dynamic based on screen width.
     final double panelWidth = screenWidth * 0.65;
     final double panelLeft = (offset.dx + size.width / 2) - (panelWidth / 2);
     final double titleFontSize = screenWidth * 0.04;
     final double bodyFontSize = screenWidth * 0.035;
     final double footerFontSize = screenWidth * 0.033;
     final double iconSize = screenWidth * 0.045;
-    // --- END MODIFICATION ---
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
@@ -117,7 +114,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                       scale: _animation,
                       alignment: Alignment.topCenter,
                       child: GestureDetector(
-                        onTap: () {}, // Swallow taps on the panel itself.
+                        onTap: () {},
                         child: Container(
                           width: panelWidth,
                           padding: const EdgeInsets.symmetric(
@@ -148,7 +145,6 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                       localizations.creditsInfoPanelTitle,
                                       style: GoogleFonts.heebo(
                                         color: AppColors.primaryColor.inverted,
-                                        // --- USE DYNAMIC FONT SIZE ---
                                         fontSize: titleFontSize,
                                         fontWeight: FontWeight.bold,
                                         decoration: TextDecoration.none,
@@ -161,7 +157,6 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                     style: GoogleFonts.heebo(
                                       color: AppColors.primaryColor.inverted
                                           .withOpacity(0.9),
-                                      // --- USE DYNAMIC FONT SIZE ---
                                       fontSize: bodyFontSize,
                                       height: 1.5,
                                       decoration: TextDecoration.none,
@@ -173,7 +168,6 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                     style: GoogleFonts.heebo(
                                       color: AppColors.primaryColor.inverted
                                           .withOpacity(0.7),
-                                      // --- USE DYNAMIC FONT SIZE ---
                                       fontSize: footerFontSize,
                                       fontStyle: FontStyle.italic,
                                       decoration: TextDecoration.none,
@@ -186,7 +180,6 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                 right: 0,
                                 child: SvgPicture.asset(
                                   'assets/icons/credit.svg',
-                                  // --- USE DYNAMIC ICON SIZE ---
                                   width: iconSize,
                                   height: iconSize,
                                   color: AppColors.primaryColor.inverted
@@ -216,9 +209,20 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return ValueListenableBuilder<int>(
+    return ValueListenableBuilder<int?>(
       valueListenable: CreditsManager.instance.totalCreditsNotifier,
       builder: (context, totalCredits, child) {
+        final String creditsText = totalCredits == null ? '?' : totalCredits.toString();
+
+        String ghostText;
+        if (totalCredits == null) {
+          ghostText = "999";
+        } else if (totalCredits < 100 && totalCredits >= 0) { // Catch 1 and 2 digit numbers
+          ghostText = "999";
+        } else {
+          ghostText = creditsText;
+        }
+
         return Stack(
           alignment: Alignment.centerLeft,
           children: [
@@ -263,16 +267,42 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                           Expanded(
                             child: FittedBox(
                               fit: BoxFit.contain,
-                              alignment: Alignment.centerLeft,
+                              alignment: Alignment.center, // Center the content
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 5.0),
-                                child: Text(
-                                  '$totalCredits',
-                                  style: TextStyle(
-                                    fontSize: screenWidth * 0.02,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primaryColor.inverted,
-                                  ),
+                                child: Stack(
+                                  alignment: Alignment.center, // Center the text
+                                  children: [
+                                    Opacity(
+                                      opacity: 0.0,
+                                      child: Text(
+                                        ghostText,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryColor.inverted,
+                                        ),
+                                      ),
+                                    ),
+                                    // FIX 3: Add AnimatedSwitcher for smooth transitions
+                                    AnimatedSwitcher(
+                                      duration: const Duration(milliseconds: 250),
+                                      transitionBuilder: (child, animation) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+                                      },
+                                      child: Text(
+                                        creditsText,
+                                        // Use a key to tell the switcher that the text has changed
+                                        key: ValueKey<String>(creditsText),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryColor.inverted,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -299,7 +329,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                 screenHeight: screenHeight,
                 onTap: () {
                   hideCreditsInfo();
-                  navigateToScreen(context, FundsScreen(),
+                  navigateToScreen(context, const FundsScreen(),
                       direction: const Offset(0.0, 1.0));
                 },
               ),

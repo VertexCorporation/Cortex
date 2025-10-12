@@ -1,7 +1,9 @@
-// credits.dart (FINAL, POLISHED, AND STATELESS)
+// credits.dart (FINAL, CORRECTED, AND PERFORMATIVE)
+// This version isolates the scroll fog logic into a dedicated StatefulWidget (_ScrollableListWithFog)
+// to prevent entire widget rebuilds on scroll, fixing the Sliver assertion crash and improving performance.
 
 import 'dart:developer';
-import 'package:cortex/main.dart'; // Assuming this is for theme/app-wide constants
+import 'package:cortex/main.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -22,8 +24,6 @@ class CreditPackage {
   });
 }
 
-/// A "dumb" widget that only displays credit packages based on the data it receives.
-/// All logic for fetching and buying is handled by the parent widget.
 class CreditContentWidget extends StatefulWidget {
   final ValueChanged<CreditPackage>? onCreditPackageSelected;
   final List<ProductDetails> availableProducts;
@@ -40,14 +40,9 @@ class CreditContentWidget extends StatefulWidget {
   State<CreditContentWidget> createState() => _CreditContentWidgetState();
 }
 
-class _CreditContentWidgetState extends State<CreditContentWidget> with SingleTickerProviderStateMixin {
+class _CreditContentWidgetState extends State<CreditContentWidget> {
   int? _selectedCardIndex;
   final List<CreditPackage> _creditPackages = [];
-  late AnimationController _shineController;
-  late Animation<double> _shineAnimation;
-
-  // --- REMOVED: InAppPurchase instance and purchase logic ---
-  // This widget is now purely for presentation. The parent handles all purchases.
 
   final bool _isTesting = !kReleaseMode;
   static const String _logName = 'CreditContentWidget';
@@ -55,73 +50,38 @@ class _CreditContentWidgetState extends State<CreditContentWidget> with SingleTi
   @override
   void initState() {
     super.initState();
-
-    // --- NEW: Initialize the shine animation ---
-    _shineController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000), // Slower, more subtle shine
-    );
-
-    _shineAnimation = Tween<double>(begin: -1.5, end: 1.5).animate(
-        CurvedAnimation(parent: _shineController, curve: Curves.linear)
-    );
-
-    _shineController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        // Wait for a few seconds before the next shine
-        Future.delayed(const Duration(seconds: 1), () {
-          if (mounted) {
-            _shineController.forward(from: 0.0);
-          }
-        });
-      }
-    });
-
-    // Start the first animation after a short delay
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        _shineController.forward();
-      }
-    });
-
-
     _buildPackagesFromProps();
-    _selectedCardIndex = 0;
-
-    // After the first frame is built, notify the parent of the default selection.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && widget.onCreditPackageSelected != null && _creditPackages.isNotEmpty) {
-        widget.onCreditPackageSelected!(_creditPackages[0]);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _shineController.dispose();
-    super.dispose();
+    // Default to the first package if available.
+    if (_creditPackages.isNotEmpty) {
+      _selectedCardIndex = 0;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.onCreditPackageSelected != null) {
+          widget.onCreditPackageSelected!(_creditPackages[0]);
+        }
+      });
+    }
   }
 
   @override
   void didUpdateWidget(covariant CreditContentWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Use listEquals from foundation.dart for a more robust comparison.
     if (!listEquals(widget.availableProducts, oldWidget.availableProducts)) {
       setState(() {
         _buildPackagesFromProps();
+        // After rebuilding packages, ensure a selection is still valid.
+        if (_creditPackages.isNotEmpty &&
+            (_selectedCardIndex == null || _selectedCardIndex! >= _creditPackages.length)) {
+          _selectedCardIndex = 0;
+          widget.onCreditPackageSelected?.call(_creditPackages[0]);
+        }
       });
     }
   }
 
-  /// Rebuilds the internal list of [CreditPackage]s from the product details
-  /// passed in via the widget's properties.
   void _buildPackagesFromProps() {
     _creditPackages.clear();
-
-    // Create a mutable copy to sort
     final sortedProducts = List<ProductDetails>.from(widget.availableProducts);
 
-    // Sort the products by amount to ensure a consistent list order.
     sortedProducts.sort((a, b) {
       final amountA = int.tryParse(a.title.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
       final amountB = int.tryParse(b.title.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
@@ -141,13 +101,8 @@ class _CreditContentWidgetState extends State<CreditContentWidget> with SingleTi
     }
   }
 
-  // --- REMOVED: buyCreditPackage and _showCustomNotification methods ---
-  // All logic is now handled by the parent widget.
-
   @override
   Widget build(BuildContext context) {
-    // If we're in a real build and the parent hasn't passed any products,
-    // show a loader. This is a good fallback for when products are fetching.
     if (_creditPackages.isEmpty && !_isTesting) {
       return const SkeletonLoader(key: ValueKey('creditLoader'));
     }
@@ -160,21 +115,12 @@ class _CreditContentWidgetState extends State<CreditContentWidget> with SingleTi
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
-    // --- DYNAMIC SIZING & LAYOUT CONSTANTS ---
     final double horizontalPadding = screenWidth * 0.04;
     final double spacingAfterTitle = screenHeight * 0.01;
     final double spacingAfterDescription = screenHeight * 0.02;
-    final double cardMarginVertical = screenHeight * 0.0075;
-    final double cardInnerPadding = screenWidth * 0.04;
-    final double iconSize = screenWidth * 0.1;
-    final double spacingBetweenIconAndText = screenWidth * 0.04;
-    final double spacingInCardText = screenHeight * 0.005;
 
-    // --- DYNAMIC FONT SIZES ---
     final double titleFontSize = screenWidth * 0.07;
     final double descriptionFontSize = screenWidth * 0.035;
-    final double cardTitleFontSize = screenWidth * 0.045;
-    final double cardPriceFontSize = screenWidth * 0.04;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -184,143 +130,250 @@ class _CreditContentWidgetState extends State<CreditContentWidget> with SingleTi
         children: [
           Text(
             localizations.buyCredits,
-            style: TextStyle(
-              fontSize: titleFontSize,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryColor.inverted,
-            ),
+            style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: spacingAfterTitle),
           Text(
             localizations.selectCreditPackageDescription,
-            style: TextStyle(
-              fontSize: descriptionFontSize,
-              color: AppColors.tertiaryColor,
-            ),
+            style: TextStyle(fontSize: descriptionFontSize, color: AppColors.tertiaryColor),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: spacingAfterDescription),
           Expanded(
-            child: ListView.builder(
-              controller: widget.scrollController,
-              itemCount: _creditPackages.length,
-              itemBuilder: (context, index) {
-                final package = _creditPackages[index];
-                final isSelected = _selectedCardIndex == index;
-
-                ProductDetails? productDetail;
-                try {
-                  productDetail = widget.availableProducts.firstWhere((p) => p.id == package.productId);
-                } catch (e) {
-                  log(
-                    'Could not find ProductDetails for ${package.productId}. Using fallback data.',
-                    name: _logName,
-                  );
-                  productDetail = null;
-                }
-
-                final String title = productDetail?.title ?? localizations.creditPackage(package.amount);
-                final String price = productDetail?.price ?? package.price;
-
-                final cardContent = AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeInOut,
-                  padding: EdgeInsets.all(cardInnerPadding),
-                  decoration: BoxDecoration(
-                    // --- MODIFIED VALUES ---
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected ? AppColors.primaryColor.inverted : AppColors.border,
-                      width: isSelected ? 2.0 : 1.0,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/credit.svg',
-                        width: iconSize,
-                        height: iconSize,
-                        colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-                      ),
-                      SizedBox(width: spacingBetweenIconAndText),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: TextStyle(
-                                fontSize: cardTitleFontSize,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryColor.inverted,
-                              ),
-                            ),
-                            SizedBox(height: spacingInCardText),
-                            Text(
-                              price,
-                              style: TextStyle(
-                                fontSize: cardPriceFontSize,
-                                color: AppColors.tertiaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-
-                return GestureDetector(
-                  onTap: () {
-                    if (mounted) setState(() => _selectedCardIndex = index);
-                    widget.onCreditPackageSelected?.call(package);
-                  },
-                  // --- WRAP with Margin & Stack for Shine Effect ---
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: cardMarginVertical),
-                    child: Stack(
-                      children: [
-                        cardContent,
-                        Positioned.fill(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20.0),
-                            child: AnimatedBuilder(
-                              animation: _shineAnimation,
-                              builder: (context, child) {
-                                return Transform.translate(
-                                  offset: Offset(MediaQuery.of(context).size.width * _shineAnimation.value, 0),
-                                  child: child,
-                                );
-                              },
-                              child: Container(
-                                width: screenWidth * 0.25,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      AppColors.secondaryColor.withOpacity(0.0),
-                                      AppColors.secondaryColor.withOpacity(0.5),
-                                      AppColors.secondaryColor.withOpacity(0.0),
-                                    ],
-                                    stops: const [0.4, 0.5, 0.6],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
+            // <<< DEĞİŞİKLİK: Ayrı bir stateful widget'a taşıdık >>>
+            child: _ScrollableListWithFog(
+              scrollController: widget.scrollController,
+              creditPackages: _creditPackages,
+              availableProducts: widget.availableProducts,
+              selectedCardIndex: _selectedCardIndex,
+              onCardSelected: (index, package) {
+                setState(() => _selectedCardIndex = index);
+                widget.onCreditPackageSelected?.call(package);
               },
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+// <<< YENİ WIDGET: Scroll ve Fog mantığını yöneten lokal stateful widget >>>
+class _ScrollableListWithFog extends StatefulWidget {
+  final ScrollController? scrollController;
+  final List<CreditPackage> creditPackages;
+  final List<ProductDetails> availableProducts;
+  final int? selectedCardIndex;
+  final Function(int, CreditPackage) onCardSelected;
+
+  const _ScrollableListWithFog({
+    required this.scrollController,
+    required this.creditPackages,
+    required this.availableProducts,
+    required this.selectedCardIndex,
+    required this.onCardSelected,
+  });
+
+  @override
+  State<_ScrollableListWithFog> createState() => _ScrollableListWithFogState();
+}
+
+class _ScrollableListWithFogState extends State<_ScrollableListWithFog> with SingleTickerProviderStateMixin {
+  bool _showBottomScrollFog = false;
+  bool _showTopScrollFog = false;
+  late AnimationController _shineController;
+  late Animation<double> _shineAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.scrollController?.addListener(_updateFogVisibility);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateFogVisibility());
+
+    _shineController = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
+    _shineAnimation = Tween<double>(begin: -1.5, end: 1.5).animate(CurvedAnimation(parent: _shineController, curve: Curves.linear));
+    _shineController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) _shineController.forward(from: 0.0);
+        });
+      }
+    });
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) _shineController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController?.removeListener(_updateFogVisibility);
+    _shineController.dispose();
+    super.dispose();
+  }
+
+  void _updateFogVisibility() {
+    if (!mounted || widget.scrollController == null) return;
+    final controller = widget.scrollController!;
+
+    if (!controller.hasClients) {
+      if (_showBottomScrollFog || _showTopScrollFog) {
+        setState(() {
+          _showBottomScrollFog = false;
+          _showTopScrollFog = false;
+        });
+      }
+      return;
+    }
+
+    final bool shouldShowTop = controller.position.pixels > 10;
+    final bool shouldShowBottom =
+        controller.position.maxScrollExtent > 0 && controller.position.pixels < controller.position.maxScrollExtent - 10;
+
+    if (shouldShowTop != _showTopScrollFog || shouldShowBottom != _showBottomScrollFog) {
+      // Bu setState SADECE bu küçük widget'ı yeniden çizer, performansı etkilemez.
+      setState(() {
+        _showTopScrollFog = shouldShowTop;
+        _showBottomScrollFog = shouldShowBottom;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
+    final localizations = AppLocalizations.of(context)!;
+
+    final double cardMarginVertical = screenHeight * 0.0075;
+    final double cardInnerPadding = screenWidth * 0.04;
+    final double iconSize = screenWidth * 0.1;
+    final double spacingBetweenIconAndText = screenWidth * 0.04;
+    final double spacingInCardText = screenHeight * 0.005;
+    final double cardTitleFontSize = screenWidth * 0.045;
+    final double cardPriceFontSize = screenWidth * 0.04;
+
+    return Stack(
+      children: [
+        ListView.builder(
+          controller: widget.scrollController,
+          itemCount: widget.creditPackages.length,
+          itemBuilder: (context, index) {
+            final package = widget.creditPackages[index];
+            final isSelected = widget.selectedCardIndex == index;
+
+            ProductDetails? productDetail;
+            try {
+              productDetail = widget.availableProducts.firstWhere((p) => p.id == package.productId);
+            } catch (e) {
+              productDetail = null;
+            }
+
+            final String title = productDetail?.title ?? localizations.creditPackage(package.amount);
+            final String price = productDetail?.price ?? package.price;
+
+            final cardContent = AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              padding: EdgeInsets.all(cardInnerPadding),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isSelected ? AppColors.primaryColor.inverted : AppColors.border,
+                  width: isSelected ? 2.0 : 1.0,
+                ),
+              ),
+              child: Row(
+                children: [
+                  SvgPicture.asset('assets/icons/credit.svg', width: iconSize, height: iconSize, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn)),
+                  SizedBox(width: spacingBetweenIconAndText),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title, style: TextStyle(fontSize: cardTitleFontSize, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted)),
+                        SizedBox(height: spacingInCardText),
+                        Text(price, style: TextStyle(fontSize: cardPriceFontSize, color: AppColors.tertiaryColor)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+
+            return GestureDetector(
+              onTap: () => widget.onCardSelected(index, package),
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: cardMarginVertical),
+                child: Stack(
+                  children: [
+                    cardContent,
+                    Positioned.fill(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20.0),
+                        child: AnimatedBuilder(
+                          animation: _shineAnimation,
+                          builder: (context, child) => Transform.translate(offset: Offset(screenWidth * _shineAnimation.value, 0), child: child),
+                          child: Container(
+                            width: screenWidth * 0.25,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft, end: Alignment.centerRight,
+                                colors: [ AppColors.secondaryColor.withOpacity(0.0), AppColors.secondaryColor.withOpacity(0.5), AppColors.secondaryColor.withOpacity(0.0)],
+                                stops: const [0.4, 0.5, 0.6],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        Align(
+          alignment: Alignment.topCenter,
+          child: IgnorePointer(
+            child: AnimatedOpacity(
+              opacity: _showTopScrollFog ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 250),
+              child: Container(
+                height: screenHeight * 0.04,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter, end: Alignment.topCenter,
+                    colors: [AppColors.background.withOpacity(0.0), AppColors.background],
+                    stops: const [0.0, 0.9],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: IgnorePointer(
+            child: AnimatedOpacity(
+              opacity: _showBottomScrollFog ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 250),
+              child: Container(
+                height: screenHeight * 0.07,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                    colors: [AppColors.background.withOpacity(0.0), AppColors.background],
+                    stops: const [0.0, 0.9],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

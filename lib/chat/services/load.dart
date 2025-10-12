@@ -151,13 +151,15 @@ class LoadService {
     final modelData = ModelData.getPreciseModelData(state.modelId!);
     if (modelData.isNotEmpty) {
       final bool hasImageModality = ModelData.hasModality(state.modelId!, 'image');
+
       state.setState(() {
-        state.modelTitle = modelData['title'] ?? 'Unknown Model';
-        state.modelDescription = modelData['description'] ?? '';
-        state.modelImagePath = modelData['imagePath'] ?? 'assets/icons/self.svg';
-        state.modelProducer = modelData['producer'] ?? 'Unknown';
+        state.modelTitle = modelData['title']?.toString() ?? 'Unknown Model';
+        state.modelDescription = modelData['description']?.toString() ?? '';
+        state.modelImagePath = modelData['imagePath']?.toString() ?? 'assets/icons/self.svg';
+        state.modelProducer = modelData['producer']?.toString() ?? 'Unknown';
         state.canHandleImage = hasImageModality;
       });
+
     }
     final String mainId = ModelData.getBaseIdFromFullId(state.modelId!);
     state.extensions.initialize(

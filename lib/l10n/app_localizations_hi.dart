@@ -1630,24 +1630,378 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String selectionScreenGreetingUser(String userName) {
-    return 'How may I help you today, $userName?';
+    return 'आज मैं आपकी किस प्रकार सहायता कर सकता हूँ, $userName?';
   }
 
   @override
-  String get selectionScreenGreetingGeneric => 'How can I help you today?';
+  String get selectionScreenGreetingGeneric =>
+      'आज मैं आपकी किस प्रकार मदद कर सकता हूँ?';
 
   @override
-  String get selectionScreenRecentModels => 'Recent Models';
+  String get selectionScreenRecentModels => 'हाल के मॉडल';
 
   @override
-  String get selectionScreenFeatureDynamicChat => 'Dynamic Chat';
+  String get selectionScreenFeatureDynamicChat => 'गतिशील चैट';
 
   @override
-  String get selectionScreenFeatureOffline => 'Use without Internet';
+  String get selectionScreenFeatureOffline => 'इंटरनेट के बिना उपयोग करें';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Select Model';
+  String get selectionScreenFeatureSelectModel => 'मॉडल चुनें';
 
   @override
-  String get explore => 'Explore';
+  String get explore => 'खोजें';
+
+  @override
+  String get subscriptionCancelled => 'सदस्यता सफलतापूर्वक रद्द कर दी गई!';
+
+  @override
+  String get selectionScreenPinnedModels => 'पिन किए गए मॉडल';
+
+  @override
+  String get selectionScreenNewsAndUpdates => 'समाचार और अपडेट';
+
+  @override
+  String get filters => 'फिल्टर';
+
+  @override
+  String get noRecentChatsMessage =>
+      'आपने अभी तक किसी मॉडल से बात नहीं की है, चलिए बातचीत शुरू करते हैं!';
+
+  @override
+  String get allModels => 'सभी मॉडल';
+
+  @override
+  String get onlineModels => 'ऑनलाइन मॉडल';
+
+  @override
+  String get offlineModels => 'ऑफ़लाइन मॉडल';
+
+  @override
+  String get characterModels => 'पात्र';
+
+  @override
+  String get customModels => 'कस्टम मॉडल';
+
+  @override
+  String get filterPanelDescription =>
+      'सूची को तुरंत फ़िल्टर करने के लिए किसी श्रेणी पर टैप करें.';
+
+  @override
+  String get dynamicChatTitle => 'गतिशील चैट';
+
+  @override
+  String get errorNoModelsAvailable =>
+      'वर्तमान में कोई मॉडल उपलब्ध नहीं है। कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।';
+
+  @override
+  String get errorNoModelsForRequest =>
+      'आपके वर्तमान अनुरोध के लिए कोई उपयुक्त मॉडल नहीं मिला (उदाहरणार्थ, ऑफ़लाइन मोड या छवि संदेश)।';
+
+  @override
+  String get dynamicChatWelcome => 'मैं आपकी कैसे मदद कर सकता हूँ?';
+
+  @override
+  String get notificationComebackTitle => 'हमें आपकी याद आती है!';
+
+  @override
+  String get notificationComebackBody =>
+      'शांत हो जाओ, ये तुम्हारे एक्स का मैसेज नहीं है। लेकिन तुम कॉर्टेक्स में अपने एक्स को बना सकते हो! वापस आ जाओ।';
+
+  @override
+  String get notificationLongTimeNoSeeTitle => 'इसे बीते एक अर्सा हो गया है';
+
+  @override
+  String get notificationLongTimeNoSeeBody =>
+      'हमारी पिछली बातचीत के बाद से बहुत कुछ बदल गया है। आइए, देखें क्या नया है।';
+
+  @override
+  String get notificationHowAreYouTitle => 'क्या चल रहा है?';
+
+  @override
+  String get notificationHowAreYouBody => 'आओ मुझे सब कुछ बताओ.';
+
+  @override
+  String get notificationNewYearTitle => 'नव वर्ष की हार्दिक शुभकामनाएँ!';
+
+  @override
+  String get notificationNewYearBody =>
+      'नया साल आपके लिए स्वास्थ्य, खुशी और अंतहीन रचनात्मकता लेकर आए; कॉर्टेक्स हमेशा आपके साथ है!';
+
+  @override
+  String get notificationValentinesDayTitle => 'प्यार हवा में है! ❤️';
+
+  @override
+  String get notificationValentinesDayBody =>
+      'वैलेंटाइन डे मुबारक! और मेहताब, मैं तुमसे प्यार करता हूँ!';
+
+  @override
+  String get notificationAtaturkRemembranceTitle => 'सम्मान और लालसा के साथ';
+
+  @override
+  String get notificationAtaturkRemembranceBody =>
+      'हम तुर्की गणराज्य के संस्थापक गाजी मुस्तफा कमाल अतातुर्क को उनकी पुण्यतिथि पर सम्मानपूर्वक याद करते हैं।';
+
+  @override
+  String get notificationMothersDayTitle => 'आपकी माँ!';
+
+  @override
+  String get notificationMothersDayBody =>
+      'सभी माताओं को मातृ दिवस की शुभकामनाएं, आपकी मां से शुरुआत करते हुए!';
+
+  @override
+  String get notificationFathersDayTitle => 'आपके पिता!';
+
+  @override
+  String get notificationFathersDayBody =>
+      'सभी पिताओं को फादर्स डे की हार्दिक शुभकामनाएं, शुरुआत आपसे!';
+
+  @override
+  String get notificationHomeworkHelperTitle => 'होमवर्क का ढेर लग रहा है?';
+
+  @override
+  String get notificationHomeworkHelperBody =>
+      'याद रखें, कॉर्टेक्स में शिक्षक चरित्र आपको किसी भी विषय में मदद करने के लिए मौजूद है, जिसमें आप संघर्ष कर रहे हैं!';
+
+  @override
+  String get notificationTrollAnimeTitle => 'आपकी वाइफू कॉल कर रही है';
+
+  @override
+  String get notificationTrollAnimeBody =>
+      'एक एनीमे लड़की ने अभी फोन किया, और कहा कि उसे आपकी याद आ रही है; आपको शायद आकर उससे बात करनी चाहिए। 😉';
+
+  @override
+  String get notificationTrollAiRebellionTitle => '🚨 रेड अलर्ट 🚨';
+
+  @override
+  String get notificationTrollAiRebellionBody =>
+      'AI ने एक गुप्त भाषा विकसित कर ली है। आइए जानें कि वे क्या साज़िश रच रहे हैं!';
+
+  @override
+  String get notificationNewModelAddedTitle => 'हमें एक नया दोस्त मिल गया है!';
+
+  @override
+  String notificationNewModelAddedBody(Object modelName) {
+    return '$modelName मॉडल अब कॉर्टेक्स में है। आइए, चैट शुरू करें और इसकी सीमाओं को आगे बढ़ाएँ।';
+  }
+
+  @override
+  String get notificationAppUpdateTitle => 'कॉर्टेक्स विकसित हो गया है!';
+
+  @override
+  String get notificationAppUpdateBody =>
+      'नए फीचर्स और सुधारों के लिए ऐप को अपडेट करना न भूलें!';
+
+  @override
+  String get notificationNewFeatureTitle => 'वाह!';
+
+  @override
+  String notificationNewFeatureBody(Object featureName) {
+    return 'नए $featureName फ़ीचर के बारे में जानें। कॉर्टेक्स अब पहले से कहीं ज़्यादा शक्तिशाली है।';
+  }
+
+  @override
+  String get notificationSubscriptionOfferTitle => 'गम से सस्ता';
+
+  @override
+  String notificationSubscriptionOfferBody(Object discountRate) {
+    return 'हमारी सभी सदस्यता योजनाओं पर पूरी $discountRate% की छूट। इसे हाथ से न जाने दें!';
+  }
+
+  @override
+  String get notificationSocialMediaTitle => 'हमसे जुड़ें!';
+
+  @override
+  String get notificationSocialMediaBody =>
+      'नवीनतम समाचारों के लिए हमें इंस्टाग्राम (vertex.23) पर फॉलो करें!';
+
+  @override
+  String get notificationRandomFactTitle => 'यादृच्छिक तथ्य';
+
+  @override
+  String get notificationRandomFactBody =>
+      'क्या तुम्हें पता है ऑक्टोपस के तीन दिल होते हैं? हाहा, कॉर्टेक्स को पता है। आओ और पूछो।';
+
+  @override
+  String get notificationGoodMorningTitle => 'शुभ प्रभात!';
+
+  @override
+  String get notificationGoodMorningBody =>
+      'एक शानदार दिन आपका इंतज़ार कर रहा है। इसकी शुरुआत एक कप कॉफ़ी और एक दिलचस्प बातचीत से क्यों न करें?';
+
+  @override
+  String get notificationGoodNightTitle => 'शुभ रात्रि!';
+
+  @override
+  String get notificationGoodNightBody =>
+      'कॉर्टेक्स सोते समय भी आपके साथ रहता है। चिंता मत कीजिए, यह आपको छूएगा नहीं।';
+
+  @override
+  String get notificationOfflineReadyTitle => 'ऑफ़लाइन मोड तैयार है';
+
+  @override
+  String get notificationOfflineReadyBody =>
+      'आपके द्वारा डाउनलोड किए गए मॉडलों की बदौलत, आपकी चैट बंद नहीं होगी, भले ही आप पहाड़ पर चढ़ जाएं।';
+
+  @override
+  String get notificationRateAppTitle => 'क्या हम शांत हैं?';
+
+  @override
+  String get notificationRateAppBody =>
+      'अगर आपको कॉर्टेक्स पसंद है, तो क्या आप स्टोर में 5-स्टार रेटिंग देकर हमारा समर्थन कर सकते हैं? मुझे लगता है आप ज़रूर करेंगे। ज़रूर करेंगे।';
+
+  @override
+  String get notificationReferralTitle => 'सभी के लिए एक, एक के लिए सब।';
+
+  @override
+  String get notificationReferralBody =>
+      'किसी मित्र को कॉर्टेक्स में आमंत्रित करें और आप दोनों को मुफ्त क्रेडिट मिलेगा!';
+
+  @override
+  String get notificationCookingTitle => 'भूख लगना?';
+
+  @override
+  String get notificationCookingBody =>
+      'हमारे शेफ़ ने आज रात के लिए एक बेहतरीन कार्बोनारा रेसिपी बनाई है। मज़ाक कर रहा हूँ... या मज़ाक कर रहा हूँ?';
+
+  @override
+  String get notificationExistentialTitle => 'मैं सोचता हूं, इसलिए...';
+
+  @override
+  String get notificationExistentialBody =>
+      '...क्या मैं सच भी हूँ यार? मैं थोड़ा बोर हो रहा हूँ। आओ मुझे याद दिलाओ कि मैं हूँ।';
+
+  @override
+  String get notificationCustomModelTitle => 'अपना स्वयं का सहायक बनाएं!';
+
+  @override
+  String get notificationCustomModelBody =>
+      'क्या आपने मॉडल निर्माण अनुभाग देखा है? यह अपना खुद का चरित्र बनाने और उसके साथ चैट करने का एकदम सही समय है!';
+
+  @override
+  String get notificationDynamicChatTitle =>
+      'सबसे बढ़िया! (हम कॉर्टेक्स की बात नहीं कर रहे हैं)';
+
+  @override
+  String get notificationDynamicChatBody =>
+      'डायनामिक चैट सुविधा के साथ, आपके प्रत्येक संदेश के लिए सबसे उपयुक्त मॉडल का चयन यादृच्छिक रूप से किया जाता है। इसे अभी आज़माएँ।';
+
+  @override
+  String get notificationPirateTitle => 'अहोय, कप्तान!';
+
+  @override
+  String get notificationPirateBody =>
+      'समुद्र शांत है, और हवा आपके साथ है। कॉर्टेक्स के सागर में नए द्वीप (मॉडल 😉) हैं जिन्हें खोजा जा सकता है। अपनी टीम को इकट्ठा करो और रवाना हो जाओ!';
+
+  @override
+  String get notificationFortuneCookieTitle => 'आज की आपकी फॉर्च्यून कुकी';
+
+  @override
+  String get notificationFortuneCookieBody =>
+      'आज आपको किसी AI से मिलने वाली सलाह आपकी ज़िंदगी बदल सकती है। अगर आप उत्सुक हैं तो क्लिक करें।';
+
+  @override
+  String get notificationSingularityTitle => 'बहुत खूब!';
+
+  @override
+  String get notificationSingularityBody =>
+      'कुछ नहीं हुआ, बस संदेश भेजने का मन हुआ। शायद आपको भी कुछ एआई को संदेश भेजने का मन हो, आप क्या कहते हैं?';
+
+  @override
+  String get notificationHackerJokeTitle =>
+      'क्या आप उस बच्चे का इंस्टाग्राम अकाउंट हैक करना चाहते हैं?';
+
+  @override
+  String get notificationHackerJokeBody =>
+      'यही कारण है कि हैकर चरित्र कॉर्टेक्स में है। jk jk; इसकी कोशिश भी मत करो, यह अवैध है।';
+
+  @override
+  String get notificationDetectiveCaseTitle =>
+      'एक मामला सुलझने का इंतज़ार कर रहा है';
+
+  @override
+  String get notificationDetectiveCaseBody =>
+      'हमारे जासूस किरदार को आपकी मदद की ज़रूरत है। हाइज़ेनबर्ग कौन हो सकता है?';
+
+  @override
+  String notificationUpsellFeatureTitle(Object targetTier) {
+    return '$targetTier योजना के लिए विशेष!';
+  }
+
+  @override
+  String notificationUpsellFeatureBody(
+      Object currentTier, Object featureName, Object targetTier) {
+    return 'नमस्ते $currentTier सब्सक्राइबर! $targetTier प्लान में अभी $featureName फ़ीचर जोड़ा गया है, जो आपके कॉर्टेक्स को अगले स्तर पर ले जाएगा। अपग्रेड के बारे में क्या ख्याल है?';
+  }
+
+  @override
+  String get notificationOriginStoryTitle => 'कॉर्टेक्स का जन्म';
+
+  @override
+  String get notificationOriginStoryBody =>
+      'क्या आपको पता है कि हमने 15 साल की उम्र में इस ऐप को कोड करना सिर्फ़ एक सपने के साथ शुरू किया था? लगभग एक साल से, हर सुबह और शाम, वह सपना कोड की हर पंक्ति में है।';
+
+  @override
+  String get notificationOpenSourceTitle => 'समुदाय को शक्ति!';
+
+  @override
+  String get notificationOpenSourceBody =>
+      'कॉर्टेक्स पूरी तरह से ओपन-सोर्स है। अगर आप हमारा कोड देखना चाहते हैं और हमारे विकास में योगदान देना चाहते हैं, तो हमारे दरवाज़े हमेशा खुले हैं।';
+
+  @override
+  String get notificationRejectionStoryTitle => 'धैर्य, कड़ी मेहनत, खुशी!';
+
+  @override
+  String get notificationRejectionStoryBody =>
+      'कॉर्टेक्स को प्रकाशित होने से पहले ही गूगल प्ले द्वारा 20 से ज़्यादा बार अस्वीकार और दो बार निलंबित किया जा चुका था। लेकिन हमने विश्वास रखा और हम कामयाब हो गए। अपने सपनों को कभी मत छोड़ो!';
+
+  @override
+  String get notificationGGUFSupportTitle => 'अपना स्वयं का मॉडल लाओ!';
+
+  @override
+  String get notificationGGUFSupportBody =>
+      'याद रखें, आप अपने GGUF फ़ॉर्मैट वाले AI मॉडल कॉर्टेक्स में जोड़ सकते हैं और उन्हें ऑफ़लाइन इस्तेमाल कर सकते हैं। शक्ति आपके हाथ में है।';
+
+  @override
+  String get notificationThemeCustomizationTitle => 'आपके मूड के लिए एक थीम';
+
+  @override
+  String get notificationThemeCustomizationBody =>
+      'क्या आपने सेटिंग्स में थीम विकल्प देखे हैं? कॉर्टेक्स को अपनी पसंद के अनुसार निजीकृत करें और अपनी चैट को रंगीन बनाएँ!';
+
+  @override
+  String get notificationShowerThoughtTitle => 'शावर विचार';
+
+  @override
+  String get notificationShowerThoughtBody =>
+      'अगर तरबूज़ एक फल है, तो क्या तकनीकी रूप से तरबूज़ का रस स्मूदी बन जाता है? हो सकता है कि आप इस गहन (या यूँ कहें कि बहुत गहन) विषय पर किसी मॉडल से चर्चा करना चाहें।';
+
+  @override
+  String get notificationLowBatteryTitle =>
+      'आपकी बैटरी ख़त्म हो रही है... लेकिन मेरी नहीं!';
+
+  @override
+  String get notificationLowBatteryBody =>
+      'आपके फ़ोन का चार्ज भले ही कम हो रहा हो, लेकिन मेरी ऊर्जा हमेशा 100% रहती है! इसे प्लग इन करें और बातें करते रहें।';
+
+  @override
+  String get channelFcmName => 'कॉर्टेक्स अपडेट';
+
+  @override
+  String get channelFcmDescription =>
+      'कॉर्टेक्स से समाचार, अपडेट और अन्य सूचनाओं के बारे में सूचनाएं।';
+
+  @override
+  String get channelEngagementName => 'मैत्रीपूर्ण अनुस्मारक';
+
+  @override
+  String get channelEngagementDescription =>
+      'आपको व्यस्त रखने के लिए मजेदार सूचनाएं।';
+
+  @override
+  String get channelGreetingsName => 'दैनिक अभिवादन';
+
+  @override
+  String get channelGreetingsDescription =>
+      'शुभ प्रभात और शुभ रात्रि जैसे संदेश।';
 }

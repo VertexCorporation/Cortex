@@ -1,7 +1,6 @@
-// funds.dart (FINALIZED & PRODUCTION-READY)
-// The UI layer is now fully responsive, with all dimensions, font sizes, and
-// paddings calculated dynamically based on the screen size. It correctly uses
-// the custom SkeletonLoader and manages the one-time benefit animation state.
+// funds.dart (FINAL & UNIFIED BRAIN ARCHITECTURE)
+// This version establishes _FundsScreenViewState as the single source of truth for the UI,
+// eliminating all race conditions and ensuring instant, consistent UI updates.
 
 import 'dart:async';
 import 'dart:developer';
@@ -27,8 +26,13 @@ class FundsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations localizations = AppLocalizations.of(context)!;
     return ChangeNotifierProvider(
-      create: (_) => FundsBackend()..initialize(),
+      create: (context) => FundsBackend()
+        ..initialize(
+          notificationService: Provider.of<NotificationService>(context, listen: false),
+          localizations: localizations,
+        ),
       child: const FundsScreenView(),
     );
   }
@@ -46,20 +50,25 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   final List<String> _planTypes = ['plus', 'pro', 'ultra'];
   late final PageController _pageController;
   int _currentPage = 1;
-
   CreditPackage? _selectedCreditPackage;
-  final Map<String, String> _selectedBillingOptions = {
+  late Map<String, String> _selectedBillingOptions = {
     'plus': 'monthly', 'pro': 'monthly', 'ultra': 'monthly',
   };
-
   late final List<ScrollController> _scrollControllers;
-  bool _showScrollFog = false;
+  bool _showBottomScrollFog = false;
+  bool _showTopScrollFog = false;
   bool _isContentLoaded = false;
   Offset _contentOffset = const Offset(0.0, 0.03);
   bool _hasAnyBenefitListAnimated = false;
-
   late final ConfettiController _confettiController;
   StreamSubscription? _purchaseCompletedSubscription;
+
+  // --- THE UNIFIED BRAIN: SINGLE SOURCE OF TRUTH FOR THE ENTIRE UI ---
+  // These local variables hold the active subscription state for the entire UI.
+  // They are updated INSTANTLY by proactive updates and LATER confirmed by backend syncs.
+  // This ensures the checkmark and the selection border are ALWAYS consistent.
+  int _uiActiveSubscriptionLevel = 0;
+  String? _uiActiveSubscriptionOption;
 
   @override
   void initState() {
@@ -70,12 +79,14 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     _confettiController = ConfettiController(duration: const Duration(seconds: 1));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _syncUiStateWithBackend();
-      _updateFogVisibility();
       final backend = Provider.of<FundsBackend>(context, listen: false);
-      _purchaseCompletedSubscription = backend.onPurchaseCompleted.listen((_) {
+      backend.addListener(_onBackendUpdate);
+      _initializeUiStateFromBackend();
+      _updateFogVisibility();
+      _purchaseCompletedSubscription = backend.onPurchaseCompleted.listen((String purchasedProductId) {
         if (mounted) {
           _confettiController.play();
+          _updateUiAfterPurchase(purchasedProductId);
         }
       });
     });
@@ -83,6 +94,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   @override
   void dispose() {
+    if (mounted) {
+      Provider.of<FundsBackend>(context, listen: false).removeListener(_onBackendUpdate);
+    }
     _pageController.dispose();
     for (var controller in _scrollControllers) {
       controller.dispose();
@@ -92,18 +106,73 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     super.dispose();
   }
 
-  void _syncUiStateWithBackend() {
+  /// Runs ONCE on init. It populates our local "UI Brain" variables from the backend.
+  void _initializeUiStateFromBackend() {
     if (!mounted) return;
     final backend = Provider.of<FundsBackend>(context, listen: false);
-    final userLevel = backend.currentUserSubscriptionLevel;
-    final activeOption = backend.activeSubscriptionOption;
-    if (userLevel > 0 && activeOption != null) {
-      if (userLevel - 1 < _planTypes.length) {
+    setState(() {
+      _uiActiveSubscriptionLevel = backend.currentUserSubscriptionLevel;
+      _uiActiveSubscriptionOption = backend.activeSubscriptionOption;
+      final userLevel = _uiActiveSubscriptionLevel;
+      final activeOption = _uiActiveSubscriptionOption;
+      if (userLevel > 0 && activeOption != null && userLevel - 1 < _planTypes.length) {
         final activePlanType = _planTypes[userLevel - 1];
-        if (_selectedBillingOptions[activePlanType] != activeOption) {
-          setState(() => _selectedBillingOptions[activePlanType] = activeOption);
-        }
+        _selectedBillingOptions[activePlanType] = activeOption;
       }
+    });
+  }
+
+  /// Listens for REAL data changes from Firestore and syncs our "UI Brain".
+  /// This IGNORES temporary state changes like `isPurchasePending`.
+  void _onBackendUpdate() {
+    if (!mounted) return;
+    final backend = Provider.of<FundsBackend>(context, listen: false);
+    final newLevel = backend.currentUserSubscriptionLevel;
+    final newOption = backend.activeSubscriptionOption;
+    final bool hasDataChanged = newLevel != _uiActiveSubscriptionLevel || newOption != _uiActiveSubscriptionOption;
+    if (hasDataChanged) {
+      log("Real backend data change detected. Syncing UI Brain. New state: L$newLevel '$newOption'.", name: "FundsScreenView");
+      setState(() {
+        _uiActiveSubscriptionLevel = newLevel;
+        _uiActiveSubscriptionOption = newOption;
+        if (newLevel > 0 && newOption != null && newLevel - 1 < _planTypes.length) {
+          final activePlanType = _planTypes[newLevel - 1];
+          _selectedBillingOptions[activePlanType] = newOption;
+        }
+      });
+    }
+  }
+
+  /// THE CORE FIX: This function now updates BOTH the selection border AND the checkmark state INSTANTLY.
+  void _updateUiAfterPurchase(String purchasedProductId) {
+    String? planType;
+    String? billingOption;
+    int? planLevel;
+
+    switch (purchasedProductId) {
+      case FundsBackend.monthlySubscriptionPlus:
+        planType = 'plus'; billingOption = 'monthly'; planLevel = 1; break;
+      case FundsBackend.annualSubscriptionPlus:
+        planType = 'plus'; billingOption = 'annual'; planLevel = 1; break;
+      case FundsBackend.monthlySubscriptionPro:
+        planType = 'pro'; billingOption = 'monthly'; planLevel = 2; break;
+      case FundsBackend.annualSubscriptionPro:
+        planType = 'pro'; billingOption = 'annual'; planLevel = 2; break;
+      case FundsBackend.monthlySubscriptionUltra:
+        planType = 'ultra'; billingOption = 'monthly'; planLevel = 3; break;
+      case FundsBackend.annualSubscriptionUltra:
+        planType = 'ultra'; billingOption = 'annual'; planLevel = 3; break;
+    }
+
+    if (planType != null && billingOption != null && planLevel != null) {
+      log("Proactive UI Update: Purchase of '$purchasedProductId' detected. Updating UI Brain.", name: "FundsScreenView");
+      setState(() {
+        // 1. Update the selection map (for the blue border)
+        _selectedBillingOptions[planType!] = billingOption!;
+        // 2. Update the local active subscription state (for the checkmark ✅)
+        _uiActiveSubscriptionLevel = planLevel!;
+        _uiActiveSubscriptionOption = billingOption;
+      });
     }
   }
 
@@ -112,22 +181,39 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       _scrollControllers[_currentPage].removeListener(_updateFogVisibility);
       _scrollControllers[newPageIndex].addListener(_updateFogVisibility);
       setState(() { _currentPage = newPageIndex; });
-      _syncUiStateWithBackend();
       _updateFogVisibility();
     }
   }
 
+  /// Updates the visibility of the top and bottom scroll fogs based on scroll position.
   void _updateFogVisibility() {
     if (!mounted) return;
     final controller = _scrollControllers[_currentPage];
+
+    // If the scroll controller isn't attached to a view yet, hide both fogs.
     if (!controller.hasClients) {
-      if (_showScrollFog) setState(() => _showScrollFog = false);
+      if (_showBottomScrollFog || _showTopScrollFog) {
+        setState(() {
+          _showBottomScrollFog = false;
+          _showTopScrollFog = false;
+        });
+      }
       return;
     }
-    final bool shouldShow = controller.position.maxScrollExtent > 0 &&
+
+    // Top fog logic: show if the user has scrolled down more than a small threshold (e.g., 10 pixels).
+    final bool shouldShowTop = controller.position.pixels > 10;
+
+    // Bottom fog logic: show if the content is scrollable and the user hasn't reached the bottom.
+    final bool shouldShowBottom = controller.position.maxScrollExtent > 0 &&
         controller.position.pixels < controller.position.maxScrollExtent - 10;
-    if (shouldShow != _showScrollFog) {
-      setState(() => _showScrollFog = shouldShow);
+
+    // If the visibility state of either fog has changed, call setState to rebuild.
+    if (shouldShowTop != _showTopScrollFog || shouldShowBottom != _showBottomScrollFog) {
+      setState(() {
+        _showTopScrollFog = shouldShowTop;
+        _showBottomScrollFog = shouldShowBottom;
+      });
     }
   }
 
@@ -142,8 +228,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     } else {
       final planType = _planTypes[_currentPage - 1];
       final billingOption = _selectedBillingOptions[planType]!;
-      if (backend.currentUserSubscriptionLevel > planLevel ||
-          (backend.currentUserSubscriptionLevel == planLevel && billingOption == backend.activeSubscriptionOption)) {
+      // Use the local UI state for button logic to be consistent.
+      if (_uiActiveSubscriptionLevel > planLevel ||
+          (_uiActiveSubscriptionLevel == planLevel && billingOption == _uiActiveSubscriptionOption)) {
         backend.manageSubscription();
         return;
       }
@@ -157,7 +244,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
         final productDetails = backend.allProducts.firstWhere((p) => p.id == productIdToPurchase);
         backend.purchase(productDetails);
       } catch (e) {
-        log('Attempted to purchase a product not found in backend list: $productIdToPurchase', name: 'FundsScreen', error: e);
+        log('Attempted to purchase a product not found: $productIdToPurchase', name: 'FundsScreen', error: e);
         _showCustomNotification(message: localizations.productNotFound, isSuccess: false);
       }
     }
@@ -224,7 +311,6 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   Widget _buildErrorScreen(BuildContext context, String message) {
     final localizations = AppLocalizations.of(context)!;
     final screenSize = MediaQuery.of(context).size;
-
     return SafeArea(
       key: const ValueKey('error_screen'),
       child: Padding(
@@ -232,7 +318,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
         child: Column(
           children: [
             Align(
-              alignment: Alignment.topRight,
+              alignment: Alignment.topCenter,
               child: IconButton(
                 icon: Icon(Icons.close, color: AppColors.primaryColor.inverted, size: screenSize.width * 0.07),
                 onPressed: () => Navigator.of(context).pop(),
@@ -252,11 +338,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                     padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
                     child: Text(
                       message,
-                      style: TextStyle(
-                        color: AppColors.primaryColor.inverted,
-                        fontSize: screenSize.width * 0.045,
-                        height: 1.4,
-                      ),
+                      style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenSize.width * 0.045, height: 1.4),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -268,11 +350,12 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.1, vertical: screenSize.height * 0.018),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
                     ),
-                    onPressed: () => Provider.of<FundsBackend>(context, listen: false).initialize(),
-                    child: Text(
-                      localizations.retry,
-                      style: TextStyle(fontSize: screenSize.width * 0.04, fontWeight: FontWeight.bold),
-                    ),
+                    onPressed: () {
+                      final backend = Provider.of<FundsBackend>(context, listen: false);
+                      final notificationService = Provider.of<NotificationService>(context, listen: false);
+                      backend.initialize(notificationService: notificationService, localizations: localizations);
+                    },
+                    child: Text(localizations.retry, style: TextStyle(fontSize: screenSize.width * 0.04, fontWeight: FontWeight.bold)),
                   )
                 ],
               ),
@@ -333,8 +416,11 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                                 planType: _planTypes[i],
                                 availableProducts: backend.subscriptionProducts,
                                 selectedBillingOption: _selectedBillingOptions[_planTypes[i]]!,
-                                activeSubscriptionLevel: backend.currentUserSubscriptionLevel,
-                                activeSubscriptionOption: backend.activeSubscriptionOption,
+                                // --- THE FINAL PIECE OF THE PUZZLE ---
+                                // Pass the local, unified UI state variables, NOT the direct backend ones.
+                                activeSubscriptionLevel: _uiActiveSubscriptionLevel,
+                                activeSubscriptionOption: _uiActiveSubscriptionOption,
+                                // ------------------------------------
                                 onBillingOptionChanged: (newOption) {
                                   setState(() { _selectedBillingOptions[_planTypes[i]] = newOption; });
                                 },
@@ -348,11 +434,34 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                               ),
                           ],
                         ),
+
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: IgnorePointer(
+                            child: AnimatedOpacity(
+                              opacity: _currentPage > 0 && _showTopScrollFog ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 250),
+                              child: Container(
+                                height: screenHeight * 0.04,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: [ AppColors.background.withOpacity(0.0), AppColors.background ],
+                                    stops: const [0.0, 0.9],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: IgnorePointer(
                             child: AnimatedOpacity(
-                              opacity: _showScrollFog ? 1.0 : 0.0,
+                              // _showScrollFog yerine _showBottomScrollFog kullanılıyor
+                              opacity: _showBottomScrollFog ? 1.0 : 0.0,
                               duration: const Duration(milliseconds: 250),
                               child: Container(
                                 height: screenHeight * 0.07,
@@ -378,10 +487,10 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       children: [
                         _buildPageIndicator(screenWidth),
                         SizedBox(height: screenHeight * 0.02),
-                        // This AnimatedContainer handles the press/pending effect (scaling and opacity)
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 250),
                           curve: Curves.easeInOut,
+                          transformAlignment: Alignment.center,
                           transform: Matrix4.identity()..scale(backend.isPurchasePending ? 0.98 : 1.0),
                           child: Opacity(
                             opacity: backend.isPurchasePending ? 0.7 : 1.0,
@@ -395,8 +504,6 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                                 minimumSize: Size(double.infinity, screenHeight * 0.06),
                                 splashFactory: backend.isPurchasePending ? NoSplash.splashFactory : InkSplash.splashFactory,
                               ),
-                              // The AnimatedSwitcher is restored to handle text transitions,
-                              // but it no longer shows a CircularProgressIndicator.
                               child: AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 250),
                                 child: _buildButtonText(context, backend, screenWidth),
@@ -450,8 +557,6 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   }
 
   Widget _buildButtonText(BuildContext context, FundsBackend backend, double screenWidth) {
-    // This method is now back to its original, robust form.
-    // The ValueKey is crucial for AnimatedSwitcher to detect text changes.
     final localizations = AppLocalizations.of(context)!;
     final textStyle = TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold, color: AppColors.primaryColor);
 
@@ -468,16 +573,17 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final currentPlanType = _planTypes[planIndex];
     final selectedBillingOption = _selectedBillingOptions[currentPlanType]!;
 
-    if (backend.currentUserSubscriptionLevel > currentPlanLevel) {
+    // Use the local UI state for button text logic as well for consistency.
+    if (_uiActiveSubscriptionLevel > currentPlanLevel) {
       return Text(localizations.manageSubscription, key: ValueKey('downgrade-$currentPlanType'), style: textStyle);
     }
-    final isTierUpgrade = backend.currentUserSubscriptionLevel != 0 && backend.currentUserSubscriptionLevel < currentPlanLevel;
-    final isBillingUpgrade = backend.currentUserSubscriptionLevel == currentPlanLevel && selectedBillingOption == 'annual' && backend.activeSubscriptionOption == 'monthly';
+    final isTierUpgrade = _uiActiveSubscriptionLevel != 0 && _uiActiveSubscriptionLevel < currentPlanLevel;
+    final isBillingUpgrade = _uiActiveSubscriptionLevel == currentPlanLevel && selectedBillingOption == 'annual' && _uiActiveSubscriptionOption == 'monthly';
 
     if (isTierUpgrade || isBillingUpgrade) {
       return Text(localizations.upgradeSubscription, key: ValueKey('upgrade-$currentPlanType-$selectedBillingOption'), style: textStyle);
     }
-    if (backend.currentUserSubscriptionLevel == currentPlanLevel && selectedBillingOption == backend.activeSubscriptionOption) {
+    if (_uiActiveSubscriptionLevel == currentPlanLevel && selectedBillingOption == _uiActiveSubscriptionOption) {
       return Text(localizations.manageSubscription, key: ValueKey('cancel-$currentPlanType'), style: textStyle);
     }
 

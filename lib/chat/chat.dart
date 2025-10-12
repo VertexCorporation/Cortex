@@ -12,6 +12,7 @@ import 'package:cortex/chat/screen/selected/input/input.dart';
 import 'package:cortex/chat/screen/selected/input/panels/briefing.dart';
 import 'package:cortex/chat/screen/selected/input/panels/edit.dart';
 import 'package:cortex/chat/screen/selected/screen.dart';
+import 'package:cortex/chat/screen/selected/dynamic.dart';
 import 'package:cortex/chat/screen/unselected/news.dart';
 import 'package:cortex/chat/screen/unselected/screen/screen.dart';
 import 'package:cortex/chat/services/context.dart';
@@ -27,6 +28,7 @@ import 'package:cortex/chat/services/stop.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
@@ -38,12 +40,13 @@ import '../errorview.dart';
 import '../extensions.dart';
 import '../funds/funds.dart';
 import '../initialization.dart';
-import '../invite.dart';
 import '../models/backend/data.dart';
 import '../models/backend/download.dart';
 import '../models/backend/system_info.dart';
 import '../navigation.dart';
+import '../notifications.dart';
 import '../server/credits.dart';
+import '../server/fetch.dart';
 import '../settings/settings.dart';
 import '../main.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -56,9 +59,10 @@ import 'services/limit.dart';
 import 'messages/messages.dart';
 
 enum AppBarMode {
-  notSelected, // Shows "Cortex" and Credits Bar
-  inSelection, // Shows "Explore" and a Back Button
-  modelSelected, // Shows Model Name and a Back Button
+  notSelected,      // Shows "Cortex" and Credits Bar
+  inSelection,      // Shows "Explore" and a Back Button
+  modelSelected,    // Shows Model Name and a Back Button
+  dynamicChat,      // Shows "Cortex" and a Back Button
 }
 
 /// The ChatScreen widget builds the chat UI and manages its state.
@@ -105,7 +109,7 @@ class ChatScreenState extends State<ChatScreen>
   bool isModelLoaded = false, isSendButtonVisible = false;
 
   final ValueNotifier<bool> isWaitingForResponseNotifier =
-      ValueNotifier<bool>(false);
+  ValueNotifier<bool>(false);
 
   bool get isWaitingForResponse => isWaitingForResponseNotifier.value;
 
@@ -118,8 +122,6 @@ class ChatScreenState extends State<ChatScreen>
   List<String> roleplayModels = [], serverSideModels = [];
   String? modelId;
   bool _showInappropriateMessageWarning = false;
-
-  bool shouldAutofocus = true;
 
   bool _modelsLoadError = false;
   bool _areModelsLoading = true; // Start in loading state.
@@ -164,13 +166,13 @@ class ChatScreenState extends State<ChatScreen>
   final GlobalKey _exitButtonKey = GlobalKey();
   final GlobalKey _accountButtonKey = GlobalKey();
   static const MethodChannel llamaChannel =
-      MethodChannel('com.vertex.cortex/llama');
+  MethodChannel('com.vertex.cortex/llama');
   final ScrollController _scrollController = ScrollController();
   bool _conversationLimitReached = false, openedFromMenu = false;
   StreamSubscription<DocumentSnapshot>? _creditsSubscription;
   String selectedExtensionLabel = '';
   final GlobalKey _extensionKey = GlobalKey();
-  GlobalKey<InputFieldState> inputFieldKey = GlobalKey<InputFieldState>();
+  final GlobalKey<InputFieldState> inputFieldKey = GlobalKey<InputFieldState>();
   final GlobalKey _inputSectionKey = GlobalKey();
   final GlobalKey _briefingOverlayKey = GlobalKey();
   double _inputSectionHeight = 0.0;
@@ -181,6 +183,7 @@ class ChatScreenState extends State<ChatScreen>
   DownloadedModelsManager? _downloadedModelsManager;
   ValueNotifier<bool> streamingNotifier = ValueNotifier<bool>(false);
   final GlobalKey<SelectionScreenState> selectionScreenKey = GlobalKey<SelectionScreenState>();
+  final GlobalKey<ChatTitleState> chatTitleKey = GlobalKey<ChatTitleState>();
 
   late final Extensions extensions;
   late final LoadService loadService;
@@ -193,8 +196,10 @@ class ChatScreenState extends State<ChatScreen>
   late final EditService editService;
   late final ContextService contextService;
   late final ResponseService responseService;
+  late final DynamicChatService dynamicChatService;
   late ChatLimitManager chatLimitManager;
   late ApiService apiService;
+  late final BannerService _bannerService;
 
   int editSessionCounter = 0;
 
@@ -210,7 +215,9 @@ class ChatScreenState extends State<ChatScreen>
   // A non-static flag to control the visibility in the current widget instance.
   bool _showDisclaimerOverlay = false;
 
-  // --- NEW STATE FLAG ---
+  // This flag now controls the visibility of the "Extension Info" banner.
+  bool _showExtensionInfoBanner = false;
+
   // A flag to determine if the photo warning should be shown.
   bool _showPhotoWarningOverlay = false;
 
@@ -223,6 +230,14 @@ class ChatScreenState extends State<ChatScreen>
   bool isUserSubscribed = false;
   int premiumTrialUses = 0;
 
+  List<ModelInfo> _recentModels = [];
+
+  static bool _hasShownDynamicChatThisSession = false;
+
+  // This flag is set when a dynamic chat session starts and persists
+  // until the user exits the chat, ensuring its identity is maintained.
+  bool isPersistentlyDynamic = false;
+
   final ValueNotifier<AppBarMode> appBarModeNotifier =
   ValueNotifier<AppBarMode>(AppBarMode.notSelected);
 
@@ -232,43 +247,77 @@ class ChatScreenState extends State<ChatScreen>
   /// `false` = Show "Explore" & Credits Bar
   final ValueNotifier<bool> isAppBarInChatModeNotifier = ValueNotifier<bool>(false);
 
+  // Add this new state variable at the top of your ChatScreenState class
+  Timer? _userDataFetchTimer;
+
+  bool isDynamicChatMode = false;
+
   // This listener now correctly handles data changes by re-syncing its local
   // state from the single source of truth (ModelData), bypassing any stale caches.
   void _handleModelDataChange() {
-    debugPrint(
-        "[ChatScreenState] Received a data change notification from ModelData.");
+    debugPrint("[ChatScreenState] Received a data change notification from ModelData.");
     if (mounted) {
-      debugPrint(
-          "[ChatScreenState] Re-initializing model list from the definitive source (ModelData).");
+      debugPrint("[ChatScreenState] Re-initializing model list from the definitive source (ModelData).");
 
       loadService.initializeFromCache();
 
+      _loadRecentModels();
+
       setState(() {
-        debugPrint(
-            "[ChatScreenState] UI rebuild triggered. The selection screen will now show the new model.");
+        debugPrint("[ChatScreenState] UI rebuild triggered. The selection screen will now show the new model.");
       });
     }
   }
 
-  Future<bool> willInfoPanelShowOnNextSelect() async {
+  /// It checks conditions and decides whether to set the `_showExtensionInfoBanner` flag,
+  /// which will cause the `FloatingInfoBanner` to be rendered in the build method.
+  Future<void> triggerExtensionInfoPanelIfNeeded() async {
+    // Prevent re-showing if already shown in this session.
     if (ChatTitle.extensionInfoShownThisSession) {
-      return false;
+      return;
     }
 
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      int showCount = prefs.getInt(ChatTitle.extensionInfoCountKey) ?? 0;
-      return showCount < 3;
-    } catch (e) {
-      debugPrint("SharedPreferences error: $e");
-      return false;
+    final prefs = await SharedPreferences.getInstance();
+    int showCount = prefs.getInt(ChatTitle.extensionInfoCountKey) ?? 0;
+
+    if (showCount < 3) {
+      if (mounted) {
+        setState(() {
+          _showExtensionInfoBanner = true;
+        });
+        await prefs.setInt(ChatTitle.extensionInfoCountKey, showCount + 1);
+        ChatTitle.extensionInfoShownThisSession = true;
+      }
     }
   }
 
   @override
   void initState() {
+    debugPrint("--- GlobalKey Forensics Report (ChatScreen) ---");
+    debugPrint("exitButtonKey: $_exitButtonKey");
+    debugPrint("accountButtonKey: $_accountButtonKey");
+    debugPrint("extensionKey: $_extensionKey");
+    debugPrint("inputFieldKey: $inputFieldKey");
+    debugPrint("inputSectionKey: $_inputSectionKey");
+    debugPrint("briefingOverlayKey: $_briefingOverlayKey");
+    debugPrint("selectionScreenKey: $selectionScreenKey");
+    debugPrint("----------------------------------------------");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    isDynamicChatMode = widget.modelId == null &&
+        widget.conversationID == null &&
+        !_hasShownDynamicChatThisSession;
+
+    // If we start in dynamic mode, set the persistent flag.
+    if (isDynamicChatMode) {
+      isPersistentlyDynamic = true;
+    }
+
+    if (CacheService.cachedRecentModels != null) {
+      _recentModels = CacheService.cachedRecentModels!;
+      _areModelsLoading = false;
+    }
 
     // --- 1. NON-CONTEXT-DEPENDENT INITIALIZATION ---
     // All of these are safe to run in initState because they don't use `context`.
@@ -283,6 +332,7 @@ class ChatScreenState extends State<ChatScreen>
       cortexSubscription: 0,
       subscriptionExpiresAt: null,
     );
+    _bannerService = BannerService();
     extensions = Extensions(vsync: this);
     scrollService = ScrollService(scrollController: _scrollController);
     stopService = StopService(this);
@@ -293,9 +343,14 @@ class ChatScreenState extends State<ChatScreen>
     sendService = SendService(this);
     readService = ReadService(this);
     responseService = ResponseService(this);
+    dynamicChatService = DynamicChatService(this);
     // Initialize the LoadService and attempt a synchronous cache load.
     loadService = LoadService(this);
     loadService.initializeFromCache();
+
+    // Synchronously initialize user data from the fast cache to prevent the '?' flicker on avatar.
+    // The live data will still be fetched by _loadUserData later.
+    _initializeUserDataFromCache();
 
     // Initialize controllers and listeners
     searchController.addListener(_onSearchChanged);
@@ -304,9 +359,23 @@ class ChatScreenState extends State<ChatScreen>
 
     // Initialize state from widget properties
     _initializeFromWidget();
-    _checkAndTriggerInviteBanner();
+    _bannerService.checkAndTriggerBanner();
 
     if (widget.modelId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onModelSelectionChanged?.call(true);
+      });
+    }
+
+    if (isDynamicChatMode) {
+      isModelSelected = false;
+      appBarModeNotifier.value = AppBarMode.dynamicChat;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        mainScreenKey.currentState?.updateBottomAppBarVisibility(true);
+      });
+
+    } else if (widget.modelId != null) {
       isModelSelected = true;
       appBarModeNotifier.value = AppBarMode.modelSelected;
     } else {
@@ -314,12 +383,119 @@ class ChatScreenState extends State<ChatScreen>
       appBarModeNotifier.value = AppBarMode.notSelected;
     }
 
+    if (isDynamicChatMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        mainScreenKey.currentState?.updateBottomAppBarVisibility(true);
+      });
+    }
+
     // The call to the now-robust function ensures premium status is checked correctly on initial load.
     _updatePremiumBriefingVisibility(widget.modelId);
     isAppBarInChatModeNotifier.value = widget.modelId != null;
   }
 
-  /// --- THE DEFINITIVE FIX ---
+  // Now robustly focuses the keyboard after the frame is built.
+  void resetAndStartDynamicConversation() {
+    setState(() {
+      messages.clear();
+      conversationID = null;
+      conversationTitle = null;
+      widget.conversationID = null;
+      widget.conversationTitle = null;
+      isWaitingForResponse = false;
+      isSendButtonVisible = false;
+      responseStopped = false;
+      isModelSelected = false; // Remains false
+      isModelLoaded = false;   // Remains false
+      isDynamicChatMode = true; // This is the view-mode trigger
+      isPersistentlyDynamic = true; // This is the session identity
+      appBarModeNotifier.value = AppBarMode.dynamicChat;
+    });
+
+    mainScreenKey.currentState?.updateBottomAppBarVisibility(true);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        textFieldFocusNode.requestFocus();
+      }
+    });
+  }
+
+  /// It ensures that if the user has previously exited the dynamic chat,
+  /// they are returned to the model selection screen, not back to the dynamic chat.
+  void onReactivated() {
+    debugPrint("[ChatScreen] Reactivated. Checking dynamic chat session status.");
+    if (_hasShownDynamicChatThisSession && isDynamicChatMode) {
+      debugPrint("[ChatScreen] Dynamic chat was previously shown this session. Forcing return to model selection.");
+      _handleExit();
+    }
+  }
+
+  // _handleExit now also ensures the bottom app bar is correctly shown
+  // when returning to the model selection screen.
+  Future<void> _handleExit() async {
+    // If exiting from dynamic chat, set the flag so it doesn't reopen automatically in this session.
+    if (appBarModeNotifier.value == AppBarMode.dynamicChat) {
+      _hasShownDynamicChatThisSession = true;
+      debugPrint("[ChatScreen] Exiting dynamic chat. Session flag set to true.");
+    }
+
+    unawaited(refreshRecentModels());
+    dismissCurrentMessageOptions();
+
+    if (extensions.isPanelVisible) {
+      extensions.closePanel();
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
+
+    // This call resets internal message/conversation state.
+    await resetConversation(resetModel: true);
+
+    widget.onModelSelectionChanged?.call(false);
+
+    if (openedFromMenu) {
+      mainScreenKey.currentState?.onItemTapped(2);
+    }
+
+    searchController.clear();
+
+    // --- TACTICAL FIX ---
+    // All state changes are bundled into a single setState call.
+    // This ensures that when the widget rebuilds, isModelSelected is definitively false,
+    // which prevents _buildChatContent from attempting to render with stale data.
+    setState(() {
+      isModelSelected = false;
+      isModelLoaded = false;
+      isDynamicChatMode = false;
+      modelId = null; // Explicitly nullify modelId
+      modelTitle = null;
+      modelImagePath = null;
+      modelProducer = null;
+      modelPath = null;
+      role = null;
+      openedFromMenu = false;
+      showPremiumBriefing = false;
+      isPersistentlyDynamic = false;
+    });
+
+    appBarModeNotifier.value = AppBarMode.notSelected;
+    // CRITICAL: Explicitly show the bottom navigation bar when returning to the selection screen.
+    mainScreenKey.currentState?.updateBottomAppBarVisibility(false);
+  }
+
+  /// Initializes user data from the local cache for an instant UI update.
+  /// This prevents the avatar from flickering back to '?' on rebuilds.
+  Future<void> _initializeUserDataFromCache() async {
+    // Use the existing FetchService to load data from SharedPreferences.
+    final cachedData = await FetchService.loadCachedUserData();
+    if (cachedData != null && mounted) {
+      setState(() {
+        _userData = cachedData;
+      });
+      debugPrint("[ChatScreen] Avatar data initialized instantly from cache.");
+    }
+  }
+
   /// This function now robustly checks if a model is premium, correctly handling
   /// character models by inspecting their base model's tier. This logic is now
   /// consistent with SelectionService, fixing the bug where the banner wouldn't
@@ -367,66 +543,6 @@ class ChatScreenState extends State<ChatScreen>
     );
   }
 
-  Future<void> _checkAndTriggerInviteBanner() async {
-    const String key = 'inviteBannerLastShownTimestamp';
-    const int showIntervalInHours = 24;
-
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final int? lastShownTimestamp = prefs.getInt(key);
-
-      if (lastShownTimestamp == null) {
-        debugPrint("[Banner Logic] No dismissal timestamp found. Displaying banner.");
-        _displayBanner();
-        return;
-      }
-
-      final DateTime lastDismissalTime = DateTime.fromMillisecondsSinceEpoch(lastShownTimestamp);
-      final Duration difference = DateTime.now().difference(lastDismissalTime);
-
-      if (difference.inHours >= showIntervalInHours) {
-        debugPrint("[Banner Logic] More than 24 hours have passed since last dismissal. Showing again.");
-        _displayBanner();
-      } else {
-        debugPrint("[Banner Logic] Banner was dismissed within the last 24 hours. Skipping.");
-      }
-    } catch (e) {
-      debugPrint("[Banner Logic] SharedPreferences error: $e");
-    }
-  }
-
-  void _displayBanner() {
-    if (mounted && !_showInviteBanner) {
-      setState(() {
-        _showInviteBanner = true;
-      });
-      debugPrint("[Banner Logic] Banner visibility set to true.");
-    }
-  }
-
-  Future<void> _startTimestampCooldown() async {
-    try {
-      const String key = 'inviteBannerLastShownTimestamp';
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(key, DateTime.now().millisecondsSinceEpoch);
-      debugPrint("[Banner Logic] Dismissal confirmed. 24-hour cooldown timestamp has been set.");
-    } catch (e) {
-      debugPrint("[Banner Logic] Failed to set cooldown timestamp: $e");
-    }
-  }
-
-  /// A public method to allow external widgets (like the Appbar) to request the banner to be shown.
-  /// It respects the "already shown" logic by only setting the state if the banner is not already visible.
-  void showInviteBanner() {
-    if (mounted && !_showInviteBanner) {
-      debugPrint("[ChatScreen] A manual request was made to show the invite banner.");
-      setState(() {
-        _showInviteBanner = true;
-      });
-    }
-  }
-
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -434,68 +550,110 @@ class ChatScreenState extends State<ChatScreen>
 
     // Run the main setup only once, the first time this method is called.
     if (!_isInitialSetupComplete) {
-      debugPrint(
-          "[ChatScreenState] didChangeDependencies: Running initial context-aware setup.");
+      debugPrint("[ChatScreenState] didChangeDependencies: Running initial context-aware setup.");
       _currentLocale = newLocale; // Set the initial locale.
 
-      // Initialize services that need AppLocalizations
       apiService = ApiService(localizations: AppLocalizations.of(context)!);
-
-      // Trigger the main asynchronous data loading process.
       _performInitialAsyncSetup();
 
       _isInitialSetupComplete = true;
       return; // Exit after initial setup.
     }
 
-    // On subsequent runs, if the new locale is different from the one we have
-    // stored, it means the user has changed the language in settings.
+    // On subsequent runs, if the new locale is different from the one we have stored...
     if (_currentLocale != null && _currentLocale != newLocale) {
       debugPrint("[ChatScreenState] Language change detected via locale. From '$_currentLocale' to '$newLocale'.");
       _currentLocale = newLocale;
 
       ModelData.clearCache();
+      CacheService.invalidateRecentModelsCache();
       _reloadAllModelsForLanguageChange();
-
       Provider.of<NewsService>(context, listen: false).forceRefresh(context);
     }
   }
 
-  /// This function now contains the "safety lock". It ensures that core services,
-  /// especially Firebase, are fully initialized before it proceeds to load
-  /// model data, which depends on Firebase services.
   Future<void> _performInitialAsyncSetup() async {
-    // 1. --- SAFETY LOCK ---
-    // Access the AppInitializer service.
     final appInitializer = Provider.of<AppInitializer>(context, listen: false);
-
-    // Await the signal that core services are ready. This line is the crucial fix.
-    // It will pause execution here until Firebase.initializeApp() and other
-    // critical tasks in AppInitializer.initialize() are complete.
-    debugPrint("[ChatScreenState] Waiting for core services to be ready...");
     await appInitializer.onCoreServicesReady;
     debugPrint("[ChatScreenState] Core services are ready. Proceeding with data fetch.");
 
-    // 2. --- PROCEED WITH ORIGINAL LOGIC ---
-    // Now that we know Firebase is ready, the rest of the code can run safely.
-    if (loadService.modelsLoaded) {
-      debugPrint("[ChatScreenState] Models already loaded from cache. UI is ready.");
-      if (mounted) {
-        setState(() {
-          _areModelsLoading = false;
-        });
-      }
-    } else {
+    if (!loadService.modelsLoaded) {
       debugPrint("[ChatScreenState] Cache was empty. Performing full model load.");
       await _reloadAllModelsForLanguageChange();
+    } else {
+      debugPrint("[ChatScreenState] Models already loaded from cache. UI is ready.");
+      if (mounted) setState(() => _areModelsLoading = false);
     }
 
-    // Other async setup tasks can also run safely now.
+    if (isDynamicChatMode || isPersistentlyDynamic) {
+      // --- MODIFIED CALL ---
+      await dynamicChatService.loadDynamicAssistantPreference();
+    }
+
+    if (mounted && isDynamicChatMode) {
+      debugPrint("[ChatScreen] Initial setup and model load complete. Now focusing keyboard.");
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) {
+          textFieldFocusNode.requestFocus();
+        }
+      });
+    }
+
+    await _loadRecentModels();
+
     await Future.wait([
       _updateInternetStatus(),
       _fetchSystemInfo(),
-      _loadUserData(), // This function also uses Firebase and is now safe.
+      _loadUserData(),
     ]);
+  }
+
+  /// Fetches the most recent model series IDs from storage and maps them
+  /// to full ModelInfo objects from the main model list.
+  Future<void> _loadRecentModels() async {
+    // 1. Check the cache first. If data exists, use it and exit.
+    if (CacheService.cachedRecentModels != null) {
+      if (mounted) {
+        setState(() {
+          _recentModels = CacheService.cachedRecentModels!;
+        });
+      }
+      return;
+    }
+
+    // 2. If cache is empty, fetch from the database.
+    final recentIds = await ChatStorageService.getRecentModelSeriesIds();
+    final loadedRecentModels = <ModelInfo>[];
+
+    // 3. --- LOGIC FIX ---
+    // The 'recentIds' list now contains correct series IDs (e.g., 'gemini').
+    // We can now do a simple, direct lookup.
+    for (final id in recentIds) {
+      try {
+        // Find the model in our main list whose ID exactly matches the recent ID.
+        final model = loadService.allModels.firstWhere((m) => m.id == id);
+        loadedRecentModels.add(model);
+      } catch (e) {
+        // This log is now more accurate if a model is truly missing.
+        debugPrint("[ChatScreen] Could not find a loaded model for recent ID: '$id'. It might have been uninstalled or is not available.");
+      }
+    }
+
+    // 4. Update the cache and the UI state.
+    CacheService.cachedRecentModels = loadedRecentModels;
+    CacheService.startRecentModelsCacheTimer();
+    if (mounted) {
+      setState(() {
+        _recentModels = loadedRecentModels;
+      });
+    }
+  }
+
+  /// A public method that can be called from other services (like SendService)
+  /// to trigger a refresh of the recent models list.
+  /// It now correctly returns a Future, making it compatible with `unawaited`.
+  Future<void> refreshRecentModels() async {
+    await _loadRecentModels();
   }
 
   /// A central function to reload all model data with robust state handling.
@@ -557,11 +715,11 @@ class ChatScreenState extends State<ChatScreen>
     _scrollController.addListener(_scrollListener);
     _internetSubscription =
         InternetConnection().onStatusChange.listen((status) {
-      if (mounted) {
-        setState(
-            () => hasInternetConnection = status == InternetStatus.connected);
-      }
-    });
+          if (mounted) {
+            setState(
+                    () => hasInternetConnection = status == InternetStatus.connected);
+          }
+        });
 
     _warningAnimationController.addStatusListener((status) {
       if (status == AnimationStatus.dismissed && mounted) {
@@ -596,7 +754,7 @@ class ChatScreenState extends State<ChatScreen>
     _slideAnimation =
         Tween<Offset>(begin: const Offset(0, 1), end: const Offset(0, 0))
             .animate(CurvedAnimation(
-                parent: editPanelController, curve: Curves.easeOut));
+            parent: editPanelController, curve: Curves.easeOut));
   }
 
   void _initializeFromWidget() {
@@ -646,6 +804,12 @@ class ChatScreenState extends State<ChatScreen>
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
+    // --- MODIFICATION START ---
+    // Cancel any existing timer and start a new one.
+    _userDataFetchTimer?.cancel();
+    _userDataFetchTimer = Timer(const Duration(seconds: 7), _handleUserDataTimeout);
+    // --- MODIFICATION END ---
+
     await _userDataSubscription?.cancel();
 
     _userDataSubscription = FirebaseFirestore.instance
@@ -654,6 +818,11 @@ class ChatScreenState extends State<ChatScreen>
         .snapshots()
         .listen((snapshot) {
       if (snapshot.exists && mounted) {
+        // --- MODIFICATION START ---
+        // Data has arrived successfully, so cancel the timeout timer.
+        _userDataFetchTimer?.cancel();
+        // --- MODIFICATION END ---
+
         final data = snapshot.data();
         setState(() {
           _userData = data;
@@ -685,6 +854,10 @@ class ChatScreenState extends State<ChatScreen>
         });
       }
     }, onError: (error) {
+      // --- MODIFICATION START ---
+      // If there's an error, also cancel the timer.
+      _userDataFetchTimer?.cancel();
+      // --- MODIFICATION END ---
       debugPrint("Error listening to user data: $error");
     });
   }
@@ -708,7 +881,6 @@ class ChatScreenState extends State<ChatScreen>
       });
     }
   }
-
 
   /// Listener for the scroll controller.
   /// This now ONLY updates the state based on scroll position.
@@ -762,14 +934,16 @@ class ChatScreenState extends State<ChatScreen>
   bool isLocalModel(String? modelId) => !isServerSideModel(modelId);
 
   bool isServerSideModel(String? modelId) {
-    if (modelId != null && modelId == this.modelId) {
-      return isCurrentModelServerSide;
-    }
     if (modelId == null || modelId.isEmpty) {
-      return false;
+      return false; // An empty ID can't be a server-side model.
     }
+
+    // This is now the ONLY logic path. It is always correct.
     final modelData = ModelData.getPreciseModelData(modelId);
-    return modelData['type'] != 'offline';
+    final isOffline = modelData['type'] == 'offline';
+
+    // Return true if the model is NOT offline.
+    return !isOffline;
   }
 
   bool get hasWise {
@@ -789,6 +963,7 @@ class ChatScreenState extends State<ChatScreen>
       if (resetModel) {
         isModelSelected = false;
         isModelLoaded = false;
+        isPersistentlyDynamic = false;
       }
     });
   }
@@ -803,7 +978,7 @@ class ChatScreenState extends State<ChatScreen>
 
   void markMessageAsReported(String aiMessage) {
     final index =
-        messages.indexWhere((m) => !m.isUserMessage && m.text == aiMessage);
+    messages.indexWhere((m) => !m.isUserMessage && m.text == aiMessage);
     if (index == -1) return;
     setState(() {
       messages[index].isReported = true;
@@ -812,45 +987,14 @@ class ChatScreenState extends State<ChatScreen>
         conversationID!, messages[index], index);
   }
 
-
-  Future<void> _handleExit() async {
-    dismissCurrentMessageOptions();
-
-    if (extensions.isPanelVisible) {
-      extensions.closePanel();
-      await Future.delayed(const Duration(milliseconds: 300));
-    }
-
-    await resetConversation(resetModel: true);
-
-    widget.onModelSelectionChanged?.call(false);
-
-    if (openedFromMenu) {
-      mainScreenKey.currentState?.onItemTapped(2);
-    }
-
-    setState(() {
-      isModelSelected = false;
-      isModelLoaded = false;
-      modelTitle = null;
-      modelImagePath = null;
-      modelProducer = null;
-      modelPath = null;
-      role = null;
-      openedFromMenu = false;
-      showPremiumBriefing = false;
-    });
-
-    // --- UPDATED: After exiting a chat, we land on the main selection screen. ---
-    appBarModeNotifier.value = AppBarMode.notSelected;
-  }
-
   // --- REWRITTEN: This logic now correctly handles the three-stage navigation flow. ---
   Future<bool> _onWillPop() async {
-    // If we are in a chat, the back button should take us to the main selection screen.
-    if (appBarModeNotifier.value == AppBarMode.modelSelected) {
+    // If we are in a chat (either with a selected model or in a dynamic session),
+    // the back button should take us to the main selection screen.
+    if (appBarModeNotifier.value == AppBarMode.modelSelected ||
+        appBarModeNotifier.value == AppBarMode.dynamicChat) {
       await _handleExit();
-      return false; // Prevent closing the app.
+      return false; // Prevent the app from closing.
     }
     // If we are in the model grid view (pushed via Navigator), this WillPopScope won't be triggered.
     // The Navigator's own back button handling will work.
@@ -861,6 +1005,8 @@ class ChatScreenState extends State<ChatScreen>
   @override
   void dispose() {
     ModelData.removeListener(_handleModelDataChange);
+    // Ensure the timer is cancelled when the widget is disposed to prevent memory leaks.
+    _userDataFetchTimer?.cancel();
     if (isModelSelected && isLocalModel(modelId)) {
       llamaChannel.invokeMethod('unloadModel');
     }
@@ -890,7 +1036,21 @@ class ChatScreenState extends State<ChatScreen>
     textFieldFocusNode.dispose();
     showScrollDownButtonByPosition = false;
     appBarModeNotifier.dispose();
+    _bannerService.dispose();
     super.dispose();
+  }
+
+  void _handleUserDataTimeout() {
+    // Check if the widget is still in the tree and if user data is still missing.
+    if (mounted && _userData == null) {
+      debugPrint("[ChatScreen] User data fetch timed out. Showing notification.");
+      // The method is named 'showNotification', not 'show'.
+      // The parameter for error is 'isSuccess', which we set to 'false'.
+      Provider.of<NotificationService>(context, listen: false).showNotification(
+        message: AppLocalizations.of(context)!.checkYourInternet,
+        isSuccess: false, // Use 'isSuccess: false' for an error state
+      );
+    }
   }
 
   @override
@@ -928,7 +1088,7 @@ class ChatScreenState extends State<ChatScreen>
 
   void _updateInputSectionHeight() {
     final RenderBox? box =
-        _inputSectionKey.currentContext?.findRenderObject() as RenderBox?;
+    _inputSectionKey.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       final newHeight = box.size.height;
       if (_inputSectionHeight != newHeight) {
@@ -1026,62 +1186,16 @@ class ChatScreenState extends State<ChatScreen>
         "$logPrefix Active chat state transiently updated to use '$newFullModelId'.");
   }
 
-  final InviteService _inviteService = InviteService();
-  bool _isSharingLink = false;
-
-  Future<void> _generateAndShareInviteLink() async {
-    if (_isSharingLink) return;
-
-    setState(() { _isSharingLink = true; });
-
-    try {
-      await _inviteService.createAndShareReferralLink(context);
-    } catch (e) {
-      debugPrint('[ChatScreen] Error for invite system: $e');
-    } finally {
-      if (mounted) {
-        setState(() { _isSharingLink = false; });
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    // A debug print to confirm the build method is being called, which helps in tracking UI updates.
     debugPrint("[ChatScreen Build] Starting UI build process.");
-
-    // --- Layout & State Variables ---
-    // These variables are calculated once per build to optimize performance.
+    final localizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
-    // The final decision to show the scroll-down button depends on both scroll position and keyboard visibility.
-    final bool showScrollDownButtonFinal = showScrollDownButtonByPosition && !isKeyboardVisible;
-
-    // Determines if the photo warning overlay should be displayed.
-    final bool isPhotoPresentInChat = messages.any((m) => m.photoPath != null && m.photoPath!.isNotEmpty) || (sendService.selectedPhoto != null);
-    _showPhotoWarningOverlay = isPhotoPresentInChat && !_showDisclaimerOverlay;
-
-    // This filtering logic is still required for the deprecated 'filteredModels' property
-    // in the SelectionScreen widget provided.
-    final List<ModelInfo> filteredModels = searchController.text.isEmpty
-        ? loadService.allModels
-        : loadService.allModels
-        .where((model) => model.title.toLowerCase().startsWith(searchController.text.toLowerCase()))
-        .toList();
-
-    // Ensures the input section's height is updated after the frame is rendered.
-    // This is crucial for positioning overlays correctly.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _updateInputSectionHeight());
-
-    // --- Widget Tree ---
     return WillPopScope(
-      // Handles the Android back button, intelligently moving between UI states.
       onWillPop: _onWillPop,
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        // The custom AppBar's state is now driven by the `appBarModeNotifier`,
-        // ensuring perfect synchronization between the screen's state and the AppBar's appearance.
         appBar: Appbar(
           modelTitle: modelTitle,
           modelImagePath: modelImagePath,
@@ -1090,7 +1204,8 @@ class ChatScreenState extends State<ChatScreen>
           userData: _userData,
           extensionKey: _extensionKey,
           onExit: () async {
-            if (appBarModeNotifier.value == AppBarMode.modelSelected) {
+            if (appBarModeNotifier.value == AppBarMode.modelSelected ||
+                appBarModeNotifier.value == AppBarMode.dynamicChat) {
               await _handleExit();
             } else if (appBarModeNotifier.value == AppBarMode.inSelection) {
               selectionScreenKey.currentState?.showSelectionView();
@@ -1108,34 +1223,37 @@ class ChatScreenState extends State<ChatScreen>
               direction: const Offset(1.0, 0.0),
             );
           },
-          onInfoPanelWillShow: () => FocusScope.of(context).unfocus(),
-          onInfoPanelDidHide: () => textFieldFocusNode.requestFocus(),
-          // --- CORRECTED ---
-          // The onTitleTap callback now correctly handles showing/hiding the extension panel.
-          // The redundant `onExtensionTap` parameter is removed.
-          onTitleTap: () async {
-            if (!extensions.isPanelVisible) {
-              extensions.showExtensionPanel(
-                context: context,
-                extensionKey: _extensionKey,
-                modelTitle: modelTitle ?? "",
-                updateModelId: (selectedEntryKey) async {
-                  await _handleChangeModelExtension(selectedEntryKey);
-                },
-              );
-            } else {
-              extensions.closePanel();
+          onTitleTap: () {
+            final mode = appBarModeNotifier.value;
+            debugPrint("[ChatScreen] Title tapped in mode: $mode");
+
+            if (mode == AppBarMode.modelSelected) {
+              if (!extensions.isPanelVisible) {
+                extensions.showExtensionPanel(
+                  context: context,
+                  extensionKey: _extensionKey,
+                  modelTitle: modelTitle ?? "",
+                  updateModelId: (selectedEntryKey) async {
+                    await _handleChangeModelExtension(selectedEntryKey);
+                  },
+                );
+              } else {
+                extensions.closePanel();
+              }
+            } else if (mode == AppBarMode.dynamicChat) {
+              dynamicChatService.showDynamicAssistantPanel();
             }
           },
-          appTitle: AppLocalizations.of(context)!.appTitle,
+          appTitle: localizations.appTitle,
           extensions: extensions,
-          onCreditsInfoTapped: showInviteBanner,
-          appBarModeNotifier: appBarModeNotifier, // The single source of truth for the AppBar's state.
+          onCreditsInfoTapped: _bannerService.triggerBannerManually,
+          appBarModeNotifier: appBarModeNotifier,
+          chatTitleKey: chatTitleKey,
         ),
         body: Container(
           decoration: BoxDecoration(
-            color: isModelSelected ? AppColors.background : null,
-            gradient: !isModelSelected
+            color: isModelSelected || isDynamicChatMode ? AppColors.background : null,
+            gradient: !(isModelSelected || isDynamicChatMode)
                 ? LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -1156,114 +1274,30 @@ class ChatScreenState extends State<ChatScreen>
                     Expanded(
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 150),
-                        transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-                        child: !isModelSelected
-                            ? _modelsLoadError
-                            ? ErrorView(
-                          key: const ValueKey('chat_error'),
-                          title: AppLocalizations.of(context)!.errorLoadingTitle,
-                          message: AppLocalizations.of(context)!.errorLoadingMessage,
-                          buttonText: AppLocalizations.of(context)!.retry,
-                          onRetry: _reloadAllModelsForLanguageChange,
-                        )
-                            : SelectionScreen(
-                          key: selectionScreenKey,
-                          isLoading: _areModelsLoading,
-                          searchController: searchController,
-                          allModels: loadService.allModels,
-                          onReloadModels: _reloadAllModelsForLanguageChange,
-                          hasInternetConnection: hasInternetConnection,
-                          conversationLimitReached: _conversationLimitReached,
-                          onSelectModel: (model) {
-                            // Correctly trigger model selection logic
-                            selectionService.selectModel(model);
-                            // Explicitly set the app bar to chat mode
-                            appBarModeNotifier.value = AppBarMode.modelSelected;
-                          },
-                          onScrollToBottom: scrollService.scrollToBottom,
-                          localizations: AppLocalizations.of(context)!,
-                          userData: _userData,
-                          // This new callback is the communication channel to update the AppBar.
-                          onViewModeChanged: (isShowingAllModels) {
-                            setState(() {
-                              appBarModeNotifier.value = isShowingAllModels
-                                  ? AppBarMode.inSelection // "Explore" title with back button
-                                  : AppBarMode.notSelected; // Default "Cortex" title with credits
-                            });
-                          },
-                          pinnedModels: [],
-                        )
-                            : (!readService.areMessagesLoaded
-                            ? readService.buildSkeletonChatMessages()
-                            : SelectedScreen(
-                          key: const ValueKey('selected'),
-                          messages: messages,
-                          scrollController: _scrollController,
-                          isEditingMode: isEditingMode,
-                          editingMessageIndex: editingMessageIndex,
-                          streamingNotifier: streamingNotifier,
-                          modelImagePath: modelImagePath,
-                          modelTitle: modelTitle,
-                          selectedModelCategory: selectedModelCategory,
-                          modelId: modelId,
-                          onStop: stopService.stopResponse,
-                          onEdit: (index) => editService.startEditingMessage(index),
-                          onFadeOutComplete: (index) {
-                            setState(() {
-                              messages.removeAt(index);
-                            });
-                          },
-                          onRegenerate: (index) => regenerateService.onRegenerate(index),
-                          onChangeModel: (index, newFullId) async {
-                            await regenerateService.onRegenerate(
-                              index,
-                              newModelId: newFullId,
-                            );
-                          },
-                          onReport: (index) {
-                            ReportDialog.show(
-                              context,
-                              aiMessage: messages[index].text,
-                              modelId: modelId!,
-                              onReportSuccess: () {
-                                if (mounted) {
-                                  setState(() => messages[index].isReported = true);
-                                  ChatStorageService.updateStoredMessage(conversationID!, messages[index], index);
-                                }
-                              },
-                            );
-                          },
-                          localizations: AppLocalizations.of(context)!,
-                        )),
+                        transitionBuilder: (child, animation) =>
+                            FadeTransition(opacity: animation, child: child),
+                        child: isModelSelected || isDynamicChatMode
+                            ? _buildChatContent(localizations)
+                            : _buildModelSelectionContent(localizations),
                       ),
                     ),
-                    NotificationListener<SizeChangedLayoutNotification>(
-                      onNotification: (notification) {
-                        WidgetsBinding.instance.addPostFrameCallback((_) => _updateInputSectionHeight());
-                        return true;
-                      },
-                      child: SizeChangedLayoutNotifier(
-                        key: _inputSectionKey,
-                        child: _buildInputSection(),
-                      ),
-                    ),
+                    _buildInputSectionWrapper(),
                   ],
                 ),
                 PremiumModelBanner(
-                  isVisible: showPremiumBriefing && isModelSelected && !isUserSubscribed,
+                  isVisible: showPremiumBriefing && isModelSelected &&
+                      !isUserSubscribed,
                   onTap: _navigateToPremiumScreen,
                 ),
-                if (isModelSelected && messages.isNotEmpty)
-                  scrollService.buildScrollDownButton(
-                    screenWidth: screenWidth,
-                    inputFieldHeight: _inputSectionHeight,
-                    showScrollDownButton: showScrollDownButtonFinal,
-                  ),
-                if (isModelSelected)
+                _buildScrollDownButton(screenWidth),
+                // It will not be shown if the extensions panel is visible,
+                // preventing the two UI elements from overlapping incorrectly.
+                if ((isModelSelected || isDynamicChatMode) && !extensions.isPanelVisible)
                   BriefingOverlay(
                     key: _briefingOverlayKey,
                     inputFieldHeight: _inputSectionHeight,
-                    availableCredits: creditsManager.totalCreditsNotifier.value,
+                    availableCredits: creditsManager.totalCreditsNotifier
+                        .value ?? 0,
                     photoSelected: sendService.selectedPhoto != null,
                     isOfflineModel: isLocalModel(modelId),
                     modelPath: modelPath,
@@ -1284,17 +1318,36 @@ class ChatScreenState extends State<ChatScreen>
                       }
                     },
                   ),
-                if (_showInviteBanner && !isModelSelected)
+                ValueListenableBuilder<bool>(
+                  valueListenable: _bannerService.showInviteBannerNotifier,
+                  builder: (context, showBanner, child) {
+                    if (showBanner && !isModelSelected && !isDynamicChatMode) {
+                      return FloatingInfoBanner(
+                        key: const ValueKey('invite_banner'),
+                        bannerType: BannerType.inviteCredits,
+                        onDismissed: () {
+                          _bannerService.startCooldown();
+                        },
+                        onTap: () {
+                          _bannerService.generateAndShareInviteLink(context);
+                        },
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+
+                if (_showExtensionInfoBanner)
                   FloatingInfoBanner(
-                    key: const ValueKey('invite_banner'),
-                    bannerType: BannerType.inviteCredits,
+                    key: const ValueKey('extension_info_banner'),
+                    bannerType: BannerType.extensionInfo,
+                    anchorKey: chatTitleKey,
                     onDismissed: () {
-                      _startTimestampCooldown();
                       if (mounted) {
-                        setState(() => _showInviteBanner = false);
+                        setState(() => _showExtensionInfoBanner = false);
+                        textFieldFocusNode.requestFocus();
                       }
                     },
-                    onTap: _generateAndShareInviteLink,
                   ),
               ],
             ),
@@ -1304,10 +1357,172 @@ class ChatScreenState extends State<ChatScreen>
     );
   }
 
+  /// Builds the content for when a model is NOT selected.
+  Widget _buildModelSelectionContent(AppLocalizations localizations) {
+    if (_modelsLoadError) {
+      return ErrorView(
+        key: const ValueKey('chat_error'),
+        title: localizations.errorLoadingTitle,
+        message: localizations.errorLoadingMessage,
+        buttonText: localizations.retry,
+        onRetry: _reloadAllModelsForLanguageChange,
+      );
+    }
+
+    return SelectionScreen(
+      key: selectionScreenKey,
+      isLoading: _areModelsLoading,
+      searchController: searchController,
+      allModels: loadService.allModels,
+      recentModels: _recentModels,
+      onReloadModels: _reloadAllModelsForLanguageChange,
+      hasInternetConnection: hasInternetConnection,
+      conversationLimitReached: _conversationLimitReached,
+      onSelectModel: (model) {
+        selectionService.selectModel(model);
+        appBarModeNotifier.value = AppBarMode.modelSelected;
+      },
+      onScrollToBottom: scrollService.scrollToBottom,
+      localizations: localizations,
+      userData: _userData,
+      onViewModeChanged: (isShowingAllModels) {
+        setState(() {
+          appBarModeNotifier.value = isShowingAllModels
+              ? AppBarMode.inSelection
+              : AppBarMode.notSelected;
+        });
+      },
+    );
+  }
+
+  /// Builds the content for when a model IS selected.
+  Widget _buildChatContent(AppLocalizations localizations) {
+    // --- TACTICAL FIX & GUARD CLAUSE ---
+    // This check is the primary fix. When _handleExit is called, it sets isModelSelected
+    // and isDynamicChatMode to false. On the very next frame, this build method runs.
+    // This condition will now be true, and we return an empty box with a unique key.
+    // This prevents the rest of the function from trying to render content with a null modelId,
+    // which was the cause of the "Unknown Model" flicker.
+    if (!isModelSelected && !isDynamicChatMode) {
+      return const SizedBox.shrink(key: ValueKey('exiting_chat_content'));
+    }
+    // --- END OF FIX ---
+
+    if (isDynamicChatMode && messages.isEmpty) {
+      final screenWidth = MediaQuery.of(context).size.width;
+      final screenHeight = MediaQuery.of(context).size.height;
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/cortex.svg',
+              width: screenWidth * 0.2,
+              colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+            ),
+            SizedBox(height: screenHeight * 0.001),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+              child: Text(
+                localizations.selectionScreenGreetingGeneric,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.06,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryColor.inverted.withOpacity(0.9),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (!readService.areMessagesLoaded) {
+      return readService.buildSkeletonChatMessages();
+    }
+
+    return SelectedScreen(
+      key: const ValueKey('selected'),
+      messages: messages,
+      scrollController: _scrollController,
+      isEditingMode: isEditingMode,
+      editingMessageIndex: editingMessageIndex,
+      streamingNotifier: streamingNotifier,
+      modelImagePath: modelImagePath,
+      modelTitle: modelTitle,
+      selectedModelCategory: selectedModelCategory,
+      modelId: modelId,
+      onStop: stopService.stopResponse,
+      onEdit: (index) => editService.startEditingMessage(index),
+      onFadeOutComplete: (index) {
+        setState(() {
+          messages.removeAt(index);
+        });
+      },
+      onRegenerate: (index) => regenerateService.onRegenerate(index),
+      onChangeModel: (index, newFullId) async {
+        await regenerateService.onRegenerate(
+          index,
+          newModelId: newFullId,
+        );
+      },
+      onReport: (index) {
+        ReportDialog.show(
+          context,
+          aiMessage: messages[index].text,
+          modelId: modelId!,
+          onReportSuccess: () {
+            if (mounted) {
+              setState(() => messages[index].isReported = true);
+              ChatStorageService.updateStoredMessage(conversationID!, messages[index], index);
+            }
+          },
+        );
+      },
+      localizations: localizations,
+    );
+  }
+
+  /// Wraps the input section with listeners needed for layout updates.
+  Widget _buildInputSectionWrapper() {
+    return NotificationListener<SizeChangedLayoutNotification>(
+      onNotification: (notification) {
+        // Use a post frame callback to avoid setState during build.
+        WidgetsBinding.instance.addPostFrameCallback((_) => _updateInputSectionHeight());
+        return true;
+      },
+      child: SizeChangedLayoutNotifier(
+        key: _inputSectionKey,
+        child: _buildInputSection(),
+      ),
+    );
+  }
+
+  /// Builds the scroll-down button, now with its visibility logic self-contained.
+  Widget _buildScrollDownButton(double screenWidth) {
+    // This is a ValueListenableBuilder listening to keyboard visibility
+    // to decide whether to show the button, making it more efficient.
+    return ValueListenableBuilder<bool>(
+      valueListenable: ValueNotifier(MediaQuery.of(context).viewInsets.bottom > 0),
+      builder: (context, isKeyboardVisible, child) {
+        final bool showScrollDownButtonFinal = showScrollDownButtonByPosition && !isKeyboardVisible;
+        if (isModelSelected && messages.isNotEmpty) {
+          return scrollService.buildScrollDownButton(
+            screenWidth: screenWidth,
+            inputFieldHeight: _inputSectionHeight,
+            showScrollDownButton: showScrollDownButtonFinal,
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
   Widget _buildInputSection() {
     final bool isOffline = !isServerSideModel(modelId);
     final bool modelMissing =
-        isOffline && !loadService.isModelOnDisk(modelPath);
+        !isDynamicChatMode && isOffline && !loadService.isModelOnDisk(modelPath);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1320,7 +1535,6 @@ class ChatScreenState extends State<ChatScreen>
               onCancel: () {
                 setState(() {
                   editService.cancelEditingMode();
-                  inputFieldKey = GlobalKey<InputFieldState>();
                 });
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   inputFieldKey.currentState?.clearPhotoPanel();
@@ -1333,7 +1547,7 @@ class ChatScreenState extends State<ChatScreen>
           child: InputField(
             key: inputFieldKey,
             localizations: AppLocalizations.of(context)!,
-            autofocus: shouldAutofocus,
+            isDynamicChatMode: isDynamicChatMode,
             isModelSelected: isModelSelected,
             isLimitExceeded: chatLimitManager.isLimitExceeded(messages),
             controller: controller,
@@ -1371,7 +1585,8 @@ class ChatScreenState extends State<ChatScreen>
                 }
               });
             },
-            canHandleImage: canHandleImage,
+            // In dynamic mode, we assume image capability until a model is chosen.
+            canHandleImage: isDynamicChatMode ? true : canHandleImage,
             isEditingMode: isEditingMode,
             originalMessageText: originalMessageText,
             preselectedPhoto: (isEditingMode &&
@@ -1380,7 +1595,7 @@ class ChatScreenState extends State<ChatScreen>
                 ? File(messages[editingMessageIndex!].photoPath!)
                 : null,
             isStorageSufficient: isStorageSufficient,
-            totalCredits: creditsManager.totalCreditsNotifier.value,
+            totalCredits: creditsManager.totalCreditsNotifier.value ?? 0,
             isServerSideModel: isServerSideModel(modelId),
             editSessionCounter: editSessionCounter,
             modelMissing: modelMissing,

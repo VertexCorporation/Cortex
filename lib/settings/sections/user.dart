@@ -13,6 +13,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 
 import '../../cache.dart';
 import '../../darkener.dart';
@@ -107,6 +108,8 @@ class UserSection extends StatefulWidget {
 }
 
 class UserSectionState extends State<UserSection> {
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
   bool _isPasswordUser = false;
 
@@ -563,9 +566,15 @@ class UserSectionState extends State<UserSection> {
     await secureStorage.deleteAll();
     debugPrint("[UserSection] All credentials cleared from secure storage.");
 
+    final notificationService = Provider.of<NotificationService>(context, listen: false);
+
+    await notificationService.clearUserTokenOnSignOut();
+
+    debugPrint("[UserSection] FCM token cleared.");
+
     // Sign out from all authentication providers.
     try {
-      await GoogleSignIn().signOut();
+      await _googleSignIn.signOut();
       debugPrint("[UserSection] Google Sign-Out successful.");
     } catch (e) {
       debugPrint("[UserSection] No active Google session to sign out from, or an error occurred: $e");

@@ -1,0 +1,21 @@
+                        -H/home/baba/Documents/cortex/android/llama/src/main/cpp
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_SYSTEM_VERSION=26
+-DANDROID_PLATFORM=android-26
+-DANDROID_ABI=x86_64
+-DCMAKE_ANDROID_ARCH_ABI=x86_64
+-DANDROID_NDK=/home/baba/Android/Sdk/ndk/26.1.10909125
+-DCMAKE_ANDROID_NDK=/home/baba/Android/Sdk/ndk/26.1.10909125
+-DCMAKE_TOOLCHAIN_FILE=/home/baba/Android/Sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=/home/baba/Android/Sdk/cmake/3.22.1/bin/ninja
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/home/baba/Documents/cortex/build/llama/intermediates/cxx/Release/6jh6m61s/obj/x86_64
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/home/baba/Documents/cortex/build/llama/intermediates/cxx/Release/6jh6m61s/obj/x86_64
+-B/home/baba/Documents/cortex/android/llama/.cxx/Release/6jh6m61s/x86_64
+-GNinja
+-DLLAMA_CURL=OFF
+-DLLAMA_BUILD_COMMON=ON
+-DGGML_LLAMAFILE=OFF
+-DCMAKE_BUILD_TYPE=Release
+                        Build command args: []
+                        Version: 2

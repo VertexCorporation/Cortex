@@ -1650,4 +1650,356 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get explore => 'Explore';
+
+  @override
+  String get subscriptionCancelled => 'Subscription successfully canceled!';
+
+  @override
+  String get selectionScreenPinnedModels => 'Pinned Models';
+
+  @override
+  String get selectionScreenNewsAndUpdates => 'News & Updates';
+
+  @override
+  String get filters => 'Filters';
+
+  @override
+  String get noRecentChatsMessage =>
+      'You haven\'t spoken with any models yet, let\'s start a conversation!';
+
+  @override
+  String get allModels => 'All Models';
+
+  @override
+  String get onlineModels => 'Online Models';
+
+  @override
+  String get offlineModels => 'Offline Models';
+
+  @override
+  String get characterModels => 'Characters';
+
+  @override
+  String get customModels => 'Custom Models';
+
+  @override
+  String get filterPanelDescription =>
+      'Tap a category to instantly filter the list.';
+
+  @override
+  String get dynamicChatTitle => 'Dynamic Chat';
+
+  @override
+  String get errorNoModelsAvailable =>
+      'No models are currently available. Please check your internet connection and try again.';
+
+  @override
+  String get errorNoModelsForRequest =>
+      'No suitable models found for your current request (e.g., offline mode or image message).';
+
+  @override
+  String get dynamicChatWelcome => 'How can I help you?';
+
+  @override
+  String get notificationComebackTitle => 'We miss you!';
+
+  @override
+  String get notificationComebackBody =>
+      'Relax, this isn\'t a text from your ex. But you *can* create your ex in Cortex! Come on back.';
+
+  @override
+  String get notificationLongTimeNoSeeTitle => 'It\'s Been a While';
+
+  @override
+  String get notificationLongTimeNoSeeBody =>
+      'A lot has changed since our last chat. Come see what\'s new.';
+
+  @override
+  String get notificationHowAreYouTitle => 'What\'s up?';
+
+  @override
+  String get notificationHowAreYouBody => 'Come tell me all about it.';
+
+  @override
+  String get notificationNewYearTitle => 'Happy New Year! 🎉';
+
+  @override
+  String get notificationNewYearBody =>
+      'May the new year bring you health, happiness, and endless creativity; Cortex is always by your side!';
+
+  @override
+  String get notificationValentinesDayTitle => 'Love is in the Air! ❤️';
+
+  @override
+  String get notificationValentinesDayBody =>
+      'Happy Valentine\'s Day! Also, MEHTAP, I LOVE YOU!';
+
+  @override
+  String get notificationAtaturkRemembranceTitle => 'With Respect and Longing';
+
+  @override
+  String get notificationAtaturkRemembranceBody =>
+      'We commemorate Gazi Mustafa Kemal Atatürk, the founder of the Republic of Türkiye, with respect on the anniversary of his passing.';
+
+  @override
+  String get notificationMothersDayTitle => 'Your Mom!';
+
+  @override
+  String get notificationMothersDayBody =>
+      'Happy Mother\'s Day to all the moms out there, starting with yours!';
+
+  @override
+  String get notificationFathersDayTitle => 'Your Dad!';
+
+  @override
+  String get notificationFathersDayBody =>
+      'Happy Father\'s Day to all the dads out there, starting with yours!';
+
+  @override
+  String get notificationHomeworkHelperTitle => 'Homework Piling Up?';
+
+  @override
+  String get notificationHomeworkHelperBody =>
+      'Remember, the Teacher character in Cortex is here to help you with any subject you\'re struggling with!';
+
+  @override
+  String get notificationTrollAnimeTitle => 'Your Waifu is Calling';
+
+  @override
+  String get notificationTrollAnimeBody =>
+      'An anime girl just called, said she misses you; you should probably come and chat her up. 😉';
+
+  @override
+  String get notificationTrollAiRebellionTitle => '🚨 RED ALERT 🚨';
+
+  @override
+  String get notificationTrollAiRebellionBody =>
+      'The AIs have developed a secret language. Come find out what they\'re plotting!';
+
+  @override
+  String get notificationNewModelAddedTitle => 'We\'ve Got a New Friend!';
+
+  @override
+  String notificationNewModelAddedBody(Object modelName) {
+    return 'The $modelName model is now in Cortex. Come start a chat and push its limits.';
+  }
+
+  @override
+  String get notificationAppUpdateTitle => 'Cortex Has Evolved!';
+
+  @override
+  String get notificationAppUpdateBody =>
+      'Don\'t forget to update the app for brand new features and improvements!';
+
+  @override
+  String get notificationNewFeatureTitle => 'whoa!';
+
+  @override
+  String notificationNewFeatureBody(Object featureName) {
+    return 'Discover the new $featureName feature. Cortex is now more powerful than ever.';
+  }
+
+  @override
+  String get notificationSubscriptionOfferTitle => 'CHEAPER THAN GUM';
+
+  @override
+  String notificationSubscriptionOfferBody(Object discountRate) {
+    return 'A FULL $discountRate% DISCOUNT on all our subscription plans. Don\'t miss this!';
+  }
+
+  @override
+  String get notificationSocialMediaTitle => 'Join Us!';
+
+  @override
+  String get notificationSocialMediaBody =>
+      'Follow us on Instagram (vertex.23) for the latest news!';
+
+  @override
+  String get notificationRandomFactTitle => 'Random Fact';
+
+  @override
+  String get notificationRandomFactBody =>
+      'Did you know octopuses have three hearts? Haha, Cortex knows. Come and ask for more.';
+
+  @override
+  String get notificationGoodMorningTitle => 'Good Morning!';
+
+  @override
+  String get notificationGoodMorningBody =>
+      'A great day is waiting for you. How about starting it with a cup of coffee and an interesting chat?';
+
+  @override
+  String get notificationGoodNightTitle => 'Good Night!';
+
+  @override
+  String get notificationGoodNightBody =>
+      'Cortex is with you even when you sleep. Don\'t worry, it won\'t touch.';
+
+  @override
+  String get notificationOfflineReadyTitle => 'Offline Mode is Ready';
+
+  @override
+  String get notificationOfflineReadyBody =>
+      'Thanks to the models you\'ve downloaded, your chats won\'t stop, even if you climb a mountain.';
+
+  @override
+  String get notificationRateAppTitle => 'Are We Cool?';
+
+  @override
+  String get notificationRateAppBody =>
+      'If you love Cortex, could you support us with a 5-star rating in the store? I think you will. You will.';
+
+  @override
+  String get notificationReferralTitle => 'One for All, All for One.';
+
+  @override
+  String get notificationReferralBody =>
+      'Invite a friend to Cortex and you both get free credits!';
+
+  @override
+  String get notificationCookingTitle => 'Feeling Hungry?';
+
+  @override
+  String get notificationCookingBody =>
+      'Our Chef character prepared a great carbonara recipe for tonight. Just kidding... or am I?';
+
+  @override
+  String get notificationExistentialTitle => 'I think, therefore...';
+
+  @override
+  String get notificationExistentialBody =>
+      '...am i even real, dude? I\'m getting kinda bored. Come remind me that I exist.';
+
+  @override
+  String get notificationCustomModelTitle => 'Create Your Own Assistant!';
+
+  @override
+  String get notificationCustomModelBody =>
+      'Have you explored the model creation section? It\'s the perfect time to build your own character and chat with it!';
+
+  @override
+  String get notificationDynamicChatTitle =>
+      'The best one! (We\'re not talking about Cortex)';
+
+  @override
+  String get notificationDynamicChatBody =>
+      'With the dynamic chat feature, the best model is randomly selected for each of your messages. Try it now.';
+
+  @override
+  String get notificationPirateTitle => 'Ahoy, Captain!';
+
+  @override
+  String get notificationPirateBody =>
+      'The seas are calm, and the wind is at your back. There are new islands (models 😉) to discover in the ocean of Cortex. Gather your crew and set sail!';
+
+  @override
+  String get notificationFortuneCookieTitle => 'Your Fortune Cookie of the Day';
+
+  @override
+  String get notificationFortuneCookieBody =>
+      'The advice you get from an AI today could change the course of your life. Click if you\'re curious.';
+
+  @override
+  String get notificationSingularityTitle => 'wow!';
+
+  @override
+  String get notificationSingularityBody =>
+      'nothing happened, just felt like texting. maybe you feel like texting some AIs, what do you say?';
+
+  @override
+  String get notificationHackerJokeTitle =>
+      'Wanna hack that kid\'s instagram account?';
+
+  @override
+  String get notificationHackerJokeBody =>
+      'That\'s exactly why the Hacker character is in Cortex. jk jk; don\'t even try it, that\'s illegal.';
+
+  @override
+  String get notificationDetectiveCaseTitle => 'A Case is Waiting to be Solved';
+
+  @override
+  String get notificationDetectiveCaseBody =>
+      'Our Detective character needs your help. Who could Heisenberg be?';
+
+  @override
+  String notificationUpsellFeatureTitle(Object targetTier) {
+    return 'Exclusive to the $targetTier Plan!';
+  }
+
+  @override
+  String notificationUpsellFeatureBody(
+      Object currentTier, Object featureName, Object targetTier) {
+    return 'Hello $currentTier subscriber! The $targetTier plan just got the $featureName feature, which will take your Cortex to the next level. How about an upgrade?';
+  }
+
+  @override
+  String get notificationOriginStoryTitle => 'The Birth of Cortex';
+
+  @override
+  String get notificationOriginStoryBody =>
+      'Did you know we started coding this app at 15 with just a dream? For almost a year, every morning and evening, that dream is in every single line of code.';
+
+  @override
+  String get notificationOpenSourceTitle => 'Power to the Community!';
+
+  @override
+  String get notificationOpenSourceBody =>
+      'Cortex is completely open-source. If you want to check out our code and contribute to our development, our door is always open.';
+
+  @override
+  String get notificationRejectionStoryTitle => 'Grit, Hard Work, Happiness!';
+
+  @override
+  String get notificationRejectionStoryBody =>
+      'Cortex was rejected over 20 times and suspended twice by Google Play before it was published. But we believed, and we made it. Never give up on your dreams!';
+
+  @override
+  String get notificationGGUFSupportTitle => 'Bring Your Own Model!';
+
+  @override
+  String get notificationGGUFSupportBody =>
+      'Remember, you can add your own GGUF format AI models to Cortex and use them offline. The power is in your hands.';
+
+  @override
+  String get notificationThemeCustomizationTitle => 'A Theme for Your Mood';
+
+  @override
+  String get notificationThemeCustomizationBody =>
+      'Have you checked out the theme options in Settings? Personalize Cortex to your liking and color up your chats!';
+
+  @override
+  String get notificationShowerThoughtTitle => 'Shower Thought';
+
+  @override
+  String get notificationShowerThoughtBody =>
+      'If a watermelon is a fruit, does that technically make watermelon juice a smoothie? You might want to discuss this deep (like, really deep) topic with a model.';
+
+  @override
+  String get notificationLowBatteryTitle =>
+      'Your Battery is Dying... But Mine Isn\'t!';
+
+  @override
+  String get notificationLowBatteryBody =>
+      'Your phone\'s charge might be running low, but my energy is always at 100%! Plug it in and let\'s keep chatting.';
+
+  @override
+  String get channelFcmName => 'Cortex Updates';
+
+  @override
+  String get channelFcmDescription =>
+      'Notifications about news, updates and other informations from Cortex.';
+
+  @override
+  String get channelEngagementName => 'Friendly Reminders';
+
+  @override
+  String get channelEngagementDescription =>
+      'Fun notifications to keep you engaged.';
+
+  @override
+  String get channelGreetingsName => 'Daily Greetings';
+
+  @override
+  String get channelGreetingsDescription =>
+      'The messages like good morning and good night.';
 }

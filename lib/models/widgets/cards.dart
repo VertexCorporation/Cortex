@@ -1,4 +1,4 @@
-// cards.dart (FINAL - Refactored with Timer for Forced Real-Time Updates)
+// cards.dart
 
 import 'dart:async';
 import 'dart:io';
@@ -17,6 +17,7 @@ import '../backend/data.dart';
 import '../backend/download.dart';
 import 'cancel.dart';
 
+// REVERTED: This is now a StatefulWidget again to manage its internal state, but without the animation logic.
 class ModelTile extends StatefulWidget {
   const ModelTile({
     super.key,
@@ -34,7 +35,7 @@ class ModelTile extends StatefulWidget {
     required this.isLastInColumn,
     required this.isSeeAll,
     required this.isDownloaded,
-    required this.manager,
+    this.manager,
     required this.compatibilityStatus,
     required this.onTileTap,
     required this.onRemoveRequested,
@@ -58,7 +59,7 @@ class ModelTile extends StatefulWidget {
   final bool isLastInColumn;
   final bool isSeeAll;
   final bool isDownloaded;
-  final DownloadManager manager;
+  final DownloadManager? manager;
   final CompatibilityStatus compatibilityStatus;
   final VoidCallback onTileTap;
   final Future<void> Function() onRemoveRequested;
@@ -77,28 +78,29 @@ class _ModelTileState extends State<ModelTile> {
   @override
   void initState() {
     super.initState();
-    widget.manager.addListener(_onDownloadStateChanged);
-
-    if (widget.manager.isDownloading) {
+    widget.manager?.addListener(_onDownloadStateChanged);
+    if (widget.manager?.isDownloading ?? false) {
       _startTimer();
     }
   }
 
   @override
   void dispose() {
-    widget.manager.removeListener(_onDownloadStateChanged);
+    widget.manager?.removeListener(_onDownloadStateChanged);
     _timer?.cancel();
     super.dispose();
   }
 
   void _onDownloadStateChanged() {
     if (mounted) {
-      if (widget.manager.isDownloading && (_timer == null || !_timer!.isActive)) {
+      final manager = widget.manager;
+      if (manager == null) return;
+
+      if (manager.isDownloading && (_timer == null || !_timer!.isActive)) {
         _startTimer();
-      } else if (!widget.manager.isDownloading && _timer != null) {
+      } else if (!manager.isDownloading && _timer != null) {
         _stopTimer();
       }
-
       setState(() {});
     }
   }
@@ -119,14 +121,21 @@ class _ModelTileState extends State<ModelTile> {
     _timer = null;
   }
 
+  // REVERTED: The build method no longer contains the AnimatedBuilder/Transform.scale wrapper.
   @override
   Widget build(BuildContext context) {
-    dev.log("[ModelTile.build] Rebuilding tile for ID: '${widget.id}', Progress: ${widget.manager.progress}%", name: 'ModelTile');
+    if (widget.manager != null) {
+      dev.log(
+          "[ModelTile.build] Rebuilding tile for ID: '${widget.id}', Progress: ${widget.manager!.progress}%",
+          name: 'ModelTile');
+    }
 
     final loc = AppLocalizations.of(context)!;
     final double w = MediaQuery.of(context).size.width;
 
-    final bool canLongPress = widget.isCustomModel || (!widget.isServerSide && (widget.isDownloaded || widget.manager.isDownloaded));
+    final bool canLongPress = widget.isCustomModel ||
+        (!widget.isServerSide &&
+            (widget.isDownloaded || (widget.manager?.isDownloaded ?? false)));
 
     final Widget finalImageWidget = _buildImage(w);
 
@@ -135,7 +144,8 @@ class _ModelTileState extends State<ModelTile> {
       gestures: {
         LongPressGestureRecognizer:
         GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
-              () => LongPressGestureRecognizer(duration: const Duration(milliseconds: 100)),
+              () =>
+              LongPressGestureRecognizer(duration: const Duration(milliseconds: 100)),
               (LongPressGestureRecognizer instance) {
             instance.onLongPress = canLongPress ? widget.onRemoveRequested : null;
           },
@@ -150,18 +160,23 @@ class _ModelTileState extends State<ModelTile> {
         horizontal: w * .005,
       ),
       child: Column(
-        children: [gestureDetector, if (!widget.isLastInColumn) SizedBox(height: w * .01)],
+        children: [
+          gestureDetector,
+          if (!widget.isLastInColumn) SizedBox(height: w * .01)
+        ],
       ),
     );
   }
 
+  // ... (All other helper methods like _buildButton, _buildImage, _content, etc., remain exactly the same)
   Widget _buildButton(BuildContext context, double w, AppLocalizations loc) {
     const double radiusFactor = .08;
     final double h = w * .09;
     final double btnW = w * .25;
     final BorderRadius br = BorderRadius.circular(w * radiusFactor);
+    final manager = widget.manager;
 
-    if (widget.manager.isDownloading) {
+    if (manager?.isDownloading ?? false) {
       return AnimatedCancelButton(
         key: ValueKey('cancel-${widget.id}'),
         onPressed: widget.onCancelDownload,
@@ -174,7 +189,7 @@ class _ModelTileState extends State<ModelTile> {
       );
     }
 
-    if (widget.manager.isPaused) {
+    if (manager?.isPaused ?? false) {
       return SizedBox(
         key: ValueKey('resume-${widget.id}'),
         width: btnW,
@@ -191,8 +206,7 @@ class _ModelTileState extends State<ModelTile> {
       );
     }
 
-    final bool showChatButton = (widget.isDownloaded || widget.manager.isDownloaded) || widget.isCustomModel || widget.isServerSide;
-
+    final bool showChatButton = (widget.isDownloaded || (manager?.isDownloaded ?? false)) || widget.isCustomModel || widget.isServerSide;
     if (showChatButton) {
       return SizedBox(
         key: ValueKey('chat-${widget.id}'),
@@ -403,10 +417,13 @@ class _ModelTileState extends State<ModelTile> {
   }
 
   Widget _buildDownloadStatusText(AppLocalizations loc, double w) {
-    if (widget.manager.isDownloading) {
-      final String text = widget.manager.progress >= 95
+    final manager = widget.manager;
+    if (manager == null) return const SizedBox.shrink();
+
+    if (manager.isDownloading) {
+      final String text = manager.progress >= 95
           ? loc.finalPreparation
-          : loc.downloaded(widget.manager.progress.toStringAsFixed(0));
+          : loc.downloaded(manager.progress.toStringAsFixed(0));
       return _fade(
         Text(
           text,
@@ -414,7 +431,7 @@ class _ModelTileState extends State<ModelTile> {
           style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: w * .03),
         ),
       );
-    } else if (widget.manager.isPaused) {
+    } else if (manager.isPaused) {
       return _fade(
         Text(
           loc.downloadPaused,

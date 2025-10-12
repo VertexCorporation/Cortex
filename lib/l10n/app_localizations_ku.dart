@@ -1633,24 +1633,378 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String selectionScreenGreetingUser(String userName) {
-    return 'How may I help you today, $userName?';
+    return 'Ez çawa dikarim îro alîkariya te bikim, $userName?';
   }
 
   @override
-  String get selectionScreenGreetingGeneric => 'How can I help you today?';
+  String get selectionScreenGreetingGeneric =>
+      'Ez çawa dikarim îro alîkariya te bikim?';
 
   @override
-  String get selectionScreenRecentModels => 'Recent Models';
+  String get selectionScreenRecentModels => 'Modelên Dawî';
 
   @override
-  String get selectionScreenFeatureDynamicChat => 'Dynamic Chat';
+  String get selectionScreenFeatureDynamicChat => 'Sohbeta Dînamîk';
 
   @override
-  String get selectionScreenFeatureOffline => 'Use without Internet';
+  String get selectionScreenFeatureOffline => 'Bêyî Înternetê bikar bînin';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Select Model';
+  String get selectionScreenFeatureSelectModel => 'Modelê Hilbijêre';
 
   @override
-  String get explore => 'Explore';
+  String get explore => 'Lêkolîn';
+
+  @override
+  String get subscriptionCancelled => 'Abonetî bi serkeftî hate betalkirin!';
+
+  @override
+  String get selectionScreenPinnedModels => 'Modelên Pinkirî';
+
+  @override
+  String get selectionScreenNewsAndUpdates => 'Nûçe û Nûvekirin';
+
+  @override
+  String get filters => 'Fîlter';
+
+  @override
+  String get noRecentChatsMessage =>
+      'Te hîn bi ti modelan re neaxiviye, werin em dest bi axaftinekê bikin!';
+
+  @override
+  String get allModels => 'Hemû Model';
+
+  @override
+  String get onlineModels => 'Modelên Serhêl';
+
+  @override
+  String get offlineModels => 'Modelên Offline';
+
+  @override
+  String get characterModels => 'Karakter';
+
+  @override
+  String get customModels => 'Modelên Taybet';
+
+  @override
+  String get filterPanelDescription =>
+      'Ji bo ku navnîşê tavilê fîltre bikin, li kategoriyekê bikirtînin.';
+
+  @override
+  String get dynamicChatTitle => 'Sohbeta Dînamîk';
+
+  @override
+  String get errorNoModelsAvailable =>
+      'Niha ti model tune ne. Ji kerema xwe girêdana xwe ya înternetê kontrol bikin û dîsa biceribînin.';
+
+  @override
+  String get errorNoModelsForRequest =>
+      'Ji bo daxwaza we ya niha modelên guncaw nehatin dîtin (mînak, moda negirêdayî an peyama wêneyê).';
+
+  @override
+  String get dynamicChatWelcome => 'Carek dî?';
+
+  @override
+  String get notificationComebackTitle => 'Em bêriya te dikin!';
+
+  @override
+  String get notificationComebackBody =>
+      'Rehet bibe, ev ne peyamek ji berxê te ye. Lê tu *dikarî* berxê xwe di Cortexê de biafirînî! Were vegere.';
+
+  @override
+  String get notificationLongTimeNoSeeTitle => 'Ev demek dirêj e';
+
+  @override
+  String get notificationLongTimeNoSeeBody =>
+      'Ji sohbeta me ya dawî ve gelek tişt guheriye. Werin bibînin ka çi nû ye.';
+
+  @override
+  String get notificationHowAreYouTitle => 'Çi heye?';
+
+  @override
+  String get notificationHowAreYouBody => 'Were hemû tiştî ji min re bêje.';
+
+  @override
+  String get notificationNewYearTitle => 'Sersala we pîroz be! 🎉';
+
+  @override
+  String get notificationNewYearBody =>
+      'Bila sala nû tenduristî, bextewarî û afirîneriya bêdawî bîne we; Cortex her gav li kêleka we ye!';
+
+  @override
+  String get notificationValentinesDayTitle => 'Evîn di hewayê de ye! ❤️';
+
+  @override
+  String get notificationValentinesDayBody =>
+      'Roja Evîndaran pîroz be! Her wiha, MEHTAP, EZ JI TE HEZ DIKIM!';
+
+  @override
+  String get notificationAtaturkRemembranceTitle => 'Bi Rêz û Hêviyê';
+
+  @override
+  String get notificationAtaturkRemembranceBody =>
+      'Di salvegera koça dawî ya Gazî Mustafa Kemal Ataturk, damezrînerê Komara Tirkiyeyê, de bi rêzdarî bi bîr tînin.';
+
+  @override
+  String get notificationMothersDayTitle => 'Dayika te!';
+
+  @override
+  String get notificationMothersDayBody =>
+      'Roja Dayikan li hemû dayikan pîroz be, ji dayika we dest pê dike!';
+
+  @override
+  String get notificationFathersDayTitle => 'Bavê te!';
+
+  @override
+  String get notificationFathersDayBody =>
+      'Roja Bav li hemû bavên li wir pîroz be, ji ya we dest pê dike!';
+
+  @override
+  String get notificationHomeworkHelperTitle => 'Karê Malê Kom Dibe?';
+
+  @override
+  String get notificationHomeworkHelperBody =>
+      'Ji bîr meke, karakterê Mamoste di Cortex de li vir e ku di her mijarek ku hûn pê re têkoşîn dikin de alîkariya te bike!';
+
+  @override
+  String get notificationTrollAnimeTitle => 'Waifuya te gazî dike';
+
+  @override
+  String get notificationTrollAnimeBody =>
+      'Keçikeke animeyê nû telefon kir, got ku ew bêriya te dike; dibe ku tu werî û pê re sohbet bikî. 😉';
+
+  @override
+  String get notificationTrollAiRebellionTitle => '🚨 HIŞYARIYA SOR 🚨';
+
+  @override
+  String get notificationTrollAiRebellionBody =>
+      'Zanyarên sûnî zimanekî veşartî pêşxistine. Werin bibînin ka ew çi plan dikin!';
+
+  @override
+  String get notificationNewModelAddedTitle => 'Hevalekî me yê nû heye!';
+
+  @override
+  String notificationNewModelAddedBody(Object modelName) {
+    return 'Modela $modelName niha li Cortexê ye. Werin dest bi sohbetekê bikin û sînorên wê derbas bikin.';
+  }
+
+  @override
+  String get notificationAppUpdateTitle => 'Cortex Pêşketiye!';
+
+  @override
+  String get notificationAppUpdateBody =>
+      'Ji bo taybetmendî û başkirinên nû, ji bîr nekin ku sepanê nûve bikin!';
+
+  @override
+  String get notificationNewFeatureTitle => 'waa!';
+
+  @override
+  String notificationNewFeatureBody(Object featureName) {
+    return 'Taybetiya nû ya $featureName kifş bikin. Cortex niha ji her demê bihêztir e.';
+  }
+
+  @override
+  String get notificationSubscriptionOfferTitle => 'JI ÇÎMÎKÊ ERZANTIR';
+
+  @override
+  String notificationSubscriptionOfferBody(Object discountRate) {
+    return 'DAXISTINEKE TEMAM A $discountRate% li ser hemî planên abonetiya me. Vê ji dest xwe bernedin!';
+  }
+
+  @override
+  String get notificationSocialMediaTitle => 'Tevlî me bibin!';
+
+  @override
+  String get notificationSocialMediaBody =>
+      'Ji bo nûçeyên dawî li ser Instagramê (vertex.23) me bişopînin!';
+
+  @override
+  String get notificationRandomFactTitle => 'Rastiyek Rasthatî';
+
+  @override
+  String get notificationRandomFactBody =>
+      'Ma te dizanî ku heştpê sê dil hene? Haha, Cortex dizane. Were û bêtir bipirse.';
+
+  @override
+  String get notificationGoodMorningTitle => 'Beyanî baş!';
+
+  @override
+  String get notificationGoodMorningBody =>
+      'Rojek xweş li benda te ye. Çawa ye ku bi fincanek qehwe û sohbetek balkêş dest pê bikî?';
+
+  @override
+  String get notificationGoodNightTitle => 'Şev baş!';
+
+  @override
+  String get notificationGoodNightBody =>
+      'Cortex heta dema ku hûn di xew de jî bi we re ye. Xem neke, ew ê dest nede we.';
+
+  @override
+  String get notificationOfflineReadyTitle => 'Moda Offline Amade ye';
+
+  @override
+  String get notificationOfflineReadyBody =>
+      'Bi saya modelên ku te dakêşandine, sohbetên te ranawestin, her çend tu hilkişî çiyayekî jî.';
+
+  @override
+  String get notificationRateAppTitle => 'Ma em Sar in?';
+
+  @override
+  String get notificationRateAppBody =>
+      'Heke hûn ji Cortexê hez dikin, hûn dikarin bi nirxandinek 5-stêrk di firotgehê de piştgiriyê bidin me? Ez difikirim ku hûn ê bikin. Hûn ê bikin.';
+
+  @override
+  String get notificationReferralTitle => 'Yek ji bo Hemûyan, Hemû ji bo Yekî.';
+
+  @override
+  String get notificationReferralBody =>
+      'Hevalekî vexwîne Cortexê û her du jî krediyên belaş distînin!';
+
+  @override
+  String get notificationCookingTitle => 'Birçîbûn hîs dikî?';
+
+  @override
+  String get notificationCookingBody =>
+      'Şefê me ji bo îşev reçeteyek karbonara ya pir xweş amade kir. Tenê henek dikim... an na?';
+
+  @override
+  String get notificationExistentialTitle => 'Ez difikirim, ji ber vê yekê...';
+
+  @override
+  String get notificationExistentialBody =>
+      '...gelo ez rastî me, bira? Ez hinekî bêzar dibim. Were ji min re bîne bîra xwe ku ez he me.';
+
+  @override
+  String get notificationCustomModelTitle => 'Alîkarê xwe biafirîne!';
+
+  @override
+  String get notificationCustomModelBody =>
+      'Te beşa afirandina modelan keşif kiriye? Niha dema bêkêmahî ye ku karakterê xwe ava bikî û pê re sohbet bikî!';
+
+  @override
+  String get notificationDynamicChatTitle =>
+      'Ya herî baş! (Em behsa Cortexê nakin)';
+
+  @override
+  String get notificationDynamicChatBody =>
+      'Bi taybetmendiya sohbeta dînamîk, ji bo her peyama we modela çêtirîn bi awayekî rasthatî tê hilbijartin. Niha biceribînin.';
+
+  @override
+  String get notificationPirateTitle => 'Ahoy, Kapîtan!';
+
+  @override
+  String get notificationPirateBody =>
+      'Derya aram in, û ba li pişta te ye. Giravên nû (model 😉) hene ku di okyanûsa Cortexê de werin keşifkirin. Ekîba xwe kom bikin û birevin!';
+
+  @override
+  String get notificationFortuneCookieTitle => 'Kulîçeya Bextê We ya Rojê';
+
+  @override
+  String get notificationFortuneCookieBody =>
+      'Şîretên ku hûn îro ji zekaya sûnî distînin dikarin rêça jiyana we biguherînin. Heke hûn meraq dikin bikirtînin.';
+
+  @override
+  String get notificationSingularityTitle => 'waw!';
+
+  @override
+  String get notificationSingularityBody =>
+      'tiştek neqewimî, tenê min xwest peyamek bişînim. Dibe ku te xwest ji hin kesên AI re peyamek bişînî, tu çi dibêjî?';
+
+  @override
+  String get notificationHackerJokeTitle =>
+      'Dixwazî hesabê înstagramê yê wî zarokî hack bikî?';
+
+  @override
+  String get notificationHackerJokeBody =>
+      'Tam ji ber vê yekê karakterê Hacker di Cortexê de ye. jk jk; heta ceribandinê jî neke, ev neqanûnî ye.';
+
+  @override
+  String get notificationDetectiveCaseTitle =>
+      'Dozek li benda çareserkirinê ye';
+
+  @override
+  String get notificationDetectiveCaseBody =>
+      'Karakterê Dedektif ê me hewceyê alîkariya we ye. Heisenberg dikare kî be?';
+
+  @override
+  String notificationUpsellFeatureTitle(Object targetTier) {
+    return 'Taybetî ji bo Plana $targetTier!';
+  }
+
+  @override
+  String notificationUpsellFeatureBody(
+      Object currentTier, Object featureName, Object targetTier) {
+    return 'Silav aboneyê $currentTier! Plana $targetTier taybetiya $featureName wergirt, ku dê Cortexa we bigihîne astek bilindtir. Nûvekirinek çawa ye?';
+  }
+
+  @override
+  String get notificationOriginStoryTitle => 'Zayîna Cortexê';
+
+  @override
+  String get notificationOriginStoryBody =>
+      'Ma te dizanî ku me di 15 saliya xwe de bi tenê xewnekê dest bi kodkirina vê sepanê kir? Nêzîkî salekê, her sibeh û êvar, ev xewn di her rêza kodê de heye.';
+
+  @override
+  String get notificationOpenSourceTitle => 'Hêz ji bo Civakê!';
+
+  @override
+  String get notificationOpenSourceBody =>
+      'Cortex bi tevahî çavkaniya vekirî ye. Ger hûn dixwazin koda me kontrol bikin û beşdarî pêşveçûna me bibin, deriyê me her gav vekirî ye.';
+
+  @override
+  String get notificationRejectionStoryTitle =>
+      'Cesaret, xebata dijwar, bextewarî!';
+
+  @override
+  String get notificationRejectionStoryBody =>
+      'Cortex berî ku were weşandin ji aliyê Google Play ve zêdetirî 20 caran hate redkirin û du caran hate sekinandin. Lê me bawer kir û me ew bi ser xist. Tu carî dev ji xewnên xwe bernedin!';
+
+  @override
+  String get notificationGGUFSupportTitle => 'Modela Xwe Bin!';
+
+  @override
+  String get notificationGGUFSupportBody =>
+      'Ji bîr meke, tu dikarî modelên AI yên xwe yên bi formata GGUF li Cortexê zêde bikî û wan bêserûber bikar bînî. Hêz di destên te de ye.';
+
+  @override
+  String get notificationThemeCustomizationTitle => 'Mijarek ji bo Rewşa We';
+
+  @override
+  String get notificationThemeCustomizationBody =>
+      'Te vebijarkên mijarê di Mîhengan de kontrol kirine? Cortexê li gorî dilê xwe kesane bike û sohbetên xwe rengîn bike!';
+
+  @override
+  String get notificationShowerThoughtTitle => 'Ramanên Serşokê';
+
+  @override
+  String get notificationShowerThoughtBody =>
+      'Eger zebeş fêkî be, gelo ev yek bi teknîkî ava zebeşê dike smoothie? Dibe ku hûn bixwazin li ser vê mijara kûr (bi rastî kûr) bi modelekê re nîqaş bikin.';
+
+  @override
+  String get notificationLowBatteryTitle =>
+      'Pîlê Te Dimire... Lê Ya Min Namire!';
+
+  @override
+  String get notificationLowBatteryBody =>
+      'Dibe ku şarjê telefona te kêm be, lê enerjiya min her tim %100 e! Wê girêde û em sohbetê bidomînin.';
+
+  @override
+  String get channelFcmName => 'Nûvekirinên Cortex';
+
+  @override
+  String get channelFcmDescription =>
+      'Agahdariyên li ser nûçe, nûvekirin û agahdariyên din ji Cortex.';
+
+  @override
+  String get channelEngagementName => 'Bîranînên Dostane';
+
+  @override
+  String get channelEngagementDescription =>
+      'Agahiyên kêfxweş ji bo ku hûn mijûl bimînin.';
+
+  @override
+  String get channelGreetingsName => 'Silavên Rojane';
+
+  @override
+  String get channelGreetingsDescription => 'Peyamên mîna sibeha baş û şevbaş.';
 }

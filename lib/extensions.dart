@@ -172,17 +172,16 @@ class Extensions {
       final screenWidth = MediaQuery.of(context).size.width;
       final panelWidth = screenWidth * 0.9;
       final horizontalMargin = (screenWidth - panelWidth) / 2;
-      final double appBarBottom = MediaQuery.of(context).padding.top + kToolbarHeight;
 
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
           return Stack(
             children: [
-              Positioned(
-                top: appBarBottom,
-                left: 0,
-                right: 0,
-                bottom: 0,
+              // --- THE FIX ---
+              // This GestureDetector now fills the ENTIRE screen. It sits behind the
+              // panel. Tapping anywhere that isn't the panel will be caught by this
+              // detector, ensuring a clean dismissal from the AppBar or any other area.
+              Positioned.fill(
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: () {

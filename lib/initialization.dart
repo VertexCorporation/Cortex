@@ -18,12 +18,15 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:upgrader/upgrader.dart';
 import 'chat/services/moderator.dart';
 import 'l10n/app_localizations.dart';
+import 'language.dart';
 import 'main.dart'; // For downloadCallback
 import 'models/backend/data.dart';
+import 'notifications.dart';
 
 /// Defines the possible high-level states of the application.
 enum AppStatus {
@@ -72,6 +75,10 @@ class AppInitializer with ChangeNotifier {
 
   late final Upgrader upgrader;
 
+  AppInitializer(AppStatus initialStatus) : _status = initialStatus {
+    debugPrint("AppInitializer: Instantiated with initial status: $_status");
+  }
+
   void _updateStatus(AppStatus newStatus) {
     if (_status != newStatus) {
       _status = newStatus;
@@ -80,18 +87,21 @@ class AppInitializer with ChangeNotifier {
     }
   }
 
-  /// Kicks off the entire application startup sequence.
-  /// It's now structured to guarantee core services are ready before proceeding.
+  /// It's now structured to guarantee core services are ready before proceeding,
+  /// with a critical, blocking check for server maintenance happening first.
   Future<void> initialize() async {
-    debugPrint("AppInitializer: Starting initialization sequence...");
-    _updateStatus(AppStatus.initializing);
-
+    debugPrint("AppInitializer: Starting initialization sequence. Current status is '$_status'.");
+    // Record the app open time as early as possible for accurate scheduling.
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      // We don't await this so it doesn't block the startup sequence.
+      Provider.of<NotificationService>(context, listen: false).recordAppOpen();
+    }
     try {
       // --- PHASE 1: CRITICAL CORE SERVICES (BLOCKING) ---
       // These must complete successfully before any other part of the app
       // can reliably function.
       debugPrint("AppInitializer: Phase 1 - Initializing critical core services...");
-      await Firebase.initializeApp();
       await FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true);
       FlutterDownloader.registerCallback(downloadCallback);
       await OfflineModeratorService().initialize();
@@ -103,19 +113,43 @@ class AppInitializer with ChangeNotifier {
       }
       debugPrint("AppInitializer: Phase 1 - SUCCESS. Core services are ready.");
 
-      // --- PHASE 2: USER FLOW & NON-BLOCKING BACKGROUND TASKS ---
-      // This part of the initialization can now safely use the core services.
-      debugPrint("AppInitializer: Phase 2 - Determining user flow...");
+      // --- PHASE 2: SERVER STATUS CHECK (BLOCKING) ---
+      // This is the critical fix. We check for maintenance mode before anything else.
+      // If the server is in maintenance, this function will update the status
+      // and this `initialize` method will stop right here.
+      debugPrint("AppInitializer: Phase 2 - Checking server status...");
+      if (await _checkServerStatus()) {
+        debugPrint("AppInitializer: Server is in maintenance. Halting further initialization.");
+        return; // Halt execution if in maintenance mode.
+      }
+      debugPrint("AppInitializer: Phase 2 - SUCCESS. Server is online.");
+
+
+      // --- PHASE 3: USER FLOW & NON-BLOCKING BACKGROUND TASKS ---
+      // This part of the initialization can now safely run.
+      debugPrint("AppInitializer: Phase 3 - Determining user flow...");
       _listenToAuthStateChanges();
       await _determineUserFlow();
 
       // These tasks run only if the user is fully authenticated and ready.
       if (_status == AppStatus.ready) {
-        debugPrint("AppInitializer: Phase 2 - Spawning non-blocking background tasks...");
-        _runInBackground(() => _checkServerStatusAndUpdates());
-        _runInBackground(() => _reconcileLocalAndRemoteModelCounts());
-        _runInBackground(() => reconcileAndSyncPurchases());
-        _runInBackground(() => ReferralHandler.checkAndStoreReferrer());
+        debugPrint("AppInitializer: Phase 3 - Spawning non-blocking background tasks...");
+        _runInBackground(() async {
+          final context = navigatorKey.currentContext;
+          if (context != null) {
+            final locale = Provider.of<LocaleProvider>(context, listen: false).locale;
+
+            final l10n = await AppLocalizations.delegate.load(locale);
+
+            await Provider.of<NotificationService>(context, listen: false).initialize(l10n);
+          } else {
+            debugPrint("[AppInitializer] CRITICAL: Could not get context to initialize NotificationService.");
+          }
+        });
+        _runInBackground(_checkForUpdates); // Check for non-critical updates in the background.
+        _runInBackground(_reconcileLocalAndRemoteModelCounts);
+        _runInBackground(reconcileAndSyncPurchases);
+        _runInBackground(ReferralHandler.checkAndStoreReferrer);
       }
 
       debugPrint("AppInitializer: Initialization sequence complete.");
@@ -228,24 +262,39 @@ class AppInitializer with ChangeNotifier {
     return null;
   }
 
-  Future<void> _checkServerStatusAndUpdates() async {
+  /// Performs a blocking check for the server's maintenance status.
+  ///
+  /// Returns `true` and updates the app status if maintenance is active,
+  /// otherwise returns `false`.
+  Future<bool> _checkServerStatus() async {
+    final bool isMaintenance = kDebugMode ? false : await checkMaintenanceMode();
+    if (isMaintenance) {
+      _updateStatus(AppStatus.maintenance);
+      return true;
+    }
+
+    // This is the perfect place to schedule a pending notification since we
+    // know the app is online and not in maintenance.
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      // Use a non-blocking call so it doesn't slow down app startup.
+      Provider.of<NotificationService>(context, listen: false).schedulePendingNotification();
+    }
+    return false;
+  }
+
+  /// Checks for a mandatory app update using the Upgrader package.
+  /// This is intended to be run as a non-blocking background task.
+  Future<void> _checkForUpdates() async {
     // We can't show Upgrader without a BuildContext, so we'll prepare it here
     // and let the UI decide when to show it.
     upgrader = Upgrader(
       debugLogging: kDebugMode,
-      // We need a context to get translations, but we don't have one here.
-      // This will be handled by passing the upgrader instance to the UI layer.
-      // The UI will then provide the localized messages.
+      // The UI layer will provide the localized messages when it displays the alert.
     );
 
     if (await upgrader.isUpdateAvailable()) {
       _updateStatus(AppStatus.updateRequired);
-      return; // An update takes priority over maintenance mode.
-    }
-
-    final bool isMaintenance = kDebugMode ? false : await _checkMaintenanceMode();
-    if (isMaintenance) {
-      _updateStatus(AppStatus.maintenance);
     }
   }
 
@@ -261,7 +310,7 @@ class AppInitializer with ChangeNotifier {
 // --- All other helper functions from the old initialization.dart ---
 // These are now private to this file and called by the AppInitializer service.
 
-Future<bool> _checkMaintenanceMode() async {
+Future<bool> checkMaintenanceMode() async {
   try {
     final callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable('getServerStatus');
     final result = await callable.call();

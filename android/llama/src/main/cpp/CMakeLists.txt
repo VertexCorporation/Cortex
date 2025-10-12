@@ -11,6 +11,11 @@ cmake_minimum_required(VERSION 3.22.1)
 # build script scope).
 project("llama-android")
 
+if(ANDROID)
+    message(STATUS "Applying 16KB page size alignment for Android build.")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,max-page-size=16384" CACHE STRING "" FORCE)
+endif()
+
 #include(FetchContent)
 #FetchContent_Declare(
 #        llama
@@ -32,7 +37,7 @@ project("llama-android")
 #
 
 #load local llama.cpp
-add_subdirectory(../../../../vendor/llama.cpp build-llama)
+add_subdirectory(../../../../../vendor/llama.cpp build-llama)
 
 # In order to load a library into your app from Java/Kotlin, you must call
 # System.loadLibrary() and pass the name of the library defined here;

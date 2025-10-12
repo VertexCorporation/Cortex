@@ -4,7 +4,6 @@ import 'package:cortex/cache.dart';
 import 'package:cortex/main.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
@@ -113,17 +112,27 @@ class NewsService with ChangeNotifier {
   /// and ensure core services like Firebase are ready before proceeding.
   /// This method should be called from `initState` within a `WidgetsBinding.instance.addPostFrameCallback`.
   Future<void> loadNews(BuildContext context) async {
-    // Prevent redundant fetches if data is already loaded or is currently loading.
-    if (_articles.isNotEmpty || !_isLoading) return;
+    // If we already have articles, there's nothing to do. Exit immediately.
+    // This is the most reliable check and avoids issues with stale `_isLoading` flags.
+    if (_articles.isNotEmpty) {
+      return;
+    }
+
+    debugPrint("[NewsService] No articles found. Initiating news load process.");
+
+    // Actively reset the state for a new loading attempt.
+    // This ensures that even if a previous attempt failed (setting _error),
+    // we start fresh. This is critical for the "login -> fail -> login again" scenario.
+    _isLoading = true;
+    _error = null;
+    notifyListeners(); // Immediately update the UI to show the shimmer.
 
     // --- CRITICAL SAFETY LOCK ---
-    // Await the signal from AppInitializer that core services are ready.
-    // This prevents any race conditions with Firebase initialization.
     final appInitializer = Provider.of<AppInitializer>(context, listen: false);
     await appInitializer.onCoreServicesReady;
     debugPrint("[NewsService] Core services are ready. Proceeding to load news.");
 
-    // Check SharedPreferences for valid cached data (within 7 days).
+    // Check SharedPreferences for valid cached data.
     final prefs = await SharedPreferences.getInstance();
     final lastFetchTimestamp = prefs.getInt(_timestampKey);
     if (lastFetchTimestamp != null) {
@@ -135,7 +144,7 @@ class NewsService with ChangeNotifier {
           _parseAndSetArticles(cachedData);
           _isLoading = false;
           notifyListeners();
-          return; // Exit if loaded from cache
+          return; // Exit if loaded from cache.
         }
       }
     }
@@ -145,58 +154,70 @@ class NewsService with ChangeNotifier {
     await _fetchAndCacheNews();
   }
 
-  /// This private method now solely focuses on the network request logic.
-  /// It can safely assume that Firebase is already initialized because the
-  /// public `loadNews` method has already performed that check.
+  /// This private method now includes a top-level timeout to prevent
+  /// any possibility of an infinite loading state.
   Future<void> _fetchAndCacheNews() async {
-    _error = null;
     try {
-      // It's safe to access FirebaseAuth here.
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) throw Exception("User is not authenticated for news fetch.");
+      // This ensures that the entire news fetching process, including all awaits inside,
+      // cannot get stuck for more than 20 seconds. If any internal await hangs
+      // indefinitely, this timeout will fire, throwing a TimeoutException.
+      await _fetchNewsWithTimeout();
 
-      final idToken = await user.getIdToken();
-
-      final urlResponse = await http.post(
-          Uri.parse(_getCacheUrlEndpoint),
-          headers: {
-            "Authorization": "Bearer $idToken",
-            "Content-Type": "application/json"
-          },
-          body: jsonEncode({'data': null})
-      );
-
-      if (urlResponse.statusCode != 200) {
-        throw Exception("Failed to get cache URL. Status: ${urlResponse.statusCode}, Body: ${urlResponse.body}");
-      }
-
-      final jsonBody = jsonDecode(urlResponse.body);
-      final String? signedUrl = jsonBody['result']?['signedUrl'];
-
-      if (signedUrl == null) {
-        throw Exception("Backend did not return a 'signedUrl'.");
-      }
-
-      final newsResponse = await http.get(Uri.parse(signedUrl));
-
-      if (newsResponse.statusCode == 200) {
-        final newsJsonString = utf8.decode(newsResponse.bodyBytes);
-        _parseAndSetArticles(newsJsonString);
-
-        // Save the fresh data and timestamp to cache.
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(_cacheKey, newsJsonString);
-        await prefs.setInt(_timestampKey, DateTime.now().millisecondsSinceEpoch);
-        debugPrint("[NewsService] Successfully fetched and cached new news data.");
-      } else {
-        throw Exception('Failed to load news content from signed URL. Status: ${newsResponse.statusCode}');
-      }
-    } catch (e) {
+    } catch (e, s) {
       _error = 'Could not fetch news updates.';
-      debugPrint('[NewsService] An error occurred during fetch: $e');
+      // This catch block will now also handle the TimeoutException.
+      debugPrint('[NewsService] An error occurred during fetch: $e\n$s');
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  /// A helper method that contains the actual fetching logic,
+  /// wrapped by a timeout in the calling function.
+  Future<void> _fetchNewsWithTimeout() async {
+    // We now wait patiently for the first authentication state to be emitted by Firebase.
+    final user = await FirebaseAuth.instance.authStateChanges().first;
+
+    if (user == null) {
+      throw Exception("User session could not be established.");
+    }
+
+    final idToken = await user.getIdToken();
+
+    final urlResponse = await http.post(
+      Uri.parse(_getCacheUrlEndpoint),
+      headers: {
+        "Authorization": "Bearer $idToken",
+        "Content-Type": "application/json"
+      },
+      body: jsonEncode({'data': null}),
+    ).timeout(const Duration(seconds: 20)); // Individual timeout for network calls
+
+    if (urlResponse.statusCode != 200) {
+      throw Exception("Failed to get cache URL. Status: ${urlResponse.statusCode}, Body: ${urlResponse.body}");
+    }
+
+    final jsonBody = jsonDecode(urlResponse.body);
+    final String? signedUrl = jsonBody['result']?['signedUrl'];
+
+    if (signedUrl == null) {
+      throw Exception("Backend did not return a 'signedUrl'.");
+    }
+
+    final newsResponse = await http.get(Uri.parse(signedUrl))
+        .timeout(const Duration(seconds: 20)); // Individual timeout for network calls
+
+    if (newsResponse.statusCode == 200) {
+      final newsJsonString = utf8.decode(newsResponse.bodyBytes);
+      _parseAndSetArticles(newsJsonString);
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_cacheKey, newsJsonString);
+      await prefs.setInt(_timestampKey, DateTime.now().millisecondsSinceEpoch);
+      debugPrint("[NewsService] Successfully fetched and cached new news data.");
+    } else {
+      throw Exception('Failed to load news content from signed URL. Status: ${newsResponse.statusCode}');
     }
   }
 
@@ -227,21 +248,68 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
   @override
   void initState() {
     super.initState();
+    // The future is initialized only once when the widget's state is created.
     _imageUrlFuture = _getCachedOrFetchDownloadUrl();
   }
 
+  /// --- ROBUST CACHING LOGIC ---
+  /// Fetches the download URL using a three-tier caching strategy to minimize network requests.
+  /// 1. In-Memory Cache (CacheService): Fastest check for immediate access within the session.
+  /// 2. Persistent Cache (SharedPreferences): Slower check, but survives app restarts and timeouts.
+  /// 3. Network Fetch: The slowest path, used only when both caches miss or are expired.
   Future<String?> _getCachedOrFetchDownloadUrl() async {
-    // 1. CACHE CHECK: Immediately check our in-memory cache first.
-    final cachedUrl = CacheService.cachedNewsImageUrls?[widget.imagePath];
-    if (cachedUrl != null) return cachedUrl;
+    // TIER 1: Check the fast, in-memory cache first.
+    final inMemoryUrl = CacheService.cachedNewsImageUrls?[widget.imagePath];
+    if (inMemoryUrl != null) {
+      debugPrint("[FirebaseStorageImage] URL found in fast in-memory cache for: ${widget.imagePath}");
+      return inMemoryUrl;
+    }
 
+    // TIER 2: Check the persistent SharedPreferences cache.
+    final prefs = await SharedPreferences.getInstance();
+    final String cacheKey = 'news_image_url_${widget.imagePath}'; // Unique key for each image
+    final String? cachedDataJson = prefs.getString(cacheKey);
+
+    if (cachedDataJson != null) {
+      try {
+        final Map<String, dynamic> cachedData = jsonDecode(cachedDataJson);
+        final int expiryTimestamp = cachedData['expires'] as int;
+
+        // Check if the cached URL is still valid.
+        if (DateTime.now().millisecondsSinceEpoch < expiryTimestamp) {
+          final String persistentUrl = cachedData['url'] as String;
+          debugPrint("[FirebaseStorageImage] URL found in persistent cache (SharedPreferences) for: ${widget.imagePath}");
+
+          // IMPORTANT: Populate the fast in-memory cache for subsequent quick access.
+          CacheService.cachedNewsImageUrls ??= {};
+          CacheService.cachedNewsImageUrls![widget.imagePath] = persistentUrl;
+
+          return persistentUrl;
+        } else {
+          debugPrint("[FirebaseStorageImage] Persistent cache expired for: ${widget.imagePath}");
+        }
+      } catch (e) {
+        debugPrint("[FirebaseStorageImage] Error decoding persistent cache: $e");
+      }
+    }
+
+    // TIER 3: If both caches miss, fetch from the network.
+    debugPrint("[FirebaseStorageImage] CACHE MISS. Fetching from network for: ${widget.imagePath}");
     final appInitializer = Provider.of<AppInitializer>(context, listen: false);
     await appInitializer.onCoreServicesReady;
 
-    debugPrint("[FirebaseStorageImage] CACHE MISS. Fetching from network for: ${widget.imagePath}");
+    // --- FIX: Using 'authStateChanges().first' for confirmed user access ---
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      final idToken = user == null ? null : await user.getIdToken();
+      // Listen to auth state changes to ensure there is a user before proceeding
+      final user = await FirebaseAuth.instance.authStateChanges().first;
+
+      if (user == null) {
+        // Handle the case where a user is not available. This should now be rare.
+        debugPrint("[FirebaseStorageImage] No user available, cannot fetch download URL.");
+        return null;
+      }
+
+      final idToken = await user.getIdToken();
 
       final response = await http.post(
         Uri.parse(_getDownloadUrlEndpoint),
@@ -254,9 +322,17 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
         final newUrl = jsonBody['result']?['signedUrl'] as String?;
 
         if (newUrl != null) {
+          // --- UPDATE BOTH CACHES ---
+          // 1. Update the fast in-memory cache.
           CacheService.cachedNewsImageUrls ??= {};
           CacheService.cachedNewsImageUrls![widget.imagePath] = newUrl;
-          CacheService.startNewsImageCacheTimer();
+          CacheService.startNewsImageCacheTimer(); // Resets the 8-min timer for the in-memory cache.
+
+          // 2. Update the persistent cache with an expiry time.
+          final expiryTime = DateTime.now().add(const Duration(minutes: 8)).millisecondsSinceEpoch;
+          final Map<String, dynamic> dataToCache = {'url': newUrl, 'expires': expiryTime};
+          await prefs.setString(cacheKey, jsonEncode(dataToCache));
+          debugPrint("[FirebaseStorageImage] Successfully fetched and updated both caches for: ${widget.imagePath}");
         }
         return newUrl;
       }
@@ -280,45 +356,78 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
   }
 }
 
-/// Main widget to display a list of news articles.
+/// Main widget to display a list of news articles with a staggered fade-in animation.
 class NewsSection extends StatelessWidget {
   const NewsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This widget now listens for locale changes to trigger a news refresh.
-    // This is a robust way to handle language changes from settings.
-    final locale = Localizations.localeOf(context);
     final newsService = Provider.of<NewsService>(context);
 
-    // This is a bit advanced: we use a post-frame callback to avoid calling
-    // a state-changing method during a build cycle.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Logic to detect if a refresh is needed will be handled by listening
-      // to the LocaleProvider higher up in the widget tree, like in chat.dart.
-      // This Consumer is now just for displaying the data.
-    });
+    // --- FIX: Robust and Reliable Display Logic ---
+    // We combine all the conditions into a single, clear statement.
+    // The news section is only displayed if there are articles to show AND it is not loading AND there isn't an error.
+    if (newsService.articles.isNotEmpty && !newsService.isLoading && newsService.error == null) {
+      return Column(
+        children: newsService.articles
+            .asMap()
+            .entries
+            .map((entry) => NewsArticleCard(
+          article: entry.value,
+          index: entry.key,
+        ))
+            .toList(),
+      );
+    }
 
-    if (newsService.isLoading && newsService.articles.isEmpty) return const _ShimmerNewsList();
-    if (newsService.error != null && newsService.articles.isEmpty) return const SizedBox.shrink();
+    // --- UI State handling with explicit and clear return statements
+    // If is loading, show shimmer
+    if (newsService.isLoading) {
+      return const _ShimmerNewsList();
+    }
 
-    return Column(
-      children: newsService.articles.map((article) => NewsArticleCard(article: article)).toList(),
-    );
+    //If there is an error, or no articles exist, hide the section entirely
+    return const SizedBox.shrink();
   }
 }
 
-/// A stateful card that displays a single news article and can be expanded.
-/// FINAL VERSION with perfect ripple, advanced animations, and minimalist interaction.
+// lib/chat/news.dart (ONLY THE REFACTORED WIDGETS)
+
+/// A stateful card that now correctly animates its appearance when first built.
+/// REFACTORED: All fixed sizes have been converted to dynamic, screen-relative values
+/// for a fully scalable and responsive layout.
 class NewsArticleCard extends StatefulWidget {
   final NewsArticle article;
-  const NewsArticleCard({super.key, required this.article});
+  final int index;
+
+  const NewsArticleCard({
+    super.key,
+    required this.article,
+    required this.index,
+  });
+
   @override
   State<NewsArticleCard> createState() => _NewsArticleCardState();
 }
 
 class _NewsArticleCardState extends State<NewsArticleCard> {
   bool _isExpanded = false;
+  bool _isAnimated = false; // Controls the animation state
+
+  @override
+  void initState() {
+    super.initState();
+    // --- CORRECTED DELAY LOGIC ---
+    // We wait for a calculated duration before setting the state to 'animated'.
+    // This is the standard way to create a staggered animation effect.
+    Future.delayed(Duration(milliseconds: 100 * widget.index), () {
+      if (mounted) {
+        setState(() {
+          _isAnimated = true;
+        });
+      }
+    });
+  }
 
   void _toggleExpansion() {
     setState(() {
@@ -326,7 +435,6 @@ class _NewsArticleCardState extends State<NewsArticleCard> {
     });
   }
 
-  // --- REFINED TAP LOGIC FOR THE ICON ---
   Future<void> _launchLink() async {
     final link = widget.article.link;
     if (link != null && link.isNotEmpty) {
@@ -341,116 +449,130 @@ class _NewsArticleCardState extends State<NewsArticleCard> {
 
   @override
   Widget build(BuildContext context) {
+    // --- DYNAMIC SIZING ---
+    // Define all layout values based on screen width for a responsive UI.
     final screenWidth = MediaQuery.of(context).size.width;
-    final locale = Localizations.localeOf(context).toLanguageTag();
+    final double cardRadius = screenWidth * 0.06; // e.g., 24px on a 400px screen
+    final double basePadding = screenWidth * 0.04; // e.g., 16px
+    final double mediumSpacing = screenWidth * 0.03; // e.g., 12px
+    final double smallSpacing = screenWidth * 0.01; // e.g., 4px
+    final double iconSize = screenWidth * 0.05; // e.g., 20px
 
+    final locale = Localizations.localeOf(context).toLanguageTag();
     final title = widget.article.getLocalized(context, widget.article.title);
     final summary = widget.article.getLocalized(context, widget.article.summary);
     final fullContent = widget.article.getLocalized(context, widget.article.content);
     final coverPath = widget.article.getLocalized(context, widget.article.coverImagePaths ?? {});
-
     final hasLink = widget.article.link != null && widget.article.link!.isNotEmpty;
     final hasExpandableContent = fullContent.isNotEmpty;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      // --- FINAL RIPPLE & INTERACTION FIX ---
-      // A clean Material -> InkWell -> Content structure.
-      // The InkWell now correctly handles both the ripple and the expansion toggle.
-      child: Material(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(24),
-        clipBehavior: Clip.antiAlias, // Ensures the ripple is clipped to the rounded corners.
-        child: InkWell(
-          onTap: hasExpandableContent ? _toggleExpansion : null, // The entire card toggles expansion.
-          splashColor: AppColors.primaryColor.inverted.withOpacity(0.1),
-          highlightColor: AppColors.primaryColor.inverted.withOpacity(0.05),
-          child: AnimatedSize(
-            duration: const Duration(milliseconds: 350), // Slightly longer for a smoother feel.
-            curve: Curves.easeInOutCubic,
-            alignment: Alignment.topCenter,
-            child: Container(
-              decoration: BoxDecoration(
-                // No color here, Material provides it.
-                // Border is now inside to not interfere with InkWell.
-                border: Border.all(color: AppColors.border, width: 1.0),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (coverPath.isNotEmpty)
-                    AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: FirebaseStorageImage(imagePath: coverPath),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
+    return AnimatedOpacity(
+      opacity: _isAnimated ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOut,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOut,
+        margin: EdgeInsets.only(
+          top: _isAnimated ? 0 : 20, // This animation effect is kept fixed
+          bottom: basePadding,
+        ),
+        child: Material(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(cardRadius),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: hasExpandableContent ? _toggleExpansion : null,
+            splashColor: AppColors.primaryColor.inverted.withOpacity(0.1),
+            highlightColor: AppColors.primaryColor.inverted.withOpacity(0.05),
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeInOutCubic,
+              alignment: Alignment.topCenter,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.border, width: 1.0), // 1.0 width is fine
+                  borderRadius: BorderRadius.circular(cardRadius),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (coverPath.isNotEmpty)
+                      ClipRRect(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(cardRadius - 1.0)),
+                        child: AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: FirebaseStorageImage(imagePath: coverPath),
+                        ),
+                      ),
+                    Padding(
+                      padding: EdgeInsets.all(basePadding),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      title,
+                                      style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted, height: 1.3),
+                                    ),
+                                    SizedBox(height: smallSpacing),
+                                    Text(
+                                      DateFormat.yMd(locale).format(widget.article.publishedAt),
+                                      style: TextStyle(fontSize: screenWidth * 0.032, color: AppColors.primaryColor.inverted.withOpacity(0.6)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (hasLink)
+                                IconButton(
+                                  icon: Icon(Icons.touch_app, size: iconSize, color: AppColors.primaryColor.inverted.withOpacity(0.8)),
+                                  onPressed: _launchLink,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                            ],
+                          ),
+                          SizedBox(height: mediumSpacing),
+                          Text(
+                            summary,
+                            style: TextStyle(fontSize: screenWidth * 0.038, color: AppColors.primaryColor.inverted.withOpacity(0.85), height: 1.5),
+                          ),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 400),
+                            transitionBuilder: (child, animation) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: const Offset(0.0, -0.1),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: _isExpanded && hasExpandableContent
+                                ? Padding(
+                              key: ValueKey(widget.article.id),
+                              padding: EdgeInsets.only(top: mediumSpacing),
                               child: Text(
-                                title,
-                                style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted, height: 1.3),
+                                fullContent,
+                                style: TextStyle(fontSize: screenWidth * 0.038, color: AppColors.primaryColor.inverted.withOpacity(0.85), height: 1.5),
                               ),
-                            ),
-                            if (hasLink)
-                            // The link icon is now its own clickable button.
-                              IconButton(
-                                icon: Icon(Icons.touch_app, size: 20, color: AppColors.primaryColor.inverted.withOpacity(0.8)),
-                                onPressed: _launchLink,
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          DateFormat.yMd(locale).format(widget.article.publishedAt),
-                          style: TextStyle(fontSize: screenWidth * 0.032, color: AppColors.primaryColor.inverted.withOpacity(0.6)),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          summary,
-                          style: TextStyle(fontSize: screenWidth * 0.038, color: AppColors.primaryColor.inverted.withOpacity(0.85), height: 1.5),
-                        ),
-                        // --- ADVANCED EXPANSION ANIMATION ---
-                        // AnimatedSwitcher provides a beautiful fade/slide transition for the full content.
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 400),
-                          transitionBuilder: (child, animation) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: SlideTransition(
-                                position: Tween<Offset>(
-                                  begin: const Offset(0.0, -0.1),
-                                  end: Offset.zero,
-                                ).animate(animation),
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: _isExpanded && hasExpandableContent
-                              ? Padding(
-                            key: ValueKey(widget.article.id), // Unique key for the switcher
-                            padding: const EdgeInsets.only(top: 12.0),
-                            child: Text(
-                              fullContent,
-                              style: TextStyle(fontSize: screenWidth * 0.038, color: AppColors.primaryColor.inverted.withOpacity(0.85), height: 1.5),
-                            ),
-                          )
-                              : const SizedBox.shrink(key: ValueKey('empty')), // Switch to an empty box when collapsed
-                        ),
-                      ],
+                            )
+                                : const SizedBox.shrink(key: ValueKey('empty')),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  // The arrow button has been completely removed for a cleaner look.
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -460,7 +582,7 @@ class _NewsArticleCardState extends State<NewsArticleCard> {
   }
 }
 
-// --- Shimmer widgets remain unchanged ---
+// --- Shimmer widgets updated to match the responsive layout ---
 class _ShimmerPlaceholder extends StatelessWidget {
   const _ShimmerPlaceholder();
   @override
@@ -481,28 +603,35 @@ class _ShimmerNewsCard extends StatelessWidget {
   const _ShimmerNewsCard();
   @override
   Widget build(BuildContext context) {
+    // --- DYNAMIC SIZING FOR SHIMMER ---
+    // Use the same screen-relative values to ensure the shimmer skeleton
+    // perfectly matches the real card's layout.
+    final screenWidth = MediaQuery.of(context).size.width;
+    final double cardRadius = screenWidth * 0.06;
+    final double basePadding = screenWidth * 0.04;
+
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+      padding: EdgeInsets.only(bottom: basePadding),
       child: Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), border: Border.all(color: AppColors.border, width: 1.0)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(cardRadius), border: Border.all(color: AppColors.border, width: 1.0)),
         child: Column(
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(23)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(cardRadius - 1)),
               child: AspectRatio(aspectRatio: 16 / 9, child: Shimmer.fromColors(baseColor: AppColors.border, highlightColor: AppColors.background, child: Container(color: Colors.white))),
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(basePadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildShimmerLine(context, 0.8, 18),
-                  const SizedBox(height: 8),
-                  _buildShimmerLine(context, 0.4, 12),
-                  const SizedBox(height: 16),
-                  _buildShimmerLine(context, 1.0, 14),
-                  const SizedBox(height: 6),
-                  _buildShimmerLine(context, 0.7, 14),
+                  _buildShimmerLine(context, 0.8, screenWidth * 0.045), // Title
+                  SizedBox(height: screenWidth * 0.02),
+                  _buildShimmerLine(context, 0.4, screenWidth * 0.032), // Date
+                  SizedBox(height: basePadding),
+                  _buildShimmerLine(context, 1.0, screenWidth * 0.038), // Summary line 1
+                  SizedBox(height: screenWidth * 0.015),
+                  _buildShimmerLine(context, 0.7, screenWidth * 0.038), // Summary line 2
                 ],
               ),
             ),
@@ -511,7 +640,9 @@ class _ShimmerNewsCard extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildShimmerLine(BuildContext context, double widthFactor, double height) {
+    // Width is already a factor, now height is also dynamic.
     return Shimmer.fromColors(baseColor: AppColors.border, highlightColor: AppColors.background, child: Container(width: MediaQuery.of(context).size.width * widthFactor, height: height, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8))));
   }
 }

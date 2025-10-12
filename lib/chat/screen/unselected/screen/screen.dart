@@ -15,6 +15,8 @@ import 'package:cortex/errorview.dart';
 
 import '../news.dart';
 
+enum FilterType { all, online, offline, characters, custom }
+
 /// A sophisticated screen that serves a dual purpose:
 /// 1. A welcoming initial selection view with quick actions, recent and pinned models, and news.
 /// 2. A comprehensive, searchable grid of all available models.
@@ -25,7 +27,7 @@ import '../news.dart';
 class SelectionScreen extends StatefulWidget {
   final TextEditingController searchController;
   final List<ModelInfo> allModels;
-  final List<ModelInfo> pinnedModels; // New property for pinned models
+  final List<ModelInfo> recentModels;
   final VoidCallback onReloadModels;
   final bool hasInternetConnection;
   final bool conversationLimitReached;
@@ -40,7 +42,7 @@ class SelectionScreen extends StatefulWidget {
     super.key,
     required this.searchController,
     required this.allModels,
-    required this.pinnedModels, // Added to constructor
+    required this.recentModels,
     required this.onReloadModels,
     required this.hasInternetConnection,
     required this.conversationLimitReached,
@@ -60,6 +62,8 @@ class SelectionScreenState extends State<SelectionScreen>
     with SingleTickerProviderStateMixin {
   bool _isShowingAllModels = false;
   List<ModelInfo> _filteredModels = [];
+  // It's nullable because initially, no filter is applied.
+  FilterType _activeFilter = FilterType.all;
 
   late final AnimationController _animationController;
   // Existing animations
@@ -71,11 +75,6 @@ class SelectionScreenState extends State<SelectionScreen>
   late final Animation<double> _recentHeaderFadeAnimation;
   late final Animation<Offset> _recentGridSlideAnimation;
   late final Animation<double> _recentGridFadeAnimation;
-  // New animations for Pinned and News sections
-  late final Animation<Offset> _pinnedHeaderSlideAnimation;
-  late final Animation<double> _pinnedHeaderFadeAnimation;
-  late final Animation<Offset> _pinnedGridSlideAnimation;
-  late final Animation<double> _pinnedGridFadeAnimation;
   late final Animation<Offset> _newsHeaderSlideAnimation;
   late final Animation<double> _newsHeaderFadeAnimation;
   late final Animation<Offset> _newsSectionSlideAnimation;
@@ -111,11 +110,6 @@ class SelectionScreenState extends State<SelectionScreen>
     _recentGridSlideAnimation = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.3, 0.5, curve: Curves.easeOutCubic)));
     _recentGridFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.3, 0.5)));
 
-    _pinnedHeaderSlideAnimation = Tween<Offset>(begin: const Offset(-1.0, 0), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.4, 0.6, curve: Curves.easeOutCubic)));
-    _pinnedHeaderFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.4, 0.6)));
-    _pinnedGridSlideAnimation = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.5, 0.7, curve: Curves.easeOutCubic)));
-    _pinnedGridFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.5, 0.7)));
-
     _newsHeaderSlideAnimation = Tween<Offset>(begin: const Offset(-1.0, 0), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.6, 0.8, curve: Curves.easeOutCubic)));
     _newsHeaderFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.6, 0.8)));
     _newsSectionSlideAnimation = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.7, 1.0, curve: Curves.easeOutCubic)));
@@ -137,13 +131,60 @@ class SelectionScreenState extends State<SelectionScreen>
     }
   }
 
+  /// NEW: A dedicated empty state widget to show when a filter is active
+  /// but no matching models are found.
+  Widget _buildFilterEmptyState() {
+    return Center(
+      child: ErrorView(
+        key: const ValueKey<String>('filter_empty_state'),
+        title: widget.localizations.noModelsFoundTitle,
+        message: widget.localizations.noModelsFoundMessage,
+      ),
+    );
+  }
+
+  /// UPDATED: This function now correctly handles all filter types, including 'all',
+  /// and applies the text search query afterwards.
   void _filterModels() {
+    List<ModelInfo> modelsToFilter = widget.allModels;
+
+    // 1. Apply the active category filter.
+    // If the filter is 'all', we skip this filtering step entirely.
+    if (_activeFilter != FilterType.all) {
+      modelsToFilter = modelsToFilter.where((model) {
+        final modelData = ModelData.getPreciseModelData(model.id);
+        switch (_activeFilter) {
+          case FilterType.online:
+          // "Online" models, excluding characters which are in their own category.
+            return modelData['type'] == 'online' && modelData['category'] != 'roleplay';
+          case FilterType.offline:
+            return modelData['type'] == 'offline';
+          case FilterType.characters:
+          // This includes all pre-defined character models.
+            return modelData['category'] == 'roleplay';
+          case FilterType.custom:
+          // This includes user-created characters/models.
+            return modelData['category'] == 'self';
+        // The 'FilterType.all' case is handled by the if-condition above,
+        // so it's not needed here. We add a default case for exhaustive matching.
+          case FilterType.all:
+          return true; // Should not happen, but keeps the analyzer happy.
+        }
+      }).toList();
+    }
+
+    // 2. Apply the text search query on the (already category-filtered) list.
     final query = widget.searchController.text.toLowerCase();
+    if (query.isNotEmpty) {
+      modelsToFilter = modelsToFilter
+          .where((model) => model.title.toLowerCase().contains(query))
+          .toList();
+    }
+
+    // 3. Update the state to trigger a UI rebuild with the new filtered list.
     if (mounted) {
       setState(() {
-        _filteredModels = widget.allModels
-            .where((model) => model.title.toLowerCase().contains(query))
-            .toList();
+        _filteredModels = modelsToFilter;
       });
     }
   }
@@ -160,8 +201,10 @@ class SelectionScreenState extends State<SelectionScreen>
       widget.onViewModeChanged(false);
       setState(() {
         _isShowingAllModels = false;
+        _activeFilter = FilterType.all;
       });
       widget.searchController.clear();
+      _filterModels();
       FocusScope.of(context).unfocus();
     }
   }
@@ -285,66 +328,143 @@ class SelectionScreenState extends State<SelectionScreen>
     ];
   }
 
+  /// Builds and displays the fully functional bottom sheet with filter options.
   void _showFilterBottomSheet() {
-    showModalBottomSheet(
+    // Get screen dimensions once to use for dynamic sizing
+    final screen = MediaQuery.of(context);
+    final screenWidth = screen.size.width;
+    final screenHeight = screen.size.height;
+
+    showModalBottomSheet<void>(
       context: context,
-      isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.4,
-          minChildSize: 0.2,
-          maxChildSize: 0.8,
-          expand: false,
-          builder: (_, controller) {
-            return Container(
-              decoration: BoxDecoration(
-                color: AppColors.secondaryColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                border: Border(top: BorderSide(color: AppColors.border, width: 1.0)),
-              ),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                    child: Container(
-                      width: 40,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: AppColors.border.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(10),
+      constraints: BoxConstraints(
+        maxWidth: screenWidth,
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+
+            Widget buildFilterChip({
+              required String title,
+              required FilterType filter,
+              required int index,
+            }) {
+              final bool isActive = _activeFilter == filter;
+              return TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: Duration(milliseconds: 300 + (index * 100)),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, child) {
+                  return Opacity(
+                    opacity: value,
+                    child: Transform.translate(
+                      offset: Offset(0.0, 20 * (1 - value)),
+                      child: child,
+                    ),
+                  );
+                },
+                child: GestureDetector(
+                  onTap: () {
+                    setModalState(() => _activeFilter = filter);
+                    setState(() {});
+                    _filterModels();
+                    Future.delayed(const Duration(milliseconds: 250), () {
+                      if (mounted) Navigator.of(context).pop();
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
+                    // Dynamic padding based on screen size
+                    padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.045,
+                        vertical: screenHeight * 0.012
+                    ),
+                    decoration: BoxDecoration(
+                      color: isActive ? AppColors.primaryColor.inverted : Colors.transparent,
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        color: AppColors.primaryColor.inverted.withOpacity(0.5),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.035, // Dynamic font size
+                        fontWeight: FontWeight.bold,
+                        color: isActive ? AppColors.secondaryColor : AppColors.primaryColor.inverted,
                       ),
                     ),
                   ),
+                ),
+              );
+            }
+
+            final filters = [
+              {'title': widget.localizations.allModels, 'filter': FilterType.all},
+              {'title': widget.localizations.onlineModels, 'filter': FilterType.online},
+              {'title': widget.localizations.offlineModels, 'filter': FilterType.offline},
+              {'title': widget.localizations.characterModels, 'filter': FilterType.characters},
+              {'title': widget.localizations.customModels, 'filter': FilterType.custom},
+            ];
+
+            return Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
+              decoration: BoxDecoration(
+                color: AppColors.secondaryColor,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                border: Border(top: BorderSide(color: AppColors.border, width: 1.0)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container( // Drag handle
+                    width: screenWidth * 0.1,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: AppColors.border.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.025),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                    child: Column(
                       children: [
                         Text(
-                          widget.localizations.save, // Placeholder title
+                          widget.localizations.filters,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
+                        ),
+                        SizedBox(height: screenHeight * 0.01),
+                        Text(
+                          widget.localizations.filterPanelDescription,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryColor.inverted,
+                            fontSize: screenWidth * 0.035,
+                            color: AppColors.primaryColor.inverted.withOpacity(0.7),
                           ),
                         ),
-                        IconButton(
-                          icon: Icon(Icons.close, color: AppColors.primaryColor.inverted),
-                          onPressed: () => Navigator.of(context).pop(),
+                        SizedBox(height: screenHeight * 0.02),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: screenWidth * 0.025,
+                          runSpacing: screenWidth * 0.025,
+                          children: List.generate(filters.length, (index) {
+                            return buildFilterChip(
+                              title: filters[index]['title'] as String,
+                              filter: filters[index]['filter'] as FilterType,
+                              index: index,
+                            );
+                          }),
                         ),
                       ],
                     ),
                   ),
-                  const Divider(indent: 16, endIndent: 16),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        widget.localizations.comingSoon,
-                        style: TextStyle(color: AppColors.primaryColor.inverted.withOpacity(0.7)),
-                      ),
-                    ),
-                  ),
+                  SizedBox(height: screen.padding.bottom + screenHeight * 0.02),
                 ],
               ),
             );
@@ -361,7 +481,6 @@ class SelectionScreenState extends State<SelectionScreen>
     final String greetingText = (name != null && name.isNotEmpty)
         ? widget.localizations.selectionScreenGreetingUser(name)
         : widget.localizations.selectionScreenGreetingGeneric;
-    final recentModels = widget.allModels.take(3).toList();
 
     return SingleChildScrollView(
       key: const ValueKey('selection_view'),
@@ -408,61 +527,45 @@ class SelectionScreenState extends State<SelectionScreen>
               opacity: _recentGridFadeAnimation,
               child: SlideTransition(
                 position: _recentGridSlideAnimation,
-                child: AnimatedSwitcher(
+                /// --- UI GLITCH FIX ---
+                /// By wrapping the AnimatedSwitcher in an AnimatedSize widget, we ensure that
+                /// any change in the child's height (e.g., from skeleton grid to placeholder text)
+                /// will be smoothly animated, preventing the "jump" effect on the layout.
+                child: AnimatedSize(
                   duration: const Duration(milliseconds: 300),
-                  child: widget.isLoading
-                      ? const ShimmerModelGridView(
-                    gridKey: ValueKey('shimmer_grid_recent'),
-                    itemCount: 3,
-                    isDetailed: false,
-                    shrinkWrap: true,
-                  )
-                      : ModelGridView(
-                    gridKey: const ValueKey('recent_models_grid'),
-                    models: recentModels,
-                    hasInternetConnection: widget.hasInternetConnection,
-                    conversationLimitReached: widget.conversationLimitReached,
-                    onSelectModel: widget.onSelectModel,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
+                  curve: Curves.easeInOut,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: widget.isLoading
+                        ? const ShimmerModelGridView(
+                      gridKey: ValueKey('shimmer_grid_recent'),
+                      itemCount: 3,
+                      isDetailed: false,
+                      shrinkWrap: true,
+                    )
+                        : widget.recentModels.isEmpty
+                    // This now calls the interactive placeholder
+                        ? _buildNoRecentModelsPlaceholder()
+                        : ModelGridView(
+                      gridKey: const ValueKey('recent_models_grid'),
+                      models: widget.recentModels,
+                      hasInternetConnection: widget.hasInternetConnection,
+                      conversationLimitReached: widget.conversationLimitReached,
+                      onSelectModel: widget.onSelectModel,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                    ),
                   ),
                 ),
               ),
             ),
-            // Pinned Models Section - Renders only if there are pinned models
-            if (widget.pinnedModels.isNotEmpty) ...[
-              SizedBox(height: screenHeight * 0.04),
-              FadeTransition(
-                opacity: _pinnedHeaderFadeAnimation,
-                child: SlideTransition(
-                  position: _pinnedHeaderSlideAnimation,
-                  child: _buildSectionHeader(context, screenWidth, "Pinned Models"), // TODO: Add to localizations
-                ),
-              ),
-              SizedBox(height: screenHeight * 0.02),
-              FadeTransition(
-                opacity: _pinnedGridFadeAnimation,
-                child: SlideTransition(
-                  position: _pinnedGridSlideAnimation,
-                  child: ModelGridView(
-                    gridKey: const ValueKey('pinned_models_grid'),
-                    models: widget.pinnedModels,
-                    hasInternetConnection: widget.hasInternetConnection,
-                    conversationLimitReached: widget.conversationLimitReached,
-                    onSelectModel: widget.onSelectModel,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                  ),
-                ),
-              ),
-            ],
             // News Section
             SizedBox(height: screenHeight * 0.04),
             FadeTransition(
               opacity: _newsHeaderFadeAnimation,
               child: SlideTransition(
                 position: _newsHeaderSlideAnimation,
-                child: _buildSectionHeader(context, screenWidth, "News & Updates"), // TODO: Add to localizations
+                child: _buildSectionHeader(context, screenWidth, widget.localizations.selectionScreenNewsAndUpdates),
               ),
             ),
             SizedBox(height: screenHeight * 0.02),
@@ -480,9 +583,55 @@ class SelectionScreenState extends State<SelectionScreen>
     );
   }
 
+  /// An interactive placeholder displayed when there are no recent chats.
+  /// Tapping it navigates the user to the "all models" view.
+  Widget _buildNoRecentModelsPlaceholder() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final borderRadius = BorderRadius.circular(20);
+
+    return Material(
+      key: const ValueKey('no_recent_placeholder'),
+      color: AppColors.background,
+      borderRadius: borderRadius,
+      child: InkWell(
+        onTap: _showAllModelsView, // Action: Show the model selection screen
+        borderRadius: borderRadius,
+        splashColor: AppColors.primaryColor.inverted.withOpacity(0.1),
+        highlightColor: AppColors.primaryColor.inverted.withOpacity(0.05),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.05,
+            vertical: screenWidth * 0.06,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.transparent, // Color is now handled by Material
+            borderRadius: borderRadius,
+            border: Border.all(color: AppColors.border, width: 1.0),
+          ),
+          child: Text(
+            widget.localizations.noRecentChatsMessage,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.primaryColor.inverted.withOpacity(0.8),
+              fontSize: screenWidth * 0.04,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildAllModelsView() {
+    // Condition for when search text is entered but finds nothing
     final isSearchEmpty =
         _filteredModels.isEmpty && widget.searchController.text.isNotEmpty;
+    // Condition for when a filter is active but finds nothing
+    final isFilterEmpty = _filteredModels.isEmpty &&
+        widget.searchController.text.isEmpty &&
+        _activeFilter != FilterType.all;
+
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -509,11 +658,13 @@ class SelectionScreenState extends State<SelectionScreen>
                 itemCount: 15,
                 isDetailed: true,
               )
+                  : isFilterEmpty
+                  ? _buildFilterEmptyState() // Shows when filter has no results
                   : isSearchEmpty
-                  ? _buildEmptyState()
+                  ? _buildEmptyState() // Shows when search has no results
                   : ModelGridView(
-                gridKey: ValueKey(
-                    'model_grid_${widget.searchController.text}'),
+                key: ValueKey(
+                    'model_grid_${_activeFilter.name}_${widget.searchController.text}'),
                 models: _filteredModels,
                 hasInternetConnection: widget.hasInternetConnection,
                 conversationLimitReached:
@@ -527,6 +678,45 @@ class SelectionScreenState extends State<SelectionScreen>
     );
   }
 
+  /// A new handler for the "Use Offline" feature button.
+  ///
+  /// This function provides an intelligent user experience:
+  /// - If the user has already downloaded at least one offline model, it switches
+  ///   to the "all models" view and automatically applies the "offline" filter.
+  /// - If the user has no downloaded offline models, it navigates them to the
+  ///   downloads page so they can get one.
+  Future<void> _onOfflineFeatureTap() async {
+    // Get the IDs of all models the user has downloaded.
+    final downloadedModelIds = (await UserModels.loadDownloadedModelPaths()).keys;
+
+    // Check if there are no downloaded models at all for a quick exit.
+    if (downloadedModelIds.isEmpty) {
+      mainScreenKey.currentState?.onItemTapped(1, pulseOffline: true);
+      return;
+    }
+
+    // Determine if at least one of the downloaded models is an 'offline' model.
+    final bool hasDownloadedOfflineModels = widget.allModels.any((model) {
+      final modelData = ModelData.getPreciseModelData(model.id);
+      return modelData['type'] == 'offline' && downloadedModelIds.contains(model.id);
+    });
+
+    // Ensure the widget is still mounted before updating its state.
+    if (!mounted) return;
+
+    if (hasDownloadedOfflineModels) {
+      // User has offline models; show them directly.
+      setState(() {
+        _activeFilter = FilterType.offline;
+      });
+      _filterModels(); // Apply the filter immediately.
+      _showAllModelsView(); // Switch to the grid view.
+    } else {
+      // No offline models downloaded; guide user to the download page.
+      mainScreenKey.currentState?.onItemTapped(1, pulseOffline: true);
+    }
+  }
+
   Widget _buildFeatureButtons(BuildContext context, double screenWidth) {
     final double horizontalPadding = screenWidth * 0.04 * 2;
     final double spaceBetweenColumns = screenWidth * 0.03;
@@ -534,8 +724,6 @@ class SelectionScreenState extends State<SelectionScreen>
     final double largeCardSize = availableFlexWidth * (5 / 9);
     final double spaceBetweenSmallCards = screenWidth * 0.03;
     final double smallCardHeight = (largeCardSize - spaceBetweenSmallCards) / 2;
-    final notificationService = Provider.of<NotificationService>(context, listen: false);
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -545,7 +733,7 @@ class SelectionScreenState extends State<SelectionScreen>
             text: widget.localizations.selectionScreenFeatureDynamicChat,
             iconPath: 'assets/icons/chat.svg',
             height: largeCardSize,
-            onTap: () => notificationService.showNotification(message: widget.localizations.comingSoon),
+            onTap: () => mainScreenKey.currentState?.startNewConversation(isDynamic: true),
           ),
         ),
         SizedBox(width: spaceBetweenColumns),
@@ -558,7 +746,7 @@ class SelectionScreenState extends State<SelectionScreen>
                 iconPath: 'assets/icons/context.svg',
                 height: smallCardHeight,
                 isSmall: true,
-                onTap: () => mainScreenKey.currentState?.onItemTapped(1),
+                onTap: _onOfflineFeatureTap,
               ),
               SizedBox(height: spaceBetweenSmallCards),
               _FeatureCard(

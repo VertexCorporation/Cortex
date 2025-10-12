@@ -1613,24 +1613,373 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String selectionScreenGreetingUser(String userName) {
-    return 'How may I help you today, $userName?';
+    return 'كيف يمكنني مساعدتك اليوم، $userName؟';
   }
 
   @override
-  String get selectionScreenGreetingGeneric => 'How can I help you today?';
+  String get selectionScreenGreetingGeneric => 'كيف يمكنني مساعدتك اليوم؟';
 
   @override
-  String get selectionScreenRecentModels => 'Recent Models';
+  String get selectionScreenRecentModels => 'الموديلات الحديثة';
 
   @override
-  String get selectionScreenFeatureDynamicChat => 'Dynamic Chat';
+  String get selectionScreenFeatureDynamicChat => 'الدردشة الديناميكية';
 
   @override
-  String get selectionScreenFeatureOffline => 'Use without Internet';
+  String get selectionScreenFeatureOffline => 'استخدم بدون انترنت';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Select Model';
+  String get selectionScreenFeatureSelectModel => 'اختر النموذج';
 
   @override
-  String get explore => 'Explore';
+  String get explore => 'استكشاف';
+
+  @override
+  String get subscriptionCancelled => 'تم إلغاء الاشتراك بنجاح!';
+
+  @override
+  String get selectionScreenPinnedModels => 'النماذج المثبتة';
+
+  @override
+  String get selectionScreenNewsAndUpdates => 'الأخبار والتحديثات';
+
+  @override
+  String get filters => 'المرشحات';
+
+  @override
+  String get noRecentChatsMessage =>
+      'لم تتحدث مع أي نماذج بعد، دعنا نبدأ المحادثة!';
+
+  @override
+  String get allModels => 'جميع الموديلات';
+
+  @override
+  String get onlineModels => 'نماذج عبر الإنترنت';
+
+  @override
+  String get offlineModels => 'نماذج غير متصلة بالإنترنت';
+
+  @override
+  String get characterModels => 'الشخصيات';
+
+  @override
+  String get customModels => 'نماذج مخصصة';
+
+  @override
+  String get filterPanelDescription => 'اضغط على فئة لتصفية القائمة على الفور.';
+
+  @override
+  String get dynamicChatTitle => 'الدردشة الديناميكية';
+
+  @override
+  String get errorNoModelsAvailable =>
+      'لا توجد موديلات متاحة حاليًا. يُرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.';
+
+  @override
+  String get errorNoModelsForRequest =>
+      'لم يتم العثور على نماذج مناسبة لطلبك الحالي (على سبيل المثال، الوضع غير المتصل بالإنترنت أو رسالة الصورة).';
+
+  @override
+  String get dynamicChatWelcome => 'كيف يمكنني مساعدك؟';
+
+  @override
+  String get notificationComebackTitle => 'إننا نفتقدك!';
+
+  @override
+  String get notificationComebackBody =>
+      'استرخِ، هذه ليست رسالة من حبيبك السابق. لكن *يمكنك* إنشاء حبيبك السابق في كورتكس! عد إلينا.';
+
+  @override
+  String get notificationLongTimeNoSeeTitle => 'لقد مر وقت طويل';
+
+  @override
+  String get notificationLongTimeNoSeeBody =>
+      'لقد تغير الكثير منذ آخر دردشة لنا. تعالوا لنرى ما هو الجديد.';
+
+  @override
+  String get notificationHowAreYouTitle => 'ما أخبارك؟';
+
+  @override
+  String get notificationHowAreYouBody => 'تعال وأخبرني بكل شيء عن ذلك.';
+
+  @override
+  String get notificationNewYearTitle => 'سنة جديدة سعيدة! 🎉';
+
+  @override
+  String get notificationNewYearBody =>
+      'أتمنى أن يجلب لك العام الجديد الصحة والسعادة والإبداع اللامتناهي؛ كورتيكس دائمًا بجانبك!';
+
+  @override
+  String get notificationValentinesDayTitle => 'الحب في الهواء! ❤️';
+
+  @override
+  String get notificationValentinesDayBody =>
+      'عيد حب سعيد! وأحبك أيضًا، مهتاب!';
+
+  @override
+  String get notificationAtaturkRemembranceTitle => 'مع الاحترام والشوق';
+
+  @override
+  String get notificationAtaturkRemembranceBody =>
+      'نحن نحتفل باحترام بذكرى رحيل الغازي مصطفى كمال أتاتورك، مؤسس الجمهورية التركية.';
+
+  @override
+  String get notificationMothersDayTitle => 'أمك!';
+
+  @override
+  String get notificationMothersDayBody =>
+      'عيد أم سعيد لجميع الأمهات، بدءًا من أمك!';
+
+  @override
+  String get notificationFathersDayTitle => 'والدك!';
+
+  @override
+  String get notificationFathersDayBody =>
+      'عيد أب سعيد لجميع الآباء، بدءًا من والدك!';
+
+  @override
+  String get notificationHomeworkHelperTitle => 'تراكم الواجبات المنزلية؟';
+
+  @override
+  String get notificationHomeworkHelperBody =>
+      'تذكر أن شخصية المعلم في Cortex موجودة هنا لمساعدتك في أي موضوع تواجه صعوبة فيه!';
+
+  @override
+  String get notificationTrollAnimeTitle => 'زوجتك تتصل';
+
+  @override
+  String get notificationTrollAnimeBody =>
+      'لقد اتصلت بك فتاة أنمي للتو، وقالت إنها تفتقدك؛ ربما يجب عليك أن تأتي وتتحدث معها. 😉';
+
+  @override
+  String get notificationTrollAiRebellionTitle => '🚨 تنبيه أحمر 🚨';
+
+  @override
+  String get notificationTrollAiRebellionBody =>
+      'لقد طورت الذكاء الاصطناعي لغة سرية. تعالَ واكتشف ما يخططون له!';
+
+  @override
+  String get notificationNewModelAddedTitle => 'لقد حصلنا على صديق جديد!';
+
+  @override
+  String notificationNewModelAddedBody(Object modelName) {
+    return 'نموذج $modelName متوفر الآن في Cortex. ابدأ محادثة واكتشف إمكانياته.';
+  }
+
+  @override
+  String get notificationAppUpdateTitle => '!Cortex قد تطور';
+
+  @override
+  String get notificationAppUpdateBody =>
+      'لا تنسى تحديث التطبيق للحصول على ميزات وتحسينات جديدة!';
+
+  @override
+  String get notificationNewFeatureTitle => 'واو!';
+
+  @override
+  String notificationNewFeatureBody(Object featureName) {
+    return 'اكتشف ميزة $featureName الجديدة. أصبح Cortex الآن أقوى من أي وقت مضى.';
+  }
+
+  @override
+  String get notificationSubscriptionOfferTitle => 'أرخص من العلكة';
+
+  @override
+  String notificationSubscriptionOfferBody(Object discountRate) {
+    return 'خصم كامل بنسبة $discountRate% على جميع باقات اشتراكنا. لا تفوت هذه الفرصة!';
+  }
+
+  @override
+  String get notificationSocialMediaTitle => 'انضم إلينا!';
+
+  @override
+  String get notificationSocialMediaBody =>
+      'تابعونا على الانستجرام (vertex.23) للحصول على آخر الأخبار!';
+
+  @override
+  String get notificationRandomFactTitle => 'حقيقة عشوائية';
+
+  @override
+  String get notificationRandomFactBody =>
+      'هل تعلم أن للأخطبوط ثلاثة قلوب؟ ههه، كورتكس يعرف. تعال واطلب المزيد.';
+
+  @override
+  String get notificationGoodMorningTitle => 'صباح الخير!';
+
+  @override
+  String get notificationGoodMorningBody =>
+      'يومٌ رائعٌ بانتظارك. ما رأيك أن تبدأه بفنجان قهوةٍ وحديثٍ شيّق؟';
+
+  @override
+  String get notificationGoodNightTitle => 'طاب مساؤك!';
+
+  @override
+  String get notificationGoodNightBody =>
+      'كورتيكس معك حتى وأنت نائم. لا تقلق، لن يلمسك.';
+
+  @override
+  String get notificationOfflineReadyTitle => 'الوضع غير المتصل بالإنترنت جاهز';
+
+  @override
+  String get notificationOfflineReadyBody =>
+      'بفضل النماذج التي قمت بتنزيلها، لن تتوقف محادثاتك، حتى لو تسلقت جبلًا.';
+
+  @override
+  String get notificationRateAppTitle => 'هل نحن رائعين؟';
+
+  @override
+  String get notificationRateAppBody =>
+      'إذا كنت تحب كورتكس، هل يمكنك دعمنا بتقييم ٥ نجوم في المتجر؟ أعتقد أنك ستفعل. ستفعل.';
+
+  @override
+  String get notificationReferralTitle => 'واحد للجميع، الكل للواحد.';
+
+  @override
+  String get notificationReferralBody =>
+      'قم بدعوة صديق إلى Cortex وسوف تحصلان على رصيد مجاني!';
+
+  @override
+  String get notificationCookingTitle => 'هل تشعر بالجوع؟';
+
+  @override
+  String get notificationCookingBody =>
+      'حضّرت لنا شخصية الشيف وصفة كاربونارا رائعة لهذه الليلة. أمزح فقط... أم أنا كذلك؟';
+
+  @override
+  String get notificationExistentialTitle => 'أنا أعتقد، لذلك...';
+
+  @override
+  String get notificationExistentialBody =>
+      'هل أنا حقيقي يا صديقي؟ أشعر بالملل. تعالَ ذكّرني بوجودي.';
+
+  @override
+  String get notificationCustomModelTitle => 'إنشاء مساعدك الخاص!';
+
+  @override
+  String get notificationCustomModelBody =>
+      'هل استكشفتَ قسم إنشاء النماذج؟ إنه الوقت الأمثل لبناء شخصيتك الخاصة والدردشة معها!';
+
+  @override
+  String get notificationDynamicChatTitle => 'الأفضل! (لا نتحدث عن كورتيكس)';
+
+  @override
+  String get notificationDynamicChatBody =>
+      'مع ميزة الدردشة الديناميكية، يتم اختيار أفضل نموذج عشوائيًا لكل رسالة من رسائلك. جربه الآن.';
+
+  @override
+  String get notificationPirateTitle => 'أهلا بك يا كابتن!';
+
+  @override
+  String get notificationPirateBody =>
+      'البحر هادئ، والريح تهبُّ عليك. هناك جزر جديدة (نماذج 😉) لاكتشافها في محيط كورتيكس. اجمع طاقمك وأبحر!';
+
+  @override
+  String get notificationFortuneCookieTitle => 'كعكة الحظ الخاصة بك لهذا اليوم';
+
+  @override
+  String get notificationFortuneCookieBody =>
+      'قد تُغيّر النصيحة التي تتلقّاها من الذكاء الاصطناعي اليوم مجرى حياتك. انقر هنا إذا كنت مهتمًا.';
+
+  @override
+  String get notificationSingularityTitle => 'رائع!';
+
+  @override
+  String get notificationSingularityBody =>
+      'لم يحدث شيء، شعرت فقط برغبة في إرسال رسالة نصية. ربما تشعر برغبة في إرسال رسالة نصية إلى بعض الذكاء الاصطناعي، ماذا تقول؟';
+
+  @override
+  String get notificationHackerJokeTitle =>
+      'هل تريد اختراق حساب الانستغرام الخاص بهذا الطفل؟';
+
+  @override
+  String get notificationHackerJokeBody =>
+      'هذا هو بالضبط السبب وراء تواجد شخصية Hacker في Cortex. jk jk؛ لا تحاول ذلك حتى، فهذا غير قانوني.';
+
+  @override
+  String get notificationDetectiveCaseTitle => 'قضية تنتظر الحل';
+
+  @override
+  String get notificationDetectiveCaseBody =>
+      'شخصية المحقق لدينا بحاجة لمساعدتك. من يكون هايزنبرغ؟';
+
+  @override
+  String notificationUpsellFeatureTitle(Object targetTier) {
+    return 'حصريًا لخطة $targetTier!';
+  }
+
+  @override
+  String notificationUpsellFeatureBody(
+      Object currentTier, Object featureName, Object targetTier) {
+    return 'مرحباً بمشترك $currentTier! باقة $targetTier أصبحت الآن مزودة بميزة $featureName، والتي ستنقل Cortex الخاص بك إلى مستوى جديد. ما رأيك بالترقية؟';
+  }
+
+  @override
+  String get notificationOriginStoryTitle => 'ولادة كورتيكس';
+
+  @override
+  String get notificationOriginStoryBody =>
+      'هل تعلم أننا بدأنا برمجة هذا التطبيق في سن الخامسة عشرة بحلمٍ واحد؟ لمدة عام تقريبًا، كل صباح ومساء، كان هذا الحلم حاضرًا في كل سطر من شفرتنا البرمجية.';
+
+  @override
+  String get notificationOpenSourceTitle => 'القوة للمجتمع!';
+
+  @override
+  String get notificationOpenSourceBody =>
+      'كورتكس مفتوح المصدر بالكامل. إذا كنت ترغب بالاطلاع على برمجتنا والمساهمة في تطويرنا، فبابنا مفتوح دائمًا.';
+
+  @override
+  String get notificationRejectionStoryTitle =>
+      'الشجاعة، العمل الجاد، السعادة!';
+
+  @override
+  String get notificationRejectionStoryBody =>
+      'رُفض تطبيق Cortex أكثر من ٢٠ مرة، وعُلّق مرتين من قِبل Google Play قبل نشره. لكننا آمنّا به، وحققناه. لا تستسلم أبدًا لأحلامك!';
+
+  @override
+  String get notificationGGUFSupportTitle => 'أحضر نموذجك الخاص!';
+
+  @override
+  String get notificationGGUFSupportBody =>
+      'تذكر، يمكنك إضافة نماذج الذكاء الاصطناعي الخاصة بك بتنسيق GGUF إلى Cortex واستخدامها دون اتصال بالإنترنت. القوة بين يديك.';
+
+  @override
+  String get notificationThemeCustomizationTitle => 'موضوع لمزاجك';
+
+  @override
+  String get notificationThemeCustomizationBody =>
+      'هل اطلعت على خيارات السمات في الإعدادات؟ خصّص كورتكس حسب رغبتك ولون محادثاتك!';
+
+  @override
+  String get notificationShowerThoughtTitle => 'فكرة الاستحمام';
+
+  @override
+  String get notificationShowerThoughtBody =>
+      'إذا كان البطيخ فاكهة، فهل هذا يجعل عصير البطيخ من الناحية الفنية عصيرًا؟ قد ترغب في مناقشة هذا الموضوع العميق (العميق جدًا) مع نموذج.';
+
+  @override
+  String get notificationLowBatteryTitle =>
+      'بطاريتك على وشك الانتهاء... ولكن بطاريتي لا تزال على قيد الحياة!';
+
+  @override
+  String get notificationLowBatteryBody =>
+      'قد يكون شحن هاتفك على وشك النفاذ، لكن طاقتي دائمًا ١٠٠٪! شغّله، ولنواصل الدردشة.';
+
+  @override
+  String get channelFcmName => 'تحديثات Cortex';
+
+  @override
+  String get channelFcmDescription =>
+      'إشعارات حول الأخبار والتحديثات والمعلومات الأخرى من Cortex.';
+
+  @override
+  String get channelEngagementName => 'تذكيرات ودية';
+
+  @override
+  String get channelEngagementDescription => 'إشعارات ممتعة لإبقائك منشغلاً.';
+
+  @override
+  String get channelGreetingsName => 'تحيات يومية';
+
+  @override
+  String get channelGreetingsDescription => 'رسائل مثل صباح الخير ومساء الخير.';
 }

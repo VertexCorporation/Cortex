@@ -9,6 +9,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'dart:async';
 import '../../theme.dart';
+import '../backend.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -50,13 +51,6 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _shineController;
   late Animation<double> _shineAnimation;
-
-  static const String _monthlySubscriptionPlus = 'vertex_ai_monthly_sub';
-  static const String _annualSubscriptionPlus = 'vertex_ai_annual_sub';
-  static const String _monthlySubscriptionPro = 'cortex_pro_monthly';
-  static const String _annualSubscriptionPro = 'cortex_pro_annual';
-  static const String _monthlySubscriptionUltra = 'cortex_ultra_monthly';
-  static const String _annualSubscriptionUltra = 'cortex_ultra_annual';
 
   @override
   void initState() {
@@ -111,17 +105,17 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
       case 'pro':
         purchaseKey = localizations.purchasePro; descriptionKey = localizations.proDescription;
         logoPath = AppColors.currentTheme == 'dark' ? 'assets/icons/subscriptions/whitepro.png' : 'assets/icons/subscriptions/prologo.png';
-        monthlyId = _monthlySubscriptionPro; annualId = _annualSubscriptionPro; currentPlanLevel = 2;
+        monthlyId = FundsBackend.monthlySubscriptionPro; annualId = FundsBackend.annualSubscriptionPro; currentPlanLevel = 2;
         break;
       case 'ultra':
         purchaseKey = localizations.purchaseUltra; descriptionKey = localizations.ultraDescription;
         logoPath = AppColors.currentTheme == 'dark' ? 'assets/icons/subscriptions/whiteultra.png' : 'assets/icons/subscriptions/ultralogo.png';
-        monthlyId = _monthlySubscriptionUltra; annualId = _annualSubscriptionUltra; currentPlanLevel = 3;
+        monthlyId = FundsBackend.monthlySubscriptionUltra; annualId = FundsBackend.annualSubscriptionUltra; currentPlanLevel = 3;
         break;
       default: // 'plus'
         purchaseKey = localizations.purchasePlus; descriptionKey = localizations.plusDescription;
         logoPath = AppColors.currentTheme == 'dark' ? 'assets/icons/subscriptions/whiteplus.png' : 'assets/icons/subscriptions/pluslogo.png';
-        monthlyId = _monthlySubscriptionPlus; annualId = _annualSubscriptionPlus; currentPlanLevel = 1;
+        monthlyId = FundsBackend.monthlySubscriptionPlus; annualId = FundsBackend.annualSubscriptionPlus; currentPlanLevel = 1;
     }
 
     ProductDetails? annualProductDetails;
@@ -221,7 +215,17 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                 children: [
                   Text(title, style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted)),
                   SizedBox(height: screenHeight * 0.005),
-                  Text(description, style: TextStyle(fontSize: screenWidth * 0.04, color: AppColors.tertiaryColor)),
+                  // THE FIX: Wrap the description in a FittedBox to prevent it from
+                  // wrapping to a new line when the card's border gets thicker.
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      description,
+                      style: TextStyle(fontSize: screenWidth * 0.04, color: AppColors.tertiaryColor),
+                      maxLines: 1, // Ensure it stays on a single line
+                    ),
+                  ),
                 ],
               ),
             ),

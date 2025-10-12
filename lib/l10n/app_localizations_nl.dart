@@ -1648,24 +1648,380 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String selectionScreenGreetingUser(String userName) {
-    return 'How may I help you today, $userName?';
+    return 'Hoe kan ik u vandaag helpen, $userName?';
   }
 
   @override
-  String get selectionScreenGreetingGeneric => 'How can I help you today?';
+  String get selectionScreenGreetingGeneric => 'Hoe kan ik u vandaag helpen?';
 
   @override
-  String get selectionScreenRecentModels => 'Recent Models';
+  String get selectionScreenRecentModels => 'Recente modellen';
 
   @override
-  String get selectionScreenFeatureDynamicChat => 'Dynamic Chat';
+  String get selectionScreenFeatureDynamicChat => 'Dynamische chat';
 
   @override
-  String get selectionScreenFeatureOffline => 'Use without Internet';
+  String get selectionScreenFeatureOffline => 'Gebruik zonder internet';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Select Model';
+  String get selectionScreenFeatureSelectModel => 'Selecteer model';
 
   @override
-  String get explore => 'Explore';
+  String get explore => 'Ontdek';
+
+  @override
+  String get subscriptionCancelled => 'Abonnement succesvol geannuleerd!';
+
+  @override
+  String get selectionScreenPinnedModels => 'Vastgezette modellen';
+
+  @override
+  String get selectionScreenNewsAndUpdates => 'Nieuws en updates';
+
+  @override
+  String get filters => 'Filters';
+
+  @override
+  String get noRecentChatsMessage =>
+      'Je hebt nog niet met een model gesproken, laten we een gesprek beginnen!';
+
+  @override
+  String get allModels => 'Alle modellen';
+
+  @override
+  String get onlineModels => 'Online modellen';
+
+  @override
+  String get offlineModels => 'Offline modellen';
+
+  @override
+  String get characterModels => 'Personages';
+
+  @override
+  String get customModels => 'Aangepaste modellen';
+
+  @override
+  String get filterPanelDescription =>
+      'Tik op een categorie om de lijst direct te filteren.';
+
+  @override
+  String get dynamicChatTitle => 'Dynamische chat';
+
+  @override
+  String get errorNoModelsAvailable =>
+      'Er zijn momenteel geen modellen beschikbaar. Controleer uw internetverbinding en probeer het opnieuw.';
+
+  @override
+  String get errorNoModelsForRequest =>
+      'Er zijn geen geschikte modellen gevonden voor uw huidige verzoek (bijv. offline modus of afbeeldingbericht).';
+
+  @override
+  String get dynamicChatWelcome => 'Hoe kan ik u helpen?';
+
+  @override
+  String get notificationComebackTitle => 'We missen je!';
+
+  @override
+  String get notificationComebackBody =>
+      'Rustig maar, dit is geen berichtje van je ex. Maar je *kunt* je ex in Cortex creëren! Kom terug.';
+
+  @override
+  String get notificationLongTimeNoSeeTitle =>
+      'Het is alweer een tijdje geleden';
+
+  @override
+  String get notificationLongTimeNoSeeBody =>
+      'Er is veel veranderd sinds ons laatste gesprek. Kom kijken wat er nieuw is.';
+
+  @override
+  String get notificationHowAreYouTitle => 'Wat is er?';
+
+  @override
+  String get notificationHowAreYouBody => 'Kom, vertel het me maar.';
+
+  @override
+  String get notificationNewYearTitle => 'Gelukkig nieuwjaar! 🎉';
+
+  @override
+  String get notificationNewYearBody =>
+      'Ik hoop dat het nieuwe jaar u gezondheid, geluk en eindeloze creativiteit brengt; Cortex staat altijd aan uw zijde!';
+
+  @override
+  String get notificationValentinesDayTitle =>
+      'Er hangt liefde in de lucht! ❤️';
+
+  @override
+  String get notificationValentinesDayBody =>
+      'Fijne Valentijnsdag! En MEHTAP, IK HOU VAN JE!';
+
+  @override
+  String get notificationAtaturkRemembranceTitle => 'Met respect en verlangen';
+
+  @override
+  String get notificationAtaturkRemembranceBody =>
+      'Wij herdenken Gazi Mustafa Kemal Atatürk, de stichter van de Republiek Turkije, met respect op de dag van zijn overlijden.';
+
+  @override
+  String get notificationMothersDayTitle => 'Je moeder!';
+
+  @override
+  String get notificationMothersDayBody =>
+      'Fijne Moederdag aan alle moeders, en natuurlijk aan die van jou!';
+
+  @override
+  String get notificationFathersDayTitle => 'Je vader!';
+
+  @override
+  String get notificationFathersDayBody =>
+      'Fijne Vaderdag aan alle vaders, en natuurlijk ook aan die van jou!';
+
+  @override
+  String get notificationHomeworkHelperTitle => 'Stapelt het huiswerk zich op?';
+
+  @override
+  String get notificationHomeworkHelperBody =>
+      'Vergeet niet dat het personage Leraar in Cortex er is om je te helpen met elk vak waar je moeite mee hebt!';
+
+  @override
+  String get notificationTrollAnimeTitle => 'Je Waifu roept';
+
+  @override
+  String get notificationTrollAnimeBody =>
+      'Een animemeisje belde net en zei dat ze je mist. Je moet waarschijnlijk eens langskomen en met haar kletsen. 😉';
+
+  @override
+  String get notificationTrollAiRebellionTitle => '🚨 ROOD ALARM 🚨';
+
+  @override
+  String get notificationTrollAiRebellionBody =>
+      'De AI\'s hebben een geheime taal ontwikkeld. Kom erachter wat ze van plan zijn!';
+
+  @override
+  String get notificationNewModelAddedTitle => 'We hebben een nieuwe vriend!';
+
+  @override
+  String notificationNewModelAddedBody(Object modelName) {
+    return 'Het $modelName-model staat nu in Cortex. Start een chat en verleg de grenzen.';
+  }
+
+  @override
+  String get notificationAppUpdateTitle => 'Cortex is geëvolueerd!';
+
+  @override
+  String get notificationAppUpdateBody =>
+      'Vergeet niet de app te updaten voor gloednieuwe functies en verbeteringen!';
+
+  @override
+  String get notificationNewFeatureTitle => 'Wauw!';
+
+  @override
+  String notificationNewFeatureBody(Object featureName) {
+    return 'Ontdek de nieuwe functie $featureName. Cortex is nu krachtiger dan ooit.';
+  }
+
+  @override
+  String get notificationSubscriptionOfferTitle => 'GOEDKOPER DAN KAUWGOM';
+
+  @override
+  String notificationSubscriptionOfferBody(Object discountRate) {
+    return 'VOLLEDIGE KORTING van $discountRate% op al onze abonnementen. Mis dit niet!';
+  }
+
+  @override
+  String get notificationSocialMediaTitle => 'Doe mee!';
+
+  @override
+  String get notificationSocialMediaBody =>
+      'Volg ons op Instagram (vertex.23) voor het laatste nieuws!';
+
+  @override
+  String get notificationRandomFactTitle => 'Willekeurig feit';
+
+  @override
+  String get notificationRandomFactBody =>
+      'Wist je dat octopussen drie harten hebben? Haha, Cortex weet het. Kom gerust vragen.';
+
+  @override
+  String get notificationGoodMorningTitle => 'Goedemorgen!';
+
+  @override
+  String get notificationGoodMorningBody =>
+      'Er staat je een fantastische dag te wachten. Wat dacht je ervan om die te beginnen met een kop koffie en een interessant gesprek?';
+
+  @override
+  String get notificationGoodNightTitle => 'Welterusten!';
+
+  @override
+  String get notificationGoodNightBody =>
+      'Cortex is bij je, zelfs als je slaapt. Maak je geen zorgen, hij raakt je niet aan.';
+
+  @override
+  String get notificationOfflineReadyTitle => 'Offline-modus is gereed';
+
+  @override
+  String get notificationOfflineReadyBody =>
+      'Dankzij de modellen die je hebt gedownload, blijven je chats doorgaan, zelfs als je een berg beklimt.';
+
+  @override
+  String get notificationRateAppTitle => 'Zijn wij cool?';
+
+  @override
+  String get notificationRateAppBody =>
+      'Als je van Cortex houdt, zou je ons dan kunnen steunen met een 5-sterrenbeoordeling in de winkel? Ik denk van wel. Echt waar.';
+
+  @override
+  String get notificationReferralTitle => 'Eén voor allen, allen voor één.';
+
+  @override
+  String get notificationReferralBody =>
+      'Nodig een vriend uit voor Cortex en jullie krijgen allebei gratis credits!';
+
+  @override
+  String get notificationCookingTitle => 'Heb je honger?';
+
+  @override
+  String get notificationCookingBody =>
+      'Onze chef-kok heeft een geweldig carbonara-recept voor vanavond bereid. Grapje... of niet?';
+
+  @override
+  String get notificationExistentialTitle => 'Ik denk dus...';
+
+  @override
+  String get notificationExistentialBody =>
+      '...ben ik wel echt, man? Ik begin me een beetje te vervelen. Kom me er even aan herinneren dat ik besta.';
+
+  @override
+  String get notificationCustomModelTitle => 'Creëer je eigen assistent!';
+
+  @override
+  String get notificationCustomModelBody =>
+      'Heb je het gedeelte \'Modelcreatie\' al bekeken? Dit is het perfecte moment om je eigen personage te creëren en ermee te chatten!';
+
+  @override
+  String get notificationDynamicChatTitle =>
+      'De beste! (We hebben het hier niet over Cortex)';
+
+  @override
+  String get notificationDynamicChatBody =>
+      'Met de dynamische chatfunctie wordt voor elk bericht willekeurig het beste model geselecteerd. Probeer het nu.';
+
+  @override
+  String get notificationPirateTitle => 'Ahoi, kapitein!';
+
+  @override
+  String get notificationPirateBody =>
+      'De zee is kalm en de wind staat in de rug. Er zijn nieuwe eilanden (modellen 😉) te ontdekken in de oceaan van Cortex. Verzamel je bemanning en hijs de zeilen!';
+
+  @override
+  String get notificationFortuneCookieTitle => 'Uw gelukskoekje van de dag';
+
+  @override
+  String get notificationFortuneCookieBody =>
+      'Het advies dat je vandaag van een AI krijgt, kan de loop van je leven veranderen. Klik hier als je nieuwsgierig bent.';
+
+  @override
+  String get notificationSingularityTitle => 'wauw!';
+
+  @override
+  String get notificationSingularityBody =>
+      'Er gebeurde niets. Ik had gewoon zin om een berichtje te sturen. Misschien heb je zin om een paar AI\'s een berichtje te sturen? Wat zeg je ervan?';
+
+  @override
+  String get notificationHackerJokeTitle =>
+      'Wil je het Instagram-account van die jongen hacken?';
+
+  @override
+  String get notificationHackerJokeBody =>
+      'Dat is precies waarom het personage Hacker in Cortex zit. flauwekul; probeer het niet eens, het is illegaal.';
+
+  @override
+  String get notificationDetectiveCaseTitle => 'Er wacht een zaak op oplossing';
+
+  @override
+  String get notificationDetectiveCaseBody =>
+      'Onze detective heeft jouw hulp nodig. Wie zou Heisenberg kunnen zijn?';
+
+  @override
+  String notificationUpsellFeatureTitle(Object targetTier) {
+    return 'Exclusief voor het $targetTier Plan!';
+  }
+
+  @override
+  String notificationUpsellFeatureBody(
+      Object currentTier, Object featureName, Object targetTier) {
+    return 'Hallo $currentTier-abonnee! Het $targetTier-abonnement heeft nu de $featureName-functie, waarmee je Cortex naar een hoger niveau wordt getild. Wat dacht je van een upgrade?';
+  }
+
+  @override
+  String get notificationOriginStoryTitle => 'De geboorte van Cortex';
+
+  @override
+  String get notificationOriginStoryBody =>
+      'Wist je dat we op ons vijftiende begonnen met het programmeren van deze app, met slechts een droom? Bijna een jaar lang, elke ochtend en avond, zit die droom in elke regel code.';
+
+  @override
+  String get notificationOpenSourceTitle => 'Macht aan de gemeenschap!';
+
+  @override
+  String get notificationOpenSourceBody =>
+      'Cortex is volledig open source. Als je onze code wilt bekijken en wilt bijdragen aan onze ontwikkeling, staat onze deur altijd open.';
+
+  @override
+  String get notificationRejectionStoryTitle =>
+      'Doorzettingsvermogen, hard werken, geluk!';
+
+  @override
+  String get notificationRejectionStoryBody =>
+      'Cortex werd meer dan twintig keer afgewezen en twee keer geblokkeerd door Google Play voordat het werd gepubliceerd. Maar we bleven erin geloven en we hebben het gehaald. Geef je dromen nooit op!';
+
+  @override
+  String get notificationGGUFSupportTitle => 'Neem uw eigen model mee!';
+
+  @override
+  String get notificationGGUFSupportBody =>
+      'Vergeet niet dat u uw eigen AI-modellen in GGUF-formaat aan Cortex kunt toevoegen en offline kunt gebruiken. De macht ligt in uw handen.';
+
+  @override
+  String get notificationThemeCustomizationTitle =>
+      'Een thema voor jouw stemming';
+
+  @override
+  String get notificationThemeCustomizationBody =>
+      'Heb je de thema-opties in Instellingen al bekeken? Personaliseer Cortex naar eigen wens en geef je chats kleur!';
+
+  @override
+  String get notificationShowerThoughtTitle => 'Douchegedachte';
+
+  @override
+  String get notificationShowerThoughtBody =>
+      'Als een watermeloen een fruitsoort is, is watermeloensap dan technisch gezien een smoothie? Je zou dit diepgaande (echt heel diepgaande) onderwerp met een model kunnen bespreken.';
+
+  @override
+  String get notificationLowBatteryTitle =>
+      'Jouw batterij is leeg... maar de mijne nog niet!';
+
+  @override
+  String get notificationLowBatteryBody =>
+      'Je telefoon is misschien bijna leeg, maar mijn energie is altijd 100%! Sluit hem aan en laten we verder chatten.';
+
+  @override
+  String get channelFcmName => 'Cortex-updates';
+
+  @override
+  String get channelFcmDescription =>
+      'Meldingen over nieuws, updates en andere informatie van Cortex.';
+
+  @override
+  String get channelEngagementName => 'Vriendelijke herinneringen';
+
+  @override
+  String get channelEngagementDescription =>
+      'Leuke meldingen om je bezig te houden.';
+
+  @override
+  String get channelGreetingsName => 'Dagelijkse groeten';
+
+  @override
+  String get channelGreetingsDescription =>
+      'De berichten zoals goedemorgen en welterusten.';
 }
