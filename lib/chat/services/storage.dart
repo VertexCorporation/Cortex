@@ -50,11 +50,13 @@ class ChatStorageService {
     debugPrint("[Storage] Added/Updated '$modelSeriesId' in recent models.");
   }
 
-  /// It fetches the top 3 most recently used model IDs directly from the new
-  /// 'recent_models' table and validates them against the currently available models.
+  /// It fetches the top 10 most recently used model IDs and validates them
+  /// against the currently available models to ensure they still exist.
+  /// CRITICAL FIX: This function is now async and ensures the master model list
+  /// from ModelData is loaded before attempting validation. This prevents a race
+  /// condition at startup where recent models would be incorrectly filtered out.
   static Future<List<String>> getRecentModelSeriesIds() async {
     final db = await DbHelper().db;
-    // Query the new table, ordered by the last used timestamp.
     final List<Map<String, dynamic>> rows = await db.query(
       'recent_models',
       columns: ['model_id'],
@@ -62,8 +64,25 @@ class ChatStorageService {
       limit: 10, // Fetch a few extra to account for potentially deleted models.
     );
 
+    if (rows.isEmpty) {
+      return []; // No recent models in the database, exit early.
+    }
+
+    // --- FIX: Ensure the master model list is loaded before proceeding ---
+    // ModelData.getCachedModelsSync() is only safe to call after ModelData
+    // has completed its initial async loading. We can check this by seeing if the cache is empty.
+    List<Map<String, dynamic>> allAvailableModels = ModelData.getCachedModelsSync();
+    if (allAvailableModels.isEmpty) {
+      debugPrint("[Storage] Master model cache is empty. Awaiting initial load...");
+      // Awaiting getModels() ensures the cache will be populated before we continue.
+      // We pass a dummy langCode as it's only needed for server sync, not for loading from a populated DB.
+      final loadedModels = await ModelData.getModels(langCode: 'en');
+      allAvailableModels = loadedModels ?? [];
+      debugPrint("[Storage] Master model cache is now populated with ${allAvailableModels.length} models.");
+    }
+    // --- END FIX ---
+
     final recentSeriesIds = <String>{};
-    final allAvailableModels = ModelData.getCachedModelsSync();
     // Create a set of available series IDs for efficient lookup.
     final availableSeriesIds = allAvailableModels.map((m) => m['id'] as String).toSet();
 

@@ -116,13 +116,18 @@ class SelectionService {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!state.mounted) return;
 
+      bool panelWasRequested = false;
       if (hasExtensions) {
         debugPrint("$logPrefix: Model has extensions. Triggering info panel check.");
-        await state.triggerExtensionInfoPanelIfNeeded();
+        panelWasRequested = await state.chatTitleKey.currentState?.triggerExtensionInfoPanelIfNeeded() ?? false;
       }
 
-      debugPrint("$logPrefix: Unconditionally requesting focus for text field.");
-      state.textFieldFocusNode.requestFocus();
+      if (!panelWasRequested) {
+        debugPrint("$logPrefix: Info panel was not shown. Requesting focus for text field immediately.");
+        state.textFieldFocusNode.requestFocus();
+      } else {
+        debugPrint("$logPrefix: Info panel was shown. Keyboard focus is deferred until panel dismissal.");
+      }
     });
 
     debugPrint("$logPrefix: Model selection process fully complete.");

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -555,30 +556,25 @@ class ModelData {
   static Future<void> _initializeModelCache({required String langCode}) async {
     await _loadLastSyncStateFromPrefs();
 
-    // --- MODIFICATION: Pass the current user's ID to getAllModels ---
     final currentUser = FirebaseAuth.instance.currentUser;
     final allDbModels = await _dbHelper.getAllModels(userId: currentUser?.uid);
-    // --- END OF MODIFICATION ---
 
     final bool isDbEmpty = allDbModels.isEmpty;
-    final bool isCacheStale = _lastSyncTime == null ||
-        DateTime.now().difference(_lastSyncTime!) > _cacheStaleDuration;
+    final bool isCacheStale = _lastSyncTime == null || DateTime.now().difference(_lastSyncTime!) > _cacheStaleDuration;
     final bool hasInternet = await InternetConnection().hasInternetAccess;
-    final bool isLangChanged = _lastSyncLangCode != null &&
-        _lastSyncLangCode != langCode;
+    final bool isLangChanged = _lastSyncLangCode != null && _lastSyncLangCode != langCode;
 
     if (hasInternet && (isDbEmpty || isCacheStale || isLangChanged)) {
-      debugPrint(
-          "[ModelData] Sync required. DB Empty: $isDbEmpty, Cache Stale: $isCacheStale, Language Changed: $isLangChanged");
+      debugPrint("[ModelData] Sync required. DB Empty: $isDbEmpty, Cache Stale: $isCacheStale, Language Changed: $isLangChanged");
       await _syncWithServer(langCode);
     } else {
-      debugPrint(
-          "[ModelData] Sync not required. Loading from local DB. DB Empty: $isDbEmpty, Cache Stale: $isCacheStale, Language Changed: $isLangChanged");
+      debugPrint("[ModelData] Sync not required. Loading from local DB. DB Empty: $isDbEmpty, Cache Stale: $isCacheStale, Language Changed: $isLangChanged");
     }
 
-    // --- MODIFICATION: Pass the current user's ID again after sync ---
     _cachedModels = await _dbHelper.getAllModels(userId: currentUser?.uid);
-    // --- END OF MODIFICATION ---
+    if (_cachedModels == null || _cachedModels!.isEmpty) {
+      debugPrint("[ModelData] UYARI: Sync sonrası bile model cache'i boş. Veritabanı boş ve sync başarısız olmuş olabilir.");
+    }
 
     if (hasInternet) {
       _syncModelImages();
@@ -692,33 +688,40 @@ class ModelData {
   }
 
   static Future<Set<String>> _syncPublicModels(String langCode) async {
-    final response = await http.get(Uri.parse(_serverUrl));
-    if (response.statusCode != 200) {
-      throw Exception('Public models server error: ${response.statusCode}');
-    }
+    try {
+      final response = await retry(
+            () => http.get(Uri.parse(_serverUrl)).timeout(const Duration(seconds: 15)),
+        retryIf: (e) => e is SocketException || e is TimeoutException || e is http.ClientException,
+        onRetry: (e) => debugPrint("[ModelData] Model list fetch error, trying again: $e"),
+        maxAttempts: 3,
+      );
 
-    final Map<String, dynamic> rawServerData = json.decode(
-        utf8.decode(response.bodyBytes));
-    final List<
-        Map<String, dynamic>> parsedServerModels = _parseAndGroupServerModels(
-        rawServerData, langCode);
-    final Set<String> validServerIds = parsedServerModels.map((
-        m) => m['id'] as String).toSet();
-
-    for (var modelData in parsedServerModels) {
-      if (!modelData['id'].startsWith('self_') &&
-          !modelData['id'].startsWith('local_')) {
-        await _dbHelper.insert('models', {
-          'id': modelData['id'],
-          'producer': modelData['producer'] ?? 'Unknown',
-          'title': modelData['title'] ?? modelData['id'],
-          'is_server_side': (modelData['type'] != 'offline') ? 1 : 0,
-          'type': modelData['type'] ?? 'online',
-          'raw_json': json.encode(modelData),
-        }, conflictAlgorithm: ConflictAlgorithm.replace);
+      if (response.statusCode != 200) {
+        throw HttpException('Public models server error: ${response.statusCode}');
       }
+      final Map<String, dynamic> rawServerData = json.decode(utf8.decode(response.bodyBytes));
+      final List<Map<String, dynamic>> parsedServerModels = _parseAndGroupServerModels(rawServerData, langCode);
+      final Set<String> validServerIds = parsedServerModels.map((m) => m['id'] as String).toSet();
+
+      for (var modelData in parsedServerModels) {
+        if (!modelData['id'].startsWith('self_') && !modelData['id'].startsWith('local_')) {
+          await _dbHelper.insert('models', {
+            'id': modelData['id'],
+            'producer': modelData['producer'] ?? 'Unknown',
+            'title': modelData['title'] ?? modelData['id'],
+            'is_server_side': (modelData['type'] != 'offline') ? 1 : 0,
+            'type': modelData['type'] ?? 'online',
+            'raw_json': json.encode(modelData),
+          }, conflictAlgorithm: ConflictAlgorithm.replace);
+        }
+      }
+      return validServerIds;
+
+    } catch (e, s) {
+      debugPrint("[ModelData] All model fetch tries were failed: $e");
+      FirebaseCrashlytics.instance.recordError(e, s, reason: 'Failed to sync public models after multiple retries');
+      return <String>{};
     }
-    return validServerIds;
   }
 
   /// PUBLIC: Returns the cached models synchronously.

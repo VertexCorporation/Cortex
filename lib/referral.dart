@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:android_play_install_referrer/android_play_install_referrer.dart';
+import 'package:play_install_referrer/play_install_referrer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// This service checks for and stores the Play Store install referrer.
@@ -27,11 +27,11 @@ class ReferralHandler {
     // Guard Clause: If this check has successfully completed in the past, do nothing.
     // This prevents re-running the logic on subsequent app starts.
     if (prefs.getBool(_referrerCheckedKey) ?? false) {
-      debugPrint('[ReferralHandlerV2] Referrer check has already been completed. Skipping.');
+      debugPrint('[ReferralHandler] Referrer check has already been completed. Skipping.');
       return;
     }
 
-    debugPrint('[ReferralHandlerV2] Performing first-time referrer check with resilient retry logic...');
+    debugPrint('[ReferralHandler] Performing first-time referrer check with resilient retry logic...');
 
     // Configuration for the retry mechanism.
     const int maxRetries = 3;
@@ -39,48 +39,48 @@ class ReferralHandler {
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        final ReferrerDetails referrerDetails = await AndroidPlayInstallReferrer.installReferrer;
+        final ReferrerDetails referrerDetails = await PlayInstallReferrer.installReferrer;
         final String? referrerUrl = referrerDetails.installReferrer;
 
         // If data is found, process it and exit immediately.
         if (referrerUrl != null && referrerUrl.isNotEmpty) {
-          debugPrint('[ReferralHandlerV2] Success: Referrer data found on attempt #$attempt: "$referrerUrl"');
+          debugPrint('[ReferralHandler] Success: Referrer data found on attempt #$attempt: "$referrerUrl"');
 
           // The data is expected in a format like 'ref=USER_ID'. We parse it.
           final Uri uri = Uri.parse('http://dummy.com?$referrerUrl');
           final String? referrerId = uri.queryParameters['ref'];
 
           if (referrerId != null && referrerId.isNotEmpty) {
-            debugPrint('[ReferralHandlerV2] Successfully parsed referrer ID: $referrerId. Saving to SharedPreferences.');
+            debugPrint('[ReferralHandler] Successfully parsed referrer ID: $referrerId. Saving to SharedPreferences.');
             await prefs.setString(_savedReferrerIdKey, referrerId);
           } else {
-            debugPrint('[ReferralHandlerV2] Data found, but "ref" parameter was missing or empty.');
+            debugPrint('[ReferralHandler] Data found, but "ref" parameter was missing or empty.');
           }
 
           // CRITICAL: Mark the check as complete and exit the function.
           await prefs.setBool(_referrerCheckedKey, true);
-          debugPrint('[ReferralHandlerV2] Referrer flow successfully completed.');
+          debugPrint('[ReferralHandler] Referrer flow successfully completed.');
           return;
         }
 
         // If we reach here, the referrerUrl was null or empty.
-        debugPrint('[ReferralHandlerV2] No referrer data on attempt #$attempt.');
+        debugPrint('[ReferralHandler] No referrer data on attempt #$attempt.');
 
       } catch (e) {
         // Log any errors from the plugin itself, but continue to the next attempt.
-        debugPrint('[ReferralHandlerV2] Error during attempt #$attempt: $e');
+        debugPrint('[ReferralHandler] Error during attempt #$attempt: $e');
       }
 
       // If this is not the last attempt, wait before trying again.
       if (attempt < maxRetries) {
-        debugPrint('[ReferralHandlerV2] Retrying in ${retryDelay.inSeconds} seconds...');
+        debugPrint('[ReferralHandler] Retrying in ${retryDelay.inSeconds} seconds...');
         await Future.delayed(retryDelay);
       }
     }
 
     // If the loop completes without finding data, we can assume there is no referrer.
     // Mark the check as complete to prevent it from running again on the next app launch.
-    debugPrint('[ReferralHandlerV2] All attempts failed to find referrer data. Marking check as complete.');
+    debugPrint('[ReferralHandler] All attempts failed to find referrer data. Marking check as complete.');
     await prefs.setBool(_referrerCheckedKey, true);
   }
 
@@ -96,6 +96,6 @@ class ReferralHandler {
   static Future<void> clearSavedReferrerId() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_savedReferrerIdKey);
-    debugPrint('[ReferralHandlerV2] Saved referrer ID cleared after use.');
+    debugPrint('[ReferralHandler] Saved referrer ID cleared after use.');
   }
 }

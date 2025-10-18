@@ -1,4 +1,4 @@
-# Install script for directory: /home/baba/Documents/cortex/android/vendor/llama.cpp
+# Install script for directory: /home/baba/Documents/cortex/vendor/llama.cpp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -78,8 +78,8 @@ endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/include/llama.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/include/llama-cpp.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/include/llama.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/include/llama-cpp.h"
     )
 endif()
 
@@ -91,7 +91,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE FILE PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE FILES "/home/baba/Documents/cortex/android/vendor/llama.cpp/convert_hf_to_gguf.py")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE FILE PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE FILES "/home/baba/Documents/cortex/vendor/llama.cpp/convert_hf_to_gguf.py")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)

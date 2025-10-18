@@ -4,7 +4,6 @@ import 'package:cortex/main.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 /// A sophisticated search bar widget that now includes an adjacent filter button.
 /// The text field has a modern design with a background fill and a distinct border.

@@ -2002,4 +2002,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'The messages like good morning and good night.';
+
+  @override
+  String get exitAppTitle => 'Leaving so soon?';
+
+  @override
+  String get exitAppConfirmation =>
+      'Are you sure you want to leave this amazing platform?';
 }

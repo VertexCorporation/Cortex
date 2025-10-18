@@ -2025,4 +2025,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'Los mensajes como buenos días y buenas noches.';
+
+  @override
+  String get exitAppTitle => '¿Te vas tan pronto?';
+
+  @override
+  String get exitAppConfirmation =>
+      '¿Estás seguro de que deseas abandonar esta increíble plataforma?';
 }

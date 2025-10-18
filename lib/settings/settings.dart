@@ -49,6 +49,7 @@ class SettingsScreenState extends State<SettingsScreen> with TickerProviderState
   Timestamp? _subscriptionExpiresAt;
   bool _isAlphaUser = false;
   late final InternetService _internetService;
+  StreamSubscription? _internetSubscription;
   bool _hasInternet = true;
   bool _isVerified = false;
   int _verifyAttempts = 0;
@@ -73,7 +74,7 @@ class SettingsScreenState extends State<SettingsScreen> with TickerProviderState
 
     _internetService = InternetService();
     _hasInternet = _internetService.currentStatus;
-    _internetService.onConnectivityChanged.listen((connected) {
+    _internetSubscription = _internetService.onConnectivityChanged.listen((connected) {
       if (mounted) {
         final bool hadInternet = _hasInternet;
         setState(() => _hasInternet = connected);
@@ -107,7 +108,7 @@ class SettingsScreenState extends State<SettingsScreen> with TickerProviderState
     _oldPasswordShakeController.dispose();
     _newPasswordShakeController.dispose();
     _confirmPasswordShakeController.dispose();
-    _internetService.dispose();
+    _internetSubscription?.cancel();
     _remainingSecondsNotifier.dispose();
     WidgetsBinding.instance.removeObserver(this);
     debugPrint("$_className: All controllers and services disposed.");

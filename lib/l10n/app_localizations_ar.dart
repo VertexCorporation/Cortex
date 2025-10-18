@@ -1982,4 +1982,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get channelGreetingsDescription => 'رسائل مثل صباح الخير ومساء الخير.';
+
+  @override
+  String get exitAppTitle => 'المغادرة قريبا؟';
+
+  @override
+  String get exitAppConfirmation =>
+      'هل أنت متأكد أنك تريد مغادرة هذه المنصة الرائعة؟';
 }

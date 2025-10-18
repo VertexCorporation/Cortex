@@ -17,7 +17,7 @@ import '../backend/data.dart';
 import '../backend/download.dart';
 import 'cancel.dart';
 
-// REVERTED: This is now a StatefulWidget again to manage its internal state, but without the animation logic.
+// This is now a StatefulWidget again to manage its internal state, but without the animation logic.
 class ModelTile extends StatefulWidget {
   const ModelTile({
     super.key,
@@ -121,7 +121,7 @@ class _ModelTileState extends State<ModelTile> {
     _timer = null;
   }
 
-  // REVERTED: The build method no longer contains the AnimatedBuilder/Transform.scale wrapper.
+  // This is the main build method for the ModelTile's state.
   @override
   Widget build(BuildContext context) {
     if (widget.manager != null) {
@@ -133,9 +133,9 @@ class _ModelTileState extends State<ModelTile> {
     final loc = AppLocalizations.of(context)!;
     final double w = MediaQuery.of(context).size.width;
 
-    final bool canLongPress = widget.isCustomModel ||
-        (!widget.isServerSide &&
-            (widget.isDownloaded || (widget.manager?.isDownloaded ?? false)));
+    // It now correctly enables the long-press gesture if the model is either a custom
+    // user-created model OR if it's a public model that has been downloaded.
+    final bool canLongPress = widget.isCustomModel || widget.isDownloaded;
 
     final Widget finalImageWidget = _buildImage(w);
 
@@ -168,7 +168,6 @@ class _ModelTileState extends State<ModelTile> {
     );
   }
 
-  // ... (All other helper methods like _buildButton, _buildImage, _content, etc., remain exactly the same)
   Widget _buildButton(BuildContext context, double w, AppLocalizations loc) {
     const double radiusFactor = .08;
     final double h = w * .09;

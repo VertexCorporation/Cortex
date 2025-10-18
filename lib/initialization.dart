@@ -12,16 +12,15 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:cortex/referral.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:upgrader/upgrader.dart';
 import 'chat/services/moderator.dart';
+import 'internet.dart';
 import 'l10n/app_localizations.dart';
 import 'language.dart';
 import 'main.dart'; // For downloadCallback
@@ -114,11 +113,20 @@ class AppInitializer with ChangeNotifier {
       debugPrint("AppInitializer: Phase 1 - SUCCESS. Core services are ready.");
 
       // --- PHASE 2: SERVER STATUS CHECK (BLOCKING) ---
-      // This is the critical fix. We check for maintenance mode before anything else.
-      // If the server is in maintenance, this function will update the status
-      // and this `initialize` method will stop right here.
       debugPrint("AppInitializer: Phase 2 - Checking server status...");
-      if (await _checkServerStatus()) {
+
+      final context = navigatorKey.currentContext;
+      NotificationService? notificationService;
+      if (context != null) {
+        final locale = Provider.of<LocaleProvider>(context, listen: false).locale;
+        final l10n = await AppLocalizations.delegate.load(locale);
+        notificationService = Provider.of<NotificationService>(context, listen: false);
+        await notificationService.initialize(l10n);
+      } else {
+        debugPrint("[AppInitializer] CRITICAL: Could not get context to initialize NotificationService.");
+      }
+
+      if (await _checkServerStatus(notificationService)) {
         debugPrint("AppInitializer: Server is in maintenance. Halting further initialization.");
         return; // Halt execution if in maintenance mode.
       }
@@ -134,18 +142,6 @@ class AppInitializer with ChangeNotifier {
       // These tasks run only if the user is fully authenticated and ready.
       if (_status == AppStatus.ready) {
         debugPrint("AppInitializer: Phase 3 - Spawning non-blocking background tasks...");
-        _runInBackground(() async {
-          final context = navigatorKey.currentContext;
-          if (context != null) {
-            final locale = Provider.of<LocaleProvider>(context, listen: false).locale;
-
-            final l10n = await AppLocalizations.delegate.load(locale);
-
-            await Provider.of<NotificationService>(context, listen: false).initialize(l10n);
-          } else {
-            debugPrint("[AppInitializer] CRITICAL: Could not get context to initialize NotificationService.");
-          }
-        });
         _runInBackground(_checkForUpdates); // Check for non-critical updates in the background.
         _runInBackground(_reconcileLocalAndRemoteModelCounts);
         _runInBackground(reconcileAndSyncPurchases);
@@ -179,9 +175,26 @@ class AppInitializer with ChangeNotifier {
   }
 
   Future<void> _determineUserFlow() async {
-    final bool isConnected = await InternetConnection().hasInternetAccess;
+    final context = navigatorKey.currentContext;
+    bool isConnected; // Define isConnected at a higher scope
+
+    if (context == null) {
+      debugPrint("[AppInitializer] CRITICAL ERROR: Could not get context to access InternetService.");
+      FirebaseCrashlytics.instance.recordError(
+          Exception("AppInitializer failed to get context for InternetService"),
+          StackTrace.current,
+          reason: "determineUserFlow_context_null"
+      );
+
+      // Failsafe: Assume offline if context is unavailable.
+      isConnected = false;
+    } else {
+      final internetProvider = Provider.of<InternetProvider>(context, listen: false);
+      isConnected = internetProvider.isConnected;
+    }
+
     if (!isConnected) {
-      debugPrint("Startup: Offline mode. Checking for cached user.");
+      debugPrint("Startup: Offline mode detected. Checking for cached user.");
       if (FirebaseAuth.instance.currentUser != null) {
         _updateStatus(AppStatus.ready);
       } else {
@@ -191,6 +204,7 @@ class AppInitializer with ChangeNotifier {
     }
 
     // --- Online Flow ---
+    debugPrint("Startup: Online mode detected. Proceeding with user authentication flow.");
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
@@ -198,6 +212,7 @@ class AppInitializer with ChangeNotifier {
     }
 
     if (user == null) {
+      debugPrint("Startup: No authenticated user found after checking cache and auto-login. Needs login.");
       _updateStatus(AppStatus.needsLogin);
       return;
     }
@@ -205,8 +220,9 @@ class AppInitializer with ChangeNotifier {
     // User is authenticated, now check Firestore data and verification status.
     try {
       await user.reload();
-      user = FirebaseAuth.instance.currentUser; // Get reloaded user
+      user = FirebaseAuth.instance.currentUser; // Get reloaded user instance
       if (user == null) { // Should not happen, but as a safeguard
+        debugPrint("Startup: User became null after reload. This is unexpected. Forcing logout.");
         _updateStatus(AppStatus.needsLogin);
         return;
       }
@@ -214,7 +230,7 @@ class AppInitializer with ChangeNotifier {
       final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
 
       if (!userDoc.exists) {
-        debugPrint('Startup: CRITICAL: User exists in Auth but not Firestore. Logging out.');
+        debugPrint('Startup: CRITICAL: User exists in Auth but not in Firestore (UID: ${user.uid}). Forcing logout.');
         await FirebaseAuth.instance.signOut();
         await const FlutterSecureStorage().deleteAll();
         _updateStatus(AppStatus.needsLogin);
@@ -222,8 +238,10 @@ class AppInitializer with ChangeNotifier {
       }
 
       if (user.emailVerified) {
+        debugPrint("Startup: User is authenticated and verified. App is ready.");
         _updateStatus(AppStatus.ready);
       } else {
+        debugPrint("Startup: User is authenticated but email is not verified. Needs verification.");
         final data = userDoc.data() as Map<String, dynamic>;
         _verificationScreenData = {
           'email': data['email'] ?? user.email ?? '',
@@ -232,8 +250,9 @@ class AppInitializer with ChangeNotifier {
         };
         _updateStatus(AppStatus.needsVerification);
       }
-    } catch (e) {
-      debugPrint("Startup: Critical error during authenticated user flow: $e. Logging out.");
+    } catch (e, s) {
+      debugPrint("Startup: CRITICAL error during authenticated user flow: $e. Forcing logout.");
+      FirebaseCrashlytics.instance.recordError(e, s, reason: "authenticatedUserFlowFailure");
       await FirebaseAuth.instance.signOut();
       await const FlutterSecureStorage().deleteAll();
       _updateStatus(AppStatus.needsLogin);
@@ -266,20 +285,15 @@ class AppInitializer with ChangeNotifier {
   ///
   /// Returns `true` and updates the app status if maintenance is active,
   /// otherwise returns `false`.
-  Future<bool> _checkServerStatus() async {
+  Future<bool> _checkServerStatus(NotificationService? notificationService) async {
     final bool isMaintenance = kDebugMode ? false : await checkMaintenanceMode();
     if (isMaintenance) {
       _updateStatus(AppStatus.maintenance);
       return true;
     }
 
-    // This is the perfect place to schedule a pending notification since we
-    // know the app is online and not in maintenance.
-    final context = navigatorKey.currentContext;
-    if (context != null) {
-      // Use a non-blocking call so it doesn't slow down app startup.
-      Provider.of<NotificationService>(context, listen: false).schedulePendingNotification();
-    }
+    notificationService?.schedulePendingNotification();
+
     return false;
   }
 

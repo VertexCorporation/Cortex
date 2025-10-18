@@ -3669,6 +3669,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The messages like good morning and good night.'**
   String get channelGreetingsDescription;
+
+  /// No description provided for @exitAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaving so soon?'**
+  String get exitAppTitle;
+
+  /// No description provided for @exitAppConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to leave this amazing platform?'**
+  String get exitAppConfirmation;
 }
 
 class _AppLocalizationsDelegate

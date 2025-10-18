@@ -1940,4 +1940,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get channelGreetingsDescription => '좋은 아침, 좋은 밤과 같은 메시지.';
+
+  @override
+  String get exitAppTitle => '곧 떠나시나요?';
+
+  @override
+  String get exitAppConfirmation => '이 놀라운 플랫폼을 떠나시겠습니까?';
 }

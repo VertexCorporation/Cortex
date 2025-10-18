@@ -769,5 +769,7 @@
   "channelEngagementName": "Freundliche Erinnerungen",
   "channelEngagementDescription": "Lustige Benachrichtigungen, die Sie bei der Stange halten.",
   "channelGreetingsName": "Tägliche Grüße",
-  "channelGreetingsDescription": "Die Nachrichten wie Guten Morgen und Gute Nacht."
+  "channelGreetingsDescription": "Die Nachrichten wie Guten Morgen und Gute Nacht.",
+  "exitAppTitle": "So bald gehen?",
+  "exitAppConfirmation": "Möchten Sie diese tolle Plattform wirklich verlassen?"
 }

@@ -1942,4 +1942,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get channelGreetingsDescription => 'おはよう、おやすみなどのメッセージ。';
+
+  @override
+  String get exitAppTitle => 'もう終了しますか？';
+
+  @override
+  String get exitAppConfirmation => '本当にこの素晴らしいプラットフォームを終了してもよろしいですか？';
 }

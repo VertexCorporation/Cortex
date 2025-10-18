@@ -38,9 +38,9 @@ class SendService {
     _isSending = false;
   }
 
-  /// This method analyzes the user's input and context to pick a random, appropriate model.
-  /// It NO LONGER calls setState. It only selects and returns the definitive model ID.
-  Future<String> _selectAndAssignDynamicModel() async {
+  /// This method analyzes the user's input and context to pick a model.
+  /// IT NO LONGER THROWS for predictable failures. It returns a model ID on success, or null on failure.
+  Future<String?> _selectAndAssignDynamicModel() async {
     debugPrint("[SendService] Dynamic mode: Selecting a model...");
     final allModels = ModelData.getCachedModelsSync();
     final hasPhoto = selectedPhoto != null;
@@ -61,22 +61,17 @@ class SendService {
         final type = modelData['type'] as String?;
         final category = modelData['category'] as String?;
 
-        if (category == 'roleplay' || category == 'self') {
-          return false;
-        }
-        if (type == 'offline' && modelData['id'].startsWith('local_')) {
-          return false;
-        }
-        if (hasPhoto) {
-          return ModelData.hasModality(m['id'], 'image');
-        }
+        if (category == 'roleplay' || category == 'self') return false;
+        if (type == 'offline' && modelData['id'].startsWith('local_')) return false;
+        if (hasPhoto) return ModelData.hasModality(m['id'], 'image');
         return true;
       }).toList();
       debugPrint("[SendService] Online. Has photo: $hasPhoto. Found ${suitableModels.length} suitable models (excluding characters/self).");
     }
 
     if (suitableModels.isEmpty) {
-      throw ApiException(AppLocalizations.of(state.context)!.errorNoModelsAvailable);
+      debugPrint("[SendService] No suitable models found. Returning null.");
+      return null; // Return null instead of throwing
     }
 
     final selectedModelData = suitableModels[math.Random().nextInt(suitableModels.length)];
@@ -96,18 +91,33 @@ class SendService {
     return finalApiModelId;
   }
 
-  /// This function now checks the `isPersistentlyDynamic` flag.
-  /// 1. If `isPersistentlyDynamic` is TRUE:
-  ///    - It calls `_selectAndAssignDynamicModel` to get a NEW random model for every message.
-  ///    - The chat remains identified as "dynamic".
-  /// 2. If `isPersistentlyDynamic` is FALSE (meaning an assistant is pinned):
-  ///    - It uses the currently set `state.modelId` as the definitive target.
-  ///    - It DOES NOT call `_selectAndAssignDynamicModel`, ensuring the message goes to the pinned assistant.
+  /// Determines the model to use for sending a message and executes the request.
+  ///
+  /// This is the central orchestration method for all outgoing messages. It handles
+  /// multiple chat states and prioritizes actions in a specific order:
+  ///
+  /// 1.  **Override Priority:** If an `overrideModelId` is provided (e.g., from a
+  ///     "Change and Regenerate" action), that model is used for this single request,
+  ///     bypassing all other logic. This is the highest priority.
+  ///
+  /// 2.  **Dynamic Chat Mode:** If no override is present and the chat is in fully
+  ///     dynamic mode (`isPersistentlyDynamic` is true), a new suitable model is
+  ///     selected at random for the message.
+  ///
+  /// 3.  **Pinned Assistant / Standard Chat:** If none of the above, the method uses the
+  ///     model currently stored in the `ChatScreenState` (`state.modelId`), which
+  ///     applies to both standard chats with a selected model and dynamic chats where
+  ///     a user has "pinned" a default assistant.
+  ///
+  /// The method also handles UI state updates (showing "thinking" bubbles), error
+  /// handling (displaying error messages), and delegates the actual network or
+  /// local processing to helper methods (`_sendServerSideMessage` or `_sendLocalMessage`).
   Future<void> sendMessage({
     String? textFromButton,
     bool isRegenerate = false,
     int? regenerateAiIndex,
     String? regeneratePhotoPath,
+    String? overrideModelId,
   }) async {
     final localizations = AppLocalizations.of(state.context)!;
     if (_isSending) return;
@@ -118,109 +128,159 @@ class SendService {
     _isSending = true;
     FocusScope.of(state.context).unfocus();
 
-    String apiModelIdForSend;
-
     try {
-      // --- CORE LOGIC CHANGE FOR OBJECTIVE 1 ---
-      // If the session is a persistent dynamic chat AND the user has NOT pinned an assistant, select a new model every time.
-      if (state.isPersistentlyDynamic) {
-        apiModelIdForSend = await _selectAndAssignDynamicModel();
-      } else {
-        // If an assistant IS pinned (`isPersistentlyDynamic` is false), or if it's a normal chat,
-        // we MUST use the modelId from the state.
-        apiModelIdForSend = state.modelId!;
-      }
-      // --- END OF CORE LOGIC CHANGE ---
-
-      if (apiModelIdForSend.isEmpty) {
-        throw ApiException("No valid model ID could be determined for sending.");
-      }
-
-      if (apiModelIdForSend == 'trash') {
-        await _handleTrashMessage(messageText);
-        _isSending = false;
-        return;
-      }
-
-      FetchService.fetchUserData().catchError((error) {
-        debugPrint("FetchUserData error: $error");
-      });
-
-      int? aiMessageIndex;
-
       if (state.editingMessageIndex != null) {
         await _handleEditingMessage(messageText);
-        _isSending = false;
         return;
-      } else if (isRegenerate) {
-        // Regeneration in dynamic chat will also pick a new model if no assistant is pinned.
-        if (state.isPersistentlyDynamic) {
-          apiModelIdForSend = await _selectAndAssignDynamicModel();
+      }
+
+      String? apiModelIdForSend;
+      bool isInternetRequired = false;
+      String errorMessage = localizations.errorNoModelsAvailable;
+
+      // --- THE DEFINITIVE MODEL SELECTION LOGIC ---
+      // This if/else if/else chain ensures only one logic path is ever executed.
+      if (overrideModelId != null && overrideModelId.isNotEmpty) {
+        // PRIORITY 1: An override is present. Use it and skip all other checks.
+        apiModelIdForSend = overrideModelId;
+        debugPrint("[SendService] Using OVERRIDE model ID for this request: $apiModelIdForSend");
+
+        final bool hasInternet = await InternetConnection().hasInternetAccess;
+        isInternetRequired = state.isServerSideModel(apiModelIdForSend);
+        if (isInternetRequired && !hasInternet) {
+          errorMessage = localizations.checkYourInternet;
+          apiModelIdForSend = null;
         }
+      } else if (state.isPersistentlyDynamic) {
+        // PRIORITY 2: No override, and chat is in fully dynamic mode. Select a random model.
+        apiModelIdForSend = await _selectAndAssignDynamicModel();
+      } else {
+        // PRIORITY 3: No override, and an assistant is pinned or it's a standard chat. Use the state's modelId.
+        apiModelIdForSend = state.modelId;
+        if (apiModelIdForSend == null || apiModelIdForSend.isEmpty) {
+          errorMessage = localizations.anErrorOccurred;
+          apiModelIdForSend = null; // Ensure it's null if no model is selected
+        } else {
+          final bool hasInternet = await InternetConnection().hasInternetAccess;
+          isInternetRequired = state.isServerSideModel(apiModelIdForSend);
+
+          if (isInternetRequired && !hasInternet) {
+            errorMessage = localizations.checkYourInternet;
+            apiModelIdForSend = null;
+          }
+        }
+      }
+      // --- END OF MODEL SELECTION LOGIC ---
+
+      // Handle cases where no suitable model could be determined.
+      if (apiModelIdForSend == null) {
+        if (isRegenerate && regenerateAiIndex != null) {
+          // Update the existing AI bubble with an error during regeneration.
+          state.setState(() {
+            final aiMessage = state.messages[regenerateAiIndex];
+            aiMessage.text = errorMessage;
+            aiMessage.isError = true;
+            aiMessage.isThinking = false;
+            state.isWaitingForResponse = false;
+          });
+        } else {
+          // For new messages, add user's prompt and a new error bubble.
+          final userMessage = Message(
+            text: messageText,
+            isUserMessage: true,
+            photoPath: selectedPhoto != null ? selectedPhoto!.path : null,
+          );
+          final errorAIMessage = Message(
+            text: errorMessage,
+            isUserMessage: false,
+            includeInContext: false,
+            isError: true,
+          );
+
+          if (state.conversationID == null) {
+            final modelIdForStorage = state.isPersistentlyDynamic ? 'dynamic' : state.modelId!;
+            await _startNewConversation(userMessage, state.isPersistentlyDynamic, modelIdForStorage, localizations);
+          } else {
+            await _appendNewMessage(userMessage, localizations);
+          }
+
+          state.setState(() {
+            state.messages.add(userMessage);
+            state.messages.add(errorAIMessage);
+            state.controller.clear();
+            state.isWaitingForResponse = false;
+          });
+          state.readService.markLoaded();
+        }
+
+        state.inputFieldKey.currentState?.clearPhotoPanel();
+        selectedPhoto = null;
+        return;
+      }
+
+      // --- Prepare UI and messages for sending ---
+      final userMessage = Message(
+        text: messageText,
+        isUserMessage: true,
+        photoPath: selectedPhoto != null ? selectedPhoto!.path : null,
+        isPhotoUploading: true,
+        model: apiModelIdForSend,
+      );
+
+      int? aiMessageIndex;
+      if (isRegenerate) {
         aiMessageIndex = regenerateAiIndex;
         state.setState(() {
-          if(state.isDynamicChatMode && aiMessageIndex != null) {
+          if (state.isDynamicChatMode && aiMessageIndex != null) {
             state.messages[aiMessageIndex].model = apiModelIdForSend;
           }
           state.isWaitingForResponse = true;
-          state.isSendButtonVisible = false;
           state.responseStopped = false;
         });
       } else {
-        final userMessage = Message(
-          text: messageText,
-          isUserMessage: true,
-          photoPath: selectedPhoto != null ? selectedPhoto!.path : null,
-          isPhotoUploading: true,
-          model: apiModelIdForSend,
-        );
         final aiThinkingMessage = Message(
-          text: "",
-          isUserMessage: false,
-          includeInContext: false,
-          isThinking: true,
-          model: apiModelIdForSend,
+          text: "", isUserMessage: false, includeInContext: false,
+          isThinking: true, model: apiModelIdForSend,
         );
+
+        if (state.conversationID == null) {
+          await _startNewConversation(userMessage, state.isDynamicChatMode, apiModelIdForSend, localizations);
+        } else {
+          await _appendNewMessage(userMessage, localizations);
+        }
 
         state.setState(() {
           state.messages.add(userMessage);
           state.messages.add(aiThinkingMessage);
           state.controller.clear();
           state.isWaitingForResponse = true;
-          state.isSendButtonVisible = false;
           state.responseStopped = false;
         });
-
         state.readService.markLoaded();
         aiMessageIndex = state.messages.length - 1;
-
-        if (state.conversationID == null) {
-          // A chat is "dynamic" if it was initiated without a pre-selected model.
-          // This is now determined by the `isDynamicChatMode` flag which is set on initState.
-          await _startNewConversation(userMessage, state.isDynamicChatMode, apiModelIdForSend, localizations);
-        } else {
-          await _appendNewMessage(userMessage, localizations);
-        }
       }
 
-      final bool photoAllowed = state.canHandleImage;
+      if (apiModelIdForSend == 'trash') {
+        await _handleTrashMessage(messageText);
+        return;
+      }
+
+      FetchService.fetchUserData().catchError((error) {
+        debugPrint("[SendService] Background fetchUserData error: $error");
+      });
+
+      final bool photoAllowed = ModelData.hasModality(apiModelIdForSend, 'image');
       final File? photoForSend = photoAllowed ? selectedPhoto : null;
-      String? photoPath = await _handlePhoto(
-        photoForSend != null,
-        regeneratePhotoPath,
-      );
+      String? photoPath = await _handlePhoto(photoForSend != null, regeneratePhotoPath);
       state.inputFieldKey.currentState?.clearPhotoPanel();
+      if (!photoAllowed && selectedPhoto != null) selectedPhoto = null;
 
-      if (!photoAllowed && selectedPhoto != null) {
-        selectedPhoto = null;
-      }
-
+      // --- Delegate to the appropriate sender (local or server-side) ---
       if (!state.isServerSideModel(apiModelIdForSend)) {
         final offlineModerator = OfflineModeratorService();
         if (offlineModerator.isPromptAcceptable(messageText)) {
-          unawaited(_sendLocalMessage(messageText, photoPath));
+          unawaited(_sendLocalMessage(messageText, photoPath, apiModelIdForSend));
         } else {
-          _isSending = false;
           throw ApiException(localizations.errorPromptFlagged);
         }
       } else {
@@ -236,9 +296,7 @@ class SendService {
 
         if (state.mounted && !state.responseStopped) {
           final int targetIndex = isRegenerate && regenerateAiIndex != null
-              ? regenerateAiIndex
-              : (aiMessageIndex ?? state.messages.length - 1);
-
+              ? regenerateAiIndex : (aiMessageIndex ?? state.messages.length - 1);
           if (targetIndex >= 0 && targetIndex < state.messages.length) {
             state.setState(() {
               final msg = state.messages[targetIndex];
@@ -248,36 +306,35 @@ class SendService {
             });
 
             if (state.conversationID != null) {
-              await ChatStorageService.upsertMessage(state.conversationID!,
-                  targetIndex, state.messages[targetIndex]);
+              await ChatStorageService.upsertMessage(state.conversationID!, targetIndex, state.messages[targetIndex]);
             }
           }
         }
         if (!isRegenerate) {
-          debugPrint("[SendService] Successful server response. Triggering review check.");
           unawaited(ReviewService().triggerReviewPromptIfNeeded(state.context));
         }
       }
 
-      String modelSeriesId;
+      // --- Post-send cleanup and updates ---
       try {
-        final parentModel = state.loadService.allModels.firstWhere((model) {
-          if (model.id == apiModelIdForSend) return true;
-          return model.extensions?.containsKey(apiModelIdForSend) ?? false;
-        });
-        modelSeriesId = parentModel.id;
-        debugPrint("[SendService] Found parent series '$modelSeriesId' for variant '$apiModelIdForSend'. Storing in recents.");
-        await ChatStorageService.addRecentModel(modelSeriesId);
+        final modelData = ModelData.getPreciseModelData(apiModelIdForSend);
+        final parentId = ModelData.getBaseIdFromFullId(apiModelIdForSend);
+        final modelIdToStore = parentId.isNotEmpty ? parentId : apiModelIdForSend;
+        debugPrint("[SendService] Storing '$modelIdToStore' in recent models for used model '$apiModelIdForSend'.");
+        await ChatStorageService.addRecentModel(modelIdToStore);
       } catch (e) {
         debugPrint("[SendService] Could not find parent series for '$apiModelIdForSend'. Could not update recent models. Error: $e");
       }
+      unawaited(state.refreshRecentModels());
 
     } catch (e) {
       if (e is UserCancelledException) {
-        debugPrint("[SendService] Caught UserCancelledException. Suppressing error UI.");
-      } else {
-        _handleSendError(e, isRegenerate, regenerateAiIndex, localizations);
+        if (state.isWaitingForResponse) {
+          _handleSendError(ApiException("Cancelled"), isRegenerate, regenerateAiIndex, localizations);
+        }
+        return;
       }
+      _handleSendError(e, isRegenerate, regenerateAiIndex, localizations);
     } finally {
       if (state.mounted) {
         _isSending = false;
@@ -390,17 +447,17 @@ class SendService {
   }
 
   /// Sends a message when using a local model via a platform channel.
-  Future<void> _sendLocalMessage(String text, String? photoPath) async {
-    // We no longer await a complete reply here. We just fire the request.
-    // The native code will send back tokens via the MethodCallHandler.
-    // We wrap it in a try-catch to handle potential errors during the call itself.
+  Future<void> _sendLocalMessage(String text, String? photoPath, String modelId) async {
     try {
+      // The native code will send back tokens via the MethodCallHandler.
+      // We wrap it in a try-catch to handle potential errors during the call itself.
+      debugPrint("[SendService] Sending local message to model '$modelId'."); // Good for logging
       await ChatScreenState.llamaChannel.invokeMethod<void>(
         'sendMessage',
         {
           'message':   text,
           'photoPath': photoPath,
-          // 'role' parameter removed as requested.
+          // 'role' is handled by the context service.
         },
       );
       // The actual response handling is now done in ChatScreenState's _methodCallHandler
@@ -417,7 +474,7 @@ class SendService {
   /// (like distinguishing between real errors and user cancellations).
   Future<void> _sendServerSideMessage(
       String text,
-      String modelIdInState,
+      String modelIdForRequest,
       String? photoPath,
       bool isRegenerate,
       int? regenerateAiIndex,
@@ -445,12 +502,12 @@ class SendService {
     // NOTE: The try-catch block that was here has been REMOVED.
     // All exceptions (ApiException, UserCancelledException, etc.) will now
     // bubble up to the `catch` block in `sendMessage`.
-    final modelData = ModelData.getPreciseModelData(modelIdInState);
+    final modelData = ModelData.getPreciseModelData(modelIdForRequest);
     final bool isPremium = (modelData['tier'] as String? ?? 'free') == 'premium';
-    debugPrint("[SendService] Sending request for model '$modelIdInState'. Is Premium: $isPremium");
+    debugPrint("[SendService] Sending request for model '$modelIdForRequest'. Is Premium: $isPremium");
     final memory = await state.contextService.buildContextMessages(
       includeLastUser: false,
-      targetModelId: modelIdInState,
+      targetModelId: modelIdForRequest,
     );
     final bool isCharacterModel = state.selectedModelCategory == 'roleplay' || state.selectedModelCategory == 'self';
 
@@ -502,17 +559,17 @@ class SendService {
     };
 
     if (isCharacterModel) {
-      final characterData = ModelData.getPreciseModelData(modelIdInState);
+      final characterData = ModelData.getPreciseModelData(modelIdForRequest);
       final baseModelId = characterData['baseModelId'] as String?;
 
       if (baseModelId == null || baseModelId.isEmpty) {
-        throw ApiException("Character '$modelIdInState' has no valid base model configured.");
+        throw ApiException("Character '$modelIdForRequest' has no valid base model configured.");
       }
 
       await state.apiService.getCharacterResponse(
         userInput: text,
         context: memory,
-        characterId: modelIdInState,
+        characterId: modelIdForRequest,
         baseModelId: baseModelId,
         isPremium: isPremium,
         photoPath: photoPath,
@@ -521,7 +578,7 @@ class SendService {
       );
     } else {
       await state.apiService.getOnlineModelResponse(
-        modelId: modelIdInState,
+        modelId: modelIdForRequest,
         userInput: text,
         context: memory,
         isPremium: isPremium,
@@ -532,18 +589,6 @@ class SendService {
     }
   }
 
-  /// Prepares the UI for regenerate mode by resetting the message text.
-  void _prepareForRegenerate(int regenerateIndex, AppLocalizations localizations) {
-    state.setState(() {
-      state.messages[regenerateIndex].isThinking = true;
-      state.messages[regenerateIndex].includeInContext = false;
-      state.isWaitingForResponse = true;
-      state.isSendButtonVisible = false;
-      state.responseStopped = false;
-    });
-  }
-
-  /// --- REFACTORED & AAA-QUALITY ---
   /// Handles send errors robustly by updating the message with the error text.
   /// Now, if a content moderation error occurs, it not only flags the AI's
   /// response bubble with the error, but it also finds the PRECEDING user

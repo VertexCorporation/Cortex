@@ -769,5 +769,7 @@
   "channelEngagementName": "친절한 알림",
   "channelEngagementDescription": "여러분의 관심을 끌기 위한 재미있는 알림.",
   "channelGreetingsName": "매일의 인사",
-  "channelGreetingsDescription": "좋은 아침, 좋은 밤과 같은 메시지."
+  "channelGreetingsDescription": "좋은 아침, 좋은 밤과 같은 메시지.",
+  "exitAppTitle": "곧 떠나시나요?",
+  "exitAppConfirmation": "이 놀라운 플랫폼을 떠나시겠습니까?"
 }

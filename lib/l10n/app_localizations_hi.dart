@@ -2004,4 +2004,11 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'शुभ प्रभात और शुभ रात्रि जैसे संदेश।';
+
+  @override
+  String get exitAppTitle => 'इतनी जल्दी जाना?';
+
+  @override
+  String get exitAppConfirmation =>
+      'क्या आप वाकई इस अद्भुत मंच को छोड़ना चाहते हैं?';
 }

@@ -1,11 +1,8 @@
 // inbox.dart
 
 import 'dart:async';
-import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/conversations/skeleton.dart';
 import 'package:cortex/conversations/tiles.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -474,24 +471,6 @@ class MenuScreenState extends State<MenuScreen>
     CacheService.cachedConversationOrder = List.of(_conversationIDsOrder);
     CacheService.cachedStarredIds = List.of(_starredConversationIDs);
     CacheService.cachedUserModels = List.of(_userModels);
-  }
-
-  /// Is the model really exist? lets control
-  Future<bool> _isModelAvailable(String modelId) async {
-    final modelData = ModelData.getPreciseModelData(modelId);
-
-    // If the model type is not 'offline', it is ALWAYS available (assuming internet).
-    if (modelData['type'] != 'offline') {
-      return true;
-    }
-
-    // If we reach here, the model IS offline. Now, we check if it's downloaded.
-    final downloadedPaths = await UserModels.loadDownloadedModelPaths();
-
-    // An offline model is available only if its ID is in the downloaded paths map.
-    // We use the baseId for checking downloads.
-    final baseId = ModelData.getBaseIdFromFullId(modelId);
-    return downloadedPaths.containsKey(baseId);
   }
 
   /// If we want reload

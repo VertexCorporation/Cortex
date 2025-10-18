@@ -1,4 +1,9 @@
 // lib/banner.dart
+//
+// This file defines reusable banner components for the application.
+// It includes a service for managing the "invite" banner's cooldown logic
+// and a generic, self-animating FloatingInfoBanner widget that can display
+// various types of content and position itself relative to other widgets.
 
 import 'package:cortex/main.dart';
 import 'package:cortex/theme.dart';
@@ -117,10 +122,10 @@ class FloatingInfoBanner extends StatefulWidget {
   });
 
   @override
-  State<FloatingInfoBanner> createState() => _FloatingInfoBannerState();
+  State<FloatingInfoBanner> createState() => FloatingInfoBannerState();
 }
 
-class _FloatingInfoBannerState extends State<FloatingInfoBanner> {
+class FloatingInfoBannerState extends State<FloatingInfoBanner> {
   bool _isVisible = false;
   Offset _anchorOffset = Offset.zero;
   Size _anchorSize = Size.zero;
@@ -131,7 +136,7 @@ class _FloatingInfoBannerState extends State<FloatingInfoBanner> {
     debugPrint("[FloatingInfoBanner] initState: Banner type '${widget.bannerType}' is being added.");
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _updateAnchorPosition();
+        // The position is now calculated in build(), so we just trigger the animation here.
         debugPrint("[FloatingInfoBanner] Triggering entry animation.");
         setState(() => _isVisible = true);
       }
@@ -141,17 +146,20 @@ class _FloatingInfoBannerState extends State<FloatingInfoBanner> {
   /// Calculates the position and size of the anchor widget if a key is provided.
   void _updateAnchorPosition() {
     if (widget.anchorKey?.currentContext != null) {
-      final RenderBox renderBox = widget.anchorKey!.currentContext!.findRenderObject() as RenderBox;
-      _anchorSize = renderBox.size;
-      _anchorOffset = renderBox.localToGlobal(Offset.zero);
+      final RenderBox? renderBox = widget.anchorKey!.currentContext!.findRenderObject() as RenderBox?;
+      if (renderBox != null) {
+        _anchorSize = renderBox.size;
+        _anchorOffset = renderBox.localToGlobal(Offset.zero);
+      }
     }
   }
 
-  void _dismiss() {
+  void dismiss() {
     if (!mounted || !_isVisible) return;
     debugPrint("[FloatingInfoBanner] Triggering exit animation.");
     setState(() => _isVisible = false);
-    Future.delayed(const Duration(milliseconds: 400), () {
+    // Give time for the animation to complete before calling the callback.
+    Future.delayed(const Duration(milliseconds: 300), () {
       debugPrint("[FloatingInfoBanner] Exit animation complete. Calling onDismissed.");
       widget.onDismissed?.call();
     });
@@ -159,6 +167,10 @@ class _FloatingInfoBannerState extends State<FloatingInfoBanner> {
 
   @override
   Widget build(BuildContext context) {
+    // By calling this in every build, we ensure the anchor position is never stale,
+    // even if the keyboard appears or other layout changes happen.
+    _updateAnchorPosition();
+
     final localizations = AppLocalizations.of(context)!;
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
@@ -170,12 +182,14 @@ class _FloatingInfoBannerState extends State<FloatingInfoBanner> {
     bool isTopBanner;
     double verticalMargin;
     Widget content;
+    bool useSpecialAnimation = false; // Flag for the new animation
 
     switch (widget.bannerType) {
       case BannerType.extensionInfo:
         isTopBanner = true; // Anchored to the app bar title
-        verticalMargin = screenHeight * 0.015;
+        verticalMargin = screenHeight * 0.02;
         content = _buildExtensionInfoContent(context, localizations);
+        useSpecialAnimation = true; // Enable the new animation for this type
         break;
       case BannerType.discount:
         isTopBanner = true;
@@ -183,54 +197,81 @@ class _FloatingInfoBannerState extends State<FloatingInfoBanner> {
         content = _buildDefaultContent(context, localizations);
         break;
       case BannerType.inviteCredits:
-      default:
-        isTopBanner = false;
+      isTopBanner = false;
         verticalMargin = screenHeight * 0.02;
         content = _buildDefaultContent(context, localizations);
         break;
     }
 
     // --- Positioning Logic ---
-    double? calculatedTop, calculatedBottom, calculatedLeft, calculatedRight;
+    double? onScreenTop, onScreenBottom, onScreenLeft, onScreenRight;
+    double offscreenTop = -(screenHeight * 0.3); // Default offscreen positions
+    double offscreenBottom = -(screenHeight * 0.3);
 
-    if (widget.anchorKey != null) {
+    if (widget.anchorKey != null && _anchorOffset != Offset.zero) {
       // Anchored positioning (used for extensionInfo)
       final double panelWidth = screenWidth * 0.8;
-      calculatedLeft = _anchorOffset.dx + _anchorSize.width / 2 - (panelWidth / 2);
+      onScreenLeft = _anchorOffset.dx + _anchorSize.width / 2 - (panelWidth / 2);
       // Clamp to screen edges
-      calculatedLeft = max(screenWidth * 0.04, min(calculatedLeft, screenWidth - panelWidth - (screenWidth * 0.04)));
-      calculatedTop = _anchorOffset.dy + _anchorSize.height + verticalMargin;
+      onScreenLeft = max(screenWidth * 0.04, min(onScreenLeft, screenWidth - panelWidth - (screenWidth * 0.04)));
+      onScreenTop = _anchorOffset.dy + _anchorSize.height + verticalMargin;
     } else {
       // Standard top/bottom positioning
       final double horizontalMargin = screenWidth * 0.02;
-      calculatedLeft = horizontalMargin;
-      calculatedRight = horizontalMargin;
+      onScreenLeft = horizontalMargin;
+      onScreenRight = horizontalMargin;
       if (isTopBanner) {
-        calculatedTop = _isVisible ? topSafeArea + verticalMargin : -(screenHeight * 0.3);
+        onScreenTop = topSafeArea + verticalMargin;
       } else {
-        calculatedBottom = _isVisible ? bottomSafeArea + verticalMargin : -(screenHeight * 0.3);
+        onScreenBottom = bottomSafeArea + verticalMargin;
       }
     }
 
-    return AnimatedPositioned(
-      duration: Duration(milliseconds: _isVisible ? 800 : 400),
-      curve: _isVisible ? Curves.elasticOut : Curves.easeOutCubic,
-      top: calculatedTop,
-      bottom: calculatedBottom,
-      left: calculatedLeft,
-      right: calculatedRight,
-      child: GestureDetector(
-        onTap: () {
-          widget.onTap?.call();
-          _dismiss();
-        },
-        onVerticalDragUpdate: (details) {
-          if (isTopBanner && details.primaryDelta! < -2) _dismiss();
-          else if (!isTopBanner && details.primaryDelta! > 2) _dismiss();
-        },
-        child: content,
-      ),
-    );
+    if (useSpecialAnimation) {
+      // For extensionInfo: Use a static Positioned and animate scale/opacity internally.
+      return Positioned(
+        top: onScreenTop,
+        left: onScreenLeft,
+        right: onScreenRight,
+        child: GestureDetector(
+          // Allow taps on the banner itself to dismiss it
+          onTap: dismiss,
+          child: AnimatedScale(
+            scale: _isVisible ? 1.0 : 0.85,
+            duration: const Duration(milliseconds: 300),
+            alignment: Alignment.topCenter,
+            curve: Curves.easeOutBack,
+            child: AnimatedOpacity(
+              opacity: _isVisible ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOut,
+              child: content,
+            ),
+          ),
+        ),
+      );
+    } else {
+      // For all other banners: Use the original AnimatedPositioned for the sliding effect.
+      return AnimatedPositioned(
+        duration: Duration(milliseconds: _isVisible ? 800 : 400),
+        curve: _isVisible ? Curves.elasticOut : Curves.easeOutCubic,
+        top: isTopBanner ? (_isVisible ? onScreenTop : offscreenTop) : null,
+        bottom: !isTopBanner ? (_isVisible ? onScreenBottom : offscreenBottom) : null,
+        left: onScreenLeft,
+        right: onScreenRight,
+        child: GestureDetector(
+          onTap: () {
+            widget.onTap?.call();
+            dismiss();
+          },
+          onVerticalDragUpdate: (details) {
+            if (isTopBanner && details.primaryDelta! < -2) dismiss();
+            else if (!isTopBanner && details.primaryDelta! > 2) dismiss();
+          },
+          child: content,
+        ),
+      );
+    }
   }
 
   /// Builds the new, custom content for the Extension Info banner.

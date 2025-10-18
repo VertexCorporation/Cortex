@@ -769,5 +769,7 @@
   "channelEngagementName": "Bîranînên Dostane",
   "channelEngagementDescription": "Agahiyên kêfxweş ji bo ku hûn mijûl bimînin.",
   "channelGreetingsName": "Silavên Rojane",
-  "channelGreetingsDescription": "Peyamên mîna sibeha baş û şevbaş."
+  "channelGreetingsDescription": "Peyamên mîna sibeha baş û şevbaş.",
+  "exitAppTitle": "Hûn ewqas zû diçin?",
+  "exitAppConfirmation": "Ma hûn piştrast in ku hûn dixwazin ji vê platforma ecêb derkevin?"
 }

@@ -12,7 +12,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'l10n/app_localizations.dart';
 
@@ -23,12 +22,14 @@ import 'l10n/app_localizations.dart';
 //======================================================================
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Initialize Firebase to ensure services like Firestore or Auth can be used.
-  await Firebase.initializeApp();
-  debugPrint("--- Background Message Handler triggered by FCM ---");
-  debugPrint("FCM Data payload: ${message.data}");
-  // Delegate the actual display logic to our centralized helper.
-  await _showLocalizedNotification(message.data);
+  try {
+    await Firebase.initializeApp();
+    debugPrint("--- Background Message Handler triggered by FCM ---");
+    debugPrint("FCM Data payload: ${message.data}");
+    await _showLocalizedNotification(message.data);
+  } catch (e, s) {
+    debugPrint("FATAL: Error in firebaseMessagingBackgroundHandler: $e\n$s");
+  }
 }
 
 //======================================================================
@@ -46,8 +47,15 @@ Future<Map<String, String>> _buildLocalizedContent(Map<String, dynamic> data) as
     return {}; // Return an empty map to signify failure.
   }
 
-  // Load the correct translations based on the device's current locale.
-  final locale = Locale(Platform.localeName.split('_').first);
+  final prefs = await SharedPreferences.getInstance();
+  final savedLocaleCode = prefs.getString('language_code');
+
+  final locale = savedLocaleCode != null
+      ? Locale(savedLocaleCode)
+      : Locale(Platform.localeName.split('_').first);
+
+  debugPrint("[Content Builder] Using '${locale.languageCode}' for notification language.");
+
   final l10n = await AppLocalizations.delegate.load(locale);
 
   String getLocalizedString(String key) {
@@ -165,20 +173,33 @@ Future<void> _showLocalizedNotification(Map<String, dynamic> data) async {
     return;
   }
 
-  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-    'cortex_notifications', // Channel ID for server-pushed notifications
+  final String title = notificationContent['title']!;
+  final String body = notificationContent['body']!;
+
+  final BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
+    body,
+    htmlFormatBigText: false,
+    contentTitle: title,
+    htmlFormatContentTitle: false,
+    summaryText: 'Cortex',
+    htmlFormatSummaryText: false,
+  );
+
+  final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    'cortex_notifications',
     'Cortex Updates',
     channelDescription: 'Notifications about news and updates from Cortex.',
     importance: Importance.max,
     priority: Priority.high,
+    styleInformation: bigTextStyleInformation,
   );
-  const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
 
-  await flutterLocalNotificationsPlugin.show(
-    DateTime.now().millisecondsSinceEpoch.toSigned(31), // Unique ID for each notification
-    notificationContent['title'],
-    notificationContent['body'],
+  final NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
+
+  await FlutterLocalNotificationsPlugin().show(
+    DateTime.now().millisecondsSinceEpoch.toSigned(31), // Unique ID
+    title,
+    body,
     platformDetails,
     payload: jsonEncode(data), // Pass the original data for tap handling
   );
@@ -198,6 +219,8 @@ class NotificationService {
   late final AndroidNotificationChannel _fcmChannel;
   late final AndroidNotificationChannel _engagementChannel;
   late final AndroidNotificationChannel _greetingsChannel;
+
+  bool _isInitialized = false;
 
   NotificationService({required this.navigatorKey});
 
@@ -225,6 +248,7 @@ class NotificationService {
     await _initializeLocalNotifications();
     await _initializeFirebaseMessaging();
 
+    _isInitialized = true;
     debugPrint("[NotificationService] Initialization complete.");
   }
 
@@ -280,49 +304,52 @@ class NotificationService {
 
   /// To be called from your main app widget when the app lifecycle changes.
   void handleAppLifecycleStateChange(AppLifecycleState state) async {
-    const int lowBatteryNotificationId = 3; // The unique ID for our low battery notification.
+    if (!_isInitialized) {
+      debugPrint("[NotificationService] App lifecycle changed, but service not initialized. Skipping.");
+      return;
+    }
+
+    const int lowBatteryNotificationId = 3;
 
     // SCENARIO 1: The user is returning to the app.
     if (state == AppLifecycleState.resumed) {
-      // CRITICAL: If the user comes back, we must cancel the pending low-battery
-      // notification so they don't receive it while using the app.
       await _localNotifications.cancel(lowBatteryNotificationId);
       debugPrint("[NotificationService] App resumed. Canceled any pending low-battery notification (ID: $lowBatteryNotificationId).");
+
+      if (_auth.currentUser != null) {
+        final pendingRequests = await _localNotifications.pendingNotificationRequests();
+
+        final engagementRequests = pendingRequests.where((p) => p.id != lowBatteryNotificationId).toList();
+
+        if (engagementRequests.isEmpty) {
+          debugPrint("[NotificationService] No pending engagement notifications found. This might be due to a force-close. Scheduling a recovery notification.");
+          await _scheduleNextEngagementNotification();
+        } else {
+          debugPrint("[NotificationService] Found ${engagementRequests.length} pending notification(s). No recovery schedule needed.");
+        }
+      }
     }
     // SCENARIO 2: The user is leaving the app.
     else if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
-      // Only schedule notifications if a user is logged in.
       if (_auth.currentUser != null) {
         debugPrint("[NotificationService] App paused/detached. Checking conditions to schedule notifications.");
 
-        // First, try to schedule a contextual low-battery notification.
         try {
           final batteryLevel = await Battery().batteryLevel;
           debugPrint("[NotificationService] Current battery level: $batteryLevel%");
-
-          // Condition 1: Is battery level below 20%?
           if (batteryLevel < 20) {
             final prefs = await SharedPreferences.getInstance();
             final lastSentTime = prefs.getInt('lowBatteryNotificationSentTime') ?? 0;
             final now = DateTime.now().millisecondsSinceEpoch;
-
-            // Condition 2: Has it been more than 12 hours since the last one?
             if (now - lastSentTime > const Duration(hours: 12).inMilliseconds) {
-
-              // Condition 3: Does the 10% chance succeed?
               if (Random().nextDouble() < 0.1) {
-                debugPrint("[NotificationService] Low battery conditions met. Scheduling notification for 5 minutes from now.");
-
                 final dataPayload = {
                   'notification_title_key': 'notificationLowBatteryTitle',
                   'notification_body_key': 'notificationLowBatteryBody',
                 };
                 final content = await _buildLocalizedContent(dataPayload);
-
                 if (content.isNotEmpty) {
-                  // Schedule for 5 minutes in the future.
                   final scheduledTime = tz.TZDateTime.now(tz.local).add(const Duration(minutes: 5));
-
                   await _zonedScheduleNotification(
                     lowBatteryNotificationId,
                     content,
@@ -330,31 +357,17 @@ class NotificationService {
                     dataPayload,
                     _engagementChannel,
                   );
-
-                  // Record the time we scheduled this to enforce the 12-hour cooldown.
                   await prefs.setInt('lowBatteryNotificationSentTime', now);
-
-                  // IMPORTANT: We have scheduled a contextual notification, so we stop here
-                  // and do not proceed to schedule a general one.
                   return;
                 }
-              } else {
-                debugPrint("[NotificationService] Low battery detected, but the 10% chance was not met. Skipping.");
               }
-            } else {
-              debugPrint("[NotificationService] Low battery detected, but notification was sent recently. Skipping.");
             }
           }
         } catch (e) {
           debugPrint("[NotificationService] CRITICAL: Could not check battery level: $e");
         }
 
-        // If the low-battery notification was NOT scheduled for any reason,
-        // proceed to the regular, long-term engagement notification scheduler.
         _scheduleNextEngagementNotification();
-
-      } else {
-        debugPrint("[NotificationService] App paused/detached, but user is logged out. Skipping scheduling.");
       }
     }
   }
@@ -405,6 +418,7 @@ class NotificationService {
   /// The main scheduler that now uses a smart, dynamic logic for ALL
   /// engagement notifications, including greetings.
   Future<void> _scheduleNextEngagementNotification() async {
+    if (!_isInitialized) return;
     // Check for maintenance mode BEFORE doing anything else.
     if (await checkMaintenanceMode()) {
       debugPrint("[NotificationService] App is under maintenance. Deferring notification scheduling.");
@@ -444,7 +458,7 @@ class NotificationService {
         }
       }
 
-      // 2. Dynamic Scheduling Logic based on User Activity (Değişiklik yok)
+      // 2. Dynamic Scheduling Logic based on User Activity
       final daysSinceLastOpen = now.difference(DateTime.fromMillisecondsSinceEpoch(lastOpenTime)).inDays;
       Duration scheduleDelay;
 
@@ -461,7 +475,7 @@ class NotificationService {
       final scheduledDateTime = now.add(scheduleDelay);
       Map<String, String>? selectedNotification;
 
-      // 3. Smart Notification Selection (including Greetings) (Değişiklik yok)
+      // 3. Smart Notification Selection (including Greetings)
       if (now.hour >= 20) { // After 8 PM, schedule a "Good Morning" for tomorrow
         selectedNotification = {'title': 'notificationGoodMorningTitle', 'body': 'notificationGoodMorningBody'};
         final tomorrow = now.add(const Duration(days: 1));
@@ -533,7 +547,7 @@ class NotificationService {
   /// Schedules the special, randomized welcome notification for the first day.
   /// This is centralized to be called from multiple places without code duplication.
   Future<void> _scheduleWelcomeNotification(tz.TZDateTime scheduledTime) async {
-    const int welcomeNotificationId = 1; // Hoş geldin için özel ve tekil ID
+    const int welcomeNotificationId = 1;
     const welcomeNotificationPool = <Map<String, String>>[
       {'title': 'notificationDynamicChatTitle', 'body': 'notificationDynamicChatBody'},
       {'title': 'notificationPirateTitle', 'body': 'notificationPirateBody'},
@@ -600,8 +614,24 @@ class NotificationService {
       AndroidNotificationChannel channel,
       ) async {
 
+    final BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
+      content['body']!,
+      htmlFormatBigText: false,
+      contentTitle: content['title'],
+      htmlFormatContentTitle: false,
+      summaryText: 'Cortex',
+      htmlFormatSummaryText: false,
+    );
+
     final platformChannelSpecifics = NotificationDetails(
-      android: AndroidNotificationDetails(channel.id, channel.name),
+      android: AndroidNotificationDetails(
+        channel.id,
+        channel.name,
+        channelDescription: channel.description,
+        importance: channel.importance,
+        priority: Priority.high,
+        styleInformation: bigTextStyleInformation,
+      ),
       iOS: const DarwinNotificationDetails(),
     );
 

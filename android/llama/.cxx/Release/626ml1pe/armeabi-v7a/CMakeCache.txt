@@ -38,14 +38,29 @@ CMAKE_ANDROID_NDK:UNINITIALIZED=/home/baba/Android/Sdk/ndk/26.1.10909125
 //Archiver
 CMAKE_AR:FILEPATH=/home/baba/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
 
+//ASM compiler
+CMAKE_ASM_COMPILER:FILEPATH=/home/baba/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/bin/clang
+
+//LLVM archiver
+CMAKE_ASM_COMPILER_AR:FILEPATH=/home/baba/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+
+//Generate index for LLVM archive
+CMAKE_ASM_COMPILER_RANLIB:FILEPATH=/home/baba/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+
 //Flags used by the compiler during all build types.
 CMAKE_ASM_FLAGS:STRING=
 
 //Flags used by the compiler during debug builds.
 CMAKE_ASM_FLAGS_DEBUG:STRING=
 
+//Flags used by the ASM compiler during MINSIZEREL builds.
+CMAKE_ASM_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG
+
 //Flags used by the compiler during release builds.
 CMAKE_ASM_FLAGS_RELEASE:STRING=
+
+//Flags used by the ASM compiler during RELWITHDEBINFO builds.
+CMAKE_ASM_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //Choose the type of build, options are: None Debug Release RelWithDebInfo
 // MinSizeRel ...
@@ -226,8 +241,7 @@ CMAKE_READELF:FILEPATH=/home/baba/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/
 //No help, variable specified on the command line.
 CMAKE_RUNTIME_OUTPUT_DIRECTORY:UNINITIALIZED=/home/baba/Documents/cortex/build/llama/intermediates/cxx/Release/626ml1pe/obj/armeabi-v7a
 
-//Flags used by the linker during the creation of dll's.
-CMAKE_SHARED_LINKER_FLAGS:STRING=
+CMAKE_SHARED_LINKER_FLAGS:STRING=-static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,-z,max-page-size=16384 -Wl,-z,max-page-size=16384
 
 //Flags used by the linker during the creation of shared libraries
 // during DEBUG builds.
@@ -281,8 +295,8 @@ CMAKE_SYSTEM_NAME:UNINITIALIZED=Android
 //No help, variable specified on the command line.
 CMAKE_SYSTEM_VERSION:UNINITIALIZED=26
 
-//The CMake toolchain file
-CMAKE_TOOLCHAIN_FILE:FILEPATH=/home/baba/Android/Sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake
+//No help, variable specified on the command line.
+CMAKE_TOOLCHAIN_FILE:UNINITIALIZED=/home/baba/Android/Sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake
 
 //If this value is on, makefiles will be generated without the
 // .SILENT directive, and all commands will be echoed to the console
@@ -325,6 +339,9 @@ GGML_AVX512_VNNI:BOOL=OFF
 
 //ggml: enable AVX-VNNI
 GGML_AVX_VNNI:BOOL=OFF
+
+//ggml: directory to load dynamic backends from (requires GGML_BACKEND_DL
+GGML_BACKEND_DIR:PATH=
 
 //ggml: build backends as dynamic libraries (requires BUILD_SHARED_LIBS)
 GGML_BACKEND_DL:BOOL=OFF
@@ -419,11 +436,17 @@ GGML_GPROF:BOOL=OFF
 //ggml: use HIP
 GGML_HIP:BOOL=OFF
 
+//ggml: enable kernel perf metrics output
+GGML_HIP_EXPORT_METRICS:BOOL=OFF
+
 //ggml: enable rocWMMA FlashAttention on GFX12
 GGML_HIP_FORCE_ROCWMMA_FATTN_GFX12:BOOL=OFF
 
 //ggml: use HIP graph, experimental, slow
 GGML_HIP_GRAPHS:BOOL=OFF
+
+//ggml: enable MFMA MMA for CDNA in MMQ
+GGML_HIP_MMQ_MFMA:BOOL=ON
 
 //ggml: do not try to use HIP VMM
 GGML_HIP_NO_VMM:BOOL=ON
@@ -473,6 +496,12 @@ GGML_METAL_USE_BF16:BOOL=OFF
 //ggml: use MUSA
 GGML_MUSA:BOOL=OFF
 
+//ggml: use MUSA graph, experimental, unstable
+GGML_MUSA_GRAPHS:BOOL=OFF
+
+//ggml: enable muDNN for accelerated copy
+GGML_MUSA_MUDNN_COPY:BOOL=OFF
+
 //ggml: optimize the build for the current system
 GGML_NATIVE:BOOL=OFF
 
@@ -505,6 +534,12 @@ GGML_RVV:BOOL=ON
 
 //ggml: enable riscv zfh
 GGML_RV_ZFH:BOOL=OFF
+
+//ggml: enable riscv zicbop
+GGML_RV_ZICBOP:BOOL=ON
+
+//ggml: enable riscv zvfh
+GGML_RV_ZVFH:BOOL=ON
 
 //ggml: enable address sanitizer
 GGML_SANITIZE_ADDRESS:BOOL=OFF
@@ -575,11 +610,23 @@ GGML_VXE:BOOL=ON
 //ggml: use WebGPU
 GGML_WEBGPU:BOOL=OFF
 
+//ggml: enable WebGPU profiling (CPU)
+GGML_WEBGPU_CPU_PROFILE:BOOL=OFF
+
 //ggml: enable WebGPU debug output
 GGML_WEBGPU_DEBUG:BOOL=OFF
 
+//ggml: enable WebGPU profiling (GPU)
+GGML_WEBGPU_GPU_PROFILE:BOOL=OFF
+
 //ggml: enable xtheadvector
 GGML_XTHEADVECTOR:BOOL=OFF
+
+//ggml: use zDNN
+GGML_ZDNN:BOOL=OFF
+
+//Path to a program.
+GIT_EXE:FILEPATH=/usr/bin/git
 
 //Git command line client
 GIT_EXECUTABLE:FILEPATH=/usr/bin/git
@@ -624,6 +671,9 @@ LLAMA_LIB_INSTALL_DIR:PATH=lib
 // in common utils
 LLAMA_LLGUIDANCE:BOOL=OFF
 
+//llama: use openssl to support HTTPS
+LLAMA_OPENSSL:BOOL=OFF
+
 //llama: enable address sanitizer
 LLAMA_SANITIZE_ADDRESS:BOOL=OFF
 
@@ -632,6 +682,9 @@ LLAMA_SANITIZE_THREAD:BOOL=OFF
 
 //llama: enable undefined sanitizer
 LLAMA_SANITIZE_UNDEFINED:BOOL=OFF
+
+//llama: install tools
+LLAMA_TOOLS_INSTALL:BOOL=OFF
 
 //Use system libggml
 LLAMA_USE_SYSTEM_GGML:BOOL=OFF
@@ -661,7 +714,7 @@ ggml_BINARY_DIR:STATIC=/home/baba/Documents/cortex/android/llama/.cxx/Release/62
 ggml_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-ggml_SOURCE_DIR:STATIC=/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml
+ggml_SOURCE_DIR:STATIC=/home/baba/Documents/cortex/vendor/llama.cpp/ggml
 
 //Value Computed by CMake
 llama-android_BINARY_DIR:STATIC=/home/baba/Documents/cortex/android/llama/.cxx/Release/626ml1pe/armeabi-v7a
@@ -679,7 +732,7 @@ llama.cpp_BINARY_DIR:STATIC=/home/baba/Documents/cortex/android/llama/.cxx/Relea
 llama.cpp_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-llama.cpp_SOURCE_DIR:STATIC=/home/baba/Documents/cortex/android/vendor/llama.cpp
+llama.cpp_SOURCE_DIR:STATIC=/home/baba/Documents/cortex/vendor/llama.cpp
 
 
 ########################
@@ -690,6 +743,23 @@ llama.cpp_SOURCE_DIR:STATIC=/home/baba/Documents/cortex/android/vendor/llama.cpp
 CMAKE_ADDR2LINE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_AR
 CMAKE_AR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_COMPILER
+CMAKE_ASM_COMPILER-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_COMPILER_AR
+CMAKE_ASM_COMPILER_AR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_COMPILER_RANLIB
+CMAKE_ASM_COMPILER_RANLIB-ADVANCED:INTERNAL=1
+CMAKE_ASM_COMPILER_WORKS:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS
+CMAKE_ASM_FLAGS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_DEBUG
+CMAKE_ASM_FLAGS_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_MINSIZEREL
+CMAKE_ASM_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_RELEASE
+CMAKE_ASM_FLAGS_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_ASM_FLAGS_RELWITHDEBINFO
+CMAKE_ASM_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //This is the directory where this CMakeCache.txt was created
 CMAKE_CACHEFILE_DIR:INTERNAL=/home/baba/Documents/cortex/android/llama/.cxx/Release/626ml1pe/armeabi-v7a
 //Major version of cmake used to create the current loaded cache
@@ -875,6 +945,7 @@ GGML_AVAILABLE_BACKENDS:INTERNAL=ggml-cpu
 GGML_COMPILER_SUPPORTS_FP16_FORMAT_I3E:INTERNAL=
 //STRINGS property for variable: GGML_CUDA_COMPRESSION_MODE
 GGML_CUDA_COMPRESSION_MODE-STRINGS:INTERNAL=none;speed;balance;size
+GGML_OPENMP_ENABLED:INTERNAL=ON
 //ADVANCED property for variable: GIT_EXECUTABLE
 GIT_EXECUTABLE-ADVANCED:INTERNAL=1
 //Result of TRY_COMPILE

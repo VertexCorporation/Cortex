@@ -769,5 +769,7 @@
   "channelEngagementName": "Pengingat Ramah",
   "channelEngagementDescription": "Notifikasi menyenangkan untuk membuat Anda tetap terlibat.",
   "channelGreetingsName": "Salam Harian",
-  "channelGreetingsDescription": "Pesannya seperti selamat pagi dan selamat malam."
+  "channelGreetingsDescription": "Pesannya seperti selamat pagi dan selamat malam.",
+  "exitAppTitle": "Akan pergi secepat ini?",
+  "exitAppConfirmation": "Apakah Anda yakin ingin meninggalkan platform menakjubkan ini?"
 }

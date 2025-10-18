@@ -145,6 +145,7 @@ class Tiles {
     Key? key,
     required String modelId,
     required VoidCallback onReport,
+    required bool isPersistentlyDynamic,
     required VoidCallback onRegenerate,
     required VoidCallback onStop,
     required Function(String newExtension) onChangeModel,
@@ -172,6 +173,7 @@ class Tiles {
       opacity: message.opacity,
       modelId: preciseModelId,
       isReported: message.isReported,
+      isPersistentlyDynamic: isPersistentlyDynamic,
       isError: message.isError,
       onReport: onReport,
       onRegenerate: onRegenerate,
@@ -247,6 +249,7 @@ class Tiles {
     required VoidCallback onRegenerate,
     required VoidCallback onStop,
     required Function(String newExtension) onChangeModel,
+    required bool isPersistentlyDynamic,
   }) {
     if (message.isUserMessage) {
       return buildUserMessageTile(
@@ -274,6 +277,7 @@ class Tiles {
         onChangeModel: onChangeModel,
         screenWidth: screenWidth,
         screenHeight: screenHeight,
+        isPersistentlyDynamic: isPersistentlyDynamic,
       );
     }
   }
@@ -292,6 +296,7 @@ class Tiles {
     required Function(int index) onRegenerate,
     required Function(int index, String newExtension) onChangeModel,
     required Function(int index) onReport,
+    required bool isPersistentlyDynamic,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -327,6 +332,7 @@ class Tiles {
           onRegenerate: () => onRegenerate(index),
           onStop: onStop,
           onChangeModel: (newExtension) => onChangeModel(index, newExtension),
+          isPersistentlyDynamic: isPersistentlyDynamic,
         );
       },
     );

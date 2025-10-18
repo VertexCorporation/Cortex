@@ -1,4 +1,4 @@
-# Install script for directory: /home/baba/Documents/cortex/android/vendor/llama.cpp/src
+# Install script for directory: /home/baba/Documents/cortex/vendor/llama.cpp/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

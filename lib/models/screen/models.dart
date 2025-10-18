@@ -755,22 +755,18 @@ class _ModelsScreenState extends State<ModelsScreen>
   }
 
   Future<void> _openCreateScreen(BuildContext context) async {
-    // --- THE FIX: The result of the push is no longer needed. ---
     // The new listener architecture handles the UI refresh automatically.
     await Navigator.push(
       context,
       SlideRightRoute(page: CreateScreen(availableBaseModels: _allModels)),
     );
-
-    // The 'if (created == true)' block has been removed.
   }
-
 
   // Handles the complete user flow for removing/uninstalling a model.
   Future<void> _handleRemoveFromList(String id, String title) async {
     // 1. Get necessary dependencies from the context before any async gaps.
     final localizations = AppLocalizations.of(context)!;
-    final internetService = Provider.of<InternetService>(context, listen: false);
+    final internetService = InternetService();
 
     // 2. Determine if the model is a custom creation or a public, downloadable one.
     final bool isCustomModel = id.startsWith('self_') || id.startsWith('local_');
@@ -1355,12 +1351,11 @@ class _ModelsScreenState extends State<ModelsScreen>
       backgroundColor: AppColors.background,
       elevation: 0,
       actions: [
-        // The "Create" button logic remains the same.
+        // The "Create" button logic
         SizedBox(
           width: screenWidth * 0.37,
           height: screenHeight * 0.1,
           child: Stack(
-            // ... (rest of the button code)
             children: [
               Positioned(
                 top: screenHeight * 0.0129,
@@ -1368,25 +1363,20 @@ class _ModelsScreenState extends State<ModelsScreen>
                 child: Container(
                   width: screenWidth * 0.26,
                   height: screenHeight * 0.045,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.016,
-                    vertical: screenHeight * 0.005,
-                  ),
                   decoration: BoxDecoration(
                     color: AppColors.senaryColor.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Stack(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Container(
-                          padding: EdgeInsets.all(screenWidth * 0.01),
-                        ),
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: screenWidth * 0.02,
+                        // --- FINAL FIX ---
+                        // Increased from 0.08 to 0.10 to give more breathing room to the '+' button.
+                        right: screenWidth * 0.10,
                       ),
-                      Positioned(
-                        top: screenWidth * 0.012,
-                        right: screenWidth * 0.094,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
                         child: Text(
                           localizations.create,
                           style: TextStyle(
@@ -1394,9 +1384,11 @@ class _ModelsScreenState extends State<ModelsScreen>
                             fontSize: screenWidth * 0.036,
                             fontWeight: FontWeight.w600,
                           ),
+                          maxLines: 1,
+                          softWrap: false,
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),

@@ -4,6 +4,7 @@ import 'package:cortex/cache.dart';
 import 'package:cortex/main.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
@@ -345,12 +346,40 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final Widget errorWidget = Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(color: AppColors.border.withOpacity(0.5)),
+        SvgPicture.asset(
+          'assets/icons/warning.svg',
+          width: screenWidth * 0.1,
+          height: screenWidth * 0.1,
+          colorFilter: ColorFilter.mode(
+            AppColors.primaryColor.inverted.withOpacity(0.5),
+            BlendMode.srcIn,
+          ),
+        ),
+      ],
+    );
+
     return FutureBuilder<String?>(
       future: _imageUrlFuture,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) return const _ShimmerPlaceholder();
-        if (!snapshot.hasData || snapshot.data == null) return Container(color: AppColors.border.withOpacity(0.5));
-        return CachedNetworkImage(imageUrl: snapshot.data!, fit: BoxFit.cover, placeholder: (context, url) => const _ShimmerPlaceholder(), errorWidget: (context, url, error) => Container(color: AppColors.border.withOpacity(0.5), child: Icon(Icons.error_outline, color: AppColors.primaryColor.inverted.withOpacity(0.4))));
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const _ShimmerPlaceholder();
+        }
+        if (!snapshot.hasData || snapshot.data == null) {
+          // Use the predefined error widget
+          return errorWidget;
+        }
+        return CachedNetworkImage(
+          imageUrl: snapshot.data!,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => const _ShimmerPlaceholder(),
+          // Use the same predefined error widget here
+          errorWidget: (context, url, error) => errorWidget,
+        );
       },
     );
   }

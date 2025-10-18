@@ -2018,4 +2018,11 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'Pesannya seperti selamat pagi dan selamat malam.';
+
+  @override
+  String get exitAppTitle => 'Akan pergi secepat ini?';
+
+  @override
+  String get exitAppConfirmation =>
+      'Apakah Anda yakin ingin meninggalkan platform menakjubkan ini?';
 }

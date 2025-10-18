@@ -13,7 +13,7 @@ import '../../../../../theme.dart';
 /// message at a time.
 class BriefingOverlay extends StatefulWidget {
   final double inputFieldHeight;
-  final int availableCredits;
+  final int? availableCredits;
   final bool photoSelected;
   final bool isOfflineModel;
   final String? modelPath;
@@ -26,6 +26,7 @@ class BriefingOverlay extends StatefulWidget {
   final bool isPremiumModel;
   final bool isSubscribed;
   final int premiumTrialUses;
+  final double safeAreaBottomPadding;
 
   const BriefingOverlay({
     super.key,
@@ -43,6 +44,7 @@ class BriefingOverlay extends StatefulWidget {
     required this.isPremiumModel,
     required this.isSubscribed,
     required this.premiumTrialUses,
+    this.safeAreaBottomPadding = 0.0,
   });
 
   @override
@@ -60,7 +62,6 @@ class _BriefingOverlayState extends State<BriefingOverlay> with TickerProviderSt
   // --- Animations ---
   late final Animation<Offset> _slideAnimation;
   late final Animation<double> _fadeAnimation;
-  late Animation<Offset> _dragAnimation;
 
   // --- State Management ---
   /// Holds the text of the message currently displayed or animating.
@@ -123,8 +124,8 @@ class _BriefingOverlayState extends State<BriefingOverlay> with TickerProviderSt
     if (_modelMissing) {
       return loc.offlineModelNotInstalled;
     }
-    if (_requiredCredits() > widget.availableCredits) {
-      return loc.insufficientCredits(widget.availableCredits, _requiredCredits());
+    if (widget.availableCredits != null && _requiredCredits() > widget.availableCredits!) {
+      return loc.insufficientCredits(widget.availableCredits!, _requiredCredits());
     }
     if (widget.showPhotoWarning) {
       return loc.photoWarningMessage;
@@ -197,9 +198,6 @@ class _BriefingOverlayState extends State<BriefingOverlay> with TickerProviderSt
     // Dismiss if dragged far enough or flung fast enough.
     if (dragDistance > screenSize.width * 0.3 || flingVelocity > 750) {
       _handleDismiss();
-    } else {
-      // Animate the panel snapping back to its original position.
-      _animateDrag(from: _dragOffset, to: Offset.zero);
     }
   }
 
@@ -209,14 +207,6 @@ class _BriefingOverlayState extends State<BriefingOverlay> with TickerProviderSt
     if (_isCurrentMessageDismissible) {
       widget.onDisclaimerDismissed();
     }
-  }
-
-  /// Helper to animate the drag offset, e.g., for the snap-back effect.
-  void _animateDrag({required Offset from, required Offset to}) {
-    _dragAnimation = Tween<Offset>(begin: from, end: to).animate(
-      CurvedAnimation(parent: _dragController, curve: Curves.easeOut),
-    );
-    _dragController.forward(from: 0.0);
   }
 
   @override
@@ -232,7 +222,7 @@ class _BriefingOverlayState extends State<BriefingOverlay> with TickerProviderSt
         }
 
         return Positioned(
-          bottom: widget.inputFieldHeight + 12,
+          bottom: widget.inputFieldHeight + widget.safeAreaBottomPadding + 12,
           left: 16,
           right: 16,
           child: child!,

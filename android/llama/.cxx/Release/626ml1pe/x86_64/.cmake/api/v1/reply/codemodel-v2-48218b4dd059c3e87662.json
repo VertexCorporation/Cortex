@@ -1,0 +1,245 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.6.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						6
+					]
+				},
+				{
+					"build" : "build-llama",
+					"childIndexes" : 
+					[
+						2,
+						5,
+						6
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-build-llama-Release-e99d36731f9451d04e13.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "/home/baba/Documents/cortex/vendor/llama.cpp"
+				},
+				{
+					"build" : "build-llama/ggml",
+					"childIndexes" : 
+					[
+						3
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-build-llama.ggml-Release-bde4f82f988c0dcf8d5a.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 2,
+					"source" : "/home/baba/Documents/cortex/vendor/llama.cpp/ggml"
+				},
+				{
+					"build" : "build-llama/ggml/src",
+					"childIndexes" : 
+					[
+						4
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-build-llama.ggml.src-Release-f5492ddb560452781d45.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 2,
+					"source" : "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/src",
+					"targetIndexes" : 
+					[
+						2,
+						3,
+						4
+					]
+				},
+				{
+					"build" : "build-llama/ggml/src/ggml-cpu",
+					"jsonFile" : "directory-build-llama.ggml.src.ggml-cpu-Release-6bb02bbae39f2431a0e2.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 2,
+					"source" : "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/src/ggml-cpu"
+				},
+				{
+					"build" : "build-llama/src",
+					"jsonFile" : "directory-build-llama.src-Release-d60cfc5bd94bb9d59a84.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "/home/baba/Documents/cortex/vendor/llama.cpp/src",
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"build" : "build-llama/common",
+					"jsonFile" : "directory-build-llama.common-Release-1cee4789c3957d3d38a2.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "/home/baba/Documents/cortex/vendor/llama.cpp/common",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "llama-android",
+					"targetIndexes" : 
+					[
+						6
+					]
+				},
+				{
+					"childIndexes" : 
+					[
+						2
+					],
+					"directoryIndexes" : 
+					[
+						1,
+						5,
+						6
+					],
+					"name" : "llama.cpp",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						5
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						2,
+						3,
+						4
+					],
+					"name" : "ggml",
+					"parentIndex" : 1,
+					"targetIndexes" : 
+					[
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 6,
+					"id" : "build_info::@8bf2afb4d8037c7b7d92",
+					"jsonFile" : "target-build_info-Release-63d7fb8384bee6e73ac6.json",
+					"name" : "build_info",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "common::@8bf2afb4d8037c7b7d92",
+					"jsonFile" : "target-common-Release-e4cc0f3c2c192e4ad5fe.json",
+					"name" : "common",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "ggml::@23533c6d68a59d54598d",
+					"jsonFile" : "target-ggml-Release-e9a57687324320572bf8.json",
+					"name" : "ggml",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "ggml-base::@23533c6d68a59d54598d",
+					"jsonFile" : "target-ggml-base-Release-9d25c774bbed69cb71b0.json",
+					"name" : "ggml-base",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "ggml-cpu::@23533c6d68a59d54598d",
+					"jsonFile" : "target-ggml-cpu-Release-af35305554d7460fbff4.json",
+					"name" : "ggml-cpu",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "llama::@b791850eb95f38641ccb",
+					"jsonFile" : "target-llama-Release-c93cf3857d5e7c508b80.json",
+					"name" : "llama",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "llama-android::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-llama-android-Release-70ee753f1968ff123509.json",
+					"name" : "llama-android",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/baba/Documents/cortex/android/llama/.cxx/Release/626ml1pe/x86_64",
+		"source" : "/home/baba/Documents/cortex/android/llama/src/main/cpp"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

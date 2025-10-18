@@ -1,4 +1,4 @@
-# Install script for directory: /home/baba/Documents/cortex/android/vendor/llama.cpp/ggml
+# Install script for directory: /home/baba/Documents/cortex/vendor/llama.cpp/ggml
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -68,21 +68,21 @@ endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-cpu.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-alloc.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-backend.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-blas.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-cann.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-cpp.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-cuda.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-opt.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-metal.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-rpc.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-sycl.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-vulkan.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/ggml-webgpu.h"
-    "/home/baba/Documents/cortex/android/vendor/llama.cpp/ggml/include/gguf.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-cpu.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-alloc.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-backend.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-blas.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-cann.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-cpp.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-cuda.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-opt.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-metal.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-rpc.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-sycl.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-vulkan.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/ggml-webgpu.h"
+    "/home/baba/Documents/cortex/vendor/llama.cpp/ggml/include/gguf.h"
     )
 endif()
 

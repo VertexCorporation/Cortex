@@ -33,6 +33,7 @@ class AIMessageTile extends StatefulWidget {
     this.onStop,
     this.onChangeModel,
     this.isThinking = false,
+    required this.isPersistentlyDynamic,
   });
 
   final String text;
@@ -48,6 +49,7 @@ class AIMessageTile extends StatefulWidget {
   final VoidCallback? onStop;
   final ValueChanged<String>? onChangeModel;
   final bool isThinking;
+  final bool isPersistentlyDynamic;
 
   @override
   State<AIMessageTile> createState() => _AIMessageTileState();
@@ -310,6 +312,7 @@ class _AIMessageTileState extends State<AIMessageTile>
       conversationHasPhoto: conversationHasPhoto,
       isSubscribed: chatState.isUserSubscribed,
       premiumTrialUses: chatState.premiumTrialUses,
+      isPersistentlyDynamic: widget.isPersistentlyDynamic,
     );
   }
 

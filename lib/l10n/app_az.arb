@@ -589,5 +589,7 @@
   "channelEngagementName": "Dost Xatırlatmalar",
   "channelEngagementDescription": "Sizi məşğul saxlamaq üçün əyləncəli bildirişlər.",
   "channelGreetingsName": "Gündəlik Salamlar",
-  "channelGreetingsDescription": "Sabahınız xeyir və gecəniz xeyir kimi mesajlar."
+  "channelGreetingsDescription": "Sabahınız xeyir və gecəniz xeyir kimi mesajlar.",
+  "exitAppTitle": "Bu qədər tez ayrılırsınız?",
+  "exitAppConfirmation": "Bu heyrətamiz platformanı tərk etmək istədiyinizə əminsiniz?"
 }

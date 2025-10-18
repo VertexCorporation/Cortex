@@ -2004,4 +2004,11 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'Sabahınız xeyir və gecəniz xeyir kimi mesajlar.';
+
+  @override
+  String get exitAppTitle => 'Bu qədər tez ayrılırsınız?';
+
+  @override
+  String get exitAppConfirmation =>
+      'Bu heyrətamiz platformanı tərk etmək istədiyinizə əminsiniz?';
 }
