@@ -769,5 +769,7 @@
   "channelEngagementName": "Дружеские напоминания",
   "channelEngagementDescription": "Забавные уведомления, которые помогут вам оставаться в курсе событий.",
   "channelGreetingsName": "Ежедневные приветствия",
-  "channelGreetingsDescription": "Сообщения типа «доброе утро» и «спокойной ночи»."
+  "channelGreetingsDescription": "Сообщения типа «доброе утро» и «спокойной ночи».",
+  "exitAppTitle": "Уходите так скоро?",
+  "exitAppConfirmation": "Вы уверены, что хотите покинуть эту замечательную платформу?"
 }

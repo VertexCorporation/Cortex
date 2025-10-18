@@ -769,5 +769,7 @@
   "channelEngagementName": "フレンドリーなリマインダー",
   "channelEngagementDescription": "あなたを夢中にさせる楽しい通知。",
   "channelGreetingsName": "日々の挨拶",
-  "channelGreetingsDescription": "おはよう、おやすみなどのメッセージ。"
+  "channelGreetingsDescription": "おはよう、おやすみなどのメッセージ。",
+  "exitAppTitle": "もう終了しますか？",
+  "exitAppConfirmation": "本当にこの素晴らしいプラットフォームを終了してもよろしいですか？"
 }

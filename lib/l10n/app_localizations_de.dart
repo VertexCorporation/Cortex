@@ -2031,4 +2031,11 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'Die Nachrichten wie Guten Morgen und Gute Nacht.';
+
+  @override
+  String get exitAppTitle => 'So bald gehen?';
+
+  @override
+  String get exitAppConfirmation =>
+      'Möchten Sie diese tolle Plattform wirklich verlassen?';
 }

@@ -7,6 +7,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../../../../internet.dart';
 import '../../../../notifications.dart';
 import '../../../../theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -33,18 +34,15 @@ class InputField extends StatefulWidget {
   final bool isLimitExceeded;
   final TextEditingController controller;
   final FocusNode textFieldFocusNode;
-  final ValueChanged<String> onTextChanged;
   final Future<void> Function() onSend;
   final Future<void> Function() onApplyEditedMessage;
   final bool isPhotoLoading;
   final Animation<Offset> slideAnimation;
   final Animation<double> fadeAnimation;
-  final bool isOffline;
   final bool isSending;
   final bool isPremiumModel;
   final bool isSubscribed;
   final int premiumTrialUses;
-  // Parameters used in editing mode and for credit checking.
   final String? originalMessageText;
   final bool isStorageSufficient;
   final int totalCredits;
@@ -67,13 +65,11 @@ class InputField extends StatefulWidget {
     required this.isLimitExceeded,
     required this.controller,
     required this.textFieldFocusNode,
-    required this.onTextChanged,
     required this.onSend,
     required this.onApplyEditedMessage,
     required this.isPhotoLoading,
     required this.slideAnimation,
     required this.fadeAnimation,
-    required this.isOffline,
     required this.isSending,
     required this.isPremiumModel,
     required this.isSubscribed,
@@ -111,6 +107,7 @@ class InputFieldState extends State<InputField> {
   /// this variable is cleared, so any new photo is considered a change.
   File? _originalPhoto;
 
+
   @override
   void initState() {
     super.initState();
@@ -118,9 +115,11 @@ class InputFieldState extends State<InputField> {
       _selectedPhoto = widget.preselectedPhoto;
       _originalPhoto = widget.preselectedPhoto;
     }
-    // This listener ensures that when the controller text changes, we also
-    // notify the parent to rebuild and re-evaluate the send button state.
-    widget.controller.addListener(() => widget.onTextChanged(widget.controller.text));
+    widget.controller.addListener(() {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -325,7 +324,6 @@ class InputFieldState extends State<InputField> {
         color: AppColors.primaryColor.inverted,
         fontSize: screenWidth * 0.04,
       ),
-      onChanged: widget.onTextChanged,
       onSubmitted: (value) async {
         if (isSendButtonEnabled) await widget.onSend();
       },
@@ -334,21 +332,28 @@ class InputFieldState extends State<InputField> {
 
   /// Builds the Send/Stop action button.
   Widget _buildSendButton(double screenWidth) {
+    final bool isConnected = context.watch<InternetProvider>().isConnected;
+
     return Padding(
       padding: EdgeInsets.only(
         right: screenWidth * 0.02,
-        // Bottom padding aligns it with the TextField's baseline
         bottom: 8.0,
       ),
-      child: ValueListenableBuilder<TextEditingValue>(
-        valueListenable: widget.controller,
-        builder: (_, __, ___) => ActionButtonWidget(
-          isEnabled: isSendButtonEnabled,
-          isOffline: widget.isOffline,
-          isSending: widget.isSending,
-          onSend: widget.onSend,
-          onStop: _handleStop,
-        ),
+      child: Builder(
+        builder: (context) {
+          bool calculatedIsEnabled = isSendButtonEnabled;
+
+          if ((widget.isServerSideModel || widget.isDynamicChatMode) && !isConnected) {
+            calculatedIsEnabled = false;
+          }
+
+          return ActionButtonWidget(
+            isEnabled: calculatedIsEnabled,
+            isSending: widget.isSending,
+            onSend: widget.onSend,
+            onStop: _handleStop,
+          );
+        },
       ),
     );
   }
@@ -399,7 +404,7 @@ class InputFieldState extends State<InputField> {
                       children: [
                         if (_selectedPhoto != null && _isPngFile(_selectedPhoto!))
                           Container(
-                            color: AppColors.primaryColor.inverted.withOpacity(0.5),
+                            color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
                           ),
                         if (_selectedPhoto != null)
                           Image.file(

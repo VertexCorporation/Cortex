@@ -63,12 +63,12 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   late final ConfettiController _confettiController;
   StreamSubscription? _purchaseCompletedSubscription;
 
-  // --- THE UNIFIED BRAIN: SINGLE SOURCE OF TRUTH FOR THE ENTIRE UI ---
   // These local variables hold the active subscription state for the entire UI.
   // They are updated INSTANTLY by proactive updates and LATER confirmed by backend syncs.
   // This ensures the checkmark and the selection border are ALWAYS consistent.
   int _uiActiveSubscriptionLevel = 0;
   String? _uiActiveSubscriptionOption;
+  late FundsBackend _backend;
 
   @override
   void initState() {
@@ -79,11 +79,11 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     _confettiController = ConfettiController(duration: const Duration(seconds: 1));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final backend = Provider.of<FundsBackend>(context, listen: false);
-      backend.addListener(_onBackendUpdate);
+      _backend = Provider.of<FundsBackend>(context, listen: false);
+      _backend.addListener(_onBackendUpdate);
       _initializeUiStateFromBackend();
       _updateFogVisibility();
-      _purchaseCompletedSubscription = backend.onPurchaseCompleted.listen((String purchasedProductId) {
+      _purchaseCompletedSubscription = _backend.onPurchaseCompleted.listen((String purchasedProductId) {
         if (mounted) {
           _confettiController.play();
           _updateUiAfterPurchase(purchasedProductId);
@@ -94,9 +94,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   @override
   void dispose() {
-    if (mounted) {
-      Provider.of<FundsBackend>(context, listen: false).removeListener(_onBackendUpdate);
-    }
+    _backend.removeListener(_onBackendUpdate);
     _pageController.dispose();
     for (var controller in _scrollControllers) {
       controller.dispose();
@@ -219,8 +217,13 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   void _onPrimaryButtonPressed() {
     final backend = Provider.of<FundsBackend>(context, listen: false);
-    if (backend.isPurchasePending) return;
     final localizations = AppLocalizations.of(context)!;
+    if (backend.isPurchasePending) return;
+    if (backend.allProducts.isEmpty) {
+      log('Purchase blocked: Product details are not loaded yet.', name: 'FundsScreen');
+      _showCustomNotification(message: localizations.productNotFound, isSuccess: false);
+      return;
+    }
     String? productIdToPurchase;
     int planLevel = _currentPage;
     if (_currentPage == 0) {
@@ -460,7 +463,6 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                           alignment: Alignment.bottomCenter,
                           child: IgnorePointer(
                             child: AnimatedOpacity(
-                              // _showScrollFog yerine _showBottomScrollFog kullanılıyor
                               opacity: _showBottomScrollFog ? 1.0 : 0.0,
                               duration: const Duration(milliseconds: 250),
                               child: Container(

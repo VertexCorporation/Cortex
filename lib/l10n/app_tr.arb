@@ -769,5 +769,7 @@
   "channelEngagementName": "Dostça Hatırlatmalar",
   "channelEngagementDescription": "İlginizi çekecek eğlenceli bildirimler.",
   "channelGreetingsName": "Günlük Selamlar",
-  "channelGreetingsDescription": "Günaydın, iyi geceler gibi mesajlar."
+  "channelGreetingsDescription": "Günaydın, iyi geceler gibi mesajlar.",
+  "exitAppTitle": "Bu kadar erken mi gidiyorsun?",
+  "exitAppConfirmation": "Bu harika platformdan ayrılmak istediğinize emin misiniz?"
 }

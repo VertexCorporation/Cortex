@@ -2011,4 +2011,11 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'As mensagens como bom dia e boa noite.';
+
+  @override
+  String get exitAppTitle => 'Vai embora tão cedo?';
+
+  @override
+  String get exitAppConfirmation =>
+      'Tem certeza de que deseja sair desta plataforma incrível?';
 }

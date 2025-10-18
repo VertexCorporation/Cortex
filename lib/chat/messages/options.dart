@@ -11,9 +11,6 @@ import 'package:provider/provider.dart'; // For NotificationService
 import 'package:cortex/l10n/app_localizations.dart'; // For localizations
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
-// Ensure these import paths are correct for your project structure
-// import '../../main.dart'; // Assuming main.dart exports necessary globals like mainScreenKey or similar.
-// If main.dart is not needed here directly, consider removing to reduce coupling.
 import '../../notifications.dart';
 import '../../theme.dart'; // For AppColors
 import '../../models/backend/data.dart'; // For ModelData
@@ -27,8 +24,6 @@ const Duration _kLongAnimationDuration = Duration(milliseconds: 200);
 // Default value for model IDs if none is provided or resolvable.
 const String _kDefaultModelId = 'default_model_id'; // Used as a fallback
 
-/// Defines UI proportionality constants relative to screen dimensions.
-/// This helps in creating responsive UI elements.
 class _UIFactors {
   // General Panel and Option Metrics
   static const double panelWidthFactor = 0.4;          // Panel width as a factor of screen width
@@ -77,79 +72,27 @@ enum MessageOption {
   edit,
 }
 
-/// A panel that displays message options with a scale animation.
-///
-/// The panel's visibility and the options displayed can be dynamic,
-/// reacting to internet connectivity, AI thinking state, and other factors.
-/// It positions itself relative to a tap [position] on the screen.
+
 class AnimatedMessageOptionsPanel extends StatefulWidget {
-  /// The text content of the message for which options are being shown.
-  /// Used, for example, by the 'Copy' and 'Report' options.
   final String messageText;
-
-  /// A [ValueNotifier] for the message text. If the message text can change
-  /// while the panel is open (e.g., streaming response), this allows the
-  /// 'Select Text' screen to get the most up-to-date text.
   final ValueNotifier<String> messageNotifier;
-
-  /// The list of [MessageOption] enums that should potentially be displayed.
-  /// The actual visible options are a subset of these, filtered by internal logic.
   final List<MessageOption> options;
-
-  /// Flag indicating if the message has already been reported.
-  /// If true, the 'Report' option might be disabled or hidden.
   final bool isReported;
-
-  /// Callback triggered when the 'Report' option is selected.
   final VoidCallback? onReport;
-
-  /// Callback triggered when the panel is dismissed, either by tapping outside
-  /// or by selecting an option that closes the panel.
   final VoidCallback onDismiss;
-
-  /// The global screen coordinates where the tap/event occurred, used as a basis
-  /// for positioning the panel. The panel will attempt to adjust its position
-  /// to stay within screen bounds.
   final Offset position;
-
-  /// The current model ID, potentially including an extension identifier
-  /// (e.g., "gemini-1.5-pro" or "gpt-4-browsing").
-  /// This is crucial for determining model-specific capabilities and available extensions.
   final String? modelIdAndExtension;
-
-  /// Callback triggered when the 'Regenerate' option is selected.
   final VoidCallback? onRegenerate;
-
-  /// Callback triggered when the 'Change Model' option results in a new model/extension selection.
-  /// The `String` argument is the ID of the newly selected model/extension.
   final ValueChanged<String>? onChangeModel;
-
-  /// Callback triggered when the 'Stop' option is selected.
   final VoidCallback? onStop;
-
-  /// Callback triggered when the 'Edit' option is selected.
   final VoidCallback? onEdit;
-
-  /// Flag indicating if the conversation involves a photo.
-  /// This affects which models/extensions can be selected via 'Change Model'.
   final bool conversationHasPhoto;
-
-  /// A direct flag indicating if the AI is currently processing or "thinking".
-  /// Used if a [ValueListenable] is not available.
   final bool? isThinking;
-
-  /// A [ValueListenable] that reflects the AI's "thinking" state.
-  /// If provided, the panel can reactively dismiss itself or change options
-  /// when the thinking state changes.
   final ValueListenable<bool>? isThinkingNotifier;
-
-  /// A [ValueNotifier] indicating if the chat screen is globally waiting for a response.
-  /// This can influence the visibility of options like 'Regenerate' or 'Change Model'.
   final ValueNotifier<bool>? isWaitingForResponseNotifier;
   final bool isSubscribed;
-  /// The number of premium model trial uses for the current day.
   final int premiumTrialUses;
-
+  final bool? isPersistentlyDynamic;
 
   const AnimatedMessageOptionsPanel({
     Key? key,
@@ -171,6 +114,7 @@ class AnimatedMessageOptionsPanel extends StatefulWidget {
     this.isWaitingForResponseNotifier,
     required this.isSubscribed,
     required this.premiumTrialUses,
+    this.isPersistentlyDynamic,
   }) : super(key: key);
 
   @override
@@ -182,15 +126,13 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
-  bool _hasInternet = true; // Assume internet initially, will be checked.
-  late String _currentModelId; // Effective model ID used internally.
+  bool _hasInternet = true;
+  late String _currentModelId;
 
-  // Listeners for reactive state changes.
   VoidCallback? _thinkingListenerCallback;
   VoidCallback? _waitingListenerCallback;
-  bool _wasWaitingForResponse = false; // Tracks previous waiting state.
+  bool _wasWaitingForResponse = false;
 
-  // UI dimensions, initialized in build based on screen size.
   double _panelWidth = 0;
   double _optionHeight = 0;
 
@@ -200,11 +142,10 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     const String logPrefix = "[AnimatedMessageOptionsPanel.initState]";
     debugPrint("$logPrefix Initializing...");
 
-    // Set the current model ID, cleaning it if necessary and defaulting if null.
     _initializeCurrentModelId(widget.modelIdAndExtension, logPrefix);
 
     _animationController = AnimationController(
-      duration: _kShortAnimationDuration, // Short duration for quick appearance
+      duration: _kShortAnimationDuration,
       vsync: this,
     );
     _scaleAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(
@@ -353,7 +294,6 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     }
   }
 
-  /// Asynchronously checks for internet connectivity and updates `_hasInternet`.
   Future<void> _checkInternetConnection() async {
     const String logPrefix = "[AnimatedMessageOptionsPanel._checkInternetConnection]";
     try {
@@ -376,7 +316,6 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     }
   }
 
-  /// Reverses the panel animation and calls `widget.onDismiss` upon completion.
   void _dismissPanel() {
     const String logPrefix = "[AnimatedMessageOptionsPanel._dismissPanel]";
     if (!mounted) {
@@ -396,8 +335,6 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
         }
       });
     } else if (_animationController.status == AnimationStatus.dismissed) {
-      // If already dismissed (animation-wise) but onDismiss might not have been called
-      // (e.g., due to rapid state changes or external dismissal not through this method).
       debugPrint("$logPrefix Panel was already in dismissed animation state. Calling onDismiss directly.");
       widget.onDismiss();
     } else {
@@ -405,63 +342,75 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     }
   }
 
-  /// Determines which of the `widget.options` should be visible based on current app state.
+  /// [REBUILT] Determines which options should be visible based on the current app state.
+  /// This now correctly handles the "Change Model" option for dynamic chats.
   List<MessageOption> _calculateVisibleOptions(bool isChatScreenWaiting, bool isMessageCurrentlyThinking) {
     const String logPrefix = "[AnimatedMessageOptionsPanel._calculateVisibleOptions]";
     if (!mounted) {
-      debugPrint("$logPrefix Not mounted. Returning empty list of options.");
+      debugPrint("$logPrefix Not mounted. Returning empty list.");
       return [];
     }
 
     final modelSeriesData = _findParentSeriesData();
+    // This is our key condition to identify a dynamic chat context.
+    final bool isDynamicContext = modelSeriesData.isEmpty;
+
     final bool isOfflineModel = (modelSeriesData['type'] as String? ?? 'online') == 'offline';
     final bool currentModelCanHandleImages = ModelData.hasModality(_currentModelId, 'image');
-
     final bool hasPremiumAccess = widget.isSubscribed || widget.premiumTrialUses < 3;
-
     final bool isCurrentModelPremium = (ModelData.getPreciseModelData(_currentModelId)['tier'] as String? ?? 'free') == 'premium';
 
-
     return widget.options.where((option) {
-      String reason = ""; // For debugging
+      String reason = "";
       bool shouldShow = true;
 
-      if (isChatScreenWaiting &&
-          (option == MessageOption.regenerate || option == MessageOption.changeModel || option == MessageOption.edit)) {
+      // Universal rule: Don't show destructive/new actions while the app is busy.
+      if (isChatScreenWaiting && (option == MessageOption.regenerate || option == MessageOption.changeModel || option == MessageOption.edit)) {
         shouldShow = false;
         reason = "Chat screen is globally waiting for a response.";
       }
 
+      // 'Stop' should only appear when the AI is actively generating a response.
       if (shouldShow && option == MessageOption.stop && !isMessageCurrentlyThinking) {
         shouldShow = false;
         reason = "Message is not currently thinking.";
       }
 
+      // Rules for 'Regenerate'.
       if (shouldShow && option == MessageOption.regenerate) {
         if (isCurrentModelPremium && !hasPremiumAccess) {
           shouldShow = false;
-          reason = "Regenerate is hidden. The model is premium and the user has no subscription or trial uses left.";
+          reason = "Model is premium and user has no access.";
         } else if (isOfflineModel || !_hasInternet) {
           shouldShow = false;
-          reason = "Regenerate is not supported for offline models or without an internet connection.";
+          reason = "Regenerate is not supported for offline models or without internet.";
         }
       }
 
+      // Universal rule for actions that would break if a photo is present but the model can't handle it.
       if (shouldShow && widget.conversationHasPhoto && !currentModelCanHandleImages) {
         if (option == MessageOption.regenerate || option == MessageOption.edit || option == MessageOption.changeModel) {
           shouldShow = false;
-          reason = "Conversation contains a photo, but the current model ('$_currentModelId') cannot process images, so destructive actions are disabled.";
+          reason = "Conversation has a photo, but current model ('$_currentModelId') cannot process images.";
         }
       }
 
+      // --- THE CORE LOGIC FIX ---
       if (shouldShow && option == MessageOption.changeModel) {
-        final int validExtCount = _validExtensionCountForChangingModel(modelSeriesData);
-        if (validExtCount <= 1) {
-          shouldShow = false;
-          reason = "Not enough other extensions to change to (found $validExtCount).";
+        if (isDynamicContext) {
+          // In a dynamic chat, ALWAYS allow changing the model. The dialog will show all available models.
+          shouldShow = true;
+        } else {
+          // In a standard chat, only show if there are other extensions to switch to.
+          final int validExtCount = _validExtensionCountForChangingModel(modelSeriesData);
+          if (validExtCount <= 1) {
+            shouldShow = false;
+            reason = "Standard chat: Not enough other extensions to change to (found $validExtCount).";
+          }
         }
       }
 
+      // 'Report' should not appear if already reported.
       if (shouldShow && option == MessageOption.report && widget.isReported) {
         shouldShow = false;
         reason = "Message has already been reported.";
@@ -475,9 +424,7 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     }).toList();
   }
 
-  /// Retrieves the base model series data for the currently active model extension.
-  /// This function is now the single, authoritative source for finding the parent series.
-  /// It searches the entire model cache to find which series contains the current extension.
+  // ... (_findParentSeriesData, _validExtensionCountForChangingModel are unchanged)
   Map<String, dynamic> _findParentSeriesData() {
     const String logPrefix = "[AnimatedMessageOptionsPanel._findParentSeriesData]";
     if (!mounted || _currentModelId == _kDefaultModelId) return {};
@@ -488,18 +435,14 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
       return {};
     }
 
-    // Iterate through all top-level model series.
     for (final seriesData in allCachedModels) {
       final extensionsMap = seriesData['extensions'] as Map<String, dynamic>?;
-      // Check if this series has an 'extensions' map and if our current model ID is a key in it.
       if (extensionsMap?.containsKey(_currentModelId) ?? false) {
         debugPrint("$logPrefix Found parent series '${seriesData['id']}' for extension '$_currentModelId'.");
-        return seriesData; // Return the entire data map for the parent series.
+        return seriesData;
       }
     }
 
-    // Fallback if no parent is found (e.g., for a model without extensions).
-    // Try to find a direct match for the model ID itself.
     final directMatch = allCachedModels.firstWhere((m) => m['id'] == _currentModelId, orElse: () => {});
     if (directMatch.isNotEmpty) {
       debugPrint("$logPrefix Found direct match for '$_currentModelId' (it's a base model itself).");
@@ -529,7 +472,6 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
 
     debugPrint("$logPrefix Found ${extMap.length} total extensions for '$seriesId'.");
 
-    // The rest of the logic is correct and remains the same.
     int count = 0;
     extMap.entries.forEach((entry) {
       final dynamic extensionData = entry.value;
@@ -549,37 +491,7 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     return count;
   }
 
-  /// Checks if the currently selected model (including its specific extension) can handle images.
-  /// --- FIX: This now accepts the pre-fetched parent series data. ---
-  bool _currentExtCanHandleImage(Map<String, dynamic> parentSeriesData) {
-    const String logPrefix = "[AnimatedMessageOptionsPanel._currentExtCanHandleImage]";
-
-    if (parentSeriesData.isEmpty) {
-      debugPrint("$logPrefix No parent series data provided. Assuming cannot handle images.");
-      return false;
-    }
-
-    final seriesId = parentSeriesData['id'] ?? 'unknown_series';
-    debugPrint("$logPrefix Checking for full model ID: '$_currentModelId' within series: '$seriesId'");
-
-    final extensionsMap = parentSeriesData['extensions'] as Map<String, dynamic>?;
-    if (extensionsMap == null || extensionsMap.isEmpty) {
-      bool seriesCanHandle = parentSeriesData['canHandleImage'] as bool? ?? false;
-      debugPrint("$logPrefix No extensions map for '$seriesId'. Series canHandleImage: $seriesCanHandle");
-      return seriesCanHandle;
-    }
-
-    final currentExtensionData = extensionsMap[_currentModelId];
-    if (currentExtensionData is Map) {
-      bool extCanHandle = (currentExtensionData['canHandleImage'] as bool?) ?? false;
-      debugPrint("$logPrefix Found data for extension '$_currentModelId'. Its canHandleImage: $extCanHandle");
-      return extCanHandle;
-    } else {
-      debugPrint("$logPrefix CRITICAL: Data for full model ID '$_currentModelId' not found as a key in 'extensions' map of '$seriesId'. Assuming cannot handle images.");
-      return false;
-    }
-  }
-
+  // ... (build and all other methods are unchanged from your provided code, as they were already correct)
   @override
   Widget build(BuildContext context) {
     const String logPrefix = "[AnimatedMessageOptionsPanel.build]";
@@ -754,16 +666,23 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
   /// DUAL MODE OPERATION:
   /// 1. STANDARD MODE: If a parent model series is found, it lists the extensions of that series.
   /// 2. DYNAMIC MODE: If no parent series is found (typical for dynamic chat), it lists ALL
-  ///    available models, categorized and sorted alphabetically, consistent with the main assistant panel.
+  ///    available models, categorized and sorted alphabetically. It now correctly filters
+  ///    offline models to show ONLY those that are downloaded.
   ///
   /// [currentFullModelId] is the ID of the currently active model/extension.
   /// Returns the ID of the selected model/extension, or null if cancelled.
   Future<String?> _showModelExtensionsDialog(BuildContext context, String currentFullModelId) async {
     const String logPrefix = "[AnimatedMessageOptionsPanel._showModelExtensionsDialog]";
 
+    // 1. Get the IDs of all offline models that are actually downloaded on the device.
+    // This is now possible thanks to a static method in the `UserModels` class.
+    final downloadedModelPaths = await UserModels.loadDownloadedModelPaths();
+    final Set<String> downloadedModelIds = downloadedModelPaths.keys.toSet();
+    debugPrint("$logPrefix Found ${downloadedModelIds.length} downloaded offline models on device.");
+
     final modelSeriesData = _findParentSeriesData();
-    // A dialog is for "dynamic mode" if it's not a standard model with multiple extensions.
-    final bool isDynamicModeDialog = modelSeriesData.isEmpty || (modelSeriesData['extensions'] as Map? ?? {}).isEmpty;
+    // Determine if we are in dynamic chat mode.
+    final bool isDynamicModeDialog = widget.isPersistentlyDynamic!;
     final String dialogTitle = AppLocalizations.of(context)!.changeModel;
 
     debugPrint("$logPrefix Showing dialog. Is Dynamic Mode: $isDynamicModeDialog. Current full ID: '$currentFullModelId'");
@@ -774,11 +693,11 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     List<Map<String, dynamic>> itemsForDialog = [];
 
     if (isDynamicModeDialog) {
-      // --- DYNAMIC MODE: BUILD LIST OF ALL MODELS (Corrected Sorting & Grouping) ---
-      debugPrint("$logPrefix Dynamic Mode: Building list of all available models with correct sorting.");
+      // --- DYNAMIC MODE: LIST ALL AVAILABLE MODELS (FILTERED) ---
+      debugPrint("$logPrefix Dynamic Mode: Building list of all available models with correct filtering.");
       final allModelInfos = ModelData.getCachedModelsSync();
       final List<Map<String, dynamic>> onlineOptions = [];
-      final List<Map<String, dynamic>> offlineOptions = [];
+      final List<Map<String, dynamic>> offlineOptions = []; // Start with an empty list
       final List<Map<String, dynamic>> characterOptions = [];
       final List<Map<String, dynamic>> selfOptions = [];
       final localizations = AppLocalizations.of(context)!;
@@ -787,36 +706,46 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
         final preciseData = ModelData.getPreciseModelData(modelMap['id'] as String);
         final String category = preciseData['category'] as String? ?? 'online';
         final String type = preciseData['type'] as String? ?? 'online';
+        final String modelId = preciseData['id'] as String;
 
         if (category == 'roleplay') {
           characterOptions.add(preciseData);
         } else if (category == 'self') {
           selfOptions.add(preciseData);
-        } else if (type == 'offline') {
-          offlineOptions.add(preciseData);
-        } else if (type == 'online') {
-          // *** CRITICAL LOGIC FROM CHAT.DART ***
-          // If it's a series with extensions, add each extension individually.
+        }
+        // *** CHANGE START: OFFLINE MODEL FILTER ***
+        // 2. If a model's type is 'offline', add it to the list ONLY if its ID exists in the `downloadedModelIds` set.
+        else if (type == 'offline') {
+          if (downloadedModelIds.contains(modelId)) {
+            offlineOptions.add(preciseData);
+            debugPrint("$logPrefix   - Adding downloaded offline model to list: '$modelId'");
+          } else {
+            debugPrint("$logPrefix   - SKIPPING offline model, not downloaded: '$modelId'");
+          }
+        }
+        // *** CHANGE END ***
+        else if (type == 'online') {
           final extensions = preciseData['extensions'] as Map<String, dynamic>?;
           if (extensions != null && extensions.isNotEmpty) {
             for (final extId in extensions.keys) {
               onlineOptions.add(ModelData.getPreciseModelData(extId));
             }
           } else {
-            // Otherwise, it's a standalone online model.
             onlineOptions.add(preciseData);
           }
         }
       }
 
+      // Sort alphabetically
       final sorter = (Map<String, dynamic> a, Map<String, dynamic> b) =>
           (a['title'] as String).toLowerCase().compareTo((b['title'] as String).toLowerCase());
 
       onlineOptions.sort(sorter);
-      offlineOptions.sort(sorter);
+      offlineOptions.sort(sorter); // The downloaded models are sorted amongst themselves
       characterOptions.sort(sorter);
       selfOptions.sort(sorter);
 
+      // Add categories (The header won't even be added if a category is empty)
       void addCategory(String title, List<Map<String, dynamic>> models) {
         if (models.isNotEmpty) {
           itemsForDialog.add({'isHeader': true, 'name': title});
@@ -835,7 +764,7 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
       addCategory(localizations.customModels, selfOptions);
 
     } else {
-      // --- STANDARD MODE: LIST EXTENSIONS OF A SERIES ---
+      // --- STANDARD MODE: LIST EXTENSIONS OF A SERIES (Unchanged) ---
       debugPrint("$logPrefix Standard Mode: Listing extensions for series '${modelSeriesData['id']}'.");
       final allExtensionsMap = modelSeriesData['extensions'] as Map<String, dynamic>?;
       if (allExtensionsMap != null) {
@@ -850,12 +779,11 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
           };
         }).toList();
 
-        // Also sort extensions alphabetically by title
         itemsForDialog.sort((a, b) => (a['name'] as String).toLowerCase().compareTo((b['name'] as String).toLowerCase()));
       }
     }
 
-    // --- UNIVERSAL FILTERING & DIALOG PRESENTATION LOGIC (UNCHANGED) ---
+    // --- (The rest of the universal filtering and dialog presentation logic remains the same) ---
     final List<Map<String, dynamic>> filteredItemsForDialog = itemsForDialog.where((item) {
       if (item['isHeader'] == true) return true;
 
@@ -877,7 +805,6 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     // Remove headers that have no items under them after filtering
     for (int i = filteredItemsForDialog.length - 1; i >= 0; i--) {
       if (filteredItemsForDialog[i]['isHeader'] == true) {
-        // Check if the next item is also a header or if it's the end of the list
         if (i == filteredItemsForDialog.length - 1 || filteredItemsForDialog[i + 1]['isHeader'] == true) {
           filteredItemsForDialog.removeAt(i);
         }
@@ -1393,12 +1320,13 @@ Future<void> showMessageOptions({
   ValueNotifier<bool>? isWaitingForResponseNotifier,
   required bool isSubscribed,
   required int premiumTrialUses,
+  bool? isPersistentlyDynamic,
 }) async {
   const String functionName = "[Global.showMessageOptions]"; // For logging
   debugPrint(
       "$functionName CALLED. Message (start): '${messageText.substring(0, math.min(20, messageText.length))}', "
           "ModelID: '$modelIdAndExtension', Options provided: ${options.length}, Photo: $conversationHasPhoto, Thinking: $isThinking, "
-          "Subscribed: $isSubscribed, Trials: $premiumTrialUses"); // Log'a eklendi
+          "Subscribed: $isSubscribed, Trials: $premiumTrialUses");
 
   dismissCurrentMessageOptions(); // Ensure any previous panel is dismissed first
 
@@ -1435,6 +1363,7 @@ Future<void> showMessageOptions({
         isWaitingForResponseNotifier: isWaitingForResponseNotifier,
         isSubscribed: isSubscribed,
         premiumTrialUses: premiumTrialUses,
+        isPersistentlyDynamic: isPersistentlyDynamic,
       );
     },
   );
@@ -1443,11 +1372,44 @@ Future<void> showMessageOptions({
   debugPrint("$functionName New OverlayEntry inserted into the overlay.");
 }
 
-
-// Helper extension for logging list of strings or providing empty string if null/empty
-extension _StringListLogHelper on List<String>? {
-  String joinToStringOrEmpty() {
-    if (this == null || this!.isEmpty) return "[]";
-    return "[${this!.join(', ')}]";
-  }
-}
+/// wow
+/// wow
+/// wow
+/// wow
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///

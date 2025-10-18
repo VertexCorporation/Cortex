@@ -5,7 +5,6 @@ import 'package:cortex/chat/screen/unselected/cards.dart';
 import 'package:cortex/chat/screen/unselected/search.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/main.dart';
-import 'package:cortex/notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/models/backend/data.dart';
@@ -29,7 +28,6 @@ class SelectionScreen extends StatefulWidget {
   final List<ModelInfo> allModels;
   final List<ModelInfo> recentModels;
   final VoidCallback onReloadModels;
-  final bool hasInternetConnection;
   final bool conversationLimitReached;
   final Function(ModelInfo) onSelectModel;
   final VoidCallback onScrollToBottom;
@@ -44,7 +42,6 @@ class SelectionScreen extends StatefulWidget {
     required this.allModels,
     required this.recentModels,
     required this.onReloadModels,
-    required this.hasInternetConnection,
     required this.conversationLimitReached,
     required this.onSelectModel,
     required this.onScrollToBottom,
@@ -540,7 +537,6 @@ class SelectionScreenState extends State<SelectionScreen>
                         ? const ShimmerModelGridView(
                       gridKey: ValueKey('shimmer_grid_recent'),
                       itemCount: 3,
-                      isDetailed: false,
                       shrinkWrap: true,
                     )
                         : widget.recentModels.isEmpty
@@ -549,7 +545,6 @@ class SelectionScreenState extends State<SelectionScreen>
                         : ModelGridView(
                       gridKey: const ValueKey('recent_models_grid'),
                       models: widget.recentModels,
-                      hasInternetConnection: widget.hasInternetConnection,
                       conversationLimitReached: widget.conversationLimitReached,
                       onSelectModel: widget.onSelectModel,
                       shrinkWrap: true,
@@ -656,7 +651,6 @@ class SelectionScreenState extends State<SelectionScreen>
                   ? ShimmerModelGridView(
                 gridKey: const ValueKey('shimmer_grid_all'),
                 itemCount: 15,
-                isDetailed: true,
               )
                   : isFilterEmpty
                   ? _buildFilterEmptyState() // Shows when filter has no results
@@ -666,7 +660,6 @@ class SelectionScreenState extends State<SelectionScreen>
                 key: ValueKey(
                     'model_grid_${_activeFilter.name}_${widget.searchController.text}'),
                 models: _filteredModels,
-                hasInternetConnection: widget.hasInternetConnection,
                 conversationLimitReached:
                 widget.conversationLimitReached,
                 onSelectModel: widget.onSelectModel,
@@ -730,7 +723,7 @@ class SelectionScreenState extends State<SelectionScreen>
         Expanded(
           flex: 5,
           child: _FeatureCard(
-            text: widget.localizations.selectionScreenFeatureDynamicChat,
+            text: widget.localizations.selectionScreenFeatureDynamicChat + ' (Beta)',
             iconPath: 'assets/icons/chat.svg',
             height: largeCardSize,
             onTap: () => mainScreenKey.currentState?.startNewConversation(isDynamic: true),

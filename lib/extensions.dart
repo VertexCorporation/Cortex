@@ -293,8 +293,8 @@ class Extensions {
 
   /// Builds the main panel container with a list of extension options.
   ///
-  /// Its function signature has been updated to accept a list of maps,
-  /// allowing it to handle rich data for each extension, including the 'tier'.
+  /// This version has been heavily optimized for performance with long lists by using ListView.builder.
+  /// This ensures that the entrance/exit animations are smooth even with 100+ options.
   static Widget buildExtensionPanelWidget({
     required BuildContext context,
     required List<Map<String, dynamic>> options,
@@ -310,17 +310,17 @@ class Extensions {
     final verticalPadding = screenWidth * 0.02;
     final iconSize = screenWidth * 0.04;
     final panelBorderRadius = screenWidth * 0.02;
-    final itemRadius = screenWidth * 0.02;
-    final spaceBetweenIconAndText = horizontalPadding * 0.5;
 
     final textStyle = TextStyle(
       color: AppColors.primaryColor.inverted,
       fontSize: screenWidth * 0.04,
     );
 
-    // Calculate text width based on the 'title' field from each map.
+    // Calculate text width based on a sample of items or a fixed value for performance.
+    // For extreme performance, we avoid iterating the whole list here.
+    // A fixed reasonable width or calculating from the first few items is often sufficient.
     double longestTextWidth = 0;
-    for (var entry in options) {
+    for (var entry in options.take(10)) { // Check first 10 items for a good estimate
       final text = entry['title'] as String? ?? entry['id'];
       final TextPainter tp = TextPainter(
         text: TextSpan(text: text, style: textStyle),
@@ -332,51 +332,38 @@ class Extensions {
         longestTextWidth = tp.width;
       }
     }
+    double requiredPanelWidth = iconSize + (horizontalPadding * 0.5) + longestTextWidth + (horizontalPadding * 2);
+    double finalPanelWidth = requiredPanelWidth.clamp(screenWidth * 0.5, panelMaxWidth);
 
-    double requiredPanelWidth = iconSize + spaceBetweenIconAndText + longestTextWidth + (horizontalPadding * 2);
-    double finalPanelWidth = requiredPanelWidth.clamp(80.0, panelMaxWidth);
-
-    // Generate all extension rows.
-    List<Widget> itemWidgets = List.generate(options.length, (i) {
-      final optionData = options[i];
-      return _buildExtensionButtonRow(
-        context: context,
-        option: optionData,
-        isSelected: optionData['id'] == selectedExtension,
-        iconSize: iconSize,
-        horizontalPadding: horizontalPadding,
-        verticalPadding: verticalPadding,
-        minHeight: optionMinHeight,
-        borderRadius: getItemBorderRadius(i, options.length, itemRadius),
-        textStyle: textStyle,
-        onTap: () => onSelect(optionData),
-        showBottomBorder: i < options.length - 1,
-      );
-    });
-
-    Widget panelContent;
+    // --- PERFORMANCE CRITICAL CHANGE ---
     const int maxVisibleItems = 5;
+    final double totalHeight = options.length * optionMinHeight;
+    final double constrainedHeight = (maxVisibleItems * optionMinHeight).clamp(0, totalHeight);
 
-    if (options.length > maxVisibleItems) {
-      double scrollableHeight = maxVisibleItems * optionMinHeight;
-
-      panelContent = ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: scrollableHeight,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: itemWidgets,
-          ),
-        ),
-      );
-    } else {
-      panelContent = Column(
-        mainAxisSize: MainAxisSize.min,
-        children: itemWidgets,
-      );
-    }
+    Widget panelContent = SizedBox(
+      height: constrainedHeight,
+      child: ListView.builder(
+        padding: EdgeInsets.zero, // Remove default padding
+        shrinkWrap: true,
+        itemCount: options.length,
+        itemBuilder: (BuildContext context, int index) {
+          final optionData = options[index];
+          return _buildExtensionButtonRow(
+            context: context,
+            option: optionData,
+            isSelected: optionData['id'] == selectedExtension,
+            iconSize: iconSize,
+            horizontalPadding: horizontalPadding,
+            verticalPadding: verticalPadding,
+            minHeight: optionMinHeight,
+            borderRadius: BorderRadius.zero,
+            textStyle: textStyle,
+            onTap: () => onSelect(optionData),
+            showBottomBorder: index < options.length - 1,
+          );
+        },
+      ),
+    );
 
     return Material(
       shape: RoundedRectangleBorder(

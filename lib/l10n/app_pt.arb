@@ -769,5 +769,7 @@
   "channelEngagementName": "Lembretes amigáveis",
   "channelEngagementDescription": "Notificações divertidas para mantê-lo envolvido.",
   "channelGreetingsName": "Saudações diárias",
-  "channelGreetingsDescription": "As mensagens como bom dia e boa noite."
+  "channelGreetingsDescription": "As mensagens como bom dia e boa noite.",
+  "exitAppTitle": "Vai embora tão cedo?",
+  "exitAppConfirmation": "Tem certeza de que deseja sair desta plataforma incrível?"
 }

@@ -13,6 +13,8 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../internet.dart';
+
 /// A robust card widget that displays a single model, designed to prevent UI overflows.
 ///
 /// This card uses a combination of dynamic sizing and flexible widgets (`Flexible`, `FittedBox`)
@@ -21,12 +23,10 @@ import 'package:shimmer/shimmer.dart';
 class ModelCard extends StatelessWidget {
   final ModelInfo model;
   final VoidCallback? onTap;
-  final bool hasInternet;
 
   const ModelCard({
     super.key,
     required this.model,
-    required this.hasInternet,
     this.onTap,
   });
 
@@ -41,6 +41,7 @@ class ModelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasInternet = context.watch<InternetProvider>().isConnected;
     final bool isServerModel = model.path == null;
     final double offlineAlpha = (isServerModel && !hasInternet) ? 0.5 : 1.0;
 
@@ -164,7 +165,6 @@ class ModelCard extends StatelessWidget {
 /// A centralized, reusable grid for displaying a list of models.
 class ModelGridView extends StatelessWidget {
   final List<ModelInfo> models;
-  final bool hasInternetConnection;
   final bool conversationLimitReached;
   final Function(ModelInfo) onSelectModel;
   final Key? gridKey;
@@ -174,7 +174,6 @@ class ModelGridView extends StatelessWidget {
   const ModelGridView({
     super.key,
     required this.models,
-    required this.hasInternetConnection,
     required this.conversationLimitReached,
     required this.onSelectModel,
     this.gridKey,
@@ -187,6 +186,7 @@ class ModelGridView extends StatelessWidget {
     final notificationService = Provider.of<NotificationService>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
+    final bool isConnected = context.watch<InternetProvider>().isConnected;
 
     return GridView.builder(
       key: gridKey,
@@ -204,11 +204,10 @@ class ModelGridView extends StatelessWidget {
         final isServerModel = model.path == null;
         return ModelCard(
           model: model,
-          hasInternet: hasInternetConnection,
           onTap: () {
             if (conversationLimitReached) return;
 
-            if (isServerModel && !hasInternetConnection) {
+            if (isServerModel && !isConnected) {
               notificationService.showNotification(
                 message: localizations.internetRequired,
                 isSuccess: false,
@@ -223,49 +222,78 @@ class ModelGridView extends StatelessWidget {
   }
 }
 
-/// A shimmer placeholder that mimics the appearance of a [ModelCard].
+/// A shimmer placeholder that perfectly mimics the layout and proportions of a [ModelCard].
+///
+/// It uses a LayoutBuilder to dynamically calculate the sizes of its internal shimmer elements
+/// based on the constraints provided by the parent grid. This ensures that the placeholder
+/// has the exact same dimensions and visual structure as the real card it represents.
 class ShimmerModelCard extends StatelessWidget {
-  final bool isDetailed;
-  const ShimmerModelCard({super.key, this.isDetailed = true});
+  const ShimmerModelCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
       baseColor: AppColors.shimmerBase,
       highlightColor: AppColors.shimmerHighlight,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.secondaryColor,
-          borderRadius: BorderRadius.circular(isDetailed ? 16 : 24),
-        ),
-        child: isDetailed
-            ? Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(width: 56, height: 56, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12))),
-            const SizedBox(height: 12),
-            Container(height: 14, width: 70, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
-            const SizedBox(height: 6),
-            Container(height: 12, width: 50, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
-          ],
-        )
-            : null,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // These calculations mirror the ones in the real ModelCard to ensure a perfect match.
+          final cardWidth = constraints.maxWidth;
+          final imageSize = cardWidth * 0.45;
+
+          return Container(
+            padding: EdgeInsets.all(cardWidth * 0.1),
+            decoration: BoxDecoration(
+              color: AppColors.secondaryColor,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Shimmer for the Image
+                Container(
+                  width: imageSize,
+                  height: imageSize,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(imageSize * 0.3),
+                  ),
+                ),
+                // Dynamic Spacer
+                const Spacer(flex: 2),
+                // Shimmer for the Title
+                Container(
+                  height: cardWidth * 0.12, // Corresponds to titleSize
+                  width: cardWidth * 0.7,   // A reasonable width for a title
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const Spacer(flex: 1),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
 }
 
 /// A reusable shimmer grid placeholder for loading states.
+///
+/// This widget now uses a fixed `childAspectRatio` of 1.1 to perfectly match the
+/// real `ModelGridView`, solving the size mismatch problem. The `isDetailed`
+/// property has been removed as the new `ShimmerModelCard` is fully responsive.
 class ShimmerModelGridView extends StatelessWidget {
   final int itemCount;
-  final bool isDetailed;
   final bool shrinkWrap;
   final Key? gridKey;
 
   const ShimmerModelGridView({
     super.key,
     required this.itemCount,
-    this.isDetailed = true,
     this.shrinkWrap = false,
     this.gridKey,
   });
@@ -279,12 +307,14 @@ class ShimmerModelGridView extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
-        crossAxisSpacing: screenWidth * 0.03, // Consistent spacing
-        mainAxisSpacing: screenWidth * 0.03,  // Consistent spacing
-        childAspectRatio: isDetailed ? 0.75 : 1.1, // Consistent aspect ratio
+        crossAxisSpacing: screenWidth * 0.03,
+        mainAxisSpacing: screenWidth * 0.03,
+        // CRITICAL FIX: This now matches the ModelGridView's aspect ratio perfectly.
+        childAspectRatio: 1.1,
       ),
       itemCount: itemCount,
-      itemBuilder: (context, index) => ShimmerModelCard(isDetailed: isDetailed),
+      // The ShimmerModelCard no longer needs parameters as it's fully dynamic.
+      itemBuilder: (context, index) => const ShimmerModelCard(),
     );
   }
 }

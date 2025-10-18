@@ -2034,4 +2034,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'Les messages comme bonjour et bonne nuit.';
+
+  @override
+  String get exitAppTitle => 'Vous partez si tôt ?';
+
+  @override
+  String get exitAppConfirmation =>
+      'Etes-vous sûr de vouloir quitter cette incroyable plateforme ?';
 }

@@ -769,5 +769,7 @@
   "channelEngagementName": "मैत्रीपूर्ण अनुस्मारक",
   "channelEngagementDescription": "आपको व्यस्त रखने के लिए मजेदार सूचनाएं।",
   "channelGreetingsName": "दैनिक अभिवादन",
-  "channelGreetingsDescription": "शुभ प्रभात और शुभ रात्रि जैसे संदेश।"
+  "channelGreetingsDescription": "शुभ प्रभात और शुभ रात्रि जैसे संदेश।",
+  "exitAppTitle": "इतनी जल्दी जाना?",
+  "exitAppConfirmation": "क्या आप वाकई इस अद्भुत मंच को छोड़ना चाहते हैं?"
 }

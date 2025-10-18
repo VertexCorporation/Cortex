@@ -769,5 +769,7 @@
   "channelEngagementName": "Vriendelijke herinneringen",
   "channelEngagementDescription": "Leuke meldingen om je bezig te houden.",
   "channelGreetingsName": "Dagelijkse groeten",
-  "channelGreetingsDescription": "De berichten zoals goedemorgen en welterusten."
+  "channelGreetingsDescription": "De berichten zoals goedemorgen en welterusten.",
+  "exitAppTitle": "Gaat u al zo snel weg?",
+  "exitAppConfirmation": "Weet u zeker dat u dit geweldige platform wilt verlaten?"
 }

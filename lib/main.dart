@@ -21,7 +21,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:upgrader/upgrader.dart';
@@ -29,6 +28,7 @@ import 'chat/chat.dart';
 import 'chat/screen/unselected/news.dart';
 import 'conversations/inbox.dart';
 import 'conversations/manager.dart';
+import 'darkener.dart';
 import 'errorview.dart';
 import 'initialization.dart';
 import 'internet.dart';
@@ -48,16 +48,6 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void downloadCallback(String id, int status, int progress) {
   final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
   send?.send([id, status, progress]);
-}
-
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  debugPrint("--- Background Message Handler ---");
-  debugPrint("Handling a background message: ${message.messageId}");
-  debugPrint("Title: ${message.notification?.title}");
-  debugPrint("Body: ${message.notification?.body}");
-  debugPrint("Data: ${message.data}");
 }
 
 /// Manages the selected tab index for the bottom navigation bar.
@@ -113,12 +103,11 @@ Future<void> main() async {
   final savedTheme = prefs.getString('selectedTheme');
   final initialTheme = savedTheme ?? (WidgetsBinding.instance.window.platformBrightness == Brightness.dark ? 'dark' : 'light');
   debugPrint("App: Using theme: $initialTheme");
-  await GoogleSignIn.instance.initialize();
 
   runApp(
     MultiProvider(
       providers: [
-        Provider<InternetService>(create: (_) => InternetService()),
+        ChangeNotifierProvider(create: (_) => InternetProvider()),
         Provider<NotificationService>(create: (_) => NotificationService(navigatorKey: navigatorKey)),
         Provider<CreditsManager>.value(value: CreditsManager.instance),
         ChangeNotifierProvider(create: (_) => AppInitializer(initialStatus)),
@@ -181,7 +170,6 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager> with WidgetsB
     return Consumer<AppInitializer>(
       builder: (context, initializer, child) {
         final status = initializer.status;
-        final user = initializer.currentUser; // Get the user from the initializer
         debugPrint("AppLifecycleManager: Rebuilding with AppStatus: $status");
 
         // The switch statement determines which high-level screen to display.
@@ -191,7 +179,7 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager> with WidgetsB
 
           case AppStatus.needsVerification:
           // Safely access user data passed by the initializer.
-            final verificationData = initializer?.verificationScreenData;
+            final verificationData = initializer.verificationScreenData;
             if (verificationData != null) {
               return EmailVerificationScreen(
                 email: verificationData['email'],
@@ -219,7 +207,6 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager> with WidgetsB
 
           case AppStatus.initializing:
           case AppStatus.ready:
-          default:
           // For both 'initializing' and 'ready' states, we show the MainScreen.
           // This is the key to the "no extra loading animation" approach.
           // The MainScreen and its children are responsible for displaying their
@@ -392,8 +379,6 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
       ChatScreen(
         key: chatScreenKey,
         onModelSelectionChanged: (isSelected) {
-          // This callback is now less critical as ChatScreen manages visibility directly,
-          // but we can keep it for consistency.
           updateBottomAppBarVisibility(isSelected);
         },
       ),
@@ -429,77 +414,131 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
     final shadowBlurRadius = screenWidth * 0.02;
     final borderRadius = screenWidth * 0.04;
 
-    // SIMPLIFIED: The `hideBottomAppBar` state is now the only factor.
     final bool shouldHideBottomAppBar = hideBottomAppBar;
 
-    return Scaffold(
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        child: screens[tabProvider.selectedIndex],
-      ),
-      bottomNavigationBar: shouldHideBottomAppBar
-          ? null
-          : Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
-          return Container(
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(borderRadius),
-                topRight: Radius.circular(borderRadius),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primaryColor.inverted.withOpacity(0.1),
-                  blurRadius: shadowBlurRadius,
-                  offset: Offset(0, -screenHeight * 0.0025),
+    return PopScope(
+      // We set canPop to false because we want to manually control ALL back navigation logic.
+      canPop: false,
+      // DEPRECATION FIX: Replaced the deprecated `onPopInvoked` with `onPopInvokedWithResult`.
+      // The `result` parameter is not needed for our logic, so it's ignored with `_`.
+      onPopInvokedWithResult: (bool didPop, dynamic _) async {
+        // If the pop was successful already (e.g., if canPop was true), do nothing.
+        if (didPop) {
+          return;
+        }
+
+        // PRIORITY 0: Check if the keyboard is open.
+        final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+        if (isKeyboardVisible) {
+          FocusScope.of(context).unfocus();
+          return; // Consume the pop event to close the keyboard.
+        }
+
+        // Access the current state of the ChatScreen.
+        final chatState = chatScreenKey.currentState;
+
+        // Fallback if ChatScreen state is not available.
+        if (chatState == null) {
+          await showExitConfirmationDialog(context);
+          return;
+        }
+
+        // Get the current navigation mode from the ChatScreen's notifier.
+        final currentMode = chatState.appBarModeNotifier.value;
+
+        // PRIORITY 1: Handle closing the "Explore All Models" panel gracefully.
+        // If the panel is open, we call its dismiss method, which triggers its
+        // closing animation, and then we consume the back press event.
+        if (currentMode == AppBarMode.inSelection) {
+          chatState.selectionScreenKey.currentState?.showSelectionView();
+          return;
+        }
+
+        // PRIORITY 2: Ask ChatScreen if it can handle the pop by closing another panel (like extensions).
+        if (!chatState.handleSystemBackPress()) {
+          // handleSystemBackPress returns 'false' if it closed a panel.
+          // The event is handled, so we do nothing more.
+          return;
+        }
+
+        // PRIORITY 3: Handle exiting an active chat session.
+        if (currentMode == AppBarMode.modelSelected || currentMode == AppBarMode.dynamicChat) {
+          await chatState.handleExit();
+          return;
+        }
+
+        // FINAL FALLBACK: If on the main screen, show exit confirmation.
+        await showExitConfirmationDialog(context);
+      },
+      child: Scaffold(
+        body: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          child: screens[tabProvider.selectedIndex],
+        ),
+        bottomNavigationBar: shouldHideBottomAppBar
+            ? null
+            : Consumer<ThemeProvider>(
+          builder: (context, themeProvider, child) {
+            return Container(
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(borderRadius),
+                  topRight: Radius.circular(borderRadius),
                 ),
-              ],
-            ),
-            child: BottomAppBar(
-              color: Colors.transparent,
-              elevation: 0,
-              child: SizedBox(
-                height: bottomBarHeight,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    BottomNavigationButton(
-                      iconPath: 'assets/icons/inbox.svg',
-                      label: appLocalizations.chats,
-                      isSelected: tabProvider.selectedIndex == 2,
-                      onTap: () => onItemTapped(2),
-                      baseSize: iconBaseSize,
-                      containerSize: iconContainerSize,
-                      labelSpacing: labelSpacing,
-                    ),
-                    BottomNavigationButton(
-                      iconPath: 'assets/icons/chat.svg',
-                      label: appLocalizations.chat,
-                      isSelected: tabProvider.selectedIndex == 0,
-                      onTap: () => onItemTapped(0),
-                      baseSize: iconBaseSize,
-                      containerSize: iconContainerSize,
-                      labelSpacing: labelSpacing,
-                    ),
-                    BottomNavigationButton(
-                      iconPath: 'assets/icons/library.svg',
-                      label: appLocalizations.library,
-                      isSelected: tabProvider.selectedIndex == 1,
-                      onTap: () => onItemTapped(1),
-                      baseSize: libraryIconSize,
-                      containerSize: libraryIconSize * 1.2,
-                      labelSpacing: labelSpacing,
-                    ),
-                  ],
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+                    blurRadius: shadowBlurRadius,
+                    offset: Offset(0, -screenHeight * 0.0025),
+                  ),
+                ],
+              ),
+              child: BottomAppBar(
+                color: Colors.transparent,
+                elevation: 0,
+                child: SizedBox(
+                  height: bottomBarHeight,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      BottomNavigationButton(
+                        iconPath: 'assets/icons/inbox.svg',
+                        label: appLocalizations.chats,
+                        isSelected: tabProvider.selectedIndex == 2,
+                        onTap: () => onItemTapped(2),
+                        baseSize: iconBaseSize,
+                        containerSize: iconContainerSize,
+                        labelSpacing: labelSpacing,
+                      ),
+                      BottomNavigationButton(
+                        iconPath: 'assets/icons/chat.svg',
+                        label: appLocalizations.chat,
+                        isSelected: tabProvider.selectedIndex == 0,
+                        onTap: () => onItemTapped(0),
+                        baseSize: iconBaseSize,
+                        containerSize: iconContainerSize,
+                        labelSpacing: labelSpacing,
+                      ),
+                      BottomNavigationButton(
+                        iconPath: 'assets/icons/library.svg',
+                        label: appLocalizations.library,
+                        isSelected: tabProvider.selectedIndex == 1,
+                        onTap: () => onItemTapped(1),
+                        baseSize: libraryIconSize,
+                        containerSize: libraryIconSize * 1.2,
+                        labelSpacing: labelSpacing,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -574,3 +613,132 @@ extension InvertedColor on Color {
 
 // List of locales with incomplete Material translations.
 const List<String> kUnsupportedMaterialLocales = ['ku'];
+
+/// Displays a centralized dialog to confirm if the user wants to exit the app.
+///
+/// If the user confirms by tapping "Yes", the application is closed via `SystemNavigator.pop()`.
+/// If the user cancels, the dialog is dismissed.
+/// Returns `true` if the app is intended to close, `false` otherwise.
+Future<bool> showExitConfirmationDialog(BuildContext context) async {
+  final appLocalizations = AppLocalizations.of(context)!;
+  final restoreNavBar = Darkener.darken();
+
+  final result = await showGeneralDialog<bool>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'ExitConfirmation',
+    transitionDuration: const Duration(milliseconds: 150),
+    pageBuilder: (ctx, animation, secondaryAnimation) {
+      return Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(ctx).size.width * 0.8,
+            decoration: BoxDecoration(
+              color: AppColors.secondaryColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        Text(
+                          appLocalizations.exitAppTitle,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryColor.inverted,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                        Text(
+                          appLocalizations.exitAppConfirmation,
+                          style: TextStyle(
+                            color: AppColors.primaryColor.inverted.withOpacity(0.4),
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(color: AppColors.border, thickness: 0.5, height: 1),
+                  IntrinsicHeight(
+                    child: Row(
+                      children: [
+                        // "No" Button (Blue - encourages staying)
+                        Expanded(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              splashColor: AppColors.senaryColor.withValues(alpha: 0.1),
+                              highlightColor: AppColors.senaryColor.withValues(alpha: 0.1),
+                              onTap: () => Navigator.of(ctx).pop(false), // Return false on cancel
+                              child: Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                child: Text(
+                                  appLocalizations.no,
+                                  style: TextStyle(
+                                    color: AppColors.senaryColor, // Blue color
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        VerticalDivider(width: 1, thickness: 0.5, color: AppColors.border),
+                        // "Yes" Button (Red - exit action)
+                        Expanded(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              splashColor: AppColors.septenaryColor.withValues(alpha: 0.1),
+                              highlightColor: AppColors.septenaryColor.withValues(alpha: 0.1),
+                              onTap: () => Navigator.of(ctx).pop(true), // Return true on confirm
+                              child: Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                child: Text(
+                                  appLocalizations.yes,
+                                  style: TextStyle(
+                                    color: AppColors.septenaryColor, // Red color
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(opacity: animation, child: child);
+    },
+  ).whenComplete(() {
+    restoreNavBar();
+  });
+
+  // If the user tapped "Yes", the result will be true.
+  if (result == true) {
+    SystemNavigator.pop();
+    return true; // The app will close.
+  }
+
+  return false; // The user chose to stay.
+}

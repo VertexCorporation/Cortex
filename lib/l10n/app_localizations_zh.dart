@@ -1890,4 +1890,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get channelGreetingsDescription => '诸如早上好和晚安之类的信息。';
+
+  @override
+  String get exitAppTitle => '这么快就走？';
+
+  @override
+  String get exitAppConfirmation => '您确定要离开这个令人惊叹的平台吗？';
 }

@@ -769,5 +769,7 @@
   "channelEngagementName": "تذكيرات ودية",
   "channelEngagementDescription": "إشعارات ممتعة لإبقائك منشغلاً.",
   "channelGreetingsName": "تحيات يومية",
-  "channelGreetingsDescription": "رسائل مثل صباح الخير ومساء الخير."
+  "channelGreetingsDescription": "رسائل مثل صباح الخير ومساء الخير.",
+  "exitAppTitle": "المغادرة قريبا؟",
+  "exitAppConfirmation": "هل أنت متأكد أنك تريد مغادرة هذه المنصة الرائعة؟"
 }

@@ -2024,4 +2024,11 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'De berichten zoals goedemorgen en welterusten.';
+
+  @override
+  String get exitAppTitle => 'Gaat u al zo snel weg?';
+
+  @override
+  String get exitAppConfirmation =>
+      'Weet u zeker dat u dit geweldige platform wilt verlaten?';
 }

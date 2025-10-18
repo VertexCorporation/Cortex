@@ -567,10 +567,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       dev.log('[Auth.Google] Fatal error during Google Sign-In', name: 'LoginScreen', error: e, stackTrace: st);
       // We no longer need to delete the user on error, because the backend is robust.
       // We just sign them out to be safe.
-      await _googleSignIn.signOut();
-      await _auth.signOut();
-      if (isMounted) {
-        notificationService.showNotification(message: l10n.anErrorOccurred, isSuccess: false);
+      try {
+        await _googleSignIn.signOut();
+        await _auth.signOut();
+        dev.log('[Auth.Google] Cleanup successful: Signed out from Google and Firebase.', name: 'LoginScreen');
+      } catch (cleanupError) {
+        dev.log('[Auth.Google] Error during cleanup sign out.', name: 'LoginScreen', error: cleanupError);
       }
 
     } finally {

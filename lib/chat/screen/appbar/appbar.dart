@@ -68,6 +68,10 @@ class Appbar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onInfoPanelDidHide;
   final ValueNotifier<AppBarMode> appBarModeNotifier;
   final GlobalKey<ChatTitleState> chatTitleKey;
+
+  // NEW: Add the callback property to the Appbar widget itself.
+  final VoidCallback onShowExtensionInfoRequest;
+
   const Appbar({
     Key? key,
     this.modelTitle,
@@ -86,21 +90,39 @@ class Appbar extends StatefulWidget implements PreferredSizeWidget {
     this.onInfoPanelDidHide,
     required this.chatTitleKey,
     required this.appBarModeNotifier,
+    required this.onShowExtensionInfoRequest, // NEW: Add to the constructor.
   }) : super(key: key);
 
   @override
-  State<Appbar> createState() => _AppbarState();
+  State<Appbar> createState() => AppbarState();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _AppbarState extends State<Appbar> with TickerProviderStateMixin {
+class AppbarState extends State<Appbar> with TickerProviderStateMixin {
   final GlobalKey<CreditsBarState> _creditsBarKey = GlobalKey<CreditsBarState>();
 
   late AnimationController _animationController;
   late AnimationController _borderAnimationController; // For the subscription border
   late Animation<double> _borderAnimation; // Animation tween
+  bool _isCreditsPanelVisible = false;
+
+  // Public method to check if any panel controlled by the AppBar is visible.
+  bool isAPanelShowing() {
+    // It's visible if either the credits panel OR the extensions panel is open.
+    return _isCreditsPanelVisible || widget.extensions.isPanelVisible;
+  }
+
+  // Public method to close any open panel. This will be called from ChatScreen.
+  void closeAnyOpenPanels() {
+    if (_isCreditsPanelVisible) {
+      _creditsBarKey.currentState?.hideCreditsInfo();
+    }
+    if (widget.extensions.isPanelVisible) {
+      widget.extensions.closePanel();
+    }
+  }
 
   /// Checks the user's subscription level and expiry date to determine
   /// if they have an active subscription.
@@ -208,6 +230,14 @@ class _AppbarState extends State<Appbar> with TickerProviderStateMixin {
     final screenHeight = MediaQuery.of(context).size.height;
     final localizations = AppLocalizations.of(context)!;
 
+    void handleExitPress() {
+      if (_isCreditsPanelVisible) {
+        _creditsBarKey.currentState?.hideCreditsInfo();
+      } else {
+        widget.onExit();
+      }
+    }
+
     return ValueListenableBuilder<AppBarMode>(
       valueListenable: widget.appBarModeNotifier,
       builder: (context, mode, child) {
@@ -219,6 +249,12 @@ class _AppbarState extends State<Appbar> with TickerProviderStateMixin {
             leadingWidget = CreditsBar(
               key: _creditsBarKey,
               onCreditsInfoTapped: widget.onCreditsInfoTapped,
+              onPanelShown: () {
+                if (mounted) setState(() => _isCreditsPanelVisible = true);
+              },
+              onPanelHidden: () {
+                if (mounted) setState(() => _isCreditsPanelVisible = false);
+              },
             );
             titleContentWidget = Text(
               widget.appTitle,
@@ -229,7 +265,6 @@ class _AppbarState extends State<Appbar> with TickerProviderStateMixin {
             );
             break;
 
-        // --- MODIFICATION START ---
           case AppBarMode.dynamicChat:
             leadingWidget = Padding(
               padding: const EdgeInsets.only(left: 8.0),
@@ -240,62 +275,59 @@ class _AppbarState extends State<Appbar> with TickerProviderStateMixin {
                     icon: Icon(Icons.arrow_back,
                         color: AppColors.primaryColor.inverted,
                         size: screenWidth * 0.06),
-                    onPressed: widget.onExit),
+                    onPressed: handleExitPress),
               ),
             );
-            // The title for dynamic chat is now a Column containing the main title and the animated subtitle.
-            titleContentWidget = Column(
-              key: const ValueKey('dynamic_chat_title_column'),
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min, // Ensure Column doesn't expand infinitely
-              children: [
-                Text(
-                  widget.appTitle,
-                  style: GoogleFonts.mavenPro(
-                    color: AppColors.primaryColor.inverted,
-                    fontSize: screenWidth * 0.08,
-                    height: 1.0, // Reduce line height for tighter packing
+            titleContentWidget = Container(
+              key: widget.chatTitleKey,
+              child: Column(
+                key: const ValueKey('dynamic_chat_title_column'),
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.appTitle,
+                    style: GoogleFonts.mavenPro(
+                      color: AppColors.primaryColor.inverted,
+                      fontSize: screenWidth * 0.08,
+                      height: 1.0,
+                    ),
                   ),
-                ),
-                // AnimatedSwitcher controls the visibility of the subtitle panel.
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  transitionBuilder: (child, animation) {
-                    // This creates a slide-down and fade-in effect.
-                    final offsetAnimation = Tween<Offset>(
-                      begin: const Offset(0.0, -0.5),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut));
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      ),
-                    );
-                  },
-                  // The child is either the panel or an empty container.
-                  // The Key is important for the switcher to detect a change.
-                  child: KeyedSubtree(
-                    key: const ValueKey('dynamic_subtitle'),
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 2.0), // Small space
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                      child: Text(
-                        localizations.dynamicChatTitle,
-                        style: GoogleFonts.mavenPro(
-                          color: AppColors.primaryColor.inverted.withOpacity(0.8),
-                          fontSize: screenWidth * 0.025, // Smaller font for subtitle
-                          fontWeight: FontWeight.w500,
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 400),
+                    transitionBuilder: (child, animation) {
+                      final offsetAnimation = Tween<Offset>(
+                        begin: const Offset(0.0, -0.5),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut));
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: KeyedSubtree(
+                      key: const ValueKey('dynamic_subtitle'),
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 2.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                        child: Text(
+                          localizations.dynamicChatTitle + ' (Beta)',
+                          style: GoogleFonts.mavenPro(
+                            color: AppColors.primaryColor.inverted.withOpacity(0.8),
+                            fontSize: screenWidth * 0.025,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
             break;
-        // --- MODIFICATION END ---
 
           case AppBarMode.inSelection:
           case AppBarMode.modelSelected:
@@ -308,10 +340,9 @@ class _AppbarState extends State<Appbar> with TickerProviderStateMixin {
                     icon: Icon(Icons.arrow_back,
                         color: AppColors.primaryColor.inverted,
                         size: screenWidth * 0.06),
-                    onPressed: widget.onExit),
+                    onPressed: handleExitPress),
               ),
             );
-
             titleContentWidget = mode == AppBarMode.inSelection
                 ? FittedBox(
               key: const ValueKey('explore_title'),
@@ -324,11 +355,14 @@ class _AppbarState extends State<Appbar> with TickerProviderStateMixin {
                 ),
               ),
             )
+            // UPDATED: Pass the required 'onShowInfoRequest' callback to the ChatTitle widget.
                 : ChatTitle(
+              key: widget.chatTitleKey,
               modelTitle: widget.modelTitle,
               extensions: widget.extensions,
               onTitleTap: widget.onTitleTap,
               extensionKey: widget.extensionKey,
+              onShowInfoRequest: widget.onShowExtensionInfoRequest, // <-- THE FIX IS HERE
             );
             break;
         }
@@ -361,7 +395,6 @@ class _AppbarState extends State<Appbar> with TickerProviderStateMixin {
                 ? widget.onTitleTap
                 : null,
             child: Container(
-              key: widget.chatTitleKey,
               alignment: Alignment.center,
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 350),

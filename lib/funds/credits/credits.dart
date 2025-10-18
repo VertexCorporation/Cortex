@@ -2,7 +2,6 @@
 // This version isolates the scroll fog logic into a dedicated StatefulWidget (_ScrollableListWithFog)
 // to prevent entire widget rebuilds on scroll, fixing the Sliver assertion crash and improving performance.
 
-import 'dart:developer';
 import 'package:cortex/main.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +44,6 @@ class _CreditContentWidgetState extends State<CreditContentWidget> {
   final List<CreditPackage> _creditPackages = [];
 
   final bool _isTesting = !kReleaseMode;
-  static const String _logName = 'CreditContentWidget';
 
   @override
   void initState() {

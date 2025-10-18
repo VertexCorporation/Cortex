@@ -1,4 +1,4 @@
-// lib/chat/services/scroll.dart (The Final, Corrected Version)
+// lib/chat/services/scroll.dart
 
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
@@ -93,26 +93,24 @@ class ScrollService {
   ///
   /// The visibility and positioning are controlled by the parent widget.
   /// This widget just handles its own appearance animations (fade, scale).
-  /// It now correctly uses the static `AppColors` class to determine icon color
-  /// without needing a BuildContext.
   Widget buildScrollDownButton({
     required double screenWidth,
     required double inputFieldHeight,
     required bool showScrollDownButton,
+    required double safeAreaBottomPadding, // Parameter for the bottom safe area inset.
   }) {
-    // --- THE DEFINITIVE FIX FOR COLOR LOGIC (WITHOUT CHANGING theme.dart) ---
-    // 1. Get the full ThemeColors object for the currently active theme.
+    // Get the full ThemeColors object for the currently active theme.
     final themeColors = AppColors.getThemeColors(AppColors.currentTheme);
 
-    // 2. Determine the icon color based on the theme's status bar brightness.
-    //    This correctly infers if the theme is light or dark.
+    // Determine the icon color based on the theme's status bar brightness.
     final Color iconColor = themeColors.statusBarIconBrightness == Brightness.light
         ? Colors.white.withOpacity(0.8)
         : Colors.black.withOpacity(0.7);
 
     return Positioned(
       right: screenWidth * 0.04,
-      bottom: inputFieldHeight + 16.0,
+      // The button's bottom position is now calculated correctly by including the safe area padding.
+      bottom: inputFieldHeight + safeAreaBottomPadding + 16.0,
       child: AnimatedOpacity(
         opacity: showScrollDownButton ? 1.0 : 0.0,
         duration: const Duration(milliseconds: 200),

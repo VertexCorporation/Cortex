@@ -769,5 +769,7 @@
   "channelEngagementName": "温馨提示",
   "channelEngagementDescription": "有趣的通知让您保持参与。",
   "channelGreetingsName": "每日问候",
-  "channelGreetingsDescription": "诸如早上好和晚安之类的信息。"
+  "channelGreetingsDescription": "诸如早上好和晚安之类的信息。",
+  "exitAppTitle": "这么快就走？",
+  "exitAppConfirmation": "您确定要离开这个令人惊叹的平台吗？"
 }

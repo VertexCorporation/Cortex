@@ -12,14 +12,19 @@ import 'package:cortex/l10n/app_localizations.dart';
 
 import '../../../funds/funds.dart';
 
+
 /// The main widget for the credits bar, containing the display, the button,
 /// and the logic for the informational pop-up panel.
 class CreditsBar extends StatefulWidget {
   final VoidCallback onCreditsInfoTapped;
+  final VoidCallback? onPanelShown;
+  final VoidCallback? onPanelHidden;
 
   const CreditsBar({
     Key? key,
     required this.onCreditsInfoTapped,
+    this.onPanelShown,
+    this.onPanelHidden,
   }) : super(key: key);
 
   @override
@@ -62,8 +67,11 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
     }
   }
 
+
   void hideCreditsInfo({bool isDisposing = false}) {
     if (_overlayEntry == null) return;
+
+    widget.onPanelHidden?.call();
 
     if (isDisposing) {
       _overlayEntry?.remove();
@@ -202,6 +210,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
 
     Overlay.of(context).insert(_overlayEntry!);
     _animationController.forward();
+    widget.onPanelShown?.call();
   }
 
   @override
@@ -441,7 +450,6 @@ class _HexagonBorderPainter extends CustomPainter {
   final Color fillColor;
   final Gradient? fillGradient;
   final double strokeWidth;
-  final Color? borderColor;
   final Gradient? gradient;
   final bool hasGlow;
 
@@ -449,7 +457,6 @@ class _HexagonBorderPainter extends CustomPainter {
     required this.fillColor,
     this.fillGradient,
     this.strokeWidth = 1.5,
-    this.borderColor,
     this.gradient,
     this.hasGlow = false,
   });
@@ -474,7 +481,7 @@ class _HexagonBorderPainter extends CustomPainter {
     }
     canvas.drawPath(path, fillPaint);
 
-    if (gradient != null || borderColor != null) {
+    if (gradient != null) {
       final Paint strokePaint = Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth;
@@ -487,8 +494,6 @@ class _HexagonBorderPainter extends CustomPainter {
             height: size.height,
           ),
         );
-      } else {
-        strokePaint.color = borderColor!;
       }
       canvas.drawPath(path, strokePaint);
     }
@@ -515,7 +520,6 @@ class _HexagonBorderPainter extends CustomPainter {
     return oldDelegate.fillColor != fillColor ||
         oldDelegate.fillGradient != fillGradient ||
         oldDelegate.strokeWidth != strokeWidth ||
-        oldDelegate.borderColor != borderColor ||
         oldDelegate.gradient != gradient ||
         oldDelegate.hasGlow != hasGlow;
   }

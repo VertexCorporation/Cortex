@@ -769,5 +769,7 @@
   "channelEngagementName": "Promemoria amichevoli",
   "channelEngagementDescription": "Notifiche divertenti per tenerti impegnato.",
   "channelGreetingsName": "Saluti quotidiani",
-  "channelGreetingsDescription": "Messaggi come buongiorno e buonanotte."
+  "channelGreetingsDescription": "Messaggi come buongiorno e buonanotte.",
+  "exitAppTitle": "Parti così presto?",
+  "exitAppConfirmation": "Sei sicuro di voler abbandonare questa fantastica piattaforma?"
 }

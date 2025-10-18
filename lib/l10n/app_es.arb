@@ -769,5 +769,7 @@
   "channelEngagementName": "Recordatorios amistosos",
   "channelEngagementDescription": "Notificaciones divertidas para mantenerte involucrado.",
   "channelGreetingsName": "Saludos diarios",
-  "channelGreetingsDescription": "Los mensajes como buenos días y buenas noches."
+  "channelGreetingsDescription": "Los mensajes como buenos días y buenas noches.",
+  "exitAppTitle": "¿Te vas tan pronto?",
+  "exitAppConfirmation": "¿Estás seguro de que deseas abandonar esta increíble plataforma?"
 }

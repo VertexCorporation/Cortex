@@ -134,7 +134,7 @@ class RegenerateService {
         isRegenerate: true,
         regenerateAiIndex: modelIndex,
         regeneratePhotoPath: photoPathForRegeneration,
-        // Note: The new model ID is handled by SendService for the API call.
+        overrideModelId: newModelId,
       );
 
       debugPrint("$logPrefix: sendMessage call completed successfully.");

@@ -2007,4 +2007,11 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get channelGreetingsDescription => 'Peyamên mîna sibeha baş û şevbaş.';
+
+  @override
+  String get exitAppTitle => 'Hûn ewqas zû diçin?';
+
+  @override
+  String get exitAppConfirmation =>
+      'Ma hûn piştrast in ku hûn dixwazin ji vê platforma ecêb derkevin?';
 }

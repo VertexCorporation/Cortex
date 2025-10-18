@@ -92,8 +92,6 @@ class _ModelDetailPageState extends State<ModelDetailPage>
   // This prevents any LateInitializationError, regardless of the data flow.
   Map<String, dynamic> _modelData = {};
   String _displayTitle = '';
-  String _displaySummary = '';
-  String _displayDescription = '';
   String _displayProducer = '';
   String _displayImagePath = 'assets/icons/self.svg'; // A safe fallback path
   bool _isFullyLocalized = true;
@@ -393,49 +391,6 @@ class _ModelDetailPageState extends State<ModelDetailPage>
         );
       }
     }
-  }
-
-  /// It calls the new central handler for removal actions.
-  /// (This function was already correct)
-  Widget _buildRemoveOrChatButtons(AppLocalizations localizations, bool isDarkTheme, double screenWidth) {
-    final String removeText = localizations.remove;
-
-    return Container(
-      key: const ValueKey('removeAndChat'),
-      height: screenWidth * 0.125,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(screenWidth * 0.03)),
-      child: _isDeleting
-      // Show a spinner while the async deletion/uninstallation is in progress.
-          ? Center(child: CircularProgressIndicator(color: AppColors.primaryColor.inverted, strokeWidth: 2.0))
-      // Otherwise, show the action buttons.
-          : Row(
-        children: [
-          Expanded(
-            child: InkWell(
-              onTap: _isDeleting ? null : _handleRemoveModel, // Calls the unified handler
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(screenWidth * 0.03), bottomLeft: Radius.circular(screenWidth * 0.03)),
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: AppColors.septenaryColor, borderRadius: BorderRadius.only(topLeft: Radius.circular(screenWidth * 0.03), bottomLeft: Radius.circular(screenWidth * 0.03))),
-                child: Text(removeText, style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04)),
-              ),
-            ),
-          ),
-          Container(width: 1.0, color: AppColors.border), // Visual separator
-          Expanded(
-            child: InkWell(
-              onTap: _isDeleting ? null : _startChatWithModel,
-              borderRadius: BorderRadius.only(topRight: Radius.circular(screenWidth * 0.03), bottomRight: Radius.circular(screenWidth * 0.03)),
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: AppColors.senaryColor, borderRadius: BorderRadius.only(topRight: Radius.circular(screenWidth * 0.03), bottomRight: Radius.circular(screenWidth * 0.03))),
-                child: Text(localizations.chat, style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04)),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   // This function is now updated to handle navigation correctly.
@@ -1215,6 +1170,9 @@ class _ModelDetailPageState extends State<ModelDetailPage>
     );
   }
 
+// This is the master function that decides which set of action buttons to display
+// at the bottom of the screen. It correctly identifies user-created models,
+// downloadable offline models, and server-side models.
   Widget _buildBottomActionButtons(AppLocalizations localizations,
       bool isDarkTheme, double screenWidth, double screenHeight) {
 
@@ -1247,9 +1205,6 @@ class _ModelDetailPageState extends State<ModelDetailPage>
       );
     }
 
-    // --- NEW DECISION LOGIC ---
-
-    // CASE 1: Is the model user-created ('self' or 'local')?
     // -> Always show "Remove / Chat" buttons.
     if (isUserCreatedModel) {
       dev.log("[ModelDetailPage.buildBottomButtons] -> Result: Showing 'Remove/Chat' for user-created model.", name: 'ModelDetail');
@@ -1281,11 +1236,58 @@ class _ModelDetailPageState extends State<ModelDetailPage>
     }
   }
 
+// This function builds the specific "Remove / Chat" button row.
+// It correctly wires the "Remove" button's onTap to the new _handleRemoveModel logic.
+  Widget _buildRemoveOrChatButtons(AppLocalizations localizations, bool isDarkTheme, double screenWidth) {
+    final String removeText = localizations.remove;
+
+    return Container(
+      key: const ValueKey('removeAndChat'),
+      height: screenWidth * 0.125,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+      child: _isDeleting
+      // Show a spinner while the async deletion/uninstallation is in progress.
+          ? Center(child: CircularProgressIndicator(color: AppColors.primaryColor.inverted, strokeWidth: 2.0))
+      // Otherwise, show the action buttons.
+          : Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: _isDeleting ? null : _handleRemoveModel, // FIX: Calls the unified handler
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(screenWidth * 0.03), bottomLeft: Radius.circular(screenWidth * 0.03)),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: AppColors.septenaryColor, borderRadius: BorderRadius.only(topLeft: Radius.circular(screenWidth * 0.03), bottomLeft: Radius.circular(screenWidth * 0.03))),
+                child: Text(removeText, style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04)),
+              ),
+            ),
+          ),
+          Container(width: 1.0, color: AppColors.border), // Visual separator
+          Expanded(
+            child: InkWell(
+              onTap: _isDeleting ? null : _startChatWithModel,
+              borderRadius: BorderRadius.only(topRight: Radius.circular(screenWidth * 0.03), bottomRight: Radius.circular(screenWidth * 0.03)),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: AppColors.senaryColor, borderRadius: BorderRadius.only(topRight: Radius.circular(screenWidth * 0.03), bottomRight: Radius.circular(screenWidth * 0.03))),
+                child: Text(localizations.chat, style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+// This is the core logic that executes when the "Remove" button is pressed.
+// It handles the confirmation dialog and calls the correct service from remove.dart.
+// Most importantly, it updates its own local state (`_isDownloaded`, `_isDeleting`)
+// to provide instant UI feedback upon successful uninstallation.
   Future<void> _handleRemoveModel() async {
     if (!mounted) return;
 
     final localizations = AppLocalizations.of(context)!;
-    final internetService = Provider.of<InternetService>(context, listen: false);
+    final internetService = InternetService();
 
     // Determine model type and prepare dialog texts using the safely loaded `_displayTitle`
     final bool isCustomModel = widget.id.startsWith('self_') || widget.id.startsWith('local_');
@@ -1299,42 +1301,40 @@ class _ModelDetailPageState extends State<ModelDetailPage>
       return;
     }
 
-    // Show confirmation dialog (dialog implementation is unchanged)
+    // Show confirmation dialog
     final restoreNavBar = Darkener.darken();
     final bool? confirmed = await showGeneralDialog<bool>(
       context: context,
       barrierLabel: 'RemoveModel',
       barrierDismissible: true,
       pageBuilder: (dialogCtx, _, __) {
-        // ... (The dialog's implementation remains unchanged)
         return Center(
-          child: Material(
-            color: Colors.transparent,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 340),
-              child: Container(
-                decoration: BoxDecoration(color: AppColors.secondaryColor, borderRadius: BorderRadius.circular(12)),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Padding(padding: const EdgeInsets.fromLTRB(24, 24, 24, 16), child: Column(children: [
-                      Text(dialogTitle, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
-                      const SizedBox(height: 12),
-                      Text(dialogMessage, style: TextStyle(color: AppColors.primaryColor.inverted.withOpacity(0.8)), textAlign: TextAlign.center),
-                    ])),
-                    Divider(color: AppColors.border, thickness: 0.5, height: 0.5),
-                    IntrinsicHeight(child: Row(children: [
-                      Expanded(child: Material(color: Colors.transparent, child: InkWell(onTap: () => Navigator.of(dialogCtx).pop(false), child: Container(alignment: Alignment.center, padding: const EdgeInsets.symmetric(vertical: 16), child: Text(localizations.cancel, style: TextStyle(color: AppColors.senaryColor, fontSize: 16)))))),
-                      VerticalDivider(color: AppColors.border, thickness: 0.5),
-                      Expanded(child: Material(color: Colors.transparent, child: InkWell(onTap: () => Navigator.of(dialogCtx).pop(true), child: Container(alignment: Alignment.center, padding: const EdgeInsets.symmetric(vertical: 16), child: Text(confirmButtonText, style: TextStyle(color: AppColors.septenaryColor, fontSize: 16)))))),
-                    ])),
-                  ]),
+            child: Material(
+              color: Colors.transparent,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 340),
+                child: Container(
+                  decoration: BoxDecoration(color: AppColors.secondaryColor, borderRadius: BorderRadius.circular(12)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      Padding(padding: const EdgeInsets.fromLTRB(24, 24, 24, 16), child: Column(children: [
+                        Text(dialogTitle, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
+                        const SizedBox(height: 12),
+                        Text(dialogMessage, style: TextStyle(color: AppColors.primaryColor.inverted.withOpacity(0.8)), textAlign: TextAlign.center),
+                      ])),
+                      Divider(color: AppColors.border, thickness: 0.5, height: 0.5),
+                      IntrinsicHeight(child: Row(children: [
+                        Expanded(child: Material(color: Colors.transparent, child: InkWell(onTap: () => Navigator.of(dialogCtx).pop(false), child: Container(alignment: Alignment.center, padding: const EdgeInsets.symmetric(vertical: 16), child: Text(localizations.cancel, style: TextStyle(color: AppColors.senaryColor, fontSize: 16)))))),
+                        VerticalDivider(color: AppColors.border, thickness: 0.5),
+                        Expanded(child: Material(color: Colors.transparent, child: InkWell(onTap: () => Navigator.of(dialogCtx).pop(true), child: Container(alignment: Alignment.center, padding: const EdgeInsets.symmetric(vertical: 16), child: Text(confirmButtonText, style: TextStyle(color: AppColors.septenaryColor, fontSize: 16)))))),
+                      ])),
+                    ]),
+                  ),
                 ),
               ),
-            ),
-          ),
-        );
-      },
+            ));
+        },
     );
     restoreNavBar();
 

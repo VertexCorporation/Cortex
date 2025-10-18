@@ -604,5 +604,7 @@
   "channelEngagementName": "Rappels amicaux",
   "channelEngagementDescription": "Des notifications amusantes pour vous garder engagé.",
   "channelGreetingsName": "Salutations quotidiennes",
-  "channelGreetingsDescription": "Les messages comme bonjour et bonne nuit."
+  "channelGreetingsDescription": "Les messages comme bonjour et bonne nuit.",
+  "exitAppTitle": "Vous partez si tôt ?",
+  "exitAppConfirmation": "Etes-vous sûr de vouloir quitter cette incroyable plateforme ?"
 }

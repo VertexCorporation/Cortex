@@ -40,7 +40,6 @@ class StopService {
     if (!state.mounted) return;
     state.setState(() {
       state.isWaitingForResponse = false;
-      state.isSendButtonVisible = state.controller.text.isNotEmpty;
     });
 
     int lastAiIndex = state.messages.lastIndexWhere((m) => !m.isUserMessage);

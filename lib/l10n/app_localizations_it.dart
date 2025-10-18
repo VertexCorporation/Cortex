@@ -2017,4 +2017,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'Messaggi come buongiorno e buonanotte.';
+
+  @override
+  String get exitAppTitle => 'Parti così presto?';
+
+  @override
+  String get exitAppConfirmation =>
+      'Sei sicuro di voler abbandonare questa fantastica piattaforma?';
 }

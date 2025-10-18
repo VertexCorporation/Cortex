@@ -11,6 +11,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 import '../../../theme.dart';
 import '../../messages/messages.dart';
 
+
 class SelectedScreen extends StatelessWidget {
   final List<Message> messages;
   final ScrollController scrollController;
@@ -21,6 +22,7 @@ class SelectedScreen extends StatelessWidget {
   final String? modelTitle;
   final String? selectedModelCategory;
   final String? modelId;
+  final bool isPersistentlyDynamic;
   final VoidCallback onStop;
   final Function(int index) onEdit;
   final Function(int index) onFadeOutComplete;
@@ -40,6 +42,7 @@ class SelectedScreen extends StatelessWidget {
     required this.modelTitle,
     required this.selectedModelCategory,
     required this.modelId,
+    required this.isPersistentlyDynamic,
     required this.onStop,
     required this.onEdit,
     required this.onFadeOutComplete,
@@ -151,6 +154,7 @@ class SelectedScreen extends StatelessWidget {
               isEditingMode: isEditingMode,
               editingMessageIndex: editingMessageIndex,
               streamingNotifier: streamingNotifier,
+              isPersistentlyDynamic: isPersistentlyDynamic,
               modelId: modelId ?? '',
               onStop: onStop,
               onEdit: onEdit,

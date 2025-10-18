@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/main.dart';
 import 'package:cortex/models/new/add.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -160,7 +159,7 @@ class _CreateScreenState extends State<CreateScreen> with TickerProviderStateMix
     super.dispose();
   }
 
-// Helper function to convert an image File to a base64 data URL
+  // Helper function to convert an image File to a base64 data URL
   Future<String?> _imageFileToBase64(File? imageFile) async {
     if (imageFile == null) return null;
     try {
@@ -192,7 +191,7 @@ class _CreateScreenState extends State<CreateScreen> with TickerProviderStateMix
     final notificationService = Provider.of<NotificationService>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
     final user = FirebaseAuth.instance.currentUser;
-    final internetService = Provider.of<InternetService>(context, listen: false);
+    final internetService = InternetService();
     final modelId = 'self_${user!.uid}_${DateTime.now().millisecondsSinceEpoch}'; // Generate ID beforehand
 
     if (!internetService.currentStatus) {

@@ -3,7 +3,7 @@ description: "Peak of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 1.7.4+174
+version: 1.8.0+180
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -20,7 +20,6 @@ dependencies:
   flutter_svg: ^2.0.15
   shimmer: ^3.0.0
   cached_network_image: ^3.4.1
-  flutter_markdown: ^0.7.4+1
   flutter_math_fork: ^0.7.4
   font_awesome_flutter: ^10.8.0
   fl_chart: ^1.1.1
@@ -80,7 +79,7 @@ dependencies:
   flutter_native_splash: ^2.4.4
   webview_flutter: ^4.13.0
   flutter_local_notifications: ^19.4.2
-  android_play_install_referrer: ^0.4.0
+  play_install_referrer: ^0.5.0
   battery_plus: ^7.0.0
 
   # --- SYNTAX HIGHLIGHTING ---
@@ -133,4 +132,12 @@ flutter:
     - assets/icons/subscriptions/
     - assets/characters/
     - assets/splash/
+    - assets/fonts/roboto/
+    - assets/fonts/mavenpro/
+    - assets/fonts/heebo/
     - assets/
+
+  # wow
+  # this
+  # pubspec.yaml
+  # is so good

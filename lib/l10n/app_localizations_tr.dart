@@ -2002,4 +2002,11 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'Günaydın, iyi geceler gibi mesajlar.';
+
+  @override
+  String get exitAppTitle => 'Bu kadar erken mi gidiyorsun?';
+
+  @override
+  String get exitAppConfirmation =>
+      'Bu harika platformdan ayrılmak istediğinize emin misiniz?';
 }

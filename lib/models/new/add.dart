@@ -157,7 +157,7 @@ class _AddScreenState extends State<AddScreen> with TickerProviderStateMixin {
   Future<void> _saveModel() async {
     final localizations = AppLocalizations.of(context)!;
     final notificationService = Provider.of<NotificationService>(context, listen: false);
-    final internetService = Provider.of<InternetService>(context, listen: false);
+    final internetService = InternetService();
 
     // --- STEP 0: PRE-FLIGHT CHECKS ---
     final bool isUltra = [3, 6].contains(_hasCortexSubscription);

@@ -982,5 +982,8 @@
   "channelGreetingsDescription": "The messages like good morning and good night.",
   "@channelGreetingsDescription": {
     "description": "The user-visible description for the greetings notification channel."
-  }
+  },
+
+  "exitAppTitle": "Leaving so soon?",
+  "exitAppConfirmation": "Are you sure you want to leave this amazing platform?"
 }

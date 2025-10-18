@@ -67,23 +67,28 @@ class DynamicChatService {
     }
   }
 
+
   /// Displays the overlay panel for the user to select their default dynamic assistant.
   /// This method encapsulates all the UI logic for creating and showing the panel.
+  /// It now uses a proven animation and dismissal logic to ensure a smooth UX.
   void showDynamicAssistantPanel() {
     debugPrint("[DynamicChatService] Attempting to show dynamic assistant panel.");
-    final context = _state.context; // Get context from the state.
+    final context = _state.context;
     final RenderBox? renderBox = _state.chatTitleKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) {
       debugPrint("[DynamicChatService] CRITICAL: Could not find renderBox for chatTitleKey. Panel cannot be shown.");
       return;
     }
 
+    // Heavy lifting is done here, BEFORE the animation starts.
     final allOptions = _buildDynamicAssistantOptions();
     final currentlySelectedId = _state.isPersistentlyDynamic ? '--dynamic--' : _state.modelId;
 
     OverlayEntry? overlayEntry;
     final overlay = Overlay.of(context);
     final Offset offset = renderBox.localToGlobal(Offset(0, renderBox.size.height + 12));
+
+    // This flag controls the closing animation.
     bool isPanelClosing = false;
 
     overlayEntry = OverlayEntry(builder: (context) {
@@ -91,13 +96,18 @@ class DynamicChatService {
       final panelWidth = screenWidth * 0.9;
       final horizontalMargin = (screenWidth - panelWidth) / 2;
 
+      // StatefulBuilder allows the overlay to manage its own state (like 'isPanelClosing').
       return StatefulBuilder(builder: (context, setModalState) {
         return Stack(
           children: [
+            // This full-screen GestureDetector catches taps outside the panel to dismiss it.
             Positioned.fill(
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
-                onTap: () => setModalState(() => isPanelClosing = true),
+                onTap: () {
+                  // Trigger the closing animation.
+                  setModalState(() => isPanelClosing = true);
+                },
                 child: Container(color: Colors.transparent),
               ),
             ),
@@ -106,17 +116,26 @@ class DynamicChatService {
               left: horizontalMargin,
               right: horizontalMargin,
               child: TweenAnimationBuilder<double>(
+                // Animate scale from 0.4 to 1.0 on open, and 1.0 to 0.4 on close.
                 tween: Tween<double>(begin: isPanelClosing ? 1.0 : 0.4, end: isPanelClosing ? 0.4 : 1.0),
-                duration: const Duration(milliseconds: 50),
+                duration: const Duration(milliseconds: 100), // Fast but smooth animation
                 curve: Curves.easeOut,
                 onEnd: () {
-                  if (isPanelClosing) overlayEntry?.remove();
+                  // CRITICAL: Remove the overlay from the screen ONLY after the closing animation is complete.
+                  if (isPanelClosing) {
+                    overlayEntry?.remove();
+                    overlayEntry = null;
+                  }
                 },
                 builder: (context, scale, child) {
                   return Transform.scale(
                     scale: scale,
                     alignment: Alignment.topCenter,
-                    child: child,
+                    // Animate opacity for a fade effect as well.
+                    child: Opacity(
+                        opacity: (scale - 0.4) / (1.0 - 0.4), // maps 0.4-1.0 scale to 0.0-1.0 opacity
+                        child: child
+                    ),
                   );
                 },
                 child: Extensions.buildExtensionPanelWidget(
@@ -126,6 +145,7 @@ class DynamicChatService {
                   modelTitle: AppLocalizations.of(context)!.dynamicChatTitle,
                   onDismiss: () => setModalState(() => isPanelClosing = true),
                   onSelect: (selectedOption) {
+                    // When an item is selected, also trigger the closing animation.
                     setModalState(() => isPanelClosing = true);
                     final selectedId = selectedOption['id'] as String;
                     _handleDynamicAssistantSelection(selectedId);
@@ -138,7 +158,7 @@ class DynamicChatService {
       });
     });
 
-    overlay.insert(overlayEntry);
+    overlay.insert(overlayEntry!);
   }
 
   /// Gathers and flattens all usable models into a sorted and categorized list
@@ -147,44 +167,77 @@ class DynamicChatService {
     final localizations = AppLocalizations.of(_state.context)!;
     final allModelInfos = _state.loadService.allModels;
 
-    final List<Map<String, dynamic>> onlineOptions = [];
+    // --- STEP 1: Process and Categorize All Models ---
+
     final List<Map<String, dynamic>> offlineOptions = [];
     final List<Map<String, dynamic>> characterOptions = [];
     final List<Map<String, dynamic>> selfOptions = [];
+
+    // Key: The series title (e.g., "Gemma").
+    // Value: A list of all SELECTABLE extension/model data maps for that series.
+    final Map<String, List<Map<String, dynamic>>> onlineSeriesMap = {};
 
     for (final modelInfo in allModelInfos) {
       final preciseData = ModelData.getPreciseModelData(modelInfo.id);
       final String category = preciseData['category'] as String? ?? 'online';
       final String type = preciseData['type'] as String? ?? 'online';
 
-      if (category == 'roleplay') {
+      if (type == 'online' && category != 'roleplay' && category != 'self') {
+        final seriesTitle = preciseData['title'] as String;
+        final extensions = preciseData['extensions'] as Map<String, dynamic>?;
+
+        // Ensure the series exists in the map.
+        onlineSeriesMap.putIfAbsent(seriesTitle, () => []);
+
+        // --- CORE LOGIC CHANGE ---
+        // If the model has extensions, it's a non-selectable series.
+        // We ONLY add its children (the extensions) to the map.
+        if (extensions != null && extensions.isNotEmpty) {
+          for (final extId in extensions.keys) {
+            onlineSeriesMap[seriesTitle]!.add(ModelData.getPreciseModelData(extId));
+          }
+        }
+        // If the model has NO extensions, it's a standalone, selectable model.
+        // We add the model itself to the map.
+        else {
+          onlineSeriesMap[seriesTitle]!.add(preciseData);
+        }
+
+      } else if (type == 'offline') {
+        offlineOptions.add(preciseData);
+      } else if (category == 'roleplay') {
         characterOptions.add(preciseData);
       } else if (category == 'self') {
         selfOptions.add(preciseData);
-      } else if (type == 'offline') {
-        if (1 == 1) { // Placeholder for isDownloaded check
-          offlineOptions.add(preciseData);
-        }
-      } else if (type == 'online') {
-        final extensions = preciseData['extensions'] as Map<String, dynamic>?;
-        if (extensions != null && extensions.isNotEmpty) {
-          for (final extId in extensions.keys) {
-            onlineOptions.add(ModelData.getPreciseModelData(extId));
-          }
-        } else {
-          onlineOptions.add(preciseData);
-        }
       }
     }
 
+    // --- STEP 2: Perform Multi-Level Sorting for Online Models ---
+
+    final List<Map<String, dynamic>> onlineOptions = [];
     final sorter = (Map<String, dynamic> a, Map<String, dynamic> b) =>
         (a['title'] as String).toLowerCase().compareTo((b['title'] as String).toLowerCase());
 
-    onlineOptions.sort(sorter);
+    // Primary Sort: Sort the series titles alphabetically.
+    final sortedSeriesTitles = onlineSeriesMap.keys.toList()..sort();
+
+    // Secondary Sort & Flatten: Iterate through sorted series, sort extensions within them, then add to final list.
+    for (final seriesTitle in sortedSeriesTitles) {
+      final extensionsInSeries = onlineSeriesMap[seriesTitle]!;
+      // This is a safety check: if a series ended up with no selectable children, skip it.
+      if (extensionsInSeries.isEmpty) continue;
+
+      extensionsInSeries.sort(sorter); // Sort extensions/models within the series.
+      onlineOptions.addAll(extensionsInSeries); // Add the sorted group.
+    }
+
+    // --- STEP 3: Sort Other Categories and Combine All Lists ---
+
     offlineOptions.sort(sorter);
     characterOptions.sort(sorter);
     selfOptions.sort(sorter);
 
+    // Combine all sorted lists in the final desired order.
     final List<Map<String, dynamic>> finalOptions = [];
     finalOptions.add({'id': '--dynamic--', 'title': localizations.dynamicChatTitle, 'tier': 'free'});
     finalOptions.addAll(onlineOptions);
@@ -192,7 +245,7 @@ class DynamicChatService {
     finalOptions.addAll(characterOptions);
     finalOptions.addAll(selfOptions);
 
-    debugPrint("[DynamicChatService] Built dynamic assistant panel with ${finalOptions.length} options.");
+    debugPrint("[DynamicChatService] Built dynamic assistant panel with ${finalOptions.length} selectable & sorted options.");
     return finalOptions;
   }
 
@@ -200,11 +253,15 @@ class DynamicChatService {
   Future<void> _handleDynamicAssistantSelection(String selectedId) async {
     if (selectedId == '--dynamic--') {
       await _saveDynamicAssistantPreference(null);
+      // When reverting to fully dynamic mode...
       _state.setState(() {
         _state.isPersistentlyDynamic = true;
         _state.modelId = null;
         _state.role = null;
-        _state.canHandleImage = true; // Revert to assuming image capability for dynamic mode
+        _state.canHandleImage = true; // Revert to assuming image capability
+        _state.modelTitle = null;     // Clear the model-specific details from the UI state
+        _state.modelImagePath = null;
+        _state.modelProducer = null;
       });
     } else {
       await _saveDynamicAssistantPreference(selectedId);
@@ -214,6 +271,15 @@ class DynamicChatService {
         _state.modelId = selectedId;
         _state.role = preciseData['role'] as String?;
         _state.canHandleImage = ModelData.hasModality(selectedId, 'image');
+
+        // This ensures that if the new model can't handle images, the photo
+        // button in the input field disables immediately, and the app bar title
+        // reflects the new assistant correctly.
+        _state.modelTitle = preciseData['title'] as String?;
+        _state.modelImagePath = preciseData['imagePath'] as String?;
+        _state.modelProducer = preciseData['producer'] as String?;
+        _state.updatePremiumBriefingVisibility(selectedId);
+        // --- END NEW ---
       });
     }
   }

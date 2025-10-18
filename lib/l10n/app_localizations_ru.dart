@@ -2012,4 +2012,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get channelGreetingsDescription =>
       'Сообщения типа «доброе утро» и «спокойной ночи».';
+
+  @override
+  String get exitAppTitle => 'Уходите так скоро?';
+
+  @override
+  String get exitAppConfirmation =>
+      'Вы уверены, что хотите покинуть эту замечательную платформу?';
 }

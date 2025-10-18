@@ -92,10 +92,6 @@ class ReviewService {
       } catch (e) {
         debugPrint("[ReviewService] Production: SharedPreferences check failed: $e");
       }
-    } else {
-      // --- TESTING LOGIC ---
-      debugPrint("[ReviewService] Testing: Forcing review prompt to show.");
-      await _showReviewPrePrompt(context: context, isProduction: false);
     }
   }
 
