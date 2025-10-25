@@ -7,15 +7,14 @@
 // and displays an animated border for subscribed users.
 
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-
+import 'package:provider/provider.dart';
 import '../../../extensions.dart';
 import '../../../theme.dart';
-import '../../chat.dart';
+import '../../providers/session.dart';
 import 'chat.dart';
 import 'credits.dart';
 
@@ -56,7 +55,6 @@ class Appbar extends StatefulWidget implements PreferredSizeWidget {
   final String? modelImagePath;
   final GlobalKey exitButtonKey;
   final GlobalKey accountButtonKey;
-  final Map<String, dynamic>? userData;
   final VoidCallback onExit;
   final VoidCallback onAccountTap;
   final VoidCallback onTitleTap;
@@ -66,19 +64,15 @@ class Appbar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback onCreditsInfoTapped;
   final VoidCallback? onInfoPanelWillShow;
   final VoidCallback? onInfoPanelDidHide;
-  final ValueNotifier<AppBarMode> appBarModeNotifier;
   final GlobalKey<ChatTitleState> chatTitleKey;
-
-  // NEW: Add the callback property to the Appbar widget itself.
   final VoidCallback onShowExtensionInfoRequest;
 
   const Appbar({
-    Key? key,
+    super.key,
     this.modelTitle,
     this.modelImagePath,
     required this.exitButtonKey,
     required this.accountButtonKey,
-    this.userData,
     required this.onExit,
     required this.onAccountTap,
     required this.onTitleTap,
@@ -89,9 +83,8 @@ class Appbar extends StatefulWidget implements PreferredSizeWidget {
     this.onInfoPanelWillShow,
     this.onInfoPanelDidHide,
     required this.chatTitleKey,
-    required this.appBarModeNotifier,
-    required this.onShowExtensionInfoRequest, // NEW: Add to the constructor.
-  }) : super(key: key);
+    required this.onShowExtensionInfoRequest,
+  });
 
   @override
   State<Appbar> createState() => AppbarState();
@@ -101,7 +94,8 @@ class Appbar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class AppbarState extends State<Appbar> with TickerProviderStateMixin {
-  final GlobalKey<CreditsBarState> _creditsBarKey = GlobalKey<CreditsBarState>();
+  final GlobalKey<CreditsBarState> _creditsBarKey = GlobalKey<
+      CreditsBarState>();
 
   late AnimationController _animationController;
   late AnimationController _borderAnimationController; // For the subscription border
@@ -124,58 +118,6 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
     }
   }
 
-  /// Checks the user's subscription level and expiry date to determine
-  /// if they have an active subscription.
-  bool get _isUserSubscribed {
-    if (widget.userData == null) return false;
-    final int level = widget.userData!['hasCortexSubscription'] as int? ?? 0;
-    if (level == 0) return false;
-
-    // A subscription level exists, now check the expiry date safely.
-    final dynamic expiresAtValue = widget.userData!['subscriptionExpiresAt'];
-    Timestamp? parsedTimestamp;
-
-    if (expiresAtValue is Timestamp) {
-      parsedTimestamp = expiresAtValue;
-    } else if (expiresAtValue is String) {
-      final DateTime? parsedDate = DateTime.tryParse(expiresAtValue);
-      if (parsedDate != null) {
-        parsedTimestamp = Timestamp.fromDate(parsedDate);
-      }
-    }
-
-    if (parsedTimestamp == null || parsedTimestamp.toDate().isBefore(DateTime.now())) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /// Helper to calculate subscription status from a userData map.
-  bool _calculateSubscriptionStatus(Map<String, dynamic>? userData) {
-    if (userData == null) return false;
-    final int level = userData['hasCortexSubscription'] as int? ?? 0;
-    if (level == 0) return false;
-
-    final dynamic expiresAtValue = userData['subscriptionExpiresAt'];
-    Timestamp? parsedTimestamp;
-
-    if (expiresAtValue is Timestamp) {
-      parsedTimestamp = expiresAtValue;
-    } else if (expiresAtValue is String) {
-      final DateTime? parsedDate = DateTime.tryParse(expiresAtValue);
-      if (parsedDate != null) {
-        parsedTimestamp = Timestamp.fromDate(parsedDate);
-      }
-    }
-
-    if (parsedTimestamp == null || parsedTimestamp.toDate().isBefore(DateTime.now())) {
-      return false;
-    }
-
-    return true;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -188,24 +130,8 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(seconds: 4),
     );
-    _borderAnimation = Tween<double>(begin: 0, end: 2 * pi).animate(_borderAnimationController);
-    if (_isUserSubscribed) {
-      _borderAnimationController.repeat();
-    }
-  }
-
-  @override
-  void didUpdateWidget(Appbar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    final bool wasSubscribed = _calculateSubscriptionStatus(oldWidget.userData);
-    final bool isNowSubscribed = _isUserSubscribed;
-
-    if (!wasSubscribed && isNowSubscribed) {
-      _borderAnimationController.repeat();
-    } else if (wasSubscribed && !isNowSubscribed) {
-      _borderAnimationController.stop();
-    }
+    _borderAnimation = Tween<double>(begin: 0, end: 2 * pi).animate(
+        _borderAnimationController);
   }
 
   @override
@@ -226,9 +152,26 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final localizations = AppLocalizations.of(context)!;
+    final sessionProvider = context.watch<ChatSessionProvider>();
+    final isUserSubscribed = sessionProvider.isUserSubscribed;
+
+    final mode = sessionProvider.appBarMode;
+
+    // Reactively control the border animation based on provider state.
+    if (isUserSubscribed && !_borderAnimationController.isAnimating) {
+      _borderAnimationController.repeat();
+    } else if (!isUserSubscribed && _borderAnimationController.isAnimating) {
+      _borderAnimationController.stop();
+    }
 
     void handleExitPress() {
       if (_isCreditsPanelVisible) {
@@ -238,220 +181,222 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
       }
     }
 
-    return ValueListenableBuilder<AppBarMode>(
-      valueListenable: widget.appBarModeNotifier,
-      builder: (context, mode, child) {
-        Widget leadingWidget;
-        Widget titleContentWidget;
+    Widget leadingWidget;
+    Widget titleContentWidget;
 
-        switch (mode) {
-          case AppBarMode.notSelected:
-            leadingWidget = CreditsBar(
-              key: _creditsBarKey,
-              onCreditsInfoTapped: widget.onCreditsInfoTapped,
-              onPanelShown: () {
-                if (mounted) setState(() => _isCreditsPanelVisible = true);
-              },
-              onPanelHidden: () {
-                if (mounted) setState(() => _isCreditsPanelVisible = false);
-              },
-            );
-            titleContentWidget = Text(
-              widget.appTitle,
-              key: const ValueKey('app_title'),
-              style: GoogleFonts.mavenPro(
-                  color: AppColors.primaryColor.inverted,
-                  fontSize: screenWidth * 0.08),
-            );
-            break;
+    switch (mode) {
+      case AppBarMode.notSelected:
+        leadingWidget = CreditsBar(
+          key: _creditsBarKey,
+          onCreditsInfoTapped: widget.onCreditsInfoTapped,
+          onPanelShown: () {
+            if (mounted) setState(() => _isCreditsPanelVisible = true);
+          },
+          onPanelHidden: () {
+            if (mounted) setState(() => _isCreditsPanelVisible = false);
+          },
+        );
+        titleContentWidget = Text(
+          widget.appTitle,
+          key: const ValueKey('app_title'),
+          style: GoogleFonts.mavenPro(
+              color: AppColors.primaryColor.inverted,
+              fontSize: screenWidth * 0.08),
+        );
+        break;
 
-          case AppBarMode.dynamicChat:
-            leadingWidget = Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                    key: const ValueKey('exit_dynamic_chat_button'),
-                    icon: Icon(Icons.arrow_back,
-                        color: AppColors.primaryColor.inverted,
-                        size: screenWidth * 0.06),
-                    onPressed: handleExitPress),
-              ),
-            );
-            titleContentWidget = Container(
-              key: widget.chatTitleKey,
-              child: Column(
-                key: const ValueKey('dynamic_chat_title_column'),
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.appTitle,
-                    style: GoogleFonts.mavenPro(
-                      color: AppColors.primaryColor.inverted,
-                      fontSize: screenWidth * 0.08,
-                      height: 1.0,
-                    ),
-                  ),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 400),
-                    transitionBuilder: (child, animation) {
-                      final offsetAnimation = Tween<Offset>(
-                        begin: const Offset(0.0, -0.5),
-                        end: Offset.zero,
-                      ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut));
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: offsetAnimation,
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: KeyedSubtree(
-                      key: const ValueKey('dynamic_subtitle'),
-                      child: Container(
-                        margin: const EdgeInsets.only(top: 2.0),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                        child: Text(
-                          localizations.dynamicChatTitle + ' (Beta)',
-                          style: GoogleFonts.mavenPro(
-                            color: AppColors.primaryColor.inverted.withOpacity(0.8),
-                            fontSize: screenWidth * 0.025,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-            break;
-
-          case AppBarMode.inSelection:
-          case AppBarMode.modelSelected:
-            leadingWidget = Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                    key: const ValueKey('back_button'),
-                    icon: Icon(Icons.arrow_back,
-                        color: AppColors.primaryColor.inverted,
-                        size: screenWidth * 0.06),
-                    onPressed: handleExitPress),
-              ),
-            );
-            titleContentWidget = mode == AppBarMode.inSelection
-                ? FittedBox(
-              key: const ValueKey('explore_title'),
-              fit: BoxFit.scaleDown,
-              child: Text(
-                localizations.explore,
+      case AppBarMode.dynamicChat:
+        leadingWidget = Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+                key: const ValueKey('exit_dynamic_chat_button'),
+                icon: Icon(Icons.arrow_back,
+                    color: AppColors.primaryColor.inverted,
+                    size: screenWidth * 0.06),
+                onPressed: handleExitPress),
+          ),
+        );
+        titleContentWidget = Container(
+          key: widget.chatTitleKey,
+          child: Column(
+            key: const ValueKey('dynamic_chat_title_column'),
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                widget.appTitle,
                 style: GoogleFonts.mavenPro(
                   color: AppColors.primaryColor.inverted,
                   fontSize: screenWidth * 0.08,
+                  height: 1.0,
                 ),
               ),
-            )
-            // UPDATED: Pass the required 'onShowInfoRequest' callback to the ChatTitle widget.
-                : ChatTitle(
-              key: widget.chatTitleKey,
-              modelTitle: widget.modelTitle,
-              extensions: widget.extensions,
-              onTitleTap: widget.onTitleTap,
-              extensionKey: widget.extensionKey,
-              onShowInfoRequest: widget.onShowExtensionInfoRequest, // <-- THE FIX IS HERE
-            );
-            break;
-        }
-
-        return AppBar(
-          toolbarHeight: screenHeight * 0.08,
-          backgroundColor: AppColors.background,
-          centerTitle: true,
-          scrolledUnderElevation: 0,
-          leadingWidth: screenWidth * 0.3,
-          leading: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 350),
-            transitionBuilder: (child, animation) {
-              final slideAnimation = Tween<Offset>(
-                begin: const Offset(-0.5, 0.0),
-                end: Offset.zero,
-              ).animate(animation);
-              return FadeTransition(
-                opacity: animation,
-                child: SlideTransition(
-                  position: slideAnimation,
-                  child: child,
-                ),
-              );
-            },
-            child: leadingWidget,
-          ),
-          title: GestureDetector(
-            onTap: (mode == AppBarMode.modelSelected || mode == AppBarMode.dynamicChat)
-                ? widget.onTitleTap
-                : null,
-            child: Container(
-              alignment: Alignment.center,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 350),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
                 transitionBuilder: (child, animation) {
+                  final offsetAnimation = Tween<Offset>(
+                    begin: const Offset(0.0, -0.5),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                      parent: animation, curve: Curves.easeOut));
                   return FadeTransition(
                     opacity: animation,
-                    child: ScaleTransition(
-                      scale: Tween<double>(begin: 0.95, end: 1.0).animate(animation),
+                    child: SlideTransition(
+                      position: offsetAnimation,
                       child: child,
                     ),
                   );
                 },
-                child: titleContentWidget,
+                child: KeyedSubtree(
+                  key: const ValueKey('dynamic_subtitle'),
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 2.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 2),
+                    child: Text(
+                      '${localizations.dynamicChatTitle} (Beta)',
+                      style: GoogleFonts.mavenPro(
+                        color: AppColors.primaryColor.inverted.withValues(
+                            alpha: 0.8),
+                        fontSize: screenWidth * 0.025,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
               ),
+            ],
+          ),
+        );
+        break;
+
+      case AppBarMode.inSelection:
+      case AppBarMode.modelSelected:
+        leadingWidget = Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+                key: const ValueKey('back_button'),
+                icon: Icon(Icons.arrow_back,
+                    color: AppColors.primaryColor.inverted,
+                    size: screenWidth * 0.06),
+                onPressed: handleExitPress),
+          ),
+        );
+        titleContentWidget = mode == AppBarMode.inSelection
+            ? FittedBox(
+          key: const ValueKey('explore_title'),
+          fit: BoxFit.scaleDown,
+          child: Text(
+            localizations.explore,
+            style: GoogleFonts.mavenPro(
+              color: AppColors.primaryColor.inverted,
+              fontSize: screenWidth * 0.08,
             ),
           ),
-          actions: [
-            SizedBox(
-              width: screenWidth * 0.3,
-              child: Stack(
-                children: [
-                  Positioned(
-                    right: 16.0,
-                    top: 0,
-                    bottom: 0,
-                    child: GestureDetector(
-                        key: widget.accountButtonKey,
-                        onTap: widget.onAccountTap,
-                        child: _buildUserAvatar(
-                            context, screenWidth, screenHeight)),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        )
+            : ChatTitle(
+          key: widget.chatTitleKey,
+          modelTitle: widget.modelTitle,
+          extensions: widget.extensions,
+          onTitleTap: widget.onTitleTap,
+          extensionKey: widget.extensionKey,
+          onShowInfoRequest: widget.onShowExtensionInfoRequest,
         );
-      },
+        break;
+    }
+
+    return AppBar(
+      toolbarHeight: screenHeight * 0.08,
+      backgroundColor: AppColors.background,
+      centerTitle: true,
+      scrolledUnderElevation: 0,
+      leadingWidth: screenWidth * 0.3,
+      leading: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 350),
+        transitionBuilder: (child, animation) {
+          final slideAnimation = Tween<Offset>(
+            begin: const Offset(-0.5, 0.0),
+            end: Offset.zero,
+          ).animate(animation);
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: slideAnimation,
+              child: child,
+            ),
+          );
+        },
+        child: leadingWidget,
+      ),
+      title: GestureDetector(
+        onTap: (mode == AppBarMode.modelSelected ||
+            mode == AppBarMode.dynamicChat)
+            ? widget.onTitleTap
+            : null,
+        child: Container(
+          alignment: Alignment.center,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 350),
+            transitionBuilder: (child, animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: ScaleTransition(
+                  scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                      animation),
+                  child: child,
+                ),
+              );
+            },
+            child: titleContentWidget,
+          ),
+        ),
+      ),
+      actions: [
+        SizedBox(
+          width: screenWidth * 0.3,
+          child: Stack(
+            children: [
+              Positioned(
+                right: 16.0,
+                top: 0,
+                bottom: 0,
+                child: GestureDetector(
+                    key: widget.accountButtonKey,
+                    onTap: widget.onAccountTap,
+                    // Pass the required provider data down to the avatar builder.
+                    child: _buildUserAvatar(
+                        context, screenWidth, screenHeight,
+                        isUserSubscribed)),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildUserAvatar(BuildContext context, double screenWidth, double screenHeight) {
+  Widget _buildUserAvatar(BuildContext context, double screenWidth,
+      double screenHeight, bool isUserSubscribed) {
+    // Get user profile info directly from the session provider.
+    final sessionProvider = context.watch<ChatSessionProvider>();
     String initial = '?';
-    if (widget.userData != null) {
-      final String? username = widget.userData!['username'] as String?;
-      final String? displayName = widget.userData!['displayName'] as String?;
-      final String? email = widget.userData!['email'] as String?;
-      String nameSource = "";
-      if (username != null && username.isNotEmpty) {
-        nameSource = username;
-      } else if (displayName != null && displayName.isNotEmpty) {
-        nameSource = displayName;
-      } else if (email != null && email.isNotEmpty) {
-        nameSource = email;
-      }
-      if (nameSource.isNotEmpty) {
-        initial = nameSource[0].toUpperCase();
-      }
+
+    final String? displayName = sessionProvider.displayName;
+    final String? email = sessionProvider.email;
+    String nameSource = "";
+
+    if (displayName != null && displayName.isNotEmpty) {
+      nameSource = displayName;
+    } else if (email != null && email.isNotEmpty) {
+      nameSource = email;
+    }
+
+    if (nameSource.isNotEmpty) {
+      initial = nameSource[0].toUpperCase();
     }
 
     Widget avatarCore = Container(
@@ -472,7 +417,7 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
           },
           child: Text(
             initial,
-            key: ValueKey<String>(initial),
+            key: ValueKey<String>(initial), // Animate when the initial changes
             style: TextStyle(
               fontSize: screenWidth * 0.045,
               color: AppColors.primaryColor.inverted,
@@ -484,12 +429,13 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
 
     Widget finalAvatar;
 
-    if (_isUserSubscribed) {
+    if (isUserSubscribed) {
       finalAvatar = AnimatedBuilder(
         animation: _borderAnimation,
         builder: (context, child) {
           return CustomPaint(
-            painter: AnimatedBorderPainter(animationValue: _borderAnimation.value),
+            painter: AnimatedBorderPainter(
+                animationValue: _borderAnimation.value),
             child: Padding(
               padding: const EdgeInsets.all(2.0),
               child: child,

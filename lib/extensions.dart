@@ -1,13 +1,13 @@
 // extensions.dart
 
 import 'dart:async';
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cortex/theme.dart';
 
-import 'models/backend/data.dart';
+import 'models/backend/data/data.dart';
 
 /// Manages the UI and data for model extensions (variants of a base model).
 ///
@@ -58,7 +58,6 @@ class Extensions {
     required String mainId,
     required String ext,
     required Map<String, dynamic> modelData,
-    required Function(bool) updateCanHandleImage,
   }) {
     final rawExt = modelData['extensions'];
     final Map<String, dynamic> extMap = (rawExt is Map)
@@ -90,9 +89,6 @@ class Extensions {
 
     currentBaseSeries = mainId;
     displayedExtensionLabel = chosenExt;
-
-    final canImage = ModelData.hasModality(chosenExt, 'image');
-    updateCanHandleImage(canImage);
   }
 
   /// Closes the extension selection panel if it's open.
@@ -177,7 +173,6 @@ class Extensions {
         builder: (BuildContext context, StateSetter setState) {
           return Stack(
             children: [
-              // --- THE FIX ---
               // This GestureDetector now fills the ENTIRE screen. It sits behind the
               // panel. Tapping anywhere that isn't the panel will be caught by this
               // detector, ensuring a clean dismissal from the AppBar or any other area.
@@ -266,7 +261,7 @@ class Extensions {
         angle: 4.7124, // Approximately 270 degrees (3*PI/2)
         child: SvgPicture.asset(
           'assets/icons/arrov.svg', // Maybe it should be 'arrow.svg'? 'arrov.svg' could be a typo.
-          colorFilter: ColorFilter.mode(color.withOpacity(arrowOpacity), BlendMode.srcIn), // Using colorFilter is more appropriate
+          color: color.withValues(alpha: arrowOpacity), // Using colorFilter is more appropriate
           width: 20,
           height: 20,
         ),
@@ -437,7 +432,7 @@ class Extensions {
             width: iconSize * 0.8,
             height: iconSize * 0.8,
             colorFilter: ColorFilter.mode(
-              AppColors.primaryColor.inverted.withOpacity(0.8),
+              AppColors.primaryColor.inverted.withValues(alpha: 0.8),
               BlendMode.srcIn,
             ),
           ),
@@ -459,9 +454,9 @@ class Extensions {
             vertical: verticalPadding,
           ),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.quaternaryColor.withOpacity(0.5) : Colors.transparent,
+            color: isSelected ? AppColors.quaternaryColor.withValues(alpha: 0.5) : Colors.transparent,
             border: showBottomBorder
-                ? Border(bottom: BorderSide(color: AppColors.primaryColor.withOpacity(0.1), width: 1.0))
+                ? Border(bottom: BorderSide(color: AppColors.primaryColor.withValues(alpha: 0.1), width: 1.0))
                 : null,
           ),
           child: rowContent,
@@ -493,11 +488,9 @@ class Extensions {
           textScaleFactor: MediaQuery.of(context).textScaleFactor,
         )..layout();
 
-        // 🔑 Kaydırma sadece gerçek taşma varsa
         final bool shouldScroll = textPainter.width > constraints.maxWidth;
 
         if (!shouldScroll) {
-          // Metin sığıyorsa normal şekilde döndür
           return Text(
             text,
             style: textStyle,
@@ -507,7 +500,6 @@ class Extensions {
           );
         }
 
-        // Metin taşarsa yatay kaydırma ekle
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
@@ -575,7 +567,7 @@ class Extensions {
 class _ShineAnimationWrapper extends StatefulWidget {
   final Widget child;
 
-  const _ShineAnimationWrapper({Key? key, required this.child}) : super(key: key);
+  const _ShineAnimationWrapper({required this.child});
 
   @override
   State<_ShineAnimationWrapper> createState() => _ShineAnimationWrapperState();
@@ -649,9 +641,9 @@ class _ShineAnimationWrapperState extends State<_ShineAnimationWrapper> with Sin
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      AppColors.secondaryColor.withOpacity(0.0),
-                      AppColors.secondaryColor.withOpacity(0.5),
-                      AppColors.secondaryColor.withOpacity(0.0),
+                      AppColors.secondaryColor.withValues(alpha: 0.0),
+                      AppColors.secondaryColor.withValues(alpha: 0.5),
+                      AppColors.secondaryColor.withValues(alpha: 0.0),
                     ],
                     stops: const [0.4, 0.5, 0.6],
                   ),

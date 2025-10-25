@@ -2009,4 +2009,11 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Bu harika platformdan ayrılmak istediğinize emin misiniz?';
+
+  @override
+  String get newsErrorTitle => 'Haberler Yüklenemedi';
+
+  @override
+  String get newsErrorMessage =>
+      'Son güncellemeler alınırken bir sorun oluştu, lütfen bağlantınızı kontrol edip tekrar deneyin.';
 }

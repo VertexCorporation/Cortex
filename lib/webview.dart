@@ -1,7 +1,7 @@
 // lib/webview.dart
 
 import 'dart:math' as math; // Used for the PI constant for rotation calculations.
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart'; // Provides access to the app's color scheme.
 import 'package:flutter/foundation.dart'; // Provides kDebugMode for conditional logging.
 import 'package:flutter/gestures.dart'; // Required for custom gesture recognizers in WebView.
@@ -197,14 +197,14 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
                 ),
                 IconButton(
                   icon: Icon(Icons.close,
-                      color: AppColors.primaryColor.inverted.withOpacity(0.7),
+                      color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
                       size: 26),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
           ),
-          Divider(height: 1, thickness: 1, color: AppColors.quinaryColor.withOpacity(0.2)),
+          Divider(height: 1, thickness: 1, color: AppColors.quinaryColor.withValues(alpha: 0.2)),
           // --- Main Content Stack ---
           Expanded(
             child: Stack(
@@ -307,7 +307,7 @@ class _TrianglePainter extends CustomPainter {
     const maxOpacity = 1.0;
     final currentOpacity = minOpacity + (progress * (maxOpacity - minOpacity));
     final paint = Paint()
-      ..color = color.withOpacity(currentOpacity)
+      ..color = color.withValues(alpha: currentOpacity)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;

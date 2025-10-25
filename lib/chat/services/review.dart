@@ -1,6 +1,6 @@
 // lib/chat/services/review.dart
 
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:provider/provider.dart';
@@ -117,12 +117,12 @@ class ReviewService {
     // --- DYNAMIC STYLES ---
     final dialogBackgroundColor = AppColors.secondaryColor;
     final primaryTextColor = AppColors.primaryColor.inverted;
-    final secondaryTextColor = AppColors.primaryColor.inverted.withOpacity(0.8);
+    final secondaryTextColor = AppColors.primaryColor.inverted.withValues(alpha: 0.8);
     final borderColor = AppColors.border;
 
     // --- BUTTON COLORS ---
     final noThanksButtonColor = AppColors.septenaryColor;
-    final laterButtonColor = AppColors.primaryColor.inverted.withOpacity(0.7);
+    final laterButtonColor = AppColors.primaryColor.inverted.withValues(alpha: 0.7);
     final rateButtonColor = AppColors.senaryColor;
 
     const double dialogMaxWidth = 340.0;
@@ -240,8 +240,8 @@ class ReviewService {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          splashColor: textColor.withOpacity(0.2),
-          highlightColor: textColor.withOpacity(0.1),
+          splashColor: textColor.withValues(alpha: 0.2),
+          highlightColor: textColor.withValues(alpha: 0.1),
           child: Container(
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),

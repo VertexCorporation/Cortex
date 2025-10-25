@@ -2014,4 +2014,11 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Ma hûn piştrast in ku hûn dixwazin ji vê platforma ecêb derkevin?';
+
+  @override
+  String get newsErrorTitle => 'Barkirina Nûçeyan Bi Ser Neket';
+
+  @override
+  String get newsErrorMessage =>
+      'Di wergirtina nûvekirinên herî dawî de pirsgirêkek çêbû, ji kerema xwe girêdana xwe kontrol bikin û dîsa biceribînin.';
 }

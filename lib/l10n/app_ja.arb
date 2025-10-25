@@ -771,5 +771,7 @@
   "channelGreetingsName": "日々の挨拶",
   "channelGreetingsDescription": "おはよう、おやすみなどのメッセージ。",
   "exitAppTitle": "もう終了しますか？",
-  "exitAppConfirmation": "本当にこの素晴らしいプラットフォームを終了してもよろしいですか？"
+  "exitAppConfirmation": "本当にこの素晴らしいプラットフォームを終了してもよろしいですか？",
+  "newsErrorTitle": "ニュースの読み込みに失敗しました",
+  "newsErrorMessage": "最新のアップデートの取得中に問題が発生しました。接続を確認してもう一度お試しください。"
 }

@@ -771,5 +771,7 @@
   "channelGreetingsName": "매일의 인사",
   "channelGreetingsDescription": "좋은 아침, 좋은 밤과 같은 메시지.",
   "exitAppTitle": "곧 떠나시나요?",
-  "exitAppConfirmation": "이 놀라운 플랫폼을 떠나시겠습니까?"
+  "exitAppConfirmation": "이 놀라운 플랫폼을 떠나시겠습니까?",
+  "newsErrorTitle": "뉴스를 로드하지 못했습니다",
+  "newsErrorMessage": "최신 업데이트를 가져오는 중 문제가 발생했습니다. 연결 상태를 확인하고 다시 시도해 주세요."
 }

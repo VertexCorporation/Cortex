@@ -2025,4 +2025,11 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Apakah Anda yakin ingin meninggalkan platform menakjubkan ini?';
+
+  @override
+  String get newsErrorTitle => 'Gagal Memuat Berita';
+
+  @override
+  String get newsErrorMessage =>
+      'Terjadi masalah saat mengambil pembaruan terkini, silakan periksa koneksi Anda dan coba lagi.';
 }

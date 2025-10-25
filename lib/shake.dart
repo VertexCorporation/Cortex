@@ -1,20 +1,19 @@
+// shake.dart
+
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 
 class ShakeWidget extends StatefulWidget {
   final Widget child;
   final AnimationController controller;
-
-  const ShakeWidget({
-    Key? key,
-    required this.child,
-    required this.controller,
-  }) : super(key: key);
+  const ShakeWidget({super.key, required this.child, required this.controller});
 
   @override
-  _ShakeWidgetState createState() => _ShakeWidgetState();
+  ShakeWidgetState createState() => ShakeWidgetState();
 }
 
-class _ShakeWidgetState extends State<ShakeWidget> {
+class ShakeWidgetState extends State<ShakeWidget> {
   late Animation<double> _offsetAnimation;
 
   @override
@@ -30,12 +29,8 @@ class _ShakeWidgetState extends State<ShakeWidget> {
     return AnimatedBuilder(
       animation: _offsetAnimation,
       builder: (context, child) {
-        final dx =
-            8 * (0.5 - 0.5 * (1 + (0.5 * _offsetAnimation.value)).abs());
-        return Transform.translate(
-          offset: Offset(dx, 0),
-          child: child,
-        );
+        final dx = sin(pi * _offsetAnimation.value * 1) * 8;
+        return Transform.translate(offset: Offset(dx, 0), child: child);
       },
       child: widget.child,
     );

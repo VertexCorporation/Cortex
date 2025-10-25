@@ -2,7 +2,7 @@
 // This version fixes the 'horizontalPadding' scope bug, ensuring all dynamic
 // calculations are correct within their respective methods.
 
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -30,7 +30,7 @@ class SubscriptionContentWidget extends StatefulWidget {
   final VoidCallback onBenefitsAnimated;
 
   const SubscriptionContentWidget({
-    Key? key,
+    super.key,
     required this.planType,
     required this.availableProducts,
     required this.selectedBillingOption,
@@ -40,7 +40,7 @@ class SubscriptionContentWidget extends StatefulWidget {
     this.scrollController,
     required this.animateBenefits,
     required this.onBenefitsAnimated,
-  }) : super(key: key);
+  });
 
   @override
   State<SubscriptionContentWidget> createState() =>
@@ -234,7 +234,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
               duration: const Duration(milliseconds: 250),
               transitionBuilder: (Widget child, Animation<double> animation) => FadeTransition(opacity: animation, child: child),
               child: showCheckmark
-                  ? Container( key: const ValueKey('checkmark'), alignment: Alignment.center, width: screenWidth * 0.17, child: SvgPicture.asset('assets/icons/checkmark.svg', colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn), width: screenWidth * 0.09, height: screenWidth * 0.09),)
+                  ? Container( key: const ValueKey('checkmark'), alignment: Alignment.center, width: screenWidth * 0.17, child: SvgPicture.asset('assets/icons/checkmark.svg', color: AppColors.primaryColor.inverted, width: screenWidth * 0.09, height: screenWidth * 0.09),)
                   : SizedBox(
                 key: const ValueKey('badges'),
                 width: screenWidth * 0.17,
@@ -272,7 +272,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.centerLeft, end: Alignment.centerRight,
-                        colors: [ AppColors.secondaryColor.withOpacity(0.0), AppColors.secondaryColor.withOpacity(0.5), AppColors.secondaryColor.withOpacity(0.0), ],
+                        colors: [ AppColors.secondaryColor.withValues(alpha: 0.0), AppColors.secondaryColor.withValues(alpha: 0.5), AppColors.secondaryColor.withValues(alpha: 0.0), ],
                         stops: const [0.4, 0.5, 0.6],
                       ),
                     ),
@@ -324,7 +324,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SvgPicture.asset('assets/icons/checkmark.svg', width: iconSize, height: iconSize, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn)),
+              SvgPicture.asset('assets/icons/checkmark.svg', width: iconSize, height: iconSize, color: AppColors.primaryColor.inverted),
               SizedBox(width: screenWidth * 0.02),
               Expanded(child: Text(benefit, style: TextStyle(fontSize: screenWidth * 0.035, color: AppColors.primaryColor.inverted))),
             ],

@@ -1,6 +1,6 @@
 // initialization.dart
 //
-// This file NO LONGER CONTAINS A WIDGET. Instead, it provides the `AppInitializer`
+// It provides the `AppInitializer`
 // service, which acts as the central brain for the application's startup and
 // lifecycle state management. It is responsible for handling authentication,
 // checking server status, and managing background synchronization tasks
@@ -11,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:cortex/referral.dart';
 import 'package:cortex/server/credits.dart';
+import 'package:cortex/server/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -23,8 +24,8 @@ import 'chat/services/moderator.dart';
 import 'internet.dart';
 import 'l10n/app_localizations.dart';
 import 'language.dart';
-import 'main.dart'; // For downloadCallback
-import 'models/backend/data.dart';
+import 'main.dart';
+import 'models/backend/data/database.dart';
 import 'notifications.dart';
 
 /// Defines the possible high-level states of the application.
@@ -164,12 +165,30 @@ class AppInitializer with ChangeNotifier {
   void _listenToAuthStateChanges() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       _currentUser = user;
+
+      final context = navigatorKey.currentContext;
+      if (context == null) {
+        debugPrint("[AppInitializer] Auth Listener: CRITICAL: Could not get context.");
+        return;
+      }
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+
       if (user == null) {
-        debugPrint('Auth State Listener: User signed out. Disposing credits listener.');
+        debugPrint('Auth State Listener: User signed out. Disposing credits listener and clearing user data.');
         CreditsManager.instance.dispose();
+
+        userProvider.clearDataOnSignOut();
+
+        _updateStatus(AppStatus.needsLogin);
+
       } else {
-        debugPrint('Auth State Listener: User signed in. Initializing credits listener.');
+        debugPrint('Auth State Listener: User signed in. Initializing credits and user data listeners.');
         CreditsManager.instance.listenToCredits();
+
+        userProvider.listenToUserData(user);
+
+        _determineUserFlow();
       }
     });
   }
@@ -207,9 +226,7 @@ class AppInitializer with ChangeNotifier {
     debugPrint("Startup: Online mode detected. Proceeding with user authentication flow.");
     User? user = FirebaseAuth.instance.currentUser;
 
-    if (user == null) {
-      user = await _attemptAutoLogin();
-    }
+    user ??= await _attemptAutoLogin();
 
     if (user == null) {
       debugPrint("Startup: No authenticated user found after checking cache and auto-login. Needs login.");
@@ -307,7 +324,7 @@ class AppInitializer with ChangeNotifier {
       // The UI layer will provide the localized messages when it displays the alert.
     );
 
-    if (await upgrader.isUpdateAvailable()) {
+    if (upgrader.isUpdateAvailable()) {
       _updateStatus(AppStatus.updateRequired);
     }
   }

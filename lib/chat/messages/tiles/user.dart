@@ -1,9 +1,9 @@
-import 'package:cortex/main.dart';
-import 'package:flutter/material.dart';
+// chat/messages/tiles/user.dart
 
-import '../../../recognizer.dart';
-import '../../../theme.dart';
-import '../../chat.dart';
+import 'package:cortex/app.dart';
+import 'package:cortex/recognizer.dart';
+import 'package:cortex/theme.dart';
+import 'package:flutter/material.dart';
 import '../options.dart';
 
 class UserMessageTile extends StatefulWidget {
@@ -11,20 +11,27 @@ class UserMessageTile extends StatefulWidget {
   final double opacity;
   final VoidCallback? onFadeOutComplete;
   final VoidCallback? onEdit;
+  final bool conversationHasPhoto;
+  final bool isUserSubscribed;
+  final int premiumTrialUses;
 
   const UserMessageTile({
-    Key? key,
+    super.key,
     required this.text,
     required this.opacity,
     this.onFadeOutComplete,
     this.onEdit,
-  }) : super(key: key);
+    required this.conversationHasPhoto,
+    required this.isUserSubscribed,
+    required this.premiumTrialUses,
+  });
 
   @override
-  _UserMessageTileState createState() => _UserMessageTileState();
+  UserMessageTileState createState() => UserMessageTileState();
 }
 
-class _UserMessageTileState extends State<UserMessageTile> with TickerProviderStateMixin {
+class UserMessageTileState extends State<UserMessageTile>
+    with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
@@ -35,7 +42,8 @@ class _UserMessageTileState extends State<UserMessageTile> with TickerProviderSt
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_fadeController);
+    _fadeAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_fadeController);
 
     if (widget.opacity == 1.0) {
       _fadeController.value = 0.0;
@@ -70,21 +78,20 @@ class _UserMessageTileState extends State<UserMessageTile> with TickerProviderSt
     super.dispose();
   }
 
+  // --- REFACTORED METHOD ---
   void _handleLongPress(BuildContext context, Offset tapPosition) {
-    final chatState = context.findAncestorStateOfType<ChatScreenState>();
-    if (chatState == null) return;
-    bool conversationHasPhoto =
-        chatState.messages.any((msg) => msg.photoPath != null && msg.photoPath!.isNotEmpty);
-
+    // The direct dependency on ChatScreenState is now removed.
+    // All necessary data is read directly from the widget's properties.
     showMessageOptions(
       context: context,
       tapPosition: tapPosition,
       messageText: widget.text,
-      options: [MessageOption.copy, MessageOption.edit, MessageOption.select],
+      options: const [MessageOption.copy, MessageOption.edit, MessageOption.select],
       onEdit: widget.onEdit,
-      conversationHasPhoto: conversationHasPhoto,
-      isSubscribed: chatState.isUserSubscribed,
-      premiumTrialUses: chatState.premiumTrialUses,
+      // Use the parameters passed into the widget constructor
+      conversationHasPhoto: widget.conversationHasPhoto,
+      isSubscribed: widget.isUserSubscribed,
+      premiumTrialUses: widget.premiumTrialUses,
     );
   }
 

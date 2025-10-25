@@ -1,12 +1,12 @@
 // sections/theme.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:cortex/notifications.dart'; // For showing notifications (e.g., theme locked)
 import 'package:cortex/theme.dart'; // For AppColors and ThemeProvider
 import 'package:flutter/foundation.dart'; // For kDebugMode
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // For SystemChrome
+// For SystemChrome
 import 'package:flutter_svg/flutter_svg.dart'; // For SVG icons
 import 'package:google_fonts/google_fonts.dart'; // For custom fonts
 import 'package:provider/provider.dart'; // For accessing ThemeProvider
@@ -40,14 +40,14 @@ class AppThemeSection extends StatefulWidget {
   final Timestamp? subscriptionExpiresAt;
 
   const AppThemeSection({
-    Key? key,
+    super.key,
     required this.appLocalizations,
     required this.userSubscriptionLevel,
     required this.subscriptionExpiresAt,
     required this.isDialogOpen,
     required this.onDialogStateChanged,
     required this.notificationService,
-  }) : super(key: key);
+  });
 
   @override
   AppThemeSectionState createState() => AppThemeSectionState();
@@ -247,7 +247,7 @@ class AppThemeSectionState extends State<AppThemeSection> {
                           'assets/icons/theme.svg',
                           width: screenWidth * 0.07,
                           height: screenWidth * 0.07,
-                          colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                          color: AppColors.primaryColor.inverted,
                         ),
                         SizedBox(height: screenHeight * 0.008),
                         Text(
@@ -259,7 +259,7 @@ class AppThemeSectionState extends State<AppThemeSection> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        Divider(thickness: 0.5, color: AppColors.quinaryColor.withOpacity(0.7)),
+                        Divider(thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha: 0.7)),
                         ConstrainedBox(
                           constraints: BoxConstraints(maxHeight: screenHeight * 0.35),
                           child: ListView.builder(
@@ -301,12 +301,12 @@ class AppThemeSectionState extends State<AppThemeSection> {
                                             groupValue: tempSelectedTheme,
                                             onChanged: (value) => setStateDialog(() => tempSelectedTheme = value!),
                                             activeColor: AppColors.primaryColor.inverted,
-                                            fillColor: MaterialStateProperty.resolveWith<Color>((states) => states.contains(MaterialState.selected) ? AppColors.primaryColor.inverted : AppColors.primaryColor.inverted.withOpacity(0.6)),
+                                            fillColor: WidgetStateProperty.resolveWith<Color>((states) => states.contains(WidgetState.selected) ? AppColors.primaryColor.inverted : AppColors.primaryColor.inverted.withValues(alpha: 0.6)),
                                           )
-                                              : SvgPicture.asset('assets/icons/lock.svg', width: screenWidth * 0.045, height: screenWidth * 0.045, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted.withOpacity(0.5), BlendMode.srcIn)),
+                                              : SvgPicture.asset('assets/icons/lock.svg', width: screenWidth * 0.045, height: screenWidth * 0.045, color: AppColors.primaryColor.inverted.withValues(alpha: 0.5)),
                                         ),
                                         SizedBox(width: screenWidth * 0.01),
-                                        Expanded(child: Text(theme['name'] as String, style: TextStyle(fontSize: screenWidth * 0.038, color: isEnabled ? AppColors.primaryColor.inverted : AppColors.primaryColor.inverted.withOpacity(0.5)))),
+                                        Expanded(child: Text(theme['name'] as String, style: TextStyle(fontSize: screenWidth * 0.038, color: isEnabled ? AppColors.primaryColor.inverted : AppColors.primaryColor.inverted.withValues(alpha: 0.5)))),
                                       ],
                                     ),
                                   ),
@@ -315,13 +315,13 @@ class AppThemeSectionState extends State<AppThemeSection> {
                             },
                           ),
                         ),
-                        Divider(thickness: 0.5, color: AppColors.quinaryColor.withOpacity(0.7), height: 1),
+                        Divider(thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha: 0.7), height: 1),
                         // "Done" button
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            splashColor: AppColors.senaryColor.withOpacity(0.1),
-                            highlightColor: AppColors.senaryColor.withOpacity(0.1),
+                            splashColor: AppColors.senaryColor.withValues(alpha: 0.1),
+                            highlightColor: AppColors.senaryColor.withValues(alpha: 0.1),
                             onTap: () {
                               // =============================================================
                               // == THE FIX: ONLY POP WITH THE RESULT, DO NOT CHANGE THEME HERE ==
@@ -417,7 +417,7 @@ class AppThemeSectionState extends State<AppThemeSection> {
           child: InkWell(
             onTap: _showThemeSelectionDialog, // Open dialog on tap
             borderRadius: BorderRadius.circular(10.0),
-            splashColor: AppColors.quaternaryColor.withOpacity(0.3),
+            splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
             child: Container(
               padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02, horizontal: screenWidth * 0.04), // Consistent padding
               child: Row(

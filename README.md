@@ -1,7 +1,6 @@
-
 <p align="center">
 
-  <h1 align="center">Cortex - Peak of Artificial Intelligence</h1>
+  <h1 align="center">Cortex - Core of Artificial Intelligence</h1>
 
   <p align="center">
     Privacy-first, hyper-personalized, and always available AI—right in your pocket.
@@ -12,7 +11,6 @@
     <a href="https://github.com/VertexCorporation/Cortex/issues">Report Bug</a>
     ·
     <a href="https://github.com/VertexCorporation/Cortex/issues">Request Feature</a>
-  </p>
 </p>
       
 <p align="center">

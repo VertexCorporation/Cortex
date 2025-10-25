@@ -2,7 +2,7 @@
 
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart'; // For AppColors
 import 'package:flutter/foundation.dart'; // For kDebugMode
 import 'package:flutter/material.dart';
@@ -56,13 +56,13 @@ class ProfileHeaderSection extends StatefulWidget {
   final Timestamp? subscriptionExpiresAt; // <<< NEW PARAMETER
 
   const ProfileHeaderSection({
-    Key? key,
+    super.key,
     required this.displayName,
     required this.email,
     required this.userSubscriptionLevel,
     required this.isAlphaUser,
     this.subscriptionExpiresAt, // Now accepts the expiration date
-  }) : super(key: key);
+  });
 
   @override
   State<ProfileHeaderSection> createState() => _ProfileHeaderSectionState();
@@ -182,7 +182,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
         vertical: screenHeight * 0.006,
       ),
       decoration: BoxDecoration(
-        color: AppColors.secondaryColor.withOpacity(0.8),
+        color: AppColors.secondaryColor.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Row(

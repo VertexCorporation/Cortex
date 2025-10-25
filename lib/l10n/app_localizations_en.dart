@@ -2009,4 +2009,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Are you sure you want to leave this amazing platform?';
+
+  @override
+  String get newsErrorTitle => 'Failed to Load News';
+
+  @override
+  String get newsErrorMessage =>
+      'There was a problem fetching the latest updates, please check your connection and try again.';
 }

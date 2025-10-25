@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:confetti/confetti.dart';
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -51,7 +51,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   late final PageController _pageController;
   int _currentPage = 1;
   CreditPackage? _selectedCreditPackage;
-  late Map<String, String> _selectedBillingOptions = {
+  late final Map<String, String> _selectedBillingOptions = {
     'plus': 'monthly', 'pro': 'monthly', 'ultra': 'monthly',
   };
   late final List<ScrollController> _scrollControllers;
@@ -334,7 +334,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   SvgPicture.asset(
                     'assets/icons/warning.svg',
                     width: screenSize.width * 0.25,
-                    colorFilter: ColorFilter.mode(AppColors.septenaryColor, BlendMode.srcIn),
+                    color: AppColors.septenaryColor,
                   ),
                   SizedBox(height: screenSize.height * 0.04),
                   Padding(
@@ -348,7 +348,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   SizedBox(height: screenSize.height * 0.05),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor.inverted.withOpacity(0.1),
+                      backgroundColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
                       foregroundColor: AppColors.primaryColor.inverted,
                       padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.1, vertical: screenSize.height * 0.018),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
@@ -450,7 +450,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                                   gradient: LinearGradient(
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
-                                    colors: [ AppColors.background.withOpacity(0.0), AppColors.background ],
+                                    colors: [ AppColors.background.withValues(alpha: 0.0), AppColors.background ],
                                     stops: const [0.0, 0.9],
                                   ),
                                 ),
@@ -471,7 +471,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                                   gradient: LinearGradient(
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
-                                    colors: [ AppColors.background.withOpacity(0.0), AppColors.background ],
+                                    colors: [ AppColors.background.withValues(alpha: 0.0), AppColors.background ],
                                     stops: const [0.0, 0.9],
                                   ),
                                 ),
@@ -551,7 +551,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
           height: screenWidth * 0.022,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(screenWidth * 0.022),
-            color: isSelected ? AppColors.primaryColor.inverted : AppColors.primaryColor.inverted.withOpacity(0.5),
+            color: isSelected ? AppColors.primaryColor.inverted : AppColors.primaryColor.inverted.withValues(alpha: 0.5),
           ),
         );
       }),

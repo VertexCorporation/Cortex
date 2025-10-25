@@ -8,7 +8,7 @@ import 'package:shimmer/shimmer.dart'; // For Shimmer effect
 ///
 /// This is shown while the actual user data is being fetched.
 class SkeletonLoader extends StatelessWidget { // Renamed to SkeletonLoaderSection for consistency
-  const SkeletonLoader({Key? key}) : super(key: key);
+  const SkeletonLoader({super.key});
 
   /// Builds a circular skeleton placeholder.
   Widget _buildCircle(BuildContext context, double size) {

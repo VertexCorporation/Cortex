@@ -771,5 +771,7 @@
   "channelGreetingsName": "تحيات يومية",
   "channelGreetingsDescription": "رسائل مثل صباح الخير ومساء الخير.",
   "exitAppTitle": "المغادرة قريبا؟",
-  "exitAppConfirmation": "هل أنت متأكد أنك تريد مغادرة هذه المنصة الرائعة؟"
+  "exitAppConfirmation": "هل أنت متأكد أنك تريد مغادرة هذه المنصة الرائعة؟",
+  "newsErrorTitle": "فشل تحميل الأخبار",
+  "newsErrorMessage": "حدثت مشكلة أثناء جلب أحدث التحديثات، يرجى التحقق من اتصالك ومحاولة مرة أخرى."
 }

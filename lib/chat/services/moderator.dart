@@ -65,7 +65,7 @@ class OfflineModeratorService {
       // Add multi-word phrases.
       final List<String> phrases = List<String>.from(config['phrases'] ?? []);
       if (phrases.isNotEmpty) {
-        patterns.add('(' + phrases.map((p) => p.replaceAll(' ', r'\s+')).join('|') + ')');
+        patterns.add('(${phrases.map((p) => p.replaceAll(' ', r'\s+')).join('|')})');
       }
 
       if (patterns.isEmpty) {

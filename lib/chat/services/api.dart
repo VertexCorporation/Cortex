@@ -11,12 +11,11 @@
 
 import 'dart:convert';
 import 'dart:async';
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:mime/mime.dart';
+import 'utils.dart';
 
 /// Represents an exception thrown when the user intentionally cancels an API request.
 class UserCancelledException implements Exception {
@@ -39,42 +38,18 @@ class ApiException implements Exception {
 
 /// The primary service for interacting with AI models via the backend proxy.
 class ApiService {
-  final AppLocalizations localizations;
   final String _proxyBaseUrl = "https://proxyopenrouterrequest-o5h7dmtija-ew.a.run.app";
 
   http.Client? _client;
   bool _isCancelled = false;
 
-  ApiService({required this.localizations});
+  ApiService();
 
   /// Cancels any ongoing HTTP request.
   void cancelRequests() {
     debugPrint("[ApiService] Cancellation requested. Setting flag and closing client.");
     _isCancelled = true;
     _client?.close();
-  }
-
-  /// A static utility function to read an image file, encode it to Base64,
-  /// and format it as a data URL string.
-  static Future<String?> formatBase64Image(String photoPath) async {
-    try {
-      final imageFile = File(photoPath);
-      if (await imageFile.exists()) {
-        final imageBytes = await imageFile.readAsBytes();
-        final mimeType = lookupMimeType(photoPath, headerBytes: imageBytes);
-
-        if (mimeType == null || !['image/png', 'image/jpeg', 'image/webp'].contains(mimeType)) {
-          debugPrint("Unsupported image type '$mimeType' for file: $photoPath");
-          return null;
-        }
-
-        final base64Image = base64Encode(imageBytes);
-        return 'data:$mimeType;base64,$base64Image';
-      }
-    } catch (e) {
-      debugPrint("Error reading or encoding photo file: $e");
-    }
-    return null;
   }
 
   /// It now accepts an `isPremium` flag and sends it to the backend for
@@ -85,6 +60,7 @@ class ApiService {
     required bool isPremium,
     Function(String textChunk)? onTextChunk,
     Function(String imageUrl)? onImageReceived,
+    required AppLocalizations localizations,
   }) async {
     _isCancelled = false;
     _client = http.Client();
@@ -290,6 +266,7 @@ class ApiService {
     String? photoPath,
     Function(String textChunk)? onTextChunk,
     Function(String imageUrl)? onImageReceived,
+    required AppLocalizations localizations,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
     List<Map<String, dynamic>> userMessageContent = [];
@@ -298,16 +275,15 @@ class ApiService {
       userMessageContent.add({"type": "text", "text": userInput});
     }
     if (photoPath != null) {
-      String? base64Image = await ApiService.formatBase64Image(photoPath);
-      if (base64Image != null) {
-        userMessageContent.add({"type": "image_url", "image_url": {"url": base64Image}});
-      }
+      String? base64Image = await Utils.formatBase64Image(photoPath);
+      userMessageContent.add({"type": "image_url", "image_url": {"url": base64Image}});
     }
     if (userMessageContent.isNotEmpty) {
       messages.add({"role": "user", "content": userMessageContent});
     }
 
     return _getResponse(
+      localizations: localizations,
       messages: messages,
       model: baseModelId,
       isPremium: isPremium,
@@ -325,6 +301,7 @@ class ApiService {
     String? photoPath,
     Function(String textChunk)? onTextChunk,
     Function(String imageUrl)? onImageReceived,
+    required AppLocalizations localizations,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
     List<Map<String, dynamic>> userMessageContent = [];
@@ -333,7 +310,7 @@ class ApiService {
       userMessageContent.add({"type": "text", "text": userInput});
     }
     if (photoPath != null) {
-      String? base64Image = await ApiService.formatBase64Image(photoPath);
+      String? base64Image = await Utils.formatBase64Image(photoPath);
       if (base64Image != null) {
         userMessageContent.add({"type": "image_url", "image_url": {"url": base64Image}});
       }
@@ -343,6 +320,7 @@ class ApiService {
     }
 
     return _getResponse(
+      localizations: localizations,
       messages: messages,
       model: modelId,
       isPremium: isPremium,

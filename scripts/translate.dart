@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:path/path.dart' as p;
 
 Future<void> main(List<String> args) async {
-
   final renameArg = args.firstWhere((arg) => arg.startsWith('--rename='), orElse: () => '');
 
   if (renameArg.isNotEmpty) {
@@ -24,8 +23,10 @@ Future<void> main(List<String> args) async {
       }
       renameMap[parts[0].trim()] = parts[1].trim();
     }
-
+    
     print('🔄 Key renaming mode is active.');
+    
+
     print('Keys that will be changed: $renameMap');
 
     final scriptPath = Platform.script.toFilePath();
@@ -62,6 +63,7 @@ Future<void> main(List<String> args) async {
     }
 
     print('\n✨ Renaming completed. Total $filesChanged files updated.');
+
     return;
   }
   
@@ -126,7 +128,7 @@ Future<void> main(List<String> args) async {
       sourceKeys[key] = value;
     }
   });
-
+  
   print('Found ${sourceKeys.length} keys in the template file ($templateArbFileName).');
 
   if (keysToUpdate.isNotEmpty) {
@@ -219,8 +221,8 @@ Future<void> main(List<String> args) async {
       print('Sync: No new keys to add. File is up to date.');
     } else {
       print('No changes were made. The keys might already be up to date.');
+      }
     }
-  }
-
-  print('\n🎉 All ARB files have been synchronized and translated successfully!');
+  
+    print('\n🎉 All ARB files have been synchronized and translated successfully!');
 }

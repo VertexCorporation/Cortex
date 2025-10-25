@@ -3681,6 +3681,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to leave this amazing platform?'**
   String get exitAppConfirmation;
+
+  /// No description provided for @newsErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to Load News'**
+  String get newsErrorTitle;
+
+  /// No description provided for @newsErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'There was a problem fetching the latest updates, please check your connection and try again.'**
+  String get newsErrorMessage;
 }
 
 class _AppLocalizationsDelegate

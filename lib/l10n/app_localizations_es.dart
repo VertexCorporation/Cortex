@@ -2032,4 +2032,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       '¿Estás seguro de que deseas abandonar esta increíble plataforma?';
+
+  @override
+  String get newsErrorTitle => 'No se pudieron cargar las noticias';
+
+  @override
+  String get newsErrorMessage =>
+      'Hubo un problema al obtener las últimas actualizaciones, verifique su conexión y vuelva a intentarlo.';
 }

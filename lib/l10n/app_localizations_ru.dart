@@ -2019,4 +2019,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Вы уверены, что хотите покинуть эту замечательную платформу?';
+
+  @override
+  String get newsErrorTitle => 'Не удалось загрузить новости';
+
+  @override
+  String get newsErrorMessage =>
+      'Возникла проблема при загрузке последних обновлений. Проверьте соединение и повторите попытку.';
 }

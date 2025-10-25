@@ -1,50 +1,64 @@
-// context.dart
+// lib/chat/services/context.dart
 
-import 'package:cortex/models/backend/data.dart';
-import 'package:cortex/chat/chat.dart';
+import 'package:cortex/chat/providers/conversation.dart';
+import 'package:cortex/chat/providers/session.dart';
+import 'package:cortex/chat/services/utils.dart';
+import 'package:cortex/models/backend/data/data.dart';
 import 'package:cortex/chat/messages/messages.dart';
-import 'api.dart';
 
+/// Service responsible for building the list of messages in the format
+/// required by the backend API. It reads the current state from the relevant providers.
 class ContextService {
-  final ChatScreenState state;
+  final ChatSessionProvider _sessionProvider;
+  final ConversationProvider _conversationProvider;
 
-  ContextService(this.state);
+  ContextService({
+    required ChatSessionProvider sessionProvider,
+    required ConversationProvider conversationProvider,
+  })  : _sessionProvider = sessionProvider,
+        _conversationProvider = conversationProvider;
 
-  /// Builds the list of messages for the API context. This method now formats
-  /// ALL messages (historical and current) into a consistent, modern,
-  /// multimodal array format that the API expects. This solves the "amnesia"
-  /// bug where the API would ignore historical context due to format mismatch.
+  /// Builds the list of messages for the API context.
   ///
-  /// [targetModelId]: The ID of the model the message will be sent to.
-  /// [includeLastUser]: Whether to include the very last user message in the context.
+  /// This method formats all relevant messages into the multimodal array format
+  /// that the API expects. It reads the system role from the `ChatSessionProvider`
+  /// and the message history from the `ConversationProvider`.
+  ///
+  /// [targetModelId]: The ID of the model the message will be sent to. This is used
+  ///                  to determine if image data should be included.
+  /// [includeLastUser]: If `false`, the very last user message in the history
+  ///                    will be excluded. This is used for regeneration scenarios.
   Future<List<Map<String, dynamic>>> buildContextMessages({
     bool includeLastUser = true,
     required String targetModelId,
   }) async {
     final List<Map<String, dynamic>> contextMessages = [];
-    final String? systemRole = state.role;
 
-    // --- IMPROVEMENT: Use the correct method to check for image capability ---
-    // Instead of a non-existent 'vision' flag, we use the reliable central method.
+    // Read the system role from the session provider.
+    final String? systemRole = _sessionProvider.role;
+
+    // Read the message list from the conversation provider and filter for valid context.
+    List<Message> history = _conversationProvider.messages
+        .where((m) => m.includeInContext && !m.isThinking && !m.isError)
+        .toList();
+
     final bool targetModelSupportsImages = ModelData.hasModality(targetModelId, 'image');
 
-    // Add the system prompt, if it exists, in the correct plain string format.
+    // Add the system prompt to the context, if it exists.
     if (systemRole != null && systemRole.isNotEmpty) {
       contextMessages.add({"role": "system", "content": systemRole});
     }
 
-    // Filter messages from the UI state to get the conversation history.
-    final List<Message> history = state.messages
-        .where((m) => m.includeInContext && !m.isThinking && !m.isError)
-        .toList();
-
-    // If we're regenerating a response, we don't include the last user message
-    // because it will be added again by the ApiService.
-    if (!includeLastUser && history.isNotEmpty && history.last.isUserMessage) {
-      history.removeLast();
+    // If we're regenerating a response, exclude the last user message
+    // because it will be added again by the SendService.
+    if (!includeLastUser && history.isNotEmpty) {
+      final int lastUserMessageIndex = history.lastIndexWhere((m) => m.isUserMessage);
+      if (lastUserMessageIndex != -1) {
+        history = history.sublist(0, lastUserMessageIndex);
+      }
     }
 
-    // --- THE CORE FIX: Loop through history and format EACH message correctly ---
+    // Loop through the filtered history and format each message into the API's required JSON structure.
     for (final message in history) {
       contextMessages.add(await _formatMessageToJson(
         message,
@@ -52,7 +66,7 @@ class ContextService {
       ));
     }
 
-    // Filter out any potential empty messages.
+    // As a final safety check, filter out any potential empty messages that might have been created.
     return contextMessages.where((m) {
       final content = m['content'];
       if (content is String) return content.isNotEmpty;
@@ -62,24 +76,25 @@ class ContextService {
   }
 
   /// Helper function to convert a single `Message` object to the required
-  /// multimodal JSON format (`"content": [ ... ]`). This is now the single
-  /// source of truth for message formatting in the context.
+  /// multimodal JSON format (`"content": [ ... ]`).
+  ///
+  /// This is a pure utility function that transforms data without side effects.
   Future<Map<String, dynamic>> _formatMessageToJson(
       Message message, {
         required bool includeImage,
       }) async {
-    // This function only handles 'user' and 'assistant' roles.
     String role = message.isUserMessage ? "user" : "assistant";
     List<Map<String, dynamic>> contentParts = [];
 
-    // Add the text part if it exists.
+    // Add the text part of the message if it's not empty.
     if (message.text.isNotEmpty) {
       contentParts.add({"type": "text", "text": message.text});
     }
 
-    // Conditionally add the image part if the target model supports it.
+    // Conditionally add the image part.
+    // This is done only if the target model supports images AND the message has a photo.
     if (includeImage && message.photoPath?.isNotEmpty == true) {
-      final String? base64Image = await ApiService.formatBase64Image(message.photoPath!);
+      final String? base64Image = await Utils.formatBase64Image(message.photoPath!);
       if (base64Image != null) {
         contentParts.add({
           "type": "image_url",
@@ -88,8 +103,7 @@ class ContextService {
       }
     }
 
-    // Always return the content as a list, even if it only has one part.
-    // This ensures consistency across the entire payload.
+    // The API always expects the content to be a list, even for text-only messages.
     return {"role": role, "content": contentParts};
   }
 }

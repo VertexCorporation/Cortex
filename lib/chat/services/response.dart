@@ -1,81 +1,85 @@
-// response.dart
+// lib/chat/services/response.dart
 
-import 'package:flutter/material.dart';
-import 'package:cortex/chat/chat.dart';
-import 'package:cortex/chat/services/storage.dart';
+import 'package:cortex/chat/providers/conversation.dart';
+import 'package:cortex/chat/services/scroll.dart';
+import 'package:flutter/foundation.dart';
 
+/// Manages the processing of incoming AI responses, both streaming and final.
+///
+/// This service acts as a bridge between raw response data (e.g., tokens from an
+/// API or native code) and the central conversation state. It translates this data
+/// into meaningful state changes within the `ConversationProvider` and orchestrates
+/// related side-effects like auto-scrolling.
 class ResponseService {
-  final ChatScreenState state;
+  final ConversationProvider _conversationProvider;
+  final ScrollService _scrollService;
 
-  ResponseService(this.state);
+  /// Creates an instance of ResponseService.
+  ///
+  /// It requires:
+  /// - [conversationProvider] to update the central message list and state.
+  /// - [scrollService] to trigger UI side-effects like auto-scrolling.
+  ResponseService({
+    required ConversationProvider conversationProvider,
+    required ScrollService scrollService,
+  })  : _conversationProvider = conversationProvider,
+        _scrollService = scrollService;
 
-  /// Called for each token received from the native Llama service.
+  /// Called for each token received from a streaming source (API or native Llama).
+  ///
+  /// It appends the token to the current "thinking" message in the `ConversationProvider`
+  /// and triggers an auto-scroll if the user is at the bottom of the chat.
   void onMessageResponse(String token) {
-    // 1. Ignore tokens if the stream has been manually stopped by the user.
-    if (state.responseStopped) {
-      debugPrint("[ResponseService] Ignored token because response was stopped.");
+    // Critical Guard: Ensure we are in a state to receive a response.
+    if (!_conversationProvider.isWaitingForResponse || _conversationProvider.wasResponseStopped) {
+      debugPrint("[ResponseService] Ignored token: state is not 'waiting' or response was stopped.");
       return;
     }
 
-    // 2. Critical Guard: Ensure we are in a state to receive a response.
-    if (!state.isWaitingForResponse || state.messages.isEmpty || state.messages.last.isUserMessage) {
-      debugPrint("[ResponseService] Ignored token because state is not 'waiting for response'.");
-      return;
+    // This is a safety net. In a correct flow, a "thinking"
+    // message should always be the last one when a response is being received.
+    _conversationProvider.appendToLastBotMessage(token);
+
+    // After the state is updated, delegate the auto-scrolling logic.
+    if (_scrollService.isUserAtBottom()) {
+      _scrollService.scrollToBottom();
     }
-
-    // 3. Perform a single, atomic state update.
-    if (!state.mounted) return;
-    state.setState(() {
-      // On the very first token, transition the UI from "thinking" to "responding".
-      if (state.messages.last.isThinking) {
-        state.messages.last.isThinking = false;
-      }
-      // Append the new token to the last message in the chat.
-      state.messages.last.text += token;
-    });
-
-    // 4. Auto-scroll if the user is at the bottom of the list.
-    // Use a post-frame callback to ensure the layout has been updated.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (state.scrollService.isUserAtBottom()) {
-        state.scrollService.scrollToBottom();
-      }
-    });
   }
 
-  /// --- THE ROBUST FIX for the "thinking" bug ---
-  /// This is the single source of truth for finalizing a response.
-  /// It is called ONLY when the `onMessageComplete` event is received from the native code.
+  /// Finalizes a response upon receiving a completion signal from a source.
+  ///
+  /// This method is the single source of truth for transitioning the conversation
+  /// from a "waiting" state to an "idle" state and persisting the final message.
   void finalizeResponse() {
-    if (!state.mounted) return;
-
-    // Only finalize if we were actually waiting for a response.
-    if (state.isWaitingForResponse) {
-      debugPrint("[ResponseService] Finalizing response. Was waiting: true.");
-      state.setState(() {
-        state.isWaitingForResponse = false;
-        // The 'responseStopped' flag is now managed by the StopService.
-        // This function just handles the successful completion.
-
-        if (state.messages.isNotEmpty && !state.messages.last.isUserMessage) {
-          final lastMessage = state.messages.last;
-          // Ensure the final state is clean.
-          lastMessage.isThinking = false;
-          lastMessage.includeInContext = true;
-
-          // Persist the final, complete message to storage.
-          if (state.conversationID != null) {
-            ChatStorageService.upsertMessage(
-              state.conversationID!,
-              state.messages.length - 1,
-              lastMessage,
-            );
-            debugPrint("[ResponseService] Final message saved to storage.");
-          }
-        }
-      });
-    } else {
+    // Guard clause: If we're not expecting a response, there's nothing to finalize.
+    if (!_conversationProvider.isWaitingForResponse) {
       debugPrint("[ResponseService] Finalize called, but state was not 'waiting'. No action taken.");
+      return;
+    }
+
+    debugPrint("[ResponseService] Finalizing response...");
+
+    final messages = _conversationProvider.messages;
+
+    // Find the specific message that needs to be finalized. It should be the last
+    // AI message that is still marked as "thinking".
+    final int targetIndex = messages.lastIndexWhere((m) => m.isThinking && !m.isUserMessage);
+
+    if (targetIndex != -1) {
+      // The `finishBotResponse` method within the provider handles all necessary state changes:
+      // 1. Sets `isThinking` to `false`.
+      // 2. Sets `includeInContext` to `true`.
+      // 3. Persists the final message to the database.
+      // 4. Sets the global `isWaitingForResponse` to `false`.
+      // 5. Notifies all listeners of the state change.
+      _conversationProvider.finishBotResponse(targetIndex);
+      debugPrint("[ResponseService] Finalized message at index $targetIndex via provider.");
+
+    } else {
+      // Fallback: If no "thinking" message was found, we still need to
+      // exit the "waiting" state to unlock the UI.
+      _conversationProvider.finishBotResponse(-1);
+      debugPrint("[ResponseService] Could not find a 'thinking' message. Forcing state cleanup via finishBotResponse(-1).");
     }
   }
 }

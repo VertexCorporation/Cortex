@@ -1,7 +1,7 @@
 // section/settings.dart
 
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:cortex/notifications.dart'; // For NotificationService
 import 'package:cortex/theme.dart'; // For AppColors
 import 'package:flutter/foundation.dart'; // For kDebugMode and Factory
@@ -14,7 +14,7 @@ import 'package:share_plus/share_plus.dart'; // For sharing functionality
 import 'package:url_launcher/url_launcher.dart'; // For launching external URLs
 
 import '../../darkener.dart';
-import '../../login/login.dart';
+import '../../shake.dart';
 import '../../webview.dart'; // For in-app WebView
 
 /// A widget that displays the main settings section in the settings screen.
@@ -29,12 +29,12 @@ class SettingsSection extends StatefulWidget {
   final VoidCallback onDataNeedsRefresh;
 
   const SettingsSection({
-    Key? key,
+    super.key,
     required this.appLocalizations,
     required this.isDialogOpen,
     required this.onDialogStateChanged,
     required this.onDataNeedsRefresh,
-  }) : super(key: key);
+  });
 
   @override
   SettingsSectionState createState() => SettingsSectionState();
@@ -222,8 +222,8 @@ class SettingsSectionState extends State<SettingsSection> with SingleTickerProvi
                                   child: Material(
                                     color: Colors.transparent,
                                     child: InkWell(
-                                      splashColor: AppColors.senaryColor.withOpacity(0.3),
-                                      highlightColor: AppColors.senaryColor.withOpacity(0.1),
+                                      splashColor: AppColors.senaryColor.withValues(alpha: 0.3),
+                                      highlightColor: AppColors.senaryColor.withValues(alpha: 0.1),
                                       onTap: isRedeeming ? null : () async {
                                         final code = redeemCodeController.text.trim();
                                         if (code.isEmpty) {
@@ -336,7 +336,7 @@ class SettingsSectionState extends State<SettingsSection> with SingleTickerProvi
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onPressed,
-        splashColor: AppColors.primaryColor.inverted.withOpacity(0.1),
+        splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: screenWidth * 0.04,
@@ -375,7 +375,7 @@ class SettingsSectionState extends State<SettingsSection> with SingleTickerProvi
   Widget _buildDivider(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Divider(
-      color: AppColors.quinaryColor.withOpacity(0.5),
+      color: AppColors.quinaryColor.withValues(alpha: 0.5),
       thickness: 0.5,
       height: 0.5,
       indent: screenWidth * 0.04,
@@ -437,7 +437,7 @@ class SettingsSectionState extends State<SettingsSection> with SingleTickerProvi
                   'assets/icons/upload.svg',
                   width: screenWidth * 0.05,
                   height: screenWidth * 0.05,
-                  colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                  color: AppColors.primaryColor.inverted,
                 ),
                     () => _shareApp(context),
               ),
@@ -449,7 +449,7 @@ class SettingsSectionState extends State<SettingsSection> with SingleTickerProvi
                   'assets/icons/star.svg',
                   width: screenWidth * 0.05,
                   height: screenWidth * 0.05,
-                  colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                  color: AppColors.primaryColor.inverted,
                 ),
                     () => _launchRateUs(context),
               ),
@@ -495,7 +495,7 @@ class SettingsSectionState extends State<SettingsSection> with SingleTickerProvi
                   'assets/icons/copyrights.svg',
                   width: screenWidth * 0.05,
                   height: screenWidth * 0.05,
-                  colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                  color: AppColors.primaryColor.inverted,
                 ),
                     () => _showCopyrights(context),
               ),

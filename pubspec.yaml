@@ -1,9 +1,9 @@
 name: cortex
-description: "Peak of Artificial Intelligence"
+description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 1.8.0+180
+version: 1.8.9+189
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -89,15 +89,18 @@ dependencies:
   confetti: ^0.8.0
   highlight: any
 
+  timezone: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
   argos_translator_offline: ^1.2.0
   flutter_launcher_icons: ^0.14.3
+  flutter_lints: ^6.0.0
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
+  remove_alpha_ios: true
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/cortex.png"
   image_path: "assets/cortex.png"
@@ -108,7 +111,7 @@ flutter_native_splash:
   image: assets/splash/white.png
 
   # —────────────── Dark-mode splash overrides ───────────────—
-  color_dark: "#000000"         # Dark-mode background
+  color_dark: "#040404"         # Dark-mode background
   image_dark: assets/splash/black.png
 
   # —────────── Android 12+ specific settings ─────────—
@@ -119,7 +122,7 @@ flutter_native_splash:
 
     # Dark-mode overrides for Android 12+
     image_dark: assets/splash/black.png
-    icon_background_color_dark: "#000000"
+    icon_background_color_dark: "#090909"
 
 flutter:
   uses-material-design: true

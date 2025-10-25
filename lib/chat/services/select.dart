@@ -1,148 +1,113 @@
 // lib/chat/services/select.dart
 
-import 'package:flutter/cupertino.dart';
+import 'package:cortex/chat/providers/conversation.dart';
+import 'package:cortex/chat/providers/session.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../main.dart';
+import '../../models/backend/data/data.dart';
 import '../../extensions.dart';
-import '../../models/backend/data.dart';
-import '../chat.dart';
+import '../../models/backend/data/info.dart';
 
+/// Service responsible for all logic related to model selection and updates.
+///
+/// It orchestrates state changes across `ChatSessionProvider` and `ConversationProvider`.
 class SelectionService {
-  final ChatScreenState state;
+  final ChatSessionProvider _sessionProvider;
+  final ConversationProvider _conversationProvider;
 
-  SelectionService({required this.state});
+  SelectionService({
+    required ChatSessionProvider sessionProvider,
+    required ConversationProvider conversationProvider,
+  })  : _sessionProvider = sessionProvider,
+        _conversationProvider = conversationProvider;
 
-  /// This function now operates in a clear, sequential manner to prevent race conditions.
-  /// 1. All data is gathered and all final values are calculated first.
-  /// 2. A single, atomic `setState` call is made with all the final values.
-  /// 3. Post-update logic, including a robust focus request, is run after the state is set.
-  Future<void> selectModel(ModelInfo modelInfo, {bool resetMessages = false}) async {
+  /// Selects a model series to start a new chat session.
+  ///
+  /// It orchestrates a full reset of the chat state:
+  /// 1. Sets the "previous tab index" in MainScreenState if context is provided.
+  /// 2. Switches to the chat tab (index 0).
+  /// 3. Clears the previous conversation.
+  /// 4. Sets the new model details in the session.
+  Future<void> selectModel(ModelInfo modelSeriesInfo, {BuildContext? context}) async {
     const String logPrefix = "[SelectionService.selectModel]";
-    debugPrint("$logPrefix: Initiating selection for model SERIES '${modelInfo.id}'.");
+    debugPrint("$logPrefix: Processing selection for model series '${modelSeriesInfo.id}'.");
 
-    if (resetMessages) {
-      await state.resetConversation();
+    if (context != null && context.mounted) {
+      Provider.of<TabProvider>(context, listen: false);
+      mainScreenKey.currentState?.startChatWithModel(modelSeriesInfo);
+      return;
     }
 
-    // --- STEP 1: GATHER ALL DATA & CALCULATE FINAL VALUES ---
-    final Map<String, dynamic> seriesData = ModelData.getPreciseModelData(modelInfo.id);
+    // 1. Clear any previous conversation and input state.
+    _conversationProvider.clearConversation();
 
-    String finalApiModelId;
+    // 2. Resolve the precise model ID to use.
+    final Map<String, dynamic> seriesData = ModelData.getPreciseModelData(modelSeriesInfo.id);
     final extensionsMap = seriesData['extensions'] as Map<String, dynamic>?;
 
+    String finalModelId;
     if (extensionsMap != null && extensionsMap.isNotEmpty) {
-      String lastUsedApiId = await Extensions.getLastSelectedExtension(modelInfo.id);
-      finalApiModelId = (lastUsedApiId.isNotEmpty && extensionsMap.containsKey(lastUsedApiId))
-          ? lastUsedApiId
+      String lastUsedId = await Extensions.getLastSelectedExtension(modelSeriesInfo.id);
+      finalModelId = (lastUsedId.isNotEmpty && extensionsMap.containsKey(lastUsedId))
+          ? lastUsedId
           : extensionsMap.keys.first;
     } else {
-      finalApiModelId = modelInfo.id;
+      finalModelId = modelSeriesInfo.id;
     }
-    debugPrint("$logPrefix: Determined final API model ID: '$finalApiModelId'");
+    debugPrint("$logPrefix: Resolved final model ID to: '$finalModelId'");
 
-    final Map<String, dynamic> preciseModelData = ModelData.getPreciseModelData(finalApiModelId);
-    final bool finalCanHandleImage = ModelData.hasModality(finalApiModelId, 'image');
-    debugPrint("$logPrefix: Calculated definitive 'canHandleImage': $finalCanHandleImage");
+    final Map<String, dynamic> preciseModelData = ModelData.getPreciseModelData(finalModelId);
 
-    final String? finalModelPath = modelInfo.path;
-    final String? finalRole = preciseModelData['role'] as String? ?? seriesData['role'] as String?;
-    final bool finalIsServerSide = (preciseModelData['type'] as String?) != 'offline';
-    final String? finalModelTitle = seriesData['title'] as String?;
-    final String? finalModelProducer = seriesData['producer'] as String?;
-    final String finalModelImagePath = ModelData.getModelImagePath(seriesData);
-    final String? category = seriesData['category'] as String?;
-    final bool hasExtensions = (seriesData['extensions'] as Map<String, dynamic>? ?? {}).isNotEmpty;
-    bool isPremium;
-
-    if (category == 'self' || category == 'roleplay') {
-      final String? baseModelId = preciseModelData['baseModelId'] as String?;
-      if (baseModelId != null && baseModelId.isNotEmpty) {
-        final Map<String, dynamic> baseModelData = ModelData.getPreciseModelData(baseModelId);
-        isPremium = (baseModelData['tier'] as String? ?? 'free') == 'premium';
-        debugPrint("$logPrefix: Character model detected. Premium status based on base model '$baseModelId': $isPremium");
-      } else {
-        isPremium = false;
-      }
-    } else {
-      isPremium = (preciseModelData['tier'] as String? ?? 'free') == 'premium';
-      debugPrint("$logPrefix: Standard model detected. Premium status: $isPremium");
-    }
-
-    debugPrint("✅ [LOG 2 - select.dart] PREPARING to set state. The role is: ${finalRole != null ? "'${finalRole.substring(0, (finalRole.length > 40) ? 40 : finalRole.length)}...'" : "NULL"}");
-
-    // --- STEP 2: PERFORM A SINGLE, ATOMIC STATE UPDATE ---
-    state.setState(() {
-      state.appBarModeNotifier.value = AppBarMode.modelSelected;
-      state.modelId = finalApiModelId;
-      state.role = finalRole;
-      state.modelPath = finalModelPath;
-      state.isCurrentModelServerSide = finalIsServerSide;
-      state.canHandleImage = finalCanHandleImage;
-      state.modelTitle = finalModelTitle;
-      state.modelProducer = finalModelProducer;
-      state.modelImagePath = finalModelImagePath;
-      state.selectedModelCategory = category;
-      state.isModelSelected = true;
-      state.isModelLoaded = finalIsServerSide;
-      state.showPremiumBriefing = isPremium;
-
-      if (state.messages.isEmpty) {
-        state.readService.markLoaded();
-      }
-    });
-
-    debugPrint("$logPrefix: Atomic setState complete. Final state for 'canHandleImage' is: ${state.canHandleImage}");
-
-    // --- STEP 3: RUN POST-UPDATE LOGIC ---
-    state.widget.onModelSelectionChanged?.call(true);
-    debugPrint("$logPrefix: Notified parent to hide BottomAppBar.");
-
-    state.extensions.initialize(
-      mainId: modelInfo.id,
-      ext: finalApiModelId,
-      modelData: seriesData,
-      updateCanHandleImage: (bool value) {
-        if (state.mounted && state.canHandleImage != value) {
-          state.setState(() => state.canHandleImage = value);
-        }
-      },
+    // 3. Construct the full ModelInfo object for the session.
+    final finalModelInfo = ModelInfo(
+      id: finalModelId,
+      title: seriesData['title'] as String? ?? modelSeriesInfo.title,
+      imagePath: ModelData.getModelImagePath(seriesData),
+      producer: seriesData['producer'] as String? ?? modelSeriesInfo.producer,
+      category: seriesData['category'] as String?,
+      extensions: extensionsMap,
     );
 
-    if (!finalIsServerSide) {
-      await state.loadService.loadModel();
-    }
+    // 4. Update the session provider with the new model details.
+    _sessionProvider.selectModel(finalModelInfo, preciseData: preciseModelData);
 
-    state.triggerDisclaimer();
-
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!state.mounted) return;
-
-      bool panelWasRequested = false;
-      if (hasExtensions) {
-        debugPrint("$logPrefix: Model has extensions. Triggering info panel check.");
-        panelWasRequested = await state.chatTitleKey.currentState?.triggerExtensionInfoPanelIfNeeded() ?? false;
-      }
-
-      if (!panelWasRequested) {
-        debugPrint("$logPrefix: Info panel was not shown. Requesting focus for text field immediately.");
-        state.textFieldFocusNode.requestFocus();
-      } else {
-        debugPrint("$logPrefix: Info panel was shown. Keyboard focus is deferred until panel dismissal.");
-      }
-    });
-
-    debugPrint("$logPrefix: Model selection process fully complete.");
+    debugPrint("$logPrefix: Session and Conversation providers updated for new chat session.");
   }
 
-  void clearModelSelection() {
-    state.setState(() {
-      state.isModelSelected = false;
-      state.modelTitle = null;
-      state.modelDescription = null;
-      state.modelImagePath = null;
-      state.modelProducer = null;
-      state.modelPath = null;
-      state.role = null;
-      state.isModelLoaded = false;
-    });
+  // ... (changeExtension ve refreshActiveChatModelDetails metotları aynı kalır)
+  /// Changes the active model to a different extension within the same series.
+  ///
+  /// This method updates the session state without resetting the conversation,
+  /// preserving the message history.
+  Future<void> changeExtension(String newFullModelId) async {
+    const String logPrefix = "[SelectionService.changeExtension]";
+    debugPrint("$logPrefix: Changing extension to '$newFullModelId'.");
+
+    if (_sessionProvider.modelId == newFullModelId) return;
+
+    final baseId = ModelData.getBaseIdFromFullId(newFullModelId);
+    await Extensions.setLastSelectedExtension(baseId, newFullModelId);
+
+    // Call the specific provider method that updates the model details
+    // WITHOUT clearing the message list. This is a session-level change.
+    _sessionProvider.updateActiveModelExtension(newFullModelId);
+
+    debugPrint("$logPrefix: Session provider updated with new extension details.");
+  }
+
+  /// Refreshes the active chat's model details from the latest available data.
+  ///
+  /// This is called after a global model data reload (e.g., language change)
+  /// to ensure the UI reflects the most current information.
+  void refreshActiveChatModelDetails(String activeModelId) {
+    const String logPrefix = "[SelectionService.refreshActiveChatModelDetails]";
+    debugPrint("$logPrefix: Refreshing details for active model '$activeModelId'.");
+
+    // This method is identical in function to changing an extension: it updates
+    // the model's metadata without resetting the chat.
+    _sessionProvider.updateActiveModelExtension(activeModelId);
+
+    debugPrint("$logPrefix: Session provider refreshed with latest model details.");
   }
 }

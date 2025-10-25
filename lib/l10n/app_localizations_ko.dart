@@ -1946,4 +1946,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get exitAppConfirmation => '이 놀라운 플랫폼을 떠나시겠습니까?';
+
+  @override
+  String get newsErrorTitle => '뉴스를 로드하지 못했습니다';
+
+  @override
+  String get newsErrorMessage =>
+      '최신 업데이트를 가져오는 중 문제가 발생했습니다. 연결 상태를 확인하고 다시 시도해 주세요.';
 }

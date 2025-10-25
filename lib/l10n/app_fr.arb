@@ -606,5 +606,7 @@
   "channelGreetingsName": "Salutations quotidiennes",
   "channelGreetingsDescription": "Les messages comme bonjour et bonne nuit.",
   "exitAppTitle": "Vous partez si tôt ?",
-  "exitAppConfirmation": "Etes-vous sûr de vouloir quitter cette incroyable plateforme ?"
+  "exitAppConfirmation": "Etes-vous sûr de vouloir quitter cette incroyable plateforme ?",
+  "newsErrorTitle": "Échec du chargement des actualités",
+  "newsErrorMessage": "Un problème est survenu lors de la récupération des dernières mises à jour, veuillez vérifier votre connexion et réessayer."
 }
