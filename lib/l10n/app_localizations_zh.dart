@@ -1896,4 +1896,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exitAppConfirmation => '您确定要离开这个令人惊叹的平台吗？';
+
+  @override
+  String get newsErrorTitle => '新闻加载失败';
+
+  @override
+  String get newsErrorMessage => '获取最新更新时出现问题，请检查您的连接并重试。';
 }

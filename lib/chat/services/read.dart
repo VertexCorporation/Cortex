@@ -1,338 +1,210 @@
-// read.dart
+// lib/chat/services/read.dart
 
-import 'dart:math';
+import 'dart:async';
+import 'package:cortex/chat/providers/conversation.dart';
+import 'package:cortex/chat/providers/session.dart';
+import 'package:cortex/chat/services/database.dart';
+import 'package:cortex/chat/services/load.dart';
 import 'package:cortex/chat/services/storage.dart';
-import 'package:flutter/material.dart';
+import 'package:cortex/conversations/manager.dart';
+import 'package:cortex/models/backend/data/data.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:shimmer/shimmer.dart';
-
-import '../../conversations/manager.dart';
-import '../../models/backend/data.dart';
-import '../../theme.dart';
-import '../chat.dart';
+import '../../models/backend/data/info.dart';
+import '../../models/backend/data/user.dart';
 import '../messages/messages.dart';
-import 'database.dart';
+import '../screen/selected/dynamic.dart';
 
+/// Service responsible for reading conversation and message data from the local database
+/// and orchestrating the state update via the dedicated providers.
+///
+/// This service is completely decoupled from the UI layer. It acts as a pure
+/// business logic component that coordinates loading a full conversation session
+/// into the central state.
 class ReadService {
-  final ChatScreenState state;
-  bool _areMessagesLoaded = false;
-  bool get areMessagesLoaded => _areMessagesLoaded;
+  final ConversationProvider _conversationProvider;
+  final ChatSessionProvider _sessionProvider;
+  final LoadService _loadService;
 
-  ReadService(this.state);
+  /// Creates an instance of the ReadService.
+  ReadService({
+    required ConversationProvider conversationProvider,
+    required ChatSessionProvider sessionProvider,
+    required LoadService loadService,
+  })  : _conversationProvider = conversationProvider,
+        _sessionProvider = sessionProvider,
+        _loadService = loadService;
 
-  /// This function now robustly handles all model types, and crucially,
-  /// notifies its parent (`MainScreen`) to hide the BottomAppBar when a
-  /// conversation is successfully loaded from the inbox.
-  Future<void> loadConversation(ConversationManager manager) async {
-    const String logPrefix = "[ReadService.loadConversation]";
-    final String conversationSpecificModelId = manager.modelId;
-    debugPrint("$logPrefix: Loading conversation. ModelId from manager: '$conversationSpecificModelId'");
+  /// Acts as a router, delegating the conversation loading to the appropriate handler.
+  ///
+  /// The [languageCode] is required to ensure that model data can be fetched
+  /// in the correct locale if it's not already cached.
+  Future<void> loadConversation(ConversationManager manager, {required String languageCode}) async {
+    final String conversationModelId = manager.modelId;
 
-    // If the conversation being loaded is a dynamic chat, handle it with a
-    // special setup process and exit early.
-    if (conversationSpecificModelId == 'dynamic') {
-      debugPrint("$logPrefix: Dynamic conversation detected. Initializing in persistent dynamic mode.");
-
-      state.setState(() {
-        // Set all the flags required for a persistent dynamic session
-        state.isDynamicChatMode = true;
-        state.isPersistentlyDynamic = true;
-        state.isModelSelected = false; // No specific model is selected
-        state.appBarModeNotifier.value = AppBarMode.dynamicChat;
-
-        // Load conversation details from the manager
-        state.conversationID = manager.conversationID;
-        state.conversationTitle = manager.conversationTitle;
-        state.openedFromMenu = true;
-
-        // Clear any previous model's data
-        state.modelTitle = null;
-        state.modelImagePath = null;
-        state.modelProducer = null;
-        state.modelId = null; // Important: modelId is null in this mode
-      });
-
-      // After setting up the dynamic mode, immediately check if there's a
-      // pinned assistant that should override the default random behavior.
-      await state.dynamicChatService.loadDynamicAssistantPreference();
-
-      // Notify the MainScreen that a selection change has occurred,
-      // which will trigger the BottomAppBar to hide.
-      state.widget.onModelSelectionChanged?.call(true);
-
-      // Load the chat history and finish.
-      await loadPreviousMessages(manager.conversationID);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (state.mounted) {
-          state.textFieldFocusNode.requestFocus();
-        }
-      });
-      return; // Exit the function to prevent normal model loading logic.
+    if (conversationModelId == 'dynamic') {
+      await _loadDynamicConversation(manager);
+    } else {
+      await _loadStandardConversation(manager, languageCode: languageCode);
     }
+  }
 
-    // The rest of the function is the logic for loading a NORMAL, model-specific chat.
-    // It will only be executed if the modelId is NOT 'dynamic'.
-    await state.loadService.loadModels();
-    final preciseModelData = ModelData.getPreciseModelData(conversationSpecificModelId);
+  /// Fetches a ConversationManager by its ID and then loads the full conversation.
+  Future<void> loadConversationById(String conversationId, {required String languageCode}) async {
+    final manager = await ConversationManager.fromId(conversationId);
 
-    Map<String, dynamic> uiSeriesData;
-    String parentSeriesId;
-    String activeExtensionId = conversationSpecificModelId;
+    if (manager != null) {
+      await loadConversation(manager, languageCode: languageCode);
+    } else {
+      debugPrint("[ReadService] Could not create ConversationManager for ID: $conversationId. Resetting session.");
+      // Instead of a monolithic reset, we just clear the providers.
+      _sessionProvider.resetSessionState();
+      _conversationProvider.clearConversation();
+    }
+  }
 
-    final parentSeriesCandidate = state.loadService.allModels.firstWhere(
-          (m) => (m.extensions?.containsKey(conversationSpecificModelId) ?? false),
-      orElse: () => ModelInfo(id: '', title: '', imagePath: '', producer: ''),
+  /// Handles the specific logic for loading a "dynamic" conversation session.
+  Future<void> _loadDynamicConversation(ConversationManager manager) async {
+    debugPrint("[ReadService] Loading dynamic conversation: ${manager.conversationID}");
+
+    // 1. Configure the session provider for a dynamic chat mode. This is the first step.
+    _sessionProvider.configureForDynamicConversation();
+
+    // 2. Set the specific conversation ID and title from the manager.
+    _conversationProvider.setConversationContext(
+      manager.conversationID,
+      manager.conversationTitle,
     );
 
-    if (parentSeriesCandidate.id.isNotEmpty) {
-      debugPrint("$logPrefix: Model '$conversationSpecificModelId' is an extension of '${parentSeriesCandidate.id}'.");
-      parentSeriesId = parentSeriesCandidate.id;
-      uiSeriesData = ModelData.getPreciseModelData(parentSeriesId);
-    } else {
-      debugPrint("$logPrefix: Model '$conversationSpecificModelId' is a standalone or character model.");
-      final baseModelId = preciseModelData['baseModelId'] as String? ?? conversationSpecificModelId;
-      parentSeriesId = ModelData.getBaseIdFromFullId(baseModelId);
-      uiSeriesData = preciseModelData;
-      activeExtensionId = baseModelId;
+    // 3. Load the message history for this conversation.
+    await _loadAndSetMessages(manager.conversationID);
+
+    final dynamicChatService = DynamicChatService(_sessionProvider);
+    await dynamicChatService.loadDynamicAssistantPreference();
+  }
+
+  /// Handles the logic for loading a standard, model-specific conversation.
+  Future<void> _loadStandardConversation(ConversationManager manager, {required String languageCode}) async {
+    const String logPrefix = "[ReadService._loadStandardConversation]";
+    debugPrint("$logPrefix: Loading conversation for model '${manager.modelId}'.");
+
+    // 1. Ensure the master model list is available.
+    await _loadService.loadModels(languageCode: languageCode);
+
+    final String conversationModelId = manager.modelId;
+    final preciseModelData = ModelData.getPreciseModelData(conversationModelId);
+    if (preciseModelData.isEmpty) {
+      debugPrint("$logPrefix: CRITICAL - Could not find precise data for model '$conversationModelId'. Aborting.");
+      _sessionProvider.setModelsLoadError();
+      return;
     }
 
+    // 2. Determine all necessary model properties.
     final bool isOffline = (preciseModelData['type'] as String?) == 'offline';
     String? finalModelPath;
 
     if (isOffline) {
       final downloadedPaths = await UserModels.loadDownloadedModelPaths();
-      final baseId = ModelData.getBaseIdFromFullId(conversationSpecificModelId);
+      final baseId = ModelData.getBaseIdFromFullId(conversationModelId);
       finalModelPath = downloadedPaths[baseId];
-      debugPrint("$logPrefix: Offline model detected. Base ID: '$baseId'. Resolved path: '$finalModelPath'");
+      debugPrint("$logPrefix: Offline model detected. Path: '$finalModelPath'");
     }
 
-    final bool definitiveCanHandleImage = ModelData.hasModality(conversationSpecificModelId, 'image');
+    final bool isPremium = _isModelPremium(preciseModelData);
 
-    bool isPremium = false;
+    // 3. Configure the session provider with all gathered model data.
+    _sessionProvider.configureForStandardConversation(
+      modelInfo: ModelInfo(
+        id: conversationModelId,
+        title: preciseModelData['title'] as String? ?? 'Untitled',
+        imagePath: ModelData.getModelImagePath(preciseModelData),
+        producer: preciseModelData['producer'] as String? ?? 'Unknown',
+        path: finalModelPath,
+        role: preciseModelData['role'] as String?,
+        category: preciseModelData['category'] as String?,
+      ),
+      isPremium: isPremium,
+    );
+
+    // 4. Set the specific conversation ID and title.
+    _conversationProvider.setConversationContext(
+      manager.conversationID,
+      manager.conversationTitle,
+    );
+
+    // 5. Load the message history for this conversation.
+    await _loadAndSetMessages(manager.conversationID);
+  }
+
+  /// Determines if a model is premium, correctly handling character models that use a base model.
+  bool _isModelPremium(Map<String, dynamic> preciseModelData) {
     final category = preciseModelData['category'] as String?;
-
     if (category == 'self' || category == 'roleplay') {
       final String? baseModelId = preciseModelData['baseModelId'] as String?;
       if (baseModelId != null && baseModelId.isNotEmpty) {
         final Map<String, dynamic> baseModelData = ModelData.getPreciseModelData(baseModelId);
-        isPremium = (baseModelData['tier'] as String? ?? 'free') == 'premium';
-        debugPrint("$logPrefix: Character model. Premium status from base '$baseModelId': $isPremium");
+        return (baseModelData['tier'] as String? ?? 'free') == 'premium';
       }
-    } else {
-      isPremium = (preciseModelData['tier'] as String? ?? 'free') == 'premium';
-      debugPrint("$logPrefix: Standard model. Premium status: $isPremium");
     }
-
-    state.setState(() {
-      state.appBarModeNotifier.value = AppBarMode.modelSelected;
-      state.modelTitle = uiSeriesData['title'] as String?;
-      state.modelImagePath = ModelData.getModelImagePath(uiSeriesData);
-      state.modelProducer = uiSeriesData['producer'] as String?;
-      state.modelId = preciseModelData['id'] as String;
-      state.selectedModelCategory = preciseModelData['category'] as String?;
-      state.role = preciseModelData['role'] as String?;
-      state.modelPath = finalModelPath;
-      state.isCurrentModelServerSide = !isOffline;
-      state.canHandleImage = definitiveCanHandleImage;
-      state.currentModelHasWise = (preciseModelData['features'] as String?)?.split('/').contains('wise') ?? false;
-      state.isModelSelected = true;
-      state.isModelLoaded = state.isCurrentModelServerSide;
-      state.openedFromMenu = true;
-      state.conversationID = manager.conversationID;
-      state.conversationTitle = manager.conversationTitle;
-      state.showPremiumBriefing = isPremium;
-      debugPrint("$logPrefix: State configured: modelId='${state.modelId}', title='${state.modelTitle}', isPremium='${state.showPremiumBriefing}'");
-    });
-
-    // Notify the MainScreen that a selection change has occurred,
-    // which will trigger the BottomAppBar to hide.
-    state.widget.onModelSelectionChanged?.call(true);
-
-    state.extensions.initialize(
-      mainId: parentSeriesId,
-      ext: activeExtensionId,
-      modelData: ModelData.getPreciseModelData(parentSeriesId),
-      updateCanHandleImage: (bool value) {
-        if (state.mounted && state.canHandleImage != value) {
-          state.setState(() => state.canHandleImage = value);
-        }
-      },
-    );
-
-    debugPrint("$logPrefix: Chat state successfully configured for conversation '${manager.conversationID}' with model '$conversationSpecificModelId'.");
-    await loadPreviousMessages(manager.conversationID);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (state.mounted) {
-        state.textFieldFocusNode.requestFocus();
-      }
-    });
+    return (preciseModelData['tier'] as String? ?? 'free') == 'premium';
   }
 
-  int _toInt(dynamic v, [int def = 0]) =>
-      v is int ? v : int.tryParse(v?.toString() ?? '') ?? def;
-
-  bool _toBool(dynamic v) => _toInt(v) == 1;
-
-  Future<void> loadPreviousMessages(String convId) async {
-    const String logPrefix = "[ReadService.loadPreviousMessages]";
-    debugPrint("$logPrefix: Called for convId: '$convId'");
-
-    if (!state.mounted) {
-      debugPrint("$logPrefix: State not mounted. Aborting message loading.");
-      return;
-    }
-    bool success = false;
+  /// Loads previous messages from the local SQLite database and updates the provider.
+  Future<void> _loadAndSetMessages(String convId) async {
+    const String logPrefix = "[ReadService._loadAndSetMessages]";
+    debugPrint("$logPrefix: Loading messages for convId: '$convId'");
 
     try {
       final db = await DbHelper().db;
-      const retries = 20;
+
+      // Retry logic for potential database locks remains a good practice.
+      const retries = 5;
       const wait = Duration(milliseconds: 100);
       List<Map<String, Object?>> rows = [];
-
       for (var i = 0; i < retries; i++) {
         try {
           rows = await db.query(
             'messages',
             where: 'conversationId = ?',
             whereArgs: [convId],
-            orderBy: 'idx ASC, id ASC',
+            orderBy: 'idx ASC', // Simple ordering is sufficient
           );
-          break;
+          break; // Success
         } on DatabaseException catch (e) {
           if (e.toString().toLowerCase().contains('database is locked')) {
-            debugPrint("$logPrefix: Database locked on attempt ${i + 1} for convId '$convId'. Retrying after $wait...");
+            debugPrint("$logPrefix: Database locked on attempt ${i + 1}. Retrying...");
             await Future.delayed(wait);
             continue;
           }
-          debugPrint("$logPrefix: DatabaseException (not a lock) for convId '$convId': $e");
-          rethrow;
+          rethrow; // It's a different database error, don't retry.
         }
       }
 
-      // --- LAZY MIGRATION & BULLETPROOF LOADING ---
       bool needsDbUpdate = false;
       final List<Message> loadedMessages = rows.map((r) {
-        // If 'uuid' is null, it's an old message that needs an upgrade.
-        if (r['uuid'] == null) {
-          needsDbUpdate = true; // Mark that we need to save changes back to the DB.
-        }
-        return Message(
-          id: r['uuid'] as String?, // Constructor handles null by creating a new UUID
-          text: (r['text'] ?? '') as String,
-          isUserMessage: (r['isUser'] as int? ?? 0) == 1,
-          opacity: 1.0,
-          isReported: (r['isReported'] as int? ?? 0) == 1,
-          photoPath: r['photoPath'] as String?,
-          model: r['model'] as String?,
-          includeInContext: (r['includeInContext'] as int? ?? 1) == 1,
-        );
+        if (r['uuid'] == null) needsDbUpdate = true;
+        return Message.fromMap(r);
       }).toList();
 
-      if (state.mounted) {
-        state.messages
-          ..clear()
-          ..addAll(loadedMessages);
-
-        if (state.messages.isNotEmpty) {
-          final lastMessage = state.messages.last;
-          if (!lastMessage.isUserMessage &&
-              lastMessage.text.trim().isEmpty &&
-              (lastMessage.photoPath ?? '').isEmpty &&
-              state.messages.length > 1) {
-            state.messages.removeLast();
-            debugPrint("$logPrefix: Removed trailing empty AI message for convId '$convId'.");
-          }
-        }
+      // Business logic: Remove a trailing empty/thinking AI message from loaded history.
+      if (loadedMessages.isNotEmpty &&
+          !loadedMessages.last.isUserMessage &&
+          loadedMessages.last.text.trim().isEmpty &&
+          (loadedMessages.last.photoPath ?? '').isEmpty) {
+        loadedMessages.removeLast();
       }
 
-      // If we found any old messages, save the newly generated UUIDs back to the database.
+      // Deliver the final, clean message list to the provider.
+      _conversationProvider.loadMessages(loadedMessages);
+
       if (needsDbUpdate) {
-        debugPrint("$logPrefix: Old messages without UUIDs found for convId '$convId'. Performing lazy migration to update them in the database.");
-        // This function overwrites all messages for the conversation with the new, corrected ones.
-        await ChatStorageService.saveCurrentMessages(convId, state.messages);
+        debugPrint("$logPrefix: Performing lazy migration to update UUIDs for convId '$convId'.");
+        await ChatStorageService.saveCurrentMessages(convId, loadedMessages);
       }
-
-      success = true;
-      debugPrint("$logPrefix: Successfully loaded and validated ${rows.length} messages for convId: '$convId'.");
+      debugPrint("$logPrefix: Successfully loaded ${loadedMessages.length} messages.");
     } catch (e, stacktrace) {
-      debugPrint("$logPrefix: Error loading previous messages for convId '$convId': $e\n$stacktrace");
-      success = false;
-    } finally {
-      if (state.mounted) {
-        state.setState(() => _areMessagesLoaded = success);
-      }
-    }
-
-    if (success && state.mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (state.mounted) {
-          state.scrollService.jumpToBottom();
-          debugPrint("$logPrefix: Scrolled to bottom for convId '$convId'.");
-        }
-      });
-    }
-  }
-
-  Widget buildSkeletonChatMessages() {
-    final screenWidth = MediaQuery.of(state.context).size.width;
-    final screenHeight = MediaQuery.of(state.context).size.height;
-    final random = Random();
-
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-      itemCount: 20,
-      itemBuilder: (context, index) {
-        bool isUserMessage = index % 2 == 0;
-        double height;
-        double width;
-
-        if (isUserMessage) {
-          height = screenHeight * (0.05 + random.nextDouble() * 0.03);
-          width = screenWidth * (0.4 + random.nextDouble() * 0.3);
-        } else {
-          width = screenWidth * (0.7 + random.nextDouble() * 0.2);
-          height = screenHeight * (0.08 + random.nextDouble() * 0.07);
-        }
-
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.008,
-            horizontal: screenWidth * 0.04,
-          ),
-          child: Align(
-            alignment:
-            isUserMessage ? Alignment.centerRight : Alignment.centerLeft,
-            child: Shimmer.fromColors(
-              baseColor: AppColors.shimmerBase,
-              highlightColor: AppColors.shimmerHighlight,
-              child: Container(
-                width: width,
-                height: height,
-                decoration: BoxDecoration(
-                  color: AppColors.tertiaryColor,
-                  borderRadius:
-                  BorderRadius.circular(isUserMessage ? (height / 2) : 12),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  /// Explicitly marks the messages as loaded. This is called by SendService
-  /// when a new conversation is started to prevent the skeleton loader from
-  /// appearing unnecessarily.
-  void markLoaded() {
-    if (!_areMessagesLoaded) {
-      _areMessagesLoaded = true;
-      // This setState is a safeguard to ensure the UI rebuilds if any other
-      // part of the app was depending on the loading state.
-      if (state.mounted) {
-        state.setState(() {});
-      }
-      debugPrint("[ReadService.markLoaded] Messages marked as loaded.");
+      debugPrint("$logPrefix: Error loading messages: $e\n$stacktrace");
+      _conversationProvider.loadMessages([]); // On error, provide an empty list for a stable state.
     }
   }
 }

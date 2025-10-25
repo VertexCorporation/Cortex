@@ -17,7 +17,7 @@ import '../../theme.dart';
 
 class PhotoViewer extends StatefulWidget {
   final File imageFile;
-  const PhotoViewer({Key? key, required this.imageFile}) : super(key: key);
+  const PhotoViewer({super.key, required this.imageFile});
 
   static Route route(File imageFile) {
     return PageRouteBuilder(
@@ -36,16 +36,16 @@ class PhotoViewer extends StatefulWidget {
           child: ScaleTransition(scale: scaleAnim, child: child),
         );
       },
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
     );
   }
 
   @override
-  _PhotoViewerState createState() => _PhotoViewerState();
+  PhotoViewerState createState() => PhotoViewerState();
 }
 
 // Add SingleTickerProviderStateMixin for the animation controller
-class _PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderStateMixin {
+class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderStateMixin {
   late Color navBarColor;
   late SystemUiOverlayStyle defaultStyle;
 
@@ -141,7 +141,7 @@ class _PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderStat
             Positioned.fill(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Container(color: Colors.black.withOpacity(0.2)),
+                child: Container(color: Colors.black.withValues(alpha: 0.2)),
               ),
             ),
             SafeArea(
@@ -195,7 +195,7 @@ class _PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderStat
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            Colors.black.withOpacity(0.5),
+                            Colors.black.withValues(alpha: 0.5),
                             Colors.transparent,
                           ],
                         ),

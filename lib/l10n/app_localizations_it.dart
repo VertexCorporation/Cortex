@@ -2024,4 +2024,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Sei sicuro di voler abbandonare questa fantastica piattaforma?';
+
+  @override
+  String get newsErrorTitle => 'Impossibile caricare le notizie';
+
+  @override
+  String get newsErrorMessage =>
+      'Si è verificato un problema durante il recupero degli ultimi aggiornamenti. Controlla la connessione e riprova.';
 }

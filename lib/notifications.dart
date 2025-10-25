@@ -181,7 +181,6 @@ Future<void> _showLocalizedNotification(Map<String, dynamic> data) async {
     htmlFormatBigText: false,
     contentTitle: title,
     htmlFormatContentTitle: false,
-    summaryText: 'Cortex',
     htmlFormatSummaryText: false,
   );
 
@@ -619,7 +618,6 @@ class NotificationService {
       htmlFormatBigText: false,
       contentTitle: content['title'],
       htmlFormatContentTitle: false,
-      summaryText: 'Cortex',
       htmlFormatSummaryText: false,
     );
 

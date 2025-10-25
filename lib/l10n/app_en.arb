@@ -985,5 +985,8 @@
   },
 
   "exitAppTitle": "Leaving so soon?",
-  "exitAppConfirmation": "Are you sure you want to leave this amazing platform?"
+  "exitAppConfirmation": "Are you sure you want to leave this amazing platform?",
+
+  "newsErrorTitle": "Failed to Load News",
+  "newsErrorMessage": "There was a problem fetching the latest updates, please check your connection and try again."
 }

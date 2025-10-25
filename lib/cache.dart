@@ -1,14 +1,39 @@
-/*  cache.dart (FINAL, UPDATED FOR NEWS IMAGES)
- *───────────────────────────────────────────────────────────────────────────
- *  Lightweight in-memory cache helper.
- *  - Added Section ⑥ for caching temporary news image URLs to prevent shimmer.
- *───────────────────────────────────────────────────────────────────────────*/
+// cache.dart (FINAL, OPTIMIZED)
+//───────────────────────────────────────────────────────────────────────────
+//  Lightweight, scalable in-memory cache helper.
+//  - Refactored to use a centralized Map and Enum for O(1) access and easy extensibility.
+//  - Eliminates boilerplate code for adding new cache types.
+//───────────────────────────────────────────────────────────────────────────
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
-import '../conversations/manager.dart';
-import '../models/backend/data.dart';
+
+/// Defines the unique keys for each type of data that can be cached.
+/// This provides type-safety and improves code readability.
+enum CacheKey {
+  // Model Selection
+  allModels,
+  filteredModels,
+  recentModels,
+
+  // Conversation Inbox
+  conversationManagers,
+  conversationOrder,
+  starredIds,
+  userModels,
+
+  // User Settings
+  settingsUserData,
+
+  // Premium Products (IAP)
+  premiumProducts,
+
+  // Models Discovery Screen
+  modelsScreenData,
+
+  // News Image URLs
+  newsImageUrls,
+}
 
 /// A singleton class to track the state of app-wide data.
 class AppDataState {
@@ -19,211 +44,120 @@ class AppDataState {
   bool _hasUserDataChanged = false;
 
   void markUserDataAsChanged() {
-    debugPrint("[AppDataState] User data has been marked as changed. A refresh will be forced on next relevant screen load.");
+    debugPrint("[AppDataState] User data marked as changed.");
     _hasUserDataChanged = true;
   }
 
   bool get needsRefresh {
     if (_hasUserDataChanged) {
-      debugPrint("[AppDataState] Change flag was checked and is TRUE. Resetting flag and reporting need for refresh.");
-      _hasUserDataChanged = false;
+      _hasUserDataChanged = false; // Reset the flag after checking.
+      debugPrint("[AppDataState] Change flag was TRUE. Reporting need for refresh.");
       return true;
     }
     return false;
   }
 }
 
+
+/// A highly optimized, centralized in-memory cache service.
 class CacheService {
-  /* SECTION ① – Model Selection */
-  static List<ModelInfo>? cachedAllModels;
-  static List<ModelInfo>? cachedFilteredModels;
+  /// The central data store. Access is O(1) thanks to the Map structure.
+  static final Map<CacheKey, dynamic> _cache = {};
 
-  /* SECTION ② – Conversation Inbox */
-  static Map<String, ConversationManager>? cachedConversationManagers;
-  static List<String>?                     cachedConversationOrder;
-  static List<String>?                     cachedStarredIds;
-  static List<Map<String, dynamic>>?       cachedUserModels;
+  /// The central store for cache expiration timers.
+  static final Map<CacheKey, Timer> _timers = {};
 
-  /* SECTION ③ – User Settings */
-  static Map<String, dynamic>? cachedSettingsUserData;
+  /// The default expiration times for different cache types.
+  static const Map<CacheKey, Duration> _defaultTimeouts = {
+    CacheKey.allModels: Duration(minutes: 2),
+    CacheKey.filteredModels: Duration(minutes: 2),
+    CacheKey.recentModels: Duration(minutes: 10),
+    CacheKey.conversationManagers: Duration(minutes: 2),
+    CacheKey.conversationOrder: Duration(minutes: 2),
+    CacheKey.starredIds: Duration(minutes: 2),
+    CacheKey.userModels: Duration(minutes: 2),
+    CacheKey.settingsUserData: Duration(minutes: 3),
+    CacheKey.premiumProducts: Duration(minutes: 10),
+    CacheKey.modelsScreenData: Duration(minutes: 5),
+    CacheKey.newsImageUrls: Duration(minutes: 8), // URLs expire in 10, so 8 is safer.
+  };
 
-  /* SECTION ④ – Premium Products (IAP) */
-  static List<ProductDetails>? cachedPremiumProducts;
+  /// Retrieves a value from the cache.
+  /// Returns the cached data, or `null` if it doesn't exist.
+  /// The type parameter `T` allows for strong typing on return.
+  ///
+  /// Example: `final List<ModelInfo>? models = CacheService.get<List<ModelInfo>>(CacheKey.allModels);`
+  static T? get<T>(CacheKey key) {
+    // Before returning the data, we "touch" the cache to reset its expiration timer.
+    touch(key);
+    if (_cache.containsKey(key)) {
+      return _cache[key] as T?;
+    }
+    return null;
+  }
 
-  /* SECTION ⑤ – Models Discovery Screen */
-  static List<Map<String, dynamic>>? cachedModelsScreenData;
+  /// Stores or updates a value in the cache and starts its expiration timer.
+  ///
+  /// Example: `CacheService.set(CacheKey.allModels, myListOfModels);`
+  static void set(CacheKey key, dynamic value) {
+    _cache[key] = value;
+    debugPrint('CacheService ▸ Set/Updated data for [${key.name}]');
+    startTimer(key);
+  }
 
-  /*───────────────────────────────
-   * SECTION ⑥ – News Image URLs (NEW!)
-   * Caches the signed URLs for news cover images to prevent re-fetching
-   * and eliminate the shimmer effect on screen transitions.
-   *──────────────────────────────*/
-  static Map<String, String>? cachedNewsImageUrls;
+  /// Removes a specific entry from the cache and cancels its timer.
+  ///
+  /// Example: `CacheService.invalidate(CacheKey.allModels);`
+  static void invalidate(CacheKey key) {
+    if (_cache.remove(key) != null) {
+      debugPrint('CacheService ▸ Invalidated cache for [${key.name}]');
+    }
+    _timers[key]?.cancel();
+    _timers.remove(key);
+  }
 
-  /*───────────────────────────────
-   * SECTION ⑦ – Recent Models (NEW!)
-   * Caches the list of recently used models to avoid frequent database queries
-   * on the main selection screen.
-   *──────────────────────────────*/
-  static List<ModelInfo>? cachedRecentModels;
+  /// Resets the expiration timer for a specific cache entry without changing its data.
+  /// This is useful when data is accessed but not modified.
+  static void touch(CacheKey key) {
+    if (_cache.containsKey(key)) {
+      startTimer(key); // Restarting the timer effectively "touches" it.
+    }
+  }
 
-  /* Internal timers – one per section */
-  static Timer? _modelCacheTimer;
-  static Timer? _conversationCacheTimer;
-  static Timer? _settingsCacheTimer;
-  static Timer? _premiumCacheTimer;
-  static Timer? _modelsScreenCacheTimer;
-  static Timer? _newsImageCacheTimer; // NEW for News Image URLs
-  static Timer? _recentModelsCacheTimer;
+  /// Starts or restarts the expiration timer for a cache entry.
+  static void startTimer(CacheKey key, {VoidCallback? onClear}) {
+    // Cancel any existing timer for this key.
+    _timers[key]?.cancel();
 
-  // MODEL CACHING
-  static void touchModelCache() => _modelCacheTimer?.cancel();
-  static void startModelCacheTimer({ Duration? timeout, VoidCallback? onClear }) {
-    _modelCacheTimer?.cancel();
-    _modelCacheTimer = Timer(timeout ?? const Duration(minutes: 2), () {
-      cachedAllModels      = null;
-      cachedFilteredModels = null;
-      debugPrint('CacheService ▸ Model cache cleared.');
+    final timeout = _defaultTimeouts[key] ?? const Duration(minutes: 5); // Fallback timeout
+
+    _timers[key] = Timer(timeout, () {
+      invalidate(key);
+      debugPrint('CacheService ▸ Cache for [${key.name}] cleared due to timeout.');
       onClear?.call();
     });
   }
 
-  // CONVERSATION CACHING
-  static void touchConversationCache() => _conversationCacheTimer?.cancel();
-  static void startConversationCacheTimer({ Duration? timeout, VoidCallback? onClear }) {
-    _conversationCacheTimer?.cancel();
-    _conversationCacheTimer = Timer(timeout ?? const Duration(minutes: 2), () {
-      invalidateConversationCache();
-      debugPrint('CacheService ▸ Conversation cache cleared.');
-      onClear?.call();
-    });
-  }
-  static void invalidateConversationCache() {
-    cachedConversationManagers = null;
-    cachedConversationOrder    = null;
-    cachedStarredIds           = null;
-    cachedUserModels           = null;
-  }
-
-  // SETTINGS CACHING
-  static void touchSettingsCache() => _settingsCacheTimer?.cancel();
-  static void startSettingsCacheTimer({ Duration? timeout, VoidCallback? onClear }) {
-    _settingsCacheTimer?.cancel();
-    _settingsCacheTimer = Timer(timeout ?? const Duration(minutes: 3), () {
-      invalidateSettingsCache();
-      debugPrint('CacheService ▸ Settings cache cleared.');
-      onClear?.call();
-    });
-  }
-  static void invalidateSettingsCache() {
-    cachedSettingsUserData = null;
-  }
-  static void updateSettingsCache(Map<String, dynamic> data) {
-    cachedSettingsUserData = data;
-    debugPrint('CacheService ▸ Settings cache was updated with new data.');
-  }
-
-  // PREMIUM PRODUCTS CACHING
-  static void touchPremiumCache() => _premiumCacheTimer?.cancel();
-  static void startPremiumCacheTimer({ Duration? timeout, VoidCallback? onClear }) {
-    _premiumCacheTimer?.cancel();
-    _premiumCacheTimer = Timer(timeout ?? const Duration(minutes: 10), () {
-      invalidatePremiumCache();
-      debugPrint('CacheService ▸ Premium products cache cleared.');
-      onClear?.call();
-    });
-  }
-  static void invalidatePremiumCache() {
-    cachedPremiumProducts = null;
-    debugPrint('CacheService ▸ Premium products cache invalidated.');
-  }
-
-  // MODELS SCREEN CACHING
-  static void touchModelsScreenCache() => _modelsScreenCacheTimer?.cancel();
-  static void startModelsScreenCacheTimer({ Duration? timeout, VoidCallback? onClear }) {
-    _modelsScreenCacheTimer?.cancel();
-    _modelsScreenCacheTimer = Timer(timeout ?? const Duration(minutes: 5), () {
-      invalidateModelsScreenCache();
-      debugPrint('CacheService ▸ ModelsScreen cache cleared due to timeout.');
-      onClear?.call();
-    });
-  }
-  static void invalidateModelsScreenCache() {
-    cachedModelsScreenData = null;
-    debugPrint('CacheService ▸ ModelsScreen cache invalidated.');
-  }
-
-  // ──────────────────────────────────────────────────────────
-  // RECENT MODELS CACHING – public helpers (NEW!)
-  // ──────────────────────────────────────────────────────────
-  static void touchRecentModelsCache() => _recentModelsCacheTimer?.cancel();
-
-  static void startRecentModelsCacheTimer({
-    Duration?   timeout,
-    VoidCallback? onClear,
-  }) {
-    _recentModelsCacheTimer?.cancel();
-    _recentModelsCacheTimer = Timer(timeout ?? const Duration(minutes: 10), () {
-      invalidateRecentModelsCache();
-      debugPrint('CacheService ▸ Recent models cache cleared due to timeout.');
-      onClear?.call();
-    });
-  }
-
-  static void invalidateRecentModelsCache() {
-    cachedRecentModels = null;
-    debugPrint('CacheService ▸ Recent models cache invalidated.');
-  }
-
-  // ──────────────────────────────────────────────────────────
-  // NEWS IMAGE URL CACHING – public helpers (NEW!)
-  // ──────────────────────────────────────────────────────────
-  static void touchNewsImageCache() => _newsImageCacheTimer?.cancel();
-
-  static void startNewsImageCacheTimer({
-    Duration?   timeout,
-    VoidCallback? onClear,
-  }) {
-    _newsImageCacheTimer?.cancel();
-    // URLs expire in 10 mins, so we clear our cache in 8 to be safe.
-    _newsImageCacheTimer = Timer(timeout ?? const Duration(minutes: 8), () {
-      invalidateNewsImageCache();
-      debugPrint('CacheService ▸ News image URL cache cleared due to timeout.');
-      onClear?.call();
-    });
-  }
-
-  static void invalidateNewsImageCache() {
-    cachedNewsImageUrls = null;
-    debugPrint('CacheService ▸ News image URL cache invalidated.');
-  }
-
-
-  // MISC – wipe everything (used on logout etc.)
+  /// Clears the entire cache and cancels all timers.
+  /// Typically used on user logout.
   static void clearAll() {
-    cachedAllModels = null;
-    cachedFilteredModels = null;
-    cachedConversationManagers = null;
-    cachedConversationOrder = null;
-    cachedStarredIds = null;
-    cachedUserModels = null;
-    cachedSettingsUserData = null;
-    cachedPremiumProducts = null;
-    cachedModelsScreenData = null;
-    cachedNewsImageUrls = null; // NEW
+    for (var timer in _timers.values) {
+      timer.cancel();
+    }
+    _timers.clear();
+    _cache.clear();
+    debugPrint('CacheService ▸ All caches cleared.');
+  }
 
-    _modelCacheTimer?.cancel();
-    _conversationCacheTimer?.cancel();
-    _settingsCacheTimer?.cancel();
-    _premiumCacheTimer?.cancel();
-    _modelsScreenCacheTimer?.cancel();
-    _newsImageCacheTimer?.cancel(); // NEW
+  // --- COMPOSITE INVALIDATION HELPERS ---
+  // For convenience, we can keep helpers that invalidate multiple keys at once.
 
-    _modelCacheTimer = null;
-    _conversationCacheTimer = null;
-    _settingsCacheTimer = null;
-    _premiumCacheTimer = null;
-    _modelsScreenCacheTimer = null;
-    _newsImageCacheTimer = null; // NEW
+  /// Invalidates all cache entries related to the conversation inbox.
+  static void invalidateConversationCache() {
+    invalidate(CacheKey.conversationManagers);
+    invalidate(CacheKey.conversationOrder);
+    invalidate(CacheKey.starredIds);
+    invalidate(CacheKey.userModels);
+    debugPrint('CacheService ▸ All conversation-related caches invalidated.');
   }
 }

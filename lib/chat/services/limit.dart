@@ -68,7 +68,7 @@ class ChatLimitManager {
     int total = 0;
     for (var message in messages) {
       // It's safer to check for null text, just in case.
-      total += message.text?.length ?? 0;
+      total += message.text.length;
     }
     return total;
   }

@@ -2041,4 +2041,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Etes-vous sûr de vouloir quitter cette incroyable plateforme ?';
+
+  @override
+  String get newsErrorTitle => 'Échec du chargement des actualités';
+
+  @override
+  String get newsErrorMessage =>
+      'Un problème est survenu lors de la récupération des dernières mises à jour, veuillez vérifier votre connexion et réessayer.';
 }

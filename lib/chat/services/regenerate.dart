@@ -1,153 +1,140 @@
-// regenerate.dart
+// lib/chat/services/regenerate.dart
 
+import 'dart:async';
+import 'package:cortex/chat/providers/conversation.dart';
+import 'package:cortex/chat/services/scroll.dart';
+import 'package:cortex/chat/services/send.dart';
+import 'package:cortex/chat/services/stop.dart';
 import 'package:cortex/chat/services/storage.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:cortex/l10n/app_localizations.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:cortex/chat/messages/messages.dart';
+import '../../l10n/app_localizations.dart';
 
-import '../../notifications.dart';
-import '../chat.dart';
-import '../messages/messages.dart';
-
-/// Service responsible for handling the message regeneration logic.
+/// Service responsible for orchestrating the message regeneration logic.
 class RegenerateService {
-  final ChatScreenState state;
+  final ConversationProvider _conversationProvider;
+  final StopService _stopService;
+  final SendService _sendService;
+  final ScrollService _scrollService;
 
-  RegenerateService({required this.state});
+  RegenerateService({
+    required ConversationProvider conversationProvider,
+    required StopService stopService,
+    required SendService sendService,
+    required ScrollService scrollService,
+  })  : _conversationProvider = conversationProvider,
+        _stopService = stopService,
+        _sendService = sendService,
+        _scrollService = scrollService;
 
-  /// Handles the regeneration of an AI message at the given [modelIndex].
+  /// Handles the regeneration of an AI message, now with support for Dynamic Chat.
   ///
-  /// This function has been completely re-architected to be robust and atomic,
-  /// resolving UI glitches where old messages would persist during regeneration.
-  ///
-  /// The process is now:
-  /// 1. Find the user message that prompted the AI response.
-  /// 2. Atomically update the state: remove the target AI message and all
-  ///    subsequent messages, and insert a new "thinking" placeholder in their place.
-  ///    This is done in a single `setState` call to prevent inconsistent UI states.
-  /// 3. Delegate the API call to `SendService`, which will now work with a
-  ///    clean and correctly prepared message list.
-  ///
-  /// It also supports a "Change and Regenerate" request as a one-time operation
-  /// by accepting an optional `newModelId` without permanently altering the chat's active model.
-  Future<void> onRegenerate(int modelIndex, {String? newModelId}) async {
+  /// This method is designed to be safe against async gaps. It captures necessary
+  /// values from the `BuildContext` before the first `await` and checks `context.mounted`
+  /// before using the context after any async operation.
+  Future<void> onRegenerate(
+      int messageIndex, {
+        required BuildContext context,
+        String? newModelId,
+        bool isDynamicRegenerate = false, required AppLocalizations localizations,
+      }) async {
     const String logPrefix = "[RegenerateService]";
     debugPrint(
-        "$logPrefix: onRegenerate called for modelIndex: $modelIndex. One-time model override requested: '${newModelId ?? 'none'}'.");
+        "$logPrefix: onRegenerate called for index: $messageIndex. Override model: '${newModelId ?? 'none'}'. Is Dynamic: $isDynamicRegenerate");
 
-    if (!state.mounted) {
-      debugPrint("$logPrefix: State is not mounted. Aborting.");
-      return;
-    }
+    // --- LINT FIX 1: Capture values from context BEFORE the first await. ---
+    final localizations = AppLocalizations.of(context)!;
 
-    final notificationService =
-    Provider.of<NotificationService>(state.context, listen: false);
-    final localizations = AppLocalizations.of(state.context)!;
-
-    if (state.isWaitingForResponse) {
+    if (_conversationProvider.isWaitingForResponse) {
       debugPrint("$logPrefix: Operation already in progress. Aborting.");
-      notificationService.showNotification(
-        message: localizations.regenerateInProgress,
-        isSuccess: false,
-        oneLine: true,
-        duration: const Duration(seconds: 3),
-        bottomOffset: 0.07,
-      );
       return;
     }
+
+    _scrollService.hideButtonImmediately();
 
     try {
-      if (modelIndex < 0 || modelIndex >= state.messages.length) {
-        debugPrint("$logPrefix: Invalid index. Aborting.");
+      // The first `await` is an async gap.
+      await _stopService.stopResponse();
+
+      // --- LINT FIX 2: Guard context usage after the async gap. ---
+      if (!context.mounted) {
+        debugPrint("$logPrefix: Context is no longer mounted after stopResponse. Aborting.");
         return;
       }
 
-      // Ensure any previous response is fully stopped.
-      await state.stopService.stopResponse();
+      final messages = _conversationProvider.messages;
 
-      // Find the user message that triggered the AI response.
-      final int triggerUserIndex = state.messages
-          .sublist(0, modelIndex)
-          .lastIndexWhere((m) => m.isUserMessage);
+      if (messageIndex < 0 || messageIndex > messages.length) {
+        debugPrint("$logPrefix: Invalid index ($messageIndex) for message list of length (${messages.length}). Aborting.");
+        return;
+      }
 
+      final int triggerUserIndex = messages.sublist(0, messageIndex).lastIndexWhere((m) => m.isUserMessage);
       if (triggerUserIndex < 0) {
-        debugPrint(
-            "$logPrefix: No preceding user message found for regeneration. Aborting.");
+        debugPrint("$logPrefix: No preceding user message found. Aborting.");
+        return;
+      }
+      final Message userMessageForRegeneration = messages[triggerUserIndex];
+
+      // Model selection logic remains the same as it uses no context.
+      String? modelIdForRequest;
+      String modelIdForProvider;
+
+      if (isDynamicRegenerate && newModelId == null) {
+        modelIdForRequest = null;
+        modelIdForProvider = userMessageForRegeneration.model ?? 'dynamic';
+        debugPrint("$logPrefix: Dynamic regenerate initiated. `overrideModelId` will be null.");
+      } else {
+        final String resolvedModelId = newModelId ??
+            (messageIndex < messages.length ? messages[messageIndex].model : userMessageForRegeneration.model)!;
+        modelIdForRequest = resolvedModelId;
+        modelIdForProvider = resolvedModelId;
+        debugPrint("$logPrefix: Standard regenerate initiated. Model forced to '$resolvedModelId'.");
+      }
+
+      _conversationProvider.prepareForRegeneration(messageIndex, modelIdForProvider);
+      _scrollService.updateButtonVisibility();
+
+      // Second async gap.
+      final conversationID = _conversationProvider.conversationID;
+      if (conversationID != null) {
+        await ChatStorageService.saveCurrentMessages(
+            conversationID, _conversationProvider.messages);
+      }
+
+      // --- LINT FIX 3: Guard context usage again before the final async call. ---
+      if (!context.mounted) {
+        debugPrint("$logPrefix: Context is no longer mounted after saving messages. Aborting.");
         return;
       }
 
-      final Message userMessageForRegeneration =
-      state.messages[triggerUserIndex];
-      final String textForRegeneration = userMessageForRegeneration.text.trim();
-      final String? photoPathForRegeneration =
-          userMessageForRegeneration.photoPath;
+      debugPrint("$logPrefix: Delegating to SendService. Using request model: '${modelIdForRequest ?? 'dynamic'}'.");
 
-      // Determine the model to record in the new "thinking" message for history.
-      final Message messageToRegenerate = state.messages[modelIndex];
-      final String modelForNewMessageRecord =
-          newModelId ?? messageToRegenerate.model ?? state.modelId!;
+      final newAiIndex = _conversationProvider.messages.length - 1;
 
-      // --- ATOMIC STATE UPDATE ---
-      // This is the critical fix. We create a new list in a single operation
-      // by taking all messages *before* the target, then adding the new
-      // "thinking" placeholder. Assigning a new list to `state.messages`
-      // guarantees that Flutter correctly rebuilds the UI without glitches.
-      if (state.mounted) {
-        state.setState(() {
-          // Create the new list ending right before the message to be regenerated.
-          List<Message> updatedMessages =
-          state.messages.sublist(0, modelIndex);
-
-          // Add the new "thinking" placeholder.
-          updatedMessages.add(Message(
-            text: "",
-            isUserMessage: false,
-            isThinking: true,
-            includeInContext: false,
-            model: modelForNewMessageRecord,
-          ));
-
-          // Atomically replace the old list with the new one.
-          state.messages = updatedMessages;
-        });
-        debugPrint(
-            "$logPrefix: Atomically updated message list. Removed messages from index $modelIndex onwards and added a 'thinking' placeholder.");
-
-        // Persist the new, shorter message list to local storage.
-        if (state.conversationID != null) {
-          await ChatStorageService.saveCurrentMessages(
-              state.conversationID!, state.messages);
-        }
-      }
-
-      // Allow the UI to update before proceeding.
-      await Future.microtask(() {});
-      if (!state.mounted) return;
-
-      // Delegate to SendService. `isRegenerate` tells it not to add new
-      // messages, but to use the placeholder we just created.
-      debugPrint(
-          "$logPrefix: Delegating to SendService. Active model: '${state.modelId}', One-time override: '$newModelId'.");
-
-      await state.sendService.sendMessage(
-        textFromButton: textForRegeneration,
+      // Final async call using the guarded context and pre-captured localizations.
+      await _sendService.sendMessage(
+        context: context, // Safe to pass now because of the mounted check
+        localizations: localizations, // Using the captured value
+        messageText: userMessageForRegeneration.text,
         isRegenerate: true,
-        regenerateAiIndex: modelIndex,
-        regeneratePhotoPath: photoPathForRegeneration,
-        overrideModelId: newModelId,
+        regenerateAiIndex: newAiIndex,
+        regeneratePhotoPath: userMessageForRegeneration.photoPath,
+        overrideModelId: modelIdForRequest,
       );
-
       debugPrint("$logPrefix: sendMessage call completed successfully.");
+
     } catch (e, s) {
       debugPrint("$logPrefix: ERROR in onRegenerate: $e\nStack Trace: $s");
-      if (state.mounted) {
-        notificationService.showNotification(
-            duration: const Duration(seconds: 4),
-            message:
-            localizations.errorOccurredDuringRegeneration(e.toString()),
-            isSuccess: false);
-        if (state.isWaitingForResponse) {
-          state.setState(() => state.isWaitingForResponse = false);
+      // The error handling part uses `localizations`, which we safely captured at the beginning.
+      if (_conversationProvider.isWaitingForResponse) {
+        final thinkingIndex = _conversationProvider.messages.lastIndexWhere((m) => m.isThinking);
+        if (thinkingIndex != -1) {
+          _conversationProvider.setErrorMessage(
+              thinkingIndex,
+              localizations.anErrorOccurred,
+              false
+          );
         }
       }
     }

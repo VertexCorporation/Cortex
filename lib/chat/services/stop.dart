@@ -1,84 +1,74 @@
-// StopService.dart
+// lib/chat/services/stop.dart
 
 import 'dart:async';
+import 'package:cortex/chat/providers/conversation.dart';
+import 'package:cortex/chat/providers/session.dart';
+import 'package:cortex/chat/services/api.dart';
+import 'package:cortex/chat/services/offline.dart';
 import 'package:cortex/chat/services/storage.dart';
-import 'package:flutter/cupertino.dart';
-import '../chat.dart';
+import 'package:cortex/chat/services/utils.dart';
+import 'package:flutter/foundation.dart';
 
+/// Manages the logic for forcefully stopping a response generation from the AI.
 class StopService {
-  final ChatScreenState state;
+  final ConversationProvider _conversationProvider;
+  final ChatSessionProvider _sessionProvider;
+  final ApiService _apiService;
+  final OfflineService _offlineService;
 
-  StopService(this.state);
+  /// Constructs the StopService with its required dependencies.
+  StopService({
+    required ConversationProvider conversationProvider,
+    required ChatSessionProvider sessionProvider,
+    required ApiService apiService,
+    required OfflineService offlineService,
+  })  : _conversationProvider = conversationProvider,
+        _sessionProvider = sessionProvider,
+        _apiService = apiService,
+        _offlineService = offlineService;
 
+  /// Initiates the process to stop the AI's response generation.
   Future<void> stopResponse() async {
-    if (state.responseStopped || !state.isWaitingForResponse) return;
+    if (!_conversationProvider.isWaitingForResponse) {
+      debugPrint("[StopService] Not waiting for a response, nothing to stop.");
+      return;
+    }
+    debugPrint("[StopService] Stop request initiated.");
 
-    state.setState(() {
-      state.responseStopped = true;
-    });
-
-    // This tells the ApiService to close its http.Client, which aborts
-    // the connection to our proxy server, preventing further processing or responses.
-    state.apiService.cancelRequests();
-    debugPrint("[StopService] Sent cancellation signal to ApiService.");
-
-    // If the model is a local one, also send a signal to the native layer.
-    if (state.isLocalModel(state.modelId)) {
-      try {
-        debugPrint("[StopService] Sending 'stopGeneration' signal to native layer for local model.");
-        await ChatScreenState.llamaChannel.invokeMethod('stopGeneration');
-      } catch (e) {
-        debugPrint("[StopService] Failed to send stop signal to native: $e");
-      }
+    final currentModelId = _sessionProvider.modelId;
+    if (currentModelId != null && Utils.isLocalModel(currentModelId)) {
+      _offlineService.stopGeneration();
+      debugPrint("[StopService] Cancellation signal sent to OfflineService.");
+    } else {
+      _apiService.cancelRequests();
+      debugPrint("[StopService] Cancellation signal sent to ApiService.");
     }
 
-    // --- The rest of the UI cleanup logic remains the same ---
-    state.chunkTimer?.cancel();
-    state.chunkTimer = null;
-    state.responseChunksQueue.clear();
+    final messages = _conversationProvider.messages;
+    final int lastMessageIndex = messages.lastIndexWhere((m) => !m.isUserMessage && m.isThinking);
 
-    if (!state.mounted) return;
-    state.setState(() {
-      state.isWaitingForResponse = false;
-    });
-
-    int lastAiIndex = state.messages.lastIndexWhere((m) => !m.isUserMessage);
-    if (lastAiIndex == -1) {
-      state.sendService.abortSend();
+    if (lastMessageIndex == -1) {
+      debugPrint("[StopService] No 'thinking' AI message found. Finalizing state just in case.");
+      _conversationProvider.finishBotResponse(-1);
       return;
     }
 
-    final aiMessage = state.messages[lastAiIndex];
-    // If the AI message was still "thinking" or empty, just remove it.
-    if (aiMessage.isThinking || aiMessage.text.trim().isEmpty) {
-      state.setState(() {
-        state.messages[lastAiIndex].opacity = 0;
-      });
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (state.mounted && lastAiIndex < state.messages.length) {
-          // Check if the message is still the one we intended to remove
-          if(state.messages[lastAiIndex].isThinking || state.messages[lastAiIndex].text.trim().isEmpty) {
-            state.setState(() {
-              state.messages.removeAt(lastAiIndex);
-            });
-          }
-        }
-      });
+    final aiMessage = messages[lastMessageIndex];
+    final bool wasJustThinking = aiMessage.text.trim().isEmpty && (aiMessage.photoPath ?? '').isEmpty;
+
+    if (wasJustThinking) {
+      debugPrint("[StopService] Stopped in 'thinking' state. Fading out bubble at index $lastMessageIndex.");
+      _conversationProvider.fadeOutMessage(lastMessageIndex);
     } else {
-      // If the AI message has content, it should be saved.
-      // This part of the logic is likely correct as it handles partial responses.
-      if (aiMessage.text.trim().isNotEmpty) {
-        state.setState(() {
-          // Ensure the thinking spinner is off
-          aiMessage.isThinking = false;
-        });
-        await ChatStorageService.upsertMessage(
-          state.conversationID!,
-          lastAiIndex,
-          aiMessage,
-        );
+      debugPrint("[StopService] Stopped in 'writing' state. Finalizing message at index $lastMessageIndex.");
+      _conversationProvider.finishBotResponse(lastMessageIndex);
+      final conversationID = _conversationProvider.conversationID;
+      if (conversationID != null) {
+        debugPrint("[StopService] Saving partially generated message to DB.");
+        await ChatStorageService.saveCurrentMessages(
+            conversationID, _conversationProvider.messages);
       }
     }
-    state.sendService.abortSend();
+    debugPrint("[StopService] Response stop process completed.");
   }
 }

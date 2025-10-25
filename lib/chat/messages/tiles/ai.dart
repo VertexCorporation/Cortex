@@ -3,16 +3,15 @@
 // =================================================================
 
 import 'dart:io';
-import 'dart:math' as math;
-
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:provider/provider.dart';
 
 import '../../../recognizer.dart';
 import '../../../theme.dart';
-import '../../chat.dart';
+import '../../providers/conversation.dart';
+import '../../providers/session.dart';
 import '../options.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import '../parser.dart';
@@ -55,164 +54,157 @@ class AIMessageTile extends StatefulWidget {
   State<AIMessageTile> createState() => _AIMessageTileState();
 }
 
-class _AIMessageTileState extends State<AIMessageTile>
-    with TickerProviderStateMixin {
+class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateMixin {
+  // NEW: Controller for the initial appearance (entry) animation of the tile
+  late final AnimationController _entryCtl;
+  late final Animation<double> _entryScaleAnim;
+
+  // Main fade controller for the entire tile
   late final AnimationController _fadeCtl;
   late final Animation<double> _fadeAnim;
 
-  late final AnimationController _typeCtl;
-  static const int _durPerBatch = 50;
-  static const int _fadeDur = 200;
-  static const int _minBatch = 5;
+  // Thinking animations (Pulse & Rotate)
+  late final AnimationController _thinkPulseCtl;
+  late final Animation<double> _thinkPulseAnim;
+  late final AnimationController _thinkRotateCtl;
 
-  final StringBuffer _chunkBuffer = StringBuffer();
-  int _totalTextLength = 0;
+  // Header entry animation (Avatar + Model Name fade-in)
+  late final AnimationController _headerEntryCtl;
+  late final Animation<double> _headerEntryAnim;
 
-  String _text = '';
-  late final ValueNotifier<bool> _thinkNtf;
-  late String _curModelId;
+  // Simplified text streaming animation
+  late final AnimationController _textAnimCtl;
+  String _stableText = "";
+  String _animatingText = "";
 
-  // `_staticCharCount` holds the number of characters that have finished
-  // animating and should be permanently displayed on the screen. This is the
-  // most critical variable in fixing the reset bug.
-  int _staticCharCount = 0;
-  List<String> _batches = [];
+  // Error state animations
+  bool _isExpandedError = false;
+  bool _showErrorText = false;
+  late AnimationController _errorSlideCtl;
+  late Animation<Offset> _errorSlideAnim;
+  late AnimationController _errorFadeOutCtl;
+  late Animation<double> _errorFadeOutAnim;
 
-  bool _isExpanded = false;
-  bool _showText = false;
-  late AnimationController _slideController;
-  late Animation<Offset> _slideAnimation;
-  late AnimationController _fadeOutController;
-  late Animation<double> _fadeOutAnimation;
-
+  // Cache for parsed markdown to improve performance
   final Map<String, List<InlineSpan>> _parseCache = {};
+
+  /// Formats a raw model ID string into a display-friendly format.
+  /// - Capitalizes the first letter of each word.
+  /// - Converts specific acronyms and parameters (e.g., "gpt" -> "GPT", "7b" -> "7B").
+  /// - Converts "ai" within words to "AI" without adding a space (e.g., "openai" -> "OpenAI").
+  ///
+  /// Example: "openai/gpt-4o" -> "OpenAI GPT 4o"
+  /// Example: "google/gemma-7b" -> "Google Gemma 7B"
+  /// Example: "stabilityai/sdxl" -> "StabilityAI Sdxl"
+  String _formatModelIdForDisplay(String rawId) {
+    if (rawId.isEmpty) {
+      return "";
+    }
+    String spacedId = rawId.replaceAll('/', ' ').replaceAll('-', ' ');
+    List<String> parts = spacedId.split(' ').where((part) => part.isNotEmpty).toList();
+    if (parts.isEmpty) {
+      return "";
+    }
+
+    List<String> formattedParts = [];
+
+    for (String segment in parts) {
+      String segmentLower = segment.toLowerCase();
+      String formattedSegment;
+
+      // Priority 1: Handle full-word acronyms and parameters
+      if (segmentLower == 'gpt') {
+        formattedSegment = 'GPT';
+      } else if (segmentLower == 'ai') {
+        formattedSegment = 'AI';
+      } else if (segment.length > 1 && segmentLower.endsWith('b') && int.tryParse(segment.substring(0, segment.length - 1)) != null) {
+        formattedSegment = '${segment.substring(0, segment.length - 1)}B';
+      }
+      // Priority 2: General case for all other words
+      else {
+        // Step 1: Capitalize the first letter of the word.
+        formattedSegment = segment[0].toUpperCase() + segment.substring(1).toLowerCase();
+
+        // Step 2: If the original word ended with "ai", correct the suffix.
+        // This turns "Openai" into "OpenAI".
+        if (segmentLower.endsWith('ai')) {
+          formattedSegment = formattedSegment.substring(0, formattedSegment.length - 2) + 'AI';
+        }
+      }
+      formattedParts.add(formattedSegment);
+    }
+    return formattedParts.join(' ');
+  }
 
   @override
   void initState() {
     super.initState();
-    _curModelId = widget.modelId;
 
-    _slideController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, -0.5),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutQuad),
-    );
-    _fadeOutController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _fadeOutAnimation =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_fadeOutController);
+    _entryCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _entryScaleAnim = CurvedAnimation(parent: _entryCtl, curve: Curves.elasticOut);
 
-    _fadeCtl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
-    _fadeAnim = Tween<double>(begin: 0, end: 1).animate(_fadeCtl);
+    _fadeCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+    _fadeAnim = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: _fadeCtl, curve: Curves.easeOut));
 
-    if (widget.isError) {
-      _fadeOutController.value = 1.0;
-      _fadeCtl.value = 0.0;
-    } else {
-      _fadeOutController.value = 0.0;
-      if (widget.opacity == 1) {
-        _fadeCtl.forward(from: 0);
-      } else {
-        _fadeCtl.reverse(from: 1);
-      }
+    _thinkPulseCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
+    _thinkPulseAnim = Tween<double>(begin: 1.0, end: 1.15).animate(CurvedAnimation(parent: _thinkPulseCtl, curve: Curves.easeInOut));
+    _thinkRotateCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 4000));
+
+    if (widget.isThinking && !widget.isError) {
+      _thinkPulseCtl.repeat(reverse: true);
+      _thinkRotateCtl.repeat();
+      _entryCtl.forward(); // Play entry animation if it starts as "thinking"
     }
 
-    _typeCtl = AnimationController(vsync: this);
-    _text = widget.text;
-    _totalTextLength = widget.text.length;
-    _staticCharCount = _text.length;
-    _thinkNtf = ValueNotifier(widget.isThinking);
+    _headerEntryCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+    _headerEntryAnim = CurvedAnimation(parent: _headerEntryCtl, curve: Curves.easeOut);
 
-    if (_text.isNotEmpty) {
-      _typeCtl.duration = const Duration(milliseconds: 1);
-      _typeCtl.value = 1;
-    }
-
-    _typeCtl.addStatusListener((status) {
+    _textAnimCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _textAnimCtl.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        _staticCharCount = _text.length;
-        _batches.clear();
-
-        if (_chunkBuffer.isNotEmpty) {
-          _processBufferAndAnimate();
-        } else {
-          if (mounted) {
-            setState(() {});
-          }
+        if (mounted && _animatingText.isNotEmpty) {
+          setState(() {
+            _stableText += _animatingText;
+            _animatingText = "";
+          });
         }
       }
     });
-  }
 
-  // This method's responsibility is simplified. It no longer manages state.
-  void _onChunk(String textToAdd) {
-    if (textToAdd.isEmpty || widget.isError) return;
+    _errorSlideCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+    _errorSlideAnim = Tween<Offset>(begin: const Offset(0, -0.5), end: Offset.zero).animate(CurvedAnimation(parent: _errorSlideCtl, curve: Curves.easeOutQuad));
+    _errorFadeOutCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+    _errorFadeOutAnim = Tween<double>(begin: 0.0, end: 1.0).animate(_errorFadeOutCtl);
 
-    _text += textToAdd;
-
-    // Create animation batches only for the NEW incoming text.
-    final newBatchSize = (textToAdd.length / 2).ceil().clamp(_minBatch, 100);
-    final List<String> newBatches = [];
-    for (var i = 0; i < textToAdd.length; i += newBatchSize) {
-      newBatches.add(
-          textToAdd.substring(i, math.min(i + newBatchSize, textToAdd.length)));
+    if (widget.isError) {
+      _errorFadeOutCtl.value = 1.0;
+      _fadeCtl.value = 0.0;
+    } else {
+      _errorFadeOutCtl.value = 0.0;
+      if (widget.opacity == 1) {
+        _fadeCtl.forward(from: 0);
+      } else {
+        _fadeCtl.value = widget.opacity;
+      }
     }
 
-    _batches = newBatches; // Overwrite previous batches, do not append.
-
-    final newDur = (_batches.length * _durPerBatch) + _fadeDur;
-    _typeCtl.duration = Duration(milliseconds: newDur);
-
-    // Start the animation from the beginning. The `_content` method will
-    // instantly draw the old text thanks to `_staticCharCount`.
-    _typeCtl.forward(from: 0);
-  }
-
-  void _processBufferAndAnimate() {
-    if (_chunkBuffer.isEmpty) {
-      return;
+    if (!widget.isThinking && widget.text.isNotEmpty) {
+      _stableText = widget.text;
+      _headerEntryCtl.value = 1.0;
+      _entryCtl.value = 1.0; // If not thinking, it's already "entered"
     }
-
-    final String textToAdd = _chunkBuffer.toString();
-    _chunkBuffer.clear();
-    _onChunk(textToAdd);
-  }
-
-  /// Finishes the animation instantly.
-  void _flushRemaining() {
-    // If there is any text waiting in the buffer, append it to the main text immediately.
-    if (_chunkBuffer.isNotEmpty) {
-      _text += _chunkBuffer.toString();
-      _chunkBuffer.clear();
-    }
-
-    // Mark all text as static and stop the animation.
-    _staticCharCount = _text.length;
-    _batches.clear();
-    if (_typeCtl.isAnimating) {
-      _typeCtl.stop();
-    }
-    _typeCtl.value = 1.0; // Set the animation as completed.
-
-    // Rerender to show the final state.
-    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    _entryCtl.dispose();
     _fadeCtl.dispose();
-    _typeCtl.dispose();
-    _thinkNtf.dispose();
-    _slideController.dispose();
-    _fadeOutController.dispose();
+    _thinkPulseCtl.dispose();
+    _thinkRotateCtl.dispose();
+    _headerEntryCtl.dispose();
+    _textAnimCtl.dispose();
+    _errorSlideCtl.dispose();
+    _errorFadeOutCtl.dispose();
     super.dispose();
   }
 
@@ -220,145 +212,162 @@ class _AIMessageTileState extends State<AIMessageTile>
   void didUpdateWidget(covariant AIMessageTile old) {
     super.didUpdateWidget(old);
 
+    // Transition from Thinking -> Not Thinking
     if (old.isThinking && !widget.isThinking) {
-      _flushRemaining();
-      _thinkNtf.value = false;
+      _thinkPulseCtl.stop();
+      _thinkRotateCtl.stop();
+      // ENHANCED: Use easeOutBack curve for a satisfying "pop" when settling.
+      _thinkPulseCtl.animateTo(1.0, duration: const Duration(milliseconds: 400), curve: Curves.easeOutBack);
+      // FIXED: Use .roundToDouble() to ensure the target is a double, not an int.
+      _thinkRotateCtl.animateTo(_thinkRotateCtl.value.roundToDouble(), duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
+      _headerEntryCtl.forward();
     }
 
-    if (old.isThinking != widget.isThinking && _thinkNtf.value != widget.isThinking) {
-      _thinkNtf.value = widget.isThinking;
+    // Transition from Not Thinking -> Thinking (for regeneration)
+    if (!old.isThinking && widget.isThinking) {
+      _entryCtl.forward(from: 0); // Play the entry animation on regenerate
+      _headerEntryCtl.reverse();
+      _stableText = "";
+      _animatingText = "";
+      _thinkPulseCtl.repeat(reverse: true);
+      _thinkRotateCtl.repeat();
     }
 
-    if (old.modelId != widget.modelId) {
-      _curModelId = widget.modelId;
-    }
-
-    if (widget.isThinking && !widget.isError && widget.text.length > _totalTextLength) {
-      final newChunk = widget.text.substring(_totalTextLength);
-      _chunkBuffer.write(newChunk);
-      _totalTextLength = widget.text.length;
-
-      if (!_typeCtl.isAnimating) {
-        _processBufferAndAnimate();
+    // Dynamic & Smooth Text Animation Logic
+    if (widget.text.length > old.text.length) {
+      if (_textAnimCtl.isAnimating) {
+        _stableText += _animatingText;
       }
-    }
+      _stableText = old.text;
+      _animatingText = widget.text.substring(old.text.length);
 
-    if (!widget.isThinking && old.text != widget.text) {
-      _chunkBuffer.clear();
-      _batches.clear();
-      if (_typeCtl.isAnimating) _typeCtl.stop();
+      final int newChars = _animatingText.length;
+      const int msPerChar = 12;
+      const int minDuration = 100;
+      const int maxDuration = 600;
+      final newDuration = (newChars * msPerChar).clamp(minDuration, maxDuration);
 
-      _text = widget.text;
-      _totalTextLength = widget.text.length;
-      _staticCharCount = widget.text.length;
-      _typeCtl.value = 1.0;
+      _textAnimCtl.duration = Duration(milliseconds: newDuration);
+      _textAnimCtl.forward(from: 0);
+
+    } else if (widget.text != old.text && !widget.isThinking) {
+      _stableText = widget.text;
+      _animatingText = "";
+      if (_textAnimCtl.isAnimating) _textAnimCtl.stop();
+      _textAnimCtl.value = 1.0;
     }
 
     if (old.isError != widget.isError) {
       if (widget.isError) {
-        _flushRemaining();
         _fadeCtl.reverse();
-        _fadeOutController.forward();
-        if (widget.isThinking) _thinkNtf.value = false;
+        _errorFadeOutCtl.forward();
       } else {
-        _fadeOutController.reverse();
+        _errorFadeOutCtl.reverse();
         _fadeCtl.forward();
-
-        if (widget.text.isNotEmpty && !widget.isThinking) {
-          _text = widget.text;
-          _totalTextLength = widget.text.length;
-          _staticCharCount = widget.text.length;
-          _typeCtl.value = 1.0;
-        }
       }
-    } else if (old.opacity != widget.opacity) {
-      final controller = widget.isError ? _fadeOutController : _fadeCtl;
-      if (widget.opacity == 1) {
-        controller.forward();
+    }
+
+    if (old.opacity != widget.opacity && !widget.isError) {
+      if (widget.opacity == 1.0) {
+        _fadeCtl.forward();
+      } else if (widget.opacity == 0.0) {
+        _fadeCtl.reverse().whenComplete(() {
+          widget.onFadeOutComplete?.call();
+        });
       } else {
-        controller.reverse();
+        _fadeCtl.value = widget.opacity;
       }
     }
   }
 
   void _onLongPress(BuildContext ctx, Offset pos) {
-    final chatState = ctx.findAncestorStateOfType<ChatScreenState>();
-    if (chatState == null) return;
-
-    final conversationHasPhoto =
-    chatState.messages.any((m) => m.photoPath?.isNotEmpty ?? false);
-
+    final conversationProvider = ctx.read<ConversationProvider>();
+    final sessionProvider = ctx.read<ChatSessionProvider>();
+    final conversationHasPhoto = conversationProvider.messages.any((m) => m.photoPath?.isNotEmpty ?? false);
+    final isUserSubscribed = sessionProvider.isUserSubscribed;
+    final premiumTrialUses = sessionProvider.premiumTrialUses;
     final aiMessageOptions = [MessageOption.copy, MessageOption.select];
     if (!widget.isError) {
-      aiMessageOptions
-          .addAll([MessageOption.regenerate, MessageOption.changeModel]);
+      aiMessageOptions.addAll([MessageOption.regenerate, MessageOption.changeModel]);
       if (!widget.isReported) aiMessageOptions.add(MessageOption.report);
     } else {
       aiMessageOptions.add(MessageOption.regenerate);
     }
-
     showMessageOptions(
       context: ctx,
       tapPosition: pos,
       messageText: widget.text,
       messageNotifier: ValueNotifier<String>(widget.text),
       options: aiMessageOptions,
-      isWaitingForResponseNotifier: chatState.isWaitingForResponseNotifier,
       isReported: widget.isReported,
       onReport: widget.onReport,
       onRegenerate: widget.onRegenerate,
       onChangeModel: widget.onChangeModel,
-      modelIdAndExtension: _curModelId,
+      modelIdAndExtension: widget.modelId,
       conversationHasPhoto: conversationHasPhoto,
-      isSubscribed: chatState.isUserSubscribed,
-      premiumTrialUses: chatState.premiumTrialUses,
+      isSubscribed: isUserSubscribed,
+      premiumTrialUses: premiumTrialUses,
       isPersistentlyDynamic: widget.isPersistentlyDynamic,
     );
+  }
+
+  void _flushAnimation() {
+    if (_textAnimCtl.isAnimating) {
+      _textAnimCtl.stop();
+      if(mounted) {
+        setState(() {
+          _stableText += _animatingText;
+          _animatingText = "";
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final scale = screenWidth / 400;
+    if (widget.isError) return _buildErrorWidget(context, scale);
 
-    if (widget.isError) {
-      return _buildErrorWidget(context, scale);
-    }
-
-    return FadeTransition(
-      opacity: _fadeAnim,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        child: RawGestureDetector(
-          behavior: HitTestBehavior.deferToChild,
-          gestures: {
-            ShortLongPressGestureRecognizer:
-            GestureRecognizerFactoryWithHandlers<
-                ShortLongPressGestureRecognizer>(
-                  () => ShortLongPressGestureRecognizer(
-                  debugOwner: this,
-                  shortPressDuration: const Duration(milliseconds: 330)),
-                  (inst) => inst.onLongPressStart =
-                  (d) => _onLongPress(context, d.globalPosition),
-            ),
-          },
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(26),
-              splashColor: AppColors.primaryColor.inverted.withOpacity(0.1),
-              onTap: _flushRemaining,
-              onLongPress: () {},
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(6, 8, 6, 0),
-                child: AnimatedBuilder(
-                  animation: Listenable.merge([_typeCtl, _thinkNtf]),
-                  builder: (ctx, _) => Row(
+    return ScaleTransition(
+      scale: _entryScaleAnim,
+      child: FadeTransition(
+        opacity: _fadeAnim,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: RawGestureDetector(
+            behavior: HitTestBehavior.deferToChild,
+            gestures: {
+              ShortLongPressGestureRecognizer: GestureRecognizerFactoryWithHandlers<ShortLongPressGestureRecognizer>(
+                    () => ShortLongPressGestureRecognizer(debugOwner: this, shortPressDuration: const Duration(milliseconds: 330)),
+                    (inst) => inst.onLongPressStart = (d) => _onLongPress(context, d.globalPosition),
+              ),
+            },
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(26),
+                splashColor: AppColors.primaryColor.inverted.withValues(alpha:0.1),
+                onTap: _flushAnimation,
+                onLongPress: () {},
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(6, 8, 6, 8),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      _avatar(scale),
-                      SizedBox(width: screenWidth * 0.04),
-                      Expanded(child: _content(context, scale)),
+                      _buildHeader(scale),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: SizeTransition(sizeFactor: animation, child: child)),
+                        child: !widget.isThinking
+                            ? Padding(
+                          key: const ValueKey('content'),
+                          padding: EdgeInsets.only(top: 8 * scale, left: 2.0 * scale),
+                          child: _buildContent(scale),
+                        )
+                            : const SizedBox.shrink(key: ValueKey('thinking')),
+                      )
                     ],
                   ),
                 ),
@@ -370,123 +379,50 @@ class _AIMessageTileState extends State<AIMessageTile>
     );
   }
 
-  Widget _buildErrorWidget(BuildContext context, double scale) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final horizontalPadding = screenWidth * 0.02;
-    final dynamicBorderRadius = screenWidth * 0.03;
-    final containerPadding = screenWidth * 0.03;
-    final dynamicFontSize = screenWidth * 0.04;
-    final iconSize = screenWidth * 0.06;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          if (_isExpanded) {
-            _showText = false;
-            _slideController.reverse().then((_) {
-              if (mounted) setState(() => _isExpanded = false);
-            });
-          } else {
-            _isExpanded = true;
-            _slideController.forward().whenComplete(() {
-              if (mounted) setState(() => _showText = true);
-            });
-          }
-        });
-      },
-      child: FadeTransition(
-        opacity: _fadeOutAnimation,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.septenaryColor.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(dynamicBorderRadius),
-              border: Border.all(color: AppColors.septenaryColor, width: 0.5),
-            ),
-            padding: EdgeInsets.all(containerPadding),
-            child: Column(
+  Widget _buildHeader(double s) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        ScaleTransition(
+          scale: _thinkPulseAnim,
+          child: RotationTransition(
+            turns: _thinkRotateCtl,
+            child: SvgPicture.asset('assets/cortex.svg', width: 26 * s, height: 26 * s, colorFilter: const ColorFilter.matrix([
+              -1, 0, 0, 0, 255,
+              0,-1, 0, 0, 255,
+              0, 0,-1, 0, 255,
+              0, 0, 0, 1, 0,
+            ])),
+          ),
+        ),
+        SizeTransition(
+          sizeFactor: _headerEntryAnim,
+          axis: Axis.horizontal,
+          axisAlignment: -1.0,
+          child: FadeTransition(
+            opacity: _headerEntryAnim,
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.error_outline,
-                        color: AppColors.septenaryColor, size: iconSize),
-                    SizedBox(width: screenWidth * 0.02),
-                    Expanded(
-                      child: Text(
-                        AppLocalizations.of(context)!.requestFailed,
-                        style: TextStyle(
-                            color: AppColors.septenaryColor,
-                            fontSize: dynamicFontSize),
-                      ),
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    AnimatedRotation(
-                      turns: _isExpanded ? 0.50 : 0.0,
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeOutQuad,
-                      child: SvgPicture.asset('assets/icons/arrov.svg',
-                          width: iconSize,
-                          height: iconSize,
-                          color: AppColors.septenaryColor),
-                    ),
-                  ],
-                ),
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOutQuad,
-                  alignment: Alignment.topCenter,
-                  child: _isExpanded
-                      ? ClipRect(
-                    child: AnimatedOpacity(
-                      opacity: _showText ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 200),
-                      child: SlideTransition(
-                        position: _slideAnimation,
-                        child: Padding(
-                          padding:
-                          EdgeInsets.only(top: screenWidth * 0.02),
-                          child: SelectableText(
-                            widget.text,
-                            style: TextStyle(
-                                color: AppColors.septenaryColor,
-                                fontSize: dynamicFontSize * 0.9),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
-                ),
+                SizedBox(width: 8 * s),
+                _buildAvatar(s * 0.7),
+                SizedBox(width: 6 * s),
+                Text("•", style: TextStyle(color: AppColors.primaryColor.inverted.withValues(alpha:0.5), fontSize: 14 * s, fontWeight: FontWeight.bold)),
+                SizedBox(width: 6 * s),
+                Text(_formatModelIdForDisplay(widget.modelId), style: TextStyle(color: AppColors.primaryColor.inverted.withValues(alpha:0.7), fontSize: 12 * s, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
               ],
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
-  Widget _avatar(double s) {
+  Widget _buildAvatar(double s) {
     final containerSize = 30 * s;
     final iconSize = 24 * s;
-    final fallbackWidget = Container(
-      width: containerSize,
-      height: containerSize,
-      decoration: BoxDecoration(
-        color: AppColors.secondaryColor,
-        borderRadius: BorderRadius.circular(15 * s),
-      ),
-      alignment: Alignment.center,
-      child: SvgPicture.asset(
-        'assets/icons/self.svg',
-        width: iconSize,
-        height: iconSize,
-        fit: BoxFit.contain,
-        colorFilter:
-        ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-      ),
-    );
+    final fallbackWidget = SvgPicture.asset('assets/icons/self.svg', width: iconSize, height: iconSize, fit: BoxFit.contain, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn));
     Widget imageWidget;
     if (widget.avatarPath.isEmpty || widget.avatarPath.endsWith('self.svg')) {
       imageWidget = fallbackWidget;
@@ -495,118 +431,128 @@ class _AIMessageTileState extends State<AIMessageTile>
       final isAsset = widget.avatarPath.startsWith('assets/');
       if (isSvg) {
         imageWidget = isAsset
-            ? SvgPicture.asset(widget.avatarPath,
-            width: iconSize,
-            height: iconSize,
-            fit: BoxFit.contain,
-            placeholderBuilder: (_) => fallbackWidget)
-            : SvgPicture.file(File(widget.avatarPath),
-            width: iconSize,
-            height: iconSize,
-            fit: BoxFit.contain,
-            placeholderBuilder: (_) => fallbackWidget);
+            ? SvgPicture.asset(widget.avatarPath, width: iconSize, height: iconSize, fit: BoxFit.contain, placeholderBuilder: (_) => fallbackWidget)
+            : SvgPicture.file(File(widget.avatarPath), width: iconSize, height: iconSize, fit: BoxFit.contain, placeholderBuilder: (_) => fallbackWidget);
       } else {
-        final imageProvider = isAsset
-            ? AssetImage(widget.avatarPath) as ImageProvider
-            : FileImage(File(widget.avatarPath));
-        imageWidget = Image(
-          image: imageProvider,
-          width: containerSize,
-          height: containerSize,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => fallbackWidget,
-        );
+        final imageProvider = isAsset ? AssetImage(widget.avatarPath) as ImageProvider : FileImage(File(widget.avatarPath));
+        imageWidget = Image(image: imageProvider, width: containerSize, height: containerSize, fit: BoxFit.cover, errorBuilder: (_, __, ___) => fallbackWidget);
       }
     }
     return Container(
-      width: containerSize,
-      height: containerSize,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: AppColors.secondaryColor,
-        borderRadius: BorderRadius.circular(15 * s),
-      ),
-      alignment: Alignment.center,
-      child: imageWidget,
+      padding: EdgeInsets.all(1.5 * s),
+      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: AppColors.primaryColor.inverted.withValues(alpha:0.2), width: 1.0)),
+      child: Container(width: containerSize, height: containerSize, clipBehavior: Clip.antiAlias, decoration: BoxDecoration(color: AppColors.secondaryColor, shape: BoxShape.circle), alignment: Alignment.center, child: imageWidget),
     );
   }
 
-  InlineSpan _applyOpacity(InlineSpan span, double op, double sigma) {
+  Widget _buildContent(double s) {
+    final baseStyle = TextStyle(fontSize: 16 * s, height: 1.35, color: AppColors.primaryColor.inverted);
+    if (!_textAnimCtl.isAnimating && _animatingText.isEmpty) {
+      if(widget.text.isEmpty) return const SizedBox.shrink();
+      return RichText(text: TextSpan(children: _getParsedSpans(widget.text), style: baseStyle));
+    }
+    return AnimatedBuilder(
+      animation: _textAnimCtl,
+      builder: (context, child) {
+        final animValue = _textAnimCtl.value;
+        final opacity = animValue.clamp(0.0, 1.0);
+        final sigma = (1.0 - opacity) * 2.0;
+        return RichText(
+          text: TextSpan(
+            style: baseStyle,
+            children: [
+              ..._getParsedSpans(_stableText),
+              if (_animatingText.isNotEmpty) ..._getParsedSpans(_animatingText).map((span) => _applyOpacityAndBlur(span, opacity, sigma)),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  List<InlineSpan> _getParsedSpans(String text) {
+    if (text.isEmpty) return [];
+    if (_parseCache.containsKey(text)) return _parseCache[text]!;
+    final spans = parseText(text);
+    if (text.length < 1000) _parseCache[text] = spans;
+    return spans;
+  }
+
+  InlineSpan _applyOpacityAndBlur(InlineSpan span, double opacity, double sigma) {
     if (span is TextSpan) {
-      final basePaint = Paint()
-        ..style = PaintingStyle.fill
-        ..color =
-        (span.style?.color ?? AppColors.primaryColor.inverted).withOpacity(op)
-        ..maskFilter =
-        sigma > 0 ? MaskFilter.blur(BlurStyle.normal, sigma) : null;
+      final baseColor = span.style?.color ?? AppColors.primaryColor.inverted;
+      final Paint foregroundPaint = Paint()..color = baseColor.withValues(alpha:opacity);
+      if (sigma > 0.1) foregroundPaint.maskFilter = MaskFilter.blur(BlurStyle.normal, sigma);
       return TextSpan(
         text: span.text,
-        children: span.children,
-        style: span.style?.copyWith(foreground: basePaint) ??
-            TextStyle(foreground: basePaint),
+        children: span.children?.map((child) => _applyOpacityAndBlur(child, opacity, sigma)).toList(),
+        style: span.style?.copyWith(foreground: foregroundPaint) ?? TextStyle(foreground: foregroundPaint),
       );
     } else if (span is WidgetSpan) {
-      return WidgetSpan(
-        alignment: span.alignment,
-        baseline: span.baseline,
-        child: Opacity(opacity: op, child: span.child),
-      );
+      return WidgetSpan(alignment: span.alignment, baseline: span.baseline, child: Opacity(opacity: opacity, child: span.child));
     }
     return span;
   }
 
-  Widget _content(BuildContext ctx, double s) {
-    final base = TextStyle(
-        fontSize: 16 * s, height: 1.35, color: AppColors.primaryColor.inverted);
-
-    if (_thinkNtf.value && _text.isEmpty && !widget.isError) {
-      return Shimmer.fromColors(
-        baseColor: base.color!,
-        highlightColor: AppColors.quaternaryColor,
-        child: Text(AppLocalizations.of(ctx)!.thinking,
-            style: base.copyWith(fontWeight: FontWeight.bold)),
-      );
-    }
-
-    List<InlineSpan> getParsedSpans(String text) {
-      if (_parseCache.containsKey(text)) {
-        return _parseCache[text]!;
-      }
-      final spans = parseText(text);
-      _parseCache[text] = spans;
-      return spans;
-    }
-
-    // When the animation is finished (value == 1.0) and the text is not empty,
-    // draw the entire text as a RichText. This is the most stable state.
-    if (_typeCtl.value == 1.0 && _text.isNotEmpty) {
-      return RichText(text: TextSpan(children: parseText(_text), style: base));
-    }
-
-    final tot = _typeCtl.duration?.inMilliseconds ?? 0;
-    final t = _typeCtl.value * tot;
-    final spans = <InlineSpan>[];
-
-    // The part of the text that has finished animating (`_staticCharCount`) is
-    // always drawn instantly and without animation.
-    if (_staticCharCount > 0) {
-      spans.addAll(getParsedSpans(_text.substring(0, _staticCharCount)));
-    }
-
-    // Only the current new part of the text (`_batches`) is animated.
-    for (var idx = 0; idx < _batches.length; idx++) {
-      final seg = _batches[idx];
-      final start = idx * _durPerBatch;
-      final end = start + _fadeDur;
-      final op = t < start ? 0.0 : (t >= end ? 1.0 : (t - start) / _fadeDur);
-      final sigma = 3 * (1 - op);
-
-      for (final span in getParsedSpans(seg)) {
-        spans.add(_applyOpacity(span, op, sigma));
-      }
-    }
-
-    if (spans.isEmpty) return const SizedBox.shrink();
-    return RichText(text: TextSpan(children: spans, style: base));
+  Widget _buildErrorWidget(BuildContext context, double scale) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final dynamicFontSize = screenWidth * 0.04;
+    final iconSize = screenWidth * 0.06;
+    return GestureDetector(
+      onTap: () => setState(() {
+        if (_isExpandedError) {
+          _errorSlideCtl.reverse().then((_) { if (mounted) setState(() { _isExpandedError = false; _showErrorText = false; }); });
+        } else {
+          _isExpandedError = true;
+          _errorSlideCtl.forward().whenComplete(() { if (mounted) setState(() => _showErrorText = true); });
+        }
+      }),
+      child: FadeTransition(
+        opacity: _errorFadeOutAnim,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+          child: Container(
+            decoration: BoxDecoration(color: AppColors.septenaryColor.withValues(alpha:0.3), borderRadius: BorderRadius.circular(screenWidth * 0.03), border: Border.all(color: AppColors.septenaryColor, width: 0.5)),
+            padding: EdgeInsets.all(screenWidth * 0.03),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.error_outline, color: AppColors.septenaryColor, size: iconSize),
+                    SizedBox(width: screenWidth * 0.02),
+                    Expanded(child: Text(AppLocalizations.of(context)!.requestFailed, style: TextStyle(color: AppColors.septenaryColor, fontSize: dynamicFontSize))),
+                    AnimatedRotation(
+                      turns: _isExpandedError ? 0.50 : 0.0,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeOutQuad,
+                      child: SvgPicture.asset('assets/icons/cortex.svg', width: iconSize, height: iconSize, colorFilter: ColorFilter.mode(AppColors.septenaryColor, BlendMode.srcIn)),
+                    ),
+                  ],
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutQuad,
+                  alignment: Alignment.topCenter,
+                  child: !_isExpandedError ? const SizedBox.shrink() : ClipRect(
+                    child: AnimatedOpacity(
+                      opacity: _showErrorText ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: SlideTransition(
+                        position: _errorSlideAnim,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: screenWidth * 0.02),
+                          child: SelectableText(widget.text, style: TextStyle(color: AppColors.septenaryColor, fontSize: dynamicFontSize * 0.9)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

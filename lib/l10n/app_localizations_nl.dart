@@ -2031,4 +2031,11 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Weet u zeker dat u dit geweldige platform wilt verlaten?';
+
+  @override
+  String get newsErrorTitle => 'Het laden van nieuws is mislukt';
+
+  @override
+  String get newsErrorMessage =>
+      'Er is een probleem opgetreden bij het ophalen van de nieuwste updates. Controleer uw verbinding en probeer het opnieuw.';
 }

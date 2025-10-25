@@ -771,5 +771,7 @@
   "channelGreetingsName": "Saludos diarios",
   "channelGreetingsDescription": "Los mensajes como buenos días y buenas noches.",
   "exitAppTitle": "¿Te vas tan pronto?",
-  "exitAppConfirmation": "¿Estás seguro de que deseas abandonar esta increíble plataforma?"
+  "exitAppConfirmation": "¿Estás seguro de que deseas abandonar esta increíble plataforma?",
+  "newsErrorTitle": "No se pudieron cargar las noticias",
+  "newsErrorMessage": "Hubo un problema al obtener las últimas actualizaciones, verifique su conexión y vuelva a intentarlo."
 }

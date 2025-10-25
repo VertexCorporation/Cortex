@@ -2,55 +2,62 @@
 //
 // The primary entry point for the Cortex application. This file is responsible for
 // setting up essential services, providers, and launching the core application structure.
-// The startup logic is designed to be extremely fast, delegating heavy lifting to
-// a dedicated service after the initial UI is rendered.
+// It performs minimal, fast setup and delegates all UI rendering to 'app.dart'.
 
-import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
+import 'package:cortex/app.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:cortex/login/login.dart';
-import 'package:cortex/login/verify.dart';
 import 'package:cortex/server/credits.dart';
+import 'package:cortex/server/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:upgrader/upgrader.dart';
-import 'chat/chat.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'banner.dart';
+import 'chat/providers/conversation.dart';
+import 'chat/providers/input.dart';
+import 'chat/providers/session.dart';
 import 'chat/screen/unselected/news.dart';
-import 'conversations/inbox.dart';
-import 'conversations/manager.dart';
-import 'darkener.dart';
-import 'errorview.dart';
+import 'chat/services/api.dart';
+import 'chat/services/context.dart';
+import 'chat/services/database.dart';
+import 'chat/services/load.dart';
+import 'chat/services/offline.dart';
+import 'chat/services/read.dart';
+import 'chat/services/recent.dart';
+import 'chat/services/regenerate.dart';
+import 'chat/services/response.dart';
+import 'chat/services/scroll.dart';
+import 'chat/services/select.dart';
+import 'chat/services/send.dart';
+import 'chat/services/stop.dart';
+import 'chat/screen/selected/dynamic.dart';
 import 'initialization.dart';
 import 'internet.dart';
 import 'language.dart';
 import 'models/backend/download.dart';
-import 'models/screen/models.dart';
 import 'notifications.dart';
 import 'theme.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
 
 // Global keys for accessing specific widget states across the application.
+// These are defined here to be passed down to the UI layer.
 final GlobalKey<MainScreenState> mainScreenKey = GlobalKey<MainScreenState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-/// Entry point for the Flutter Downloader background isolate.
+/// A top-level function for the Flutter Downloader background isolate.
 @pragma('vm:entry-point')
 void downloadCallback(String id, int status, int progress) {
   final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
   send?.send([id, status, progress]);
 }
 
-/// Manages the selected tab index for the bottom navigation bar.
+/// A simple state manager for the selected tab index of the bottom navigation bar.
 class TabProvider with ChangeNotifier {
   int _selectedIndex = 0;
   int get selectedIndex => _selectedIndex;
@@ -64,50 +71,62 @@ class TabProvider with ChangeNotifier {
 }
 
 /// The main entry point of the application.
-/// It now performs a rapid, synchronous check for a cached user session
-/// to prevent a UI flash on startup. Heavy async operations are still
-/// delegated to the AppInitializer service.
+/// It performs a rapid, synchronous check for a cached user session,
+/// sets up all necessary background services and providers, and then
+/// launches the UI defined in `app.dart`.
 Future<void> main() async {
   debugPrint("App: Starting application setup.");
   tz.initializeTimeZones();
 
-  WidgetsFlutterBinding.ensureInitialized();
+  final binding = WidgetsFlutterBinding.ensureInitialized();
 
-  // Initializing Firebase here is essential to safely check for a current user
-  // and to set up the background message handler before the app runs.
+  // Initialize Firebase, essential for auth checks and background messaging.
   await Firebase.initializeApp();
 
+  // Configure global error handlers to report to Crashlytics.
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   PlatformDispatcher.instance.onError = (error, stack) {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
 
-  // Point to the new, centralized background handler in notifications.dart
+  // Set up the background message handler.
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-  // This is a very fast, synchronous check of the locally cached user token.
-  // It does NOT involve a network request.
+  // Perform a fast, synchronous check of the locally cached user token.
+  // This does NOT involve a network request and prevents UI flash.
   final initialUser = FirebaseAuth.instance.currentUser;
   final initialStatus = initialUser == null
       ? AppStatus.needsLogin
       : AppStatus.initializing;
   debugPrint("App: Pre-runApp check complete. Initial status: $initialStatus");
 
+  // Enforce portrait orientation.
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
+  // Load saved theme preference before the UI builds.
   final prefs = await SharedPreferences.getInstance();
   final savedTheme = prefs.getString('selectedTheme');
-  final initialTheme = savedTheme ?? (WidgetsBinding.instance.window.platformBrightness == Brightness.dark ? 'dark' : 'light');
+  final initialTheme = savedTheme ?? (PlatformDispatcher.instance.platformBrightness == Brightness.dark ? 'dark' : 'light');
   debugPrint("App: Using theme: $initialTheme");
 
+  // Pre-load localizations to avoid any flicker.
+  await AppLocalizations.delegate.load(
+    binding.platformDispatcher.locale,
+  );
+
+  // Launch the application by providing the providers and running the Cortex widget.
   runApp(
     MultiProvider(
       providers: [
+        //======================================================================
+        // SECTION 1: CORE & APP-WIDE PROVIDERS
+        //======================================================================
         ChangeNotifierProvider(create: (_) => InternetProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
         Provider<NotificationService>(create: (_) => NotificationService(navigatorKey: navigatorKey)),
         Provider<CreditsManager>.value(value: CreditsManager.instance),
         ChangeNotifierProvider(create: (_) => AppInitializer(initialStatus)),
@@ -117,628 +136,62 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => DownloadedModelsManager()),
         ChangeNotifierProvider(create: (_) => TabProvider()),
+        Provider<RecentModelsManager>(create: (_) => RecentModelsManager()),
+        Provider<DbHelper>(create: (_) => DbHelper()),
+        Provider<BannerService>(create: (_) => BannerService()),
+
+        //======================================================================
+        // SECTION 2: CHAT FEATURE PROVIDERS (STATE & SERVICES)
+        //======================================================================
+
+        // State Providers
+        ChangeNotifierProxyProvider<UserProvider, ChatSessionProvider>(
+          create: (_) => ChatSessionProvider(),
+          update: (_, userProvider, previousSessionProvider) {
+            if (userProvider.userData != null) {
+              previousSessionProvider!.updateUserData(userProvider.userData!);
+            }
+            return previousSessionProvider!;
+          },
+        ),
+        ChangeNotifierProvider(create: (_) => ConversationProvider()),
+        ChangeNotifierProvider(create: (_) => InputProvider()),
+
+        // Foundational Services
+        Provider<ScrollService>(create: (_) => ScrollService()),
+        Provider<ApiService>(create: (_) => ApiService()),
+        Provider<DynamicChatService>(create: (context) => DynamicChatService(context.read<ChatSessionProvider>())),
+
+        // Services with Dependencies
+        Provider<ResponseService>(create: (context) => ResponseService(conversationProvider: context.read<ConversationProvider>(), scrollService: context.read<ScrollService>())),
+        Provider<OfflineService>(create: (context) => OfflineService(responseService: context.read<ResponseService>(), sessionProvider: context.read<ChatSessionProvider>())),
+        Provider<SelectionService>(create: (context) => SelectionService(sessionProvider: context.read<ChatSessionProvider>(), conversationProvider: context.read<ConversationProvider>())),
+        Provider<ContextService>(create: (context) => ContextService(sessionProvider: context.read<ChatSessionProvider>(), conversationProvider: context.read<ConversationProvider>())),
+        Provider<LoadService>(create: (context) => LoadService(sessionProvider: context.read<ChatSessionProvider>(), selectionService: context.read<SelectionService>())),
+        Provider<ReadService>(create: (context) => ReadService(sessionProvider: context.read<ChatSessionProvider>(), conversationProvider: context.read<ConversationProvider>(), loadService: context.read<LoadService>())),
+        Provider<SendService>(create: (context) => SendService(sessionProvider: context.read<ChatSessionProvider>(), conversationProvider: context.read<ConversationProvider>(), inputProvider: context.read<InputProvider>(), apiService: context.read<ApiService>(), contextService: context.read<ContextService>(), scrollService: context.read<ScrollService>(), recentModelsManager: context.read<RecentModelsManager>(), offlineService: context.read<OfflineService>())),
+        Provider<StopService>(create: (context) => StopService(
+            conversationProvider: context.read<ConversationProvider>(),
+            sessionProvider: context.read<ChatSessionProvider>(),
+            apiService: context.read<ApiService>(),
+            offlineService: context.read<OfflineService>()
+        )),
+        Provider<RegenerateService>(
+          create: (context) => RegenerateService(
+            conversationProvider: context.read<ConversationProvider>(),
+            stopService: context.read<StopService>(),
+            sendService: context.read<SendService>(),
+            scrollService: context.read<ScrollService>(),
+          ),
+          lazy: true,
+        ),
       ],
+      // The root widget of the application is now Cortex from app.dart
       child: Cortex(
         navigatorKey: navigatorKey,
         startupScreen: const AppLifecycleManager(),
       ),
     ),
   );
-  debugPrint("App: Minimal setup complete. Heavy lifting delegated to AppInitializer service.");
-}
-
-/// A new widget that acts as the main router for the application's lifecycle.
-/// It listens to the `AppInitializer` service and displays the appropriate screen
-/// based on the current application state (e.g., initializing, logged in, needs login).
-/// This eliminates the need for a separate loading screen.
-class AppLifecycleManager extends StatefulWidget {
-  const AppLifecycleManager({super.key});
-
-  @override
-  State<AppLifecycleManager> createState() => _AppLifecycleManagerState();
-}
-
-class _AppLifecycleManagerState extends State<AppLifecycleManager> with WidgetsBindingObserver {
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AppInitializer>(context, listen: false).initialize();
-    });
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-
-    context.read<NotificationService>().handleAppLifecycleStateChange(state);
-    debugPrint("IGNITION HAS BEEN TURNED! New State: $state");
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // We consume the AppInitializer to react to state changes.
-    return Consumer<AppInitializer>(
-      builder: (context, initializer, child) {
-        final status = initializer.status;
-        debugPrint("AppLifecycleManager: Rebuilding with AppStatus: $status");
-
-        // The switch statement determines which high-level screen to display.
-        switch (status) {
-          case AppStatus.needsLogin:
-            return const LoginScreen();
-
-          case AppStatus.needsVerification:
-          // Safely access user data passed by the initializer.
-            final verificationData = initializer.verificationScreenData;
-            if (verificationData != null) {
-              return EmailVerificationScreen(
-                email: verificationData['email'],
-                username: verificationData['username'],
-                userId: verificationData['userId'],
-                password: '', // Password should never be passed to the UI.
-              );
-            }
-            // Fallback if data is unexpectedly null.
-            return const LoginScreen();
-
-          case AppStatus.maintenance:
-            return const MaintenanceScreen();
-
-          case AppStatus.updateRequired:
-          // The Upgrader widget will handle showing the mandatory update dialog.
-          // It wraps a minimal Scaffold to provide a basic background.
-            return UpgradeAlert(
-              upgrader: initializer.upgrader,
-              barrierDismissible: false,
-              showIgnore: false,
-              showLater: false,
-              child: const Scaffold(body: Center(child: Text("Checking for updates..."))),
-            );
-
-          case AppStatus.initializing:
-          case AppStatus.ready:
-          // For both 'initializing' and 'ready' states, we show the MainScreen.
-          // This is the key to the "no extra loading animation" approach.
-          // The MainScreen and its children are responsible for displaying their
-          // own content, or a skeleton/empty state while their specific data is loading.
-            return MainScreen(key: mainScreenKey);
-        }
-      },
-    );
-  }
-}
-
-
-/// The main application widget that sets up MaterialApp.
-class Cortex extends StatelessWidget {
-  const Cortex({super.key, required this.navigatorKey, this.startupScreen});
-
-  final GlobalKey<NavigatorState> navigatorKey;
-  final Widget? startupScreen;
-
-  ThemeData _buildTheme(String currentTheme) {
-    final bool isDark = currentTheme == 'dark';
-    final baseTheme = isDark ? ThemeData.dark() : ThemeData.light();
-    return baseTheme.copyWith(
-      primaryColor: AppColors.background,
-      scaffoldBackgroundColor: AppColors.background,
-      colorScheme: baseTheme.colorScheme.copyWith(
-          primary: AppColors.primaryColor.inverted,
-          onPrimary: AppColors.primaryColor,
-          secondary: AppColors.border,
-          onSecondary: AppColors.quaternaryColor,
-          surface: AppColors.background,
-          onSurface: AppColors.border,
-          error: AppColors.septenaryColor),
-      textSelectionTheme: TextSelectionThemeData(
-          cursorColor: AppColors.primaryColor.inverted,
-          selectionColor: AppColors.quaternaryColor),
-      inputDecorationTheme: InputDecorationTheme(
-          focusColor: AppColors.primaryColor.inverted,
-          hintStyle: TextStyle(color: AppColors.tertiaryColor),
-          labelStyle: TextStyle(color: AppColors.tertiaryColor)),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final localeProvider = Provider.of<LocaleProvider>(context);
-
-    return MaterialApp(
-      navigatorKey: navigatorKey,
-      theme: _buildTheme(themeProvider.currentTheme),
-      builder: (context, child) {
-        themeProvider.updateSystemUIOverlayStyle();
-        return child!;
-      },
-      locale: localeProvider.locale,
-      supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      localeResolutionCallback: (locale, supportedLocales) {
-        // Your existing locale resolution logic is sound.
-        final chosenLocale = localeProvider.locale;
-        if (kUnsupportedMaterialLocales.contains(chosenLocale.languageCode)) {
-          return const Locale('en');
-        }
-        return chosenLocale;
-      },
-      home: startupScreen,
-    );
-  }
-}
-
-/// A screen to display during server maintenance.
-class MaintenanceScreen extends StatelessWidget {
-  const MaintenanceScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final appLocalizations = AppLocalizations.of(context)!;
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: ErrorView(
-        title: appLocalizations.maintenanceTitle,
-        message: appLocalizations.maintenanceMessage,
-      ),
-    );
-  }
-}
-
-/// The main screen containing the bottom navigation and primary app views.
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
-
-  @override
-  MainScreenState createState() => MainScreenState();
-}
-
-class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
-  final GlobalKey<ChatScreenState> chatScreenKey = GlobalKey<ChatScreenState>();
-  final GlobalKey<MenuScreenState> menuScreenKey = GlobalKey<MenuScreenState>();
-
-  bool hideBottomAppBar = false;
-  bool _showOfflinePulse = false;
-
-  @override
-  void initState() {
-    super.initState();
-    debugPrint("MainScreen: Initializing state.");
-  }
-
-  // Now informs the ChatScreen when its tab is tapped.
-  void onItemTapped(int index, {bool pulseOffline = false}) {
-    // If the user is tapping on the Chat tab (index 0),
-    // we notify the ChatScreenState to re-evaluate its status.
-    if (index == 0) {
-      chatScreenKey.currentState?.onReactivated();
-    }
-
-    if (mounted && index == 1 && pulseOffline) {
-      setState(() {
-        _showOfflinePulse = true;
-      });
-    }
-    Provider.of<TabProvider>(context, listen: false).setSelectedIndex(index);
-  }
-
-  // MODIFIED: This is now the single source of truth for visibility.
-  void updateBottomAppBarVisibility([bool value = false]) {
-    if (hideBottomAppBar == value) return;
-    setState(() {
-      hideBottomAppBar = value;
-    });
-    Provider.of<ThemeProvider>(context, listen: false).updateSystemUIOverlayStyle();
-  }
-
-  void openConversation(ConversationManager manager) {
-    Provider.of<TabProvider>(context, listen: false).setSelectedIndex(0);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      chatScreenKey.currentState?.readService.loadConversation(manager);
-      // Let the ChatScreen decide the visibility. It's usually true here.
-      // updateBottomAppBarVisibility(true);
-    });
-  }
-
-  // MODIFIED: This method now correctly defers visibility logic to the ChatScreen.
-  void startNewConversation({bool isDynamic = false}) {
-    Provider.of<TabProvider>(context, listen: false).setSelectedIndex(0);
-    if (isDynamic) {
-      chatScreenKey.currentState?.resetAndStartDynamicConversation();
-    } else {
-      chatScreenKey.currentState?.resetConversation();
-    }
-    // The visibility will be handled by the methods called above,
-    // so we remove the direct call from here.
-    // updateBottomAppBarVisibility(false);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final tabProvider = Provider.of<TabProvider>(context);
-    final appLocalizations = AppLocalizations.of(context)!;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    final List<Widget> screens = [
-      ChatScreen(
-        key: chatScreenKey,
-        onModelSelectionChanged: (isSelected) {
-          updateBottomAppBarVisibility(isSelected);
-        },
-      ),
-      ModelsScreen(
-        key: const ValueKey('Models'),
-        showOfflineModelsPulse: _showOfflinePulse,
-      ),
-      MenuScreen(key: menuScreenKey),
-    ];
-
-    if (_showOfflinePulse) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          setState(() {
-            _showOfflinePulse = false;
-          });
-        }
-      });
-    }
-
-    SystemChrome.setApplicationSwitcherDescription(
-      ApplicationSwitcherDescription(
-        label: 'Cortex',
-        primaryColor: AppColors.background.value,
-      ),
-    );
-
-    final bottomBarHeight = screenHeight * 0.09;
-    final iconBaseSize = screenHeight * 0.028;
-    final libraryIconSize = screenHeight * 0.022;
-    final iconContainerSize = iconBaseSize * 1.2;
-    final labelSpacing = screenHeight * 0.002;
-    final shadowBlurRadius = screenWidth * 0.02;
-    final borderRadius = screenWidth * 0.04;
-
-    final bool shouldHideBottomAppBar = hideBottomAppBar;
-
-    return PopScope(
-      // We set canPop to false because we want to manually control ALL back navigation logic.
-      canPop: false,
-      // DEPRECATION FIX: Replaced the deprecated `onPopInvoked` with `onPopInvokedWithResult`.
-      // The `result` parameter is not needed for our logic, so it's ignored with `_`.
-      onPopInvokedWithResult: (bool didPop, dynamic _) async {
-        // If the pop was successful already (e.g., if canPop was true), do nothing.
-        if (didPop) {
-          return;
-        }
-
-        // PRIORITY 0: Check if the keyboard is open.
-        final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
-        if (isKeyboardVisible) {
-          FocusScope.of(context).unfocus();
-          return; // Consume the pop event to close the keyboard.
-        }
-
-        // Access the current state of the ChatScreen.
-        final chatState = chatScreenKey.currentState;
-
-        // Fallback if ChatScreen state is not available.
-        if (chatState == null) {
-          await showExitConfirmationDialog(context);
-          return;
-        }
-
-        // Get the current navigation mode from the ChatScreen's notifier.
-        final currentMode = chatState.appBarModeNotifier.value;
-
-        // PRIORITY 1: Handle closing the "Explore All Models" panel gracefully.
-        // If the panel is open, we call its dismiss method, which triggers its
-        // closing animation, and then we consume the back press event.
-        if (currentMode == AppBarMode.inSelection) {
-          chatState.selectionScreenKey.currentState?.showSelectionView();
-          return;
-        }
-
-        // PRIORITY 2: Ask ChatScreen if it can handle the pop by closing another panel (like extensions).
-        if (!chatState.handleSystemBackPress()) {
-          // handleSystemBackPress returns 'false' if it closed a panel.
-          // The event is handled, so we do nothing more.
-          return;
-        }
-
-        // PRIORITY 3: Handle exiting an active chat session.
-        if (currentMode == AppBarMode.modelSelected || currentMode == AppBarMode.dynamicChat) {
-          await chatState.handleExit();
-          return;
-        }
-
-        // FINAL FALLBACK: If on the main screen, show exit confirmation.
-        await showExitConfirmationDialog(context);
-      },
-      child: Scaffold(
-        body: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          transitionBuilder: (Widget child, Animation<double> animation) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          child: screens[tabProvider.selectedIndex],
-        ),
-        bottomNavigationBar: shouldHideBottomAppBar
-            ? null
-            : Consumer<ThemeProvider>(
-          builder: (context, themeProvider, child) {
-            return Container(
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(borderRadius),
-                  topRight: Radius.circular(borderRadius),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
-                    blurRadius: shadowBlurRadius,
-                    offset: Offset(0, -screenHeight * 0.0025),
-                  ),
-                ],
-              ),
-              child: BottomAppBar(
-                color: Colors.transparent,
-                elevation: 0,
-                child: SizedBox(
-                  height: bottomBarHeight,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      BottomNavigationButton(
-                        iconPath: 'assets/icons/inbox.svg',
-                        label: appLocalizations.chats,
-                        isSelected: tabProvider.selectedIndex == 2,
-                        onTap: () => onItemTapped(2),
-                        baseSize: iconBaseSize,
-                        containerSize: iconContainerSize,
-                        labelSpacing: labelSpacing,
-                      ),
-                      BottomNavigationButton(
-                        iconPath: 'assets/icons/chat.svg',
-                        label: appLocalizations.chat,
-                        isSelected: tabProvider.selectedIndex == 0,
-                        onTap: () => onItemTapped(0),
-                        baseSize: iconBaseSize,
-                        containerSize: iconContainerSize,
-                        labelSpacing: labelSpacing,
-                      ),
-                      BottomNavigationButton(
-                        iconPath: 'assets/icons/library.svg',
-                        label: appLocalizations.library,
-                        isSelected: tabProvider.selectedIndex == 1,
-                        onTap: () => onItemTapped(1),
-                        baseSize: libraryIconSize,
-                        containerSize: libraryIconSize * 1.2,
-                        labelSpacing: labelSpacing,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-/// A reusable, animated button for the bottom navigation bar.
-class BottomNavigationButton extends StatelessWidget {
-  final String iconPath;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-  final double baseSize, containerSize, labelSpacing;
-
-  const BottomNavigationButton({
-    super.key,
-    required this.iconPath,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-    this.baseSize = 20.0,
-    this.containerSize = 24.0,
-    this.labelSpacing = 2.0,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final Color iconColor = isSelected ? AppColors.primaryColor.inverted : AppColors.tertiaryColor;
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: containerSize,
-              height: containerSize,
-              child: Center(
-                child: AnimatedScale(
-                  scale: isSelected ? 1.2 : 1.0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  child: SvgPicture.asset(iconPath,
-                      width: baseSize, height: baseSize, color: iconColor),
-                ),
-              ),
-            ),
-            SizedBox(height: labelSpacing),
-            AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 200),
-              style: GoogleFonts.roboto(
-                  fontSize: baseSize * 0.5,
-                  color: iconColor,
-                  fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal),
-              child: AnimatedScale(
-                scale: isSelected ? 1.1 : 1.0,
-                duration: const Duration(milliseconds: 200),
-                child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Helper extension to make color inversion cleaner.
-extension InvertedColor on Color {
-  Color get inverted => Color.fromARGB(alpha, 255 - red, 255 - green, 255 - blue);
-}
-
-// List of locales with incomplete Material translations.
-const List<String> kUnsupportedMaterialLocales = ['ku'];
-
-/// Displays a centralized dialog to confirm if the user wants to exit the app.
-///
-/// If the user confirms by tapping "Yes", the application is closed via `SystemNavigator.pop()`.
-/// If the user cancels, the dialog is dismissed.
-/// Returns `true` if the app is intended to close, `false` otherwise.
-Future<bool> showExitConfirmationDialog(BuildContext context) async {
-  final appLocalizations = AppLocalizations.of(context)!;
-  final restoreNavBar = Darkener.darken();
-
-  final result = await showGeneralDialog<bool>(
-    context: context,
-    barrierDismissible: true,
-    barrierLabel: 'ExitConfirmation',
-    transitionDuration: const Duration(milliseconds: 150),
-    pageBuilder: (ctx, animation, secondaryAnimation) {
-      return Center(
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            width: MediaQuery.of(ctx).size.width * 0.8,
-            decoration: BoxDecoration(
-              color: AppColors.secondaryColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        Text(
-                          appLocalizations.exitAppTitle,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryColor.inverted,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                        Text(
-                          appLocalizations.exitAppConfirmation,
-                          style: TextStyle(
-                            color: AppColors.primaryColor.inverted.withOpacity(0.4),
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(color: AppColors.border, thickness: 0.5, height: 1),
-                  IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        // "No" Button (Blue - encourages staying)
-                        Expanded(
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              splashColor: AppColors.senaryColor.withValues(alpha: 0.1),
-                              highlightColor: AppColors.senaryColor.withValues(alpha: 0.1),
-                              onTap: () => Navigator.of(ctx).pop(false), // Return false on cancel
-                              child: Container(
-                                alignment: Alignment.center,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                child: Text(
-                                  appLocalizations.no,
-                                  style: TextStyle(
-                                    color: AppColors.senaryColor, // Blue color
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        VerticalDivider(width: 1, thickness: 0.5, color: AppColors.border),
-                        // "Yes" Button (Red - exit action)
-                        Expanded(
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              splashColor: AppColors.septenaryColor.withValues(alpha: 0.1),
-                              highlightColor: AppColors.septenaryColor.withValues(alpha: 0.1),
-                              onTap: () => Navigator.of(ctx).pop(true), // Return true on confirm
-                              child: Container(
-                                alignment: Alignment.center,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                child: Text(
-                                  appLocalizations.yes,
-                                  style: TextStyle(
-                                    color: AppColors.septenaryColor, // Red color
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    },
-    transitionBuilder: (context, animation, secondaryAnimation, child) {
-      return FadeTransition(opacity: animation, child: child);
-    },
-  ).whenComplete(() {
-    restoreNavBar();
-  });
-
-  // If the user tapped "Yes", the result will be true.
-  if (result == true) {
-    SystemNavigator.pop();
-    return true; // The app will close.
-  }
-
-  return false; // The user chose to stay.
+  debugPrint("App: Minimal setup complete. UI rendering and heavy lifting delegated.");
 }

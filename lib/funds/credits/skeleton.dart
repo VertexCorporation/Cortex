@@ -6,7 +6,7 @@ import '../../theme.dart';
 
 /// A fixed, reusable skeleton loader—no constructor params needed.
 class SkeletonLoader extends StatelessWidget {
-  const SkeletonLoader({Key? key}) : super(key: key);
+  const SkeletonLoader({super.key});
 
   @override
   Widget build(BuildContext context) {

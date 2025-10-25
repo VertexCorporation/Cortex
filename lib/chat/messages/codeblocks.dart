@@ -41,7 +41,7 @@ const oneDarkProTheme = {
 class CodeBlockWidget extends StatefulWidget {
   final String code;
 
-  const CodeBlockWidget({Key? key, required this.code}) : super(key: key);
+  const CodeBlockWidget({super.key, required this.code});
 
   @override
   State<CodeBlockWidget> createState() => _CodeBlockWidgetState();
@@ -104,7 +104,7 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.7),
+              color: Colors.black.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(

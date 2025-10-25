@@ -2038,4 +2038,11 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Möchten Sie diese tolle Plattform wirklich verlassen?';
+
+  @override
+  String get newsErrorTitle => 'Nachrichten konnten nicht geladen werden';
+
+  @override
+  String get newsErrorMessage =>
+      'Beim Abrufen der neuesten Updates ist ein Problem aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.';
 }

@@ -771,5 +771,7 @@
   "channelGreetingsName": "每日问候",
   "channelGreetingsDescription": "诸如早上好和晚安之类的信息。",
   "exitAppTitle": "这么快就走？",
-  "exitAppConfirmation": "您确定要离开这个令人惊叹的平台吗？"
+  "exitAppConfirmation": "您确定要离开这个令人惊叹的平台吗？",
+  "newsErrorTitle": "新闻加载失败",
+  "newsErrorMessage": "获取最新更新时出现问题，请检查您的连接并重试。"
 }

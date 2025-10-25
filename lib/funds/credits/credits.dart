@@ -2,7 +2,7 @@
 // This version isolates the scroll fog logic into a dedicated StatefulWidget (_ScrollableListWithFog)
 // to prevent entire widget rebuilds on scroll, fixing the Sliver assertion crash and improving performance.
 
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -29,11 +29,11 @@ class CreditContentWidget extends StatefulWidget {
   final ScrollController? scrollController;
 
   const CreditContentWidget({
-    Key? key,
+    super.key,
     this.onCreditPackageSelected,
     required this.availableProducts,
     this.scrollController,
-  }) : super(key: key);
+  });
 
   @override
   State<CreditContentWidget> createState() => _CreditContentWidgetState();
@@ -285,7 +285,7 @@ class _ScrollableListWithFogState extends State<_ScrollableListWithFog> with Sin
               ),
               child: Row(
                 children: [
-                  SvgPicture.asset('assets/icons/credit.svg', width: iconSize, height: iconSize, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn)),
+                  SvgPicture.asset('assets/icons/credit.svg', width: iconSize, height: iconSize, color: AppColors.primaryColor.inverted),
                   SizedBox(width: spacingBetweenIconAndText),
                   Expanded(
                     child: Column(
@@ -319,7 +319,7 @@ class _ScrollableListWithFogState extends State<_ScrollableListWithFog> with Sin
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 begin: Alignment.centerLeft, end: Alignment.centerRight,
-                                colors: [ AppColors.secondaryColor.withOpacity(0.0), AppColors.secondaryColor.withOpacity(0.5), AppColors.secondaryColor.withOpacity(0.0)],
+                                colors: [ AppColors.secondaryColor.withValues(alpha: 0.0), AppColors.secondaryColor.withValues(alpha: 0.5), AppColors.secondaryColor.withValues(alpha: 0.0)],
                                 stops: const [0.4, 0.5, 0.6],
                               ),
                             ),
@@ -344,7 +344,7 @@ class _ScrollableListWithFogState extends State<_ScrollableListWithFog> with Sin
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter, end: Alignment.topCenter,
-                    colors: [AppColors.background.withOpacity(0.0), AppColors.background],
+                    colors: [AppColors.background.withValues(alpha: 0.0), AppColors.background],
                     stops: const [0.0, 0.9],
                   ),
                 ),
@@ -363,7 +363,7 @@ class _ScrollableListWithFogState extends State<_ScrollableListWithFog> with Sin
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                    colors: [AppColors.background.withOpacity(0.0), AppColors.background],
+                    colors: [AppColors.background.withValues(alpha: 0.0), AppColors.background],
                     stops: const [0.0, 0.9],
                   ),
                 ),

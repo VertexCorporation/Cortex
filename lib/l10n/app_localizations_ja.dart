@@ -1948,4 +1948,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get exitAppConfirmation => '本当にこの素晴らしいプラットフォームを終了してもよろしいですか？';
+
+  @override
+  String get newsErrorTitle => 'ニュースの読み込みに失敗しました';
+
+  @override
+  String get newsErrorMessage => '最新のアップデートの取得中に問題が発生しました。接続を確認してもう一度お試しください。';
 }

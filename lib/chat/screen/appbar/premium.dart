@@ -1,8 +1,7 @@
-import 'dart:math';
-import 'dart:ui';
+// chat/screen/premium.dart
 
-import 'package:cortex/main.dart';
-import 'package:flutter/cupertino.dart';
+import 'dart:math';
+import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -17,10 +16,10 @@ class PremiumModelBanner extends StatefulWidget {
   final VoidCallback onTap;
 
   const PremiumModelBanner({
-    Key? key,
+    super.key,
     required this.isVisible,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   State<PremiumModelBanner> createState() => PremiumModelBannerState();
@@ -153,8 +152,8 @@ class PremiumModelBannerState extends State<PremiumModelBanner>
                   child: InkWell(
                     onTap: widget.onTap,
                     borderRadius: BorderRadius.circular(borderRadius * 0.8),
-                    splashColor: AppColors.primaryColor.withOpacity(0.1),
-                    highlightColor: AppColors.primaryColor.withOpacity(0.05),
+                    splashColor: AppColors.primaryColor.withValues(alpha: 0.1),
+                    highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         maxHeight: maxBannerHeight,
@@ -200,7 +199,7 @@ class PremiumModelBannerState extends State<PremiumModelBanner>
                                       style: TextStyle(
                                         fontSize: descriptionFontSize,
                                         color: AppColors.primaryColor.inverted
-                                            .withOpacity(0.8),
+                                            .withValues(alpha: 0.8),
                                       ),
                                       softWrap: true,
                                     ),

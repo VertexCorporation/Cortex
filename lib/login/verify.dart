@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cortex/app.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -22,12 +23,12 @@ class EmailVerificationScreen extends StatefulWidget {
   final String password;
 
   const EmailVerificationScreen({
-    Key? key,
+    super.key,
     required this.email,
     required this.username,
     required this.userId,
     required this.password,
-  }) : super(key: key);
+  });
 
   @override
   State<EmailVerificationScreen> createState() => _EmailVerificationScreenState();
@@ -61,7 +62,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     if (!mounted) return;
 
     setState(() => _isContinuing = true);
-    _cancelTimers(); // Diğer zamanlayıcıları durdur
+    _cancelTimers();
 
     try {
       dev.log('[Continue] User chose to continue without verification. Navigating to MainScreen.', name: 'EmailVerification');
@@ -96,21 +97,65 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   }
 
   void _startTimers() {
+    // Ensure any existing timers are cancelled before starting new ones to prevent duplicates.
+    _countdownTimer?.cancel();
+    _emailCheckTimer?.cancel();
+
+    // This timer is for the UI countdown display. It doesn't make network calls.
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingSeconds > 0) {
         if (mounted) {
           setState(() => _remainingSeconds--);
         }
       } else {
-        timer.cancel();
+        timer.cancel(); // Stop the countdown when it reaches zero.
       }
     });
+
+    // This timer periodically checks if the user's email has been verified.
+    // This is where the network call happens and where the error must be handled.
     _emailCheckTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
-      await FirebaseAuth.instance.currentUser?.reload();
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null && user.emailVerified) {
-        _handleVerified();
-        timer.cancel();
+      // THE FIX IS IMPLEMENTED HERE:
+      // We wrap the entire network-dependent logic in a try-catch block
+      // to gracefully handle potential network failures without crashing the app.
+      try {
+        final user = FirebaseAuth.instance.currentUser;
+
+        // Safety check: If for some reason the user is no longer signed in,
+        // stop the timer to prevent further errors.
+        if (user == null) {
+          dev.log('[EmailVerification] User is null, stopping verification check.', name: 'EmailVerification');
+          timer.cancel();
+          return;
+        }
+
+        // This is the network request that was causing the crash.
+        // It fetches the latest user data from Firebase servers.
+        await user.reload();
+
+        // After reload(), we need to get the updated user object instance.
+        final freshUser = FirebaseAuth.instance.currentUser;
+
+        // Check the verification status on the fresh user object.
+        if (freshUser != null && freshUser.emailVerified) {
+          dev.log('[EmailVerification] Email has been successfully verified for ${freshUser.email}.', name: 'EmailVerification');
+          _handleVerified(); // Trigger navigation to the main app
+          timer.cancel();      // Stop this timer as its job is done.
+        }
+      } on FirebaseAuthException catch (e) {
+        // This block specifically catches Firebase-related exceptions.
+        if (e.code == 'network-request-failed') {
+          // This is the expected error when the device is offline.
+          // We log it for debugging but do not crash the app. The timer will simply try again.
+          dev.log('[EmailVerification] Network request failed while checking email status. Will retry.', name: 'EmailVerification');
+        } else {
+          // Log other potential Firebase errors (e.g., 'user-token-expired') for diagnostics.
+          dev.log('[EmailVerification] A Firebase error occurred during verification check: ${e.code}', name: 'EmailVerification', error: e);
+        }
+      } catch (e) {
+        // This is a general catch-all for any other unexpected errors,
+        // ensuring the application remains stable under all circumstances.
+        dev.log('[EmailVerification] A generic error occurred during verification check.', name: 'EmailVerification', error: e);
       }
     });
   }
@@ -267,7 +312,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                             width: availableWidth * 1.2,
                             height: availableWidth * 1.2,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryColor.withOpacity(0.1),
+                              color: AppColors.primaryColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(availableWidth * 0.15),
                             ),
                           ),
@@ -402,7 +447,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 class AnimatedDigit extends StatelessWidget {
   final String digit;
   final TextStyle? style;
-  const AnimatedDigit({Key? key, required this.digit, this.style}) : super(key: key);
+  const AnimatedDigit({super.key, required this.digit, this.style});
 
   @override
   Widget build(BuildContext context) {
@@ -419,7 +464,7 @@ class AnimatedDigit extends StatelessWidget {
 class AnimatedTime extends StatelessWidget {
   final String time; // "HH:MM:SS"
   final TextStyle? style;
-  const AnimatedTime({Key? key, required this.time, this.style}) : super(key: key);
+  const AnimatedTime({super.key, required this.time, this.style});
 
   @override
   Widget build(BuildContext context) {

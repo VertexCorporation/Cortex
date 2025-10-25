@@ -1,5 +1,7 @@
+// chat/messages/parser.dart
+
 import 'dart:ui' as ui;
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +11,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 import '../../notifications.dart';
 import '../../theme.dart';
 import 'codeblocks.dart';
+import 'package:flutter/foundation.dart';
 
 double _baseFs() =>
     (ui.window.physicalSize.width / ui.window.devicePixelRatio) * 0.042;
@@ -17,8 +20,7 @@ double _baseFs() =>
 class SafeMathTex extends StatelessWidget {
   final String latex;
   final TextStyle textStyle;
-  const SafeMathTex({required this.latex, required this.textStyle, Key? key})
-      : super(key: key);
+  const SafeMathTex({required this.latex, required this.textStyle, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +170,9 @@ List<InlineSpan> parseText(String text) {
     return spans;
   } catch (e) {
     final fs = _baseFs();
-    print('parseText unexpected error: $e');
+    if (kDebugMode) {
+      print('parseText unexpected error: $e');
+    }
     return [
       TextSpan(
         text: text,
@@ -318,19 +322,21 @@ InlineSpan _processBlockMatch(_MatchRange match, double fs) {
           return TextSpan(text: matchText, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs));
         }
 
-        List<String> _splitRow(String row) => row.split('|').where((c) => c.trim().isNotEmpty).map((c) => c.trim()).toList();
-        final header = _splitRow(lines.first);
+        List<String> splitRow(String row) => row.split('|').where((c) => c.trim().isNotEmpty).map((c) => c.trim()).toList();
+        final header = splitRow(lines.first);
         final dataRowsRaw = lines.skip(2);
-        final dataRows = dataRowsRaw.map(_splitRow).toList();
+        final dataRows = dataRowsRaw.map(splitRow).toList();
         final colCount = header.length;
-        List<Widget> _padStr(List<String> cells, Widget Function(String) builder) {
+        List<Widget> padStr(List<String> cells, Widget Function(String) builder) {
           final padded = [...cells];
-          while (padded.length < colCount) padded.add('');
+          while (padded.length < colCount) {
+            padded.add('');
+          }
           return padded.map(builder).toList();
         }
 
-        Widget _th(String txt) => Padding(padding: const EdgeInsets.all(8), child: Text(txt, style: const TextStyle(fontWeight: FontWeight.bold)));
-        Widget _td(String txt) => Padding(padding: const EdgeInsets.all(8), child: Text(txt));
+        Widget th(String txt) => Padding(padding: const EdgeInsets.all(8), child: Text(txt, style: const TextStyle(fontWeight: FontWeight.bold)));
+        Widget td(String txt) => Padding(padding: const EdgeInsets.all(8), child: Text(txt));
 
         return WidgetSpan(
           child: Padding(
@@ -339,8 +345,8 @@ InlineSpan _processBlockMatch(_MatchRange match, double fs) {
               border: TableBorder.all(color: Colors.grey),
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: [
-                TableRow(children: _padStr(header, _th)),
-                for (final row in dataRows) TableRow(children: _padStr(row, _td)),
+                TableRow(children: padStr(header, th)),
+                for (final row in dataRows) TableRow(children: padStr(row, td)),
               ],
             ),
           ),
@@ -352,7 +358,7 @@ InlineSpan _processBlockMatch(_MatchRange match, double fs) {
           final content = matchText.substring(level + 1);
           final headingSize = fs * (1 + (6 - level) * 0.15);
           return TextSpan(
-            text: content + '\n',
+            text: '$content\n',
             style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: headingSize, fontWeight: FontWeight.bold),
           );
         }
@@ -364,7 +370,9 @@ InlineSpan _processBlockMatch(_MatchRange match, double fs) {
     }
   } catch (e) {
     // IF ANY UNEXPECTED ERROR OCCURS, SAFELY RENDER THE SEGMENT AS PLAIN TEXT
-    print('Error processing block match: ${match.text}, Error: $e');
+    if (kDebugMode) {
+      print('Error processing block match: ${match.text}, Error: $e');
+    }
     return TextSpan(text: match.text, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs));
   }
 }
@@ -448,7 +456,9 @@ InlineSpan _processInlineMatch(_MatchRange match, double fs, {bool isThinking = 
     }
   } catch (e) {
     // IF ANY UNEXPECTED ERROR OCCURS, SAFELY RENDER THE SEGMENT AS PLAIN TEXT
-    print('Error processing inline match: ${match.text}, Error: $e');
+    if (kDebugMode) {
+      print('Error processing inline match: ${match.text}, Error: $e');
+    }
     return TextSpan(
       text: match.text,
       style: TextStyle(
@@ -481,10 +491,9 @@ class _FittingLatexWidget extends StatefulWidget {
   final bool isDarkTheme;
 
   const _FittingLatexWidget({
-    Key? key,
     required this.latex,
     required this.isDarkTheme,
-  }) : super(key: key);
+  });
 
   @override
   State<_FittingLatexWidget> createState() => _FittingLatexWidgetState();

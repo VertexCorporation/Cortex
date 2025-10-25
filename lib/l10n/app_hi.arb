@@ -771,5 +771,7 @@
   "channelGreetingsName": "दैनिक अभिवादन",
   "channelGreetingsDescription": "शुभ प्रभात और शुभ रात्रि जैसे संदेश।",
   "exitAppTitle": "इतनी जल्दी जाना?",
-  "exitAppConfirmation": "क्या आप वाकई इस अद्भुत मंच को छोड़ना चाहते हैं?"
+  "exitAppConfirmation": "क्या आप वाकई इस अद्भुत मंच को छोड़ना चाहते हैं?",
+  "newsErrorTitle": "समाचार लोड करने में विफल",
+  "newsErrorMessage": "नवीनतम अपडेट प्राप्त करने में समस्या हुई, कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें."
 }

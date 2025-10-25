@@ -771,5 +771,7 @@
   "channelGreetingsName": "Tägliche Grüße",
   "channelGreetingsDescription": "Die Nachrichten wie Guten Morgen und Gute Nacht.",
   "exitAppTitle": "So bald gehen?",
-  "exitAppConfirmation": "Möchten Sie diese tolle Plattform wirklich verlassen?"
+  "exitAppConfirmation": "Möchten Sie diese tolle Plattform wirklich verlassen?",
+  "newsErrorTitle": "Nachrichten konnten nicht geladen werden",
+  "newsErrorMessage": "Beim Abrufen der neuesten Updates ist ein Problem aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut."
 }

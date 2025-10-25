@@ -1,4 +1,4 @@
-// backend.dart (FINALIZED & PRODUCTION-READY)
+// viewmodel.dart (FINALIZED & PRODUCTION-READY)
 // This version integrates robust caching to prevent skeleton loaders on subsequent
 // visits and adds comprehensive Firebase Crashlytics logging to all critical
 // payment and data fetching flows for maximum stability and monitoring.
@@ -90,11 +90,8 @@ class FundsBackend with ChangeNotifier {
     if (_initialized) return;
     _initialized = true;
 
-    // Store the services for later use in the purchase flow
     _notificationService = notificationService;
     _localizations = localizations;
-
-    CacheService.touchPremiumCache();
 
     _purchaseStreamSubscription = _inAppPurchase.purchaseStream.listen(
       _onPurchaseUpdated,
@@ -105,31 +102,37 @@ class FundsBackend with ChangeNotifier {
     await _fetchProductDetails();
   }
 
-
   Future<void> _fetchProductDetails() async {
+    // --- FIX 1: Use the new invalidation method ---
     if (AppDataState().needsRefresh) {
-      CacheService.invalidatePremiumCache();
+      CacheService.invalidate(CacheKey.premiumProducts);
     }
 
+    // --- FIX 2: Use the new 'get' method ---
     // Attempt to load from cache first for an instant UI.
-    if (CacheService.cachedPremiumProducts != null && CacheService.cachedPremiumProducts!.isNotEmpty) {
+    final cachedProducts = CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
+
+    if (cachedProducts != null && cachedProducts.isNotEmpty) {
       log('Cache hit! Initializing with cached product data.', name: _logName);
-      _products = CacheService.cachedPremiumProducts!;
+      _products = cachedProducts;
       _errorMessage = null;
       _setLoading(false); // Show the UI immediately with cached data
-      // We don't return here; we continue to fetch fresh data in the background.
     } else {
       // Only show the main loading skeleton if the cache is empty.
       _setLoading(true);
     }
 
-    _setLoading(true);
+    // This _setLoading(true) was redundant, removing it.
+    // _setLoading(true);
 
     if (!kReleaseMode) {
       log('Running in Test Mode. Using mock product data.', name: _logName);
       await Future.delayed(const Duration(milliseconds: 800));
       _products = _mockProducts;
-      CacheService.cachedPremiumProducts = _mockProducts;
+
+      // --- FIX 3: Use the new 'set' method ---
+      CacheService.set(CacheKey.premiumProducts, _mockProducts);
+
       _errorMessage = null;
       _setLoading(false);
       return;
@@ -163,7 +166,10 @@ class FundsBackend with ChangeNotifier {
       }
 
       _products = response.productDetails;
-      CacheService.cachedPremiumProducts = _products;
+
+      // --- FIX 4: Use the new 'set' method ---
+      CacheService.set(CacheKey.premiumProducts, _products);
+
       _errorMessage = null;
 
     } catch (e, stack) {
@@ -454,12 +460,13 @@ class FundsBackend with ChangeNotifier {
   void _setPurchasePending(bool value) { _isPurchasePending = value; notifyListeners(); }
   void _setError(String message) { _errorMessage = message; _isLoading = false; notifyListeners(); }
 
+
   @override
   void dispose() {
     _purchaseStreamSubscription.cancel();
     _userSubscription?.cancel();
     _purchaseCompletedController.close();
-    CacheService.startPremiumCacheTimer();
+
     super.dispose();
   }
 }

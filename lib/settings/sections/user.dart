@@ -3,8 +3,7 @@
 import 'dart:async';
 
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:cortex/main.dart';
-import 'package:cortex/server/fetch.dart';
+import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,98 +16,41 @@ import 'package:provider/provider.dart';
 
 import '../../cache.dart';
 import '../../darkener.dart';
-import '../../login/login.dart';
-import '../../models/backend/data.dart';
+import '../../models/backend/data/data.dart';
 import '../../models/backend/download.dart';
 import '../../notifications.dart';
-
-// Helper Widget for Shake Animation (No changes needed)
-class ShakeWidget extends StatefulWidget {
-  final Widget child;
-  final AnimationController controller;
-  const ShakeWidget({Key? key, required this.child, required this.controller})
-      : super(key: key);
-  @override
-  ShakeWidgetState createState() => ShakeWidgetState();
-}
-
-class ShakeWidgetState extends State<ShakeWidget> {
-  late Animation<double> _animation;
-  VoidCallback? _animationListener;
-  void Function(AnimationStatus)? _statusListener;
-  @override
-  void initState() {
-    super.initState();
-    _animation = Tween<double>(begin: -5, end: 5).animate(
-        CurvedAnimation(parent: widget.controller, curve: Curves.elasticIn));
-    _animationListener = () {
-      if (mounted) {
-        setState(() {});
-      }
-    };
-    _statusListener = (status) {
-      if (status == AnimationStatus.completed) {
-        widget.controller.reset();
-      }
-    };
-    _animation.addListener(_animationListener!);
-    widget.controller.addStatusListener(_statusListener!);
-  }
-
-  @override
-  void dispose() {
-    if (_animationListener != null) {
-      _animation.removeListener(_animationListener!);
-    }
-    if (_statusListener != null) {
-      widget.controller.removeStatusListener(_statusListener!);
-    }
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.translate(
-        offset: Offset(_animation.value, 0), child: widget.child);
-  }
-}
+import '../../server/user.dart';
+import '../../shake.dart';
 
 class UserSection extends StatefulWidget {
   final AppLocalizations appLocalizations;
   final NotificationService notificationService;
-  final Map<String, dynamic>? userData;
-  final VoidCallback fetchUserDataCallback;
-  final RegExp usernameRegExp;
-  final AnimationController editProfileShakeController;
-  final AnimationController oldPasswordShakeController;
-  final AnimationController newPasswordShakeController;
-  final AnimationController confirmPasswordShakeController;
-  final bool isDialogOpen;
   final Function(bool) onDialogStateChanged;
+  final bool isDialogOpen;
   final Future<bool> Function() hasInternetConnectionCallback;
 
   const UserSection({
-    Key? key,
+    super.key,
     required this.appLocalizations,
     required this.notificationService,
-    required this.userData,
-    required this.fetchUserDataCallback,
-    required this.usernameRegExp,
-    required this.editProfileShakeController,
-    required this.oldPasswordShakeController,
-    required this.newPasswordShakeController,
-    required this.confirmPasswordShakeController,
-    required this.isDialogOpen,
     required this.onDialogStateChanged,
+    required this.isDialogOpen,
     required this.hasInternetConnectionCallback,
-  }) : super(key: key);
+  });
 
   @override
   UserSectionState createState() => UserSectionState();
 }
 
-class UserSectionState extends State<UserSection> {
+class UserSectionState extends State<UserSection> with TickerProviderStateMixin {
+  // Animation controllers are now managed by the State.
+  late final AnimationController editProfileShakeController;
+  late final AnimationController oldPasswordShakeController;
+  late final AnimationController newPasswordShakeController;
+  late final AnimationController confirmPasswordShakeController;
 
+  // The RegExp is now a constant within the State.
+  final RegExp usernameRegExp = RegExp(r'^[a-zA-Z0-9_]{3,20}$');
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
   bool _isPasswordUser = false;
@@ -116,7 +58,25 @@ class UserSectionState extends State<UserSection> {
   @override
   void initState() {
     super.initState();
+
+    // Initialize all animation controllers.
+    const shakeDuration = Duration(milliseconds: 500);
+    editProfileShakeController = AnimationController(vsync: this, duration: shakeDuration);
+    oldPasswordShakeController = AnimationController(vsync: this, duration: shakeDuration);
+    newPasswordShakeController = AnimationController(vsync: this, duration: shakeDuration);
+    confirmPasswordShakeController = AnimationController(vsync: this, duration: shakeDuration);
+
     _checkUserProvider();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controllers when the widget is removed to prevent memory leaks.
+    editProfileShakeController.dispose();
+    oldPasswordShakeController.dispose();
+    newPasswordShakeController.dispose();
+    confirmPasswordShakeController.dispose();
+    super.dispose();
   }
 
   void _checkUserProvider() {
@@ -150,7 +110,7 @@ class UserSectionState extends State<UserSection> {
         child: InkWell(
           onTap: enabled ? onPressed : null,
           borderRadius: BorderRadius.circular(10.0),
-          splashColor: AppColors.quaternaryColor.withOpacity(0.3),
+          splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
           child: Container(
             padding: EdgeInsets.symmetric(
               horizontal: screenWidth * 0.04,
@@ -180,13 +140,13 @@ class UserSectionState extends State<UserSection> {
     );
   }
 
-  void _showEditProfileDialog() {
+  void _showEditProfileDialog(Map<String, dynamic> userData) {
     if (widget.isDialogOpen) return;
     widget.onDialogStateChanged(true);
 
     final appLocalizations = widget.appLocalizations;
     final nameController =
-        TextEditingController(text: widget.userData?['username'] ?? '');
+        TextEditingController(text: userData['username'] ?? '');
     String? editUsernameError;
     bool isLoading = false;
 
@@ -225,14 +185,13 @@ class UserSectionState extends State<UserSection> {
                   builder: (dialogContext, setStateDialog) {
                     Future<void> handleUpdateUsername() async {
                       final newName = nameController.text.trim();
-                      final currentUsername =
-                          widget.userData?['username'] ?? "";
+                      final currentUsername = userData['username'] ?? "";
 
                       // Client-side validation is still useful for quick feedback.
                       if (newName.isEmpty) {
                         setStateDialog(() => editUsernameError =
                             appLocalizations.usernameTooShort);
-                        widget.editProfileShakeController.forward(from: 0);
+                        editProfileShakeController.forward(from: 0);
                         return;
                       }
                       if (newName.toLowerCase() ==
@@ -240,10 +199,9 @@ class UserSectionState extends State<UserSection> {
                         Navigator.of(ctx).pop();
                         return;
                       }
-                      if (!widget.usernameRegExp.hasMatch(newName)) {
-                        setStateDialog(() => editUsernameError =
-                            appLocalizations.invalidUsernameCharacters);
-                        widget.editProfileShakeController.forward(from: 0);
+                      if (!usernameRegExp.hasMatch(newName)) { // <<< CORRECTED
+                        setStateDialog(() => editUsernameError = appLocalizations.invalidUsernameCharacters);
+                        editProfileShakeController.forward(from: 0); // <<< CORRECTED
                         return;
                       }
 
@@ -266,21 +224,19 @@ class UserSectionState extends State<UserSection> {
                             isSuccess: true,
                             bottomOffset: 0.02,
                           );
-                          widget.fetchUserDataCallback();
-                          await FetchService.updateProfileInitial(newName);
                         }
                       } on FirebaseFunctionsException catch (e) {
                         setStateDialog(() {
                           editUsernameError = getLocalizedErrorMessage(e.code);
                         });
-                        widget.editProfileShakeController.forward(from: 0);
+                        editProfileShakeController.forward(from: 0);
                         debugPrint(
                             "FirebaseFunctionsException: ${e.code} - ${e.message}");
                       } catch (e) {
                         setStateDialog(() {
                           editUsernameError = appLocalizations.anErrorOccurred;
                         });
-                        widget.editProfileShakeController.forward(from: 0);
+                        editProfileShakeController.forward(from: 0);
                         debugPrint("Generic error calling updateUsername: $e");
                       } finally {
                         if (mounted) {
@@ -316,7 +272,7 @@ class UserSectionState extends State<UserSection> {
                                 children: [
                                   ShakeWidget(
                                       controller:
-                                          widget.editProfileShakeController,
+                                          editProfileShakeController,
                                       child: TextField(
                                           controller: nameController,
                                           maxLength: 20,
@@ -372,9 +328,9 @@ class UserSectionState extends State<UserSection> {
                                       color: Colors.transparent,
                                       child: InkWell(
                                           splashColor: AppColors.senaryColor
-                                              .withOpacity(0.1),
+                                              .withValues(alpha: 0.1),
                                           highlightColor: AppColors.senaryColor
-                                              .withOpacity(0.1),
+                                              .withValues(alpha: 0.1),
                                           onTap: isLoading
                                               ? null
                                               : () => Navigator.of(ctx).pop(),
@@ -386,8 +342,7 @@ class UserSectionState extends State<UserSection> {
                                               child: Text(
                                                   appLocalizations.cancel,
                                                   style: TextStyle(
-                                                      color:
-                                                          AppColors.senaryColor,
+                                                      color: AppColors.senaryColor,
                                                       fontSize: 16)))))),
                               VerticalDivider(
                                   width: 1,
@@ -398,10 +353,10 @@ class UserSectionState extends State<UserSection> {
                                       color: Colors.transparent,
                                       child: InkWell(
                                           splashColor: AppColors.septenaryColor
-                                              .withOpacity(0.1),
+                                              .withValues(alpha: 0.1),
                                           highlightColor: AppColors
                                               .septenaryColor
-                                              .withOpacity(0.1),
+                                              .withValues(alpha: 0.1),
                                           onTap: isLoading
                                               ? null
                                               : handleUpdateUsername,
@@ -478,7 +433,7 @@ class UserSectionState extends State<UserSection> {
                                 Text(appLocalizations.logoutConfirmationTitle,
                                     style: TextStyle(
                                         color: AppColors.primaryColor.inverted
-                                            .withOpacity(0.4),
+                                            .withValues(alpha: 0.4),
                                         fontSize: 14),
                                     textAlign: TextAlign.center)
                               ])),
@@ -493,9 +448,9 @@ class UserSectionState extends State<UserSection> {
                                     color: Colors.transparent,
                                     child: InkWell(
                                         splashColor: AppColors.senaryColor
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         highlightColor: AppColors.senaryColor
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         onTap: () => Navigator.of(ctx).pop(),
                                         child: Container(
                                             alignment: Alignment.center,
@@ -503,8 +458,7 @@ class UserSectionState extends State<UserSection> {
                                                 vertical: 16),
                                             child: Text(appLocalizations.no,
                                                 style: TextStyle(
-                                                    color:
-                                                        AppColors.senaryColor,
+                                                    color: AppColors.senaryColor,
                                                     fontSize: 16)))))),
                             VerticalDivider(
                                 width: 1,
@@ -515,9 +469,9 @@ class UserSectionState extends State<UserSection> {
                                     color: Colors.transparent,
                                     child: InkWell(
                                         splashColor: AppColors.septenaryColor
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         highlightColor: AppColors.septenaryColor
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         onTap: () => _performLogout(),
                                         child: Container(
                                             alignment: Alignment.center,
@@ -540,39 +494,23 @@ class UserSectionState extends State<UserSection> {
     });
   }
 
-  /// This now includes clearing all credentials from `flutter_secure_storage`
-  /// to ensure the 'Remember Me' feature is completely reset on logout.
+  /// Handles the complete user logout process.
   Future<void> _performLogout() async {
-    // Instantiate secure storage to clear it.
-    final secureStorage = const FlutterSecureStorage();
-
-    // Clear all in-memory caches first to prevent data leaks between sessions.
-    ModelData.clearCache();
-    debugPrint("[UserSection] In-memory model cache cleared.");
-    await FileDownloadHelper().cancelAllPendingDownloads();
-    await FetchService.clearProfileInitial();
-    CacheService.clearAll();
-    debugPrint("[UserSection] All other in-memory caches and services cleared.");
-
-    // Reset System UI for the login screen.
-    final overlay = AppColors.getSystemUIOverlayStyleForTheme(AppColors.currentTheme);
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        systemNavigationBarColor: overlay['navigationBarColor'] as Color,
-        systemNavigationBarIconBrightness: overlay['navigationBarIconBrightness'] as Brightness
-    ));
-
-    // CRITICAL NEW STEP: Clear all stored credentials from the device's secure vault.
-    // This is the most important part of the new logout process.
-    await secureStorage.deleteAll();
-    debugPrint("[UserSection] All credentials cleared from secure storage.");
-
+    // IMPORTANT: Grab any provider that needs `context` *before* any async gaps,
+    // especially before signOut(), which will cause this widget to be unmounted.
     final notificationService = Provider.of<NotificationService>(context, listen: false);
 
-    await notificationService.clearUserTokenOnSignOut();
+    // STEP 1: Sign out of Firebase immediately.
+    // This is the most critical step for the UI. It triggers the listener that
+    // rebuilds the app's widget tree and shows the login screen.
+    await FirebaseAuth.instance.signOut();
+    debugPrint("[UserSection] Firebase Sign-Out successful. UI transition has been initiated.");
 
-    debugPrint("[UserSection] FCM token cleared.");
+    // STEP 2: Perform all other cleanup tasks.
+    // From the user's perspective, these are now running in the background as they
+    // are already being navigated away from this screen.
 
-    // Sign out from all authentication providers.
+    // Sign out from other providers like Google.
     try {
       await _googleSignIn.signOut();
       debugPrint("[UserSection] Google Sign-Out successful.");
@@ -580,16 +518,29 @@ class UserSectionState extends State<UserSection> {
       debugPrint("[UserSection] No active Google session to sign out from, or an error occurred: $e");
     }
 
-    await FirebaseAuth.instance.signOut();
-    debugPrint("[UserSection] Firebase Sign-Out successful.");
+    // Clear all stored credentials from the device's secure vault.
+    final secureStorage = const FlutterSecureStorage();
+    await secureStorage.deleteAll();
+    debugPrint("[UserSection] All credentials cleared from secure storage.");
 
-    if (!mounted) return;
+    // Clear the user's FCM token from the server to stop notifications.
+    await notificationService.clearUserTokenOnSignOut();
+    debugPrint("[UserSection] FCM token cleared from server.");
 
-    // Navigate back to the login screen, removing all previous routes.
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-            (_) => false
-    );
+    // Clear all in-memory caches to prevent data leaks between sessions.
+    ModelData.clearCache();
+    CacheService.clearAll();
+    debugPrint("[UserSection] All in-memory caches cleared.");
+
+    // Cancel any ongoing file downloads.
+    await FileDownloadHelper().cancelAllPendingDownloads();
+
+    // Reset System UI for the login screen that is now being displayed.
+    final overlay = AppColors.getSystemUIOverlayStyleForTheme(AppColors.currentTheme);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        systemNavigationBarColor: overlay['navigationBarColor'] as Color,
+        systemNavigationBarIconBrightness: overlay['navigationBarIconBrightness'] as Brightness
+    ));
   }
 
   void _showChangePasswordDialog() {
@@ -612,7 +563,6 @@ class UserSectionState extends State<UserSection> {
       pageBuilder: (ctx, animation, secondaryAnimation) {
         return Center(
             child: SingleChildScrollView(
-          // Klavye açıldığında taşmayı önler
           child: Material(
             color: Colors.transparent,
             child: Container(
@@ -638,14 +588,14 @@ class UserSectionState extends State<UserSection> {
                         setStateDialog(() {
                           oldPasswordError = appLocalizations.passwordRequired;
                         });
-                        widget.oldPasswordShakeController.forward(from: 0);
+                        oldPasswordShakeController.forward(from: 0);
                         return;
                       }
                       if (newPassword.isEmpty || newPassword.length < 6) {
                         setStateDialog(() {
                           newPasswordError = appLocalizations.weakPassword;
                         });
-                        widget.newPasswordShakeController.forward(from: 0);
+                        newPasswordShakeController.forward(from: 0);
                         return;
                       }
                       if (confirmPassword != newPassword) {
@@ -653,7 +603,7 @@ class UserSectionState extends State<UserSection> {
                           confirmPasswordError =
                               appLocalizations.passwordsDoNotMatch;
                         });
-                        widget.confirmPasswordShakeController.forward(from: 0);
+                        confirmPasswordShakeController.forward(from: 0);
                         return;
                       }
                       setStateDialog(() => isLoading = true);
@@ -683,19 +633,19 @@ class UserSectionState extends State<UserSection> {
                           setStateDialog(() {
                             oldPasswordError = appLocalizations.wrongPassword;
                           });
-                          widget.oldPasswordShakeController.forward(from: 0);
+                          oldPasswordShakeController.forward(from: 0);
                         } else if (e.code == 'weak-password') {
                           setStateDialog(() {
                             newPasswordError = appLocalizations.weakPassword;
                           });
-                          widget.newPasswordShakeController.forward(from: 0);
+                          newPasswordShakeController.forward(from: 0);
                         } else {
                           debugPrint(
                               "Change Password FirebaseAuth Error: ${e.code} - ${e.message}");
                           setStateDialog(() {
                             oldPasswordError = appLocalizations.authError;
                           });
-                          widget.oldPasswordShakeController.forward(from: 0);
+                          oldPasswordShakeController.forward(from: 0);
                         }
                       } catch (e) {
                         setStateDialog(() => isLoading = false);
@@ -703,7 +653,7 @@ class UserSectionState extends State<UserSection> {
                         setStateDialog(() {
                           oldPasswordError = appLocalizations.updateFailed;
                         });
-                        widget.oldPasswordShakeController.forward(from: 0);
+                        oldPasswordShakeController.forward(from: 0);
                       }
                     }
 
@@ -725,7 +675,7 @@ class UserSectionState extends State<UserSection> {
                                   children: [
                                     ShakeWidget(
                                         controller:
-                                            widget.oldPasswordShakeController,
+                                            oldPasswordShakeController,
                                         child: TextField(
                                             controller: oldPasswordController,
                                             obscureText: true,
@@ -740,8 +690,7 @@ class UserSectionState extends State<UserSection> {
                                                         .primaryColor.inverted),
                                                 enabledBorder: OutlineInputBorder(
                                                     borderSide: BorderSide(
-                                                        color:
-                                                            AppColors.border),
+                                                        color: AppColors.border),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             10.0)),
@@ -771,7 +720,7 @@ class UserSectionState extends State<UserSection> {
                                   children: [
                                     ShakeWidget(
                                         controller:
-                                            widget.newPasswordShakeController,
+                                            newPasswordShakeController,
                                         child: TextField(
                                             controller: newPasswordController,
                                             obscureText: true,
@@ -786,8 +735,7 @@ class UserSectionState extends State<UserSection> {
                                                         .primaryColor.inverted),
                                                 enabledBorder: OutlineInputBorder(
                                                     borderSide: BorderSide(
-                                                        color:
-                                                            AppColors.border),
+                                                        color: AppColors.border),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             10.0)),
@@ -816,8 +764,7 @@ class UserSectionState extends State<UserSection> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     ShakeWidget(
-                                        controller: widget
-                                            .confirmPasswordShakeController,
+                                        controller: confirmPasswordShakeController,
                                         child: TextField(
                                             controller:
                                                 confirmPasswordController,
@@ -833,8 +780,7 @@ class UserSectionState extends State<UserSection> {
                                                         .primaryColor.inverted),
                                                 enabledBorder: OutlineInputBorder(
                                                     borderSide: BorderSide(
-                                                        color:
-                                                            AppColors.border),
+                                                        color: AppColors.border),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             10.0)),
@@ -869,9 +815,9 @@ class UserSectionState extends State<UserSection> {
                                   color: Colors.transparent,
                                   child: InkWell(
                                       splashColor: AppColors.senaryColor
-                                          .withOpacity(0.1),
+                                          .withValues(alpha: 0.1),
                                       highlightColor: AppColors.senaryColor
-                                          .withOpacity(0.1),
+                                          .withValues(alpha: 0.1),
                                       onTap: isLoading
                                           ? null
                                           : () => Navigator.of(ctx).pop(),
@@ -892,9 +838,9 @@ class UserSectionState extends State<UserSection> {
                                   color: Colors.transparent,
                                   child: InkWell(
                                       splashColor: AppColors.septenaryColor
-                                          .withOpacity(0.1),
+                                          .withValues(alpha: 0.1),
                                       highlightColor: AppColors.septenaryColor
-                                          .withOpacity(0.1),
+                                          .withValues(alpha: 0.1),
                                       onTap: isLoading
                                           ? null
                                           : attemptChangePassword,
@@ -933,77 +879,94 @@ class UserSectionState extends State<UserSection> {
 
   @override
   Widget build(BuildContext context) {
-    final appLocalizations = widget.appLocalizations;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    // Wrap the UI in a Consumer widget to listen to UserProvider.
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          appLocalizations.user,
-          style: GoogleFonts.roboto(
-              color: AppColors.primaryColor.inverted,
-              fontSize: screenWidth * 0.05,
-              fontWeight: FontWeight.w600),
-        ),
-        SizedBox(height: screenHeight * 0.01),
-        Text(
-          appLocalizations.manageProfileDescription,
-          style: GoogleFonts.roboto(
-              color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
-        ),
-        SizedBox(height: screenHeight * 0.02),
-        _buildCenteredButton(
-          context: context,
-          text: appLocalizations.editProfile,
-          onPressed: () async {
-            bool hasInternet = await widget.hasInternetConnectionCallback();
-            if (hasInternet) {
-              _showEditProfileDialog();
-            } else {
-              widget.notificationService.showNotification(
-                  bottomOffset: 0.02,
-                  isSuccess: false,
-                  message: appLocalizations.noInternetConnection);
-            }
-          },
-        ),
-        SizedBox(height: screenHeight * 0.015),
-        // DEĞİŞİKLİK: Şifre değiştirme butonu artık sadece şifreyle giriş yapan kullanıcılara gösteriliyor.
-        _buildCenteredButton(
-          context: context,
-          text: appLocalizations.changePassword,
-          enabled: _isPasswordUser, // Butonu etkinleştirir/devre dışı bırakır.
-          onPressed: () async {
-            bool hasInternet = await widget.hasInternetConnectionCallback();
-            if (hasInternet) {
-              _showChangePasswordDialog();
-            } else {
-              widget.notificationService.showNotification(
-                  bottomOffset: 0.02,
-                  isSuccess: false,
-                  message: appLocalizations.noInternetConnection);
-            }
-          },
-        ),
-        SizedBox(height: screenHeight * 0.015),
-        _buildCenteredButton(
-          context: context,
-          text: appLocalizations.logout,
-          onPressed: () async {
-            bool hasInternet = await widget.hasInternetConnectionCallback();
-            if (hasInternet) {
-              _showLogoutConfirmationDialog();
-            } else {
-              widget.notificationService.showNotification(
-                  bottomOffset: 0.02,
-                  isSuccess: false,
-                  message: appLocalizations.noInternetConnection);
-            }
-          },
-        ),
-      ],
+        // Add a guard clause: If the user is not logged in or data is not
+        // yet available, render nothing to prevent errors during transitions.
+        if (!userProvider.isLoggedIn) {
+          return const SizedBox.shrink();
+        }
+
+        // THIS IS THE LINE THAT FIXES THE ERROR:
+        // We define `userData` from the provider for use in this build scope.
+        final userData = userProvider.userData!;
+
+        // Now the rest of the build logic can safely use the `userData` variable.
+        final appLocalizations = widget.appLocalizations;
+        final screenWidth = MediaQuery.of(context).size.width;
+        final screenHeight = MediaQuery.of(context).size.height;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              appLocalizations.user,
+              style: GoogleFonts.roboto(
+                  color: AppColors.primaryColor.inverted,
+                  fontSize: screenWidth * 0.05,
+                  fontWeight: FontWeight.w600),
+            ),
+            SizedBox(height: screenHeight * 0.01),
+            Text(
+              appLocalizations.manageProfileDescription,
+              style: GoogleFonts.roboto(
+                  color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
+            ),
+            SizedBox(height: screenHeight * 0.02),
+            _buildCenteredButton(
+              context: context,
+              text: appLocalizations.editProfile,
+              onPressed: () async {
+                bool hasInternet = await widget.hasInternetConnectionCallback();
+                if (hasInternet) {
+                  // Now this call is valid because `userData` is defined.
+                  _showEditProfileDialog(userData);
+                } else {
+                  widget.notificationService.showNotification(
+                      bottomOffset: 0.02,
+                      isSuccess: false,
+                      message: appLocalizations.noInternetConnection);
+                }
+              },
+            ),
+            SizedBox(height: screenHeight * 0.015),
+            _buildCenteredButton(
+              context: context,
+              text: appLocalizations.changePassword,
+              enabled: _isPasswordUser,
+              onPressed: () async {
+                bool hasInternet = await widget.hasInternetConnectionCallback();
+                if (hasInternet) {
+                  _showChangePasswordDialog();
+                } else {
+                  widget.notificationService.showNotification(
+                      bottomOffset: 0.02,
+                      isSuccess: false,
+                      message: appLocalizations.noInternetConnection);
+                }
+              },
+            ),
+            SizedBox(height: screenHeight * 0.015),
+            _buildCenteredButton(
+              context: context,
+              text: appLocalizations.logout,
+              onPressed: () async {
+                bool hasInternet = await widget.hasInternetConnectionCallback();
+                if (hasInternet) {
+                  _showLogoutConfirmationDialog();
+                } else {
+                  widget.notificationService.showNotification(
+                      bottomOffset: 0.02,
+                      isSuccess: false,
+                      message: appLocalizations.noInternetConnection);
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

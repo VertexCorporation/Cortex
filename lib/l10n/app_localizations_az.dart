@@ -2011,4 +2011,11 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Bu heyrətamiz platformanı tərk etmək istədiyinizə əminsiniz?';
+
+  @override
+  String get newsErrorTitle => 'Xəbərləri Yükləmək alınmadı';
+
+  @override
+  String get newsErrorMessage =>
+      'Ən son güncəlləmələri əldə edərkən problem baş verdi, əlaqənizi yoxlayın və yenidən cəhd edin.';
 }

@@ -771,5 +771,7 @@
   "channelGreetingsName": "Dagelijkse groeten",
   "channelGreetingsDescription": "De berichten zoals goedemorgen en welterusten.",
   "exitAppTitle": "Gaat u al zo snel weg?",
-  "exitAppConfirmation": "Weet u zeker dat u dit geweldige platform wilt verlaten?"
+  "exitAppConfirmation": "Weet u zeker dat u dit geweldige platform wilt verlaten?",
+  "newsErrorTitle": "Het laden van nieuws is mislukt",
+  "newsErrorMessage": "Er is een probleem opgetreden bij het ophalen van de nieuwste updates. Controleer uw verbinding en probeer het opnieuw."
 }

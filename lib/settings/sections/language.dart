@@ -1,6 +1,6 @@
 // sections/language.dart
 
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart'; // For your application's theme settings
 import 'package:flutter/foundation.dart'; // For kDebugModes
 import 'package:flutter/material.dart';
@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart'; // For custom fonts
 import 'package:cortex/l10n/app_localizations.dart';
 
 import '../../darkener.dart';
-import '../../models/backend/data.dart'; // For localization
+import '../../models/backend/data/data.dart'; // For localization
 
 /// A widget that manages the app language selection section in the settings screen.
 ///
@@ -34,13 +34,13 @@ class AppLanguageSection extends StatefulWidget {
   final Function(bool) onDialogStateChanged;
 
   const AppLanguageSection({
-    Key? key,
+    super.key,
     required this.appLocalizations,
     required this.selectedLanguageCode,
     required this.onLanguageChanged,
     required this.isDialogOpen,
     required this.onDialogStateChanged,
-  }) : super(key: key);
+  });
 
   @override
   AppLanguageSectionState createState() => AppLanguageSectionState();
@@ -171,7 +171,7 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
                           'assets/icons/language.svg', // Language icon
                           width: screenWidth * 0.07,
                           height: screenWidth * 0.07,
-                          colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn), // Icon color
+                          color: AppColors.primaryColor.inverted, // Icon color
                         ),
                         SizedBox(height: screenHeight * 0.008), // Spacing between icon and title
                         Text(
@@ -183,7 +183,7 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        Divider(thickness: 0.5, color: AppColors.quinaryColor.withOpacity(0.7)), // Separator line
+                        Divider(thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha: 0.7)), // Separator line
                         // Language list
                         Container(
                           constraints: BoxConstraints(maxHeight: maxListHeight), // Max height for the list
@@ -224,13 +224,13 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
                                           // Active (selected) Radio button color
                                           activeColor: AppColors.primaryColor.inverted, // Desired color (e.g., black or a dark theme-appropriate color)
                                           // Fill color for passive and active states
-                                          fillColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                                            if (states.contains(MaterialState.selected)) {
+                                          fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                                            if (states.contains(WidgetState.selected)) {
                                               // For selected state, AppColors.primaryColor.inverted (like black)
                                               return AppColors.primaryColor.inverted;
                                             }
                                             // For unselected state, a lighter color
-                                            return AppColors.primaryColor.inverted.withOpacity(0.6);
+                                            return AppColors.primaryColor.inverted.withValues(alpha: 0.6);
                                           }),
                                         ),
                                         Expanded( // Expanded to prevent text overflow
@@ -250,13 +250,13 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
                             },
                           ),
                         ),
-                        Divider(thickness: 0.5, color: AppColors.quinaryColor.withOpacity(0.7), height: 1), // Bottom separator
+                        Divider(thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha: 0.7), height: 1), // Bottom separator
                         // "Done" button
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            splashColor: AppColors.senaryColor.withOpacity(0.1), // Light splash for the button
-                            highlightColor: AppColors.senaryColor.withOpacity(0.1),
+                            splashColor: AppColors.senaryColor.withValues(alpha: 0.1), // Light splash for the button
+                            highlightColor: AppColors.senaryColor.withValues(alpha: 0.1),
                             onTap: () {
                               if (kDebugMode) {
                                 print('[AppLanguageSection] "Done" button tapped. Selected language: $tempSelectedLanguageCode');
@@ -342,7 +342,7 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
           child: InkWell(
             onTap: _showLanguageSelectionDialog, // Open dialog on tap
             borderRadius: BorderRadius.circular(10.0), // Also for splash effect
-            splashColor: AppColors.quaternaryColor.withOpacity(0.3), // Tap effect color
+            splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3), // Tap effect color
             child: Container(
               padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02, horizontal: screenWidth * 0.04), // Button inner padding
               child: Row(

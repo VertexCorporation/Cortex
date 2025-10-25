@@ -771,5 +771,7 @@
   "channelGreetingsName": "Salam Harian",
   "channelGreetingsDescription": "Pesannya seperti selamat pagi dan selamat malam.",
   "exitAppTitle": "Akan pergi secepat ini?",
-  "exitAppConfirmation": "Apakah Anda yakin ingin meninggalkan platform menakjubkan ini?"
+  "exitAppConfirmation": "Apakah Anda yakin ingin meninggalkan platform menakjubkan ini?",
+  "newsErrorTitle": "Gagal Memuat Berita",
+  "newsErrorMessage": "Terjadi masalah saat mengambil pembaruan terkini, silakan periksa koneksi Anda dan coba lagi."
 }

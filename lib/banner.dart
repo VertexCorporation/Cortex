@@ -5,7 +5,7 @@
 // and a generic, self-animating FloatingInfoBanner widget that can display
 // various types of content and position itself relative to other widgets.
 
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -265,8 +265,9 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner> {
             dismiss();
           },
           onVerticalDragUpdate: (details) {
-            if (isTopBanner && details.primaryDelta! < -2) dismiss();
-            else if (!isTopBanner && details.primaryDelta! > 2) dismiss();
+            if (isTopBanner && details.primaryDelta! < -2) {
+              dismiss();
+            } else if (!isTopBanner && details.primaryDelta! > 2) {dismiss();}
           },
           child: content,
         ),
@@ -304,7 +305,7 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner> {
           border: Border.all(color: AppColors.border, width: borderWidth),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: shadowBlurRadius,
               offset: Offset(0, shadowOffsetY),
             )
@@ -322,19 +323,19 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner> {
             SizedBox(height: smallSpacing),
             Text(localizations.extensionInfoPanelBody1,
                 style: GoogleFonts.heebo(
-                    color: AppColors.primaryColor.inverted.withOpacity(0.9),
+                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.9),
                     fontSize: bodyFontSize,
                     height: 1.5)),
             SizedBox(height: smallSpacing),
             Text(localizations.extensionInfoPanelBody2,
                 style: GoogleFonts.heebo(
-                    color: AppColors.primaryColor.inverted.withOpacity(0.9),
+                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.9),
                     fontSize: bodyFontSize,
                     height: 1.5)),
             SizedBox(height: mediumSpacing),
             Text(localizations.extensionInfoPanelFooter,
                 style: GoogleFonts.heebo(
-                    color: AppColors.primaryColor.inverted.withOpacity(0.7),
+                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
                     fontSize: footerFontSize,
                     fontStyle: FontStyle.italic)),
           ],
@@ -399,7 +400,7 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner> {
           borderRadius: BorderRadius.circular(borderRadius),
           boxShadow: [
             BoxShadow(
-              color: AppColors.senaryColor.withOpacity(0.5),
+              color: AppColors.senaryColor.withValues(alpha: 0.5),
               blurRadius: shadowBlurRadius,
               offset: Offset(0, shadowOffsetY),
             )
@@ -433,7 +434,7 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontSize: subtitleFontSize,
                     ),
                   ),

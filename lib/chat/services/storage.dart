@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:cortex/cache.dart'; // Added for cache invalidation
 import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
-import '../../models/backend/data.dart';
+import '../../models/backend/data/data.dart';
 import 'database.dart';
 import '../messages/messages.dart';
 
@@ -34,8 +34,20 @@ class ChatStorageService {
   }
 
   /// This function is called after a successful message send to mark a model as "used".
-  /// Using `ConflictAlgorithm.replace` provides an efficient "upsert" operation.
-  static Future<void> addRecentModel(String modelSeriesId) async {
+  /// It now intelligently ensures that only a valid MODEL SERIES ID is saved,
+  /// preventing producer names or full variant IDs from being stored.
+  static Future<void> addRecentModel(String modelId) async {
+    final String modelSeriesId = ModelData.getBaseIdFromFullId(modelId);
+
+    final allModels = ModelData.getCachedModelsSync();
+    final bool isValidSeriesId = allModels.any((m) => m['id'] == modelSeriesId);
+
+    if (modelSeriesId.isEmpty || !isValidSeriesId) {
+      debugPrint("[Storage] FAILED to add recent model. Could not resolve a valid series ID from '$modelId'. Aborting.");
+      return;
+    }
+    // ==========================================================
+
     final db = await DbHelper().db;
     await db.insert(
       'recent_models',
@@ -46,7 +58,7 @@ class ChatStorageService {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     // Invalidate the cache to ensure the UI re-fetches the updated list.
-    CacheService.invalidateRecentModelsCache();
+    CacheService.invalidate(CacheKey.recentModels);
     debugPrint("[Storage] Added/Updated '$modelSeriesId' in recent models.");
   }
 
@@ -178,6 +190,7 @@ class ChatStorageService {
       _lastMsgController.add({
         'convId': convId,
         'text': lastMessage.text,
+        'photoPath': lastMessage.photoPath,
         'ts': DateTime.now().millisecondsSinceEpoch,
       });
     }
@@ -189,9 +202,9 @@ class ChatStorageService {
     final db = await DbHelper().db;
     final rows = await db.query(
       'messages',
-      where: 'conversationId = ?',
+      where: 'conversationId = ? AND ((text IS NOT NULL AND TRIM(text) != \'\') OR (photoPath IS NOT NULL AND photoPath != \'\'))',
       whereArgs: [conversationID],
-      orderBy: 'ts DESC',
+      orderBy: 'idx DESC',
       limit: 1,
     );
     return rows.isNotEmpty ? rows.first : null;
@@ -264,8 +277,10 @@ class ChatStorageService {
     final db = await DbHelper().db;
     await db.delete('messages', where: 'conversationId = ?', whereArgs: [id]);
     await db.delete('conversations', where: 'id = ?', whereArgs: [id]);
+    // This helper invalidates all conversation-related cache entries at once.
     CacheService.invalidateConversationCache();
-    CacheService.invalidateRecentModelsCache();
+    // Also invalidate recent models, as a deleted conversation might affect this list.
+    CacheService.invalidate(CacheKey.recentModels);
   }
 
   /// Atomically deletes all conversations (and their messages) associated with a specific model ID.
@@ -304,7 +319,7 @@ class ChatStorageService {
     });
     // After deletion, invalidate the caches to force a UI refresh.
     CacheService.invalidateConversationCache();
-    CacheService.invalidateRecentModelsCache();
+    CacheService.invalidate(CacheKey.recentModels);
   }
 
   static Future<void> setStarred(String id, bool starred) async {

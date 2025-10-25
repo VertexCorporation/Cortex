@@ -591,5 +591,7 @@
   "channelGreetingsName": "Gündəlik Salamlar",
   "channelGreetingsDescription": "Sabahınız xeyir və gecəniz xeyir kimi mesajlar.",
   "exitAppTitle": "Bu qədər tez ayrılırsınız?",
-  "exitAppConfirmation": "Bu heyrətamiz platformanı tərk etmək istədiyinizə əminsiniz?"
+  "exitAppConfirmation": "Bu heyrətamiz platformanı tərk etmək istədiyinizə əminsiniz?",
+  "newsErrorTitle": "Xəbərləri Yükləmək alınmadı",
+  "newsErrorMessage": "Ən son güncəlləmələri əldə edərkən problem baş verdi, əlaqənizi yoxlayın və yenidən cəhd edin."
 }

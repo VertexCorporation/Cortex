@@ -4,7 +4,7 @@ import 'package:cortex/theme.dart';
 
 /// A standalone skeleton loader widget extracted from FundsScreen.
 class SkeletonLoader extends StatelessWidget {
-  const SkeletonLoader({Key? key}) : super(key: key);
+  const SkeletonLoader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class SkeletonLoader extends StatelessWidget {
         .size
         .height;
 
-    return Container(
+    return SizedBox(
       width: screenWidth,
       height: screenHeight,
       child: Shimmer.fromColors(

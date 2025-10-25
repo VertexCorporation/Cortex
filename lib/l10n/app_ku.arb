@@ -771,5 +771,7 @@
   "channelGreetingsName": "Silavên Rojane",
   "channelGreetingsDescription": "Peyamên mîna sibeha baş û şevbaş.",
   "exitAppTitle": "Hûn ewqas zû diçin?",
-  "exitAppConfirmation": "Ma hûn piştrast in ku hûn dixwazin ji vê platforma ecêb derkevin?"
+  "exitAppConfirmation": "Ma hûn piştrast in ku hûn dixwazin ji vê platforma ecêb derkevin?",
+  "newsErrorTitle": "Barkirina Nûçeyan Bi Ser Neket",
+  "newsErrorMessage": "Di wergirtina nûvekirinên herî dawî de pirsgirêkek çêbû, ji kerema xwe girêdana xwe kontrol bikin û dîsa biceribînin."
 }

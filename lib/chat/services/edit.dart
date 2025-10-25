@@ -1,128 +1,152 @@
-// edit.dart
+// lib/chat/services/edit.dart
 
+import 'dart:async';
+import 'package:cortex/chat/providers/conversation.dart';
+import 'package:cortex/chat/providers/input.dart';
+import 'package:cortex/chat/services/regenerate.dart';
+import 'package:cortex/chat/services/scroll.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import '../chat.dart';
 import '../messages/messages.dart';
 
 /// Service responsible for managing the message editing lifecycle.
-/// It handles entering and exiting edit mode, and applying the final changes
-/// by delegating the resubmission to the RegenerateService.
 class EditService {
-  final ChatScreenState state;
-  EditService({required this.state});
+  final InputProvider _inputProvider;
+  final ConversationProvider _conversationProvider;
+  final RegenerateService _regenerateService;
+  final ScrollService _scrollService;
+  final TextEditingController _controller;
+  final FocusNode _focusNode;
+  final AnimationController _panelController;
 
-  // A temporary backup of the message list before an edit starts.
   List<Message>? _messagesBeforeEdit;
 
-  /// This function now works on the message list that was already truncated
-  /// by `startEditingMessage`. Its responsibilities are:
-  /// 1. Capture the edited content.
-  /// 2. Update the last message in the list (the one being edited).
-  /// 3. Clean up the editing UI state and the message backup.
-  /// 4. Delegate the "resend" operation to RegenerateService.
-  Future<void> applyEditedMessage() async {
-    final int? editingIndex = state.editingMessageIndex;
-    if (editingIndex == null) return;
+  EditService({
+    required InputProvider inputProvider,
+    required ConversationProvider conversationProvider,
+    required RegenerateService regenerateService,
+    required ScrollService scrollService,
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required AnimationController panelController,
+  })  : _inputProvider = inputProvider,
+        _conversationProvider = conversationProvider,
+        _regenerateService = regenerateService,
+        _scrollService = scrollService,
+        _controller = controller,
+        _focusNode = focusNode,
+        _panelController = panelController;
 
-    // 1. Capture the final edited content.
-    final String newText = state.controller.text.trim();
-    final String? newPhotoPath = state.sendService.selectedPhoto?.path;
+  Future<void> applyEditedMessage(BuildContext context) async {
+    final localizations = AppLocalizations.of(context)!;
 
-    final originalMessage = state.messages[editingIndex];
+    final int? editingIndex = _inputProvider.editingMessageIndex;
+    // We no longer need _messagesBeforeEdit for the core logic, just for the original message comparison.
+    final List<Message> originalMessages = _messagesBeforeEdit ?? _conversationProvider.messages;
 
-    // Ensure we don't proceed if there's no change.
-    if (newText.isEmpty && newPhotoPath == null) {
+    if (editingIndex == null || editingIndex >= originalMessages.length) {
       cancelEditingMode();
       return;
     }
-    if (newText == state.originalMessageText && newPhotoPath == null && originalMessage.photoPath == null) {
+
+    final String newText = _controller.text.trim();
+    final String? newPhotoPath = _inputProvider.selectedPhoto?.path;
+    final originalMessage = originalMessages[editingIndex];
+
+    // Check if anything actually changed.
+    final bool textChanged = newText != originalMessage.text;
+    final bool photoChanged = newPhotoPath != originalMessage.photoPath;
+    if (!textChanged && !photoChanged) {
       cancelEditingMode();
       return;
     }
 
-    final updatedUserMessage = Message(
-      id: originalMessage.id, // Keep the original ID for now.
+    // --- REFACTORED ATOMIC UPDATE ---
+    // 1. Create the new, definitive message list by truncating to the edit point.
+    List<Message> updatedList = List.from(originalMessages.sublist(0, editingIndex));
+
+    // 2. Add the updated user message.
+    final updatedMessage = originalMessage.copyWith(
       text: newText,
-      isUserMessage: true,
-      photoPath: newPhotoPath ?? originalMessage.photoPath,
-      model: originalMessage.model,
+      photoPath: newPhotoPath,
+      opacity: 1.0,
+      includeInContext: true, // Ensure it's re-included in context
+    );
+    updatedList.add(updatedMessage);
+
+    // 3. Load this final, correct state into the provider. The UI will update instantly.
+    _conversationProvider.loadMessages(updatedList);
+
+    // 4. Clean up the input UI.
+    _inputProvider.finishEditing();
+    _controller.clear();
+    await _panelController.reverse();
+    _ensureKeyboardFocus();
+
+    // 5. Now, trigger regeneration. The index for the new AI response is simply
+    //    the new length of our updated list.
+    final int newAiMessageIndex = updatedList.length;
+
+    // We no longer need the complex if/else, as the new `onRegenerate` handles
+    // the append case gracefully.
+    await _regenerateService.onRegenerate(
+      newAiMessageIndex,
+      localizations: localizations,
+      context: context,
     );
 
-    // 2. Clean up the editing UI state.
-    state.setState(() {
-      // Replace the old message with the updated one.
-      state.messages[editingIndex] = updatedUserMessage;
-
-      // Exit editing mode and clear related state variables.
-      state.isEditingMode = false;
-      state.editingMessageIndex = null;
-      state.originalMessageText = null;
-      state.controller.clear();
-      state.sendService.selectedPhoto = null;
-
-      // The edit is confirmed, so clear the backup.
-      _messagesBeforeEdit = null;
-    });
-
-    // Animate the edit panel away.
-    await state.editPanelController.reverse();
-
-    // 3. Delegate the core logic to RegenerateService.
-    //    It will regenerate the AI message that should follow our edited message.
-    await state.regenerateService.onRegenerate(editingIndex + 1);
+    // The backup is no longer needed for regeneration logic. Clean it up.
+    _clearBackup();
+    // --- REFACTOR END ---
   }
 
-  /// This now immediately truncates the message list for a clean and predictable UI,
-  /// backing up the original list in case of cancellation.
-  void startEditingMessage(int index) {
-    if (!state.mounted || state.isEditingMode) return;
+  void startEditingMessage(int index) async {
+    if (_inputProvider.isEditingMode) return;
 
-    // Backup the current message list before making changes.
-    _messagesBeforeEdit = List.from(state.messages);
+    final messages = _conversationProvider.messages;
+    if (index < 0 || index >= messages.length) return;
 
-    state.setState(() {
-      final messageToEdit = state.messages[index];
-      state.editingMessageIndex = index;
-      state.originalMessageText = messageToEdit.text;
+    _scrollService.hideButtonImmediately();
 
-      // Truncate the list to only include messages up to and including the one being edited.
-      // This correctly and instantly removes all subsequent messages from the view.
-      state.messages = state.messages.sublist(0, index + 1);
+    _messagesBeforeEdit = List.from(messages);
+    final messageToEdit = messages[index];
 
-      state.controller.text = messageToEdit.text;
-      state.controller.selection = TextSelection.fromPosition(
-        TextPosition(offset: state.controller.text.length),
-      );
+    _inputProvider.startEditing(index, messageToEdit);
 
-      state.isEditingMode = true;
-      state.editSessionCounter++; // Force InputField to rebuild with preselected photo etc.
-    });
+    _panelController.forward();
 
-    FocusScope.of(state.context).requestFocus(state.textFieldFocusNode);
-    state.editPanelController.forward();
+    _controller.text = messageToEdit.text;
+    _controller.selection = TextSelection.fromPosition(
+      TextPosition(offset: _controller.text.length),
+    );
+
+    await Future.delayed(const Duration(milliseconds: 100));
+    _ensureKeyboardFocus();
   }
 
-  /// This now restores the full message list from the backup created when
-  /// the edit began.
   void cancelEditingMode() {
-    if (!state.mounted) return;
+    if (!_inputProvider.isEditingMode) return;
 
-    state.setState(() {
-      // Restore the original message list from the backup.
-      if (_messagesBeforeEdit != null) {
-        state.messages = _messagesBeforeEdit!;
-        _messagesBeforeEdit = null;
-      }
+    if (_messagesBeforeEdit != null) {
+      _conversationProvider.loadMessages(_messagesBeforeEdit!);
+    }
 
-      // Reset all editing-related state variables.
-      state.editingMessageIndex = null;
-      state.originalMessageText = null;
-      state.isEditingMode = false;
-      state.controller.clear();
-      state.sendService.selectedPhoto = null;
+    _inputProvider.cancelEditing();
+    _panelController.reverse();
+
+    _clearBackup();
+    _controller.clear();
+
+    _ensureKeyboardFocus();
+  }
+
+  void _ensureKeyboardFocus() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
     });
+  }
 
-    state.textFieldFocusNode.unfocus();
-    state.editPanelController.reverse();
+  void _clearBackup() {
+    _messagesBeforeEdit = null;
   }
 }

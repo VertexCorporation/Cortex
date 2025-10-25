@@ -1,7 +1,7 @@
 // lib/chat/screen/appbar/credits.dart
 
 import 'dart:math';
-import 'package:cortex/main.dart';
+import 'package:cortex/app.dart';
 import 'package:cortex/navigation.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/theme.dart';
@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-
+import '../../../banner.dart';
 import '../../../funds/funds.dart';
-
+import 'package:provider/provider.dart';
 
 /// The main widget for the credits bar, containing the display, the button,
 /// and the logic for the informational pop-up panel.
@@ -21,11 +21,11 @@ class CreditsBar extends StatefulWidget {
   final VoidCallback? onPanelHidden;
 
   const CreditsBar({
-    Key? key,
+    super.key,
     required this.onCreditsInfoTapped,
     this.onPanelShown,
     this.onPanelHidden,
-  }) : super(key: key);
+  });
 
   @override
   CreditsBarState createState() => CreditsBarState();
@@ -89,6 +89,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
 
   void _showCreditsInfo() {
     if (_overlayEntry != null) return;
+    context.read<BannerService>().triggerBannerManually();
 
     final RenderBox renderBox =
     _creditsInfoKey.currentContext!.findRenderObject() as RenderBox;
@@ -134,7 +135,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                 color: AppColors.border, width: 0.8),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.25),
+                                color: Colors.black.withValues(alpha: 0.25),
                                 blurRadius: 15,
                                 offset: const Offset(0, 5),
                               )
@@ -164,7 +165,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                     localizations.creditsInfoPanelBody,
                                     style: GoogleFonts.heebo(
                                       color: AppColors.primaryColor.inverted
-                                          .withOpacity(0.9),
+                                          .withValues(alpha: 0.9),
                                       fontSize: bodyFontSize,
                                       height: 1.5,
                                       decoration: TextDecoration.none,
@@ -175,7 +176,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                     localizations.creditsInfoPanelFooter,
                                     style: GoogleFonts.heebo(
                                       color: AppColors.primaryColor.inverted
-                                          .withOpacity(0.7),
+                                          .withValues(alpha: 0.7),
                                       fontSize: footerFontSize,
                                       fontStyle: FontStyle.italic,
                                       decoration: TextDecoration.none,
@@ -191,7 +192,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                   width: iconSize,
                                   height: iconSize,
                                   color: AppColors.primaryColor.inverted
-                                      .withOpacity(0.6),
+                                      .withValues(alpha: 0.6),
                                 ),
                               ),
                             ],
@@ -320,7 +321,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                             'assets/icons/credit.svg',
                             width: screenWidth * 0.05,
                             height: screenWidth * 0.05,
-                            colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                            color: AppColors.primaryColor.inverted,
                           ),
                           SizedBox(width: screenWidth * 0.01),
                         ],
@@ -410,7 +411,7 @@ class _AnimatedHexagonButtonState extends State<_AnimatedHexagonButton>
       center: Alignment.center,
       radius: 0.8,
       colors: [
-        AppColors.quaternaryColor.withOpacity(0.9),
+        AppColors.quaternaryColor.withValues(alpha: 0.9),
         AppColors.quaternaryColor,
       ],
     );
@@ -433,7 +434,7 @@ class _AnimatedHexagonButtonState extends State<_AnimatedHexagonButton>
             child: Center(
               child: SvgPicture.asset(
                 'assets/icons/sparkle.svg',
-                colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                color: AppColors.primaryColor.inverted,
                 width: widget.screenWidth * 0.045,
                 height: widget.screenWidth * 0.045,
               ),
@@ -467,7 +468,7 @@ class _HexagonBorderPainter extends CustomPainter {
 
     if (hasGlow) {
       final Paint glowPaint = Paint()
-        ..color = const Color(0xFF833AB4).withOpacity(0.6)
+        ..color = const Color(0xFF833AB4).withValues(alpha: 0.6)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
       canvas.drawPath(path.shift(const Offset(0, 2)), glowPaint);
     }

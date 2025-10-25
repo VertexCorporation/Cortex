@@ -2011,4 +2011,11 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'क्या आप वाकई इस अद्भुत मंच को छोड़ना चाहते हैं?';
+
+  @override
+  String get newsErrorTitle => 'समाचार लोड करने में विफल';
+
+  @override
+  String get newsErrorMessage =>
+      'नवीनतम अपडेट प्राप्त करने में समस्या हुई, कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें.';
 }

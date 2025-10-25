@@ -38,13 +38,13 @@ class OverflowText extends StatelessWidget {
   final Animation<double>? animation;
 
   const OverflowText({
-    Key? key,
+    super.key,
     required this.text,
     this.style,
     this.maxLines = 1,
     this.fadeLength = 6,
     this.animation,
-  }) : super(key: key);
+  });
 
   /// Calculates the number of characters (runes) that can fit within the given
   /// constraints without overflowing.
@@ -171,7 +171,7 @@ class OverflowText extends StatelessWidget {
           final double animatedOpacity = (animation?.value ?? 1.0) * charOpacity;
 
           final TextStyle? charStyle = style?.copyWith(
-            color: baseColorForFade.withOpacity(animatedOpacity.clamp(0.0, 1.0)),
+            color: baseColorForFade.withValues(alpha: animatedOpacity.clamp(0.0, 1.0)),
           );
 
           spans.add(TextSpan(

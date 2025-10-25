@@ -1989,4 +1989,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'هل أنت متأكد أنك تريد مغادرة هذه المنصة الرائعة؟';
+
+  @override
+  String get newsErrorTitle => 'فشل تحميل الأخبار';
+
+  @override
+  String get newsErrorMessage =>
+      'حدثت مشكلة أثناء جلب أحدث التحديثات، يرجى التحقق من اتصالك ومحاولة مرة أخرى.';
 }

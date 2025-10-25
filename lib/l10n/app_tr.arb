@@ -771,5 +771,7 @@
   "channelGreetingsName": "Günlük Selamlar",
   "channelGreetingsDescription": "Günaydın, iyi geceler gibi mesajlar.",
   "exitAppTitle": "Bu kadar erken mi gidiyorsun?",
-  "exitAppConfirmation": "Bu harika platformdan ayrılmak istediğinize emin misiniz?"
+  "exitAppConfirmation": "Bu harika platformdan ayrılmak istediğinize emin misiniz?",
+  "newsErrorTitle": "Haberler Yüklenemedi",
+  "newsErrorMessage": "Son güncellemeler alınırken bir sorun oluştu, lütfen bağlantınızı kontrol edip tekrar deneyin."
 }

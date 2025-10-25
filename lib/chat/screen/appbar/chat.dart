@@ -1,8 +1,8 @@
 // lib/chat/screen/appbar/chat.dart
 
 import 'dart:math';
+import 'package:cortex/app.dart';
 import 'package:cortex/extensions.dart';
-import 'package:cortex/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,23 +19,19 @@ class ChatTitle extends StatefulWidget {
   static const String extensionInfoCountKey = 'extensionInfoPanelShowCount';
 
   const ChatTitle({
-    Key? key,
+    super.key,
     required this.modelTitle,
     required this.extensions,
     required this.onTitleTap,
     required this.extensionKey,
     required this.onShowInfoRequest,
-  }) : super(key: key);
+  });
 
   @override
   State<ChatTitle> createState() => ChatTitleState();
 }
 
 class ChatTitleState extends State<ChatTitle> {
-
-  /// 1. It first checks if the panel has already been shown in the current app SESSION.
-  /// 2. It then checks if the TOTAL persistent show count has exceeded the limit of 3.
-  /// The panel is only shown if both checks pass. It returns a bool indicating its decision.
   Future<bool> triggerExtensionInfoPanelIfNeeded() async {
     // CHECK 1: Has it already been shown in this session?
     if (ChatTitle.extensionInfoShownThisSession) {
@@ -67,8 +63,8 @@ class ChatTitleState extends State<ChatTitle> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
     final bool hasExtensions = widget.extensions.currentExtensions.isNotEmpty;
+    final screenWidth = MediaQuery.of(context).size.width;
     final double fontSize = screenWidth * 0.056;
 
     final Widget titleContent = Row(

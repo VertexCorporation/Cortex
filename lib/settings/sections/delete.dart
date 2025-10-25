@@ -1,7 +1,7 @@
 // lib/settings/delete.dart
 
 import 'dart:async';
-import 'package:cortex/main.dart'; // Assuming ShakeWidget is defined here or in a common utility.
+import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +14,6 @@ import 'package:cloud_functions/cloud_functions.dart';
 // Local imports
 import '../../darkener.dart';
 import '../../theme.dart';
-import '../../login/login.dart';
 import '../../notifications.dart';
 import '../../cache.dart';
 import '../../chat/services/storage.dart';
@@ -34,11 +33,11 @@ class DeleteSection extends StatefulWidget {
   final bool isFromActiveChat;
 
   const DeleteSection({
-    Key? key,
+    super.key,
     required this.userData,
     required this.hasInternet,
     this.isFromActiveChat = false,
-  }) : super(key: key);
+  });
 
   @override
   DeleteSectionState createState() => DeleteSectionState();
@@ -211,8 +210,8 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    splashColor: Colors.red.withOpacity(0.3),
-                                    highlightColor: Colors.red.withOpacity(0.1),
+                                    splashColor: Colors.red.withValues(alpha: 0.3),
+                                    highlightColor: Colors.red.withValues(alpha: 0.1),
                                     onTap: () async {
                                       // --- NEW LOGIC ---
                                       if (confirmController.text.trim() != "VERTEX") {
@@ -386,8 +385,8 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    splashColor: Colors.red.withOpacity(0.3),
-                                    highlightColor: Colors.red.withOpacity(0.1),
+                                    splashColor: Colors.red.withValues(alpha: 0.3),
+                                    highlightColor: Colors.red.withValues(alpha: 0.1),
                                     onTap: () async {
                                       // --- CORE LOGIC CHANGE: Validate 'VERTEX' instead of password. ---
                                       final confirmationText = confirmController.text.trim();
@@ -404,7 +403,6 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
                                       }
 
                                       try {
-                                        // --- CRITICAL: User re-authentication with password has been removed. ---
 
                                         debugPrint("$methodName: Confirmation successful. Calling 'requestAccountDeletion' function...");
                                         final functions = FirebaseFunctions.instanceFor(region: 'europe-west1');
@@ -416,18 +414,12 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
 
                                         if (!context.mounted) return;
 
-                                        Navigator.of(context).pushAndRemoveUntil(
-                                          MaterialPageRoute(builder: (context) => const LoginScreen()),
-                                              (Route<dynamic> route) => false,
-                                        );
-
                                         _notificationService.showNotification(
                                             message: appLocalizations.accountDeletionRequested,
                                             isSuccess: true,
                                             bottomOffset: 0.02
                                         );
 
-                                        // --- CHANGE: Removed FirebaseAuthException catch block for wrong password. ---
                                       } on FirebaseFunctionsException catch (e) {
                                         if (!dialogPageContext.mounted) return;
                                         debugPrint("$methodName: FirebaseFunctionsException: ${e.code} - ${e.message}");
@@ -479,7 +471,7 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
       child: InkWell(
         onTap: () => _showDeleteAllConversationsDialog(appLocalizations),
         borderRadius: BorderRadius.circular(10.0),
-        splashColor: AppColors.quaternaryColor.withOpacity(0.3),
+        splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
           child: Row(
@@ -507,7 +499,7 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
       child: InkWell(
         onTap: () => _showDeleteAccountDialog(appLocalizations),
         borderRadius: BorderRadius.circular(10.0),
-        splashColor: AppColors.quaternaryColor.withOpacity(0.3),
+        splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
           child: Row(
@@ -530,10 +522,10 @@ class DeleteSectionState extends State<DeleteSection> with TickerProviderStateMi
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.septenaryColor.withOpacity(0.1),
+        color: AppColors.septenaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(10.0),
         border: Border.all(
-          color: AppColors.septenaryColor.withOpacity(0.5),
+          color: AppColors.septenaryColor.withValues(alpha: 0.5),
           width: 1,
         ),
       ),
@@ -609,10 +601,10 @@ class ShakeWidget extends StatefulWidget {
   final AnimationController controller;
 
   const ShakeWidget({
-    Key? key,
+    super.key,
     required this.child,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   ShakeWidgetState createState() => ShakeWidgetState();

@@ -2018,4 +2018,11 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get exitAppConfirmation =>
       'Tem certeza de que deseja sair desta plataforma incrível?';
+
+  @override
+  String get newsErrorTitle => 'Falha ao carregar notícias';
+
+  @override
+  String get newsErrorMessage =>
+      'Ocorreu um problema ao obter as atualizações mais recentes. Verifique sua conexão e tente novamente.';
 }
