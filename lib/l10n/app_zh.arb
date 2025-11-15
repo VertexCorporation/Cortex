@@ -773,5 +773,22 @@
   "exitAppTitle": "这么快就走？",
   "exitAppConfirmation": "您确定要离开这个令人惊叹的平台吗？",
   "newsErrorTitle": "新闻加载失败",
-  "newsErrorMessage": "获取最新更新时出现问题，请检查您的连接并重试。"
+  "newsErrorMessage": "获取最新更新时出现问题，请检查您的连接并重试。",
+  "codeNotFound": "您输入的验证码无效或已过期。",
+  "whatIsNew": "什么是新的？",
+  "onboardingTitle1": "嘿！我们是Cortex团队。",
+  "onboardingDesc1": "很高兴在这里见到你，{userName}。我们是几个高中生开发者，决定改写人工智能行业的规则。很高兴认识你！那么，让我们更好地了解彼此吧。",
+  "onboardingTitle2": "问题非常严重。",
+  "onboardingDesc2": "人工智能革命已经到来，但却停滞在门槛之上。高昂的订阅费、复杂的平台、侵犯隐私的行为以及阻碍人工智能普及的因素……只要这些因素存在，这道门槛就永远无法逾越。",
+  "onboardingTitle3": "我们不能袖手旁观。",
+  "onboardingDesc3": "为了跨越这道门槛，我们打造了一个功能强大、美观大方、可定制化、易于使用、完全透明、支持在线和离线使用，并且只将您的数据保存在您的设备上的平台。我们把权力还给了它真正应该在的人：您。",
+  "onboardingTitle4": "这从来都不容易。",
+  "onboardingDesc4": "我们被拒绝了几十次，被暂停了好几次，收到过虚假警告，还不得不几十次更改品牌。一路走来，我们被告知这是不可能的。但我们从未放弃，因为我们坚信这个项目属于所有人，而不仅仅是我们。而这正是我们走到今天的原因。",
+  "onboardingFinalTitle": "是时候进行一场革命了。",
+  "onboardingFinalDesc": "如果你看到了这个屏幕，那是因为我们没有放弃。而且我们绝不会放弃。来吧，让我们一起将人工智能革命带给全世界。成为这段故事的一部分……",
+  "onboardingFinalQuestion": "你准备好了吗？",
+  "onboardingFinalButton": "是的！",
+  "dude": "哥们",
+  "swipeToContinue": "滑动继续",
+  "cacheIsNotUpToDate": "您的Play商店缓存未更新。请关闭并重新打开Play商店应用，或重启您的设备。"
 }

@@ -2,51 +2,38 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/chat/services/limit.dart';
-import 'package:flutter/foundation.dart';
-import 'package:cortex/models/backend/data/data.dart';
-
-import '../../models/backend/data/info.dart';
+import 'package:flutter/material.dart';
+import '../../library/backend/data/entity.dart';
+import '../../library/backend/data/service.dart';
+import '../../library/providers/local.dart';
 import '../screen/selected/dynamic.dart';
 
-/// Defines the visual and functional state of the AppBar in the ChatScreen.
 enum AppBarMode {
-  notSelected,      // Default view: "Cortex" title, credits bar.
-  inSelection,      // "Explore All Models" view: "Explore" title, back button.
-  modelSelected,    // Active chat with a standard model: Model name, back button.
-  dynamicChat,      // Active dynamic chat: "Cortex" title, back button.
+  notSelected,
+  inSelection,
+  modelSelected,
+  dynamicChat,
 }
 
-/// A dedicated provider responsible for managing the state of the overall chat session.
 class ChatSessionProvider with ChangeNotifier {
   // ===========================================================================
   // SECTION 1: PRIVATE STATE VARIABLES
   // ===========================================================================
 
+  final ModelService _modelService;
+  ModelLocalStateProvider? _localStateProvider;
+
   // -------------------- Session & UI Mode State --------------------
   AppBarMode _appBarMode = AppBarMode.notSelected;
   bool _isModelSelected = false;
-  // Tracks if the session is in "Dynamic Chat" mode, regardless of whether
-  // it's currently purely random or has a pinned assistant.
   bool _isPersistentlyDynamic = false;
   bool _isExitingChat = false;
   bool _wasDynamicOnExit = false;
 
   // -------------------- Model List State --------------------
-  List<ModelInfo> _allModels = [];
-  bool _areModelsLoading = true;
-  bool _modelsLoadError = false;
-
-  // -------------------- Selected Model State --------------------
-  String? _modelId;
-  String? _modelTitle;
-  String? _modelImagePath;
-  String? _modelProducer;
-  String? _modelPath;
-  String? _role;
-  bool _canHandleImage = false;
-  bool _isLocalModelLoaded = false;
-  String? _lastModelTitle;
-  String? _lastModelImagePath;
+  // --- All selected model data is now encapsulated in a single, nullable entity. ---
+  ModelEntity? _selectedModel;
+  ModelEntity? _lastExitedModel; // To preserve data during exit animations.
 
   // -------------------- User & Subscription State --------------------
   bool _isUserSubscribed = false;
@@ -54,6 +41,7 @@ class ChatSessionProvider with ChangeNotifier {
   ChatLimitManager? _chatLimitManager;
   String? _displayName;
   String? _email;
+  Locale _currentLocale = const Locale('en'); // Default to English.
 
   // -------------------- Session-wide UI Flags --------------------
   bool _showDisclaimer = false;
@@ -65,111 +53,134 @@ class ChatSessionProvider with ChangeNotifier {
   // SECTION 2: PUBLIC GETTERS
   // ===========================================================================
 
-  // -------------------- Session & UI Mode State --------------------
   AppBarMode get appBarMode => _appBarMode;
   bool get isModelSelected => _isModelSelected;
-  /// Returns true if we are in the Dynamic Chat feature (either random or pinned).
   bool get isDynamicChat => _isPersistentlyDynamic;
-  /// Returns true if ANY chat is active, keeping the ChatController in the active view.
   bool get isChatActive => _isModelSelected || _isPersistentlyDynamic;
   bool get isExitingChat => _isExitingChat;
   bool get wasDynamicOnExit => _wasDynamicOnExit;
+  List<ModelEntity> get allModels => _modelService.getCachedModelsSync();
+  bool get areModelsLoading => _modelService.isLoading;
+  bool get modelsLoadError => false;
 
-  // -------------------- Model List State --------------------
-  List<ModelInfo> get allModels => _allModels;
-  bool get areModelsLoading => _areModelsLoading;
-  bool get modelsLoadError => _modelsLoadError;
+  String? get modelId => _selectedModel?.id;
 
-  // -------------------- Selected Model State --------------------
-  String? get modelId => _modelId;
-  String? get modelTitle => _isExitingChat ? _lastModelTitle : _modelTitle;
-  String? get modelImagePath => _isExitingChat ? _lastModelImagePath : _modelImagePath;
-  String? get role => _role;
-  String? get modelPath => _modelPath;
-  bool get canHandleImage => _canHandleImage;
+  String? get modelTitle {
+    final currentModel = _isExitingChat ? _lastExitedModel : _selectedModel;
+    if (currentModel == null) {
+      return null;
+    }
+
+    final langCode = _currentLocale.languageCode;
+    final baseId = _modelService.getBaseIdFromFullId(currentModel.id, langCode: langCode);
+
+    if (baseId == currentModel.id) {
+      return currentModel.displayTitle;
+    }
+
+    try {
+      final seriesModel = _modelService.getPreciseModelData(baseId, langCode: langCode);
+      return seriesModel.displayTitle;
+    } catch (e) {
+      // Fallback remains the same, which is robust.
+      return currentModel.displayTitle;
+    }
+  }
+
+  String? get modelImagePath {
+    final model = _isExitingChat ? _lastExitedModel : _selectedModel;
+    return model?.imagePath;
+  }
+
+  String? get role => _selectedModel?.role;
+  String? get modelPath {
+    if (_selectedModel == null || _selectedModel!.isServerSide) {
+      return null;
+    }
+
+    return _localStateProvider?.getFilePathById(_selectedModel!.id);
+  }
+  bool get canHandleImage => _selectedModel?.modalities['image'] == true;
+
+  // Local model loading state is transient and remains separate.
+  bool _isLocalModelLoaded = false;
   bool get isLocalModelLoaded => _isLocalModelLoaded;
 
-  // -------------------- User & Subscription State --------------------
   bool get isUserSubscribed => _isUserSubscribed;
   int get premiumTrialUses => _premiumTrialUses;
   ChatLimitManager? get chatLimitManager => _chatLimitManager;
   String? get displayName => _displayName;
   String? get email => _email;
-
-  // -------------------- Session-wide UI Flags --------------------
-  bool get showDisclaimer {
-    return isChatActive && !_hasDismissedDisclaimerThisSession;
-  }
+  bool get showDisclaimer => isChatActive && !_hasDismissedDisclaimerThisSession;
   bool get showPremiumBanner => _showPremiumBanner;
   bool get isStorageSufficient => _isStorageSufficient;
 
+  // Returns the current locale used by the session for localization.
+  Locale getLocale() => _currentLocale;
+
   // ===========================================================================
-  // SECTION 3: STATE MUTATION METHODS (ACTIONS)
+  // SECTION 3: CONSTRUCTOR
   // ===========================================================================
 
-  // -------------------- Model List Actions --------------------
+  ChatSessionProvider({required ModelService modelService}) : _modelService = modelService;
+  
+  // ===========================================================================
+  // SECTION 4: STATE MUTATION METHODS (ACTIONS)
+  // ===========================================================================
 
-  void setModelsLoading() {
-    _areModelsLoading = true;
-    _modelsLoadError = false;
-    notifyListeners();
+  /// Sets the current locale for the session, required for localization.
+  void setLocale(Locale locale) {
+    _currentLocale = locale;
   }
 
-  void setModelsLoadSuccess(List<ModelInfo> loadedModels) {
-    _areModelsLoading = false;
-    _modelsLoadError = false;
-    _allModels = loadedModels;
-    notifyListeners();
-  }
-
-  void setModelsLoadError() {
-    _areModelsLoading = false;
-    _modelsLoadError = true;
-    notifyListeners();
-  }
-
-  // -------------------- Chat Session Lifecycle Actions --------------------
-
-  void selectModel(ModelInfo model, {Map<String, dynamic>? preciseData}) {
-    final data = preciseData ?? ModelData.getPreciseModelData(model.id);
-
+  void selectModel(ModelEntity entity) {
     _isModelSelected = true;
     _isPersistentlyDynamic = false;
     _appBarMode = AppBarMode.modelSelected;
     _isExitingChat = false;
+    _selectedModel = entity;
 
-    _modelId = model.id;
-    _modelTitle = model.title;
-    _modelImagePath = model.imagePath;
-    _modelProducer = model.producer;
-    _modelPath = data['path'] as String?;
-    _role = data['role'] as String?;
-    _canHandleImage = ModelData.hasModality(model.id, 'image');
+    if (!entity.isServerSide) {
+      _isLocalModelLoaded = false;
+    }
 
-    updatePremiumBannerVisibility((data['tier'] as String? ?? 'free') == 'premium');
-
+    updatePremiumBannerVisibility(entity.isPremium);
     notifyListeners();
   }
 
-  /// Intelligently starts a new dynamic chat session by first checking for a
-  /// pinned assistant preference. This is now the single source of truth for
-  /// beginning a dynamic chat.
-  /// Intelligently starts a new dynamic chat session by first checking for a
-  /// pinned assistant preference. This is now the single source of truth for
-  /// beginning a dynamic chat.
+  void configureForStandardChat({
+    required ModelEntity model,
+    required bool isPremium,
+  }) {
+    _isExitingChat = false;
+    _isPersistentlyDynamic = false;
+    _isModelSelected = true;
+    _appBarMode = AppBarMode.modelSelected;
+
+    _selectedModel = model;
+
+    if (!model.isServerSide) {
+      _isLocalModelLoaded = false;
+    }
+
+    _showPremiumBanner = isPremium && !_isUserSubscribed;
+    notifyListeners();
+  }
+
   Future<void> startDynamicConversation() async {
-    // 1. Set the basic dynamic chat state immediately. This ensures the UI
-    // transitions to the active chat view without delay.
     _isModelSelected = false;
     _isPersistentlyDynamic = true;
     _appBarMode = AppBarMode.dynamicChat;
     _isExitingChat = false;
-    // Notify listeners for the initial UI change, but without model details yet.
+    _selectedModel = null;
+    _isLocalModelLoaded = false;
+    _showPremiumBanner = false;
     notifyListeners();
-
-    // 2. Asynchronously check for a saved assistant preference.
     final dynamicChatService = DynamicChatService(this);
-    await dynamicChatService.loadDynamicAssistantPreference();
+    await dynamicChatService.loadDynamicAssistantPreference(
+      langCode: _currentLocale.languageCode,
+      modelService: _modelService,
+    );
   }
 
   void resetSessionState() {
@@ -177,20 +188,12 @@ class ChatSessionProvider with ChangeNotifier {
       _isExitingChat = true;
       _wasDynamicOnExit = _isPersistentlyDynamic;
     }
-
-    _lastModelTitle = _modelTitle;
-    _lastModelImagePath = _modelImagePath;
+    _lastExitedModel = _selectedModel;
 
     _isModelSelected = false;
     _isPersistentlyDynamic = false;
     _appBarMode = AppBarMode.notSelected;
-    _modelId = null;
-    _modelTitle = null;
-    _modelImagePath = null;
-    _modelProducer = null;
-    _modelPath = null;
-    _role = null;
-    _canHandleImage = false;
+    _selectedModel = null;
     _isLocalModelLoaded = false;
     _showPremiumBanner = false;
 
@@ -199,53 +202,16 @@ class ChatSessionProvider with ChangeNotifier {
     Future.delayed(const Duration(milliseconds: 400), () {
       if (_isExitingChat) {
         _isExitingChat = false;
-        _lastModelTitle = null;
-        _lastModelImagePath = null;
+        _lastExitedModel = null;
       }
     });
   }
 
-  void configureForDynamicConversation() {
-    _isExitingChat = false;
-    _isModelSelected = false;
-    _isPersistentlyDynamic = true;
-    _appBarMode = AppBarMode.dynamicChat;
-    _modelId = null;
-    _modelTitle = null;
-    _modelImagePath = null;
-    _modelProducer = null;
-    _modelPath = null;
-    _role = null;
-    _canHandleImage = true;
-    _isLocalModelLoaded = false;
-    _showPremiumBanner = false;
-
-    notifyListeners();
+  /// Sets the required dependency for local model state management.
+  /// This must be called by the ProxyProvider in main.dart.
+  void setDependencies(ModelLocalStateProvider localStateProvider) {
+    _localStateProvider ??= localStateProvider;
   }
-
-  void configureForStandardConversation({
-    required ModelInfo modelInfo,
-    required bool isPremium,
-  }) {
-    _isExitingChat = false;
-    _isPersistentlyDynamic = false;
-
-    _isModelSelected = true;
-    _appBarMode = AppBarMode.modelSelected;
-    _modelId = modelInfo.id;
-    _modelTitle = modelInfo.title;
-    _modelImagePath = modelInfo.imagePath;
-    _modelProducer = modelInfo.producer;
-    _modelPath = modelInfo.path;
-    _role = modelInfo.role;
-    _canHandleImage = ModelData.hasModality(modelInfo.id, 'image');
-    _showPremiumBanner = isPremium && !_isUserSubscribed;
-    _isLocalModelLoaded = false;
-
-    notifyListeners();
-  }
-
-  // -------------------- Selected Model & Dynamic Chat Actions --------------------
 
   void setLocalModelLoaded(bool isLoaded) {
     if (_isLocalModelLoaded != isLoaded) {
@@ -255,66 +221,34 @@ class ChatSessionProvider with ChangeNotifier {
   }
 
   void updateActiveModelExtension(String newModelId) {
-    final preciseData = ModelData.getPreciseModelData(newModelId);
-
-    _modelId = newModelId;
-    _role = preciseData['role'] as String? ?? _role;
-    _canHandleImage = ModelData.hasModality(newModelId, 'image');
-
-    final seriesData = ModelData.getPreciseModelData(ModelData.getBaseIdFromFullId(newModelId));
-    _modelTitle = seriesData['title'] as String? ?? _modelTitle;
-    _modelImagePath = ModelData.getModelImagePath(seriesData);
-    _modelProducer = seriesData['producer'] as String? ?? _modelProducer;
-
-    final bool isPremium = (preciseData['tier'] as String? ?? 'free') == 'premium';
-    updatePremiumBannerVisibility(isPremium);
-
+    final langCode = _currentLocale.languageCode;
+    _selectedModel = _modelService.getPreciseModelData(newModelId, langCode: langCode);
+    updatePremiumBannerVisibility(_selectedModel?.isPremium ?? false);
     notifyListeners();
   }
 
-  /// Configures the state to use a specific, "pinned" model WITHIN the Dynamic Chat mode.
   void pinDynamicAssistant(String modelId) {
-    final preciseData = ModelData.getPreciseModelData(modelId);
+    final langCode = _currentLocale.languageCode;
+    final entity = _modelService.getPreciseModelData(modelId, langCode: langCode);
 
-    // CRITICAL FIX: We MUST remain in persistently dynamic mode so `isChatActive`
-    // remains true and the ChatController doesn't exit the view.
     _isPersistentlyDynamic = true;
     _isModelSelected = false;
     _appBarMode = AppBarMode.dynamicChat;
+    _selectedModel = entity;
 
-    _modelId = modelId;
-    _role = preciseData['role'] as String?;
-    _canHandleImage = ModelData.hasModality(modelId, 'image');
-
-    _modelTitle = preciseData['title'] as String?;
-    _modelImagePath = preciseData['imagePath'] as String?;
-    _modelProducer = preciseData['producer'] as String?;
-
-    final bool isPremium = (preciseData['tier'] as String? ?? 'free') == 'premium';
-    updatePremiumBannerVisibility(isPremium);
-
+    updatePremiumBannerVisibility(entity.isPremium);
     notifyListeners();
   }
 
-  /// Resets the Dynamic Chat to its default "ask anything" (random) mode.
   void unpinDynamicAssistant() {
-    // CRITICAL FIX: Ensure we stay in dynamic mode.
     _isPersistentlyDynamic = true;
     _isModelSelected = false;
     _appBarMode = AppBarMode.dynamicChat;
-
-    _modelId = null;
-    _role = null;
-    _canHandleImage = true; // Default capability for generic mode.
-    _modelTitle = null;
-    _modelImagePath = null;
-    _modelProducer = null;
+    _selectedModel = null;
 
     updatePremiumBannerVisibility(false);
     notifyListeners();
   }
-
-  // -------------------- User & UI Flag Actions --------------------
 
   void updateUserData(Map<String, dynamic> data) {
     final int subscriptionLevel = data['hasCortexSubscription'] ?? 0;
@@ -322,14 +256,11 @@ class ChatSessionProvider with ChangeNotifier {
 
     final dynamic lastResetValue = data['premiumModelTrialLastReset'];
     Timestamp? lastResetTimestamp;
-
     if (lastResetValue is Timestamp) {
       lastResetTimestamp = lastResetValue;
     } else if (lastResetValue is String) {
       final parsedDate = DateTime.tryParse(lastResetValue);
-      if (parsedDate != null) {
-        lastResetTimestamp = Timestamp.fromDate(parsedDate);
-      }
+      if (parsedDate != null) lastResetTimestamp = Timestamp.fromDate(parsedDate);
     }
 
     int trialUses = data['premiumModelTrialUses'] as int? ?? 0;
@@ -347,14 +278,11 @@ class ChatSessionProvider with ChangeNotifier {
 
     final dynamic expiresValue = data['subscriptionExpiresAt'];
     Timestamp? subscriptionExpiresAt;
-
     if (expiresValue is Timestamp) {
       subscriptionExpiresAt = expiresValue;
     } else if (expiresValue is String) {
       final parsedDate = DateTime.tryParse(expiresValue);
-      if (parsedDate != null) {
-        subscriptionExpiresAt = Timestamp.fromDate(parsedDate);
-      }
+      if (parsedDate != null) subscriptionExpiresAt = Timestamp.fromDate(parsedDate);
     }
 
     _chatLimitManager = ChatLimitManager(
@@ -362,11 +290,9 @@ class ChatSessionProvider with ChangeNotifier {
       subscriptionExpiresAt: subscriptionExpiresAt,
     );
 
-    if (_isModelSelected && modelId != null) {
-      final modelData = ModelData.getPreciseModelData(modelId!);
-      updatePremiumBannerVisibility((modelData['tier'] as String? ?? 'free') == 'premium');
+    if (_selectedModel != null) {
+      updatePremiumBannerVisibility(_selectedModel!.isPremium);
     }
-
     notifyListeners();
   }
 

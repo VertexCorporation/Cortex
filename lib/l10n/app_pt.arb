@@ -773,5 +773,22 @@
   "exitAppTitle": "Vai embora tão cedo?",
   "exitAppConfirmation": "Tem certeza de que deseja sair desta plataforma incrível?",
   "newsErrorTitle": "Falha ao carregar notícias",
-  "newsErrorMessage": "Ocorreu um problema ao obter as atualizações mais recentes. Verifique sua conexão e tente novamente."
+  "newsErrorMessage": "Ocorreu um problema ao obter as atualizações mais recentes. Verifique sua conexão e tente novamente.",
+  "codeNotFound": "O código que você inseriu é inválido ou expirou.",
+  "whatIsNew": "O que há de novo?",
+  "onboardingTitle1": "Olá! Somos a Equipe Cortex.",
+  "onboardingDesc1": "É ótimo te ver por aqui, {userName}. Somos um grupo de desenvolvedores do ensino médio que decidiu reescrever as regras da indústria de IA. É um prazer te conhecer! Então, vamos nos conhecer melhor.",
+  "onboardingTitle2": "Havia problemas enormes.",
+  "onboardingDesc2": "A revolução da IA chegou, mas ficou estagnada na porta de entrada. Com altas taxas de assinatura, plataformas complexas, aqueles que destroem a privacidade e aqueles que bloqueiam o acesso à IA... enquanto eles estivessem no jogo, essa porta jamais poderia ser ultrapassada.",
+  "onboardingTitle3": "Não podíamos simplesmente ficar de braços cruzados.",
+  "onboardingDesc3": "Para ultrapassar esse limite, criamos uma plataforma poderosa, estética, personalizável, fácil de usar, totalmente transparente, que funciona online e offline e mantém seus dados apenas no seu dispositivo. Devolvemos o poder a quem ele pertence: a você.",
+  "onboardingTitle4": "Isso nunca foi fácil.",
+  "onboardingDesc4": "Fomos rejeitados dezenas de vezes, suspensos diversas vezes, recebemos avisos falsos e tivemos que mudar nossa marca dezenas de vezes. Em meio a tudo isso e muito mais, nos disseram que era impossível. Mas nunca desistimos, acreditando que este projeto pertence a todos, não apenas a nós. E é exatamente por isso que estamos aqui.",
+  "onboardingFinalTitle": "Chegou a hora da revolução.",
+  "onboardingFinalDesc": "Se você está vendo esta tela, é porque não desistimos. E não temos nenhuma intenção de desistir. Vamos lá, vamos levar a revolução da IA para o mundo juntos. Para fazer parte dessa história...",
+  "onboardingFinalQuestion": "Você está pronto?",
+  "onboardingFinalButton": "SIM!",
+  "dude": "Cara",
+  "swipeToContinue": "Deslize para continuar",
+  "cacheIsNotUpToDate": "O cache da sua Play Store não está atualizado. Feche e abra novamente o aplicativo Play Store ou reinicie o seu dispositivo."
 }

@@ -22,18 +22,34 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
     var messages by mutableStateOf(listOf("Initializing..."))
         private set
 
-    // FIX 1: Corrected typo from `mutableStateof` to `mutableStateOf`.
     var message by mutableStateOf("")
         private set
 
     override fun onCleared() {
         super.onCleared()
+        unload()
+    }
 
+    fun unload() {
+        Log.d(tag, "ViewModel received unload command.")
         viewModelScope.launch {
             try {
                 llamaAndroid.unload()
+                log("Model removed from the memory.")
             } catch (exc: IllegalStateException) {
                 messages += exc.message!!
+                Log.e(tag, "unload() was unsuccessful", exc)
+            }
+        }
+    }
+
+    fun clearKv() {
+        viewModelScope.launch {
+            try {
+                llamaAndroid.clearKv()
+                log("KV cache cleared.")
+            } catch (e: Exception) {
+                Log.e(tag, "clearKv() failed", e)
             }
         }
     }
@@ -45,7 +61,7 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
         }
     }
 
-    fun send() {
+    fun send(photoBase64: String?) {
         val text = message
         message = ""
 
@@ -53,12 +69,13 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
         messages += ""
 
         viewModelScope.launch {
+            if (photoBase64 != null && photoBase64.isNotEmpty()) {
+                llamaAndroid.setImage(photoBase64)
+            }
             try {
-                // --- FIX: `role` olmadan gönderim yap ve akışı doğru şekilde yönet ---
                 llamaAndroid.send(message = text)
                     .catch { exception ->
                         Log.e(tag, "send() failed", exception)
-                        // Hatayı Flutter'a bildir ve tamamlandığını sinyalle
                         if (LlamaService.isChannelInitialized) {
                             val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
                             mainHandler.post {
@@ -68,20 +85,15 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
                         messages += exception.message!!
                     }
                     .collect { token ->
-                        // --- FIX: EN KRİTİK DÜZELTME BURADA. ---
-                        // Alınan her token'ı MethodChannel üzerinden Flutter'a ilet.
                         if (LlamaService.isChannelInitialized) {
                             val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
                             mainHandler.post {
                                 LlamaService.resultChannel.invokeMethod("onMessageResponse", token)
                             }
                         }
-                        // Aynı zamanda yerel logları da güncelle (debug için).
                         messages = messages.dropLast(1) + (messages.last() + token)
                     }
 
-                // --- FIX: Akış başarıyla tamamlandığında Flutter'a sinyal gönder. ---
-                // Bu, `collect` bittikten sonra çağrılacak.
                 if (LlamaService.isChannelInitialized) {
                     val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
                     mainHandler.post {
@@ -91,7 +103,6 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
 
             } catch (e: Exception) {
                 Log.e(tag, "send coroutine içinde hata", e)
-                // Beklenmedik hatalarda bile tamamlanma sinyalinin gönderildiğinden emin ol.
                 if (LlamaService.isChannelInitialized) {
                     val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
                     mainHandler.post {

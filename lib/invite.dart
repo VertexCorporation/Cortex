@@ -59,6 +59,11 @@ class InviteService {
     // ====================================================================
 
     // Open the native share sheet with our dynamically generated content.
-    await Share.share(shareText, subject: shareSubject);
+    await SharePlus.instance.share(
+      ShareParams(
+        text: shareText,
+        subject: shareSubject,
+      ),
+    );
   }
 }

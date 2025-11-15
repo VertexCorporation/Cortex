@@ -2018,4 +2018,63 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get newsErrorMessage =>
       'नवीनतम अपडेट प्राप्त करने में समस्या हुई, कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें.';
+
+  @override
+  String get codeNotFound =>
+      'आपके द्वारा प्रविष्ट कोड अमान्य है या उसकी समय सीमा समाप्त हो चुकी है।';
+
+  @override
+  String get whatIsNew => 'नया क्या है?';
+
+  @override
+  String get onboardingTitle1 => 'अरे! हम कॉर्टेक्स टीम हैं।';
+
+  @override
+  String onboardingDesc1(String userName) {
+    return '$userName, आपको यहाँ देखकर बहुत अच्छा लगा। हम कुछ हाई स्कूल के डेवलपर हैं जिन्होंने AI उद्योग के नियमों को नए सिरे से लिखने का फैसला किया है। आपसे मिलकर बहुत अच्छा लगा! तो चलिए एक-दूसरे को बेहतर तरीके से जानते हैं।';
+  }
+
+  @override
+  String get onboardingTitle2 => 'समस्याएँ बहुत बड़ी थीं।';
+
+  @override
+  String get onboardingDesc2 =>
+      'एआई क्रांति आई, लेकिन वह दहलीज पर ही अटक गई। ऊँची सदस्यता शुल्क, जटिल प्लेटफ़ॉर्म, निजता का हनन करने वाले और एआई तक पहुँच को अवरुद्ध करने वाले... जब तक वे खेल में थे, यह दहलीज कभी पार नहीं की जा सकी।';
+
+  @override
+  String get onboardingTitle3 => 'हम यूं ही खड़े नहीं रह सकते थे।';
+
+  @override
+  String get onboardingDesc3 =>
+      'उस सीमा को पार करने के लिए, हमने एक ऐसा प्लेटफ़ॉर्म बनाया है जो शक्तिशाली, सुंदर, अनुकूलन योग्य, उपयोग में आसान, पूरी तरह से पारदर्शी है, ऑनलाइन और ऑफलाइन दोनों तरह से काम करता है, और आपका डेटा सिर्फ़ आपके डिवाइस पर ही रखता है। हमने यह शक्ति वापस उसी को दी है जहाँ इसकी ज़िम्मेदारी है: आपको।';
+
+  @override
+  String get onboardingTitle4 => 'यह कभी आसान नहीं था.';
+
+  @override
+  String get onboardingDesc4 =>
+      'हमें दर्जनों बार अस्वीकार किया गया, कई बार निलंबित किया गया, झूठी चेतावनियाँ मिलीं, और दर्जनों बार अपना ब्रांड बदलना पड़ा। इन सबके बावजूद, हमें बताया गया कि यह संभव नहीं है। लेकिन हमने कभी हार नहीं मानी, यह मानते हुए कि यह परियोजना सिर्फ़ हमारी नहीं, बल्कि सभी की है। और इसीलिए हम यहाँ हैं।';
+
+  @override
+  String get onboardingFinalTitle => 'यह क्रांति का समय है.';
+
+  @override
+  String get onboardingFinalDesc =>
+      'अगर आप यह स्क्रीन देख रहे हैं, तो इसकी वजह यह है कि हमने हार नहीं मानी। और हमारा हार मानने का कोई इरादा नहीं है। आइए, हम सब मिलकर AI क्रांति को दुनिया तक पहुँचाएँ। इस कहानी का हिस्सा बनने के लिए...';
+
+  @override
+  String get onboardingFinalQuestion => 'क्या आप तैयार हैं?';
+
+  @override
+  String get onboardingFinalButton => 'हाँ!';
+
+  @override
+  String get dude => 'दोस्त';
+
+  @override
+  String get swipeToContinue => 'जारी रखने के लिए स्वाइप करें';
+
+  @override
+  String get cacheIsNotUpToDate =>
+      'आपका Play Store कैश अपडेट नहीं है। कृपया Play Store ऐप बंद करके दोबारा खोलें, या अपना डिवाइस रीस्टार्ट करें।';
 }

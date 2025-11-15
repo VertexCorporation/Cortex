@@ -1,4 +1,4 @@
-// lib/chat/controller.dart
+// lib/chat/main/controller.dart
 
 //
 // This file defines the ChatController widget, which acts as the main orchestrator
@@ -13,7 +13,6 @@ import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/screen/appbar/appbar.dart';
 import 'package:cortex/chat/screen/appbar/chat.dart';
-import 'package:cortex/chat/services/load.dart';
 import 'package:cortex/chat/services/offline.dart';
 import 'package:cortex/chat/services/read.dart';
 import 'package:cortex/chat/services/recent.dart';
@@ -25,13 +24,13 @@ import 'package:provider/provider.dart';
 import '../../banner.dart';
 import '../../initialization.dart';
 import '../../l10n/app_localizations.dart';
-import '../../language.dart';
-import '../../models/backend/data/data.dart';
+import '../../library/backend/data/service.dart';
 import '../../navigation.dart';
-import '../../settings/settings.dart';
+import '../../settings/controller.dart';
 import '../../theme.dart';
+import '../messages/options/manager.dart';
 import '../screen/selected/dynamic.dart';
-import '../screen/unselected/news.dart';
+import '../screen/unselected/widgets/news/service.dart';
 import 'active.dart';
 import 'inactive.dart';
 
@@ -76,8 +75,10 @@ class ChatControllerState extends State<ChatController>
   // Key for the user account avatar/button in the AppBar.
   final GlobalKey _accountButtonKey = GlobalKey();
   // Member variables to hold provider instances safely.
-  ChatSessionProvider? _sessionProvider;
-  OfflineService? _offlineService;
+  late final ChatSessionProvider _sessionProvider;
+  late final OfflineService _offlineService;
+  late final ModelService _modelService;
+
   // --- UI and Animation State ---
 
   // Manages the UI helper for model extensions (e.g., different versions of a model).
@@ -104,9 +105,12 @@ class ChatControllerState extends State<ChatController>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
-    // Initialize UI helpers that are owned by this controller.
     extensions = Extensions(vsync: this);
+
+    // --- Get all provider instances here, ONCE. ---
+    _sessionProvider = context.read<ChatSessionProvider>();
+    _offlineService = context.read<OfflineService>();
+    _modelService = context.read<ModelService>();
   }
 
   @override
@@ -114,39 +118,26 @@ class ChatControllerState extends State<ChatController>
     super.didChangeDependencies();
     final newLocale = Localizations.localeOf(context);
 
-    // Perform one-time setup that depends on the context.
     if (!_isInitialSetupComplete) {
       debugPrint("[Controller] didChangeDependencies: Performing one-time initial setup.");
       _isInitialSetupComplete = true;
       _currentLocale = newLocale;
 
-      // Safely get provider references here
-      _sessionProvider = context.read<ChatSessionProvider>();
-      _offlineService = context.read<OfflineService>();
-
-      // Heavy lifting is done after the first frame is built.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          _performInitialAsyncSetup();
+          _performInitialAsyncSetup(newLocale.languageCode);
         }
       });
       return;
     }
 
-    // If the language changes, trigger a full data reload.
     if (_currentLocale != newLocale) {
-      debugPrint("[Controller] Language change detected. Forcing data reload.");
+      debugPrint("[Controller] Language change detected for language: '${newLocale.languageCode}'.");
       _currentLocale = newLocale;
 
-      // The state-changing calls are wrapped in a post-frame callback.
-      // This schedules the execution of this code to run immediately AFTER the current
-      // build cycle is complete, thus avoiding the "setState() called during build" error.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        // We add a `mounted` check as a safety measure, since this code runs asynchronously.
         if (mounted) {
-          // These calls can now safely call `notifyListeners()` because the build is finished.
-          inactiveChatViewKey.currentState?.reloadAllModelsForLanguageChange();
-          context.read<NewsService>().forceRefresh(context);
+          context.read<NewsService>().loadNewsForLanguage(newLocale.languageCode);
         }
       });
     }
@@ -178,19 +169,24 @@ class ChatControllerState extends State<ChatController>
     }
   }
 
+
   /// Handles the logic for exiting any active chat. It orchestrates a full state
   /// reset across all relevant providers and notifies the parent widget.
   Future<void> handleExit() async {
+    // --- Get all providers and langCode at the beginning ---
     final sessionProvider = context.read<ChatSessionProvider>();
     final conversationProvider = context.read<ConversationProvider>();
     final inputProvider = context.read<InputProvider>();
     final recentModelsManager = context.read<RecentModelsManager>();
+    // Get the langCode from the context, as it's available here.
+    final langCode = Localizations.localeOf(context).languageCode;
 
     if (sessionProvider.isDynamicChat) {
       hasShownDynamicChatThisSession = true;
       debugPrint("[Controller] Exiting dynamic chat. Session flag set.");
     }
 
+    dismissCurrentMessageOptions();
     appbarKey.currentState?.closeAnyOpenPanels();
 
     activeChatViewKey.currentState?.cancelAnyActiveEdit();
@@ -198,7 +194,7 @@ class ChatControllerState extends State<ChatController>
     activeChatViewKey.currentState?.clearControllers();
     inactiveChatViewKey.currentState?.clearControllers();
 
-    unawaited(recentModelsManager.refresh());
+    unawaited(recentModelsManager.refresh(langCode: langCode));
 
     sessionProvider.resetSessionState();
     conversationProvider.clearConversation();
@@ -207,27 +203,23 @@ class ChatControllerState extends State<ChatController>
     widget.onModelSelectionChanged?.call(false);
   }
 
-
-  Future<void> _performInitialAsyncSetup() async {
-    // Wait for core services like Firebase to be ready.
+  Future<void> _performInitialAsyncSetup(String langCode) async {
+    // Wait for core services...
     await context.read<AppInitializer>().onCoreServicesReady;
     if (!mounted) return;
 
-    final langCode = Localizations.localeOf(context).languageCode;
+    // We still need to load news and initialize recent models.
+    final newsFuture = context.read<NewsService>().loadNewsForLanguage(langCode);
+    final recentFuture = context.read<RecentModelsManager>().initialize(langCode: langCode);
+    await Future.wait([newsFuture, recentFuture]);
 
-    // Load models and initialize recent models manager concurrently.
-    await Future.wait([
-      context.read<LoadService>().loadModels(languageCode: langCode),
-      context.read<RecentModelsManager>().initialize(),
-    ]);
     if (!mounted) return;
 
-    // If the app was opened with a specific conversation ID, load it.
+    // Conversation loading logic remains the same.
     if (widget.conversationID != null) {
-      final currentLanguageCode = context.read<LocaleProvider>().locale.languageCode;
       await context.read<ReadService>().loadConversationById(
         widget.conversationID!,
-        languageCode: currentLanguageCode,
+        languageCode: langCode,
       );
       return;
     }
@@ -238,30 +230,31 @@ class ChatControllerState extends State<ChatController>
     debugPrint("[Controller] Disposing state...");
     WidgetsBinding.instance.removeObserver(this);
 
-    // Use the cached provider instances instead of context.read() ---
-    // This is now safe because _sessionProvider and _offlineService were set
-    // earlier in the widget's lifecycle.
-    if (_sessionProvider?.isChatActive == true && Utils.isLocalModel(_sessionProvider?.modelId)) {
-      debugPrint("[Controller] Disposing: Unloading local model ${_sessionProvider?.modelId}.");
-      _offlineService?.unloadModel();
+    // --- Use the securely stored provider instances ---
+    if (_sessionProvider.isChatActive) {
+      final langCode = _sessionProvider.getLocale().languageCode;
+
+      if (Utils.isLocalModel(_sessionProvider.modelId, langCode: langCode, modelService: _modelService)) {
+        debugPrint("[Controller] Disposing: Unloading local model ${_sessionProvider.modelId}.");
+
+        _offlineService.releaseModel();
+      }
     }
 
-    // Dispose of UI helpers owned by this controller.
     extensions.dispose();
-
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    final sessionProvider = context.read<ChatSessionProvider>();
 
-    // When the app is backgrounded, unload any active local models to save resources.
+    // For consistency and absolute safety, use the stored instances here as well.
     if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
-      if (sessionProvider.isChatActive && Utils.isLocalModel(sessionProvider.modelId)) {
+      final langCode = _sessionProvider.getLocale().languageCode;
+      if (_sessionProvider.isChatActive && Utils.isLocalModel(_sessionProvider.modelId, langCode: langCode, modelService: _modelService)) {
         debugPrint("[Controller] AppLifecycle: $state. Unloading local model.");
-        context.read<OfflineService>().unloadModel();
+        _offlineService.releaseModel();
       }
     }
   }
@@ -290,23 +283,24 @@ class ChatControllerState extends State<ChatController>
     final localizations = AppLocalizations.of(context)!;
     final bannerService = context.read<BannerService>();
     final bool isStandardChatActive = sessionProvider.isModelSelected && sessionProvider.modelId != null;
-
     final bool isChatNowActive = sessionProvider.isChatActive;
+    final modelService = context.read<ModelService>();
 
     if (isStandardChatActive) {
-      final currentBaseId = ModelData.getBaseIdFromFullId(sessionProvider.modelId!);
+      final langCode = Localizations.localeOf(context).languageCode;
+
+      final currentBaseId = modelService.getBaseIdFromFullId(sessionProvider.modelId!, langCode: langCode);
+
       if (currentBaseId != _lastInitializedBaseId) {
-        debugPrint("[Controller] Model series changed from '$_lastInitializedBaseId' to '$currentBaseId'. Initializing extensions.");
         _lastInitializedBaseId = currentBaseId;
-        final seriesData = ModelData.getPreciseModelData(currentBaseId);
+        final seriesEntity = modelService.getPreciseModelData(currentBaseId, langCode: langCode);
         extensions.initialize(
           mainId: currentBaseId,
           ext: sessionProvider.modelId!,
-          modelData: seriesData,
+          model: seriesEntity,
         );
       }
     } else if (_lastInitializedBaseId != null) {
-      debugPrint("[Controller] Chat exited. Resetting last initialized model ID.");
       _lastInitializedBaseId = null;
     }
 
@@ -341,13 +335,16 @@ class ChatControllerState extends State<ChatController>
                     inactiveChatViewKey.currentState?.showSelectionView();
                   }
                 },
-                onAccountTap: () async {
-                  final isChatCurrentlyActive = sessionProvider.isChatActive;
-                  if (extensions.isPanelVisible) extensions.closePanel();
-                  await Future.delayed(const Duration(milliseconds: 300));
-                  if (!mounted) return;
+                onAccountTap: () {
+                  navigateToScreen(
+                    SettingsScreen(isFromActiveChat: _sessionProvider.isChatActive),
+                    direction: const Offset(1.0, 0.0),
+                  );
+
+                  if (extensions.isPanelVisible) {
+                    extensions.closePanel();
+                  }
                   FocusScope.of(context).unfocus();
-                  navigateToScreen(context, SettingsScreen(isFromActiveChat: isChatCurrentlyActive), direction: const Offset(1.0, 0.0));
                 },
                 onShowExtensionInfoRequest: () async {
                   if (mounted) {
@@ -371,6 +368,7 @@ class ChatControllerState extends State<ChatController>
                           await context.read<SelectionService>().changeExtension(selectedEntryKey);
                           if (mounted) extensions.closePanel();
                         },
+                        modelService: modelService,
                       );
                     } else {
                       extensions.closePanel();
@@ -404,8 +402,19 @@ class ChatControllerState extends State<ChatController>
                     duration: const Duration(milliseconds: 250),
                     transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
                     child: sessionProvider.isChatActive
-                        ? ActiveChatView(key: activeChatViewKey, onModelSelectionChanged: widget.onModelSelectionChanged, extensions: extensions)
-                        : InactiveChatView(key: inactiveChatViewKey, onModelSelectionChanged: widget.onModelSelectionChanged),
+                        ? SizedBox(
+                      key: const ValueKey('active_chat_view'),
+                      child: ActiveChatView(
+                          key: activeChatViewKey,
+                          onModelSelectionChanged: widget.onModelSelectionChanged,
+                          extensions: extensions),
+                    )
+                        : SizedBox(
+                      key: const ValueKey('inactive_chat_view'),
+                      child: InactiveChatView(
+                          key: inactiveChatViewKey,
+                          onModelSelectionChanged: widget.onModelSelectionChanged),
+                    ),
                   ),
                 ),
               ),

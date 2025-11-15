@@ -13,13 +13,10 @@ class ChatLimitManager {
   })  : _cortexSubscription = cortexSubscription,
         _subscriptionExpiresAt = subscriptionExpiresAt;
 
-  /// [FINAL & PERFECTED VERSION]
   /// Calculates the true, trusted subscription level by handling both
   /// standard time-based subscriptions (1, 2, 3) and
   /// lifetime/manual subscriptions (4, 5, 6).
   int get _activeSubscriptionLevel {
-    // --- THE FIX IS HERE ---
-
     // First, check for lifetime/manual subscription levels.
     // These are always active and do not need a date check.
     if (_cortexSubscription >= 4) {
@@ -52,15 +49,15 @@ class ChatLimitManager {
 
     // This logic now works correctly for ALL subscription types.
     if (level == 0) {
-      return 10000;
-    } else if (level == 1 || level == 4) {
-      return 20000;
-    } else if (level == 2 || level == 5) {
-      return 35000;
-    } else if (level == 3 || level == 6) {
       return 50000;
+    } else if (level == 1 || level == 4) {
+      return 70000;
+    } else if (level == 2 || level == 5) {
+      return 90000;
+    } else if (level == 3 || level == 6) {
+      return 100000;
     }
-    return 10000; // Fallback for any unknown cases.
+    return 50000; // Fallback for any unknown cases.
   }
 
   /// Calculates the total number of characters in a list of messages.

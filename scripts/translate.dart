@@ -23,11 +23,9 @@ Future<void> main(List<String> args) async {
       }
       renameMap[parts[0].trim()] = parts[1].trim();
     }
-    
-    print('🔄 Key renaming mode is active.');
-    
 
-    print('Keys that will be changed: $renameMap');
+    stdout.writeln('🔄 Key renaming mode is active.');
+    stdout.writeln('Keys that will be changed: $renameMap');
 
     final scriptPath = Platform.script.toFilePath();
     final projectRoot = p.dirname(p.dirname(scriptPath));
@@ -39,10 +37,8 @@ Future<void> main(List<String> args) async {
       final file = File(fileEntity.path);
       String content = await file.readAsString();
 
-
       bool fileModified = false;
       renameMap.forEach((oldKey, newKey) {
-
         final oldKeyPattern = '"$oldKey"';
         final newKeyPattern = '"$newKey"';
         final oldMetaPattern = '"@$oldKey"';
@@ -57,33 +53,16 @@ Future<void> main(List<String> args) async {
 
       if (fileModified) {
         await file.writeAsString(content);
-        print('✅ Updated: ${p.basename(file.path)}');
+        stdout.writeln('✅ Updated: ${p.basename(file.path)}');
         filesChanged++;
       }
     }
 
-    print('\n✨ Renaming completed. Total $filesChanged files updated.');
-
+    stdout.writeln('\n✨ Renaming completed. Total $filesChanged files updated.');
     return;
   }
-  
-  // =========================================================================
-  // === MANUAL OVERRIDE SYSTEM ==============================================
-  // =========================================================================
-  // For keys that require a perfect, culturally nuanced translation,
-  // define them here. The script will use these instead of calling the API.
-  //
-  // Structure:
-  // 'arb_key': {
-  //   'locale_code': 'The perfect, hand-crafted translation string.',
-  // },
-  // =========================================================================
-  final Map<String, Map<String, String>> manualOverrides = {
-    // Here is the manuel translation system wow
-    // 'key': {
-    //   'fr': 'Une autre traduction parfaite.'
-    // }
-  };
+
+  final Map<String, Map<String, String>> manualOverrides = {};
 
   List<String> keysToUpdate = [];
   final keyArg = args.firstWhere((arg) => arg.startsWith('--key='), orElse: () => '');
@@ -99,7 +78,6 @@ Future<void> main(List<String> args) async {
 
   final scriptPath = Platform.script.toFilePath();
   final projectRoot = p.dirname(p.dirname(scriptPath));
-
   final arbDir = p.join(projectRoot, 'lib', 'l10n');
   final templateArbFileName = 'app_en.arb';
   final sourceLocale = 'en';
@@ -107,10 +85,12 @@ Future<void> main(List<String> args) async {
     'tr', 'zh', 'fr', 'hi', 'pt', 'id', 'az', 'de', 'es', 'it', 'ja', 'ko', 'ku', 'ru', 'ar', 'nl'
   ];
 
+  stdout.writeln('--- Cortex Translation using Google API v2 ---');
+
   if (keysToUpdate.isNotEmpty) {
-    print('🟢 Force update mode activated for specific keys: "$keysToUpdate"');
+    stdout.writeln('🟢 Force update mode activated for specific keys: "$keysToUpdate"');
   } else {
-    print('🔵 Starting standard synchronization and translation process...');
+    stdout.writeln('-> Running standard synchronization for all keys...');
   }
 
   final templateArbFile = p.join(arbDir, templateArbFileName);
@@ -121,15 +101,24 @@ Future<void> main(List<String> args) async {
     exit(1);
   }
 
-  final Map<String, dynamic> templateContent = jsonDecode(await templateFile.readAsString());
+  late final Map<String, dynamic> templateContent;
+  try {
+    templateContent = jsonDecode(await templateFile.readAsString());
+  } on FormatException catch (e) {
+    stderr.writeln('❌ FATAL ERROR: Template ARB file is not a valid JSON: $templateArbFile');
+    stderr.writeln('   Please check the file for syntax errors like missing commas.');
+    stderr.writeln('   Details: $e');
+    exit(1);
+  }
+
   final Map<String, dynamic> sourceKeys = {};
   templateContent.forEach((key, value) {
     if (!key.startsWith('@')) {
       sourceKeys[key] = value;
     }
   });
-  
-  print('Found ${sourceKeys.length} keys in the template file ($templateArbFileName).');
+
+  stdout.writeln('Found ${sourceKeys.length} keys in the template file ($templateArbFileName).');
 
   if (keysToUpdate.isNotEmpty) {
     for (final key in keysToUpdate) {
@@ -141,16 +130,26 @@ Future<void> main(List<String> args) async {
   }
 
   for (final locale in targetLocales) {
-    print('\n--- Processing locale: $locale ---');
+    stdout.writeln('\n--- Processing locale: $locale ---');
     final targetArbFileName = 'app_$locale.arb';
     final targetArbFilePath = p.join(arbDir, targetArbFileName);
     final File targetFile = File(targetArbFilePath);
 
     Map<String, dynamic> targetContent = {};
     if (await targetFile.exists()) {
-      targetContent = jsonDecode(await targetFile.readAsString());
-    } else {
-      print('File not found, creating a new one: $targetArbFileName');
+      try {
+        final content = await targetFile.readAsString();
+        if (content.trim().isNotEmpty) {
+          targetContent = jsonDecode(content);
+        }
+      } on FormatException catch (e) {
+        stderr.writeln('❌ WARNING: Could not parse existing file, it will be treated as empty: $targetArbFileName');
+        stderr.writeln('   Details: $e');
+      }
+    }
+
+    if (targetContent.isEmpty) {
+      stdout.writeln('File is empty or new, creating with locale key: $targetArbFileName');
       targetContent['@@locale'] = locale;
     }
 
@@ -163,12 +162,11 @@ Future<void> main(List<String> args) async {
       if (shouldTranslate) {
         wasModified = true;
 
-        // Check for a manual override before attempting to translate.
         if (manualOverrides.containsKey(key) && manualOverrides[key]!.containsKey(locale)) {
           final overriddenText = manualOverrides[key]![locale]!;
           targetContent[key] = overriddenText;
-          print('   ✍️ Manual override applied: "$overriddenText"');
-          continue; // Skip the API call and move to the next key.
+          stdout.writeln('   ✍️ Manual override applied: "$overriddenText"');
+          continue;
         }
 
         const placeholder = 'CORTEXNEWLINE';
@@ -176,9 +174,9 @@ Future<void> main(List<String> args) async {
         final textToSend = originalText.replaceAll('\n', placeholder);
 
         if (keysToUpdate.contains(key)) {
-          print('-> Force update: "$key". Translating text: "$textToSend"');
+          stdout.writeln('-> Force update: "$key". Translating text: "$textToSend"');
         } else {
-          print('-> Found missing key "$key". Translating text: "$textToSend"');
+          stdout.writeln('-> Found missing key "$key". Translating text: "$textToSend"');
         }
 
         final result = await Process.run(
@@ -193,19 +191,16 @@ Future<void> main(List<String> args) async {
 
         if (result.exitCode == 0) {
           String translatedText = result.stdout.toString().trim().replaceAll(placeholder, '\n');
-
           translatedText = translatedText
               .replaceAll('&#39;', "'")
               .replaceAll('&quot;', '"')
               .replaceAll('&amp;', '&')
               .replaceAll('&lt;', '<')
               .replaceAll('&gt;', '>');
-
           final instructionRegex = RegExp(r'\[.*?\]\s*');
           translatedText = translatedText.replaceAll(instructionRegex, '');
-
           targetContent[key] = translatedText;
-          print('   ✅ Translation successful: "$translatedText"');
+          stdout.writeln('   ✅ Translation successful: "$translatedText"');
         } else {
           targetContent[key] = originalText;
           stderr.writeln('   ❌ Error translating key "$key". Using source text as fallback.');
@@ -216,13 +211,13 @@ Future<void> main(List<String> args) async {
 
     if (wasModified) {
       await targetFile.writeAsString(JsonEncoder.withIndent('  ').convert(targetContent));
-      print('Saved updated file: $targetArbFileName');
+      stdout.writeln('Saved updated file: $targetArbFileName');
     } else if (keysToUpdate.isEmpty) {
-      print('Sync: No new keys to add. File is up to date.');
+      stdout.writeln('Sync: No new keys to add. File is up to date.');
     } else {
-      print('No changes were made. The keys might already be up to date.');
-      }
+      stdout.writeln('No changes were made. The keys might already be up to date.');
     }
-  
-    print('\n🎉 All ARB files have been synchronized and translated successfully!');
+  }
+
+  stdout.writeln('\n--- Translation Process Finished ---');
 }

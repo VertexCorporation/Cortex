@@ -5,7 +5,6 @@ import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/services/regenerate.dart';
 import 'package:cortex/chat/services/scroll.dart';
-import 'package:cortex/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../messages/messages.dart';
 
@@ -38,11 +37,9 @@ class EditService {
         _panelController = panelController;
 
   Future<void> applyEditedMessage(BuildContext context) async {
-    final localizations = AppLocalizations.of(context)!;
-
     final int? editingIndex = _inputProvider.editingMessageIndex;
-    // We no longer need _messagesBeforeEdit for the core logic, just for the original message comparison.
-    final List<Message> originalMessages = _messagesBeforeEdit ?? _conversationProvider.messages;
+    final List<Message> originalMessages =
+        _messagesBeforeEdit ?? _conversationProvider.messages;
 
     if (editingIndex == null || editingIndex >= originalMessages.length) {
       cancelEditingMode();
@@ -53,73 +50,141 @@ class EditService {
     final String? newPhotoPath = _inputProvider.selectedPhoto?.path;
     final originalMessage = originalMessages[editingIndex];
 
-    // Check if anything actually changed.
+    final String originalPhotoPath = originalMessage.photoPath ?? '';
+    final String normalizedNewPhotoPath = newPhotoPath ?? '';
+
     final bool textChanged = newText != originalMessage.text;
-    final bool photoChanged = newPhotoPath != originalMessage.photoPath;
+    final bool photoChanged = normalizedNewPhotoPath != originalPhotoPath;
+
+    debugPrint(
+      "[EditService] Original vs New → "
+          "originalText='${originalMessage.text}', "
+          "originalPhotoPath=$originalPhotoPath, "
+          "newText='$newText', "
+          "newPhotoPath=$normalizedNewPhotoPath, "
+          "textChanged=$textChanged, photoChanged=$photoChanged",
+    );
+
     if (!textChanged && !photoChanged) {
+      debugPrint("[EditService] Nothing changed. Cancelling edit mode.");
       cancelEditingMode();
       return;
     }
 
-    // --- REFACTORED ATOMIC UPDATE ---
-    // 1. Create the new, definitive message list by truncating to the edit point.
-    List<Message> updatedList = List.from(originalMessages.sublist(0, editingIndex));
+    final bool clearPhoto = photoChanged && newPhotoPath == null;
 
-    // 2. Add the updated user message.
+    List<Message> updatedList =
+    List<Message>.from(originalMessages.sublist(0, editingIndex));
+
     final updatedMessage = originalMessage.copyWith(
       text: newText,
       photoPath: newPhotoPath,
       opacity: 1.0,
-      includeInContext: true, // Ensure it's re-included in context
+      includeInContext: true,
+      clearPhoto: clearPhoto,
     );
+
     updatedList.add(updatedMessage);
 
-    // 3. Load this final, correct state into the provider. The UI will update instantly.
-    _conversationProvider.loadMessages(updatedList);
+    debugPrint(
+      "[EditService] Updated user message prepared at index $editingIndex → "
+          "finalPhotoPath=${updatedMessage.photoPath}, "
+          "updatedList.length=${updatedList.length}",
+    );
 
-    // 4. Clean up the input UI.
+    _conversationProvider.loadMessages(updatedList);
+    debugPrint(
+      "[EditService] ConversationProvider.loadMessages called "
+          "with updatedList.length=${updatedList.length}",
+    );
+
+    // 4) input UI cleanup
     _inputProvider.finishEditing();
     _controller.clear();
     await _panelController.reverse();
     _ensureKeyboardFocus();
 
-    // 5. Now, trigger regeneration. The index for the new AI response is simply
-    //    the new length of our updated list.
     final int newAiMessageIndex = updatedList.length;
 
-    // We no longer need the complex if/else, as the new `onRegenerate` handles
-    // the append case gracefully.
-    await _regenerateService.onRegenerate(
-      newAiMessageIndex,
-      localizations: localizations,
-      context: context,
+    debugPrint(
+      "[EditService] Triggering regenerate for newAiMessageIndex=$newAiMessageIndex. "
+          "LastUser.photoPath=${updatedList.lastWhere((m) => m.isUserMessage).photoPath}",
     );
 
-    // The backup is no longer needed for regeneration logic. Clean it up.
+    if (context.mounted) {
+      await _regenerateService.onRegenerate(
+        newAiMessageIndex,
+        context: context,
+      );
+    }
+
     _clearBackup();
-    // --- REFACTOR END ---
+    debugPrint("[EditService] applyEditedMessage completed. Backup cleared.");
   }
 
   void startEditingMessage(int index) async {
-    if (_inputProvider.isEditingMode) return;
+    // Do not start a new edit session if one is already active.
+    if (_inputProvider.isEditingMode) {
+      debugPrint("[EditService] startEditingMessage ignored: already in editing mode.");
+      return;
+    }
 
     final messages = _conversationProvider.messages;
-    if (index < 0 || index >= messages.length) return;
+    debugPrint(
+      "[EditService] startEditingMessage called for index=$index, "
+          "currentMessages.length=${messages.length}",
+    );
 
+    if (index < 0 || index >= messages.length) {
+      debugPrint("[EditService] startEditingMessage aborted: index out of range.");
+      return;
+    }
+
+    // Hide the scroll-down button immediately while entering edit mode.
     _scrollService.hideButtonImmediately();
 
-    _messagesBeforeEdit = List.from(messages);
-    final messageToEdit = messages[index];
+    // Backup the full original list so we can:
+    // - restore it if the user cancels editing
+    // - use it as the source of truth when regenerating the AI reply
+    _messagesBeforeEdit = List<Message>.from(messages);
+    debugPrint(
+      "[EditService] Backup of messages created. backupLength=${_messagesBeforeEdit!.length}",
+    );
 
+    // Build a "visible" subset that only includes messages up to (and including)
+    // the one being edited. This ensures:
+    // - no extra scroll area below the edited message
+    // - any photos in later messages are completely removed from the list
+    final List<Message> visibleSubset = messages.sublist(0, index + 1);
+    debugPrint(
+      "[EditService] Visible subset created. visibleSubset.length=${visibleSubset.length}",
+    );
+
+    // Load the truncated list into the conversation provider so the UI behaves
+    // as if later messages do not exist at all during editing.
+    _conversationProvider.loadMessages(visibleSubset);
+
+    // The message to edit is now the last item in the visible subset.
+    final messageToEdit = visibleSubset[index];
+    debugPrint(
+      "[EditService] messageToEdit index=$index → "
+          "text='${messageToEdit.text.substring(0, messageToEdit.text.length.clamp(0, 50))}', "
+          "photoPath=${messageToEdit.photoPath}",
+    );
+
+    // Inform the InputProvider that editing has started for this index.
     _inputProvider.startEditing(index, messageToEdit);
 
+    // Show the top edit panel.
     _panelController.forward();
 
+    // Fill the input field with the existing text and place the cursor at the end.
     _controller.text = messageToEdit.text;
     _controller.selection = TextSelection.fromPosition(
       TextPosition(offset: _controller.text.length),
     );
 
+    // Ensure the keyboard is focused shortly after the panel animation starts.
     await Future.delayed(const Duration(milliseconds: 100));
     _ensureKeyboardFocus();
   }

@@ -1,17 +1,18 @@
-// lib/chat/screen/unselected/cards.dart
+// lib/chat/screen/unselected/widgets/cards.dart
+// Contains the visual components for displaying models, including individual
+// cards and grid layouts that support external scroll controllers.
 
 import 'dart:io';
 import 'package:cortex/app.dart';
-import 'package:cortex/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../../internet.dart';
-import '../../../library/backend/data/entity.dart';
-import '../../../library/backend/data/service.dart';
+import '../../../../internet.dart';
+import '../../../../library/backend/data/entity.dart';
+import '../../../../notifications/introvert.dart';
 
 /// A robust card widget that displays a single model, designed to prevent UI overflows.
 class ModelCard extends StatelessWidget {
@@ -24,19 +25,13 @@ class ModelCard extends StatelessWidget {
     this.onTap,
   });
 
-  /// Resolves the definitive image path for the model by passing the entity.
-  String _resolveImagePath(ModelService modelService) {
-    return modelService.getModelImagePath(model);
-  }
-
   @override
   Widget build(BuildContext context) {
     final bool hasInternet = context.watch<InternetProvider>().isConnected;
     final bool isServerModel = model.isServerSide;
     final double offlineAlpha = (isServerModel && !hasInternet) ? 0.5 : 1.0;
-    final modelService = context.read<ModelService>();
 
-    final String imagePath = _resolveImagePath(modelService);
+    final String imagePath = model.imagePath ?? 'assets/icons/self.svg';
     final bool isSvg = imagePath.toLowerCase().endsWith('.svg');
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -122,7 +117,7 @@ class ModelCard extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    model.displayTitle, // Use the pre-localized title from the entity.
+                    model.displayTitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: AppColors.primaryColor.inverted,
@@ -142,7 +137,6 @@ class ModelCard extends StatelessWidget {
 }
 
 /// A centralized, reusable grid for displaying a list of models.
-/// REFACTORED: Now operates on a list of [ModelEntity].
 class ModelGridView extends StatelessWidget {
   final List<ModelEntity> models;
   final bool conversationLimitReached;
@@ -150,6 +144,9 @@ class ModelGridView extends StatelessWidget {
   final Key? gridKey;
   final ScrollPhysics physics;
   final bool shrinkWrap;
+
+  /// An optional controller to manage the grid's scroll position from a parent widget.
+  final ScrollController? scrollController;
 
   const ModelGridView({
     super.key,
@@ -159,17 +156,19 @@ class ModelGridView extends StatelessWidget {
     this.gridKey,
     this.physics = const AlwaysScrollableScrollPhysics(),
     this.shrinkWrap = false,
+    this.scrollController,
   });
 
   @override
   Widget build(BuildContext context) {
-    final notificationService = Provider.of<NotificationService>(context, listen: false);
+    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isConnected = context.watch<InternetProvider>().isConnected;
 
     return GridView.builder(
       key: gridKey,
+      controller: scrollController,
       shrinkWrap: shrinkWrap,
       physics: physics,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -183,16 +182,17 @@ class ModelGridView extends StatelessWidget {
         final model = models[index];
         final isServerModel = model.isServerSide;
         return ModelCard(
-          model: model, // Pass the entity directly.
+          model: model,
           onTap: () {
             if (conversationLimitReached) return;
             if (isServerModel && !isConnected) {
               notificationService.showNotification(
                 message: localizations.internetRequired,
-                isSuccess: false,
+                type: NotificationType.error,
+                  oneLine: true
               );
             } else {
-              onSelectModel(model); // The callback correctly passes the entity.
+              onSelectModel(model);
             }
           },
         );
@@ -258,11 +258,15 @@ class ShimmerModelGridView extends StatelessWidget {
   final bool shrinkWrap;
   final Key? gridKey;
 
+  /// An optional controller to manage the grid's scroll position from a parent widget.
+  final ScrollController? scrollController;
+
   const ShimmerModelGridView({
     super.key,
     required this.itemCount,
     this.shrinkWrap = false,
     this.gridKey,
+    this.scrollController,
   });
 
   @override
@@ -270,8 +274,10 @@ class ShimmerModelGridView extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     return GridView.builder(
       key: gridKey,
+      controller: scrollController,
       shrinkWrap: shrinkWrap,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(),
+
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         crossAxisSpacing: screenWidth * 0.03,

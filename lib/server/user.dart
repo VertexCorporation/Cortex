@@ -1,4 +1,4 @@
-// lib/providers/user_provider.dart
+// lib/server/user.dart
 
 import 'dart:async';
 import 'dart:convert';
@@ -31,6 +31,38 @@ class UserProvider with ChangeNotifier {
   /// The user's display name. Defaults to 'Guest' if unavailable.
   String get username => _userData?['username'] as String? ?? 'Guest';
 
+  /// Returns true if the user has any active, non-free subscription tier.
+  bool get isSubscriptionActive {
+    final data = _userData;
+    if (data == null) {
+      debugPrint("[LOG | UserProvider] isSubscriptionActive -> returning FALSE (userData is null).");
+      return false;
+    }
+
+    final int level = data['hasCortexSubscription'] as int? ?? 0;
+
+    // The rest of the logic can now remain as it was, because `level` will
+    // now have the correct value (e.g., > 0 for a subscribed user).
+
+    if (level >= 4) {
+      debugPrint("[LOG | UserProvider] isSubscriptionActive -> returning TRUE (Tier >= 4).");
+      return true;
+    }
+
+    if (level > 0) {
+      final dynamic expiresAtRaw = data['subscriptionExpiresAt'];
+      final Timestamp? expiresAt = expiresAtRaw is Timestamp ? expiresAtRaw : null;
+
+      if (expiresAt != null && expiresAt.toDate().isAfter(DateTime.now())) {
+        debugPrint("[LOG | UserProvider] isSubscriptionActive -> returning TRUE (Tier > 0 and not expired).");
+        return true;
+      }
+    }
+
+    debugPrint("[LOG | UserProvider] isSubscriptionActive -> returning FALSE (Default case).");
+    return false;
+  }
+
   /// The first initial of the user's name for use in avatars. Defaults to '?'.
   String get profileInitial {
     final name = username;
@@ -56,6 +88,7 @@ class UserProvider with ChangeNotifier {
       if (snapshot.exists) {
         _userData = snapshot.data();
         _cacheUserData(_userData!); // Persist data to local cache.
+        debugPrint("[LOG | UserProvider] Firing notifyListeners() due to Firestore snapshot update.");
         notifyListeners(); // Notify widgets to rebuild with new data.
         debugPrint("[UserProvider] User data updated for: ${user.uid}");
       }

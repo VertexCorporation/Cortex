@@ -14,10 +14,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:provider/provider.dart';
-import '../../notifications.dart';
-
-import '../../darkener.dart';
-import '../../theme.dart';
+import '../../../darkener.dart';
+import '../../../notifications/introvert.dart';
+import '../../../theme.dart';
 
 /// Defines the possible reasons for reporting a message.
 enum ReportSubject {
@@ -30,21 +29,21 @@ enum ReportSubject {
 class ReportDialog extends StatefulWidget {
   final String aiMessage;
   final String modelId;
-  // NEW: A callback function to be invoked on success.
+  // A callback function to be invoked on success.
   final VoidCallback onReportSuccess;
 
   const ReportDialog({
     super.key,
     required this.aiMessage,
     required this.modelId,
-    required this.onReportSuccess, // <<< NEW PARAMETER
+    required this.onReportSuccess,
   });
 
-  // UPDATED STATIC SHOW METHOD
+  // SHOW METHOD
   static Future<void> show(BuildContext context, {
     required String aiMessage,
     required String modelId,
-    required VoidCallback onReportSuccess, // <<< NEW PARAMETER
+    required VoidCallback onReportSuccess,
   }) async {
     final restoreSystemUI = Darkener.darken(affectStatusBar: true);
 
@@ -58,7 +57,7 @@ class ReportDialog extends StatefulWidget {
           return ReportDialog(
             aiMessage: aiMessage,
             modelId: modelId,
-            onReportSuccess: onReportSuccess, // <<< Passed down to the instance
+            onReportSuccess: onReportSuccess,
           );
         },
         transitionBuilder: (context, animation, secondaryAnimation, child) {
@@ -167,7 +166,7 @@ class _ReportDialogState extends State<ReportDialog>
   }
 
   Future<void> _submitReportToFirebase() async {
-    final notificationService = Provider.of<NotificationService>(context, listen: false);
+    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
 
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
@@ -191,23 +190,24 @@ class _ReportDialogState extends State<ReportDialog>
     widget.onReportSuccess();
     if (kDebugMode) debugPrint("[ReportDialog] Called onReportSuccess callback to update parent UI.");
 
-    // --- NEW: SHOW SUCCESS NOTIFICATION ---
     // We need to get the AppLocalizations for the notification message.
     // Since this method might be called when the context is being torn down,
     // it's safer to get it before the async gap if possible, or just use the
     // current context which should still be valid here.
-    final localizations = AppLocalizations.of(context);
-    if (localizations != null) {
-      notificationService.showNotification(
-        message: localizations.reportSubmitted, // e.g., "Report submitted successfully."
-        isSuccess: true,
-      );
+    if (mounted) {
+      final localizations = AppLocalizations.of(context);
+      if (localizations != null) {
+        notificationService.showNotification(
+          message: localizations.reportSubmitted,
+          // e.g., "Report submitted successfully."
+          type: NotificationType.success
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // ... (no changes in this method's body)
     final localizations = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
 
@@ -311,7 +311,6 @@ class _ReportDialogState extends State<ReportDialog>
     required String label,
     required ReportSubject subject,
   }) {
-    // ... (no changes in this method's body)
     final bool isSelected = _selectedSubject == subject;
     return InkWell(
       borderRadius: BorderRadius.circular(8),
@@ -349,8 +348,11 @@ class _ReportDialogState extends State<ReportDialog>
   }
 
   Widget _buildActionButtons() {
-    // ... (no changes in this method's body)
     final localizations = AppLocalizations.of(context)!;
+
+    final Color cancelColor = AppColors.senaryColor;
+    final Color submitColor = AppColors.septenaryColor;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -361,20 +363,35 @@ class _ReportDialogState extends State<ReportDialog>
               Expanded(
                 child: InkWell(
                   onTap: () => Navigator.of(context).pop(),
+                  splashColor: cancelColor.withValues(alpha:0.16),
+                  highlightColor: cancelColor.withValues(alpha:0.10),
                   child: Container(
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Text(
                       localizations.closeButton,
-                      style: TextStyle(color: AppColors.senaryColor, fontSize: 16),
+                      style: TextStyle(
+                        color: cancelColor,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
               ),
-              VerticalDivider(width: 1, thickness: 0.5, color: AppColors.quinaryColor),
+              VerticalDivider(
+                width: 1,
+                thickness: 0.5,
+                color: AppColors.quinaryColor,
+              ),
               Expanded(
                 child: InkWell(
                   onTap: _isSubmitting ? null : _handleSubmission,
+                  splashColor: _isSubmitting
+                      ? Colors.transparent
+                      : submitColor.withValues(alpha:0.18),
+                  highlightColor: _isSubmitting
+                      ? Colors.transparent
+                      : submitColor.withValues(alpha:0.12),
                   child: Container(
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -384,13 +401,13 @@ class _ReportDialogState extends State<ReportDialog>
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: AppColors.septenaryColor,
+                        color: submitColor,
                       ),
                     )
                         : Text(
                       localizations.submitButton,
                       style: TextStyle(
-                        color: AppColors.septenaryColor,
+                        color: submitColor,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),

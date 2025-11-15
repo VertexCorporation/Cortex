@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
 import '../../../l10n/app_localizations.dart';
 import '../../../theme.dart';
 
@@ -27,7 +26,6 @@ class PremiumModelBanner extends StatefulWidget {
 
 class PremiumModelBannerState extends State<PremiumModelBanner>
     with TickerProviderStateMixin {
-  // ... (This widget's state remains completely unchanged)
   late final AnimationController _rgbController;
   late final AnimationController _slideController;
   late final Animation<Offset> _slideAnimation;
@@ -65,8 +63,7 @@ class PremiumModelBannerState extends State<PremiumModelBanner>
         _isDismissedByUser = false;
       });
       _slideController.forward(from: 0.0);
-    }
-    else if (!widget.isVisible && oldWidget.isVisible) {
+    } else if (!widget.isVisible && oldWidget.isVisible) {
       _slideController.reverse();
     }
   }
@@ -113,101 +110,106 @@ class PremiumModelBannerState extends State<PremiumModelBanner>
         }
         return child!;
       },
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: SafeArea(
-          bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 0),
-            child: GestureDetector(
-              onVerticalDragEnd: (details) {
-                if (details.primaryVelocity != null &&
-                    details.primaryVelocity! < 0) {
-                  _handleDismiss();
-                }
-              },
-              child: AnimatedBuilder(
-                animation: _rgbController,
-                builder: (context, child) {
-                  return Container(
-                    padding: EdgeInsets.all(borderThickness),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(borderRadius),
-                      gradient: SweepGradient(
-                        center: Alignment.center,
-                        colors: const [
-                          Colors.red, Colors.yellow, Colors.green, Colors.cyan,
-                          Colors.blue, Colors.purple, Colors.red,
-                        ],
-                        transform:
-                        GradientRotation(_rgbController.value * 2 * pi),
-                      ),
-                    ),
-                    child: child,
-                  );
+      // The ClipRect widget is added here to contain the slide animation.
+      // This ensures the banner appears to slide out from under the AppBar,
+      // not from the top of the screen.
+      child: ClipRect(
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 0),
+              child: GestureDetector(
+                onVerticalDragEnd: (details) {
+                  if (details.primaryVelocity != null &&
+                      details.primaryVelocity! < 0) {
+                    _handleDismiss();
+                  }
                 },
-                child: Material(
-                  color: AppColors.primaryColor,
-                  borderRadius: BorderRadius.circular(borderRadius * 0.8),
-                  child: InkWell(
-                    onTap: widget.onTap,
-                    borderRadius: BorderRadius.circular(borderRadius * 0.8),
-                    splashColor: AppColors.primaryColor.withValues(alpha: 0.1),
-                    highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: maxBannerHeight,
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: internalPaddingVertical,
-                          horizontal: internalPaddingHorizontal,
+                child: AnimatedBuilder(
+                  animation: _rgbController,
+                  builder: (context, child) {
+                    return Container(
+                      padding: EdgeInsets.all(borderThickness),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(borderRadius),
+                        gradient: SweepGradient(
+                          center: Alignment.center,
+                          colors: const [
+                            Colors.red, Colors.yellow, Colors.green, Colors.cyan,
+                            Colors.blue, Colors.purple, Colors.red,
+                          ],
+                          transform:
+                          GradientRotation(_rgbController.value * 2 * pi),
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 2.0),
-                              child: SvgPicture.asset(
-                                'assets/icons/sparkle.svg',
-                                colorFilter: ColorFilter.mode(
-                                    AppColors.primaryColor.inverted,
-                                    BlendMode.srcIn),
-                                width: iconSize,
-                                height: iconSize,
-                              ),
-                            ),
-                            SizedBox(width: gapBetweenIconAndText),
-                            Expanded(
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      localizations.premiumModelNoticeTitle,
-                                      style: TextStyle(
-                                        fontSize: titleFontSize,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryColor.inverted,
-                                      ),
-                                    ),
-                                    SizedBox(height: gapBetweenTitleAndDesc),
-                                    Text(
-                                      localizations
-                                          .premiumModelNoticeDescription,
-                                      style: TextStyle(
-                                        fontSize: descriptionFontSize,
-                                        color: AppColors.primaryColor.inverted
-                                            .withValues(alpha: 0.8),
-                                      ),
-                                      softWrap: true,
-                                    ),
-                                  ],
+                      ),
+                      child: child,
+                    );
+                  },
+                  child: Material(
+                    color: AppColors.primaryColor,
+                    borderRadius: BorderRadius.circular(borderRadius * 0.8),
+                    child: InkWell(
+                      onTap: widget.onTap,
+                      borderRadius: BorderRadius.circular(borderRadius * 0.8),
+                      splashColor: AppColors.primaryColor.withValues(alpha: 0.1),
+                      highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: maxBannerHeight,
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: internalPaddingVertical,
+                            horizontal: internalPaddingHorizontal,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2.0),
+                                child: SvgPicture.asset(
+                                  'assets/icons/sparkle.svg',
+                                  colorFilter: ColorFilter.mode(
+                                      AppColors.primaryColor.inverted,
+                                      BlendMode.srcIn),
+                                  width: iconSize,
+                                  height: iconSize,
                                 ),
                               ),
-                            ),
-                          ],
+                              SizedBox(width: gapBetweenIconAndText),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        localizations.premiumModelNoticeTitle,
+                                        style: TextStyle(
+                                          fontSize: titleFontSize,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryColor.inverted,
+                                        ),
+                                      ),
+                                      SizedBox(height: gapBetweenTitleAndDesc),
+                                      Text(
+                                        localizations
+                                            .premiumModelNoticeDescription,
+                                        style: TextStyle(
+                                          fontSize: descriptionFontSize,
+                                          color: AppColors.primaryColor.inverted
+                                              .withValues(alpha: 0.8),
+                                        ),
+                                        softWrap: true,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

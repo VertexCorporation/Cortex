@@ -1,4 +1,4 @@
-// search.dart
+// lib/chat/screen/unselected/widgets/search.dart
 
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';

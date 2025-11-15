@@ -21,7 +21,6 @@ class LlamaService : Service() {
         @JvmStatic
         fun sendTokenToFlutter(token: String) {
             if (isChannelInitialized) {
-                // Run on the main thread
                 val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
                 mainHandler.post {
                     resultChannel.invokeMethod("onMessageResponse", token)
@@ -31,7 +30,6 @@ class LlamaService : Service() {
             }
         }
 
-        // --- FIX: This method is now static (part of the companion object) ---
         // This allows MainActivity to set the channel correctly on the service's static properties
         // before the service instance, which will use these properties, is started.
         fun setMethodChannel(channel: MethodChannel) {
@@ -51,19 +49,25 @@ class LlamaService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.let {
-            val action = it.getStringExtra("action")
+        intent?.let { val action = it.getStringExtra("action")
             when (action) {
-                "loadModel" -> {
+                "cacheModel" -> {
                     val path = it.getStringExtra("modelPath")
-                    path?.let { loadModel(it) }
+                    path?.let { cacheModel(it) }
                 }
                 "sendMessage" -> {
-                    val message = it.getStringExtra("message")
-                    message?.let { sendMessage(it) }
+                    val message = it.getStringExtra("message") ?: ""
+                    val photoBase64 = it.getStringExtra("photoBase64")
+                    sendMessage(message, photoBase64)
                 }
                 "stopGeneration" -> {
                     stopGeneration()
+                }
+                "releaseModel" -> {
+                    releaseModel()
+                }
+                "resetKv" -> {
+                    resetKv()
                 }
                 else -> {
                     Log.w("LlamaService", "Unknown action received: $action")
@@ -73,10 +77,9 @@ class LlamaService : Service() {
         return START_STICKY
     }
 
-    fun loadModel(path: String) {
+    fun cacheModel(path: String) {
         serviceScope.launch {
             viewModel.load(path)
-
             if (isChannelInitialized) {
                 resultChannel.invokeMethod("onModelLoaded", "Model loaded successfully: $path")
             } else {
@@ -90,11 +93,29 @@ class LlamaService : Service() {
         viewModel.stop()
     }
 
-    fun sendMessage(message: String) {
+    private fun releaseModel() {
+        Log.d("LlamaService", "Executing unloadModel.")
         serviceScope.launch {
-            viewModel.updateMessage(message)
-            // Call the updated `send` method, which no longer takes a parameter.
-            viewModel.send()
+            viewModel.unload()
+        }
+    }
+
+    private fun resetKv() {
+        Log.d("LlamaService", "Executing resetKv (clear KV cache).")
+        serviceScope.launch {
+            try {
+                viewModel.clearKv()
+            } catch (e: Exception) {
+                Log.e("LlamaService", "resetKv failed", e)
+            }
+        }
+    }
+
+    fun sendMessage(message: String?, photoBase64: String?) {
+        val safeMessage = message ?: ""
+        serviceScope.launch {
+            viewModel.updateMessage(safeMessage)
+            viewModel.send(photoBase64)
         }
     }
 
@@ -105,11 +126,5 @@ class LlamaService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
-    }
-
-    fun setMethodChannel(channel: MethodChannel) {
-        resultChannel = channel
-        isChannelInitialized = true
-        Log.d("LlamaService", "MethodChannel initialized")
     }
 }

@@ -4,18 +4,18 @@
 // response streaming, providing a clean and secure interface for the rest of the application.
 //
 // Key Features:
-// - Handles communication with the secure backend proxy (v2.2+).
-// - Natively supports streaming of both text chunks and image data.
-// - Implements robust error handling for various API and network issues.
-// - Includes a mechanism to gracefully handle user-initiated request cancellations.
+// - Manages its own dedicated Dio instance, configured specifically for long-running stream requests.
+// - Handles communication with the secure backend proxy.
+// - Natively supports streaming of text chunks and image data via SSE.
+// - Implements robust error handling and a graceful cancellation mechanism.
 
 import 'dart:convert';
 import 'dart:async';
+import 'package:cortex/chat/services/utils.dart';
+import 'package:cortex/l10n/app_localizations.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import 'package:cortex/l10n/app_localizations.dart';
-import 'utils.dart';
 
 /// Represents an exception thrown when the user intentionally cancels an API request.
 class UserCancelledException implements Exception {
@@ -40,20 +40,28 @@ class ApiException implements Exception {
 class ApiService {
   final String _proxyBaseUrl = "https://proxyopenrouterrequest-o5h7dmtija-ew.a.run.app";
 
-  http.Client? _client;
-  bool _isCancelled = false;
+  /// A dedicated Dio instance for this service, configured for streaming.
+  /// It does NOT use the global RetryInterceptor to avoid conflicts with long-lived streams.
+  final Dio _dio;
 
-  ApiService();
+  CancelToken? _cancelToken;
 
-  /// Cancels any ongoing HTTP request.
+  ApiService()
+      : _dio = Dio(BaseOptions(
+    connectTimeout: const Duration(seconds: 20),
+    // A long receive timeout is crucial for Server-Sent Events (SSE)
+    // as the model might "think" for a long time before sending the next chunk.
+    receiveTimeout: const Duration(minutes: 5),
+  ));
+
+  /// Cancels any ongoing Dio request using the CancelToken.
   void cancelRequests() {
-    debugPrint("[ApiService] Cancellation requested. Setting flag and closing client.");
-    _isCancelled = true;
-    _client?.close();
+    debugPrint("[ApiService] Cancellation requested. Firing CancelToken.");
+    _cancelToken?.cancel("Request was cancelled by the user.");
   }
 
-  /// It now accepts an `isPremium` flag and sends it to the backend for
-  /// correct credit deduction and trial management.
+  /// The core private method for handling streaming API responses using its dedicated Dio instance.
+  /// Implements an intelligent "try fast, retry smart" token refresh strategy.
   Future<String> _getResponse({
     required List<Map<String, dynamic>> messages,
     required String model,
@@ -62,201 +70,215 @@ class ApiService {
     Function(String imageUrl)? onImageReceived,
     required AppLocalizations localizations,
   }) async {
-    _isCancelled = false;
-    _client = http.Client();
+    _cancelToken = CancelToken();
 
-    final completer = Completer<String>();
-    final finalContent = StringBuffer();
-    String currentEvent = '';
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw ApiException(localizations.errorUserNotAuthenticated, statusCode: 401, code: 'NO_USER');
+    }
 
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw ApiException(localizations.errorUserNotAuthenticated, statusCode: 401);
-      }
-      final idToken = await user.getIdToken();
+    // This nested function contains the actual request logic.
+    // It is designed to be called once for the initial attempt, and a second time for a retry if needed.
+    Future<String> attemptRequest(String token) async {
+      final completer = Completer<String>();
+      final finalContent = StringBuffer();
+      String currentEvent = '';
 
-      final url = Uri.parse(_proxyBaseUrl);
-      final request = http.Request('POST', url)
-        ..headers.addAll({
-          "Authorization": "Bearer $idToken",
-          "Content-Type": "application/json",
-        })
-        ..body = jsonEncode({
-          "model": model,
-          "messages": messages,
-          "isPremiumModel": isPremium,
-        });
+      // The try block inside the attempt is only to re-throw DioExceptions
+      // so the outer logic can decide whether to retry.
+      try {
+        debugPrint("[ApiService] Attempting request with a token.");
+        final response = await _dio.post<ResponseBody>(
+          _proxyBaseUrl,
+          data: jsonEncode({
+            "model": model,
+            "messages": messages,
+            "isPremiumModel": isPremium,
+          }),
+          cancelToken: _cancelToken,
+          options: Options(
+            responseType: ResponseType.stream,
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Accept': 'text/event-stream',
+              'Cache-Control': 'no-cache',
+            },
+            sendTimeout: const Duration(seconds: 30),
+          ),
+        );
 
-      final streamedResponse = await _client!.send(request);
+        debugPrint("[ApiService] Request sent. Status Code: ${response.statusCode}. Waiting for stream...");
 
-      if (streamedResponse.statusCode != 200) {
-        final errorBodyString = await streamedResponse.stream.bytesToString();
-        debugPrint("Proxy Pre-flight Error [${streamedResponse.statusCode}]: $errorBodyString");
-
-        String? errorCode;
-        String serverMessage = localizations.errorServer;
-
-        try {
-          final errorJson = jsonDecode(errorBodyString);
-          if (errorJson['error'] is Map) {
-            final errorObject = errorJson['error'];
-            errorCode = errorObject['code']?.toString();
-            serverMessage = errorObject['message'] ?? serverMessage;
-          }
-        } catch (e) { /* Ignore parse error, use defaults. */ }
-
-        String finalUserMessage;
-        switch (errorCode) {
-          case 'TOKEN_MISSING':
-          case 'TOKEN_INVALID':
-            finalUserMessage = localizations.errorApiAuthentication;
-            break;
-          case 'INSUFFICIENT_USER_CREDITS':
-            finalUserMessage = localizations.errorInsufficientCredits;
-            break;
-          case 'PREMIUM_TRIAL_EXHAUSTED':
-            finalUserMessage = localizations.premiumTrialExhaustedMessage;
-            break;
-          default:
-            finalUserMessage = serverMessage;
+        final stream = response.data?.stream;
+        if (stream == null) {
+          throw ApiException(localizations.errorServer, code: 'NULL_STREAM');
         }
-        throw ApiException(finalUserMessage, statusCode: streamedResponse.statusCode, code: errorCode);
-      }
 
-      streamedResponse.stream
-          .transform(utf8.decoder)
-          .transform(const LineSplitter())
-          .listen(
-            (line) {
-          debugPrint("[CLIENT_LINE_RECEIVER] Received line: $line");
+        stream
+            .map(utf8.decode)
+            .transform(const LineSplitter())
+            .listen(
+              (line) {
+            if (completer.isCompleted) return;
 
-          if (completer.isCompleted) return;
-
-          if (line.startsWith('event: ')) {
-            currentEvent = line.substring(7).trim();
-            return; // The next line will be the data for this event.
-          }
-
-          if (line.startsWith('data: ')) {
-            final dataString = line.substring(6).trim();
-            if (dataString.isEmpty) return;
-
-            switch (currentEvent) {
-              case 'moderation':
-                try {
-                  final data = jsonDecode(dataString);
-                  if (data['flagged'] == true) {
-                    debugPrint("[ApiService] Received moderation event: FLAGGED.");
-                    final message = data['message'] ?? localizations.errorPromptFlagged;
-                    completer.completeError(ApiException(message, code: data['code']?.toString()));
-                  } else {
-                    debugPrint("[ApiService] Received moderation event: PASSED.");
-                    completer.complete(finalContent.toString());
-                  }
-                } catch (e) {
-                  completer.completeError(ApiException(localizations.errorServer, code: 'CLIENT_PARSE_ERROR'));
-                }
-                break;
-
-              case 'error':
-                try {
-                  final data = jsonDecode(dataString);
-                  final code = data['code']?.toString();
-                  final serverMessage = data['message']?.toString();
-                  String finalMessage;
-
-                  switch (code) {
-                    case 'PREMIUM_TRIAL_EXHAUSTED':
-                      finalMessage = localizations.premiumTrialExhaustedMessage;
-                      break;
-                    case 'INSUFFICIENT_USER_CREDITS':
-                      finalMessage = localizations.errorInsufficientCredits;
-                      break;
-                    case 'CONTENT_FLAGGED':
-                      finalMessage = localizations.errorPromptFlagged;
-                      break;
-                    case 'TOKEN_MISSING':
-                    case 'TOKEN_INVALID':
-                      finalMessage = localizations.errorApiAuthentication;
-                      break;
-                    default:
-                      finalMessage = serverMessage ?? localizations.errorServer;
-                  }
-                  completer.completeError(ApiException(finalMessage, code: code));
-                } catch (e) {
-                  completer.completeError(ApiException(localizations.errorServer, code: 'CLIENT_PARSE_ERROR'));
-                }
-                break;
-
-              case 'text_chunk':
-                try {
-                  final data = jsonDecode(dataString);
-                  final text = data['text'] as String?;
-                  if (text != null) {
-                    onTextChunk?.call(text);
-                    finalContent.write(text);
-                  }
-                } catch (e) {
-                  debugPrint("[ApiService] Could not parse text_chunk, ignoring. Chunk: $dataString");
-                }
-                break;
-
-              case 'image_chunk':
-                try {
-                  final data = jsonDecode(dataString);
-                  final url = data['url'] as String?;
-                  if (url != null) {
-                    onImageReceived?.call(url);
-                  }
-                } catch (e) {
-                  debugPrint("[ApiService] Could not parse image_chunk, ignoring. Chunk: $dataString");
-                }
-                break;
-
-              default:
-              // Ignore any unknown or empty events.
-                break;
+            if (line.startsWith('event: ')) {
+              currentEvent = line.substring(7).trim();
+              return;
             }
-            // Reset event name after processing data
-            currentEvent = '';
-          }
-        },
-        onError: (error) {
-          if (!completer.isCompleted) {
-            if (_isCancelled) {
+
+            if (line.startsWith('data: ')) {
+              final dataString = line.substring(6).trim();
+              if (dataString.isEmpty) return;
+
+              switch (currentEvent) {
+                case 'moderation':
+                  try {
+                    final data = jsonDecode(dataString);
+                    if (data['flagged'] == true) {
+                      final message = data['message'] ?? localizations.errorPromptFlagged;
+                      completer.completeError(ApiException(message, code: data['code']?.toString()));
+                    } else {
+                      // This is the final success event, but onDone will handle completion.
+                      // We can just wait for the stream to close.
+                    }
+                  } catch (e) {
+                    completer.completeError(ApiException(localizations.errorServer, code: 'CLIENT_PARSE_ERROR'));
+                  }
+                  break;
+                case 'error':
+                  try {
+                    final data = jsonDecode(dataString);
+                    final code = data['code']?.toString();
+                    final serverMessage = data['message']?.toString();
+                    String finalMessage;
+                    switch (code) {
+                      case 'PREMIUM_TRIAL_EXHAUSTED':
+                        finalMessage = localizations.premiumTrialExhaustedMessage;
+                        break;
+                      case 'INSUFFICIENT_USER_CREDITS':
+                        finalMessage = localizations.errorInsufficientCredits;
+                        break;
+                      case 'CONTENT_FLAGGED':
+                        finalMessage = localizations.errorPromptFlagged;
+                        break;
+                      case 'TOKEN_MISSING':
+                      case 'TOKEN_INVALID':
+                        finalMessage = localizations.errorApiAuthentication;
+                        break;
+                      default:
+                        finalMessage = serverMessage ?? localizations.errorServer;
+                    }
+                    completer.completeError(ApiException(finalMessage, code: code));
+                  } catch (e) {
+                    completer.completeError(ApiException(localizations.errorServer, code: 'CLIENT_PARSE_ERROR'));
+                  }
+                  break;
+                case 'text_chunk':
+                  try {
+                    final data = jsonDecode(dataString);
+                    final text = data['text'] as String?;
+                    if (text != null) {
+                      onTextChunk?.call(text);
+                      finalContent.write(text);
+                    }
+                  } catch (e) {/* Ignore parse error */}
+                  break;
+                case 'image_chunk':
+                  try {
+                    final data = jsonDecode(dataString);
+                    final url = data['url'] as String?;
+                    if (url != null) {
+                      onImageReceived?.call(url);
+                    }
+                  } catch (e) {/* Ignore parse error */}
+                  break;
+                default:
+                  break;
+              }
+              currentEvent = '';
+            }
+          },
+          onError: (error) {
+            if (completer.isCompleted) return;
+            debugPrint("[ApiService] Stream listener error: $error");
+
+            if (error is DioException && error.type == DioExceptionType.cancel) {
               completer.completeError(UserCancelledException());
             } else {
               completer.completeError(ApiException(localizations.errorNetwork));
             }
-          }
-        },
-        onDone: () {
-          if (!completer.isCompleted) {
-            debugPrint("[ApiService] Stream ended prematurely without a final confirmation event.");
-            completer.completeError(ApiException(localizations.errorNetwork, code: 'PREMATURE_CLOSE'));
-          }
-        },
-        cancelOnError: true,
-      );
+          },
+          onDone: () {
+            if (!completer.isCompleted) {
+              // For SSE, the stream closing without an error event
+              // means the model has finished sending its response. This is a SUCCESS case.
+              debugPrint("[ApiService] Stream ended successfully. Completing with final content.");
+              completer.complete(finalContent.toString());
+            }
+          },
+          cancelOnError: true,
+        );
 
-      return completer.future;
+        return completer.future;
+
+      } on DioException {
+        // Re-throw the exception so the outer catch block can analyze it and decide to retry.
+        rethrow;
+      }
+    }
+
+    try {
+      // === ATTEMPT 1: Use the cached token for maximum performance ===
+      debugPrint("[ApiService] Getting cached Firebase ID Token (attempt 1)...");
+      final idToken = await user.getIdToken(false);
+      return await attemptRequest(idToken!);
+
+    } on DioException catch (e) {
+      // === FAILURE ANALYSIS: Check if it's an auth error (401/403) ===
+      if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
+        debugPrint("[ApiService] Auth error on attempt 1 (status ${e.response?.statusCode}). Refreshing token for attempt 2...");
+
+        try {
+          // === ATTEMPT 2: Force refresh the token and retry the request ===
+          final refreshedToken = await user.getIdToken(true);
+          return await attemptRequest(refreshedToken!);
+        } catch (retryError) {
+          // If the second attempt also fails, it's a genuine error.
+          debugPrint("[ApiService] Second attempt also failed: $retryError");
+          if (retryError is DioException) {
+            throw ApiException(localizations.errorApiAuthentication, statusCode: retryError.response?.statusCode, code: 'AUTH_RETRY_FAILED');
+          }
+          throw ApiException(localizations.errorNetwork, code: 'RETRY_UNHANDLED_ERROR');
+        }
+      }
+
+      // If it was a different DioException (e.g., network, timeout, etc.), handle it directly.
+      if (e.type == DioExceptionType.cancel) {
+        throw UserCancelledException();
+      }
+
+      // Handle Dio exceptions with a response but not related to auth
+      if (e.response != null) {
+        throw ApiException(localizations.errorServer, statusCode: e.response!.statusCode);
+      }
+
+      // Handle Dio exceptions without a response (network issues)
+      debugPrint("DioException without response (Network Error): ${e.message}");
+      throw ApiException(localizations.errorNetwork, code: 'CONNECTION_ERROR');
 
     } catch (e) {
-      if (_isCancelled) throw UserCancelledException();
-      if (e is ApiException) rethrow;
+      // Catch any other unexpected errors that were not DioExceptions.
+      if (e is UserCancelledException || e is ApiException) rethrow; // Keep original custom exceptions.
       debugPrint("Unhandled client-side API error in _getResponse: $e");
-      throw ApiException(localizations.errorNetwork);
+      throw ApiException(localizations.errorNetwork, code: 'UNHANDLED_CLIENT_ERROR');
     } finally {
-      completer.future.whenComplete(() {
-        _client?.close();
-        _isCancelled = false;
-        debugPrint("[ApiService] Request lifecycle complete. Client closed.");
-      });
+      _cancelToken = null;
+      debugPrint("[ApiService] Request lifecycle complete.");
     }
   }
 
-  /// Public method for character-based models, now supporting image outputs.
+  /// Public method for character-based models.
   Future<String> getCharacterResponse({
     required String userInput,
     required List<Map<String, dynamic>> context,
@@ -276,7 +298,9 @@ class ApiService {
     }
     if (photoPath != null) {
       String? base64Image = await Utils.formatBase64Image(photoPath);
-      userMessageContent.add({"type": "image_url", "image_url": {"url": base64Image}});
+      if (base64Image != null) {
+        userMessageContent.add({"type": "image_url", "image_url": {"url": base64Image}});
+      }
     }
     if (userMessageContent.isNotEmpty) {
       messages.add({"role": "user", "content": userMessageContent});
@@ -292,7 +316,7 @@ class ApiService {
     );
   }
 
-  /// Public method for standard online models, now supporting image outputs.
+  /// Public method for standard online models.
   Future<String> getOnlineModelResponse({
     required String modelId,
     required bool isPremium,

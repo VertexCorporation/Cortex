@@ -2032,4 +2032,63 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get newsErrorMessage =>
       'Terjadi masalah saat mengambil pembaruan terkini, silakan periksa koneksi Anda dan coba lagi.';
+
+  @override
+  String get codeNotFound =>
+      'Kode yang Anda masukkan tidak valid atau telah kedaluwarsa.';
+
+  @override
+  String get whatIsNew => 'Apa yang baru?';
+
+  @override
+  String get onboardingTitle1 => 'Hai! Kami Tim Cortex.';
+
+  @override
+  String onboardingDesc1(String userName) {
+    return 'Senang sekali bertemu Anda di sini, $userName. Kami adalah beberapa pengembang SMA yang memutuskan untuk menulis ulang aturan industri AI. Senang bertemu Anda! Jadi, mari kita saling mengenal lebih baik.';
+  }
+
+  @override
+  String get onboardingTitle2 => 'Ada Masalah Besar.';
+
+  @override
+  String get onboardingDesc2 =>
+      'Revolusi AI telah tiba, tetapi terhenti di ambang batas. Dengan biaya berlangganan yang tinggi, platform yang kompleks, mereka yang merusak privasi, dan mereka yang memblokir akses ke AI... selama mereka masih berkecimpung di dalamnya, ambang batas ini tidak akan pernah bisa dilampaui.';
+
+  @override
+  String get onboardingTitle3 => 'Kita Tidak Bisa Hanya Berdiam Diri.';
+
+  @override
+  String get onboardingDesc3 =>
+      'Untuk mencapai ambang batas tersebut, kami membangun platform yang tangguh, estetis, mudah disesuaikan, mudah digunakan, sepenuhnya transparan, berfungsi daring maupun luring, dan menyimpan data Anda hanya di perangkat Anda. Kami mengembalikan kendali tersebut ke tempatnya yang semestinya: Anda.';
+
+  @override
+  String get onboardingTitle4 => 'Ini Tidak Pernah Mudah.';
+
+  @override
+  String get onboardingDesc4 =>
+      'Kami ditolak puluhan kali, ditangguhkan berkali-kali, menerima peringatan palsu, dan harus mengubah merek kami puluhan kali. Meskipun begitu, kami selalu diberi tahu bahwa hal itu tidak mungkin dilakukan. Namun kami tidak pernah menyerah, percaya bahwa proyek ini milik semua orang, bukan hanya kami. Dan itulah alasan kami ada di sini.';
+
+  @override
+  String get onboardingFinalTitle => 'Waktunya Revolusi.';
+
+  @override
+  String get onboardingFinalDesc =>
+      'Jika Anda melihat layar ini, itu karena kami tidak menyerah. Dan kami tidak berniat menyerah. Ayo, kita bawa revolusi AI ke dunia bersama-sama. Untuk menjadi bagian dari kisah ini...';
+
+  @override
+  String get onboardingFinalQuestion => 'APAKAH KAMU SIAP?';
+
+  @override
+  String get onboardingFinalButton => 'YA!';
+
+  @override
+  String get dude => 'Bung';
+
+  @override
+  String get swipeToContinue => 'Geser untuk melanjutkan';
+
+  @override
+  String get cacheIsNotUpToDate =>
+      'Cache Play Store Anda belum diperbarui. Silakan tutup dan buka kembali aplikasi Play Store, atau mulai ulang perangkat Anda.';
 }

@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 1.8.9+189
+version: 2.4.5+245
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -52,18 +52,20 @@ dependencies:
   uuid: ^4.5.1
   mutex: ^3.1.0
   retry: ^3.1.2
-  http: any
-  dio: ^5.7.0
-  internet_connection_checker_plus: any
-  upgrader: ^12.1.0
+  dio: ^5.9.0
+  dio_smart_retry: ^7.0.1
+  internet_connection_checker_plus: ^2.9.1
+  upgrader: ^12.3.0
+  package_info_plus: ^9.0.0
+  version: ^3.0.2
 
   # --- FILE & DATA HANDLING ---
   sqflite: ^2.4.1
-  path: any
+  path: ^1.9.1
   file_picker: ^10.3.3
   image_picker: ^1.1.2
   gallery_saver_plus: ^3.2.1
-  mime: any
+  mime: ^2.0.0
   share_plus: ^12.0.0
   flutter_downloader: ^1.11.8
 
@@ -87,9 +89,9 @@ dependencies:
 
   # --- CONFETTI ---
   confetti: ^0.8.0
-  highlight: any
+  highlight: ^0.7.0
+  timezone: ^0.10.1
 
-  timezone: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -111,7 +113,7 @@ flutter_native_splash:
   image: assets/splash/white.png
 
   # —────────────── Dark-mode splash overrides ───────────────—
-  color_dark: "#040404"         # Dark-mode background
+  color_dark: "#000000"         # Dark-mode background
   image_dark: assets/splash/black.png
 
   # —────────── Android 12+ specific settings ─────────—
@@ -122,15 +124,12 @@ flutter_native_splash:
 
     # Dark-mode overrides for Android 12+
     image_dark: assets/splash/black.png
-    icon_background_color_dark: "#090909"
+    icon_background_color_dark: "#000000"
 
 flutter:
   uses-material-design: true
   generate: true
   assets:
-    - assets/models/both/
-    - assets/models/offline/
-    - assets/models/online/
     - assets/icons/
     - assets/icons/subscriptions/
     - assets/characters/
@@ -138,9 +137,13 @@ flutter:
     - assets/fonts/roboto/
     - assets/fonts/mavenpro/
     - assets/fonts/heebo/
+    - assets/fonts/poppins/
+    - assets/models/
+    - assets/producers/
+    - assets/neuro/
     - assets/
 
-  # wow
-  # this
-  # pubspec.yaml
-  # is so good
+# wow
+# this
+# pubspec.yaml
+# is so good

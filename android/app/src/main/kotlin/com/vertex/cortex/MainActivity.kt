@@ -48,29 +48,40 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, LLAMA_CH)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
-                    "loadModel"    -> {
+                    "cacheModel"    -> {
                         val path = call.argument<String>("path")
                         if (path.isNullOrBlank()) {
                             result.error("INVALID_PATH", "Model path is null or empty", null)
                             return@setMethodCallHandler
                         }
-                        startLlamaService("loadModel", "modelPath" to path)
+                        startLlamaService("cacheModel", "modelPath" to path)
                         result.success("Model loading started: $path")
                     }
 
                     "sendMessage"  -> {
                         val msg = call.argument<String>("message")
+                        val photo = call.argument<String>("photoBase64")
                         if (msg.isNullOrBlank()) {
                             result.error("INVALID_MSG", "Message is null or empty", null)
                             return@setMethodCallHandler
                         }
-                        startLlamaService("sendMessage", "message" to msg)
+                        startLlamaService("sendMessage", "message" to msg, "photoBase64" to (photo ?: ""))
                         result.success("Message sent: $msg")
                     }
 
                     "stopGeneration" -> {
                         startLlamaService("stopGeneration")
                         result.success("Stop generation request sent.")
+                    }
+
+                    "releaseModel" -> {
+                        startLlamaService("releaseModel")
+                        result.success("Unload model request sent.")
+                    }
+
+                    "resetKv" -> {
+                        startLlamaService("resetKv")
+                        result.success("KV reset request sent.")
                     }
 
                     else -> result.notImplemented()
@@ -123,7 +134,6 @@ class MainActivity : FlutterActivity() {
             extras.forEach { (k, v) -> putExtra(k, v) }
         }
 
-        // --- FIX: Correctly initialize the static MethodChannel on the LlamaService companion object ---
         // This ensures the service can communicate back to Flutter. The previous implementation
         // created a new, unused service instance, which was a bug.
         LlamaService.setMethodChannel(

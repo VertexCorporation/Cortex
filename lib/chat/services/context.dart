@@ -3,20 +3,23 @@
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/utils.dart';
-import 'package:cortex/models/backend/data/data.dart';
 import 'package:cortex/chat/messages/messages.dart';
+import 'package:cortex/library/backend/data/service.dart';
 
 /// Service responsible for building the list of messages in the format
 /// required by the backend API. It reads the current state from the relevant providers.
 class ContextService {
   final ChatSessionProvider _sessionProvider;
   final ConversationProvider _conversationProvider;
+  final ModelService _modelService;
 
   ContextService({
     required ChatSessionProvider sessionProvider,
     required ConversationProvider conversationProvider,
+    required ModelService modelService,
   })  : _sessionProvider = sessionProvider,
-        _conversationProvider = conversationProvider;
+        _conversationProvider = conversationProvider,
+        _modelService = modelService;
 
   /// Builds the list of messages for the API context.
   ///
@@ -31,6 +34,7 @@ class ContextService {
   Future<List<Map<String, dynamic>>> buildContextMessages({
     bool includeLastUser = true,
     required String targetModelId,
+    required String langCode,
   }) async {
     final List<Map<String, dynamic>> contextMessages = [];
 
@@ -42,7 +46,7 @@ class ContextService {
         .where((m) => m.includeInContext && !m.isThinking && !m.isError)
         .toList();
 
-    final bool targetModelSupportsImages = ModelData.hasModality(targetModelId, 'image');
+    final bool targetModelSupportsImages = _modelService.hasModality(targetModelId, langCode: langCode, modality: 'image');
 
     // Add the system prompt to the context, if it exists.
     if (systemRole != null && systemRole.isNotEmpty) {

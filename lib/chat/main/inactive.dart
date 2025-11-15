@@ -1,4 +1,4 @@
-// lib/chat/widgets/inactive.dart
+// lib/chat/main/inactive.dart
 //
 // This file defines the InactiveChatView widget. It is responsible for rendering the UI
 // when no chat is active. This includes the model selection screen, displaying recent
@@ -7,19 +7,16 @@
 
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/session.dart';
-import 'package:cortex/chat/screen/unselected/screen/screen.dart';
-import 'package:cortex/chat/services/load.dart';
+import 'package:cortex/chat/screen/unselected/controller.dart';
 import 'package:cortex/chat/services/recent.dart';
-import 'package:cortex/chat/services/scroll.dart';
 import 'package:cortex/chat/services/select.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../banner.dart';
-import '../../errorview.dart';
-import '../../initialization.dart';
+import '../../error.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-
-import '../../models/backend/data/info.dart';
+import '../../library/backend/data/entity.dart';
+import '../../library/providers/catalog.dart';
 import '../../server/user.dart';
 
 /// A stateful widget that displays the UI for the model selection screen.
@@ -43,8 +40,8 @@ class InactiveChatViewState extends State<InactiveChatView> {
   // Controller for the model search input field.
   final TextEditingController searchController = TextEditingController();
   // Key to access the state of the child SelectionScreen widget.
-  final GlobalKey<SelectionScreenState> selectionScreenKey =
-  GlobalKey<SelectionScreenState>();
+  final GlobalKey<SelectionControllerState> selectionControllerKey =
+  GlobalKey<SelectionControllerState>();
 
   @override
   void initState() {
@@ -53,12 +50,11 @@ class InactiveChatViewState extends State<InactiveChatView> {
       if (!mounted) return;
 
       widget.onModelSelectionChanged?.call(false);
-
       context.read<BannerService>().checkAndTriggerBanner();
 
       final sessionProvider = context.read<ChatSessionProvider>();
       if (sessionProvider.appBarMode == AppBarMode.inSelection) {
-        selectionScreenKey.currentState?.showAllModelsView();
+        selectionControllerKey.currentState?.showExploreView();
       }
     });
   }
@@ -78,59 +74,43 @@ class InactiveChatViewState extends State<InactiveChatView> {
   /// Public method to programmatically switch the view back to the main selection
   /// page from the "all models" grid.
   void showSelectionView() {
-    selectionScreenKey.currentState?.showSelectionView();
+    selectionControllerKey.currentState?.showWelcomeView();
   }
 
   /// Public method to programmatically switch to the "all models" grid.
   /// This is called by the parent MainScreen when restoring the view state after a chat exit.
   void showAllModelsView() {
-    selectionScreenKey.currentState?.showAllModelsView();
-  }
-
-  /// A central function to trigger a reload of all model data.
-  /// This is called by the parent controller when a language change is detected.
-  Future<void> reloadAllModelsForLanguageChange() async {
-    if (!mounted) return;
-    debugPrint("[InactiveView] Triggering model reload...");
-
-    // Ensure core services are ready before attempting to load data.
-    final appInitializer = context.read<AppInitializer>();
-    await appInitializer.onCoreServicesReady;
-    if (!mounted) return;
-
-    // Delegate the actual loading logic to the LoadService.
-    await context
-        .read<LoadService>()
-        .loadModels(languageCode: Localizations.localeOf(context).languageCode);
-
-    debugPrint("[InactiveView] Model reload command sent to LoadService.");
+    selectionControllerKey.currentState?.showExploreView();
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
 
+    // We watch ChatSessionProvider for the actual list of models (which it gets from ModelService).
     final sessionProvider = context.watch<ChatSessionProvider>();
+    final catalogProvider = context.watch<ModelCatalogProvider>();
+
     final conversationProvider = context.watch<ConversationProvider>();
     final recentModelsManager = context.watch<RecentModelsManager>();
     final bannerService = context.watch<BannerService>();
     final userProvider = context.watch<UserProvider>();
 
-    if (sessionProvider.modelsLoadError) {
+    // The error view now gets its state from the catalog.
+    if (catalogProvider.loadError) {
       return ErrorView(
         key: const ValueKey('chat_error'),
         title: localizations.errorLoadingTitle,
         message: localizations.errorLoadingMessage,
         buttonText: localizations.retry,
-        onRetry: reloadAllModelsForLanguageChange,
+        onRetry: () => catalogProvider.retryLoad(),
       );
     }
 
-    // The entire view is wrapped in a Stack to overlay the banner.
     return Stack(
       children: [
-        // Original content (SelectionScreen) is the first child of the Stack.
-        ValueListenableBuilder<List<ModelInfo>>(
+        // --- This builder now listens for a List<ModelEntity> ---
+        ValueListenableBuilder<List<ModelEntity>>(
           valueListenable: recentModelsManager.recentModelsNotifier,
           builder: (context, recentModelsValue, child) {
             final bool isLimitExceeded =
@@ -139,19 +119,15 @@ class InactiveChatViewState extends State<InactiveChatView> {
                 ) ??
                     false;
 
-            return SelectionScreen(
-              key: selectionScreenKey,
-              isLoading: sessionProvider.areModelsLoading,
+            return SelectionController(
+              key: selectionControllerKey, // The key is now attached here
+              isLoading: catalogProvider.isLoading,
               allModels: sessionProvider.allModels,
               recentModels: recentModelsValue,
               conversationLimitReached: isLimitExceeded,
               searchController: searchController,
-              onReloadModels: reloadAllModelsForLanguageChange,
               onSelectModel: (model, ctx) {
                 context.read<SelectionService>().selectModel(model, context: ctx);
-              },
-              onScrollToBottom: () {
-                context.read<ScrollService>().scrollToBottom();
               },
               localizations: localizations,
               userData: userProvider.userData,
@@ -165,7 +141,6 @@ class InactiveChatViewState extends State<InactiveChatView> {
           },
         ),
 
-        // A ValueListenableBuilder is added to show the banner conditionally.
         ValueListenableBuilder<bool>(
           valueListenable: bannerService.showInviteBannerNotifier,
           builder: (context, showBanner, child) {

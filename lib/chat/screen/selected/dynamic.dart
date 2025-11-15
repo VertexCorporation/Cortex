@@ -3,9 +3,11 @@
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/extensions.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:cortex/models/backend/data/data.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../library/backend/data/entity.dart';
+import '../../../library/backend/data/service.dart';
 
 /// A dedicated service class to handle all logic related to the Dynamic Chat feature.
 ///
@@ -26,34 +28,34 @@ class DynamicChatService {
   ///
   /// It validates the saved model ID against the models loaded in the provider
   /// and triggers the appropriate state change via the provider's methods.
-  Future<void> loadDynamicAssistantPreference() async {
+  /// Loads the user's preferred dynamic assistant from SharedPreferences.
+  Future<void> loadDynamicAssistantPreference({
+    required String langCode,
+    required ModelService modelService,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     final assistantId = prefs.getString(dynamicAssistantKey);
 
     if (assistantId == null || assistantId.isEmpty) {
-      debugPrint("[DynamicChatService] No dynamic assistant preference found. Using default random mode.");
-      // Ensure state is set to generic dynamic mode if no preference exists.
+      debugPrint("[DynamicChatService] No dynamic assistant preference found.");
       if (_sessionProvider.isDynamicChat && _sessionProvider.modelId != null) {
         _sessionProvider.unpinDynamicAssistant();
       }
       return;
     }
 
-    // Validate that the saved model still exists by checking the master list.
-    final allModels = _sessionProvider.allModels;
-    bool isValid = allModels.any((model) {
-      if (model.id == assistantId) return true;
-      // Also check if the ID belongs to an extension of a known model series.
-      final extensions = ModelData.getPreciseModelData(model.id)['extensions'] as Map<String, dynamic>?;
-      return extensions?.containsKey(assistantId) ?? false;
-    });
+    // Fetch the entity with the required langCode, using the provided modelService.
+    final model = modelService.getPreciseModelData(assistantId, langCode: langCode);
+
+    // A model is valid if its ID is not 'Unknown Model' (the fallback ID).
+    final bool isValid = model.displayTitle != 'Unknown Model';
 
     if (isValid) {
       debugPrint("[DynamicChatService] Valid dynamic assistant found: '$assistantId'. Pinning model.");
       _sessionProvider.pinDynamicAssistant(assistantId);
     } else {
-      debugPrint("[DynamicChatService] WARN: Saved assistant '$assistantId' is no longer available. Reverting to default.");
-      await _saveDynamicAssistantPreference(null); // Clear the invalid preference.
+      debugPrint("[DynamicChatService] WARN: Saved assistant '$assistantId' is no longer available.");
+      await _saveDynamicAssistantPreference(null);
       _sessionProvider.unpinDynamicAssistant();
     }
   }
@@ -74,7 +76,9 @@ class DynamicChatService {
     }
 
     // Pre-calculate options before triggering any UI updates.
-    final allOptions = _buildDynamicAssistantOptions(context);
+    final modelService = context.read<ModelService>();
+
+    final allOptions = _buildDynamicAssistantOptions(context, modelService: modelService);
     final currentlySelectedId = (_sessionProvider.isDynamicChat && _sessionProvider.modelId == null)
         ? '--dynamic--'
         : _sessionProvider.modelId;
@@ -160,49 +164,44 @@ class DynamicChatService {
   }
 
   /// Gathers, categorizes, and sorts all usable models for the assistant panel.
-  /// It correctly separates base model series from their selectable extension variants.
-  List<Map<String, dynamic>> _buildDynamicAssistantOptions(BuildContext context) {
+  List<Map<String, dynamic>> _buildDynamicAssistantOptions(
+      BuildContext context, {
+        required ModelService modelService,
+      }) {
     final localizations = AppLocalizations.of(context)!;
-    final allModelInfos = _sessionProvider.allModels;
+    final langCode = Localizations.localeOf(context).languageCode;
 
-    final List<Map<String, dynamic>> offlineOptions = [];
-    final List<Map<String, dynamic>> characterOptions = [];
-    final List<Map<String, dynamic>> selfOptions = [];
-    final Map<String, List<Map<String, dynamic>>> onlineSeriesMap = {};
+    final allModelEntities = _sessionProvider.allModels;
 
-    for (final modelInfo in allModelInfos) {
-      final preciseData = ModelData.getPreciseModelData(modelInfo.id);
-      final String category = preciseData['category'] as String? ?? 'online';
-      final String type = preciseData['type'] as String? ?? 'online';
+    final List<ModelEntity> offlineOptions = [];
+    final List<ModelEntity> characterOptions = [];
+    final List<ModelEntity> selfOptions = [];
+    final Map<String, List<ModelEntity>> onlineSeriesMap = {};
 
-      if (type == 'online' && category != 'roleplay' && category != 'self') {
-        final seriesTitle = preciseData['title'] as String;
-        final extensions = preciseData['extensions'] as Map<String, dynamic>?;
-
+    for (final model in allModelEntities) {
+      if (!model.isServerSide) { // Offline
+        offlineOptions.add(model);
+      } else if (model.category == 'roleplay') {
+        characterOptions.add(model);
+      } else if (model.category == 'self') {
+        selfOptions.add(model);
+      } else { // Online models
+        final seriesTitle = model.displayTitle;
         onlineSeriesMap.putIfAbsent(seriesTitle, () => []);
 
-        // CORE LOGIC: If a series has extensions, only the extensions are selectable.
-        // If it has none, the series itself is selectable.
-        if (extensions != null && extensions.isNotEmpty) {
-          for (final extId in extensions.keys) {
-            onlineSeriesMap[seriesTitle]!.add(ModelData.getPreciseModelData(extId));
+        if (model.extensions != null && model.extensions!.isNotEmpty) {
+          for (final extId in model.extensions!.keys) {
+            onlineSeriesMap[seriesTitle]!.add(modelService.getPreciseModelData(extId, langCode: langCode));
           }
         } else {
-          onlineSeriesMap[seriesTitle]!.add(preciseData);
+          onlineSeriesMap[seriesTitle]!.add(model);
         }
-      } else if (type == 'offline') {
-        offlineOptions.add(preciseData);
-      } else if (category == 'roleplay') {
-        characterOptions.add(preciseData);
-      } else if (category == 'self') {
-        selfOptions.add(preciseData);
       }
     }
 
     // Sort and flatten the online options.
-    final List<Map<String, dynamic>> onlineOptions = [];
-    int sorter(Map<String, dynamic> a, Map<String, dynamic> b) =>
-        (a['title'] as String).toLowerCase().compareTo((b['title'] as String).toLowerCase());
+    final List<ModelEntity> onlineOptions = [];
+    int sorter(ModelEntity a, ModelEntity b) => a.displayTitle.toLowerCase().compareTo(b.displayTitle.toLowerCase());
 
     final sortedSeriesTitles = onlineSeriesMap.keys.toList()..sort();
     for (final seriesTitle in sortedSeriesTitles) {
@@ -219,13 +218,14 @@ class DynamicChatService {
     // Combine into the final list with the "Random" option first.
     final List<Map<String, dynamic>> finalOptions = [
       {'id': '--dynamic--', 'title': localizations.dynamicChatTitle, 'tier': 'free'},
-      ...onlineOptions,
-      ...offlineOptions,
-      ...characterOptions,
-      ...selfOptions,
+      // Convert the sorted lists of entities into the map structure the UI expects.
+      ...onlineOptions.map((m) => {'id': m.id, 'title': m.displayTitle, 'tier': m.tier}),
+      ...offlineOptions.map((m) => {'id': m.id, 'title': m.displayTitle, 'tier': m.tier}),
+      ...characterOptions.map((m) => {'id': m.id, 'title': m.displayTitle, 'tier': m.tier}),
+      ...selfOptions.map((m) => {'id': m.id, 'title': m.displayTitle, 'tier': m.tier}),
     ];
 
-    debugPrint("[DynamicChatService] Built dynamic assistant panel with ${finalOptions.length} selectable options.");
+    debugPrint("[DynamicChatService] Built panel with ${finalOptions.length} options.");
     return finalOptions;
   }
 

@@ -2045,4 +2045,63 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get newsErrorMessage =>
       'Beim Abrufen der neuesten Updates ist ein Problem aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.';
+
+  @override
+  String get codeNotFound =>
+      'Der eingegebene Code ist ungültig oder abgelaufen.';
+
+  @override
+  String get whatIsNew => 'Was ist neu?';
+
+  @override
+  String get onboardingTitle1 => 'Hey! Wir sind das Cortex-Team.';
+
+  @override
+  String onboardingDesc1(String userName) {
+    return 'Schön, dass du da bist, $userName. Wir sind ein paar Schüler, die beschlossen haben, die Regeln der KI-Branche neu zu schreiben. Es freut uns, dich kennenzulernen! Lass uns also ein bisschen besser kennenlernen.';
+  }
+
+  @override
+  String get onboardingTitle2 => 'Es gab riesige Probleme.';
+
+  @override
+  String get onboardingDesc2 =>
+      'Die KI-Revolution kam, blieb aber an der Schwelle stecken. Hohe Abonnementgebühren, komplexe Plattformen, diejenigen, die die Privatsphäre zerstören, und diejenigen, die den Zugang zu KI blockieren – solange diese Akteure im Spiel waren, konnte diese Schwelle nicht überschritten werden.';
+
+  @override
+  String get onboardingTitle3 => 'Wir konnten nicht einfach zusehen.';
+
+  @override
+  String get onboardingDesc3 =>
+      'Um diese Hürde zu überwinden, haben wir eine leistungsstarke, ästhetische, anpassbare, benutzerfreundliche und vollständig transparente Plattform entwickelt, die sowohl online als auch offline funktioniert und Ihre Daten ausschließlich auf Ihrem Gerät speichert. Wir haben die Macht dorthin zurückgebracht, wo sie hingehört: zu dir.';
+
+  @override
+  String get onboardingTitle4 => 'Das war nie einfach.';
+
+  @override
+  String get onboardingDesc4 =>
+      'Wir wurden dutzende Male abgelehnt, mehrfach gesperrt, erhielten falsche Warnungen und mussten unsere Marke dutzende Male ändern. Trotz allem wurde uns immer wieder gesagt, es sei unmöglich. Doch wir gaben nie auf, denn wir glaubten fest daran, dass dieses Projekt allen gehört, nicht nur uns. Und genau deshalb sind wir hier.';
+
+  @override
+  String get onboardingFinalTitle => 'Es ist Zeit für eine Revolution.';
+
+  @override
+  String get onboardingFinalDesc =>
+      'Wenn du diesen Bildschirm sehen, dann deshalb, weil wir nicht aufgegeben haben. Und wir haben nicht die Absicht aufzugeben. Los, lasst uns gemeinsam die KI-Revolution in die Welt tragen. Werde Teil dieser Geschichte …';
+
+  @override
+  String get onboardingFinalQuestion => 'BIST DU BEREIT?';
+
+  @override
+  String get onboardingFinalButton => 'JA!';
+
+  @override
+  String get dude => 'Alter';
+
+  @override
+  String get swipeToContinue => 'Zum Fortfahren wischen';
+
+  @override
+  String get cacheIsNotUpToDate =>
+      'Der Cache Ihres Play Stores ist nicht aktuell. Bitte schließen Sie die Play Store-App und öffnen Sie sie erneut oder starten Sie Ihr Gerät neu.';
 }

@@ -13,8 +13,8 @@ import 'package:provider/provider.dart';
 
 // Local Imports
 import '../../banner.dart';
-import '../../notifications.dart';
 import '../../webview.dart';
+import '../notifications/introvert.dart';
 import '../theme.dart';
 import 'backend.dart';
 import 'credits/credits.dart';
@@ -30,7 +30,7 @@ class FundsScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => FundsBackend()
         ..initialize(
-          notificationService: Provider.of<NotificationService>(context, listen: false),
+          notificationService: Provider.of<IntrovertNotificationService>(context, listen: false),
           localizations: localizations,
         ),
       child: const FundsScreenView(),
@@ -55,8 +55,6 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     'plus': 'monthly', 'pro': 'monthly', 'ultra': 'monthly',
   };
   late final List<ScrollController> _scrollControllers;
-  bool _showBottomScrollFog = false;
-  bool _showTopScrollFog = false;
   bool _isContentLoaded = false;
   Offset _contentOffset = const Offset(0.0, 0.03);
   bool _hasAnyBenefitListAnimated = false;
@@ -75,14 +73,12 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     super.initState();
     _pageController = PageController(initialPage: _currentPage);
     _scrollControllers = List.generate(4, (_) => ScrollController());
-    _scrollControllers[_currentPage].addListener(_updateFogVisibility);
     _confettiController = ConfettiController(duration: const Duration(seconds: 1));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _backend = Provider.of<FundsBackend>(context, listen: false);
       _backend.addListener(_onBackendUpdate);
       _initializeUiStateFromBackend();
-      _updateFogVisibility();
       _purchaseCompletedSubscription = _backend.onPurchaseCompleted.listen((String purchasedProductId) {
         if (mounted) {
           _confettiController.play();
@@ -141,7 +137,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     }
   }
 
-  /// THE CORE FIX: This function now updates BOTH the selection border AND the checkmark state INSTANTLY.
+  /// This function now updates BOTH the selection border AND the checkmark state INSTANTLY.
   void _updateUiAfterPurchase(String purchasedProductId) {
     String? planType;
     String? billingOption;
@@ -174,54 +170,13 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     }
   }
 
-  void _onPageChanged(int newPageIndex) {
-    if (_currentPage != newPageIndex) {
-      _scrollControllers[_currentPage].removeListener(_updateFogVisibility);
-      _scrollControllers[newPageIndex].addListener(_updateFogVisibility);
-      setState(() { _currentPage = newPageIndex; });
-      _updateFogVisibility();
-    }
-  }
-
-  /// Updates the visibility of the top and bottom scroll fogs based on scroll position.
-  void _updateFogVisibility() {
-    if (!mounted) return;
-    final controller = _scrollControllers[_currentPage];
-
-    // If the scroll controller isn't attached to a view yet, hide both fogs.
-    if (!controller.hasClients) {
-      if (_showBottomScrollFog || _showTopScrollFog) {
-        setState(() {
-          _showBottomScrollFog = false;
-          _showTopScrollFog = false;
-        });
-      }
-      return;
-    }
-
-    // Top fog logic: show if the user has scrolled down more than a small threshold (e.g., 10 pixels).
-    final bool shouldShowTop = controller.position.pixels > 10;
-
-    // Bottom fog logic: show if the content is scrollable and the user hasn't reached the bottom.
-    final bool shouldShowBottom = controller.position.maxScrollExtent > 0 &&
-        controller.position.pixels < controller.position.maxScrollExtent - 10;
-
-    // If the visibility state of either fog has changed, call setState to rebuild.
-    if (shouldShowTop != _showTopScrollFog || shouldShowBottom != _showBottomScrollFog) {
-      setState(() {
-        _showTopScrollFog = shouldShowTop;
-        _showBottomScrollFog = shouldShowBottom;
-      });
-    }
-  }
-
   void _onPrimaryButtonPressed() {
     final backend = Provider.of<FundsBackend>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
     if (backend.isPurchasePending) return;
     if (backend.allProducts.isEmpty) {
       log('Purchase blocked: Product details are not loaded yet.', name: 'FundsScreen');
-      _showCustomNotification(message: localizations.productNotFound, isSuccess: false);
+      _showCustomNotification(message: localizations.productNotFound, isSuccess: NotificationType.error);
       return;
     }
     String? productIdToPurchase;
@@ -248,25 +203,30 @@ class _FundsScreenViewState extends State<FundsScreenView> {
         backend.purchase(productDetails);
       } catch (e) {
         log('Attempted to purchase a product not found: $productIdToPurchase', name: 'FundsScreen', error: e);
-        _showCustomNotification(message: localizations.productNotFound, isSuccess: false);
+        _showCustomNotification(message: localizations.productNotFound, isSuccess: NotificationType.error);
       }
     }
   }
 
   void _showTermsAndConditions() async {
+    if (!mounted) return;
+
     final localizations = AppLocalizations.of(context)!;
+
     const String termsUrl = "https://vertexishere.com/cortex-terms-of-service";
     const String policyUrl = "https://vertexishere.com/cortex-privacy-policy";
-    if (!context.mounted) return;
+
     await showAppWebViewModal(context, localizations.termsOfService, termsUrl);
-    if (!context.mounted) return;
+
+    if (!mounted) return;
+
     await showAppWebViewModal(context, localizations.privacyPolicy, policyUrl);
   }
 
-  void _showCustomNotification({required String message, bool isSuccess = true}) {
+  void _showCustomNotification({required String message, required NotificationType isSuccess}) {
     if (mounted) {
-      Provider.of<NotificationService>(context, listen: false).showNotification(
-          message: message, isSuccess: isSuccess, oneLine: false, fontSize: 0.025, bottomOffset: 0.01);
+      Provider.of<IntrovertNotificationService>(context, listen: false).showNotification(
+          message: message, type: isSuccess, oneLine: false, fontSize: 0.025, bottomOffset: 0.01);
     }
   }
 
@@ -334,7 +294,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   SvgPicture.asset(
                     'assets/icons/warning.svg',
                     width: screenSize.width * 0.25,
-                    color: AppColors.septenaryColor,
+                    colorFilter: ColorFilter.mode(AppColors.septenaryColor, BlendMode.srcIn),
                   ),
                   SizedBox(height: screenSize.height * 0.04),
                   Padding(
@@ -355,7 +315,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                     ),
                     onPressed: () {
                       final backend = Provider.of<FundsBackend>(context, listen: false);
-                      final notificationService = Provider.of<NotificationService>(context, listen: false);
+                      final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
                       backend.initialize(notificationService: notificationService, localizations: localizations);
                     },
                     child: Text(localizations.retry, style: TextStyle(fontSize: screenSize.width * 0.04, fontWeight: FontWeight.bold)),
@@ -403,82 +363,33 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                     ),
                   ),
                   Expanded(
-                    child: Stack(
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: _onPageChanged,
                       children: [
-                        PageView(
-                          controller: _pageController,
-                          onPageChanged: _onPageChanged,
-                          children: [
-                            CreditContentWidget(
-                              availableProducts: backend.creditProducts,
-                              onCreditPackageSelected: (package) => setState(() => _selectedCreditPackage = package),
-                              scrollController: _scrollControllers[0],
-                            ),
-                            for (int i = 0; i < _planTypes.length; i++)
-                              SubscriptionContentWidget(
-                                planType: _planTypes[i],
-                                availableProducts: backend.subscriptionProducts,
-                                selectedBillingOption: _selectedBillingOptions[_planTypes[i]]!,
-                                // --- THE FINAL PIECE OF THE PUZZLE ---
-                                // Pass the local, unified UI state variables, NOT the direct backend ones.
-                                activeSubscriptionLevel: _uiActiveSubscriptionLevel,
-                                activeSubscriptionOption: _uiActiveSubscriptionOption,
-                                // ------------------------------------
-                                onBillingOptionChanged: (newOption) {
-                                  setState(() { _selectedBillingOptions[_planTypes[i]] = newOption; });
-                                },
-                                scrollController: _scrollControllers[i + 1],
-                                animateBenefits: !_hasAnyBenefitListAnimated,
-                                onBenefitsAnimated: () {
-                                  if (!_hasAnyBenefitListAnimated) {
-                                    setState(() { _hasAnyBenefitListAnimated = true; });
-                                  }
-                                },
-                              ),
-                          ],
+                        CreditContentWidget(
+                          availableProducts: backend.creditProducts,
+                          onCreditPackageSelected: (package) => setState(() => _selectedCreditPackage = package),
+                          scrollController: _scrollControllers[0],
                         ),
-
-                        Align(
-                          alignment: Alignment.topCenter,
-                          child: IgnorePointer(
-                            child: AnimatedOpacity(
-                              opacity: _currentPage > 0 && _showTopScrollFog ? 1.0 : 0.0,
-                              duration: const Duration(milliseconds: 250),
-                              child: Container(
-                                height: screenHeight * 0.04,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                    colors: [ AppColors.background.withValues(alpha: 0.0), AppColors.background ],
-                                    stops: const [0.0, 0.9],
-                                  ),
-                                ),
-                              ),
-                            ),
+                        for (int i = 0; i < _planTypes.length; i++)
+                          SubscriptionContentWidget(
+                            planType: _planTypes[i],
+                            availableProducts: backend.subscriptionProducts,
+                            selectedBillingOption: _selectedBillingOptions[_planTypes[i]]!,
+                            activeSubscriptionLevel: _uiActiveSubscriptionLevel,
+                            activeSubscriptionOption: _uiActiveSubscriptionOption,
+                            onBillingOptionChanged: (newOption) {
+                              setState(() { _selectedBillingOptions[_planTypes[i]] = newOption; });
+                            },
+                            scrollController: _scrollControllers[i + 1],
+                            animateBenefits: !_hasAnyBenefitListAnimated,
+                            onBenefitsAnimated: () {
+                              if (!_hasAnyBenefitListAnimated) {
+                                setState(() { _hasAnyBenefitListAnimated = true; });
+                              }
+                            },
                           ),
-                        ),
-
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: IgnorePointer(
-                            child: AnimatedOpacity(
-                              opacity: _showBottomScrollFog ? 1.0 : 0.0,
-                              duration: const Duration(milliseconds: 250),
-                              child: Container(
-                                height: screenHeight * 0.07,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [ AppColors.background.withValues(alpha: 0.0), AppColors.background ],
-                                    stops: const [0.0, 0.9],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -493,7 +404,12 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                           duration: const Duration(milliseconds: 250),
                           curve: Curves.easeInOut,
                           transformAlignment: Alignment.center,
-                          transform: Matrix4.identity()..scale(backend.isPurchasePending ? 0.98 : 1.0),
+                          transform: Matrix4.identity()..scaleByDouble(
+                            backend.isPurchasePending ? 0.98 : 1.0,
+                            backend.isPurchasePending ? 0.98 : 1.0,
+                            backend.isPurchasePending ? 0.98 : 1.0,
+                            backend.isPurchasePending ? 0.98 : 1.0,
+                          ),
                           child: Opacity(
                             opacity: backend.isPurchasePending ? 0.7 : 1.0,
                             child: ElevatedButton(
@@ -536,6 +452,14 @@ class _FundsScreenViewState extends State<FundsScreenView> {
         ),
       ),
     );
+  }
+
+  void _onPageChanged(int newPageIndex) {
+    if (_currentPage != newPageIndex) {
+      setState(() {
+        _currentPage = newPageIndex;
+      });
+    }
   }
 
   Widget _buildPageIndicator(double screenWidth) {

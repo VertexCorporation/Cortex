@@ -1,15 +1,16 @@
-// header.dart
+// lib/settings/sections/header.dart
 
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cortex/app.dart';
-import 'package:cortex/theme.dart'; // For AppColors
-import 'package:flutter/foundation.dart'; // For kDebugMode
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart'; // For custom fonts
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+import '../../app.dart';
+import '../../theme.dart';
+import '../providers/general.dart';
 
 /// A self-contained, animated painter for creating a rotating gradient border.
-/// It is used by ProfileHeaderSection to indicate a subscription status.
+/// It is used by `ProfileHeaderSection` to indicate a subscription status.
 class AnimatedBorderPainter extends CustomPainter {
   final double animationValue;
 
@@ -17,52 +18,35 @@ class AnimatedBorderPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const double strokeWidth = 2.5; // Slightly thicker for better visibility
+    const double strokeWidth = 2.5;
     final Rect rect = Offset.zero & size;
     final double radius = size.width / 2;
-
-    // The paint object configures the shader and stroke properties.
     final Paint paint = Paint()
       ..shader = SweepGradient(
-        colors: AppColors.animatedBorderGradientColors, // Assumes this is defined in your theme.
+        colors: AppColors.animatedBorderGradientColors,
         startAngle: 0.0,
         endAngle: 2 * pi,
         transform: GradientRotation(animationValue),
       ).createShader(rect)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
-
-    // Draw the circle with the gradient paint.
     canvas.drawCircle(Offset(radius, radius), radius - strokeWidth / 2, paint);
   }
 
   @override
   bool shouldRepaint(covariant AnimatedBorderPainter oldDelegate) {
-    // Repaint only if the animation value has changed to optimize performance.
     return oldDelegate.animationValue != animationValue;
   }
 }
 
-/// A widget that displays the user's profile header.
+/// A widget that displays the user's profile header by consuming data from `SettingsGeneralProvider`.
 ///
-/// This widget is now a StatefulWidget to manage its own animation controller,
-/// ensuring the animation only runs when the widget is visible. This optimizes
-/// performance and prevents GPU glitches.
+/// This component is responsible for displaying the user's avatar, name, email,
+/// and any subscription or special status badges. It manages its own animation for the
+/// subscriber border, starting and stopping it based on changes in the user's
+/// active subscription status sourced directly from the provider.
 class ProfileHeaderSection extends StatefulWidget {
-  final String displayName;
-  final String email;
-  final int userSubscriptionLevel;
-  final bool isAlphaUser;
-  final Timestamp? subscriptionExpiresAt; // <<< NEW PARAMETER
-
-  const ProfileHeaderSection({
-    super.key,
-    required this.displayName,
-    required this.email,
-    required this.userSubscriptionLevel,
-    required this.isAlphaUser,
-    this.subscriptionExpiresAt, // Now accepts the expiration date
-  });
+  const ProfileHeaderSection({super.key});
 
   @override
   State<ProfileHeaderSection> createState() => _ProfileHeaderSectionState();
@@ -70,112 +54,81 @@ class ProfileHeaderSection extends StatefulWidget {
 
 class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
     with SingleTickerProviderStateMixin {
+  late final AnimationController _animationController;
+  late final Animation<double> _animation;
+  bool _isAnimationInitialized = false;
 
-  late AnimationController _animationController;
-  late Animation<double> _animation;
-  bool _isControllerInitialized = false;
+  /// Stores the last known active level to detect when the animation state needs to change.
+  /// This variable is a side-effect manager, not a data source for the UI.
+  int _lastKnownActiveLevel = 0;
 
-  /// Internal, reliable getter that checks both the subscription level
-  /// and the expiration date to determine the true active status.
-  int get _activeLevel {
-    final level = widget.userSubscriptionLevel;
-
-    if (level >= 4) {
-      return level;
-    }
-
-    if (level == 0) return 0;
-    if (widget.subscriptionExpiresAt == null) return 0;
-    if (widget.subscriptionExpiresAt!.toDate().isBefore(DateTime.now())) return 0;
-
-    return level;
+  @override
+  void initState() {
+    super.initState();
+    // Animation is initialized in `didChangeDependencies` to ensure the provider
+    // is available when the initial check is performed.
   }
 
-  /// Helper to initialize the animation controller.
+  /// Manages the animation's lifecycle as a side-effect of provider data changes.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final generalProvider = Provider.of<SettingsGeneralProvider>(context);
+
+    // Read the definitive active level directly from the provider's smart getter.
+    final int newActiveLevel = generalProvider.activeSubscriptionLevel;
+
+    // Compare with the last known state to decide if the animation needs to change.
+    if (newActiveLevel != _lastKnownActiveLevel) {
+      if (newActiveLevel >= 1 && !_isAnimationInitialized) {
+        _initializeAnimation(); // User is now an active subscriber.
+      } else if (newActiveLevel == 0 && _isAnimationInitialized) {
+        _disposeAnimation(); // Subscription is no longer active.
+      }
+      // Update the state detector for the next change.
+      _lastKnownActiveLevel = newActiveLevel;
+    }
+  }
+
   void _initializeAnimation() {
-    if (_isControllerInitialized) return;
+    if (_isAnimationInitialized) return;
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 4),
     )..repeat();
     _animation = Tween<double>(begin: 0, end: 2 * pi).animate(_animationController);
-    _isControllerInitialized = true;
+    // Use `setState` only to rebuild and show the animation.
+    if(mounted) setState(() => _isAnimationInitialized = true);
   }
 
-  /// Helper to safely dispose of the animation controller.
   void _disposeAnimation() {
-    if (_isControllerInitialized) {
+    if (_isAnimationInitialized) {
       _animationController.dispose();
-      _isControllerInitialized = false;
-    }
-  }
-
-  /// Helper function for didUpdateWidget to calculate the old active level.
-  int _calculateActiveLevel(int level, Timestamp? expiresAt) {
-    if (level == 0) return 0;
-    if (expiresAt == null) return 0;
-    if (expiresAt.toDate().isBefore(DateTime.now())) return 0;
-    return level;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Start animation based on the reliable `_activeLevel`.
-    if (_activeLevel >= 1) {
-      _initializeAnimation();
-    }
-  }
-
-  /// --- UPDATED LIFECYCLE METHOD ---
-  /// Handles dynamic changes to the subscription status while the widget is visible.
-  @override
-  void didUpdateWidget(covariant ProfileHeaderSection oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    final oldActiveLevel = _calculateActiveLevel(
-        oldWidget.userSubscriptionLevel, oldWidget.subscriptionExpiresAt);
-    final newActiveLevel = _activeLevel;
-
-    // If the active status has changed, update the animation state.
-    if (oldActiveLevel != newActiveLevel) {
-      if (newActiveLevel >= 1 && !_isControllerInitialized) {
-        _initializeAnimation(); // User just subscribed
-      } else if (newActiveLevel < 1 && _isControllerInitialized) {
-        _disposeAnimation(); // Subscription just expired
-      }
-      // Trigger a rebuild to reflect the change visually.
-      if (mounted) setState(() {});
+      if(mounted) setState(() => _isAnimationInitialized = false);
     }
   }
 
   @override
   void dispose() {
-    _disposeAnimation();
+    // Ensure the animation controller is disposed to prevent memory leaks.
+    if (_isAnimationInitialized) {
+      _animationController.dispose();
+    }
     super.dispose();
   }
 
-  /// Returns the subscription label based on the reliable `_activeLevel`.
-  String _getSubscriptionLabel() {
-    switch (_activeLevel) {
-      case 1:
-      case 4: return "Plus";
-      case 2:
-      case 5: return "Pro";
-      case 3:
-      case 6: return "Ultra";
+  String _getSubscriptionLabel(int activeLevel) {
+    switch (activeLevel) {
+      case 1: case 4: return "Plus";
+      case 2: case 5: return "Pro";
+      case 3: case 6: return "Ultra";
       default: return "";
     }
   }
 
-  /// Builds a badge widget with an icon and a label.
   Widget _buildBadge(BuildContext context, IconData icon, String label) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
-    double iconSize = screenWidth * 0.045;
-    double fontSize = screenWidth * 0.032;
-
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: screenWidth * 0.025,
@@ -188,16 +141,9 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: AppColors.primaryColor.inverted, size: iconSize),
+          Icon(icon, color: AppColors.primaryColor.inverted, size: screenWidth * 0.045),
           SizedBox(width: screenWidth * 0.015),
-          Text(
-            label,
-            style: GoogleFonts.poppins(
-              color: AppColors.primaryColor.inverted,
-              fontSize: fontSize,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          Text(label, style: GoogleFonts.poppins(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.032, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -205,17 +151,22 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
 
   @override
   Widget build(BuildContext context) {
+    context.watch<ThemeProvider>();
+
+    // Use `context.watch` to listen for changes and get the latest data.
+    final generalProvider = context.watch<SettingsGeneralProvider>();
+
+    // The UI is now driven directly by the provider's state, ensuring it is always up-to-date.
+    final userData = generalProvider.userData;
+    final activeLevel = generalProvider.activeSubscriptionLevel;
+
+    // Safely extract data with fallbacks.
+    final displayName = userData?['username'] as String? ?? 'User';
+    final email = generalProvider.isVerified ? (userData?['email'] as String? ?? '...') : 'Unverified';
+    final isAlphaUser = userData?['alphaUser'] as bool? ?? false;
+
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    double avatarSize = screenWidth * 0.25;
-    double fontSizeName = screenWidth * 0.06;
-    double fontSizeEmail = screenWidth * 0.04;
-    double spacing = screenWidth * 0.04;
-
-    if (kDebugMode) {
-      print('[ProfileHeaderSection] Building widget. Active Level: $_activeLevel');
-    }
+    final double avatarSize = screenWidth * 0.25;
 
     Widget avatar = Container(
       width: avatarSize,
@@ -225,18 +176,14 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
         radius: avatarSize / 2.2,
         backgroundColor: AppColors.secondaryColor,
         child: Text(
-          widget.displayName.isNotEmpty ? widget.displayName[0].toUpperCase() : 'U',
-          style: TextStyle(
-            fontSize: avatarSize / 2.5,
-            color: AppColors.primaryColor.inverted,
-            fontWeight: FontWeight.bold,
-          ),
+          displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
+          style: TextStyle(fontSize: avatarSize / 2.5, color: AppColors.primaryColor.inverted, fontWeight: FontWeight.bold),
         ),
       ),
     );
 
-    // Apply animated border based on the reliable `_activeLevel`.
-    if (_activeLevel >= 1) {
+    // Conditionally wrap the avatar with the animation if the subscription is active.
+    if (activeLevel >= 1 && _isAnimationInitialized) {
       avatar = AnimatedBuilder(
         animation: _animationController,
         builder: (context, child) {
@@ -256,7 +203,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             avatar,
-            SizedBox(width: spacing),
+            SizedBox(width: screenWidth * 0.04),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,40 +213,21 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      widget.displayName,
-                      style: GoogleFonts.poppins(
-                        color: AppColors.primaryColor.inverted,
-                        fontSize: fontSizeName,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    child: Text(displayName, style: GoogleFonts.poppins(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.06, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ),
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      widget.email,
-                      style: GoogleFonts.poppins(
-                        color: AppColors.quinaryColor,
-                        fontSize: fontSizeEmail,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    child: Text(email, style: GoogleFonts.poppins(color: AppColors.quinaryColor, fontSize: screenWidth * 0.04, fontWeight: FontWeight.w400), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ),
-                  SizedBox(height: screenHeight * 0.01),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                   Row(
                     children: [
-                      // Display badges based on the reliable `_activeLevel`.
-                      if (_activeLevel >= 1)
-                        _buildBadge(context, Icons.star_rounded, _getSubscriptionLabel()),
-                      if (_activeLevel >= 1 && widget.isAlphaUser)
+                      if (activeLevel >= 1)
+                        _buildBadge(context, Icons.star_rounded, _getSubscriptionLabel(activeLevel)),
+                      if (activeLevel >= 1 && isAlphaUser)
                         SizedBox(width: screenWidth * 0.02),
-                      if (widget.isAlphaUser)
+                      if (isAlphaUser)
                         _buildBadge(context, Icons.explore, "Alpha"),
                     ],
                   ),

@@ -3693,6 +3693,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'There was a problem fetching the latest updates, please check your connection and try again.'**
   String get newsErrorMessage;
+
+  /// No description provided for @codeNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The code you entered is invalid or has expired.'**
+  String get codeNotFound;
+
+  /// No description provided for @whatIsNew.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new?'**
+  String get whatIsNew;
+
+  /// No description provided for @onboardingTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Hey! We\'re the Cortex Team.'**
+  String get onboardingTitle1;
+
+  /// No description provided for @onboardingDesc1.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s awesome to see you here, {userName}. We\'re a few high school developers who decided to rewrite the rules of the AI industry. It\'s great to meet you! So let\'s get to know each other better.'**
+  String onboardingDesc1(String userName);
+
+  /// No description provided for @onboardingTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'There Were Huge Problems.'**
+  String get onboardingTitle2;
+
+  /// No description provided for @onboardingDesc2.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI revolution arrived, but it got stuck at the threshold. With high subscription fees, complex platforms, those who destroy privacy, and those who block accessibility to AI... as long as they were in the game, this threshold could never be crossed.'**
+  String get onboardingDesc2;
+
+  /// No description provided for @onboardingTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'We Couldn\'t Just Stand By.'**
+  String get onboardingTitle3;
+
+  /// No description provided for @onboardingDesc3.
+  ///
+  /// In en, this message translates to:
+  /// **'To cross that threshold, we built a platform that is powerful, aesthetic, customizable, easy to use, fully transparent, works both online and offline, and keeps your data only on your device. We gave the power back to where it belongs: you.'**
+  String get onboardingDesc3;
+
+  /// No description provided for @onboardingTitle4.
+  ///
+  /// In en, this message translates to:
+  /// **'This Was Never Easy.'**
+  String get onboardingTitle4;
+
+  /// No description provided for @onboardingDesc4.
+  ///
+  /// In en, this message translates to:
+  /// **'We were rejected dozens of times, suspended multiple times, received fake warnings, and had to change our brand many times. Through it all and more, we were told it couldn\'t be done. But we never gave up, believing this project belongs to everyone, not just us. And that\'s exactly why we\'re here.'**
+  String get onboardingDesc4;
+
+  /// No description provided for @onboardingFinalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s Time for a Revolution.'**
+  String get onboardingFinalTitle;
+
+  /// No description provided for @onboardingFinalDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'re seeing this screen, it\'s because we didn\'t give up. And we have no intention of giving up. Come on, let\'s take the AI revolution to the world together. To be a part of this story...'**
+  String get onboardingFinalDesc;
+
+  /// No description provided for @onboardingFinalQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'ARE YOU READY?'**
+  String get onboardingFinalQuestion;
+
+  /// No description provided for @onboardingFinalButton.
+  ///
+  /// In en, this message translates to:
+  /// **'YES!'**
+  String get onboardingFinalButton;
+
+  /// No description provided for @dude.
+  ///
+  /// In en, this message translates to:
+  /// **'Dude'**
+  String get dude;
+
+  /// No description provided for @swipeToContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe to continue'**
+  String get swipeToContinue;
+
+  /// No description provided for @cacheIsNotUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Play Store cache is not up-to-date. Please close and reopen the Play Store app, or restart your device.'**
+  String get cacheIsNotUpToDate;
 }
 
 class _AppLocalizationsDelegate

@@ -4,10 +4,10 @@ import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../library/backend/data/entity.dart';
+import '../../library/backend/data/service.dart';
 import '../../main.dart';
-import '../../models/backend/data/data.dart';
 import '../../extensions.dart';
-import '../../models/backend/data/info.dart';
 
 /// Service responsible for all logic related to model selection and updates.
 ///
@@ -15,67 +15,65 @@ import '../../models/backend/data/info.dart';
 class SelectionService {
   final ChatSessionProvider _sessionProvider;
   final ConversationProvider _conversationProvider;
+  final ModelService _modelService;
 
   SelectionService({
     required ChatSessionProvider sessionProvider,
     required ConversationProvider conversationProvider,
+    required ModelService modelService,
   })  : _sessionProvider = sessionProvider,
-        _conversationProvider = conversationProvider;
+        _conversationProvider = conversationProvider,
+        _modelService = modelService;
 
-  /// Selects a model series to start a new chat session.
+  /// Selects a model to start a new chat session using a ModelEntity.
   ///
-  /// It orchestrates a full reset of the chat state:
-  /// 1. Sets the "previous tab index" in MainScreenState if context is provided.
-  /// 2. Switches to the chat tab (index 0).
-  /// 3. Clears the previous conversation.
-  /// 4. Sets the new model details in the session.
-  Future<void> selectModel(ModelInfo modelSeriesInfo, {BuildContext? context}) async {
+  /// It orchestrates a full reset of the chat state by:
+  /// 1. Navigating to the chat tab if called from an external screen.
+  /// 2. Clearing the previous conversation's state.
+  /// 3. Resolving the precise model/extension to use (e.g., last used).
+  /// 4. Setting the new model details in the session provider.
+  Future<void> selectModel(ModelEntity aiEntity, {BuildContext? context}) async {
     const String logPrefix = "[SelectionService.selectModel]";
-    debugPrint("$logPrefix: Processing selection for model series '${modelSeriesInfo.id}'.");
+    debugPrint("$logPrefix: Processing selection for model series '${aiEntity.id}'.");
 
+    // This part handles navigation from outside the chat screen (e.g., Library).
+    // It now passes the ModelEntity directly to MainScreen.
     if (context != null && context.mounted) {
       Provider.of<TabProvider>(context, listen: false);
-      mainScreenKey.currentState?.startChatWithModel(modelSeriesInfo);
+      mainScreenKey.currentState?.startChatWithModel(aiEntity);
       return;
     }
 
-    // 1. Clear any previous conversation and input state.
+    // --- Logic for selecting a model from within the chat screen ---
+
+    // 1. Clear any previous conversation.
     _conversationProvider.clearConversation();
 
-    // 2. Resolve the precise model ID to use.
-    final Map<String, dynamic> seriesData = ModelData.getPreciseModelData(modelSeriesInfo.id);
-    final extensionsMap = seriesData['extensions'] as Map<String, dynamic>?;
-
+    // 2. Resolve the precise model ID to use (if it's a series with extensions).
+    final extensionsMap = aiEntity.extensions;
     String finalModelId;
+
     if (extensionsMap != null && extensionsMap.isNotEmpty) {
-      String lastUsedId = await Extensions.getLastSelectedExtension(modelSeriesInfo.id);
+      String lastUsedId = await Extensions.getLastSelectedExtension(aiEntity.id);
       finalModelId = (lastUsedId.isNotEmpty && extensionsMap.containsKey(lastUsedId))
           ? lastUsedId
           : extensionsMap.keys.first;
     } else {
-      finalModelId = modelSeriesInfo.id;
+      finalModelId = aiEntity.id;
     }
     debugPrint("$logPrefix: Resolved final model ID to: '$finalModelId'");
 
-    final Map<String, dynamic> preciseModelData = ModelData.getPreciseModelData(finalModelId);
+    // 3. Get the precise entity for the final selected model.
+    final langCode = _sessionProvider.getLocale().languageCode;
+    final finalModelEntity = _modelService.getPreciseModelData(finalModelId, langCode: langCode);
+    _sessionProvider.selectModel(finalModelEntity);
 
-    // 3. Construct the full ModelInfo object for the session.
-    final finalModelInfo = ModelInfo(
-      id: finalModelId,
-      title: seriesData['title'] as String? ?? modelSeriesInfo.title,
-      imagePath: ModelData.getModelImagePath(seriesData),
-      producer: seriesData['producer'] as String? ?? modelSeriesInfo.producer,
-      category: seriesData['category'] as String?,
-      extensions: extensionsMap,
-    );
-
-    // 4. Update the session provider with the new model details.
-    _sessionProvider.selectModel(finalModelInfo, preciseData: preciseModelData);
+    // 4. Update the session provider directly with the final ModelEntity.
+    _sessionProvider.selectModel(finalModelEntity);
 
     debugPrint("$logPrefix: Session and Conversation providers updated for new chat session.");
   }
 
-  // ... (changeExtension ve refreshActiveChatModelDetails metotları aynı kalır)
   /// Changes the active model to a different extension within the same series.
   ///
   /// This method updates the session state without resetting the conversation,
@@ -86,7 +84,8 @@ class SelectionService {
 
     if (_sessionProvider.modelId == newFullModelId) return;
 
-    final baseId = ModelData.getBaseIdFromFullId(newFullModelId);
+    final langCode = _sessionProvider.getLocale().languageCode;
+    final baseId = _modelService.getBaseIdFromFullId(newFullModelId, langCode: langCode);
     await Extensions.setLastSelectedExtension(baseId, newFullModelId);
 
     // Call the specific provider method that updates the model details

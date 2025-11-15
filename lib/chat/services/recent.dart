@@ -1,89 +1,73 @@
 // lib/chat/services/recent.dart
 
-// This file defines the RecentModelsManager class, which encapsulates all logic
-// for fetching, caching, and providing the list of recently used models.
-// It uses a ValueNotifier to allow the UI to reactively update when the list changes.
-
 import 'package:cortex/chat/services/storage.dart';
-import 'package:cortex/models/backend/data/data.dart';
+import 'package:cortex/library/backend/data/service.dart';
 import 'package:flutter/foundation.dart';
 import '../../cache.dart';
-import '../../models/backend/data/info.dart';
+import '../../library/backend/data/entity.dart';
 
 /// Manages the state and logic for recently used models.
-///
-/// This class is responsible for:
-/// - Owning the list of recent models.
-/// - Providing the list to the UI via a [ValueNotifier].
-/// - Loading models from the fast cache or persistent storage.
-/// - Handling the logic to refresh the list when needed.
+/// This class now exclusively uses and provides [ModelEntity] objects.
 class RecentModelsManager {
-  /// A notifier that holds the list of recent models.
-  /// The UI can listen to this to rebuild automatically when the data changes.
-  final ValueNotifier<List<ModelInfo>> recentModelsNotifier =
-  ValueNotifier<List<ModelInfo>>([]);
+  /// A notifier that holds the list of recent models as [ModelEntity].
+  final ValueNotifier<List<ModelEntity>> recentModelsNotifier =
+  ValueNotifier<List<ModelEntity>>([]);
+  final ModelService _modelService;
 
-  /// A public getter to easily access the current list of models without listening.
-  List<ModelInfo> get recentModels => recentModelsNotifier.value;
+  RecentModelsManager({required ModelService modelService})
+      : _modelService = modelService;
+
+  /// A public getter to access the current list of [ModelEntity] objects.
+  List<ModelEntity> get recentModels => recentModelsNotifier.value;
 
   /// Initializes the manager by loading models from the fastest available source.
-  ///
-  /// It first checks the in-memory cache. If the cache is empty, it triggers
-  /// a full refresh from persistent storage.
-  Future<void> initialize() async {
+  Future<void> initialize({required String langCode}) async {
     debugPrint("[RecentModelsManager] Initializing...");
-    final cachedModels = CacheService.get<List<ModelInfo>>(CacheKey.recentModels);
 
-    if (cachedModels != null) {
+    // The cache now stores raw maps, which we hydrate into entities.
+    final cachedModelMaps = CacheService.get<List<Map<String, dynamic>>>(CacheKey.recentModels);
+
+    if (cachedModelMaps != null) {
       debugPrint("[RecentModelsManager] Loading recent models from fast cache.");
-      recentModelsNotifier.value = cachedModels;
+      // Hydrate the raw maps from cache into ModelEntity objects.
+      recentModelsNotifier.value = cachedModelMaps
+          .map((map) => ModelEntity.fromMap(map, langCode))
+          .toList();
     } else {
       debugPrint("[RecentModelsManager] Fast cache is empty. Performing a full refresh.");
-      await refresh();
+      await refresh(langCode: langCode);
     }
   }
 
-  /// Fetches the most recent model series IDs from storage, maps them to full
-  /// [ModelInfo] objects, updates the cache, and notifies listeners.
-  ///
-  /// This is the single source of truth for reloading recent models.
-  Future<void> refresh() async {
+  /// Fetches the most recent model IDs, finds the corresponding [ModelEntity] objects,
+  /// updates the cache, and notifies listeners.
+  Future<void> refresh({required String langCode}) async {
     debugPrint("[RecentModelsManager] Refreshing recent models from storage.");
-    // This function now safely waits for the master list to be loaded
-    // and returns a list of GUARANTEED valid model series IDs.
-    final recentIds = await ChatStorageService.getRecentModelSeriesIds();
-    final loadedRecentModels = <ModelInfo>[];
 
-    // Get the definitive, populated list of all models from the central source.
-    final allModels = ModelData.getCachedModelsSync();
+    final recentIds = await ChatStorageService.getRecentModelSeriesIds(langCode: langCode, modelService: _modelService);
+    final loadedRecentModels = <ModelEntity>[];
+    final List<ModelEntity> allModels = _modelService.getCachedModelsSync();
 
     for (final id in recentIds) {
       try {
-        // Search in the definitive list.
-        final modelData = allModels.firstWhere((m) => m['id'] == id);
-
-        // Convert the raw map to a ModelInfo object.
-        loadedRecentModels.add(ModelInfo(
-          id: modelData['id'],
-          title: modelData['title'],
-          imagePath: ModelData.getModelImagePath(modelData),
-          producer: modelData['producer'],
-        ));
+        // Find the full ModelEntity from the master list.
+        final model = allModels.firstWhere((m) => m.id == id);
+        // Add the entity directly to the list, no conversion needed.
+        loadedRecentModels.add(model);
       } catch (e) {
-        debugPrint("[RecentModelsManager] CRITICAL: Could not map a validated recent ID ('$id') to a model. This should not happen. Error: $e");
+        debugPrint("[RecentModelsManager] Could not map recent ID ('$id') to a model. It may have been removed.");
       }
     }
 
-    // Update the fast cache.
-    CacheService.set(CacheKey.recentModels, loadedRecentModels);
+    // REFACTORED: When caching, serialize the entities back to raw maps.
+    CacheService.set(CacheKey.recentModels, loadedRecentModels.map((e) => e.toMap()).toList());
 
-    // Notify all listeners (like the UI) about the new list.
+    // Notify all listeners with the new list of entities.
     recentModelsNotifier.value = loadedRecentModels;
     debugPrint("[RecentModelsManager] Refresh complete. Found ${loadedRecentModels.length} recent models.");
   }
 
-  /// Cleans up resources, specifically the [ValueNotifier].
-  /// This should be called in the `dispose` method of the owning widget.
+  /// Cleans up resources.
   void dispose() {
     recentModelsNotifier.dispose();
   }

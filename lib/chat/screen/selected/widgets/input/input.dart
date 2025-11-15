@@ -1,15 +1,15 @@
-// chat/screen/selected/input/input.dart
+// chat/screen/selected/widgets/input/input.dart
 
 import 'dart:io';
 import 'package:cortex/app.dart';
-import 'package:cortex/chat/screen/selected/input/buttons.dart';
+import 'package:cortex/chat/screen/selected/widgets/input/buttons.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../../../../internet.dart';
-import '../../../../notifications.dart';
-import '../../../../theme.dart';
+import '../../../../../internet.dart';
+import '../../../../../notifications/introvert.dart';
+import '../../../../../theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 
 /// A widget that represents the chat input area including
@@ -104,11 +104,12 @@ class InputFieldState extends State<InputField> {
   /// This is used to compare against a new selection. Once the original photo is removed,
   /// this variable is cleared, so any new photo is considered a change.
   File? _originalPhoto;
-
+  bool _photoRemoved = false;
 
   @override
   void initState() {
     super.initState();
+    _photoRemoved = false;
     if (widget.isEditingMode && widget.preselectedPhoto != null) {
       _selectedPhoto = widget.preselectedPhoto;
       _originalPhoto = widget.preselectedPhoto;
@@ -125,19 +126,47 @@ class InputFieldState extends State<InputField> {
     super.didUpdateWidget(oldWidget);
 
     if (!oldWidget.isEditingMode && widget.isEditingMode) {
+      debugPrint(
+        "[InputField] Entering edit mode. preselectedPhoto=${widget.preselectedPhoto?.path}",
+      );
       setState(() {
         _selectedPhoto = widget.preselectedPhoto;
         _originalPhoto = widget.preselectedPhoto;
         _photoKey = UniqueKey();
+        _photoRemoved = false;
       });
+      debugPrint(
+        "[InputField] Edit mode state → _selectedPhoto=${_selectedPhoto?.path}, "
+            "_originalPhoto=${_originalPhoto?.path}, _photoRemoved=$_photoRemoved",
+      );
     }
 
-    // When exiting edit mode, clear everything.
     if (oldWidget.isEditingMode && !widget.isEditingMode) {
+      debugPrint("[InputField] Exiting edit mode. Clearing photo panel.");
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) clearPhotoPanel();
       });
     }
+  }
+
+  /// Removes the currently selected photo by setting _selectedPhoto to null,
+  /// and clearing the stored _originalPhoto so that the "no photo" state
+  /// is considered a real change in edit mode as well.
+  void _removeSelectedPhoto() {
+    debugPrint(
+      "[InputField] _removeSelectedPhoto called. "
+          "isEditingMode=${widget.isEditingMode}, "
+          "before → selected=${_selectedPhoto?.path}, original=${_originalPhoto?.path}",
+    );
+    setState(() {
+      _selectedPhoto = null;
+      _photoRemoved = true;
+    });
+    debugPrint(
+      "[InputField] After remove → selected=${_selectedPhoto?.path}, "
+          "original=${_originalPhoto?.path}, _photoRemoved=$_photoRemoved",
+    );
+    widget.onPhotoSelected?.call(null);
   }
 
   /// Opens the image picker to allow the user to select a photo from the gallery.
@@ -157,18 +186,6 @@ class InputFieldState extends State<InputField> {
     } catch (e) {
       debugPrint("Error picking photo: $e");
     }
-  }
-
-  /// Removes the currently selected photo by setting _selectedPhoto to null,
-  /// marking _photoRemoved, and clearing the stored _originalPhoto.
-  void _removeSelectedPhoto() {
-    setState(() {
-      _selectedPhoto = null;
-      if (!widget.isEditingMode) {
-        _originalPhoto = null;
-      }
-    });
-    widget.onPhotoSelected?.call(null);
   }
 
   /// Clears the photo selection panel and resets internal flags.
@@ -270,10 +287,10 @@ class InputFieldState extends State<InputField> {
           ? null
           : () {
         if (hasPhoto) {
-          Provider.of<NotificationService>(context, listen: false)
+          Provider.of<IntrovertNotificationService>(context, listen: false)
               .showNotification(
             message: widget.localizations.photoLimitReachedMessage,
-            isSuccess: false,
+            type: NotificationType.error,
             bottomOffset: 0.22,
             fontSize: 0.032,
           );
@@ -478,15 +495,14 @@ class InputFieldState extends State<InputField> {
     return 0;
   }
 
-  /// Determines whether the send button should be enabled, with detailed logging.
-  /// Now correctly handles premium trials for free users.
+  /// Determines whether the send button should be enabled.
+  /// This getter is designed to be efficient for frequent calls.
   bool get isSendButtonEnabled {
-    // Basic checks first (these are unchanged)
-    if (widget.modelMissing || widget.isSending || !widget.isStorageSufficient || widget.isLimitExceeded) {
-      return false;
-    }
+    if (widget.modelMissing) return false;
+    if (widget.isSending) return false;
+    if (!widget.isStorageSufficient) return false;
+    if (widget.isLimitExceeded) return false;
 
-    // If it's a premium model, the user is NOT subscribed, AND their trials are used up, disable the button.
     if (widget.isPremiumModel && !widget.isSubscribed && widget.premiumTrialUses >= 3) {
       return false;
     }
@@ -502,7 +518,14 @@ class InputFieldState extends State<InputField> {
     if (widget.isEditingMode) {
       final String originalText = widget.originalMessageText ?? '';
       final bool textChanged = currentText != originalText;
-      final bool photoChanged = _originalPhoto?.path != _selectedPhoto?.path;
+
+      bool photoChanged;
+      if (_photoRemoved) {
+        photoChanged = true;
+      } else {
+        photoChanged = _originalPhoto?.path != _selectedPhoto?.path;
+      }
+
       if (!textChanged && !photoChanged) {
         return false;
       }

@@ -36,7 +36,7 @@ class RegenerateService {
       int messageIndex, {
         required BuildContext context,
         String? newModelId,
-        bool isDynamicRegenerate = false, required AppLocalizations localizations,
+        bool isDynamicRegenerate = false
       }) async {
     const String logPrefix = "[RegenerateService]";
     debugPrint(

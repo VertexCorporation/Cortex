@@ -5,18 +5,21 @@ import 'package:cortex/app.dart';
 import 'package:cortex/chat/messages/messages.dart';
 import 'package:cortex/chat/messages/viewer.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:cortex/models/backend/data/data.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../library/backend/data/service.dart';
 import '../../messages/tiles/ai.dart';
 import '../../messages/tiles/user.dart';
 
 /// A utility class that acts as a factory for building different types of message widgets.
 ///
 /// It centralizes the logic for constructing message tiles and the main messages list,
-/// ensuring a consistent appearance and behavior throughout the chat screen.
+/// ensuring a consistent appearance and behavior throughout the chat screen. This class
+/// is designed to be decoupled from business state (like subscription status),
+/// focusing solely on UI construction.
 class Tiles {
-  /// Builds a user's message tile, handling the switch between normal and "editing" states.
+  /// Builds a user's message tile, handling the switch between its normal and "editing" states.
   static Widget buildUserMessageTile({
     required BuildContext context,
     required Message message,
@@ -28,10 +31,6 @@ class Tiles {
     VoidCallback? onFadeOutComplete,
     required double screenWidth,
     required double screenHeight,
-    // --- NEW: Required parameters passed down for the child UserMessageTile ---
-    required bool conversationHasPhoto,
-    required bool isUserSubscribed,
-    required int premiumTrialUses,
   }) {
     final isEditingThisMessage = isEditingMode && (editingMessageIndex == index);
     return AnimatedCrossFade(
@@ -54,17 +53,13 @@ class Tiles {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.info_outline,
-                  color: AppColors.primaryColor.inverted, size: 20),
+              Icon(Icons.info_outline, color: AppColors.primaryColor.inverted, size: 20),
               SizedBox(width: screenWidth * 0.02),
               Expanded(
                 child: Text(
                   AppLocalizations.of(context)!.editingMessageInfo,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppColors.primaryColor.inverted,
-                    fontSize: 15,
-                  ),
+                  style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: 15),
                 ),
               ),
             ],
@@ -80,10 +75,6 @@ class Tiles {
         screenHeight: screenHeight,
         onEdit: onEdit,
         onFadeOutComplete: onFadeOutComplete,
-        // Pass the new parameters down to the final builder.
-        conversationHasPhoto: conversationHasPhoto,
-        isUserSubscribed: isUserSubscribed,
-        premiumTrialUses: premiumTrialUses,
       ),
     );
   }
@@ -98,10 +89,6 @@ class Tiles {
     required double screenHeight,
     required VoidCallback onEdit,
     VoidCallback? onFadeOutComplete,
-    // --- NEW: Required parameters to be passed to UserMessageTile ---
-    required bool conversationHasPhoto,
-    required bool isUserSubscribed,
-    required int premiumTrialUses,
   }) {
     return Column(
       key: ValueKey('normal_user_$index'),
@@ -109,19 +96,11 @@ class Tiles {
       children: [
         if (message.photoPath != null)
           Padding(
-            padding: EdgeInsets.only(
-              right: screenWidth * 0.04,
-              bottom: screenHeight * 0.006,
-            ),
+            padding: EdgeInsets.only(right: screenWidth * 0.04, bottom: screenHeight * 0.006),
             child: Align(
               alignment: Alignment.centerRight,
               child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    PhotoViewer.route(File(message.photoPath!)),
-                  );
-                },
+                onTap: () => Navigator.push(context, PhotoViewer.route(File(message.photoPath!))),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
                   child: Image.file(
@@ -136,14 +115,10 @@ class Tiles {
           ),
         if (message.text.trim().isNotEmpty)
           UserMessageTile(
+            message: message,
             key: key,
-            text: message.text,
-            opacity: message.opacity,
             onFadeOutComplete: onFadeOutComplete,
             onEdit: onEdit,
-            conversationHasPhoto: conversationHasPhoto,
-            isUserSubscribed: isUserSubscribed,
-            premiumTrialUses: premiumTrialUses,
           ),
       ],
     );
@@ -155,39 +130,34 @@ class Tiles {
     required Message message,
     required String modelId,
     required VoidCallback onReport,
-    required VoidCallback onRegenerate,
+    required void Function({String? newModelId}) onRegenerate,
     required VoidCallback onStop,
-    required ValueChanged<String> onChangeModel,
     required double screenWidth,
     required double screenHeight,
-    required bool isPersistentlyDynamic,
-    // --- NEW: Required parameters passed down for the child AIMessageTile ---
-    required bool conversationHasPhoto,
-    required bool isUserSubscribed,
-    required int premiumTrialUses,
-    required ValueNotifier<bool> isWaitingForResponseNotifier,
+    required ModelService modelService,
   }) {
+    final langCode = Localizations.localeOf(context).languageCode;
     final preciseModelId = message.model ?? modelId;
-    final modelData = ModelData.getPreciseModelData(preciseModelId);
-    final correctImagePath = modelData['imagePath'] as String? ?? 'assets/icons/self.svg';
+
+    // Fetch the type-safe entity using the provided modelService.
+    final model = modelService.getPreciseModelData(preciseModelId, langCode: langCode);
+
+    // Get the image path from the entity using the provided modelService.
+    final correctImagePath = modelService.getModelImagePath(model);
 
     final bool hasPhoto = message.photoPath != null && message.photoPath!.isNotEmpty;
     final bool hasText = message.text.trim().isNotEmpty;
     final bool isThinkingWithoutContent = message.isThinking && !hasPhoto && !hasText;
 
     final aiMessageContentWidget = AIMessageTile(
-      text: message.text,
+      message: message,
       avatarPath: correctImagePath,
-      opacity: message.opacity,
-      modelId: preciseModelId,
-      isReported: message.isReported,
-      isError: message.isError,
-      isThinking: message.isThinking,
-      isPersistentlyDynamic: isPersistentlyDynamic,
       onReport: onReport,
-      onRegenerate: onRegenerate,
+      onRegenerate: ({String? newModelId}) {
+        debugPrint("[Tiles.buildAIMessageTile] The unified callback passed to AIMessageTile is being called. newModelId: '$newModelId'");
+        onRegenerate(newModelId: newModelId);
+      },
       onStop: onStop,
-      onChangeModel: onChangeModel,
       parsedSpans: message.parsedSpans,
     );
 
@@ -195,17 +165,12 @@ class Tiles {
         ? Padding(
       padding: EdgeInsets.only(
         left: screenWidth * 0.04,
-        bottom: (hasText || isThinkingWithoutContent)
-            ? screenHeight * 0.006
-            : 0,
+        bottom: (hasText || isThinkingWithoutContent) ? screenHeight * 0.006 : 0,
       ),
       child: Align(
         alignment: Alignment.centerLeft,
         child: GestureDetector(
-          onTap: () => Navigator.push(
-            context,
-            PhotoViewer.route(File(message.photoPath!)),
-          ),
+          onTap: () => Navigator.push(context, PhotoViewer.route(File(message.photoPath!))),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: Image.file(
@@ -244,15 +209,9 @@ class Tiles {
     required double screenHeight,
     required String modelId,
     required VoidCallback onReport,
-    required VoidCallback onRegenerate,
+    required void Function({String? newModelId}) onRegenerate,
     required VoidCallback onStop,
-    required ValueChanged<String> onChangeModel,
-    required bool isPersistentlyDynamic,
-    // --- NEW: Required parameters to be passed down the chain ---
-    required bool conversationHasPhoto,
-    required bool isUserSubscribed,
-    required int premiumTrialUses,
-    required ValueNotifier<bool> isWaitingForResponseNotifier,
+    required ModelService modelService,
   }) {
     if (message.isUserMessage) {
       return buildUserMessageTile(
@@ -266,10 +225,6 @@ class Tiles {
         onFadeOutComplete: onFadeOutComplete,
         screenWidth: screenWidth,
         screenHeight: screenHeight,
-        // Pass the required data down to the user tile builder.
-        conversationHasPhoto: conversationHasPhoto,
-        isUserSubscribed: isUserSubscribed,
-        premiumTrialUses: premiumTrialUses,
       );
     } else {
       return buildAIMessageTile(
@@ -279,24 +234,17 @@ class Tiles {
         onReport: onReport,
         onRegenerate: onRegenerate,
         onStop: onStop,
-        onChangeModel: onChangeModel,
         screenWidth: screenWidth,
         screenHeight: screenHeight,
-        isPersistentlyDynamic: isPersistentlyDynamic,
-        // Pass the required data down to the AI tile builder.
-        conversationHasPhoto: conversationHasPhoto,
-        isUserSubscribed: isUserSubscribed,
-        premiumTrialUses: premiumTrialUses,
-        isWaitingForResponseNotifier: isWaitingForResponseNotifier,
+        modelService: modelService,
       );
     }
   }
 
   /// The main factory method that builds the entire scrollable list of messages.
   ///
-  /// This is the entry point that should be called from the main UI. It reads
-  /// the required data and passes it down to the individual tile builders.
-  /// It now uses `reverse: true` to properly handle keyboard appearance.
+  /// This is the entry point that should be called from the main UI. It passes
+  /// the necessary callbacks down to the individual tile builders.
   static Widget buildMessagesList({
     required BuildContext context,
     required List<Message> messages,
@@ -307,35 +255,22 @@ class Tiles {
     required VoidCallback onStop,
     required ValueChanged<int> onEdit,
     ValueChanged<int>? onFadeOutComplete,
-    required ValueChanged<int> onRegenerate,
-    required void Function(int index, String newExtension) onChangeModel,
+    required void Function(int index, {String? newModelId}) onRegenerate,
     required ValueChanged<int> onReport,
-    required bool isPersistentlyDynamic,
-    required bool conversationHasPhoto,
-    required bool isUserSubscribed,
-    required int premiumTrialUses,
-    required ValueNotifier<bool> isWaitingForResponseNotifier,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final modelService = context.read<ModelService>();
 
     return ListView.separated(
       controller: scrollController,
-      padding: EdgeInsets.only(
-        top: screenHeight * 0.01,
-        bottom: screenHeight * 0.01,
-      ),
+      padding: EdgeInsets.only(top: screenHeight * 0.01, bottom: screenHeight * 0.01),
       cacheExtent: 500,
       itemCount: messages.length,
-      separatorBuilder: (context, index) =>
-          SizedBox(height: screenHeight * 0.01),
+      separatorBuilder: (context, index) => SizedBox(height: screenHeight * 0.01),
       itemBuilder: (context, index) {
         Message message = messages[index];
-
-        final bool isMessageUnderEdit = isEditingMode &&
-            editingMessageIndex != null &&
-            index > editingMessageIndex;
-
+        final bool isMessageUnderEdit = isEditingMode && editingMessageIndex != null && index > editingMessageIndex;
         if (isMessageUnderEdit) {
           message = message.copyWith(opacity: 0.0);
         }
@@ -353,14 +288,12 @@ class Tiles {
           screenHeight: screenHeight,
           modelId: modelId,
           onReport: () => onReport(index),
-          onRegenerate: () => onRegenerate(index),
+          onRegenerate: ({String? newModelId}) {
+            debugPrint("[Tiles.buildMessagesList] Adapter callback created for index $index. Forwarding call. newModelId: '$newModelId'");
+            onRegenerate(index, newModelId: newModelId);
+          },
           onStop: onStop,
-          onChangeModel: (newExtension) => onChangeModel(index, newExtension),
-          isPersistentlyDynamic: isPersistentlyDynamic,
-          conversationHasPhoto: conversationHasPhoto,
-          isUserSubscribed: isUserSubscribed,
-          premiumTrialUses: premiumTrialUses,
-          isWaitingForResponseNotifier: isWaitingForResponseNotifier,
+          modelService: modelService,
         );
       },
     );

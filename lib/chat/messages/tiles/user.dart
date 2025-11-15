@@ -4,57 +4,44 @@ import 'package:cortex/app.dart';
 import 'package:cortex/recognizer.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
-import '../options.dart';
+import '../options/manager.dart';
+import '../messages.dart';
 
 class UserMessageTile extends StatefulWidget {
-  final String text;
-  final double opacity;
+  final Message message;
   final VoidCallback? onFadeOutComplete;
   final VoidCallback? onEdit;
-  final bool conversationHasPhoto;
-  final bool isUserSubscribed;
-  final int premiumTrialUses;
 
   const UserMessageTile({
     super.key,
-    required this.text,
-    required this.opacity,
+    required this.message,
     this.onFadeOutComplete,
     this.onEdit,
-    required this.conversationHasPhoto,
-    required this.isUserSubscribed,
-    required this.premiumTrialUses,
   });
 
   @override
   UserMessageTileState createState() => UserMessageTileState();
 }
 
-class UserMessageTileState extends State<UserMessageTile>
-    with TickerProviderStateMixin {
+class UserMessageTileState extends State<UserMessageTile> with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _fadeAnimation =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_fadeController);
+    _fadeController = AnimationController(duration: const Duration(milliseconds: 200), vsync: this);
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_fadeController);
 
-    if (widget.opacity == 1.0) {
-      _fadeController.value = 0.0;
-      _fadeController.forward();
+    if (widget.message.opacity == 1.0) {
+      _fadeController.forward(from: 0.0);
     } else {
-      _fadeController.value = 1.0;
-      _fadeController.reverse();
+      _fadeController.value = widget.message.opacity;
+      if (widget.message.opacity == 0.0) _fadeController.reverse();
     }
 
     _fadeController.addStatusListener((status) {
-      if (status == AnimationStatus.dismissed && widget.opacity == 0.0) {
+      if (status == AnimationStatus.dismissed && widget.message.opacity == 0.0) {
         widget.onFadeOutComplete?.call();
       }
     });
@@ -63,10 +50,10 @@ class UserMessageTileState extends State<UserMessageTile>
   @override
   void didUpdateWidget(UserMessageTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.opacity != oldWidget.opacity) {
-      if (widget.opacity == 1.0) {
+    if (widget.message.opacity != oldWidget.message.opacity) {
+      if (widget.message.opacity == 1.0) {
         _fadeController.forward();
-      } else if (widget.opacity == 0.0) {
+      } else if (widget.message.opacity == 0.0) {
         _fadeController.reverse();
       }
     }
@@ -78,20 +65,15 @@ class UserMessageTileState extends State<UserMessageTile>
     super.dispose();
   }
 
-  // --- REFACTORED METHOD ---
+  // --- FIX 3: Simplify the long press handler ---
   void _handleLongPress(BuildContext context, Offset tapPosition) {
-    // The direct dependency on ChatScreenState is now removed.
-    // All necessary data is read directly from the widget's properties.
     showMessageOptions(
       context: context,
       tapPosition: tapPosition,
-      messageText: widget.text,
-      options: const [MessageOption.copy, MessageOption.edit, MessageOption.select],
+      // Pass the entire message object. The panel will handle the rest.
+      message: widget.message,
+      // Only pass the relevant callback.
       onEdit: widget.onEdit,
-      // Use the parameters passed into the widget constructor
-      conversationHasPhoto: widget.conversationHasPhoto,
-      isSubscribed: widget.isUserSubscribed,
-      premiumTrialUses: widget.premiumTrialUses,
     );
   }
 
@@ -101,16 +83,10 @@ class UserMessageTileState extends State<UserMessageTile>
       opacity: _fadeAnimation,
       child: RawGestureDetector(
         gestures: {
-          ShortLongPressGestureRecognizer:
-          GestureRecognizerFactoryWithHandlers<ShortLongPressGestureRecognizer>(
-                () => ShortLongPressGestureRecognizer(
-              debugOwner: this,
-              shortPressDuration: const Duration(milliseconds: 330),
-            ),
+          ShortLongPressGestureRecognizer: GestureRecognizerFactoryWithHandlers<ShortLongPressGestureRecognizer>(
+                () => ShortLongPressGestureRecognizer(debugOwner: this, shortPressDuration: const Duration(milliseconds: 330)),
                 (instance) {
-              instance.onLongPressStart = (details) {
-                _handleLongPress(context, details.globalPosition);
-              };
+              instance.onLongPressStart = (details) => _handleLongPress(context, details.globalPosition);
             },
           ),
         },
@@ -130,16 +106,11 @@ class UserMessageTileState extends State<UserMessageTile>
                     borderRadius: BorderRadius.circular(24),
                     onTap: () => FocusScope.of(context).unfocus(),
                     child: Container(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.7,
-                      ),
+                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
                       padding: const EdgeInsets.all(12),
                       child: Text(
-                        widget.text,
-                        style: TextStyle(
-                          color: AppColors.primaryColor.inverted,
-                          fontSize: 16,
-                        ),
+                        widget.message.text,
+                        style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: 16),
                       ),
                     ),
                   ),

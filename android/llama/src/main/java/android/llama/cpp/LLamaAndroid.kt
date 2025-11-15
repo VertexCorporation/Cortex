@@ -3,6 +3,7 @@
 package android.llama.cpp
 
 import android.util.Log
+import android.util.Base64
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -54,6 +55,7 @@ class LLamaAndroid {
     private external fun new_sampler(): Long
     private external fun free_sampler(sampler: Long)
     private external fun request_stop()
+    private external fun set_image(bytes: ByteArray)
 
     suspend fun load(pathToModel: String) {
         withContext(runLoop) {
@@ -79,6 +81,16 @@ class LLamaAndroid {
         }
     }
 
+    fun setImage(base64: String) {
+        if (base64.isBlank()) {
+            Log.w(tag, "setImage() called with blank base64, ignoring.")
+            return
+        }
+        val bytes = Base64.decode(base64, Base64.DEFAULT)
+        set_image(bytes)
+        Log.d(tag, "setImage() successfully forwarded ${bytes.size} bytes to native side.")
+    }
+
     // This is NOT a suspend function and does not need the runLoop
     // as it calls a simple, thread-safe native method.
     fun requestStop() {
@@ -86,41 +98,54 @@ class LLamaAndroid {
         request_stop()
     }
 
+    fun clearKv() {
+        val state = threadLocalState.get()
+        if (state is State.Loaded) {
+            kv_cache_clear(state.context)
+            Log.d(tag, "KV cache cleared (manual).")
+        } else {
+            Log.w(tag, "clearKv() ignored: model is not loaded.")
+        }
+    }
+
     fun send(message: String): Flow<String> = flow {
         when (val state = threadLocalState.get()) {
             is State.Loaded -> {
                 try {
-                    // --- FIX: CONSTRUCT THE CHAT TEMPLATE WITHOUT A ROLE ---
-                    val fullPrompt = "<|im_start|>user\n$message<|im_end|>\n<|im_start|>assistant\n"
+                    val fullPrompt = message
 
-                    val nlen = 2048 // Max generation length
+                    kv_cache_clear(state.context)
 
-                    // Initialize the generation with the full, formatted prompt
-                    val ncur = IntVar(completion_init(state.context, state.batch, fullPrompt, true, nlen))
+                    val nlen = 1024
 
-                    // Loop to get tokens one by one
+                    val ncur = IntVar(
+                        completion_init(
+                            state.context,
+                            state.batch,
+                            fullPrompt,
+                            true,
+                            nlen
+                        )
+                    )
+
                     while (ncur.value < nlen) {
-                        val str = completion_loop(state.context, state.batch, state.sampler, nlen, ncur)
-                        if (str == null) {
-                            // The native side signaled completion by returning null
-                            break
-                        }
-                        // Only emit non-empty tokens
-                        if (str.isNotEmpty()) {
-                            emit(str)
-                        }
+                        val str = completion_loop(
+                            state.context,
+                            state.batch,
+                            state.sampler,
+                            nlen,
+                            ncur
+                        )
+                        if (str == null) break
+                        if (str.isNotEmpty()) emit(str)
                     }
                 } finally {
-                    // This block ensures cleanup happens even if the loop breaks or fails
                     kv_cache_clear(state.context)
                 }
             }
-            else -> {
-                Log.e(tag, "send() called but model is not loaded.")
-            }
+            else -> Log.e("LLamaAndroid", "send() called but model is not loaded.")
         }
-    }.flowOn(runLoop) // Ensure all native calls happen on the dedicated thread.
-
+    }.flowOn(runLoop)
     suspend fun unload() {
         withContext(runLoop) {
             when (val state = threadLocalState.get()) {

@@ -2016,4 +2016,62 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get newsErrorMessage =>
       'Son güncellemeler alınırken bir sorun oluştu, lütfen bağlantınızı kontrol edip tekrar deneyin.';
+
+  @override
+  String get codeNotFound => 'Girdiğiniz kod geçersiz veya süresi dolmuş.';
+
+  @override
+  String get whatIsNew => 'Ne var ne yok?';
+
+  @override
+  String get onboardingTitle1 => 'Selam! Biz Cortex Ekibiyiz.';
+
+  @override
+  String onboardingDesc1(String userName) {
+    return 'Seni burada görmek harika, $userName. Biz, yapay zeka sektörünün kurallarını yeniden yazmaya karar veren birkaç liseli geliştiriciyiz, tanışmak güzel! O halde daha çok tanışalım, daha güzel olsun.';
+  }
+
+  @override
+  String get onboardingTitle2 => 'Çok Büyük Sorunlar Vardı.';
+
+  @override
+  String get onboardingDesc2 =>
+      'Yapay zeka devrimi kapımıza kadar geldi, ancak eşikte takılıp kaldı. Yüksek abonelik ücretleri, karmaşık platformlar, gizliliği yok edenler, yapay zekaya erişimi engelleyenler ve çok daha fazlası oyunda olduğu sürece bu eşik asla da aşılamazdı.';
+
+  @override
+  String get onboardingTitle3 => 'Boş Duramazdık.';
+
+  @override
+  String get onboardingDesc3 =>
+      'Bu eşiği aşmak için güçlü, estetik, özelleştirilebilir, kullanımı kolay, tamamen şeffaf, hem çevrimiçi hem de çevrimdışı çalışan ve verilerinizi yalnızca cihazınızda tutan bir platform yaptık. Gücü, ait olduğu yere, yani size geri verdik.';
+
+  @override
+  String get onboardingTitle4 => 'Bu İş Hiç Kolay Değildi.';
+
+  @override
+  String get onboardingDesc4 =>
+      'Onlarca kez reddedildik, defalarca askıya alındık, sahte ihtarlar aldık, markamızı çokça kez değiştirmek zorunda kaldık ve daha niceleriyle bize bunun yapılamayacağı söylendi. Ama asla pes etmedik, bu projenin sadece bize değil herkese ait olduğuna inandık; işte tam da bu yüzden buradayız.';
+
+  @override
+  String get onboardingFinalTitle => 'Devrim Zamanı.';
+
+  @override
+  String get onboardingFinalDesc =>
+      'Bu ekranı görüyorsan, pes etmediğimiz içindir; bundan sonra pes etmeye de niyetimiz yok. Hadi gel, yapay zeka devrimini hep birlikte dünyaya taşıyalım. Bu hikâyenin parçası olmaya...';
+
+  @override
+  String get onboardingFinalQuestion => 'HAZIR MISIN?';
+
+  @override
+  String get onboardingFinalButton => 'EVET!';
+
+  @override
+  String get dude => 'Kanka';
+
+  @override
+  String get swipeToContinue => 'Devam etmek için kaydır';
+
+  @override
+  String get cacheIsNotUpToDate =>
+      'Play Store önbelleğiniz güncel değil. Lütfen Play Store uygulamasını kapatıp yeniden açın veya cihazınızı yeniden başlatın.';
 }

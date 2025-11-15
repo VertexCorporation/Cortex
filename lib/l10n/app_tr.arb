@@ -773,5 +773,22 @@
   "exitAppTitle": "Bu kadar erken mi gidiyorsun?",
   "exitAppConfirmation": "Bu harika platformdan ayrılmak istediğinize emin misiniz?",
   "newsErrorTitle": "Haberler Yüklenemedi",
-  "newsErrorMessage": "Son güncellemeler alınırken bir sorun oluştu, lütfen bağlantınızı kontrol edip tekrar deneyin."
+  "newsErrorMessage": "Son güncellemeler alınırken bir sorun oluştu, lütfen bağlantınızı kontrol edip tekrar deneyin.",
+  "codeNotFound": "Girdiğiniz kod geçersiz veya süresi dolmuş.",
+  "whatIsNew": "Ne var ne yok?",
+  "onboardingTitle1": "Selam! Biz Cortex Ekibiyiz.",
+  "onboardingDesc1": "Seni burada görmek harika, {userName}. Biz, yapay zeka sektörünün kurallarını yeniden yazmaya karar veren birkaç liseli geliştiriciyiz, tanışmak güzel! O halde daha çok tanışalım, daha güzel olsun.",
+  "onboardingTitle2": "Çok Büyük Sorunlar Vardı.",
+  "onboardingDesc2": "Yapay zeka devrimi kapımıza kadar geldi, ancak eşikte takılıp kaldı. Yüksek abonelik ücretleri, karmaşık platformlar, gizliliği yok edenler, yapay zekaya erişimi engelleyenler ve çok daha fazlası oyunda olduğu sürece bu eşik asla da aşılamazdı.",
+  "onboardingTitle3": "Boş Duramazdık.",
+  "onboardingDesc3": "Bu eşiği aşmak için güçlü, estetik, özelleştirilebilir, kullanımı kolay, tamamen şeffaf, hem çevrimiçi hem de çevrimdışı çalışan ve verilerinizi yalnızca cihazınızda tutan bir platform yaptık. Gücü, ait olduğu yere, yani size geri verdik.",
+  "onboardingTitle4": "Bu İş Hiç Kolay Değildi.",
+  "onboardingDesc4": "Onlarca kez reddedildik, defalarca askıya alındık, sahte ihtarlar aldık, markamızı çokça kez değiştirmek zorunda kaldık ve daha niceleriyle bize bunun yapılamayacağı söylendi. Ama asla pes etmedik, bu projenin sadece bize değil herkese ait olduğuna inandık; işte tam da bu yüzden buradayız.",
+  "onboardingFinalTitle": "Devrim Zamanı.",
+  "onboardingFinalDesc": "Bu ekranı görüyorsan, pes etmediğimiz içindir; bundan sonra pes etmeye de niyetimiz yok. Hadi gel, yapay zeka devrimini hep birlikte dünyaya taşıyalım. Bu hikâyenin parçası olmaya...",
+  "onboardingFinalQuestion": "HAZIR MISIN?",
+  "onboardingFinalButton": "EVET!",
+  "dude": "Kanka",
+  "swipeToContinue": "Devam etmek için kaydır",
+  "cacheIsNotUpToDate": "Play Store önbelleğiniz güncel değil. Lütfen Play Store uygulamasını kapatıp yeniden açın veya cihazınızı yeniden başlatın."
 }

@@ -4,7 +4,8 @@ import 'dart:async';
 import 'package:cortex/cache.dart'; // Added for cache invalidation
 import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
-import '../../models/backend/data/data.dart';
+import '../../library/backend/data/entity.dart';
+import '../../library/backend/data/service.dart';
 import 'database.dart';
 import '../messages/messages.dart';
 
@@ -17,8 +18,11 @@ class ChatStorageService {
       _lastMsgController.stream;
 
   static Future<void> saveConversation(
-      String id, String title, List<dynamic> _,
-      {String? modelId, bool isStarred = false}) async {
+      String id,
+      String title,
+      List<dynamic> _,
+      {String? modelId, bool isStarred = false}
+      ) async {
     final db = await DbHelper().db;
     await db.insert(
       'conversations',
@@ -31,33 +35,34 @@ class ChatStorageService {
       },
       conflictAlgorithm: ConflictAlgorithm.ignore,
     );
+
+    AppDataState().markUserDataAsChanged();
   }
 
   /// This function is called after a successful message send to mark a model as "used".
   /// It now intelligently ensures that only a valid MODEL SERIES ID is saved,
   /// preventing producer names or full variant IDs from being stored.
-  static Future<void> addRecentModel(String modelId) async {
-    final String modelSeriesId = ModelData.getBaseIdFromFullId(modelId);
+  static Future<void> addRecentModel(
+      String modelId, {
+        required String langCode,
+        required ModelService modelService,
+      }) async {
+    final String modelSeriesId = modelService.getBaseIdFromFullId(modelId, langCode: langCode);
 
-    final allModels = ModelData.getCachedModelsSync();
-    final bool isValidSeriesId = allModels.any((m) => m['id'] == modelSeriesId);
+    final allModels = modelService.getCachedModelsSync();
+    final bool isValidSeriesId = allModels.any((m) => m.id == modelSeriesId);
 
     if (modelSeriesId.isEmpty || !isValidSeriesId) {
-      debugPrint("[Storage] FAILED to add recent model. Could not resolve a valid series ID from '$modelId'. Aborting.");
+      debugPrint("[Storage] FAILED to add recent model. Could not resolve a valid series ID from '$modelId'.");
       return;
     }
-    // ==========================================================
 
     final db = await DbHelper().db;
     await db.insert(
       'recent_models',
-      {
-        'model_id': modelSeriesId,
-        'last_used': DateTime.now().millisecondsSinceEpoch,
-      },
+      {'model_id': modelSeriesId, 'last_used': DateTime.now().millisecondsSinceEpoch},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    // Invalidate the cache to ensure the UI re-fetches the updated list.
     CacheService.invalidate(CacheKey.recentModels);
     debugPrint("[Storage] Added/Updated '$modelSeriesId' in recent models.");
   }
@@ -65,54 +70,39 @@ class ChatStorageService {
   /// It fetches the top 10 most recently used model IDs and validates them
   /// against the currently available models to ensure they still exist.
   /// CRITICAL FIX: This function is now async and ensures the master model list
-  /// from ModelData is loaded before attempting validation. This prevents a race
+  /// from ModelService() is loaded before attempting validation. This prevents a race
   /// condition at startup where recent models would be incorrectly filtered out.
-  static Future<List<String>> getRecentModelSeriesIds() async {
+  static Future<List<String>> getRecentModelSeriesIds({
+    required String langCode,
+    required ModelService modelService,
+  }) async {
     final db = await DbHelper().db;
     final List<Map<String, dynamic>> rows = await db.query(
-      'recent_models',
-      columns: ['model_id'],
-      orderBy: 'last_used DESC',
-      limit: 10, // Fetch a few extra to account for potentially deleted models.
-    );
+        'recent_models', columns: ['model_id'], orderBy: 'last_used DESC', limit: 10);
 
-    if (rows.isEmpty) {
-      return []; // No recent models in the database, exit early.
-    }
+    if (rows.isEmpty) return [];
 
-    // --- FIX: Ensure the master model list is loaded before proceeding ---
-    // ModelData.getCachedModelsSync() is only safe to call after ModelData
-    // has completed its initial async loading. We can check this by seeing if the cache is empty.
-    List<Map<String, dynamic>> allAvailableModels = ModelData.getCachedModelsSync();
+    // Use the provided modelService instance.
+    List<ModelEntity> allAvailableModels = modelService.getCachedModelsSync();
     if (allAvailableModels.isEmpty) {
       debugPrint("[Storage] Master model cache is empty. Awaiting initial load...");
-      // Awaiting getModels() ensures the cache will be populated before we continue.
-      // We pass a dummy langCode as it's only needed for server sync, not for loading from a populated DB.
-      final loadedModels = await ModelData.getModels(langCode: 'en');
+      final loadedModels = await modelService.getModels(langCode: langCode);
       allAvailableModels = loadedModels ?? [];
-      debugPrint("[Storage] Master model cache is now populated with ${allAvailableModels.length} models.");
     }
-    // --- END FIX ---
 
     final recentSeriesIds = <String>{};
-    // Create a set of available series IDs for efficient lookup.
-    final availableSeriesIds = allAvailableModels.map((m) => m['id'] as String).toSet();
+    final availableSeriesIds = allAvailableModels.map((m) => m.id).toSet();
 
     for (final row in rows) {
       final modelIdFromDb = row['model_id'] as String?;
       if (modelIdFromDb == null) continue;
 
-      // VALIDATION: Ensure the model still exists in the master list.
       if (availableSeriesIds.contains(modelIdFromDb)) {
         recentSeriesIds.add(modelIdFromDb);
       } else {
         debugPrint("[Storage] Ignoring recent model '$modelIdFromDb' because it no longer exists.");
       }
-
-      // Stop when we have found 3 valid recent models.
-      if (recentSeriesIds.length >= 3) {
-        break;
-      }
+      if (recentSeriesIds.length >= 3) break;
     }
 
     return recentSeriesIds.toList();
@@ -161,7 +151,6 @@ class ChatStorageService {
     await _updateConversationTimestamp(convId, db);
   }
 
-
   static Future<void> saveCurrentMessages(
       String convId, List<Message> msgs) async {
     final db = await DbHelper().db;
@@ -187,6 +176,7 @@ class ChatStorageService {
       await _updateConversationTimestamp(convId, db);
 
       final lastMessage = msgs.last;
+
       _lastMsgController.add({
         'convId': convId,
         'text': lastMessage.text,
@@ -223,6 +213,19 @@ class ChatStorageService {
         .toList();
   }
 
+  /// Removes a specific model ID from the 'recent_models' table.
+  /// This is called when a model is deleted or uninstalled to keep the list consistent.
+  static Future<void> removeRecentModel(String modelId) async {
+    final db = await DbHelper().db;
+    await db.delete(
+      'recent_models',
+      where: 'model_id = ?',
+      whereArgs: [modelId],
+    );
+    CacheService.invalidate(CacheKey.recentModels);
+    debugPrint("[Storage] Removed '$modelId' from recent models.");
+  }
+
   static Future<Map<String, dynamic>?> getMessageByIdx(
       String convId, int idx) async {
     final db = await DbHelper().db;
@@ -238,9 +241,8 @@ class ChatStorageService {
   static Future<void> upsertMessage(
       String convId, int idx, Message m) async {
     final db = await DbHelper().db;
-    // --- CONSOLIDATED MAP FOR UPSERT ---
     final messageData = {
-      'uuid': m.id, // --- ADD: Include the ID in the data map
+      'uuid': m.id,
       'conversationId': convId,
       'idx': idx,
       'isUser': m.isUserMessage ? 1 : 0,
@@ -252,23 +254,19 @@ class ChatStorageService {
       'ts': DateTime.now().millisecondsSinceEpoch,
     };
 
-    final updated = await db.update(
+    await db.insert(
       'messages',
       messageData,
-      where: 'conversationId = ? AND idx = ?',
-      whereArgs: [convId, idx],
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    if (updated == 0) {
-      await db.insert(
-        'messages',
-        messageData,
-      );
-    }
-    _updateConversationTimestamp(convId, db);
+
+    await _updateConversationTimestamp(convId, db); // Await this operation
     final now = DateTime.now().millisecondsSinceEpoch;
+
     _lastMsgController.add({
       'convId': convId,
       'text': m.text,
+      'photoPath': m.photoPath,
       'ts': now,
     });
   }
@@ -281,7 +279,11 @@ class ChatStorageService {
     CacheService.invalidateConversationCache();
     // Also invalidate recent models, as a deleted conversation might affect this list.
     CacheService.invalidate(CacheKey.recentModels);
+
+    // Notify that the conversation list has structurally changed.
+    AppDataState().markUserDataAsChanged();
   }
+
 
   /// Atomically deletes all conversations (and their messages) associated with a specific model ID.
   /// This is used when a model is uninstalled or deleted by the user.
@@ -299,7 +301,8 @@ class ChatStorageService {
       return; // Nothing to do.
     }
 
-    final List<String> convIds = convsToDelete.map((row) => row['id'] as String).toList();
+    final List<String> convIds =
+    convsToDelete.map((row) => row['id'] as String).toList();
 
     // Step 2: Use a transaction to ensure both deletions succeed or fail together.
     await db.transaction((txn) async {
@@ -320,76 +323,56 @@ class ChatStorageService {
     // After deletion, invalidate the caches to force a UI refresh.
     CacheService.invalidateConversationCache();
     CacheService.invalidate(CacheKey.recentModels);
+
+    // Let the rest of the app know that the conversation list changed.
+    AppDataState().markUserDataAsChanged();
   }
 
   static Future<void> setStarred(String id, bool starred) async {
     final db = await DbHelper().db;
-    await db.update('conversations', {'isStarred': starred ? 1 : 0},
-        where: 'id = ?', whereArgs: [id]);
+    await db.update(
+      'conversations',
+      {'isStarred': starred ? 1 : 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    // Star/unstar should be reflected in the inbox immediately.
+    AppDataState().markUserDataAsChanged();
   }
 
   static Future<void> renameConversation(String id, String newTitle) async {
     final db = await DbHelper().db;
-    await db.update('conversations', {'title': newTitle},
-        where: 'id = ?', whereArgs: [id]);
+    await db.update(
+      'conversations',
+      {'title': newTitle},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    // This also affects inbox data; mark it as changed.
+    AppDataState().markUserDataAsChanged();
   }
 
-  /// Deletes all conversations that are currently VISIBLE to the logged-in user
-  /// by checking against their personal "model universe".
+  /// Atomically deletes ALL conversations and their associated messages from the local database.
+  /// This provides a clean slate for the user, matching their expectation of the "Delete All" action.
   static Future<void> deleteAllConversations() async {
     final db = await DbHelper().db;
+    debugPrint("[ChatStorage] Deleting all conversations and messages from the database.");
 
-    // Step 1: Create the definitive "allow list" of models for the current user.
-    final allUserVisibleModels = ModelData.getCachedModelsSync();
-    final Set<String> userVisibleModelIds = {};
-    for (final model in allUserVisibleModels) {
-      userVisibleModelIds.add(model['id'] as String);
-      if (model['extensions'] is Map) {
-        userVisibleModelIds.addAll((model['extensions'] as Map<String, dynamic>).keys);
-      }
-    }
-    debugPrint("[ChatStorage] Security Gate: User can see ${userVisibleModelIds.length} total model IDs. Deleting associated conversations.");
-
-    // Step 2: Get all conversations from the DB to filter against the allow list.
-    final allConversationsInDb = await db.query('conversations', columns: ['id', 'modelId']);
-    final List<String> convIdsToDelete = [];
-
-    // Step 3: Iterate and mark for deletion only if the conversation's model is in the user's visible set.
-    for (final conv in allConversationsInDb) {
-      final modelId = conv['modelId'] as String? ?? '';
-      final convId = conv['id'] as String;
-
-      if (userVisibleModelIds.contains(modelId)) {
-        convIdsToDelete.add(convId); // This conversation is visible, so it can be deleted.
-      } else {
-        // This conversation is not visible (belongs to another user), so we leave it alone.
-        debugPrint("[ChatStorage] Preserving conversation '$convId' (model: '$modelId'). It is not visible to the current user.");
-      }
-    }
-
-    if (convIdsToDelete.isEmpty) {
-      debugPrint("[ChatStorage] No visible conversations found to delete for the current user.");
-      return;
-    }
-
-    debugPrint("[ChatStorage] Identified ${convIdsToDelete.length} visible conversations to delete.");
-
-    // Step 4: Atomically delete the marked items.
+    // Use a transaction to ensure both tables are cleared atomically.
+    // If one deletion fails, the other is rolled back.
     await db.transaction((txn) async {
-      final placeholders = List.filled(convIdsToDelete.length, '?').join(',');
-      await txn.delete(
-        'messages',
-        where: 'conversationId IN ($placeholders)',
-        whereArgs: convIdsToDelete,
-      );
-      await txn.delete(
-        'conversations',
-        where: 'id IN ($placeholders)',
-        whereArgs: convIdsToDelete,
-      );
+      await txn.delete('messages');       // Deletes all rows from the messages table
+      await txn.delete('conversations');  // Deletes all rows from the conversations table
     });
 
+    debugPrint("[ChatStorage] All conversations successfully deleted.");
+
+    // Invalidate caches to force a full UI refresh.
     CacheService.invalidateConversationCache();
+
+    AppDataState().markUserDataAsChanged();
   }
 
   /// Checks if there are any conversations stored locally using sqflite.

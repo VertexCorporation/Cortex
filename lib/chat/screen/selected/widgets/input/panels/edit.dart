@@ -1,4 +1,4 @@
-// edit.dart
+// lib/chat/screen/selected/widgets/input/panels/edit.dart
 
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';

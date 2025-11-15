@@ -6,10 +6,9 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:url_launcher/url_launcher.dart'; // ADDED: For URL fallback
-
+import 'package:url_launcher/url_launcher.dart';
 import '../../darkener.dart';
-import '../../notifications.dart';
+import '../../notifications/introvert.dart';
 import '../../theme.dart';
 
 /// A service to manage showing the in-app review prompt to the user
@@ -26,16 +25,19 @@ class ReviewService {
   // Cooldown duration
   static const Duration _promptCooldown = Duration(days: 3);
 
-  // --- NEW ROBUST METHOD WITH FALLBACK ---
+  /// A robust method to take the user to the store listing page.
+  ///
+  /// It first tries the `in_app_review` package's method. If that fails,
+  /// it falls back to launching the Play Store URL directly.
+  /// This ensures the user can always access the rating page.
   /// A robust method to take the user to the store listing page.
   ///
   /// It first tries the `in_app_review` package's method. If that fails,
   /// it falls back to launching the Play Store URL directly.
   /// This ensures the user can always access the rating page.
   Future<void> _launchStoreReview(BuildContext context) async {
-    // We need context to show notifications in case of complete failure.
     if (!context.mounted) return;
-    final notificationService = Provider.of<NotificationService>(context, listen: false);
+    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
 
     debugPrint("[ReviewService] Starting robust store review flow.");
@@ -52,32 +54,39 @@ class ReviewService {
       debugPrint("[ReviewService] Method 1 failed: $e. Falling back to URL launcher.");
       final Uri url = Uri.parse('https://play.google.com/store/apps/details?id=$_appStoreId');
 
+      // The async gap is here.
       if (await canLaunchUrl(url)) {
-        // This will try to open the Play Store app or a browser as a last resort.
         await launchUrl(url, mode: LaunchMode.externalApplication);
         debugPrint("[ReviewService] Method 2 (URL Launcher) succeeded.");
       } else {
         // --- FINAL RESORT: ERROR MESSAGE ---
-        // If nothing works, inform the user.
+        // We are now after the async gap, but we are using the `notificationService`
+        // and `localizations` variables we safely captured earlier. No context is used here.
         debugPrint("[ReviewService] Could not launch URL: $url");
         notificationService.showNotification(
           message: localizations.anErrorOccurred,
-          isSuccess: false,
+          type: NotificationType.success,
         );
       }
     }
   }
 
   /// The single entry point for the review logic.
+  /// The single entry point for the review logic.
   Future<void> triggerReviewPromptIfNeeded(BuildContext context) async {
+    // This initial check prevents us from even starting if the widget is already gone.
     if (!context.mounted) return;
 
-    const bool isProduction = true;
+    const bool isProduction = true; // Assuming this is your flag
 
     if (isProduction) {
       // --- PRODUCTION LOGIC ---
       try {
+        // The async gap starts here.
         final prefs = await SharedPreferences.getInstance();
+
+        // After the async gap, we can no longer trust the original 'context' directly.
+        // However, the checks below do not use the context, so they are safe.
         if (prefs.getBool(_reviewCompletedKey) ?? false) {
           debugPrint("[ReviewService] Production: Flow completed. Skipping.");
           return;
@@ -87,8 +96,16 @@ class ReviewService {
           debugPrint("[ReviewService] Production: In cooldown. Skipping.");
           return;
         }
+
         debugPrint("[ReviewService] Production: Conditions met. Showing prompt.");
+
+        // This is the guard that the linter requires. It ensures that even after
+        // waiting for SharedPreferences, the widget is still in the tree.
+        if (!context.mounted) return;
+
+        // Now, this call is guaranteed to be safe.
         await _showReviewPrePrompt(context: context, isProduction: true);
+
       } catch (e) {
         debugPrint("[ReviewService] Production: SharedPreferences check failed: $e");
       }
@@ -100,12 +117,13 @@ class ReviewService {
     required BuildContext context,
     required bool isProduction,
   }) async {
+    // STEP 1: Capture all context-dependent variables BEFORE any awaits.
     if (!context.mounted) return;
-
     final localizations = AppLocalizations.of(context)!;
 
     if (isProduction) {
       try {
+        // --- The First Async Gap ---
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt(_lastPromptedKey, DateTime.now().millisecondsSinceEpoch);
         debugPrint("[ReviewService] Production: Cooldown timestamp updated.");
@@ -114,26 +132,28 @@ class ReviewService {
       }
     }
 
+    // STEP 2: Add a guard check AFTER the first async gap, right before using the context again.
+    if (!context.mounted) return;
+
     // --- DYNAMIC STYLES ---
     final dialogBackgroundColor = AppColors.secondaryColor;
     final primaryTextColor = AppColors.primaryColor.inverted;
-    final secondaryTextColor = AppColors.primaryColor.inverted.withValues(alpha: 0.8);
+    final secondaryTextColor = AppColors.primaryColor.inverted.withValues(alpha:0.8);
     final borderColor = AppColors.border;
-
-    // --- BUTTON COLORS ---
     final noThanksButtonColor = AppColors.septenaryColor;
-    final laterButtonColor = AppColors.primaryColor.inverted.withValues(alpha: 0.7);
+    final laterButtonColor = AppColors.primaryColor.inverted.withValues(alpha:0.7);
     final rateButtonColor = AppColors.senaryColor;
-
     const double dialogMaxWidth = 340.0;
 
     final restoreNavBar = Darkener.darken();
 
+    // --- The Second Async Gap ---
     await showGeneralDialog<void>(
-      context: context,
+      context: context, // This use is now safe.
       barrierLabel: 'ReviewPrompt',
       barrierDismissible: true,
       pageBuilder: (dialogCtx, _, __) {
+        // `dialogCtx` is a new, valid context for the duration of this builder.
         return Center(
           child: Material(
             color: Colors.transparent,
@@ -173,12 +193,13 @@ class ReviewService {
                                   final prefs = await SharedPreferences.getInstance();
                                   await prefs.setBool(_reviewCompletedKey, true);
                                 }
-                                Navigator.of(dialogCtx).pop();
+                                // Guard usage of the dialog's context.
+                                if (dialogCtx.mounted) {
+                                  Navigator.of(dialogCtx).pop();
+                                }
                               },
                             ),
-
                             VerticalDivider(color: borderColor, thickness: 0.5, width: 0.5),
-
                             // 2. "Maybe Later" Button
                             _buildDialogButton(
                               text: localizations.reviewMaybeLater,
@@ -188,9 +209,7 @@ class ReviewService {
                                 Navigator.of(dialogCtx).pop();
                               },
                             ),
-
                             VerticalDivider(color: borderColor, thickness: 0.5, width: 0.5),
-
                             // 3. "Rate Now" Button
                             _buildDialogButton(
                               text: localizations.reviewRateNow,
@@ -198,19 +217,19 @@ class ReviewService {
                               isBold: true,
                               onTap: () async {
                                 debugPrint("[ReviewService] User selected 'Rate Now'.");
-                                // First, close the custom dialog.
+
+                                // First, close the custom dialog (safe to do without a check first).
                                 Navigator.of(dialogCtx).pop();
 
-                                // Then, mark the flow as completed.
                                 if (isProduction) {
                                   final prefs = await SharedPreferences.getInstance();
                                   await prefs.setBool(_reviewCompletedKey, true);
                                 }
 
-                                // --- MODIFIED ACTION ---
-                                // Call the new robust function to handle store linking.
-                                // We pass the original `context` for broader compatibility.
-                                await _launchStoreReview(context);
+                                // Guard usage of the original context.
+                                if (context.mounted) {
+                                  await _launchStoreReview(context);
+                                }
                               },
                             ),
                           ],

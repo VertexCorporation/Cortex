@@ -773,5 +773,22 @@
   "exitAppTitle": "Hûn ewqas zû diçin?",
   "exitAppConfirmation": "Ma hûn piştrast in ku hûn dixwazin ji vê platforma ecêb derkevin?",
   "newsErrorTitle": "Barkirina Nûçeyan Bi Ser Neket",
-  "newsErrorMessage": "Di wergirtina nûvekirinên herî dawî de pirsgirêkek çêbû, ji kerema xwe girêdana xwe kontrol bikin û dîsa biceribînin."
+  "newsErrorMessage": "Di wergirtina nûvekirinên herî dawî de pirsgirêkek çêbû, ji kerema xwe girêdana xwe kontrol bikin û dîsa biceribînin.",
+  "codeNotFound": "Koda ku te nivîsandiye nederbasdar e an jî dema wê derbas bûye.",
+  "whatIsNew": "Çi nû ye?",
+  "onboardingTitle1": "Hey! Em Tîma Cortexê ne.",
+  "onboardingDesc1": "Dîtina te li vir pir xweş e, {userName}. Em çend pêşdebirên dibistana navîn in ku biryar dan qaîdeyên pîşesaziya AI ji nû ve binivîsin. Xweş e ku em te nas dikin! Werin em hev çêtir nas bikin.",
+  "onboardingTitle2": "Pirsgirêkên Mezin hebûn.",
+  "onboardingDesc2": "Şoreşa AI hat, lê ew li ber derî asê ma. Bi xercên abonetiyê yên bilind, platformên tevlihev, yên ku nepenîtiyê xera dikin, û yên ku gihîştina AI asteng dikin... heta ku ew di lîstikê de bûn, ev bergirî qet nedikarî bihata derbas kirin.",
+  "onboardingTitle3": "Em nekarîn tenê li ber xwe bidin.",
+  "onboardingDesc3": "Ji bo derbaskirina wê eniyê, me platformek ava kir ku bihêz, estetîk, xwerûkirî, bikaranîna wê hêsan e, bi tevahî zelal e, hem serhêl û hem jî negirêdayî dixebite, û daneyên we tenê li ser cîhaza we dihêle. Me hêz vegerand cihê ku ew aîdî we ye: we.",
+  "onboardingTitle4": "Ev Qet Hêsan Nebû.",
+  "onboardingDesc4": "Em bi dehan caran hatin redkirin, gelek caran hatin sekinandin, hişyariyên sexte wergirtin, û bi dehan caran me neçar ma ku marqeya xwe biguherînin. Di nav van hemûyan de û ji bilî vê, ji me re hat gotin ku ev nikare were kirin. Lê me qet dev jê berneda, bawer kir ku ev proje ya her kesî ye, ne tenê ya me. Û tam ji ber vê yekê em li vir in.",
+  "onboardingFinalTitle": "Dema Şoreşê ye.",
+  "onboardingFinalDesc": "Eger hûn vê ekranê dibînin, ev ji ber wê yekê ye ku me dev jê berneda. Û niyeta me ya devjêberdanê tune. Werin, em bi hev re şoreşa AI bigihînin cîhanê. Ji bo ku hûn bibin beşek ji vê çîrokê...",
+  "onboardingFinalQuestion": "AMADE NE?",
+  "onboardingFinalButton": "ERÊ!",
+  "dude": "Dude",
+  "swipeToContinue": "Ji bo berdewamkirinê bihejînin",
+  "cacheIsNotUpToDate": "Keşeya Play Store-a we ne nûjen e. Ji kerema xwe sepana Play Store bigirin û ji nû ve vekin, an jî cîhaza xwe ji nû ve bidin destpêkirin."
 }

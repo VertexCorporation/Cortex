@@ -2018,4 +2018,63 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get newsErrorMessage =>
       'Ən son güncəlləmələri əldə edərkən problem baş verdi, əlaqənizi yoxlayın və yenidən cəhd edin.';
+
+  @override
+  String get codeNotFound =>
+      'Daxil etdiyiniz kod etibarsızdır və ya vaxtı keçib.';
+
+  @override
+  String get whatIsNew => 'Nə yenilik var?';
+
+  @override
+  String get onboardingTitle1 => 'Hey! Biz Cortex Komandasıyıq.';
+
+  @override
+  String onboardingDesc1(String userName) {
+    return 'Səni burada görmək çox gözəldir, $userName. Biz AI sənayesinin qaydalarını yenidən yazmağa qərar verən bir neçə orta məktəb tərtibatçısıyıq. Səninlə görüşmək çox xoşdur! Beləliklə, gəl bir-birimizi daha yaxşı tanıyaq.';
+  }
+
+  @override
+  String get onboardingTitle2 => 'Böyük Problemlər Var idi.';
+
+  @override
+  String get onboardingDesc2 =>
+      'AI inqilabı gəldi, ancaq eşikdə ilişib qaldı. Yüksək abunə haqları, mürəkkəb platformalar, məxfiliyi məhv edənlər və süni intellektə əlçatanlığı bloklayanlarla... nə qədər ki, onlar oyunda idilər, bu həddi heç vaxt keçmək mümkün deyildi.';
+
+  @override
+  String get onboardingTitle3 => 'Biz sadəcə dayana bilmədik.';
+
+  @override
+  String get onboardingDesc3 =>
+      'Bu həddi keçmək üçün biz güclü, estetik, fərdiləşdirilə bilən, istifadəsi asan, tam şəffaf, həm onlayn, həm də oflayn işləyən və məlumatlarını yalnız cihazında saxlayan platforma yaratdıq. Gücü aid olduğu yerə qaytardıq: sənə.';
+
+  @override
+  String get onboardingTitle4 => 'Bu Heç Asan Olmayıb.';
+
+  @override
+  String get onboardingDesc4 =>
+      'Biz onlarla dəfə rədd edildik, dəfələrlə dayandırıldıq, saxta xəbərdarlıqlar aldıq və onlarla dəfə brendimizi dəyişməli olduq. Bütün bunlara baxmayaraq, bizə bunun mümkün olmadığını söylədilər. Amma biz bu layihənin təkcə bizə deyil, hamıya aid olduğuna inanaraq heç vaxt təslim olmadıq. Və məhz buna görə buradayıq.';
+
+  @override
+  String get onboardingFinalTitle => 'İnqilab vaxtıdır.';
+
+  @override
+  String get onboardingFinalDesc =>
+      'Əgər bu ekranı görürsənsə, bunun səbəbi təslim olmamağımızdır. Və bizim təslim olmaq fikrimiz yoxdur. Gəl, AI inqilabını birlikdə dünyaya aparaq. Bu hekayənin bir hissəsi olmaq üçün...';
+
+  @override
+  String get onboardingFinalQuestion => 'SƏN HAZIRSAN?';
+
+  @override
+  String get onboardingFinalButton => 'Bəli!';
+
+  @override
+  String get dude => 'dostum';
+
+  @override
+  String get swipeToContinue => 'Davam etmək üçün sürüşdür';
+
+  @override
+  String get cacheIsNotUpToDate =>
+      'Play Store keşiniz güncəl deyil. Lütfən, Play Store tətbiqini bağlayın və yenidən açın və ya cihazınızı yenidən başladın.';
 }

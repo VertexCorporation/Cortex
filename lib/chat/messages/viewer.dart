@@ -2,7 +2,6 @@
 
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -10,9 +9,10 @@ import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../notifications.dart';
+import '../../darkener.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:path/path.dart' as path;
+import '../../notifications/introvert.dart';
 import '../../theme.dart';
 
 class PhotoViewer extends StatefulWidget {
@@ -36,7 +36,7 @@ class PhotoViewer extends StatefulWidget {
           child: ScaleTransition(scale: scaleAnim, child: child),
         );
       },
-      barrierColor: Colors.black.withValues(alpha: 0.5),
+      barrierColor: Colors.black.withValues(alpha:0.5),
     );
   }
 
@@ -44,55 +44,30 @@ class PhotoViewer extends StatefulWidget {
   PhotoViewerState createState() => PhotoViewerState();
 }
 
-// Add SingleTickerProviderStateMixin for the animation controller
 class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderStateMixin {
-  late Color navBarColor;
   late SystemUiOverlayStyle defaultStyle;
 
-  // Controllers for the elastic zoom effect
   late TransformationController _transformationController;
   late AnimationController _animationController;
   Animation<Matrix4>? _animation;
 
-
-  Color darkenWithBlack(Color color, double factor) {
-    assert(factor >= 0 && factor <= 1);
-    final r = (color.red * (1.0 - factor)).round();
-    final g = (color.green * (1.0 - factor)).round();
-    final b = (color.blue * (1.0 - factor)).round();
-    return Color.fromARGB(color.alpha, r, g, b);
-  }
-
   @override
   void initState() {
     super.initState();
-    final themeSettings = AppColors.getSystemUIOverlayStyleForTheme(AppColors.currentTheme);
-    navBarColor = themeSettings['navigationBarColor'] as Color;
+    final theme = AppColors.currentTheme;
+    final currentSettings = AppColors.getSystemUIOverlayStyleForTheme(theme);
     defaultStyle = SystemUiOverlayStyle(
-      systemNavigationBarColor: navBarColor,
-      systemNavigationBarIconBrightness:
-      ThemeData.estimateBrightnessForColor(navBarColor) == Brightness.dark
-          ? Brightness.light
-          : Brightness.dark,
-    );
-    final darkenedNavBarColor = darkenWithBlack(navBarColor, 0.8);
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        systemNavigationBarColor: darkenedNavBarColor,
-        systemNavigationBarIconBrightness:
-        ThemeData.estimateBrightnessForColor(darkenedNavBarColor) == Brightness.dark
-            ? Brightness.light
-            : Brightness.dark,
-      ),
+      systemNavigationBarColor: currentSettings['navigationBarColor'] as Color,
+      systemNavigationBarIconBrightness: currentSettings['navigationBarIconBrightness'] as Brightness,
+      statusBarColor: currentSettings['statusBarColor'] as Color,
+      statusBarIconBrightness: currentSettings['statusBarIconBrightness'] as Brightness,
     );
 
-    // Initialize the controllers
     _transformationController = TransformationController();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300), // Animation duration
+      duration: const Duration(milliseconds: 300),
     )..addListener(() {
-      // Update the transformation controller value during animation
       if (_animation != null) {
         _transformationController.value = _animation!.value;
       }
@@ -102,13 +77,11 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
   @override
   void dispose() {
     SystemChrome.setSystemUIOverlayStyle(defaultStyle);
-    // Dispose controllers to prevent memory leaks
     _transformationController.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
-  // This function will be called to animate the view back to its original state
   void _animateToIdentity() {
     _animation = Matrix4Tween(
       begin: _transformationController.value,
@@ -123,17 +96,11 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final notificationService =
-    Provider.of<NotificationService>(context, listen: false);
+    Provider.of<IntrovertNotificationService>(context, listen: false);
     final Size screenSize = MediaQuery.of(context).size;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        systemNavigationBarColor: darkenWithBlack(navBarColor, 0.8),
-        systemNavigationBarIconBrightness:
-        ThemeData.estimateBrightnessForColor(darkenWithBlack(navBarColor, 0.8)) ==
-            Brightness.dark
-            ? Brightness.light
-            : Brightness.dark,
-      ),
+      value: Darkener.getDarkenedOverlayStyle(factor: 0.8),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Stack(
@@ -141,7 +108,7 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
             Positioned.fill(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Container(color: Colors.black.withValues(alpha: 0.2)),
+                child: Container(color: Colors.black.withValues(alpha:0.2)),
               ),
             ),
             SafeArea(
@@ -160,14 +127,11 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                         maxHeight: screenSize.height * 0.8,
                       ),
                       child: InteractiveViewer(
-                        // Pass the controller to manage transformation
                         transformationController: _transformationController,
-                        // This is called when the user stops pinching/panning
                         onInteractionEnd: (details) {
-                          // Animate back to the original state
                           _animateToIdentity();
                         },
-                        panEnabled: true, // Enable panning when zoomed
+                        panEnabled: true,
                         scaleEnabled: true,
                         minScale: 1.0,
                         maxScale: 4.0,
@@ -195,7 +159,7 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            Colors.black.withValues(alpha: 0.5),
+                            Colors.black.withValues(alpha:0.5),
                             Colors.transparent,
                           ],
                         ),
@@ -227,8 +191,13 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                         Expanded(
                           child: GestureDetector(
                             onTap: () async {
-                              await Share.shareXFiles(
-                                  [XFile(widget.imageFile.path)]);
+                              final box = context.findRenderObject() as RenderBox?;
+                              await SharePlus.instance.share(
+                                ShareParams(
+                                  files: [XFile(widget.imageFile.path)],
+                                  sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+                                ),
+                              );
                             },
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -284,20 +253,20 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                                 if (success == true) {
                                   notificationService.showNotification(
                                     message: localizations.downloadSuccess,
-                                    isSuccess: true,
+                                    type: NotificationType.success,
                                     bottomOffset: 0.1,
                                   );
                                 } else {
                                   notificationService.showNotification(
                                     message: localizations.downloadFailed,
-                                    isSuccess: false,
+                                    type: NotificationType.error,
                                     bottomOffset: 0.1,
                                   );
                                 }
                               } catch (e) {
                                 notificationService.showNotification(
                                   message: localizations.downloadFailed,
-                                  isSuccess: false,
+                                  type: NotificationType.error,
                                   bottomOffset: 0.1,
                                 );
                               }

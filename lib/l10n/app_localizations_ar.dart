@@ -1996,4 +1996,63 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get newsErrorMessage =>
       'حدثت مشكلة أثناء جلب أحدث التحديثات، يرجى التحقق من اتصالك ومحاولة مرة أخرى.';
+
+  @override
+  String get codeNotFound => 'الرمز الذي أدخلته غير صالح أو منتهي الصلاحية.';
+
+  @override
+  String get whatIsNew => 'ما الجديد؟';
+
+  @override
+  String get onboardingTitle1 => 'مرحباً! نحن فريق كورتكس.';
+
+  @override
+  String onboardingDesc1(String userName) {
+    return 'سررنا برؤيتك هنا يا $userName. نحن بضعة مطورين من طلاب المرحلة الثانوية قررنا تغيير قواعد صناعة الذكاء الاصطناعي. سررنا بلقائك! فلنتعرف على بعضنا البعض بشكل أفضل.';
+  }
+
+  @override
+  String get onboardingTitle2 => 'لقد كانت هناك مشاكل ضخمة.';
+
+  @override
+  String get onboardingDesc2 =>
+      'لقد وصلت ثورة الذكاء الاصطناعي، لكنها علقت عند عتبة النجاح. فمع رسوم الاشتراك المرتفعة، والمنصات المعقدة، ومن ينتهكون الخصوصية، ومن يعرقلون الوصول إلى الذكاء الاصطناعي... طالما كانوا جزءًا من اللعبة، لم يكن من الممكن تجاوز هذه العتبة.';
+
+  @override
+  String get onboardingTitle3 =>
+      'لم يكن بوسعنا أن نكتفي بالوقوف مكتوفي الأيدي.';
+
+  @override
+  String get onboardingDesc3 =>
+      'لتجاوز هذه العقبة، أنشأنا منصةً قويةً، أنيقةً، قابلةً للتخصيص، سهلة الاستخدام، وشفافةً تمامًا، تعمل على الإنترنت وخارجه، وتحتفظ ببياناتك على جهازك فقط. لقد أعدنا القوة إلى حيث تنتمي: أنت.';
+
+  @override
+  String get onboardingTitle4 => 'لم يكن هذا سهلا أبدا.';
+
+  @override
+  String get onboardingDesc4 =>
+      'رُفضنا عشرات المرات، وأُوقفنا عن العمل عدة مرات، وتلقينا إنذارات كاذبة، واضطررنا لتغيير علامتنا التجارية عشرات المرات. خلال كل هذا وأكثر، قيل لنا إنه لا يمكن تحقيق ذلك. لكننا لم نستسلم أبدًا، مؤمنين بأن هذا المشروع ملك للجميع، وليس لنا وحدنا. ولهذا السبب تحديدًا نحن هنا.';
+
+  @override
+  String get onboardingFinalTitle => 'لقد حان وقت الثورة.';
+
+  @override
+  String get onboardingFinalDesc =>
+      'إذا كنت ترى هذه الشاشة، فذلك لأننا لم نستسلم. وليس لدينا أي نية للاستسلام. هيا، لننقل ثورة الذكاء الاصطناعي إلى العالم معًا. لنكون جزءًا من هذه القصة...';
+
+  @override
+  String get onboardingFinalQuestion => 'هل أنت مستعد؟';
+
+  @override
+  String get onboardingFinalButton => 'نعم!';
+
+  @override
+  String get dude => 'يا صديقي';
+
+  @override
+  String get swipeToContinue => 'مرر للمتابعة';
+
+  @override
+  String get cacheIsNotUpToDate =>
+      'ذاكرة التخزين المؤقت لمتجر Play ليست مُحدَّثة. يُرجى إغلاق تطبيق متجر Play وإعادة فتحه، أو إعادة تشغيل جهازك.';
 }

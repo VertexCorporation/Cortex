@@ -2,12 +2,12 @@
 
 import 'dart:async';
 import 'package:cortex/app.dart';
+import 'package:cortex/library/backend/data/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cortex/theme.dart';
-
-import 'models/backend/data/data.dart';
+import 'library/backend/data/entity.dart';
 
 /// Manages the UI and data for model extensions (variants of a base model).
 ///
@@ -57,16 +57,11 @@ class Extensions {
   void initialize({
     required String mainId,
     required String ext,
-    required Map<String, dynamic> modelData,
+    required ModelEntity model,
   }) {
-    final rawExt = modelData['extensions'];
-    final Map<String, dynamic> extMap = (rawExt is Map)
-        ? Map<String, dynamic>.from(rawExt)
-        : {};
+    final extMap = model.extensions;
 
-    // If the model has no extensions, just reset internal state and exit.
-    // DO NOT call updateCanHandleImage. The caller (`SelectionService`) has already set the correct state.
-    if (extMap.isEmpty) {
+    if (extMap == null || extMap.isEmpty) {
       currentExtensions = [];
       extensionDisplayNames = {};
       currentBaseSeries = '';
@@ -74,8 +69,7 @@ class Extensions {
       return;
     }
 
-    // This part is for models WITH extensions and works as intended.
-    currentExtensions = extMap.keys.map((k) => k.toString()).toList();
+    currentExtensions = extMap.keys.toList();
     extensionDisplayNames = {
       for (final key in currentExtensions)
         key: (extMap[key] is Map && extMap[key]['title'] is String)
@@ -145,18 +139,34 @@ class Extensions {
     required BuildContext context,
     required GlobalKey extensionKey,
     required String modelTitle,
-    required Function(String) updateModelId, // A simple callback with the selected extension ID.
+    required Function(String) updateModelId,
+    required ModelService modelService,
   }) {
     if (currentExtensions.isEmpty) return;
     _panelIsClosing = false;
     const String logPrefix = "[Extensions.showExtensionPanel]";
     debugPrint("$logPrefix Panel opened for model series '$currentBaseSeries'.");
 
-    // Prepare a list of full data maps for each option to pass to the UI builder.
-    final allModelData = ModelData.getPreciseModelData(currentBaseSeries);
-    final extensionsMap = allModelData['extensions'] as Map<String, dynamic>? ?? {};
+    // Get the current language code from the context.
+    final langCode = Localizations.localeOf(context).languageCode;
+
+    // Fetch the type-safe ModelEntity for the current series.
+    // We now pass the required `langCode`.
+    final modelSeriesEntity = modelService.getPreciseModelData(currentBaseSeries, langCode: langCode);
+
+    // Safely access the extensions map from the entity.
+    final extensionsMap = modelSeriesEntity.extensions ?? {};
+
+    // Create the 'options' list by mapping over the extension IDs and pulling
+    // the corresponding data from the extensions map.
     final List<Map<String, dynamic>> options = currentExtensions
-        .map((extId) => extensionsMap[extId] as Map<String, dynamic>? ?? {'id': extId, 'title': extId})
+        .map((extId) {
+      if (extensionsMap.containsKey(extId) && extensionsMap[extId] is Map<String, dynamic>) {
+        return extensionsMap[extId] as Map<String, dynamic>;
+      }
+      // Provide a safe fallback if the extension data is somehow missing.
+      return {'id': extId, 'title': extId};
+    })
         .toList();
 
     final overlay = Overlay.of(context);
@@ -261,7 +271,7 @@ class Extensions {
         angle: 4.7124, // Approximately 270 degrees (3*PI/2)
         child: SvgPicture.asset(
           'assets/icons/arrov.svg', // Maybe it should be 'arrow.svg'? 'arrov.svg' could be a typo.
-          color: color.withValues(alpha: arrowOpacity), // Using colorFilter is more appropriate
+          colorFilter: ColorFilter.mode(color.withValues(alpha: arrowOpacity), BlendMode.srcIn), // Using colorFilter is more appropriate
           width: 20,
           height: 20,
         ),
@@ -375,7 +385,11 @@ class Extensions {
     );
   }
 
-  // 👉 extensions.dart
+  /// Builds a single clickable row for an extension in the panel.
+  ///
+  /// This method now reads the 'tier' and 'title' from the provided map.
+  /// It conditionally renders the sparkle icon and wraps the row in the
+  /// shine animation if the tier is 'premium'.
   /// Builds a single clickable row for an extension in the panel.
   ///
   /// This method now reads the 'tier' and 'title' from the provided map.
@@ -397,7 +411,12 @@ class Extensions {
     // Extract tier and determine if the extension is premium.
     final String tier = option['tier'] as String? ?? 'free';
     final bool isPremium = tier == 'premium';
-    final String variantTitle = option['title'] as String? ?? option['id'];
+
+    // Format the variant title to remove leading dashes and spaces for a cleaner UI.
+    String variantTitle = (option['title'] as String? ?? option['id']).trim();
+    while (variantTitle.startsWith('-') || variantTitle.startsWith(' ')) {
+      variantTitle = variantTitle.substring(1).trim();
+    }
 
     // The base UI for the row content.
     Widget rowContent = Row(
@@ -417,6 +436,7 @@ class Extensions {
         SizedBox(width: horizontalPadding * 0.5),
         Expanded(
           child: _buildScrollableText(
+            // Use the newly formatted title.
             text: variantTitle,
             textStyle: textStyle.copyWith(
               fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
@@ -485,7 +505,7 @@ class Extensions {
           text: TextSpan(text: text, style: textStyle),
           maxLines: 1,
           textDirection: TextDirection.ltr,
-          textScaleFactor: MediaQuery.of(context).textScaleFactor,
+          textScaler: MediaQuery.of(context).textScaler,
         )..layout();
 
         final bool shouldScroll = textPainter.width > constraints.maxWidth;
