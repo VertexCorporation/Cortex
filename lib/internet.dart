@@ -9,7 +9,6 @@ import 'dart:async';
 /// throughout the application. This centralizes the logic and makes it easy for any
 /// widget to react to connectivity changes.
 class InternetProvider with ChangeNotifier {
-  // CORRECTED: The subscription listens to a Stream<bool>, not InternetStatus.
   late final StreamSubscription<bool> _subscription;
   bool _isConnected = true; // Assume connected initially to avoid UI flicker.
 

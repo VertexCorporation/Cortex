@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cortex/chat/screen/selected/tiles.dart';
 import 'package:provider/provider.dart';
 
+import '../../../fog.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../theme.dart';
 import '../../providers/conversation.dart';
@@ -20,14 +21,13 @@ import '../../providers/session.dart';
 /// This widget is now self-contained. It reads all the necessary state
 /// directly from the providers (`ChatSessionProvider`, `ConversationProvider`,
 /// `UserInputProvider`) instead of receiving numerous parameters.
-class SelectedScreen extends StatelessWidget {
-  // It only needs things that are truly owned by the parent State, like controllers and callbacks.
+///
+class SelectedScreen extends StatefulWidget {
   final ScrollController scrollController;
   final VoidCallback onStop;
   final Function(int index) onEdit;
   final Function(int index) onFadeOutComplete;
-  final Function(int index) onRegenerate;
-  final Function(int index, String newExtension) onChangeModel;
+  final void Function(int index, {String? newModelId}) onRegenerate;
   final Function(int index) onReport;
 
   const SelectedScreen({
@@ -36,10 +36,41 @@ class SelectedScreen extends StatelessWidget {
     required this.onStop,
     required this.onEdit,
     required this.onFadeOutComplete,
-    required this.onRegenerate,
-    required this.onChangeModel,
+    required this.onRegenerate, // Now takes the unified callback
     required this.onReport,
   });
+
+  @override
+  State<SelectedScreen> createState() => _SelectedScreenState();
+}
+
+class _SelectedScreenState extends State<SelectedScreen> with TickerProviderStateMixin {
+
+  late final AnimationController _animationController;
+  late final Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +82,6 @@ class SelectedScreen extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // The message list is now read directly from the ConversationProvider.
     final currentMessages = conversationProvider.messages;
 
     return AnimatedSwitcher(
@@ -63,36 +93,37 @@ class SelectedScreen extends StatelessWidget {
       // --- BUILD EMPTY STATE ---
           ? SizedBox(
         key: const ValueKey('empty_state'),
-        child: _buildEmptyState(context, screenWidth, screenHeight, sessionProvider),
+        child: _buildEmptyState(
+            context, screenWidth, screenHeight, sessionProvider),
       )
       // --- BUILD MESSAGE LIST ---
           : Builder(
         key: const ValueKey('message_list'),
         builder: (context) {
-          final bool conversationHasPhoto = currentMessages.any((m) => m.photoPath != null);
-          final isWaitingNotifier = ValueNotifier<bool>(conversationProvider.isWaitingForResponse);
-
           return Column(
             children: [
               Expanded(
-                child: Tiles.buildMessagesList(
-                  context: context,
-                  messages: currentMessages.toList(),
-                  scrollController: scrollController,
-                  isEditingMode: inputProvider.isEditingMode,
-                  editingMessageIndex: inputProvider.editingMessageIndex,
-                  modelId: sessionProvider.modelId ?? '',
-                  isPersistentlyDynamic: sessionProvider.isDynamicChat,
-                  isUserSubscribed: sessionProvider.isUserSubscribed,
-                  premiumTrialUses: sessionProvider.premiumTrialUses,
-                  isWaitingForResponseNotifier: isWaitingNotifier,
-                  conversationHasPhoto: conversationHasPhoto,
-                  onStop: onStop,
-                  onEdit: onEdit,
-                  onFadeOutComplete: onFadeOutComplete,
-                  onRegenerate: onRegenerate,
-                  onChangeModel: onChangeModel,
-                  onReport: onReport,
+                // The message list is now wrapped with ScrollFog to create
+                // a smooth visual transition at the top and bottom edges.
+                child: ScrollFog(
+                  scrollController: widget.scrollController,
+                  fogColor: AppColors.background,
+                  topFogHeight: screenHeight * 0.02,
+                  bottomFogHeight: screenHeight * 0.02,
+                  child: Tiles.buildMessagesList(
+                    context: context,
+                    messages: currentMessages.toList(),
+                    scrollController: widget.scrollController,
+                    isEditingMode: inputProvider.isEditingMode,
+                    editingMessageIndex:
+                    inputProvider.editingMessageIndex,
+                    modelId: sessionProvider.modelId ?? '',
+                    onStop: widget.onStop,
+                    onEdit: widget.onEdit,
+                    onFadeOutComplete: widget.onFadeOutComplete,
+                    onRegenerate: widget.onRegenerate,
+                    onReport: widget.onReport,
+                  ),
                 ),
               ),
             ],
@@ -109,29 +140,33 @@ class SelectedScreen extends StatelessWidget {
       double screenHeight,
       ChatSessionProvider sessionProvider,
       ) {
-    if (sessionProvider.isDynamicChat || (sessionProvider.isExitingChat && sessionProvider.wasDynamicOnExit)) {
+    if (sessionProvider.isDynamicChat ||
+        (sessionProvider.isExitingChat && sessionProvider.wasDynamicOnExit)) {
       return Center(
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                width: screenWidth * 0.4,
-                height: screenWidth * 0.4,
-                child: Container(
-                  clipBehavior: Clip.antiAlias,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  child: SvgPicture.asset(
-                    'assets/cortex.svg',
-                    fit: BoxFit.contain,
-                    colorFilter: const ColorFilter.matrix([
-                      -1, 0, 0, 0, 255,
-                      0,-1, 0, 0, 255,
-                      0, 0,-1, 0, 255,
-                      0, 0, 0, 1, 0,
-                    ]),
+              ScaleTransition(
+                scale: _scaleAnimation,
+                child: SizedBox(
+                  width: screenWidth * 0.3,
+                  height: screenWidth * 0.3,
+                  child: Container(
+                    clipBehavior: Clip.antiAlias,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    child: SvgPicture.asset(
+                      'assets/cortex.svg',
+                      fit: BoxFit.contain,
+                      colorFilter: const ColorFilter.matrix([
+                        -1, 0, 0, 0, 255,
+                        0, -1, 0, 0, 255,
+                        0, 0, -1, 0, 255,
+                        0, 0, 0, 1, 0,
+                      ]),
+                    ),
                   ),
                 ),
               ),
@@ -173,7 +208,8 @@ class SelectedScreen extends StatelessWidget {
       if (isSvg) {
         imageWidget = path.startsWith('assets/')
             ? SvgPicture.asset(path, fit: BoxFit.contain)
-            : SvgPicture.file(File(path), fit: BoxFit.contain, placeholderBuilder: (_) => fallbackImage);
+            : SvgPicture.file(File(path),
+            fit: BoxFit.contain, placeholderBuilder: (_) => fallbackImage);
       } else {
         final provider = path.startsWith('assets/')
             ? AssetImage(path) as ImageProvider

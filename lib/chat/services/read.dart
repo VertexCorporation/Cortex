@@ -4,16 +4,14 @@ import 'dart:async';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/database.dart';
-import 'package:cortex/chat/services/load.dart';
 import 'package:cortex/chat/services/storage.dart';
-import 'package:cortex/conversations/manager.dart';
-import 'package:cortex/models/backend/data/data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
-import '../../models/backend/data/info.dart';
-import '../../models/backend/data/user.dart';
+import '../../inbox/manager.dart';
+import '../../library/backend/data/entity.dart';
+import '../../library/backend/data/service.dart';
+import '../../library/backend/data/user.dart';
 import '../messages/messages.dart';
-import '../screen/selected/dynamic.dart';
 
 /// Service responsible for reading conversation and message data from the local database
 /// and orchestrating the state update via the dedicated providers.
@@ -24,16 +22,15 @@ import '../screen/selected/dynamic.dart';
 class ReadService {
   final ConversationProvider _conversationProvider;
   final ChatSessionProvider _sessionProvider;
-  final LoadService _loadService;
+  final ModelService _modelService;
 
-  /// Creates an instance of the ReadService.
   ReadService({
     required ConversationProvider conversationProvider,
     required ChatSessionProvider sessionProvider,
-    required LoadService loadService,
+    required ModelService modelService,
   })  : _conversationProvider = conversationProvider,
         _sessionProvider = sessionProvider,
-        _loadService = loadService;
+        _modelService = modelService;
 
   /// Acts as a router, delegating the conversation loading to the appropriate handler.
   ///
@@ -51,13 +48,13 @@ class ReadService {
 
   /// Fetches a ConversationManager by its ID and then loads the full conversation.
   Future<void> loadConversationById(String conversationId, {required String languageCode}) async {
-    final manager = await ConversationManager.fromId(conversationId);
+    // Pass the required langCode to the factory constructor.
+    final manager = await ConversationManager.fromId(conversationId, langCode: languageCode, modelService: _modelService);
 
     if (manager != null) {
       await loadConversation(manager, languageCode: languageCode);
     } else {
       debugPrint("[ReadService] Could not create ConversationManager for ID: $conversationId. Resetting session.");
-      // Instead of a monolithic reset, we just clear the providers.
       _sessionProvider.resetSessionState();
       _conversationProvider.clearConversation();
     }
@@ -66,21 +63,12 @@ class ReadService {
   /// Handles the specific logic for loading a "dynamic" conversation session.
   Future<void> _loadDynamicConversation(ConversationManager manager) async {
     debugPrint("[ReadService] Loading dynamic conversation: ${manager.conversationID}");
-
-    // 1. Configure the session provider for a dynamic chat mode. This is the first step.
-    _sessionProvider.configureForDynamicConversation();
-
-    // 2. Set the specific conversation ID and title from the manager.
+    await _sessionProvider.startDynamicConversation();
     _conversationProvider.setConversationContext(
       manager.conversationID,
       manager.conversationTitle,
     );
-
-    // 3. Load the message history for this conversation.
     await _loadAndSetMessages(manager.conversationID);
-
-    final dynamicChatService = DynamicChatService(_sessionProvider);
-    await dynamicChatService.loadDynamicAssistantPreference();
   }
 
   /// Handles the logic for loading a standard, model-specific conversation.
@@ -88,41 +76,23 @@ class ReadService {
     const String logPrefix = "[ReadService._loadStandardConversation]";
     debugPrint("$logPrefix: Loading conversation for model '${manager.modelId}'.");
 
-    // 1. Ensure the master model list is available.
-    await _loadService.loadModels(languageCode: languageCode);
+    // The manager already holds the precise ModelEntity.
+    final ModelEntity preciseModel = manager.model;
 
-    final String conversationModelId = manager.modelId;
-    final preciseModelData = ModelData.getPreciseModelData(conversationModelId);
-    if (preciseModelData.isEmpty) {
-      debugPrint("$logPrefix: CRITICAL - Could not find precise data for model '$conversationModelId'. Aborting.");
-      _sessionProvider.setModelsLoadError();
-      return;
-    }
-
-    // 2. Determine all necessary model properties.
-    final bool isOffline = (preciseModelData['type'] as String?) == 'offline';
+    // 2. Determine all necessary model properties from the entity.
     String? finalModelPath;
-
-    if (isOffline) {
+    if (!preciseModel.isServerSide) {
       final downloadedPaths = await UserModels.loadDownloadedModelPaths();
-      final baseId = ModelData.getBaseIdFromFullId(conversationModelId);
+      final baseId = _modelService.getBaseIdFromFullId(preciseModel.id);
       finalModelPath = downloadedPaths[baseId];
       debugPrint("$logPrefix: Offline model detected. Path: '$finalModelPath'");
     }
 
-    final bool isPremium = _isModelPremium(preciseModelData);
+    final bool isPremium = _isModelPremium(preciseModel, langCode: languageCode);
 
     // 3. Configure the session provider with all gathered model data.
-    _sessionProvider.configureForStandardConversation(
-      modelInfo: ModelInfo(
-        id: conversationModelId,
-        title: preciseModelData['title'] as String? ?? 'Untitled',
-        imagePath: ModelData.getModelImagePath(preciseModelData),
-        producer: preciseModelData['producer'] as String? ?? 'Unknown',
-        path: finalModelPath,
-        role: preciseModelData['role'] as String?,
-        category: preciseModelData['category'] as String?,
-      ),
+    _sessionProvider.configureForStandardChat(
+      model: preciseModel,
       isPremium: isPremium,
     );
 
@@ -137,16 +107,15 @@ class ReadService {
   }
 
   /// Determines if a model is premium, correctly handling character models that use a base model.
-  bool _isModelPremium(Map<String, dynamic> preciseModelData) {
-    final category = preciseModelData['category'] as String?;
-    if (category == 'self' || category == 'roleplay') {
-      final String? baseModelId = preciseModelData['baseModelId'] as String?;
+  bool _isModelPremium(ModelEntity model, {required String langCode}) {
+    if (model.category == 'self' || model.category == 'roleplay') {
+      final String? baseModelId = model.baseModelId;
       if (baseModelId != null && baseModelId.isNotEmpty) {
-        final Map<String, dynamic> baseModelData = ModelData.getPreciseModelData(baseModelId);
-        return (baseModelData['tier'] as String? ?? 'free') == 'premium';
+        final ModelEntity baseModel = _modelService.getPreciseModelData(baseModelId, langCode: langCode);
+        return baseModel.isPremium;
       }
     }
-    return (preciseModelData['tier'] as String? ?? 'free') == 'premium';
+    return model.isPremium;
   }
 
   /// Loads previous messages from the local SQLite database and updates the provider.

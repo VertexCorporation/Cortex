@@ -1,58 +1,42 @@
-// section/settings.dart
+// lib/settings/sections/settings.dart
 
-import 'package:cloud_functions/cloud_functions.dart';
-import 'package:cortex/app.dart';
-import 'package:cortex/notifications.dart'; // For NotificationService
-import 'package:cortex/theme.dart'; // For AppColors
-import 'package:flutter/foundation.dart'; // For kDebugMode and Factory
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart'; // For SVG icons
-import 'package:google_fonts/google_fonts.dart'; // For custom fonts
-import 'package:cortex/l10n/app_localizations.dart'; // For localization
-import 'package:provider/provider.dart'; // To access NotificationService
-import 'package:share_plus/share_plus.dart'; // For sharing functionality
-import 'package:url_launcher/url_launcher.dart'; // For launching external URLs
-
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../app.dart';
 import '../../darkener.dart';
+import '../../l10n/app_localizations.dart';
+import '../../notifications/introvert.dart';
 import '../../shake.dart';
-import '../../webview.dart'; // For in-app WebView
+import '../../theme.dart';
+import '../../webview.dart';
+import '../providers/general.dart';
+import '../providers/actions.dart';
 
-/// A widget that displays the main settings section in the settings screen.
+/// A widget that displays the main settings and information section.
 ///
-/// This section includes options like Help, Share App, Rate Us,
-/// Terms of Use, Privacy Policy, and Copyrights.
-/// It manages its own actions, such as launching URLs and showing modals.
+/// This component provides access to informational pages (Help, ToS, Privacy),
+/// app-related actions (Share, Rate), and user actions like redeeming a code.
+/// It delegates complex stateful actions to providers and manages its own
+/// local UI state, like animation controllers for dialogs.
 class SettingsSection extends StatefulWidget {
-  final AppLocalizations appLocalizations;
-  final bool isDialogOpen;
-  final ValueChanged<bool> onDialogStateChanged;
-  final VoidCallback onDataNeedsRefresh;
-
-  const SettingsSection({
-    super.key,
-    required this.appLocalizations,
-    required this.isDialogOpen,
-    required this.onDialogStateChanged,
-    required this.onDataNeedsRefresh,
-  });
+  const SettingsSection({super.key});
 
   @override
-  SettingsSectionState createState() => SettingsSectionState();
+  State<SettingsSection> createState() => _SettingsSectionState();
 }
 
-class SettingsSectionState extends State<SettingsSection> with SingleTickerProviderStateMixin {
-  // Method to get NotificationService, ensuring context is available.
-  NotificationService _getNotificationService(BuildContext context) {
-    return Provider.of<NotificationService>(context, listen: false);
-  }
-
-  late AnimationController _redeemCodeShakeController;
+class _SettingsSectionState extends State<SettingsSection> with TickerProviderStateMixin {
+  late final AnimationController _redeemCodeShakeController;
 
   @override
   void initState() {
     super.initState();
-    const shakeDuration = Duration(milliseconds: 500);
-    _redeemCodeShakeController = AnimationController(vsync: this, duration: shakeDuration);
+    _redeemCodeShakeController = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
   }
 
   @override
@@ -61,225 +45,180 @@ class SettingsSectionState extends State<SettingsSection> with SingleTickerProvi
     super.dispose();
   }
 
-  /// Launches the given URL in an external application (e.g., a browser).
+  /// Launches the given URL in an external application.
   Future<void> _launchURL(BuildContext context, String url) async {
-    final Uri parsedUrl = Uri.parse(url);
-    if (kDebugMode) {
-      print('[SettingsSection] Attempting to launch URL: $url');
+    final notificationService = context.read<IntrovertNotificationService>();
+    final appLocalizations = AppLocalizations.of(context)!;
+    if (!await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication)) {
+      notificationService.showNotification(
+        message: appLocalizations.anErrorOccurred,
+        type: NotificationType.error
+      );
     }
-    if (!await launchUrl(parsedUrl, mode: LaunchMode.externalApplication)) {
-      if (kDebugMode) {
-        print('[SettingsSection] Could not launch URL: $url');
-      }
-      if (mounted) {
-        _getNotificationService(context).showNotification(
-          message: widget.appLocalizations.anErrorOccurred,
-          isSuccess: false,
-          bottomOffset: 0.02,
-        );
-      }
-    }
-  }
-
-  /// Launches the help center URL (Discord).
-  void _launchHelp(BuildContext context) {
-    if (kDebugMode) {
-      print('[SettingsSection] Launching help.');
-    }
-    _launchURL(context, "https://discord.gg/sK53fypPBZ");
   }
 
   /// Triggers the native platform's sharing functionality.
   Future<void> _shareApp(BuildContext context) async {
+    final appLocalizations = AppLocalizations.of(context)!;
     if (kDebugMode) {
       print('[SettingsSection] Sharing app.');
     }
     try {
-      await Share.share(
-        widget.appLocalizations.shareMessage,
-        subject: widget.appLocalizations.shareSubject,
+      final result = await SharePlus.instance.share(
+        ShareParams(
+          text: appLocalizations.shareMessage,
+          subject: appLocalizations.shareSubject,
+        ),
       );
+
+      if (result.status == ShareResultStatus.success) {
+        if (kDebugMode) {
+          print('Thank you for sharing the app!');
+        }
+      }
+
     } catch (e) {
       if (kDebugMode) {
         print("[SettingsSection] Error sharing app: $e");
       }
-      if (mounted) {
-        _getNotificationService(context).showNotification(
-          message: widget.appLocalizations.shareFailed,
-          isSuccess: false,
-          bottomOffset: 0.02,
+      if (context.mounted) {
+        context.read<IntrovertNotificationService>().showNotification(
+          message: appLocalizations.shareFailed,
+          type: NotificationType.error
         );
       }
     }
   }
 
-  /// Launches the app store page for rating.
-  void _launchRateUs(BuildContext context) {
-    if (kDebugMode) {
-      print('[SettingsSection] Launching rate us.');
-    }
-    _launchURL(context, "https://play.google.com/store/apps/details?id=com.vertex.cortex");
-  }
+  /// Displays the "Redeem Code" dialog, driven by `SettingsActionProvider`.
+  /// The dialog is responsive to the on-screen keyboard, animating upwards to keep the content visible,
+  /// and now displays localized error messages directly from the server.
+  Future<void> _showRedeemCodeDialog(BuildContext context) async {
+    // Guard against async gaps: Get providers and localizations before the dialog.
+    final actionProvider = context.read<SettingsActionProvider>();
+    final generalProvider = context.read<SettingsGeneralProvider>();
+    final appLocalizations = AppLocalizations.of(context)!;
 
-  /// Displays the "Redeem Code" dialog and handles the server-side logic for creator code redemption.
-  void _showRedeemCodeDialog(BuildContext context) {
-    if (widget.isDialogOpen) return;
-    widget.onDialogStateChanged(true);
-
-    final redeemCodeController = TextEditingController();
-    String? confirmError;
-    bool isRedeeming = false; // Local state for the loading indicator
+    final codeController = TextEditingController();
+    String? errorText;
     final RestoreCallback restoreNavBar = Darkener.darken();
-    // Get the functions instance once
-    final functions = FirebaseFunctions.instanceFor(region: 'europe-west1');
 
-    showGeneralDialog(
+    await showGeneralDialog(
       context: context,
-      barrierDismissible: !isRedeeming, // Prevent closing while loading
-      barrierLabel: 'RedeemCodeDialogBarrier',
-      transitionDuration: const Duration(milliseconds: 150),
-      pageBuilder: (dialogPageContext, animation, secondaryAnimation) {
-        // Dynamic sizing variables...
-        final screenWidth = MediaQuery.of(dialogPageContext).size.width;
-        final screenHeight = MediaQuery.of(dialogPageContext).size.height;
-        final double dialogWidth = screenWidth * 0.8;
-        final double borderRadius = screenWidth * 0.03;
-        final double contentPadding = screenWidth * 0.05;
-        final double verticalSpacing = screenHeight * 0.015;
-        final double inputSpacing = screenHeight * 0.025;
-        final double buttonVerticalPadding = screenHeight * 0.02;
-        final double titleFontSize = screenWidth * 0.045;
-        final double bodyFontSize = screenWidth * 0.035;
-        final double buttonFontSize = screenWidth * 0.04;
+      barrierDismissible: true,
+      barrierLabel: 'RedeemCodeDialog',
+      pageBuilder: (ctx, _, __) {
+        final screenWidth = MediaQuery.of(ctx).size.width;
+        final keyboardPadding = MediaQuery.of(ctx).viewInsets.bottom;
 
-        return Center(
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              width: dialogWidth,
-              decoration: BoxDecoration(
-                color: AppColors.secondaryColor,
-                borderRadius: BorderRadius.circular(borderRadius),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(borderRadius),
-                child: SingleChildScrollView(
-                  child: StatefulBuilder(
-                    builder: (dialogContext, setDialogInnerState) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(contentPadding),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+        return AnimatedPadding(
+          padding: EdgeInsets.only(bottom: keyboardPadding),
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          child: Center(
+            child: SingleChildScrollView(
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  width: screenWidth * 0.8,
+                  decoration: BoxDecoration(color: AppColors.secondaryColor, borderRadius: BorderRadius.circular(10)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Consumer<SettingsActionProvider>(
+                      builder: (context, provider, child) {
+                        final isRedeeming = provider.isRedeemingCode;
+                        return StatefulBuilder(
+                          builder: (dialogContext, setDialogInnerState) {
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                // Title, Body, TextField... (remain the same)
-                                Text(widget.appLocalizations.redeemCode, style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
-                                SizedBox(height: verticalSpacing),
-                                Text(widget.appLocalizations.enterYourCode, style: TextStyle(color: AppColors.quinaryColor, fontSize: bodyFontSize), textAlign: TextAlign.center),
-                                SizedBox(height: inputSpacing),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ShakeWidget(
-                                      controller: _redeemCodeShakeController,
-                                      child: TextField(
-                                        controller: redeemCodeController,
-                                        autofocus: true,
-                                        style: TextStyle(color: AppColors.primaryColor.inverted),
-                                        decoration: InputDecoration(labelText: widget.appLocalizations.code, labelStyle: TextStyle(color: AppColors.primaryColor.inverted), enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.quinaryColor), borderRadius: BorderRadius.circular(borderRadius)), focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor.inverted), borderRadius: BorderRadius.circular(borderRadius))),
+                                Padding(
+                                  padding: EdgeInsets.all(screenWidth * 0.05),
+                                  child: Column(
+                                    children: [
+                                      Text(appLocalizations.redeemCode, style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
+                                      SizedBox(height: screenWidth * 0.03),
+                                      Text(appLocalizations.enterYourCode, style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035), textAlign: TextAlign.center),
+                                      SizedBox(height: screenWidth * 0.05),
+                                      ShakeWidget(
+                                        controller: _redeemCodeShakeController,
+                                        child: TextField(
+                                          controller: codeController,
+                                          autofocus: true,
+                                          style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.04),
+                                          decoration: InputDecoration(
+                                            labelText: appLocalizations.code,
+                                            labelStyle: TextStyle(color: AppColors.primaryColor.inverted),
+                                            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.quinaryColor), borderRadius: BorderRadius.circular(10.0)),
+                                            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor.inverted), borderRadius: BorderRadius.circular(10.0)),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    AnimatedSwitcher(
-                                      duration: const Duration(milliseconds: 300),
-                                      child: confirmError != null ? Padding(padding: EdgeInsets.only(top: screenHeight * 0.01), child: Text(confirmError!, style: const TextStyle(color: Colors.red), key: ValueKey(confirmError))) : const SizedBox.shrink(key: ValueKey("emptyConfirmError")),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Divider(color: AppColors.quinaryColor, thickness: 0.5, height: 1),
-                          IntrinsicHeight(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: isRedeeming ? null : () => Navigator.of(dialogPageContext).pop(),
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        padding: EdgeInsets.symmetric(vertical: buttonVerticalPadding),
-                                        child: Text(widget.appLocalizations.cancel, style: TextStyle(color: AppColors.quinaryColor, fontSize: buttonFontSize)),
+                                      AnimatedSwitcher(
+                                        duration: const Duration(milliseconds: 300),
+                                        child: errorText != null ? Padding(padding: EdgeInsets.only(top: screenWidth * 0.02), child: Text(errorText!, style: TextStyle(color: Colors.red, fontSize: screenWidth * 0.03), key: ValueKey(errorText))) : const SizedBox.shrink(key: ValueKey("emptyError")),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 ),
-                                VerticalDivider(width: 1, thickness: 0.5, color: AppColors.quinaryColor),
-                                Expanded(
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      splashColor: AppColors.senaryColor.withValues(alpha: 0.3),
-                                      highlightColor: AppColors.senaryColor.withValues(alpha: 0.1),
-                                      onTap: isRedeeming ? null : () async {
-                                        final code = redeemCodeController.text.trim();
-                                        if (code.isEmpty) {
-                                          setDialogInnerState(() => confirmError = widget.appLocalizations.codeCannotBeEmpty);
-                                          _redeemCodeShakeController.forward(from: 0);
-                                          return;
-                                        }
-
-                                        setDialogInnerState(() {
-                                          isRedeeming = true;
-                                          confirmError = null;
-                                        });
-
-                                        try {
-                                          await functions.httpsCallable('redeemCreatorCode').call({'code': code});
-
-                                          if (!dialogPageContext.mounted) return;
-                                          Navigator.of(dialogPageContext).pop();
-
-                                          _getNotificationService(context).showNotification(
-                                              message: widget.appLocalizations.creatorSupportedSuccess,
-                                              isSuccess: true,
-                                              bottomOffset: 0.02
-                                          );
-                                          // --- REFRESH PARENT SCREEN DATA ---
-                                          widget.onDataNeedsRefresh();
-
-                                        } on FirebaseFunctionsException catch (e) {
-                                          // Map server errors to user-friendly messages
-                                          final String message = e.message ?? widget.appLocalizations.anErrorOccurred;
-                                          setDialogInnerState(() => confirmError = message);
-                                          _redeemCodeShakeController.forward(from: 0);
-                                        } catch (e) {
-                                          setDialogInnerState(() => confirmError = widget.appLocalizations.anErrorOccurred);
-                                          _redeemCodeShakeController.forward(from: 0);
-                                        } finally {
-                                          // Ensure the loading state is always turned off
-                                          setDialogInnerState(() => isRedeeming = false);
-                                        }
-                                      },
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        padding: EdgeInsets.symmetric(vertical: buttonVerticalPadding),
-                                        child: isRedeeming
-                                            ? SizedBox(height: buttonFontSize, width: buttonFontSize, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.senaryColor))
-                                            : Text(widget.appLocalizations.redeem, style: TextStyle(color: AppColors.senaryColor, fontSize: buttonFontSize, fontWeight: FontWeight.bold)),
+                                Divider(color: AppColors.quinaryColor, thickness: 0.5, height: 1),
+                                IntrinsicHeight(
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                              onTap: isRedeeming ? null : () => Navigator.of(ctx).pop(),
+                                              splashColor: AppColors.septenaryColor.withValues(alpha: 0.1),
+                                              highlightColor: AppColors.septenaryColor.withValues(alpha: 0.1),
+                                              child: Container(alignment: Alignment.center, padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04), child: Text(appLocalizations.cancel, style: TextStyle(color: AppColors.septenaryColor, fontSize: screenWidth * 0.04)))
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      VerticalDivider(width: 1, thickness: 0.5, color: AppColors.quinaryColor),
+                                      Expanded(
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                            splashColor: AppColors.senaryColor.withValues(alpha: 0.1),
+                                            highlightColor: AppColors.senaryColor.withValues(alpha: 0.1),
+                                            onTap: isRedeeming ? null : () async {
+                                              final code = codeController.text.trim();
+                                              if (code.isEmpty) {
+                                                setDialogInnerState(() => errorText = appLocalizations.codeCannotBeEmpty);
+                                                _redeemCodeShakeController.forward(from: 0);
+                                                return;
+                                              }
+
+                                              try {
+                                                await actionProvider.redeemCode(ctx, code);
+                                                await generalProvider.refreshData();
+                                                if (ctx.mounted) Navigator.of(ctx).pop();
+                                              } catch (e) {
+                                                setDialogInnerState(() => errorText = e.toString());
+                                                _redeemCodeShakeController.forward(from: 0);
+                                              }
+                                            },
+                                            child: Container(
+                                              alignment: Alignment.center,
+                                              padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04),
+                                              child: isRedeeming
+                                                  ? SizedBox(width: screenWidth * 0.05, height: screenWidth * 0.05, child: CircularProgressIndicator(strokeWidth: 2.0, color: AppColors.senaryColor))
+                                                  : Text(appLocalizations.redeem, style: TextStyle(color: AppColors.senaryColor, fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold)),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
-                            ),
-                          ),
-                        ],
-                      );
-                    },
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -287,83 +226,32 @@ class SettingsSectionState extends State<SettingsSection> with SingleTickerProvi
           ),
         );
       },
-      transitionBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
     ).whenComplete(() {
       restoreNavBar();
-      widget.onDialogStateChanged(false);
     });
   }
 
-  /// Displays the "Terms of Use" page in a WebView modal.
-  void _showTermsOfService(BuildContext context) {
-    showAppWebViewModal(
-      context,
-      widget.appLocalizations.termsOfService,
-      "https://vertexishere.com/cortex-terms-of-service",
-    );
-  }
-
-  /// Displays the "Privacy Policy" page in a WebView modal.
-  void _showPrivacyPolicy(BuildContext context) {
-    showAppWebViewModal(
-      context,
-      widget.appLocalizations.privacyPolicy,
-      "https://vertexishere.com/cortex-privacy-policy",
-    );
-  }
-
-  /// Displays the "Copyrights and Attributions" page in a WebView modal.
-  void _showCopyrights(BuildContext context) {
-    showAppWebViewModal(
-      context,
-      widget.appLocalizations.copyrights,
-      "https://vertexishere.com/cortex-attributions",
-    );
+  /// Displays a page in a WebView modal.
+  void _showWebView(BuildContext context, String title, String url) {
+    showAppWebViewModal(context, title, url);
   }
 
   /// Builds a styled button for a setting item.
-  Widget _buildSettingsButton(
-      BuildContext context,
-      String text,
-      Widget icon,
-      VoidCallback onPressed,
-      ) {
+  Widget _buildSettingsButton(BuildContext context, {required String text, required Widget icon, required VoidCallback onPressed}) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Material(
       color: AppColors.secondaryColor,
-      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onPressed,
-        splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+        splashColor: AppColors.primaryColor.inverted.withValues(alpha:0.1),
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.04,
-            vertical: screenHeight * 0.02,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenWidth * 0.045),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  icon,
-                  SizedBox(width: screenWidth * 0.04),
-                  Text(
-                    text,
-                    style: GoogleFonts.roboto(
-                      color: AppColors.primaryColor.inverted,
-                      fontSize: screenWidth * 0.04,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: AppColors.primaryColor.inverted,
-                size: screenWidth * 0.04,
-              ),
+              icon,
+              SizedBox(width: screenWidth * 0.04),
+              Expanded(child: Text(text, style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500))),
+              Icon(Icons.arrow_forward_ios, color: AppColors.primaryColor.inverted, size: screenWidth * 0.04),
             ],
           ),
         ),
@@ -373,133 +261,81 @@ class SettingsSectionState extends State<SettingsSection> with SingleTickerProvi
 
   /// Builds a divider line used between settings buttons.
   Widget _buildDivider(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    return Divider(
-      color: AppColors.quinaryColor.withValues(alpha: 0.5),
-      thickness: 0.5,
-      height: 0.5,
-      indent: screenWidth * 0.04,
-      endIndent: screenWidth * 0.04,
-    );
+    return Divider(color: AppColors.quinaryColor.withValues(alpha:0.5), thickness: 0.5, height: 0.5, indent: MediaQuery.of(context).size.width * 0.04, endIndent: MediaQuery.of(context).size.width * 0.04);
   }
 
   @override
   Widget build(BuildContext context) {
+    context.watch<ThemeProvider>();
+
+    final appLocalizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    if (kDebugMode) {
-      print('[SettingsSection] Building widget.');
+    final List<Map<String, dynamic>> settingsButtons = [
+      {'key': 'help', 'icon': Icons.help_outline, 'action': () => _launchURL(context, "https://discord.gg/sK53fypPBZ")},
+      {'key': 'shareApp', 'icon': 'assets/icons/upload.svg', 'action': () => _shareApp(context)},
+      {'key': 'rateUs', 'icon': 'assets/icons/star.svg', 'action': () => _launchURL(context, "https://play.google.com/store/apps/details?id=com.vertex.cortex")},
+      {'key': 'redeemCode', 'icon': Icons.card_giftcard, 'action': () => _showRedeemCodeDialog(context)},
+      {'key': 'termsOfService', 'icon': Icons.article_outlined, 'action': () => _showWebView(context, appLocalizations.termsOfService, "https://vertexishere.com/cortex-terms-of-service")},
+      {'key': 'privacyPolicy', 'icon': Icons.privacy_tip_outlined, 'action': () => _showWebView(context, appLocalizations.privacyPolicy, "https://vertexishere.com/cortex-privacy-policy")},
+      {'key': 'copyrights', 'icon': 'assets/icons/copyrights.svg', 'action': () => _showWebView(context, appLocalizations.copyrights, "https://vertexishere.com/cortex-attributions")},
+    ];
+
+    String getLocalizedText(String key) {
+      switch (key) {
+        case 'help': return appLocalizations.help;
+        case 'shareApp': return appLocalizations.shareApp;
+        case 'rateUs': return appLocalizations.rateUs;
+        case 'redeemCode': return appLocalizations.redeemCode;
+        case 'termsOfService': return appLocalizations.termsOfService;
+        case 'privacyPolicy': return appLocalizations.privacyPolicy;
+        case 'copyrights': return appLocalizations.copyrights;
+        default: return '';
+      }
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section title
         Text(
-          widget.appLocalizations.settings,
-          style: GoogleFonts.roboto(
-            color: AppColors.primaryColor.inverted,
-            fontSize: screenWidth * 0.05,
-            fontWeight: FontWeight.w600,
-          ),
+          appLocalizations.settings,
+          style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600),
         ),
         SizedBox(height: screenHeight * 0.01),
-        // Section description
         Text(
-          widget.appLocalizations.accessSettingsDescription,
-          style: GoogleFonts.roboto(
-            color: AppColors.quinaryColor,
-            fontSize: screenWidth * 0.035,
-          ),
+          appLocalizations.accessSettingsDescription,
+          style: GoogleFonts.roboto(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
         ),
         SizedBox(height: screenHeight * 0.02),
-        // Group of settings buttons with rounded corners for the whole group
         ClipRRect(
           borderRadius: BorderRadius.circular(12.0),
           child: Column(
-            children: [
-              _buildSettingsButton(
-                context,
-                widget.appLocalizations.help,
-                Icon(
-                  Icons.help_outline,
-                  color: AppColors.primaryColor.inverted,
-                  size: screenWidth * 0.05,
-                ),
-                    () => _launchHelp(context),
-              ),
-              _buildDivider(context),
-              _buildSettingsButton(
-                context,
-                widget.appLocalizations.shareApp,
-                SvgPicture.asset(
-                  'assets/icons/upload.svg',
-                  width: screenWidth * 0.05,
-                  height: screenWidth * 0.05,
-                  color: AppColors.primaryColor.inverted,
-                ),
-                    () => _shareApp(context),
-              ),
-              _buildDivider(context),
-              _buildSettingsButton(
-                context,
-                widget.appLocalizations.rateUs,
-                SvgPicture.asset(
-                  'assets/icons/star.svg',
-                  width: screenWidth * 0.05,
-                  height: screenWidth * 0.05,
-                  color: AppColors.primaryColor.inverted,
-                ),
-                    () => _launchRateUs(context),
-              ),
-              _buildDivider(context),
-              // --- NEW BUTTON ADDED HERE ---
-              _buildSettingsButton(
-                context,
-                widget.appLocalizations.redeemCode, // Assuming 'redeemCode' is in your l10n file
-                Icon(
-                  Icons.card_giftcard, // A suitable icon for redeeming a code
-                  color: AppColors.primaryColor.inverted,
-                  size: screenWidth * 0.05,
-                ),
-                    () => _showRedeemCodeDialog(context),
-              ),
-              _buildDivider(context),
-              _buildSettingsButton(
-                context,
-                widget.appLocalizations.termsOfService,
-                Icon(
-                  Icons.article_outlined,
-                  color: AppColors.primaryColor.inverted,
-                  size: screenWidth * 0.05,
-                ),
-                    () => _showTermsOfService(context),
-              ),
-              _buildDivider(context),
-              _buildSettingsButton(
-                context,
-                widget.appLocalizations.privacyPolicy,
-                Icon(
-                  Icons.privacy_tip_outlined,
-                  color: AppColors.primaryColor.inverted,
-                  size: screenWidth * 0.05,
-                ),
-                    () => _showPrivacyPolicy(context),
-              ),
-              _buildDivider(context),
-              _buildSettingsButton(
-                context,
-                widget.appLocalizations.copyrights,
-                SvgPicture.asset(
-                  'assets/icons/copyrights.svg',
-                  width: screenWidth * 0.05,
-                  height: screenWidth * 0.05,
-                  color: AppColors.primaryColor.inverted,
-                ),
-                    () => _showCopyrights(context),
-              ),
-            ],
+            children: List.generate(settingsButtons.length, (index) {
+              final item = settingsButtons[index];
+              final iconData = item['icon'];
+
+              Widget iconWidget;
+              if (iconData is IconData) {
+                iconWidget = Icon(iconData, color: AppColors.primaryColor.inverted, size: screenWidth * 0.05);
+              } else if (iconData is String && iconData.endsWith('.svg')) {
+                iconWidget = SvgPicture.asset(iconData, width: screenWidth * 0.05, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn));
+              } else {
+                iconWidget = const SizedBox.shrink();
+              }
+
+              return Column(
+                children: [
+                  _buildSettingsButton(
+                    context,
+                    text: getLocalizedText(item['key']),
+                    icon: iconWidget,
+                    onPressed: item['action'],
+                  ),
+                  if (index < settingsButtons.length - 1) _buildDivider(context),
+                ],
+              );
+            }),
           ),
         ),
       ],

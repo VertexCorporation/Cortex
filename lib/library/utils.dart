@@ -1,9 +1,7 @@
-// lib/chat/widgets/options/utils.dart
+// lib/library/utils.dart
 
-import 'package:flutter/cupertino.dart';
-
-import '../../backend/data/data.dart';
-import '../../backend/data/entity.dart'; // --- IMPORT ModelEntity ---
+import 'package:cortex/library/backend/data/service.dart';
+import 'backend/data/entity.dart';
 
 /// A utility class containing static helper methods for processing model data.
 ///
@@ -11,13 +9,30 @@ class ModelDataUtils {
   // Private constructor to prevent instantiation of this utility class.
   ModelDataUtils._();
 
+  static String cleanTitle(String? t) {
+    if (t == null) return '';
+    var s = t.trimLeft();
+    while (s.isNotEmpty &&
+        (s.startsWith('-') ||
+            s.startsWith('_') ||
+            s.startsWith(' '))) {
+      s = s.substring(1).trimLeft();
+    }
+    return s;
+  }
+
   /// Finds the parent series [ModelEntity] for a given model variant ID.
   ///
   /// For example, given 'gemini-1.5-pro', it will find and return the main
   /// 'gemini' series entity. Returns `null` if no parent is found.
   /// If the provided ID is already a base series ID, it returns that entity directly.
-  static ModelEntity? findParentSeriesData(String modelId, {required String langCode}) {
-    final allCachedModels = ModelData.getCachedModelsSync();
+  static ModelEntity? findParentSeriesData(
+      String modelId, {
+        required String langCode,
+        required ModelService modelService, // <-- NEW PARAMETER
+      }) {
+    // Use the provided modelService instance instead of the singleton.
+    final allCachedModels = modelService.getCachedModelsSync(); // CORRECTED
     if (allCachedModels.isEmpty) return null;
 
     // First, check if the ID itself is a parent series.
@@ -59,7 +74,6 @@ class ModelDataUtils {
       if (data is Map<String, dynamic>) {
         if (conversationHasPhoto) {
           // In a photo chat, only count extensions that support images.
-          // REFACTORED: Safe access to the nested map.
           final modalities = data['modalities'] as Map<String, dynamic>? ?? {};
           if (modalities['image'] == true) {
             count++;
@@ -75,11 +89,11 @@ class ModelDataUtils {
 
   /// Takes a raw model ID (e.g., "google/gemma-7b" or "gpt-4-turbo")
   /// and formats it into a human-readable title (e.g., "Google Gemma 7B" or "GPT 4 Turbo").
-  static String formatModelId(String rawId) {
-    if (rawId.isEmpty) {
+  static String formatModelName(String modelName) {
+    if (modelName.isEmpty) {
       return "";
     }
-    String spacedId = rawId.replaceAll('/', ' ').replaceAll('-', ' ');
+    String spacedId = modelName.replaceAll('/', ' ').replaceAll('-', ' ');
     List<String> parts = spacedId.split(' ').where((part) => part.isNotEmpty).toList();
     if (parts.isEmpty) {
       return "";
@@ -88,7 +102,10 @@ class ModelDataUtils {
     for (String segment in parts) {
       String segmentLower = segment.toLowerCase();
       String formattedSegment;
-
+      if (segment.toUpperCase() == segment) {
+        formattedParts.add(segment);
+        continue;
+      }
       if (segmentLower == 'gpt') {
         formattedSegment = 'GPT';
       } else if (segmentLower == 'ai') {
@@ -107,24 +124,4 @@ class ModelDataUtils {
     }
     return formattedParts.join(' ');
   }
-}
-
-class SlideRightRoute extends PageRouteBuilder<bool> {
-  final Widget page;
-  SlideRightRoute({required this.page})
-      : super(
-    pageBuilder: (context, animation, secondaryAnimation) => page,
-    transitionDuration: const Duration(milliseconds: 300),
-    reverseTransitionDuration: const Duration(milliseconds: 300),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = const Offset(1.0, 0.0);
-      var end = Offset.zero;
-      var curve = Curves.ease;
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
 }

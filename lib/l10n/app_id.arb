@@ -773,5 +773,22 @@
   "exitAppTitle": "Akan pergi secepat ini?",
   "exitAppConfirmation": "Apakah Anda yakin ingin meninggalkan platform menakjubkan ini?",
   "newsErrorTitle": "Gagal Memuat Berita",
-  "newsErrorMessage": "Terjadi masalah saat mengambil pembaruan terkini, silakan periksa koneksi Anda dan coba lagi."
+  "newsErrorMessage": "Terjadi masalah saat mengambil pembaruan terkini, silakan periksa koneksi Anda dan coba lagi.",
+  "codeNotFound": "Kode yang Anda masukkan tidak valid atau telah kedaluwarsa.",
+  "whatIsNew": "Apa yang baru?",
+  "onboardingTitle1": "Hai! Kami Tim Cortex.",
+  "onboardingDesc1": "Senang sekali bertemu Anda di sini, {userName}. Kami adalah beberapa pengembang SMA yang memutuskan untuk menulis ulang aturan industri AI. Senang bertemu Anda! Jadi, mari kita saling mengenal lebih baik.",
+  "onboardingTitle2": "Ada Masalah Besar.",
+  "onboardingDesc2": "Revolusi AI telah tiba, tetapi terhenti di ambang batas. Dengan biaya berlangganan yang tinggi, platform yang kompleks, mereka yang merusak privasi, dan mereka yang memblokir akses ke AI... selama mereka masih berkecimpung di dalamnya, ambang batas ini tidak akan pernah bisa dilampaui.",
+  "onboardingTitle3": "Kita Tidak Bisa Hanya Berdiam Diri.",
+  "onboardingDesc3": "Untuk mencapai ambang batas tersebut, kami membangun platform yang tangguh, estetis, mudah disesuaikan, mudah digunakan, sepenuhnya transparan, berfungsi daring maupun luring, dan menyimpan data Anda hanya di perangkat Anda. Kami mengembalikan kendali tersebut ke tempatnya yang semestinya: Anda.",
+  "onboardingTitle4": "Ini Tidak Pernah Mudah.",
+  "onboardingDesc4": "Kami ditolak puluhan kali, ditangguhkan berkali-kali, menerima peringatan palsu, dan harus mengubah merek kami puluhan kali. Meskipun begitu, kami selalu diberi tahu bahwa hal itu tidak mungkin dilakukan. Namun kami tidak pernah menyerah, percaya bahwa proyek ini milik semua orang, bukan hanya kami. Dan itulah alasan kami ada di sini.",
+  "onboardingFinalTitle": "Waktunya Revolusi.",
+  "onboardingFinalDesc": "Jika Anda melihat layar ini, itu karena kami tidak menyerah. Dan kami tidak berniat menyerah. Ayo, kita bawa revolusi AI ke dunia bersama-sama. Untuk menjadi bagian dari kisah ini...",
+  "onboardingFinalQuestion": "APAKAH KAMU SIAP?",
+  "onboardingFinalButton": "YA!",
+  "dude": "Bung",
+  "swipeToContinue": "Geser untuk melanjutkan",
+  "cacheIsNotUpToDate": "Cache Play Store Anda belum diperbarui. Silakan tutup dan buka kembali aplikasi Play Store, atau mulai ulang perangkat Anda."
 }

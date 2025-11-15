@@ -1,33 +1,30 @@
-// lib/settings/providers/user.dart
+// lib/settings/providers/actions.dart
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import '../../initialization.dart';
-import '../../notifications.dart';
 import '../../internet.dart';
+import '../../l10n/app_localizations.dart';
+import '../../notifications/introvert.dart';
 import '../services/auth.dart';
 import '../services/profile.dart';
 
 /// Manages user-initiated actions and their corresponding UI states.
 ///
 /// This provider acts as a ViewModel in an MVVM architecture. It orchestrates
-/// user operations like updating a profile, changing a password, or deleting an
-/// account by communicating with the appropriate services (`AuthService`, `ProfileService`).
-///
-/// It holds the state for ongoing operations (e.g., `isUpdatingUsername`)
-/// and notifies listeners, allowing the UI to react with loading indicators
-/// or state changes. For global actions like signing out, it delegates to the
-/// `AppInitializer` to ensure a clean and complete session teardown.
+/// user operations and is responsible for handling exceptions from the service layer,
+/// localizing error messages, and displaying user-facing notifications. For global actions
+/// like signing out, it delegates to the `AppInitializer`.
 class SettingsActionProvider with ChangeNotifier {
   final AuthService _authService;
   final ProfileService _profileService;
-  final NotificationService _notificationService;
+  final IntrovertNotificationService _notificationService;
   final InternetProvider _internetProvider;
   final AppInitializer _appInitializer;
 
   SettingsActionProvider({
     required AuthService authService,
     required ProfileService profileService,
-    required NotificationService notificationService,
+    required IntrovertNotificationService notificationService,
     required InternetProvider internetProvider,
     required AppInitializer appInitializer,
   })  : _authService = authService,
@@ -37,7 +34,6 @@ class SettingsActionProvider with ChangeNotifier {
         _appInitializer = appInitializer;
 
   // --- UI State Variables ---
-
   bool _isUpdatingUsername = false;
   bool get isUpdatingUsername => _isUpdatingUsername;
 
@@ -53,28 +49,54 @@ class SettingsActionProvider with ChangeNotifier {
   bool _isRedeemingCode = false;
   bool get isRedeemingCode => _isRedeemingCode;
 
-  // --- Private Helper ---
-  bool _checkInternet() {
+  // --- Private Helpers ---
+
+  bool _checkInternet(AppLocalizations localizations) {
     if (!_internetProvider.isConnected) {
       _notificationService.showNotification(
-        message: "No internet connection. Please try again later.",
-        isSuccess: false,
+        message: localizations.noInternetConnection,
+        type: NotificationType.error,
       );
       return false;
     }
     return true;
   }
 
+  String _getLocalizedProfileError(AppLocalizations localizations, String code) {
+    switch (code) {
+      case 'already-exists':
+        return localizations.usernameTaken;
+      case 'invalid-argument':
+        return localizations.invalidUsernameCharacters;
+      case 'not-found':
+        return localizations.codeNotFound;
+      case 'resource-exhausted':
+        return localizations.tooManyRequests;
+      default:
+        return localizations.anErrorOccurred;
+    }
+  }
+
+  String _getLocalizedAuthError(AppLocalizations localizations, String code) {
+    switch (code) {
+      case 'wrong-password':
+      case 'invalid-credential':
+        return localizations.wrongPassword;
+      case 'weak-password':
+        return localizations.weakPassword;
+      case 'too-many-requests':
+        return localizations.tooManyRequests;
+      default:
+        return localizations.anErrorOccurred;
+    }
+  }
+
   // --- Public Methods / Actions ---
 
-  /// Attempts to update the user's username.
-  ///
-  /// Shows notifications for success or failure states.
-  /// Returns `true` on success, `false` otherwise.
-  ///
-  /// Throws: Catches `ProfileException` for specific user-friendly error messages.
-  Future<bool> updateUsername(String newUsername) async {
-    if (isUpdatingUsername || !_checkInternet()) return false;
+  Future<void> updateUsername(BuildContext context, String newUsername) async {
+    // Guard against async gaps: get localizations before the first await.
+    final localizations = AppLocalizations.of(context)!;
+    if (isUpdatingUsername || !_checkInternet(localizations)) return;
 
     _isUpdatingUsername = true;
     notifyListeners();
@@ -82,33 +104,24 @@ class SettingsActionProvider with ChangeNotifier {
     try {
       await _profileService.updateUsername(newUsername);
       _notificationService.showNotification(
-          message: "Your profile has been updated successfully.",
-          isSuccess: true);
-      return true;
+          message: localizations.profileUpdated,
+          type: NotificationType.success);
     } on ProfileException catch (e) {
-      _notificationService.showNotification(message: e.message, isSuccess: false);
-      return false;
-    } catch (e) {
-      _notificationService.showNotification(
-          message: "An unexpected error occurred.", isSuccess: false);
-      return false;
+      throw Exception(_getLocalizedProfileError(localizations, e.code));
+    } catch (_) {
+      throw Exception(localizations.anErrorOccurred);
     } finally {
       _isUpdatingUsername = false;
       notifyListeners();
     }
   }
 
-  /// Attempts to change the current user's password.
-  ///
-  /// Shows notifications for success or failure states.
-  /// Returns `true` on success, `false` otherwise.
-  ///
-  /// Throws: Catches `AuthException` for specific user-friendly error messages.
-  Future<bool> changePassword({
+  Future<void> changePassword(BuildContext context, {
     required String oldPassword,
     required String newPassword,
   }) async {
-    if (isChangingPassword || !_checkInternet()) return false;
+    final localizations = AppLocalizations.of(context)!;
+    if (isChangingPassword || !_checkInternet(localizations)) return;
 
     _isChangingPassword = true;
     notifyListeners();
@@ -117,29 +130,20 @@ class SettingsActionProvider with ChangeNotifier {
       await _authService.changePassword(
           oldPassword: oldPassword, newPassword: newPassword);
       _notificationService.showNotification(
-          message: "Your password has been updated.", isSuccess: true);
-      return true;
+          message: localizations.passwordUpdated, type: NotificationType.success);
     } on AuthException catch (e) {
-      _notificationService.showNotification(message: e.message, isSuccess: false);
-      return false;
-    } catch (e) {
-      _notificationService.showNotification(
-          message: "An unexpected error occurred.", isSuccess: false);
-      return false;
+      throw Exception(_getLocalizedAuthError(localizations, e.code));
+    } catch (_) {
+      throw Exception(localizations.anErrorOccurred);
     } finally {
       _isChangingPassword = false;
       notifyListeners();
     }
   }
 
-  /// Attempts to redeem a creator or promotional code.
-  ///
-  /// Shows notifications for success or failure states.
-  /// Returns `true` on success, `false` otherwise.
-  ///
-  /// Throws: Catches `ProfileException` for specific user-friendly error messages.
-  Future<bool> redeemCode(String code) async {
-    if (isRedeemingCode || !_checkInternet()) return false;
+  Future<void> redeemCode(BuildContext context, String code) async {
+    final localizations = AppLocalizations.of(context)!;
+    if (isRedeemingCode || !_checkInternet(localizations)) return;
 
     _isRedeemingCode = true;
     notifyListeners();
@@ -147,24 +151,19 @@ class SettingsActionProvider with ChangeNotifier {
     try {
       await _profileService.redeemCreatorCode(code);
       _notificationService.showNotification(
-          message: "Creator supported successfully!", isSuccess: true);
-      return true;
+          message: localizations.creatorSupportedSuccess, type: NotificationType.success);
     } on ProfileException catch (e) {
-      _notificationService.showNotification(message: e.message, isSuccess: false);
-      return false;
-    } catch (e) {
-      _notificationService.showNotification(
-          message: "An unexpected error occurred.", isSuccess: false);
-      return false;
+      throw Exception(_getLocalizedProfileError(localizations, e.code));
+    } catch (_) {
+      throw Exception(localizations.anErrorOccurred);
     } finally {
       _isRedeemingCode = false;
       notifyListeners();
     }
   }
 
-  /// Initiates the full, orchestrated sign-out process.
-  /// Delegates the core logic to `AppInitializer` for a clean session teardown.
-  Future<void> performLogout() async {
+  Future<void> performLogout(BuildContext context) async {
+    final localizations = AppLocalizations.of(context)!;
     if (_isLoggingOut) return;
 
     _isLoggingOut = true;
@@ -173,13 +172,11 @@ class SettingsActionProvider with ChangeNotifier {
     try {
       await _appInitializer.signOut();
     } catch (e) {
-      debugPrint("UserProvider: An error occurred during the orchestrated logout: $e");
+      debugPrint("SettingsActionProvider: An error occurred during the orchestrated logout: $e");
       _notificationService.showNotification(
-          message: "Could not log out. Please try again.", isSuccess: false);
+          message: localizations.anErrorOccurred, // Using a generic error message
+          type: NotificationType.error);
     } finally {
-      // The AppInitializer's auth listener handles UI navigation.
-      // We only reset the local state, ensuring we don't call notifyListeners
-      // on a disposed widget.
       _isLoggingOut = false;
       if (hasListeners) {
         notifyListeners();
@@ -187,14 +184,11 @@ class SettingsActionProvider with ChangeNotifier {
     }
   }
 
-  /// Initiates the permanent deletion of the user's account.
-  ///
-  /// This is a two-step process:
-  /// 1. Request account deletion from the backend via `ProfileService`.
-  /// 2. Delegate the full sign-out process to `AppInitializer`.
-  /// Returns `true` on success, `false` otherwise.
-  Future<bool> deleteAccount() async {
-    if (isDeletingAccount || !_checkInternet()) return false;
+  Future<void> deleteAccount(BuildContext context) async {
+    final localizations = AppLocalizations.of(context)!;
+    if (isDeletingAccount || !_checkInternet(localizations)) {
+      throw Exception(localizations.noInternetConnection);
+    }
 
     _isDeletingAccount = true;
     notifyListeners();
@@ -202,19 +196,18 @@ class SettingsActionProvider with ChangeNotifier {
     try {
       await _profileService.requestAccountDeletion();
       _notificationService.showNotification(
-          message: "Account deletion request sent. You will be logged out.",
-          isSuccess: true);
+          message: localizations.accountDeletionRequested,
+          type: NotificationType.success);
 
-      // After a successful request, perform a full sign-out.
       await _appInitializer.signOut();
-      return true;
     } on ProfileException catch (e) {
-      _notificationService.showNotification(message: e.message, isSuccess: false);
-      return false;
+      final message = _getLocalizedProfileError(localizations, e.code);
+      _notificationService.showNotification(message: message, type: NotificationType.error);
+      rethrow;
     } catch (e) {
       _notificationService.showNotification(
-          message: "An unexpected error occurred.", isSuccess: false);
-      return false;
+          message: localizations.anErrorOccurred, type: NotificationType.error);
+      rethrow;
     } finally {
       _isDeletingAccount = false;
       if (hasListeners) {

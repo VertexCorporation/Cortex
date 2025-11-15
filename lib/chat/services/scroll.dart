@@ -30,11 +30,38 @@ class ScrollService {
     debugPrint("[ScrollService] Controller has been set.");
   }
 
+  ScrollPosition? _getSafePosition() {
+    final controller = _scrollController;
+    if (controller == null || !controller.hasClients) {
+      return null;
+    }
+
+    final positions = controller.positions;
+    if (positions.length != 1) {
+      debugPrint(
+        "[ScrollService] Multiple (${positions.length}) scroll positions attached. "
+            "Skipping scroll computation for safety.",
+      );
+      return null;
+    }
+
+    try {
+      return controller.position;
+    } catch (e, s) {
+      debugPrint(
+        "[ScrollService] Error accessing ScrollController.position: $e\n$s",
+      );
+      return null;
+    }
+  }
+
   /// Checks if the user is near the bottom of the scrollable area.
   bool isUserAtBottom({double threshold = 100.0}) {
-    if (_scrollController == null || !_scrollController!.hasClients) return true;
-    final maxScroll = _scrollController!.position.maxScrollExtent;
-    final currentScroll = _scrollController!.offset;
+    final position = _getSafePosition();
+    if (position == null) return true;
+
+    final maxScroll = position.maxScrollExtent;
+    final currentScroll = position.pixels;
     if (maxScroll == 0.0) return true;
     return (maxScroll - currentScroll) <= threshold;
   }
@@ -93,39 +120,55 @@ class ScrollService {
   }
 
   /// Smoothly animates the scroll position to the very bottom of the list.
+  /// This version includes enhanced safety checks to prevent crashes during rapid rebuilds.
+  /// Smoothly animates the scroll position to the very bottom of the list.
   Future<void> scrollToBottom({
     double threshold = 10.0,
     Duration duration = const Duration(milliseconds: 300),
   }) async {
     await WidgetsBinding.instance.endOfFrame;
-    if (_scrollController == null || !_scrollController!.hasClients) return;
 
-    final targetOffset = _scrollController!.position.maxScrollExtent;
-    final currentOffset = _scrollController!.offset;
-
-    if ((targetOffset - currentOffset).abs() < threshold) return;
+    final position = _getSafePosition();
+    if (position == null) {
+      debugPrint(
+        "[ScrollService] scrollToBottom skipped: No safe ScrollPosition available.",
+      );
+      return;
+    }
 
     try {
+      final targetOffset = position.maxScrollExtent;
+      final currentOffset = position.pixels;
+
+      if ((targetOffset - currentOffset).abs() < threshold) return;
+
       await _scrollController!.animateTo(
         targetOffset,
         duration: duration,
         curve: Curves.easeOut,
       );
-    } catch (e) {
-      debugPrint("[ScrollService] Could not complete scrollToBottom: $e");
+    } catch (e, s) {
+      debugPrint(
+        "[ScrollService] Could not complete scrollToBottom due to an error. "
+            "Error: $e\n$s",
+      );
     }
   }
 
   /// Instantly jumps the scroll position to the bottom of the list.
   void jumpToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController != null && _scrollController!.hasClients) {
-        final maxScroll = _scrollController!.position.maxScrollExtent;
-        _scrollController!.jumpTo(maxScroll);
-        debugPrint("[ScrollService] Safely jumped to bottom (max: $maxScroll).");
-      } else {
-        debugPrint("[ScrollService] Jump to bottom skipped: ScrollController has no clients or controller is null.");
+      final position = _getSafePosition();
+      if (position == null) {
+        debugPrint(
+          "[ScrollService] Jump to bottom skipped: No safe ScrollPosition.",
+        );
+        return;
       }
+
+      final maxScroll = position.maxScrollExtent;
+      _scrollController!.jumpTo(maxScroll);
+      debugPrint("[ScrollService] Safely jumped to bottom (max: $maxScroll).");
     });
   }
 
@@ -137,22 +180,64 @@ class ScrollService {
     }
   }
 
-  /// Builds the animated "Scroll to Bottom" button.
   Widget buildScrollDownButton({
     required double screenWidth,
-    required double inputFieldHeight,
+    required double screenHeight,
+    required double bottomPanelHeight,      // height of panel (edit + input + briefing)
     required bool showScrollDownButton,
-    required double safeAreaBottomPadding,
+    required double safeAreaBottomPadding,  // typically MediaQuery.padding.bottom
+    required bool isKeyboardOpen,
+    required double keyboardHeight,         // MediaQuery.viewInsets.bottom
   }) {
-    // This method's implementation is correct and requires no changes.
     final themeColors = AppColors.getThemeColors(AppColors.currentTheme);
-    final Color iconColor = themeColors.statusBarIconBrightness == Brightness.light
+    final Color iconColor =
+    themeColors.statusBarIconBrightness == Brightness.light
         ? Colors.white.withValues(alpha: 0.9)
         : Colors.black.withValues(alpha: 0.8);
 
+    // Base: distance from the *top of the bottom panel* up to the button.
+    final double panelTopMargin = screenHeight * 0.02;
+
+    // ————————————————————————————————————————————————
+    // Compute distance from SCREEN BOTTOM to button:
+    //
+    // 1) When keyboard is OPEN:
+    //    screen bottom → keyboard top     = keyboardHeight
+    //    keyboard top → panel top         = bottomPanelHeight
+    //    panel top → button               = panelTopMargin
+    //
+    //    => bottomOffset = keyboardHeight + bottomPanelHeight + panelTopMargin
+    //
+    // 2) When keyboard is CLOSED:
+    //    screen bottom → panel top        = bottomPanelHeight + safeAreaBottomPadding
+    //    panel top → button               = panelTopMargin
+    //
+    //    => bottomOffset = bottomPanelHeight + safeAreaBottomPadding + panelTopMargin
+    //       and then clamped so it doesn’t hug the very bottom.
+    // ————————————————————————————————————————————————
+
+    double bottomOffset;
+
+    if (isKeyboardOpen) {
+      bottomOffset = keyboardHeight +
+          bottomPanelHeight +
+          panelTopMargin;
+    } else {
+      bottomOffset = bottomPanelHeight +
+          safeAreaBottomPadding +
+          panelTopMargin;
+
+      // Keep it at least some distance from the absolute bottom when
+      // keyboard is not visible, so it doesn't visually merge with the input.
+      final double minBottomOffset = screenHeight * 0.02; // 2% of screen height
+      if (bottomOffset < minBottomOffset) {
+        bottomOffset = minBottomOffset;
+      }
+    }
+
     return Positioned(
       right: screenWidth * 0.02,
-      bottom: inputFieldHeight + safeAreaBottomPadding + 16.0,
+      bottom: bottomOffset,
       child: AnimatedOpacity(
         opacity: showScrollDownButton ? 1.0 : 0.0,
         duration: const Duration(milliseconds: 200),
@@ -170,20 +255,23 @@ class ScrollService {
                 decoration: BoxDecoration(
                   color: AppColors.background.withValues(alpha: 0.9),
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.border.withValues(alpha: 0.5), width: 1),
+                  border: Border.all(
+                    color: AppColors.border.withValues(alpha: 0.5),
+                    width: 1,
+                  ),
                   boxShadow: const [
                     BoxShadow(
                       color: Colors.black38,
                       blurRadius: 8,
                       offset: Offset(0, 4),
-                    )
+                    ),
                   ],
                 ),
                 child: SvgPicture.asset(
                   'assets/icons/arrov.svg',
-                  color: iconColor,
                   width: screenWidth * 0.04,
                   height: screenWidth * 0.04,
+                  colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
                 ),
               ),
             ),

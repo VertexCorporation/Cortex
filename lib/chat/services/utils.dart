@@ -4,30 +4,42 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:mime/mime.dart';
+import '../../library/backend/data/entity.dart';
+import '../../library/backend/data/service.dart';
 
-import '../../models/backend/data/data.dart';
-
+/// A collection of static utility methods used across the application.
 class Utils {
+  static bool isLocalModel(String? modelId, {
+    required String langCode,
+    required ModelService modelService,
+  }) => !isServerSideModel(
+    modelId,
+    langCode: langCode,
+    modelService: modelService,
+  );
 
-  static bool isLocalModel(String? modelId) => !isServerSideModel(modelId);
-
-  static bool isServerSideModel(String? modelId) {
+  static bool isServerSideModel(String? modelId, {
+    required String langCode,
+    required ModelService modelService,
+  }) {
     if (modelId == null || modelId.isEmpty) {
-      return false; // An empty ID can't be a server-side model.
+      return true; // Default to server-side for safety if ID is invalid.
     }
 
-    // This is now the ONLY logic path. It is always correct.
-    final modelData = ModelData.getPreciseModelData(modelId);
-    final isOffline = modelData['type'] == 'offline';
+    // Fetch the type-safe entity using the provided modelService.
+    final model = modelService.getPreciseModelData(modelId, langCode: langCode);
 
-    // Return true if the model is NOT offline.
-    return !isOffline;
+    // Use the safe getter from the entity.
+    return model.isServerSide;
   }
 
-  static Map<String, dynamic> getModelDataFromId(String targetModelId) {
-    debugPrint(
-        "[ChatScreenState.getModelDataFromId] Fetching data for '$targetModelId' using central ModelData service.");
-    return ModelData.getPreciseModelData(targetModelId);
+  /// It requires a `langCode` to ensure correct localization.
+  static ModelEntity getModelEntityFromId(String targetModelId, {
+    required String langCode,
+    required ModelService modelService,
+  }) {
+    debugPrint("[Utils.getModelEntityFromId] Fetching entity for '$targetModelId' using provided modelService.");
+    return modelService.getPreciseModelData(targetModelId, langCode: langCode);
   }
 
   /// A static utility to read any file, encode it to Base64, and return its data and MIME type.
@@ -39,8 +51,7 @@ class Utils {
         final mimeType = lookupMimeType(filePath, headerBytes: fileBytes);
 
         if (mimeType == null) {
-          debugPrint(
-              "Unsupported file type or could not determine MIME for: $filePath");
+          debugPrint("Unsupported file type or could not determine MIME for: $filePath");
           return null;
         }
 
@@ -58,6 +69,7 @@ class Utils {
 
   /// A static utility function to read an image file, encode it to Base64,
   /// and format it as a data URL string.
+  /// (This method is pure and does not require changes).
   static Future<String?> formatBase64Image(String photoPath) async {
     try {
       final imageFile = File(photoPath);

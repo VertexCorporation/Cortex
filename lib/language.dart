@@ -38,11 +38,14 @@ class LocaleProvider extends ChangeNotifier {
     if (savedLanguageCode != null && _allowedLanguageCodes.contains(savedLanguageCode)) {
       _locale = Locale(savedLanguageCode);
     } else {
-      Locale deviceLocale = ui.window.locale;
+      final dispatcher = ui.PlatformDispatcher.instance;
+      // Get the locale from the dispatcher.
+      final Locale deviceLocale = dispatcher.locale;
+
       if (_allowedLanguageCodes.contains(deviceLocale.languageCode)) {
         _locale = deviceLocale;
       } else {
-        _locale = const Locale('en');
+        _locale = const Locale('en'); // Fallback to English
       }
       await _saveLocale(_locale);
     }

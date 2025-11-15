@@ -2038,4 +2038,62 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get newsErrorMessage =>
       'Er is een probleem opgetreden bij het ophalen van de nieuwste updates. Controleer uw verbinding en probeer het opnieuw.';
+
+  @override
+  String get codeNotFound => 'De ingevoerde code is ongeldig of verlopen.';
+
+  @override
+  String get whatIsNew => 'Wat is er nieuw?';
+
+  @override
+  String get onboardingTitle1 => 'Hallo! Wij zijn het Cortex Team.';
+
+  @override
+  String onboardingDesc1(String userName) {
+    return 'Geweldig om je hier te zien, $userName. Wij zijn een stel middelbareschoolontwikkelaars die besloten de regels van de AI-industrie te herschrijven. Leuk je te ontmoeten! Laten we elkaar beter leren kennen.';
+  }
+
+  @override
+  String get onboardingTitle2 => 'Er waren enorme problemen.';
+
+  @override
+  String get onboardingDesc2 =>
+      'De AI-revolutie was een feit, maar bleef steken op de drempel. Met hoge abonnementskosten, complexe platforms, degenen die de privacy schenden en degenen die de toegang tot AI blokkeren... zolang ze meededen, kon deze drempel nooit worden overschreden.';
+
+  @override
+  String get onboardingTitle3 => 'Wij konden niet zomaar blijven zitten.';
+
+  @override
+  String get onboardingDesc3 =>
+      'Om die drempel te overbruggen, hebben we een krachtig, esthetisch, aanpasbaar, gebruiksvriendelijk en volledig transparant platform gebouwd, dat zowel online als offline werkt en je gegevens alleen op jouw apparaat bewaart. We hebben de macht teruggegeven aan waar die hoort: aan jou.';
+
+  @override
+  String get onboardingTitle4 => 'Dit was nooit gemakkelijk.';
+
+  @override
+  String get onboardingDesc4 =>
+      'We werden tientallen keren afgewezen, meerdere keren geschorst, kregen valse waarschuwingen en moesten tientallen keren van merk veranderen. Steeds weer kregen we te horen dat het niet kon. Maar we gaven nooit op, in de overtuiging dat dit project van iedereen is, niet alleen van ons. En dat is precies waarom we hier zijn.';
+
+  @override
+  String get onboardingFinalTitle => 'Het is tijd voor een revolutie.';
+
+  @override
+  String get onboardingFinalDesc =>
+      'Als je dit scherm ziet, komt dat omdat we niet hebben opgegeven. En we zijn niet van plan op te geven. Kom op, laten we samen de AI-revolutie de wereld in sturen. Om deel uit te maken van dit verhaal...';
+
+  @override
+  String get onboardingFinalQuestion => 'BEN JE KLAAR?';
+
+  @override
+  String get onboardingFinalButton => 'JA!';
+
+  @override
+  String get dude => 'Kerel';
+
+  @override
+  String get swipeToContinue => 'Veeg om door te gaan';
+
+  @override
+  String get cacheIsNotUpToDate =>
+      'Je Play Store-cache is niet up-to-date. Sluit de Play Store-app en open deze opnieuw, of start je apparaat opnieuw op.';
 }

@@ -1,11 +1,11 @@
-// buttons.dart
+// lib/chat/screen/selected/widgets/input/buttons.dart
 
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import '../../../../internet.dart';
-import '../../../../theme.dart';
+import '../../../../../internet.dart';
+import '../../../../../theme.dart';
 
 class ActionButtonWidget extends StatelessWidget {
   final bool isEnabled;

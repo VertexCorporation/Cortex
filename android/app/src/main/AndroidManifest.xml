@@ -68,6 +68,10 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
+        <meta-data
+            android:name="vn.hunghd.flutterdownloader.NOTIFICATION_ICON"
+            android:resource="@drawable/ic_notification" />
+
         <!-- Flutter engine plugin metadata (don't delete) -->
         <meta-data
             android:name="flutterEmbedding"

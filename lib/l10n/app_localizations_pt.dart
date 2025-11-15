@@ -2025,4 +2025,63 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get newsErrorMessage =>
       'Ocorreu um problema ao obter as atualizações mais recentes. Verifique sua conexão e tente novamente.';
+
+  @override
+  String get codeNotFound => 'O código que você inseriu é inválido ou expirou.';
+
+  @override
+  String get whatIsNew => 'O que há de novo?';
+
+  @override
+  String get onboardingTitle1 => 'Olá! Somos a Equipe Cortex.';
+
+  @override
+  String onboardingDesc1(String userName) {
+    return 'É ótimo te ver por aqui, $userName. Somos um grupo de desenvolvedores do ensino médio que decidiu reescrever as regras da indústria de IA. É um prazer te conhecer! Então, vamos nos conhecer melhor.';
+  }
+
+  @override
+  String get onboardingTitle2 => 'Havia problemas enormes.';
+
+  @override
+  String get onboardingDesc2 =>
+      'A revolução da IA chegou, mas ficou estagnada na porta de entrada. Com altas taxas de assinatura, plataformas complexas, aqueles que destroem a privacidade e aqueles que bloqueiam o acesso à IA... enquanto eles estivessem no jogo, essa porta jamais poderia ser ultrapassada.';
+
+  @override
+  String get onboardingTitle3 =>
+      'Não podíamos simplesmente ficar de braços cruzados.';
+
+  @override
+  String get onboardingDesc3 =>
+      'Para ultrapassar esse limite, criamos uma plataforma poderosa, estética, personalizável, fácil de usar, totalmente transparente, que funciona online e offline e mantém seus dados apenas no seu dispositivo. Devolvemos o poder a quem ele pertence: a você.';
+
+  @override
+  String get onboardingTitle4 => 'Isso nunca foi fácil.';
+
+  @override
+  String get onboardingDesc4 =>
+      'Fomos rejeitados dezenas de vezes, suspensos diversas vezes, recebemos avisos falsos e tivemos que mudar nossa marca dezenas de vezes. Em meio a tudo isso e muito mais, nos disseram que era impossível. Mas nunca desistimos, acreditando que este projeto pertence a todos, não apenas a nós. E é exatamente por isso que estamos aqui.';
+
+  @override
+  String get onboardingFinalTitle => 'Chegou a hora da revolução.';
+
+  @override
+  String get onboardingFinalDesc =>
+      'Se você está vendo esta tela, é porque não desistimos. E não temos nenhuma intenção de desistir. Vamos lá, vamos levar a revolução da IA para o mundo juntos. Para fazer parte dessa história...';
+
+  @override
+  String get onboardingFinalQuestion => 'Você está pronto?';
+
+  @override
+  String get onboardingFinalButton => 'SIM!';
+
+  @override
+  String get dude => 'Cara';
+
+  @override
+  String get swipeToContinue => 'Deslize para continuar';
+
+  @override
+  String get cacheIsNotUpToDate =>
+      'O cache da sua Play Store não está atualizado. Feche e abra novamente o aplicativo Play Store ou reinicie o seu dispositivo.';
 }

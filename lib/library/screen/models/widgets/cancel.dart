@@ -82,10 +82,10 @@ class AnimatedBorder extends StatefulWidget {
   });
 
   @override
-  _AnimatedBorderState createState() => _AnimatedBorderState();
+  AnimatedBorderState createState() => AnimatedBorderState();
 }
 
-class _AnimatedBorderState extends State<AnimatedBorder> with SingleTickerProviderStateMixin {
+class AnimatedBorderState extends State<AnimatedBorder> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override

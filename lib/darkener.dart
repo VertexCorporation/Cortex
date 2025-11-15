@@ -133,9 +133,6 @@ class Darkener {
 
   /// Private: blends [color] with black by [factor].
   static Color _blendWithBlack(Color color, double factor) {
-    final r = (color.red * (1 - factor)).round();
-    final g = (color.green * (1 - factor)).round();
-    final b = (color.blue * (1 - factor)).round();
-    return Color.fromARGB(color.alpha, r, g, b);
+    return Color.lerp(color, Colors.black, factor)!;
   }
 }

@@ -109,6 +109,7 @@ class Message {
     double? opacity,
     bool? isPhotoUploading,
     List<InlineSpan>? parsedSpans,
+    bool clearPhoto = false,
   }) {
     // If the text is changing, the notifier's value must be updated.
     // Otherwise, we reuse the existing notifier for efficiency.
@@ -133,7 +134,7 @@ class Message {
       id: finalId,
       text: text ?? this.text,
       isUserMessage: isUserMessage ?? this.isUserMessage,
-      photoPath: photoPath ?? this.photoPath,
+      photoPath: clearPhoto ? null : (photoPath ?? this.photoPath),
       model: model ?? this.model,
       includeInContext: includeInContext ?? this.includeInContext,
       isReported: isReported ?? this.isReported,

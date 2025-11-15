@@ -1,4 +1,4 @@
-// lib/login/auth_screen.dart
+// lib/login/screen.dart
 
 import 'package:cortex/app.dart';
 import 'package:cortex/l10n/app_localizations.dart';

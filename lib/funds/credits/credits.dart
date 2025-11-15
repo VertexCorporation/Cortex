@@ -1,6 +1,7 @@
-// credits.dart (FINAL, CORRECTED, AND PERFORMATIVE)
-// This version isolates the scroll fog logic into a dedicated StatefulWidget (_ScrollableListWithFog)
-// to prevent entire widget rebuilds on scroll, fixing the Sliver assertion crash and improving performance.
+// credits.dart (FINAL & REFINED ARCHITECTURE)
+// This version uses the central ScrollFog widget internally to apply fog
+// ONLY to the scrollable list, not the static header text. This resolves
+// the UI issue while maintaining a clean, modular architecture.
 
 import 'package:cortex/app.dart';
 import 'package:flutter/foundation.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import '../../fog.dart';
 import '../../theme.dart';
 import 'skeleton.dart';
 
@@ -42,7 +44,6 @@ class CreditContentWidget extends StatefulWidget {
 class _CreditContentWidgetState extends State<CreditContentWidget> {
   int? _selectedCardIndex;
   final List<CreditPackage> _creditPackages = [];
-
   final bool _isTesting = !kReleaseMode;
 
   @override
@@ -113,42 +114,44 @@ class _CreditContentWidgetState extends State<CreditContentWidget> {
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
-    final double horizontalPadding = screenWidth * 0.04;
-    final double spacingAfterTitle = screenHeight * 0.01;
-    final double spacingAfterDescription = screenHeight * 0.02;
-
-    final double titleFontSize = screenWidth * 0.07;
-    final double descriptionFontSize = screenWidth * 0.035;
-
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
       child: Column(
         key: const ValueKey('creditContent'),
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // --- Static Header Content (No Fog Here) ---
           Text(
             localizations.buyCredits,
-            style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
+            style: TextStyle(fontSize: screenWidth * 0.07, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: spacingAfterTitle),
+          SizedBox(height: screenHeight * 0.01),
           Text(
             localizations.selectCreditPackageDescription,
-            style: TextStyle(fontSize: descriptionFontSize, color: AppColors.tertiaryColor),
+            style: TextStyle(fontSize: screenWidth * 0.035, color: AppColors.tertiaryColor),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: spacingAfterDescription),
+          SizedBox(height: screenHeight * 0.02),
+
+          // --- Scrollable Area (Fog Applied Here) ---
           Expanded(
-            // <<< DEĞİŞİKLİK: Ayrı bir stateful widget'a taşıdık >>>
-            child: _ScrollableListWithFog(
-              scrollController: widget.scrollController,
-              creditPackages: _creditPackages,
-              availableProducts: widget.availableProducts,
-              selectedCardIndex: _selectedCardIndex,
-              onCardSelected: (index, package) {
-                setState(() => _selectedCardIndex = index);
-                widget.onCreditPackageSelected?.call(package);
-              },
+            // The central ScrollFog widget now wraps ONLY the list view.
+            child: ScrollFog(
+              scrollController: widget.scrollController!,
+              fogColor: AppColors.background,
+              topFogHeight: screenHeight * 0.04,
+              bottomFogHeight: screenHeight * 0.07,
+              child: _CreditPackageListView(
+                creditPackages: _creditPackages,
+                availableProducts: widget.availableProducts,
+                selectedCardIndex: _selectedCardIndex,
+                scrollController: widget.scrollController,
+                onCardSelected: (index, package) {
+                  setState(() => _selectedCardIndex = index);
+                  widget.onCreditPackageSelected?.call(package);
+                },
+              ),
             ),
           ),
         ],
@@ -157,15 +160,17 @@ class _CreditContentWidgetState extends State<CreditContentWidget> {
   }
 }
 
-// <<< YENİ WIDGET: Scroll ve Fog mantığını yöneten lokal stateful widget >>>
-class _ScrollableListWithFog extends StatefulWidget {
+
+// This widget is now responsible ONLY for rendering the list and its internal animations (like the shine effect).
+// All fog logic has been removed and is now handled by the parent ScrollFog widget.
+class _CreditPackageListView extends StatefulWidget {
   final ScrollController? scrollController;
   final List<CreditPackage> creditPackages;
   final List<ProductDetails> availableProducts;
   final int? selectedCardIndex;
   final Function(int, CreditPackage) onCardSelected;
 
-  const _ScrollableListWithFog({
+  const _CreditPackageListView({
     required this.scrollController,
     required this.creditPackages,
     required this.availableProducts,
@@ -174,23 +179,19 @@ class _ScrollableListWithFog extends StatefulWidget {
   });
 
   @override
-  State<_ScrollableListWithFog> createState() => _ScrollableListWithFogState();
+  State<_CreditPackageListView> createState() => _CreditPackageListViewState();
 }
 
-class _ScrollableListWithFogState extends State<_ScrollableListWithFog> with SingleTickerProviderStateMixin {
-  bool _showBottomScrollFog = false;
-  bool _showTopScrollFog = false;
+class _CreditPackageListViewState extends State<_CreditPackageListView> with SingleTickerProviderStateMixin {
   late AnimationController _shineController;
   late Animation<double> _shineAnimation;
 
   @override
   void initState() {
     super.initState();
-    widget.scrollController?.addListener(_updateFogVisibility);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _updateFogVisibility());
-
     _shineController = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
     _shineAnimation = Tween<double>(begin: -1.5, end: 1.5).animate(CurvedAnimation(parent: _shineController, curve: Curves.linear));
+
     _shineController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         Future.delayed(const Duration(seconds: 1), () {
@@ -198,6 +199,7 @@ class _ScrollableListWithFogState extends State<_ScrollableListWithFog> with Sin
         });
       }
     });
+
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) _shineController.forward();
     });
@@ -205,36 +207,8 @@ class _ScrollableListWithFogState extends State<_ScrollableListWithFog> with Sin
 
   @override
   void dispose() {
-    widget.scrollController?.removeListener(_updateFogVisibility);
     _shineController.dispose();
     super.dispose();
-  }
-
-  void _updateFogVisibility() {
-    if (!mounted || widget.scrollController == null) return;
-    final controller = widget.scrollController!;
-
-    if (!controller.hasClients) {
-      if (_showBottomScrollFog || _showTopScrollFog) {
-        setState(() {
-          _showBottomScrollFog = false;
-          _showTopScrollFog = false;
-        });
-      }
-      return;
-    }
-
-    final bool shouldShowTop = controller.position.pixels > 10;
-    final bool shouldShowBottom =
-        controller.position.maxScrollExtent > 0 && controller.position.pixels < controller.position.maxScrollExtent - 10;
-
-    if (shouldShowTop != _showTopScrollFog || shouldShowBottom != _showBottomScrollFog) {
-      // Bu setState SADECE bu küçük widget'ı yeniden çizer, performansı etkilemez.
-      setState(() {
-        _showTopScrollFog = shouldShowTop;
-        _showBottomScrollFog = shouldShowBottom;
-      });
-    }
   }
 
   @override
@@ -244,134 +218,104 @@ class _ScrollableListWithFogState extends State<_ScrollableListWithFog> with Sin
     final screenHeight = screenSize.height;
     final localizations = AppLocalizations.of(context)!;
 
-    final double cardMarginVertical = screenHeight * 0.0075;
-    final double cardInnerPadding = screenWidth * 0.04;
-    final double iconSize = screenWidth * 0.1;
-    final double spacingBetweenIconAndText = screenWidth * 0.04;
-    final double spacingInCardText = screenHeight * 0.005;
-    final double cardTitleFontSize = screenWidth * 0.045;
-    final double cardPriceFontSize = screenWidth * 0.04;
+    return ListView.builder(
+      controller: widget.scrollController,
+      itemCount: widget.creditPackages.length,
+      padding: EdgeInsets.only(bottom: screenHeight * 0.02), // Add padding for better scroll end
+      itemBuilder: (context, index) {
+        final package = widget.creditPackages[index];
+        final isSelected = widget.selectedCardIndex == index;
 
-    return Stack(
-      children: [
-        ListView.builder(
-          controller: widget.scrollController,
-          itemCount: widget.creditPackages.length,
-          itemBuilder: (context, index) {
-            final package = widget.creditPackages[index];
-            final isSelected = widget.selectedCardIndex == index;
+        ProductDetails? productDetail;
+        try {
+          productDetail = widget.availableProducts.firstWhere((p) => p.id == package.productId);
+        } catch (e) {
+          productDetail = null;
+        }
 
-            ProductDetails? productDetail;
-            try {
-              productDetail = widget.availableProducts.firstWhere((p) => p.id == package.productId);
-            } catch (e) {
-              productDetail = null;
-            }
+        final String title = productDetail?.title ?? localizations.creditPackage(package.amount);
+        final String price = productDetail?.price ?? package.price;
 
-            final String title = productDetail?.title ?? localizations.creditPackage(package.amount);
-            final String price = productDetail?.price ?? package.price;
-
-            final cardContent = AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeInOut,
-              padding: EdgeInsets.all(cardInnerPadding),
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isSelected ? AppColors.primaryColor.inverted : AppColors.border,
-                  width: isSelected ? 2.0 : 1.0,
-                ),
+        final cardContent = AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          padding: EdgeInsets.all(screenWidth * 0.04),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isSelected ? AppColors.primaryColor.inverted : AppColors.border,
+              width: isSelected ? 2.0 : 1.0,
+            ),
+          ),
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/credit.svg',
+                width: screenWidth * 0.1,
+                height: screenWidth * 0.1,
+                colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
               ),
-              child: Row(
-                children: [
-                  SvgPicture.asset('assets/icons/credit.svg', width: iconSize, height: iconSize, color: AppColors.primaryColor.inverted),
-                  SizedBox(width: spacingBetweenIconAndText),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(title, style: TextStyle(fontSize: cardTitleFontSize, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted)),
-                        SizedBox(height: spacingInCardText),
-                        Text(price, style: TextStyle(fontSize: cardPriceFontSize, color: AppColors.tertiaryColor)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-
-            return GestureDetector(
-              onTap: () => widget.onCardSelected(index, package),
-              child: Container(
-                margin: EdgeInsets.symmetric(vertical: cardMarginVertical),
-                child: Stack(
+              SizedBox(width: screenWidth * 0.04),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    cardContent,
-                    Positioned.fill(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20.0),
-                        child: AnimatedBuilder(
-                          animation: _shineAnimation,
-                          builder: (context, child) => Transform.translate(offset: Offset(screenWidth * _shineAnimation.value, 0), child: child),
-                          child: Container(
-                            width: screenWidth * 0.25,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.centerLeft, end: Alignment.centerRight,
-                                colors: [ AppColors.secondaryColor.withValues(alpha: 0.0), AppColors.secondaryColor.withValues(alpha: 0.5), AppColors.secondaryColor.withValues(alpha: 0.0)],
-                                stops: const [0.4, 0.5, 0.6],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                    Text(
+                      title,
+                      style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
+                    ),
+                    SizedBox(height: screenHeight * 0.005),
+                    Text(
+                      price,
+                      style: TextStyle(fontSize: screenWidth * 0.04, color: AppColors.tertiaryColor),
                     ),
                   ],
                 ),
               ),
-            );
-          },
-        ),
-        Align(
-          alignment: Alignment.topCenter,
-          child: IgnorePointer(
-            child: AnimatedOpacity(
-              opacity: _showTopScrollFog ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 250),
-              child: Container(
-                height: screenHeight * 0.04,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter, end: Alignment.topCenter,
-                    colors: [AppColors.background.withValues(alpha: 0.0), AppColors.background],
-                    stops: const [0.0, 0.9],
+            ],
+          ),
+        );
+
+        return GestureDetector(
+          onTap: () => widget.onCardSelected(index, package),
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: screenHeight * 0.0075),
+            child: Stack(
+              children: [
+                cardContent,
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20.0),
+                    child: AnimatedBuilder(
+                      animation: _shineAnimation,
+                      builder: (context, child) => Transform.translate(
+                        offset: Offset(screenWidth * _shineAnimation.value, 0),
+                        child: child,
+                      ),
+                      child: Container(
+                        width: screenWidth * 0.25,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              AppColors.secondaryColor.withValues(alpha: 0.0),
+                              AppColors.secondaryColor.withValues(alpha: 0.5),
+                              AppColors.secondaryColor.withValues(alpha: 0.0),
+                            ],
+                            stops: const [0.4, 0.5, 0.6],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: IgnorePointer(
-            child: AnimatedOpacity(
-              opacity: _showBottomScrollFog ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 250),
-              child: Container(
-                height: screenHeight * 0.07,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                    colors: [AppColors.background.withValues(alpha: 0.0), AppColors.background],
-                    stops: const [0.0, 0.9],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }

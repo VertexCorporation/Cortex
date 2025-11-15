@@ -10,9 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../initialization.dart';
 import '../main.dart';
-import '../notifications.dart';
+import '../notifications/introvert.dart';
+import '../reconcile.dart';
+import '../screen.dart';
 import '../theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 
@@ -20,14 +21,14 @@ class EmailVerificationScreen extends StatefulWidget {
   final String email;
   final String username;
   final String userId;
-  final String password;
+  final String? password;
 
   const EmailVerificationScreen({
     super.key,
     required this.email,
     required this.username,
     required this.userId,
-    required this.password,
+    this.password,
   });
 
   @override
@@ -35,7 +36,7 @@ class EmailVerificationScreen extends StatefulWidget {
 }
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
-  late NotificationService _notificationService;
+  late IntrovertNotificationService _notificationService;
   static const int totalVerificationDuration = 86400;
   int _remainingSeconds = totalVerificationDuration;
   Timer? _countdownTimer;
@@ -81,7 +82,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       dev.log('[Continue] Unexpected error during navigation: $e', name: 'EmailVerification', error: e, stackTrace: st);
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
-        _notificationService.showNotification(message: l10n.authError, isSuccess: false);
+        _notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
         setState(() => _isContinuing = false);
         _startTimers();
       }
@@ -91,7 +92,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   @override
   void initState() {
     super.initState();
-    _notificationService = Provider.of<NotificationService>(context, listen: false);
+    _notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
     _initializeRemainingTime();
     _startTimers();
   }
@@ -244,7 +245,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         _notificationService.showNotification(
           message: l10n.maxResendLimitReached,
           bottomOffset: 0.02,
-          isSuccess: false,
+          type: NotificationType.error,
         );
         return;
       }
@@ -258,19 +259,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       await _initializeRemainingTime();
       _notificationService.showNotification(
         message: l10n.linkSent,
-        isSuccess: true,
+        type: NotificationType.success,
         bottomOffset: 0.02,
       );
     } on FirebaseAuthException catch (e) {
       dev.log('Error resending verification email: ${e.code}', name: 'EmailVerification', error: e);
       if (e.code == 'too-many-requests') {
-        _notificationService.showNotification(message: l10n.tooManyRequests, isSuccess: false, bottomOffset: 0.02);
+        _notificationService.showNotification(message: l10n.tooManyRequests, type: NotificationType.error, bottomOffset: 0.02);
       } else {
-        _notificationService.showNotification(message: '${l10n.authError}: ${e.message}', isSuccess: false, bottomOffset: 0.02);
+        _notificationService.showNotification(message: '${l10n.authError}: ${e.message}', type: NotificationType.error, bottomOffset: 0.02);
       }
     } catch (e) {
       dev.log('Unknown error during resend: $e', name: 'EmailVerification', error: e);
-      _notificationService.showNotification(message: l10n.authError, isSuccess: false, bottomOffset: 0.02);
+      _notificationService.showNotification(message: l10n.authError, type: NotificationType.error, bottomOffset: 0.02);
     } finally {
       if (mounted) {
         setState(() => _isResendLoading = false);

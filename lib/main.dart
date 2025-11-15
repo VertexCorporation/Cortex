@@ -1,33 +1,46 @@
 // main.dart
 //
-// The primary entry point for the Cortex application. This file is responsible for
-// setting up essential services, providers, and launching the core application structure.
-// It performs minimal, fast setup and delegates all UI rendering to 'app.dart'.
+// Entry point and global bootstrapping for Cortex.
+// - Initializes Firebase, Crashlytics, messaging, time zones, and orientation.
+// - Performs a lightweight bootstrap (onboarding state, initial auth state, theme).
+// - Wires up all core, settings, chat and library providers.
+// - Hosts the root [Cortex] widget and [AppLifecycleManager].
+//
 
+import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:cortex/app.dart';
-import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/screen.dart';
 import 'package:cortex/server/credits.dart';
 import 'package:cortex/server/user.dart';
+import 'package:cortex/settings/providers/actions.dart';
+import 'package:cortex/settings/providers/general.dart';
+import 'package:cortex/settings/services/auth.dart';
+import 'package:cortex/settings/services/profile.dart';
+import 'package:dio/dio.dart';
+import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
+
 import 'banner.dart';
 import 'chat/providers/conversation.dart';
 import 'chat/providers/input.dart';
 import 'chat/providers/session.dart';
-import 'chat/screen/unselected/news.dart';
+import 'chat/screen/unselected/widgets/news/service.dart';
 import 'chat/services/api.dart';
 import 'chat/services/context.dart';
 import 'chat/services/database.dart';
-import 'chat/services/load.dart';
 import 'chat/services/offline.dart';
 import 'chat/services/read.dart';
 import 'chat/services/recent.dart';
@@ -38,160 +51,567 @@ import 'chat/services/select.dart';
 import 'chat/services/send.dart';
 import 'chat/services/stop.dart';
 import 'chat/screen/selected/dynamic.dart';
+import 'inbox/providers/general.dart';
 import 'initialization.dart';
 import 'internet.dart';
 import 'language.dart';
-import 'models/backend/download.dart';
-import 'notifications.dart';
+import 'library/backend/data/repository.dart';
+import 'library/backend/data/service.dart';
+import 'library/backend/download/download.dart';
+import 'library/providers/catalog.dart';
+import 'library/providers/local.dart';
+import 'lifecycle.dart';
+import 'notifications/extrovert.dart';
+import 'notifications/introvert.dart';
 import 'theme.dart';
 
-// Global keys for accessing specific widget states across the application.
-// These are defined here to be passed down to the UI layer.
+/// Global keys used across the app.
+///
+/// [mainScreenKey] lets services (like [AppLifecycleManager]) trigger
+/// actions on the main screen (e.g., start a new conversation).
 final GlobalKey<MainScreenState> mainScreenKey = GlobalKey<MainScreenState>();
+
+/// Global navigator key to allow navigation from services without BuildContext.
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-/// A top-level function for the Flutter Downloader background isolate.
+/// FlutterDownloader callback entry point.
+/// This must be a top-level function and annotated with `@pragma('vm:entry-point')`.
 @pragma('vm:entry-point')
 void downloadCallback(String id, int status, int progress) {
-  final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
-  send?.send([id, status, progress]);
+  final SendPort? sendPort =
+  IsolateNameServer.lookupPortByName('downloader_send_port');
+  sendPort?.send(<dynamic>[id, status, progress]);
 }
 
-/// A simple state manager for the selected tab index of the bottom navigation bar.
+/// Simple provider to track the currently selected bottom navigation tab.
 class TabProvider with ChangeNotifier {
   int _selectedIndex = 0;
+
   int get selectedIndex => _selectedIndex;
 
   void setSelectedIndex(int index) {
-    if (_selectedIndex != index) {
-      _selectedIndex = index;
-      notifyListeners();
-    }
+    if (_selectedIndex == index) return;
+    _selectedIndex = index;
+    notifyListeners();
   }
 }
 
-/// The main entry point of the application.
-/// It performs a rapid, synchronous check for a cached user session,
-/// sets up all necessary background services and providers, and then
-/// launches the UI defined in `app.dart`.
-Future<void> main() async {
-  debugPrint("App: Starting application setup.");
+/// Data returned from the initial bootstrap phase.
+class BootstrapResult {
+  final AppStatus initialStatus;
+  final String initialTheme;
+
+  BootstrapResult({
+    required this.initialStatus,
+    required this.initialTheme,
+  });
+}
+
+/// Performs all pre-UI bootstrapping:
+/// - Firebase initialization
+/// - Crashlytics + global error wiring
+/// - FCM background handler registration
+/// - Reading onboarding + auth status
+/// - Choosing initial theme
+/// - Orientation lock
+class AppBootstrap {
+  static Future<BootstrapResult> init() async {
+    // 1. Initialize Firebase once.
+    await Firebase.initializeApp();
+
+    // 2. Wire Crashlytics + global error handlers.
+    final FlutterExceptionHandler? originalOnError = FlutterError.onError;
+    FlutterError.onError = (FlutterErrorDetails details) {
+      final Object exception = details.exception;
+      final String exceptionString = exception.toString();
+
+      final bool isBenignNetworkImageError =
+          details.library == 'image resource service' &&
+              exceptionString.contains('Connection closed while receiving data');
+
+      if (isBenignNetworkImageError) {
+        debugPrint(
+          '[AppBootstrap] Ignoring benign network image error: $exceptionString',
+        );
+
+        if (!kReleaseMode) {
+          (originalOnError ?? FlutterError.dumpErrorToConsole)(details);
+        }
+        return;
+      }
+
+      FirebaseCrashlytics.instance.recordFlutterError(details);
+
+      (originalOnError ?? FlutterError.dumpErrorToConsole)(details);
+    };
+
+    PlatformDispatcher.instance.onError = (error, stack) {
+      // Known "non-fatal" app-level exceptions that we can quietly swallow.
+      if (error is ApiException || error is UserCancelledException) {
+        return true;
+      }
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
+      return true;
+    };
+
+    // 3. Register background message handler for FCM.
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+    // 4. Load shared preferences once and reuse.
+    final prefs = await SharedPreferences.getInstance();
+
+    final bool hasCompletedOnboarding =
+        prefs.getBool('has_completed_onboarding') ?? false;
+
+    // Determine initial app status:
+    // - If onboarding is not completed → onboarding flow.
+    // - If completed but no Firebase user → login.
+    // - If completed and user exists → full initialization.
+    late final AppStatus initialStatus;
+
+    if (!hasCompletedOnboarding) {
+      initialStatus = AppStatus.needsOnboarding;
+    } else {
+      final initialUser = FirebaseAuth.instance.currentUser;
+      initialStatus =
+      initialUser == null ? AppStatus.needsLogin : AppStatus.initializing;
+    }
+
+    // 5. Lock orientation to portrait.
+    await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    // 6. Determine initial theme from preferences or system brightness.
+    final savedTheme = prefs.getString('selectedTheme');
+    final String initialTheme = savedTheme ??
+        (PlatformDispatcher.instance.platformBrightness == Brightness.dark
+            ? 'dark'
+            : 'light');
+
+    return BootstrapResult(
+      initialStatus: initialStatus,
+      initialTheme: initialTheme,
+    );
+  }
+}
+
+/// Application entry point.
+///
+/// Keeps the main setup ultra-light:
+/// - Ensures widgets binding
+/// - Preserves the native splash
+/// - Initializes time zones
+/// - Boots the [AppGatekeeper], which does the heavy lifting via a FutureBuilder.
+void main() {
+  final WidgetsBinding widgetsBinding =
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Keep native splash until we're sure about the first real frame.
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  // Initialize time zones (for notifications, scheduling, etc.).
   tz.initializeTimeZones();
 
-  final binding = WidgetsFlutterBinding.ensureInitialized();
+  runApp(const AppGatekeeper());
+}
 
-  // Initialize Firebase, essential for auth checks and background messaging.
-  await Firebase.initializeApp();
+/// Top-level widget responsible for:
+/// - Running the bootstrap once
+/// - Building the provider tree
+/// - Injecting [AppLifecycleManager] into [Cortex].
+class AppGatekeeper extends StatelessWidget {
+  const AppGatekeeper({super.key});
 
-  // Configure global error handlers to report to Crashlytics.
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
+  /// Cached bootstrap future to avoid re-running initialization on hot reload
+  /// or rebuilds of [FutureBuilder].
+  static final Future<BootstrapResult> _bootstrapFuture =
+  AppBootstrap.init();
 
-  // Set up the background message handler.
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<BootstrapResult>(
+      future: _bootstrapFuture,
+      builder: (BuildContext context, AsyncSnapshot<BootstrapResult> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            // A minimal, non-crashing UI for bootstrap errors.
+            return MaterialApp(
+              home: Scaffold(
+                body: Center(
+                  child: Text('Bootstrap error: ${snapshot.error}'),
+                ),
+              ),
+            );
+          }
 
-  // Perform a fast, synchronous check of the locally cached user token.
-  // This does NOT involve a network request and prevents UI flash.
-  final initialUser = FirebaseAuth.instance.currentUser;
-  final initialStatus = initialUser == null
-      ? AppStatus.needsLogin
-      : AppStatus.initializing;
-  debugPrint("App: Pre-runApp check complete. Initial status: $initialStatus");
+          final bootstrap = snapshot.data!;
 
-  // Enforce portrait orientation.
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+          return MultiProvider(
+            providers: <SingleChildWidget>[
+              ..._buildCoreProviders(
+                bootstrap.initialStatus,
+                bootstrap.initialTheme,
+              ),
+              ..._buildSettingsProviders(),
+              ..._buildChatAndLibraryProviders(),
+            ],
+            child: Cortex(
+              navigatorKey: navigatorKey,
+              startupScreen: const AppLifecycleManager(),
+            ),
+          );
+        }
 
-  // Load saved theme preference before the UI builds.
-  final prefs = await SharedPreferences.getInstance();
-  final savedTheme = prefs.getString('selectedTheme');
-  final initialTheme = savedTheme ?? (PlatformDispatcher.instance.platformBrightness == Brightness.dark ? 'dark' : 'light');
-  debugPrint("App: Using theme: $initialTheme");
+        // While bootstrapping we keep the native splash visible and render nothing.
+        return const SizedBox.shrink();
+      },
+    );
+  }
+}
 
-  // Pre-load localizations to avoid any flicker.
-  await AppLocalizations.delegate.load(
-    binding.platformDispatcher.locale,
-  );
-
-  // Launch the application by providing the providers and running the Cortex widget.
-  runApp(
-    MultiProvider(
-      providers: [
-        //======================================================================
-        // SECTION 1: CORE & APP-WIDE PROVIDERS
-        //======================================================================
-        ChangeNotifierProvider(create: (_) => InternetProvider()),
-        ChangeNotifierProvider(create: (_) => UserProvider()),
-        Provider<NotificationService>(create: (_) => NotificationService(navigatorKey: navigatorKey)),
-        Provider<CreditsManager>.value(value: CreditsManager.instance),
-        ChangeNotifierProvider(create: (_) => AppInitializer(initialStatus)),
-        ChangeNotifierProvider(create: (_) => NewsService()),
-        ChangeNotifierProvider(create: (_) => FileDownloadHelper()),
-        ChangeNotifierProvider(create: (_) => ThemeProvider(initialTheme)),
-        ChangeNotifierProvider(create: (_) => LocaleProvider()),
-        ChangeNotifierProvider(create: (_) => DownloadedModelsManager()),
-        ChangeNotifierProvider(create: (_) => TabProvider()),
-        Provider<RecentModelsManager>(create: (_) => RecentModelsManager()),
-        Provider<DbHelper>(create: (_) => DbHelper()),
-        Provider<BannerService>(create: (_) => BannerService()),
-
-        //======================================================================
-        // SECTION 2: CHAT FEATURE PROVIDERS (STATE & SERVICES)
-        //======================================================================
-
-        // State Providers
-        ChangeNotifierProxyProvider<UserProvider, ChatSessionProvider>(
-          create: (_) => ChatSessionProvider(),
-          update: (_, userProvider, previousSessionProvider) {
-            if (userProvider.userData != null) {
-              previousSessionProvider!.updateUserData(userProvider.userData!);
-            }
-            return previousSessionProvider!;
-          },
-        ),
-        ChangeNotifierProvider(create: (_) => ConversationProvider()),
-        ChangeNotifierProvider(create: (_) => InputProvider()),
-
-        // Foundational Services
-        Provider<ScrollService>(create: (_) => ScrollService()),
-        Provider<ApiService>(create: (_) => ApiService()),
-        Provider<DynamicChatService>(create: (context) => DynamicChatService(context.read<ChatSessionProvider>())),
-
-        // Services with Dependencies
-        Provider<ResponseService>(create: (context) => ResponseService(conversationProvider: context.read<ConversationProvider>(), scrollService: context.read<ScrollService>())),
-        Provider<OfflineService>(create: (context) => OfflineService(responseService: context.read<ResponseService>(), sessionProvider: context.read<ChatSessionProvider>())),
-        Provider<SelectionService>(create: (context) => SelectionService(sessionProvider: context.read<ChatSessionProvider>(), conversationProvider: context.read<ConversationProvider>())),
-        Provider<ContextService>(create: (context) => ContextService(sessionProvider: context.read<ChatSessionProvider>(), conversationProvider: context.read<ConversationProvider>())),
-        Provider<LoadService>(create: (context) => LoadService(sessionProvider: context.read<ChatSessionProvider>(), selectionService: context.read<SelectionService>())),
-        Provider<ReadService>(create: (context) => ReadService(sessionProvider: context.read<ChatSessionProvider>(), conversationProvider: context.read<ConversationProvider>(), loadService: context.read<LoadService>())),
-        Provider<SendService>(create: (context) => SendService(sessionProvider: context.read<ChatSessionProvider>(), conversationProvider: context.read<ConversationProvider>(), inputProvider: context.read<InputProvider>(), apiService: context.read<ApiService>(), contextService: context.read<ContextService>(), scrollService: context.read<ScrollService>(), recentModelsManager: context.read<RecentModelsManager>(), offlineService: context.read<OfflineService>())),
-        Provider<StopService>(create: (context) => StopService(
-            conversationProvider: context.read<ConversationProvider>(),
-            sessionProvider: context.read<ChatSessionProvider>(),
-            apiService: context.read<ApiService>(),
-            offlineService: context.read<OfflineService>()
-        )),
-        Provider<RegenerateService>(
-          create: (context) => RegenerateService(
-            conversationProvider: context.read<ConversationProvider>(),
-            stopService: context.read<StopService>(),
-            sendService: context.read<SendService>(),
-            scrollService: context.read<ScrollService>(),
+/// Core app-wide providers: networking, localization, connectivity, auth,
+/// models, initialization, notifications, theming, and storage helpers.
+List<SingleChildWidget> _buildCoreProviders(
+    AppStatus initialStatus,
+    String initialTheme,
+    ) {
+  return <SingleChildWidget>[
+    // Global Dio instance with Smart Retry.
+    Provider<Dio>(
+      create: (_) {
+        final dio = Dio(
+          BaseOptions(
+            connectTimeout: const Duration(seconds: 15),
+            receiveTimeout: const Duration(seconds: 30),
           ),
-          lazy: true,
-        ),
-      ],
-      // The root widget of the application is now Cortex from app.dart
-      child: Cortex(
-        navigatorKey: navigatorKey,
-        startupScreen: const AppLifecycleManager(),
+        );
+
+        dio.interceptors.add(
+          RetryInterceptor(
+            dio: dio,
+            logPrint: (Object msg) =>
+                debugPrint('[DioRetry-Global] $msg'),
+            retries: 5,
+            retryDelays: const <Duration>[
+              Duration(seconds: 1),
+              Duration(seconds: 3),
+              Duration(seconds: 5),
+              Duration(seconds: 7),
+              Duration(seconds: 9),
+            ],
+          ),
+        );
+
+        return dio;
+      },
+    ),
+
+    // Locale & connectivity.
+    ChangeNotifierProvider<LocaleProvider>(
+      create: (_) => LocaleProvider(),
+    ),
+    ChangeNotifierProvider<InternetProvider>(
+      create: (_) => InternetProvider(),
+    ),
+
+    // User data & credits.
+    ChangeNotifierProvider<UserProvider>(
+      create: (_) => UserProvider(),
+    ),
+    Provider<CreditsManager>.value(
+      value: CreditsManager.instance,
+    ),
+
+    // Auth & notifications.
+    Provider<AuthService>(
+      create: (_) => AuthService(),
+    ),
+    Provider<ExtrovertNotificationService>(
+      create: (_) =>
+          ExtrovertNotificationService(navigatorKey: navigatorKey),
+    ),
+    Provider<IntrovertNotificationService>(
+      create: (_) =>
+          IntrovertNotificationService(navigatorKey: navigatorKey),
+    ),
+
+    // Model repository + service.
+    Provider<ModelRepository>(
+      create: (BuildContext context) => ModelRepository(
+        dio: context.read<Dio>(),
       ),
     ),
-  );
-  debugPrint("App: Minimal setup complete. UI rendering and heavy lifting delegated.");
+    ChangeNotifierProvider<ModelService>(
+      create: (BuildContext context) => ModelService(
+        repository: context.read<ModelRepository>(),
+      ),
+    ),
+
+    // App initializer orchestrates startup + auth + lifecycle gatekeeping.
+    ChangeNotifierProvider<AppInitializer>(
+      create: (BuildContext context) => AppInitializer(
+        initialStatus: initialStatus,
+        authService: context.read<AuthService>(),
+        modelService: context.read<ModelService>(),
+        extrovertNotificationService:
+        context.read<ExtrovertNotificationService>(),
+        introvertNotificationService:
+        context.read<IntrovertNotificationService>(),
+        internetProvider: context.read<InternetProvider>(),
+        userProvider: context.read<UserProvider>(),
+      ),
+    ),
+
+    // News service depends on AppInitializer + Dio + connectivity.
+    ChangeNotifierProxyProvider3<AppInitializer, Dio, InternetProvider,
+        NewsService>(
+      create: (BuildContext context) => NewsService(
+        appInitializer: context.read<AppInitializer>(),
+        dio: context.read<Dio>(),
+        internetProvider: context.read<InternetProvider>(),
+      ),
+      update: (
+          BuildContext _,
+          AppInitializer appInit,
+          Dio dio,
+          InternetProvider internet,
+          NewsService? previous,
+          ) {
+        final service = previous ??
+            NewsService(
+              appInitializer: appInit,
+              dio: dio,
+              internetProvider: internet,
+            );
+        service.updateDependencies(
+          appInitializer: appInit,
+          dio: dio,
+          internetProvider: internet,
+        );
+        return service;
+      },
+    ),
+
+    // Downloads, theming, tab navigation, database, and banners.
+    ChangeNotifierProvider<FileDownloadHelper>(
+      create: (_) => FileDownloadHelper(),
+    ),
+    ChangeNotifierProvider<ThemeProvider>(
+      create: (_) => ThemeProvider(initialTheme),
+    ),
+    ChangeNotifierProvider<TabProvider>(
+      create: (_) => TabProvider(),
+    ),
+    Provider<DbHelper>(
+      create: (_) => DbHelper(),
+    ),
+    Provider<BannerService>(
+      create: (_) => BannerService(),
+    ),
+  ];
+}
+
+/// Settings-related providers (profile, general settings and actions).
+List<SingleChildWidget> _buildSettingsProviders() {
+  return <SingleChildWidget>[
+    Provider<ProfileService>(
+      create: (_) => ProfileService(),
+    ),
+    ChangeNotifierProxyProvider<InternetProvider, SettingsGeneralProvider>(
+      create: (BuildContext context) => SettingsGeneralProvider(
+        authService: context.read<AuthService>(),
+        profileService: context.read<ProfileService>(),
+        notificationService: context.read<IntrovertNotificationService>(),
+      ),
+      update: (
+          BuildContext context,
+          InternetProvider internetProvider,
+          SettingsGeneralProvider? previous,
+          ) {
+        final provider = previous ??
+            SettingsGeneralProvider(
+              authService: context.read<AuthService>(),
+              profileService: context.read<ProfileService>(),
+              notificationService:
+              context.read<IntrovertNotificationService>(),
+            );
+        provider.updateConnectivity(internetProvider);
+        return provider;
+      },
+    ),
+    ChangeNotifierProvider<SettingsActionProvider>(
+      create: (BuildContext context) => SettingsActionProvider(
+        authService: context.read<AuthService>(),
+        profileService: context.read<ProfileService>(),
+        notificationService: context.read<IntrovertNotificationService>(),
+        appInitializer: context.read<AppInitializer>(),
+        internetProvider: context.read<InternetProvider>(),
+      ),
+    ),
+  ];
+}
+
+/// Chat and model-library providers:
+/// - Model catalog + local state
+/// - Chat session + conversation + input
+/// - Recent models, API, scroll, dynamic chat
+/// - Response, context, offline, selection, read, send, stop, regenerate
+List<SingleChildWidget> _buildChatAndLibraryProviders() {
+  return <SingleChildWidget>[
+    // Inbox, Model catalog and local state.
+    ChangeNotifierProvider<InboxViewModel>(
+      create: (BuildContext context) {
+        final vm = InboxViewModel(
+          modelService: context.read<ModelService>(),
+          notificationService: context.read<IntrovertNotificationService>(),
+        );
+
+        final langCode =
+            context.read<LocaleProvider>().locale.languageCode;
+        scheduleMicrotask(() => vm.initialize(langCode));
+
+        return vm;
+      },
+    ),
+    ChangeNotifierProvider<ModelCatalogProvider>(
+      create: (_) => ModelCatalogProvider(),
+    ),
+    ChangeNotifierProvider<DownloadedModelsManager>(
+      create: (_) => DownloadedModelsManager(),
+    ),
+    ChangeNotifierProxyProvider<ModelCatalogProvider, ModelLocalStateProvider>(
+      create: (BuildContext context) {
+        final provider = ModelLocalStateProvider();
+        provider.initialize(context: context);
+        return provider;
+      },
+      update: (
+          BuildContext context,
+          ModelCatalogProvider catalog,
+          ModelLocalStateProvider? local,
+          ) {
+        final localState = local ?? ModelLocalStateProvider();
+        localState.update(catalog.allModels);
+        return localState;
+      },
+    ),
+
+    // Chat session.
+    ChangeNotifierProxyProvider3<UserProvider, ModelService,
+        ModelLocalStateProvider, ChatSessionProvider>(
+      create: (BuildContext context) => ChatSessionProvider(
+        modelService: context.read<ModelService>(),
+      ),
+      update: (
+          BuildContext _,
+          UserProvider user,
+          ModelService modelService,
+          ModelLocalStateProvider local,
+          ChatSessionProvider? previous,
+          ) {
+        final session =
+            previous ?? ChatSessionProvider(modelService: modelService);
+        session.setDependencies(local);
+
+        if (user.userData != null) {
+          session.updateUserData(user.userData!);
+        }
+        return session;
+      },
+    ),
+
+    // Conversation + input.
+    ChangeNotifierProvider<ConversationProvider>(
+      create: (_) => ConversationProvider(),
+    ),
+    ChangeNotifierProvider<InputProvider>(
+      create: (_) => InputProvider(),
+    ),
+
+    // Recent models.
+    Provider<RecentModelsManager>(
+      create: (BuildContext context) => RecentModelsManager(
+        modelService: context.read<ModelService>(),
+      ),
+    ),
+
+    // Core chat services.
+    Provider<ApiService>(
+      create: (_) => ApiService(),
+    ),
+    Provider<ScrollService>(
+      create: (_) => ScrollService(),
+    ),
+    Provider<DynamicChatService>(
+      create: (BuildContext context) =>
+          DynamicChatService(context.read<ChatSessionProvider>()),
+    ),
+    Provider<ResponseService>(
+      create: (BuildContext context) => ResponseService(
+        conversationProvider: context.read<ConversationProvider>(),
+        scrollService: context.read<ScrollService>(),
+      ),
+    ),
+    Provider<ContextService>(
+      create: (BuildContext context) => ContextService(
+        sessionProvider: context.read<ChatSessionProvider>(),
+        conversationProvider: context.read<ConversationProvider>(),
+        modelService: context.read<ModelService>(),
+      ),
+    ),
+    Provider<OfflineService>(
+      create: (BuildContext context) => OfflineService(
+        responseService: context.read<ResponseService>(),
+        sessionProvider: context.read<ChatSessionProvider>(),
+        modelService: context.read<ModelService>(),
+        contextService: context.read<ContextService>(),
+      ),
+    ),
+    Provider<SelectionService>(
+      create: (BuildContext context) => SelectionService(
+        sessionProvider: context.read<ChatSessionProvider>(),
+        conversationProvider: context.read<ConversationProvider>(),
+        modelService: context.read<ModelService>(),
+      ),
+    ),
+    Provider<ReadService>(
+      create: (BuildContext context) => ReadService(
+        sessionProvider: context.read<ChatSessionProvider>(),
+        conversationProvider: context.read<ConversationProvider>(),
+        modelService: context.read<ModelService>(),
+      ),
+    ),
+    Provider<SendService>(
+      create: (BuildContext context) => SendService(
+        sessionProvider: context.read<ChatSessionProvider>(),
+        conversationProvider: context.read<ConversationProvider>(),
+        inputProvider: context.read<InputProvider>(),
+        apiService: context.read<ApiService>(),
+        contextService: context.read<ContextService>(),
+        scrollService: context.read<ScrollService>(),
+        recentModelsManager: context.read<RecentModelsManager>(),
+        offlineService: context.read<OfflineService>(),
+        modelService: context.read<ModelService>(),
+      ),
+    ),
+    Provider<StopService>(
+      create: (BuildContext context) => StopService(
+        conversationProvider: context.read<ConversationProvider>(),
+        sessionProvider: context.read<ChatSessionProvider>(),
+        apiService: context.read<ApiService>(),
+        offlineService: context.read<OfflineService>(),
+        modelService: context.read<ModelService>(),
+      ),
+    ),
+    Provider<RegenerateService>(
+      create: (BuildContext context) => RegenerateService(
+        conversationProvider: context.read<ConversationProvider>(),
+        stopService: context.read<StopService>(),
+        sendService: context.read<SendService>(),
+        scrollService: context.read<ScrollService>(),
+      ),
+    ),
+  ];
 }

@@ -2031,4 +2031,62 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get newsErrorMessage =>
       'Si è verificato un problema durante il recupero degli ultimi aggiornamenti. Controlla la connessione e riprova.';
+
+  @override
+  String get codeNotFound => 'Il codice inserito non è valido o è scaduto.';
+
+  @override
+  String get whatIsNew => 'Cosa c\'è di nuovo?';
+
+  @override
+  String get onboardingTitle1 => 'Ciao! Siamo il Cortex Team.';
+
+  @override
+  String onboardingDesc1(String userName) {
+    return 'È fantastico vederti qui, $userName. Siamo un gruppo di sviluppatori delle scuole superiori che hanno deciso di riscrivere le regole del settore dell\'intelligenza artificiale. È un piacere conoscerti! Impariamo a conoscerci meglio.';
+  }
+
+  @override
+  String get onboardingTitle2 => 'C\'erano enormi problemi.';
+
+  @override
+  String get onboardingDesc2 =>
+      'La rivoluzione dell\'intelligenza artificiale è arrivata, ma è rimasta bloccata sulla soglia. Con abbonamenti elevati, piattaforme complesse, chi viola la privacy e chi blocca l\'accesso all\'intelligenza artificiale... finché loro sono rimasti nel gioco, questa soglia non poteva essere superata.';
+
+  @override
+  String get onboardingTitle3 => 'Non potevamo restare a guardare.';
+
+  @override
+  String get onboardingDesc3 =>
+      'Per superare questa soglia, abbiamo creato una piattaforma potente, esteticamente gradevole, personalizzabile, facile da usare, completamente trasparente, che funziona sia online che offline e conserva i tuoi dati solo sul tuo dispositivo. Abbiamo restituito il potere a chi lo merita: a te.';
+
+  @override
+  String get onboardingTitle4 => 'Non è mai stato facile.';
+
+  @override
+  String get onboardingDesc4 =>
+      'Siamo stati respinti decine di volte, sospesi più volte, abbiamo ricevuto falsi avvertimenti e abbiamo dovuto cambiare il nostro marchio decine di volte. In tutto questo, e anche di più, ci è stato detto che non si poteva fare. Ma non ci siamo mai arresi, convinti che questo progetto appartenga a tutti, non solo a noi. Ed è esattamente per questo che siamo qui.';
+
+  @override
+  String get onboardingFinalTitle => 'È tempo di una rivoluzione.';
+
+  @override
+  String get onboardingFinalDesc =>
+      'Se vedete questa schermata, è perché non ci siamo arresi. E non abbiamo alcuna intenzione di arrenderci. Forza, portiamo insieme la rivoluzione dell\'intelligenza artificiale nel mondo. Per far parte di questa storia...';
+
+  @override
+  String get onboardingFinalQuestion => 'SEI PRONTO?';
+
+  @override
+  String get onboardingFinalButton => 'SÌ!';
+
+  @override
+  String get dude => 'Tizio';
+
+  @override
+  String get swipeToContinue => 'Scorri per continuare';
+
+  @override
+  String get cacheIsNotUpToDate =>
+      'La cache del Play Store non è aggiornata. Chiudi e riapri l\'app Play Store oppure riavvia il dispositivo.';
 }

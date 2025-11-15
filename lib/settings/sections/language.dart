@@ -1,119 +1,56 @@
-// sections/language.dart
+// lib/settings/sections/language.dart
 
-import 'package:cortex/app.dart';
-import 'package:cortex/theme.dart'; // For your application's theme settings
-import 'package:flutter/foundation.dart'; // For kDebugModes
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart'; // For SVG icons
-import 'package:google_fonts/google_fonts.dart'; // For custom fonts
-import 'package:cortex/l10n/app_localizations.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../app.dart';
 import '../../darkener.dart';
-import '../../models/backend/data/data.dart'; // For localization
+import '../../l10n/app_localizations.dart';
+import '../../language.dart';
+import '../../library/providers/catalog.dart';
+import '../../theme.dart';
 
-/// A widget that manages the app language selection section in the settings screen.
+/// A widget that manages the app language selection in the settings screen.
 ///
-/// This widget provides a UI for the user to select the application language.
-/// When the language selection is initiated, a dialog is displayed listing the available languages.
-class AppLanguageSection extends StatefulWidget {
-  /// Contains the necessary strings for localization.
-  final AppLocalizations appLocalizations;
+/// This component is a consumer of `LocaleProvider` to get the current language
+/// and trigger language changes. It presents the user with a polished dialog to
+/// select from a list of available application languages.
+class AppLanguageSection extends StatelessWidget {
+  const AppLanguageSection({super.key});
 
-  /// The code of the currently selected language (e.g., 'en', 'tr').
-  final String selectedLanguageCode;
-
-  /// Callback function that is invoked when the language is changed.
-  /// It receives the code of the newly selected language as a parameter.
-  final Function(String) onLanguageChanged;
-
-  /// Indicates whether a dialog is currently open.
-  /// Used to prevent multiple dialogs from opening simultaneously.
-  final bool isDialogOpen;
-
-  /// Callback to notify the parent widget about the dialog's open/close state.
-  final Function(bool) onDialogStateChanged;
-
-  const AppLanguageSection({
-    super.key,
-    required this.appLocalizations,
-    required this.selectedLanguageCode,
-    required this.onLanguageChanged,
-    required this.isDialogOpen,
-    required this.onDialogStateChanged,
-  });
-
-  @override
-  AppLanguageSectionState createState() => AppLanguageSectionState();
-}
-
-class AppLanguageSectionState extends State<AppLanguageSection> {
   /// Returns the localized language name corresponding to the given language code.
-  /// Returns the localized language name corresponding to the given language code.
-  String _getLocalizedLanguageName(String code) {
-    if (kDebugMode) {
-      print('[AppLanguageSection] _getLocalizedLanguageName called for code: $code');
-    }
+  String _getLocalizedLanguageName(AppLocalizations localizations, String code) {
     switch (code) {
-      case 'en':
-        return widget.appLocalizations.english;
-      case 'tr':
-        return widget.appLocalizations.turkish;
-      case 'zh':
-        return widget.appLocalizations.chinese;
-      case 'fr':
-        return widget.appLocalizations.french;
-    // --- NEW CASES ADDED HERE ---
-      case 'hi':
-        return widget.appLocalizations.hindi;
-      case 'pt':
-        return widget.appLocalizations.portuguese;
-      case 'id':
-        return widget.appLocalizations.indonesian;
-      case 'az':
-        return widget.appLocalizations.azerbaijani;
-      case 'de':
-        return widget.appLocalizations.german;
-      case 'es':
-        return widget.appLocalizations.spanish;
-      case 'it':
-        return widget.appLocalizations.italian;
-      case 'ja':
-        return widget.appLocalizations.japanese;
-      case 'ku':
-        return widget.appLocalizations.kurdish;
-      case 'nl':
-        return widget.appLocalizations.dutch;
-      case 'ru':
-        return widget.appLocalizations.russian;
-      case 'ko':
-        return widget.appLocalizations.korean;
-      default:
-        if (kDebugMode) {
-          print('[AppLanguageSection] Unknown language code: $code, returning code itself.');
-        }
-        return code; // Fallback for any unknown codes
+      case 'en': return localizations.english;
+      case 'tr': return localizations.turkish;
+      case 'zh': return localizations.chinese;
+      case 'fr': return localizations.french;
+      case 'hi': return localizations.hindi;
+      case 'pt': return localizations.portuguese;
+      case 'id': return localizations.indonesian;
+      case 'az': return localizations.azerbaijani;
+      case 'de': return localizations.german;
+      case 'es': return localizations.spanish;
+      case 'it': return localizations.italian;
+      case 'ja': return localizations.japanese;
+      case 'ku': return localizations.kurdish;
+      case 'nl': return localizations.dutch;
+      case 'ru': return localizations.russian;
+      case 'ko': return localizations.korean;
+      default: return code; // Fallback for unknown codes
     }
   }
 
-
-  /// Displays the language selection dialog.
-  Future<void> _showLanguageSelectionDialog() async {
-    if (widget.isDialogOpen) {
-      if (kDebugMode) {
-        print('[AppLanguageSection] Language selection dialog requested, but another dialog is already open.');
-      }
-      return;
-    }
-    widget.onDialogStateChanged(true); // Notify that a dialog is opening
-    if (kDebugMode) {
-      print('[AppLanguageSection] Showing language selection dialog.');
-    }
-
-    final appLocalizations = widget.appLocalizations;
+  /// Displays the language selection dialog, featuring a custom design with icons
+  /// and ripple effects for an enhanced user experience.
+  Future<void> _showLanguageSelectionDialog(BuildContext context) async {
+    final localeProvider = context.read<LocaleProvider>();
+    final appLocalizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final modelCatalogProvider = context.read<ModelCatalogProvider>();
 
-    // List of supported languages. Each entry contains a code and its localized name.
     final languages = [
       {'code': 'en', 'name': appLocalizations.english},
       {'code': 'tr', 'name': appLocalizations.turkish},
@@ -133,49 +70,44 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
       {'code': 'ko', 'name': appLocalizations.korean},
     ];
 
-    String tempSelectedLanguageCode = widget.selectedLanguageCode; // Temporarily selected language
-    final double itemHeight = screenHeight * 0.07; // Approximate height of each language item
-    // Maximum height of the language list, limited to 5 items if more are available.
-    final double maxListHeight = languages.length > 5
-        ? 5 * itemHeight
-        : languages.length * itemHeight + (screenHeight * 0.01 * (languages.length - 1)); // Additional height for Radio padding
-
+    // Temporarily holds the selected language within the dialog.
+    String tempSelectedLanguageCode = localeProvider.locale.languageCode;
     final RestoreCallback restoreNavBar = Darkener.darken(factor: 0.5);
 
-    await showGeneralDialog(
+    final selectedLangCode = await showGeneralDialog<String>(
       context: context,
-      barrierDismissible: true, // Allows dismissing the dialog by tapping outside
-      barrierLabel: 'LanguageSelection', // Accessibility label
-      transitionDuration: const Duration(milliseconds: 150), // Transition animation duration
-      pageBuilder: (ctx, animation, secondaryAnimation) {
-        // Builder for the dialog content
+      barrierDismissible: true,
+      barrierLabel: 'LanguageSelection',
+      transitionDuration: const Duration(milliseconds: 150),
+      pageBuilder: (ctx, _, __) {
         return Center(
           child: Material(
-            color: Colors.transparent, // Make the background transparent
+            color: Colors.transparent,
             child: Container(
-              width: screenWidth * 0.70, // Dialog width
+              width: screenWidth * 0.7,
               decoration: BoxDecoration(
-                color: AppColors.secondaryColor, // Dialog background color
-                borderRadius: BorderRadius.circular(16), // Rounded corners
+                color: AppColors.secondaryColor,
+                borderRadius: BorderRadius.circular(16),
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16), // Clip content to rounded corners
-                child: StatefulBuilder( // For state changes within the dialog (e.g., Radio selection)
+                borderRadius: BorderRadius.circular(16),
+                child: StatefulBuilder(
                   builder: (dialogContext, setStateDialog) {
                     return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch content horizontally
-                      mainAxisSize: MainAxisSize.min, // Size to fit content
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        SizedBox(height: screenHeight * 0.02), // Top padding
+                        // --- Dialog Header with Icon ---
+                        SizedBox(height: screenHeight * 0.02),
                         SvgPicture.asset(
-                          'assets/icons/language.svg', // Language icon
+                          'assets/icons/language.svg',
                           width: screenWidth * 0.07,
                           height: screenWidth * 0.07,
-                          color: AppColors.primaryColor.inverted, // Icon color
+                          colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
                         ),
-                        SizedBox(height: screenHeight * 0.008), // Spacing between icon and title
+                        SizedBox(height: screenHeight * 0.008),
                         Text(
-                          appLocalizations.language, // "Language" title
+                          appLocalizations.language,
                           style: TextStyle(
                             fontSize: screenWidth * 0.045,
                             fontWeight: FontWeight.bold,
@@ -183,101 +115,78 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        Divider(thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha: 0.7)), // Separator line
-                        // Language list
-                        Container(
-                          constraints: BoxConstraints(maxHeight: maxListHeight), // Max height for the list
+                        SizedBox(height: screenHeight * 0.008),
+                        Divider(height: 1, thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha:0.7)),
+
+                        // --- Language List ---
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxHeight: screenHeight * 0.4),
                           child: ListView.builder(
-                            shrinkWrap: true, // Size to fit content
-                            padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01), // Vertical padding within the list
-                            itemCount: languages.length, // Number of languages
+                            shrinkWrap: true,
+                            padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01, horizontal: screenWidth * 0.02),
+                            itemCount: languages.length,
                             itemBuilder: (context, index) {
                               final lang = languages[index];
-                              return Material(
-                                color: Colors.transparent, // Transparent to remove ripple effect from Material
-                                child: InkWell(
-                                  onTap: () {
-                                    if (kDebugMode) {
-                                      print('[AppLanguageSection] Language item tapped: ${lang['name']}');
-                                    }
-                                    setStateDialog(() { // Update state within the dialog
-                                      tempSelectedLanguageCode = lang['code']!;
-                                    });
-                                  },
-                                  splashColor: Colors.transparent, // Remove splash effect
-                                  highlightColor: Colors.transparent, // Remove highlight effect
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03, vertical: screenHeight * 0.01),
-                                    child: Row(
-                                      children: [
-                                        Radio<String>(
-                                          value: lang['code']!,
-                                          groupValue: tempSelectedLanguageCode,
-                                          onChanged: (value) {
-                                            if (kDebugMode) {
-                                              print('[AppLanguageSection] Radio changed to: $value');
-                                            }
-                                            setStateDialog(() {
-                                              tempSelectedLanguageCode = value!;
-                                            });
-                                          },
-                                          // Active (selected) Radio button color
-                                          activeColor: AppColors.primaryColor.inverted, // Desired color (e.g., black or a dark theme-appropriate color)
-                                          // Fill color for passive and active states
-                                          fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
-                                            if (states.contains(WidgetState.selected)) {
-                                              // For selected state, AppColors.primaryColor.inverted (like black)
-                                              return AppColors.primaryColor.inverted;
-                                            }
-                                            // For unselected state, a lighter color
-                                            return AppColors.primaryColor.inverted.withValues(alpha: 0.6);
-                                          }),
-                                        ),
-                                        Expanded( // Expanded to prevent text overflow
-                                          child: Text(
-                                            lang['name']!, // Language name
-                                            style: TextStyle(
-                                              fontSize: screenWidth * 0.038,
-                                              color: AppColors.primaryColor.inverted,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                              final String langCode = lang['code']!;
+                              final bool isSelected = (tempSelectedLanguageCode == langCode);
+
+                              return AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut,
+                                decoration: BoxDecoration(
+                                  color: isSelected ? AppColors.primaryColor.inverted.withValues(alpha:0.02) : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: ListTile(
+                                  title: Text(
+                                    lang['name']!,
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.038,
+                                      color: AppColors.primaryColor.inverted,
                                     ),
                                   ),
+                                  leading: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 200),
+                                    transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                                    child: Icon(
+                                      isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                                      key: ValueKey<bool>(isSelected), // Important for AnimatedSwitcher
+                                      color: AppColors.primaryColor.inverted,
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    if (!isSelected) {
+                                      setStateDialog(() => tempSelectedLanguageCode = langCode);
+                                    }
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
                                 ),
                               );
                             },
                           ),
                         ),
-                        Divider(thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha: 0.7), height: 1), // Bottom separator
-                        // "Done" button
+
+                        // --- Dialog Footer with "Done" Button ---
+                        Divider(height: 1, thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha:0.7)),
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            splashColor: AppColors.senaryColor.withValues(alpha: 0.1), // Light splash for the button
-                            highlightColor: AppColors.senaryColor.withValues(alpha: 0.1),
-                            onTap: () {
-                              if (kDebugMode) {
-                                print('[AppLanguageSection] "Done" button tapped. Selected language: $tempSelectedLanguageCode');
-                              }
-                              // --- FIX: Apply changes in the correct order ---
-                              // 1. Notify the parent (SettingsScreen) about the new language.
-                              widget.onLanguageChanged(tempSelectedLanguageCode);
-
-                              // 2. Clear the central model data cache to force a reload with the new language.
-                              ModelData.clearCache();
-                              debugPrint("[AppLanguageSection] ModelData cache cleared due to language change.");
-
-                              // 3. Close the dialog.
-                              Navigator.of(ctx).pop();
-                            },
+                            splashColor: AppColors.senaryColor.withValues(alpha:0.1),
+                            highlightColor: AppColors.senaryColor.withValues(alpha:0.1),
+                            onTap: () => Navigator.of(ctx).pop(tempSelectedLanguageCode),
                             child: Container(
                               height: screenHeight * 0.065,
                               alignment: Alignment.center,
                               child: Text(
-                                appLocalizations.done, // "Done"
-                                style: TextStyle(fontSize: screenWidth * 0.04, color: AppColors.senaryColor, fontWeight: FontWeight.w500),
+                                appLocalizations.done,
+                                style: TextStyle(
+                                  fontSize: screenWidth * 0.04,
+                                  color: AppColors.senaryColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ),
@@ -291,74 +200,88 @@ class AppLanguageSectionState extends State<AppLanguageSection> {
           ),
         );
       },
-      // Transition animation for the dialog
-      transitionBuilder: (context, animation, secondaryAnimation, child) =>
-          FadeTransition(opacity: animation, child: child),
-    ).whenComplete(() {
-      // Actions to perform when the dialog is closed (for any reason)
-      if (kDebugMode) {
-        print('[AppLanguageSection] Language selection dialog closed.');
-      }
-      restoreNavBar();
-      widget.onDialogStateChanged(false); // Notify that the dialog is closed
-    });
+    );
+
+    restoreNavBar();
+
+    if (selectedLangCode == null || selectedLangCode == localeProvider.locale.languageCode) {
+      return;
+    }
+
+    localeProvider.setLocale(Locale(selectedLangCode));
+
+    // 1. Set the new locale. This will cause UI widgets that watch LocaleProvider to rebuild.
+    await localeProvider.setLocale(Locale(selectedLangCode));
+
+    // 2. Manually trigger a full refresh on the ModelCatalogProvider.
+    modelCatalogProvider.refreshCatalog();
+
+    debugPrint("[AppLanguageSection] Language changed to '$selectedLangCode'. All caches cleared, models are refreshing.");
   }
 
   @override
   Widget build(BuildContext context) {
-    final appLocalizations = widget.appLocalizations;
+    context.watch<ThemeProvider>();
+
+    // Watch the LocaleProvider to rebuild this section when the language changes.
+    final localeProvider = context.watch<LocaleProvider>();
+    final appLocalizations = AppLocalizations.of(context)!;
+
+    final currentLanguageCode = localeProvider.locale.languageCode;
+    final currentLanguageName = _getLocalizedLanguageName(appLocalizations, currentLanguageCode);
+
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    if (kDebugMode) {
-      print('[AppLanguageSection] Building widget. Selected language: ${widget.selectedLanguageCode}');
-    }
-
-    // Main view of the language selection section
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start, // Align titles to the left
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section title: "Language"
+        // Section Title
         Text(
           appLocalizations.language,
           style: GoogleFonts.roboto(
             color: AppColors.primaryColor.inverted,
-            fontSize: screenWidth * 0.05, // Title font size
-            fontWeight: FontWeight.w600, // Title font weight
+            fontSize: screenWidth * 0.05,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        SizedBox(height: screenHeight * 0.01), // Spacing between title and description
-        // Section description
+        SizedBox(height: screenHeight * 0.01),
+        // Section Description
         Text(
           appLocalizations.languageDescription,
-          style: GoogleFonts.roboto(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
+          style: GoogleFonts.roboto(
+            color: AppColors.quinaryColor,
+            fontSize: screenWidth * 0.035,
+          ),
         ),
-        SizedBox(height: screenHeight * 0.02), // Spacing between description and button
-        // Language selection button
+        SizedBox(height: screenHeight * 0.02),
+        // The main button to open the selection dialog.
         Material(
-          color: AppColors.secondaryColor, // Button background color
-          borderRadius: BorderRadius.circular(10.0), // Button corner radius
-          clipBehavior: Clip.antiAlias, // Clip content to bounds
+          color: AppColors.secondaryColor,
+          borderRadius: BorderRadius.circular(10.0),
+          clipBehavior: Clip.antiAlias,
           child: InkWell(
-            onTap: _showLanguageSelectionDialog, // Open dialog on tap
-            borderRadius: BorderRadius.circular(10.0), // Also for splash effect
-            splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3), // Tap effect color
+            onTap: () => _showLanguageSelectionDialog(context),
+            borderRadius: BorderRadius.circular(10.0),
+            splashColor: AppColors.quaternaryColor.withValues(alpha:0.3),
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02, horizontal: screenWidth * 0.04), // Button inner padding
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02, horizontal: screenWidth * 0.04),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space items out
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Name of the selected language
                   Text(
-                    _getLocalizedLanguageName(widget.selectedLanguageCode),
+                    currentLanguageName,
                     style: GoogleFonts.roboto(
-                        color: AppColors.primaryColor.inverted,
-                        fontSize: screenWidth * 0.041111, // Text font size
-                        fontWeight: FontWeight.w500 // Text font weight
+                      color: AppColors.primaryColor.inverted,
+                      fontSize: screenWidth * 0.041,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  // Arrow icon on the right
-                  Icon(Icons.arrow_forward_ios, color: AppColors.primaryColor.inverted, size: screenWidth * 0.04),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: AppColors.primaryColor.inverted,
+                    size: screenWidth * 0.04,
+                  ),
                 ],
               ),
             ),

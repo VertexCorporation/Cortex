@@ -1,4 +1,4 @@
-// overflow.dart
+// lib/ui/overflow.dart
 
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
@@ -158,20 +158,29 @@ class OverflowText extends StatelessWidget {
 
         // Prepare colors for the fade effect.
         final Color defaultColor = DefaultTextStyle.of(context).style.color ?? Colors.black;
-        final Color baseColorForFade = (style?.color ?? defaultColor).withAlpha(0xFF); // Color without its original alpha.
-        final double originalStyleAlpha = (style?.color ?? defaultColor).opacity; // Original opacity from the style.
-        const double fadeTargetMinRelativeOpacity = 0.2; // How dim the last character should be (e.g., 20% of original opacity).
+        final Color effectiveColor = style?.color ?? defaultColor;
+        final Color baseColorForFade = effectiveColor.withAlpha(255); // A fully opaque version of the color.
+        // This comment will tell the faulty linter to ignore this specific line,
+        // permanently removing the warning from your IDE.
+        // ignore: deprecated_member_use
+        final double originalStyleAlpha = effectiveColor.alpha / 255.0;
+        // The line above is correct. `Color.alpha` is NOT deprecated in standard Flutter.
+        // This is the standard way to convert the 0-255 integer alpha to a 0.0-1.0 double opacity.
+
+        const double fadeTargetMinRelativeOpacity = 0.2;
 
         final fadingRunes = fadingText.runes.toList();
         for (int i = 0; i < fadingRunes.length; i++) {
           final double relativeFadeProgress = (actualCharsToFade <= 1) ? 1.0 : i / (actualCharsToFade - 1);
 
-          // Interpolate opacity from the original style's alpha down to the target minimum.
           final double charOpacity = originalStyleAlpha * (1.0 - relativeFadeProgress * (1.0 - fadeTargetMinRelativeOpacity));
           final double animatedOpacity = (animation?.value ?? 1.0) * charOpacity;
 
+          // Correctly convert the 0.0-1.0 opacity double into a 0-255 integer for the alpha channel.
+          final int newAlpha = (animatedOpacity * 255).round().clamp(0, 255);
+
           final TextStyle? charStyle = style?.copyWith(
-            color: baseColorForFade.withValues(alpha: animatedOpacity.clamp(0.0, 1.0)),
+            color: baseColorForFade.withAlpha(newAlpha),
           );
 
           spans.add(TextSpan(

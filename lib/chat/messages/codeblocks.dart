@@ -1,126 +1,208 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_highlight/flutter_highlight.dart';
-import 'package:flutter/services.dart';
-import 'package:highlight/highlight.dart' as highlight;
-import 'package:cortex/l10n/app_localizations.dart';
+// ================ lib/chat/messages/codeblocks.dart (FULLY REFACTORED AND FIXED) ================
 
-const oneDarkProTheme = {
-  'comment': TextStyle(color: Color(0xff5c6370)), // Gri (yorumlar)
-  'quote': TextStyle(color: Color(0xff5c6370)), // Gri (alıntılar)
-  'variable': TextStyle(color: Color(0xffe06c75)), // Kırmızı
-  'template-variable': TextStyle(color: Color(0xffe06c75)), // Kırmızı
-  'attribute': TextStyle(color: Color(0xffd19a66)), // Turuncu
-  'tag': TextStyle(color: Color(0xffe06c75)), // Kırmızı
-  'name': TextStyle(color: Color(0xff61afef)), // Mavi
-  'regexp': TextStyle(color: Color(0xff98c379)), // Yeşil
-  'link': TextStyle(color: Color(0xff61afef)), // Mavi
-  'selector-id': TextStyle(color: Color(0xffd19a66)), // Turuncu
-  'selector-class': TextStyle(color: Color(0xffd19a66)), // Turuncu
-  'number': TextStyle(color: Color(0xffd19a66)), // Turuncu
-  'meta': TextStyle(color: Color(0xff61afef)), // Mavi
-  'built_in': TextStyle(color: Color(0xffe5c07b)), // Açık sarı
-  'builtin-name': TextStyle(color: Color(0xffe5c07b)), // Açık sarı
-  'literal': TextStyle(color: Color(0xff56b6c2)), // Cam göbeği
-  'type': TextStyle(color: Color(0xffe5c07b)), // Açık sarı
-  'params': TextStyle(color: Color(0xffabb2bf)), // Açık gri
-  'string': TextStyle(color: Color(0xff98c379)), // Yeşil
-  'symbol': TextStyle(color: Color(0xff98c379)), // Yeşil
-  'bullet': TextStyle(color: Color(0xff98c379)), // Yeşil
-  'title': TextStyle(color: Color(0xff61afef)), // Mavi
-  'section': TextStyle(color: Color(0xff61afef)), // Mavi
-  'keyword': TextStyle(color: Color(0xffc678dd)), // Mor
-  'selector-tag': TextStyle(color: Color(0xffc678dd)), // Mor
-  'root': TextStyle(
-    backgroundColor: Color(0xFF141414),
-    color: Color(0xffabb2bf),
-  ),
-  'emphasis': TextStyle(fontStyle: FontStyle.italic),
-  'strong': TextStyle(fontWeight: FontWeight.bold),
+import 'package:cortex/app.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_highlight/flutter_highlight.dart';
+import 'package:cortex/l10n/app_localizations.dart';
+import 'package:highlight/highlight.dart' as highlight;
+import 'package:highlight/languages/all.dart';
+import 'package:provider/provider.dart';
+
+import '../../notifications/introvert.dart';
+import '../../theme.dart';
+
+const Map<String, TextStyle> oneDarkProTheme = {
+  'root'             : TextStyle(backgroundColor: Color(0xFF141414), color: Color(0xffabb2bf)),
+  'comment'          : TextStyle(color: Color(0xff5c6370), fontStyle: FontStyle.italic),
+  'quote'            : TextStyle(color: Color(0xff5c6370), fontStyle: FontStyle.italic),
+  'variable'         : TextStyle(color: Color(0xffe06c75)),
+  'template-variable': TextStyle(color: Color(0xffe06c75)),
+  'tag'              : TextStyle(color: Color(0xffe06c75)),
+  'name'             : TextStyle(color: Color(0xff61afef)),
+  'selector-id'      : TextStyle(color: Color(0xffe06c75)),
+  'selector-class'   : TextStyle(color: Color(0xffe06c75)),
+  'regexp'           : TextStyle(color: Color(0xff98c379)),
+  'deletion'         : TextStyle(color: Color(0xffe06c75)),
+  'number'           : TextStyle(color: Color(0xffd19a66)),
+  'built_in'         : TextStyle(color: Color(0xffe5c07b)),
+  'builtin-name'     : TextStyle(color: Color(0xffe5c07b)),
+  'literal'          : TextStyle(color: Color(0xff56b6c2)),
+  'type'             : TextStyle(color: Color(0xffe5c07b)),
+  'params'           : TextStyle(color: Color(0xffabb2bf)),
+  'meta'             : TextStyle(color: Color(0xffc678dd)),
+  'meta-keyword'     : TextStyle(color: Color(0xffc678dd)),
+  'meta-string'      : TextStyle(color: Color(0xff98c379)),
+  'string'           : TextStyle(color: Color(0xff98c379)),
+  'symbol'           : TextStyle(color: Color(0xff56b6c2)),
+  'bullet'           : TextStyle(color: Color(0xff56b6c2)),
+  'addition'         : TextStyle(color: Color(0xff98c379)),
+  'title'            : TextStyle(color: Color(0xff61afef)),
+  'section'          : TextStyle(color: Color(0xff61afef)),
+  'keyword'          : TextStyle(color: Color(0xffc678dd)),
+  'selector-tag'     : TextStyle(color: Color(0xffc678dd)),
+  'attribute'        : TextStyle(color: Color(0xffd19a66)),
+  'emphasis'         : TextStyle(fontStyle: FontStyle.italic),
+  'strong'           : TextStyle(fontWeight: FontWeight.bold),
 };
 
+/// A widget that displays a block of code with syntax highlighting, a copy button,
+/// and a language identifier.
 class CodeBlockWidget extends StatefulWidget {
   final String code;
+  final String? language;
 
-  const CodeBlockWidget({super.key, required this.code});
+  const CodeBlockWidget({
+    super.key,
+    required this.code,
+    this.language,
+  });
 
   @override
   State<CodeBlockWidget> createState() => _CodeBlockWidgetState();
 }
 
 class _CodeBlockWidgetState extends State<CodeBlockWidget> {
-  String? detectedLanguage;
+  String? _resolvedLanguage;
+  bool _copying = false;
 
   @override
   void initState() {
     super.initState();
-    _detectLanguage();
+    _resolveLanguage();
   }
 
-  void _detectLanguage() {
-    final result = highlight.highlight.parse(
-      widget.code,
-      autoDetection: true,
-    );
-    setState(() {
-      detectedLanguage = result.language;
-    });
+  @override
+  void didUpdateWidget(covariant CodeBlockWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.language != oldWidget.language || widget.code != oldWidget.code) {
+      _resolveLanguage();
+    }
+  }
+
+  /// Resolves the language to be used for highlighting.
+  /// Priority:
+  /// 1. Use the language hint provided by the parser if it's valid and supported.
+  /// 2. If no valid hint is provided, fall back to auto-detection.
+  void _resolveLanguage() {
+    String? finalLang;
+    final providedLang = widget.language?.toLowerCase().trim();
+
+    if (providedLang != null && providedLang.isNotEmpty) {
+      if (allLanguages.containsKey(providedLang)) {
+        finalLang = providedLang;
+        debugPrint("[CodeBlock] Using provided and supported language hint: '$finalLang'");
+      } else {
+        debugPrint("[CodeBlock] Provided language hint '${widget.language}' is not in `allLanguages`. Falling back to auto-detection.");
+      }
+    }
+
+    // If no valid hint was found or provided, and the code is not empty, fall back to auto-detection.
+    if (finalLang == null && widget.code.isNotEmpty) {
+      final result = highlight.highlight.parse(widget.code, autoDetection: true);
+      finalLang = result.language; // This can still be null if detection fails.
+      debugPrint("[CodeBlock] No valid hint. Auto-detected language: '$finalLang'");
+    }
+
+    if (mounted) {
+      setState(() {
+        _resolvedLanguage = finalLang;
+      });
+    }
+  }
+
+  Future<void> _copyCodeToClipboard() async {
+    if (_copying) return;
+    if (mounted) setState(() => _copying = true);
+    await Clipboard.setData(ClipboardData(text: widget.code));
+    if (mounted) {
+      Provider.of<IntrovertNotificationService>(context, listen: false).showNotification(
+        message: AppLocalizations.of(context)!.messageCopied,
+        type: NotificationType.success,
+        bottomOffset: 0.02,
+      );
+    }
+    await Future.delayed(const Duration(milliseconds: 1200));
+    if (mounted) {
+      setState(() => _copying = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isUnknown = detectedLanguage == null || detectedLanguage!.isEmpty;
-    final languageName = isUnknown
-        ? AppLocalizations.of(context)!.text // Örn. "Bilinmeyen"
-        : detectedLanguage!;
+    final languageNameForDisplay = _resolvedLanguage != null && _resolvedLanguage!.isNotEmpty
+        ? (_resolvedLanguage![0].toUpperCase() + _resolvedLanguage!.substring(1))
+        : AppLocalizations.of(context)!.text;
+
+    final languageForHighlighter = _resolvedLanguage ?? 'plaintext';
 
     return Stack(
       children: [
         Container(
-          // Arka plan rengini temada belirtilen "root" rengiyle aynı ayarlıyoruz
           decoration: BoxDecoration(
-            color: const Color(0xFF141414),
+            color: oneDarkProTheme['root']?.backgroundColor ?? const Color(0xFF141414),
             borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.border, width: 0.5),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 32),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: HighlightView(
-              widget.code,
-              language: isUnknown ? null : detectedLanguage,
-              // One Dark Pro temasını kullanıyoruz
-              theme: oneDarkProTheme,
-              padding: const EdgeInsets.all(12),
-              textStyle: const TextStyle(
-                fontFamily: 'monospace',
-                fontSize: 14,
-              ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  key: ValueKey('${widget.code.hashCode}_${languageForHighlighter.hashCode}'),
+                  child: Container(
+                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                    child: HighlightView(
+                      widget.code,
+                      language: languageForHighlighter,
+                      theme: oneDarkProTheme,
+                      padding: const EdgeInsets.fromLTRB(12, 42, 12, 12),
+                      textStyle: const TextStyle(fontFamily: 'monospace', fontSize: 14),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),
-        // Sol üst köşede algılanan dil adı veya "Bilinmeyen"
         Positioned(
-          top: 4,
-          left: 8,
+          top: 0,
+          left: 0,
+          right: 0,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.7),
-              borderRadius: BorderRadius.circular(4),
+              color: AppColors.primaryColor.inverted,
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
             ),
-            child: Text(
-              languageName,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    languageNameForDisplay,
+                    style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+                InkWell(
+                  onTap: _copyCodeToClipboard,
+                  borderRadius: BorderRadius.circular(4),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: ScaleTransition(scale: animation, child: child)),
+                      child: _copying
+                          ? const Icon(Icons.check, size: 18, color: Colors.greenAccent, key: ValueKey('check'))
+                          : const Icon(Icons.copy_all_outlined, size: 18, color: Colors.white70, key: ValueKey('copy')),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ),
-        Positioned(
-          top: 4,
-          right: 8,
-          child: IconButton(
-            icon: const Icon(Icons.copy, size: 16, color: Colors.white),
-            onPressed: () async {
-              await Clipboard.setData(ClipboardData(text: widget.code));
-            },
           ),
         ),
       ],

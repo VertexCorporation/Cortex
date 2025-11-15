@@ -1954,4 +1954,62 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get newsErrorMessage => '最新のアップデートの取得中に問題が発生しました。接続を確認してもう一度お試しください。';
+
+  @override
+  String get codeNotFound => '入力したコードは無効または期限切れです。';
+
+  @override
+  String get whatIsNew => '新着情報？';
+
+  @override
+  String get onboardingTitle1 => 'こんにちは！私たちはCortexチームです。';
+
+  @override
+  String onboardingDesc1(String userName) {
+    return '$userNameさん、お会いできて嬉しいです。私たちはAI業界のルールを塗り替えようと決意した、高校生開発者の集まりです。お会いできて嬉しいです！ぜひお互いのことをもっとよく知りましょう。';
+  }
+
+  @override
+  String get onboardingTitle2 => '大きな問題がありました。';
+
+  @override
+  String get onboardingDesc2 =>
+      'AI革命は到来したものの、敷居で行き詰まってしまった。高額なサブスクリプション料金、複雑なプラットフォーム、プライバシーを侵害する者、AIへのアクセスを遮断する者…彼らがゲームに参加している限り、この敷居は決して越えられなかった。';
+
+  @override
+  String get onboardingTitle3 => '私たちはただ傍観することはできませんでした。';
+
+  @override
+  String get onboardingDesc3 =>
+      'その限界を超えるために、私たちは強力で美しく、カスタマイズ可能で使いやすく、完全な透明性を備え、オンラインでもオフラインでも動作し、データをデバイス内にのみ保存するプラットフォームを構築しました。私たちは、その力を本来あるべき場所、つまりあなたに返しました。';
+
+  @override
+  String get onboardingTitle4 => 'これは決して簡単なことではありませんでした。';
+
+  @override
+  String get onboardingDesc4 =>
+      '何十回も拒否され、何度もアカウントが停止され、偽の警告を受け、ブランド名も何十回も変更を余儀なくされました。その間ずっと、不可能だと言われ続けました。しかし、私たちは決して諦めませんでした。このプロジェクトは私たちだけのものではなく、皆のものなのだと信じていたからです。まさにそれが、私たちがここにいる理由です。';
+
+  @override
+  String get onboardingFinalTitle => '革命の時が来た。';
+
+  @override
+  String get onboardingFinalDesc =>
+      'この画面を見ているのは、私たちが諦めなかったからです。そして、諦めるつもりもありません。さあ、一緒にAI革命を世界へ広げましょう。この物語の一部となるために…';
+
+  @override
+  String get onboardingFinalQuestion => '準備はいい？';
+
+  @override
+  String get onboardingFinalButton => 'はい！';
+
+  @override
+  String get dude => '仲間';
+
+  @override
+  String get swipeToContinue => 'スワイプして続行';
+
+  @override
+  String get cacheIsNotUpToDate =>
+      'Playストアのキャッシュが最新ではありません。Playストアアプリを閉じて再度開くか、デバイスを再起動してください。';
 }

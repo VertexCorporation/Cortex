@@ -191,8 +191,8 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                   'assets/icons/credit.svg',
                                   width: iconSize,
                                   height: iconSize,
-                                  color: AppColors.primaryColor.inverted
-                                      .withValues(alpha: 0.6),
+                                  colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted
+                                      .withValues(alpha: 0.6), BlendMode.srcIn),
                                 ),
                               ),
                             ],
@@ -321,7 +321,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                             'assets/icons/credit.svg',
                             width: screenWidth * 0.05,
                             height: screenWidth * 0.05,
-                            color: AppColors.primaryColor.inverted,
+                            colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
                           ),
                           SizedBox(width: screenWidth * 0.01),
                         ],
@@ -339,7 +339,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                 screenHeight: screenHeight,
                 onTap: () {
                   hideCreditsInfo();
-                  navigateToScreen(context, const FundsScreen(),
+                  navigateToScreen(const FundsScreen(),
                       direction: const Offset(0.0, 1.0));
                 },
               ),
@@ -434,7 +434,7 @@ class _AnimatedHexagonButtonState extends State<_AnimatedHexagonButton>
             child: Center(
               child: SvgPicture.asset(
                 'assets/icons/sparkle.svg',
-                color: AppColors.primaryColor.inverted,
+                colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
                 width: widget.screenWidth * 0.045,
                 height: widget.screenWidth * 0.045,
               ),

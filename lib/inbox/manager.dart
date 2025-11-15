@@ -1,44 +1,34 @@
 // lib/conversations/manager.dart
 
 import 'dart:async';
-import 'package:cortex/models/backend/data/data.dart';
 import 'package:flutter/foundation.dart';
 import '../chat/services/storage.dart';
 import '../chat/services/database.dart';
+import '../library/backend/data/entity.dart';
+import '../library/backend/data/service.dart';
 
 class ConversationManager extends ChangeNotifier {
   final String conversationID;
   String conversationTitle;
   bool isStarred;
   bool isDeleted = false;
-
-  late Map<String, dynamic> _modelData;
-
-  String get modelId => _modelData['id'] as String? ?? '';
-  String get modelTitle {
-    // If it's a dynamic chat, the title is handled by the UI layer.
-    // The manager itself doesn't know the localized text.
-    if (_modelData['id'] == 'dynamic') {
-      // We can return the hardcoded English text as a last-resort fallback.
-      return _modelData['title'] as String? ?? 'Dynamic Chat';
-    }
-    // For all other models, return their actual title.
-    return _modelData['title'] as String? ?? 'Unknown Model';
-  }
-  String get modelImagePath => _modelData['imagePath'] as String? ?? 'assets/icons/self.svg';
-  String get modelDescription => _modelData['description'] as String? ?? '';
-  String get modelProducer => _modelData['producer'] as String? ?? 'Unknown';
-  bool get canHandleImage => _modelData['canHandleImage'] as bool? ?? false;
-  String? get role => _modelData['role'] as String?;
-  String? get modelPath => _modelData['path'] as String?;
-  String? get modelCategory => _modelData['category'] as String?;
-  bool get isServerSide => (_modelData['type'] as String? ?? 'online') != 'offline';
+  late ModelEntity _model;
+  final ModelService _modelService;
+  ModelEntity get model => _model; // Public getter for the UI
+  String get modelId => _model.id;
+  String get modelTitle => _model.displayTitle;
+  String get modelImagePath => _modelService.getModelImagePath(_model);
+  String get modelDescription => _model.displayDescription;
+  String get modelProducer => _model.producer;
+  bool get canHandleImage => _model.modalities['image'] == true;
+  String? get role => _model.role;
+  String? get modelPath => null; // This info is not in ModelEntity
+  String get modelCategory => _model.category;
+  bool get isServerSide => _model.isServerSide;
 
   DateTime _lastMessageDate;
   String _lastMessageText;
   String _lastMessagePhotoPath;
-
-  late final StreamSubscription<Map<String, dynamic>> _sub;
 
   ConversationManager({
     required this.conversationID,
@@ -46,44 +36,28 @@ class ConversationManager extends ChangeNotifier {
     required String initialModelId,
     required this.isStarred,
     required DateTime lastMessageDate,
+    required String langCode,
     String lastMessageText = '',
     String lastMessagePhotoPath = '',
+    required ModelService modelService,
   })  : _lastMessageText = lastMessageText,
         _lastMessageDate = lastMessageDate,
-        _lastMessagePhotoPath = lastMessagePhotoPath {
-    // This logic ensures that even if a model is not immediately available in the cache,
-    // we still have valid fallback data, and we correctly handle the special 'dynamic' case.
+        _lastMessagePhotoPath = lastMessagePhotoPath,
+        _modelService = modelService {
 
     if (initialModelId == 'dynamic') {
-      // Case 1: The conversation is a "Dynamic Chat".
-      // We create a special placeholder map for its UI representation.
-      _modelData = {
+      _model = ModelEntity.fromMap({
         'id': 'dynamic',
-        'title': 'Dynamic Chat', // This can be localized in the UI layer later
+        'title': 'Dynamic Chat',
         'imagePath': 'assets/cortex.svg',
         'producer': 'Cortex',
-        'canHandleImage': true,
+        'modalities': {'image': true},
         'type': 'online',
         'category': 'dynamic',
-      };
+      }, langCode);
     } else {
-      // Case 2: It's a standard model conversation.
-      // We fetch the data using the reliable static method.
-      final data = ModelData.getPreciseModelData(initialModelId);
-
-      // If, for some reason (e.g., race condition at startup), the model data is not found,
-      // we create a fallback map to prevent crashes and show "Unknown Model".
-      if (data.isEmpty) {
-        _modelData = {
-          'id': initialModelId,
-          'title': 'Unknown Model',
-          'imagePath': 'assets/icons/self.svg', // A safe default icon
-        };
-        debugPrint(
-            "Warning: Could not find precise data for model '$initialModelId' during ConversationManager init. Using fallback.");
-      } else {
-        _modelData = data;
-      }
+      // getPreciseModelData now requires langCode and always returns a valid entity.
+      _model = _modelService.getPreciseModelData(initialModelId, langCode: langCode);
     }
   }
 
@@ -91,28 +65,17 @@ class ConversationManager extends ChangeNotifier {
   String get lastMessageText => _lastMessageText;
   String get lastMessagePhotoPath => _lastMessagePhotoPath;
 
-  static Future<ConversationManager?> fromId(String conversationId) async {
+  static Future<ConversationManager?> fromId(String conversationId, {required String langCode, required ModelService modelService, }) async {
     try {
       final db = await DbHelper().db;
-
-      // 1. Fetch the main conversation data.
       final List<Map<String, dynamic>> convData = await db.query(
-        'conversations',
-        where: 'id = ?',
-        whereArgs: [conversationId],
-        limit: 1,
-      );
+          'conversations', where: 'id = ?', whereArgs: [conversationId], limit: 1);
 
-      if (convData.isEmpty) {
-        debugPrint("[ConversationManager] No conversation found in DB for ID: $conversationId");
-        return null;
-      }
+      if (convData.isEmpty) return null;
       final convRow = convData.first;
 
-      // 2. Fetch the last message data to initialize the manager.
       final lastMsg = await ChatStorageService.getLastMessage(conversationId);
 
-      // 3. Create and return the new instance using the default constructor.
       return ConversationManager(
         conversationID: conversationId,
         conversationTitle: convRow['title'] as String? ?? 'Untitled',
@@ -123,6 +86,8 @@ class ConversationManager extends ChangeNotifier {
             : DateTime.fromMillisecondsSinceEpoch(convRow['lastMessageDate'] as int? ?? 0),
         lastMessageText: lastMsg?['text'] as String? ?? '',
         lastMessagePhotoPath: lastMsg?['photoPath'] as String? ?? '',
+        langCode: langCode,
+        modelService: modelService,
       );
     } catch (e) {
       debugPrint("[ConversationManager] Error creating instance from ID '$conversationId': $e");
@@ -130,23 +95,16 @@ class ConversationManager extends ChangeNotifier {
     }
   }
 
-
-  Future<bool> checkForModelUpdate() async {
+  Future<bool> checkForModelUpdate({required String langCode}) async {
     try {
       final db = await DbHelper().db;
       final List<Map<String, dynamic>> result = await db.query(
-        'conversations',
-        columns: ['modelId'],
-        where: 'id = ?',
-        whereArgs: [conversationID],
-        limit: 1,
-      );
+          'conversations', columns: ['modelId'], where: 'id = ?', whereArgs: [conversationID], limit: 1);
 
       if (result.isNotEmpty) {
         final latestModelId = result.first['modelId'] as String?;
         if (latestModelId != null && latestModelId != modelId) {
-          debugPrint("[ConversationManager] Model ID for '$conversationID' changed from '$modelId' to '$latestModelId'. Refreshing details.");
-          _modelData = ModelData.getPreciseModelData(latestModelId);
+          _model = _modelService.getPreciseModelData(latestModelId, langCode: langCode);
           notifyListeners();
           return true;
         }
@@ -204,11 +162,5 @@ class ConversationManager extends ChangeNotifier {
   void setDeleted(bool val) {
     isDeleted = val;
     notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    _sub.cancel();
-    super.dispose();
   }
 }

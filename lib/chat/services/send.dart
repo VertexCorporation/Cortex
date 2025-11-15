@@ -19,17 +19,16 @@ import 'package:cortex/chat/services/context.dart';
 import 'package:cortex/chat/services/moderator.dart';
 import 'package:cortex/chat/services/offline.dart';
 import 'package:cortex/chat/services/recent.dart';
-import 'package:cortex/chat/services/review.dart';
 import 'package:cortex/chat/services/scroll.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:cortex/models/backend/data/data.dart';
 import 'package:flutter/widgets.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
-import '../../models/backend/data/info.dart';
+import '../../library/backend/data/entity.dart';
+import '../../library/backend/data/service.dart';
 import '../messages/messages.dart';
 
 /// Service responsible for sending messages. It orchestrates interactions between providers and other services.
@@ -45,9 +44,9 @@ class SendService {
   final ScrollService _scrollService;
   final RecentModelsManager _recentModelsManager;
   final OfflineService _offlineService;
-
   final Uuid _uuid = const Uuid();
   bool _isSending = false;
+  final ModelService _modelService;
 
   /// Constructs the SendService with all its required dependencies.
   SendService({
@@ -59,6 +58,7 @@ class SendService {
     required ScrollService scrollService,
     required RecentModelsManager recentModelsManager,
     required OfflineService offlineService,
+    required ModelService modelService,
   })  : _conversationProvider = conversationProvider,
         _sessionProvider = sessionProvider,
         _inputProvider = inputProvider,
@@ -66,41 +66,33 @@ class SendService {
         _contextService = contextService,
         _scrollService = scrollService,
         _recentModelsManager = recentModelsManager,
-        _offlineService = offlineService;
-
+        _offlineService = offlineService,
+        _modelService = modelService;
 
   /// Analyzes the current state to select a suitable model in "random dynamic chat" mode.
-  /// Returns a model ID on success, or null on failure.
-  Future<String?> _selectAndAssignDynamicModel() {
+  Future<String?> _selectAndAssignDynamicModel({required String langCode}) {
     debugPrint("[SendService] Dynamic mode: Selecting a random model...");
-    // This logic remains the same as it correctly handles the "random" selection case.
-    // ... (existing code for random selection)
-    final allModels = _sessionProvider.allModels;
+    // The provider's allModels might still be ModelInfo, this needs to be addressed there.
+    // Assuming we fetch fresh from ModelService() for safety.
+    final allModels = _modelService.getCachedModelsSync();
     final hasPhoto = _inputProvider.selectedPhoto != null;
 
-    List<ModelInfo> suitableModels = allModels.where((model) {
-      final modelData = ModelData.getPreciseModelData(model.id);
-      final type = modelData['type'] as String?;
-      final category = modelData['category'] as String?;
-
-      if (category == 'roleplay' || category == 'self') return false;
-      if (type == 'offline') return false;
-      if (hasPhoto) return ModelData.hasModality(model.id, 'image');
+    List<ModelEntity> suitableModels = allModels.where((model) {
+      if (model.category == 'roleplay' || model.category == 'self') return false;
+      if (!model.isServerSide) return false;
+      if (hasPhoto) return _modelService.hasModality(model.id, langCode: langCode, modality: 'image');
       return true;
     }).toList();
 
-    debugPrint("[SendService] Online. Has photo: $hasPhoto. Found ${suitableModels.length} suitable models.");
+    debugPrint("[SendService] Found ${suitableModels.length} suitable models for dynamic chat.");
+    if (suitableModels.isEmpty) return Future.value(null);
 
-    if (suitableModels.isEmpty) {
-      debugPrint("[SendService] No suitable random models found. Returning null.");
-      return Future.value(null);
-    }
+    final selectedSeries = suitableModels[math.Random().nextInt(suitableModels.length)];
 
-    final selectedModelData = suitableModels[math.Random().nextInt(suitableModels.length)];
-    final selectedModelId = selectedModelData.id;
-
-    final extensions = ModelData.getPreciseModelData(selectedModelId)['extensions'] as Map<String, dynamic>?;
-    final finalApiModelId = (extensions != null && extensions.isNotEmpty) ? extensions.keys.first : selectedModelId;
+    // If the selected model is a series, pick its first extension. Otherwise, use its ID.
+    final finalApiModelId = (selectedSeries.extensions?.isNotEmpty ?? false)
+        ? selectedSeries.extensions!.keys.first
+        : selectedSeries.id;
 
     debugPrint("[SendService] Dynamically and randomly selected model ID: $finalApiModelId.");
     return Future.value(finalApiModelId);
@@ -122,137 +114,195 @@ class SendService {
     final String text = messageText.trim();
     if (text.isEmpty && photo == null && regeneratePhotoPath == null) return false;
 
+    debugPrint(
+      "[SendService] sendMessage called → "
+          "isRegenerate=$isRegenerate, "
+          "regenerateAiIndex=$regenerateAiIndex, "
+          "incomingPhotoParam=${photo?.path}, "
+          "regeneratePhotoPathParam=$regeneratePhotoPath, "
+          "currentMessages=${_conversationProvider.messages.length}",
+    );
+
     _isSending = true;
 
     try {
       String? apiModelIdForSend;
       String errorMessage = localizations.errorNoModelsAvailable;
 
-      // =======================================================================
-      // SECTION 1: DETERMINE THE MODEL TO USE (THE CORE FIX)
-      // =======================================================================
+      // --- Get langCode once at the beginning to pass to all helpers ---
+      final langCode = Localizations.localeOf(context).languageCode;
+
       final hasInternet = await InternetConnection().hasInternetAccess;
 
       if (overrideModelId != null && overrideModelId.isNotEmpty) {
-        // Priority 1: An override model ID is provided (e.g., for regeneration with a new model).
         apiModelIdForSend = overrideModelId;
-        debugPrint("[SendService] Using override model ID: $apiModelIdForSend");
+        debugPrint("[SendService] Using overrideModelId: $overrideModelId");
       } else if (_sessionProvider.isDynamicChat) {
-        // Priority 2: We are in Dynamic Chat mode. Now we must check if an assistant is pinned.
         final pinnedAssistantId = _sessionProvider.modelId;
         if (pinnedAssistantId != null && pinnedAssistantId.isNotEmpty) {
-          // A specific assistant is pinned. Use it directly.
           apiModelIdForSend = pinnedAssistantId;
-          debugPrint("[SendService] Dynamic Chat with pinned assistant: $apiModelIdForSend");
+          debugPrint("[SendService] Dynamic chat pinned model: $apiModelIdForSend");
         } else {
-          // No assistant is pinned. Fall back to the random selection logic.
-          apiModelIdForSend = await _selectAndAssignDynamicModel();
-          debugPrint("[SendService] Dynamic Chat with random selection. Chose: $apiModelIdForSend");
+          apiModelIdForSend = await _selectAndAssignDynamicModel(langCode: langCode);
+          debugPrint("[SendService] Dynamic chat selected model: $apiModelIdForSend");
         }
       } else {
-        // Priority 3: This is a standard chat with a pre-selected model.
         apiModelIdForSend = _sessionProvider.modelId;
-        debugPrint("[SendService] Standard chat with model: $apiModelIdForSend");
+        debugPrint("[SendService] Static chat using session model: $apiModelIdForSend");
       }
-      // =======================================================================
-      // END OF FIX
-      // =======================================================================
-
 
       // --- 2. Validate the Selected Model ---
       if (apiModelIdForSend == null || apiModelIdForSend.isEmpty) {
         errorMessage = localizations.errorNoModelsAvailable;
         apiModelIdForSend = null;
-      } else if (Utils.isServerSideModel(apiModelIdForSend) && !hasInternet) {
+        debugPrint("[SendService] Model validation failed: No model selected.");
+      } else if (Utils.isServerSideModel(apiModelIdForSend, langCode: langCode, modelService: _modelService) && !hasInternet) {
         errorMessage = localizations.checkYourInternet;
         apiModelIdForSend = null;
+        debugPrint("[SendService] Model validation failed: Server-side model but no internet.");
       }
 
       if (apiModelIdForSend == null) {
-        _handleSendError(ApiException(errorMessage), isRegenerate, regenerateAiIndex, localizations);
+        _handleSendError(
+          ApiException(errorMessage),
+          isRegenerate,
+          regenerateAiIndex,
+          localizations,
+          failedUserText: text,
+          failedPhotoPath: photo?.path,
+        );
         return false;
       }
 
       // --- 3. Prepare the User Message and Update State ---
+
+      debugPrint("[SendService] Resolving effectivePhotoPath...");
+
+      // Compute the effective photo path. In regenerate flow we ALWAYS trust
+      // the latest user message in the conversation (so edits are respected).
+      String? effectivePhotoPath;
+
+      if (photo != null) {
+        effectivePhotoPath = photo.path;
+        debugPrint("[SendService] Using DIRECT photo from parameter: $effectivePhotoPath");
+      } else if (isRegenerate) {
+        final messages = _conversationProvider.messages;
+        Message? lastUserMessage;
+        int lastUserIndex = -1;
+
+        for (int i = messages.length - 1; i >= 0; i--) {
+          if (messages[i].isUserMessage) {
+            lastUserMessage = messages[i];
+            lastUserIndex = i;
+            break;
+          }
+        }
+
+        if (lastUserMessage != null) {
+          effectivePhotoPath = lastUserMessage.photoPath;
+          debugPrint(
+            "[SendService] Regenerate flow: using lastUserMessage at index "
+                "$lastUserIndex with photoPath=${lastUserMessage.photoPath}",
+          );
+        } else {
+          effectivePhotoPath = null;
+          debugPrint("[SendService] Regenerate flow: no user message found → photoPath=null");
+        }
+      } else {
+        effectivePhotoPath = null;
+        debugPrint("[SendService] Normal send without photo. photoPath=null");
+      }
+
+      debugPrint("[SendService] Final effectivePhotoPath=$effectivePhotoPath");
+
       final userMessage = Message(
         text: text,
         isUserMessage: true,
-        photoPath: photo?.path ?? regeneratePhotoPath,
+        photoPath: effectivePhotoPath,
         isPhotoUploading: photo != null,
         model: apiModelIdForSend,
+      );
+
+      debugPrint(
+        "[SendService] Creating userMessage → "
+            "text='${text.substring(0, text.length.clamp(0, 50))}', "
+            "photoPath=${userMessage.photoPath}, "
+            "model=$apiModelIdForSend, "
+            "isRegenerate=$isRegenerate",
       );
 
       int aiMessageIndex;
       if (isRegenerate && regenerateAiIndex != null) {
         aiMessageIndex = regenerateAiIndex;
+        debugPrint("[SendService] Regenerate mode: Reusing aiMessageIndex=$aiMessageIndex");
       } else {
         if (_conversationProvider.conversationID == null) {
           final newConvId = _uuid.v4();
           final newConvTitle = (text.isEmpty && userMessage.photoPath != null)
               ? "🖼️"
               : (text.length > 28 ? text.substring(0, 28) : text);
-
-          // For storage, if a pinned assistant is used, we store its ID. Otherwise, 'dynamic'.
           final modelIdForStorage = (_sessionProvider.isDynamicChat && _sessionProvider.modelId != null)
               ? _sessionProvider.modelId!
               : (_sessionProvider.isDynamicChat ? 'dynamic' : apiModelIdForSend);
-
+          debugPrint(
+            "[SendService] Starting new conversation → "
+                "id=$newConvId, title='$newConvTitle', modelIdForStorage=$modelIdForStorage",
+          );
           _conversationProvider.startNewConversationSession(newConvId, newConvTitle, modelIdForStorage, userMessage);
         } else {
+          debugPrint("[SendService] Appending user message to existing conversation.");
           _conversationProvider.appendMessageToConversation(userMessage);
         }
         aiMessageIndex = _conversationProvider.messages.length - 1;
+        debugPrint("[SendService] AI message will be at index $aiMessageIndex");
       }
 
       _inputProvider.clearSelectedPhoto();
+      debugPrint("[SendService] InputProvider selectedPhoto cleared after send.");
 
       // --- 4. Delegate to the Appropriate Sending Logic ---
-      if (!Utils.isServerSideModel(apiModelIdForSend)) {
+      if (!Utils.isServerSideModel(apiModelIdForSend, langCode: langCode, modelService: _modelService)) {
         final offlineModerator = OfflineModeratorService();
         if (offlineModerator.isPromptAcceptable(text)) {
+          debugPrint("[SendService] Routing message to OfflineService (local model).");
           unawaited(_sendLocalMessage(text, userMessage.photoPath, apiModelIdForSend));
         } else {
+          debugPrint("[SendService] Prompt rejected by OfflineModerator.");
           throw ApiException(localizations.errorPromptFlagged);
         }
       } else {
+        debugPrint("[SendService] Routing message to ApiService (server-side).");
         await _sendServerSideMessage(
           text,
           apiModelIdForSend,
           userMessage.photoPath,
           localizations,
           aiMessageIndex,
+          langCode,
         );
         _conversationProvider.finishBotResponse(aiMessageIndex);
       }
 
       // --- 5. Perform Post-Send Cleanup ---
       try {
-        final parentId = ModelData.getBaseIdFromFullId(apiModelIdForSend);
-        final modelIdToStore = parentId.isNotEmpty ? parentId : apiModelIdForSend;
-        await ChatStorageService.addRecentModel(modelIdToStore);
-        unawaited(_recentModelsManager.refresh());
+        await ChatStorageService.addRecentModel(apiModelIdForSend, langCode: langCode, modelService: _modelService);
+        unawaited(_recentModelsManager.refresh(langCode: langCode));
       } catch (e) {
         debugPrint("[SendService] Could not update recent models for '$apiModelIdForSend'. Error: $e");
       }
-
-      if (context.mounted) {
-        unawaited(ReviewService().triggerReviewPromptIfNeeded(context));
-      }
-
       return true;
 
     } catch (e) {
       if (e is UserCancelledException) {
-        debugPrint("[SendService] Caught UserCancelledException. This is an expected outcome of a user stop action. Suppressing any further error UI.");
-        return false; // Exit without calling _handleSendError.
+        debugPrint("[SendService] Caught UserCancelledException. Suppressing error UI.");
+        return false;
       }
-
-      // For ANY OTHER type of exception, we proceed with the original error handling logic.
       debugPrint("[SendService] Caught an unhandled exception: $e");
       _handleSendError(e, isRegenerate, regenerateAiIndex, localizations);
       return false;
     } finally {
       _isSending = false;
+      debugPrint("[SendService] sendMessage completed. isRegenerate=$isRegenerate");
     }
   }
 
@@ -273,19 +323,22 @@ class SendService {
       String? photoPath,
       AppLocalizations localizations,
       int aiMessageIndex,
+      String langCode,
       ) async {
-    final modelData = ModelData.getPreciseModelData(modelIdForRequest);
-    final bool isPremium = (modelData['tier'] as String? ?? 'free') == 'premium';
-    final bool isCharacterModel = (modelData['category'] as String?) == 'roleplay' || (modelData['category'] as String?) == 'self';
+    final model = _modelService.getPreciseModelData(modelIdForRequest, langCode: langCode);
+    final bool isPremium = model.isPremium;
+    final bool isCharacterModel = model.category == 'roleplay' || model.category == 'self';
 
     debugPrint("[SendService] Sending server request for model '$modelIdForRequest'. Is Premium: $isPremium");
 
     final memory = await _contextService.buildContextMessages(
       includeLastUser: false,
       targetModelId: modelIdForRequest,
+      langCode: langCode, // Pass langCode down to the context service.
     );
 
-    Null onTextChunk(String textChunk) {
+    // This helper function is called for each piece of text streamed from the API.
+    void onTextChunk(String textChunk) {
       if (_conversationProvider.wasResponseStopped) return;
       _conversationProvider.appendToLastBotMessage(textChunk);
       if (_scrollService.isUserAtBottom()) {
@@ -293,7 +346,8 @@ class SendService {
       }
     }
 
-    Future<Null> onImageReceived(String imageUrl) async {
+    // This helper function is called when the API generates and returns an image.
+    Future<void> onImageReceived(String imageUrl) async {
       if (_conversationProvider.wasResponseStopped) return;
       try {
         final imageBytes = base64Decode(imageUrl.split(',').last);
@@ -301,8 +355,6 @@ class SendService {
         final filePath = '${tempDir.path}/${_uuid.v4()}.png';
         final file = File(filePath);
         await file.writeAsBytes(imageBytes);
-        // This functionality needs to be added to ConversationProvider if desired.
-        // _conversationProvider.updateBotMessageWithImage(aiMessageIndex, filePath);
       } catch (e) {
         debugPrint("[SendService] Error saving received image: $e");
         _conversationProvider.setErrorMessage(aiMessageIndex, localizations.errorImageLoad, false);
@@ -310,7 +362,8 @@ class SendService {
     }
 
     if (isCharacterModel) {
-      final baseModelId = modelData['baseModelId'] as String?;
+      // Use the safe property from the entity.
+      final baseModelId = model.baseModelId;
       if (baseModelId == null || baseModelId.isEmpty) {
         throw ApiException("Character '$modelIdForRequest' has no valid base model configured.");
       }
@@ -340,20 +393,38 @@ class SendService {
   }
 
   /// Handles send errors by updating the ConversationProvider with an error state.
-  void _handleSendError(Object error, bool isRegenerate, int? regenerateAiIndex, AppLocalizations localizations) {
-    final String errorMessage = error is ApiException ? error.message : localizations.anErrorOccurred;
-    final bool isContentFlagError = error is ApiException && error.message == localizations.errorPromptFlagged;
+  void _handleSendError(
+      Object error,
+      bool isRegenerate,
+      int? regenerateAiIndex,
+      AppLocalizations localizations, {
+        String? failedUserText,
+        String? failedPhotoPath,
+      }) {
+    final String errorMessage =
+    error is ApiException ? error.message : localizations.anErrorOccurred;
+    final bool isContentFlagError =
+        error is ApiException && error.message == localizations.errorPromptFlagged;
 
     if (isRegenerate && regenerateAiIndex != null) {
-      _conversationProvider.setErrorMessage(regenerateAiIndex, errorMessage, isContentFlagError);
+      _conversationProvider.setErrorMessage(
+        regenerateAiIndex,
+        errorMessage,
+        isContentFlagError,
+      );
     } else {
       final userMessagePlaceholder = Message(
-          text: "",
-          isUserMessage: true,
-          photoPath: _inputProvider.selectedPhoto?.path,
-          includeInContext: !isContentFlagError
+        text: failedUserText ?? "",
+        isUserMessage: true,
+        photoPath: failedPhotoPath ?? _inputProvider.selectedPhoto?.path,
+        includeInContext: !isContentFlagError,
       );
-      _conversationProvider.showSendError(userMessagePlaceholder, errorMessage, isContentFlagError);
+
+      _conversationProvider.showSendError(
+        userMessagePlaceholder,
+        errorMessage,
+        isContentFlagError,
+      );
     }
   }
 }

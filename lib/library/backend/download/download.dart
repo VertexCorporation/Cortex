@@ -119,32 +119,22 @@ class FileDownloadHelper extends ChangeNotifier {
 
         final taskInfo = _tasks[taskId];
         if (taskInfo != null) {
-          final prefs = await SharedPreferences.getInstance();
-          final String spKeyDownloading = 'is_downloading_${taskInfo.modelId}';
-
           if (status == DownloadTaskStatus.running) {
             taskInfo.onProgress(taskId, progress.toDouble());
-            await prefs.setBool(spKeyDownloading, true);
           } else if (status == DownloadTaskStatus.enqueued) {
-            await prefs.setBool(spKeyDownloading, true);
+            // Do nothing
           } else if (status == DownloadTaskStatus.complete) {
-            await prefs.setBool(spKeyDownloading, false);
             taskInfo.onDownloadCompleted(taskId);
             _tasks.remove(taskId);
-
-            debugPrint("[FileDownloadHelper] Download complete for task '$taskId'. Broadcasting a global state change notification.");
+            debugPrint("[FileDownloadHelper] Download complete for task '$taskId'. Broadcasting global state change.");
             DownloadedModelsManager().notifyListenersOfChange();
-
           } else if (status == DownloadTaskStatus.paused) {
-            await prefs.setBool(spKeyDownloading, false);
             taskInfo.onDownloadPaused();
-          } else if (status == DownloadTaskStatus.failed || status == DownloadTaskStatus.canceled) {
-            await prefs.setBool(spKeyDownloading, false);
-            // Don't call onDownloadError here for cancellations, as the controller handles it.
-            // Only call it for genuine failures.
-            if (status == DownloadTaskStatus.failed) {
-              taskInfo.onDownloadError('Download failed');
-            }
+          } else if (status == DownloadTaskStatus.failed) {
+            taskInfo.onDownloadError('Download failed');
+            _tasks.remove(taskId);
+          } else if (status == DownloadTaskStatus.canceled) {
+            debugPrint("[FileDownloadHelper] Task '$taskId' was confirmed as canceled by the backend.");
             _tasks.remove(taskId);
           }
         }
@@ -215,8 +205,7 @@ class FileDownloadHelper extends ChangeNotifier {
     }
   }
 
-  /// --- THE PERFECT FIX ---
-  /// This method is now robust and stateless. Its only job is to tell the
+  ///  Its only job is to tell the
   /// flutter_downloader plugin to cancel a task. It does not rely on the
   /// in-memory `_tasks` map, so it works perfectly even after an app restart.
   Future<void> cancelDownload(String taskId) async {
@@ -285,8 +274,7 @@ class FileDownloadHelper extends ChangeNotifier {
       }
 
       final prefs       = await SharedPreferences.getInstance();
-      final keysToWipe  = prefs.getKeys().where((k) =>
-      k.startsWith('is_downloading_') || k.startsWith('download_task_id_'));
+      final keysToWipe  = prefs.getKeys().where((k) => k.startsWith('download_task_id_'));
       for (final k in keysToWipe) {
         await prefs.remove(k);
       }

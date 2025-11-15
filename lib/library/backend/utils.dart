@@ -16,11 +16,17 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:io';
-import 'package:cortex/models/backend/system.dart';
+import 'package:cortex/library/backend/system.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'data/info.dart';
-import 'data/user.dart'; // CompatibilityStatus, ModelInfo, etc.
+import 'data/user.dart';
+
+/// Describes the compatibility of a model with the current device's hardware.
+enum CompatibilityStatus {
+  compatible,
+  insufficientRAM,
+  insufficientStorage,
+}
 
 // It takes the source file path and destination path.
 // Returns the path of the copied file on success, or throws an error on failure.
@@ -43,7 +49,7 @@ Future<String> copyFileInIsolate(Map<String, String> paths) async {
 }
 
 /// Utility helpers for model handling, disk IO, and system-capability checks.
-class Utils {
+class ModelsBackendUtils {
   /* ───────────────────────────────── FILE & LAYOUT HELPERS ───────────────── */
 
   /// Calculates the **maximum height** needed for a PageView that shows model
@@ -54,10 +60,6 @@ class Utils {
       List<Map<String, dynamic>> models,
       double screenWidth,
       ) {
-    dev.log(
-      'calculateCategoryHeight(models: ${models.length}, width: $screenWidth)',
-      name: 'Utils',
-    );
 
     const modelsPerColumn = 3;
     const verticalSpacingFactor = 0.01;
@@ -79,7 +81,6 @@ class Utils {
     final dynamicGap = cardHeight * 0.2;
     final result = maxColumnHeight + dynamicGap;
 
-    dev.log('Calculated category height = $result', name: 'Utils');
     return result;
   }
 
@@ -105,8 +106,6 @@ class Utils {
     assert(filesDir.isNotEmpty, 'filesDir must not be empty');
     assert(modelId.isNotEmpty, 'modelId must not be empty');
 
-    // THE FLAWLESS FIX: The filename is derived ONLY from the non-localized, unique modelId.
-    // This guarantees that the UI layer and the backend layer are looking for the exact same file.
     final fullPath = p.join(filesDir, '$modelId.gguf');
 
     dev.log(
@@ -209,13 +208,6 @@ class Utils {
     // 5) Check each resource.
     final ramOK = hasRamMB >= needRamMB;
     final storageOK = freeMB >= needStoreMB;
-
-    // 6) Log details for debugging.
-    dev.log(
-      '[compat] modelSize=$modelSizeInMB MB, neededRAM=$needRamMB MB, '
-          'availableRAM=$hasRamMB MB, neededStorage=$needStoreMB MB, freeStorage=$freeMB MB',
-      name: 'Utils',
-    );
 
     if (!ramOK) return CompatibilityStatus.insufficientRAM;
     if (!storageOK) return CompatibilityStatus.insufficientStorage;

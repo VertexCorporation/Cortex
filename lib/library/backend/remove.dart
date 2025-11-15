@@ -1,29 +1,34 @@
-// remove.dart
+// lib/library/backend/remove.dart
 
-import 'dart:io';
 import 'dart:developer' as dev;
-import 'package:flutter/material.dart'; // For BuildContext
-import 'package:provider/provider.dart'; // For Provider
-import 'package:cortex/l10n/app_localizations.dart'; // For localizations
-import 'package:cortex/models/backend/utils.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:cortex/library/backend/utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/app_localizations.dart';
 import '../../chat/services/storage.dart';
-import '../../notifications.dart'; // For NotificationService
-import 'data/data.dart';
+import '../../notifications/introvert.dart';
 import 'data/database.dart';
+import 'data/image.dart';
+import 'data/service.dart';
 import 'data/user.dart';
-import 'download.dart';
 
+/// A static service class for handling the removal and uninstallation of models.
+/// It orchestrates all necessary cleanup operations across different data sources.
 class ModelRemoveService {
+  // Private constructor to prevent instantiation.
   const ModelRemoveService._();
 
-  /// Deletes a user-created model ('self_' or 'local_').
-  /// It requires a BuildContext to send notifications via Provider.
+  /// Deletes a user-created model ('self_' or 'local_') from all data sources.
+  /// This is a permanent, destructive action that includes server-side deletion.
   static Future<bool> deleteCustomModel({
     required String id,
     required String title,
-    required BuildContext context,
+    required IntrovertNotificationService notificationService,
+    required AppLocalizations localizations,
+    required ModelService modelService,
   }) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -31,39 +36,40 @@ class ModelRemoveService {
       return false;
     }
 
-    final notificationService = Provider.of<NotificationService>(context, listen: false);
-    final localizations = AppLocalizations.of(context)!;
-
     dev.log('--- [ModelRemoveService.deleteCustom] START for ID: $id ---', name: 'ModelRemove');
     try {
+      // Step 1: De-register the model from the backend server.
       final callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable('deleteCustomModel');
       await callable.call({'modelType': id.startsWith('self_') ? 'roleplay' : 'offline'});
-      dev.log('[ModelRemoveService.deleteCustom] Step 1/4: De-registered from server.', name: 'ModelRemove');
+      dev.log('[ModelRemoveService.deleteCustom] Step 1/7: De-registered from server.', name: 'ModelRemove');
 
+      // Step 2: Remove the model's raw data from the local SQLite database.
       final db = await DatabaseHelper.instance.database;
       await db.delete('models', where: 'id = ?', whereArgs: [id]);
-      dev.log('[ModelRemoveService.deleteCustom] Step 2/4: Removed from local DB.', name: 'ModelRemove');
+      dev.log('[ModelRemoveService.deleteCustom] Step 2/7: Removed from local DB.', name: 'ModelRemove');
 
+      // Step 3 & 4: Clean up application-level data (conversations and recents).
       await ChatStorageService.deleteConversationsForModel(id);
-      dev.log('[ModelRemoveService.deleteCustom] Step 3/4: Deleted associated conversations.', name: 'ModelRemove');
+      dev.log('[ModelRemoveService.deleteCustom] Step 3/7: Deleted associated conversations.', name: 'ModelRemove');
+      await ChatStorageService.removeRecentModel(id);
+      dev.log('[ModelRemoveService.deleteCustom] Step 4/7: Removed from recent models list.', name: 'ModelRemove');
 
-      final downloadedModelPaths = await UserModels.loadDownloadedModelPaths();
-      final ggufFilePath = downloadedModelPaths[id];
-      if (ggufFilePath != null && ggufFilePath.isNotEmpty) {
-        final file = File(ggufFilePath);
-        if (await file.exists()) await file.delete();
-      }
-      await UserModels.removeDownloadedModel(id);
-      await ModelData.removeCachedImages([id]);
-      dev.log('[ModelRemoveService.deleteCustom] Step 4/4: Cleaned up local files.', name: 'ModelRemove');
+      // Step 5: If it was an offline model, clean up its GGUF file and download task.
+      await _cleanupDownloadTaskAndFile(id);
+      dev.log('[ModelRemoveService.deleteCustom] Step 5/7: Cleaned up GGUF file and download task (if any).', name: 'ModelRemove');
 
-      ModelData.removeModelFromCache(id);
-      dev.log('[ModelRemoveService.deleteCustom] Step 5/5: Removed model from live cache and notified listeners.', name: 'ModelRemove');
+      // Step 6: Remove any cached cover images.
+      await ModelImageCache.remove([id]);
+      dev.log('[ModelRemoveService.deleteCustom] Step 6/7: Cleaned up image cache.', name: 'ModelRemove');
 
+      // FINAL STEP: Remove the model from the central in-memory cache.
+      // This will trigger a reactive UI update across the app.
+      modelService.removeModelFromEntityCache(id);
+      dev.log('[ModelRemoveService.deleteCustom] Step 7/7: Removed model from live entity cache.', name: 'ModelRemove');
 
       notificationService.showNotification(
         message: localizations.modelRemovedSuccess(title),
-        isSuccess: true,
+        type: NotificationType.success,
       );
 
       dev.log('--- [ModelRemoveService.deleteCustom] SUCCESS for ID: $id ---', name: 'ModelRemove');
@@ -71,82 +77,80 @@ class ModelRemoveService {
 
     } catch (e, st) {
       dev.log('--- [ModelRemoveService.deleteCustom] FAILED for ID: $id. Error: $e ---', name: 'ModelRemove', stackTrace: st);
-
       notificationService.showNotification(
         message: localizations.errorDeletingModel,
-        isSuccess: false,
+        type: NotificationType.error,
       );
       return false;
     }
   }
 
   /// Uninstalls a public, downloaded model from the local device.
-  /// This operation is now atomic: the in-app record is only removed if the
-  /// physical file is successfully deleted or already absent.
+  /// This is a local-only action and does not affect server data.
+  /// FIX: Removed notificationService and localizations. The caller is now
+  /// responsible for showing UI feedback. Returns true on success.
   static Future<bool> uninstallDownloadedModel({
     required String id,
     required String title,
-    required BuildContext context,
   }) async {
-    // Get service references before any async gaps to avoid context issues.
-    final notificationService = Provider.of<NotificationService>(context, listen: false);
-    final downloadedModelsManager = Provider.of<DownloadedModelsManager>(context, listen: false);
-    final localizations = AppLocalizations.of(context)!;
-
     final logName = 'ModelUninstall';
     dev.log('--- [ModelRemoveService.uninstall] START Uninstall Process for ID: $id ---', name: logName);
 
     try {
-      // Step 1: Get the canonical file path. (Unchanged)
-      dev.log('[ModelRemoveService.uninstall] Step 1/4: Constructing canonical file path.', name: logName);
-      final filesDir = await Utils.initializeDirectory();
-      final String ggufFilePath = Utils.getFilePathById(filesDir: filesDir, modelId: id, modelTitle: title);
-      final file = File(ggufFilePath);
+      // Step 1: Clean up the download task and the physical GGUF file.
+      dev.log('[ModelRemoveService.uninstall] Step 1/4: Cleaning up download task and physical file.', name: logName);
+      await _cleanupDownloadTaskAndFile(id, title: title);
 
-      // Step 2: Attempt to delete the physical file first. (Unchanged)
-      dev.log('[ModelRemoveService.uninstall] Step 2/4: Attempting to delete physical file.', name: logName);
-      if (await file.exists()) {
-        try {
-          await file.delete();
-          dev.log('[ModelRemoveService.uninstall]   - SUCCESS: Deleted file at $ggufFilePath', name: logName);
-        } catch (e) {
-          dev.log('[ModelRemoveService.uninstall]   - FAILED: Could not delete file. Aborting uninstall. Error: $e', name: logName);
-          throw Exception('Failed to delete model file on disk.');
-        }
-      } else {
-        dev.log('[ModelRemoveService.uninstall]   - INFO: File did not exist at $ggufFilePath. No deletion needed.', name: logName);
-      }
-
-      // Step 3: Remove the in-app record from SharedPreferences. (Unchanged)
-      dev.log('[ModelRemoveService.uninstall] Step 3/4: Physical file confirmed gone. Removing in-app record.', name: logName);
+      // Step 2: Remove the persistent record of the download from UserModels.
+      dev.log('[ModelRemoveService.uninstall] Step 2/4: Removing in-app record from UserModels.', name: logName);
       await UserModels.removeDownloadedModel(id);
 
-      // Step 4: Delete associated conversations. (Unchanged)
-      dev.log('[ModelRemoveService.uninstall] Step 4/4: Deleting all associated conversations.', name: logName);
+      // Step 3 & 4: Clean up application-level data (conversations and recents).
+      dev.log('[ModelRemoveService.uninstall] Step 3/4: Deleting all associated conversations.', name: logName);
       await ChatStorageService.deleteConversationsForModel(id);
-
-      // Step 5: NOW, after all file/record operations are complete, notify the UI.
-      // This is the correct moment to trigger a refresh.
-      dev.log('[ModelRemoveService.uninstall] Step 5/5: Notifying listeners of the state change.', name: logName);
-      downloadedModelsManager.notifyListenersOfChange();
-
-      // Show the success message to the user.
-      notificationService.showNotification(
-        message: localizations.modelRemovedSuccess(title),
-        isSuccess: true,
-      );
+      dev.log('[ModelRemoveService.uninstall] Step 4/4: Removing from recent models list.', name: logName);
+      await ChatStorageService.removeRecentModel(id);
 
       dev.log('--- [ModelRemoveService.uninstall] SUCCESS for ID: $id ---', name: logName);
       return true;
 
     } catch (e, st) {
-      // Error handling remains unchanged.
       dev.log('--- [ModelRemoveService.uninstall] FAILED for ID: $id. Error: $e ---', name: logName, stackTrace: st);
-      notificationService.showNotification(
-        message: localizations.errorDeletingModel,
-        isSuccess: false,
-      );
+      // ERROR NOTIFICATION LOGIC REMOVED FROM HERE
       return false;
+    }
+  }
+
+  /// A private helper to robustly clean up all artifacts of a download.
+  /// It finds the task ID from SharedPreferences, removes the task from the
+  /// downloader's database, and then manually deletes the file as a guarantee.
+  static Future<void> _cleanupDownloadTaskAndFile(String modelId, {String? title}) async {
+    final logName = 'DownloadCleanup';
+    dev.log('[Cleanup] Starting cleanup for model ID: $modelId', name: logName);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final taskId = prefs.getString('download_task_id_$modelId');
+
+      if (taskId != null) {
+        dev.log('[Cleanup] Found associated task ID: $taskId. Removing from FlutterDownloader.', name: logName);
+        await FlutterDownloader.remove(taskId: taskId, shouldDeleteContent: true);
+        await prefs.remove('download_task_id_$modelId');
+      } else {
+        dev.log('[Cleanup] No active task ID found in prefs. Proceeding with manual file deletion.', name: logName);
+      }
+
+      final filesDir = await ModelsBackendUtils.initializeDirectory();
+      final ggufFilePath = ModelsBackendUtils.getFilePathById(filesDir: filesDir, modelId: modelId, modelTitle: title ?? modelId);
+      final file = File(ggufFilePath);
+
+      if (await file.exists()) {
+        await file.delete();
+        dev.log('[Cleanup] Successfully deleted file at: $ggufFilePath', name: logName);
+      } else {
+        dev.log('[Cleanup] File at $ggufFilePath did not exist. No manual deletion needed.', name: logName);
+      }
+    } catch (e) {
+      dev.log('[Cleanup] An error occurred during cleanup for $modelId, but uninstall will continue. Error: $e', name: logName);
     }
   }
 }

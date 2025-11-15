@@ -1,13 +1,14 @@
-// subscriptions.dart (FINALIZED & PRODUCTION-READY)
-// This version fixes the 'horizontalPadding' scope bug, ensuring all dynamic
-// calculations are correct within their respective methods.
+// subscriptions.dart (FINAL, REFINED & PRODUCTION-READY)
+// This version integrates the central ScrollFog widget internally to apply
+// the effect only to this scrollable page, maintaining a clean architecture.
 
+import 'dart:async';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'dart:async';
+import '../../fog.dart';
 import '../../theme.dart';
 import '../backend.dart';
 
@@ -136,36 +137,43 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
 
     final bool isActivePlan = widget.activeSubscriptionLevel == currentPlanLevel;
 
-    return SingleChildScrollView(
-      controller: widget.scrollController,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: Column(
-          children: [
-            Text(purchaseKey, style: TextStyle(fontSize: screenWidth * 0.07, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
-            SizedBox(height: verticalSpacingSmall),
-            Text(descriptionKey, textAlign: TextAlign.center, style: TextStyle(fontSize: screenWidth * 0.035, color: AppColors.tertiaryColor)),
-            SizedBox(height: verticalSpacingMedium),
-            Image.asset(logoPath, height: logoHeight),
-            SizedBox(height: verticalSpacingMedium),
-            _buildSubscriptionOption(
-              context: context, localizations: localizations, option: 'annual',
-              title: "${localizations.annual} ${widget.planType.capitalize()}",
-              description: localizations.annualPlanDescription(formattedMonthlyEquivalentPrice),
-              isBestValue: true, isSelected: widget.selectedBillingOption == 'annual',
-              isSubscribedPlan: isActivePlan, activeSubscriptionOption: widget.activeSubscriptionOption ?? '',
-            ),
-            SizedBox(height: verticalSpacingSmall),
-            _buildSubscriptionOption(
-              context: context, localizations: localizations, option: 'monthly',
-              title: "${localizations.monthly} ${widget.planType.capitalize()}",
-              description: localizations.monthlyPlanDescription(_getPriceForId(monthlyId)),
-              isBestValue: false, isSelected: widget.selectedBillingOption == 'monthly',
-              isSubscribedPlan: isActivePlan, activeSubscriptionOption: widget.activeSubscriptionOption ?? '',
-            ),
-            SizedBox(height: verticalSpacingLarge),
-            _buildBenefitsList(context, localizations, widget.planType),
-          ],
+    return ScrollFog(
+      scrollController: widget.scrollController!,
+      fogColor: AppColors.background,
+      topFogHeight: screenHeight * 0.04,
+      bottomFogHeight: screenHeight * 0.07,
+      child: SingleChildScrollView(
+        controller: widget.scrollController,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: Column(
+            children: [
+              Text(purchaseKey, style: TextStyle(fontSize: screenWidth * 0.07, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
+              SizedBox(height: verticalSpacingSmall),
+              Text(descriptionKey, textAlign: TextAlign.center, style: TextStyle(fontSize: screenWidth * 0.035, color: AppColors.tertiaryColor)),
+              SizedBox(height: verticalSpacingMedium),
+              Image.asset(logoPath, height: logoHeight),
+              SizedBox(height: verticalSpacingMedium),
+              _buildSubscriptionOption(
+                context: context, localizations: localizations, option: 'annual',
+                title: "${localizations.annual} ${widget.planType.capitalize()}",
+                description: localizations.annualPlanDescription(formattedMonthlyEquivalentPrice),
+                isBestValue: true, isSelected: widget.selectedBillingOption == 'annual',
+                isSubscribedPlan: isActivePlan, activeSubscriptionOption: widget.activeSubscriptionOption ?? '',
+              ),
+              SizedBox(height: verticalSpacingSmall),
+              _buildSubscriptionOption(
+                context: context, localizations: localizations, option: 'monthly',
+                title: "${localizations.monthly} ${widget.planType.capitalize()}",
+                description: localizations.monthlyPlanDescription(_getPriceForId(monthlyId)),
+                isBestValue: false, isSelected: widget.selectedBillingOption == 'monthly',
+                isSubscribedPlan: isActivePlan, activeSubscriptionOption: widget.activeSubscriptionOption ?? '',
+              ),
+              SizedBox(height: verticalSpacingLarge),
+              _buildBenefitsList(context, localizations, widget.planType),
+              SizedBox(height: verticalSpacingLarge), // Add padding for better scroll end
+            ],
+          ),
         ),
       ),
     );
@@ -215,15 +223,13 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                 children: [
                   Text(title, style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted)),
                   SizedBox(height: screenHeight * 0.005),
-                  // THE FIX: Wrap the description in a FittedBox to prevent it from
-                  // wrapping to a new line when the card's border gets thicker.
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
                     child: Text(
                       description,
                       style: TextStyle(fontSize: screenWidth * 0.04, color: AppColors.tertiaryColor),
-                      maxLines: 1, // Ensure it stays on a single line
+                      maxLines: 1,
                     ),
                   ),
                 ],
@@ -234,7 +240,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
               duration: const Duration(milliseconds: 250),
               transitionBuilder: (Widget child, Animation<double> animation) => FadeTransition(opacity: animation, child: child),
               child: showCheckmark
-                  ? Container( key: const ValueKey('checkmark'), alignment: Alignment.center, width: screenWidth * 0.17, child: SvgPicture.asset('assets/icons/checkmark.svg', color: AppColors.primaryColor.inverted, width: screenWidth * 0.09, height: screenWidth * 0.09),)
+                  ? Container( key: const ValueKey('checkmark'), alignment: Alignment.center, width: screenWidth * 0.17, child: SvgPicture.asset('assets/icons/checkmark.svg', colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn), width: screenWidth * 0.09, height: screenWidth * 0.09),)
                   : SizedBox(
                 key: const ValueKey('badges'),
                 width: screenWidth * 0.17,
@@ -288,8 +294,6 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
 
   Widget _buildBenefitsList(BuildContext context, AppLocalizations localizations, String planType) {
     final screenWidth = MediaQuery.of(context).size.width;
-
-    // THE FIX: Define horizontalPadding here so it's in the correct scope.
     final double horizontalPadding = screenWidth * 0.06;
 
     String benefit7Text = localizations.benefit7(planType == 'plus' ? '500' : planType == 'pro' ? '1000' : '2000');
@@ -319,12 +323,11 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         final double iconSize = screenWidth * 0.05;
 
         final benefitContent = SizedBox(
-          // Now this calculation works correctly.
           width: (screenWidth - (horizontalPadding * 2) - (screenWidth * 0.02)) / 2,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SvgPicture.asset('assets/icons/checkmark.svg', width: iconSize, height: iconSize, color: AppColors.primaryColor.inverted),
+              SvgPicture.asset('assets/icons/checkmark.svg', width: iconSize, height: iconSize, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn)),
               SizedBox(width: screenWidth * 0.02),
               Expanded(child: Text(benefit, style: TextStyle(fontSize: screenWidth * 0.035, color: AppColors.primaryColor.inverted))),
             ],

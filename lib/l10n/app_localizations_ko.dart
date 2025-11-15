@@ -1953,4 +1953,62 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get newsErrorMessage =>
       '최신 업데이트를 가져오는 중 문제가 발생했습니다. 연결 상태를 확인하고 다시 시도해 주세요.';
+
+  @override
+  String get codeNotFound => '입력하신 코드가 잘못되었거나 만료되었습니다.';
+
+  @override
+  String get whatIsNew => '새로운 소식은?';
+
+  @override
+  String get onboardingTitle1 => '안녕하세요! 저희는 Cortex 팀이에요.';
+
+  @override
+  String onboardingDesc1(String userName) {
+    return '$userName님, 여기서 만나게 되어 정말 반가워요. 저희는 AI 업계의 판도를 바꾸기로 한 고등학생 개발자들이에요. 만나서 반가워요! 앞으로 서로 더 알아가요.';
+  }
+
+  @override
+  String get onboardingTitle2 => '거대한 문제들이 있었어요.';
+
+  @override
+  String get onboardingDesc2 =>
+      'AI 혁명이 도래했지만, 한계에 부딪혔습니다. 높은 가입비, 복잡한 플랫폼, 개인정보를 침해하는 자, 그리고 AI 접근성을 차단하는 자... 이들이 게임에 참여하는 한, 이 한계는 결코 넘을 수 없었습니다.';
+
+  @override
+  String get onboardingTitle3 => '우리는 가만히 있을 수 없었어요.';
+
+  @override
+  String get onboardingDesc3 =>
+      '그 한계를 넘기 위해, 저희는 강력하고, 아름답고, 커스텀할 수 있고, 쓰기 편하며, 완전히 투명한 플랫폼을 만들었어요. 온라인과 오프라인 모두에서 작동하고, 당신의 데이터는 오직 당신의 기기에만 저장돼요. 저희는 힘을 원래 있어야 할 곳, 바로 당신에게 돌려줬어요.';
+
+  @override
+  String get onboardingTitle4 => '결코 쉽지 않은 길이었어요.';
+
+  @override
+  String get onboardingDesc4 =>
+      '수십 번 거절당하고, 여러 번 계정이 정지되고, 가짜 경고를 받고, 수십 번이나 브랜드를 바꿔야 했어요. 이 모든 과정 속에서 \'불가능하다\'는 말을 들었죠. 하지만 저희는 절대 포기하지 않았어요. 이 프로젝트는 저희뿐만 아니라 모두의 것이라고 믿었거든요. 바로 그게 저희가 지금 여기 있는 이유예요.';
+
+  @override
+  String get onboardingFinalTitle => '혁명의 시간이에요.';
+
+  @override
+  String get onboardingFinalDesc =>
+      '이 화면을 보고 있다면, 저희가 포기하지 않았다는 뜻이에요. 그리고 앞으로도 포기할 생각은 없어요. 자, 함께 AI 혁명을 세상에 알려요. 이 이야기의 일부가 될 준비...';
+
+  @override
+  String get onboardingFinalQuestion => '준비됐어요?';
+
+  @override
+  String get onboardingFinalButton => '네!';
+
+  @override
+  String get dude => '친구';
+
+  @override
+  String get swipeToContinue => '계속하려면 스와이프하세요';
+
+  @override
+  String get cacheIsNotUpToDate =>
+      'Play 스토어 캐시가 최신 상태가 아닙니다. Play 스토어 앱을 닫았다가 다시 열거나 기기를 다시 시작하세요.';
 }

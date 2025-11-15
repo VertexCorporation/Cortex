@@ -1,6 +1,5 @@
 // lib/chat/services/stop.dart
 
-import 'dart:async';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/api.dart';
@@ -8,24 +7,28 @@ import 'package:cortex/chat/services/offline.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:cortex/chat/services/utils.dart';
 import 'package:flutter/foundation.dart';
+import '../../library/backend/data/service.dart';
 
 /// Manages the logic for forcefully stopping a response generation from the AI.
+
 class StopService {
   final ConversationProvider _conversationProvider;
   final ChatSessionProvider _sessionProvider;
   final ApiService _apiService;
   final OfflineService _offlineService;
+  final ModelService _modelService;
 
-  /// Constructs the StopService with its required dependencies.
   StopService({
     required ConversationProvider conversationProvider,
     required ChatSessionProvider sessionProvider,
     required ApiService apiService,
     required OfflineService offlineService,
+    required ModelService modelService,
   })  : _conversationProvider = conversationProvider,
         _sessionProvider = sessionProvider,
         _apiService = apiService,
-        _offlineService = offlineService;
+        _offlineService = offlineService,
+        _modelService = modelService;
 
   /// Initiates the process to stop the AI's response generation.
   Future<void> stopResponse() async {
@@ -35,8 +38,12 @@ class StopService {
     }
     debugPrint("[StopService] Stop request initiated.");
 
+    // 1. Get the language code from the session provider.
+    final langCode = _sessionProvider.getLocale().languageCode;
     final currentModelId = _sessionProvider.modelId;
-    if (currentModelId != null && Utils.isLocalModel(currentModelId)) {
+
+    // 2. Call the updated utility method with the required modelService.
+    if (currentModelId != null && Utils.isLocalModel(currentModelId, langCode: langCode, modelService: _modelService)) {
       _offlineService.stopGeneration();
       debugPrint("[StopService] Cancellation signal sent to OfflineService.");
     } else {
@@ -57,16 +64,52 @@ class StopService {
     final bool wasJustThinking = aiMessage.text.trim().isEmpty && (aiMessage.photoPath ?? '').isEmpty;
 
     if (wasJustThinking) {
-      debugPrint("[StopService] Stopped in 'thinking' state. Fading out bubble at index $lastMessageIndex.");
+      debugPrint(
+        "[StopService] Stopped in 'thinking' state with EMPTY content. "
+            "Fading out AI bubble at index $lastMessageIndex, then removing.",
+      );
+
       _conversationProvider.fadeOutMessage(lastMessageIndex);
+
+      await Future.delayed(const Duration(milliseconds: 220));
+
+      final conversationID = _conversationProvider.conversationID;
+      final prunedMessages = List.of(_conversationProvider.messages)
+        ..removeWhere(
+              (m) =>
+          !m.isUserMessage &&
+              m.text.trim().isEmpty &&
+              ((m.photoPath ?? '').isEmpty),
+        );
+
+      _conversationProvider.loadMessages(prunedMessages);
+
+      if (conversationID != null) {
+        debugPrint(
+          "[StopService] Persisting pruned messages list "
+              "(empty AI bubble removed after fade).",
+        );
+        await ChatStorageService.saveCurrentMessages(
+          conversationID,
+          prunedMessages,
+        );
+      }
+
+      _conversationProvider.finishBotResponse(-1);
+      debugPrint("[StopService] Empty AI message faded out and removed.");
     } else {
-      debugPrint("[StopService] Stopped in 'writing' state. Finalizing message at index $lastMessageIndex.");
+      debugPrint(
+        "[StopService] Stopped in 'writing' state. Finalizing message at index $lastMessageIndex. "
+            "textLength=${aiMessage.text.length}, photoPath=${aiMessage.photoPath}",
+      );
       _conversationProvider.finishBotResponse(lastMessageIndex);
       final conversationID = _conversationProvider.conversationID;
       if (conversationID != null) {
         debugPrint("[StopService] Saving partially generated message to DB.");
         await ChatStorageService.saveCurrentMessages(
-            conversationID, _conversationProvider.messages);
+          conversationID,
+          _conversationProvider.messages,
+        );
       }
     }
     debugPrint("[StopService] Response stop process completed.");

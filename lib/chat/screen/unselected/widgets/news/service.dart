@@ -1,4 +1,4 @@
-// lib/screen/unselected/news/service.dart
+// lib/chat/screen/unselected/widgets/news/service.dart
 
 import 'dart:async';
 import 'dart:convert';
@@ -7,7 +7,8 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../initialization.dart';
-import 'news.dart';
+import '../../../../../internet.dart';
+import 'data.dart';
 
 /// Defines the possible states for the news loading process.
 enum NewsState {
@@ -17,8 +18,6 @@ enum NewsState {
   loading,
   /// The state when news articles have been successfully loaded.
   success,
-  /// The state when an error occurred during the loading process.
-  error,
 }
 
 /// A service class responsible for fetching, caching, and managing the state of news articles.
@@ -27,15 +26,65 @@ enum NewsState {
 /// It is decoupled from the UI layer by receiving its dependencies (Dio, AppInitializer)
 /// via its constructor, making it highly testable.
 class NewsService with ChangeNotifier {
-  final Dio _dio;
-  final AppInitializer _appInitializer;
+  late Dio _dio;
+  late AppInitializer _appInitializer;
+  late InternetProvider _internetProvider;
 
-  /// Private constructor for dependency injection.
+  final Set<String> _languagesWithFetchErrors = {};
+
+  bool _isLoadingOperation = false;
+
+  final Map<String, List<NewsArticle>> _cachedArticlesByLang = {};
+  String _currentLanguageCode = 'en';
+
   NewsService({
     required Dio dio,
     required AppInitializer appInitializer,
-  })  : _dio = dio,
-        _appInitializer = appInitializer;
+    required InternetProvider internetProvider,
+  }) {
+    _dio = dio;
+    _appInitializer = appInitializer;
+    _internetProvider = internetProvider;
+    _internetProvider.addListener(_onConnectivityChanged);
+
+    debugPrint("[NewsService] Instance created. Awaiting first load command from UI.");
+  }
+
+  @override
+  void dispose() {
+    _internetProvider.removeListener(_onConnectivityChanged);
+    super.dispose();
+  }
+
+  void updateDependencies({
+    required AppInitializer appInitializer,
+    required Dio dio,
+    required InternetProvider internetProvider,
+  }) {
+    _appInitializer = appInitializer;
+    _dio = dio;
+
+    if (_internetProvider != internetProvider) {
+      _internetProvider.removeListener(_onConnectivityChanged);
+      _internetProvider = internetProvider;
+      _internetProvider.addListener(_onConnectivityChanged);
+    }
+  }
+
+  void _onConnectivityChanged() {
+    if (_internetProvider.isConnected && _languagesWithFetchErrors.isNotEmpty) {
+      debugPrint("[NewsService] Internet reconnected. Clearing language error cache and checking for retry.");
+
+      final bool shouldRetryCurrentLanguage = _languagesWithFetchErrors.contains(_currentLanguageCode);
+
+      _languagesWithFetchErrors.clear();
+
+      if (shouldRetryCurrentLanguage) {
+        debugPrint("[NewsService] Retrying to fetch news for the current language '$_currentLanguageCode' automatically.");
+        loadNewsForLanguage(_currentLanguageCode);
+      }
+    }
+  }
 
   // --- State Management ---
 
@@ -43,13 +92,9 @@ class NewsService with ChangeNotifier {
   /// The current state of the news loading process.
   NewsState get state => _state;
 
-  List<NewsArticle> _articles = [];
-  /// The list of loaded news articles. This list is empty until the state is `success`.
-  List<NewsArticle> get articles => _articles;
-
-  String _errorMessage = '';
-  /// The error message, only relevant when the state is `error`.
-  String get errorMessage => _errorMessage;
+  /// The list of loaded news articles for the CURRENTLY selected language.
+  /// It safely returns an empty list if no data is available for that language.
+  List<NewsArticle> get articles => _cachedArticlesByLang[_currentLanguageCode] ?? [];
 
   // --- Constants ---
 
@@ -59,60 +104,61 @@ class NewsService with ChangeNotifier {
 
   // --- Public Methods ---
 
-  /// Loads news articles, utilizing a 7-day cache to avoid unnecessary network requests.
-  ///
-  /// This is the primary method to be called by the UI to fetch news.
-  /// It first checks for valid cached data before fetching from the network.
-  Future<void> loadNews() async {
-    // If articles are already loaded and the state is success, do nothing.
-    if (_state == NewsState.success && _articles.isNotEmpty) {
+  /// The new primary method to load news for a specific language.
+  /// It first checks the multi-language cache before fetching from the network.
+  Future<void> loadNewsForLanguage(String languageCode) async {
+    _currentLanguageCode = languageCode;
+
+    if (_cachedArticlesByLang.containsKey(languageCode) && !_languagesWithFetchErrors.contains(languageCode)) {
+      debugPrint("[NewsService] Found valid cached articles for '$languageCode'. Showing immediately.");
+      _setState(NewsState.success, "loadNewsForLanguage - from lang cache");
       return;
     }
 
-    _setState(NewsState.loading);
+    if (_isLoadingOperation) {
+      debugPrint("[NewsService] loadNewsForLanguage SKIPPED: An operation is already in progress.");
+      return;
+    }
+    _isLoadingOperation = true;
+    _setState(NewsState.loading, "loadNewsForLanguage - starting fetch for '$languageCode'");
 
     try {
-      // Ensure core services like Firebase are ready before any operation.
       await _appInitializer.onCoreServicesReady;
 
-      // Attempt to load from cache first.
-      final bool loadedFromCache = await _loadFromCache();
-      if (loadedFromCache) {
-        _setState(NewsState.success);
-        return;
+      if (await _loadFromCache()) {
+      } else {
+        debugPrint("[NewsService] Device cache invalid for '$languageCode'. Fetching from network.");
+        await _fetchFromNetworkAndCache();
       }
-
-      // If cache is invalid or missing, fetch from the network.
-      debugPrint("[NewsService] Cache invalid or empty. Fetching from network.");
-      await _fetchFromNetworkAndCache();
-      _setState(NewsState.success);
-
     } catch (e, s) {
       _handleError('Could not fetch news updates.', e, s);
+    } finally {
+      _isLoadingOperation = false;
     }
   }
 
-  /// Forces a refresh of the news articles, bypassing the cache.
-  ///
-  /// This is useful for "pull-to-refresh" actions or after a significant app
-  /// event like a language change.
-  Future<void> forceRefresh() async {
-    debugPrint("[NewsService] Force refresh triggered.");
-    _setState(NewsState.loading);
+  /// Forces a refresh for the CURRENT language, bypassing all caches.
+  Future<void> forceRefreshCurrentLanguage() async {
+    if (_isLoadingOperation) {
+      debugPrint("[NewsService] forceRefresh SKIPPED: An operation is already in progress.");
+      return;
+    }
+    _isLoadingOperation = true;
+    _setState(NewsState.loading, "forceRefreshCurrentLanguage - starting fetch for '$_currentLanguageCode'");
 
     try {
       await _appInitializer.onCoreServicesReady;
       await _fetchFromNetworkAndCache();
-      _setState(NewsState.success);
     } catch (e, s) {
       _handleError('Could not refresh news updates.', e, s);
+    } finally {
+      _isLoadingOperation = false;
     }
   }
 
   // --- Private Helper Methods ---
 
   /// Attempts to load and parse news articles from SharedPreferences.
-  /// Returns `true` if loading from cache was successful, `false` otherwise.
   Future<bool> _loadFromCache() async {
     final prefs = await SharedPreferences.getInstance();
     final lastFetchTimestamp = prefs.getInt(_timestampKey);
@@ -122,8 +168,10 @@ class NewsService with ChangeNotifier {
       if (DateTime.now().difference(lastFetchDate).inDays < 7) {
         final cachedData = prefs.getString(_cacheKey);
         if (cachedData != null) {
-          debugPrint("[NewsService] Loading news from valid cache.");
-          _parseAndSetArticles(cachedData);
+          debugPrint("[NewsService] Loading news from valid device cache.");
+          final parsedArticles = _parseAndValidateArticles(cachedData);
+          _cachedArticlesByLang[_currentLanguageCode] = parsedArticles;
+          _setState(NewsState.success, "loadFromCache");
           return true;
         }
       }
@@ -131,77 +179,81 @@ class NewsService with ChangeNotifier {
     return false;
   }
 
-  /// Fetches news data from the network, parses it, and saves it to the cache.
-  /// Throws an exception if any step of the process fails.
+  /// Fetches news data from the network, parses it, and saves it to caches.
   Future<void> _fetchFromNetworkAndCache() async {
     final user = await FirebaseAuth.instance.authStateChanges().first;
-    if (user == null) {
-      throw Exception("User session could not be established for news fetch.");
-    }
+    if (user == null) throw Exception("User session could not be established.");
+
     final idToken = await user.getIdToken();
 
-    // 1. Get the signed URL for the news JSON file.
-    final urlResponse = await _dio.post(
-      _getCacheUrlEndpoint,
+    final urlResponse = await _dio.post(_getCacheUrlEndpoint,
       data: jsonEncode({'data': null}),
-      options: Options(headers: {
-        "Authorization": "Bearer $idToken",
-        "Content-Type": "application/json",
-      }),
+      options: Options(headers: {"Authorization": "Bearer $idToken", "Content-Type": "application/json"}),
     );
 
-    if (urlResponse.statusCode != 200 || urlResponse.data == null) {
-      throw Exception("Failed to get cache URL. Status: ${urlResponse.statusCode}");
-    }
+    if (urlResponse.statusCode != 200 || urlResponse.data == null) throw Exception("Failed to get cache URL.");
     final String? signedUrl = urlResponse.data['result']?['signedUrl'];
-    if (signedUrl == null) {
-      throw Exception("Backend did not return a 'signedUrl'.");
-    }
+    if (signedUrl == null) throw Exception("Backend did not return a 'signedUrl'.");
 
-    // 2. Fetch the actual news content using the signed URL.
-    final newsResponse = await _dio.get(
-      signedUrl,
-      options: Options(responseType: ResponseType.bytes),
-    );
+    final newsResponse = await _dio.get(signedUrl, options: Options(responseType: ResponseType.bytes));
 
     if (newsResponse.statusCode == 200 && newsResponse.data != null) {
       final newsJsonString = utf8.decode(newsResponse.data as List<int>);
-      _parseAndSetArticles(newsJsonString);
+      final parsedArticles = _parseAndValidateArticles(newsJsonString);
 
-      // 3. Cache the new data successfully.
+      _cachedArticlesByLang[_currentLanguageCode] = parsedArticles;
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_cacheKey, newsJsonString);
       await prefs.setInt(_timestampKey, DateTime.now().millisecondsSinceEpoch);
       debugPrint("[NewsService] Successfully fetched and cached new news data.");
+      _setState(NewsState.success, "fetchFromNetwork");
     } else {
       throw Exception('Failed to load news content. Status: ${newsResponse.statusCode}');
     }
   }
 
-  /// Parses the JSON string into a list of [NewsArticle] objects.
-  /// Throws an exception if parsing fails.
-  void _parseAndSetArticles(String jsonString) {
+  /// Parses the JSON string and filters out any invalid articles.
+  List<NewsArticle> _parseAndValidateArticles(String jsonString) {
     try {
       final List<dynamic> jsonData = json.decode(jsonString);
-      _articles = jsonData
-          .map((json) => NewsArticle.fromJson(json as Map<String, dynamic>))
-          .toList();
+      final allArticles = jsonData.map((json) => NewsArticle.fromJson(json as Map<String, dynamic>)).toList();
+
+      final validArticles = allArticles.where((article) => article.isValid).toList();
+
+      if (allArticles.length != validArticles.length) {
+        debugPrint("[NewsService] Filtered out ${allArticles.length - validArticles.length} invalid articles.");
+      }
+      return validArticles;
     } catch (e) {
-      // Re-throw a more specific error to be caught by the calling method.
       throw Exception('Failed to parse news articles: $e');
     }
   }
 
-  /// A centralized method for handling errors.
+  /// Handles errors by setting state to success with an empty list for the current language,
+  /// preserving data for other languages.
   void _handleError(String message, Object e, StackTrace s) {
-    debugPrint('[NewsService] An error occurred: $e\n$s');
-    _errorMessage = message;
-    _articles = [];
-    _setState(NewsState.error);
+    debugPrint('[NewsService] ERROR for language "$_currentLanguageCode": $message. Exception: $e');
+
+    _languagesWithFetchErrors.add(_currentLanguageCode);
+
+    _cachedArticlesByLang[_currentLanguageCode] = [];
+
+    _setState(NewsState.success, "handleError - failing silently for '$_currentLanguageCode'");
   }
 
-  /// A centralized method for updating the state and notifying listeners.
-  void _setState(NewsState newState) {
+  /// A centralized method for updating the state and notifying listeners with logging.
+  /// It now prevents unnecessary notifications if the state hasn't actually changed.
+  void _setState(NewsState newState, String source) {
+    // If the new state is the same as the current state,
+    // there is no reason to notify listeners and trigger a UI rebuild.
+    // This is a core optimization that prevents unnecessary redraw cycles.
+    if (_state == newState) {
+      debugPrint("[NewsService] State is already $newState. No notification needed. (Source: $source)");
+      return;
+    }
+
+    debugPrint("[NewsService] State changed from $_state to: $newState. Triggered by: $source");
     _state = newState;
     notifyListeners();
   }

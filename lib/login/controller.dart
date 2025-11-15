@@ -1,16 +1,12 @@
 // lib/login/controller.dart
 
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:cortex/main.dart';
-import 'package:cortex/notifications.dart';
 import 'package:cortex/webview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../app.dart';
+import '../notifications/introvert.dart';
 import 'backend.dart';
-import 'verify.dart';
 
 /// Defines the authentication mode for the UI.
 enum AuthMode { login, register }
@@ -29,7 +25,7 @@ enum AuthMode { login, register }
 class LoginController extends ChangeNotifier {
   // --- Dependencies (Initialized via `initialize`) ---
   late final LoginBackendService _backendService;
-  late final NotificationService _notificationService;
+  late final IntrovertNotificationService _notificationService;
 
   // --- UI State ---
   AuthMode _authMode = AuthMode.login;
@@ -69,7 +65,7 @@ class LoginController extends ChangeNotifier {
   /// The `context` is used only for the initial setup and is not stored.
   void initialize(TickerProvider vsync, BuildContext context) {
     _backendService = LoginBackendService();
-    _notificationService = Provider.of<NotificationService>(context, listen: false);
+    _notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
 
     const duration300 = Duration(milliseconds: 300);
     const shakeDuration = Duration(milliseconds: 500);
@@ -158,14 +154,6 @@ class LoginController extends ChangeNotifier {
 
     switch (result) {
       case LoginSuccess():
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainScreen(key: mainScreenKey)));
-        break;
-      case LoginEmailNotVerified(user: final user):
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => EmailVerificationScreen(email: user.email!, userId: user.uid, password: password, username: ''),
-          ),
-        );
         break;
       case LoginInvalidCredentials():
         _loginEmailError = l10n.invalidCredentials;
@@ -187,6 +175,8 @@ class LoginController extends ChangeNotifier {
 
   /// Handles the registration submission logic. Requires a fresh `BuildContext` from the UI.
   Future<void> submitRegister(BuildContext context, String username, String email, String password) async {
+    if (_isLoading) return;
+
     _clearServerErrors();
     _setLoading(true);
 
@@ -202,12 +192,7 @@ class LoginController extends ChangeNotifier {
     final l10n = AppLocalizations.of(context)!;
 
     switch (result) {
-      case RegistrationSuccess(user: final user):
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => EmailVerificationScreen(email: email, username: username, userId: user.uid, password: password),
-          ),
-        );
+      case RegistrationSuccess():
         break;
       case RegistrationUsernameTaken():
         _registerUsernameError = l10n.usernameTaken;
@@ -231,6 +216,8 @@ class LoginController extends ChangeNotifier {
 
   /// Handles Google Sign-In. Requires a fresh `BuildContext` from the UI.
   Future<void> signInWithGoogle(BuildContext context) async {
+    if (_isLoading) return;
+
     _setLoading(true);
     final result = await _backendService.signInWithGoogle(
       context: context,
@@ -241,10 +228,8 @@ class LoginController extends ChangeNotifier {
 
     switch(result) {
       case GoogleSignInSuccess():
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => MainScreen(key: mainScreenKey)));
         break;
       case GoogleSignInFailure():
-      // The service already handled user feedback.
         break;
     }
     _setLoading(false);
@@ -256,7 +241,7 @@ class LoginController extends ChangeNotifier {
     final l10n = AppLocalizations.of(context)!;
     final Uri url = Uri.parse('https://vertexishere.com/reset-password');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      _notificationService.showNotification(message: l10n.couldNotOpenLink, isSuccess: false);
+      _notificationService.showNotification(message: l10n.couldNotOpenLink, type: NotificationType.error);
     }
   }
 
