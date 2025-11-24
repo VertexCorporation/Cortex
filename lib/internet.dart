@@ -1,37 +1,44 @@
 // internet.dart
 
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'dart:async';
 
-/// A dedicated ChangeNotifier to manage and provide internet connectivity state
-/// throughout the application. This centralizes the logic and makes it easy for any
-/// widget to react to connectivity changes.
+/// A dedicated ChangeNotifier to manage and provide internet connectivity state.
 class InternetProvider with ChangeNotifier {
   late final StreamSubscription<bool> _subscription;
-  bool _isConnected = true; // Assume connected initially to avoid UI flicker.
+  bool _isConnected = true; // Assume connected initially (Optimistic UI).
 
   bool get isConnected => _isConnected;
 
   InternetProvider() {
-    // Immediately check initial status and then start listening for changes.
     _initialize();
   }
 
   void _initialize() async {
-    // Set initial state faster
+    // 1. Initial fast check
     _isConnected = await InternetService().hasInternet();
     notifyListeners();
 
-    // Listen for subsequent changes. The 'status' parameter here is now correctly inferred as a bool.
+    // 2. Listen for live changes
     _subscription = InternetService().onConnectivityChanged.listen((status) {
-      final newStatus = status;
-      if (_isConnected != newStatus) {
-        _isConnected = newStatus;
+      if (_isConnected != status) {
+        _isConnected = status;
         notifyListeners();
       }
     });
+
+  }
+
+  /// --- NEW METHOD ---
+  /// Called by AppInitializer during startup to get the definitive
+  /// current status before running background tasks.
+  Future<void> checkInternetConnection() async {
+    final bool currentStatus = await InternetService().hasInternet();
+    if (_isConnected != currentStatus) {
+      _isConnected = currentStatus;
+      notifyListeners();
+    }
   }
 
   @override
@@ -41,8 +48,7 @@ class InternetProvider with ChangeNotifier {
   }
 }
 
-
-/// Singleton service to centralize internet connectivity checks
+/// Singleton service to centralize internet connectivity checks (No changes needed here, but kept for context)
 class InternetService {
   InternetService._internal() {
     _initialize();
@@ -56,7 +62,6 @@ class InternetService {
   bool _hasInternet = true;
   late final StreamSubscription<InternetStatus> _subscription;
 
-  /// Initialize listener and initial status
   void _initialize() {
     _subscription = _checker.onStatusChange.listen((status) {
       final connected = status == InternetStatus.connected;
@@ -64,24 +69,20 @@ class InternetService {
         _hasInternet = connected;
         _controller.add(connected);
 
-        final logMessage = "[Connectivity] Status changed to: ${connected ? 'ONLINE' : 'OFFLINE'}";
-        debugPrint(logMessage);
-
-        FirebaseCrashlytics.instance.log(logMessage);
+        // Only log significant changes to keep logs clean
+        if (kDebugMode) {
+          debugPrint("[Connectivity] Status changed to: ${connected ? 'ONLINE' : 'OFFLINE'}");
+        }
       }
     });
   }
 
-  /// Returns current known connectivity status
   bool get currentStatus => _hasInternet;
 
-  /// Returns a broadcast stream of connectivity changes
   Stream<bool> get onConnectivityChanged => _controller.stream;
 
-  /// Performs an immediate connectivity check
   Future<bool> hasInternet() => _checker.hasInternetAccess;
 
-  /// Dispose the stream controller (call at app teardown)
   void dispose() {
     _subscription.cancel();
     _controller.close();

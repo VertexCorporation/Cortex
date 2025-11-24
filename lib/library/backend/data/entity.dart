@@ -100,36 +100,41 @@ class ModelEntity {
   /// Factory constructor to create a [ModelEntity] from a raw map.
   factory ModelEntity.fromMap(Map<String, dynamic> map, String langCode) {
 
+    // Yardımcı fonksiyon: Gelen değer String ise döndürür, Map ise dili seçer.
     String? getStringOrLocalized(dynamic value) {
       if (value == null) return null;
       if (value is String) return value;
       if (value is Map) {
         final localizedMap = Map<String, String>.from(value.map((key, val) => MapEntry(key.toString(), val.toString())));
-        return localizedMap[langCode] ?? localizedMap['en'];
+        // Öncelik: İstenen Dil > İngilizce > Map'in ilk değeri
+        return localizedMap[langCode] ?? localizedMap['en'] ?? localizedMap.values.firstOrNull;
       }
       return value.toString();
     }
 
     return ModelEntity(
-      id: map['id'] as String,
-      displayTitle: map['title'] as String? ?? map['id'] as String,
-      producer: map['producer'] as String? ?? 'Unknown',
-      type: map['type'] as String? ?? 'online',
-      category: map['category'] as String? ?? 'online',
+      id: map['id']?.toString() ?? 'unknown',
+      displayTitle: getStringOrLocalized(map['title']) ?? getStringOrLocalized(map['id']) ?? 'Unknown Model',
+      producer: getStringOrLocalized(map['producer']) ?? 'Unknown',
+      type: getStringOrLocalized(map['type']) ?? 'online',
+      category: getStringOrLocalized(map['category']) ?? 'online',
       role: getStringOrLocalized(map['role']),
-      displaySummary: map['summary'] as String? ?? '',
-      displayDescription: map['description'] as String? ?? '',
+      displaySummary: getStringOrLocalized(map['summary']) ?? '',
+      displayDescription: getStringOrLocalized(map['description']) ?? '',
       baseModelId: getStringOrLocalized(map['baseModelId']),
       imagePath: getStringOrLocalized(map['imagePath']),
       ggufPath: getStringOrLocalized(map['ggufPath']),
-      tier: map['tier'] as String? ?? 'free',
-      size: map['size'] as int?,
-      ram: map['ram'] as int?,
+      tier: getStringOrLocalized(map['tier']) ?? 'free',
+      size: int.tryParse(map['size']?.toString() ?? ''),
+      ram: int.tryParse(map['ram']?.toString() ?? ''),
+
       modalities: Map<String, dynamic>.from(map['modalities'] as Map? ?? {}),
       outputs: Map<String, dynamic>.from(map['outputs'] as Map? ?? {}),
       extensions: map['extensions'] as Map<String, dynamic>?,
+
       url: getStringOrLocalized(map['url']),
       context: getStringOrLocalized(map['context']),
+
       isFullyLocalized: map['isFullyLocalized'] as bool? ?? true,
       chatFormat: map['chatFormat'] != null
           ? ChatFormat.fromMap(map['chatFormat'] as Map<String, dynamic>)
@@ -195,6 +200,8 @@ class ModelEntity {
       'type': type,
       'category': category,
       'role': role,
+      'summary': displaySummary,
+      'description': displayDescription,
       'baseModelId': baseModelId,
       'imagePath': imagePath,
       'ggufPath': ggufPath,
@@ -207,6 +214,7 @@ class ModelEntity {
       'url': url,
       'context': context,
       'isFullyLocalized': isFullyLocalized,
+      'chatFormat': chatFormat?.toMap(),
     };
   }
 

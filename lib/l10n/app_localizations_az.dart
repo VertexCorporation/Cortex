@@ -1433,7 +1433,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Kreditlər onlayn modellərlə söhbət etmək üçün istifadə olunur. hər mesaj bizə pula başa gəlir və bu kreditlər bizi batmağa qoymur indi gəlin sistemi başa salım\n\n• Pulsuz onlayn modelə hər mesaj 10 kreditdir.\n• Premium onlayn modelə hər mesaj 20 kreditdir.\n• Bir əlavə daxil etmək 30 kredit daha artırır.\n• Pulsuz plan istifadəçiləri hər gün sıfırlanan 200 kredit bonusu əldə edir.';
+      'Kreditlər onlayn süni intellekt modelləri ilə söhbət etmək üçün istifadə olunur. hər mesaj doğrudan cibimizdən çıxır və düzünü desək bu kreditlər olmasa çoxdan tam müflislik yoluna girmişdik vallah. İndi gəlin sistemi qısa və aydın şəkildə izah edək:\n\n• Pulsuz onlayn modelə göndərilən hər mesaj 5 kreditə başa gəlir.\n• Onlayn premium modelə göndərilən hər mesaj 20 kreditə başa gəlir.\n• Qoşma əlavə etmək 30 əlavə kredit tələb edir.\n• Pulsuz plan istifadəçiləri hər gün sıfırlanan 200 kredit bonusu alır.';
 
   @override
   String get creditsInfoPanelFooter => 'Xoş söhbətlər!';
@@ -1514,7 +1514,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Vertex hesabınıza daxil olun. Google vasitəsilə qeydiyyatdan keçən yeni istifadəçilər Şərtlərimiz və Məxfilik Siyasətimizlə razılaşırlar. Onları Qeydiyyat ekranında nəzərdən keçirə bilərsiniz.';
+      'Vertex hesabınıza daxil olun. Üçüncü tərəf xidmətləri vasitəsilə qeydiyyatdan keçən yeni istifadəçilər Şərtlər və Məxfilik Siyasətimizlə razılaşırlar. Siz onlara Qeydiyyat ekranında baxa bilərsiniz.';
 
   @override
   String get registerSubtitle =>
@@ -2077,4 +2077,42 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'Play Store keşiniz güncəl deyil. Lütfən, Play Store tətbiqini bağlayın və yenidən açın və ya cihazınızı yenidən başladın.';
+
+  @override
+  String get continueAsGuest => 'Hesab yaratmadan davam edin';
+
+  @override
+  String get guestModeWarning =>
+      'Qonaq rejimi ən yaxşı xidmət keyfiyyətini təmin etmək üçün məhdud xüsusiyyətlərə malikdir.';
+
+  @override
+  String get anonymousEntity => 'Anonim Müəssisə';
+
+  @override
+  String get upgradeAccountTitle => 'Hesabınızı Tamamlayın';
+
+  @override
+  String get upgradeAccountDescription =>
+      'Gündəlik 200 bonus krediti əldə etmək və daha çox limiti açmaq üçün hesab yaradın.';
+
+  @override
+  String get createAccount => 'Hesab Yaradın';
+
+  @override
+  String get upgradeTitle => 'Qeydiyyatı yekunlaşdırın';
+
+  @override
+  String get accountLinkedSuccess => 'Hesab uğurla yaradıldı!';
+
+  @override
+  String get continueWithApple => 'Apple ilə davam edin';
+
+  @override
+  String get guest => 'Qonaq';
+
+  @override
+  String get betterWithAnAccount => 'Bu bölmə hesabla daha yaxşıdır!';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

@@ -135,36 +135,29 @@ class Extensions {
   /// uses a simple `updateModelId` callback that expects the full ID of the
   /// selected extension. This delegates state management responsibility back
   /// to the calling widget (`ChatScreen`).
+  /// Displays the extension selection panel overlay.
   void showExtensionPanel({
     required BuildContext context,
     required GlobalKey extensionKey,
     required String modelTitle,
     required Function(String) updateModelId,
     required ModelService modelService,
+    required VoidCallback onPanelClosed,
   }) {
     if (currentExtensions.isEmpty) return;
     _panelIsClosing = false;
     const String logPrefix = "[Extensions.showExtensionPanel]";
     debugPrint("$logPrefix Panel opened for model series '$currentBaseSeries'.");
 
-    // Get the current language code from the context.
     final langCode = Localizations.localeOf(context).languageCode;
-
-    // Fetch the type-safe ModelEntity for the current series.
-    // We now pass the required `langCode`.
     final modelSeriesEntity = modelService.getPreciseModelData(currentBaseSeries, langCode: langCode);
-
-    // Safely access the extensions map from the entity.
     final extensionsMap = modelSeriesEntity.extensions ?? {};
 
-    // Create the 'options' list by mapping over the extension IDs and pulling
-    // the corresponding data from the extensions map.
     final List<Map<String, dynamic>> options = currentExtensions
         .map((extId) {
       if (extensionsMap.containsKey(extId) && extensionsMap[extId] is Map<String, dynamic>) {
         return extensionsMap[extId] as Map<String, dynamic>;
       }
-      // Provide a safe fallback if the extension data is somehow missing.
       return {'id': extId, 'title': extId};
     })
         .toList();
@@ -183,14 +176,13 @@ class Extensions {
         builder: (BuildContext context, StateSetter setState) {
           return Stack(
             children: [
-              // This GestureDetector now fills the ENTIRE screen. It sits behind the
-              // panel. Tapping anywhere that isn't the panel will be caught by this
-              // detector, ensuring a clean dismissal from the AppBar or any other area.
+              // Full screen detector for "Tap Outside"
               Positioned.fill(
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: () {
                     debugPrint("$logPrefix Panel dismissed by tapping outside.");
+                    // Trigger internal closing animation
                     setState(() {
                       _panelIsClosing = true;
                     });
@@ -217,8 +209,11 @@ class Extensions {
                     );
                   },
                   onEnd: () {
+                    // When closing animation finishes (either by selection or tap outside)
                     if (_panelIsClosing) {
                       removeExtensionPanel();
+                      // Notify the controller so Briefing can reappear
+                      onPanelClosed();
                     }
                   },
                   child: Align(
@@ -234,11 +229,17 @@ class Extensions {
                         });
                       },
                       onSelect: (selectedOption) async {
-                        // The 'selectedOption' is now a Map, not a MapEntry.
                         final selectedId = selectedOption['id'] as String;
-                        debugPrint("$logPrefix User selected extension: '$selectedId'. Invoking callback.");
+                        debugPrint("$logPrefix User selected extension: '$selectedId'.");
                         displayedExtensionLabel = selectedId;
+
+                        // 1. Update logic
                         await updateModelId(selectedId);
+
+                        // 2. Trigger close. This sets _panelIsClosing=true,
+                        // which runs the animation, hits onEnd, removes panel,
+                        // and finally calls onPanelClosed().
+                        closePanel();
                       },
                     ),
                   ),

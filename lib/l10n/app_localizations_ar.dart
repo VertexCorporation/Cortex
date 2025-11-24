@@ -1417,7 +1417,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'تُستخدم الأرصدة للدردشة مع النماذج عبر الإنترنت. كل رسالة بتكلفنا فلوس والأرصدة دي هي اللي بتمنعنا من الإفلاس طيب دلوقتي يلا نشرح النظام\n\n• كل رسالة لنموذج مجاني على الإنترنت بتكلف 10 أرصدة.\n• كل رسالة لنموذج بريميوم على الإنترنت بتكلف 20 رصيد.\n• إضافة مرفق بتضيف 30 رصيد زيادة.\n• مستخدمين الخطة المجانية بياخدوا مكافأة 200 رصيد بتتجدد كل يوم.';
+      'يتم استخدام الاعتمادات للدردشة مع نماذج الذكاء الاصطناعي عبر الإنترنت. بصراحة كل رسالة نرسلها تعتبر تكلفة حقيقية علينا وهذه الاعتمادات هي الشيء الوحيد تقريبًا الذي يمنعنا من الإفلاس تمامًا، يعني هي اللي شايلة الموضوع كله. الآن دعونا نشرح النظام بشكل بسيط وواضح:\n\n• تكلف كل رسالة إلى نموذج مجاني عبر الإنترنت 5 اعتمادات.\n• تكلف كل رسالة إلى نموذج مميز عبر الإنترنت 20 اعتمادًا.\n• يضيف تضمين مرفق 30 اعتمادًا إضافيًا.\n• يحصل مستخدمو الخطة المجانية على مكافأة قدرها 200 اعتماد يُعاد ضبطها يوميًا.';
 
   @override
   String get creditsInfoPanelFooter => 'استمتع بالدردشة!';
@@ -1495,7 +1495,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'سجل الدخول إلى حساب Vertex الخاص بك. يوافق المستخدمون الجدد الذين يسجلون عبر Google على شروطنا وسياسة الخصوصية. يمكنك مراجعتها على شاشة التسجيل.';
+      'سجّل دخولك إلى حساب فيرتكس. يوافق المستخدمون الجدد الذين يسجلون عبر خدمات جهات خارجية على شروطنا وسياسة الخصوصية. يمكنك مراجعتها في صفحة التسجيل.';
 
   @override
   String get registerSubtitle =>
@@ -2055,4 +2055,42 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'ذاكرة التخزين المؤقت لمتجر Play ليست مُحدَّثة. يُرجى إغلاق تطبيق متجر Play وإعادة فتحه، أو إعادة تشغيل جهازك.';
+
+  @override
+  String get continueAsGuest => 'متابعة دون إنشاء حساب';
+
+  @override
+  String get guestModeWarning =>
+      'يحتوي وضع الضيف على ميزات محدودة لضمان أفضل جودة للخدمة.';
+
+  @override
+  String get anonymousEntity => 'كيان مجهول';
+
+  @override
+  String get upgradeAccountTitle => 'أكمل حسابك';
+
+  @override
+  String get upgradeAccountDescription =>
+      'قم بإنشاء حساب للحصول على 200 رصيد إضافي يوميًا وفتح المزيد من الحدود.';
+
+  @override
+  String get createAccount => 'إنشاء حساب';
+
+  @override
+  String get upgradeTitle => 'إتمام التسجيل';
+
+  @override
+  String get accountLinkedSuccess => 'تم إنشاء الحساب بنجاح!';
+
+  @override
+  String get continueWithApple => 'متابعة مع Apple';
+
+  @override
+  String get guest => 'ضيف';
+
+  @override
+  String get betterWithAnAccount => 'هذا القسم أفضل مع حساب!';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

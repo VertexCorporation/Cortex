@@ -394,9 +394,11 @@ class DeleteSection extends StatelessWidget {
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
 
-    final appLocalizations = AppLocalizations.of(context)!;
-    final hasInternet = context.watch<SettingsGeneralProvider>().hasInternet;
+    final generalProvider = context.watch<SettingsGeneralProvider>();
+    final hasInternet = generalProvider.hasInternet;
+    final isAnonymous = generalProvider.isAnonymous;
 
+    final appLocalizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -413,14 +415,15 @@ class DeleteSection extends StatelessWidget {
           style: GoogleFonts.roboto(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
         ),
         SizedBox(height: screenHeight * 0.02),
-        // *** FIX: Access 'isFromActiveChat' directly, without 'widget.' ***
         if (isFromActiveChat)
           _buildDisabledInfoText(context)
         else
           _buildDeleteAllConversationsButton(context),
-        SizedBox(height: screenHeight * 0.015),
-        if (hasInternet)
+
+        if (hasInternet && !isAnonymous) ...[
+          SizedBox(height: screenHeight * 0.015),
           _buildDeleteAccountButton(context),
+        ],
       ],
     );
   }

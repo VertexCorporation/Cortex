@@ -1448,7 +1448,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Los créditos se utilizan para chatear con modelos en línea. cada mensaje nos cuesta pasta y estos créditos evitan que nos vayamos a pique venga ahora explicamos el sistema\n\n• Cada mensaje a un modelo online gratuito cuesta 10 créditos.\n• Cada mensaje a un modelo online premium cuesta 20 créditos.\n• Incluir un adjunto suma 30 créditos más.\n• Los usuarios del plan gratuito obtienen un bono de 200 créditos que se reinicia a diario.';
+      'Los créditos se utilizan para chatear con modelos de IA en línea. cada mensaje de verdad nos cuesta pasta y estos créditos son básicamente lo único que nos salva de irnos directos a la quiebra jaja. Ahora vamos a explicar rápidamente cómo funciona el sistema:\n\n• Cada mensaje a un modelo en línea gratuito cuesta 5 créditos.\n• Cada mensaje a un modelo en línea premium cuesta 20 créditos.\n• Adjuntar un archivo suma 30 créditos más.\n• Los usuarios del plan gratuito reciben un bono de 200 créditos que se reinicia todos los días.';
 
   @override
   String get creditsInfoPanelFooter => '¡Feliz chateo!';
@@ -1531,7 +1531,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Inicia sesión en tu cuenta de Vertex. Los nuevos usuarios que se registren a través de Google aceptan nuestros Términos y Política de Privacidad. Puedes revisarlos en la pantalla de Registro.';
+      'Inicia sesión en tu cuenta de Vertex. Los nuevos usuarios que se registren a través de servicios de terceros aceptan nuestros Términos y Política de Privacidad. Puedes revisarlos en la pantalla de Registro.';
 
   @override
   String get registerSubtitle =>
@@ -2098,4 +2098,42 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'La caché de Play Store no está actualizada. Cierra y vuelve a abrir la aplicación Play Store o reinicia tu dispositivo.';
+
+  @override
+  String get continueAsGuest => 'Continúa sin crear una cuenta';
+
+  @override
+  String get guestModeWarning =>
+      'El modo invitado tiene funciones limitadas para garantizar la mejor calidad de servicio.';
+
+  @override
+  String get anonymousEntity => 'Entidad anónima';
+
+  @override
+  String get upgradeAccountTitle => 'Completa tu cuenta';
+
+  @override
+  String get upgradeAccountDescription =>
+      'Crea una cuenta para obtener 200 créditos de bonificación diarios y desbloquear más límites.';
+
+  @override
+  String get createAccount => 'Crear una cuenta';
+
+  @override
+  String get upgradeTitle => 'Finalizar registro';
+
+  @override
+  String get accountLinkedSuccess => '¡Cuenta creada con éxito!';
+
+  @override
+  String get continueWithApple => 'Continúa con Apple';
+
+  @override
+  String get guest => 'Invitado';
+
+  @override
+  String get betterWithAnAccount => '¡Esta sección es mejor con una cuenta!';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

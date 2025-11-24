@@ -1,4 +1,4 @@
-// database.dart
+// lib/chat/services/database.dart
 
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
@@ -100,5 +100,19 @@ class DbHelper {
     }
     await batch.commit();
     debugPrint("[Database] onUpgrade: All migrations successfully applied.");
+  }
+
+  /// Compresses the database and cleans up unused space (Disk Saver).
+  /// Call this method occasionally (e.g., after heavy deletions or sync).
+  Future<void> optimizeDatabase() async {
+    try {
+      // Ensure the database is initialized
+      if (_db == null) await db;
+
+      await _db!.execute('VACUUM');
+      debugPrint("[DatabaseHelper] Database vacuumed and optimized (Disk Space Reclaimed).");
+    } catch (e) {
+      debugPrint("[DatabaseHelper] Optimization failed (likely disk full or locked): $e");
+    }
   }
 }

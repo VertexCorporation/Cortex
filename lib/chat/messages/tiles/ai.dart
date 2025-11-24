@@ -158,29 +158,64 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
   void didUpdateWidget(covariant AIMessageTile old) {
     super.didUpdateWidget(old);
     final String logPrefix = "[AIMessageTile.didUpdateWidget]";
+
+    // 1. Stream Starting Logic
     final bool isStreamStarting = old.message.text.isEmpty && widget.message.text.isNotEmpty && widget.message.isThinking;
 
-    if (isStreamStarting) {
+    if (isStreamStarting && !widget.message.isError) {
       debugPrint("$logPrefix Stream starting. Revealing header.");
       if (_thinkPulseCtl.isAnimating) _thinkPulseCtl.stop();
       if (_thinkRotateCtl.isAnimating) _thinkRotateCtl.stop();
+
       _thinkPulseCtl.animateTo(1.0, duration: const Duration(milliseconds: 400), curve: Curves.easeOutBack);
       _thinkRotateCtl.animateTo(_thinkRotateCtl.value.roundToDouble(), duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
       _headerEntryCtl.forward();
     }
 
-    if (old.message.isThinking && !widget.message.isThinking) {
-      debugPrint("$logPrefix Stream finished. Finalizing state.");
+    // 2. ERROR STATE HANDLING
+    if (old.message.isError != widget.message.isError) {
+      if (widget.message.isError) {
+        debugPrint("$logPrefix Error detected. Halting thinking animations.");
+
+        final bool hasContent = _stableText.isNotEmpty || widget.message.text.isNotEmpty;
+
+        if (_thinkPulseCtl.isAnimating) _thinkPulseCtl.stop();
+        if (_thinkRotateCtl.isAnimating) _thinkRotateCtl.stop();
+
+        if (_textAnimCtl.isAnimating) {
+          _textAnimCtl.stop();
+          if (_animatingText.isNotEmpty) {
+            _stableText += _animatingText;
+            _animatingText = "";
+          }
+        }
+
+        if (!hasContent) {
+          _fadeCtl.reverse();
+        } else {
+
+        }
+
+        _errorFadeOutCtl
+          ..value = 0.0
+          ..forward();
+
+      } else {
+        _errorFadeOutCtl.reverse();
+        _fadeCtl.forward();
+      }
+    }
+
+    // 3. Stream Finished Logic
+    if (!widget.message.isError && old.message.isThinking && !widget.message.isThinking) {
+      debugPrint("$logPrefix Stream finished successfully.");
 
       if (_thinkPulseCtl.isAnimating) _thinkPulseCtl.stop();
       if (_thinkRotateCtl.isAnimating) _thinkRotateCtl.stop();
 
       final double current = _thinkRotateCtl.value;
       double target = current.ceilToDouble();
-
-      if ((target - current).abs() < 0.001) {
-        target += 1.0;
-      }
+      if ((target - current).abs() < 0.001) target += 1.0;
 
       _thinkRotateCtl.animateTo(
         target,
@@ -198,8 +233,9 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
       _textAnimCtl.value = 1.0;
     }
 
-    if (!old.message.isThinking && widget.message.isThinking) {
-      debugPrint("$logPrefix Regeneration started. Resetting state.");
+    // 4. Regeneration Logic
+    if (!old.message.isThinking && widget.message.isThinking && !widget.message.isError) {
+      debugPrint("$logPrefix Regeneration started.");
       _entryCtl.forward(from: 0);
       _headerEntryCtl.reverse();
       _stableText = "";
@@ -208,7 +244,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
       _thinkRotateCtl.repeat();
     }
 
-    if (widget.message.text != old.message.text && widget.message.isThinking) {
+    // 5. Text Update Logic
+    if (!widget.message.isError && widget.message.text != old.message.text && widget.message.isThinking) {
       setState(() {
         if (_textAnimCtl.isAnimating) {
           _stableText += _animatingText;
@@ -219,25 +256,21 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
         } else {
           _stableText = widget.message.text;
           _animatingText = "";
-          if (_textAnimCtl.isAnimating) {
-            _textAnimCtl.stop();
-          }
+          if (_textAnimCtl.isAnimating) _textAnimCtl.stop();
         }
 
         if (_animatingText.isNotEmpty) {
           final int newChars = _animatingText.length;
           const int msPerChar = 15;
-          const int minDuration = 150;
-          const int maxDuration = 800;
-          final newDuration = (newChars * msPerChar).clamp(minDuration, maxDuration);
+          final newDuration = (newChars * msPerChar).clamp(150, 800);
           _textAnimCtl.duration = Duration(milliseconds: newDuration);
-
           _textAnimCtl.forward(from: 0.0);
         }
       });
     }
 
-    else if (widget.message.text != old.message.text && !widget.message.isThinking) {
+    // 6. Static Text Change
+    else if (!widget.message.isError && widget.message.text != old.message.text && !widget.message.isThinking) {
       setState(() {
         _stableText = widget.message.text;
         _animatingText = "";
@@ -245,17 +278,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
       if (_textAnimCtl.isAnimating) _textAnimCtl.stop();
       _textAnimCtl.value = 1.0;
     }
-    if (old.message.isError != widget.message.isError) {
-      if (widget.message.isError) {
-        _fadeCtl.reverse();
-        _errorFadeOutCtl
-          ..value = 0.0
-          ..forward();
-      } else {
-        _errorFadeOutCtl.reverse();
-        _fadeCtl.forward();
-      }
-    }
+
+    // 7. Opacity Updates
     if (old.message.opacity != widget.message.opacity && !widget.message.isError) {
       if (widget.message.opacity == 1.0) {
         _fadeCtl.forward();

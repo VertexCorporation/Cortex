@@ -304,7 +304,6 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
         break;
     }
 
-    // --- NEW: Calculate the initial for the avatar ---
     // This allows us to use it for the ValueKey to trigger the animation.
     String initial = '?';
     final String? displayName = sessionProvider.displayName;
@@ -315,7 +314,10 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
       nameSource = displayName;
     } else if (email != null && email.isNotEmpty) {
       nameSource = email;
+    } else {
+      nameSource = localizations.anonymousEntity;
     }
+
     if (nameSource.isNotEmpty) {
       initial = nameSource[0].toUpperCase();
     }

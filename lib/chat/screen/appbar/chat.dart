@@ -6,7 +6,6 @@ import 'package:cortex/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../theme.dart';
 
 class ChatTitle extends StatefulWidget {
@@ -32,35 +31,6 @@ class ChatTitle extends StatefulWidget {
 }
 
 class ChatTitleState extends State<ChatTitle> {
-  Future<bool> triggerExtensionInfoPanelIfNeeded() async {
-    // CHECK 1: Has it already been shown in this session?
-    if (ChatTitle.extensionInfoShownThisSession) {
-      debugPrint("[ChatTitle] Info panel already shown THIS SESSION. Skipping.");
-      return false; // Do not show, return false.
-    }
-
-    // CHECK 2: Has the total display limit (3) been reached?
-    final prefs = await SharedPreferences.getInstance();
-    final int showCount = prefs.getInt(ChatTitle.extensionInfoCountKey) ?? 0;
-
-    if (showCount >= 3) {
-      debugPrint("[ChatTitle] Info panel has reached the permanent display limit of 3. Disabled.");
-      return false; // Do not show, return false.
-    }
-
-    // 1. Request the parent widget to display the panel.
-    widget.onShowInfoRequest();
-
-    // 2. Set the session flag to 'true' to prevent it from showing again until the app restarts.
-    ChatTitle.extensionInfoShownThisSession = true;
-
-    // 3. Increment and save the persistent total show counter.
-    await prefs.setInt(ChatTitle.extensionInfoCountKey, showCount + 1);
-    debugPrint("[ChatTitle] Requested parent to show info panel. Session flag set. New permanent count: ${showCount + 1}");
-
-    return true; // A request to show the panel was made, return true.
-  }
-
   @override
   Widget build(BuildContext context) {
     final bool hasExtensions = widget.extensions.currentExtensions.isNotEmpty;

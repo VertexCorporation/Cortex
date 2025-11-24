@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
+import java.io.File
 import kotlin.concurrent.thread
 
 /**
@@ -52,10 +53,41 @@ class LLamaAndroid {
     // Benchmarking and other functions from your code
     private external fun new_batch(nTokens: Int, embd: Int, nSeqMax: Int): Long
     private external fun free_batch(batch: Long)
-    private external fun new_sampler(): Long
+    private external fun new_sampler(temp: Float, topP: Float, topK: Int): Long
     private external fun free_sampler(sampler: Long)
     private external fun request_stop()
     private external fun set_image(bytes: ByteArray)
+
+    private fun computeSamplerParams(pathToModel: String): Triple<Float, Float, Int> {
+        return try {
+            val file = File(pathToModel)
+            if (!file.exists()) {
+                Log.w(tag, "Model file does not exist for sampler computation. Falling back to greedy.")
+                Triple(0.0f, 0.0f, 0)
+            } else {
+                val sizeMb = (file.length() / (1024L * 1024L)).toInt()
+                Log.d(tag, "Model size for sampler ≈ $sizeMb MB")
+
+                when {
+                    sizeMb <= 1000 -> {
+                        Triple(0.3f, 0.85f, 30)
+                    }
+                    sizeMb <= 5000 -> {
+                        Triple(0.5f, 0.90f, 40)
+                    }
+                    sizeMb <= 9000 -> {
+                        Triple(0.7f, 0.92f, 50)
+                    }
+                    else -> {
+                        Triple(0.9f, 0.95f, 60)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "Failed to compute sampler params. Falling back to greedy.", e)
+            Triple(0.0f, 0.0f, 0)
+        }
+    }
 
     suspend fun load(pathToModel: String) {
         withContext(runLoop) {
@@ -67,13 +99,19 @@ class LLamaAndroid {
                     val context = new_context(model)
                     if (context == 0L) throw IllegalStateException("new_context() failed")
 
-                    val batch = new_batch(512, 0, 1)
+                    val batch = new_batch(2048, 0, 1)
                     if (batch == 0L) throw IllegalStateException("new_batch() failed")
 
-                    val sampler = new_sampler()
+                    val (temp, topP, topK) = computeSamplerParams(pathToModel)
+
+                    val sampler = new_sampler(
+                        temp,
+                        topP,
+                        topK
+                    )
                     if (sampler == 0L) throw IllegalStateException("new_sampler() failed")
 
-                    Log.i(tag, "Loaded model $pathToModel")
+                    Log.i(tag, "Loaded model $pathToModel with sampler: temp=$temp, topP=$topP, topK=$topK")
                     threadLocalState.set(State.Loaded(model, context, batch, sampler))
                 }
                 else -> Log.w(tag, "Model already loaded.")

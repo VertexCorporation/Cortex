@@ -21,7 +21,6 @@ class AuthUnknownException extends AuthException {
   AuthUnknownException() : super('unknown-error');
 }
 
-
 /// A service dedicated to handling all authentication-related operations.
 ///
 /// This class acts as an abstraction layer over the Firebase Authentication SDK.

@@ -13,9 +13,6 @@
 //   to prevent infinite loops ("hellohellohello...", "aaaaaa...", etc.).
 //
 
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/processor.dart';
 import 'package:cortex/chat/services/response.dart';
@@ -24,6 +21,36 @@ import 'package:flutter/services.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import 'context.dart';
+
+class SamplerPreset {
+  final double temperature;
+  final double topP;
+  final int topK;
+
+  SamplerPreset(this.temperature, this.topP, this.topK);
+}
+
+SamplerPreset computeSampler(ModelEntity model) {
+  final size = model.size ?? 0; // MB
+
+  if (size <= 300) {
+    return SamplerPreset(0.1, 1.0, 1);     // Micro
+  } else if (size <= 700) {
+    return SamplerPreset(0.25, 0.98, 5);   // Mini
+  } else if (size <= 1400) {
+    return SamplerPreset(0.40, 0.92, 20);  // Small
+  } else if (size <= 3000) {
+    return SamplerPreset(0.55, 0.90, 40);  // Medium
+  } else if (size <= 5000) {
+    return SamplerPreset(0.70, 0.92, 60);  // Large
+  } else if (size <= 8000) {
+    return SamplerPreset(0.80, 0.94, 80);  // XL
+  } else if (size <= 12000) {
+    return SamplerPreset(0.90, 0.95, 100); // XXL
+  } else {
+    return SamplerPreset(1.00, 0.97, 120); // Ultra
+  }
+}
 
 /// A service to manage communication with the native (Kotlin/Swift) layer
 /// for handling on-device, offline model interactions via a platform channel.
@@ -158,9 +185,7 @@ class OfflineService {
       'sendMessage',
       {
         'message': finalPrompt,
-        'photoBase64': photoPath != null
-            ? await _encodePhotoToBase64(photoPath)
-            : null,
+        'photoPath': photoPath,
       },
     );
   }
@@ -464,16 +489,5 @@ class OfflineService {
     // Request the native side to stop generation. We still rely on
     // 'onMessageComplete' from native to finalize the response.
     stopGeneration();
-  }
-
-  Future<String?> _encodePhotoToBase64(String? path) async {
-    if (path == null) return null;
-    try {
-      final bytes = await File(path).readAsBytes();
-      return base64Encode(bytes);
-    } catch (e) {
-      debugPrint("[OfflineService] Failed to encode photo: $e");
-      return null;
-    }
   }
 }

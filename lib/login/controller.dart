@@ -5,7 +5,9 @@ import 'package:cortex/webview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../cache.dart';
 import '../notifications/introvert.dart';
+import '../settings/providers/general.dart';
 import 'backend.dart';
 
 /// Defines the authentication mode for the UI.
@@ -46,7 +48,6 @@ class LoginController extends ChangeNotifier {
   late final AnimationController registerUsernameShakeController;
   late final AnimationController registerEmailShakeController;
   late final AnimationController registerPasswordShakeController;
-  late final AnimationController registerConfirmPasswordShakeController;
 
   // --- Public Getters for UI ---
   AuthMode get authMode => _authMode;
@@ -76,7 +77,6 @@ class LoginController extends ChangeNotifier {
     registerUsernameShakeController = AnimationController(vsync: vsync, duration: shakeDuration);
     registerEmailShakeController = AnimationController(vsync: vsync, duration: shakeDuration);
     registerPasswordShakeController = AnimationController(vsync: vsync, duration: shakeDuration);
-    registerConfirmPasswordShakeController = AnimationController(vsync: vsync, duration: shakeDuration);
   }
 
   @override
@@ -87,7 +87,6 @@ class LoginController extends ChangeNotifier {
     registerUsernameShakeController.dispose();
     registerEmailShakeController.dispose();
     registerPasswordShakeController.dispose();
-    registerConfirmPasswordShakeController.dispose();
     super.dispose();
   }
 
@@ -230,6 +229,109 @@ class LoginController extends ChangeNotifier {
       case GoogleSignInSuccess():
         break;
       case GoogleSignInFailure():
+        break;
+    }
+    _setLoading(false);
+  }
+
+  /// Handles the anonymous login submission.
+  /// This should usually be called after the user confirms the warning dialog.
+  Future<void> submitAnonymousLogin(BuildContext context) async {
+    if (_isLoading) return;
+
+    if (!_agreeToTerms) return;
+
+    _clearServerErrors();
+    _setLoading(true);
+
+    final result = await _backendService.signInAnonymously(
+      context: context,
+      notificationService: _notificationService,
+    );
+
+    if (!(context.mounted)) return;
+
+    switch (result) {
+      case AnonymousSignInSuccess():
+        break;
+      case AnonymousSignInNetworkError():
+      case AnonymousSignInFailure():
+        _setLoading(false);
+        break;
+    }
+  }
+
+  /// Handles Apple Sign-In. Requires a fresh `BuildContext` from the UI.
+  Future<void> signInWithApple(BuildContext context) async {
+    if (_isLoading) return;
+
+    _setLoading(true);
+    final result = await _backendService.signInWithApple(
+      context: context,
+      notificationService: _notificationService,
+    );
+
+    if (!(context.mounted)) return;
+
+    switch(result) {
+      case AppleSignInSuccess():
+      // Logic handled in backend (sync token, etc.), UI will react to auth state change.
+        break;
+      case AppleSignInFailure():
+      // Error notification handled in backend.
+        break;
+    }
+    _setLoading(false);
+  }
+
+  /// Handles the upgrade (linking) submission logic.
+  Future<void> submitUpgrade(BuildContext context, String username, String email, String password) async {
+    if (_isLoading) return;
+
+    _clearServerErrors();
+    _setLoading(true);
+
+    final result = await _backendService.linkAnonymousWithEmail(
+      context: context,
+      notificationService: _notificationService,
+      username: username,
+      email: email,
+      password: password,
+    );
+
+    if (!(context.mounted)) return;
+    final l10n = AppLocalizations.of(context)!;
+
+    switch (result) {
+      case RegistrationSuccess():
+        CacheService.invalidate(CacheKey.settingsUserData);
+
+        if (context.mounted) {
+          await context.read<SettingsGeneralProvider>().refreshData();
+        }
+
+        if (context.mounted) {
+          Navigator.of(context).pop();
+          _notificationService.showNotification(
+              message: l10n.accountLinkedSuccess,
+              type: NotificationType.success
+          );
+        }
+        break;
+      case RegistrationUsernameTaken():
+        _registerUsernameError = l10n.usernameTaken;
+        registerUsernameShakeController.forward(from: 0);
+        break;
+      case RegistrationEmailInUse():
+        _registerEmailError = l10n.emailAlreadyInUse;
+        registerEmailShakeController.forward(from: 0);
+        break;
+      case RegistrationWeakPassword():
+        _registerPasswordError = l10n.weakPassword;
+        registerPasswordShakeController.forward(from: 0);
+        break;
+      case RegistrationNetworkError():
+      case RegistrationUnknownError():
         break;
     }
     _setLoading(false);

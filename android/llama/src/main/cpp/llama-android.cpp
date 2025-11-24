@@ -168,7 +168,7 @@ ctx_params.n_ctx           = 2048;
 ctx_params.n_threads       = n_threads;
 ctx_params.n_threads_batch = n_threads;
 
-llama_context * context = llama_new_context_with_model(model, ctx_params);
+llama_context * context = llama_init_from_model(model, ctx_params);
 
 if (!context) {
 LOGe("llama_new_context_with_model() returned null)");
@@ -300,7 +300,7 @@ llama_model_desc(model, model_desc, sizeof(model_desc));
 const auto model_size     = double(llama_model_size(model)) / 1024.0 / 1024.0 / 1024.0;
 const auto model_n_params = double(llama_model_n_params(model)) / 1e9;
 
-const auto backend    = "(Android)"; // TODO: What should this be?
+const auto backend = "Android / CPU";
 
 std::stringstream result;
 result << std::setprecision(2);
@@ -314,54 +314,62 @@ return env->NewStringUTF(result.str().c_str());
 
 extern "C"
 JNIEXPORT jlong JNICALL
-        Java_android_llama_cpp_LLamaAndroid_new_1batch(JNIEnv *, jobject, jint n_tokens, jint embd, jint n_seq_max) {
-
-// Source: Copy of llama.cpp:llama_batch_init but heap-allocated.
-
-llama_batch *batch = new llama_batch {
-        0,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-};
-
-if (embd) {
-batch->embd = (float *) malloc(sizeof(float) * n_tokens * embd);
-} else {
-batch->token = (llama_token *) malloc(sizeof(llama_token) * n_tokens);
-}
-
-batch->pos      = (llama_pos *)     malloc(sizeof(llama_pos)      * n_tokens);
-batch->n_seq_id = (int32_t *)       malloc(sizeof(int32_t)        * n_tokens);
-batch->seq_id   = (llama_seq_id **) malloc(sizeof(llama_seq_id *) * n_tokens);
-for (int i = 0; i < n_tokens; ++i) {
-batch->seq_id[i] = (llama_seq_id *) malloc(sizeof(llama_seq_id) * n_seq_max);
-}
-batch->logits   = (int8_t *)        malloc(sizeof(int8_t)         * n_tokens);
-
+        Java_android_llama_cpp_LLamaAndroid_new_1batch(
+        JNIEnv *, jobject, jint n_tokens, jint embd, jint n_seq_max) {
+llama_batch * batch = new llama_batch(llama_batch_init(n_tokens, embd, n_seq_max));
 return reinterpret_cast<jlong>(batch);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_android_llama_cpp_LLamaAndroid_free_1batch(JNIEnv *, jobject, jlong batch_pointer) {
-//llama_batch_free(*reinterpret_cast<llama_batch *>(batch_pointer));
-const auto batch = reinterpret_cast<llama_batch *>(batch_pointer);
+Java_android_llama_cpp_LLamaAndroid_free_1batch(JNIEnv *, jobject, jlong p) {
+auto batch = reinterpret_cast<llama_batch *>(p);
+llama_batch_free(*batch);
 delete batch;
 }
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_android_llama_cpp_LLamaAndroid_new_1sampler(JNIEnv *, jobject) {
-    auto sparams = llama_sampler_chain_default_params();
-    sparams.no_perf = true;
-    llama_sampler * smpl = llama_sampler_chain_init(sparams);
-    llama_sampler_chain_add(smpl, llama_sampler_init_greedy());
+        Java_android_llama_cpp_LLamaAndroid_new_1sampler(
+        JNIEnv * env,
+        jobject /* thiz */,
+        jfloat temperature,
+jfloat top_p,
+        jint top_k
+) {
+(void) env; // unused warning fix
 
-    return reinterpret_cast<jlong>(smpl);
+auto sparams = llama_sampler_chain_default_params();
+sparams.no_perf = true;
+
+llama_sampler * smpl = llama_sampler_chain_init(sparams);
+
+// --- Pure greedy path (deterministic) ---
+if (temperature <= 0.0f) {
+llama_sampler_chain_add(smpl, llama_sampler_init_greedy());
+return reinterpret_cast<jlong>(smpl);
+}
+
+// --- Stochastic path (temp / top-k / top-p + dist) ---
+
+// 1) Top-K
+if (top_k > 0) {
+llama_sampler_chain_add(smpl, llama_sampler_init_top_k(top_k));
+}
+
+// 2) Top-P
+if (top_p > 0.0f && top_p < 1.0f) {
+// min_keep = 1
+llama_sampler_chain_add(smpl, llama_sampler_init_top_p(top_p, 1));
+}
+
+// 3) Temperature
+llama_sampler_chain_add(smpl, llama_sampler_init_temp(temperature));
+
+// 4) Final sampler
+llama_sampler_chain_add(smpl, llama_sampler_init_dist(LLAMA_DEFAULT_SEED));
+
+return reinterpret_cast<jlong>(smpl);
 }
 
 extern "C"
@@ -412,7 +420,10 @@ LOGi("completion_init: %zu image bytes available for multimodal processing.",
 auto n_ctx = llama_n_ctx(context);
 auto n_kv_req = tokens_list.size() + n_len;
 
-LOGi("n_len = %d, n_ctx = %d, n_kv_req = %d", n_len, n_ctx, n_kv_req);
+LOGi("n_len = %d, n_ctx = %d, n_kv_req = %zu",
+     n_len,
+     n_ctx,
+     (size_t) n_kv_req);
 
 if (n_kv_req > n_ctx) {
 LOGe("error: n_kv_req > n_ctx, the required KV cache size is not big enough");
@@ -503,5 +514,21 @@ return new_token;
 extern "C"
 JNIEXPORT void JNICALL
 Java_android_llama_cpp_LLamaAndroid_kv_1cache_1clear(JNIEnv *, jobject, jlong context) {
-llama_memory_clear(llama_get_memory(reinterpret_cast<llama_context *>(context)), true);
+if (context == 0) {
+__android_log_print(ANDROID_LOG_WARN, "llama-android", "clearKv() received null context, retrying...");
+
+int retries = 20;
+while (context == 0 && retries-- > 0) {
+usleep(10000);
+}
+
+if (context == 0) {
+__android_log_print(ANDROID_LOG_ERROR, "llama-android", "clearKv() FAILED: context pointer still null.");
+return;
+}
+}
+
+auto ctx = reinterpret_cast<llama_context *>(context);
+llama_memory_clear(llama_get_memory(ctx), true);
+__android_log_print(ANDROID_LOG_INFO, "llama-android", "KV cache successfully cleared.");
 }

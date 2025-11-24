@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LlamaService : Service() {
 
@@ -40,6 +41,7 @@ class LlamaService : Service() {
     }
 
     private lateinit var viewModel: MainViewModel
+
     private val serviceScope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate() {
@@ -57,8 +59,8 @@ class LlamaService : Service() {
                 }
                 "sendMessage" -> {
                     val message = it.getStringExtra("message") ?: ""
-                    val photoBase64 = it.getStringExtra("photoBase64")
-                    sendMessage(message, photoBase64)
+                    val photoPath = it.getStringExtra("photoPath")
+                    sendMessage(message, photoPath)
                 }
                 "stopGeneration" -> {
                     stopGeneration()
@@ -79,7 +81,9 @@ class LlamaService : Service() {
 
     fun cacheModel(path: String) {
         serviceScope.launch {
-            viewModel.load(path)
+            withContext(Dispatchers.IO) {
+                viewModel.load(path)
+            }
             if (isChannelInitialized) {
                 resultChannel.invokeMethod("onModelLoaded", "Model loaded successfully: $path")
             } else {
@@ -111,10 +115,30 @@ class LlamaService : Service() {
         }
     }
 
-    fun sendMessage(message: String?, photoBase64: String?) {
+    fun sendMessage(message: String?, photoPath: String?) {
         val safeMessage = message ?: ""
         serviceScope.launch {
             viewModel.updateMessage(safeMessage)
+
+            var photoBase64: String? = null
+
+            if (!photoPath.isNullOrBlank()) {
+                photoBase64 = withContext(Dispatchers.IO) {
+                    try {
+                        val file = java.io.File(photoPath)
+                        if (file.exists()) {
+                            val bytes = file.readBytes()
+                            android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+                        } else {
+                            null
+                        }
+                    } catch (e: Exception) {
+                        Log.e("LlamaService", "Error reading image file: $e")
+                        null
+                    }
+                }
+            }
+
             viewModel.send(photoBase64)
         }
     }

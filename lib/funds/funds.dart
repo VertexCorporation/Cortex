@@ -14,7 +14,10 @@ import 'package:provider/provider.dart';
 // Local Imports
 import '../../banner.dart';
 import '../../webview.dart';
+import '../login/upgrade.dart';
+import '../navigation.dart';
 import '../notifications/introvert.dart';
+import '../server/user.dart';
 import '../theme.dart';
 import 'backend.dart';
 import 'credits/credits.dart';
@@ -173,6 +176,13 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   void _onPrimaryButtonPressed() {
     final backend = Provider.of<FundsBackend>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
+    final isAnonymous = context.read<UserProvider>().isAnonymous;
+
+    if (isAnonymous) {
+      navigateToScreen(const UpgradeAccountScreen(), direction: const Offset(0.0, 1.0));
+      FocusScope.of(context).unfocus();
+      return;
+    }
     if (backend.isPurchasePending) return;
     if (backend.allProducts.isEmpty) {
       log('Purchase blocked: Product details are not loaded yet.', name: 'FundsScreen');
@@ -330,6 +340,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   }
 
   Widget _buildMainContent(BuildContext context, FundsBackend backend) {
+    final localizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -393,6 +404,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       ],
                     ),
                   ),
+
                   Padding(
                     padding: EdgeInsets.fromLTRB(screenWidth * 0.06, screenHeight * 0.01, screenWidth * 0.06, screenHeight * 0.02),
                     child: Column(
@@ -400,20 +412,21 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       children: [
                         _buildPageIndicator(screenWidth),
                         SizedBox(height: screenHeight * 0.02),
+
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 250),
                           curve: Curves.easeInOut,
                           transformAlignment: Alignment.center,
                           transform: Matrix4.identity()..scaleByDouble(
-                            backend.isPurchasePending ? 0.98 : 1.0,
-                            backend.isPurchasePending ? 0.98 : 1.0,
-                            backend.isPurchasePending ? 0.98 : 1.0,
-                            backend.isPurchasePending ? 0.98 : 1.0,
+                            backend.isPurchasePending ? 0.95 : 1.0,
+                            backend.isPurchasePending ? 0.95 : 1.0,
+                            backend.isPurchasePending ? 0.95 : 1.0,
+                            backend.isPurchasePending ? 0.95 : 1.0,
                           ),
                           child: Opacity(
-                            opacity: backend.isPurchasePending ? 0.7 : 1.0,
+                            opacity: backend.isPurchasePending ? 0.6 : 1.0,
                             child: ElevatedButton(
-                              onPressed: backend.isPurchasePending ? null : _onPrimaryButtonPressed,
+                              onPressed: _onPrimaryButtonPressed,
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: AppColors.primaryColor,
                                 backgroundColor: AppColors.primaryColor.inverted,
@@ -429,13 +442,52 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                             ),
                           ),
                         ),
+
+                        SizedBox(height: screenHeight * 0.015),
+
+                        // --- RESTORE BUTTON ---
+                        TextButton(
+                          onPressed: backend.isPurchasePending ? null : () async {
+                            await backend.restorePurchases();
+                          },
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            localizations.restorePurchases,
+                            style: TextStyle(
+                              color: AppColors.primaryColor.inverted,
+                              fontSize: screenWidth * 0.035,
+                              fontWeight: FontWeight.w600,
+                              decorationColor: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ),
+
                         SizedBox(height: screenHeight * 0.01),
+
                         TextButton(
                           onPressed: _showTermsAndConditions,
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           child: Text(
                             AppLocalizations.of(context)!.termsOfServiceAndPrivacyPolicyWarning,
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: AppColors.tertiaryColor, fontSize: screenWidth * 0.028),
+                            style: TextStyle(
+                                color: AppColors.tertiaryColor,
+                                fontSize: screenWidth * 0.026
+                            ),
                           ),
                         ),
                       ],

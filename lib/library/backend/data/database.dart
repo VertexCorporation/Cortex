@@ -1,4 +1,4 @@
-// models/backend/data/database.dart
+// lib/library/backend/data/database.dart
 
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
@@ -46,57 +46,116 @@ class DatabaseHelper {
 
   /// REFACTORED: Inserts a new model, automatically encrypting user-created data.
   /// It now accepts an optional `userId` to perform encryption.
-  Future<void> insert(String table, Map<String, dynamic> values, {
+  /// Handles SQLITE_FULL errors gracefully.
+  Future<int> insert(String table, Map<String, dynamic> values, {
     ConflictAlgorithm? conflictAlgorithm,
-    String? userId, // <-- NEW: User ID for encryption
+    String? userId, // <-- User ID for encryption
+  }) async {
+    try {
+      final db = await instance.database;
+      final modelId = values['id'] as String?;
+      final rawJson = values['raw_json'] as String?;
+
+      // --- ENCRYPTION LOGIC ---
+      // If it's a user-created model and we have a user ID, encrypt the data.
+      if (userId != null && rawJson != null && (modelId?.startsWith('self_') == true || modelId?.startsWith('local_') == true)) {
+        final encryptedJson = CryptoHelper.encrypt(rawJson, userId);
+        if (encryptedJson != null) {
+          values['raw_json'] = encryptedJson; // Replace raw JSON with encrypted data
+          debugPrint("[DatabaseHelper] Encrypted data for model '$modelId'");
+        } else {
+          debugPrint("[DatabaseHelper] CRITICAL: Failed to encrypt data for model '$modelId'");
+          // We might choose to throw here, or proceed unencrypted (risky). Throwing is safer.
+          throw Exception("Encryption failed for model $modelId");
+        }
+      }
+
+      return await db.insert(
+        table,
+        values,
+        conflictAlgorithm: conflictAlgorithm ?? ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      if (e.toString().contains("SQLITE_FULL") || e.toString().contains("database or disk is full")) {
+        debugPrint("[DatabaseHelper] CRITICAL: Disk full during insert. Data NOT saved.");
+        return -1; // Return -1 to indicate failure
+      }
+      rethrow;
+    }
+  }
+
+  /// Updates rows in the database.
+  Future<int> update(String table, Map<String, dynamic> values, {String? where, List<Object?>? whereArgs}) async {
+    try {
+      final db = await instance.database;
+      return await db.update(table, values, where: where, whereArgs: whereArgs);
+    } catch (e) {
+      if (e.toString().contains("SQLITE_FULL") || e.toString().contains("database or disk is full")) {
+        debugPrint("[DatabaseHelper] CRITICAL: Disk full during update. Data NOT saved.");
+        return -1;
+      }
+      rethrow;
+    }
+  }
+
+  /// Queries rows from the database.
+  /// This wrapper is needed because `Repository` calls `db.query`.
+  Future<List<Map<String, dynamic>>> query(String table, {
+    bool? distinct,
+    List<String>? columns,
+    String? where,
+    List<Object?>? whereArgs,
+    String? groupBy,
+    String? having,
+    String? orderBy,
+    int? limit,
+    int? offset,
   }) async {
     final db = await instance.database;
-    final modelId = values['id'] as String?;
-    final rawJson = values['raw_json'] as String?;
-
-    // --- ENCRYPTION LOGIC ---
-    // If it's a user-created model and we have a user ID, encrypt the data.
-    if (userId != null && rawJson != null && (modelId?.startsWith('self_') == true || modelId?.startsWith('local_') == true)) {
-      final encryptedJson = CryptoHelper.encrypt(rawJson, userId);
-      if (encryptedJson != null) {
-        values['raw_json'] = encryptedJson; // Replace raw JSON with encrypted data
-        debugPrint("[DatabaseHelper] Encrypted data for model '$modelId'");
-      } else {
-        // Handle encryption failure if necessary, maybe throw an error
-        debugPrint("[DatabaseHelper] CRITICAL: Failed to encrypt data for model '$modelId'");
-        throw Exception("Encryption failed for model $modelId");
-      }
-    }
-
-    await db.insert(
+    return await db.query(
       table,
-      values,
-      conflictAlgorithm: conflictAlgorithm ?? ConflictAlgorithm.replace,
+      distinct: distinct,
+      columns: columns,
+      where: where,
+      whereArgs: whereArgs,
+      groupBy: groupBy,
+      having: having,
+      orderBy: orderBy,
+      limit: limit,
+      offset: offset,
     );
   }
 
   /// Deletes any models from the local DB that are not present in the provided set of IDs.
   Future<void> deleteModelsNotIn(Set<String> validIds) async {
-    // (This function remains unchanged)
     if (validIds.isEmpty) return;
-    final db = await instance.database;
-    final placeholders = List.filled(validIds.length, '?').join(',');
-    await db.delete(
-      'models',
-      where: 'id NOT IN ($placeholders)',
-      whereArgs: validIds.toList(),
-    );
+    try {
+      final db = await instance.database;
+      final placeholders = List.filled(validIds.length, '?').join(',');
+      await db.delete(
+        'models',
+        where: 'id NOT IN ($placeholders)',
+        whereArgs: validIds.toList(),
+      );
+    } catch (e) {
+      if (e.toString().contains("SQLITE_FULL")) return; // Ignore disk full on delete
+      rethrow;
+    }
   }
 
   /// Deletes all user-created models from the local database.
   Future<void> deleteUserCreatedModels() async {
-    // (This function remains unchanged, though it's no longer our primary security method)
-    final db = await instance.database;
-    final count = await db.delete(
-      'models',
-      where: "id LIKE 'self_%' OR id LIKE 'local_%'",
-    );
-    debugPrint("[DatabaseHelper] Logout cleanup: Deleted $count user-created models to protect privacy.");
+    try {
+      final db = await instance.database;
+      final count = await db.delete(
+        'models',
+        where: "id LIKE 'self_%' OR id LIKE 'local_%'",
+      );
+      debugPrint("[DatabaseHelper] Logout cleanup: Deleted $count user-created models to protect privacy.");
+    } catch (e) {
+      if (e.toString().contains("SQLITE_FULL")) return;
+      rethrow;
+    }
   }
 
   /// Deletes rows from the specified table based on a 'where' clause.
@@ -104,14 +163,22 @@ class DatabaseHelper {
     String? where,
     List<Object?>? whereArgs,
   }) async {
-    final db = await database;
-    final count = await db.delete(
-      table,
-      where: where,
-      whereArgs: whereArgs,
-    );
-    debugPrint("[DatabaseHelper] Deleted $count rows from '$table' where: $where");
-    return count;
+    try {
+      final db = await database;
+      final count = await db.delete(
+        table,
+        where: where,
+        whereArgs: whereArgs,
+      );
+      debugPrint("[DatabaseHelper] Deleted $count rows from '$table' where: $where");
+      return count;
+    } catch (e) {
+      if (e.toString().contains("SQLITE_FULL") || e.toString().contains("database or disk is full")) {
+        debugPrint("[DatabaseHelper] Disk full error during delete (journal write failed). Ignoring.");
+        return 0;
+      }
+      rethrow;
+    }
   }
 
   /// REFACTORED: Retrieves all models, decrypting user-specific data.
@@ -146,5 +213,16 @@ class DatabaseHelper {
     }
 
     return decodedModels;
+  }
+
+  /// Call this method occasionally (e.g., after sync).
+  Future<void> optimizeDatabase() async {
+    try {
+      final db = await database;
+      await db.execute('VACUUM');
+      debugPrint("[DatabaseHelper] Database vacuumed and optimized (Disk Space Reclaimed).");
+    } catch (e) {
+      debugPrint("[DatabaseHelper] Optimization failed (likely disk full or locked): $e");
+    }
   }
 }

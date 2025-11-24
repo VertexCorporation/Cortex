@@ -10,6 +10,7 @@
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/screen.dart';
 import 'package:cortex/server/credits.dart';
@@ -27,12 +28,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
-
 import 'banner.dart';
 import 'chat/providers/conversation.dart';
 import 'chat/providers/input.dart';
@@ -51,6 +51,7 @@ import 'chat/services/select.dart';
 import 'chat/services/send.dart';
 import 'chat/services/stop.dart';
 import 'chat/screen/selected/dynamic.dart';
+import 'funds/backend.dart';
 import 'inbox/providers/general.dart';
 import 'initialization.dart';
 import 'internet.dart';
@@ -116,79 +117,65 @@ class BootstrapResult {
 /// - Orientation lock
 class AppBootstrap {
   static Future<BootstrapResult> init() async {
-    // 1. Initialize Firebase once.
+    final stopwatch = Stopwatch()..start();
+
+    // 1. Initialize Firebase (Required for Auth).
     await Firebase.initializeApp();
 
-    // 2. Wire Crashlytics + global error handlers.
-    final FlutterExceptionHandler? originalOnError = FlutterError.onError;
+    try {
+      FirebaseFirestore.instance.settings = const Settings(
+        persistenceEnabled: true,
+        cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+      );
+    } catch (e) {
+      debugPrint("Firestore settings already set or failed: $e");
+    }
+
+    // 2. Wire Crashlytics (Standard lightweight setup).
     FlutterError.onError = (FlutterErrorDetails details) {
-      final Object exception = details.exception;
-      final String exceptionString = exception.toString();
-
-      final bool isBenignNetworkImageError =
-          details.library == 'image resource service' &&
-              exceptionString.contains('Connection closed while receiving data');
-
-      if (isBenignNetworkImageError) {
-        debugPrint(
-          '[AppBootstrap] Ignoring benign network image error: $exceptionString',
-        );
-
-        if (!kReleaseMode) {
-          (originalOnError ?? FlutterError.dumpErrorToConsole)(details);
-        }
-        return;
-      }
-
       FirebaseCrashlytics.instance.recordFlutterError(details);
-
-      (originalOnError ?? FlutterError.dumpErrorToConsole)(details);
     };
-
     PlatformDispatcher.instance.onError = (error, stack) {
-      // Known "non-fatal" app-level exceptions that we can quietly swallow.
-      if (error is ApiException || error is UserCancelledException) {
-        return true;
-      }
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
       return true;
     };
 
-    // 3. Register background message handler for FCM.
+    // 3. Register background message handler (Lightweight registration).
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    await FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true);
+    FlutterDownloader.registerCallback(downloadCallback);
 
-    // 4. Load shared preferences once and reuse.
+    // 4. Load shared preferences (Required for Theme/Onboarding).
     final prefs = await SharedPreferences.getInstance();
+    final bool hasCompletedOnboarding = prefs.getBool('has_completed_onboarding') ?? false;
 
-    final bool hasCompletedOnboarding =
-        prefs.getBool('has_completed_onboarding') ?? false;
-
-    // Determine initial app status:
-    // - If onboarding is not completed → onboarding flow.
-    // - If completed but no Firebase user → login.
-    // - If completed and user exists → full initialization.
-    late final AppStatus initialStatus;
-
+    // 5. OPTIMISTIC AUTH CHECK (Local Only):
+    // We do NOT check the internet or reload the user here.
+    // We trust the local cache to render the UI immediately.
+    AppStatus initialStatus;
     if (!hasCompletedOnboarding) {
       initialStatus = AppStatus.needsOnboarding;
     } else {
+      // Just check if a user object exists in memory/cache.
       final initialUser = FirebaseAuth.instance.currentUser;
-      initialStatus =
-      initialUser == null ? AppStatus.needsLogin : AppStatus.initializing;
+      initialStatus = initialUser == null ? AppStatus.needsLogin : AppStatus.ready;
     }
 
-    // 5. Lock orientation to portrait.
-    await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+    // 6. Lock orientation.
+    await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
 
-    // 6. Determine initial theme from preferences or system brightness.
+    // 7. Determine Theme.
     final savedTheme = prefs.getString('selectedTheme');
     final String initialTheme = savedTheme ??
         (PlatformDispatcher.instance.platformBrightness == Brightness.dark
             ? 'dark'
             : 'light');
+
+    debugPrint("[AppBootstrap] Finished in ${stopwatch.elapsedMilliseconds}ms. Status: $initialStatus");
+    stopwatch.stop();
 
     return BootstrapResult(
       initialStatus: initialStatus,
@@ -210,9 +197,6 @@ void main() {
 
   // Keep native splash until we're sure about the first real frame.
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
-  // Initialize time zones (for notifications, scheduling, etc.).
-  tz.initializeTimeZones();
 
   runApp(const AppGatekeeper());
 }
@@ -409,6 +393,9 @@ List<SingleChildWidget> _buildCoreProviders(
     ),
     Provider<BannerService>(
       create: (_) => BannerService(),
+    ),
+    ChangeNotifierProvider<FundsBackend>(
+      create: (_) => FundsBackend(),
     ),
   ];
 }

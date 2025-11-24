@@ -11,7 +11,6 @@ import '../../notifications/introvert.dart';
 import '../services/auth.dart';
 import '../services/profile.dart';
 
-
 /// Manages the general state and data specifically for the settings screen.
 ///
 /// This provider acts as the primary ViewModel for the settings UI. Its main
@@ -40,6 +39,7 @@ class SettingsGeneralProvider with ChangeNotifier {
   Map<String, dynamic>? _userData;
 
   // --- Public Getters for UI State ---
+
   bool get isLoading => _isLoading;
 
   bool get hasInternet => _hasInternet;
@@ -49,6 +49,11 @@ class SettingsGeneralProvider with ChangeNotifier {
   Map<String, dynamic>? get userData => _userData;
 
   bool get isVerified => _authService.isCurrentUserVerified();
+
+  bool get isAnonymous {
+    if (_userData == null) return false;
+    return _userData!['accountType'] == 'anonymous';
+  }
 
   // --- Computed Properties from UserData (Safe Getters) ---
 
@@ -148,15 +153,19 @@ class SettingsGeneralProvider with ChangeNotifier {
   }
 
   Future<void> refreshData({bool isInitialLoad = false}) async {
-    if (!_hasInternet) {
-      return;
-    }
+    if (!_hasInternet) return;
+
     try {
       await _authService.reloadCurrentUser();
+
       final freshData = await _profileService.fetchUserData();
+
       _userData = freshData;
       CacheService.set(CacheKey.settingsUserData, freshData);
+
       notifyListeners();
+      debugPrint("[GeneralProvider] Data refreshed. AccountType: ${_userData?['accountType']}");
+
     } catch (e) {
       debugPrint("[GeneralProvider] Error refreshing user data: $e");
       if (!isInitialLoad && _userData == null) {

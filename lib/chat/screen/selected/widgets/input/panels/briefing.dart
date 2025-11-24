@@ -1,15 +1,4 @@
 // lib/chat/screen/selected/widgets/input/panels/briefing.dart
-//
-// BRIEFING OVERLAY — FLOATING VERSION
-//
-// Key changes:
-// 1) The panel is designed to be used as an absolutely-positioned floating
-//    widget (e.g., inside a Stack with Positioned). It no longer assumes
-//    any responsibility for reserving layout space.
-// 2) It reports its *visible* height (after slide animation *and* drag)
-//    via onVisibleHeightChanged so the parent can position other floating
-//    UI (e.g., scroll button) exactly above it.
-// 3) Dismiss is drag/tap driven for dismissible messages, unchanged in UX.
 
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +7,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 import '../../../../../../theme.dart';
 
 class BriefingOverlay extends StatefulWidget {
-  // --- Data properties to determine which message to show ---
+  // --- Data properties ---
   final int? availableCredits;
   final bool photoSelected;
   final bool isOfflineModel;
@@ -32,10 +21,8 @@ class BriefingOverlay extends StatefulWidget {
   final bool isPremiumModel;
   final bool isSubscribed;
   final int premiumTrialUses;
+  final bool isVisible;
 
-  /// Called whenever the *visible* height of the panel changes.
-  /// `height` already accounts for animation progress, current drag offset,
-  /// and panel measurement. Parent can use this to reposition other floaters.
   final ValueChanged<double>? onVisibleHeightChanged;
 
   const BriefingOverlay({
@@ -53,6 +40,7 @@ class BriefingOverlay extends StatefulWidget {
     required this.isPremiumModel,
     required this.isSubscribed,
     required this.premiumTrialUses,
+    required this.isVisible,
     this.onVisibleHeightChanged,
   });
 
@@ -62,18 +50,14 @@ class BriefingOverlay extends StatefulWidget {
 
 class _BriefingOverlayState extends State<BriefingOverlay>
     with TickerProviderStateMixin {
-  // --- Animation Controllers ---
-  late final AnimationController _slideController;
 
-  // --- Animations ---
+  late final AnimationController _slideController;
   late final Animation<Offset> _slideAnimation;
   late final Animation<double> _fadeAnimation;
 
-  // --- Internal State ---
   String? _currentMessageText;
   bool _isCurrentMessageDismissible = false;
 
-  // Measurement of the panel content.
   final GlobalKey _panelKey = GlobalKey();
   double _measuredPanelHeight = 0.0;
 
@@ -89,6 +73,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     final curvedAnimation =
     CurvedAnimation(parent: _slideController, curve: Curves.easeOut);
 
+    // Slide from bottom (Offset 0,1) to position (Offset 0,0)
     _slideAnimation =
         Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
             .animate(curvedAnimation);
@@ -96,14 +81,12 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     _fadeAnimation =
         Tween<double>(begin: 0.0, end: 1.0).animate(curvedAnimation);
 
-    // Listen to animation progress to continuously report visible height.
     _slideController.addListener(_reportVisibleHeightThrottled);
 
-    // Initial evaluation happens after the first frame.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _evaluateAndAnimate();
-        _measurePanelHeightAndReport(); // ensure baseline
+        _measurePanelHeightAndReport();
       }
     });
   }
@@ -111,8 +94,9 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   @override
   void didUpdateWidget(covariant BriefingOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // Trigger animation evaluation whenever any prop changes
     _evaluateAndAnimate();
-    // Re-measure next frame (icon/text can change with locale/data).
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _measurePanelHeightAndReport();
     });
@@ -125,8 +109,11 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     super.dispose();
   }
 
-  /// Determines the highest priority message to display based on widget properties.
   String? _evaluateMessageText(AppLocalizations loc) {
+    // If parent says hide, return null immediately.
+    // This forces the exit animation logic to trigger.
+    if (!widget.isVisible) return null;
+
     if (widget.isPremiumModel &&
         !widget.isSubscribed &&
         widget.premiumTrialUses >= 3) {
@@ -149,14 +136,13 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     return null;
   }
 
-  /// Checks if the current message type is user-dismissible.
   bool _isMessageDismissible(String? messageText, AppLocalizations loc) {
     if (messageText == null) return false;
     return messageText == loc.photoWarningMessage ||
         messageText == loc.disclaimerMessage;
   }
 
-  /// Orchestrates transitions between messages (slide out -> swap -> slide in).
+  /// The core animation logic handles the 'Exit' gracefully now.
   void _evaluateAndAnimate() {
     if (!mounted) return;
     final loc = AppLocalizations.of(context)!;
@@ -164,24 +150,30 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
     if (nextMessageText != _currentMessageText) {
       final nextIsDismissible = _isMessageDismissible(nextMessageText, loc);
-      final bool isShowingMessage = _slideController.isCompleted;
+      final bool isShowingMessage = _slideController.value > 0.0;
       final bool hasNewMessage = nextMessageText != null;
 
       if (isShowingMessage) {
+        // CASE 1: Currently showing something.
+        // We must reverse (slide down) FIRST.
         _slideController.reverse().then((_) {
           if (!mounted) return;
+
           if (hasNewMessage) {
+            // If swapping to a new message: change text, slide up.
             setState(() {
               _currentMessageText = nextMessageText;
               _isCurrentMessageDismissible = nextIsDismissible;
             });
             _slideController.forward(from: 0.0);
           } else {
+            // If hiding completely: just clear text (animation is already done).
             setState(() => _currentMessageText = null);
           }
           _measurePanelHeightAndReport();
         });
       } else if (hasNewMessage) {
+        // CASE 2: Was hidden, now showing. Slide up.
         setState(() {
           _currentMessageText = nextMessageText;
           _isCurrentMessageDismissible = nextIsDismissible;
@@ -189,7 +181,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
         _slideController.forward(from: 0.0);
         _measurePanelHeightAndReport();
       } else {
-        // No message to show
+        // CASE 3: Was hidden, stays hidden.
         setState(() {
           _currentMessageText = null;
         });
@@ -198,23 +190,19 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     }
   }
 
-  /// Triggered when a drag gesture ends.
   void _handlePanEnd(DragEndDetails details) {
     _handleDismiss();
   }
 
-  /// Dismiss if allowed; otherwise ignore.
   void _handleDismiss() {
     if (_isCurrentMessageDismissible && _slideController.isCompleted) {
       _slideController.reverse().then((_) {
         if (!mounted) return;
         widget.onDisclaimerDismissed();
-        setState(() {});
+        setState(() {}); // Triggers re-evaluation
       });
     }
   }
-
-  // --- Measurement & Reporting ------------------------------------------------
 
   void _measurePanelHeightAndReport() {
     final RenderBox? box =
@@ -227,66 +215,54 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   }
 
   void _reportVisibleHeightThrottled() {
-    // Called frequently by the animation controller; keep it lightweight.
     _reportVisibleHeight();
   }
 
   void _reportVisibleHeight() {
     if (!mounted) return;
-
-    // 1) Base panel height (measured once the layout is done)
     final double base = _measuredPanelHeight;
+    // Calculate precise visible height based on animation value
+    final double slideT = _slideController.value.clamp(0.0, 1.0);
+    double visible = base * slideT;
 
-    // 2) Animation progress
-    final double slideT = _slideController.isDismissed
-        ? 0.0
-        : _slideController.value.clamp(0.0, 1.0);
-    final double fadeT = _fadeAnimation.value.clamp(0.0, 1.0);
-
-    // 3) Effective visible height (no drag offset anymore)
-    double visible = base * slideT * fadeT;
-
-    // Small epsilon to avoid jitter
     if (visible < 0.5) visible = 0.0;
-
     widget.onVisibleHeightChanged?.call(visible);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_currentMessageText == null) {
-      // Notify parent that there is no visible height anymore.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) widget.onVisibleHeightChanged?.call(0.0);
-      });
+    // Don't use SizedBox.shrink here if animating out.
+    // Only return shrink if text is null AND animation is fully dismissed.
+    if (_currentMessageText == null && _slideController.isDismissed) {
+      // Just to be safe, report 0 height
+      if (_measuredPanelHeight != 0) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if(mounted) widget.onVisibleHeightChanged?.call(0.0);
+        });
+      }
       return const SizedBox.shrink();
     }
 
-    // Floating visual only: does not reserve layout space.
     return FadeTransition(
       opacity: _fadeAnimation,
       child: SlideTransition(
         position: _slideAnimation,
         child: GestureDetector(
-          // Any drag gesture (any direction) simply triggers a downward
-          // dismiss animation; the panel no longer follows the finger.
           onPanUpdate: _isCurrentMessageDismissible
-              ? (details) {
-            _handleDismiss();
-          }
+              ? (details) { _handleDismiss(); }
               : null,
           onPanEnd: _isCurrentMessageDismissible ? _handlePanEnd : null,
           onTap: _isCurrentMessageDismissible ? _handleDismiss : null,
           child: _BriefingPanelContent(
             key: _panelKey,
-            message: _currentMessageText!,
+            message: _currentMessageText ?? "", // Safe fallback
           ),
         ),
       ),
     );
   }
 
-  // --- Helper Methods ---
+  // --- Helpers ---
   int _requiredCredits() {
     if (widget.isOfflineModel) return 0;
     final base = widget.isPremiumModel ? 20 : 10;
@@ -295,7 +271,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   }
 }
 
-/// Stateless content container (visuals only).
 class _BriefingPanelContent extends StatelessWidget {
   final String message;
   const _BriefingPanelContent({super.key, required this.message});

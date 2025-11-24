@@ -48,7 +48,8 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
     final initializer = Provider.of<AppInitializer>(context, listen: false);
     _previousStatus = initializer.status;
 
-    // Kick off the initialization once the first frame is scheduled.
+    // Kick off the initialization.
+    // Since 'initialize()' is now non-blocking/fast, this will return almost instantly.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       initializer.initialize();
@@ -77,6 +78,19 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
     return Consumer<AppInitializer>(
       builder: (BuildContext context, AppInitializer initializer, Widget? _) {
         final AppStatus currentStatus = initializer.status;
+
+        // We remove the splash as soon as we are NOT initializing.
+        // Since Bootstrap now returns 'ready' or 'needsLogin' immediately,
+        // this happens almost instantly.
+        if (!_splashRemoved && currentStatus != AppStatus.initializing) {
+          _splashRemoved = true;
+
+          // Defer removal slightly to ensure the MainScreen frame is painted.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            debugPrint('AppLifecycleManager: UI Ready. Removing Native Splash.');
+            FlutterNativeSplash.remove();
+          });
+        }
 
         debugPrint(
           'AppLifecycleManager: Rebuilding. Current: $currentStatus, Previous: $_previousStatus',

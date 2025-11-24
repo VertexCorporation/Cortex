@@ -1431,7 +1431,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Krediler, çevrimiçi modellerle sohbet etmek için kullanılır. her mesajın bize bi maliyeti var ve bu krediler batmamızı engelliyo neyse hadi sistemi anlatalım\n\n• Ücretsiz bir çevrimiçi modele her mesaj 10 kredi.\n• Premium bir online modele her mesaj 20 kredi.\n• Bir ek dahil etmek 30 kredi daha ekler.\n• Ücretsiz plan kullanıcıları her gün sıfırlanan 200 kredi bonusu alır.';
+      'Krediler, çevrimiçi modellerle sohbet etmek için kullanılır. her mesajın bize bi maliyeti var ve bu krediler batmamızı engelliyo neyse hadi sistemi anlatalım\n\n• Ücretsiz bir çevrimiçi modele mesaj göndermek 5 kredidir.\n• Premium bir çevrimiçi modele mesaj göndermek 20 kredidir.\n• Bir ek dahil etmek 30 kredi daha ekler.\n• Ücretsiz plan kullanıcıları her gün sıfırlanan 200 kredi bonusu alır.';
 
   @override
   String get creditsInfoPanelFooter => 'İyi sohbetler!';
@@ -1512,7 +1512,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Vertex hesabınıza giriş yapın. Google ile kaydolan yeni kullanıcılar, Kullanım Koşullarımızı ve Gizlilik Politikamızı kabul etmiş sayılır. Bu belgeleri Kayıt Ol ekranında inceleyebilirsiniz.';
+      'Vertex hesabınıza giriş yapın. Üçüncü taraf hizmetler aracılığıyla kaydolan yeni kullanıcılar, Şartlar ve Gizlilik Politikamızı kabul etmiş sayılır. Bunları Kayıt ekranında inceleyebilirsiniz.';
 
   @override
   String get registerSubtitle =>
@@ -2074,4 +2074,42 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'Play Store önbelleğiniz güncel değil. Lütfen Play Store uygulamasını kapatıp yeniden açın veya cihazınızı yeniden başlatın.';
+
+  @override
+  String get continueAsGuest => 'Hesap oluşturmadan devam edin';
+
+  @override
+  String get guestModeWarning =>
+      'Misafir modu, en iyi hizmet kalitesini sağlamak için sınırlı özelliklere sahiptir.';
+
+  @override
+  String get anonymousEntity => 'Anonim Varlık';
+
+  @override
+  String get upgradeAccountTitle => 'Hesabınızı Tamamlayın';
+
+  @override
+  String get upgradeAccountDescription =>
+      'Günlük 200 bonus kredisi kazanmak ve daha fazla limitin kilidini açmak için bir hesap oluşturun.';
+
+  @override
+  String get createAccount => 'Hesap Oluştur';
+
+  @override
+  String get upgradeTitle => 'Kaydı Tamamla';
+
+  @override
+  String get accountLinkedSuccess => 'Hesap başarıyla oluşturuldu!';
+
+  @override
+  String get continueWithApple => 'Apple ile devam edin';
+
+  @override
+  String get guest => 'Misafir';
+
+  @override
+  String get betterWithAnAccount => 'Bu kısım bir hesapla daha iyi!';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

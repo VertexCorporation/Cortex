@@ -61,6 +61,7 @@ class ModelLocalStateProvider extends ChangeNotifier {
   late final VoidCallback _downloadedModelsManagerListener;
   List<ModelEntity> _currentModels = [];
   bool isInitialized = false;
+  bool _isRequestingPermission = false;
 
   //================================================================================
   // Public Getters for UI consumption
@@ -141,6 +142,11 @@ class ModelLocalStateProvider extends ChangeNotifier {
     required String id,
     required String? url,
   }) async {
+    if (_isRequestingPermission) {
+      debugPrint("[ModelLocalStateProvider] Permission request already in progress. Ignoring tap.");
+      return false;
+    }
+
     final manager = _downloadManagers[id];
     final isAlreadyCompleted = _downloadCompleted[id] ?? false;
     final modelTitle = _getTitleById(id) ?? id;
@@ -149,34 +155,45 @@ class ModelLocalStateProvider extends ChangeNotifier {
       return false;
     }
 
-    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
-    final localizations = AppLocalizations.of(context)!;
+    _isRequestingPermission = true;
 
-    final notificationStatus = await Permission.notification.request();
-    if (Platform.isAndroid) {
-      final deviceInfo = await DeviceInfoPlugin().androidInfo;
-      if (deviceInfo.version.sdkInt <= 32) {
-        final storageStatus = await Permission.storage.request();
-        if (!storageStatus.isGranted) {
-          notificationService.showNotification(
-              message: localizations.storagePermissionRequired, type: NotificationType.error);
-          return false;
+    try {
+      final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+      final localizations = AppLocalizations.of(context)!;
+
+      final notificationStatus = await Permission.notification.request();
+
+      if (Platform.isAndroid) {
+        final deviceInfo = await DeviceInfoPlugin().androidInfo;
+        if (deviceInfo.version.sdkInt <= 32) {
+          final storageStatus = await Permission.storage.request();
+          if (!storageStatus.isGranted) {
+            notificationService.showNotification(
+                message: localizations.storagePermissionRequired, type: NotificationType.error);
+            return false;
+          }
         }
       }
-    }
 
-    final canShowSystemNotifications = notificationStatus.isGranted;
-    _dl.startDownload(
-        id: id,
-        url: url,
-        title: modelTitle,
-        showSystemNotification: canShowSystemNotifications);
+      final canShowSystemNotifications = notificationStatus.isGranted;
+      _dl.startDownload(
+          id: id,
+          url: url,
+          title: modelTitle,
+          showSystemNotification: canShowSystemNotifications);
 
-    if (!canShowSystemNotifications) {
-      notificationService.showNotification(
-          message: localizations.downloadStarted, type: NotificationType.error, oneLine: true);
+      if (!canShowSystemNotifications) {
+        notificationService.showNotification(
+            message: localizations.downloadStarted, type: NotificationType.error, oneLine: true);
+      }
+      return true;
+
+    } catch (e) {
+      debugPrint("[ModelLocalStateProvider] Error during permission/download sequence: $e");
+      return false;
+    } finally {
+      _isRequestingPermission = false;
     }
-    return true;
   }
 
   /// Initiates the uninstallation of a downloaded model.

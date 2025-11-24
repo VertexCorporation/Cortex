@@ -1431,7 +1431,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'क्रेडिट का उपयोग ऑनलाइन मॉडल के साथ चैट करने के लिए किया जाता है। हर मेसेज में हमारा पैसा लगता है और ये क्रेडिट्स ही हमें डूबने से बचा रहे हैं तो अब चलो सिस्टम समझाते हैं\n\n• एक मुफ्त ऑनलाइन मॉडल को हर मेसेज 10 क्रेडिट का पड़ता है।\n• एक ऑनलाइन प्रीमियम मॉडल को हर मेसेज 20 क्रेडिट का पड़ता है।\n• एक अटैचमेंट शामिल करने पर 30 और क्रेडिट जुड़ते हैं।\n• मुफ्त प्लान वाले यूजर्स को रोज रीसेट होने वाला 200 क्रेडिट बोनस मिलता है।';
+      'क्रेडिट ऑनलाइन एआई मॉडलों के साथ चैट करने के लिए उपयोग किए जाते हैं। हर मैसेज सच में हमारी जेब से जाता है और यही क्रेडिट हमें पूरा कंगाल होने से बचा रहे होते हैं, थोड़ा मजाकिया लगे लेकिन सीन tam olarak bu. अब सिस्टम को जल्दी और साफ तरीके से समझ लेते हैं:\n\n• किसी मुफ्त ऑनलाइन मॉडल को भेजे जाने वाले हर संदेश की कीमत 5 क्रेडिट है।\n• किसी प्रीमियम ऑनलाइन मॉडल को भेजे जाने वाले हर संदेश की कीमत 20 क्रेडिट है।\n• कोई अटैचमेंट जोड़ने पर 30 अतिरिक्त क्रेडिट लगते हैं。\n• फ्री प्लान उपयोगकर्ताओं को रोज़ाना रीसेट होने वाला 200 क्रेडिट का बोनस मिलता है。';
 
   @override
   String get creditsInfoPanelFooter => 'हैप्पी चैटिंग!';
@@ -1512,7 +1512,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'अपने वर्टेक्स खाते में लॉग इन करें। Google के माध्यम से साइन अप करने वाले नए उपयोगकर्ता हमारी शर्तों और गोपनीयता नीति से सहमत हैं। आप उन्हें साइन अप स्क्रीन पर समीक्षा कर सकते हैं।';
+      'अपने वर्टेक्स खाते में लॉग इन करें। तृतीय-पक्ष सेवाओं के माध्यम से साइन अप करने वाले नए उपयोगकर्ता हमारी शर्तों और गोपनीयता नीति से सहमत होते हैं। आप साइन अप स्क्रीन पर उनकी समीक्षा कर सकते हैं।';
 
   @override
   String get registerSubtitle =>
@@ -2077,4 +2077,42 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'आपका Play Store कैश अपडेट नहीं है। कृपया Play Store ऐप बंद करके दोबारा खोलें, या अपना डिवाइस रीस्टार्ट करें।';
+
+  @override
+  String get continueAsGuest => 'खाता बनाए बिना जारी रखें';
+
+  @override
+  String get guestModeWarning =>
+      'सर्वोत्तम सेवा गुणवत्ता सुनिश्चित करने के लिए अतिथि मोड में सीमित सुविधाएँ हैं।';
+
+  @override
+  String get anonymousEntity => 'अनाम संस्था';
+
+  @override
+  String get upgradeAccountTitle => 'अपना खाता पूरा करें';
+
+  @override
+  String get upgradeAccountDescription =>
+      'प्रतिदिन 200 बोनस क्रेडिट प्राप्त करने और अधिक सीमाएं अनलॉक करने के लिए एक खाता बनाएं।';
+
+  @override
+  String get createAccount => 'खाता बनाएं';
+
+  @override
+  String get upgradeTitle => 'पंजीकरण को अंतिम रूप दें';
+
+  @override
+  String get accountLinkedSuccess => 'खाता सफलतापूर्वक बनाया गया!';
+
+  @override
+  String get continueWithApple => 'Apple के साथ जारी रखें';
+
+  @override
+  String get guest => 'अतिथि';
+
+  @override
+  String get betterWithAnAccount => 'यह अनुभाग एक खाते के साथ बेहतर है!';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

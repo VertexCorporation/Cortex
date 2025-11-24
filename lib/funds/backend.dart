@@ -4,6 +4,7 @@
 // payment and data fetching flows for maximum stability and monitoring.
 
 import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'dart:developer';
@@ -107,51 +108,43 @@ class FundsBackend with ChangeNotifier {
   }
 
   Future<void> _fetchProductDetails() async {
-    // --- FIX 1: Use the new invalidation method ---
+    // 1. Invalidate cache if global refresh is requested
     if (AppDataState().needsRefresh) {
       CacheService.invalidate(CacheKey.premiumProducts);
     }
 
-    // --- FIX 2: Use the new 'get' method ---
-    // Attempt to load from cache first for an instant UI.
+    // 2. Attempt to load from cache first for instant UI
     final cachedProducts = CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
 
     if (cachedProducts != null && cachedProducts.isNotEmpty) {
       log('Cache hit! Initializing with cached product data.', name: _logName);
       _products = cachedProducts;
       _errorMessage = null;
-      _setLoading(false); // Show the UI immediately with cached data
+      _setLoading(false);
     } else {
-      // Only show the main loading skeleton if the cache is empty.
       _setLoading(true);
     }
 
-    // This _setLoading(true) was redundant, removing it.
-    // _setLoading(true);
-
+    // --- TEST MODE LOGIC ---
     if (!kReleaseMode) {
       log('Running in Test Mode. Using mock product data.', name: _logName);
       await Future.delayed(const Duration(milliseconds: 800));
       _products = _mockProducts;
-
-      // --- FIX 3: Use the new 'set' method ---
       CacheService.set(CacheKey.premiumProducts, _mockProducts);
-
       _errorMessage = null;
       _setLoading(false);
       return;
     }
 
+    // --- INTERNET CHECK ---
     if (!await InternetService().hasInternet()) {
-      _setError("No Internet Connection. Please check your network and try again.");
+      _setError(_localizations.noInternetConnection);
       return;
     }
 
+    // --- STORE AVAILABILITY CHECK ---
     if (!await _inAppPurchase.isAvailable()) {
-      _setError("The store is currently unavailable. Please try again later.");
-      await _crashlytics.recordError(
-        'InAppPurchaseUnavailable', null, reason: 'InAppPurchase.isAvailable() returned false.', fatal: false,
-      );
+      _setError(_localizations.anErrorOccurred);
       return;
     }
 
@@ -162,26 +155,29 @@ class FundsBackend with ChangeNotifier {
       if (response.error != null) {
         throw Exception('Store error: ${response.error!.message}');
       }
+
+      // --- Handle Empty List as an Error (Without Crashlytics) ---
       if (response.productDetails.isEmpty) {
-        log('Store returned zero products. This might be a config issue.', name: _logName);
-        await _crashlytics.recordError(
-          'EmptyProductList', null, reason: 'queryProductDetails returned an empty list.', fatal: false,
-        );
+        log('Store returned zero products. Treating as failure to trigger Retry UI.', name: _logName);
+        // Throwing forces catch block
+        throw Exception("Store returned no products. This implies a Store connection issue.");
       }
 
       _products = response.productDetails;
-
-      // --- FIX 4: Use the new 'set' method ---
       CacheService.set(CacheKey.premiumProducts, _products);
-
       _errorMessage = null;
 
     } catch (e, stack) {
       log('Error fetching product details: $e', name: _logName, error: e);
-      await _crashlytics.recordError(
-        e, stack, reason: 'Failed in _fetchProductDetails catch block.', fatal: true,
-      );
-      _setError("Could not load products. Please try again.");
+
+      if (e.toString().contains("Store returned no products")) {
+        _setError(_localizations.noProductsFound);
+      } else {
+        await _crashlytics.recordError(
+          e, stack, reason: 'Failed in _fetchProductDetails catch block.', fatal: true,
+        );
+        _setError(_localizations.anErrorOccurred);
+      }
     } finally {
       _setLoading(false);
     }
@@ -256,6 +252,24 @@ class FundsBackend with ChangeNotifier {
       } finally {
         _setPurchasePending(false);
       }
+      return;
+    }
+
+    if (!kReleaseMode) {
+      log('Running in Debug Mode. Simulating successful purchase for ${product.id}', name: _logName);
+
+      await Future.delayed(const Duration(seconds: 1));
+
+      _notificationService.showNotification(
+        message: "${_localizations.purchaseSuccessful} (Test)",
+        type: NotificationType.success,
+        oneLine: false,
+      );
+
+      _purchaseCompletedController.add(product.id);
+      AppDataState().markUserDataAsChanged();
+
+      _setPurchasePending(false);
       return;
     }
 
@@ -393,35 +407,14 @@ class FundsBackend with ChangeNotifier {
       log('Error initiating purchase flow: $e', name: _logName, error: e);
 
       if (isLikelyStaleProductError) {
-        // Known BillingClient flakiness - treat as non-fatal and show generic error.
-        log(
-          'Caught a known native billing crash (likely stale ProductDetails / PendingIntent issue). Suppressing fatal Crashlytics report.',
-          name: _logName,
-        );
-        await _crashlytics.recordError(
-          e,
-          stack,
-          reason:
-          'Known BillingClient stale-product / PendingIntent issue while purchasing ${freshProductDetails.id}.',
-          fatal: false,
-        );
+        log('Known native billing crash suppressed (PendingIntent). UI remains stable.', name: _logName);
+
         _notificationService.showNotification(
           message: _localizations.anErrorOccurred,
           type: NotificationType.error,
         );
       } else if (isInvalidOfferTokenError) {
-        // Configuration / Play Console or cache issue. Non-fatal, user-friendly message.
-        log(
-          'INVALID_OFFER_TOKEN encountered for product ${freshProductDetails.id}. This indicates a Play Store configuration or cache problem.',
-          name: _logName,
-        );
-        await _crashlytics.recordError(
-          e,
-          stack,
-          reason:
-          'INVALID_OFFER_TOKEN for product ${freshProductDetails.id}. Likely Play Store base plan / offer configuration or cache issue.',
-          fatal: false,
-        );
+        log('INVALID_OFFER_TOKEN encountered.', name: _logName);
         _notificationService.showNotification(
           message: _localizations.productNotFound,
           type: NotificationType.error,
@@ -473,8 +466,14 @@ class FundsBackend with ChangeNotifier {
       return;
     }
 
-    // --- PATH 2: REGULAR USER MANAGEMENT ---
-    final Uri url = Uri.parse('https://play.google.com/store/account/subscriptions?package=com.vertex.cortex');
+    // --- PATH 2: REGULAR USER MANAGEMENT (Platform Aware) ---
+    Uri url;
+    if (Platform.isIOS) {
+      url = Uri.parse('https://apps.apple.com/account/subscriptions');
+    } else {
+      url = Uri.parse('https://play.google.com/store/account/subscriptions?package=$appPackageName');
+    }
+
     try {
       if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -484,6 +483,37 @@ class FundsBackend with ChangeNotifier {
     } catch (e, stack) {
       log('Could not launch subscription management URL.', name: _logName, error: e);
       await _crashlytics.recordError(e, stack, reason: 'Failed to launch subscription management URL.', fatal: false);
+    }
+  }
+
+  // --- RESTORE PURCHASES ---
+  Future<void> restorePurchases() async {
+    if (_isPurchasePending) return;
+
+    _setPurchasePending(true);
+
+    try {
+      log('Restoring purchases...', name: _logName);
+
+      await _inAppPurchase.restorePurchases();
+
+      Future.delayed(const Duration(seconds: 3), () {
+        if (_isPurchasePending) {
+          log('Restore timeout or no purchases found. Resetting UI.', name: _logName);
+          _setPurchasePending(false);
+        }
+      });
+
+    } catch (e, stack) {
+      log('Restore failed: $e', name: _logName, error: e);
+      await _crashlytics.recordError(e, stack, reason: 'Restore purchases failed');
+
+      _notificationService.showNotification(
+        message: _localizations.anErrorOccurred,
+        type: NotificationType.error,
+      );
+
+      _setPurchasePending(false);
     }
   }
 

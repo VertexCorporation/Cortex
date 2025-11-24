@@ -23,20 +23,24 @@ class ChatStorageService {
       List<dynamic> _,
       {String? modelId, bool isStarred = false}
       ) async {
-    final db = await DbHelper().db;
-    await db.insert(
-      'conversations',
-      {
-        'id': id,
-        'title': title,
-        'modelId': modelId,
-        'isStarred': isStarred ? 1 : 0,
-        'lastMessageDate': DateTime.now().millisecondsSinceEpoch,
-      },
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
+    try {
+      final db = await DbHelper().db;
+      await db.insert(
+        'conversations',
+        {
+          'id': id,
+          'title': title,
+          'modelId': modelId,
+          'isStarred': isStarred ? 1 : 0,
+          'lastMessageDate': DateTime.now().millisecondsSinceEpoch,
+        },
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
 
-    AppDataState().markUserDataAsChanged();
+      AppDataState().markUserDataAsChanged();
+    } catch (e) {
+      _handleDiskError(e, 'saveConversation');
+    }
   }
 
   /// This function is called after a successful message send to mark a model as "used".
@@ -57,14 +61,18 @@ class ChatStorageService {
       return;
     }
 
-    final db = await DbHelper().db;
-    await db.insert(
-      'recent_models',
-      {'model_id': modelSeriesId, 'last_used': DateTime.now().millisecondsSinceEpoch},
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-    CacheService.invalidate(CacheKey.recentModels);
-    debugPrint("[Storage] Added/Updated '$modelSeriesId' in recent models.");
+    try {
+      final db = await DbHelper().db;
+      await db.insert(
+        'recent_models',
+        {'model_id': modelSeriesId, 'last_used': DateTime.now().millisecondsSinceEpoch},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      CacheService.invalidate(CacheKey.recentModels);
+      debugPrint("[Storage] Added/Updated '$modelSeriesId' in recent models.");
+    } catch (e) {
+      _handleDiskError(e, 'addRecentModel');
+    }
   }
 
   /// It fetches the top 10 most recently used model IDs and validates them
@@ -109,80 +117,95 @@ class ChatStorageService {
   }
 
   static Future<void> _updateConversationTimestamp(String convId, Database db) async {
-    await db.update(
-      'conversations',
-      {'lastMessageDate': DateTime.now().millisecondsSinceEpoch},
-      where: 'id = ?',
-      whereArgs: [convId],
-    );
+    try {
+      await db.update(
+        'conversations',
+        {'lastMessageDate': DateTime.now().millisecondsSinceEpoch},
+        where: 'id = ?',
+        whereArgs: [convId],
+      );
+    } catch (e) {
+      _handleDiskError(e, '_updateConversationTimestamp');
+    }
   }
 
   static Future<void> updateConversationModelId(
       String id, String newModelId) async {
-    final db = await DbHelper().db;
-    await db.update(
-      'conversations',
-      {'modelId': newModelId},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    try {
+      final db = await DbHelper().db;
+      await db.update(
+        'conversations',
+        {'modelId': newModelId},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      _handleDiskError(e, 'updateConversationModelId');
+    }
   }
 
   /* ---------- messages (append / update) ---------- */
 
   static Future<void> updateStoredMessage(
       String convId, Message m, int idx) async {
-    final db = await DbHelper().db;
-    await db.update(
-      'messages',
-      {
-        'uuid': m.id,
-        'text': m.text,
-        'isUser': m.isUserMessage ? 1 : 0,
-        'isReported': m.isReported ? 1 : 0,
-        'photoPath': m.photoPath,
-        'model': m.model,
-        'includeInContext': m.includeInContext ? 1 : 0,
-        'ts': DateTime.now().millisecondsSinceEpoch,
-      },
-      where: 'conversationId = ? AND idx = ?',
-      whereArgs: [convId, idx],
-    );
-    await _updateConversationTimestamp(convId, db);
+    try {
+      final db = await DbHelper().db;
+      await db.update(
+        'messages',
+        {
+          'uuid': m.id,
+          'text': m.text,
+          'isUser': m.isUserMessage ? 1 : 0,
+          'isReported': m.isReported ? 1 : 0,
+          'photoPath': m.photoPath,
+          'model': m.model,
+          'includeInContext': m.includeInContext ? 1 : 0,
+          'ts': DateTime.now().millisecondsSinceEpoch,
+        },
+        where: 'conversationId = ? AND idx = ?',
+        whereArgs: [convId, idx],
+      );
+      await _updateConversationTimestamp(convId, db);
+    } catch (e) {
+      _handleDiskError(e, 'updateStoredMessage');
+    }
   }
 
   static Future<void> saveCurrentMessages(
       String convId, List<Message> msgs) async {
-    final db = await DbHelper().db;
-    final batch = db.batch();
-    batch.delete('messages', where: 'conversationId = ?', whereArgs: [convId]);
-    for (int i = 0; i < msgs.length; i++) {
-      final m = msgs[i];
-      batch.insert('messages', {
-        'uuid': m.id,
-        'conversationId': convId,
-        'idx': i,
-        'isUser': m.isUserMessage ? 1 : 0,
-        'text': m.text,
-        'photoPath': m.photoPath,
-        'isReported': m.isReported ? 1 : 0,
-        'model': m.model,
-        'includeInContext': m.includeInContext ? 1 : 0,
-        'ts': DateTime.now().millisecondsSinceEpoch,
-      });
-    }
-    await batch.commit(noResult: true);
-    if (msgs.isNotEmpty) {
-      await _updateConversationTimestamp(convId, db);
+    try {
+      final db = await DbHelper().db;
+      final batch = db.batch();
+      batch.delete('messages', where: 'conversationId = ?', whereArgs: [convId]);
+      for (int i = 0; i < msgs.length; i++) {
+        final m = msgs[i];
+        batch.insert('messages', {
+          'uuid': m.id,
+          'conversationId': convId,
+          'idx': i,
+          'isUser': m.isUserMessage ? 1 : 0,
+          'text': m.text,
+          'photoPath': m.photoPath,
+          'isReported': m.isReported ? 1 : 0,
+          'model': m.model,
+          'includeInContext': m.includeInContext ? 1 : 0,
+          'ts': DateTime.now().millisecondsSinceEpoch,
+        });
+      }
+      await batch.commit(noResult: true);
 
-      final lastMessage = msgs.last;
-
-      _lastMsgController.add({
-        'convId': convId,
-        'text': lastMessage.text,
-        'photoPath': lastMessage.photoPath,
-        'ts': DateTime.now().millisecondsSinceEpoch,
-      });
+      if (msgs.isNotEmpty) {
+        await _updateConversationTimestamp(convId, db);
+        final lastMessage = msgs.last;
+        _lastMsgController.add({
+          'convId': convId,
+          'text': lastMessage.text,
+          'photoPath': lastMessage.photoPath,
+          'ts': DateTime.now().millisecondsSinceEpoch,
+        });
+      }
+    } catch (e) {
+      _handleDiskError(e, 'saveCurrentMessages');
     }
   }
 
@@ -202,10 +225,15 @@ class ChatStorageService {
 
   static Future<List<Message>> removeEmptyMessagesForConversation(
       String convId, List<Message> inMemory) async {
-    final db = await DbHelper().db;
-    await db.delete('messages',
-        where: 'conversationId = ? AND text = "" AND (photoPath IS NULL OR photoPath="")',
-        whereArgs: [convId]);
+    try {
+      final db = await DbHelper().db;
+      await db.delete('messages',
+          where: 'conversationId = ? AND text = "" AND (photoPath IS NULL OR photoPath="")',
+          whereArgs: [convId]);
+    } catch (e) {
+      _handleDiskError(e, 'removeEmptyMessagesForConversation');
+    }
+
     return inMemory
         .where((m) =>
     m.text.trim().isNotEmpty ||
@@ -216,14 +244,18 @@ class ChatStorageService {
   /// Removes a specific model ID from the 'recent_models' table.
   /// This is called when a model is deleted or uninstalled to keep the list consistent.
   static Future<void> removeRecentModel(String modelId) async {
-    final db = await DbHelper().db;
-    await db.delete(
-      'recent_models',
-      where: 'model_id = ?',
-      whereArgs: [modelId],
-    );
-    CacheService.invalidate(CacheKey.recentModels);
-    debugPrint("[Storage] Removed '$modelId' from recent models.");
+    try {
+      final db = await DbHelper().db;
+      await db.delete(
+        'recent_models',
+        where: 'model_id = ?',
+        whereArgs: [modelId],
+      );
+      CacheService.invalidate(CacheKey.recentModels);
+      debugPrint("[Storage] Removed '$modelId' from recent models.");
+    } catch (e) {
+      _handleDiskError(e, 'removeRecentModel');
+    }
   }
 
   static Future<Map<String, dynamic>?> getMessageByIdx(
@@ -240,139 +272,170 @@ class ChatStorageService {
 
   static Future<void> upsertMessage(
       String convId, int idx, Message m) async {
-    final db = await DbHelper().db;
-    final messageData = {
-      'uuid': m.id,
-      'conversationId': convId,
-      'idx': idx,
-      'isUser': m.isUserMessage ? 1 : 0,
-      'text': m.text,
-      'photoPath': m.photoPath,
-      'isReported': m.isReported ? 1 : 0,
-      'model': m.model,
-      'includeInContext': m.includeInContext ? 1 : 0,
-      'ts': DateTime.now().millisecondsSinceEpoch,
-    };
+    try {
+      final db = await DbHelper().db;
+      final messageData = {
+        'uuid': m.id,
+        'conversationId': convId,
+        'idx': idx,
+        'isUser': m.isUserMessage ? 1 : 0,
+        'text': m.text,
+        'photoPath': m.photoPath,
+        'isReported': m.isReported ? 1 : 0,
+        'model': m.model,
+        'includeInContext': m.includeInContext ? 1 : 0,
+        'ts': DateTime.now().millisecondsSinceEpoch,
+      };
 
-    await db.insert(
-      'messages',
-      messageData,
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+      await db.insert(
+        'messages',
+        messageData,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
 
-    await _updateConversationTimestamp(convId, db); // Await this operation
-    final now = DateTime.now().millisecondsSinceEpoch;
+      await _updateConversationTimestamp(convId, db);
+      final now = DateTime.now().millisecondsSinceEpoch;
 
-    _lastMsgController.add({
-      'convId': convId,
-      'text': m.text,
-      'photoPath': m.photoPath,
-      'ts': now,
-    });
+      _lastMsgController.add({
+        'convId': convId,
+        'text': m.text,
+        'photoPath': m.photoPath,
+        'ts': now,
+      });
+    } catch (e) {
+      _handleDiskError(e, 'upsertMessage');
+    }
   }
 
   static Future<void> deleteConversation(String id) async {
-    final db = await DbHelper().db;
-    await db.delete('messages', where: 'conversationId = ?', whereArgs: [id]);
-    await db.delete('conversations', where: 'id = ?', whereArgs: [id]);
-    // This helper invalidates all conversation-related cache entries at once.
-    CacheService.invalidateConversationCache();
-    // Also invalidate recent models, as a deleted conversation might affect this list.
-    CacheService.invalidate(CacheKey.recentModels);
+    try {
+      final db = await DbHelper().db;
+      await db.delete('messages', where: 'conversationId = ?', whereArgs: [id]);
+      await db.delete('conversations', where: 'id = ?', whereArgs: [id]);
 
-    // Notify that the conversation list has structurally changed.
-    AppDataState().markUserDataAsChanged();
+      // This helper invalidates all conversation-related cache entries at once.
+      CacheService.invalidateConversationCache();
+      // Also invalidate recent models, as a deleted conversation might affect this list.
+      CacheService.invalidate(CacheKey.recentModels);
+
+      // Notify that the conversation list has structurally changed.
+      AppDataState().markUserDataAsChanged();
+    } catch (e) {
+      _handleDiskError(e, 'deleteConversation');
+    }
   }
 
 
   /// Atomically deletes all conversations (and their messages) associated with a specific model ID.
   /// This is used when a model is uninstalled or deleted by the user.
   static Future<void> deleteConversationsForModel(String modelId) async {
-    final db = await DbHelper().db;
-    // Step 1: Find all conversation IDs that use this model.
-    final List<Map<String, dynamic>> convsToDelete = await db.query(
-      'conversations',
-      columns: ['id'],
-      where: 'modelId = ?',
-      whereArgs: [modelId],
-    );
-
-    if (convsToDelete.isEmpty) {
-      return; // Nothing to do.
-    }
-
-    final List<String> convIds =
-    convsToDelete.map((row) => row['id'] as String).toList();
-
-    // Step 2: Use a transaction to ensure both deletions succeed or fail together.
-    await db.transaction((txn) async {
-      final placeholders = List.filled(convIds.length, '?').join(',');
-      // Delete all messages belonging to these conversations.
-      await txn.delete(
-        'messages',
-        where: 'conversationId IN ($placeholders)',
-        whereArgs: convIds,
-      );
-      // Delete the conversations themselves.
-      await txn.delete(
+    try {
+      final db = await DbHelper().db;
+      // Step 1: Find all conversation IDs that use this model.
+      final List<Map<String, dynamic>> convsToDelete = await db.query(
         'conversations',
-        where: 'id IN ($placeholders)',
-        whereArgs: convIds,
+        columns: ['id'],
+        where: 'modelId = ?',
+        whereArgs: [modelId],
       );
-    });
-    // After deletion, invalidate the caches to force a UI refresh.
-    CacheService.invalidateConversationCache();
-    CacheService.invalidate(CacheKey.recentModels);
 
-    // Let the rest of the app know that the conversation list changed.
-    AppDataState().markUserDataAsChanged();
+      if (convsToDelete.isEmpty) {
+        return; // Nothing to do.
+      }
+
+      final List<String> convIds =
+      convsToDelete.map((row) => row['id'] as String).toList();
+
+      // Step 2: Use a transaction to ensure both deletions succeed or fail together.
+      await db.transaction((txn) async {
+        final placeholders = List.filled(convIds.length, '?').join(',');
+        // Delete all messages belonging to these conversations.
+        await txn.delete(
+          'messages',
+          where: 'conversationId IN ($placeholders)',
+          whereArgs: convIds,
+        );
+        // Delete the conversations themselves.
+        await txn.delete(
+          'conversations',
+          where: 'id IN ($placeholders)',
+          whereArgs: convIds,
+        );
+      });
+      // After deletion, invalidate the caches to force a UI refresh.
+      CacheService.invalidateConversationCache();
+      CacheService.invalidate(CacheKey.recentModels);
+
+      // Let the rest of the app know that the conversation list changed.
+      AppDataState().markUserDataAsChanged();
+    } catch (e) {
+      _handleDiskError(e, 'deleteConversationsForModel');
+    }
   }
 
   static Future<void> setStarred(String id, bool starred) async {
-    final db = await DbHelper().db;
-    await db.update(
-      'conversations',
-      {'isStarred': starred ? 1 : 0},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    try {
+      final db = await DbHelper().db;
+      await db.update(
+        'conversations',
+        {'isStarred': starred ? 1 : 0},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
 
-    // Star/unstar should be reflected in the inbox immediately.
-    AppDataState().markUserDataAsChanged();
+      // Star/unstar should be reflected in the inbox immediately.
+      AppDataState().markUserDataAsChanged();
+    } catch (e) {
+      _handleDiskError(e, 'setStarred');
+    }
   }
 
   static Future<void> renameConversation(String id, String newTitle) async {
-    final db = await DbHelper().db;
-    await db.update(
-      'conversations',
-      {'title': newTitle},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    try {
+      final db = await DbHelper().db;
+      await db.update(
+        'conversations',
+        {'title': newTitle},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
 
-    // This also affects inbox data; mark it as changed.
-    AppDataState().markUserDataAsChanged();
+      // This also affects inbox data; mark it as changed.
+      AppDataState().markUserDataAsChanged();
+    } catch (e) {
+      _handleDiskError(e, 'renameConversation');
+    }
   }
 
-  /// Atomically deletes ALL conversations and their associated messages from the local database.
-  /// This provides a clean slate for the user, matching their expectation of the "Delete All" action.
+  /// Atomically deletes ALL conversations, their associated messages, AND recent models history.
+  /// This provides a complete clean slate for the user.
   static Future<void> deleteAllConversations() async {
-    final db = await DbHelper().db;
-    debugPrint("[ChatStorage] Deleting all conversations and messages from the database.");
+    try {
+      final db = await DbHelper().db;
+      debugPrint("[ChatStorage] Deleting all conversations, messages, and recent models history.");
 
-    // Use a transaction to ensure both tables are cleared atomically.
-    // If one deletion fails, the other is rolled back.
-    await db.transaction((txn) async {
-      await txn.delete('messages');       // Deletes all rows from the messages table
-      await txn.delete('conversations');  // Deletes all rows from the conversations table
-    });
+      // Use a transaction to ensure all tables are cleared atomically.
+      // If one deletion fails, everything rolls back.
+      await db.transaction((txn) async {
+        await txn.delete('messages');       // Delete messages
+        await txn.delete('conversations');  // Delete conversations
+        await txn.delete('recent_models');  // Delete recent model history
+      });
 
-    debugPrint("[ChatStorage] All conversations successfully deleted.");
+      debugPrint("[ChatStorage] All chat data successfully deleted.");
 
-    // Invalidate caches to force a full UI refresh.
-    CacheService.invalidateConversationCache();
+      // Invalidate caches to force a full UI refresh.
+      CacheService.invalidateConversationCache();
+      CacheService.invalidate(CacheKey.recentModels);
 
-    AppDataState().markUserDataAsChanged();
+      AppDataState().markUserDataAsChanged();
+
+      // Trigger VACUUM to reclaim disk space after bulk delete
+      await DbHelper().optimizeDatabase();
+
+    } catch (e) {
+      _handleDiskError(e, 'deleteAllConversations');
+    }
   }
 
   /// Checks if there are any conversations stored locally using sqflite.
@@ -385,5 +448,19 @@ class ChatStorageService {
     );
     // If the count is null or 0, there are no conversations.
     return count != null && count > 0;
+  }
+
+  /// Centralized error handler for database write operations.
+  /// If the error is SQLITE_FULL, it logs a critical warning but prevents the app from crashing.
+  static void _handleDiskError(Object e, String operationName) {
+    if (e.toString().contains("SQLITE_FULL") || e.toString().contains("database or disk is full")) {
+      debugPrint("[ChatStorage] CRITICAL: Device storage is full. '$operationName' failed. Data was NOT saved to prevent crash.");
+      // In a real-world app, you might want to show a toast to the user here,
+      // but keeping the service UI-agnostic is generally better practice.
+    } else {
+      debugPrint("[ChatStorage] Unexpected error in '$operationName': $e");
+      // Rethrow other errors (syntax, schema issues) so they can be fixed during dev
+      throw e;
+    }
   }
 }

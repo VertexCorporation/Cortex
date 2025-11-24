@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 2.4.5+245
+version: 2.9.0+290
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -38,8 +38,8 @@ dependencies:
   firebase_messaging: ^16.0.2          # Added
 
   # --- IN-APP PURCHASE ---
-  in_app_purchase: ^3.2.0
-  in_app_purchase_android: ^0.4.0
+  in_app_purchase: ^3.2.3
+  in_app_purchase_android: ^0.4.0+7
   in_app_purchase_storekit: ^0.4.6
   in_app_review: ^2.0.10
 
@@ -91,6 +91,7 @@ dependencies:
   confetti: ^0.8.0
   highlight: ^0.7.0
   timezone: ^0.10.1
+  sign_in_with_apple: ^7.0.1
 
 dev_dependencies:
   flutter_test:
