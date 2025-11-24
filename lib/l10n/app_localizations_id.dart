@@ -1439,7 +1439,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Kredit digunakan untuk mengobrol dengan model online. tiap pesan itu butuh biaya dan kredit ini yang bikin kita gak bangkrut yaudah sekarang gini sistemnya\n\n• Setiap pesan ke model online gratis biayanya 10 kredit.\n• Setiap pesan ke model online premium biayanya 20 kredit.\n• Termasuk lampiran nambah 30 kredit lagi.\n• Pengguna paket gratis dapet bonus 200 kredit yang direset tiap hari.';
+      'Credit digunakan untuk mengobrol dengan model AI secara online. tiap pesan itu beneran jadi biaya buat kami dan credit inilah yang sebenernya nyelametin kami dari jalur bangkrut total haha. Sekarang kita jelaskan sebentar bagaimana sistem ini bekerja:\n\n• Setiap pesan ke model online gratis dikenai biaya 5 credit.\n• Setiap pesan ke model online premium dikenai biaya 20 credit.\n• Menambahkan lampiran akan menambah 30 credit lagi.\n• Pengguna paket gratis mendapatkan bonus 200 credit yang direset setiap hari.';
 
   @override
   String get creditsInfoPanelFooter => 'Selamat mengobrol!';
@@ -1521,7 +1521,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Masuk ke akun Vertex Anda. Pengguna baru yang mendaftar melalui Google menyetujui Persyaratan & Kebijakan Privasi kami. Anda dapat meninjaunya di layar Pendaftaran.';
+      'Masuk ke akun Vertex Anda. Pengguna baru yang mendaftar melalui layanan pihak ketiga menyetujui Syarat & Kebijakan Privasi kami. Anda dapat meninjaunya di layar Daftar.';
 
   @override
   String get registerSubtitle =>
@@ -2091,4 +2091,42 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'Cache Play Store Anda belum diperbarui. Silakan tutup dan buka kembali aplikasi Play Store, atau mulai ulang perangkat Anda.';
+
+  @override
+  String get continueAsGuest => 'Lanjutkan tanpa membuat akun';
+
+  @override
+  String get guestModeWarning =>
+      'Mode tamu memiliki fitur terbatas untuk memastikan kualitas layanan terbaik.';
+
+  @override
+  String get anonymousEntity => 'Entitas Anonim';
+
+  @override
+  String get upgradeAccountTitle => 'Lengkapi Akun Anda';
+
+  @override
+  String get upgradeAccountDescription =>
+      'Buat akun untuk mendapatkan 200 kredit bonus harian dan membuka lebih banyak batasan.';
+
+  @override
+  String get createAccount => 'Buat Akun';
+
+  @override
+  String get upgradeTitle => 'Selesaikan Pendaftaran';
+
+  @override
+  String get accountLinkedSuccess => 'Akun berhasil dibuat!';
+
+  @override
+  String get continueWithApple => 'Lanjutkan dengan Apple';
+
+  @override
+  String get guest => 'Tamu';
+
+  @override
+  String get betterWithAnAccount => 'Bagian ini lebih baik dengan akun!';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

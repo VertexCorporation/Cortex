@@ -1455,7 +1455,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Les crédits sont utilisés pour discuter avec les modèles en ligne. chaque message nous coûte du fric et ces crédits nous empêchent de couler bon maintenant on vous explique le système\n\n• Chaque message à un modèle en ligne gratuit coûte 10 crédits.\n• Chaque message à un modèle premium en ligne coûte 20 crédits.\n• L\'inclusion d\'une pièce jointe ajoute 30 crédits de plus.\n• Les utilisateurs du plan gratuit obtiennent un bonus de 200 crédits qui se réinitialise quotidiennement.';
+      'Les crédits servent à discuter avec des modèles d’IA en ligne. chaque message nous coûte vraiment de l’argent et ces crédits sont un peu tout ce qui nous évite de finir complètement fauchés lol. Voici rapidement comment le système fonctionne :\n\n• Chaque message envoyé à un modèle en ligne gratuit coûte 5 crédits.\n• Chaque message envoyé à un modèle en ligne premium coûte 20 crédits.\n• Ajouter une pièce jointe ajoute 30 crédits supplémentaires.\n• Les utilisateurs de l’offre gratuite reçoivent un bonus de 200 crédits qui est réinitialisé chaque jour.';
 
   @override
   String get creditsInfoPanelFooter => 'Bonnes discussions !';
@@ -1538,7 +1538,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Connectez-vous à votre compte Vertex. Les nouveaux utilisateurs s\'inscrivant via Google acceptent nos Conditions d\'utilisation et notre Politique de confidentialité. Vous pouvez les consulter sur l\'écran d\'inscription.';
+      'Connectez-vous à votre compte Vertex. Les nouveaux utilisateurs s\'inscrivant via des services tiers acceptent nos Conditions d\'utilisation et notre Politique de confidentialité. Vous pouvez les consulter sur la page d\'inscription.';
 
   @override
   String get registerSubtitle =>
@@ -2108,4 +2108,43 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'Le cache du Play Store n\'est pas à jour. Veuillez fermer puis rouvrir l\'application Play Store, ou redémarrer votre appareil.';
+
+  @override
+  String get continueAsGuest => 'Continuer sans créer de compte';
+
+  @override
+  String get guestModeWarning =>
+      'Le mode invité offre des fonctionnalités limitées afin de garantir la meilleure qualité de service.';
+
+  @override
+  String get anonymousEntity => 'Entité anonyme';
+
+  @override
+  String get upgradeAccountTitle => 'Complétez votre compte';
+
+  @override
+  String get upgradeAccountDescription =>
+      'Créez un compte pour obtenir 200 crédits bonus par jour et débloquer des limites supplémentaires.';
+
+  @override
+  String get createAccount => 'Créer un compte';
+
+  @override
+  String get upgradeTitle => 'Finaliser l\'inscription';
+
+  @override
+  String get accountLinkedSuccess => 'Compte créé avec succès !';
+
+  @override
+  String get continueWithApple => 'Continuez avec Apple';
+
+  @override
+  String get guest => 'Invité';
+
+  @override
+  String get betterWithAnAccount =>
+      'Cette section est plus agréable avec un compte !';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

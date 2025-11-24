@@ -2706,7 +2706,7 @@ abstract class AppLocalizations {
   /// No description provided for @creditsInfoPanelBody.
   ///
   /// In en, this message translates to:
-  /// **'Credits are used to chat with online models. every single message costs us cash and these credits keepin us from going broke now lets explain the system \n\n• Each message to a free online model costs 10 credits.\n• Each message to an online premium model costs 20 credits.\n• Including an attachment adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.'**
+  /// **'Credits are used to chat with online models. every single message costs us cash and these credits keepin us from going broke now lets explain the system \n\n• Each message to a free online model costs 5 credits.\n• Each message to an online premium model costs 20 credits.\n• Including an attachment adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.'**
   String get creditsInfoPanelBody;
 
   /// No description provided for @creditsInfoPanelFooter.
@@ -2838,7 +2838,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Log in to your Vertex account. New users signing up via Google agree to our Terms & Privacy Policy. You can review them on the Sign Up screen.'**
+  /// **'Log in to your Vertex account. New users signing up via third-party services agree to our Terms & Privacy Policy. You can review them on the Sign Up screen.'**
   String get loginSubtitle;
 
   /// No description provided for @registerSubtitle.
@@ -3795,6 +3795,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Play Store cache is not up-to-date. Please close and reopen the Play Store app, or restart your device.'**
   String get cacheIsNotUpToDate;
+
+  /// No description provided for @continueAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue without creating an account'**
+  String get continueAsGuest;
+
+  /// No description provided for @guestModeWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest mode has limited features to ensure the best service quality.'**
+  String get guestModeWarning;
+
+  /// No description provided for @anonymousEntity.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous Entity'**
+  String get anonymousEntity;
+
+  /// No description provided for @upgradeAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Your Account'**
+  String get upgradeAccountTitle;
+
+  /// No description provided for @upgradeAccountDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account to get daily 200 bonus credits and unlock more limits.'**
+  String get upgradeAccountDescription;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
+
+  /// No description provided for @upgradeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Finalize Registration'**
+  String get upgradeTitle;
+
+  /// No description provided for @accountLinkedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Account successfully created!'**
+  String get accountLinkedSuccess;
+
+  /// No description provided for @continueWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get continueWithApple;
+
+  /// No description provided for @guest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get guest;
+
+  /// No description provided for @betterWithAnAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'This section is better with an account!'**
+  String get betterWithAnAccount;
+
+  /// No description provided for @restorePurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get restorePurchases;
 }
 
 class _AppLocalizationsDelegate

@@ -148,6 +148,10 @@ class ModelRepository {
       return true;
 
     } catch (e) {
+      if (e.toString().contains("SQLITE_FULL")) {
+        debugPrint("$logPrefix: DISK FULL. Could not update base model.");
+        return false;
+      }
       debugPrint("$logPrefix: CRITICAL ERROR updating base model: $e");
       return false;
     }
@@ -215,18 +219,26 @@ class ModelRepository {
     }
   }
 
-  /// Fetches the public model list from the remote server, parses it, and
-  /// stores the raw data in the local SQLite database.
+  /// Fetches the public model list from the remote server.
   Future<Set<String>> _fetchAndStorePublicModels(String langCode) async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>(_serverUrl);
+      final response = await _dio.get<Map<String, dynamic>>(
+        _serverUrl,
+        options: Options(
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
+      );
 
-      if (response.statusCode != 200 || response.data == null) {
-        throw DioException(
-          requestOptions: response.requestOptions,
-          response: response,
-          error: 'Server error: ${response.statusCode} or empty data',
-        );
+      if (response.statusCode != 200) {
+        debugPrint("[ModelRepository] Server returned status ${response.statusCode}. Skipping sync.");
+        return <String>{};
+      }
+
+      if (response.data == null) {
+        debugPrint("[ModelRepository] Server returned empty data.");
+        return <String>{};
       }
 
       final rawServerData = response.data!;
@@ -235,30 +247,52 @@ class ModelRepository {
 
       for (var modelData in parsedServerModels) {
         if (!modelData['id'].startsWith('self_') && !modelData['id'].startsWith('local_')) {
-          await _dbHelper.insert('models', {
-            'id': modelData['id'],
-            'producer': modelData['producer'] ?? 'Unknown',
-            'title': modelData['title'] ?? modelData['id'],
-            'is_server_side': (modelData['type'] != 'offline') ? 1 : 0,
-            'type': modelData['type'] ?? 'online',
-            'raw_json': json.encode(modelData),
-          }, conflictAlgorithm: ConflictAlgorithm.replace);
+          try {
+            await _dbHelper.insert('models', {
+              'id': modelData['id'],
+              'producer': modelData['producer'] ?? 'Unknown',
+              'title': modelData['title'] ?? modelData['id'],
+              'is_server_side': (modelData['type'] != 'offline') ? 1 : 0,
+              'type': modelData['type'] ?? 'online',
+              'raw_json': json.encode(modelData),
+            }, conflictAlgorithm: ConflictAlgorithm.replace);
+          } catch (e) {
+            if (e.toString().contains("SQLITE_FULL")) {
+              debugPrint("[ModelRepository] DISK FULL. Aborting model sync save.");
+              // If disk is full, stop trying to insert further models to avoid spamming logs and wasting CPU
+              break;
+            }
+            // If it's another error, we might want to continue or rethrow.
+            // Here we rethrow to keep existing behavior for non-disk errors.
+            rethrow;
+          }
         }
       }
+
+      // Try to vacuum the database after a sync to keep file size small.
+      // This helps prevent future SQLITE_FULL errors.
+      await _dbHelper.optimizeDatabase();
+
       return validServerIds;
 
     } on DioException catch (e, s) {
-      if (e.type == DioExceptionType.connectionError || e.error is SocketException) {
-        debugPrint("[ModelRepository] A predictable network error occurred during public model fetch (e.g., no internet, DNS failure). This is not a bug. Error: $e");
+      if (e.response?.statusCode == 500) {
+        debugPrint("[ModelRepository] Server Error (500). Using local cache instead.");
+        FirebaseCrashlytics.instance.log("Server 500 error on model sync. Skipping.");
         return <String>{};
       }
 
-      debugPrint("[ModelRepository] An unexpected DioException occurred during public model fetch: $e");
-      FirebaseCrashlytics.instance.recordError(e, s, reason: 'Failed to sync public models with Dio');
+      if (e.type == DioExceptionType.connectionError || e.error is SocketException) {
+        debugPrint("[ModelRepository] Network error. Using local cache.");
+        return <String>{};
+      }
+
+      debugPrint("[ModelRepository] Unexpected DioException: $e");
+      FirebaseCrashlytics.instance.recordError(e, s, reason: 'Failed to sync public models');
       return <String>{};
 
     } catch (e, s) {
-      debugPrint("[ModelRepository] An unexpected generic error occurred during public model fetch: $e");
+      debugPrint("[ModelRepository] Generic error: $e");
       FirebaseCrashlytics.instance.recordError(e, s, reason: 'Unexpected failure in public model sync');
       return <String>{};
     }
@@ -268,28 +302,36 @@ class ModelRepository {
   Future<void> _cleanupStaleModels(Set<String> validPublicIds) async {
     if (validPublicIds.isEmpty) return;
 
-    final db = await _dbHelper.database;
-    final placeholders = List.filled(validPublicIds.length, '?').join(',');
-    final staleModels = await db.query(
-      'models',
-      columns: ['id', 'raw_json'],
-      where: "id NOT IN ($placeholders) AND id NOT LIKE 'self_%' AND id NOT LIKE 'local_%'",
-      whereArgs: validPublicIds.toList(),
-    );
-
-    if (staleModels.isNotEmpty) {
-      debugPrint("[ModelRepository] Found ${staleModels.length} stale public models to clean up.");
-      final staleModelIds = staleModels.map((m) => m['id'] as String).toList();
-
-      // Concurrently delete associated images from cache.
-      await _deleteStaleImages(staleModels);
-
-      final count = await db.delete(
+    try {
+      final db = await _dbHelper.database;
+      final placeholders = List.filled(validPublicIds.length, '?').join(',');
+      final staleModels = await db.query(
         'models',
-        where: "id IN (${List.filled(staleModelIds.length, '?').join(',')})",
-        whereArgs: staleModelIds,
+        columns: ['id', 'raw_json'],
+        where: "id NOT IN ($placeholders) AND id NOT LIKE 'self_%' AND id NOT LIKE 'local_%'",
+        whereArgs: validPublicIds.toList(),
       );
-      debugPrint("[ModelRepository] Cleaned up $count stale models from database.");
+
+      if (staleModels.isNotEmpty) {
+        debugPrint("[ModelRepository] Found ${staleModels.length} stale public models to clean up.");
+        final staleModelIds = staleModels.map((m) => m['id'] as String).toList();
+
+        // Concurrently delete associated images from cache.
+        await _deleteStaleImages(staleModels);
+
+        final count = await db.delete(
+          'models',
+          where: "id IN (${List.filled(staleModelIds.length, '?').join(',')})",
+          whereArgs: staleModelIds,
+        );
+        debugPrint("[ModelRepository] Cleaned up $count stale models from database.");
+      }
+    } catch (e) {
+      if (e.toString().contains("SQLITE_FULL")) {
+        debugPrint("[ModelRepository] Disk full during cleanup. Skipping delete operation.");
+        return;
+      }
+      debugPrint("[ModelRepository] Error during cleanup: $e");
     }
   }
 
@@ -422,12 +464,14 @@ class ModelRepository {
       seriesData.forEach((seriesName, seriesValue) {
         if (seriesValue is! Map<String, dynamic>) return;
 
-        final variantsMap = Map<String, dynamic>.from(seriesValue)..remove('series_description');
+        final cleanSeriesValue = _sanitizeRawData(seriesValue);
+
+        final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)..remove('series_description');
         if (variantsMap.isEmpty) return;
 
         final model = (variantsMap.length == 1 && variantsMap.containsKey('Default'))
             ? _parseSingleVariantModel(seriesName, producerName, variantsMap['Default'], langCode)
-            : _parseMultiVariantSeries(seriesName, producerName, seriesValue, langCode);
+            : _parseMultiVariantSeries(seriesName, producerName, cleanSeriesValue, langCode);
 
         if (model != null) finalList.add(model);
       });
@@ -436,18 +480,17 @@ class ModelRepository {
   }
 
   Map<String, dynamic>? _parseSingleVariantModel(String seriesName, String producerName, Map<String, dynamic> variantData, String langCode) {
+    final cleanVariantData = _sanitizeRawData(variantData);
+
     final serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
-    final modelId = variantData['id'] as String? ?? seriesName;
-    final details = variantData['details'] as Map<String, dynamic>? ?? {};
+    final modelId = cleanVariantData['id'] as String? ?? seriesName;
+    final details = cleanVariantData['details'] as Map<String, dynamic>? ?? {};
     final localizedDetails = (details[serverLangKey] as Map<String, dynamic>?) ?? {};
     final englishDetails = (details['en'] as Map<String, dynamic>?) ?? {};
 
-    final modelCategory = variantData['category']?.toString() ??
-        variantData['type']?.toString() ?? 'online';
+    final modelCategory = cleanVariantData['category']?.toString() ??
+        cleanVariantData['type']?.toString() ?? 'online';
 
-    // We check localization for summary and description, but EXCLUDE title check.
-    // The flag is false only if the language is not English/Chinese and a specific translation was missing,
-    // forcing a fallback to English for a *visible* field other than the title.
     final bool isLocalized = (langCode == 'en' || langCode == 'zh') ||
         (
             localizedDetails.isNotEmpty &&
@@ -456,12 +499,12 @@ class ModelRepository {
         );
 
     return {
-      ...variantData,
+      ...cleanVariantData,
 
       'id': modelId,
       'title': localizedDetails['title'] ?? englishDetails['title'] ?? modelId,
       'producer': producerName,
-      'type': variantData['type'] ?? 'online',
+      'type': cleanVariantData['type'] ?? 'online',
       'category': modelCategory,
       'summary': localizedDetails['summary'] ?? englishDetails['summary'] ?? '',
       'description': localizedDetails['description'] ?? englishDetails['description'] ?? '',
@@ -471,17 +514,17 @@ class ModelRepository {
   }
 
   Map<String, dynamic>? _parseMultiVariantSeries(String seriesName, String producerName, Map<String, dynamic> seriesValue, String langCode) {
-    final serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
-    final seriesDetails = seriesValue['series_description'] as Map<String, dynamic>? ?? {};
+    final cleanSeriesValue = _sanitizeRawData(seriesValue);
 
-    // Only check if series_description is localized.
+    final serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
+    final seriesDetails = cleanSeriesValue['series_description'] as Map<String, dynamic>? ?? {};
+
     final bool isSeriesLocalized = (langCode == 'en' || langCode == 'zh') ||
         (seriesDetails[serverLangKey] != null && (seriesDetails[serverLangKey] as String).isNotEmpty);
 
     final localizedSeriesSummary = seriesDetails[serverLangKey] as String? ?? seriesDetails['en'] as String? ?? '';
 
-
-    final variantsMap = Map<String, dynamic>.from(seriesValue)
+    final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)
       ..remove('series_description')
       ..remove('reasoning');
     if (variantsMap.isEmpty) return null;
@@ -489,17 +532,19 @@ class ModelRepository {
     final extensions = <String, dynamic>{};
     variantsMap.forEach((variantKey, variantData) {
       if (variantData is! Map<String, dynamic>) return;
-      final descriptionMap = variantData['description'] as Map<String, dynamic>? ?? {};
 
-      // Only check if the variant's description is localized. The title is ignored.
+      final cleanVariantData = _sanitizeRawData(variantData);
+
+      final descriptionMap = cleanVariantData['description'] as Map<String, dynamic>? ?? {};
+
       final bool isVariantLocalized = (langCode == 'en' || langCode == 'zh') ||
           (descriptionMap[serverLangKey] != null && (descriptionMap[serverLangKey] as String).isNotEmpty);
 
-      extensions[variantData['id'] as String] = {
-        ...variantData,
-        'id': variantData['id'],
-        'title': variantData['title'] ?? variantKey,
-        'summary': localizedSeriesSummary, // Variants inherit the series summary
+      extensions[cleanVariantData['id'] as String] = {
+        ...cleanVariantData,
+        'id': cleanVariantData['id'],
+        'title': cleanVariantData['title'] ?? variantKey,
+        'summary': localizedSeriesSummary,
         'description': descriptionMap[serverLangKey] ?? descriptionMap['en'] ?? '',
         'isFullyLocalized': isVariantLocalized,
       };
@@ -508,18 +553,40 @@ class ModelRepository {
     if (extensions.isEmpty) return null;
 
     return {
-      ...seriesValue,
+      ...cleanSeriesValue,
 
       'id': seriesName.toLowerCase().replaceAll(' ', '-'),
-      'title': seriesValue['title'] ?? seriesName,
+      'title': cleanSeriesValue['title'] ?? seriesName,
       'producer': producerName,
       'type': 'online',
-      'category': seriesValue['category'] ?? 'online',
+      'category': cleanSeriesValue['category'] ?? 'online',
       'summary': localizedSeriesSummary,
       'description': localizedSeriesSummary,
       'extensions': extensions,
       'isFullyLocalized': isSeriesLocalized,
     };
+  }
+
+  Map<String, dynamic> _sanitizeRawData(Map<String, dynamic> source) {
+    final Map<String, dynamic> cleanMap = Map<String, dynamic>.from(source);
+
+    cleanMap.remove('processing_status');
+    cleanMap.remove('last_syncer_run');
+    cleanMap.remove('cumulativeFailureCount');
+
+    cleanMap.removeWhere((key, value) =>
+    key.endsWith('_source_hash') ||
+        key.endsWith('_audit')
+    );
+
+    for (final key in cleanMap.keys.toList()) {
+      final value = cleanMap[key];
+      if (value is Map) {
+        cleanMap[key] = _sanitizeRawData(Map<String, dynamic>.from(value));
+      }
+    }
+
+    return cleanMap;
   }
 
   // --- PERSISTENCE HELPERS ---

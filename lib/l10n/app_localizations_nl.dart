@@ -1446,7 +1446,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Credits worden gebruikt om te chatten met online modellen. elk bericht kost ons geld en deze credits zorgen ervoor dat we niet failliet gaan oké nu leggen we het systeem uit\n\n• Elk bericht naar een gratis online model kost 10 credits.\n• Elk bericht naar een online premium model kost 20 credits.\n• Het toevoegen van een bijlage voegt 30 extra credits toe.\n• Gratis gebruikers krijgen een bonus van 200 credits die dagelijks wordt gereset.';
+      'Credits worden gebruikt om te chatten met online AI-modellen. elke losse message tikt voor ons echt mee in de kosten en juist die credits zorgen er eigenlijk voor dat we niet gewoon keihard blut gaan haha. Laten we nu kort uitleggen hoe het systeem werkt:\n\n• Elk bericht naar een gratis online model kost 5 credits.\n• Elk bericht naar een premium online model kost 20 credits.\n• Een bijlage meesturen voegt nog eens 30 credits toe.\n• Gebruikers van het gratis abonnement krijgen een bonus van 200 credits die elke dag opnieuw wordt ingesteld.';
 
   @override
   String get creditsInfoPanelFooter => 'Veel chatplezier!';
@@ -1529,7 +1529,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Log in op je Vertex-account. Nieuwe gebruikers die zich via Google aanmelden, gaan akkoord met onze Voorwaarden & Privacybeleid. Je kunt deze bekijken op het Aanmeldscherm.';
+      'Meld u aan bij uw Vertex-account. Nieuwe gebruikers die zich aanmelden via services van derden, gaan akkoord met onze Algemene voorwaarden en ons Privacybeleid. U kunt deze bekijken op het aanmeldscherm.';
 
   @override
   String get registerSubtitle =>
@@ -2096,4 +2096,42 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'Je Play Store-cache is niet up-to-date. Sluit de Play Store-app en open deze opnieuw, of start je apparaat opnieuw op.';
+
+  @override
+  String get continueAsGuest => 'Doorgaan zonder een account aan te maken';
+
+  @override
+  String get guestModeWarning =>
+      'De gastmodus heeft beperkte functies om de beste servicekwaliteit te garanderen.';
+
+  @override
+  String get anonymousEntity => 'Anonieme entiteit';
+
+  @override
+  String get upgradeAccountTitle => 'Maak uw account compleet';
+
+  @override
+  String get upgradeAccountDescription =>
+      'Maak een account aan en ontvang dagelijks 200 bonuscredits en ontgrendel meer limieten.';
+
+  @override
+  String get createAccount => 'Account aanmaken';
+
+  @override
+  String get upgradeTitle => 'Registratie afronden';
+
+  @override
+  String get accountLinkedSuccess => 'Account succesvol aangemaakt!';
+
+  @override
+  String get continueWithApple => 'Doorgaan met Apple';
+
+  @override
+  String get guest => 'Gast';
+
+  @override
+  String get betterWithAnAccount => 'Deze sectie is beter met een account!';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

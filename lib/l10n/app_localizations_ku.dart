@@ -1434,7 +1434,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Kredî ji bo sohbetkirina bi modelên serhêl re têne bikar an in. her peyamek ji bo me mesrefek e û ev kredî nahêlin em îflas bikin nexwe werin em sîstemê şirove bikin\n\n• Her peyamek ji bo modelek serhêl a belaş 10 kredî ye.\n• Her peyamek ji bo modelek premium a serhêl 20 kredî ye.\n• Tevlîkirina pêvekekê 30 krediyên din zêde dike.\n• Bikarhênerên plana belaş bonûsek 200 krediyê ku rojane tê nûkirin distînin.';
+      'Kredî têne bikar anîn ji bo sohbetkirin bi modelên zêrek (AI) yên serhêl. rastî her peyamek wekî xwe tê dibin bi lêçûna pereyê û ev kredî ne tenê numre ne, bi rastî ew in ku naxêlin me bi qasî rewşê bi xêrê ve biçin şûnê muflîsî. Niha em ê bi awayekî hêsan şîrove bikin ka sistem çawa dixebite:\n\n• Her peyamek ji bo modelek serhêl a belaş 5 kredîyan lêçûn dike.\n• Her peyamek ji bo modelek serhêl a premium 20 kredîyan lêçûn dike.\n• Heke pêvek an belgeyek were zêdekirin, 30 kredî yên din ji bo tevahî têne derxistin.\n• Bikarhênerên plana belaş bonusek 200 kredîyan distînin ku her roj ji nû ve tê sazkirin.';
 
   @override
   String get creditsInfoPanelFooter => 'Sohbeta xweş!';
@@ -1516,7 +1516,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Têkeve hesabê xwe yê Vertex. Bikarhênerên nû yên ku bi rêya Google-ê qeyd dibin, bi Şert & Polîtîkaya Nepenîtiyê ya me razî dibin. Tu dikarî wan li ser ekrana Qeydbûnê binirxînî.';
+      'Têkeve hesabê xwe yê Vertex. Bikarhênerên nû yên ku bi rêya karûbarên partiya sêyemîn qeyd dibin, Merc û Siyaseta me ya Taybetîtiyê qebûl dikin. Hûn dikarin wan li ser ekrana Qeydkirinê binirxînin.';
 
   @override
   String get registerSubtitle =>
@@ -2080,4 +2080,42 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'Keşeya Play Store-a we ne nûjen e. Ji kerema xwe sepana Play Store bigirin û ji nû ve vekin, an jî cîhaza xwe ji nû ve bidin destpêkirin.';
+
+  @override
+  String get continueAsGuest => 'Bêyî çêkirina hesabê berdewam bike';
+
+  @override
+  String get guestModeWarning =>
+      'Moda mêvan xwedî taybetmendiyên sînorkirî ye da ku kalîteya karûbarê çêtirîn misoger bike.';
+
+  @override
+  String get anonymousEntity => 'Yekîneya Anonîm';
+
+  @override
+  String get upgradeAccountTitle => 'Hesabê xwe temam bike';
+
+  @override
+  String get upgradeAccountDescription =>
+      'Hesabê xwe çêke da ku rojane 200 kredîyên bonus bistînî û sînorên zêdetir vebikî.';
+
+  @override
+  String get createAccount => 'Hesabê Biafirîne';
+
+  @override
+  String get upgradeTitle => 'Qeydkirinê Biqedîne';
+
+  @override
+  String get accountLinkedSuccess => 'Hesab bi serkeftî hat afirandin!';
+
+  @override
+  String get continueWithApple => 'Bi Apple re berdewam bike';
+
+  @override
+  String get guest => 'Mêvan';
+
+  @override
+  String get betterWithAnAccount => 'Ev beş bi hesabê çêtir e!';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

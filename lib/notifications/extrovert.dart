@@ -205,7 +205,14 @@ Future<void> _showLocalizedNotification(Map<String, dynamic> data) async {
     styleInformation: bigTextStyleInformation,
   );
 
-  final NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
+  final NotificationDetails platformDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      )
+  );
 
   await FlutterLocalNotificationsPlugin().show(
     DateTime.now().millisecondsSinceEpoch.toSigned(31), // Unique ID
@@ -283,9 +290,13 @@ class ExtrovertNotificationService {
     await _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(_greetingsChannel);
 
     const AndroidInitializationSettings initSettingsAndroid = AndroidInitializationSettings('ic_notification');
-    const DarwinInitializationSettings initSettingsIOS = DarwinInitializationSettings();
+    const DarwinInitializationSettings initSettingsIOS = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
 
-    const InitializationSettings initSettings = InitializationSettings(
+    final InitializationSettings initSettings = InitializationSettings(
       android: initSettingsAndroid,
       iOS: initSettingsIOS,
     );
@@ -296,62 +307,121 @@ class ExtrovertNotificationService {
     );
   }
 
-
   /// Sets up Firebase Cloud Messaging, including permissions and message listeners.
   Future<void> _initializeFirebaseMessaging() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? localToken = prefs.getString('fcm_token');
-      final String? currentToken = await _fcm.getToken();
-
-      if (currentToken == null) {
-        debugPrint("[ExtrovertNotificationService] Failed to get FCM token from Firebase. This can happen if Play Services are unavailable. Aborting FCM setup for this session.");
+      //
+      // --- SAFETY 1: Is the device supports Google Play Services?  ---
+      //
+      final bool fcmAvailable = await _fcm.isSupported();
+      if (!fcmAvailable) {
+        debugPrint("[Extrovert] FCM not supported on this device. Skipping FCM init.");
         return;
       }
 
-      debugPrint("[ExtrovertNotificationService] Current FCM Token from Firebase: $currentToken");
-
-      if (localToken != currentToken) {
-        debugPrint("[ExtrovertNotificationService] New or updated token detected. Saving to local storage and Firestore.");
-        await prefs.setString('fcm_token', currentToken);
-        await _saveTokenToDatabase(currentToken);
-      } else {
-        debugPrint("[ExtrovertNotificationService] Token is unchanged. No updates needed.");
+      //
+      // --- SAFETY 2: Do we have permission? ---
+      //
+      final settings = await _fcm.getNotificationSettings();
+      if (settings.authorizationStatus == AuthorizationStatus.denied) {
+        debugPrint("[Extrovert] Notifications denied. Not requesting token.");
+        return;
       }
 
+      //
+      // --- SAFETY 3: Take Token Process (With Retry Strategy) ---
+      //
+      final prefs = await SharedPreferences.getInstance();
+      final String? cachedToken = prefs.getString('fcm_token');
+
+      String? token;
+      int retryCount = 0;
+      const int maxRetries = 3;
+
+      while (retryCount < maxRetries) {
+        try {
+          token = await _fcm.getToken();
+          if (token != null) break; // Success!
+        } catch (e) {
+          final String errorStr = e.toString();
+
+          // Check for specific recoverable errors
+          final bool isServiceNotAvailable = errorStr.contains("SERVICE_NOT_AVAILABLE") ||
+              errorStr.contains("java.io.IOException");
+          final bool isTooManyRegistrations = errorStr.contains("TOO_MANY_REGISTRATIONS");
+
+          if (isServiceNotAvailable || isTooManyRegistrations) {
+            retryCount++;
+            if (retryCount < maxRetries) {
+              debugPrint("[Extrovert] FCM Token fetch failed ($errorStr). Retrying ($retryCount/$maxRetries) in ${retryCount * 2} seconds...");
+              await Future.delayed(Duration(seconds: retryCount * 2)); // Exponential backoff: 2s, 4s, 6s
+            } else {
+              debugPrint("[Extrovert] FCM Token fetch gave up after $maxRetries attempts. Using cached token if available.");
+              token = cachedToken; // Fallback to cache
+            }
+          } else {
+            // If it's a different error (e.g. invalid config), don't retry, just log.
+            debugPrint("[Extrovert] Unrecoverable error fetching FCM token: $e");
+            break;
+          }
+        }
+      }
+
+      if (token == null) {
+        debugPrint("[Extrovert] Could not obtain an FCM token (Network issue or Service Unavailable). Skipping setup this session.");
+        return;
+      }
+
+      //
+      // --- ONLY IF TOKEN CHANGED ---
+      //
+      if (cachedToken != token) {
+        await prefs.setString('fcm_token', token);
+        await _saveTokenToDatabase(token);
+        debugPrint("[Extrovert] Token saved/updated successfully.");
+      } else {
+        debugPrint("[Extrovert] Token unchanged. No write needed.");
+      }
+
+      //
+      // --- Token Refresh Listener ---
+      //
       _fcm.onTokenRefresh.listen((newToken) async {
-        debugPrint("[ExtrovertNotificationService] FCM Token was refreshed by Firebase: $newToken");
+        debugPrint("[Extrovert] Token refreshed: $newToken");
         await prefs.setString('fcm_token', newToken);
         await _saveTokenToDatabase(newToken);
+      }, onError: (err) {
+        debugPrint("[Extrovert] Token refresh stream error: $err");
       });
 
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        debugPrint('[ExtrovertNotificationService] Received a foreground message!');
-        _showLocalizedNotification(message.data);
+      //
+      // --- Foreground Message Listener ---
+      //
+      FirebaseMessaging.onMessage.listen((RemoteMessage msg) {
+        debugPrint("[Extrovert] Foreground FCM received.");
+        _showLocalizedNotification(msg.data);
       });
 
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        debugPrint('[ExtrovertNotificationService] App opened from background via notification!');
-        _handleTapLogic(message.data);
-      });
-
+      //
+      // --- Message Tapped When App Killed ---
+      //
       final initialMessage = await _fcm.getInitialMessage();
       if (initialMessage != null) {
-        debugPrint('[ExtrovertNotificationService] App opened from terminated state!');
-        Future.delayed(const Duration(seconds: 1), () => _handleTapLogic(initialMessage.data));
+        Future.delayed(
+          const Duration(seconds: 1),
+              () => _handleTapLogic(initialMessage.data),
+        );
       }
-    }
 
-    on FirebaseException catch (e, s) {
-      if (e.message != null && e.message!.contains('SERVICE_NOT_AVAILABLE')) {
-        debugPrint("[ExtrovertNotificationService] A predictable FCM error occurred: ${e.code} - ${e.message}. This is likely due to no internet or missing Google Play Services. This is not a bug.");
-      } else {
-        debugPrint("[ExtrovertNotificationService] An unexpected FirebaseException occurred during FCM initialization: ${e.code}");
-        FirebaseCrashlytics.instance.recordError(e, s, reason: "FCM Initialization Failed (FirebaseException)");
-      }
     } catch (e, s) {
-      debugPrint("[ExtrovertNotificationService] A critical generic error occurred during FCM initialization: $e");
-      FirebaseCrashlytics.instance.recordError(e, s, reason: "FCM Initialization Failed (Generic)");
+      // Final safety net.
+      // We verify if it is the known "SERVICE_NOT_AVAILABLE" to avoid spamming Crashlytics
+      if (e.toString().contains("SERVICE_NOT_AVAILABLE")) {
+        debugPrint("[Extrovert] FCM Service Not Available (Ignored in Crashlytics): $e");
+      } else {
+        debugPrint("[Extrovert] UNEXPECTED ERROR during FCM init: $e");
+        FirebaseCrashlytics.instance.recordError(e, s, reason: "FCM Initialization Failed (Fatal)");
+      }
     }
   }
 
@@ -366,8 +436,21 @@ class ExtrovertNotificationService {
     try {
       _isRequestingPermission = true;
 
-      debugPrint("[ExtrovertNotificationService] Strategically requesting notification permission...");
-      await _fcm.requestPermission();
+      await _fcm.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      if (Platform.isIOS) {
+        await _localNotifications
+            .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+            ?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+      }
     } catch (e, s) {
       if (e is! FirebaseException || e.code != 'failed-precondition') {
         debugPrint("[ExtrovertNotificationService] Error requesting notification permission: $e");
@@ -702,7 +785,11 @@ class ExtrovertNotificationService {
           htmlFormatContentTitle: false,
         ),
       ),
-      iOS: const DarwinNotificationDetails(),
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
     );
 
     await _localNotifications.zonedSchedule(

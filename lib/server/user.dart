@@ -31,6 +31,13 @@ class UserProvider with ChangeNotifier {
   /// The user's display name. Defaults to 'Guest' if unavailable.
   String get username => _userData?['username'] as String? ?? 'Guest';
 
+  /// Checks if the current user is in 'Guest/Anonymous' mode.
+  /// Returns true ONLY if the accountType is explicitly 'anonymous'.
+  bool get isAnonymous {
+    if (_userData == null) return false;
+    return _userData!['accountType'] == 'anonymous';
+  }
+
   /// Returns true if the user has any active, non-free subscription tier.
   bool get isSubscriptionActive {
     final data = _userData;

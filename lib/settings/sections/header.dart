@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../app.dart';
+import '../../l10n/app_localizations.dart';
 import '../../theme.dart';
 import '../providers/general.dart';
 
@@ -151,18 +152,32 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
 
   @override
   Widget build(BuildContext context) {
+    // Needed for theme & localization updates
     context.watch<ThemeProvider>();
+    final l10n = AppLocalizations.of(context)!; // Add localization access
 
     // Use `context.watch` to listen for changes and get the latest data.
     final generalProvider = context.watch<SettingsGeneralProvider>();
 
-    // The UI is now driven directly by the provider's state, ensuring it is always up-to-date.
+    // The UI is now driven directly by the provider's state.
     final userData = generalProvider.userData;
     final activeLevel = generalProvider.activeSubscriptionLevel;
 
+    // --- ANONYMOUS LOGIC ---
+    final isAnonymous = generalProvider.isAnonymous;
+
     // Safely extract data with fallbacks.
-    final displayName = userData?['username'] as String? ?? 'User';
-    final email = generalProvider.isVerified ? (userData?['email'] as String? ?? '...') : 'Unverified';
+    final String displayName;
+    final String email;
+
+    if (isAnonymous) {
+      displayName = l10n.anonymousEntity;
+      email = l10n.betterWithAnAccount;
+    } else {
+      displayName = userData?['username'] as String? ?? l10n.user;
+      email = userData?['email'] as String? ?? '...';
+    }
+
     final isAlphaUser = userData?['alphaUser'] as bool? ?? false;
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -176,8 +191,15 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
         radius: avatarSize / 2.2,
         backgroundColor: AppColors.secondaryColor,
         child: Text(
-          displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
-          style: TextStyle(fontSize: avatarSize / 2.5, color: AppColors.primaryColor.inverted, fontWeight: FontWeight.bold),
+          isAnonymous
+              ? (displayName.isNotEmpty ? displayName.characters.first.toUpperCase() : '?')
+              : (displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U'),
+
+          style: TextStyle(
+              fontSize: avatarSize / 2.5,
+              color: AppColors.primaryColor.inverted,
+              fontWeight: FontWeight.bold
+          ),
         ),
       ),
     );
@@ -213,12 +235,30 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
-                    child: Text(displayName, style: GoogleFonts.poppins(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.06, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    child: Text(
+                        displayName,
+                        style: GoogleFonts.poppins(
+                            color: AppColors.primaryColor.inverted,
+                            fontSize: screenWidth * 0.06,
+                            fontWeight: FontWeight.w600
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis
+                    ),
                   ),
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
-                    child: Text(email, style: GoogleFonts.poppins(color: AppColors.quinaryColor, fontSize: screenWidth * 0.04, fontWeight: FontWeight.w400), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    child: Text(
+                        email,
+                        style: GoogleFonts.poppins(
+                            color: AppColors.quinaryColor,
+                            fontSize: screenWidth * 0.035, // Slightly smaller for guest warning
+                            fontWeight: FontWeight.w400
+                        ),
+                        maxLines: 2, // Allow 2 lines for the guest warning
+                        overflow: TextOverflow.ellipsis
+                    ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                   Row(
@@ -229,6 +269,10 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
                         SizedBox(width: screenWidth * 0.02),
                       if (isAlphaUser)
                         _buildBadge(context, Icons.explore, "Alpha"),
+
+                      // Optional: Add a badge for Guest
+                      if (isAnonymous && activeLevel == 0)
+                        _buildBadge(context, Icons.person_outline, l10n.guest),
                     ],
                   ),
                 ],

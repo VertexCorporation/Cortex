@@ -29,9 +29,11 @@ class ModelService with ChangeNotifier {
   // --- Private State ---
 
   bool _isLoading = false;
+  bool _hasError = false;
 
   /// Returns true if the service is actively fetching/processing model data.
   bool get isLoading => _isLoading;
+  bool get hasError => _hasError;
 
   /// In-memory cache for processed, type-safe [ModelEntity] objects.
   /// This is the final, sorted, and ready-to-use list for the UI.
@@ -53,6 +55,7 @@ class ModelService with ChangeNotifier {
     'jannano128k': 'assets/models/jannano128k.jpg',
     'gptneox': 'assets/models/gptneox.jpg',
     'supernova-medius': 'assets/producers/arceeai.jpg',
+    'hermes-2-pro-mistral-7b': 'assets/models/hermes.jpg',
 
     // All roleplay characters are treated as exact IDs.
     'teacher': 'assets/characters/teacher.jpg',
@@ -96,6 +99,9 @@ class ModelService with ChangeNotifier {
     'mai': 'assets/models/mai.jpg',
     'ministral': 'assets/models/ministral.jpg',
     'mixtral': 'assets/models/mixtral.jpg',
+    'pixtral': 'assets/models/pixtral.jpg',
+    'magistral': 'assets/models/magistral.jpg',
+    'devstral': 'assets/models/devstral.jpg',
     'phi': 'assets/models/phi.png', // Catches phi-3, phi-4, etc.
     'wizardlm': 'assets/models/wizardlm.jpg',
     'tinyllama': 'assets/models/tinyllama.png',
@@ -119,7 +125,7 @@ class ModelService with ChangeNotifier {
     'meta': 'assets/models/llama.png',
     'cohere': 'assets/models/cohere.jpg',
     'unsloth': 'assets/producers/unslothhai.jpg',
-    'menlo': 'assets/producers/menloresearch.png',
+    'menlo': 'assets/producers/menloresearch.jpg',
     'thebloke': 'assets/producers/thebloke.jpg',
     'snowflake': 'assets/producers/snowflake.jpg',
     'secondstate': 'assets/producers/secondstate.jpg',
@@ -138,7 +144,7 @@ class ModelService with ChangeNotifier {
     'lm': 'assets/producers/lmstudiocommunity.jpg',
     'moonshot': 'assets/producers/moonshotai.jpg',
     'z.ai': 'assets/producers/z.ai.jpg',
-    'ibm': 'assets/producres/ibm.jpg',
+    'ibm': 'assets/producers/ibm.jpg',
     'inclusion': 'assets/producers/inclusionai.jpg',
     'nvidia': 'assets/producers/nvidia.jpg'
   };
@@ -163,9 +169,11 @@ class ModelService with ChangeNotifier {
     const String logPrefix = "[ModelService.getModels]";
 
     _isLoading = true;
+    _hasError = false; // Reset error state on new attempt
+    notifyListeners(); // Notify UI that loading started
 
     try {
-      if (_cachedEntities != null) {
+      if (_cachedEntities != null && _cachedEntities!.isNotEmpty) {
         return _cachedEntities;
       }
 
@@ -178,8 +186,10 @@ class ModelService with ChangeNotifier {
         localAssetMap: _localAssetImageMap,
       );
 
-      if (rawModels == null) {
-        debugPrint("$logPrefix: Repository returned null. Data fetching failed.");
+      // --- Handle Empty List as Error ---
+      if (rawModels == null || rawModels.isEmpty) {
+        debugPrint("$logPrefix: Repository returned null or empty list. Marking as Error.");
+        _hasError = true;
         return null;
       }
 
@@ -208,14 +218,25 @@ class ModelService with ChangeNotifier {
         finalEntities.insert(0, neuroModel);
       }
 
+      // Final check: if processing resulted in 0 entities, flag error.
+      if (finalEntities.isEmpty) {
+        _hasError = true;
+        return null;
+      }
+
       _cachedEntities = finalEntities;
       debugPrint("$logPrefix: Caching ${finalEntities.length} ENRICHED model entities.");
       unawaited(_validateAndAssignDefaultBaseModels());
 
       return _cachedEntities;
 
+    } catch (e, s) {
+      debugPrint("$logPrefix: Exception caught: $e\n$s");
+      _hasError = true; // Mark error on exception
+      return null;
     } finally {
       _isLoading = false;
+      notifyListeners(); // Ensure UI rebuilds to show either list or error
     }
   }
 

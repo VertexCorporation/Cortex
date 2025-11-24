@@ -21,6 +21,7 @@ import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../banner.dart';
 import '../../initialization.dart';
 import '../../l10n/app_localizations.dart';
@@ -95,11 +96,17 @@ class ChatControllerState extends State<ChatController>
   Locale? _currentLocale;
   // Ensures one-time asynchronous setup runs only once.
   bool _isInitialSetupComplete = false;
-  // A session flag to prevent a dismissed dynamic chat from reappearing on tab re-selection.
+
   static bool hasShownDynamicChatThisSession = false;
-  // Last initialized base id, so explanatory.
+
+  static bool hasShownExtensionInfoThisSession = false;
+
   String? _lastInitializedBaseId;
   bool _wasChatActive = false;
+
+  bool _extensionInfoPrefsLoaded = false;
+  int _extensionInfoTotalShows = 0;
+  bool _autoShowExtensionInfoScheduled = false;
 
   @override
   void initState() {
@@ -203,6 +210,48 @@ class ChatControllerState extends State<ChatController>
     widget.onModelSelectionChanged?.call(false);
   }
 
+  void _scheduleAutoShowExtensionInfoIfNeeded() {
+    if (_autoShowExtensionInfoScheduled ||
+        _showExtensionInfoBanner ||
+        hasShownExtensionInfoThisSession) {
+      return;
+    }
+
+    _autoShowExtensionInfoScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _autoShowExtensionInfoScheduled = false;
+      unawaited(_tryAutoShowExtensionInfoBanner());
+    });
+  }
+
+  Future<void> _tryAutoShowExtensionInfoBanner() async {
+    if (!_extensionInfoPrefsLoaded) {
+      final prefs = await SharedPreferences.getInstance();
+      _extensionInfoTotalShows = prefs.getInt('extensionInfoTotalShows') ?? 0;
+      _extensionInfoPrefsLoaded = true;
+    }
+
+    if (_extensionInfoTotalShows >= 2) return;
+    if (hasShownExtensionInfoThisSession) return;
+    if (_showExtensionInfoBanner) return;
+
+    hasShownExtensionInfoThisSession = true;
+
+    if (!mounted) return;
+
+    FocusScope.of(context).unfocus();
+    await Future.delayed(const Duration(milliseconds: 150));
+    if (!mounted) return;
+
+    setState(() => _showExtensionInfoBanner = true);
+
+    _extensionInfoTotalShows++;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('extensionInfoTotalShows', _extensionInfoTotalShows);
+  }
+
+
   Future<void> _performInitialAsyncSetup(String langCode) async {
     // Wait for core services...
     await context.read<AppInitializer>().onCoreServicesReady;
@@ -289,16 +338,27 @@ class ChatControllerState extends State<ChatController>
     if (isStandardChatActive) {
       final langCode = Localizations.localeOf(context).languageCode;
 
-      final currentBaseId = modelService.getBaseIdFromFullId(sessionProvider.modelId!, langCode: langCode);
+      final currentBaseId = modelService.getBaseIdFromFullId(
+        sessionProvider.modelId!,
+        langCode: langCode,
+      );
 
       if (currentBaseId != _lastInitializedBaseId) {
         _lastInitializedBaseId = currentBaseId;
-        final seriesEntity = modelService.getPreciseModelData(currentBaseId, langCode: langCode);
+        final seriesEntity = modelService.getPreciseModelData(
+          currentBaseId,
+          langCode: langCode,
+        );
+
         extensions.initialize(
           mainId: currentBaseId,
           ext: sessionProvider.modelId!,
           model: seriesEntity,
         );
+
+        if ((seriesEntity.extensions ?? {}).isNotEmpty) {
+          _scheduleAutoShowExtensionInfoIfNeeded();
+        }
       }
     } else if (_lastInitializedBaseId != null) {
       _lastInitializedBaseId = null;
@@ -307,7 +367,13 @@ class ChatControllerState extends State<ChatController>
     if (isChatNowActive && !_wasChatActive) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Future.delayed(const Duration(milliseconds: 400), () {
-          if (mounted && activeChatViewKey.currentState != null) {
+          if (!mounted) return;
+
+          if (_showExtensionInfoBanner || _autoShowExtensionInfoScheduled) {
+            return;
+          }
+
+          if (activeChatViewKey.currentState != null) {
             activeChatViewKey.currentState?.focusTextField();
           }
         });
@@ -354,21 +420,27 @@ class ChatControllerState extends State<ChatController>
                     }
                     if (!mounted) return;
                     setState(() => _showExtensionInfoBanner = true);
+                    hasShownExtensionInfoThisSession = true;
                   }
                 },
                 onTitleTap: () {
                   final mode = sessionProvider.appBarMode;
                   if (mode == AppBarMode.modelSelected) {
                     if (!extensions.isPanelVisible) {
+                      FocusScope.of(context).unfocus();
+
                       extensions.showExtensionPanel(
                         context: context,
                         extensionKey: _extensionKey,
                         modelTitle: sessionProvider.modelTitle ?? "",
                         updateModelId: (selectedEntryKey) async {
                           await context.read<SelectionService>().changeExtension(selectedEntryKey);
-                          if (mounted) extensions.closePanel();
                         },
                         modelService: modelService,
+
+                        onPanelClosed: () {
+                          if (mounted) setState(() {});
+                        },
                       );
                     } else {
                       extensions.closePanel();
@@ -436,7 +508,6 @@ class ChatControllerState extends State<ChatController>
                 setState(() => _showExtensionInfoBanner = false);
                 focusTextField();
               }
-              bannerService.startCooldown();
             },
           ),
         ],

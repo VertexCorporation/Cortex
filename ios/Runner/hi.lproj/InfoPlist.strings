@@ -1,0 +1,4 @@
+"NSCameraUsageDescription" = "फोटो लेने के लिए Cortex को आपके कैमरे तक पहुंच की आवश्यकता है।";
+"NSPhotoLibraryUsageDescription" = "चित्र अपलोड करने के लिए Cortex को आपकी गैलरी तक पहुंच की आवश्यकता है।";
+"NSPhotoLibraryAddUsageDescription" = "Cortex को आपकी गैलरी में चित्र सहेजने की अनुमति चाहिए।";
+"NSMicrophoneUsageDescription" = "वॉयस चैट के लिए Cortex को माइक्रोफ़ोन तक पहुंच की आवश्यकता है।";

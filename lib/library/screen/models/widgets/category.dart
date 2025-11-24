@@ -48,7 +48,10 @@ class ModelCategorySection extends StatelessWidget {
     return ModelsBackendUtils.calculateCategoryHeight(modelMaps, screenWidth);
   }
 
-  List<Widget> _buildModelColumns(BuildContext context, double screenWidth) {
+  List<Widget> _buildModelColumns(
+      BuildContext context,
+      double screenWidth,
+      ) {
     final List<Widget> columns = [];
     const int modelsPerColumn = 3;
     final int totalModels = models.length;
@@ -60,21 +63,22 @@ class ModelCategorySection extends StatelessWidget {
           ? totalModels
           : startIndex + modelsPerColumn;
 
-      final List<ModelEntity> columnModels = models.sublist(startIndex, endIndex);
+      final List<ModelEntity> columnModels =
+      models.sublist(startIndex, endIndex);
 
       columns.add(
         Padding(
-          padding: EdgeInsets.only(right: screenWidth * 0.01, left: screenWidth * 0.01),
+          padding: EdgeInsets.only(right: screenWidth * 0.001),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: columnModels.map((model) {
-
               final isDownloaded = downloadedStates[model.id] ?? false;
-              final manager = model.isServerSide ? null : downloadManagers[model.id];
-
-              final compatibilityStatus =
-              isDownloaded ? CompatibilityStatus.compatible : getCompatibilityStatus(model.size);
+              final manager =
+              model.isServerSide ? null : downloadManagers[model.id];
+              final compatibilityStatus = isDownloaded
+                  ? CompatibilityStatus.compatible
+                  : getCompatibilityStatus(model.size);
 
               return ModelTile(
                 model: model,
@@ -88,8 +92,17 @@ class ModelCategorySection extends StatelessWidget {
                   HapticFeedback.mediumImpact();
                   await onRemovePressed(model.id, model.displayTitle);
                 },
-                onChatPressed: () => onChatPressed(model.id, model.isServerSide, isCustomModel: model.isCustomModel, modelPath: null),
-                onDownloadPressed: () => onDownloadPressed(id: model.id, url: model.url, title: model.displayTitle),
+                onChatPressed: () => onChatPressed(
+                  model.id,
+                  model.isServerSide,
+                  isCustomModel: model.isCustomModel,
+                  modelPath: null,
+                ),
+                onDownloadPressed: () => onDownloadPressed(
+                  id: model.id,
+                  url: model.url,
+                  title: model.displayTitle,
+                ),
                 onCancelDownload: () => onCancelDownload(model.id),
                 onResumeDownload: () => onResumeDownload(model.id),
               );
@@ -125,27 +138,48 @@ class ModelCategorySection extends StatelessWidget {
     if (models.isEmpty) {
       return const SizedBox.shrink();
     }
+
     final double screenWidth = MediaQuery.of(context).size.width;
     const double horizontalPaddingRatio = 0.04;
-    final double cardWidth = screenWidth - (screenWidth * horizontalPaddingRatio * 2);
-    final double pageViewWidth = cardWidth + (screenWidth * horizontalPaddingRatio);
-    final double viewportFraction = pageViewWidth / screenWidth;
+    final double sectionHPad = screenWidth * horizontalPaddingRatio;
+    const double pageFraction = 0.98;
+    final double viewportFraction = pageFraction;
 
+    final double availableWidth = screenWidth - 2 * sectionHPad;
+
+    final double pageWidth = availableWidth * viewportFraction;
+
+    final double sideInset = (availableWidth - pageWidth) / 2;
+
+    final double trackShift = sideInset * 2;
 
     final Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * horizontalPaddingRatio),
+          padding: EdgeInsets.symmetric(horizontal: sectionHPad),
           child: _buildHeader(screenWidth),
         ),
         SizedBox(
           height: _calculateHeight(screenWidth),
-          child: PageView(
-            clipBehavior: Clip.none,
-            controller: PageController(viewportFraction: viewportFraction),
-            children: _buildModelColumns(context, screenWidth),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: sectionHPad),
+            child: Transform.translate(
+              offset: Offset(-trackShift, 0),
+              child: PageView(
+                clipBehavior: Clip.none,
+                controller: PageController(
+                  viewportFraction: viewportFraction,
+                ),
+                padEnds: true,
+                physics: const PageScrollPhysics(),
+                children: _buildModelColumns(
+                  context,
+                  screenWidth,
+                ),
+              ),
+            ),
           ),
         ),
       ],
@@ -156,15 +190,25 @@ class ModelCategorySection extends StatelessWidget {
         animation: pulseAnimation!,
         builder: (context, child) {
           const double maxExpansionInPixels = 7.0;
-          final double originalContentWidth = screenWidth - 2 * (screenWidth * 0.04);
-          final double maxDesiredWidth = originalContentWidth + maxExpansionInPixels;
-          final double targetWidth = (maxDesiredWidth < screenWidth) ? maxDesiredWidth : screenWidth;
-          final double maxTargetScale = (originalContentWidth > 0) ? targetWidth / originalContentWidth : 1.0;
-          final double animationProgress = (pulseAnimation!.value - 1.0) / 0.10;
-          final double finalAppliedScale = 1.0 + (animationProgress * (maxTargetScale - 1.0));
+          final double originalContentWidth =
+              screenWidth - 2 * (screenWidth * 0.04);
+          final double maxDesiredWidth =
+              originalContentWidth + maxExpansionInPixels;
+          final double targetWidth =
+          (maxDesiredWidth < screenWidth) ? maxDesiredWidth : screenWidth;
+          final double maxTargetScale = (originalContentWidth > 0)
+              ? targetWidth / originalContentWidth
+              : 1.0;
+          final double animationProgress =
+              (pulseAnimation!.value - 1.0) / 0.10;
+          final double finalAppliedScale =
+              1.0 + (animationProgress * (maxTargetScale - 1.0));
           final double headerApproxHeight = screenWidth * 0.08;
-          final double contentOriginalHeight = _calculateHeight(screenWidth) + headerApproxHeight;
-          final double extraHeight = (contentOriginalHeight * finalAppliedScale) - contentOriginalHeight;
+          final double contentOriginalHeight =
+              _calculateHeight(screenWidth) + headerApproxHeight;
+          final double extraHeight =
+              (contentOriginalHeight * finalAppliedScale) -
+                  contentOriginalHeight;
           final double bottomSpacerHeight = extraHeight / 2.0;
           return Column(
             mainAxisSize: MainAxisSize.min,

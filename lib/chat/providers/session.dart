@@ -61,7 +61,7 @@ class ChatSessionProvider with ChangeNotifier {
   bool get wasDynamicOnExit => _wasDynamicOnExit;
   List<ModelEntity> get allModels => _modelService.getCachedModelsSync();
   bool get areModelsLoading => _modelService.isLoading;
-  bool get modelsLoadError => false;
+  bool get modelsLoadError => _modelService.hasError;
 
   String? get modelId => _selectedModel?.id;
 

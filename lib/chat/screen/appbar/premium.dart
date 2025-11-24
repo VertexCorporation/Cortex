@@ -4,7 +4,11 @@ import 'dart:math';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../login/upgrade.dart';
+import '../../../navigation.dart';
+import '../../../server/user.dart';
 import '../../../theme.dart';
 
 /// A banner that appears below the AppBar to notify the user that a premium model is selected.
@@ -151,7 +155,18 @@ class PremiumModelBannerState extends State<PremiumModelBanner>
                     color: AppColors.primaryColor,
                     borderRadius: BorderRadius.circular(borderRadius * 0.8),
                     child: InkWell(
-                      onTap: widget.onTap,
+                        onTap: () {
+                          final isAnonymous = context
+                              .read<UserProvider>()
+                              .isAnonymous;
+
+                          if (isAnonymous) {
+                            navigateToScreen(const UpgradeAccountScreen(), direction: const Offset(0.0, 1.0));
+                            FocusScope.of(context).unfocus();
+                          } else {
+                            widget.onTap();
+                          }
+                        },
                       borderRadius: BorderRadius.circular(borderRadius * 0.8),
                       splashColor: AppColors.primaryColor.withValues(alpha: 0.1),
                       highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),

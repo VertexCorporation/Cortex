@@ -60,12 +60,16 @@ class MainActivity : FlutterActivity() {
 
                     "sendMessage"  -> {
                         val msg = call.argument<String>("message")
-                        val photo = call.argument<String>("photoBase64")
+
+                        val photoPath = call.argument<String>("photoPath")
+
                         if (msg.isNullOrBlank()) {
                             result.error("INVALID_MSG", "Message is null or empty", null)
                             return@setMethodCallHandler
                         }
-                        startLlamaService("sendMessage", "message" to msg, "photoBase64" to (photo ?: ""))
+
+                        // Servisi başlatırken artık "photoPath" gönderiyoruz
+                        startLlamaService("sendMessage", "message" to msg, "photoPath" to (photoPath ?: ""))
                         result.success("Message sent: $msg")
                     }
 

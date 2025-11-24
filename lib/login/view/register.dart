@@ -8,13 +8,6 @@ import 'package:flutter/material.dart';
 import '../../shake.dart';
 
 /// A "dumb" widget responsible only for displaying the registration form UI.
-///
-/// This widget holds no business logic. It receives all its data and callbacks
-/// from a parent "orchestrator" widget. Its responsibilities are:
-///   1. To render the TextFormFields and Buttons for creating an account.
-///   2. To manage purely local UI state, such as password visibility.
-///   3. To report user actions (e.g., form submission) back to the parent.
-///   4. To display loading states and error messages provided by the parent.
 class RegisterForm extends StatefulWidget {
   // --- Callbacks to the Orchestrator ---
   final Future<void> Function(String username, String email, String password) onSubmit;
@@ -22,7 +15,7 @@ class RegisterForm extends StatefulWidget {
 
   // --- State from the Orchestrator ---
   final bool isLoading;
-  final bool agreeToTerms; // The state of the checkbox is controlled by the parent.
+  final bool agreeToTerms;
   final String? usernameError;
   final String? emailError;
   final String? passwordError;
@@ -31,7 +24,6 @@ class RegisterForm extends StatefulWidget {
   final AnimationController usernameShakeController;
   final AnimationController emailShakeController;
   final AnimationController passwordShakeController;
-  final AnimationController confirmPasswordShakeController;
 
   // --- Responsive UI Parameters ---
   final double deviceHeight;
@@ -49,7 +41,6 @@ class RegisterForm extends StatefulWidget {
     required this.usernameShakeController,
     required this.emailShakeController,
     required this.passwordShakeController,
-    required this.confirmPasswordShakeController,
     required this.deviceHeight,
     required this.fontScale,
   });
@@ -63,11 +54,9 @@ class _RegisterFormState extends State<RegisterForm> {
   late final TextEditingController _usernameController;
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
-  late final TextEditingController _confirmPasswordController;
 
   // --- Local UI State ---
   bool _isPasswordVisible = false;
-  bool _isConfirmPasswordVisible = false;
 
   // --- Form Data ---
   String _username = '';
@@ -82,12 +71,8 @@ class _RegisterFormState extends State<RegisterForm> {
     _usernameController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
-    _confirmPasswordController = TextEditingController();
   }
 
-  /// This lifecycle method is crucial for displaying server-side errors.
-  /// When the parent widget rebuilds with a new error, this method detects
-  /// the change and forces the form to re-validate, thus showing the error message.
   @override
   void didUpdateWidget(RegisterForm oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -107,7 +92,6 @@ class _RegisterFormState extends State<RegisterForm> {
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -123,12 +107,15 @@ class _RegisterFormState extends State<RegisterForm> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    final bool isDisabled = widget.isLoading || !widget.agreeToTerms;
+
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: widget.deviceHeight * 0.04),
+          // Spacing matched to Login
+          SizedBox(height: widget.deviceHeight * 0.03),
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
@@ -137,25 +124,25 @@ class _RegisterFormState extends State<RegisterForm> {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 42 * widget.fontScale,
+                fontSize: 38 * widget.fontScale,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).textTheme.titleLarge?.color,
               ),
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: widget.deviceHeight * 0.001),
+            padding: EdgeInsets.only(top: widget.deviceHeight * 0.005),
             child: Text(
               l10n.registerSubtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 10 * widget.fontScale,
+                fontSize: 12 * widget.fontScale,
                 color: Theme.of(context).textTheme.bodySmall?.color,
                 height: 1.2,
               ),
             ),
           ),
-          SizedBox(height: widget.deviceHeight * 0.04),
+          SizedBox(height: widget.deviceHeight * 0.02),
 
           // --- Username Field ---
           ShakeWidget(
@@ -174,6 +161,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 counterText: '',
                 errorMaxLines: 3,
+                contentPadding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale, horizontal: 12),
               ),
               maxLength: 20,
               validator: (value) {
@@ -205,6 +193,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 counterText: '',
                 errorMaxLines: 3,
+                contentPadding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale, horizontal: 12),
               ),
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
@@ -231,18 +220,32 @@ class _RegisterFormState extends State<RegisterForm> {
                 labelText: l10n.password,
                 labelStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color),
                 prefixIcon: Icon(Icons.lock_outline, color: Theme.of(context).iconTheme.color),
+
                 suffixIcon: IconButton(
-                  icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off, color: Theme.of(context).iconTheme.color),
+                  icon: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                    child: Icon(
+                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      key: ValueKey(_isPasswordVisible ? 'icon1' : 'icon2'),
+                      color: Theme.of(context).iconTheme.color,
+                    ),
+                  ),
                   onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
                 ),
+
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 counterText: '',
                 errorMaxLines: 3,
+                contentPadding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale, horizontal: 12),
               ),
               obscureText: !_isPasswordVisible,
+              maxLength: 64,
               validator: (value) {
                 if (widget.passwordError != null) return widget.passwordError;
-                if (value == null || value.length < 6) return l10n.weakPassword;
+                if (value == null || value.length < 6) return l10n.invalidPassword;
                 return null;
               },
               onSaved: (value) => _password = value!.trim(),
@@ -250,53 +253,39 @@ class _RegisterFormState extends State<RegisterForm> {
           ),
           SizedBox(height: widget.deviceHeight * 0.02),
 
-          // --- Confirm Password Field ---
-          ShakeWidget(
-            controller: widget.confirmPasswordShakeController,
-            child: TextFormField(
-              controller: _confirmPasswordController,
-              onChanged: (_) => widget.onInputChanged(),
-              cursorColor: AppColors.primaryColor.inverted,
-              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: AppColors.secondaryColor,
-                labelText: l10n.confirmPassword,
-                labelStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color),
-                prefixIcon: Icon(Icons.lock_outline, color: Theme.of(context).iconTheme.color),
-                suffixIcon: IconButton(
-                  icon: Icon(_isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off, color: Theme.of(context).iconTheme.color),
-                  onPressed: () => setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible),
-                ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                counterText: '',
-                errorMaxLines: 3,
-              ),
-              obscureText: !_isConfirmPasswordVisible,
-              validator: (value) {
-                if (value?.trim() != _passwordController.text.trim()) {
-                  return l10n.passwordsDoNotMatch;
-                }
-                return null;
-              },
-            ),
-          ),
-          SizedBox(height: widget.deviceHeight * 0.03),
-
           // --- Submit Button ---
           AnimatedOpacity(
-            opacity: widget.isLoading || !widget.agreeToTerms ? 0.6 : 1.0,
+            opacity: isDisabled ? 0.5 : 1.0,
             duration: const Duration(milliseconds: 200),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor.inverted,
-                  padding: EdgeInsets.symmetric(vertical: widget.deviceHeight * 0.02),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: IgnorePointer(
+              ignoring: isDisabled,
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.background,
+                    foregroundColor: AppColors.primaryColor.inverted,
+
+                    disabledBackgroundColor: AppColors.background,
+                    disabledForegroundColor: AppColors.primaryColor.inverted,
+
+                    padding: EdgeInsets.symmetric(vertical: widget.deviceHeight * 0.018),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 0,
+                    side: BorderSide(color: AppColors.quinaryColor.withValues(alpha:0.3)),
+                  ),
+
+                  onPressed: _submitForm,
+                  child: Text(
+                      l10n.signUp,
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold
+                      )
+                  ),
                 ),
-                onPressed: (widget.isLoading || !widget.agreeToTerms) ? null : _submitForm,
-                child: Text(l10n.signUp, style: TextStyle(fontSize: 18, color: AppColors.primaryColor)),
               ),
             ),
           ),

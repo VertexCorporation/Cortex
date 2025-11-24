@@ -2,16 +2,20 @@
 // It's good practice to have a more generic name if it might handle more than just login in the future.
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer' as dev;
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../initialization.dart';
 import '../main.dart';
 import '../notifications/extrovert.dart';
@@ -56,6 +60,24 @@ class GoogleSignInSuccess extends GoogleSignInResult {
 }
 class GoogleSignInFailure extends GoogleSignInResult {}
 
+/// Represents the outcomes for an anonymous sign-in attempt.
+sealed class AnonymousSignInResult {}
+
+class AnonymousSignInSuccess extends AnonymousSignInResult {
+  final User user;
+  AnonymousSignInSuccess(this.user);
+}
+class AnonymousSignInNetworkError extends AnonymousSignInResult {}
+class AnonymousSignInFailure extends AnonymousSignInResult {}
+
+/// Represents the exhaustive set of outcomes for an Apple Sign-In attempt.
+sealed class AppleSignInResult {}
+
+class AppleSignInSuccess extends AppleSignInResult {
+  final User user;
+  AppleSignInSuccess(this.user);
+}
+class AppleSignInFailure extends AppleSignInResult {}
 
 /// A service class that encapsulates all backend authentication logic.
 ///
@@ -280,6 +302,187 @@ class LoginBackendService {
     }
   }
 
+  /// Handles the anonymous sign-in flow.
+  Future<AnonymousSignInResult> signInAnonymously({
+    required BuildContext context,
+    required IntrovertNotificationService notificationService,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final extrovertNotificationService = context.read<ExtrovertNotificationService>();
+
+    if (!await InternetConnection().hasInternetAccess) {
+      notificationService.showNotification(
+        message: l10n.noInternetConnection,
+        type: NotificationType.error,
+      );
+      return AnonymousSignInNetworkError();
+    }
+
+    try {
+      final UserCredential userCredential = await _auth.signInAnonymously();
+      final User? user = userCredential.user;
+
+      if (user == null) throw FirebaseAuthException(code: 'anonymous-user-null');
+
+      await extrovertNotificationService.syncTokenAfterLogin();
+
+      dev.log('[Auth.Anonymous] Signed in anonymously. UID: ${user.uid}', name: 'LoginBackend');
+
+      return AnonymousSignInSuccess(user);
+
+    } catch (e, st) {
+      dev.log(
+          '[Auth.Anonymous] Error during anonymous sign-in',
+          name: 'LoginBackend',
+          error: e,
+          stackTrace: st
+      );
+
+      notificationService.showNotification(
+          message: l10n.authError,
+          type: NotificationType.error
+      );
+      return AnonymousSignInFailure();
+    }
+  }
+
+  /// Handles the Apple Sign-In flow with Nonce verification for Firebase.
+  /// Handles the Apple Sign-In flow with Nonce verification for Firebase.
+  Future<AppleSignInResult> signInWithApple({
+    required BuildContext context,
+    required IntrovertNotificationService notificationService,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final extrovertNotificationService = context.read<ExtrovertNotificationService>();
+
+    try {
+      // 1. Generate a nonce (random string) for security.
+      final rawNonce = _generateNonce();
+      final sha256Nonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+      // 2. Request Apple ID credential.
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: sha256Nonce,
+        webAuthenticationOptions: WebAuthenticationOptions(
+          clientId: 'com.vertex.cortex.signin',
+
+          redirectUri: Uri.parse(
+            'https://vertex-ai-1618.firebaseapp.com/__/auth/handler',
+          ),
+        ),
+      );
+
+      // 3. Create an OAuthCredential for Firebase using the raw nonce.
+      final OAuthCredential credential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+        rawNonce: rawNonce,
+      );
+
+      // 4. Sign in to Firebase.
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      if (user == null) {
+        throw Exception("Firebase sign in with Apple returned a null user.");
+      }
+
+      // --- Post-login logic ---
+      final bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+
+      if (isNewUser) {
+        String? displayName;
+        if (appleCredential.givenName != null) {
+          displayName = "${appleCredential.givenName} ${appleCredential.familyName ?? ''}".trim();
+        }
+
+        await _postUsernameSuggestion(uid: user.uid, username: displayName);
+
+        if (displayName != null && displayName.isNotEmpty) {
+          await user.updateDisplayName(displayName);
+        }
+      }
+
+      await _secureStorage.write(key: 'remember_me', value: 'true');
+      await _secureStorage.write(key: 'email', value: user.email);
+
+      await extrovertNotificationService.syncTokenAfterLogin();
+
+      dev.log('[Auth.Apple] Sign-in complete for UID: ${user.uid}.', name: 'LoginBackend');
+      return AppleSignInSuccess(user);
+
+    } catch (e, st) {
+      if (e is SignInWithAppleAuthorizationException) {
+        if (e.code == AuthorizationErrorCode.canceled) {
+          dev.log('[Auth.Apple] Sign-in cancelled by user.', name: 'LoginBackend');
+          return AppleSignInFailure();
+        }
+      }
+
+      dev.log('[Auth.Apple] Error during Apple Sign-In', name: 'LoginBackend', error: e, stackTrace: st);
+
+      notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
+      return AppleSignInFailure();
+    }
+  }
+
+  /// Upgrades an anonymous account by linking it with Email/Password.
+  /// Triggers the Cloud Function 'completeAnonymousRegistration' upon success.
+  Future<RegistrationResult> linkAnonymousWithEmail({
+    required BuildContext context,
+    required IntrovertNotificationService notificationService,
+    required String username,
+    required String email,
+    required String password,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final user = _auth.currentUser;
+    final extrovertNotificationService = context.read<ExtrovertNotificationService>();
+
+    if (user == null || !user.isAnonymous) return RegistrationUnknownError();
+
+    if (!await InternetConnection().hasInternetAccess) {
+      notificationService.showNotification(message: l10n.noInternetConnection, type: NotificationType.error);
+      return RegistrationNetworkError();
+    }
+
+    try {
+      final isAvailable = await _isUsernameAvailable(username, notificationService, l10n);
+      if (!isAvailable) return RegistrationUsernameTaken();
+
+      final credential = EmailAuthProvider.credential(email: email, password: password);
+      await user.linkWithCredential(credential);
+
+      final callable = _functions.httpsCallable('completeAnonymousRegistration');
+      await callable.call();
+
+      await extrovertNotificationService.syncTokenAfterLogin();
+
+      return RegistrationSuccess();
+
+    } on FirebaseAuthException catch (e) {
+      dev.log('[Auth.Link] Error: ${e.code}', name: 'LoginBackend');
+      switch (e.code) {
+        case 'email-already-in-use':
+        case 'credential-already-in-use':
+          return RegistrationEmailInUse();
+        case 'weak-password':
+          return RegistrationWeakPassword();
+        default:
+          notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
+          return RegistrationUnknownError();
+      }
+    } catch (e) {
+      dev.log('[Auth.Link] Generic Error: $e', name: 'LoginBackend');
+      notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
+      return RegistrationUnknownError();
+    }
+  }
+
   // --- Private Helper Methods ---
 
   Future<void> _postUsernameSuggestion({required String uid, String? username}) async {
@@ -329,5 +532,12 @@ class LoginBackendService {
     } else {
       await _secureStorage.deleteAll();
     }
+  }
+
+  /// Generates a cryptographically secure random string for the nonce.
+  String _generateNonce([int length = 32]) {
+    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)]).join();
   }
 }

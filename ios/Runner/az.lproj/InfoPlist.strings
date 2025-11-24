@@ -1,0 +1,4 @@
+"NSCameraUsageDescription" = "Cortex şəkil çəkmək üçün kameranıza giriş tələb edir.";
+"NSPhotoLibraryUsageDescription" = "Cortex şəkil yükləmək üçün qalereyanıza giriş tələb edir.";
+"NSPhotoLibraryAddUsageDescription" = "Cortex şəkilləri qalereyaya yadda saxlamaq üçün icazə tələb edir.";
+"NSMicrophoneUsageDescription" = "Cortex səsli söhbət üçün mikrofona giriş tələb edir.";

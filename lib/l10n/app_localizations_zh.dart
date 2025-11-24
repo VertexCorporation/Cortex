@@ -1369,7 +1369,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      '点数用于与在线模型聊天。 每条信息我们都得花钱 这些点数能让我们撑下去 好吧现在来解释下这个系统\n\n• 给免费在线模型发一条消息花费10点数。\n• 给在线高级模型发一条消息花费20点数。\n• 加个附件会多花30点数。\n• 免费用户每天有200点数重置奖励。';
+      '积分用于和在线 AI 模型聊天。每一条消息对我们来说都是真金白银的成本，这些积分说白了就是不让我们直接亏到破产的救命稻草。现在简单说一下这个系统是怎么工作的：\n\n• 给免费的在线模型发送每条消息需要 5 点积分。\n• 给高级在线模型发送每条消息需要 20 点积分。\n• 附加一个文件会额外多花 30 点积分。\n• 免费套餐用户每天都会获得 200 点积分奖励，并且每天重置。';
 
   @override
   String get creditsInfoPanelFooter => '聊天愉快！';
@@ -1440,7 +1440,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      '登录您的 Vertex 帐户。通过谷歌注册的新用户即表示同意我们的服务条款和隐私政策。您可以在注册页面查阅这些政策。';
+      '登录您的 Vertex 帐户。通过第三方服务注册的新用户需同意我们的条款和隐私政策。您可以在注册页面查看这些条款和政策。';
 
   @override
   String get registerSubtitle => '创建一个 Vertex 帐户，您也可以用它来访问我们的其他项目。';
@@ -1959,4 +1959,40 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get cacheIsNotUpToDate => '您的Play商店缓存未更新。请关闭并重新打开Play商店应用，或重启您的设备。';
+
+  @override
+  String get continueAsGuest => '无需创建帐户即可继续';
+
+  @override
+  String get guestModeWarning => '访客模式功能有限，以确保最佳服务质量。';
+
+  @override
+  String get anonymousEntity => '匿名实体';
+
+  @override
+  String get upgradeAccountTitle => '完善您的账户';
+
+  @override
+  String get upgradeAccountDescription => '创建账户即可每日获得 200 奖励积分并解锁更多限额。';
+
+  @override
+  String get createAccount => '创建账户';
+
+  @override
+  String get upgradeTitle => '完成注册';
+
+  @override
+  String get accountLinkedSuccess => '账户创建成功！';
+
+  @override
+  String get continueWithApple => '继续使用 Apple';
+
+  @override
+  String get guest => '客人';
+
+  @override
+  String get betterWithAnAccount => '注册账号后，此部分内容会显示得更清晰！';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

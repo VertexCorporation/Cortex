@@ -38,6 +38,20 @@ class ChatTokens {
       ignoreRegex: map['ignore_regex'] as String?,
     );
   }
+
+  /// Converts the instance back to a JSON map.
+  Map<String, dynamic> toMap() {
+    return {
+      'system_start': systemStart,
+      'system_end': systemEnd,
+      'user_start': userStart,
+      'user_end': userEnd,
+      'assistant_start': assistantStart,
+      'assistant_end': assistantEnd,
+      'stop_generation': stopGeneration,
+      'ignore_regex': ignoreRegex,
+    };
+  }
 }
 
 /// Represents the complete chat format configuration for a model.
@@ -59,5 +73,13 @@ class ChatFormat {
           ? ChatTokens.fromMap(map['tokens'] as Map<String, dynamic>)
           : null,
     );
+  }
+
+  /// Converts the instance back to a JSON map.
+  Map<String, dynamic> toMap() {
+    return {
+      'template': template,
+      'tokens': tokens?.toMap(),
+    };
   }
 }

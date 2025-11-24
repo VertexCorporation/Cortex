@@ -2,11 +2,13 @@
 
 import 'dart:async';
 import 'package:cortex/settings/providers/general.dart';
+import 'package:cortex/settings/sections/anonymous.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../app.dart';
 import '../cache.dart';
+import '../fog.dart';
 import '../l10n/app_localizations.dart';
 import '../theme.dart';
 import 'sections/delete.dart';
@@ -36,9 +38,12 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObserver {
+  late final ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     WidgetsBinding.instance.addObserver(this);
     debugPrint("[SettingsScreen] Initialized and observing app lifecycle.");
   }
@@ -46,6 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _scrollController.dispose();
     debugPrint("[SettingsScreen] Disposed and stopped observing app lifecycle.");
     super.dispose();
   }
@@ -55,9 +61,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed && mounted) {
       debugPrint("[SettingsScreen] App resumed. Forcing a refresh of user data.");
-      // Invalidate the cache to ensure fresh data is fetched from the server.
       CacheService.invalidate(CacheKey.settingsUserData);
-      // Trigger the data refresh through the provider.
       context.read<SettingsGeneralProvider>().refreshData();
     }
   }
@@ -65,7 +69,6 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
-    // Listen to ThemeProvider changes to rebuild the entire screen with new colors.
     context.watch<ThemeProvider>();
 
     return Scaffold(
@@ -83,7 +86,6 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
             final bool showSkeleton = generalProvider.isLoading ||
                 (generalProvider.hasInternet && generalProvider.userData == null);
 
-            // Use AnimatedSwitcher for a smooth transition between loading and content states.
             return AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
@@ -102,20 +104,24 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
     final screenWidth = MediaQuery.of(context).size.width;
     final generalProvider = context.watch<SettingsGeneralProvider>();
 
+    final bool isAnonymous = generalProvider.isAnonymous;
+
     final List<Widget> settingsItems = [
       if (generalProvider.userData != null)
         const ProfileHeaderSection(),
 
-      SizedBox(height: screenWidth * 0.04),
+      SizedBox(height: screenWidth * 0.06),
 
-      // The unverified panel is only shown if the user is not verified and has internet.
-      if (!generalProvider.isVerified && generalProvider.hasInternet)
+      if (isAnonymous)
+        const AnonymousUpgradePanel(),
+
+      if (!isAnonymous && !generalProvider.isVerified && generalProvider.hasInternet)
         const _UnverifiedAccountPanel(),
 
-      if (generalProvider.hasInternet)
+      if (!isAnonymous && generalProvider.hasInternet)
         const UserSection(),
 
-      if (generalProvider.hasInternet)
+      if (!isAnonymous && generalProvider.hasInternet)
         SizedBox(height: screenWidth * 0.04),
 
       const AppLanguageSection(),
@@ -128,20 +134,30 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
       SizedBox(height: screenWidth * 0.04),
 
       DeleteSection(isFromActiveChat: isFromActiveChat),
-      SizedBox(height: screenWidth * 0.04),
+
+      // Bottom padding for comfortable scrolling
+      SizedBox(height: screenWidth * 0.08),
     ];
 
-    return ListView.builder(
-      key: const ValueKey('settingsContent'),
-      padding: EdgeInsets.all(screenWidth * 0.04),
-      itemCount: settingsItems.length,
-      itemBuilder: (context, index) {
-        return settingsItems[index];
-      },
+    return ScrollFog(
+      scrollController: _scrollController,
+      fogColor: AppColors.background,
+      topFogHeight: 20,
+      bottomFogHeight: 20,
+      showTop: true,
+      showBottom: true,
+      child: ListView.builder(
+        controller: _scrollController,
+        key: const ValueKey('settingsContent'),
+        padding: EdgeInsets.all(screenWidth * 0.04),
+        itemCount: settingsItems.length,
+        itemBuilder: (context, index) {
+          return settingsItems[index];
+        },
+      ),
     );
   }
 }
-
 
 /// A private stateful widget to display the "Unverified Account" panel.
 /// It manages its own timer for the live countdown, ensuring encapsulation.
@@ -233,82 +249,85 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
     context.watch<ThemeProvider>();
 
     final appLocalizations = AppLocalizations.of(context)!;
-    // Use `watch` here to rebuild when `isResendingEmail` or `verificationAttempts` change.
     final generalProvider = context.watch<SettingsGeneralProvider>();
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
     final timeStr = _formatRemainingTime(_remainingSeconds);
 
-    return Container(
-      margin: EdgeInsets.only(bottom: screenHeight * 0.02),
-      padding: EdgeInsets.all(screenWidth * 0.04),
-      decoration: BoxDecoration(
-        color: AppColors.secondaryColor,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: AppColors.septenaryColor, width: 2),
-      ),
-      child: Column(
-        children: [
-          Text(
-            appLocalizations.unverifiedAccountHeader,
-            style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
-            textAlign: TextAlign.center,
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(screenWidth * 0.04),
+          decoration: BoxDecoration(
+            color: AppColors.secondaryColor,
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(color: AppColors.septenaryColor, width: 2),
           ),
-          SizedBox(height: screenHeight * 0.01),
-          Text(
-            appLocalizations.unverifiedAccountWarning(timeStr),
-            style: TextStyle(fontSize: screenWidth * 0.035, color: AppColors.quinaryColor),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: screenHeight * 0.015),
-          // Live Countdown Timer Display
-          Text(
-            timeStr,
-            style: GoogleFonts.anaheim(textStyle: TextStyle(fontSize: screenWidth * 0.05, color: AppColors.primaryColor.inverted, fontWeight: FontWeight.w900)),
-          ),
-          SizedBox(height: screenHeight * 0.015),
-          // Verify Now Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(screenHeight * 0.06), backgroundColor: AppColors.senaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-              onPressed: () => context.read<SettingsGeneralProvider>().refreshData(),
-              child: Text(appLocalizations.verifyNow, style: TextStyle(color: AppColors.primaryColor, fontSize: screenWidth * 0.04)),
-            ),
-          ),
-          SizedBox(height: screenHeight * 0.015),
-          // Resend Code Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(screenHeight * 0.06), backgroundColor: AppColors.senaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-              onPressed: (generalProvider.isResendingEmail || generalProvider.verificationAttempts >= 2) ? null : () {
-                context.read<SettingsGeneralProvider>().resendVerificationEmail();
-              },
-              child: generalProvider.isResendingEmail
-                  ? SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.primaryColor))
-                  : Text(
-                appLocalizations.resendCode,
+          child: Column(
+            children: [
+              Text(
+                appLocalizations.unverifiedAccountHeader,
+                style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: (generalProvider.verificationAttempts >= 2) ? AppColors.quinaryColor : AppColors.primaryColor, fontSize: screenWidth * 0.04),
               ),
-            ),
-          ),
-          // Max Resend Limit Notice
-          if (generalProvider.verificationAttempts >= 2)
-            Padding(
-              padding: EdgeInsets.only(top: screenHeight * 0.01),
-              child: Center(
-                child: Text(
-                  appLocalizations.maxResendLimitReached,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.septenaryColor, fontSize: screenWidth * 0.035, fontWeight: FontWeight.bold),
+              SizedBox(height: screenHeight * 0.01),
+              Text(
+                appLocalizations.unverifiedAccountWarning(timeStr),
+                style: TextStyle(fontSize: screenWidth * 0.035, color: AppColors.quinaryColor),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: screenHeight * 0.015),
+              // Live Countdown Timer Display
+              Text(
+                timeStr,
+                style: GoogleFonts.anaheim(textStyle: TextStyle(fontSize: screenWidth * 0.05, color: AppColors.primaryColor.inverted, fontWeight: FontWeight.w900)),
+              ),
+              SizedBox(height: screenHeight * 0.015),
+              // Verify Now Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(screenHeight * 0.06), backgroundColor: AppColors.senaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                  onPressed: () => context.read<SettingsGeneralProvider>().refreshData(),
+                  child: Text(appLocalizations.verifyNow, style: TextStyle(color: AppColors.primaryColor, fontSize: screenWidth * 0.04)),
                 ),
               ),
-            ),
-        ],
-      ),
+              SizedBox(height: screenHeight * 0.015),
+              // Resend Code Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(screenHeight * 0.06), backgroundColor: AppColors.senaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                  onPressed: (generalProvider.isResendingEmail || generalProvider.verificationAttempts >= 2) ? null : () {
+                    context.read<SettingsGeneralProvider>().resendVerificationEmail();
+                  },
+                  child: generalProvider.isResendingEmail
+                      ? SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.primaryColor))
+                      : Text(
+                    appLocalizations.resendCode,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: (generalProvider.verificationAttempts >= 2) ? AppColors.quinaryColor : AppColors.primaryColor, fontSize: screenWidth * 0.04),
+                  ),
+                ),
+              ),
+              // Max Resend Limit Notice
+              if (generalProvider.verificationAttempts >= 2)
+                Padding(
+                  padding: EdgeInsets.only(top: screenHeight * 0.01),
+                  child: Center(
+                    child: Text(
+                      appLocalizations.maxResendLimitReached,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: AppColors.septenaryColor, fontSize: screenWidth * 0.035, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        SizedBox(height: screenWidth * 0.04),
+      ],
     );
   }
 }

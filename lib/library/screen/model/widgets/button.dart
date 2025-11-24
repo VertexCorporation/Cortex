@@ -202,7 +202,6 @@ class BottomActionButtons extends StatelessWidget {
           key: const ValueKey('cancelButton'),
           onPressed: () => localProvider.cancelDownload(provider.mainModel!.id),
           width: double.infinity,
-          // FIX 1: Use the passed buttonHeight for consistency.
           height: buttonHeight,
           borderRadius: screenWidth * 0.03,
           borderColor: AppColors.primaryColor.inverted,
@@ -233,7 +232,6 @@ class BottomActionButtons extends StatelessWidget {
 
         final isButtonEnabled = hasInternet && isCompatible;
 
-        // FIX 1: Apply the buttonHeight to the SizedBox to make the ElevatedButton fill the space.
         return SizedBox(
           width: double.infinity,
           height: buttonHeight,
@@ -256,7 +254,7 @@ class BottomActionButtons extends StatelessWidget {
             ),
             child: Text(
               buttonText,
-              style: TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
             ),
           ),
         );

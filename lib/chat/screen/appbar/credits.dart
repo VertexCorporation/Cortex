@@ -67,13 +67,11 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
     }
   }
 
-
   void hideCreditsInfo({bool isDisposing = false}) {
     if (_overlayEntry == null) return;
 
-    widget.onPanelHidden?.call();
-
     if (isDisposing) {
+      widget.onPanelHidden?.call();
       _overlayEntry?.remove();
       _overlayEntry = null;
       return;
@@ -83,6 +81,8 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
       if (mounted) {
         _overlayEntry?.remove();
         _overlayEntry = null;
+
+        widget.onPanelHidden?.call();
       }
     });
   }

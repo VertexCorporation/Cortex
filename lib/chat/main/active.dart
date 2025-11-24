@@ -34,9 +34,11 @@ import '../../funds/funds.dart';
 import '../../l10n/app_localizations.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/providers/local.dart';
+import '../../login/upgrade.dart';
 import '../../navigation.dart';
 import '../../server/credits.dart';
 import 'package:cortex/chat/services/utils.dart';
+import '../../server/user.dart';
 import '../messages/options/report.dart';
 import '../messages/skeleton.dart';
 import '../screen/selected/widgets/input/input.dart';
@@ -220,11 +222,6 @@ class ActiveChatViewState extends State<ActiveChatView>
     }
   }
 
-  void _navigateToPremiumScreen() {
-    navigateToScreen(const FundsScreen(), direction: const Offset(0.0, 1.0));
-    FocusScope.of(context).unfocus();
-  }
-
   @override
   Widget build(BuildContext context) {
     final sessionProvider = context.watch<ChatSessionProvider>();
@@ -255,31 +252,37 @@ class ActiveChatViewState extends State<ActiveChatView>
         // LAYER 2: Premium banner (unchanged).
         PremiumModelBanner(
           isVisible: sessionProvider.showPremiumBanner,
-          onTap: _navigateToPremiumScreen,
+          onTap: () {
+            final isAnonymous = context.read<UserProvider>().isAnonymous;
+
+            if (isAnonymous) {
+              navigateToScreen(const UpgradeAccountScreen(), direction: const Offset(0.0, 1.0));
+              FocusScope.of(context).unfocus();
+            } else {
+              navigateToScreen(const FundsScreen(), direction: const Offset(0.0, 1.0));
+              FocusScope.of(context).unfocus();
+            }
+          },
         ),
 
-        // LAYER 3: Floating briefing overlay (positioned above bottom panel).
+        // LAYER 3: Floating briefing overlay
         AnimatedBuilder(
           animation: bottomPanelHeightNotifier,
           builder: (context, _) {
             final basePanelHeight = bottomPanelHeightNotifier.value;
             const horizontalPadding = 16.0;
 
-            final canShowBriefing = sessionProvider.isChatActive &&
+            // This boolean logic calculates visibility, but NOT whether the widget exists.
+            // Briefing should hide if the chat isn't active OR if the extension panel is open.
+            final bool shouldBeVisible = sessionProvider.isChatActive &&
                 !widget.extensions.isPanelVisible;
-
-            if (!canShowBriefing) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) briefingVisibleHeightNotifier.value = 0.0;
-              });
-              return const SizedBox.shrink();
-            }
 
             return Positioned(
               left: horizontalPadding,
               right: horizontalPadding,
               bottom: basePanelHeight + bottomSafe + _briefingBottomOffset,
               child: BriefingOverlay(
+                isVisible: shouldBeVisible,
                 availableCredits:
                 context.watch<CreditsManager>().totalCreditsNotifier.value,
                 photoSelected:
@@ -460,21 +463,30 @@ class ActiveChatViewState extends State<ActiveChatView>
                 inputFieldKey.currentState?.clearPhotoPanel();
                 FocusScope.of(context).unfocus();
 
-                context
-                    .read<SendService>()
-                    .sendMessage(
+                final isServerSide = Utils.isServerSideModel(
+                  sessionProvider.modelId,
+                  langCode: langCode,
+                  modelService: modelService,
+                );
+
+                final sendFuture = context.read<SendService>().sendMessage(
                   context: context,
                   localizations: localizations,
                   messageText: messageText,
                   photo: photo,
-                )
-                    .then((success) {
-                  if (success && mounted) {
-                    unawaited(
-                      ReviewService().triggerReviewPromptIfNeeded(context),
-                    );
-                  }
-                });
+                );
+
+                if (isServerSide) {
+                  sendFuture.then((success) {
+                    if (success && mounted) {
+                      unawaited(
+                        ReviewService().triggerReviewPromptIfNeeded(context),
+                      );
+                    }
+                  });
+                } else {
+                  _attachOfflineReviewListener();
+                }
               }
             }
           },
@@ -545,6 +557,32 @@ class ActiveChatViewState extends State<ActiveChatView>
   }
 
   // ---------------- Helpers ----------------
+
+  void _attachOfflineReviewListener() {
+    final conversationProvider = context.read<ConversationProvider>();
+
+    if (!conversationProvider.isWaitingForResponse) {
+      return;
+    }
+
+    late VoidCallback listener;
+
+    listener = () {
+      if (!mounted) {
+        conversationProvider.removeListener(listener);
+        return;
+      }
+
+      if (!conversationProvider.isWaitingForResponse) {
+        conversationProvider.removeListener(listener);
+        unawaited(
+          ReviewService().triggerReviewPromptIfNeeded(context),
+        );
+      }
+    };
+
+    conversationProvider.addListener(listener);
+  }
 
   bool _isLimitExceeded(BuildContext context) {
     final sessionProvider = context.read<ChatSessionProvider>();

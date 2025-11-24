@@ -1451,7 +1451,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Credits werden zum Chatten mit Online-Models verwendet. jede nachricht kostet uns kohle und diese credits bewahren uns vor der pleite also erklären wir jetzt das system\n\n• Jede Nachricht an ein kostenloses Online-Model kostet 10 Credits.\n• Jede Nachricht an ein Online-Premium-Model kostet 20 Credits.\n• Das Hinzufügen eines Anhangs fügt 30 weitere Credits hinzu.\n• Benutzer des kostenlosen Plans erhalten einen Bonus von 200 Credits, der täglich zurückgesetzt wird.';
+      'Credits werden verwendet, um mit Online-KI-Modellen zu chatten. jede einzelne nachricht kostet uns in echt einfach geld und genau diese credits sind das, was uns davor bewahrt komplett den bach runterzugehen lol. Jetzt erklären wir kurz, wie das System funktioniert:\n\n• Jede Nachricht an ein kostenloses Online-Modell kostet 5 Credits.\n• Jede Nachricht an ein Premium-Online-Modell kostet 20 Credits.\n• Das Hinzufügen eines Anhangs kostet 30 weitere Credits.\n• Nutzer des kostenlosen Tarifs erhalten einen Bonus von 200 Credits, der jeden Tag zurückgesetzt wird.';
 
   @override
   String get creditsInfoPanelFooter => 'Viel Spaß beim Chatten!';
@@ -1533,7 +1533,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Melde dich bei deinem Vertex-Konto an. Neue Benutzer, die sich über Google anmelden, stimmen unseren Nutzungs- und Datenschutzbestimmungen zu. Du kannst sie auf dem Registrierungsbildschirm einsehen.';
+      'Melden Sie sich in Ihrem Vertex-Konto an. Neukunden, die sich über Drittanbieterdienste registrieren, stimmen unseren Nutzungsbedingungen und Datenschutzbestimmungen zu. Diese können Sie auf der Registrierungsseite einsehen.';
 
   @override
   String get registerSubtitle =>
@@ -2104,4 +2104,43 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'Der Cache Ihres Play Stores ist nicht aktuell. Bitte schließen Sie die Play Store-App und öffnen Sie sie erneut oder starten Sie Ihr Gerät neu.';
+
+  @override
+  String get continueAsGuest => 'Ohne Kontoerstellung fortfahren';
+
+  @override
+  String get guestModeWarning =>
+      'Der Gastmodus bietet nur eingeschränkte Funktionen, um eine optimale Servicequalität zu gewährleisten.';
+
+  @override
+  String get anonymousEntity => 'Anonyme Entität';
+
+  @override
+  String get upgradeAccountTitle => 'Vervollständigen Sie Ihr Konto';
+
+  @override
+  String get upgradeAccountDescription =>
+      'Erstellen Sie ein Konto, um täglich 200 Bonus-Credits zu erhalten und weitere Limits freizuschalten.';
+
+  @override
+  String get createAccount => 'Benutzerkonto erstellen';
+
+  @override
+  String get upgradeTitle => 'Registrierung abschließen';
+
+  @override
+  String get accountLinkedSuccess => 'Konto erfolgreich erstellt!';
+
+  @override
+  String get continueWithApple => 'Weiter mit Apple';
+
+  @override
+  String get guest => 'Gast';
+
+  @override
+  String get betterWithAnAccount =>
+      'Dieser Abschnitt ist mit einem Konto besser nutzbar!';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

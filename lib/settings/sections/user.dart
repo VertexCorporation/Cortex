@@ -459,6 +459,7 @@ class UserSection extends StatelessWidget {
           enabled: hasInternet,
           onPressed: () => _showDialog(context, child: const _LogoutDialog()),
         ),
+        SizedBox(height: screenWidth * 0.04),
       ],
     );
   }

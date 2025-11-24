@@ -1431,7 +1431,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'Credits are used to chat with online models. every single message costs us cash and these credits keepin us from going broke now lets explain the system \n\n• Each message to a free online model costs 10 credits.\n• Each message to an online premium model costs 20 credits.\n• Including an attachment adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.';
+      'Credits are used to chat with online models. every single message costs us cash and these credits keepin us from going broke now lets explain the system \n\n• Each message to a free online model costs 5 credits.\n• Each message to an online premium model costs 20 credits.\n• Including an attachment adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.';
 
   @override
   String get creditsInfoPanelFooter => 'Happy chatting!';
@@ -1512,7 +1512,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Log in to your Vertex account. New users signing up via Google agree to our Terms & Privacy Policy. You can review them on the Sign Up screen.';
+      'Log in to your Vertex account. New users signing up via third-party services agree to our Terms & Privacy Policy. You can review them on the Sign Up screen.';
 
   @override
   String get registerSubtitle =>
@@ -2074,4 +2074,42 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'Your Play Store cache is not up-to-date. Please close and reopen the Play Store app, or restart your device.';
+
+  @override
+  String get continueAsGuest => 'Continue without creating an account';
+
+  @override
+  String get guestModeWarning =>
+      'Guest mode has limited features to ensure the best service quality.';
+
+  @override
+  String get anonymousEntity => 'Anonymous Entity';
+
+  @override
+  String get upgradeAccountTitle => 'Complete Your Account';
+
+  @override
+  String get upgradeAccountDescription =>
+      'Create an account to get daily 200 bonus credits and unlock more limits.';
+
+  @override
+  String get createAccount => 'Create Account';
+
+  @override
+  String get upgradeTitle => 'Finalize Registration';
+
+  @override
+  String get accountLinkedSuccess => 'Account successfully created!';
+
+  @override
+  String get continueWithApple => 'Continue with Apple';
+
+  @override
+  String get guest => 'Guest';
+
+  @override
+  String get betterWithAnAccount => 'This section is better with an account!';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }

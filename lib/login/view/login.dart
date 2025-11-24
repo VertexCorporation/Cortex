@@ -8,13 +8,6 @@ import 'package:flutter/material.dart';
 import '../../shake.dart';
 
 /// A "dumb" widget responsible only for displaying the login form UI.
-///
-/// This widget holds no business logic. It receives all its data and callbacks
-/// from a parent "orchestrator" widget. Its responsibilities are:
-///   1. To render the TextFormFields, Buttons, and other UI elements for logging in.
-///   2. To manage purely local UI state, such as password visibility.
-///   3. To report user actions (e.g., form submission) back to the parent.
-///   4. To display loading states and error messages provided by the parent.
 class LoginForm extends StatefulWidget {
   // --- Callbacks to the Orchestrator ---
   final Future<void> Function(String email, String password, bool rememberMe) onSubmit;
@@ -72,9 +65,6 @@ class _LoginFormState extends State<LoginForm> {
     _passwordController = TextEditingController();
   }
 
-  /// This lifecycle method is crucial for displaying server-side errors.
-  /// When the parent widget rebuilds with a new error, this method detects
-  /// the change and forces the form to re-validate, thus showing the error message.
   @override
   void didUpdateWidget(LoginForm oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -110,7 +100,7 @@ class _LoginFormState extends State<LoginForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: widget.deviceHeight * 0.04),
+          SizedBox(height: widget.deviceHeight * 0.03),
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
@@ -119,25 +109,25 @@ class _LoginFormState extends State<LoginForm> {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 42 * widget.fontScale,
+                fontSize: 38 * widget.fontScale,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).textTheme.titleLarge?.color,
               ),
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: widget.deviceHeight * 0.001),
+            padding: EdgeInsets.only(top: widget.deviceHeight * 0.005),
             child: Text(
               l10n.loginSubtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 10 * widget.fontScale,
+                fontSize: 12 * widget.fontScale,
                 color: Theme.of(context).textTheme.bodySmall?.color,
-                height: 1.2,
+                height: 1.3,
               ),
             ),
           ),
-          SizedBox(height: widget.deviceHeight * 0.04),
+          SizedBox(height: widget.deviceHeight * 0.02),
 
           // --- Email Field ---
           ShakeWidget(
@@ -156,6 +146,7 @@ class _LoginFormState extends State<LoginForm> {
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 counterText: '',
                 errorMaxLines: 3,
+                contentPadding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale, horizontal: 12),
               ),
               keyboardType: TextInputType.emailAddress,
               maxLength: 42,
@@ -183,13 +174,26 @@ class _LoginFormState extends State<LoginForm> {
                 labelText: l10n.password,
                 labelStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color),
                 prefixIcon: Icon(Icons.lock_outline, color: Theme.of(context).iconTheme.color),
+
                 suffixIcon: IconButton(
-                  icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off, color: Theme.of(context).iconTheme.color),
+                  icon: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder: (child, animation) {
+                        return FadeTransition(opacity: animation, child: child);
+                    },
+                    child: Icon(
+                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      key: ValueKey(_isPasswordVisible ? 'icon1' : 'icon2'),
+                      color: Theme.of(context).iconTheme.color,
+                    ),
+                  ),
                   onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
                 ),
+
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 counterText: '',
                 errorMaxLines: 3,
+                contentPadding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale, horizontal: 12),
               ),
               obscureText: !_isPasswordVisible,
               maxLength: 64,
@@ -203,31 +207,57 @@ class _LoginFormState extends State<LoginForm> {
           ),
 
           // --- Remember Me & Forgot Password ---
-          Padding(
-            padding: EdgeInsets.only(top: widget.deviceHeight * 0.01),
+          SizedBox(
+            height: widget.deviceHeight * 0.07,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Checkbox(
-                      value: _rememberMe,
-                      onChanged: (value) => setState(() => _rememberMe = value ?? false),
-                      checkColor: AppColors.primaryColor,
-                      activeColor: AppColors.primaryColor.inverted,
+                    SizedBox(
+                      height: 24 * widget.fontScale,
+                      width: 24 * widget.fontScale,
+                      child: Checkbox(
+                        value: _rememberMe,
+                        onChanged: (value) => setState(() => _rememberMe = value ?? false),
+                        checkColor: AppColors.primaryColor,
+                        activeColor: AppColors.primaryColor.inverted,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                     ),
-                    Text(l10n.rememberMe, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
+                    SizedBox(width: 8 * widget.fontScale),
+                    Text(
+                        l10n.rememberMe,
+                        style: TextStyle(
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                            fontSize: 14 * widget.fontScale
+                        )
+                    ),
                   ],
                 ),
                 TextButton(
                   onPressed: widget.onForgotPassword,
-                  child: Text(l10n.forgotPassword, style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.w600)),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                      l10n.forgotPassword,
+                      style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14 * widget.fontScale,
+                      )
+                  ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: widget.deviceHeight * 0.03),
+
+          SizedBox(height: widget.deviceHeight * 0.015),
 
           // --- Submit Button ---
           AnimatedOpacity(
@@ -237,14 +267,22 @@ class _LoginFormState extends State<LoginForm> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor.inverted,
-                  padding: EdgeInsets.symmetric(vertical: widget.deviceHeight * 0.02),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  backgroundColor: AppColors.background,
+                  foregroundColor: AppColors.primaryColor.inverted,
+                  padding: EdgeInsets.symmetric(vertical: widget.deviceHeight * 0.018),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                  side: BorderSide(color: AppColors.quinaryColor.withValues(alpha:0.3)),
                 ),
                 onPressed: widget.isLoading ? null : _submitForm,
                 child: Text(
                   l10n.logIn,
-                  style: TextStyle(fontSize: 18, color: AppColors.primaryColor),
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold
+                  ),
                 ),
               ),
             ),

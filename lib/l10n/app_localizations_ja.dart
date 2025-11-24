@@ -1391,7 +1391,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get creditsInfoPanelBody =>
-      'クレジットはオンラインモデルとのチャットに使用されます。メッセージには金がかかってんだ このクレジットのおかげで俺たちは潰れずに済んでる じゃあシステムを説明するぜ\n\n• 無料のオンラインモデルへの各メッセージは10クレジット。\n• オンラインのプレミアムモデルへの各メッセージは20クレジット。\n• 添付ファイルを含めるとさらに30クレジットが追加される。\n• 無料プランのユーザーは毎日リセットされる200クレジットのボーナスがもらえる。';
+      'クレジットはオンラインのAIモデルとチャットするために使われます。正直言うとメッセージ1つ1つがちゃんとコストになっていて、その穴埋めをしてくれて破産ルートからどうにか守ってくれているのがこのクレジットなんですよね。では、このシステムがどう動いているのかを簡単に説明します。\n\n• 無料のオンラインモデルに送るメッセージ1件につき、5クレジットかかります。\n• プレミアムオンラインモデルに送るメッセージ1件につき、20クレジットかかります。\n• 添付ファイルを付けると、さらに30クレジットが追加で必要になります。\n• 無料プランのユーザーには、毎日リセットされる200クレジットのボーナスが付与されます。';
 
   @override
   String get creditsInfoPanelFooter => '楽しいチャットを！';
@@ -1464,7 +1464,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'あなたのVertexアカウントにログインしてください。Google経由で新規登録するユーザーは、当社の利用規約とプライバシーポリシーに同意したことになります。これらはサインアップ画面で確認できます。';
+      'Vertexアカウントにログインしてください。サードパーティサービス経由で新規登録される方は、当社の利用規約とプライバシーポリシーに同意するものとします。利用規約とプライバシーポリシーはサインアップ画面でご確認いただけます。';
 
   @override
   String get registerSubtitle => 'Vertexアカウントを作成してください。これは当社の他のプロジェクトでも使用できます。';
@@ -2012,4 +2012,41 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get cacheIsNotUpToDate =>
       'Playストアのキャッシュが最新ではありません。Playストアアプリを閉じて再度開くか、デバイスを再起動してください。';
+
+  @override
+  String get continueAsGuest => 'アカウントを作成せずに続行';
+
+  @override
+  String get guestModeWarning => 'ゲスト モードでは、最高のサービス品質を確保するために機能が制限されています。';
+
+  @override
+  String get anonymousEntity => '匿名エンティティ';
+
+  @override
+  String get upgradeAccountTitle => 'アカウントを完了する';
+
+  @override
+  String get upgradeAccountDescription =>
+      'アカウントを作成すると、毎日 200 のボーナス クレジットを獲得し、さらに制限を解除できます。';
+
+  @override
+  String get createAccount => 'アカウントを作成する';
+
+  @override
+  String get upgradeTitle => '登録を完了する';
+
+  @override
+  String get accountLinkedSuccess => 'アカウントが正常に作成されました。';
+
+  @override
+  String get continueWithApple => 'Appleで続ける';
+
+  @override
+  String get guest => 'ゲスト';
+
+  @override
+  String get betterWithAnAccount => 'このセクションはアカウントがあればさらに便利になります!';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
 }
