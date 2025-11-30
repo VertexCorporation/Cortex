@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:cortex/settings/providers/general.dart';
 import 'package:cortex/settings/sections/anonymous.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../app.dart';
 import '../cache.dart';
@@ -76,6 +75,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
       appBar: AppBar(
         scrolledUnderElevation: 0,
         title: Text(appLocalizations.settings, style: TextStyle(color: AppColors.primaryColor.inverted)),
+        centerTitle: false,
         backgroundColor: AppColors.background,
         elevation: 0,
         iconTheme: IconThemeData(color: AppColors.primaryColor.inverted),
@@ -281,7 +281,6 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
               // Live Countdown Timer Display
               Text(
                 timeStr,
-                style: GoogleFonts.anaheim(textStyle: TextStyle(fontSize: screenWidth * 0.05, color: AppColors.primaryColor.inverted, fontWeight: FontWeight.w900)),
               ),
               SizedBox(height: screenHeight * 0.015),
               // Verify Now Button

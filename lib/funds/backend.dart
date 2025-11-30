@@ -33,6 +33,7 @@ class FundsBackend with ChangeNotifier {
   // --- Stream Subscriptions ---
   StreamSubscription<List<PurchaseDetails>>? _purchaseStreamSubscription;
   StreamSubscription<DocumentSnapshot>? _userSubscription;
+  StreamSubscription<User?>? _authSubscription;
 
   // --- Private State Properties ---
   bool _isLoading = true;
@@ -145,7 +146,11 @@ class FundsBackend with ChangeNotifier {
       onError: _onPurchaseStreamError,
     );
 
-    _listenToUserChanges();
+    _authSubscription?.cancel();
+    _authSubscription = _auth.authStateChanges().listen((user) {
+      _listenToUserChanges();
+    });
+
     await _fetchProductDetails();
   }
 
@@ -656,20 +661,39 @@ class FundsBackend with ChangeNotifier {
   }
 
   void _handleFailedPurchase(PurchaseDetails purchaseDetails) {
-    log('Purchase error: ${purchaseDetails.error?.message}', name: _logName, error: purchaseDetails.error);
-    _crashlytics.recordError(
-      purchaseDetails.error ?? 'Unknown Purchase Error', StackTrace.current, reason: 'Purchase failed for product ${purchaseDetails.productID}', fatal: false,
-    );
-
-    // THE FIX: Show a user-friendly error notification from the store.
+    final errorCode = purchaseDetails.error?.code ?? '';
     final errorMessage = purchaseDetails.error?.message ?? _localizations.purchaseStreamError;
+    final errorString = purchaseDetails.error?.toString().toLowerCase() ?? '';
+
+    final isUserCancelled = errorCode == 'canceled' || errorString.contains('user canceled');
+    final isInsufficientFunds = errorCode == 'purchase_error' &&
+        (errorMessage.contains('insufficient funds') ||
+            errorMessage.contains('Payment declined') ||
+            errorString.contains('billingunavailable'));
+    final isAlreadyOwned = errorCode == 'item_already_owned';
+
+    if (!isUserCancelled && !isInsufficientFunds && !isAlreadyOwned) {
+      log('Purchase error: $errorMessage', name: _logName, error: purchaseDetails.error);
+      _crashlytics.recordError(
+        purchaseDetails.error ?? 'Unknown Purchase Error',
+        StackTrace.current,
+        reason: 'Purchase failed for product ${purchaseDetails.productID}',
+        fatal: false,
+      );
+    } else {
+      log('Purchase failed due to user/billing status (Ignored from Crashlytics): $errorMessage', name: _logName);
+    }
+
     _notificationService.showNotification(
       message: errorMessage,
       type: NotificationType.error,
       oneLine: false,
     );
 
-    if (purchaseDetails.pendingCompletePurchase) _inAppPurchase.completePurchase(purchaseDetails);
+    if (purchaseDetails.pendingCompletePurchase) {
+      _inAppPurchase.completePurchase(purchaseDetails);
+    }
+
     _setPurchasePending(false);
   }
 
@@ -689,7 +713,6 @@ class FundsBackend with ChangeNotifier {
     _setPurchasePending(false);
   }
 
-
   void _handleCanceledPurchase(PurchaseDetails d) {
     if (d.pendingCompletePurchase) _inAppPurchase.completePurchase(d);
     _setPurchasePending(false);
@@ -697,28 +720,49 @@ class FundsBackend with ChangeNotifier {
 
   void _listenToUserChanges() {
     _userSubscription?.cancel();
+    _userSubscription = null;
+
     final user = _auth.currentUser;
-    if (user != null) {
-      _userSubscription = _firestore.collection('users').doc(user.uid).snapshots().listen((snapshot) {
+
+    if (user == null) {
+      _currentUserSubscriptionLevel = 0;
+      _activeSubscriptionOption = null;
+      notifyListeners();
+      return;
+    }
+
+    _userSubscription = _firestore.collection('users').doc(user.uid).snapshots().listen((snapshot) {
+      if (!snapshot.exists) {
+        _currentUserSubscriptionLevel = 0;
+        _activeSubscriptionOption = null;
+      } else {
         final data = snapshot.data();
         _currentUserSubscriptionLevel = data?['hasCortexSubscription'] ?? 0;
         _activeSubscriptionOption = data?['activeSubscriptionOption'];
-        notifyListeners();
-      }, onError: (error, stack) {
-        log('Error listening to user document: $error', name: _logName, error: error);
-        _crashlytics.recordError(error, stack, reason: 'Firestore user snapshot listener failed.', fatal: false);
-      });
-    }
+      }
+      notifyListeners();
+    }, onError: (error, stack) {
+      if (error.toString().contains("permission-denied")) {
+        log('Firestore permission denied (User signed out during sync). Subscription cancelled.', name: _logName);
+        _userSubscription?.cancel();
+        return;
+      }
+
+      log('Error listening to user document: $error', name: _logName, error: error);
+      _crashlytics.recordError(error, stack, reason: 'Firestore user snapshot listener failed.', fatal: false);
+    });
   }
 
   void _setLoading(bool value) { _isLoading = value; notifyListeners(); }
   void _setPurchasePending(bool value) { _isPurchasePending = value; notifyListeners(); }
   void _setError(String message) { _errorMessage = message; _isLoading = false; notifyListeners(); }
 
-
   @override
   void dispose() {
-    _userSubscription?.cancel(); // Only cancel user data listener if needed
+    _purchaseStreamSubscription?.cancel();
+    _userSubscription?.cancel();
+    _authSubscription?.cancel();
+    _purchaseCompletedController.close();
     super.dispose();
   }
 }

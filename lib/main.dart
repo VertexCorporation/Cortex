@@ -102,10 +102,11 @@ class TabProvider with ChangeNotifier {
 class BootstrapResult {
   final AppStatus initialStatus;
   final String initialTheme;
-
+  final String? initialLanguageCode;
   BootstrapResult({
     required this.initialStatus,
     required this.initialTheme,
+    required this.initialLanguageCode,
   });
 }
 
@@ -137,6 +138,11 @@ class AppBootstrap {
       FirebaseCrashlytics.instance.recordFlutterError(details);
     };
     PlatformDispatcher.instance.onError = (error, stack) {
+      if (error.toString().contains("System process kill detected")) {
+        debugPrint("Ignored non-fatal system kill log.");
+        return true;
+      }
+
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
       return true;
     };
@@ -178,9 +184,15 @@ class AppBootstrap {
     debugPrint("[AppBootstrap] Finished in ${stopwatch.elapsedMilliseconds}ms. Status: $initialStatus");
     stopwatch.stop();
 
+    final String? savedLanguage = prefs.getString('language_code');
+
+    debugPrint("[AppBootstrap] Finished in ${stopwatch.elapsedMilliseconds}ms. Status: $initialStatus, Lang: $savedLanguage");
+    stopwatch.stop();
+
     return BootstrapResult(
       initialStatus: initialStatus,
       initialTheme: initialTheme,
+      initialLanguageCode: savedLanguage,
     );
   }
 }
@@ -239,6 +251,7 @@ class AppGatekeeper extends StatelessWidget {
               ..._buildCoreProviders(
                 bootstrap.initialStatus,
                 bootstrap.initialTheme,
+                bootstrap.initialLanguageCode,
               ),
               ..._buildSettingsProviders(),
               ..._buildChatAndLibraryProviders(),
@@ -262,6 +275,7 @@ class AppGatekeeper extends StatelessWidget {
 List<SingleChildWidget> _buildCoreProviders(
     AppStatus initialStatus,
     String initialTheme,
+    String? initialLanguageCode,
     ) {
   return <SingleChildWidget>[
     // Global Dio instance with Smart Retry.
@@ -296,7 +310,13 @@ List<SingleChildWidget> _buildCoreProviders(
 
     // Locale & connectivity.
     ChangeNotifierProvider<LocaleProvider>(
-      create: (_) => LocaleProvider(),
+      create: (_) {
+        final provider = LocaleProvider();
+        if (initialLanguageCode != null) {
+          provider.setLocale(Locale(initialLanguageCode));
+        }
+        return provider;
+      },
     ),
     ChangeNotifierProvider<InternetProvider>(
       create: (_) => InternetProvider(),

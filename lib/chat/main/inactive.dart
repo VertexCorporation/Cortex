@@ -18,6 +18,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/providers/catalog.dart';
 import '../../server/user.dart';
+import '../../theme.dart';
 
 /// A stateful widget that displays the UI for the model selection screen.
 class InactiveChatView extends StatefulWidget {
@@ -85,6 +86,8 @@ class InactiveChatViewState extends State<InactiveChatView> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<ThemeProvider>();
+
     final localizations = AppLocalizations.of(context)!;
 
     // We watch ChatSessionProvider for the actual list of models (which it gets from ModelService).
@@ -107,7 +110,9 @@ class InactiveChatViewState extends State<InactiveChatView> {
       );
     }
 
-    return Stack(
+    return Container(
+      color: AppColors.background,
+      child: Stack(
       children: [
         // --- This builder now listens for a List<ModelEntity> ---
         ValueListenableBuilder<List<ModelEntity>>(
@@ -158,6 +163,7 @@ class InactiveChatViewState extends State<InactiveChatView> {
           },
         ),
       ],
+      ),
     );
   }
 }

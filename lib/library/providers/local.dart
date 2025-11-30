@@ -32,17 +32,32 @@ Future<_ProcessedStateData> _processModelStatesInBackground(
 
   final List<Map<String, dynamic>> modelMaps = args['models'];
   final String filesDirectoryPath = args['filesDirectoryPath'];
+  final String oldFilesDirectoryPath = args['oldFilesDirectoryPath'];
 
   final offlineModels = modelMaps.where((m) => m['type'] == 'offline').toList();
+
   final nonOfflineModelStates = {
     for (var model in modelMaps.where((m) => m['type'] != 'offline'))
       model['id'] as String: false
   };
-  final offlineModelStates =
-  await ModelsBackendUtils.collectFileStates(offlineModels, filesDirectoryPath);
+
+  final newPathStates = await ModelsBackendUtils.collectFileStates(offlineModels, filesDirectoryPath);
+
+  Map<String, bool> oldPathStates = {};
+  if (filesDirectoryPath != oldFilesDirectoryPath) {
+    oldPathStates = await ModelsBackendUtils.collectFileStates(offlineModels, oldFilesDirectoryPath);
+  }
+
+  final Map<String, bool> combinedStates = {};
+  for (var model in offlineModels) {
+    final id = model['id'] as String;
+    final existsInNew = newPathStates[id] ?? false;
+    final existsInOld = oldPathStates[id] ?? false;
+    combinedStates[id] = existsInNew || existsInOld;
+  }
 
   return _ProcessedStateData(
-    downloadCompleted: {...nonOfflineModelStates, ...offlineModelStates},
+    downloadCompleted: {...nonOfflineModelStates, ...combinedStates},
   );
 }
 
@@ -55,6 +70,7 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   SystemInfoData? _systemInfo;
   Map<String, bool> _downloadCompleted = {};
   String _filesDirectoryPath = '';
+  String _oldFilesDirectoryPath = '';
   final Map<String, DownloadManager> _downloadManagers = {};
   final DownloadedModelsManager _downloadedModelsManager = DownloadedModelsManager();
   late final ModelDownloadController _dl;
@@ -248,10 +264,23 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   }
 
   String getFilePathById(String id) {
+    final title = _getTitleById(id) ?? id;
+
+    if (_oldFilesDirectoryPath.isNotEmpty) {
+      final oldPath = ModelsBackendUtils.getFilePathById(
+          filesDir: _oldFilesDirectoryPath,
+          modelId: id,
+          modelTitle: title
+      );
+      if (File(oldPath).existsSync()) {
+        return oldPath;
+      }
+    }
+
     return ModelsBackendUtils.getFilePathById(
       filesDir: _filesDirectoryPath,
       modelId: id,
-      modelTitle: _getTitleById(id) ?? id,
+      modelTitle: title,
     );
   }
 
@@ -259,34 +288,53 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   // Private Logic & State Management
   //================================================================================
 
+
   Future<void> _initializeDependencies() async {
     if (_filesDirectoryPath.isEmpty) {
-      _filesDirectoryPath = (await getApplicationSupportDirectory()).path;
+      if (Platform.isAndroid) {
+        final dir = await getExternalStorageDirectory();
+        final supportDir = await getApplicationSupportDirectory();
+
+        _filesDirectoryPath = dir?.path ?? supportDir.path;
+
+        _oldFilesDirectoryPath = supportDir.path;
+      } else {
+        _filesDirectoryPath = (await getApplicationSupportDirectory()).path;
+        _oldFilesDirectoryPath = _filesDirectoryPath;
+      }
     }
+
     if (_systemInfo == null) {
       _systemInfo = await SystemInfoProvider.fetchSystemInfo();
       notifyListeners();
     }
   }
 
-  void _onDownloadedModelsChanged() {
-    debugPrint("[ModelLocalStateProvider] Downloaded models changed. Refreshing state.");
-    _refreshStateAfterFileChange();
-  }
-
   Future<void> _refreshStateAfterFileChange() async {
     if (_filesDirectoryPath.isEmpty) await _initializeDependencies();
 
-    final newDownloadStates = await ModelsBackendUtils.collectFileStates(
-        _currentModels.map((e) => e.toMap()).toList(), _filesDirectoryPath);
+    final modelsList = _currentModels.map((e) => e.toMap()).toList();
 
-    bool hasChanged = !mapEquals(_downloadCompleted, newDownloadStates);
+    final newDownloadStates = await ModelsBackendUtils.collectFileStates(modelsList, _filesDirectoryPath);
+
+    Map<String, bool> oldDownloadStates = {};
+    if (_filesDirectoryPath != _oldFilesDirectoryPath) {
+      oldDownloadStates = await ModelsBackendUtils.collectFileStates(modelsList, _oldFilesDirectoryPath);
+    }
+
+    final Map<String, bool> combinedStates = {};
+    for (var model in _currentModels) {
+      combinedStates[model.id] = (newDownloadStates[model.id] ?? false) ||
+          (oldDownloadStates[model.id] ?? false);
+    }
+
+    bool hasChanged = !mapEquals(_downloadCompleted, combinedStates);
     if (hasChanged) {
-      _downloadCompleted = newDownloadStates;
+      _downloadCompleted = combinedStates;
     }
 
     for (final model in _currentModels) {
-      final newState = newDownloadStates[model.id] ?? false;
+      final newState = combinedStates[model.id] ?? false;
       final oldState = _downloadManagers[model.id]?.isDownloaded ?? !newState;
       if (newState != oldState) {
         _downloadManagers[model.id]?.setDownloaded(newState);
@@ -297,7 +345,6 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
     if (hasChanged) {
       CacheService.invalidate(CacheKey.filteredModels);
       debugPrint("[ModelLocalStateProvider] Download state changed. Invalidated filtered models cache.");
-
       notifyListeners();
     }
   }
@@ -312,6 +359,7 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
     final processedData = await compute(_processModelStatesInBackground, {
       'models': models.map((e) => e.toMap()).toList(),
       'filesDirectoryPath': _filesDirectoryPath,
+      'oldFilesDirectoryPath': _oldFilesDirectoryPath,
       'token': token,
     });
 
@@ -330,6 +378,11 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
     );
 
     notifyListeners();
+  }
+
+  void _onDownloadedModelsChanged() {
+    debugPrint("[ModelLocalStateProvider] Downloaded models changed. Refreshing state.");
+    _refreshStateAfterFileChange();
   }
 
   //================================================================================

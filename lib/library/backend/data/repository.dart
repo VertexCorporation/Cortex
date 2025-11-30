@@ -38,7 +38,6 @@ class ModelRepository {
   List<Map<String, dynamic>>? _rawModelsCache;
   List<Map<String, dynamic>>? get rawModelsCache => _rawModelsCache;
 
-
   // Configuration constants for data synchronization.
   static const Duration _cacheStaleDuration = Duration(hours: 1);
   static const String _prefsKeyLastSync = 'model_data_last_sync_timestamp';
@@ -220,6 +219,16 @@ class ModelRepository {
   }
 
   /// Fetches the public model list from the remote server.
+  ///
+  /// OPTIMIZATION NOTES FOR LOW-END DEVICES (ANR Prevention):
+  /// 1. **Isolate Parsing**: JSON parsing is moved to a background isolate via `compute`.
+  ///    This prevents the CPU from blocking the main thread during data processing.
+  /// 2. **Chunked Inserts**: Database writes are split into batches of 50.
+  /// 3. **UI Yielding**: After each batch commit, we `await Future.delayed(Duration.zero)`.
+  ///    This gives the UI thread a chance to render frames and handle events, preventing
+  ///    "Application Not Responding" errors on slow storage devices.
+  /// 4. **Deferred Vacuum**: Database optimization is performed only after all writes are done
+  ///    and after a brief cooling period.
   Future<Set<String>> _fetchAndStorePublicModels(String langCode) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
@@ -242,13 +251,33 @@ class ModelRepository {
       }
 
       final rawServerData = response.data!;
-      final parsedServerModels = _parseAndGroupServerModels(rawServerData, langCode);
+
+      // 1. Offload heavy JSON parsing to a background isolate.
+      debugPrint("[ModelRepository] Parsing server data in background isolate...");
+      final parsedServerModels = await compute(
+        _parseServerDataIsolate,
+        {'data': rawServerData, 'langCode': langCode},
+      );
+
       final validServerIds = parsedServerModels.map((m) => m['id'] as String).toSet();
 
-      for (var modelData in parsedServerModels) {
-        if (!modelData['id'].startsWith('self_') && !modelData['id'].startsWith('local_')) {
-          try {
-            await _dbHelper.insert('models', {
+      // Filter out local/custom models just in case the server sent something weird.
+      final modelsToInsert = parsedServerModels.where((modelData) {
+        return !modelData['id'].startsWith('self_') && !modelData['id'].startsWith('local_');
+      }).toList();
+
+      if (modelsToInsert.isNotEmpty) {
+        final db = await _dbHelper.database;
+        const int batchSize = 50; // Optimal chunk size to prevent locking
+
+        for (var i = 0; i < modelsToInsert.length; i += batchSize) {
+          final end = (i + batchSize < modelsToInsert.length) ? i + batchSize : modelsToInsert.length;
+          final currentBatch = modelsToInsert.sublist(i, end);
+
+          final batch = db.batch();
+
+          for (var modelData in currentBatch) {
+            batch.insert('models', {
               'id': modelData['id'],
               'producer': modelData['producer'] ?? 'Unknown',
               'title': modelData['title'] ?? modelData['id'],
@@ -256,21 +285,28 @@ class ModelRepository {
               'type': modelData['type'] ?? 'online',
               'raw_json': json.encode(modelData),
             }, conflictAlgorithm: ConflictAlgorithm.replace);
+          }
+
+          try {
+            await batch.commit(noResult: true);
+
+            // 2. Yield to the UI thread to prevent ANRs on slow devices.
+            await Future.delayed(Duration.zero);
           } catch (e) {
             if (e.toString().contains("SQLITE_FULL")) {
               debugPrint("[ModelRepository] DISK FULL. Aborting model sync save.");
-              // If disk is full, stop trying to insert further models to avoid spamming logs and wasting CPU
               break;
+            } else {
+              rethrow;
             }
-            // If it's another error, we might want to continue or rethrow.
-            // Here we rethrow to keep existing behavior for non-disk errors.
-            rethrow;
           }
         }
       }
 
-      // Try to vacuum the database after a sync to keep file size small.
-      // This helps prevent future SQLITE_FULL errors.
+      // 3. Allow UI to breathe before the heavy VACUUM operation.
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // 4. Perform database optimization.
       await _dbHelper.optimizeDatabase();
 
       return validServerIds;
@@ -453,9 +489,16 @@ class ModelRepository {
     }
   }
 
-  // --- PARSING HELPERS ---
+  // --- STATIC PARSING HELPERS (ISOLATE-READY) ---
 
-  List<Map<String, dynamic>> _parseAndGroupServerModels(Map<String, dynamic> rawData, String langCode) {
+  /// Static entry point for the isolate to parse server data.
+  static List<Map<String, dynamic>> _parseServerDataIsolate(Map<String, dynamic> params) {
+    final rawData = params['data'] as Map<String, dynamic>;
+    final langCode = params['langCode'] as String;
+    return _staticParseAndGroupServerModels(rawData, langCode);
+  }
+
+  static List<Map<String, dynamic>> _staticParseAndGroupServerModels(Map<String, dynamic> rawData, String langCode) {
     final List<Map<String, dynamic>> finalList = [];
     final producers = rawData['producers'] as Map<String, dynamic>? ?? {};
 
@@ -464,14 +507,14 @@ class ModelRepository {
       seriesData.forEach((seriesName, seriesValue) {
         if (seriesValue is! Map<String, dynamic>) return;
 
-        final cleanSeriesValue = _sanitizeRawData(seriesValue);
+        final cleanSeriesValue = _staticSanitizeRawData(seriesValue);
 
         final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)..remove('series_description');
         if (variantsMap.isEmpty) return;
 
         final model = (variantsMap.length == 1 && variantsMap.containsKey('Default'))
-            ? _parseSingleVariantModel(seriesName, producerName, variantsMap['Default'], langCode)
-            : _parseMultiVariantSeries(seriesName, producerName, cleanSeriesValue, langCode);
+            ? _staticParseSingleVariantModel(seriesName, producerName, variantsMap['Default'], langCode)
+            : _staticParseMultiVariantSeries(seriesName, producerName, cleanSeriesValue, langCode);
 
         if (model != null) finalList.add(model);
       });
@@ -479,8 +522,8 @@ class ModelRepository {
     return finalList;
   }
 
-  Map<String, dynamic>? _parseSingleVariantModel(String seriesName, String producerName, Map<String, dynamic> variantData, String langCode) {
-    final cleanVariantData = _sanitizeRawData(variantData);
+  static Map<String, dynamic>? _staticParseSingleVariantModel(String seriesName, String producerName, Map<String, dynamic> variantData, String langCode) {
+    final cleanVariantData = _staticSanitizeRawData(variantData);
 
     final serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
     final modelId = cleanVariantData['id'] as String? ?? seriesName;
@@ -513,8 +556,8 @@ class ModelRepository {
     };
   }
 
-  Map<String, dynamic>? _parseMultiVariantSeries(String seriesName, String producerName, Map<String, dynamic> seriesValue, String langCode) {
-    final cleanSeriesValue = _sanitizeRawData(seriesValue);
+  static Map<String, dynamic>? _staticParseMultiVariantSeries(String seriesName, String producerName, Map<String, dynamic> seriesValue, String langCode) {
+    final cleanSeriesValue = _staticSanitizeRawData(seriesValue);
 
     final serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
     final seriesDetails = cleanSeriesValue['series_description'] as Map<String, dynamic>? ?? {};
@@ -533,7 +576,7 @@ class ModelRepository {
     variantsMap.forEach((variantKey, variantData) {
       if (variantData is! Map<String, dynamic>) return;
 
-      final cleanVariantData = _sanitizeRawData(variantData);
+      final cleanVariantData = _staticSanitizeRawData(variantData);
 
       final descriptionMap = cleanVariantData['description'] as Map<String, dynamic>? ?? {};
 
@@ -567,7 +610,7 @@ class ModelRepository {
     };
   }
 
-  Map<String, dynamic> _sanitizeRawData(Map<String, dynamic> source) {
+  static Map<String, dynamic> _staticSanitizeRawData(Map<String, dynamic> source) {
     final Map<String, dynamic> cleanMap = Map<String, dynamic>.from(source);
 
     cleanMap.remove('processing_status');
@@ -582,7 +625,7 @@ class ModelRepository {
     for (final key in cleanMap.keys.toList()) {
       final value = cleanMap[key];
       if (value is Map) {
-        cleanMap[key] = _sanitizeRawData(Map<String, dynamic>.from(value));
+        cleanMap[key] = _staticSanitizeRawData(Map<String, dynamic>.from(value));
       }
     }
 

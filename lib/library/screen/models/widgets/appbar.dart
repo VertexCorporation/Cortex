@@ -43,6 +43,7 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       backgroundColor: AppColors.background,
+      centerTitle: false,
       elevation: 0,
       actions: [
         // The "Create" button logic is now fully contained within this widget.
