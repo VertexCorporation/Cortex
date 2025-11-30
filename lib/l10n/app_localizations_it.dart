@@ -2126,5 +2126,5 @@ class AppLocalizationsIt extends AppLocalizations {
   String get betterWithAnAccount => 'Questa sezione è migliore con un account!';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => 'Ripristina gli acquisti';
 }

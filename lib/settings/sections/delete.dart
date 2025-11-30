@@ -4,8 +4,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import '../../app.dart';
 import '../../cache.dart';
 import '../../chat/services/storage.dart';
@@ -319,7 +317,7 @@ class DeleteSection extends StatelessWidget {
             children: [
               Text(
                 appLocalizations.deleteAllConversationsButton,
-                style: GoogleFonts.roboto(color: Colors.white, fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500),
+                style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500),
               ),
               Icon(Icons.arrow_forward_ios, color: Colors.white, size: screenWidth * 0.04),
             ],
@@ -348,7 +346,7 @@ class DeleteSection extends StatelessWidget {
             children: [
               Text(
                 appLocalizations.deleteAccountButton,
-                style: GoogleFonts.roboto(color: Colors.white, fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500),
+                style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500),
               ),
               Icon(Icons.arrow_forward_ios, color: Colors.white, size: screenWidth * 0.04),
             ],
@@ -381,7 +379,7 @@ class DeleteSection extends StatelessWidget {
           Expanded(
             child: Text(
               appLocalizations.deleteAllConversationsDisabledInfo,
-              style: GoogleFonts.roboto(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
+              style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
               textAlign: TextAlign.start,
             ),
           ),
@@ -407,12 +405,12 @@ class DeleteSection extends StatelessWidget {
       children: [
         Text(
           appLocalizations.delete,
-          style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600),
         ),
         SizedBox(height: screenHeight * 0.01),
         Text(
           appLocalizations.deleteDescription,
-          style: GoogleFonts.roboto(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
+          style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
         ),
         SizedBox(height: screenHeight * 0.02),
         if (isFromActiveChat)

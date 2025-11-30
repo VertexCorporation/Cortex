@@ -3,7 +3,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -250,7 +249,7 @@ class _SettingsSectionState extends State<SettingsSection> with TickerProviderSt
             children: [
               icon,
               SizedBox(width: screenWidth * 0.04),
-              Expanded(child: Text(text, style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500))),
+              Expanded(child: Text(text, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500))),
               Icon(Icons.arrow_forward_ios, color: AppColors.primaryColor.inverted, size: screenWidth * 0.04),
             ],
           ),
@@ -300,12 +299,12 @@ class _SettingsSectionState extends State<SettingsSection> with TickerProviderSt
       children: [
         Text(
           appLocalizations.settings,
-          style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600),
         ),
         SizedBox(height: screenHeight * 0.01),
         Text(
           appLocalizations.accessSettingsDescription,
-          style: GoogleFonts.roboto(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
+          style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
         ),
         SizedBox(height: screenHeight * 0.02),
         ClipRRect(

@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:path/path.dart' as path;
 
 import '../../../../../l10n/app_localizations.dart';
@@ -37,7 +36,7 @@ class GgufFilePicker extends StatelessWidget {
         // --- Section Title & Description ---
         Text(
           localizations.modelUploadTitle,
-          style: GoogleFonts.roboto(
+          style: TextStyle(
             color: AppColors.primaryColor.inverted,
             fontSize: screenWidth * 0.05,
             fontWeight: FontWeight.w600,
@@ -46,7 +45,7 @@ class GgufFilePicker extends StatelessWidget {
         SizedBox(height: screenHeight * 0.005),
         Text(
           localizations.modelUploadDescription,
-          style: GoogleFonts.roboto(
+          style: TextStyle(
             color: AppColors.quinaryColor,
             fontSize: screenWidth * 0.035,
           ),

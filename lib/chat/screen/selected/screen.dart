@@ -4,7 +4,6 @@ import 'package:cortex/app.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:cortex/chat/screen/selected/tiles.dart';
 import 'package:provider/provider.dart';
 
@@ -56,7 +55,8 @@ class _SelectedScreenState extends State<SelectedScreen> with TickerProviderStat
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
+    )
+      ..repeat(reverse: true);
 
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(
@@ -79,8 +79,14 @@ class _SelectedScreenState extends State<SelectedScreen> with TickerProviderStat
     final conversationProvider = context.watch<ConversationProvider>();
     final inputProvider = context.watch<InputProvider>();
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     final currentMessages = conversationProvider.messages;
 
@@ -134,12 +140,21 @@ class _SelectedScreenState extends State<SelectedScreen> with TickerProviderStat
   }
 
   /// A private helper method to build the UI for an empty chat screen.
-  Widget _buildEmptyState(
-      BuildContext context,
+  Widget _buildEmptyState(BuildContext context,
       double screenWidth,
       double screenHeight,
-      ChatSessionProvider sessionProvider,
-      ) {
+      ChatSessionProvider sessionProvider,) {
+    final bool isDarkBackground = AppColors.background.computeLuminance() < 0.5;
+
+    final ColorFilter? smartCortexFilter = isDarkBackground
+        ? const ColorFilter.matrix([
+      -1, 0, 0, 0, 255,
+      0, -1, 0, 0, 255,
+      0, 0, -1, 0, 255,
+      0, 0, 0, 1, 0,
+    ])
+        : null;
+
     if (sessionProvider.isDynamicChat ||
         (sessionProvider.isExitingChat && sessionProvider.wasDynamicOnExit)) {
       return Center(
@@ -160,25 +175,23 @@ class _SelectedScreenState extends State<SelectedScreen> with TickerProviderStat
                     child: SvgPicture.asset(
                       'assets/cortex.svg',
                       fit: BoxFit.contain,
-                      colorFilter: const ColorFilter.matrix([
-                        -1, 0, 0, 0, 255,
-                        0, -1, 0, 0, 255,
-                        0, 0, -1, 0, 255,
-                        0, 0, 0, 1, 0,
-                      ]),
+                      colorFilter: smartCortexFilter,
                     ),
                   ),
                 ),
               ),
               SizedBox(height: screenHeight * 0.01),
-              Text(
-                AppLocalizations.of(context)!.selectionScreenGreetingGeneric,
-                style: GoogleFonts.heebo(
-                  fontSize: screenWidth * 0.06,
-                  color: AppColors.primaryColor.inverted,
-                  fontWeight: FontWeight.w600,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
+                child: Text(
+                  AppLocalizations.of(context)!.selectionScreenGreetingGeneric,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.06,
+                    color: AppColors.primaryColor.inverted,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
               SizedBox(height: screenHeight * 0.02),
             ],
@@ -243,7 +256,7 @@ class _SelectedScreenState extends State<SelectedScreen> with TickerProviderStat
             if (sessionProvider.modelTitle != null)
               Text(
                 sessionProvider.modelTitle!,
-                style: GoogleFonts.heebo(
+                style: TextStyle(
                   fontSize: screenWidth * 0.05,
                   color: AppColors.primaryColor.inverted,
                   fontWeight: FontWeight.w600,

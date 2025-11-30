@@ -90,11 +90,14 @@ class Tiles {
     required VoidCallback onEdit,
     VoidCallback? onFadeOutComplete,
   }) {
+    final bool hasPhoto = message.photoPath != null;
+    final bool isImage = hasPhoto && _isImageFile(message.photoPath!);
+
     return Column(
       key: ValueKey('normal_user_$index'),
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        if (message.photoPath != null)
+        if (hasPhoto && isImage)
           Padding(
             padding: EdgeInsets.only(right: screenWidth * 0.04, bottom: screenHeight * 0.006),
             child: Align(
@@ -108,11 +111,20 @@ class Tiles {
                     width: screenWidth * 0.4,
                     height: screenWidth * 0.4,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image, color: AppColors.tertiaryColor),
                   ),
                 ),
               ),
             ),
+          )
+        else if (hasPhoto && !isImage)
+          Container(
+            margin: EdgeInsets.only(right: screenWidth * 0.04, bottom: 8),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: AppColors.tertiaryColor, borderRadius: BorderRadius.circular(8)),
+            child: const Icon(Icons.insert_drive_file, color: Colors.black54),
           ),
+
         if (message.text.trim().isNotEmpty)
           UserMessageTile(
             message: message,
@@ -124,6 +136,7 @@ class Tiles {
     );
   }
 
+  /// Builds an AI's message tile, which can include a photo and a text bubble.
   /// Builds an AI's message tile, which can include a photo and a text bubble.
   static Widget buildAIMessageTile({
     required BuildContext context,
@@ -146,6 +159,8 @@ class Tiles {
     final correctImagePath = modelService.getModelImagePath(model);
 
     final bool hasPhoto = message.photoPath != null && message.photoPath!.isNotEmpty;
+    final bool isImage = hasPhoto && _isImageFile(message.photoPath!);
+
     final bool hasText = message.text.trim().isNotEmpty;
     final bool isThinkingWithoutContent = message.isThinking && !hasPhoto && !hasText;
 
@@ -161,29 +176,65 @@ class Tiles {
       parsedSpans: message.parsedSpans,
     );
 
-    final photoWidget = hasPhoto
-        ? Padding(
-      padding: EdgeInsets.only(
-        left: screenWidth * 0.04,
-        bottom: (hasText || isThinkingWithoutContent) ? screenHeight * 0.006 : 0,
-      ),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: GestureDetector(
-          onTap: () => Navigator.push(context, PhotoViewer.route(File(message.photoPath!))),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: Image.file(
-              File(message.photoPath!),
-              width: screenWidth * 0.4,
-              height: screenWidth * 0.4,
-              fit: BoxFit.cover,
+    Widget photoWidget;
+
+    if (hasPhoto && isImage) {
+      photoWidget = Padding(
+        padding: EdgeInsets.only(
+          left: screenWidth * 0.04,
+          bottom: (hasText || isThinkingWithoutContent) ? screenHeight * 0.006 : 0,
+        ),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: GestureDetector(
+            onTap: () => Navigator.push(context, PhotoViewer.route(File(message.photoPath!))),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.file(
+                File(message.photoPath!),
+                width: screenWidth * 0.4,
+                height: screenWidth * 0.4,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.grey),
+              ),
             ),
           ),
         ),
-      ),
-    )
-        : const SizedBox.shrink();
+      );
+    } else if (hasPhoto && !isImage) {
+      photoWidget = Padding(
+        padding: EdgeInsets.only(
+          left: screenWidth * 0.04,
+          bottom: (hasText || isThinkingWithoutContent) ? screenHeight * 0.006 : 0,
+        ),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            width: screenWidth * 0.4,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+                color: AppColors.tertiaryColor.withValues(alpha:0.2),
+                borderRadius: BorderRadius.circular(8)
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.description, color: AppColors.primaryColor.inverted, size: 32),
+                const SizedBox(height: 4),
+                Text(
+                  message.photoPath!.split('/').last,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else {
+      photoWidget = const SizedBox.shrink();
+    }
 
     return Column(
       key: ValueKey('ai_message_${message.id}'),
@@ -297,5 +348,11 @@ class Tiles {
         );
       },
     );
+  }
+
+  // OUR HELPER GUY
+  static bool _isImageFile(String path) {
+    final ext = path.split('.').last.toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'].contains(ext);
   }
 }

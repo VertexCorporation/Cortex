@@ -621,5 +621,6 @@
   "accountLinkedSuccess": "Hesab uğurla yaradıldı!",
   "continueWithApple": "Apple ilə davam edin",
   "guest": "Qonaq",
-  "betterWithAnAccount": "Bu bölmə hesabla daha yaxşıdır!"
+  "betterWithAnAccount": "Bu bölmə hesabla daha yaxşıdır!",
+  "restorePurchases": "Satınalmaları bərpa edin"
 }

@@ -47,7 +47,7 @@ Future<_ProcessedStateData> _processModelStatesInBackground(
 }
 
 /// Manages the local state of models on the device, such as download status and system compatibility.
-class ModelLocalStateProvider extends ChangeNotifier {
+class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver {
   //================================================================================
   // Private State Properties
   //================================================================================
@@ -80,6 +80,9 @@ class ModelLocalStateProvider extends ChangeNotifier {
   /// The method signature now uses a named `context` parameter for consistency.
   void initialize({required BuildContext context}) {
     if (isInitialized) return;
+
+    WidgetsBinding.instance.addObserver(this);
+
     isInitialized = true;
     debugPrint("[ModelLocalStateProvider] Initializing...");
 
@@ -114,8 +117,25 @@ class ModelLocalStateProvider extends ChangeNotifier {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      debugPrint("[ModelLocalStateProvider] App resumed from background. Forcing download state sync.");
+
+      _dl.checkDownloadingStates(
+        models: _currentModels,
+        groundTruthDownloadStates: _downloadCompleted,
+      );
+
+      if (_filesDirectoryPath.isNotEmpty && _currentModels.isNotEmpty) {
+        _updateFileStatesInBackground(_currentModels);
+      }
+    }
+  }
+
+  @override
   void dispose() {
     debugPrint("[ModelLocalStateProvider] Disposing...");
+    WidgetsBinding.instance.removeObserver(this);
     _downloadedModelsManager.removeListener(_downloadedModelsManagerListener);
     super.dispose();
   }

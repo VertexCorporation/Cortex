@@ -1,0 +1,4 @@
+"NSCameraUsageDescription" = "Cortex нужен доступ к вашей камере для фотосъемки.";
+"NSPhotoLibraryUsageDescription" = "Cortex нужен доступ к вашей галерее для загрузки изображений.";
+"NSPhotoLibraryAddUsageDescription" = "Cortex нужно разрешение для сохранения изображений в галерею.";
+"NSMicrophoneUsageDescription" = "Cortex нужен доступ к микрофону для голосового чата.";

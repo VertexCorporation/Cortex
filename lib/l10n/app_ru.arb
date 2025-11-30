@@ -801,5 +801,6 @@
   "accountLinkedSuccess": "Учетная запись успешно создана!",
   "continueWithApple": "Продолжить с Apple",
   "guest": "Гость",
-  "betterWithAnAccount": "Этот раздел лучше просматривать с учетной записью!"
+  "betterWithAnAccount": "Этот раздел лучше просматривать с учетной записью!",
+  "restorePurchases": "Восстановить покупки"
 }

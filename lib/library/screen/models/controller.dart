@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:cortex/library/screen/models/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../backend/search.dart';
 import '../../providers/catalog.dart';
@@ -14,11 +15,6 @@ import 'widgets/appbar.dart';
 
 const _kWarningPanelDelay = Duration(milliseconds: 700);
 
-/// The main UI widget for the Library Screen.
-///
-/// It consumes the globally-provided `ModelCatalogProvider` and `ModelLocalStateProvider`
-/// to build its view. It is responsible for its own UI-specific state, such as
-/// animations and focus nodes, but does not manage the provider lifecycle.
 class LibraryScreen extends StatefulWidget {
   final bool showOfflineModelsPulse;
   const LibraryScreen({super.key, this.showOfflineModelsPulse = false});
@@ -29,11 +25,10 @@ class LibraryScreen extends StatefulWidget {
 
 class _LibraryScreenState extends State<LibraryScreen>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<LibraryScreen> {
-  // Providers are now read from context, not created here.
+
   ModelCatalogProvider? _catalogProvider;
   ModelLocalStateProvider? _localStateProvider;
 
-  // UI-specific state and controllers are owned by this widget.
   ModelsSearchController? _searchCtrl;
   late final FocusNode _searchFocusNode;
   late final ScrollController _scrollController;
@@ -41,7 +36,7 @@ class _LibraryScreenState extends State<LibraryScreen>
   late Animation<double> _pulseAnimation;
 
   bool _showLocalizationWarning = false;
-  static bool _hasWarningBeenShownThisSession = false;
+
   bool _isInitialized = false;
 
   @override
@@ -61,8 +56,6 @@ class _LibraryScreenState extends State<LibraryScreen>
     _pulseAnimation =
         Tween<double>(begin: 1.0, end: 1.0).animate(_pulseController);
 
-    // This is the correct lifecycle method for one-time setup.
-    // Using addPostFrameCallback ensures that the context is fully available.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && !_isInitialized) {
         _catalogProvider = context.read<ModelCatalogProvider>();
@@ -72,7 +65,6 @@ class _LibraryScreenState extends State<LibraryScreen>
         _searchCtrl = ModelsSearchController(
           context: context,
           focusNode: _searchFocusNode,
-          // Initial data is passed here. Updates will be handled via watch/consumer.
           allModels: _catalogProvider!.allModels,
           downloadManagers: Map.from(_localStateProvider!.downloadManagers),
           downloadedFileStates: _localStateProvider!.downloadCompleted,
@@ -101,16 +93,41 @@ class _LibraryScreenState extends State<LibraryScreen>
           _startPulseAnimation();
         }
 
-        if (!_hasWarningBeenShownThisSession) {
-          Future.delayed(_kWarningPanelDelay, () {
-            if (mounted) {
-              setState(() => _showLocalizationWarning = true);
-              _hasWarningBeenShownThisSession = true;
-            }
-          });
-        }
+        _checkAndScheduleLocalizationWarning();
       }
     });
+  }
+
+  Future<void> _checkAndScheduleLocalizationWarning() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      const String key = 'last_localization_warning_ts';
+
+      final int? lastShownTs = prefs.getInt(key);
+      final DateTime now = DateTime.now();
+      bool shouldShow = false;
+
+      if (lastShownTs == null) {
+        shouldShow = true;
+      } else {
+        final DateTime lastShownDate = DateTime.fromMillisecondsSinceEpoch(lastShownTs);
+        final Duration diff = now.difference(lastShownDate);
+        if (diff.inDays >= 7) {
+          shouldShow = true;
+        }
+      }
+
+      if (shouldShow) {
+        Future.delayed(_kWarningPanelDelay, () async {
+          if (mounted) {
+            setState(() => _showLocalizationWarning = true);
+            await prefs.setInt(key, now.millisecondsSinceEpoch);
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint("Warning scheduling error: $e");
+    }
   }
 
   @override
@@ -157,7 +174,7 @@ class _LibraryScreenState extends State<LibraryScreen>
     _searchFocusNode.removeListener(_onSearchFocusChanged);
     _searchFocusNode.dispose();
     _scrollController.dispose();
-    _pulseController.dispose(); // Dispose the animation controller.
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -186,14 +203,10 @@ class _LibraryScreenState extends State<LibraryScreen>
       );
     }
 
-    // ModelCatalogProvider or ModelLocalStateProvider notifies its listeners.
-    // The main LibraryScreen widget itself no longer rebuilds unnecessarily.
     return Consumer2<ModelCatalogProvider, ModelLocalStateProvider>(
       builder: (context, catalog, localState, child) {
         final bool showLoadingSkeleton = catalog.isLoading;
 
-        // Update the search controller with the latest data from providers.
-        // This is safe to do inside the builder.
         if (!showLoadingSkeleton) {
           _searchCtrl!.updateModels(catalog.allModels);
           _searchCtrl!.downloadManagers = Map.from(localState.downloadManagers);
@@ -217,7 +230,6 @@ class _LibraryScreenState extends State<LibraryScreen>
             systemInfo: localState.systemInfo,
             downloadedStates: localState.downloadCompleted,
             downloadManagers: Map.from(localState.downloadManagers),
-            // Pass the function reference directly from the provider.
             getCompatibilityStatus: localState.getCompatibilityStatus,
             searchController: _searchCtrl!,
             showLocalizationWarning: _showLocalizationWarning,

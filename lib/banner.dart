@@ -10,7 +10,6 @@ import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'dart:math';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -316,25 +315,25 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(localizations.extensionInfoPanelTitle,
-                style: GoogleFonts.heebo(
+                style: TextStyle(
                     color: AppColors.primaryColor.inverted,
                     fontSize: titleFontSize,
                     fontWeight: FontWeight.bold)),
             SizedBox(height: smallSpacing),
             Text(localizations.extensionInfoPanelBody1,
-                style: GoogleFonts.heebo(
+                style: TextStyle(
                     color: AppColors.primaryColor.inverted.withValues(alpha: 0.9),
                     fontSize: bodyFontSize,
                     height: 1.5)),
             SizedBox(height: smallSpacing),
             Text(localizations.extensionInfoPanelBody2,
-                style: GoogleFonts.heebo(
+                style: TextStyle(
                     color: AppColors.primaryColor.inverted.withValues(alpha: 0.9),
                     fontSize: bodyFontSize,
                     height: 1.5)),
             SizedBox(height: mediumSpacing),
             Text(localizations.extensionInfoPanelFooter,
-                style: GoogleFonts.heebo(
+                style: TextStyle(
                     color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
                     fontSize: footerFontSize,
                     fontStyle: FontStyle.italic)),

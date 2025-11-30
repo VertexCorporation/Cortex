@@ -9,6 +9,10 @@ import flutter_downloader
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
 
+    let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+
+    LlamaService.register(with: controller.pluginRegistry().registrar(forPlugin: "LlamaService")!)
+
     FlutterDownloaderPlugin.setPluginRegistrantCallback(registerPlugins)
 
     GeneratedPluginRegistrant.register(with: self)

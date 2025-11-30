@@ -30,6 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -194,6 +195,7 @@ class AppBootstrap {
 void main() {
   final WidgetsBinding widgetsBinding =
   WidgetsFlutterBinding.ensureInitialized();
+  GoogleFonts.config.allowRuntimeFetching = false;
 
   // Keep native splash until we're sure about the first real frame.
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -394,8 +396,17 @@ List<SingleChildWidget> _buildCoreProviders(
     Provider<BannerService>(
       create: (_) => BannerService(),
     ),
-    ChangeNotifierProvider<FundsBackend>(
-      create: (_) => FundsBackend(),
+    ChangeNotifierProxyProvider<IntrovertNotificationService, FundsBackend>(
+      create: (BuildContext context) => FundsBackend(),
+      update: (
+          BuildContext context,
+          IntrovertNotificationService notificationService,
+          FundsBackend? previous,
+          ) {
+        final backend = previous ?? FundsBackend();
+        backend.setNotificationService(notificationService);
+        return backend;
+      },
     ),
   ];
 }

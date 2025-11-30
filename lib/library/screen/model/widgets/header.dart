@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../theme.dart';
@@ -59,7 +58,7 @@ class ModelHeader extends StatelessWidget {
             children: [
               Text(
                 provider.displayTitle,
-                style: GoogleFonts.poppins(
+                style: TextStyle(
                   color: AppColors.primaryColor.inverted,
                   fontSize: screenWidth * 0.06,
                   fontWeight: FontWeight.bold,
@@ -68,7 +67,7 @@ class ModelHeader extends StatelessWidget {
               SizedBox(height: screenWidth * 0.01),
               Text(
                 provider.displayProducer,
-                style: GoogleFonts.poppins(
+                style: TextStyle(
                   color: AppColors.quinaryColor,
                   fontSize: screenWidth * 0.04,
                 ),
@@ -192,7 +191,7 @@ class _InfoRow extends StatelessWidget {
         Expanded(
           child: Text(
             '$label: $value',
-            style: GoogleFonts.poppins(
+            style: TextStyle(
               color: AppColors.quinaryColor,
               fontSize: screenWidth * 0.04,
             ),

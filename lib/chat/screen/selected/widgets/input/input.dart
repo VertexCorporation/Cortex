@@ -481,13 +481,23 @@ class InputFieldState extends State<InputField> {
     return digest.toString();
   }
 
+  /// Calculates the credit cost for the current operation.
+  /// This logic is now fully aligned with server-side validation (v3.0).
   int _requiredCredits() {
+    // Offline / Local Models
+    if (!widget.isServerSideModel) return 0;
+
+    // --- DYNAMIC CHAT IS ALWAYS PREMIUM (AUTO ROUTER) ---
     if (widget.isDynamicChatMode) {
-      return 0;
+      const base = 20; // Auto Router cost
+      final photo = (_selectedPhoto != null) ? 30 : 0;
+      return base + photo;
     }
 
+    // Standard Server-Side Models
     if (widget.isServerSideModel) {
-      final base = widget.isPremiumModel ? 20 : 10;
+      // Aligned with Server: Premium=20, Standard=5 (was 10 in old client code)
+      final base = widget.isPremiumModel ? 20 : 5;
       final photo = (_selectedPhoto != null) ? 30 : 0;
       return base + photo;
     }

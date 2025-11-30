@@ -1994,5 +1994,5 @@ class AppLocalizationsZh extends AppLocalizations {
   String get betterWithAnAccount => '注册账号后，此部分内容会显示得更清晰！';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => '恢复购买';
 }

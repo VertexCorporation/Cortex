@@ -17,8 +17,10 @@ import 'package:cortex/server/user.dart';
 import 'package:cortex/settings/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:upgrader/upgrader.dart';
@@ -87,9 +89,9 @@ class AppInitializer with ChangeNotifier {
 
   void configureUpgrader(AppLocalizations l10n) {
     _upgrader ??= Upgrader(
-        messages: AppUpgraderMessages(appLocalizations: l10n),
-        debugLogging: kDebugMode,
-      );
+      messages: AppUpgraderMessages(appLocalizations: l10n),
+      debugLogging: kDebugMode,
+    );
   }
 
   /// Flag used to prevent authStateChanges from running user flow checks
@@ -102,6 +104,10 @@ class AppInitializer with ChangeNotifier {
   /// Flag used to indicate a deliberate sign-out is in progress. This prevents
   /// the offline check from blocking a user-initiated sign-out.
   bool _isSigningOut = false;
+
+  /// Flag used to follow post startup tasks.
+  bool _isPostStartupTasksRunning = false;
+
   final AuthService _authService;
   final ModelService _modelService;
   final ExtrovertNotificationService _extrovertNotificationService;
@@ -128,6 +134,12 @@ class AppInitializer with ChangeNotifier {
     if (_status != newStatus) {
       _status = newStatus;
       debugPrint("AppInitializer: Status changed to $_status");
+
+      if (_status == AppStatus.ready && !_coreServicesReadyCompleter.isCompleted) {
+        debugPrint("[AppInitializer] Status became READY via flow change. Triggering post-startup tasks.");
+        _runInBackground(_performPostStartupTasks);
+      }
+
       notifyListeners();
     }
   }
@@ -148,70 +160,150 @@ class AppInitializer with ChangeNotifier {
   }
 
   /// Entry point for the application initialization pipeline.
-  ///
-  /// Design goals:
-  /// - Keep the UI thread as free as possible.
-  /// - Run heavy work in background tasks.
-  /// - Only block when absolutely necessary (e.g. maintenance checks).
-  /// ENTRY POINT: Ultra-fast initialization.
-  /// Only checks local state to unblock the UI immediately.
   Future<void> initialize() async {
     dev.log("[AppInitializer] Phase 1: Fast Start. Status: $_status");
 
-    // 1. Check Connectivity IMMEDIATELY (Fast check).
-    // We need this to decide if we should even try background verification.
+    // 1. Check Connectivity IMMEDIATELY.
     await _internetProvider.checkInternetConnection();
 
-    // 2. If we are already 'ready' (from Bootstrap), we let the UI render.
-    // We spawn the heavy tasks to run AFTER the UI is visible.
+    if (await _checkForAppUpdate()) {
+      dev.log("[AppInitializer] Update required. Flow halted.");
+      return;
+    }
+
+    if (await _checkServerStatus()) {
+      dev.log("[AppInitializer] Maintenance mode. Flow halted.");
+      return;
+    }
+
     if (_status == AppStatus.ready) {
       dev.log("[AppInitializer] User exists locally. UI will render. Scheduling background tasks.");
-
-      // Listen to auth changes mostly for SignOut events during usage.
       _listenToAuthStateChanges();
-
-      // TRIGGER BACKGROUND TASKS (Non-blocking)
       _runInBackground(_performPostStartupTasks);
     }
     else {
-      // If we need login or onboarding, we just listen to auth to react to user input.
       _listenToAuthStateChanges();
+      if (_status != AppStatus.initializing) {
+        _runInBackground(_determineUserFlow);
+      }
     }
   }
 
-  /// This method runs AFTER the main screen is visible.
   /// It handles everything that used to block the startup.
+  /// This method runs AFTER the main screen is visible.
   Future<void> _performPostStartupTasks() async {
-    dev.log("[AppInitializer] Phase 2: Starting Background Verification & Heavy Init...");
+    if (_isPostStartupTasksRunning || _coreServicesReadyCompleter.isCompleted) {
+      return;
+    }
+    _isPostStartupTasksRunning = true;
+    try
+    {
+      dev.log("[AppInitializer] Phase 2: Starting Background Verification & Heavy Init...");
 
-    // 1. Initialize Heavy Libraries (Timezones, Downloader, etc.)
-    // These were removed from main.dart to save time.
-    await _initializeHeavyLibraries();
+      await Future.delayed(const Duration(milliseconds: 200));
 
-    // 2. Check Server Maintenance
-    // If maintenance is on, this will trigger a state change and the UI will
-    // overlay the MaintenanceScreen on top of the MainScreen.
-    if (await _checkServerStatus()) {
-      return; // Maintenance mode active, stop here.
+      // 1. Initialize Heavy Libraries (Timezones, Downloader, etc.)
+      await _initializeHeavyLibraries();
+
+      await Future.delayed(Duration.zero);
+
+      // 2. Check Server Maintenance
+      if (await _checkServerStatus()) {
+        return;
+      }
+
+      // 3. Verify the User Session
+      if (_currentUser != null && _internetProvider.isConnected) {
+        await _verifyUserSessionRemote();
+      }
+
+      // 4. Background Reconciliations
+      _runInBackground(reconcileLocalAndRemoteModelCounts);
+      _runInBackground(reconcileAndSyncPurchases);
+
+      if (Platform.isAndroid) {
+        _runInBackground(ReferralHandler.checkAndStoreReferrer);
+      }
+
+      if (!_coreServicesReadyCompleter.isCompleted) {
+        _coreServicesReadyCompleter.complete();
+      }
+      dev.log("[AppInitializer] Phase 2 Complete. App is fully synced.");
+    } finally {
+      if (!_coreServicesReadyCompleter.isCompleted) {
+        _coreServicesReadyCompleter.complete();
+        dev.log("[AppInitializer] Core Services Marked Ready (Finally Block).");
+      }
+    }
+  }
+
+  /// Checks for app updates using a hybrid approach.
+  Future<bool> _checkForAppUpdate() async {
+
+    // --- STRATEGY 1: STORE CHECK (UPGRADER) ---
+    try {
+      await upgrader.initialize();
+      if (upgrader.isUpdateAvailable()) {
+        dev.log("[AppInitializer] Upgrader detected a new version.");
+        _updateStatus(AppStatus.updateRequired);
+        return true;
+      }
+    } catch (e) {
+      dev.log("[AppInitializer] Upgrader check failed: $e. Proceeding to Remote Config fallback.");
     }
 
-    // 3. Verify the User Session (The "Real" Auth Check)
-    // We trusted the local cache to show the UI, now we verify with the server.
-    if (_currentUser != null && _internetProvider.isConnected) {
-      await _verifyUserSessionRemote();
+    // --- STRATEGY 2: REMOTE CONFIG FALLBACK ---
+    try {
+      final remoteConfig = FirebaseRemoteConfig.instance;
+
+      await remoteConfig.setConfigSettings(RemoteConfigSettings(
+        fetchTimeout: const Duration(seconds: 10),
+        minimumFetchInterval: Duration.zero,
+      ));
+
+      await remoteConfig.fetchAndActivate();
+
+      final String minRequiredVersion = remoteConfig.getString('min_required_version');
+
+      if (minRequiredVersion.isNotEmpty) {
+        final packageInfo = await PackageInfo.fromPlatform();
+        final String currentVersion = packageInfo.version;
+
+        dev.log("[AppInitializer] Remote Config Check: Current ($currentVersion) vs Required ($minRequiredVersion)");
+
+        if (_isCurrentVersionLower(currentVersion, minRequiredVersion)) {
+          dev.log("[AppInitializer] Remote Config enforcement: Update required.");
+          _updateStatus(AppStatus.updateRequired);
+          return true;
+        }
+      }
+    } catch (e) {
+      dev.log("[AppInitializer] Remote Config check failed: $e");
     }
 
-    // 4. Background Reconciliations
-    _runInBackground(reconcileLocalAndRemoteModelCounts);
-    _runInBackground(reconcileAndSyncPurchases);
-    if (Platform.isAndroid) {
-      _runInBackground(ReferralHandler.checkAndStoreReferrer);
-    }
+    return false;
+  }
 
-    if (!_coreServicesReadyCompleter.isCompleted) {
-      _coreServicesReadyCompleter.complete();
+  /// Helper to compare semantic version strings (e.g., "2.9.4" vs "2.9.5").
+  /// Returns true if [current] is lower than [required].
+  bool _isCurrentVersionLower(String current, String required) {
+    try {
+      List<int> currParts = current.split('.').map(int.parse).toList();
+      List<int> reqParts = required.split('.').map(int.parse).toList();
+
+      // Normalize lengths (e.g. 2.9 vs 2.9.1)
+      final length = [currParts.length, reqParts.length].reduce((a, b) => a > b ? a : b);
+      for (int i = 0; i < length; i++) {
+        final int c = i < currParts.length ? currParts[i] : 0;
+        final int r = i < reqParts.length ? reqParts[i] : 0;
+
+        if (c < r) return true; // Current is lower
+        if (c > r) return false; // Current is higher
+      }
+    } catch (e) {
+      dev.log("[AppInitializer] Error parsing versions: $e");
     }
-    dev.log("[AppInitializer] Phase 2 Complete. App is fully synced.");
+    return false; // Assume safe if parsing fails
   }
 
   /// Moved here from main.dart to unblock startup.
@@ -290,6 +382,10 @@ class AppInitializer with ChangeNotifier {
   }
 
   void _listenToAuthStateChanges() {
+    if (_isSigningOut) {
+      return;
+    }
+
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (_status == AppStatus.initializing && user != null) {
 
@@ -336,34 +432,37 @@ class AppInitializer with ChangeNotifier {
 
   /// Handles the complete, orchestrated user sign-out process centrally.
   Future<void> signOut() async {
-    debugPrint(
-      "AppInitializer: Starting orchestrated sign-out process.",
-    );
+    debugPrint("AppInitializer: Starting orchestrated sign-out process.");
 
     _isSigningOut = true;
     try {
       // STEP 1: Application-level data cleanup.
       _modelService.clearAllCache();
       CacheService.clearAll();
-      debugPrint("AppInitializer: All in-memory caches cleared.");
 
       await const FlutterSecureStorage().deleteAll();
-      debugPrint(
-        "AppInitializer: All credentials cleared from secure storage.",
-      );
-
       await _extrovertNotificationService.clearUserTokenOnSignOut();
-      debugPrint("AppInitializer: FCM token cleared from server.");
-
       await FileDownloadHelper().cancelAllPendingDownloads();
-      debugPrint("AppInitializer: All downloads cancelled.");
+
+      // Clear User Provider Data Explicitly
+      await _userProvider.clearDataOnSignOut();
+      CreditsManager.instance.dispose();
 
       // STEP 2: Sign out from auth providers.
       await _authService.signOutFromProviders();
-      debugPrint(
-        "AppInitializer: Provider sign-out successful. UI transition will now occur.",
-      );
+
+      _currentUser = null;
+
+      debugPrint("AppInitializer: Sign-out complete. Forcing UI transition.");
+
+      // STEP 3: FORCE UI UPDATE
+      _updateStatus(AppStatus.needsLogin);
+
+    } catch (e) {
+      debugPrint("AppInitializer: Error during sign out: $e");
+      _updateStatus(AppStatus.needsLogin);
     } finally {
+      await Future.delayed(const Duration(milliseconds: 500));
       _isSigningOut = false;
     }
   }
@@ -385,10 +484,10 @@ class AppInitializer with ChangeNotifier {
   }
 
   /// Determines the correct application state based on the user's authentication
-  /// and verification status, including a robust check for Firestore data readiness.
+  /// and verification status.
   ///
-  /// This method is carefully structured to avoid heavy synchronous work on
-  /// the main isolate and relies on async I/O instead.
+  /// This version is "BULLETPROOF". It prioritizes keeping the user IN the app
+  /// over strict server validation during unstable network conditions.
   Future<void> _determineUserFlow() async {
     final prefs = await SharedPreferences.getInstance();
     final hasCompletedOnboarding =
@@ -399,9 +498,9 @@ class AppInitializer with ChangeNotifier {
       return;
     }
 
-    final bool isConnected = _internetProvider.isConnected;
-
-    if (!isConnected) {
+    // 1. Initial Connectivity Check
+    // If we are definitely offline, trust the local cache immediately.
+    if (!_internetProvider.isConnected) {
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser != null) {
         await _userProvider.fetchInitialData(currentUser);
@@ -412,6 +511,7 @@ class AppInitializer with ChangeNotifier {
       return;
     }
 
+    // 2. Resolve Current User
     User? user = FirebaseAuth.instance.currentUser;
     user ??= await _attemptAutoLogin();
 
@@ -421,140 +521,144 @@ class AppInitializer with ChangeNotifier {
     }
 
     try {
+      // 3. Attempt Server Sync (Reload)
+      // This is where "end of stream" errors usually happen.
       await user.reload();
       user = FirebaseAuth.instance.currentUser;
 
+      // Edge case: User deleted while app was running?
       if (user == null) {
         _updateStatus(AppStatus.needsLogin);
         return;
       }
 
-      // --- User is READY if Email Verified OR Anonymous ---
-      if (user.emailVerified || user.isAnonymous) {
-        debugPrint(
-          "[_determineUserFlow] User is Verified OR Anonymous. Proceeding to ready.",
-        );
+      // --- USER IS AUTHENTICATED BEYOND THIS POINT ---
 
-        bool userDocumentCreated;
+      // 4. Check Verification Status
+      if (user.emailVerified || user.isAnonymous) {
+        // User is logically ready. Now check/wait for their database doc.
+
+        bool userDocumentReady = false;
         try {
-          userDocumentCreated = await _waitForUserDocument(user.uid);
-        } on FirebaseException catch (e, s) {
-          // If anonymous, we can be more lenient about missing docs initially
-          if (user.isAnonymous) {
-            userDocumentCreated = true;
-          } else {
-            FirebaseCrashlytics.instance.recordError(e, s, reason: "userDocCheckFailure");
-            userDocumentCreated = false;
-          }
-        } catch (_) {
-          // Allow anonymous users to proceed even if doc check fails (it might be creating)
-          userDocumentCreated = user.isAnonymous;
+          // Robust check with retries
+          userDocumentReady = await _waitForUserDocument(user.uid);
+        } catch (e) {
+          debugPrint("[_determineUserFlow] Warning: Doc check failed ($e).");
+          // If anonymous, or if it failed due to network, be lenient.
+          // For a new registration, the doc might be creating via Cloud Functions.
+          // Better to let them in than kick them out.
+          userDocumentReady = true;
         }
 
-        if (userDocumentCreated) {
+        if (userDocumentReady) {
+          // Success Path
           _updateStatus(AppStatus.ready);
         } else {
-          // Only force sign out if it's a verified user missing their doc
+          // Critical: User verified, internet works, but NO doc exists after retries.
+          // This implies a deleted account or data corruption.
           debugPrint("[_determineUserFlow] Critical: Verified user missing doc. Signing out.");
           await signOut();
         }
+
       } else {
-        // --- User is NOT Anonymous AND NOT Verified -> Show Verification Screen ---
-        debugPrint(
-          "[_determineUserFlow] User is authenticated but email is not verified. Showing verification screen.",
-        );
+        // 5. Handle Unverified User
+        // We need to fetch data to show the email address on the Verify Screen.
+        debugPrint("[_determineUserFlow] User email not verified. Loading verification data.");
 
         Map<String, dynamic>? data;
         try {
-          final userDocServer = await FirebaseFirestore.instance
+          // Try server first
+          final doc = await FirebaseFirestore.instance
               .collection('users')
               .doc(user.uid)
-              .get(const GetOptions(source: Source.server))
-              .timeout(const Duration(seconds: 6));
-
-          data = userDocServer.data();
+              .get();
+          data = doc.data();
         } catch (_) {
-          DocumentSnapshot<Map<String, dynamic>>? userDocCache;
-          try {
-            userDocCache = await FirebaseFirestore.instance
-                .collection('users')
-                .doc(user.uid)
-                .get(const GetOptions(source: Source.cache));
-          } catch (_) {
-            userDocCache = null;
-          }
-
-          data = userDocCache?.data();
+          // Fallback to cache/local info if server fails
+          data = null;
         }
 
         _verificationScreenData = {
           'email': data?['email'] ?? user.email ?? '',
           'username': data?['username'] ?? '',
           'userId': user.uid,
-          'password': '',
+          'password': '', // Password not needed for simple status check
         };
         _updateStatus(AppStatus.needsVerification);
       }
-    } catch (e, s) {
-      if (e is FirebaseAuthException) {
-        final bool isCorruptSessionError = e.code == 'unknown' &&
-            (e.message?.contains('Json conversion failed') == true ||
-                e.message?.contains('403') == true ||
-                e.message?.contains('Forbidden') == true);
 
-        if (isCorruptSessionError) {
-          debugPrint(
-              "[_determineUserFlow] Corrupt session detected (HTML/403 response). "
-                  "Logging out safely without crash reporting.");
+    } catch (e, s) {
+      // --- CRITICAL ERROR HANDLING SECTION ---
+
+      if (e is FirebaseAuthException) {
+        final String msg = e.message?.toLowerCase() ?? '';
+        final String code = e.code;
+
+        // A. TRANSIENT NETWORK ERRORS (DO NOT LOG OUT)
+        // Includes: "unexpected end of stream", "network-request-failed", timeouts.
+        final bool isNetworkGlitch =
+            code == 'network-request-failed' ||
+                msg.contains('end of stream') ||
+                msg.contains('connection closed') ||
+                msg.contains('socket') ||
+                msg.contains('timeout') ||
+                msg.contains('unable to resolve host');
+
+        if (isNetworkGlitch) {
+          debugPrint("[_determineUserFlow] Network error during reload ($code). Assuming Offline-Ready.");
+          // Even though reload failed, the local session is likely valid.
+          // Let the user in. The UserProvider will handle missing data.
+          _updateStatus(AppStatus.ready);
+          return;
+        }
+
+        // B. CORRUPT SESSION ERRORS (MUST LOG OUT)
+        // Usually caused by captive portals (public wifi) returning HTML instead of JSON.
+        final bool isCorruptSession = code == 'unknown' &&
+            (msg.contains('json conversion failed') ||
+                msg.contains('403') ||
+                msg.contains('forbidden') ||
+                msg.contains('html'));
+
+        if (isCorruptSession) {
+          debugPrint("[_determineUserFlow] Corrupt session (HTML/403). Logging out safely.");
           await signOut();
           return;
         }
 
-        switch (e.code) {
+        // C. FATAL AUTH ERRORS (MUST LOG OUT)
+        switch (code) {
           case 'user-token-expired':
           case 'user-disabled':
           case 'user-not-found':
           case 'invalid-credential':
-            debugPrint(
-              "[_determineUserFlow] Non-recoverable auth state detected "
-                  "(${e.code}). Forcing a clean sign-out.",
-            );
+          case 'session-cookie-expired':
+            debugPrint("[_determineUserFlow] Fatal auth error ($code). Signing out.");
             await signOut();
             break;
 
-          case 'network-request-failed':
-          case 'web-context-cancelled':
-            debugPrint(
-              "[_determineUserFlow] Network request failed during user "
-                  "validation, but a cached user exists. Assuming offline and "
-                  "proceeding to ready state.",
-            );
-            _updateStatus(AppStatus.ready);
-            break;
-
           default:
-            debugPrint(
-              "[_determineUserFlow] Unhandled FirebaseAuthException: "
-                  "${e.code}. Forcing logout.",
-            );
-            FirebaseCrashlytics.instance.recordError(
-              e,
-              s,
-              reason: "authenticatedUserFlowFailure",
-            );
+          // D. UNKNOWN FIREBASE ERRORS
+          // If we don't know what it is, but it's NOT a network glitch,
+          // it's safer to log it and sign out to prevent stuck states.
+            debugPrint("[_determineUserFlow] Unhandled Firebase Error: $code. Signing out.");
+            FirebaseCrashlytics.instance.recordError(e, s, reason: "AuthFlow_UnhandledFirebase");
             await signOut();
             break;
         }
       } else {
-        debugPrint(
-          "[_determineUserFlow] Non-Firebase CRITICAL error during "
-              "authenticated user flow: $e. Forcing logout.",
-        );
-        FirebaseCrashlytics.instance.recordError(
-          e,
-          s,
-          reason: "authenticatedUserFlowFailure",
-        );
+        // E. NON-FIREBASE ERRORS (Platform, etc.)
+        // If it's a generic SocketException (not wrapped in FirebaseAuthException), handle it as network.
+        if (e.toString().toLowerCase().contains('socketexception') ||
+            e.toString().toLowerCase().contains('handshake')) {
+          debugPrint("[_determineUserFlow] Socket/Handshake error. Assuming Offline-Ready.");
+          _updateStatus(AppStatus.ready);
+          return;
+        }
+
+        // Otherwise, it's a crash-worthy logic error.
+        debugPrint("[_determineUserFlow] Critical system error: $e. Signing out.");
+        FirebaseCrashlytics.instance.recordError(e, s, reason: "AuthFlow_SystemError");
         await signOut();
       }
     }

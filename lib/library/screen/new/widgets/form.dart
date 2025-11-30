@@ -2,7 +2,6 @@
 
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../../theme.dart';
 
 /// A reusable form section widget for the model creation process.
@@ -39,7 +38,7 @@ class CreationFormSection extends StatelessWidget {
         // --- Section Title ---
         Text(
           title,
-          style: GoogleFonts.roboto(
+          style: TextStyle(
             color: AppColors.primaryColor.inverted,
             fontSize: screenWidth * 0.05,
             fontWeight: FontWeight.w600,
@@ -50,7 +49,7 @@ class CreationFormSection extends StatelessWidget {
         // --- Section Description ---
         Text(
           description,
-          style: GoogleFonts.roboto(
+          style: TextStyle(
             color: AppColors.quinaryColor,
             fontSize: screenWidth * 0.035,
           ),

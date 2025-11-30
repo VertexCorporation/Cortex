@@ -2092,5 +2092,5 @@ class AppLocalizationsAr extends AppLocalizations {
   String get betterWithAnAccount => 'هذا القسم أفضل مع حساب!';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => 'استعادة المشتريات';
 }

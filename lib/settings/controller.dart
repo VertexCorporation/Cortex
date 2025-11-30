@@ -75,7 +75,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
       backgroundColor: AppColors.background,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-        title: Text(appLocalizations.settings, style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted)),
+        title: Text(appLocalizations.settings, style: TextStyle(color: AppColors.primaryColor.inverted)),
         backgroundColor: AppColors.background,
         elevation: 0,
         iconTheme: IconThemeData(color: AppColors.primaryColor.inverted),

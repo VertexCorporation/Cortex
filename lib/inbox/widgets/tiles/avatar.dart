@@ -7,18 +7,8 @@ import '../../../app.dart';
 import '../../../theme.dart';
 
 /// A widget that displays the avatar for a conversation tile.
-///
-/// It intelligently handles different image types and sources:
-/// - SVG or PNG files.
-/// - Images from local assets or the device's file system.
-/// - Applies specific color filters or padding based on the image type.
-/// - Provides a fallback icon if the image path is invalid or the file is not found.
 class TileAvatar extends StatelessWidget {
-  /// The path to the image resource. Can be an asset path (e.g., 'assets/icons/model.svg')
-  /// or a file path from the device's storage.
   final String imagePath;
-
-  /// The size (width and height) of the avatar container.
   final double size;
 
   const TileAvatar({
@@ -33,18 +23,15 @@ class TileAvatar extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        // The background color provides a consistent look, especially for transparent PNGs.
         color: AppColors.secondaryColor,
-        borderRadius: BorderRadius.circular(size * 0.125), // Responsive corner radius
+        borderRadius: BorderRadius.circular(size * 0.125),
       ),
-      // Clip.antiAlias ensures the child image respects the container's rounded corners.
       clipBehavior: Clip.antiAlias,
       alignment: Alignment.center,
       child: _buildImageWidget(),
     );
   }
 
-  /// Determines the correct image widget to build based on the file extension and path.
   Widget _buildImageWidget() {
     final String pathLower = imagePath.toLowerCase();
     final bool isAsset = imagePath.startsWith('assets/');
@@ -55,19 +42,35 @@ class TileAvatar extends StatelessWidget {
     } else if (pathLower.endsWith('.png')) {
       return _buildPngImage(isAsset, imageFile);
     } else {
-      // Fallback for other image types like .jpg, .jpeg, etc.
       return _buildRasterImage(isAsset, imageFile);
     }
   }
 
-  /// Builds an [SvgPicture] from either assets or a local file.
   Widget _buildSvgImage(bool isAsset, File file) {
-    // Apply special styling for specific icons, e.g., 'self.svg'.
-    final isSelfIcon = imagePath.toLowerCase().endsWith('self.svg');
-    final double iconSize = isSelfIcon ? size * 0.6 : size;
-    final ColorFilter? colorFilter = isSelfIcon
-        ? ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn)
-        : null; // No filter for other SVGs unless specified
+    final String pathLower = imagePath.toLowerCase();
+    final bool isSelfIcon = pathLower.endsWith('self.svg');
+    final bool isCortexIcon = pathLower.endsWith('cortex.svg');
+
+    final double iconSize = (isSelfIcon || isCortexIcon) ? size * 0.8 : size;
+
+    ColorFilter? colorFilter;
+
+    if (isSelfIcon) {
+      colorFilter = ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn);
+    } else if (isCortexIcon) {
+      final bool isDarkContainer = AppColors.secondaryColor.computeLuminance() < 0.5;
+
+      if (isDarkContainer) {
+        colorFilter = const ColorFilter.matrix([
+          -1,  0,  0, 0, 255,
+          0, -1,  0, 0, 255,
+          0,  0, -1, 0, 255,
+          0,  0,  0, 1,   0,
+        ]);
+      } else {
+        colorFilter = null;
+      }
+    }
 
     if (isAsset) {
       return SvgPicture.asset(
@@ -90,9 +93,7 @@ class TileAvatar extends StatelessWidget {
     return _buildFallbackIcon();
   }
 
-  /// Builds a padded [Image] widget for PNG files.
   Widget _buildPngImage(bool isAsset, File file) {
-    // PNGs, especially logos, often look better with some padding.
     return Padding(
       padding: EdgeInsets.all(size * 0.15),
       child: isAsset
@@ -103,8 +104,14 @@ class TileAvatar extends StatelessWidget {
     );
   }
 
-  /// Builds a standard [Image] widget for other raster formats (jpg, etc.).
   Widget _buildRasterImage(bool isAsset, File file) {
+    final String extension = imagePath.split('.').last.toLowerCase();
+    final bool isValidImage = ['jpg', 'jpeg', 'webp', 'bmp', 'gif'].contains(extension);
+
+    if (!isValidImage && !isAsset) {
+      return _buildFallbackIcon();
+    }
+
     return isAsset
         ? Image.asset(imagePath, width: size, height: size, fit: BoxFit.cover)
         : (file.existsSync()
@@ -112,7 +119,6 @@ class TileAvatar extends StatelessWidget {
         : _buildFallbackIcon());
   }
 
-  /// Returns a fallback icon to display when an image cannot be loaded.
   Widget _buildFallbackIcon() {
     return Icon(
       Icons.image_not_supported_outlined,

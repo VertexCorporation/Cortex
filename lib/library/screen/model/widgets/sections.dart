@@ -9,8 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../theme.dart';
-import '../../../../notifications/introvert.dart';
-import '../../../../overflow.dart';
 import '../../../backend/data/entity.dart';
 import '../../../backend/data/service.dart';
 import '../../../providers/details.dart';
@@ -152,18 +150,122 @@ class DescriptionSection extends StatelessWidget {
             child: AnimatedCrossFade(
               duration: const Duration(milliseconds: 300),
               crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-              firstChild: OverflowText(
-                text: fullDescription,
+              firstChild: _ParsedText(
+                fullText: fullDescription,
                 style: textStyle,
                 maxLines: 4,
-                fadeLength: 8,
               ),
-              secondChild: _LinkedText(fullText: fullDescription, style: textStyle),
+              secondChild: _ParsedText(
+                fullText: fullDescription,
+                style: textStyle,
+                maxLines: null,
+                overflow: TextOverflow.visible,
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+/// A helper widget to parse and display text with embedded markdown-style links AND bold text.
+class _ParsedText extends StatelessWidget {
+  final String fullText;
+  final TextStyle style;
+  final int? maxLines;
+  final TextOverflow overflow;
+
+  const _ParsedText({
+    required this.fullText,
+    required this.style,
+    this.maxLines,
+    this.overflow = TextOverflow.clip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Styles
+    final linkStyle = style.copyWith(color: AppColors.senaryColor, fontWeight: FontWeight.w600);
+
+    final boldStyle = style.copyWith(fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted);
+
+    // Regex to capture:
+    // 1. **Bold** -> (\*\*(.*?)\*\*)
+    // 2. [Label](url) -> (\[([^\]]+)\]\(([^)]+)\))
+    // 3. Raw URL -> (https?://\S+)
+    final combinedRegExp = RegExp(r'(\*\*(.*?)\*\*)|(\[([^\]]+)\]\(([^)]+)\))|(https?://\S+)');
+
+    final spans = <TextSpan>[];
+    int lastEnd = 0;
+
+    for (final match in combinedRegExp.allMatches(fullText)) {
+      // Add plain text before the match
+      if (match.start > lastEnd) {
+        spans.add(TextSpan(text: fullText.substring(lastEnd, match.start), style: style));
+      }
+
+      final String matchText = match.group(0)!;
+
+      if (matchText.startsWith('**')) {
+        // --- BOLD HANDLING ---
+        // Group 2 contains the text inside **...**
+        final content = match.group(2) ?? "";
+        spans.add(TextSpan(text: content, style: boldStyle));
+
+      } else if (matchText.startsWith('[')) {
+        // --- MARKDOWN LINK HANDLING ---
+        // Group 4 is label, Group 5 is URL
+        final label = match.group(4) ?? "";
+        final href = match.group(5) ?? "";
+
+        spans.add(TextSpan(
+            text: label,
+            style: linkStyle,
+            recognizer: TapGestureRecognizer()
+              ..onTap = () async => _launchUrl(href)
+        ));
+
+      } else {
+        // --- RAW URL HANDLING ---
+        // Group 6 is the raw URL
+        final url = match.group(6) ?? matchText;
+        spans.add(TextSpan(
+            text: url,
+            style: linkStyle,
+            recognizer: TapGestureRecognizer()
+              ..onTap = () async => _launchUrl(url)
+        ));
+      }
+
+      lastEnd = match.end;
+    }
+
+    // Add remaining plain text
+    if (lastEnd < fullText.length) {
+      spans.add(TextSpan(text: fullText.substring(lastEnd), style: style));
+    }
+
+    // Using Text.rich allows for better handling of maxLines and overflow compared to RichText
+    return Text.rich(
+      TextSpan(children: spans),
+      maxLines: maxLines,
+      overflow: overflow,
+      softWrap: true,
+    );
+  }
+
+  Future<void> _launchUrl(String href) async {
+    try {
+      final uri = Uri.tryParse(href);
+      if (uri != null && await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        debugPrint("[_ParsedText] Could not launch URL: $href");
+      }
+    } catch (e) {
+      debugPrint("[_ParsedText] Error launching URL: $e");
+    }
   }
 }
 
@@ -353,56 +455,5 @@ class FeaturesSection extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-
-/// A helper widget to parse and display text with embedded markdown-style links.
-class _LinkedText extends StatelessWidget {
-  final String fullText;
-  final TextStyle style;
-
-  const _LinkedText({required this.fullText, required this.style});
-
-  @override
-  Widget build(BuildContext context) {
-    final notificationService = context.read<IntrovertNotificationService>();
-    final localizations = AppLocalizations.of(context)!;
-
-    final linkStyle = style.copyWith(color: AppColors.senaryColor, fontWeight: FontWeight.w600);
-    final linkRegExp = RegExp(r'\[([^\]]+)\]\(([^)]+)\)|(https?://\S+)');
-
-    final spans = <TextSpan>[];
-    int lastEnd = 0;
-
-    for (final match in linkRegExp.allMatches(fullText)) {
-      if (match.start > lastEnd) {
-        spans.add(TextSpan(text: fullText.substring(lastEnd, match.start), style: style));
-      }
-
-      String label = match.group(1) ?? match.group(3)!;
-      String href = match.group(2) ?? match.group(3)!;
-
-      spans.add(TextSpan(
-          text: label,
-          style: linkStyle,
-          recognizer: TapGestureRecognizer()
-            ..onTap = () async {
-              final uri = Uri.tryParse(href);
-              if (uri != null && await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              } else {
-                notificationService.showNotification(message: localizations.anErrorOccurred, type: NotificationType.error);
-              }
-            }
-      ));
-      lastEnd = match.end;
-    }
-
-    if (lastEnd < fullText.length) {
-      spans.add(TextSpan(text: fullText.substring(lastEnd), style: style));
-    }
-
-    return RichText(text: TextSpan(children: spans));
   }
 }

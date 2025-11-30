@@ -2048,5 +2048,5 @@ class AppLocalizationsJa extends AppLocalizations {
   String get betterWithAnAccount => 'このセクションはアカウントがあればさらに便利になります!';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => '購入を復元する';
 }

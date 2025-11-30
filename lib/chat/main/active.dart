@@ -249,9 +249,12 @@ class ActiveChatViewState extends State<ActiveChatView>
           ),
         ),
 
-        // LAYER 2: Premium banner (unchanged).
+        // LAYER 2: Premium banner.
         PremiumModelBanner(
           isVisible: sessionProvider.showPremiumBanner,
+          onDismiss: () {
+            context.read<ChatSessionProvider>().dismissPremiumBanner();
+          },
           onTap: () {
             final isAnonymous = context.read<UserProvider>().isAnonymous;
 
@@ -272,10 +275,7 @@ class ActiveChatViewState extends State<ActiveChatView>
             final basePanelHeight = bottomPanelHeightNotifier.value;
             const horizontalPadding = 16.0;
 
-            // This boolean logic calculates visibility, but NOT whether the widget exists.
-            // Briefing should hide if the chat isn't active OR if the extension panel is open.
-            final bool shouldBeVisible = sessionProvider.isChatActive &&
-                !widget.extensions.isPanelVisible;
+            final bool shouldBeVisible = sessionProvider.isChatActive;
 
             return Positioned(
               left: horizontalPadding,
@@ -295,7 +295,7 @@ class ActiveChatViewState extends State<ActiveChatView>
                 showDisclaimer:
                 context.watch<ChatSessionProvider>().showDisclaimer,
                 isPremiumModel:
-                context.watch<ChatSessionProvider>().showPremiumBanner,
+                context.watch<ChatSessionProvider>().isCurrentModelPremium,
                 isSubscribed:
                 context.watch<ChatSessionProvider>().isUserSubscribed,
                 premiumTrialUses:
@@ -313,12 +313,13 @@ class ActiveChatViewState extends State<ActiveChatView>
                     briefingVisibleHeightNotifier.value = h;
                   }
                 },
+                isDynamicChat: sessionProvider.isDynamicChat,
               ),
             );
           },
         ),
 
-// LAYER 4: Scroll-to-bottom button — now correctly compensates keyboard height.
+        // LAYER 4: Scroll-to-bottom button — now correctly compensates keyboard height.
         AnimatedBuilder(
           animation: Listenable.merge([
             showScrollDownButtonNotifier,
@@ -418,7 +419,7 @@ class ActiveChatViewState extends State<ActiveChatView>
           ),
         ),
 
-        // INPUT FIELD (unchanged)
+        // INPUT FIELD
         InputField(
           key: inputFieldKey,
           localizations: localizations,
@@ -436,7 +437,7 @@ class ActiveChatViewState extends State<ActiveChatView>
           isStorageSufficient: sessionProvider.isStorageSufficient,
           modelMissing: modelMissing,
           role: sessionProvider.role,
-          isPremiumModel: sessionProvider.showPremiumBanner,
+          isPremiumModel: sessionProvider.isCurrentModelPremium,
           isSubscribed: sessionProvider.isUserSubscribed,
           premiumTrialUses: sessionProvider.premiumTrialUses,
           isServerSideModel: Utils.isServerSideModel(

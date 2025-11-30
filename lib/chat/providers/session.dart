@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/chat/services/limit.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/providers/local.dart';
@@ -48,6 +49,7 @@ class ChatSessionProvider with ChangeNotifier {
   bool _showPremiumBanner = false;
   bool _isStorageSufficient = true;
   static bool _hasDismissedDisclaimerThisSession = false;
+  bool _hasDismissedPremiumBannerThisSession = false;
 
   // ===========================================================================
   // SECTION 2: PUBLIC GETTERS
@@ -111,8 +113,12 @@ class ChatSessionProvider with ChangeNotifier {
   ChatLimitManager? get chatLimitManager => _chatLimitManager;
   String? get displayName => _displayName;
   String? get email => _email;
-  bool get showDisclaimer => isChatActive && !_hasDismissedDisclaimerThisSession;
+  bool get showDisclaimer => isChatActive && _showDisclaimer && !_hasDismissedDisclaimerThisSession;
   bool get showPremiumBanner => _showPremiumBanner;
+  bool get isCurrentModelPremium {
+    final model = _isExitingChat ? _lastExitedModel : _selectedModel;
+    return model?.isPremium ?? false;
+  }
   bool get isStorageSufficient => _isStorageSufficient;
 
   // Returns the current locale used by the session for localization.
@@ -196,6 +202,7 @@ class ChatSessionProvider with ChangeNotifier {
     _selectedModel = null;
     _isLocalModelLoaded = false;
     _showPremiumBanner = false;
+    _hasDismissedPremiumBannerThisSession = false;
 
     notifyListeners();
 
@@ -297,17 +304,46 @@ class ChatSessionProvider with ChangeNotifier {
   }
 
   void updatePremiumBannerVisibility(bool isPremiumModel) {
-    final shouldShow = isPremiumModel && !_isUserSubscribed;
+    final shouldShow = isPremiumModel && !_isUserSubscribed && !_hasDismissedPremiumBannerThisSession;
+
     if (_showPremiumBanner != shouldShow) {
       _showPremiumBanner = shouldShow;
       notifyListeners();
     }
   }
 
-  void triggerDisclaimer() {
-    if (!_showDisclaimer) {
-      _showDisclaimer = true;
-      notifyListeners();
+  /// Checks if the disclaimer should be shown based on time elapsed since last shown.
+  /// If 3 days (72 hours) have passed, it sets the flag to true.
+  Future<void> triggerDisclaimer() async {
+    if (_hasDismissedDisclaimerThisSession || _showDisclaimer) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      const String key = 'last_disclaimer_shown_ts';
+      final int? lastShownTs = prefs.getInt(key);
+      final DateTime now = DateTime.now();
+
+      bool shouldShow = false;
+
+      if (lastShownTs == null) {
+        shouldShow = true;
+      } else {
+        final DateTime lastShownDate = DateTime.fromMillisecondsSinceEpoch(lastShownTs);
+        final Duration diff = now.difference(lastShownDate);
+
+        if (diff.inDays >= 3) {
+          shouldShow = true;
+        }
+      }
+
+      if (shouldShow) {
+        _showDisclaimer = true;
+        notifyListeners();
+
+        await prefs.setInt(key, now.millisecondsSinceEpoch);
+      }
+    } catch (e) {
+      debugPrint("Disclaimer check error: $e");
     }
   }
 
@@ -315,6 +351,14 @@ class ChatSessionProvider with ChangeNotifier {
     if (_hasDismissedDisclaimerThisSession) return;
     _hasDismissedDisclaimerThisSession = true;
     notifyListeners();
+  }
+
+  void dismissPremiumBanner() {
+    if (!_hasDismissedPremiumBannerThisSession) {
+      _hasDismissedPremiumBannerThisSession = true;
+      _showPremiumBanner = false;
+      notifyListeners();
+    }
   }
 
   void setStorageSufficient(bool isSufficient) {

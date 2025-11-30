@@ -62,10 +62,6 @@
             android:name="vn.hunghd.flutterdownloader.NOTIFICATION_CHANNEL_ID"
             android:value="cortex_notifications" />
 
-        <meta-data
-            android:name="io.flutter.embedding.android.EnableImpeller"
-            android:value="false" />
-
         <service
             android:name=".LlamaService"
             android:enabled="true"

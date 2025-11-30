@@ -17,7 +17,6 @@ class ModelDownloadController {
     required this.managers,
     required this.downloadCompleted,
     required this.getFilePathById,
-    // THE CORRECT PATTERN: A simple callback to signal a state change.
     required this.onStateChange,
   });
 
@@ -74,7 +73,6 @@ class ModelDownloadController {
         ..setPaused(false)
         ..setProgress(0);
 
-      // *** THE FIX ***: Invoke the callback to trigger the UI update.
       onStateChange();
 
       await _doDownload(
@@ -108,7 +106,6 @@ class ModelDownloadController {
       ..setPaused(false)
       ..setProgress(0);
 
-    // *** THE FIX ***: Invoke the callback to trigger the UI update.
     // This is the key to making the UI update immediately and correctly.
     onStateChange();
 
@@ -181,8 +178,10 @@ class ModelDownloadController {
     required List<ModelEntity> models,
     required Map<String, bool> groundTruthDownloadStates,
   }) async {
+
     final tasks = await FlutterDownloader.loadTasks();
-    if (tasks == null) return;
+    final safeTasks = tasks ?? [];
+
     final prefs = await SharedPreferences.getInstance();
     bool needsUIRefresh = false;
 
@@ -190,60 +189,95 @@ class ModelDownloadController {
       if (model.isServerSide) continue;
       final id = model.id;
       final manager = managers[id];
-      if (manager == null) continue;
+      final effectiveManager = manager ?? managers.putIfAbsent(id, () => DownloadManager());
 
       final taskId = prefs.getString('download_task_id_$id');
-      final task = taskId == null ? null : tasks.firstWhereOrNull((t) => t.taskId == taskId);
+      final task = taskId == null ? null : safeTasks.firstWhereOrNull((t) => t.taskId == taskId);
+
+      bool isTaskRunning = task != null &&
+          (task.status == DownloadTaskStatus.running || task.status == DownloadTaskStatus.enqueued);
+
+      if (!isTaskRunning && _activeDownloadCompleters.containsKey(id)) {
+        debugPrint("[DownloadController] ZOMBIE LOCK DETECTED for '$id'. Forcing completer termination.");
+        final completer = _activeDownloadCompleters[id];
+        if (completer != null && !completer.isCompleted) {
+          completer.completeError("System process kill detected on resume");
+        }
+        _activeDownloadCompleters.remove(id);
+      }
+
 
       if (task == null) {
-        if (manager.isDownloading || manager.isPaused) {
-          manager..setDownloading(false)..setPaused(false)..setProgress(0);
+        if (effectiveManager.isDownloading || effectiveManager.isPaused) {
+          debugPrint("[DownloadController] Sync: Task for '$id' disappeared. Resetting UI.");
+          effectiveManager..setDownloading(false)..setPaused(false)..setProgress(0);
           needsUIRefresh = true;
         }
-        await prefs.remove('download_task_id_$id');
+
+        if (taskId != null) {
+          await prefs.remove('download_task_id_$id');
+          _downloadTaskIds.remove(id);
+        }
         continue;
       }
 
       _downloadTaskIds[id] = task.taskId;
-      manager.setCancelled(false);
+      effectiveManager.setCancelled(false);
+
+      debugPrint("[DownloadController] Syncing '$id': Status ${task.status}, Progress ${task.progress}");
 
       switch (task.status) {
         case DownloadTaskStatus.running:
+          effectiveManager..setDownloading(true)..setPaused(false)..setProgress(task.progress.toDouble());
+          needsUIRefresh = true;
+          break;
+
         case DownloadTaskStatus.enqueued:
-          manager..setDownloading(true)..setPaused(false)..setProgress(task.progress.toDouble());
-          needsUIRefresh = true; // State changed
+          effectiveManager..setDownloading(true)..setPaused(false)..setProgress(task.progress.toDouble());
+          needsUIRefresh = true;
           break;
+
         case DownloadTaskStatus.paused:
-          manager..setDownloading(false)..setPaused(true)..setProgress(task.progress.toDouble());
-          needsUIRefresh = true; // State changed
+          effectiveManager..setDownloading(false)..setPaused(true)..setProgress(task.progress.toDouble());
+          needsUIRefresh = true;
           break;
+
         case DownloadTaskStatus.complete:
-        // We only trust the 'complete' status if the file ACTUALLY exists on disk.
           final bool fileActuallyExists = groundTruthDownloadStates[id] ?? false;
 
           if (fileActuallyExists) {
-            // The file is there, so the state is genuinely 'downloaded'.
-            manager..setDownloading(false)..setPaused(false)..setDownloaded(true)..setProgress(100);
-            // We can now safely remove the task ID as it's no longer pending.
+            effectiveManager..setDownloading(false)..setPaused(false)..setDownloaded(true)..setProgress(100);
             await prefs.remove('download_task_id_$id');
             needsUIRefresh = true;
           } else {
-            // CONFLICT DETECTED! The task is 'complete', but the file is gone (uninstalled).
-            // The file system wins. We must clean up the stale task.
-            debugPrint("[DownloadController] Conflict found for '$id'. Task is 'complete' but file is missing. Cleaning up stale task.");
+            debugPrint("[DownloadController] Conflict found for '$id'. Task complete but file missing.");
             await FlutterDownloader.remove(taskId: task.taskId, shouldDeleteContent: false);
             await prefs.remove('download_task_id_$id');
-            // The manager's state was already set to 'isDownloaded: false' by the file check,
-            // so we don't need to change it here.
+            effectiveManager..setDownloading(false)..setDownloaded(false)..setProgress(0);
+            needsUIRefresh = true;
           }
           break;
-        default: // failed, canceled, undefined
-          manager..setDownloading(false)..setPaused(false)..setProgress(0);
+
+        case DownloadTaskStatus.failed:
+          debugPrint("[DownloadController] Sync: Task '$id' failed while backgrounded.");
+          effectiveManager..setDownloading(false)..setPaused(false)..setProgress(0);
+
+          await FlutterDownloader.remove(taskId: task.taskId, shouldDeleteContent: false);
           await prefs.remove('download_task_id_$id');
-          needsUIRefresh = true; // State changed
+          needsUIRefresh = true;
+          break;
+
+        case DownloadTaskStatus.canceled:
+          effectiveManager..setDownloading(false)..setPaused(false)..setProgress(0);
+          await prefs.remove('download_task_id_$id');
+          needsUIRefresh = true;
+          break;
+
+        default: // undefined
           break;
       }
     }
+
     if (needsUIRefresh) {
       onStateChange();
     }

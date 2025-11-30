@@ -9,11 +9,6 @@ import '../services/auth.dart';
 import '../services/profile.dart';
 
 /// Manages user-initiated actions and their corresponding UI states.
-///
-/// This provider acts as a ViewModel in an MVVM architecture. It orchestrates
-/// user operations and is responsible for handling exceptions from the service layer,
-/// localizing error messages, and displaying user-facing notifications. For global actions
-/// like signing out, it delegates to the `AppInitializer`.
 class SettingsActionProvider with ChangeNotifier {
   final AuthService _authService;
   final ProfileService _profileService;
@@ -94,7 +89,6 @@ class SettingsActionProvider with ChangeNotifier {
   // --- Public Methods / Actions ---
 
   Future<void> updateUsername(BuildContext context, String newUsername) async {
-    // Guard against async gaps: get localizations before the first await.
     final localizations = AppLocalizations.of(context)!;
     if (isUpdatingUsername || !_checkInternet(localizations)) return;
 
@@ -162,6 +156,7 @@ class SettingsActionProvider with ChangeNotifier {
     }
   }
 
+  /// Performs the logout process and handles UI navigation upon success.
   Future<void> performLogout(BuildContext context) async {
     final localizations = AppLocalizations.of(context)!;
     if (_isLoggingOut) return;
@@ -171,13 +166,31 @@ class SettingsActionProvider with ChangeNotifier {
 
     try {
       await _appInitializer.signOut();
+
+      // After signing out, we must dismiss the dialog so the user feels the action.
+      // The AppLifecycleManager will detect the 'needsLogin' state and swap
+      // the entire MaterialApp to the AuthScreen, but popping here prevents glitches.
+      if (context.mounted) {
+        // 1. Pop the Logout Confirmation Dialog
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+
+        // 2. (Optional) Pop the Settings Screen to reveal MainScreen underneath
+        // This makes the transition to the AuthScreen feel smoother.
+        if (context.mounted && Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      }
+
     } catch (e) {
       debugPrint("SettingsActionProvider: An error occurred during the orchestrated logout: $e");
       _notificationService.showNotification(
-          message: localizations.anErrorOccurred, // Using a generic error message
+          message: localizations.anErrorOccurred,
           type: NotificationType.error);
     } finally {
       _isLoggingOut = false;
+      // We check mounted again because the navigator pops above might have unmounted us
       if (hasListeners) {
         notifyListeners();
       }
@@ -200,6 +213,13 @@ class SettingsActionProvider with ChangeNotifier {
           type: NotificationType.success);
 
       await _appInitializer.signOut();
+
+      // Also pop dialogs here for account deletion flow
+      if (context.mounted) {
+        if (Navigator.of(context).canPop()) Navigator.of(context).pop();
+        if (context.mounted && Navigator.of(context).canPop()) Navigator.of(context).pop();
+      }
+
     } on ProfileException catch (e) {
       final message = _getLocalizedProfileError(localizations, e.code);
       _notificationService.showNotification(message: message, type: NotificationType.error);

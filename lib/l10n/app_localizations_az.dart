@@ -2114,5 +2114,5 @@ class AppLocalizationsAz extends AppLocalizations {
   String get betterWithAnAccount => 'Bu bölmə hesabla daha yaxşıdır!';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => 'Satınalmaları bərpa edin';
 }

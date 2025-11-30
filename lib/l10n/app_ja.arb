@@ -801,5 +801,6 @@
   "accountLinkedSuccess": "アカウントが正常に作成されました。",
   "continueWithApple": "Appleで続ける",
   "guest": "ゲスト",
-  "betterWithAnAccount": "このセクションはアカウントがあればさらに便利になります!"
+  "betterWithAnAccount": "このセクションはアカウントがあればさらに便利になります!",
+  "restorePurchases": "購入を復元する"
 }

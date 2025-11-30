@@ -636,5 +636,6 @@
   "accountLinkedSuccess": "Compte créé avec succès !",
   "continueWithApple": "Continuez avec Apple",
   "guest": "Invité",
-  "betterWithAnAccount": "Cette section est plus agréable avec un compte !"
+  "betterWithAnAccount": "Cette section est plus agréable avec un compte !",
+  "restorePurchases": "Restaurer les achats"
 }

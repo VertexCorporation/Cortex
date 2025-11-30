@@ -1,7 +1,6 @@
 // lib/settings/sections/user.dart
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../app.dart';
 import '../../darkener.dart';
@@ -411,7 +410,7 @@ class UserSection extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(text, style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.041, fontWeight: FontWeight.w500)),
+                Text(text, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.041, fontWeight: FontWeight.w500)),
                 Icon(Icons.arrow_forward_ios, color: AppColors.primaryColor.inverted, size: screenWidth * 0.04),
               ],
             ),
@@ -435,9 +434,9 @@ class UserSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(appLocalizations.user, style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600)),
+        Text(appLocalizations.user, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600)),
         SizedBox(height: screenHeight * 0.01),
-        Text(appLocalizations.manageProfileDescription, style: GoogleFonts.roboto(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035)),
+        Text(appLocalizations.manageProfileDescription, style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035)),
         SizedBox(height: screenHeight * 0.02),
         _buildCenteredButton(
           context,

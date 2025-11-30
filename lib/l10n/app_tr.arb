@@ -659,7 +659,7 @@
   "extensionInfoPanelTitle": "Modelleri Keşfedin",
   "extensionInfoPanelBody1": "Bu ok, bu serideki farklı modeller arasında geçiş yapmanızı sağlar.",
   "extensionInfoPanelBody2": "Bu seriyle ilk kez sohbete başladığınızda varsayılan model otomatik olarak seçilir ve sohbet sırasında seçiminizi istediğiniz zaman değiştirebilirsiniz.",
-  "extensionInfoPanelFooter": "Her model hakkında detaylı bilgi görüntülemek veya farklı bir modeli manuel olarak seçmek için lütfen Kütüphane&#39;ye gidin; oradan bu model serisini seçin ve detay sayfasının üst kısmındaki oka dokunun.",
+  "extensionInfoPanelFooter": "Her model hakkında detaylı bilgi görüntülemek veya farklı bir modeli manuel olarak seçmek için lütfen Kütüphane'ye gidin; oradan bu model serisini seçin ve detay sayfasının üst kısmındaki oka dokunun.",
   "premiumModelNoticeTitle": "Premium Model",
   "premiumModelNoticeDescription": "Bu model premium bir modeldir, premium modellerde ücretsiz kullanıcılar günde 3 mesajla sınırlıdır; sınırsız erişimin kilidini açmak için abone olun!",
   "benefitPremiumModels": "Premium modellere erişim",
@@ -801,5 +801,6 @@
   "accountLinkedSuccess": "Hesap başarıyla oluşturuldu!",
   "continueWithApple": "Apple ile devam edin",
   "guest": "Misafir",
-  "betterWithAnAccount": "Bu kısım bir hesapla daha iyi!"
+  "betterWithAnAccount": "Bu kısım bir hesapla daha iyi!",
+  "restorePurchases": "Satın Alımları Geri Yükle"
 }

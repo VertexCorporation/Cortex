@@ -17,6 +17,8 @@ import 'package:cortex/library/backend/data/image.dart';
 import 'package:cortex/library/backend/data/repository.dart';
 import 'package:flutter/foundation.dart';
 
+import 'defaults.dart';
+
 /// The [ModelService] class is the main provider of model-related data and
 /// business logic for the application.
 class ModelService with ChangeNotifier {
@@ -41,113 +43,6 @@ class ModelService with ChangeNotifier {
 
   /// In-memory cache for resolved image paths to avoid frequent disk I/O.
   Map<String, String>? _cachedImagePaths;
-
-  /// A map of predefined local asset paths for common models, structured by matching priority.
-  /// The matching logic will check these in order:
-  /// 1. Exact ID matches for specific models.
-  /// 2. Partial "family" matches (e.g., 'phi' for 'phi-4').
-  /// 3. General producer fallbacks (e.g., 'google' for any Google model).
-  /// All keys must be lowercase for consistent matching.
-  final Map<String, String> _localAssetImageMap = {
-    // --- PRIORITY 1: EXACT MODEL IDS ---
-    // Use this for specific models that need a unique image, overriding any family/producer rule.
-    'neuro': 'assets/characters/neuro.jpg',
-    'jannano128k': 'assets/models/jannano128k.jpg',
-    'gptneox': 'assets/models/gptneox.jpg',
-    'supernova-medius': 'assets/producers/arceeai.jpg',
-    'hermes-2-pro-mistral-7b': 'assets/models/hermes.jpg',
-
-    // All roleplay characters are treated as exact IDs.
-    'teacher': 'assets/characters/teacher.jpg',
-    'doctor': 'assets/characters/doctor.jpg',
-    'animegirl': 'assets/characters/animegirl.jpg',
-    'astronaut': 'assets/characters/astronaut.jpg',
-    'psychologist': 'assets/characters/psychologist.jpg',
-    'gamer': 'assets/characters/gamer.jpg',
-    'hacker': 'assets/characters/hacker.jpg',
-    'athlete': 'assets/characters/athlete.jpg',
-    'trash': 'assets/characters/trash.jpg',
-    'tree': 'assets/characters/tree.jpg',
-    'chef': 'assets/characters/chef.jpg',
-    'lawyer': 'assets/characters/lawyer.jpg',
-    'engineer': 'assets/characters/engineer.jpg',
-    'crazy': 'assets/characters/crazy.jpg',
-    'baby': 'assets/characters/baby.jpg',
-    'police': 'assets/characters/police.jpg',
-    'scientist': 'assets/characters/scientist.jpg',
-    'dj': 'assets/characters/dj.jpg',
-    'lover': 'assets/characters/lover.jpg',
-    'shaver': 'assets/characters/shaver.jpg',
-    'detective': 'assets/characters/detective.jpg',
-    'grandmother': 'assets/characters/grandmother.jpg',
-    'miner': 'assets/characters/miner.jpg',
-
-    // --- PRIORITY 2: MODEL FAMILIES / SERIES ---
-    // These keys will match if a model's ID *contains* them. Longer keys are prioritized.
-    // (e.g., 'gpt-3.5-turbo' will match 'gpt-')
-    'gpt': 'assets/producers/openai.jpg', // Catches gpt-3.5, gpt-4, etc.
-    'chatgpt': 'assets/producers/openai.jpg',
-    'claude': 'assets/models/claude.jpg',
-    'codex': 'assets/models/codex.jpg',
-    'deepseek': 'assets/models/deepseek.jpg',
-    'qwen': 'assets/models/qwen.png',
-    'gemini': 'assets/models/gemini.png',
-    'gemma': 'assets/models/gemma.jpg',
-    'grok': 'assets/models/grok.jpg',
-    'hermes': 'assets/models/hermes.jpg',
-    'codestral': 'assets/models/codestral.jpg',
-    'mai': 'assets/models/mai.jpg',
-    'ministral': 'assets/models/ministral.jpg',
-    'mixtral': 'assets/models/mixtral.jpg',
-    'pixtral': 'assets/models/pixtral.jpg',
-    'magistral': 'assets/models/magistral.jpg',
-    'devstral': 'assets/models/devstral.jpg',
-    'phi': 'assets/models/phi.png', // Catches phi-3, phi-4, etc.
-    'wizardlm': 'assets/models/wizardlm.jpg',
-    'tinyllama': 'assets/models/tinyllama.png',
-    'llama': 'assets/models/llama.png',
-    'command': 'assets/models/cohere.jpg',
-    'nova': 'assets/models/nova.jpg', // Assuming you have an Amazon logo
-    'perplexity': 'assets/models/perplexity.jpg',
-    'lfm': 'assets/producers/liquidai.jpg',
-
-    // --- PRIORITY 3: PRODUCERS (FALLBACK) ---
-    // This is the last resort if no better match is found. Keys are simplified for broader matching.
-    'openai': 'assets/producers/openai.jpg',
-    'anthropic': 'assets/producers/anthropic.jpg',
-    'amazon': 'assets/producers/amazon.jpg',
-    'google': 'assets/producers/google.jpg',
-    'xai': 'assets/producers/xai.jpg',
-    'arcee': 'assets/producers/arceeai.jpg',
-    'nousresearch': 'assets/producers/nousresearch.jpg',
-    'mistral': 'assets/models/mistral.jpg',
-    'microsoft': 'assets/producers/microsoft.jpg',
-    'meta': 'assets/models/llama.png',
-    'cohere': 'assets/models/cohere.jpg',
-    'unsloth': 'assets/producers/unslothhai.jpg',
-    'menlo': 'assets/producers/menloresearch.jpg',
-    'thebloke': 'assets/producers/thebloke.jpg',
-    'snowflake': 'assets/producers/snowflake.jpg',
-    'secondstate': 'assets/producers/secondstate.jpg',
-    'modular': 'assets/producers/modularai.jpg',
-    'intel': 'assets/producers/intel.jpg',
-    'ggml': 'assets/producers/ggmlorg.jpg',
-    'fortytwonetwork': 'assets/producers/fortytwonetwork.jpg',
-    'devquasar': 'assets/producers/devquasar.jpg',
-    'defog': 'assets/producers/defogai.jpg',
-    'lamapi': 'assets/producers/lamapi.jpg',
-    'liquid': 'assets/producers/liquidai.jpg',
-    'mazyarpanahi': 'assets/producers/mazyarpanahi.jpg',
-    'neuphonic': 'assets/producers/neuphonic.jpg',
-    'jetbrains': 'assets/producers/jetbrains.png',
-    'zed': 'assets/producers/zed.jpg',
-    'lm': 'assets/producers/lmstudiocommunity.jpg',
-    'moonshot': 'assets/producers/moonshotai.jpg',
-    'z.ai': 'assets/producers/z.ai.jpg',
-    'ibm': 'assets/producers/ibm.jpg',
-    'inclusion': 'assets/producers/inclusionai.jpg',
-    'nvidia': 'assets/producers/nvidia.jpg'
-  };
 
   // --- Public API ---
 
@@ -183,7 +78,7 @@ class ModelService with ChangeNotifier {
       debugPrint("$logPrefix: Fetching raw models from repository.");
       final rawModels = await _repository.getAllModels(
         langCode: langCode,
-        localAssetMap: _localAssetImageMap,
+        localAssetMap: ModelDefaults.localAssetImageMap,
       );
 
       // --- Handle Empty List as Error ---
@@ -414,6 +309,10 @@ class ModelService with ChangeNotifier {
       return _createFallbackEntity(modelId, langCode: langCode);
     }
 
+    if (modelId == 'openrouter/auto') {
+      return ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
+    }
+
     // Search 1: Exact match in top-level models.
     try {
       return allModels.firstWhere((model) => model.id == modelId);
@@ -446,7 +345,7 @@ class ModelService with ChangeNotifier {
   ///
   /// Priority Order:
   /// 1. A specific, downloaded and cached image for this model ID. This is the highest priority.
-  /// 2. If no downloaded image exists, fall back to the local asset map (`_localAssetImageMap`), checking in this order:
+  /// 2. If no downloaded image exists, fall back to the local asset map (`ModelDefaults.localAssetImageMap`), checking in this order:
   ///    a. An exact match for the model ID or its base series ID.
   ///    b. The best partial "family" match (e.g., 'phi-4' matching 'phi').
   ///    c. A match for the model's producer name (e.g., 'xai' for a Grok model).
@@ -468,11 +367,11 @@ class ModelService with ChangeNotifier {
     final producerLower = model.producer.toLowerCase();
 
     // 2a. Exact ID or Base ID match
-    if (_localAssetImageMap.containsKey(modelIdLower)) {
-      return _localAssetImageMap[modelIdLower]!;
+    if (ModelDefaults.localAssetImageMap.containsKey(modelIdLower)) {
+      return ModelDefaults.localAssetImageMap[modelIdLower]!;
     }
-    if (_localAssetImageMap.containsKey(baseIdLower)) {
-      return _localAssetImageMap[baseIdLower]!;
+    if (ModelDefaults.localAssetImageMap.containsKey(baseIdLower)) {
+      return ModelDefaults.localAssetImageMap[baseIdLower]!;
     }
 
     // 2b. Best "series" or "family" match
@@ -503,7 +402,7 @@ class ModelService with ChangeNotifier {
     final identifier = modelIdentifier.toLowerCase();
 
     // Loop through all keys in our asset map.
-    for (final assetKey in _localAssetImageMap.keys) {
+    for (final assetKey in ModelDefaults.localAssetImageMap.keys) {
       // If the model's ID contains one of the map keys...
       if (identifier.contains(assetKey)) {
         // ...and if this is the first match we've found, or if this key is longer
@@ -516,7 +415,7 @@ class ModelService with ChangeNotifier {
     }
 
     // If we found a best match, return its corresponding path from the map.
-    return bestMatchKey != null ? _localAssetImageMap[bestMatchKey] : null;
+    return bestMatchKey != null ? ModelDefaults.localAssetImageMap[bestMatchKey] : null;
   }
 
   /// Checks if a model or its underlying base model supports a specific modality.

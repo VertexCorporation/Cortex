@@ -1,0 +1,4 @@
+"NSCameraUsageDescription" = "Cortex benötigt Zugriff auf Ihre Kamera, um Fotos aufzunehmen.";
+"NSPhotoLibraryUsageDescription" = "Cortex benötigt Zugriff auf Ihre Galerie, um Bilder hochzuladen.";
+"NSPhotoLibraryAddUsageDescription" = "Cortex benötigt die Erlaubnis, Bilder in Ihrer Galerie zu speichern.";
+"NSMicrophoneUsageDescription" = "Cortex benötigt Zugriff auf das Mikrofon für den Voice-Chat.";

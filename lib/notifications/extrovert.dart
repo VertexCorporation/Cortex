@@ -18,7 +18,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/timezone.dart' as timezone;
+import 'package:timezone/data/latest.dart' as data;
 import '../l10n/app_localizations.dart';
 import '../maintenance.dart';
 
@@ -248,6 +249,19 @@ class ExtrovertNotificationService {
   /// and can be called early in the app lifecycle without needing a BuildContext.
   Future<void> initialize() async {
     if (_isInitialized) return;
+
+    try {
+      data.initializeTimeZones();
+
+      try {
+        final _ = timezone.local;
+      } catch (e) {
+        debugPrint("[ExtrovertNotificationService] Timezone local not set. Defaulting to UTC to prevent crash.");
+        timezone.setLocalLocation(timezone.getLocation('UTC'));
+      }
+    } catch (e) {
+      debugPrint("[ExtrovertNotificationService] Error initializing timezones: $e");
+    }
 
     // Load localization data safely.
     final prefs = await SharedPreferences.getInstance();
@@ -518,7 +532,7 @@ class ExtrovertNotificationService {
     };
     final content = await _buildLocalizedContent(dataPayload);
     if (content.isNotEmpty) {
-      final scheduledTime = tz.TZDateTime.now(tz.local).add(const Duration(minutes: 5));
+      final scheduledTime = DateTime.now().add(const Duration(minutes: 5));
       await _zonedScheduleNotification(
         lowBatteryNotificationId,
         content,
@@ -618,19 +632,17 @@ class ExtrovertNotificationService {
       await _localNotifications.cancel(engagementNotificationId);
 
       final prefs = await SharedPreferences.getInstance();
-      final now = tz.TZDateTime.now(tz.local);
+      final now = DateTime.now(); // Standart DateTime
 
       final firstOpenTime = prefs.getInt('firstAppOpenTime');
       final lastOpenTime = prefs.getInt('lastAppOpenTime') ?? now.millisecondsSinceEpoch;
       final lastScheduledTime = prefs.getInt('lastSmartScheduleTime') ?? 0;
 
-      // Cooldown: Don't schedule if one was recently scheduled.
       if (now.millisecondsSinceEpoch - lastScheduledTime < const Duration(hours: 24).inMilliseconds) {
         debugPrint("[ExtrovertNotificationService] Smart notification scheduled recently. Skipping.");
         return;
       }
 
-      // 1. First Day Welcome Notification Logic
       final welcomeNotificationSent = prefs.getBool('welcomeNotificationSent') ?? false;
       if (firstOpenTime != null && !welcomeNotificationSent) {
         final firstOpenDate = DateTime.fromMillisecondsSinceEpoch(firstOpenTime);
@@ -641,7 +653,6 @@ class ExtrovertNotificationService {
         }
       }
 
-      // 2. Dynamic Scheduling based on User Activity
       final daysSinceLastOpen = now.difference(DateTime.fromMillisecondsSinceEpoch(lastOpenTime)).inDays;
       Duration scheduleDelay;
       if (daysSinceLastOpen <= 2) {
@@ -657,17 +668,16 @@ class ExtrovertNotificationService {
       final scheduledDateTime = now.add(scheduleDelay);
       Map<String, String> selectedNotification;
 
-      // 3. Smart Notification Selection (including Greetings)
-      if (now.hour >= 20) { // After 8 PM, schedule "Good Morning" for tomorrow
+      if (now.hour >= 20) {
         selectedNotification = {'title': 'notificationGoodMorningTitle', 'body': 'notificationGoodMorningBody'};
         final tomorrow = now.add(const Duration(days: 1));
-        final finalScheduleTime = tz.TZDateTime(tz.local, tomorrow.year, tomorrow.month, tomorrow.day, 9);
+        final finalScheduleTime = DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9);
         await _scheduleFinalNotification(engagementNotificationId, selectedNotification, finalScheduleTime, _greetingsChannel);
-      } else if (now.hour < 18) { // Before 6 PM, schedule "Good Night" for tonight
+      } else if (now.hour < 18) {
         selectedNotification = {'title': 'notificationGoodNightTitle', 'body': 'notificationGoodNightBody'};
-        final finalScheduleTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, 22);
+        final finalScheduleTime = DateTime(now.year, now.month, now.day, 22);
         await _scheduleFinalNotification(engagementNotificationId, selectedNotification, finalScheduleTime, _greetingsChannel);
-      } else { // Otherwise, schedule a general engagement notification based on activity
+      } else {
         if (daysSinceLastOpen > 14) {
           const comebackPool = [
             {'title': 'notificationComebackTitle', 'body': 'notificationComebackBody'},
@@ -675,7 +685,6 @@ class ExtrovertNotificationService {
           ];
           selectedNotification = comebackPool[Random().nextInt(comebackPool.length)];
         } else {
-          // A much richer pool for active users to keep things interesting.
           const generalPool = [
             {'title': 'notificationHowAreYouTitle', 'body': 'notificationHowAreYouBody'},
             {'title': 'notificationRandomFactTitle', 'body': 'notificationRandomFactBody'},
@@ -703,12 +712,11 @@ class ExtrovertNotificationService {
 
     debugPrint("[ExtrovertNotificationService] Maintenance is over. Intelligently scheduling deferred notification.");
 
-    // Check if the deferred notification was the user's very first welcome notification.
     final welcomeNotificationSent = prefs.getBool('welcomeNotificationSent') ?? false;
 
     if (!welcomeNotificationSent) {
       debugPrint("[ExtrovertNotificationService] The pending notification was a 'Welcome' notification. Scheduling it now.");
-      final scheduledTime = tz.TZDateTime.now(tz.local).add(const Duration(minutes: 5));
+      final scheduledTime = DateTime.now().add(const Duration(minutes: 5));
       await _scheduleWelcomeNotification(scheduledTime);
     } else {
       debugPrint("[ExtrovertNotificationService] Scheduling a general engagement notification after maintenance.");
@@ -717,7 +725,7 @@ class ExtrovertNotificationService {
         {'title': 'notificationLongTimeNoSeeTitle', 'body': 'notificationLongTimeNoSeeBody'},
       ];
       final selectedNotification = generalPool[Random().nextInt(generalPool.length)];
-      final scheduledTime = tz.TZDateTime.now(tz.local).add(const Duration(minutes: 5));
+      final scheduledTime = DateTime.now().add(const Duration(minutes: 5));
       await _scheduleFinalNotification(2, selectedNotification, scheduledTime, _engagementChannel);
     }
 
@@ -725,7 +733,7 @@ class ExtrovertNotificationService {
   }
 
   /// Schedules a special, randomized welcome notification with a larger variety pool.
-  Future<void> _scheduleWelcomeNotification(tz.TZDateTime scheduledTime) async {
+  Future<void> _scheduleWelcomeNotification(DateTime scheduledTime) async {
     const int welcomeNotificationId = 1;
     const welcomePool = [
       {'title': 'notificationDynamicChatTitle', 'body': 'notificationDynamicChatBody'},
@@ -748,11 +756,11 @@ class ExtrovertNotificationService {
   }
 
   /// Helper to build and schedule a notification, centralizing the logic.
-  Future<void> _scheduleFinalNotification(int id, Map<String, String> notificationKeys, tz.TZDateTime scheduledTime, AndroidNotificationChannel channel) async {
+  Future<void> _scheduleFinalNotification(int id, Map<String, String> notificationKeys, DateTime scheduledTime, AndroidNotificationChannel channel) async {
     final dataPayload = {
       'notification_title_key': notificationKeys['title']!,
       'notification_body_key': notificationKeys['body']!,
-      'channel_id': channel.id, // Pass channel info
+      'channel_id': channel.id,
       'channel_name': channel.name,
       'channel_desc': channel.description,
     };
@@ -766,10 +774,26 @@ class ExtrovertNotificationService {
   Future<void> _zonedScheduleNotification(
       int id,
       Map<String, String> content,
-      tz.TZDateTime scheduledDateTime,
+      DateTime scheduledDateTime,
       Map<String, dynamic> payload,
       AndroidNotificationChannel channel,
       ) async {
+
+    timezone.TZDateTime timezoneScheduled;
+    try {
+      timezoneScheduled = timezone.TZDateTime.from(scheduledDateTime, timezone.local);
+    } catch (e) {
+      debugPrint("[Extrovert] Timezone conversion failed. Re-initializing fallback.");
+      try {
+        data.initializeTimeZones();
+        timezone.setLocalLocation(timezone.getLocation('UTC'));
+        timezoneScheduled = timezone.TZDateTime.from(scheduledDateTime, timezone.local);
+      } catch (innerE) {
+        debugPrint("[Extrovert] CRITICAL: Timezone fatal error. Cannot schedule notification.");
+        return;
+      }
+    }
+    // ----------------------------
 
     final platformChannelSpecifics = NotificationDetails(
       android: AndroidNotificationDetails(
@@ -796,7 +820,7 @@ class ExtrovertNotificationService {
       id,
       content['title'],
       content['body'],
-      scheduledDateTime,
+      timezoneScheduled,
       platformChannelSpecifics,
       payload: jsonEncode(payload),
       androidScheduleMode: AndroidScheduleMode.inexact,
@@ -804,7 +828,7 @@ class ExtrovertNotificationService {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('lastSmartScheduleTime', DateTime.now().millisecondsSinceEpoch);
-    debugPrint("[ExtrovertNotificationService] Scheduled '${payload['notification_title_key']}' on channel '${channel.name}' for ${scheduledDateTime.toString()}.");
+    debugPrint("[ExtrovertNotificationService] Scheduled '${payload['notification_title_key']}' for ${timezoneScheduled.toString()}.");
   }
 
   /// Saves or updates the user's FCM token in their Firestore document.

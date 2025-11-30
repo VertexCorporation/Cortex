@@ -29,15 +29,7 @@ class FundsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations localizations = AppLocalizations.of(context)!;
-    return ChangeNotifierProvider(
-      create: (context) => FundsBackend()
-        ..initialize(
-          notificationService: Provider.of<IntrovertNotificationService>(context, listen: false),
-          localizations: localizations,
-        ),
-      child: const FundsScreenView(),
-    );
+    return const FundsScreenView();
   }
 }
 
@@ -80,8 +72,13 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _backend = Provider.of<FundsBackend>(context, listen: false);
+
+      final localizations = AppLocalizations.of(context)!;
+      _backend.updateLocalizationAndRefresh(localizations: localizations);
+
       _backend.addListener(_onBackendUpdate);
       _initializeUiStateFromBackend();
+
       _purchaseCompletedSubscription = _backend.onPurchaseCompleted.listen((String purchasedProductId) {
         if (mounted) {
           _confettiController.play();

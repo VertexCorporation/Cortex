@@ -13,12 +13,6 @@ import '../widgets/news/service.dart';
 import '../widgets/news/skeleton.dart';
 import '../widgets/news/view.dart';
 
-/// The WelcomeView is a dedicated "View" responsible for displaying the initial
-/// animated welcome screen.
-///
-/// It encapsulates all entry animations and the layout for the greeting,
-/// feature buttons, recent models, and news sections. It is designed to be
-/// a self-contained unit managed by a parent controller.
 class WelcomeView extends StatefulWidget {
   final Map<String, dynamic>? userData;
   final List<ModelEntity> recentModels;
@@ -48,6 +42,7 @@ class WelcomeView extends StatefulWidget {
 }
 
 class _WelcomeViewState extends State<WelcomeView> with SingleTickerProviderStateMixin {
+  // ... (Animation Controller ve Değişkenler AYNEN KALSIN) ...
   late final AnimationController _animationController;
   late final Animation<Offset> _greetingSlideAnimation;
   late final Animation<double> _greetingFadeAnimation;
@@ -62,38 +57,25 @@ class _WelcomeViewState extends State<WelcomeView> with SingleTickerProviderStat
   late final Animation<Offset> _newsSectionSlideAnimation;
   late final Animation<double> _newsSectionFadeAnimation;
 
-  // This flag ensures the entry animation only runs once per app session.
   static bool _hasAnimatedThisSession = false;
-  // Manages the scroll position of the view to enable the fog effect.
   late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    );
-
+    _animationController = AnimationController(duration: const Duration(milliseconds: 2000), vsync: this);
     _scrollController = ScrollController();
 
-    // Animation intervals are staggered to create a cascading effect.
     _greetingSlideAnimation = Tween<Offset>(begin: const Offset(-1.5, 0), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.0, 0.2, curve: Curves.easeOutQuart)));
     _greetingFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.0, 0.2)));
-
     _buttonsSlideAnimation = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.1, 0.3, curve: Curves.easeOutCubic)));
     _buttonsFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.1, 0.3)));
-
     _recentHeaderSlideAnimation = Tween<Offset>(begin: const Offset(-1.0, 0), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.2, 0.4, curve: Curves.easeOutCubic)));
     _recentHeaderFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.2, 0.4)));
-
     _recentGridSlideAnimation = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.3, 0.5, curve: Curves.easeOutCubic)));
     _recentGridFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.3, 0.5)));
-
     _newsHeaderSlideAnimation = Tween<Offset>(begin: const Offset(-1.0, 0), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.6, 0.8, curve: Curves.easeOutCubic)));
     _newsHeaderFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.6, 0.8)));
-
     _newsSectionSlideAnimation = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.7, 1.0, curve: Curves.easeOutCubic)));
     _newsSectionFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: const Interval(0.7, 1.0)));
 
@@ -103,6 +85,19 @@ class _WelcomeViewState extends State<WelcomeView> with SingleTickerProviderStat
     } else {
       _animationController.value = 1.0;
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final langCode = Localizations.localeOf(context).languageCode;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<NewsService>().loadNewsForLanguage(langCode);
+      }
+    });
   }
 
   @override
@@ -179,11 +174,7 @@ class _WelcomeViewState extends State<WelcomeView> with SingleTickerProviderStat
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       child: widget.isLoading
-                          ? const ShimmerModelGridView(
-                        key: ValueKey('shimmer_grid_recent'),
-                        itemCount: 3,
-                        shrinkWrap: true,
-                      )
+                          ? const ShimmerModelGridView(key: ValueKey('shimmer_grid_recent'), itemCount: 3, shrinkWrap: true)
                           : widget.recentModels.isEmpty
                           ? _buildNoRecentModelsPlaceholder()
                           : ModelGridView(
@@ -198,12 +189,20 @@ class _WelcomeViewState extends State<WelcomeView> with SingleTickerProviderStat
                   ),
                 ),
               ),
+
+              // We wrap the ENTIRE section (Header + Content) in Consumer.
+              // If state is success AND list is empty, we show SizedBox.shrink.
               Consumer<NewsService>(
                 builder: (context, newsService, child) {
-                  // --- MODIFIED LOGIC ---
-                  // We now always show the NewsSection container, but its content
-                  // is conditionally displayed based on the newsService state.
-                  // This ensures the category area is present during loading.
+                  // Decide if we should show the news section at all.
+                  // Show if loading OR if we have articles. Hide if success but empty.
+                  final bool shouldShow = newsService.state == NewsState.loading ||
+                      (newsService.state == NewsState.success && newsService.articles.isNotEmpty);
+
+                  if (!shouldShow) {
+                    return const SizedBox.shrink(key: ValueKey('news_hidden'));
+                  }
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -221,32 +220,24 @@ class _WelcomeViewState extends State<WelcomeView> with SingleTickerProviderStat
                         transitionBuilder: (Widget child, Animation<double> animation) {
                           return FadeTransition(
                             opacity: animation,
-                            child: SizeTransition(
-                              sizeFactor: animation,
-                              axisAlignment: -1.0,
-                              child: child,
-                            ),
+                            child: SizeTransition(sizeFactor: animation, axisAlignment: -1.0, child: child),
                           );
                         },
                         child: newsService.state == NewsState.loading
-                            ? const ShimmerNewsList(key: ValueKey('news_loading_skeleton')) // Show skeleton while loading
-                            : newsService.state == NewsState.success && newsService.articles.isNotEmpty
-                            ? FadeTransition( // Fade in the actual news content
+                            ? const ShimmerNewsList(key: ValueKey('news_loading_skeleton'))
+                            : FadeTransition(
                           opacity: _newsSectionFadeAnimation,
                           child: SlideTransition(
                             position: _newsSectionSlideAnimation,
                             child: const NewsSection(),
                           ),
-                        )
-                            : const SizedBox.shrink( // Hide if no news or error
-                          key: ValueKey('news_empty_or_error'),
                         ),
                       ),
                     ],
                   );
                 },
               ),
-              SizedBox(height: screenHeight * 0.02), // Bottom padding
+              SizedBox(height: screenHeight * 0.02),
             ],
           ),
         ),
@@ -254,58 +245,35 @@ class _WelcomeViewState extends State<WelcomeView> with SingleTickerProviderStat
     );
   }
 
-  /// Builds a reusable header for a section.
   Widget _buildSectionHeader(BuildContext context, double screenWidth, String title) {
     return Text(
       title,
-      style: TextStyle(
-          fontSize: screenWidth * 0.048,
-          fontWeight: FontWeight.bold,
-          color: AppColors.primaryColor.inverted),
+      style: TextStyle(fontSize: screenWidth * 0.048, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
     );
   }
 
-  /// An interactive placeholder displayed when there are no recent chats.
-  /// Tapping it navigates the user to the "all models" view.
   Widget _buildNoRecentModelsPlaceholder() {
     final screenWidth = MediaQuery.of(context).size.width;
     final borderRadius = BorderRadius.circular(20);
-
     return Material(
       key: const ValueKey('no_recent_placeholder'),
       color: AppColors.background,
       borderRadius: borderRadius,
       child: InkWell(
-        onTap: widget.onShowExploreView, // Calls the callback passed from the controller
+        onTap: widget.onShowExploreView,
         borderRadius: borderRadius,
         splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
         highlightColor: AppColors.primaryColor.inverted.withValues(alpha: 0.05),
         child: Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.05,
-            vertical: screenWidth * 0.06,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: borderRadius,
-            border: Border.all(color: AppColors.border, width: 1.0),
-          ),
-          child: Text(
-            widget.localizations.noRecentChatsMessage,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.primaryColor.inverted.withValues(alpha: 0.8),
-              fontSize: screenWidth * 0.04,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05, vertical: screenWidth * 0.06),
+          decoration: BoxDecoration(color: Colors.transparent, borderRadius: borderRadius, border: Border.all(color: AppColors.border, width: 1.0)),
+          child: Text(widget.localizations.noRecentChatsMessage, textAlign: TextAlign.center, style: TextStyle(color: AppColors.primaryColor.inverted.withValues(alpha: 0.8), fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500)),
         ),
       ),
     );
   }
 
-  /// Builds the grid of main feature buttons.
   Widget _buildFeatureButtons(BuildContext context, double screenWidth) {
     final double horizontalPadding = screenWidth * 0.04 * 2;
     final double spaceBetweenColumns = screenWidth * 0.03;
@@ -316,35 +284,15 @@ class _WelcomeViewState extends State<WelcomeView> with SingleTickerProviderStat
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          flex: 5,
-          child: FeatureCard(
-            text: widget.localizations.selectionScreenFeatureDynamicChat,
-            iconPath: 'assets/icons/chat.svg',
-            height: largeCardSize,
-            onTap: widget.onStartDynamicChat,
-          ),
-        ),
+        Expanded(flex: 5, child: FeatureCard(text: widget.localizations.selectionScreenFeatureDynamicChat, iconPath: 'assets/icons/chat.svg', height: largeCardSize, onTap: widget.onStartDynamicChat)),
         SizedBox(width: spaceBetweenColumns),
         Expanded(
           flex: 4,
           child: Column(
             children: [
-              FeatureCard(
-                text: widget.localizations.selectionScreenFeatureOffline,
-                iconPath: 'assets/icons/context.svg',
-                height: smallCardHeight,
-                isSmall: true,
-                onTap: widget.onOfflineFeatureTap,
-              ),
+              FeatureCard(text: widget.localizations.selectionScreenFeatureOffline, iconPath: 'assets/icons/context.svg', height: smallCardHeight, isSmall: true, onTap: widget.onOfflineFeatureTap),
               SizedBox(height: spaceBetweenSmallCards),
-              FeatureCard(
-                text: widget.localizations.selectionScreenFeatureSelectModel,
-                iconPath: 'assets/icons/library.svg',
-                height: smallCardHeight,
-                isSmall: true,
-                onTap: widget.onShowExploreView,
-              ),
+              FeatureCard(text: widget.localizations.selectionScreenFeatureSelectModel, iconPath: 'assets/icons/library.svg', height: smallCardHeight, isSmall: true, onTap: widget.onShowExploreView),
             ],
           ),
         ),

@@ -801,5 +801,6 @@
   "accountLinkedSuccess": "Konto erfolgreich erstellt!",
   "continueWithApple": "Weiter mit Apple",
   "guest": "Gast",
-  "betterWithAnAccount": "Dieser Abschnitt ist mit einem Konto besser nutzbar!"
+  "betterWithAnAccount": "Dieser Abschnitt ist mit einem Konto besser nutzbar!",
+  "restorePurchases": "Käufe wiederherstellen"
 }

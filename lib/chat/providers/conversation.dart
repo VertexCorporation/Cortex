@@ -239,6 +239,15 @@ class ConversationProvider with ChangeNotifier {
     if (index < 0 || index >= _messages.length) return;
 
     final aiMessage = _messages[index];
+
+    if (aiMessage.isThinking && aiMessage.text.isEmpty) {
+      debugPrint("[ConversationProvider] Error occurred during thinking phase. Removing empty bubble to prevent whitespace.");
+      _messages.removeAt(index);
+      _isWaitingForResponse = false;
+      notifyListeners();
+      return;
+    }
+
     _messages[index] = aiMessage.copyWith(
       text: errorMessage,
       isThinking: false,
@@ -246,7 +255,6 @@ class ConversationProvider with ChangeNotifier {
       includeInContext: false,
     );
 
-    // If it's a content flag error, neutralize the preceding user message.
     if (isContentFlagError && index > 0) {
       final userMessageIndex = index - 1;
       final userMessage = _messages[userMessageIndex];
@@ -264,6 +272,11 @@ class ConversationProvider with ChangeNotifier {
 
   /// Adds a new user message and a corresponding error message to the list.
   void showSendError(Message userMessage, String errorMessage, bool isContentFlagError) {
+    if (_messages.isNotEmpty && _messages.last.isThinking) {
+      setErrorMessage(_messages.length - 1, errorMessage, isContentFlagError);
+      return;
+    }
+
     final finalUserMessage = userMessage.copyWith(includeInContext: !isContentFlagError);
     final errorAIMessage = Message(text: errorMessage, isUserMessage: false, isError: true, includeInContext: false);
 
