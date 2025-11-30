@@ -2123,5 +2123,5 @@ class AppLocalizationsRu extends AppLocalizations {
       'Этот раздел лучше просматривать с учетной записью!';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => 'Восстановить покупки';
 }

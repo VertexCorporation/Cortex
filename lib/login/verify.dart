@@ -8,7 +8,6 @@ import 'package:cortex/app.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
 import '../notifications/introvert.dart';
@@ -424,14 +423,12 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     ),
                     AnimatedTime(
                       time: _formatTime(_remainingSeconds),
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
+                      style: TextStyle(
                           fontSize: availableHeight * 0.025,
                           color: Theme.of(context).textTheme.bodySmall?.color,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
                     const Spacer(flex: 1),
                   ],
                 ],

@@ -801,5 +801,6 @@
   "accountLinkedSuccess": "खाता सफलतापूर्वक बनाया गया!",
   "continueWithApple": "Apple के साथ जारी रखें",
   "guest": "अतिथि",
-  "betterWithAnAccount": "यह अनुभाग एक खाते के साथ बेहतर है!"
+  "betterWithAnAccount": "यह अनुभाग एक खाते के साथ बेहतर है!",
+  "restorePurchases": "खरीदारी वापस लौटाएं"
 }

@@ -801,5 +801,6 @@
   "accountLinkedSuccess": "계정이 성공적으로 생성되었습니다!",
   "continueWithApple": "Apple로 계속하기",
   "guest": "손님",
-  "betterWithAnAccount": "이 섹션은 계정이 있으면 더 좋습니다!"
+  "betterWithAnAccount": "이 섹션은 계정이 있으면 더 좋습니다!",
+  "restorePurchases": "구매 복원"
 }

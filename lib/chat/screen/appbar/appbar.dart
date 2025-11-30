@@ -346,6 +346,7 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
         child: leadingWidget,
       ),
       title: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: (mode == AppBarMode.modelSelected ||
             mode == AppBarMode.dynamicChat)
             ? widget.onTitleTap
@@ -375,12 +376,11 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
             children: [
               Positioned(
                 right: 16.0,
-                top: 0,
+                top: 8,
                 bottom: 0,
                 child: GestureDetector(
                   key: widget.accountButtonKey,
                   onTap: widget.onAccountTap,
-                  // --- NEW: AnimatedSwitcher wraps the avatar ---
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 400),
                     transitionBuilder: (child, animation) {
@@ -460,12 +460,14 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
       finalAvatar = AnimatedBuilder(
         animation: _borderAnimation,
         builder: (context, child) {
-          return CustomPaint(
-            painter:
-            AnimatedBorderPainter(animationValue: _borderAnimation.value),
-            child: Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: child,
+          return RepaintBoundary(
+            child: CustomPaint(
+              painter:
+              AnimatedBorderPainter(animationValue: _borderAnimation.value),
+              child: Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: child,
+              ),
             ),
           );
         },

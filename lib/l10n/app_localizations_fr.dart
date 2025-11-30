@@ -2146,5 +2146,5 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cette section est plus agréable avec un compte !';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => 'Restaurer les achats';
 }

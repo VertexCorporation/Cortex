@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../app.dart';
 import '../../darkener.dart';
@@ -239,7 +238,7 @@ class AppLanguageSection extends StatelessWidget {
         // Section Title
         Text(
           appLocalizations.language,
-          style: GoogleFonts.roboto(
+          style: TextStyle(
             color: AppColors.primaryColor.inverted,
             fontSize: screenWidth * 0.05,
             fontWeight: FontWeight.w600,
@@ -249,7 +248,7 @@ class AppLanguageSection extends StatelessWidget {
         // Section Description
         Text(
           appLocalizations.languageDescription,
-          style: GoogleFonts.roboto(
+          style: TextStyle(
             color: AppColors.quinaryColor,
             fontSize: screenWidth * 0.035,
           ),
@@ -271,7 +270,7 @@ class AppLanguageSection extends StatelessWidget {
                 children: [
                   Text(
                     currentLanguageName,
-                    style: GoogleFonts.roboto(
+                    style: TextStyle(
                       color: AppColors.primaryColor.inverted,
                       fontSize: screenWidth * 0.041,
                       fontWeight: FontWeight.w500,

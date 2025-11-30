@@ -2128,5 +2128,5 @@ class AppLocalizationsId extends AppLocalizations {
   String get betterWithAnAccount => 'Bagian ini lebih baik dengan akun!';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => 'Pulihkan Pembelian';
 }

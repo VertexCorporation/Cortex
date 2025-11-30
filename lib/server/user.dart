@@ -11,8 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// A provider class to manage the authenticated user's state and data.
 ///
 /// This class is the single source of truth for user information. It handles
-/// fetching data from Firestore, caching it locally, and providing reactive
-/// updates to the UI.
+/// fetching data from Firestore, caching it locally to allow offline usage,
+/// and providing reactive updates to the UI.
 class UserProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -39,34 +39,50 @@ class UserProvider with ChangeNotifier {
   }
 
   /// Returns true if the user has any active, non-free subscription tier.
+  ///
+  /// UPDATED LOGIC: This now correctly handles data sources from both Firestore
+  /// (where dates are [Timestamp]) and local Cache (where dates are ISO [String]s).
   bool get isSubscriptionActive {
     final data = _userData;
+    // Safety check: if no data is loaded yet, assume no subscription.
     if (data == null) {
-      debugPrint("[LOG | UserProvider] isSubscriptionActive -> returning FALSE (userData is null).");
       return false;
     }
 
     final int level = data['hasCortexSubscription'] as int? ?? 0;
 
-    // The rest of the logic can now remain as it was, because `level` will
-    // now have the correct value (e.g., > 0 for a subscribed user).
-
+    // Lifetime or high-tier subscription (no expiration check needed).
     if (level >= 4) {
-      debugPrint("[LOG | UserProvider] isSubscriptionActive -> returning TRUE (Tier >= 4).");
       return true;
     }
 
+    // Standard subscription tiers (check expiration).
     if (level > 0) {
       final dynamic expiresAtRaw = data['subscriptionExpiresAt'];
-      final Timestamp? expiresAt = expiresAtRaw is Timestamp ? expiresAtRaw : null;
 
-      if (expiresAt != null && expiresAt.toDate().isAfter(DateTime.now())) {
-        debugPrint("[LOG | UserProvider] isSubscriptionActive -> returning TRUE (Tier > 0 and not expired).");
+      DateTime? expiryDate;
+
+      // Case 1: Live data from Firestore (Timestamp object).
+      if (expiresAtRaw is Timestamp) {
+        expiryDate = expiresAtRaw.toDate();
+      }
+      // Case 2: Cached data from SharedPreferences (String object).
+      // jsonDecode returns the date as a String, so we must parse it.
+      else if (expiresAtRaw is String) {
+        try {
+          expiryDate = DateTime.parse(expiresAtRaw);
+        } catch (_) {
+          // If the date string is malformed, treat it as invalid/expired.
+          debugPrint("[UserProvider] Error parsing cached subscription date.");
+        }
+      }
+
+      // If valid expiry date exists and is in the future, subscription is active.
+      if (expiryDate != null && expiryDate.isAfter(DateTime.now())) {
         return true;
       }
     }
 
-    debugPrint("[LOG | UserProvider] isSubscriptionActive -> returning FALSE (Default case).");
     return false;
   }
 
@@ -82,7 +98,7 @@ class UserProvider with ChangeNotifier {
   /// Listens for real-time updates to the user's document in Firestore.
   ///
   /// This method should be called when a user signs in. It sets up a stream
-  /// that automatically updates the provider's state when data changes in the database.
+  /// that automatically updates the provider's state when data changes.
   void listenToUserData(User user) {
     // Cancel any existing subscription to avoid memory leaks.
     _userSubscription?.cancel();
@@ -93,16 +109,28 @@ class UserProvider with ChangeNotifier {
         .snapshots()
         .listen((snapshot) {
       if (snapshot.exists) {
-        _userData = snapshot.data();
-        _cacheUserData(_userData!); // Persist data to local cache.
-        debugPrint("[LOG | UserProvider] Firing notifyListeners() due to Firestore snapshot update.");
-        notifyListeners(); // Notify widgets to rebuild with new data.
-        debugPrint("[UserProvider] User data updated for: ${user.uid}");
+        final data = snapshot.data();
+
+        // Safety: Only update if data is not null.
+        if (data != null) {
+          _userData = data;
+          _cacheUserData(data); // Persist updated data to local cache.
+
+          debugPrint("[LOG | UserProvider] Firing notifyListeners() due to Firestore snapshot update.");
+          notifyListeners();
+          debugPrint("[UserProvider] User data updated for: ${user.uid}");
+        }
       }
     }, onError: (error) {
       debugPrint("[UserProvider] Error listening to user data: $error");
-      // On error, fall back to a signed-out state by clearing all data.
-      clearDataOnSignOut();
+
+      // UPDATED LOGIC: Do not clear data on transient network errors.
+      // We only force a sign-out state if the permission is explicitly denied,
+      // which usually means the user was banned or deleted server-side.
+      // For network errors, we keep the stale data (Fault Tolerance).
+      if (error is FirebaseException && error.code == 'permission-denied') {
+        clearDataOnSignOut();
+      }
     });
   }
 
@@ -112,20 +140,26 @@ class UserProvider with ChangeNotifier {
   /// then fetches the latest data from the server to ensure freshness.
   Future<void> fetchInitialData(User user) async {
     try {
-      // First, load from cache so the UI isn't blocked.
+      // 1. Load from cache so the UI isn't blocked/blank.
       await _loadCachedUserData();
-      notifyListeners();
+      // If we found cached data, notify immediately to show the UI.
+      if (_userData != null) notifyListeners();
 
-      // Then, fetch the latest data from the server.
+      // 2. Fetch the authoritative data from the server.
       final doc = await _firestore.collection('users').doc(user.uid).get();
       if (doc.exists) {
-        _userData = doc.data();
-        await _cacheUserData(_userData!);
-        notifyListeners();
-        debugPrint("[UserProvider] Initial user data fetched for: ${user.uid}");
+        final data = doc.data();
+        if (data != null) {
+          _userData = data;
+          await _cacheUserData(data);
+          notifyListeners(); // Rebuild with fresh data.
+          debugPrint("[UserProvider] Initial user data fetched for: ${user.uid}");
+        }
       }
     } catch (e) {
       debugPrint("[UserProvider] Error fetching initial data: $e");
+      // Note: We don't throw here. If fetching fails, we stay with cached data
+      // (or null data), preventing a crash.
     }
   }
 
@@ -146,14 +180,19 @@ class UserProvider with ChangeNotifier {
   // --- Private Helper Methods ---
 
   /// Caches the user data to SharedPreferences as a JSON string.
+  /// Handles Firestore [Timestamp] conversion to String for JSON compatibility.
   Future<void> _cacheUserData(Map<String, dynamic> data) async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonString = jsonEncode(
-      data,
-      toEncodable: (object) =>
-      object is Timestamp ? object.toDate().toIso8601String() : object,
-    );
-    await prefs.setString('cached_user_data', jsonString);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonString = jsonEncode(
+        data,
+        toEncodable: (object) =>
+        object is Timestamp ? object.toDate().toIso8601String() : object,
+      );
+      await prefs.setString('cached_user_data', jsonString);
+    } catch (e) {
+      debugPrint("[UserProvider] Cache write error: $e");
+    }
   }
 
   /// Loads user data from the SharedPreferences cache, if it exists.

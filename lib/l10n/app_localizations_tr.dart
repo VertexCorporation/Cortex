@@ -1612,7 +1612,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get extensionInfoPanelFooter =>
-      'Her model hakkında detaylı bilgi görüntülemek veya farklı bir modeli manuel olarak seçmek için lütfen Kütüphane&#39;ye gidin; oradan bu model serisini seçin ve detay sayfasının üst kısmındaki oka dokunun.';
+      'Her model hakkında detaylı bilgi görüntülemek veya farklı bir modeli manuel olarak seçmek için lütfen Kütüphane\'ye gidin; oradan bu model serisini seçin ve detay sayfasının üst kısmındaki oka dokunun.';
 
   @override
   String get premiumModelNoticeTitle => 'Premium Model';
@@ -2111,5 +2111,5 @@ class AppLocalizationsTr extends AppLocalizations {
   String get betterWithAnAccount => 'Bu kısım bir hesapla daha iyi!';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => 'Satın Alımları Geri Yükle';
 }

@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../theme.dart';
@@ -53,7 +52,7 @@ class BaseModelSelector extends StatelessWidget {
         child: Text(
           localizations.noMatchingModels,
           textAlign: TextAlign.center,
-          style: GoogleFonts.roboto(color: AppColors.quinaryColor, fontSize: screenWidth * 0.038),
+          style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.038),
         ),
       );
     }
@@ -73,9 +72,9 @@ class BaseModelSelector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // --- Section Title & Description ---
-        Text(localizations.baseModelTitle, style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600)),
+        Text(localizations.baseModelTitle, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600)),
         const SizedBox(height: 5),
-        Text(localizations.baseModelDescription, style: GoogleFonts.roboto(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035)),
+        Text(localizations.baseModelDescription, style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035)),
         const SizedBox(height: 15),
 
         // --- Selection Button ---
@@ -92,7 +91,7 @@ class BaseModelSelector extends StatelessWidget {
                   Expanded(
                     child: Text(
                       selectedBaseModelDisplayTitle ?? localizations.selectBaseModel,
-                      style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.04),
+                      style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.04),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),

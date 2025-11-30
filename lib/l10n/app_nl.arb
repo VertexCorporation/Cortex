@@ -650,7 +650,7 @@
   "dutch": "Nederlands",
   "russian": "Russisch",
   "featureDocumentTitle": "Documentondersteuning",
-  "featureDocumentDescription": "Dit model kan vragen over geüploade documenten, zoals PDF&#39;s en tekstbestanden, analyseren en beantwoorden.",
+  "featureDocumentDescription": "Dit model kan vragen over geüploade documenten, zoals PDF's en tekstbestanden, analyseren en beantwoorden.",
   "featureAudioTitle": "Spraakinvoer",
   "featureAudioDescription": "Dit model kan gesproken audio-input begrijpen en verwerken.",
   "featureImageGenerationTitle": "Beeldgeneratie",
@@ -801,5 +801,6 @@
   "accountLinkedSuccess": "Account succesvol aangemaakt!",
   "continueWithApple": "Doorgaan met Apple",
   "guest": "Gast",
-  "betterWithAnAccount": "Deze sectie is beter met een account!"
+  "betterWithAnAccount": "Deze sectie is beter met een account!",
+  "restorePurchases": "Aankopen herstellen"
 }

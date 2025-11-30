@@ -17,16 +17,19 @@ import '../../../theme.dart';
 class PremiumModelBanner extends StatefulWidget {
   final bool isVisible;
   final VoidCallback onTap;
+  final VoidCallback? onDismiss;
 
   const PremiumModelBanner({
     super.key,
     required this.isVisible,
     required this.onTap,
+    this.onDismiss,
   });
 
   @override
   State<PremiumModelBanner> createState() => PremiumModelBannerState();
 }
+
 
 class PremiumModelBannerState extends State<PremiumModelBanner>
     with TickerProviderStateMixin {
@@ -85,6 +88,7 @@ class PremiumModelBannerState extends State<PremiumModelBanner>
         setState(() {
           _isDismissedByUser = true;
         });
+        widget.onDismiss?.call();
       }
     });
   }

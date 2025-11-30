@@ -2,7 +2,6 @@
 
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../app.dart';
@@ -144,7 +143,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
         children: [
           Icon(icon, color: AppColors.primaryColor.inverted, size: screenWidth * 0.045),
           SizedBox(width: screenWidth * 0.015),
-          Text(label, style: GoogleFonts.poppins(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.032, fontWeight: FontWeight.w500)),
+          Text(label, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.032, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -237,7 +236,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
                     alignment: Alignment.centerLeft,
                     child: Text(
                         displayName,
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
                             color: AppColors.primaryColor.inverted,
                             fontSize: screenWidth * 0.06,
                             fontWeight: FontWeight.w600
@@ -251,7 +250,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
                     alignment: Alignment.centerLeft,
                     child: Text(
                         email,
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
                             color: AppColors.quinaryColor,
                             fontSize: screenWidth * 0.035, // Slightly smaller for guest warning
                             fontWeight: FontWeight.w400

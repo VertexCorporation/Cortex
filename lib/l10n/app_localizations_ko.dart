@@ -2047,5 +2047,5 @@ class AppLocalizationsKo extends AppLocalizations {
   String get betterWithAnAccount => '이 섹션은 계정이 있으면 더 좋습니다!';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => '구매 복원';
 }

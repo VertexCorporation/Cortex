@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../app.dart';
 import '../../darkener.dart';
@@ -279,12 +278,12 @@ class AppThemeSection extends StatelessWidget {
       children: [
         Text(
           appLocalizations.theme,
-          style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600),
         ),
         SizedBox(height: screenHeight * 0.01),
         Text(
           appLocalizations.themeDescription,
-          style: GoogleFonts.roboto(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
+          style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
         ),
         SizedBox(height: screenHeight * 0.02),
         Material(
@@ -302,7 +301,7 @@ class AppThemeSection extends StatelessWidget {
                 children: [
                   Text(
                     currentThemeName,
-                    style: GoogleFonts.roboto(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.041, fontWeight: FontWeight.w500),
+                    style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.041, fontWeight: FontWeight.w500),
                   ),
                   Icon(Icons.arrow_forward_ios, color: AppColors.primaryColor.inverted, size: screenWidth * 0.04),
                 ],

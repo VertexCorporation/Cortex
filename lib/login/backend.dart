@@ -127,14 +127,14 @@ class LoginBackendService {
           password: password,
         );
 
-        await extrovertNotificationService.syncTokenAfterLogin();
+        extrovertNotificationService.syncTokenAfterLogin().ignore();
 
         return LoginSuccess(freshUser);
       }
 
       dev.log('[Auth.Login] User verified. UID: ${freshUser.uid}. Running post-login tasks.', name: 'LoginBackend');
 
-      await extrovertNotificationService.syncTokenAfterLogin();
+      extrovertNotificationService.syncTokenAfterLogin().ignore();
 
       return LoginSuccess(freshUser);
 
@@ -198,7 +198,7 @@ class LoginBackendService {
         name: 'LoginBackend',
       );
 
-      await extrovertNotificationService.syncTokenAfterLogin();
+      extrovertNotificationService.syncTokenAfterLogin().ignore();
 
       await _postUsernameSuggestion(uid: user.uid, username: username);
 
@@ -230,7 +230,11 @@ class LoginBackendService {
       notificationService.showNotification(message: l10n.authError, type: NotificationType.error);
       return RegistrationUnknownError();
     } finally {
-      initializer.setRegistrationStatus(false);
+      try {
+        initializer.setRegistrationStatus(false);
+      } catch (_) {
+        dev.log('Warning: Initializer disposed before registration lock could be released.');
+      }
     }
   }
 
@@ -277,7 +281,7 @@ class LoginBackendService {
       await _secureStorage.write(key: 'remember_me', value: 'true');
       await _secureStorage.write(key: 'email', value: user.email);
 
-      await extrovertNotificationService.syncTokenAfterLogin();
+      extrovertNotificationService.syncTokenAfterLogin().ignore();
 
       dev.log('[Auth.Google] Sign-in complete for UID: ${user.uid}.', name: 'LoginBackend');
       return GoogleSignInSuccess(user);
@@ -324,7 +328,7 @@ class LoginBackendService {
 
       if (user == null) throw FirebaseAuthException(code: 'anonymous-user-null');
 
-      await extrovertNotificationService.syncTokenAfterLogin();
+      extrovertNotificationService.syncTokenAfterLogin().ignore();
 
       dev.log('[Auth.Anonymous] Signed in anonymously. UID: ${user.uid}', name: 'LoginBackend');
 
@@ -410,7 +414,7 @@ class LoginBackendService {
       await _secureStorage.write(key: 'remember_me', value: 'true');
       await _secureStorage.write(key: 'email', value: user.email);
 
-      await extrovertNotificationService.syncTokenAfterLogin();
+      extrovertNotificationService.syncTokenAfterLogin().ignore();
 
       dev.log('[Auth.Apple] Sign-in complete for UID: ${user.uid}.', name: 'LoginBackend');
       return AppleSignInSuccess(user);
@@ -460,7 +464,7 @@ class LoginBackendService {
       final callable = _functions.httpsCallable('completeAnonymousRegistration');
       await callable.call();
 
-      await extrovertNotificationService.syncTokenAfterLogin();
+      extrovertNotificationService.syncTokenAfterLogin().ignore();
 
       return RegistrationSuccess();
 

@@ -22,6 +22,7 @@ class BriefingOverlay extends StatefulWidget {
   final bool isSubscribed;
   final int premiumTrialUses;
   final bool isVisible;
+  final bool isDynamicChat;
 
   final ValueChanged<double>? onVisibleHeightChanged;
 
@@ -41,6 +42,7 @@ class BriefingOverlay extends StatefulWidget {
     required this.isSubscribed,
     required this.premiumTrialUses,
     required this.isVisible,
+    required this.isDynamicChat,
     this.onVisibleHeightChanged,
   });
 
@@ -265,7 +267,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   // --- Helpers ---
   int _requiredCredits() {
     if (widget.isOfflineModel) return 0;
-    final base = widget.isPremiumModel ? 20 : 10;
+    final base = (widget.isDynamicChat || widget.isPremiumModel) ? 20 : 10;
     final photo = widget.photoSelected ? 30 : 0;
     return base + photo;
   }

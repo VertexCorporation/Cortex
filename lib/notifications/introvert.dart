@@ -145,7 +145,7 @@ class IntrovertNotificationService {
         if (_isBottomAppBarVisible) {
           extraOffset = media.size.height * 0.04;
         } else {
-          extraOffset = -media.size.height * 0.02;
+          extraOffset = media.size.height * 0.02;
         }
 
         double adjustedOffset = baseBottomOffset + extraOffset;

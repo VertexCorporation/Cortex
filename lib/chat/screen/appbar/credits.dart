@@ -7,14 +7,11 @@ import 'package:cortex/server/credits.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import '../../../banner.dart';
 import '../../../funds/funds.dart';
 import 'package:provider/provider.dart';
 
-/// The main widget for the credits bar, containing the display, the button,
-/// and the logic for the informational pop-up panel.
 class CreditsBar extends StatefulWidget {
   final VoidCallback onCreditsInfoTapped;
   final VoidCallback? onPanelShown;
@@ -53,7 +50,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
   @override
   void dispose() {
     _animationController.dispose();
-    hideCreditsInfo(isDisposing: true); // Ensure overlay is removed
+    hideCreditsInfo(isDisposing: true);
     super.dispose();
   }
 
@@ -81,7 +78,6 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
       if (mounted) {
         _overlayEntry?.remove();
         _overlayEntry = null;
-
         widget.onPanelHidden?.call();
       }
     });
@@ -99,7 +95,10 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
     final localizations = AppLocalizations.of(context)!;
 
     final double panelWidth = screenWidth * 0.65;
-    final double panelLeft = (offset.dx + size.width / 2) - (panelWidth / 2);
+    final double panelLeft = ((offset.dx + size.width / 2) - (panelWidth / 2));
+
+    final double panelTop = offset.dy + size.height + 16;
+
     final double titleFontSize = screenWidth * 0.04;
     final double bodyFontSize = screenWidth * 0.035;
     final double footerFontSize = screenWidth * 0.033;
@@ -116,12 +115,12 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
               children: [
                 Positioned(
                   left: max(12.0, panelLeft),
-                  top: offset.dy + size.height + 8,
+                  top: panelTop,
                   child: FadeTransition(
                     opacity: _animation,
                     child: ScaleTransition(
                       scale: _animation,
-                      alignment: Alignment.topCenter,
+                      alignment: Alignment.topLeft,
                       child: GestureDetector(
                         onTap: () {},
                         child: Container(
@@ -152,7 +151,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                     const EdgeInsets.only(right: 24.0),
                                     child: Text(
                                       localizations.creditsInfoPanelTitle,
-                                      style: GoogleFonts.heebo(
+                                      style: TextStyle(
                                         color: AppColors.primaryColor.inverted,
                                         fontSize: titleFontSize,
                                         fontWeight: FontWeight.bold,
@@ -163,7 +162,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                   const SizedBox(height: 8),
                                   Text(
                                     localizations.creditsInfoPanelBody,
-                                    style: GoogleFonts.heebo(
+                                    style: TextStyle(
                                       color: AppColors.primaryColor.inverted
                                           .withValues(alpha: 0.9),
                                       fontSize: bodyFontSize,
@@ -174,7 +173,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                   const SizedBox(height: 10),
                                   Text(
                                     localizations.creditsInfoPanelFooter,
-                                    style: GoogleFonts.heebo(
+                                    style: TextStyle(
                                       color: AppColors.primaryColor.inverted
                                           .withValues(alpha: 0.7),
                                       fontSize: footerFontSize,
@@ -223,11 +222,10 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
       valueListenable: CreditsManager.instance.totalCreditsNotifier,
       builder: (context, totalCredits, child) {
         final String creditsText = totalCredits == null ? '?' : totalCredits.toString();
-
         String ghostText;
         if (totalCredits == null) {
           ghostText = "999";
-        } else if (totalCredits < 100 && totalCredits >= 0) { // Catch 1 and 2 digit numbers
+        } else if (totalCredits < 100 && totalCredits >= 0) {
           ghostText = "999";
         } else {
           ghostText = creditsText;
@@ -249,7 +247,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                 alignment: Alignment.centerLeft,
                 children: [
                   Positioned(
-                    top: screenHeight * 0.0129,
+                    top: screenHeight * 0.02,
                     left: screenWidth * 0.05,
                     child: Container(
                       key: _creditsInfoKey,
@@ -263,7 +261,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                     ),
                   ),
                   Positioned(
-                    top: screenHeight * 0.0129,
+                    top: screenHeight * 0.02,
                     left: screenWidth * 0.05,
                     child: Container(
                       width: screenWidth * 0.26,
@@ -277,11 +275,11 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                           Expanded(
                             child: FittedBox(
                               fit: BoxFit.contain,
-                              alignment: Alignment.center, // Center the content
+                              alignment: Alignment.center,
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 5.0),
                                 child: Stack(
-                                  alignment: Alignment.center, // Center the text
+                                  alignment: Alignment.center,
                                   children: [
                                     Opacity(
                                       opacity: 0.0,
@@ -293,7 +291,6 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                         ),
                                       ),
                                     ),
-                                    // FIX 3: Add AnimatedSwitcher for smooth transitions
                                     AnimatedSwitcher(
                                       duration: const Duration(milliseconds: 250),
                                       transitionBuilder: (child, animation) {
@@ -304,7 +301,6 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                       },
                                       child: Text(
                                         creditsText,
-                                        // Use a key to tell the switcher that the text has changed
                                         key: ValueKey<String>(creditsText),
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -332,7 +328,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
               ),
             ),
             Positioned(
-              top: screenHeight * 0.0129,
+              top: screenHeight * 0.02,
               left: screenWidth * 0.02,
               child: _AnimatedHexagonButton(
                 screenWidth: screenWidth,
@@ -351,7 +347,6 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
   }
 }
 
-/// A hexagon button with a continuous "pulsing" animation and a premium look.
 class _AnimatedHexagonButton extends StatefulWidget {
   final VoidCallback onTap;
   final double screenWidth;
@@ -398,12 +393,12 @@ class _AnimatedHexagonButtonState extends State<_AnimatedHexagonButton>
     const Gradient borderGradient = SweepGradient(
       center: FractionalOffset.center,
       colors: <Color>[
-        Color(0xFF405DE6), // Blue
-        Color(0xFF833AB4), // Purple
-        Color(0xFFE1306C), // Red
-        Color(0xFFF77737), // Orange
-        Color(0xFFFFDC80), // Yellow
-        Color(0xFF405DE6), // Blue to complete the loop
+        Color(0xFF405DE6),
+        Color(0xFF833AB4),
+        Color(0xFFE1306C),
+        Color(0xFFF77737),
+        Color(0xFFFFDC80),
+        Color(0xFF405DE6),
       ],
     );
 
@@ -423,20 +418,22 @@ class _AnimatedHexagonButtonState extends State<_AnimatedHexagonButton>
         child: SizedBox(
           width: widget.screenWidth * 0.1,
           height: widget.screenHeight * 0.045,
-          child: CustomPaint(
-            painter: _HexagonBorderPainter(
-              fillColor: AppColors.quaternaryColor,
-              fillGradient: fillGradient,
-              strokeWidth: 2.5,
-              gradient: borderGradient,
-              hasGlow: true,
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                'assets/icons/sparkle.svg',
-                colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-                width: widget.screenWidth * 0.045,
-                height: widget.screenWidth * 0.045,
+          child: RepaintBoundary(
+            child: CustomPaint(
+              painter: _HexagonBorderPainter(
+                fillColor: AppColors.quaternaryColor,
+                fillGradient: fillGradient,
+                strokeWidth: 2.5,
+                gradient: borderGradient,
+                hasGlow: true,
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  'assets/icons/sparkle.svg',
+                  colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                  width: widget.screenWidth * 0.045,
+                  height: widget.screenWidth * 0.045,
+                ),
               ),
             ),
           ),
@@ -446,7 +443,6 @@ class _AnimatedHexagonButtonState extends State<_AnimatedHexagonButton>
   }
 }
 
-/// CustomPainter to support a "glow" effect and inner gradient for the hexagon.
 class _HexagonBorderPainter extends CustomPainter {
   final Color fillColor;
   final Gradient? fillGradient;

@@ -9,7 +9,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
@@ -69,34 +68,8 @@ class SendService {
         _offlineService = offlineService,
         _modelService = modelService;
 
-  /// Analyzes the current state to select a suitable model in "random dynamic chat" mode.
-  Future<String?> _selectAndAssignDynamicModel({required String langCode}) {
-    debugPrint("[SendService] Dynamic mode: Selecting a random model...");
-    // The provider's allModels might still be ModelInfo, this needs to be addressed there.
-    // Assuming we fetch fresh from ModelService() for safety.
-    final allModels = _modelService.getCachedModelsSync();
-    final hasPhoto = _inputProvider.selectedPhoto != null;
-
-    List<ModelEntity> suitableModels = allModels.where((model) {
-      if (model.category == 'roleplay' || model.category == 'self') return false;
-      if (!model.isServerSide) return false;
-      if (hasPhoto) return _modelService.hasModality(model.id, langCode: langCode, modality: 'image');
-      return true;
-    }).toList();
-
-    debugPrint("[SendService] Found ${suitableModels.length} suitable models for dynamic chat.");
-    if (suitableModels.isEmpty) return Future.value(null);
-
-    final selectedSeries = suitableModels[math.Random().nextInt(suitableModels.length)];
-
-    // If the selected model is a series, pick its first extension. Otherwise, use its ID.
-    final finalApiModelId = (selectedSeries.extensions?.isNotEmpty ?? false)
-        ? selectedSeries.extensions!.keys.first
-        : selectedSeries.id;
-
-    debugPrint("[SendService] Dynamically and randomly selected model ID: $finalApiModelId.");
-    return Future.value(finalApiModelId);
-  }
+  // REMOVED: _selectAndAssignDynamicModel logic is no longer needed because
+  // we now offload this responsibility to 'openrouter/auto'.
 
   /// Central orchestration method for sending new messages.
   Future<bool> sendMessage({
@@ -143,8 +116,9 @@ class SendService {
           apiModelIdForSend = pinnedAssistantId;
           debugPrint("[SendService] Dynamic chat pinned model: $apiModelIdForSend");
         } else {
-          apiModelIdForSend = await _selectAndAssignDynamicModel(langCode: langCode);
-          debugPrint("[SendService] Dynamic chat selected model: $apiModelIdForSend");
+          // This model ('openrouter/auto') handles routing logic on the server side.
+          apiModelIdForSend = 'openrouter/auto';
+          debugPrint("[SendService] Dynamic chat using Auto Router: $apiModelIdForSend");
         }
       } else {
         apiModelIdForSend = _sessionProvider.modelId;
@@ -152,14 +126,25 @@ class SendService {
       }
 
       // --- 2. Validate the Selected Model ---
+      // We check if it is 'openrouter/auto' specifically to skip standard validation
+      final isAutoRouter = apiModelIdForSend == 'openrouter/auto';
+
       if (apiModelIdForSend == null || apiModelIdForSend.isEmpty) {
         errorMessage = localizations.errorNoModelsAvailable;
         apiModelIdForSend = null;
         debugPrint("[SendService] Model validation failed: No model selected.");
-      } else if (Utils.isServerSideModel(apiModelIdForSend, langCode: langCode, modelService: _modelService) && !hasInternet) {
+      } else if (!isAutoRouter &&
+          Utils.isServerSideModel(apiModelIdForSend, langCode: langCode, modelService: _modelService) &&
+          !hasInternet) {
+        // Standard server-side models require internet
         errorMessage = localizations.checkYourInternet;
         apiModelIdForSend = null;
         debugPrint("[SendService] Model validation failed: Server-side model but no internet.");
+      } else if (isAutoRouter && !hasInternet) {
+        // Auto router is strictly server-side
+        errorMessage = localizations.checkYourInternet;
+        apiModelIdForSend = null;
+        debugPrint("[SendService] Model validation failed: Auto Router requires internet.");
       }
 
       if (apiModelIdForSend == null) {
@@ -241,14 +226,20 @@ class SendService {
           final newConvTitle = (text.isEmpty && userMessage.photoPath != null)
               ? "🖼️"
               : (text.length > 28 ? text.substring(0, 28) : text);
-          final modelIdForStorage = (_sessionProvider.isDynamicChat && _sessionProvider.modelId != null)
+          final modelIdForStorage =
+          (_sessionProvider.isDynamicChat && _sessionProvider.modelId != null)
               ? _sessionProvider.modelId!
               : (_sessionProvider.isDynamicChat ? 'dynamic' : apiModelIdForSend);
           debugPrint(
             "[SendService] Starting new conversation → "
                 "id=$newConvId, title='$newConvTitle', modelIdForStorage=$modelIdForStorage",
           );
-          _conversationProvider.startNewConversationSession(newConvId, newConvTitle, modelIdForStorage, userMessage);
+          _conversationProvider.startNewConversationSession(
+            newConvId,
+            newConvTitle,
+            modelIdForStorage,
+            userMessage,
+          );
         } else {
           debugPrint("[SendService] Appending user message to existing conversation.");
           _conversationProvider.appendMessageToConversation(userMessage);
@@ -261,7 +252,9 @@ class SendService {
       debugPrint("[SendService] InputProvider selectedPhoto cleared after send.");
 
       // --- 4. Delegate to the Appropriate Sending Logic ---
-      if (!Utils.isServerSideModel(apiModelIdForSend, langCode: langCode, modelService: _modelService)) {
+      // If it is 'openrouter/auto', we skip the local model check because it is definitely server-side.
+      if (!isAutoRouter &&
+          !Utils.isServerSideModel(apiModelIdForSend, langCode: langCode, modelService: _modelService)) {
         final offlineModerator = OfflineModeratorService();
         if (offlineModerator.isPromptAcceptable(text)) {
           debugPrint("[SendService] Routing message to OfflineService (local model).");
@@ -284,14 +277,20 @@ class SendService {
       }
 
       // --- 5. Perform Post-Send Cleanup ---
-      try {
-        await ChatStorageService.addRecentModel(apiModelIdForSend, langCode: langCode, modelService: _modelService);
-        unawaited(_recentModelsManager.refresh(langCode: langCode));
-      } catch (e) {
-        debugPrint("[SendService] Could not update recent models for '$apiModelIdForSend'. Error: $e");
+      // We don't save 'openrouter/auto' to recent models to avoid cluttering the UI with internal IDs.
+      if (!isAutoRouter) {
+        try {
+          await ChatStorageService.addRecentModel(
+            apiModelIdForSend,
+            langCode: langCode,
+            modelService: _modelService,
+          );
+          unawaited(_recentModelsManager.refresh(langCode: langCode));
+        } catch (e) {
+          debugPrint("[SendService] Could not update recent models for '$apiModelIdForSend'. Error: $e");
+        }
       }
       return true;
-
     } catch (e) {
       if (e is UserCancelledException) {
         debugPrint("[SendService] Caught UserCancelledException. Suppressing error UI.");
@@ -325,11 +324,23 @@ class SendService {
       int aiMessageIndex,
       String langCode,
       ) async {
-    final model = _modelService.getPreciseModelData(modelIdForRequest, langCode: langCode);
-    final bool isPremium = model.isPremium;
-    final bool isCharacterModel = model.category == 'roleplay' || model.category == 'self';
+    final bool isAutoRouter = modelIdForRequest == 'openrouter/auto';
 
-    debugPrint("[SendService] Sending server request for model '$modelIdForRequest'. Is Premium: $isPremium");
+    // If it's the Auto Router, we don't fetch local entity data because the ID doesn't exist there.
+    // We treat it as a generic premium, online model.
+    final ModelEntity model = _modelService.getPreciseModelData(modelIdForRequest, langCode: langCode);
+
+    // Auto router generally routes to top-tier models (GPT-4, Claude 3.5), so we treat it as Premium
+    // to ensure correct credit deduction logic in Cloud Functions.
+    final bool isPremium = model.isPremium;
+
+    final bool isCharacterModel =
+    isAutoRouter ? false : (model.category == 'roleplay' || model.category == 'self');
+
+    debugPrint(
+      "[SendService] Sending server request for model '$modelIdForRequest'. "
+          "Is Auto: $isAutoRouter, Is Premium: $isPremium",
+    );
 
     final memory = await _contextService.buildContextMessages(
       includeLastUser: false,
@@ -401,8 +412,7 @@ class SendService {
         String? failedUserText,
         String? failedPhotoPath,
       }) {
-    final String errorMessage =
-    error is ApiException ? error.message : localizations.anErrorOccurred;
+    final String errorMessage = error is ApiException ? error.message : localizations.anErrorOccurred;
     final bool isContentFlagError =
         error is ApiException && error.message == localizations.errorPromptFlagged;
 

@@ -1,0 +1,4 @@
+"NSCameraUsageDescription" = "O Cortex precisa de acesso à sua câmera para tirar fotos.";
+"NSPhotoLibraryUsageDescription" = "O Cortex precisa de acesso à sua galeria para enviar imagens.";
+"NSPhotoLibraryAddUsageDescription" = "O Cortex precisa de permissão para salvar imagens na sua galeria.";
+"NSMicrophoneUsageDescription" = "O Cortex precisa de acesso ao microfone para bate-papo por voz.";

@@ -801,5 +801,6 @@
   "accountLinkedSuccess": "账户创建成功！",
   "continueWithApple": "继续使用 Apple",
   "guest": "客人",
-  "betterWithAnAccount": "注册账号后，此部分内容会显示得更清晰！"
+  "betterWithAnAccount": "注册账号后，此部分内容会显示得更清晰！",
+  "restorePurchases": "恢复购买"
 }

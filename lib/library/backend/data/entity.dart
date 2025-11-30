@@ -8,7 +8,7 @@ import 'format.dart';
 /// It is a "dumb" data object that expects to be instantiated with display-ready,
 /// pre-localized data from the service or repository layer.
 class ModelEntity {
-  /// The unique identifier for the model (e.g., 'gpt-4', 'neuro').
+  /// The unique identifier for the model (e.g., 'gpt-5', 'neuro').
   final String id;
 
   /// The display-ready, localized title.
@@ -100,13 +100,11 @@ class ModelEntity {
   /// Factory constructor to create a [ModelEntity] from a raw map.
   factory ModelEntity.fromMap(Map<String, dynamic> map, String langCode) {
 
-    // Yardımcı fonksiyon: Gelen değer String ise döndürür, Map ise dili seçer.
     String? getStringOrLocalized(dynamic value) {
       if (value == null) return null;
       if (value is String) return value;
       if (value is Map) {
         final localizedMap = Map<String, String>.from(value.map((key, val) => MapEntry(key.toString(), val.toString())));
-        // Öncelik: İstenen Dil > İngilizce > Map'in ilk değeri
         return localizedMap[langCode] ?? localizedMap['en'] ?? localizedMap.values.firstOrNull;
       }
       return value.toString();

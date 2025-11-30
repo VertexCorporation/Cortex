@@ -4,7 +4,6 @@ import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'app.dart';
 import 'chat/main/controller.dart';
@@ -44,6 +43,9 @@ class MainScreenState extends State<MainScreen> {
   final GlobalKey<InboxScreenState> inboxScreenKey =
   GlobalKey<InboxScreenState>();
 
+  final PageStorageKey<String> libraryScreenKey =
+  const PageStorageKey('LibraryScreen');
+
   int _previousTabIndex = 0;
   bool hideBottomAppBar = false;
   bool _showOfflinePulse = false;
@@ -53,7 +55,6 @@ class MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
-    // Initialize model catalog and local state once the context is ready.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<ModelCatalogProvider>().initialize(context: context);
@@ -65,7 +66,6 @@ class MainScreenState extends State<MainScreen> {
     final TabProvider tabProvider =
     Provider.of<TabProvider>(context, listen: false);
 
-    // Only update previous index when the tab actually changes.
     if (tabProvider.selectedIndex != index) {
       setState(() {
         _previousTabIndex = tabProvider.selectedIndex;
@@ -73,7 +73,6 @@ class MainScreenState extends State<MainScreen> {
     }
 
     if (index == 0) {
-      // Reactivate chat screen when returning to it.
       chatScreenKey.currentState?.onReactivated();
     }
 
@@ -86,7 +85,6 @@ class MainScreenState extends State<MainScreen> {
     tabProvider.setSelectedIndex(index);
   }
 
-  /// Controls the visibility of the bottom navigation bar.
   void updateBottomAppBarVisibility([bool value = false]) {
     if (hideBottomAppBar == value) return;
 
@@ -102,7 +100,6 @@ class MainScreenState extends State<MainScreen> {
         .updateSystemUIOverlayStyle();
   }
 
-  /// Open an existing conversation from the inbox/manager.
   void openConversation(ConversationManager manager) async {
     final TabProvider tabProvider =
     Provider.of<TabProvider>(context, listen: false);
@@ -113,7 +110,6 @@ class MainScreenState extends State<MainScreen> {
 
     tabProvider.setSelectedIndex(0);
 
-    // Ensure core services are fully ready.
     await context.read<AppInitializer>().onCoreServicesReady;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -129,7 +125,6 @@ class MainScreenState extends State<MainScreen> {
     });
   }
 
-  /// Starts a brand new conversation on the chat tab.
   void startNewConversation({bool isDynamic = false}) {
     final TabProvider tabProvider =
     Provider.of<TabProvider>(context, listen: false);
@@ -162,7 +157,6 @@ class MainScreenState extends State<MainScreen> {
     });
   }
 
-  /// Starts a new chat with the given [ModelEntity].
   void startChatWithModel(ModelEntity model) {
     final TabProvider tabProvider =
     Provider.of<TabProvider>(context, listen: false);
@@ -189,18 +183,14 @@ class MainScreenState extends State<MainScreen> {
     });
   }
 
-  /// Handles exiting the chat context back to the previously active tab.
   Future<void> _handleChatExit() async {
-    // 1. Allow the ChatController to clean up any internal state.
     await chatScreenKey.currentState?.handleExit();
 
-    // 2. Switch back to the previously active tab.
     if (mounted) {
       Provider.of<TabProvider>(context, listen: false)
           .setSelectedIndex(_previousTabIndex);
     }
 
-    // 3. Restore "All Models" view if we were in it before entering chat.
     if (_wasInAllModelsView) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         chatScreenKey.currentState?.inactiveChatViewKey.currentState
@@ -220,22 +210,6 @@ class MainScreenState extends State<MainScreen> {
     final double screenHeight = screenSize.height;
     final double screenWidth = screenSize.width;
 
-    final List<Widget> screens = <Widget>[
-      ChatController(
-        key: chatScreenKey,
-        onModelSelectionChanged: (bool isSelected) {
-          updateBottomAppBarVisibility(isSelected);
-        },
-        onExitRequest: _handleChatExit,
-      ),
-      LibraryScreen(
-        key: const ValueKey<String>('Models'),
-        showOfflineModelsPulse: _showOfflinePulse,
-      ),
-      InboxScreen(key: inboxScreenKey),
-    ];
-
-    // Reset the offline pulse after first frame if it was set.
     if (_showOfflinePulse) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -245,7 +219,6 @@ class MainScreenState extends State<MainScreen> {
       });
     }
 
-    // Update app switcher description for multitasking UI.
     SystemChrome.setApplicationSwitcherDescription(
       ApplicationSwitcherDescription(
         label: 'Cortex',
@@ -277,7 +250,6 @@ class MainScreenState extends State<MainScreen> {
         final ChatControllerState? chatControllerState =
             chatScreenKey.currentState;
 
-        // If there is no chat controller yet, we handle a direct app-exit case.
         if (chatControllerState == null) {
           final bool shouldExit = await showExitConfirmationDialog(context);
           if (shouldExit) {
@@ -286,7 +258,6 @@ class MainScreenState extends State<MainScreen> {
           return;
         }
 
-        // Let ChatController consume the back press first (e.g. close drawers, etc.).
         if (!chatControllerState.handleSystemBackPress()) {
           return;
         }
@@ -295,20 +266,17 @@ class MainScreenState extends State<MainScreen> {
         context.read<ChatSessionProvider>();
         final AppBarMode currentMode = sessionProvider.appBarMode;
 
-        // If we are in model selection, switch to selection view instead of exiting.
         if (currentMode == AppBarMode.inSelection) {
           chatControllerState.inactiveChatViewKey.currentState
               ?.showSelectionView();
           return;
         }
 
-        // If a chat is active, exit back to the previous tab instead of quitting the app.
         if (sessionProvider.isChatActive) {
           await _handleChatExit();
           return;
         }
 
-        // Final fallback: ask user if they want to exit the app.
         final bool shouldExit = await showExitConfirmationDialog(context);
         if (shouldExit) {
           SystemNavigator.pop();
@@ -316,16 +284,23 @@ class MainScreenState extends State<MainScreen> {
       },
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-        body: AnimatedSwitcher(
+        body: FadeIndexedStack(
+          index: tabProvider.selectedIndex,
           duration: const Duration(milliseconds: 200),
-          transitionBuilder:
-              (Widget child, Animation<double> animation) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-          child: screens[tabProvider.selectedIndex],
+          children: <Widget>[
+            ChatController(
+              key: chatScreenKey,
+              onModelSelectionChanged: (bool isSelected) {
+                updateBottomAppBarVisibility(isSelected);
+              },
+              onExitRequest: _handleChatExit,
+            ),
+            LibraryScreen(
+              key: libraryScreenKey,
+              showOfflineModelsPulse: _showOfflinePulse,
+            ),
+            InboxScreen(key: inboxScreenKey),
+          ],
         ),
         bottomNavigationBar: shouldHideBottomAppBar
             ? null
@@ -381,7 +356,7 @@ class MainScreenState extends State<MainScreen> {
                         iconPath: 'assets/icons/library.svg',
                         label: appLocalizations.library,
                         isSelected: tabProvider.selectedIndex == 1,
-                        onTap: () => onItemTapped(1),
+                        onTap: () => onItemTapped(1, pulseOffline: true),
                         baseSize: libraryIconSize,
                         containerSize: libraryIconSize * 1.2,
                         labelSpacing: labelSpacing,
@@ -454,7 +429,7 @@ class BottomNavigationButton extends StatelessWidget {
             SizedBox(height: labelSpacing),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
-              style: GoogleFonts.roboto(
+              style: TextStyle(
                 fontSize: baseSize * 0.5,
                 color: iconColor,
                 fontWeight:
@@ -472,6 +447,108 @@ class BottomNavigationButton extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// A custom widget that behaves like an [IndexedStack] (preserving state)
+/// but animates the transition.
+class FadeIndexedStack extends StatefulWidget {
+  final int index;
+  final List<Widget> children;
+  final Duration duration;
+
+  const FadeIndexedStack({
+    super.key,
+    required this.index,
+    required this.children,
+    this.duration = const Duration(milliseconds: 250),
+  });
+
+  @override
+  State<FadeIndexedStack> createState() => _FadeIndexedStackState();
+}
+
+class _FadeIndexedStackState extends State<FadeIndexedStack> {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: widget.children.asMap().entries.map((entry) {
+        final int childIndex = entry.key;
+        final Widget child = entry.value;
+        final bool isActive = childIndex == widget.index;
+
+        return _SmartFadeItem(
+          isActive: isActive,
+          duration: widget.duration,
+          child: child,
+        );
+      }).toList(),
+    );
+  }
+}
+
+/// Helper widget to manage the Offstage logic for a single item.
+class _SmartFadeItem extends StatefulWidget {
+  final bool isActive;
+  final Duration duration;
+  final Widget child;
+
+  const _SmartFadeItem({
+    required this.isActive,
+    required this.duration,
+    required this.child,
+  });
+
+  @override
+  State<_SmartFadeItem> createState() => _SmartFadeItemState();
+}
+
+class _SmartFadeItemState extends State<_SmartFadeItem> {
+  late bool _isOffstage;
+
+  @override
+  void initState() {
+    super.initState();
+    // If starting inactive, go offstage immediately.
+    _isOffstage = !widget.isActive;
+  }
+
+  @override
+  void didUpdateWidget(_SmartFadeItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If becoming active, immediately bring Onstage to allow fade-in.
+    if (widget.isActive && _isOffstage) {
+      setState(() {
+        _isOffstage = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 1. MaintainState: true -> Keeps the RAM/State alive (Critical for Models screen).
+    // 2. visible: !_isOffstage -> Removes paint/hitTest cost when hidden.
+    return Visibility(
+      visible: !_isOffstage,
+      maintainState: true,
+      maintainAnimation: true,
+      maintainSize: true, // Keeps the layout space to avoid shifts
+      child: AnimatedOpacity(
+        opacity: widget.isActive ? 1.0 : 0.0,
+        duration: widget.duration,
+        curve: Curves.easeInOut,
+        onEnd: () {
+          // OPTIMIZATION TRIGGER:
+          // Once the fade-out is COMPLETE, set the widget to Offstage.
+          if (!widget.isActive) {
+            setState(() {
+              _isOffstage = true;
+            });
+          }
+        },
+        child: widget.child,
       ),
     );
   }

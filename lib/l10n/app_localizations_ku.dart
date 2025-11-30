@@ -2117,5 +2117,5 @@ class AppLocalizationsKu extends AppLocalizations {
   String get betterWithAnAccount => 'Ev beş bi hesabê çêtir e!';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => 'Kirînan Vegerîne';
 }

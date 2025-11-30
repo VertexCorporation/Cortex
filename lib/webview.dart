@@ -8,9 +8,7 @@ import 'package:flutter/gestures.dart'; // Required for custom gesture recognize
 import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart'; // For localization strings.
 import 'package:flutter_svg/flutter_svg.dart'; // For rendering SVG assets.
-import 'package:google_fonts/google_fonts.dart'; // For custom fonts.
 import 'package:webview_flutter/webview_flutter.dart'; // The core WebView widget.
-
 
 // --- CACHING MECHANISM ---
 // This static map acts as a cache for our WebView controllers.
@@ -18,7 +16,6 @@ import 'package:webview_flutter/webview_flutter.dart'; // The core WebView widge
 // By making it `static`, it persists for the app's entire lifecycle
 // and is shared across all calls to `showAppWebViewModal`.
 final Map<String, WebViewController> _controllerCache = {};
-
 
 /// Displays a responsive, cached WebView within a modal bottom sheet.
 Future<void> showAppWebViewModal(BuildContext context, String title, String url) async {
@@ -276,7 +273,7 @@ class _ErrorDisplay extends StatelessWidget {
           Text(
             localizations.pageCouldNotBeLoaded,
             textAlign: TextAlign.center,
-            style: GoogleFonts.roboto(
+            style: TextStyle(
               color: AppColors.primaryColor.inverted,
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -286,7 +283,7 @@ class _ErrorDisplay extends StatelessWidget {
           Text(
             localizations.checkYourInternet,
             textAlign: TextAlign.center,
-            style: GoogleFonts.roboto(color: AppColors.quinaryColor, fontSize: 14),
+            style: TextStyle(color: AppColors.quinaryColor, fontSize: 14),
           ),
         ],
       ),

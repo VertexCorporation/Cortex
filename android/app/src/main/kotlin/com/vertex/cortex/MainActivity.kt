@@ -138,14 +138,18 @@ class MainActivity : FlutterActivity() {
             extras.forEach { (k, v) -> putExtra(k, v) }
         }
 
-        // This ensures the service can communicate back to Flutter. The previous implementation
-        // created a new, unused service instance, which was a bug.
+        // This ensures the service can communicate back to Flutter.
         LlamaService.setMethodChannel(
             MethodChannel(flutterEngine?.dartExecutor?.binaryMessenger ?: return, LLAMA_CH)
         )
 
-        startService(intent)
-
-        Log.d(TAG, "LlamaService started, action=$action extras=${extras.toMap()}")
+        try {
+            startService(intent)
+            Log.d(TAG, "LlamaService started, action=$action extras=${extras.toMap()}")
+        } catch (e: IllegalStateException) {
+            Log.w(TAG, "⚠️ BackgroundServiceStartNotAllowedException: App is in background. Ignored action: $action")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start LlamaService: ${e.message}")
+        }
     }
 }

@@ -1,7 +1,6 @@
 // lib/inbox/widgets/tiles/content.dart
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../app.dart';
@@ -153,7 +152,7 @@ class _TileContentState extends State<TileContent>
           SizedBox(height: screenHeight * 0.001),
           Text(
             displayModelTitle,
-            style: GoogleFonts.poppins(
+            style: TextStyle(
               fontSize: screenWidth * 0.03,
               fontWeight: FontWeight.w400,
               color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
@@ -189,7 +188,7 @@ class _TileContentState extends State<TileContent>
 
   Widget _buildAnimatedTitleWidget() {
     final screenWidth = MediaQuery.of(context).size.width;
-    final textStyle = GoogleFonts.poppins(
+    final textStyle = TextStyle(
       fontSize: screenWidth * 0.045,
       fontWeight: FontWeight.w500,
       height: 1.2,
@@ -275,7 +274,7 @@ class _TileContentState extends State<TileContent>
       spans.add(
         TextSpan(
           text: text[i],
-          style: GoogleFonts.poppins(
+          style: TextStyle(
             fontSize: fontSize,
             fontWeight: FontWeight.w500,
             height: lineHeight,

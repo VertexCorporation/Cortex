@@ -1597,7 +1597,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get featureDocumentDescription =>
-      'Dit model kan vragen over geüploade documenten, zoals PDF&#39;s en tekstbestanden, analyseren en beantwoorden.';
+      'Dit model kan vragen over geüploade documenten, zoals PDF\'s en tekstbestanden, analyseren en beantwoorden.';
 
   @override
   String get featureAudioTitle => 'Spraakinvoer';
@@ -2133,5 +2133,5 @@ class AppLocalizationsNl extends AppLocalizations {
   String get betterWithAnAccount => 'Deze sectie is beter met een account!';
 
   @override
-  String get restorePurchases => 'Restore Purchases';
+  String get restorePurchases => 'Aankopen herstellen';
 }

@@ -31,7 +31,7 @@ class FundsBackend with ChangeNotifier {
   final FirebaseCrashlytics _crashlytics = FirebaseCrashlytics.instance;
 
   // --- Stream Subscriptions ---
-  late StreamSubscription<List<PurchaseDetails>> _purchaseStreamSubscription;
+  StreamSubscription<List<PurchaseDetails>>? _purchaseStreamSubscription;
   StreamSubscription<DocumentSnapshot>? _userSubscription;
 
   // --- Private State Properties ---
@@ -87,6 +87,48 @@ class FundsBackend with ChangeNotifier {
   ];
 
   static const String appPackageName = "com.vertex.cortex";
+
+  // --- Access and Manage FundsBackend Provider ----
+
+  FundsBackend() {
+    _startListeningToPurchases();
+  }
+
+  void setNotificationService(IntrovertNotificationService service) {
+    _notificationService = service;
+  }
+
+  Future<void> updateLocalizationAndRefresh({
+    required AppLocalizations localizations,
+  }) async {
+    _localizations = localizations;
+
+    if (_products.isEmpty || AppDataState().needsRefresh) {
+      await _fetchProductDetails();
+    }
+  }
+
+  void _startListeningToPurchases() {
+    _purchaseStreamSubscription?.cancel();
+
+    _purchaseStreamSubscription = _inAppPurchase.purchaseStream.listen(
+      _onPurchaseUpdated,
+      onError: (error) {
+        log('Global Purchase Stream Error: $error', name: _logName);
+
+        try {
+          _notificationService.showNotification(
+            message: _localizations.purchaseStreamError,
+            type: NotificationType.error,
+            oneLine: false,
+          );
+        } catch (_) {}
+      },
+    );
+    _listenToUserChanges();
+  }
+
+  // Finally
 
   Future<void> initialize({
     required IntrovertNotificationService notificationService,
@@ -538,6 +580,12 @@ class FundsBackend with ChangeNotifier {
 
     final verificationData = purchaseDetails.verificationData.serverVerificationData;
 
+    void safeAddEvent() {
+      if (!_purchaseCompletedController.isClosed) {
+        _purchaseCompletedController.add(purchaseDetails.productID);
+      }
+    }
+
     // Guard against empty or invalid receipts
     if (verificationData.trim().isEmpty || verificationData.trim() == "{}" || verificationData.trim() == "[]") {
       log('Skipping cloud verification: invalid or empty receipt for ${purchaseDetails.productID}', name: _logName);
@@ -547,7 +595,7 @@ class FundsBackend with ChangeNotifier {
         reason: 'Skipped verification for ${purchaseDetails.productID} due to empty or malformed receipt.',
         fatal: false,
       );
-      // Complete purchase locally to avoid stuck state
+
       if (purchaseDetails.pendingCompletePurchase) {
         await _inAppPurchase.completePurchase(purchaseDetails);
       }
@@ -556,7 +604,9 @@ class FundsBackend with ChangeNotifier {
         type: NotificationType.success,
         oneLine: false,
       );
-      _purchaseCompletedController.add(purchaseDetails.productID);
+
+      safeAddEvent();
+
       _setPurchasePending(false);
       return;
     }
@@ -581,9 +631,10 @@ class FundsBackend with ChangeNotifier {
       );
 
       AppDataState().markUserDataAsChanged();
-      _purchaseCompletedController.add(purchaseDetails.productID);
+
+      safeAddEvent();
+
     } on FirebaseFunctionsException catch (e, stack) {
-      // Handle backend HttpsError gracefully
       log('Purchase verification failed with FirebaseFunctionsException: ${e.message}', name: _logName);
       await _crashlytics.recordError(e, stack, reason: 'Server returned HttpsError for ${purchaseDetails.productID}', fatal: false);
       _notificationService.showNotification(
@@ -592,7 +643,6 @@ class FundsBackend with ChangeNotifier {
         oneLine: false,
       );
     } catch (e, stack) {
-      // Handle generic failures without crashing
       log('Unexpected verification exception: $e', name: _logName);
       await _crashlytics.recordError(e, stack, reason: 'Unexpected client-side error during verifyPurchase', fatal: false);
       _notificationService.showNotification(
@@ -668,10 +718,7 @@ class FundsBackend with ChangeNotifier {
 
   @override
   void dispose() {
-    _purchaseStreamSubscription.cancel();
-    _userSubscription?.cancel();
-    _purchaseCompletedController.close();
-
+    _userSubscription?.cancel(); // Only cancel user data listener if needed
     super.dispose();
   }
 }

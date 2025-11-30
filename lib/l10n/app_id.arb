@@ -801,5 +801,6 @@
   "accountLinkedSuccess": "Akun berhasil dibuat!",
   "continueWithApple": "Lanjutkan dengan Apple",
   "guest": "Tamu",
-  "betterWithAnAccount": "Bagian ini lebih baik dengan akun!"
+  "betterWithAnAccount": "Bagian ini lebih baik dengan akun!",
+  "restorePurchases": "Pulihkan Pembelian"
 }

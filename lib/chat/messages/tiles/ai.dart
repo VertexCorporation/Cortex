@@ -316,13 +316,33 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
     }
   }
 
+  // This replaces the old logic that had a hard 'if (isError) return ...' check.
+  // Now, it smoothly transitions between the standard tile (spinning icon)
+  // and the error widget using a cross-fade animation.
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final scale = screenWidth / 400;
-    if (widget.message.isError) return _buildErrorWidget(context, scale);
 
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 400), // Smooth transition duration
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+      // Swaps between the Error Widget and the Standard Layout based on state.
+      // Unique Keys are essential here for the animation to trigger correctly.
+      child: widget.message.isError
+          ? _buildErrorWidget(context, scale, key: const ValueKey('error_view'))
+          : _buildStandardTile(context, scale, key: const ValueKey('standard_view')),
+    );
+  }
+
+  // --- NEW: Extracted Standard Layout ---
+  // This contains the original UI logic (Spinner, Header, Content)
+  // moved into a dedicated helper to make the build method clean.
+  Widget _buildStandardTile(BuildContext context, double scale, {Key? key}) {
     return ScaleTransition(
+      key: key,
       scale: _entryScaleAnim,
       child: FadeTransition(
         opacity: _fadeAnim,
@@ -340,7 +360,7 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(26),
-                splashColor: AppColors.primaryColor.inverted.withValues(alpha:0.1),
+                splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
                 onTap: _flushAnimation,
                 onLongPress: () {},
                 child: Padding(
@@ -350,11 +370,7 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildHeader(scale),
-                      // ================== NEW & IMPROVED CONTENT AREA ==================
-                      // Removed the problematic AnimatedSwitcher.
-                      // This SizeTransition gracefully reveals the content area as the header animates in.
-                      // It ensures the _buildContent widget is always in the tree during streaming,
-                      // allowing it to update and render each new chunk.
+                      // Use SizeTransition to smoothly reveal content as header settles
                       SizeTransition(
                         sizeFactor: _headerEntryAnim,
                         child: Padding(
@@ -362,7 +378,6 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
                           child: _buildContent(scale),
                         ),
                       ),
-                      // =================================================================
                     ],
                   ),
                 ),
@@ -374,16 +389,96 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
     );
   }
 
+  // Added the 'key' parameter to support AnimatedSwitcher.
+  Widget _buildErrorWidget(BuildContext context, double scale, {Key? key}) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final dynamicFontSize = screenWidth * 0.04;
+    final iconSize = screenWidth * 0.06;
+
+    return GestureDetector(
+      key: key, // Critical for animation
+      onTap: () => setState(() {
+        if (_isExpandedError) {
+          _errorSlideCtl.reverse().then((_) { if (mounted) setState(() { _isExpandedError = false; _showErrorText = false; }); });
+        } else {
+          _isExpandedError = true;
+          _errorSlideCtl.forward().whenComplete(() { if (mounted) setState(() => _showErrorText = true); });
+        }
+      }),
+      child: FadeTransition(
+        opacity: _errorFadeOutAnim, // Uses the specific error fade controller
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+          child: Container(
+            decoration: BoxDecoration(
+                color: AppColors.septenaryColor.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                border: Border.all(color: AppColors.septenaryColor, width: 0.5)
+            ),
+            padding: EdgeInsets.all(screenWidth * 0.03),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      color: AppColors.septenaryColor,
+                      size: iconSize,
+                    ),
+                    SizedBox(width: screenWidth * 0.02),
+                    Expanded(
+                      child: Text(
+                        AppLocalizations.of(context)!.requestFailed,
+                        style: TextStyle(
+                          color: AppColors.septenaryColor,
+                          fontSize: dynamicFontSize,
+                        ),
+                      ),
+                    ),
+                    AnimatedRotation(
+                      turns: _isExpandedError ? 0.50 : 0.0,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeOutQuad,
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: AppColors.septenaryColor,
+                        size: iconSize,
+                      ),
+                    ),
+                  ],
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutQuad,
+                  alignment: Alignment.topCenter,
+                  child: !_isExpandedError ? const SizedBox.shrink() : ClipRect(
+                    child: AnimatedOpacity(
+                      opacity: _showErrorText ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: SlideTransition(
+                        position: _errorSlideAnim,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: screenWidth * 0.02),
+                          child: SelectableText(widget.message.text, style: TextStyle(color: AppColors.septenaryColor, fontSize: dynamicFontSize * 0.9)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildHeader(double s) {
     final modelService = context.read<ModelService>();
-
-    // 1. Get the current language code from the context.
     final langCode = Localizations.localeOf(context).languageCode;
-
-    // 2. Fetch the type-safe ModelEntity using the provider.
     final model = modelService.getPreciseModelData(widget.message.model ?? '', langCode: langCode);
 
-    // 3. Use the entity's properties directly.
     String? textToDisplay;
     if (model.category == 'self') {
       if (model.displayTitle.isNotEmpty) textToDisplay = model.displayTitle;
@@ -395,6 +490,16 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
       }
     }
 
+    final bool isDarkBackground = AppColors.background.computeLuminance() < 0.5;
+    final ColorFilter? smartCortexFilter = isDarkBackground
+        ? const ColorFilter.matrix([
+      -1,  0,  0, 0, 255,
+      0, -1,  0, 0, 255,
+      0,  0, -1, 0, 255,
+      0,  0,  0, 1,   0,
+    ])
+        : null;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -403,7 +508,14 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
           scale: _thinkPulseAnim,
           child: RotationTransition(
             turns: _thinkRotateCtl,
-            child: SvgPicture.asset('assets/cortex.svg', width: 26 * s, height: 26 * s, colorFilter: const ColorFilter.matrix([-1,0,0,0,255,0,-1,0,0,255,0,0,-1,0,255,0,0,0,1,0])),
+            child: RepaintBoundary(
+              child: SvgPicture.asset(
+                'assets/cortex.svg',
+                width: 26 * s,
+                height: 26 * s,
+                colorFilter: smartCortexFilter,
+              ),
+            ),
           ),
         ),
         SizeTransition(
@@ -485,7 +597,7 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
             style: baseStyle,
             children: [
               ..._getParsedSpans(_stableText),
-              if (_animatingText.isNotEmpty) ..._getParsedSpans(_animatingText).map((span) => _applyOpacityAndBlur(span, opacity, sigma)),
+              if (_animatingText.isNotEmpty) ..._getParsedSpans(_animatingText).map((span) => _applyOpacity(span, opacity, sigma)),
             ],
           ),
         );
@@ -503,99 +615,25 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
     return spans;
   }
 
-  InlineSpan _applyOpacityAndBlur(InlineSpan span, double opacity, double sigma) {
+  InlineSpan _applyOpacity(InlineSpan span, double opacity, double sigma) {
     if (span is TextSpan) {
       final baseColor = span.style?.color ?? AppColors.primaryColor.inverted;
-      final Paint foregroundPaint = Paint()..color = baseColor.withValues(alpha:opacity);
-      if (sigma > 0.1) {
-        foregroundPaint.maskFilter = MaskFilter.blur(BlurStyle.normal, sigma);
-      }
+
       return TextSpan(
         text: span.text,
-        children: span.children?.map((child) => _applyOpacityAndBlur(child, opacity, sigma)).toList(),
-        style: span.style?.copyWith(foreground: foregroundPaint, color: null) ?? TextStyle(foreground: foregroundPaint),
+        children: span.children?.map((child) => _applyOpacity(child, opacity, sigma)).toList(),
+        style: span.style?.copyWith(
+          color: baseColor.withValues(alpha: opacity),
+          foreground: null,
+        ) ?? TextStyle(color: baseColor.withValues(alpha: opacity)),
       );
     } else if (span is WidgetSpan) {
-      return WidgetSpan(alignment: span.alignment, baseline: span.baseline, child: Opacity(opacity: opacity, child: span.child));
+      return WidgetSpan(
+          alignment: span.alignment,
+          baseline: span.baseline,
+          child: Opacity(opacity: opacity, child: span.child)
+      );
     }
     return span;
-  }
-
-  Widget _buildErrorWidget(BuildContext context, double scale) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final dynamicFontSize = screenWidth * 0.04;
-    final iconSize = screenWidth * 0.06;
-    return GestureDetector(
-      onTap: () => setState(() {
-        if (_isExpandedError) {
-          _errorSlideCtl.reverse().then((_) { if (mounted) setState(() { _isExpandedError = false; _showErrorText = false; }); });
-        } else {
-          _isExpandedError = true;
-          _errorSlideCtl.forward().whenComplete(() { if (mounted) setState(() => _showErrorText = true); });
-        }
-      }),
-      child: FadeTransition(
-        opacity: _errorFadeOutAnim,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-          child: Container(
-            decoration: BoxDecoration(color: AppColors.septenaryColor.withValues(alpha:0.3), borderRadius: BorderRadius.circular(screenWidth * 0.03), border: Border.all(color: AppColors.septenaryColor, width: 0.5)),
-            padding: EdgeInsets.all(screenWidth * 0.03),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      color: AppColors.septenaryColor,
-                      size: iconSize,
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    Expanded(
-                      child: Text(
-                        AppLocalizations.of(context)!.requestFailed,
-                        style: TextStyle(
-                          color: AppColors.septenaryColor,
-                          fontSize: dynamicFontSize,
-                        ),
-                      ),
-                    ),
-                    AnimatedRotation(
-                      turns: _isExpandedError ? 0.50 : 0.0,
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeOutQuad,
-                      child: Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: AppColors.septenaryColor,
-                        size: iconSize,
-                      ),
-                    ),
-                  ],
-                ),
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOutQuad,
-                  alignment: Alignment.topCenter,
-                  child: !_isExpandedError ? const SizedBox.shrink() : ClipRect(
-                    child: AnimatedOpacity(
-                      opacity: _showErrorText ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 200),
-                      child: SlideTransition(
-                        position: _errorSlideAnim,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: screenWidth * 0.02),
-                          child: SelectableText(widget.message.text, style: TextStyle(color: AppColors.septenaryColor, fontSize: dynamicFontSize * 0.9)),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
