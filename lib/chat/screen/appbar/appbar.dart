@@ -153,6 +153,8 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<ThemeProvider>();
+
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final localizations = AppLocalizations.of(context)!;

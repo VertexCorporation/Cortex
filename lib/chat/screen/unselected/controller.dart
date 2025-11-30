@@ -7,6 +7,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/main.dart';
 import 'package:cortex/library/backend/data/user.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../library/backend/data/entity.dart';
 import 'package:cortex/theme.dart';
@@ -106,6 +107,8 @@ class SelectionControllerState extends State<SelectionController> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<ThemeProvider>();
+
     return PopScope(
       canPop: !_isShowingExploreView,
 

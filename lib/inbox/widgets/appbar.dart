@@ -30,7 +30,7 @@ class InboxAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: AppColors.background,
       elevation: 0,
       scrolledUnderElevation: 0,
-
+      centerTitle: false,
       title: Text(
         localizations.conversationsTitle,
         style: TextStyle(
