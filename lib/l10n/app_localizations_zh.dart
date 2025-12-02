@@ -1995,4 +1995,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get restorePurchases => '恢复购买';
+
+  @override
+  String annualTotalDescription(Object price) {
+    return 'Total per year: $price';
+  }
+
+  @override
+  String equivalentMonthlyDescription(Object price) {
+    return '≈ $price/month';
+  }
 }

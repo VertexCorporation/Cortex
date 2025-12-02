@@ -173,6 +173,7 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   }
 
   /// Handles the entire flow for starting a model download, including permission requests.
+  /// Handles the entire flow for starting a model download, including permission requests.
   Future<bool> requestPermissionAndStartDownload({
     required BuildContext context,
     required String id,
@@ -200,8 +201,9 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
       final notificationStatus = await Permission.notification.request();
 
       if (Platform.isAndroid) {
-        final deviceInfo = await DeviceInfoPlugin().androidInfo;
-        if (deviceInfo.version.sdkInt <= 32) {
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+
+        if (androidInfo.version.sdkInt <= 32) {
           final storageStatus = await Permission.storage.request();
           if (!storageStatus.isGranted) {
             notificationService.showNotification(
@@ -209,9 +211,23 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
             return false;
           }
         }
+
+        final manufacturer = androidInfo.manufacturer.toLowerCase();
+        final problematicVendors = ['xiaomi', 'redmi', 'poco', 'huawei', 'honor', 'oppo', 'vivo', 'meizu', 'oneplus'];
+
+        if (problematicVendors.any((vendor) => manufacturer.contains(vendor))) {
+          final batteryStatus = await Permission.ignoreBatteryOptimizations.status;
+
+          if (!batteryStatus.isGranted) {
+            debugPrint("[ModelLocalStateProvider] $manufacturer device found, requesting the battery optimization permission.");
+
+            await Permission.ignoreBatteryOptimizations.request();
+          }
+        }
       }
 
       final canShowSystemNotifications = notificationStatus.isGranted;
+
       _dl.startDownload(
           id: id,
           url: url,

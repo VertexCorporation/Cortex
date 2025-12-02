@@ -1391,7 +1391,7 @@ abstract class AppLocalizations {
   /// No description provided for @subscribedPlan.
   ///
   /// In en, this message translates to:
-  /// **'Subsrcibed'**
+  /// **'Subscribed'**
   String get subscribedPlan;
 
   /// No description provided for @errorResponseNotReceived.
@@ -3867,6 +3867,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restore Purchases'**
   String get restorePurchases;
+
+  /// No description provided for @annualTotalDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Total per year: {price}'**
+  String annualTotalDescription(Object price);
+
+  /// No description provided for @equivalentMonthlyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {price}/month'**
+  String equivalentMonthlyDescription(Object price);
 }
 
 class _AppLocalizationsDelegate

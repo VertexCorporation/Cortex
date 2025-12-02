@@ -276,7 +276,7 @@
       "amount": {}
     }
   },
-  "subscribedPlan": "Subsrcibed",
+  "subscribedPlan": "Subscribed",
 
   "errorResponseNotReceived": "Response not received",
   "googleApiRequestFailed": "Google API request failed {attempt} times: {error}",
@@ -1029,5 +1029,9 @@
   "continueWithApple": "Continue with Apple",
   "guest": "Guest",
   "betterWithAnAccount": "This section is better with an account!",
-  "restorePurchases": "Restore Purchases"
+  "restorePurchases": "Restore Purchases",
+  "annualTotalDescription": "Total per year: {price}",
+  "@annualTotalDescription": { "placeholders": { "price": {} } },
+  "equivalentMonthlyDescription": "≈ {price}/month",
+  "@equivalentMonthlyDescription": { "placeholders": { "price": {} } }
 }

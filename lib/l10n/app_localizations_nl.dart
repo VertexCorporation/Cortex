@@ -2134,4 +2134,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get restorePurchases => 'Aankopen herstellen';
+
+  @override
+  String annualTotalDescription(Object price) {
+    return 'Total per year: $price';
+  }
+
+  @override
+  String equivalentMonthlyDescription(Object price) {
+    return '≈ $price/month';
+  }
 }

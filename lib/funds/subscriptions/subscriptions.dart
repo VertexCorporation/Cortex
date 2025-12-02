@@ -4,6 +4,7 @@
 
 import 'dart:async';
 import 'package:cortex/app.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -104,19 +105,36 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
 
     switch (widget.planType) {
       case 'pro':
-        purchaseKey = localizations.purchasePro; descriptionKey = localizations.proDescription;
-        logoPath = AppColors.currentTheme == 'dark' ? 'assets/icons/subscriptions/whitepro.png' : 'assets/icons/subscriptions/prologo.png';
-        monthlyId = FundsBackend.monthlySubscriptionPro; annualId = FundsBackend.annualSubscriptionPro; currentPlanLevel = 2;
+        purchaseKey = localizations.purchasePro;
+        descriptionKey = localizations.proDescription;
+        logoPath = AppColors.currentTheme == 'dark'
+            ? 'assets/icons/subscriptions/whitepro.png'
+            : 'assets/icons/subscriptions/prologo.png';
+        monthlyId = FundsBackend.monthlySubscriptionPro;
+        annualId = FundsBackend.annualSubscriptionPro;
+        currentPlanLevel = 2;
         break;
+
       case 'ultra':
-        purchaseKey = localizations.purchaseUltra; descriptionKey = localizations.ultraDescription;
-        logoPath = AppColors.currentTheme == 'dark' ? 'assets/icons/subscriptions/whiteultra.png' : 'assets/icons/subscriptions/ultralogo.png';
-        monthlyId = FundsBackend.monthlySubscriptionUltra; annualId = FundsBackend.annualSubscriptionUltra; currentPlanLevel = 3;
+        purchaseKey = localizations.purchaseUltra;
+        descriptionKey = localizations.ultraDescription;
+        logoPath = AppColors.currentTheme == 'dark'
+            ? 'assets/icons/subscriptions/whiteultra.png'
+            : 'assets/icons/subscriptions/ultralogo.png';
+        monthlyId = FundsBackend.monthlySubscriptionUltra;
+        annualId = FundsBackend.annualSubscriptionUltra;
+        currentPlanLevel = 3;
         break;
+
       default: // 'plus'
-        purchaseKey = localizations.purchasePlus; descriptionKey = localizations.plusDescription;
-        logoPath = AppColors.currentTheme == 'dark' ? 'assets/icons/subscriptions/whiteplus.png' : 'assets/icons/subscriptions/pluslogo.png';
-        monthlyId = FundsBackend.monthlySubscriptionPlus; annualId = FundsBackend.annualSubscriptionPlus; currentPlanLevel = 1;
+        purchaseKey = localizations.purchasePlus;
+        descriptionKey = localizations.plusDescription;
+        logoPath = AppColors.currentTheme == 'dark'
+            ? 'assets/icons/subscriptions/whiteplus.png'
+            : 'assets/icons/subscriptions/pluslogo.png';
+        monthlyId = FundsBackend.monthlySubscriptionPlus;
+        annualId = FundsBackend.annualSubscriptionPlus;
+        currentPlanLevel = 1;
     }
 
     ProductDetails? annualProductDetails;
@@ -126,14 +144,28 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
       annualProductDetails = null;
     }
 
+    // --- Monthly equivalent ---
     final String formattedMonthlyEquivalentPrice;
     if (annualProductDetails != null && annualProductDetails.rawPrice > 0) {
-      final currencySymbol = annualProductDetails.price.replaceAll(RegExp(r'[\d.,\s]'), '');
+      final currencySymbol =
+      annualProductDetails.price.replaceAll(RegExp(r'[\d.,\s]'), '');
       final monthlyPrice = (annualProductDetails.rawPrice / 12).toStringAsFixed(2);
       formattedMonthlyEquivalentPrice = "$currencySymbol$monthlyPrice";
     } else {
       formattedMonthlyEquivalentPrice = '...';
     }
+
+    final bool isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+
+    final String annualTotalPrice =
+        annualProductDetails?.price ?? _getPriceForId(annualId);
+
+    final String annualPrimaryDesc =
+    localizations.annualTotalDescription(annualTotalPrice);
+
+    final String? annualSecondaryDesc = isIOS
+        ? null
+        : localizations.equivalentMonthlyDescription(formattedMonthlyEquivalentPrice);
 
     final bool isActivePlan = widget.activeSubscriptionLevel == currentPlanLevel;
 
@@ -148,30 +180,62 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Column(
             children: [
-              Text(purchaseKey, style: TextStyle(fontSize: screenWidth * 0.07, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
+              Text(
+                purchaseKey,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.07,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryColor.inverted,
+                ),
+                textAlign: TextAlign.center,
+              ),
               SizedBox(height: verticalSpacingSmall),
-              Text(descriptionKey, textAlign: TextAlign.center, style: TextStyle(fontSize: screenWidth * 0.035, color: AppColors.tertiaryColor)),
+              Text(
+                descriptionKey,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.035,
+                  color: AppColors.tertiaryColor,
+                ),
+              ),
               SizedBox(height: verticalSpacingMedium),
               Image.asset(logoPath, height: logoHeight),
               SizedBox(height: verticalSpacingMedium),
+
+              // --- Annual option ---
               _buildSubscriptionOption(
-                context: context, localizations: localizations, option: 'annual',
+                context: context,
+                localizations: localizations,
+                option: 'annual',
                 title: "${localizations.annual} ${widget.planType.capitalize()}",
-                description: localizations.annualPlanDescription(formattedMonthlyEquivalentPrice),
-                isBestValue: true, isSelected: widget.selectedBillingOption == 'annual',
-                isSubscribedPlan: isActivePlan, activeSubscriptionOption: widget.activeSubscriptionOption ?? '',
+                primaryDescription: annualPrimaryDesc,
+                secondaryDescription: annualSecondaryDesc,
+                isBestValue: true,
+                isSelected: widget.selectedBillingOption == 'annual',
+                isSubscribedPlan: isActivePlan,
+                activeSubscriptionOption: widget.activeSubscriptionOption ?? '',
               ),
+
               SizedBox(height: verticalSpacingSmall),
+
+              // --- Monthly option ---
               _buildSubscriptionOption(
-                context: context, localizations: localizations, option: 'monthly',
+                context: context,
+                localizations: localizations,
+                option: 'monthly',
                 title: "${localizations.monthly} ${widget.planType.capitalize()}",
-                description: localizations.monthlyPlanDescription(_getPriceForId(monthlyId)),
-                isBestValue: false, isSelected: widget.selectedBillingOption == 'monthly',
-                isSubscribedPlan: isActivePlan, activeSubscriptionOption: widget.activeSubscriptionOption ?? '',
+                primaryDescription:
+                localizations.monthlyPlanDescription(_getPriceForId(monthlyId)),
+                secondaryDescription: null,
+                isBestValue: false,
+                isSelected: widget.selectedBillingOption == 'monthly',
+                isSubscribedPlan: isActivePlan,
+                activeSubscriptionOption: widget.activeSubscriptionOption ?? '',
               ),
+
               SizedBox(height: verticalSpacingLarge),
               _buildBenefitsList(context, localizations, widget.planType),
-              SizedBox(height: verticalSpacingLarge), // Add padding for better scroll end
+              SizedBox(height: verticalSpacingLarge),
             ],
           ),
         ),
@@ -179,24 +243,51 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     );
   }
 
-  Widget _buildSubscriptionOption({ required BuildContext context, required AppLocalizations localizations, required String option, required String title, required String description, required bool isBestValue, required bool isSelected, required bool isSubscribedPlan, required String activeSubscriptionOption, }) {
+  Widget _buildSubscriptionOption({
+    required BuildContext context,
+    required AppLocalizations localizations,
+    required String option,
+    required String title,
+    required String primaryDescription,
+    required String? secondaryDescription,
+    required bool isBestValue,
+    required bool isSelected,
+    required bool isSubscribedPlan,
+    required String activeSubscriptionOption,
+  }) {
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
-    final bool isEffectivelyDisabled = isSubscribedPlan && activeSubscriptionOption == 'annual' && option == 'monthly';
+    final bool isEffectivelyDisabled =
+        isSubscribedPlan && activeSubscriptionOption == 'annual' && option == 'monthly';
     final bool showCheckmark = isSubscribedPlan && activeSubscriptionOption == option;
 
-    Widget buildBadge({required Color backgroundColor, required Color textColor, required String text}) {
+    Widget buildBadge({
+      required Color backgroundColor,
+      required Color textColor,
+      required String text,
+    }) {
       return Container(
-        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.005, horizontal: screenWidth * 0.02),
-        decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(6)),
+        padding: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.005,
+          horizontal: screenWidth * 0.02,
+        ),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(6),
+        ),
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
             text,
-            style: TextStyle(color: textColor, fontSize: screenWidth * 0.025, fontWeight: FontWeight.bold),
-            maxLines: 1, softWrap: false,
+            style: TextStyle(
+              color: textColor,
+              fontSize: screenWidth * 0.025,
+              fontWeight: FontWeight.bold,
+            ),
+            maxLines: 1,
+            softWrap: false,
           ),
         ),
       );
@@ -206,13 +297,17 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
       width: double.infinity,
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
-        color: AppColors.background, borderRadius: BorderRadius.circular(20),
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isSelected ? AppColors.primaryColor.inverted : AppColors.border,
           width: isSelected ? 2.0 : 1.0,
         ),
       ),
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.015),
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.04,
+        vertical: screenHeight * 0.015,
+      ),
       child: IntrinsicHeight(
         child: Row(
           children: [
@@ -221,26 +316,75 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(title, style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted)),
-                  SizedBox(height: screenHeight * 0.005),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.045,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor.inverted,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.006),
+
+                  // Primary line
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      description,
-                      style: TextStyle(fontSize: screenWidth * 0.04, color: AppColors.tertiaryColor),
+                      primaryDescription,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.040,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.tertiaryColor,
+                      ),
                       maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.visible,
                     ),
                   ),
+
+                  // Secondary line
+                  if (secondaryDescription != null) ...[
+                    SizedBox(height: screenHeight * 0.004),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        secondaryDescription,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.032,
+                          color: AppColors.tertiaryColor.withValues(alpha: 0.85),
+                        ),
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.visible,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
             SizedBox(width: screenWidth * 0.02),
+
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
-              transitionBuilder: (Widget child, Animation<double> animation) => FadeTransition(opacity: animation, child: child),
+              transitionBuilder: (child, animation) =>
+                  FadeTransition(opacity: animation, child: child),
               child: showCheckmark
-                  ? Container( key: const ValueKey('checkmark'), alignment: Alignment.center, width: screenWidth * 0.17, child: SvgPicture.asset('assets/icons/checkmark.svg', colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn), width: screenWidth * 0.09, height: screenWidth * 0.09),)
+                  ? Container(
+                key: const ValueKey('checkmark'),
+                alignment: Alignment.center,
+                width: screenWidth * 0.17,
+                child: SvgPicture.asset(
+                  'assets/icons/checkmark.svg',
+                  colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted,
+                    BlendMode.srcIn,
+                  ),
+                  width: screenWidth * 0.09,
+                  height: screenWidth * 0.09,
+                ),
+              )
                   : SizedBox(
                 key: const ValueKey('badges'),
                 width: screenWidth * 0.17,
@@ -248,8 +392,22 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Visibility( visible: isBestValue, maintainSize: true, maintainAnimation: true, maintainState: true, child: buildBadge(backgroundColor: Colors.green, textColor: Colors.white, text: localizations.bestValue), ),
-                    buildBadge(backgroundColor: AppColors.primaryColor.inverted, textColor: AppColors.primaryColor, text: localizations.discountOffer(80)),
+                    Visibility(
+                      visible: isBestValue,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: buildBadge(
+                        backgroundColor: Colors.green,
+                        textColor: Colors.white,
+                        text: localizations.bestValue,
+                      ),
+                    ),
+                    buildBadge(
+                      backgroundColor: AppColors.primaryColor.inverted,
+                      textColor: AppColors.primaryColor,
+                      text: localizations.discountOffer(80),
+                    ),
                   ],
                 ),
               ),
@@ -269,16 +427,24 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
             content,
             Positioned.fill(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16.0),
+                borderRadius: BorderRadius.circular(20.0),
                 child: AnimatedBuilder(
                   animation: _shineAnimation,
-                  builder: (context, child) => Transform.translate( offset: Offset(MediaQuery.of(context).size.width * _shineAnimation.value, 0), child: child, ),
+                  builder: (context, child) => Transform.translate(
+                    offset: Offset(MediaQuery.of(context).size.width * _shineAnimation.value, 0),
+                    child: child,
+                  ),
                   child: Container(
                     width: screenWidth * 0.25,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        begin: Alignment.centerLeft, end: Alignment.centerRight,
-                        colors: [ AppColors.secondaryColor.withValues(alpha: 0.0), AppColors.secondaryColor.withValues(alpha: 0.5), AppColors.secondaryColor.withValues(alpha: 0.0), ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          AppColors.secondaryColor.withValues(alpha: 0.0),
+                          AppColors.secondaryColor.withValues(alpha: 0.5),
+                          AppColors.secondaryColor.withValues(alpha: 0.0),
+                        ],
                         stops: const [0.4, 0.5, 0.6],
                       ),
                     ),
