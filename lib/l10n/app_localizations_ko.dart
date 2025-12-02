@@ -2048,4 +2048,14 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get restorePurchases => '구매 복원';
+
+  @override
+  String annualTotalDescription(Object price) {
+    return 'Total per year: $price';
+  }
+
+  @override
+  String equivalentMonthlyDescription(Object price) {
+    return '≈ $price/month';
+  }
 }

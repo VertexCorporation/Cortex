@@ -2129,4 +2129,14 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get restorePurchases => 'Pulihkan Pembelian';
+
+  @override
+  String annualTotalDescription(Object price) {
+    return 'Total per year: $price';
+  }
+
+  @override
+  String equivalentMonthlyDescription(Object price) {
+    return '≈ $price/month';
+  }
 }

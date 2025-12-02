@@ -2093,4 +2093,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get restorePurchases => 'استعادة المشتريات';
+
+  @override
+  String annualTotalDescription(Object price) {
+    return 'Total per year: $price';
+  }
+
+  @override
+  String equivalentMonthlyDescription(Object price) {
+    return '≈ $price/month';
+  }
 }

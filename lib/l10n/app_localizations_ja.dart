@@ -2049,4 +2049,14 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get restorePurchases => '購入を復元する';
+
+  @override
+  String annualTotalDescription(Object price) {
+    return 'Total per year: $price';
+  }
+
+  @override
+  String equivalentMonthlyDescription(Object price) {
+    return '≈ $price/month';
+  }
 }

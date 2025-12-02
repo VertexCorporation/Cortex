@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
         android:label="Cortex"
@@ -82,8 +83,10 @@
             android:name="flutterEmbedding"
             android:value="2"/>
 
-        <!-- Begin FlutterDownloader customization -->
-        <!-- disable default Initializer -->
+        <!-- ========================================== -->
+        <!-- FLUTTER DOWNLOADER & WORKMANAGER SETTINGS -->
+        <!-- ========================================== -->
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
@@ -95,7 +98,6 @@
                 tools:node="remove" />
         </provider>
 
-
         <provider
             android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider"
             android:authorities="${applicationId}.flutter_downloader.provider"
@@ -106,24 +108,31 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
-        <!-- declare customized Initializer -->
-        <provider
-            android:name="vn.hunghd.flutterdownloader.FlutterDownloaderInitializer"
-            android:authorities="${applicationId}.flutter-downloader-init"
-            android:exported="false">
-            <!-- changes this number to configure the maximum number of concurrent tasks -->
-            <meta-data
-                android:name="vn.hunghd.flutterdownloader.MAX_CONCURRENT_TASKS"
-                android:value="5" />
-        </provider>
-        <!-- End FlutterDownloader customization -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false"
+            android:stopWithTask="false"
+            tools:node="merge" />
 
         <service
             android:name="vn.hunghd.flutterdownloader.DownloadWorker"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:foregroundServiceType="dataSync"
-            android:exported="true"
-            tools:node="merge" />
+            android:exported="false"
+            android:stopWithTask="false"
+            android:directBootAware="true"
+            tools:node="replace" />
+
+        <provider
+            android:name="vn.hunghd.flutterdownloader.FlutterDownloaderInitializer"
+            android:authorities="${applicationId}.flutter-downloader-init"
+            android:exported="false">
+            <meta-data
+                android:name="vn.hunghd.flutterdownloader.MAX_CONCURRENT_TASKS"
+                android:value="5" />
+        </provider>
+        <!-- End FlutterDownloader customization -->
 
     </application>
 

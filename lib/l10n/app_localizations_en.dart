@@ -700,7 +700,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get subscribedPlan => 'Subsrcibed';
+  String get subscribedPlan => 'Subscribed';
 
   @override
   String get errorResponseNotReceived => 'Response not received';
@@ -2112,4 +2112,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restorePurchases => 'Restore Purchases';
+
+  @override
+  String annualTotalDescription(Object price) {
+    return 'Total per year: $price';
+  }
+
+  @override
+  String equivalentMonthlyDescription(Object price) {
+    return '≈ $price/month';
+  }
 }

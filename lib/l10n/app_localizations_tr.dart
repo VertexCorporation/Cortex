@@ -2112,4 +2112,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get restorePurchases => 'Satın Alımları Geri Yükle';
+
+  @override
+  String annualTotalDescription(Object price) {
+    return 'Total per year: $price';
+  }
+
+  @override
+  String equivalentMonthlyDescription(Object price) {
+    return '≈ $price/month';
+  }
 }
