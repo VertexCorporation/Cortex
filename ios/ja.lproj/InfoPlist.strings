@@ -1,4 +1,0 @@
-"NSCameraUsageDescription" = "Cortexは写真を撮るためにカメラへのアクセスを必要とします。";
-"NSPhotoLibraryUsageDescription" = "Cortexは画像をアップロードするためにギャラリーへのアクセスを必要とします。";
-"NSPhotoLibraryAddUsageDescription" = "Cortexは画像をギャラリーに保存するための許可を必要とします。";
-"NSMicrophoneUsageDescription" = "Cortexはボイスチャットのためにマイクへのアクセスを必要とします。";
