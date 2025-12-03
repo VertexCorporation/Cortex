@@ -191,17 +191,7 @@
       }
     }
   },
-  "annualPlanDescription": "{price}/bln, ditagih tahunan",
-  "@annualPlanDescription": {
-    "description": "Deskripsi untuk paket tahunan, menunjukkan harga bulanan yang setara agar terlihat lebih terjangkau. Contoh: $4.17/bln, ditagih tahunan",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "$4.17"
-      }
-    }
-  },
-  "monthlyPlanDescription": "{price}/bln, ditagih bulanan",
+  "monthlyPlanDescription": "{price}/bulan, ditagih setiap bulan",
   "@monthlyPlanDescription": {
     "description": "Deskripsi untuk paket bulanan, menunjukkan harga per bulan. Contoh: $4.99/bln, ditagih bulanan",
     "placeholders": {
@@ -802,5 +792,7 @@
   "continueWithApple": "Lanjutkan dengan Apple",
   "guest": "Tamu",
   "betterWithAnAccount": "Bagian ini lebih baik dengan akun!",
-  "restorePurchases": "Pulihkan Pembelian"
+  "restorePurchases": "Pulihkan Pembelian",
+  "annualTotalDescription": "{price}/tahun, ditagih setiap tahun",
+  "equivalentMonthlyDescription": "Sekitar {price}/bulan"
 }

@@ -559,13 +559,8 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String annualPlanDescription(String price) {
-    return '$price/мес., оплата за год';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
-    return '$price/мес., оплата ежемесячно';
+    return '$price/месяц, оплата ежемесячно';
   }
 
   @override
@@ -2127,11 +2122,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String annualTotalDescription(Object price) {
-    return 'Total per year: $price';
+    return '$price/год, оплата производится ежегодно';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return '≈ $price/month';
+    return 'Примерно $price/месяц';
   }
 }

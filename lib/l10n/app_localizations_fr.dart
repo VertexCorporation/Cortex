@@ -568,11 +568,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String annualPlanDescription(String price) {
-    return '$price/mois, facturé annuellement';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/mois, facturé mensuellement';
   }
@@ -2150,11 +2145,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String annualTotalDescription(Object price) {
-    return 'Total per year: $price';
+    return '$price/an, facturé annuellement';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return '≈ $price/month';
+    return 'Environ $price/mois';
   }
 }

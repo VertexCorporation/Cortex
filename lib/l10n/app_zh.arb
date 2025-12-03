@@ -191,17 +191,7 @@
       }
     }
   },
-  "annualPlanDescription": "每月{price}，按年计费",
-  "@annualPlanDescription": {
-    "description": "年度计划的描述，显示等效的月度价格以使其看起来更实惠。例如：$4.17/月，按年计费",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "$4.17"
-      }
-    }
-  },
-  "monthlyPlanDescription": "每月{price}，按月计费",
+  "monthlyPlanDescription": "{price}/月，按月计费",
   "@monthlyPlanDescription": {
     "description": "月度计划的描述，显示每月价格。例如：$4.99/月，按月计费",
     "placeholders": {
@@ -802,5 +792,7 @@
   "continueWithApple": "继续使用 Apple",
   "guest": "客人",
   "betterWithAnAccount": "注册账号后，此部分内容会显示得更清晰！",
-  "restorePurchases": "恢复购买"
+  "restorePurchases": "恢复购买",
+  "annualTotalDescription": "{price}/年，按年计费",
+  "equivalentMonthlyDescription": "约 {price}/月"
 }

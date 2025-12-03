@@ -558,13 +558,8 @@ class AppLocalizationsKu extends AppLocalizations {
   }
 
   @override
-  String annualPlanDescription(String price) {
-    return '$price/mehê, salane tê fatûrekirin';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
-    return '$price/mehê, mehane tê fatûrekirin';
+    return '$price/meh, mehane tê fatûrekirin';
   }
 
   @override
@@ -2121,11 +2116,11 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String annualTotalDescription(Object price) {
-    return 'Total per year: $price';
+    return '$price/sal, salane tê fatûrekirin';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return '≈ $price/month';
+    return 'Nêzîkî $price/meh';
   }
 }

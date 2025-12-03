@@ -191,16 +191,6 @@
       }
     }
   },
-  "annualPlanDescription": "{price}/ay, yıllık faturalandırılır",
-  "@annualPlanDescription": {
-    "description": "Yıllık planın açıklaması, daha uygun görünmesi için aylık eşdeğer fiyatı gösterir. Örnek: $4.17/ay, yıllık faturalandırılır",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "₺85.00"
-      }
-    }
-  },
   "monthlyPlanDescription": "{price}/ay, aylık faturalandırılır",
   "@monthlyPlanDescription": {
     "description": "Aylık planın açıklaması, aylık fiyatı gösterir. Örnek: $4.99/ay, aylık faturalandırılır",
@@ -802,5 +792,7 @@
   "continueWithApple": "Apple ile devam edin",
   "guest": "Misafir",
   "betterWithAnAccount": "Bu kısım bir hesapla daha iyi!",
-  "restorePurchases": "Satın Alımları Geri Yükle"
+  "restorePurchases": "Satın Alımları Geri Yükle",
+  "annualTotalDescription": "{price}/yıl, yıllık faturalandırılır",
+  "equivalentMonthlyDescription": "Yaklaşık {price}/ay"
 }

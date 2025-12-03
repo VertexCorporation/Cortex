@@ -191,17 +191,7 @@
       }
     }
   },
-  "annualPlanDescription": "{price}/माह, सालाना बिल किया गया",
-  "@annualPlanDescription": {
-    "description": "वार्षिक योजना के लिए विवरण, इसे और अधिक किफायती बनाने के लिए मासिक समकक्ष मूल्य दिखा रहा है। उदाहरण: $4.17/माह, सालाना बिल किया गया",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "$4.17"
-      }
-    }
-  },
-  "monthlyPlanDescription": "{price}/माह, मासिक बिल किया गया",
+  "monthlyPlanDescription": "{price}/माह, मासिक बिल",
   "@monthlyPlanDescription": {
     "description": "मासिक योजना के लिए विवरण, प्रति माह मूल्य दिखा रहा है। उदाहरण: $4.99/माह, मासिक बिल किया गया",
     "placeholders": {
@@ -802,5 +792,7 @@
   "continueWithApple": "Apple के साथ जारी रखें",
   "guest": "अतिथि",
   "betterWithAnAccount": "यह अनुभाग एक खाते के साथ बेहतर है!",
-  "restorePurchases": "खरीदारी वापस लौटाएं"
+  "restorePurchases": "खरीदारी वापस लौटाएं",
+  "annualTotalDescription": "{price}/वर्ष, वार्षिक बिल",
+  "equivalentMonthlyDescription": "लगभग {price}/माह"
 }

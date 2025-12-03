@@ -204,18 +204,7 @@
         }
       }
     },
-
-  "annualPlanDescription": "{price}/mo, billed annually",
-  "@annualPlanDescription": {
-    "description": "The description for the annual plan, showing the monthly equivalent price to make it seem more affordable. Example: $4.17/mo, billed annually",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "$4.17"
-      }
-    }
-  },
-  "monthlyPlanDescription": "{price}/mo, billed monthly",
+  "monthlyPlanDescription": "{price}/month, billed monthly",
   "@monthlyPlanDescription": {
     "description": "The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly",
     "placeholders": {
@@ -1030,8 +1019,8 @@
   "guest": "Guest",
   "betterWithAnAccount": "This section is better with an account!",
   "restorePurchases": "Restore Purchases",
-  "annualTotalDescription": "Total per year: {price}",
+  "annualTotalDescription": "{price}/year, billed annually",
   "@annualTotalDescription": { "placeholders": { "price": {} } },
-  "equivalentMonthlyDescription": "≈ {price}/month",
+  "equivalentMonthlyDescription": "Approximately {price}/month",
   "@equivalentMonthlyDescription": { "placeholders": { "price": {} } }
 }

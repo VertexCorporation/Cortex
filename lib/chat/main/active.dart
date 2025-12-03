@@ -41,6 +41,7 @@ import 'package:cortex/chat/services/utils.dart';
 import '../../server/user.dart';
 import '../messages/options/report.dart';
 import '../messages/skeleton.dart';
+import '../messages/tiles/ai.dart';
 import '../screen/selected/widgets/input/input.dart';
 import '../screen/selected/widgets/input/panels/briefing.dart';
 import '../screen/selected/widgets/input/panels/edit.dart';
@@ -515,45 +516,58 @@ class ActiveChatViewState extends State<ActiveChatView>
       return const MessageListSkeleton(key: ValueKey('messages_skeleton'));
     }
 
-    return SelectedScreen(
-      key: const ValueKey('selected_screen'),
-      scrollController: scrollController,
-      onStop: context.read<StopService>().stopResponse,
-      onEdit: (index) => editService.startEditingMessage(index),
-      onFadeOutComplete: (index) =>
-          context.read<ConversationProvider>().removeMessageAtIndex(index),
-      onRegenerate: (int index, {String? newModelId}) {
-        final regenerateService = context.read<RegenerateService>();
-        final bool isDynamic = sessionProvider.isDynamicChat;
-        regenerateService.onRegenerate(
-          index,
-          context: context,
-          newModelId: newModelId,
-          isDynamicRegenerate: isDynamic,
-        );
+    return NotificationListener<AiStreamFinishedNotification>(
+      onNotification: (notification) {
+        debugPrint("[ActiveChatView] AI Stream visual animation finished.");
+
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            ReviewService().triggerReviewPromptIfNeeded(context);
+          }
+        });
+
+        return true;
       },
-      onReport: (index) {
-        final messages = conversationProvider.messages;
-        final modelId = messages[index].model;
-        if (modelId == null) return;
-        ReportDialog.show(
-          context,
-          aiMessage: messages[index].text,
-          modelId: modelId,
-          onReportSuccess: () {
-            if (!mounted) return;
-            final updatedMessage = messages[index].copyWith(isReported: true);
-            conversationProvider.updateMessageAtIndex(index, updatedMessage);
-            if (conversationProvider.conversationID != null) {
-              ChatStorageService.updateStoredMessage(
-                conversationProvider.conversationID!,
-                updatedMessage,
-                index,
-              );
-            }
-          },
-        );
-      },
+      child: SelectedScreen(
+        key: const ValueKey('selected_screen'),
+        scrollController: scrollController,
+        onStop: context.read<StopService>().stopResponse,
+        onEdit: (index) => editService.startEditingMessage(index),
+        onFadeOutComplete: (index) =>
+            context.read<ConversationProvider>().removeMessageAtIndex(index),
+        onRegenerate: (int index, {String? newModelId}) {
+          final regenerateService = context.read<RegenerateService>();
+          final bool isDynamic = sessionProvider.isDynamicChat;
+          regenerateService.onRegenerate(
+            index,
+            context: context,
+            newModelId: newModelId,
+            isDynamicRegenerate: isDynamic,
+          );
+        },
+        onReport: (index) {
+          final messages = conversationProvider.messages;
+          final modelId = messages[index].model;
+          if (modelId == null) return;
+          ReportDialog.show(
+            context,
+            aiMessage: messages[index].text,
+            modelId: modelId,
+            onReportSuccess: () {
+              if (!mounted) return;
+              final updatedMessage = messages[index].copyWith(isReported: true);
+              conversationProvider.updateMessageAtIndex(index, updatedMessage);
+              if (conversationProvider.conversationID != null) {
+                ChatStorageService.updateStoredMessage(
+                  conversationProvider.conversationID!,
+                  updatedMessage,
+                  index,
+                );
+              }
+            },
+          );
+        },
+      ),
     );
   }
 

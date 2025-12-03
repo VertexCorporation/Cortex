@@ -561,13 +561,8 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String annualPlanDescription(String price) {
-    return '$price/bln, ditagih tahunan';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
-    return '$price/bln, ditagih bulanan';
+    return '$price/bulan, ditagih setiap bulan';
   }
 
   @override
@@ -2132,11 +2127,11 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String annualTotalDescription(Object price) {
-    return 'Total per year: $price';
+    return '$price/tahun, ditagih setiap tahun';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return '≈ $price/month';
+    return 'Sekitar $price/bulan';
   }
 }

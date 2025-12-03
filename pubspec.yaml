@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 3.1.1+311
+version: 3.1.9+319
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -86,12 +86,13 @@ dependencies:
 
   # --- SYNTAX HIGHLIGHTING ---
   flutter_highlight: ^0.7.0
+  highlight: ^0.7.0
 
   # --- CONFETTI ---
   confetti: ^0.8.0
-  highlight: ^0.7.0
+
+  # --- TIMEZONE ---
   timezone: ^0.10.1
-  sign_in_with_apple: ^7.0.1
 
 dev_dependencies:
   flutter_test:

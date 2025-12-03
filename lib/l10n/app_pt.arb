@@ -191,17 +191,7 @@
       }
     }
   },
-  "annualPlanDescription": "{price}/mês, faturado anualmente",
-  "@annualPlanDescription": {
-    "description": "A descrição para o plano anual, mostrando o preço mensal equivalente para parecer mais acessível. Exemplo: 4,17€/mês, faturado anualmente",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "4,17€"
-      }
-    }
-  },
-  "monthlyPlanDescription": "{price}/mês, faturado mensalmente",
+  "monthlyPlanDescription": "{price}/mês, cobrado mensalmente",
   "@monthlyPlanDescription": {
     "description": "A descrição para o plano mensal, mostrando o preço por mês. Exemplo: 4,99€/mês, faturado mensalmente",
     "placeholders": {
@@ -802,5 +792,7 @@
   "continueWithApple": "Continue com a Apple",
   "guest": "Convidado",
   "betterWithAnAccount": "Esta seção fica melhor com uma conta!",
-  "restorePurchases": "Restaurar compras"
+  "restorePurchases": "Restaurar compras",
+  "annualTotalDescription": "{price}/ano, faturado anualmente",
+  "equivalentMonthlyDescription": "Aproximadamente {price}/mês"
 }

@@ -544,13 +544,8 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String annualPlanDescription(String price) {
-    return '월 $price, 연간 청구';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
-    return '월 $price, 월간 청구';
+    return '$price/월, 월별 청구';
   }
 
   @override
@@ -2051,11 +2046,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String annualTotalDescription(Object price) {
-    return 'Total per year: $price';
+    return '$price/년, 연간 청구';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return '≈ $price/month';
+    return '약 $price/월';
   }
 }

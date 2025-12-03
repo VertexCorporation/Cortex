@@ -191,17 +191,7 @@
       }
     }
   },
-  "annualPlanDescription": "{price}/شهريًا، تتم الفوترة سنويًا",
-  "@annualPlanDescription": {
-    "description": "The description for the annual plan, showing the monthly equivalent price to make it seem more affordable. Example: $4.17/mo, billed annually",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "$4.17"
-      }
-    }
-  },
-  "monthlyPlanDescription": "{price}/شهريًا، تتم الفوترة شهريًا",
+  "monthlyPlanDescription": "{price}/شهريًا، يتم دفع الفاتورة شهريًا",
   "@monthlyPlanDescription": {
     "description": "The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly",
     "placeholders": {
@@ -802,5 +792,7 @@
   "continueWithApple": "متابعة مع Apple",
   "guest": "ضيف",
   "betterWithAnAccount": "هذا القسم أفضل مع حساب!",
-  "restorePurchases": "استعادة المشتريات"
+  "restorePurchases": "استعادة المشتريات",
+  "annualTotalDescription": "{price}/سنة، يتم دفعها سنويًا",
+  "equivalentMonthlyDescription": "تقريبًا {price}/شهريًا"
 }

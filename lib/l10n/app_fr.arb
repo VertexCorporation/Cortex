@@ -169,7 +169,6 @@
   "manageSubscription": "Gérer l'abonnement",
   "purchasePlan": "Acheter {planName}",
   "discountOffer": "{percent}% DE RÉDUCTION",
-  "annualPlanDescription": "{price}/mois, facturé annuellement",
   "monthlyPlanDescription": "{price}/mois, facturé mensuellement",
   "discountBannerTitle": "SPÉCIAL LANCEMENT : 80% DE RÉDUCTION !",
   "discountBannerSubtitle": "Remise exclusive sur TOUS les abonnements pour célébrer notre lancement. Ne manquez pas ça !",
@@ -637,5 +636,7 @@
   "continueWithApple": "Continuez avec Apple",
   "guest": "Invité",
   "betterWithAnAccount": "Cette section est plus agréable avec un compte !",
-  "restorePurchases": "Restaurer les achats"
+  "restorePurchases": "Restaurer les achats",
+  "annualTotalDescription": "{price}/an, facturé annuellement",
+  "equivalentMonthlyDescription": "Environ {price}/mois"
 }

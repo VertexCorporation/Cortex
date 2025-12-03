@@ -9,6 +9,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
@@ -25,9 +26,11 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:flutter/widgets.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
+import '../../library/providers/local.dart';
 import '../messages/messages.dart';
 
 /// Service responsible for sending messages. It orchestrates interactions between providers and other services.
@@ -68,9 +71,6 @@ class SendService {
         _offlineService = offlineService,
         _modelService = modelService;
 
-  // REMOVED: _selectAndAssignDynamicModel logic is no longer needed because
-  // we now offload this responsibility to 'openrouter/auto'.
-
   /// Central orchestration method for sending new messages.
   Future<bool> sendMessage({
     required BuildContext context,
@@ -82,6 +82,7 @@ class SendService {
     String? regeneratePhotoPath,
     String? overrideModelId,
   }) async {
+
     if (_isSending) return false;
 
     final String text = messageText.trim();
@@ -101,6 +102,7 @@ class SendService {
     try {
       String? apiModelIdForSend;
       String errorMessage = localizations.errorNoModelsAvailable;
+      final localState = context.read<ModelLocalStateProvider>();
 
       // --- Get langCode once at the beginning to pass to all helpers ---
       final langCode = Localizations.localeOf(context).languageCode;
@@ -111,16 +113,78 @@ class SendService {
         apiModelIdForSend = overrideModelId;
         debugPrint("[SendService] Using overrideModelId: $overrideModelId");
       } else if (_sessionProvider.isDynamicChat) {
-        final pinnedAssistantId = _sessionProvider.modelId;
-        if (pinnedAssistantId != null && pinnedAssistantId.isNotEmpty) {
-          apiModelIdForSend = pinnedAssistantId;
-          debugPrint("[SendService] Dynamic chat pinned model: $apiModelIdForSend");
+        // --- DYNAMIC CHAT LOGIC ---
+        if (hasInternet) {
+          // 1. ONLINE: Use Pinned Model OR Auto Router
+          final pinnedAssistantId = _sessionProvider.modelId;
+          if (pinnedAssistantId != null && pinnedAssistantId.isNotEmpty) {
+            apiModelIdForSend = pinnedAssistantId;
+            debugPrint("[SendService] Dynamic chat (Online) pinned model: $apiModelIdForSend");
+          } else {
+            apiModelIdForSend = 'openrouter/auto';
+            debugPrint("[SendService] Dynamic chat (Online) using Auto Router: $apiModelIdForSend");
+          }
         } else {
-          // This model ('openrouter/auto') handles routing logic on the server side.
-          apiModelIdForSend = 'openrouter/auto';
-          debugPrint("[SendService] Dynamic chat using Auto Router: $apiModelIdForSend");
+          // 2. OFFLINE: Fallback to Local Models
+          debugPrint("[SendService] Dynamic chat (Offline): Attempting to find a suitable local model.");
+
+          final downloadedStates = localState.downloadCompleted;
+          final allCachedModels = _modelService.getCachedModelsSync();
+
+          // Filter: Must be offline type AND marked as downloaded in local state
+          final offlineModels = allCachedModels.where((m) {
+            return !m.isServerSide && (downloadedStates[m.id] == true);
+          }).toList();
+
+          if (offlineModels.isEmpty) {
+            errorMessage = localizations.errorNoModelsAvailable;
+            apiModelIdForSend = null;
+            debugPrint("[SendService] Dynamic chat (Offline): No downloaded models found.");
+          } else if (offlineModels.length == 1) {
+            // Only one option, use it.
+            final model = offlineModels.first;
+            apiModelIdForSend = model.id;
+            debugPrint("[SendService] Dynamic chat (Offline): Single model available. Selected: ${model.id}");
+
+            // Check vision support
+            final bool supportsImage = model.modalities['image'] == true;
+            if ((photo != null || regeneratePhotoPath != null) && !supportsImage) {
+              debugPrint("[SendService] Warning: Model ${model.id} does not support vision. Discarding photo.");
+              photo = null;
+              regeneratePhotoPath = null;
+            }
+          } else {
+            // Multiple options: Smart Selection
+            final hasPhoto = photo != null || regeneratePhotoPath != null;
+            final random = Random();
+
+            if (hasPhoto) {
+              // Try to find ANY model that supports images
+              final visionModels = offlineModels.where((m) => m.modalities['image'] == true).toList();
+
+              if (visionModels.isNotEmpty) {
+                // Pick a random one among those who support vision
+                final selectedModel = visionModels[random.nextInt(visionModels.length)];
+                apiModelIdForSend = selectedModel.id;
+                debugPrint("[SendService] Dynamic chat (Offline): Selected vision-capable model: ${selectedModel.id}");
+              } else {
+                // No vision model installed. Pick a random text model and discard photo.
+                debugPrint("[SendService] Dynamic chat (Offline): No vision model found for photo. Discarding photo.");
+                photo = null;
+                regeneratePhotoPath = null;
+                final selectedModel = offlineModels[random.nextInt(offlineModels.length)];
+                apiModelIdForSend = selectedModel.id;
+              }
+            } else {
+              // No photo: Pick a completely random offline model
+              final selectedModel = offlineModels[random.nextInt(offlineModels.length)];
+              apiModelIdForSend = selectedModel.id;
+              debugPrint("[SendService] Dynamic chat (Offline): Randomly selected text model: $apiModelIdForSend");
+            }
+          }
         }
       } else {
+        // --- STATIC CHAT LOGIC ---
         apiModelIdForSend = _sessionProvider.modelId;
         debugPrint("[SendService] Static chat using session model: $apiModelIdForSend");
       }
@@ -130,7 +194,12 @@ class SendService {
       final isAutoRouter = apiModelIdForSend == 'openrouter/auto';
 
       if (apiModelIdForSend == null || apiModelIdForSend.isEmpty) {
-        errorMessage = localizations.errorNoModelsAvailable;
+        // Error message is already set above for specific cases, fallback to default if needed.
+        if (apiModelIdForSend == null && errorMessage == localizations.errorNoModelsAvailable) {
+          // Keep existing error message
+        } else {
+          errorMessage = localizations.errorNoModelsAvailable;
+        }
         apiModelIdForSend = null;
         debugPrint("[SendService] Model validation failed: No model selected.");
       } else if (!isAutoRouter &&
@@ -184,10 +253,17 @@ class SendService {
         }
 
         if (lastUserMessage != null) {
-          effectivePhotoPath = lastUserMessage.photoPath;
+          // If we discarded the photo earlier (because model didn't support it), effectivePhotoPath stays null.
+          if (regeneratePhotoPath != null || photo != null) {
+            effectivePhotoPath = lastUserMessage.photoPath;
+          } else {
+            // If logic above set photo/regeneratePhotoPath to null, we respect that.
+            effectivePhotoPath = null;
+          }
+
           debugPrint(
             "[SendService] Regenerate flow: using lastUserMessage at index "
-                "$lastUserIndex with photoPath=${lastUserMessage.photoPath}",
+                "$lastUserIndex with photoPath=${lastUserMessage.photoPath}. Effective: $effectivePhotoPath",
           );
         } else {
           effectivePhotoPath = null;

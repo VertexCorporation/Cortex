@@ -189,54 +189,6 @@ class AppInitializer with ChangeNotifier {
     }
   }
 
-  /// It handles everything that used to block the startup.
-  /// This method runs AFTER the main screen is visible.
-  Future<void> _performPostStartupTasks() async {
-    if (_isPostStartupTasksRunning || _coreServicesReadyCompleter.isCompleted) {
-      return;
-    }
-    _isPostStartupTasksRunning = true;
-    try
-    {
-      dev.log("[AppInitializer] Phase 2: Starting Background Verification & Heavy Init...");
-
-      await Future.delayed(const Duration(milliseconds: 200));
-
-      // 1. Initialize Heavy Libraries (Timezones, Downloader, etc.)
-      await _initializeHeavyLibraries();
-
-      await Future.delayed(Duration.zero);
-
-      // 2. Check Server Maintenance
-      if (await _checkServerStatus()) {
-        return;
-      }
-
-      // 3. Verify the User Session
-      if (_currentUser != null && _internetProvider.isConnected) {
-        await _verifyUserSessionRemote();
-      }
-
-      // 4. Background Reconciliations
-      _runInBackground(reconcileLocalAndRemoteModelCounts);
-      _runInBackground(reconcileAndSyncPurchases);
-
-      if (Platform.isAndroid) {
-        _runInBackground(ReferralHandler.checkAndStoreReferrer);
-      }
-
-      if (!_coreServicesReadyCompleter.isCompleted) {
-        _coreServicesReadyCompleter.complete();
-      }
-      dev.log("[AppInitializer] Phase 2 Complete. App is fully synced.");
-    } finally {
-      if (!_coreServicesReadyCompleter.isCompleted) {
-        _coreServicesReadyCompleter.complete();
-        dev.log("[AppInitializer] Core Services Marked Ready (Finally Block).");
-      }
-    }
-  }
-
   /// Checks for app updates using a hybrid approach.
   Future<bool> _checkForAppUpdate() async {
 
@@ -306,6 +258,51 @@ class AppInitializer with ChangeNotifier {
     return false; // Assume safe if parsing fails
   }
 
+  /// It handles everything that used to block the startup.
+  /// This method runs AFTER the main screen is visible.
+  Future<void> _performPostStartupTasks() async {
+    if (_isPostStartupTasksRunning || _coreServicesReadyCompleter.isCompleted) {
+      return;
+    }
+    _isPostStartupTasksRunning = true;
+    try {
+      dev.log("[AppInitializer] Phase 2: Starting Background Verification & Heavy Init...");
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      // 1. Initialize Heavy Libraries (Only Timezones & Moderator now)
+      await _initializeHeavyLibraries();
+
+      // 2. Check Server Maintenance
+      if (await _checkServerStatus()) {
+        return;
+      }
+
+      // 3. Verify the User Session
+      if (_currentUser != null && _internetProvider.isConnected) {
+        await _verifyUserSessionRemote();
+      }
+
+      // 4. Background Reconciliations
+      _runInBackground(reconcileLocalAndRemoteModelCounts);
+      _runInBackground(reconcileAndSyncPurchases);
+
+      if (Platform.isAndroid) {
+        _runInBackground(ReferralHandler.checkAndStoreReferrer);
+      }
+
+      if (!_coreServicesReadyCompleter.isCompleted) {
+        _coreServicesReadyCompleter.complete();
+      }
+      dev.log("[AppInitializer] Phase 2 Complete. App is fully synced.");
+    } finally {
+      if (!_coreServicesReadyCompleter.isCompleted) {
+        _coreServicesReadyCompleter.complete();
+        dev.log("[AppInitializer] Core Services Marked Ready (Finally Block).");
+      }
+    }
+  }
+
   /// Moved here from main.dart to unblock startup.
   Future<void> _initializeHeavyLibraries() async {
     try {
@@ -319,6 +316,7 @@ class AppInitializer with ChangeNotifier {
       await _extrovertNotificationService.initialize();
       _extrovertNotificationService.recordAppOpen();
 
+      dev.log("[AppInitializer] Heavy libraries initialized.");
     } catch (e) {
       dev.log("Error initializing heavy libraries: $e");
     }

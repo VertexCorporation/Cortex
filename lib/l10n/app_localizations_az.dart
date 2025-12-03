@@ -557,13 +557,8 @@ class AppLocalizationsAz extends AppLocalizations {
   }
 
   @override
-  String annualPlanDescription(String price) {
-    return '$price/ay, illik hesablanır';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
-    return '$price/ay, aylıq hesablanır';
+    return '$price/ay, aylıq ödəniş edilir';
   }
 
   @override
@@ -2118,11 +2113,11 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String annualTotalDescription(Object price) {
-    return 'Total per year: $price';
+    return '$price/il, illik hesablanır';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return '≈ $price/month';
+    return 'Təxminən $price/ay';
   }
 }
