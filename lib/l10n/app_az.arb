@@ -169,8 +169,7 @@
   "manageSubscription": "Abunəliyi İdarə et",
   "purchasePlan": "{planName} al",
   "discountOffer": "{percent}% ENDİRİM",
-  "annualPlanDescription": "{price}/ay, illik hesablanır",
-  "monthlyPlanDescription": "{price}/ay, aylıq hesablanır",
+  "monthlyPlanDescription": "{price}/ay, aylıq ödəniş edilir",
   "discountBannerTitle": "BAŞLANĞIC XÜSUSİ: 80% ENDİRİM!",
   "discountBannerSubtitle": "Başlanğıcımızı qeyd etmək üçün BÜTÜN abunəlik planlarında eksklüziv endirim. Qaçırmayın!",
   "purchasePro": "Cortex Pro al",
@@ -622,5 +621,7 @@
   "continueWithApple": "Apple ilə davam edin",
   "guest": "Qonaq",
   "betterWithAnAccount": "Bu bölmə hesabla daha yaxşıdır!",
-  "restorePurchases": "Satınalmaları bərpa edin"
+  "restorePurchases": "Satınalmaları bərpa edin",
+  "annualTotalDescription": "{price}/il, illik hesablanır",
+  "equivalentMonthlyDescription": "Təxminən {price}/ay"
 }

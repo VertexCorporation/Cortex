@@ -802,5 +802,7 @@
   "continueWithApple": "Continúa con Apple",
   "guest": "Invitado",
   "betterWithAnAccount": "¡Esta sección es mejor con una cuenta!",
-  "restorePurchases": "Restaurar compras"
+  "restorePurchases": "Restaurar compras",
+  "annualTotalDescription": "{price}/año, facturado anualmente",
+  "equivalentMonthlyDescription": "Aproximadamente {price}/mes"
 }

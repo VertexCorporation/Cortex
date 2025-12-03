@@ -191,17 +191,7 @@
       }
     }
   },
-  "annualPlanDescription": "{price}/月、年間請求",
-  "@annualPlanDescription": {
-    "description": "年間プランの説明。月額換算価格を表示して手頃に見せる。例：$4.17/月、年間請求",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "$4.17"
-      }
-    }
-  },
-  "monthlyPlanDescription": "{price}/月、月間請求",
+  "monthlyPlanDescription": "{price}/月、月払い",
   "@monthlyPlanDescription": {
     "description": "月間プランの説明。月額価格を表示。例：$4.99/月、月間請求",
     "placeholders": {
@@ -802,5 +792,7 @@
   "continueWithApple": "Appleで続ける",
   "guest": "ゲスト",
   "betterWithAnAccount": "このセクションはアカウントがあればさらに便利になります!",
-  "restorePurchases": "購入を復元する"
+  "restorePurchases": "購入を復元する",
+  "annualTotalDescription": "{price}/年、年払い",
+  "equivalentMonthlyDescription": "月額約{price}"
 }

@@ -191,17 +191,7 @@
       }
     }
   },
-  "annualPlanDescription": "월 {price}, 연간 청구",
-  "@annualPlanDescription": {
-    "description": "더 저렴해 보이도록 월간 등가 가격을 보여주는 연간 플랜 설명. 예: 월 $4.17, 연간 청구",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "$4.17"
-      }
-    }
-  },
-  "monthlyPlanDescription": "월 {price}, 월간 청구",
+  "monthlyPlanDescription": "{price}/월, 월별 청구",
   "@monthlyPlanDescription": {
     "description": "월별 가격을 보여주는 월간 플랜 설명. 예: 월 $4.99, 월간 청구",
     "placeholders": {
@@ -802,5 +792,7 @@
   "continueWithApple": "Apple로 계속하기",
   "guest": "손님",
   "betterWithAnAccount": "이 섹션은 계정이 있으면 더 좋습니다!",
-  "restorePurchases": "구매 복원"
+  "restorePurchases": "구매 복원",
+  "annualTotalDescription": "{price}/년, 연간 청구",
+  "equivalentMonthlyDescription": "약 {price}/월"
 }

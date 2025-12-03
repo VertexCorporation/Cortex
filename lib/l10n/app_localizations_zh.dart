@@ -540,13 +540,8 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String annualPlanDescription(String price) {
-    return '每月$price，按年计费';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
-    return '每月$price，按月计费';
+    return '$price/月，按月计费';
   }
 
   @override
@@ -1998,11 +1993,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String annualTotalDescription(Object price) {
-    return 'Total per year: $price';
+    return '$price/年，按年计费';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return '≈ $price/month';
+    return '约 $price/月';
   }
 }

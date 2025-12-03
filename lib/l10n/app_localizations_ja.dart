@@ -545,13 +545,8 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String annualPlanDescription(String price) {
-    return '$price/月、年間請求';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
-    return '$price/月、月間請求';
+    return '$price/月、月払い';
   }
 
   @override
@@ -2052,11 +2047,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String annualTotalDescription(Object price) {
-    return 'Total per year: $price';
+    return '$price/年、年払い';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return '≈ $price/month';
+    return '月額約$price';
   }
 }

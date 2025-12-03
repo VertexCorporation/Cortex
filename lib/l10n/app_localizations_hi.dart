@@ -557,13 +557,8 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String annualPlanDescription(String price) {
-    return '$price/माह, सालाना बिल किया गया';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
-    return '$price/माह, मासिक बिल किया गया';
+    return '$price/माह, मासिक बिल';
   }
 
   @override
@@ -2118,11 +2113,11 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String annualTotalDescription(Object price) {
-    return 'Total per year: $price';
+    return '$price/वर्ष, वार्षिक बिल';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return '≈ $price/month';
+    return 'लगभग $price/माह';
   }
 }

@@ -191,17 +191,7 @@
       }
     }
   },
-  "annualPlanDescription": "{price}/мес., оплата за год",
-  "@annualPlanDescription": {
-    "description": "The description for the annual plan, showing the monthly equivalent price to make it seem more affordable. Example: $4.17/mo, billed annually",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "$4.17"
-      }
-    }
-  },
-  "monthlyPlanDescription": "{price}/мес., оплата ежемесячно",
+  "monthlyPlanDescription": "{price}/месяц, оплата ежемесячно",
   "@monthlyPlanDescription": {
     "description": "The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly",
     "placeholders": {
@@ -802,5 +792,7 @@
   "continueWithApple": "Продолжить с Apple",
   "guest": "Гость",
   "betterWithAnAccount": "Этот раздел лучше просматривать с учетной записью!",
-  "restorePurchases": "Восстановить покупки"
+  "restorePurchases": "Восстановить покупки",
+  "annualTotalDescription": "{price}/год, оплата производится ежегодно",
+  "equivalentMonthlyDescription": "Примерно {price}/месяц"
 }

@@ -1142,16 +1142,10 @@ abstract class AppLocalizations {
   /// **'{percent}% OFF'**
   String discountOffer(int percent);
 
-  /// The description for the annual plan, showing the monthly equivalent price to make it seem more affordable. Example: $4.17/mo, billed annually
-  ///
-  /// In en, this message translates to:
-  /// **'{price}/mo, billed annually'**
-  String annualPlanDescription(String price);
-
   /// The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly
   ///
   /// In en, this message translates to:
-  /// **'{price}/mo, billed monthly'**
+  /// **'{price}/month, billed monthly'**
   String monthlyPlanDescription(String price);
 
   /// The main headline for the promotional banner, emphasizing a special launch discount.
@@ -3871,13 +3865,13 @@ abstract class AppLocalizations {
   /// No description provided for @annualTotalDescription.
   ///
   /// In en, this message translates to:
-  /// **'Total per year: {price}'**
+  /// **'{price}/year, billed annually'**
   String annualTotalDescription(Object price);
 
   /// No description provided for @equivalentMonthlyDescription.
   ///
   /// In en, this message translates to:
-  /// **'≈ {price}/month'**
+  /// **'Approximately {price}/month'**
   String equivalentMonthlyDescription(Object price);
 }
 

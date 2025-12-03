@@ -14,6 +14,10 @@ import '../messages.dart';
 import '../parser.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 
+class AiStreamFinishedNotification extends Notification {
+  const AiStreamFinishedNotification();
+}
+
 class AIMessageTile extends StatefulWidget {
   final Message message;
   final String avatarPath;
@@ -209,6 +213,12 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
     // 3. Stream Finished Logic
     if (!widget.message.isError && old.message.isThinking && !widget.message.isThinking) {
       debugPrint("$logPrefix Stream finished successfully.");
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          const AiStreamFinishedNotification().dispatch(context);
+        }
+      });
 
       if (_thinkPulseCtl.isAnimating) _thinkPulseCtl.stop();
       if (_thinkRotateCtl.isAnimating) _thinkRotateCtl.stop();

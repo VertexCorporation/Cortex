@@ -191,16 +191,6 @@
       }
     }
   },
-  "annualPlanDescription": "{price}/mese, fatturato annualmente",
-  "@annualPlanDescription": {
-    "description": "La descrizione del piano annuale, che mostra il prezzo mensile equivalente per farlo sembrare più conveniente. Esempio: 4,17€/mese, fatturato annualmente",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "4,17€"
-      }
-    }
-  },
   "monthlyPlanDescription": "{price}/mese, fatturato mensilmente",
   "@monthlyPlanDescription": {
     "description": "La descrizione del piano mensile, che mostra il prezzo al mese. Esempio: 4,99€/mese, fatturato mensilmente",
@@ -802,5 +792,7 @@
   "continueWithApple": "Continua con Apple",
   "guest": "Ospite",
   "betterWithAnAccount": "Questa sezione è migliore con un account!",
-  "restorePurchases": "Ripristina gli acquisti"
+  "restorePurchases": "Ripristina gli acquisti",
+  "annualTotalDescription": "{price}/anno, fatturato annualmente",
+  "equivalentMonthlyDescription": "Circa {price}/mese"
 }

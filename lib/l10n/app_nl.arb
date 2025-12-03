@@ -191,17 +191,7 @@
       }
     }
   },
-  "annualPlanDescription": "{price}/mnd, jaarlijks gefactureerd",
-  "@annualPlanDescription": {
-    "description": "The description for the annual plan, showing the monthly equivalent price to make it seem more affordable. Example: $4.17/mo, billed annually",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "$4.17"
-      }
-    }
-  },
-  "monthlyPlanDescription": "{price}/mnd, maandelijks gefactureerd",
+  "monthlyPlanDescription": "{price}/maand, maandelijks gefactureerd",
   "@monthlyPlanDescription": {
     "description": "The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly",
     "placeholders": {
@@ -802,5 +792,7 @@
   "continueWithApple": "Doorgaan met Apple",
   "guest": "Gast",
   "betterWithAnAccount": "Deze sectie is beter met een account!",
-  "restorePurchases": "Aankopen herstellen"
+  "restorePurchases": "Aankopen herstellen",
+  "annualTotalDescription": "{price}/jaar, jaarlijks gefactureerd",
+  "equivalentMonthlyDescription": "Ongeveer {price}/maand"
 }

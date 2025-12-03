@@ -121,7 +121,7 @@ class AppBootstrap {
   static Future<BootstrapResult> init() async {
     final stopwatch = Stopwatch()..start();
 
-    // 1. Initialize Firebase (Required for Auth).
+    // 1. Initialize Firebase.
     await Firebase.initializeApp();
 
     try {
@@ -130,63 +130,53 @@ class AppBootstrap {
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
     } catch (e) {
-      debugPrint("Firestore settings already set or failed: $e");
+      debugPrint("Firestore settings warning: $e");
     }
 
-    // 2. Wire Crashlytics (Standard lightweight setup).
+    // 2. Wire Crashlytics.
     FlutterError.onError = (FlutterErrorDetails details) {
       FirebaseCrashlytics.instance.recordFlutterError(details);
     };
     PlatformDispatcher.instance.onError = (error, stack) {
       if (error.toString().contains("System process kill detected")) {
-        debugPrint("Ignored non-fatal system kill log.");
         return true;
       }
-
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
       return true;
     };
 
-    // 3. Register background message handler (Lightweight registration).
+    // 3. Register background message handler.
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
     await FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true);
     FlutterDownloader.registerCallback(downloadCallback);
 
-    // 4. Load shared preferences (Required for Theme/Onboarding).
+    // 4. Load shared preferences.
     final prefs = await SharedPreferences.getInstance();
-    final bool hasCompletedOnboarding = prefs.getBool('has_completed_onboarding') ?? false;
+    final bool hasCompletedOnboarding =
+        prefs.getBool('has_completed_onboarding') ?? false;
 
-    // 5. OPTIMISTIC AUTH CHECK (Local Only):
-    // We do NOT check the internet or reload the user here.
-    // We trust the local cache to render the UI immediately.
+    // 5. Optimistic Auth Check.
     AppStatus initialStatus;
     if (!hasCompletedOnboarding) {
       initialStatus = AppStatus.needsOnboarding;
     } else {
-      // Just check if a user object exists in memory/cache.
       final initialUser = FirebaseAuth.instance.currentUser;
-      initialStatus = initialUser == null ? AppStatus.needsLogin : AppStatus.ready;
+      initialStatus =
+      initialUser == null ? AppStatus.needsLogin : AppStatus.ready;
     }
 
-    // 6. Lock orientation.
-    await SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-
-    // 7. Determine Theme.
+    // 6. Determine Theme.
     final savedTheme = prefs.getString('selectedTheme');
     final String initialTheme = savedTheme ??
         (PlatformDispatcher.instance.platformBrightness == Brightness.dark
             ? 'dark'
             : 'light');
 
-    debugPrint("[AppBootstrap] Finished in ${stopwatch.elapsedMilliseconds}ms. Status: $initialStatus");
-    stopwatch.stop();
-
     final String? savedLanguage = prefs.getString('language_code');
 
-    debugPrint("[AppBootstrap] Finished in ${stopwatch.elapsedMilliseconds}ms. Status: $initialStatus, Lang: $savedLanguage");
+    debugPrint(
+        "[AppBootstrap] Finished in ${stopwatch.elapsedMilliseconds}ms. Status: $initialStatus");
     stopwatch.stop();
 
     return BootstrapResult(
@@ -204,12 +194,16 @@ class AppBootstrap {
 /// - Preserves the native splash
 /// - Initializes time zones
 /// - Boots the [AppGatekeeper], which does the heavy lifting via a FutureBuilder.
-void main() {
+void main() async {
   final WidgetsBinding widgetsBinding =
   WidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
 
-  // Keep native splash until we're sure about the first real frame.
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   runApp(const AppGatekeeper());
@@ -499,6 +493,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
     ChangeNotifierProvider<DownloadedModelsManager>(
       create: (_) => DownloadedModelsManager(),
     ),
+
     ChangeNotifierProxyProvider<ModelCatalogProvider, ModelLocalStateProvider>(
       create: (BuildContext context) {
         final provider = ModelLocalStateProvider();

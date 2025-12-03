@@ -556,11 +556,6 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String annualPlanDescription(String price) {
-    return '$price/ay, yıllık faturalandırılır';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/ay, aylık faturalandırılır';
   }
@@ -2115,11 +2110,11 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String annualTotalDescription(Object price) {
-    return 'Total per year: $price';
+    return '$price/yıl, yıllık faturalandırılır';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return '≈ $price/month';
+    return 'Yaklaşık $price/ay';
   }
 }

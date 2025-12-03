@@ -191,17 +191,7 @@
       }
     }
   },
-  "annualPlanDescription": "{price}/mehê, salane tê fatûrekirin",
-  "@annualPlanDescription": {
-    "description": "Danasîna plana salane, ku bihayê mehane yê wekhev nîşan dide da ku ew erzantir xuya bike. Mînak: 4.17$/mehê, salane tê fatûrekirin",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "4.17$"
-      }
-    }
-  },
-  "monthlyPlanDescription": "{price}/mehê, mehane tê fatûrekirin",
+  "monthlyPlanDescription": "{price}/meh, mehane tê fatûrekirin",
   "@monthlyPlanDescription": {
     "description": "Danasîna plana mehane, ku bihayê mehê nîşan dide. Mînak: 4.99$/mehê, mehane tê fatûrekirin",
     "placeholders": {
@@ -802,5 +792,7 @@
   "continueWithApple": "Bi Apple re berdewam bike",
   "guest": "Mêvan",
   "betterWithAnAccount": "Ev beş bi hesabê çêtir e!",
-  "restorePurchases": "Kirînan Vegerîne"
+  "restorePurchases": "Kirînan Vegerîne",
+  "annualTotalDescription": "{price}/sal, salane tê fatûrekirin",
+  "equivalentMonthlyDescription": "Nêzîkî {price}/meh"
 }

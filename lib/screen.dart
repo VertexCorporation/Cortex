@@ -126,18 +126,21 @@ class MainScreenState extends State<MainScreen> {
   }
 
   void startNewConversation({bool isDynamic = false}) {
-    final TabProvider tabProvider =
-    Provider.of<TabProvider>(context, listen: false);
-
-    setState(() {
-      _previousTabIndex = tabProvider.selectedIndex;
-    });
-
-    tabProvider.setSelectedIndex(0);
-
+    // FIX: Ensure this runs on the next frame to guarantee Context/Provider availability
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
+      final TabProvider tabProvider =
+      Provider.of<TabProvider>(context, listen: false);
+
+      if (tabProvider.selectedIndex != 0) {
+        setState(() {
+          _previousTabIndex = tabProvider.selectedIndex;
+        });
+        tabProvider.setSelectedIndex(0);
+      }
+
+      // Safe Access to Providers
       final ChatSessionProvider sessionProvider =
       context.read<ChatSessionProvider>();
       final ConversationProvider conversationProvider =
@@ -288,12 +291,18 @@ class MainScreenState extends State<MainScreen> {
           index: tabProvider.selectedIndex,
           duration: const Duration(milliseconds: 200),
           children: <Widget>[
-            ChatController(
-              key: chatScreenKey,
-              onModelSelectionChanged: (bool isSelected) {
-                updateBottomAppBarVisibility(isSelected);
+            // FIX: Wrap ChatController in Consumer to guarantee Provider visibility
+            // This prevents "ProviderNotFound" errors during fast switching or startup
+            Consumer<ChatSessionProvider>(
+              builder: (context, sessionProvider, _) {
+                return ChatController(
+                  key: chatScreenKey,
+                  onModelSelectionChanged: (bool isSelected) {
+                    updateBottomAppBarVisibility(isSelected);
+                  },
+                  onExitRequest: _handleChatExit,
+                );
               },
-              onExitRequest: _handleChatExit,
             ),
             LibraryScreen(
               key: libraryScreenKey,
