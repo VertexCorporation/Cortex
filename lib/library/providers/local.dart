@@ -236,7 +236,7 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
 
       if (!canShowSystemNotifications) {
         notificationService.showNotification(
-            message: localizations.downloadStarted, type: NotificationType.error, oneLine: true);
+            message: localizations.downloadStarted, type: NotificationType.success, oneLine: true);
       }
       return true;
 

@@ -46,7 +46,6 @@ class RegistrationWeakPassword extends RegistrationResult {}
 class RegistrationNetworkError extends RegistrationResult {}
 class RegistrationUnknownError extends RegistrationResult {}
 
-
 /// Represents the exhaustive set of outcomes for a Google Sign-In attempt.
 sealed class GoogleSignInResult {}
 
@@ -123,14 +122,14 @@ class LoginBackendService {
           password: password,
         );
 
-        extrovertNotificationService.syncTokenAfterLogin().ignore();
+        _safeTokenSync(extrovertNotificationService);
 
         return LoginSuccess(freshUser);
       }
 
       dev.log('[Auth.Login] User verified. UID: ${freshUser.uid}. Running post-login tasks.', name: 'LoginBackend');
 
-      extrovertNotificationService.syncTokenAfterLogin().ignore();
+      _safeTokenSync(extrovertNotificationService);
 
       return LoginSuccess(freshUser);
 
@@ -194,7 +193,7 @@ class LoginBackendService {
         name: 'LoginBackend',
       );
 
-      extrovertNotificationService.syncTokenAfterLogin().ignore();
+      _safeTokenSync(extrovertNotificationService);
 
       await _postUsernameSuggestion(uid: user.uid, username: username);
 
@@ -277,7 +276,7 @@ class LoginBackendService {
       await _secureStorage.write(key: 'remember_me', value: 'true');
       await _secureStorage.write(key: 'email', value: user.email);
 
-      extrovertNotificationService.syncTokenAfterLogin().ignore();
+      _safeTokenSync(extrovertNotificationService);
 
       dev.log('[Auth.Google] Sign-in complete for UID: ${user.uid}.', name: 'LoginBackend');
       return GoogleSignInSuccess(user);
@@ -324,7 +323,7 @@ class LoginBackendService {
 
       if (user == null) throw FirebaseAuthException(code: 'anonymous-user-null');
 
-      extrovertNotificationService.syncTokenAfterLogin().ignore();
+      _safeTokenSync(extrovertNotificationService);
 
       dev.log('[Auth.Anonymous] Signed in anonymously. UID: ${user.uid}', name: 'LoginBackend');
 
@@ -392,7 +391,7 @@ class LoginBackendService {
       }
 
       // 4) Token sync (non-blocking)
-      extrovertNotificationService.syncTokenAfterLogin().ignore();
+      _safeTokenSync(extrovertNotificationService);
 
       dev.log('[Auth.Apple] Sign-in complete for UID: ${user.uid}.',
           name: 'LoginBackend');
@@ -445,7 +444,7 @@ class LoginBackendService {
       final callable = _functions.httpsCallable('completeAnonymousRegistration');
       await callable.call();
 
-      extrovertNotificationService.syncTokenAfterLogin().ignore();
+      _safeTokenSync(extrovertNotificationService);
 
       return RegistrationSuccess();
 
@@ -517,5 +516,14 @@ class LoginBackendService {
     } else {
       await _secureStorage.deleteAll();
     }
+  }
+
+  /// A safe way to sync the token.
+  /// It waits briefly to allow backend triggers (Cloud Functions) to create
+  /// the user document in Firestore, preventing 'permission-denied' errors.
+  void _safeTokenSync(ExtrovertNotificationService service) {
+    Future.delayed(const Duration(seconds: 1), () {
+      service.syncTokenAfterLogin().ignore();
+    });
   }
 }

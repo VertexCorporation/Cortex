@@ -1,7 +1,7 @@
 import Flutter
 import Foundation
 
-class LlamaService: NSObject {
+class LlamaService: NSObject, FlutterPlugin {
     private var llamaContext: LlamaContext?
     private var resultChannel: FlutterMethodChannel?
 
@@ -17,7 +17,7 @@ class LlamaService: NSObject {
 
         case "cacheModel":
             guard let args = call.arguments as? [String: Any],
-                  let path = args["path"] as? String else {
+            let path = args["path"] as? String else {
                 result(FlutterError(code: "INVALID_ARGS", message: "Path is required", details: nil))
                 return
             }
@@ -45,7 +45,7 @@ class LlamaService: NSObject {
 
         case "sendMessage":
             guard let args = call.arguments as? [String: Any],
-                  let message = args["message"] as? String else {
+            let message = args["message"] as? String else {
                 result(FlutterError(code: "INVALID_ARGS", message: "Message is required", details: nil))
                 return
             }
@@ -58,6 +58,8 @@ class LlamaService: NSObject {
             result(nil)
 
             Task {
+                await context.clear()
+
                 await context.completion_init(text: message)
 
                 while await !context.is_done {
@@ -71,6 +73,8 @@ class LlamaService: NSObject {
                         break
                     }
                 }
+
+                await context.clear()
 
                 DispatchQueue.main.async {
                     self.resultChannel?.invokeMethod("onMessageComplete", arguments: nil)

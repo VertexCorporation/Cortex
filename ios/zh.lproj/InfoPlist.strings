@@ -1,4 +1,0 @@
-"NSCameraUsageDescription" = "Cortex 需要访问您的相机以拍摄照片。";
-"NSPhotoLibraryUsageDescription" = "Cortex 需要访问您的相册以上传图片。";
-"NSPhotoLibraryAddUsageDescription" = "Cortex 需要权限将图片保存到您的相册。";
-"NSMicrophoneUsageDescription" = "Cortex 需要访问麦克风以进行语音聊天。";

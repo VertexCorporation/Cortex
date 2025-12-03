@@ -1,4 +1,0 @@
-"NSCameraUsageDescription" = "يحتاج Cortex إلى الوصول للكاميرا لالتقاط الصور.";
-"NSPhotoLibraryUsageDescription" = "يحتاج Cortex إلى الوصول لمعرض الصور لرفع الصور.";
-"NSPhotoLibraryAddUsageDescription" = "يحتاج Cortex إلى إذن لحفظ الصور في المعرض.";
-"NSMicrophoneUsageDescription" = "يحتاج Cortex إلى الوصول للميكروفون للدردشة الصوتية.";
