@@ -7,7 +7,6 @@ import 'package:cortex/l10n/app_localizations.dart';
 import '../../../../../../theme.dart';
 
 class BriefingOverlay extends StatefulWidget {
-  // --- Data properties ---
   final int? availableCredits;
   final bool photoSelected;
   final bool isOfflineModel;
@@ -75,7 +74,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     final curvedAnimation =
     CurvedAnimation(parent: _slideController, curve: Curves.easeOut);
 
-    // Slide from bottom (Offset 0,1) to position (Offset 0,0)
     _slideAnimation =
         Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
             .animate(curvedAnimation);
@@ -96,7 +94,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   @override
   void didUpdateWidget(covariant BriefingOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Trigger animation evaluation whenever any prop changes
     _evaluateAndAnimate();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -112,8 +109,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   }
 
   String? _evaluateMessageText(AppLocalizations loc) {
-    // If parent says hide, return null immediately.
-    // This forces the exit animation logic to trigger.
     if (!widget.isVisible) return null;
 
     if (widget.isPremiumModel &&
@@ -144,7 +139,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
         messageText == loc.disclaimerMessage;
   }
 
-  /// The core animation logic handles the 'Exit' gracefully now.
   void _evaluateAndAnimate() {
     if (!mounted) return;
     final loc = AppLocalizations.of(context)!;
@@ -156,26 +150,21 @@ class _BriefingOverlayState extends State<BriefingOverlay>
       final bool hasNewMessage = nextMessageText != null;
 
       if (isShowingMessage) {
-        // CASE 1: Currently showing something.
-        // We must reverse (slide down) FIRST.
         _slideController.reverse().then((_) {
           if (!mounted) return;
 
           if (hasNewMessage) {
-            // If swapping to a new message: change text, slide up.
             setState(() {
               _currentMessageText = nextMessageText;
               _isCurrentMessageDismissible = nextIsDismissible;
             });
             _slideController.forward(from: 0.0);
           } else {
-            // If hiding completely: just clear text (animation is already done).
             setState(() => _currentMessageText = null);
           }
           _measurePanelHeightAndReport();
         });
       } else if (hasNewMessage) {
-        // CASE 2: Was hidden, now showing. Slide up.
         setState(() {
           _currentMessageText = nextMessageText;
           _isCurrentMessageDismissible = nextIsDismissible;
@@ -183,7 +172,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
         _slideController.forward(from: 0.0);
         _measurePanelHeightAndReport();
       } else {
-        // CASE 3: Was hidden, stays hidden.
         setState(() {
           _currentMessageText = null;
         });
@@ -201,7 +189,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
       _slideController.reverse().then((_) {
         if (!mounted) return;
         widget.onDisclaimerDismissed();
-        setState(() {}); // Triggers re-evaluation
+        setState(() {});
       });
     }
   }
@@ -223,7 +211,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   void _reportVisibleHeight() {
     if (!mounted) return;
     final double base = _measuredPanelHeight;
-    // Calculate precise visible height based on animation value
     final double slideT = _slideController.value.clamp(0.0, 1.0);
     double visible = base * slideT;
 
@@ -233,10 +220,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
   @override
   Widget build(BuildContext context) {
-    // Don't use SizedBox.shrink here if animating out.
-    // Only return shrink if text is null AND animation is fully dismissed.
     if (_currentMessageText == null && _slideController.isDismissed) {
-      // Just to be safe, report 0 height
       if (_measuredPanelHeight != 0) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if(mounted) widget.onVisibleHeightChanged?.call(0.0);
@@ -257,14 +241,13 @@ class _BriefingOverlayState extends State<BriefingOverlay>
           onTap: _isCurrentMessageDismissible ? _handleDismiss : null,
           child: _BriefingPanelContent(
             key: _panelKey,
-            message: _currentMessageText ?? "", // Safe fallback
+            message: _currentMessageText ?? "",
           ),
         ),
       ),
     );
   }
 
-  // --- Helpers ---
   int _requiredCredits() {
     if (widget.isOfflineModel) return 0;
     final base = (widget.isDynamicChat || widget.isPremiumModel) ? 20 : 10;
@@ -279,10 +262,23 @@ class _BriefingPanelContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth >= 600;
+
+    // --- DYNAMIC SCALING ---
+    // Tablet: Scaled down percentage to look crisp (2.2% font).
+    // Phone: Default percentage (4%).
+
+    final double fontSize = isTablet ? screenWidth * 0.022 : 14.0;
+    final double iconSize = isTablet ? screenWidth * 0.035 : 24.0;
+    final double paddingHorizontal = isTablet ? screenWidth * 0.03 : 20.0;
+    final double paddingVertical = isTablet ? screenWidth * 0.02 : 12.0;
+    final double borderRadius = isTablet ? screenWidth * 0.015 : 12.0;
+
     final boxDecoration = BoxDecoration(
       color: AppColors.background,
       border: Border.fromBorderSide(BorderSide(color: AppColors.border)),
-      borderRadius: const BorderRadius.all(Radius.circular(12)),
+      borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
       boxShadow: const [
         BoxShadow(
           color: Colors.black12,
@@ -293,12 +289,12 @@ class _BriefingPanelContent extends StatelessWidget {
     );
 
     final textStyle = TextStyle(
-      fontSize: 14,
+      fontSize: fontSize,
       color: AppColors.primaryColor.inverted,
     );
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      padding: EdgeInsets.symmetric(vertical: paddingVertical, horizontal: paddingHorizontal),
       decoration: boxDecoration,
       child: Row(
         children: [
@@ -308,10 +304,10 @@ class _BriefingPanelContent extends StatelessWidget {
               AppColors.primaryColor.inverted,
               BlendMode.srcIn,
             ),
-            width: 24,
-            height: 24,
+            width: iconSize,
+            height: iconSize,
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: isTablet ? screenWidth * 0.02 : 12.0),
           Expanded(
             child: Text(
               message,

@@ -24,6 +24,30 @@ class ActionButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isConnected = context.watch<InternetProvider>().isConnected;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // RESPONSIVE LOGIC
+    final bool isTablet = screenWidth >= 600;
+
+    // --- FULLY DYNAMIC DIMENSIONS ---
+
+    // Button Size (Container dimensions)
+    // Tablet: 6% of screen width (e.g. 48px on 800w). Phone: ~9% (approx 36px).
+    // This reduction on tablet gives it breathing room inside the input field padding.
+    final double buttonSize = isTablet ? screenWidth * 0.052 : screenWidth * 0.09;
+
+    // Send Icon Size (Arrow)
+    // Tablet: 3.5% of width. Phone: 6%.
+    final double sendIconSize = isTablet ? screenWidth * 0.035 : screenWidth * 0.06;
+
+    // Stop Icon Size (SVG)
+    // Tablet: 3% of width. Phone: 5.5%.
+    final double stopIconSize = isTablet ? screenWidth * 0.03 : screenWidth * 0.055;
+
+    // Border Radius for Stop Button
+    // Half of buttonSize to keep it circular/rounded.
+    final double stopBorderRadius = buttonSize / 2;
+
     final Duration currentDuration = isEnabled
         ? const Duration(milliseconds: 100)
         : const Duration(milliseconds: 200);
@@ -47,8 +71,8 @@ class ActionButtonWidget extends StatelessWidget {
       child: AnimatedContainer(
         duration: currentDuration,
         curve: Curves.easeOut,
-        width: 34,
-        height: 34,
+        width: buttonSize,
+        height: buttonSize,
         decoration: BoxDecoration(
           color: backgroundColor,
           shape: BoxShape.circle,
@@ -60,7 +84,7 @@ class ActionButtonWidget extends StatelessWidget {
           child: Icon(
             Icons.arrow_upward,
             color: iconColor,
-            size: 24,
+            size: sendIconSize,
           ),
         ),
       ),
@@ -72,17 +96,17 @@ class ActionButtonWidget extends StatelessWidget {
       child: AnimatedContainer(
         duration: currentDuration,
         curve: Curves.easeOut,
-        width: 34,
-        height: 34,
+        width: buttonSize,
+        height: buttonSize,
         decoration: BoxDecoration(
           color: AppColors.primaryColor.inverted,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(stopBorderRadius),
         ),
         child: Center(
           child: SvgPicture.asset(
             'assets/icons/stop.svg',
-            width: 22,
-            height: 22,
+            width: stopIconSize,
+            height: stopIconSize,
             colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
           ),
         ),

@@ -906,20 +906,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get help => 'Помощь';
 
   @override
-  String get redeemCode => 'Активировать код';
+  String get supportCreator => 'Поддержите создателя';
 
   @override
-  String get enterYourCode =>
-      'Поддержите своих любимых авторов! Введите их уникальный код ниже, чтобы они получили долю от ваших покупок в Cortex.';
+  String get enterYourTag =>
+      'Поддержите любимых авторов! Введите их уникальный тег ниже, чтобы подарить им часть ваших покупок в Cortex.';
 
   @override
-  String get code => 'Код';
+  String get creatorTag => 'Тег создателя';
 
   @override
-  String get redeem => 'Активировать';
+  String get support => 'Поддерживать';
 
   @override
-  String get codeCannotBeEmpty => 'Код не может быть пустым';
+  String get tagCannotBeEmpty => 'Тег создателя не может быть пустым';
 
   @override
   String get userId => 'ID пользователя';
@@ -1510,11 +1510,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Войдите в свою учётную запись Vertex. Новые пользователи, регистрирующиеся через сторонние сервисы, соглашаются с нашими Условиями и Политикой конфиденциальности. Вы можете ознакомиться с ними на экране регистрации.';
+      'Войдите в свою учётную запись Vertex. Продолжая, вы соглашаетесь с нашими Условиями обслуживания и Политикой конфиденциальности.';
 
   @override
   String get registerSubtitle =>
-      'Создайте аккаунт Vertex, который вы также сможете использовать для других наших проектов.';
+      'Создайте учётную запись Vertex для беспрепятственного доступа ко всем нашим сервисам. Продолжая, вы соглашаетесь с нашими Условиями обслуживания и Политикой конфиденциальности.';
 
   @override
   String get photoWarningMessage =>
@@ -2023,8 +2023,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Возникла проблема при загрузке последних обновлений. Проверьте соединение и повторите попытку.';
 
   @override
-  String get codeNotFound =>
-      'Введенный вами код недействителен или срок его действия истек.';
+  String get tagNotFound => 'Введенный вами тег недействителен или устарел.';
 
   @override
   String get whatIsNew => 'Что нового?';
@@ -2128,5 +2127,13 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return 'Примерно $price/месяц';
+  }
+
+  @override
+  String get confirmDownloadTitle => 'Вы уверены, что хотите загрузить?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'Эта модель займет примерно $size пространства.';
   }
 }

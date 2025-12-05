@@ -19,11 +19,6 @@ import 'sections/user.dart';
 import 'skeleton.dart';
 
 /// The main screen for displaying user settings.
-///
-/// This widget acts as the root view for the settings interface. It is a
-/// state-consumer that listens to `SettingsGeneralProvider` to determine what to display:
-/// either a loading skeleton or the main content. It also listens to `ThemeProvider`
-/// to rebuild the entire screen when the app's theme is changed.
 class SettingsScreen extends StatefulWidget {
   final bool isFromActiveChat;
 
@@ -68,17 +63,35 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth >= 600;
+
     context.watch<ThemeProvider>();
+
+    // --- TABLET APPBAR CONFIG ---
+    final double toolbarHeight = isTablet ? screenWidth * 0.14 : kToolbarHeight;
+    final double titleSize = isTablet ? 36.0 : screenWidth * 0.055;
+    final double iconSize = isTablet ? 32.0 : 24.0;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-        title: Text(appLocalizations.settings, style: TextStyle(color: AppColors.primaryColor.inverted)),
+        toolbarHeight: toolbarHeight,
+        title: Text(
+          appLocalizations.settings,
+          style: TextStyle(
+            color: AppColors.primaryColor.inverted,
+            fontSize: titleSize,
+          ),
+        ),
         centerTitle: false,
         backgroundColor: AppColors.background,
         elevation: 0,
-        iconTheme: IconThemeData(color: AppColors.primaryColor.inverted),
+        iconTheme: IconThemeData(
+            color: AppColors.primaryColor.inverted,
+            size: iconSize
+        ),
       ),
       body: SafeArea(
         child: Consumer<SettingsGeneralProvider>(
@@ -91,7 +104,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
               transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
               child: showSkeleton
                   ? const SkeletonLoader(key: ValueKey('skeleton'))
-                  : _buildContent(context, widget.isFromActiveChat),
+                  : _buildContent(context, widget.isFromActiveChat, isTablet),
             );
           },
         ),
@@ -100,7 +113,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
   }
 
   /// Builds the main content of the settings screen once data is loaded.
-  Widget _buildContent(BuildContext context, bool isFromActiveChat) {
+  Widget _buildContent(BuildContext context, bool isFromActiveChat, bool isTablet) {
     final screenWidth = MediaQuery.of(context).size.width;
     final generalProvider = context.watch<SettingsGeneralProvider>();
 
@@ -110,7 +123,7 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
       if (generalProvider.userData != null)
         const ProfileHeaderSection(),
 
-      SizedBox(height: screenWidth * 0.06),
+      SizedBox(height: isTablet ? 40.0 : screenWidth * 0.06),
 
       if (isAnonymous)
         const AnonymousUpgradePanel(),
@@ -122,23 +135,24 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
         const UserSection(),
 
       if (!isAnonymous && generalProvider.hasInternet)
-        SizedBox(height: screenWidth * 0.04),
+        SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
 
       const AppLanguageSection(),
-      SizedBox(height: screenWidth * 0.04),
+      SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
 
       const AppThemeSection(),
-      SizedBox(height: screenWidth * 0.04),
+      SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
 
       const SettingsSection(),
-      SizedBox(height: screenWidth * 0.04),
+      SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
 
       DeleteSection(isFromActiveChat: isFromActiveChat),
 
       // Bottom padding for comfortable scrolling
-      SizedBox(height: screenWidth * 0.08),
+      SizedBox(height: isTablet ? 60.0 : screenWidth * 0.08),
     ];
 
+    // Center constrain for tablet to prevent super wide UI
     return ScrollFog(
       scrollController: _scrollController,
       fogColor: AppColors.background,
@@ -146,21 +160,27 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
       bottomFogHeight: 20,
       showTop: true,
       showBottom: true,
-      child: ListView.builder(
-        controller: _scrollController,
-        key: const ValueKey('settingsContent'),
-        padding: EdgeInsets.all(screenWidth * 0.04),
-        itemCount: settingsItems.length,
-        itemBuilder: (context, index) {
-          return settingsItems[index];
-        },
+      child: Center(
+        child: Container(
+          // Tablet constraint: Max width 800px. Phone: Full width.
+          constraints: BoxConstraints(maxWidth: isTablet ? 800 : double.infinity),
+          child: ListView.builder(
+            controller: _scrollController,
+            key: const ValueKey('settingsContent'),
+            // Fixed reasonable padding on tablet
+            padding: EdgeInsets.all(isTablet ? 32.0 : screenWidth * 0.04),
+            itemCount: settingsItems.length,
+            itemBuilder: (context, index) {
+              return settingsItems[index];
+            },
+          ),
+        ),
       ),
     );
   }
 }
 
 /// A private stateful widget to display the "Unverified Account" panel.
-/// It manages its own timer for the live countdown, ensuring encapsulation.
 class _UnverifiedAccountPanel extends StatefulWidget {
   const _UnverifiedAccountPanel();
 
@@ -175,28 +195,22 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
   @override
   void initState() {
     super.initState();
-    // The timer is initialized in didChangeDependencies to ensure provider data is available.
   }
 
-  /// This method is called when the widget is first built and whenever its
-  /// dependencies (like Providers) change. It's the ideal place to react to
-  /// data updates and reset the timer.
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _resetTimer();
   }
 
-  /// Calculates the remaining time and starts or resets the countdown timer.
   void _resetTimer() {
-    _timer?.cancel(); // Cancel any existing timer to prevent multiple timers running.
+    _timer?.cancel();
 
     final generalProvider = context.read<SettingsGeneralProvider>();
     final createdAt = generalProvider.createdAt;
     final verifyAttempts = generalProvider.verificationAttempts;
 
     if (createdAt != null) {
-      // Replicates the logic from the original system: each resend adds 24 hours.
       final deadline = createdAt.toDate().add(Duration(hours: 24 * (verifyAttempts + 1)));
       final difference = deadline.difference(DateTime.now());
 
@@ -210,7 +224,6 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
     }
   }
 
-  /// Starts a periodic timer that decrements the remaining seconds every second.
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingSeconds > 0) {
@@ -221,7 +234,6 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
         }
       } else {
         timer.cancel();
-        // Optionally trigger a data refresh when the timer hits zero.
         if (mounted) {
           context.read<SettingsGeneralProvider>().refreshData();
         }
@@ -231,11 +243,10 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
 
   @override
   void dispose() {
-    _timer?.cancel(); // Crucial: always cancel the timer to avoid memory leaks.
+    _timer?.cancel();
     super.dispose();
   }
 
-  /// Formats the total seconds into a HH:MM:SS string.
   String _formatRemainingTime(int totalSeconds) {
     if (totalSeconds < 0) totalSeconds = 0;
     final hours = totalSeconds ~/ 3600;
@@ -252,13 +263,20 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
     final generalProvider = context.watch<SettingsGeneralProvider>();
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final bool isTablet = screenWidth >= 600;
 
     final timeStr = _formatRemainingTime(_remainingSeconds);
+
+    // Tablet Optimizations for this specific panel
+    final double headerSize = isTablet ? 24.0 : screenWidth * 0.045;
+    final double bodySize = isTablet ? 16.0 : screenWidth * 0.035;
+    final double buttonHeight = isTablet ? 60.0 : screenHeight * 0.06;
+    final double padding = isTablet ? 24.0 : screenWidth * 0.04;
 
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(screenWidth * 0.04),
+          padding: EdgeInsets.all(padding),
           decoration: BoxDecoration(
             color: AppColors.secondaryColor,
             borderRadius: BorderRadius.circular(12.0),
@@ -268,28 +286,33 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
             children: [
               Text(
                 appLocalizations.unverifiedAccountHeader,
-                style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
+                style: TextStyle(fontSize: headerSize, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: screenHeight * 0.01),
               Text(
                 appLocalizations.unverifiedAccountWarning(timeStr),
-                style: TextStyle(fontSize: screenWidth * 0.035, color: AppColors.quinaryColor),
+                style: TextStyle(fontSize: bodySize, color: AppColors.quinaryColor),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: screenHeight * 0.015),
               // Live Countdown Timer Display
               Text(
                 timeStr,
+                style: TextStyle(fontSize: bodySize, fontWeight: FontWeight.bold, color: AppColors.septenaryColor),
               ),
               SizedBox(height: screenHeight * 0.015),
               // Verify Now Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(screenHeight * 0.06), backgroundColor: AppColors.senaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: Size.fromHeight(buttonHeight),
+                      backgroundColor: AppColors.senaryColor,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
+                  ),
                   onPressed: () => context.read<SettingsGeneralProvider>().refreshData(),
-                  child: Text(appLocalizations.verifyNow, style: TextStyle(color: AppColors.primaryColor, fontSize: screenWidth * 0.04)),
+                  child: Text(appLocalizations.verifyNow, style: TextStyle(color: AppColors.primaryColor, fontSize: isTablet ? 18 : screenWidth * 0.04)),
                 ),
               ),
               SizedBox(height: screenHeight * 0.015),
@@ -297,7 +320,11 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(screenHeight * 0.06), backgroundColor: AppColors.senaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: Size.fromHeight(buttonHeight),
+                      backgroundColor: AppColors.senaryColor,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
+                  ),
                   onPressed: (generalProvider.isResendingEmail || generalProvider.verificationAttempts >= 2) ? null : () {
                     context.read<SettingsGeneralProvider>().resendVerificationEmail();
                   },
@@ -306,7 +333,7 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
                       : Text(
                     appLocalizations.resendCode,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: (generalProvider.verificationAttempts >= 2) ? AppColors.quinaryColor : AppColors.primaryColor, fontSize: screenWidth * 0.04),
+                    style: TextStyle(color: (generalProvider.verificationAttempts >= 2) ? AppColors.quinaryColor : AppColors.primaryColor, fontSize: isTablet ? 18 : screenWidth * 0.04),
                   ),
                 ),
               ),
@@ -318,14 +345,14 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
                     child: Text(
                       appLocalizations.maxResendLimitReached,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.septenaryColor, fontSize: screenWidth * 0.035, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: AppColors.septenaryColor, fontSize: bodySize, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
             ],
           ),
         ),
-        SizedBox(height: screenWidth * 0.04),
+        SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
       ],
     );
   }

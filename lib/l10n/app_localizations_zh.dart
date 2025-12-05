@@ -866,19 +866,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get help => '帮助';
 
   @override
-  String get redeemCode => '兑换代码';
+  String get supportCreator => '支持创作者';
 
   @override
-  String get enterYourCode => '支持您喜爱的创作者！在下方输入他们的专属代码，让他们从您的 Cortex 购买中获得分成。';
+  String get enterYourTag => '支持你最喜欢的创作者！在下方输入他们的专属标签，即可让他们分享你在Cortex上的消费收益。';
 
   @override
-  String get code => '代码';
+  String get creatorTag => '创作者标签';
 
   @override
-  String get redeem => '兑换';
+  String get support => '支持';
 
   @override
-  String get codeCannotBeEmpty => '代码不能为空';
+  String get tagCannotBeEmpty => '创建者标签不能为空';
 
   @override
   String get userId => '用户 ID';
@@ -1434,11 +1434,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get userDisabled => '该用户帐户已被禁用。';
 
   @override
-  String get loginSubtitle =>
-      '登录您的 Vertex 帐户。通过第三方服务注册的新用户需同意我们的条款和隐私政策。您可以在注册页面查看这些条款和政策。';
+  String get loginSubtitle => '登录您的Vertex账户。继续操作即表示您同意我们的服务条款和隐私政策。';
 
   @override
-  String get registerSubtitle => '创建一个 Vertex 帐户，您也可以用它来访问我们的其他项目。';
+  String get registerSubtitle =>
+      '创建 Vertex 帐户，即可无缝访问我们的所有服务。继续操作即表示您同意我们的服务条款和隐私政策。';
 
   @override
   String get photoWarningMessage => '包含一张照片。不支持图像的模型可能会忽略它。';
@@ -1872,7 +1872,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get channelFcmName => 'Cortex 更新';
 
   @override
-  String get channelFcmDescription => '有关 Cortex 的新闻、更新和其他信息的通知。';
+  String get channelFcmDescription => '接收来自 Cortex 的新闻、更新和其他信息的通知。';
 
   @override
   String get channelEngagementName => '温馨提示';
@@ -1899,7 +1899,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get newsErrorMessage => '获取最新更新时出现问题，请检查您的连接并重试。';
 
   @override
-  String get codeNotFound => '您输入的验证码无效或已过期。';
+  String get tagNotFound => '您输入的标签无效或已过期。';
 
   @override
   String get whatIsNew => '什么是新的？';
@@ -1999,5 +1999,13 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return '约 $price/月';
+  }
+
+  @override
+  String get confirmDownloadTitle => '您确定要下载吗？';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return '该模型将占用大约$size的空间。';
   }
 }

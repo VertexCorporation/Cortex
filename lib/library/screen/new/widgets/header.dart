@@ -10,10 +10,6 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../../theme.dart';
 
 /// A widget for the profile header section in the model creation process.
-///
-/// It includes the model's avatar, name input field, and summary input field.
-/// This widget is stateless and receives all its data and controllers from
-/// a parent provider, making it highly reusable for both 'Create' and 'Add' screens.
 class CreationProfileHeader extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController summaryController;
@@ -32,7 +28,6 @@ class CreationProfileHeader extends StatelessWidget {
     required this.nameShakeController,
   });
 
-  /// Shows a confirmation dialog before removing the selected photo.
   Future<void> _confirmRemovePhoto(BuildContext context) async {
     final localizations = AppLocalizations.of(context)!;
     final restoreNavBar = Darkener.darken();
@@ -56,8 +51,14 @@ class CreationProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final double avatarSize = screenWidth * 0.3;
-    final double spacing = screenWidth * 0.02;
+    final bool isTablet = screenWidth >= 600;
+
+    // --- TABLET OPTIMIZATIONS ---
+    // Make Avatar substantially larger on tablet (180px)
+    final double avatarSize = isTablet ? 180.0 : screenWidth * 0.3;
+    final double spacing = isTablet ? 32.0 : screenWidth * 0.02;
+    final double borderRadius = isTablet ? 16.0 : screenWidth * 0.025;
+    final double inputTextSize = isTablet ? 18.0 : 16.0;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,7 +75,7 @@ class CreationProfileHeader extends StatelessWidget {
         // --- Text Fields Section ---
         Expanded(
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: spacing / 2),
+            padding: EdgeInsets.symmetric(vertical: isTablet ? 8 : spacing / 2),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,16 +88,16 @@ class CreationProfileHeader extends StatelessWidget {
                       controller: nameController,
                       maxLength: 16,
                       inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9çÇğĞıİöÖşŞüÜ\s]'))],
-                      style: TextStyle(color: AppColors.primaryColor.inverted),
+                      style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: inputTextSize),
                       decoration: InputDecoration(
                         labelText: AppLocalizations.of(context)!.nameLabel,
-                        labelStyle: TextStyle(color: AppColors.primaryColor.inverted),
+                        labelStyle: TextStyle(color: AppColors.primaryColor.inverted, fontSize: inputTextSize),
                         filled: true,
-                        fillColor: AppColors.primaryColor, // UPDATED: Matched old color
+                        fillColor: AppColors.primaryColor,
                         counterText: '',
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.border), borderRadius: BorderRadius.circular(screenWidth * 0.025)),
-                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor.inverted), borderRadius: BorderRadius.circular(screenWidth * 0.025)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: isTablet ? 16 : 8),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.border), borderRadius: BorderRadius.circular(borderRadius)),
+                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor.inverted), borderRadius: BorderRadius.circular(borderRadius)),
                       ),
                     ),
                   ),
@@ -107,16 +108,16 @@ class CreationProfileHeader extends StatelessWidget {
                   child: TextField(
                     controller: summaryController,
                     maxLength: 40,
-                    style: TextStyle(color: AppColors.primaryColor.inverted),
+                    style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: inputTextSize),
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context)!.summaryLabel,
-                      labelStyle: TextStyle(color: AppColors.primaryColor.inverted),
+                      labelStyle: TextStyle(color: AppColors.primaryColor.inverted, fontSize: inputTextSize),
                       filled: true,
-                      fillColor: AppColors.primaryColor, // UPDATED: Matched old color
+                      fillColor: AppColors.primaryColor,
                       counterText: '',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.border), borderRadius: BorderRadius.circular(screenWidth * 0.025)),
-                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor.inverted), borderRadius: BorderRadius.circular(screenWidth * 0.025)),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: isTablet ? 16 : 8),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.border), borderRadius: BorderRadius.circular(borderRadius)),
+                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor.inverted), borderRadius: BorderRadius.circular(borderRadius)),
                     ),
                     maxLines: 1,
                   ),
@@ -129,13 +130,12 @@ class CreationProfileHeader extends StatelessWidget {
     );
   }
 
-  /// Builds the confirmation dialog, styled to match the original application.
   Widget _buildConfirmationDialog(BuildContext ctx, AppLocalizations localizations) {
     return Center(
       child: Material(
         color: Colors.transparent,
         child: Container(
-          width: MediaQuery.of(ctx).size.width * 0.8,
+          width: MediaQuery.of(ctx).size.width >= 600 ? 500 : MediaQuery.of(ctx).size.width * 0.8,
           decoration: BoxDecoration(color: AppColors.secondaryColor, borderRadius: BorderRadius.circular(10)),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
@@ -143,12 +143,12 @@ class CreationProfileHeader extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
                     children: [
-                      Text(localizations.removePhotoTitle, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
-                      const SizedBox(height: 12),
-                      Text(localizations.confirmRemovePhoto, style: TextStyle(color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
+                      Text(localizations.removePhotoTitle, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
+                      const SizedBox(height: 16),
+                      Text(localizations.confirmRemovePhoto, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: 16), textAlign: TextAlign.center),
                     ],
                   ),
                 ),
@@ -170,7 +170,6 @@ class CreationProfileHeader extends StatelessWidget {
     );
   }
 
-  /// Helper to build a styled dialog button, matching the original app design.
   Widget _buildDialogButton(BuildContext ctx, String text, Color color, VoidCallback onPressed) {
     return Expanded(
       child: Material(
@@ -181,8 +180,8 @@ class CreationProfileHeader extends StatelessWidget {
           onTap: onPressed,
           child: Container(
             alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text(text, style: TextStyle(color: color, fontSize: 16), textAlign: TextAlign.center),
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            child: Text(text, style: TextStyle(color: color, fontSize: 18), textAlign: TextAlign.center),
           ),
         ),
       ),
@@ -190,7 +189,6 @@ class CreationProfileHeader extends StatelessWidget {
   }
 }
 
-/// A private helper widget for the circular avatar and its selection/removal controls.
 class _AvatarPicker extends StatelessWidget {
   final double size;
   final File? image;
@@ -219,7 +217,7 @@ class _AvatarPicker extends StatelessWidget {
               backgroundColor: AppColors.secondaryColor,
               backgroundImage: image != null ? FileImage(image!) : null,
               child: image == null
-                  ? Icon(Icons.broken_image, size: size / 2.5, color: AppColors.primaryColor.inverted) // UPDATED to match old icon
+                  ? Icon(Icons.broken_image, size: size / 2.5, color: AppColors.primaryColor.inverted)
                   : null,
             ),
             Positioned(
@@ -236,7 +234,7 @@ class _AvatarPicker extends StatelessWidget {
                   ),
                   child: AnimatedRotation(
                     duration: const Duration(milliseconds: 300),
-                    turns: image == null ? 0.0 : 0.125, // 45 degrees
+                    turns: image == null ? 0.0 : 0.125,
                     child: SvgPicture.asset(
                       'assets/icons/plus.svg',
                       width: size * 0.18,
@@ -256,7 +254,6 @@ class _AvatarPicker extends StatelessWidget {
   }
 }
 
-// Dummy ShakeWidget to prevent compilation errors if it's not defined elsewhere.
 class ShakeWidget extends StatelessWidget {
   final Widget child;
   final AnimationController controller;

@@ -910,20 +910,20 @@ class AppLocalizationsIt extends AppLocalizations {
   String get help => 'Aiuto';
 
   @override
-  String get redeemCode => 'Riscatta Codice';
+  String get supportCreator => 'Supporta un creatore';
 
   @override
-  String get enterYourCode =>
-      'Sostieni i tuoi creatori preferiti! Inserisci il loro codice unico qui sotto per dare loro una parte dei tuoi acquisti su Cortex.';
+  String get enterYourTag =>
+      'Sostieni i tuoi creatori preferiti! Inserisci il loro tag univoco qui sotto per condividere con loro i tuoi acquisti Cortex.';
 
   @override
-  String get code => 'Codice';
+  String get creatorTag => 'Tag del creatore';
 
   @override
-  String get redeem => 'Riscatta';
+  String get support => 'Sostieni';
 
   @override
-  String get codeCannotBeEmpty => 'Il codice non può essere vuoto';
+  String get tagCannotBeEmpty => 'Il tag creatore non può essere vuoto';
 
   @override
   String get userId => 'ID Utente';
@@ -1518,11 +1518,11 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Accedi al tuo account Vertex. I nuovi utenti che si registrano tramite servizi di terze parti accettano i nostri Termini e la nostra Informativa sulla privacy. Puoi consultarli nella schermata di registrazione.';
+      'Accedi al tuo account Vertex. Continuando, accetti i nostri Termini di servizio e l\'Informativa sulla privacy.';
 
   @override
   String get registerSubtitle =>
-      'Crea un account Vertex, che potrai utilizzare anche per i nostri altri progetti.';
+      'Crea un account Vertex per accedere senza problemi a tutti i nostri servizi. Continuando, accetti i nostri Termini di servizio e l\'Informativa sulla privacy.';
 
   @override
   String get photoWarningMessage =>
@@ -2028,7 +2028,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Si è verificato un problema durante il recupero degli ultimi aggiornamenti. Controlla la connessione e riprova.';
 
   @override
-  String get codeNotFound => 'Il codice inserito non è valido o è scaduto.';
+  String get tagNotFound => 'Il tag inserito non è valido o è scaduto.';
 
   @override
   String get whatIsNew => 'Cosa c\'è di nuovo?';
@@ -2131,5 +2131,13 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return 'Circa $price/mese';
+  }
+
+  @override
+  String get confirmDownloadTitle => 'Sei sicuro di voler scaricare?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'Questo modello occuperà circa $size di spazio.';
   }
 }

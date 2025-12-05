@@ -12,10 +12,8 @@ import '../providers/general.dart';
 
 /// A widget that manages the app theme selection section in the settings screen.
 ///
-/// This component consumes `SettingsGeneralProvider` and `ThemeProvider`. It
-/// displays the currently selected theme and provides a polished dialog for the user to
-/// choose a new one. Theme availability is dynamically determined based on the
-/// user's active subscription status from the provider.
+/// This component adapts its internal dialog UI to the screen size, ensuring
+/// comfortable interaction targets on both phones and tablets.
 class AppThemeSection extends StatelessWidget {
   const AppThemeSection({super.key});
 
@@ -31,7 +29,7 @@ class AppThemeSection extends StatelessWidget {
       'ocean': localizations.ocean,
       'scarletSnow': localizations.scarletSnow,
     };
-    return mapping[themeCode] ?? themeCode; // Fallback to the code itself
+    return mapping[themeCode] ?? themeCode;
   }
 
   /// Determines the minimum subscription level required to unlock a theme.
@@ -60,10 +58,7 @@ class AppThemeSection extends StatelessWidget {
     return activeUserLevel >= requiredLevel;
   }
 
-  /// Sorts themes according to a specific logic:
-  /// 1. Base themes ('light', 'dark', 'grayscale') always come first.
-  /// 2. All other enabled themes are sorted alphabetically.
-  /// 3. All locked themes are listed last, sorted by required level, then alphabetically.
+  /// Sorts themes: Base > Enabled Alphabetical > Locked.
   List<Map<String, dynamic>> _sortThemes(List<Map<String, dynamic>> themes) {
     themes.sort((a, b) {
       final bool aEnabled = a['enabled'] as bool;
@@ -97,14 +92,17 @@ class AppThemeSection extends StatelessWidget {
     return themes;
   }
 
-  /// Displays the theme selection dialog with a polished UI and animations.
+  /// Displays the theme selection dialog with responsive scaling.
   Future<void> _showThemeSelectionDialog(BuildContext context) async {
     final generalProvider = context.read<SettingsGeneralProvider>();
     final themeProvider = context.read<ThemeProvider>();
     final notificationService = context.read<IntrovertNotificationService>();
     final appLocalizations = AppLocalizations.of(context)!;
+
+    // --- DYNAMIC SCALING ---
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final double scale = screenWidth / 400.0;
 
     final List<String> availableThemeCodes = AppColors.overlayStyles.keys.toList();
     List<Map<String, dynamic>> themesList = availableThemeCodes.map((code) {
@@ -129,10 +127,14 @@ class AppThemeSection extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: Container(
-              width: screenWidth * 0.7,
-              decoration: BoxDecoration(color: AppColors.secondaryColor, borderRadius: BorderRadius.circular(16)),
+              // Cap width for tablets so it doesn't look too stretched
+              width: (screenWidth * 0.8).clamp(0, 500 * scale),
+              decoration: BoxDecoration(
+                  color: AppColors.secondaryColor,
+                  borderRadius: BorderRadius.circular(16 * scale)
+              ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16 * scale),
                 child: StatefulBuilder(
                   builder: (dialogContext, setStateDialog) {
                     return Column(
@@ -140,20 +142,24 @@ class AppThemeSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // --- Dialog Header with Icon ---
-                        SizedBox(height: screenHeight * 0.02),
+                        SizedBox(height: 20 * scale),
                         SvgPicture.asset(
                           'assets/icons/theme.svg',
-                          width: screenWidth * 0.07,
-                          height: screenWidth * 0.07,
+                          width: 30 * scale,
+                          height: 30 * scale,
                           colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
                         ),
-                        SizedBox(height: screenHeight * 0.008),
+                        SizedBox(height: 10 * scale),
                         Text(
                           appLocalizations.theme,
-                          style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
+                          style: TextStyle(
+                              fontSize: 18 * scale,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryColor.inverted
+                          ),
                           textAlign: TextAlign.center,
                         ),
-                        SizedBox(height: screenHeight * 0.008),
+                        SizedBox(height: 10 * scale),
                         Divider(height: 1, thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha:0.7)),
 
                         // --- Themes List with Animations ---
@@ -161,7 +167,10 @@ class AppThemeSection extends StatelessWidget {
                           constraints: BoxConstraints(maxHeight: screenHeight * 0.4),
                           child: ListView.builder(
                             shrinkWrap: true,
-                            padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01, horizontal: screenWidth * 0.02),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10 * scale,
+                                horizontal: 10 * scale
+                            ),
                             itemCount: themesList.length,
                             itemBuilder: (context, index) {
                               final theme = themesList[index];
@@ -174,7 +183,7 @@ class AppThemeSection extends StatelessWidget {
                                 curve: Curves.easeInOut,
                                 decoration: BoxDecoration(
                                   color: isSelected ? AppColors.primaryColor.inverted.withValues(alpha: 0.02) : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(8 * scale),
                                 ),
                                 child: ListTile(
                                   leading: isEnabled
@@ -185,16 +194,17 @@ class AppThemeSection extends StatelessWidget {
                                       isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
                                       key: ValueKey<bool>(isSelected),
                                       color: AppColors.primaryColor.inverted,
+                                      size: 24 * scale,
                                     ),
                                   )
                                       : SizedBox(
-                                    width: 24, // Align with radio button size
-                                    height: 24,
+                                    width: 24 * scale,
+                                    height: 24 * scale,
                                     child: Center(
                                       child: SvgPicture.asset(
                                         'assets/icons/lock.svg',
-                                        width: 20,
-                                        height: 20,
+                                        width: 20 * scale,
+                                        height: 20 * scale,
                                         colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted.withValues(alpha:0.5), BlendMode.srcIn),
                                       ),
                                     ),
@@ -202,7 +212,7 @@ class AppThemeSection extends StatelessWidget {
                                   title: Text(
                                     theme['name'] as String,
                                     style: TextStyle(
-                                      fontSize: 15,
+                                      fontSize: 15 * scale,
                                       color: isEnabled ? AppColors.primaryColor.inverted : AppColors.primaryColor.inverted.withValues(alpha: 0.5),
                                     ),
                                   ),
@@ -213,15 +223,15 @@ class AppThemeSection extends StatelessWidget {
                                       }
                                     } else {
                                       notificationService.showNotification(
-                                        message: appLocalizations.themeLocked,
-                                        type: NotificationType.error
+                                          message: appLocalizations.themeLocked,
+                                          type: NotificationType.error
                                       );
                                     }
                                   },
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(8 * scale),
                                   ),
-                                  contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 10 * scale),
                                 ),
                               );
                             },
@@ -237,11 +247,15 @@ class AppThemeSection extends StatelessWidget {
                             highlightColor: AppColors.senaryColor.withValues(alpha:0.1),
                             onTap: () => Navigator.of(ctx).pop(tempSelectedTheme),
                             child: Container(
-                              height: 50,
+                              height: 50 * scale,
                               alignment: Alignment.center,
                               child: Text(
                                 appLocalizations.done,
-                                style: TextStyle(fontSize: 16, color: AppColors.senaryColor, fontWeight: FontWeight.w500),
+                                style: TextStyle(
+                                    fontSize: 16 * scale,
+                                    color: AppColors.senaryColor,
+                                    fontWeight: FontWeight.w500
+                                ),
                               ),
                             ),
                           ),
@@ -271,39 +285,39 @@ class AppThemeSection extends StatelessWidget {
     final currentThemeName = _getLocalizedThemeName(appLocalizations, themeProvider.currentTheme);
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final double scale = screenWidth / 400.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           appLocalizations.theme,
-          style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600),
+          style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: 18 * scale, fontWeight: FontWeight.w600),
         ),
-        SizedBox(height: screenHeight * 0.01),
+        SizedBox(height: 8 * scale),
         Text(
           appLocalizations.themeDescription,
-          style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
+          style: TextStyle(color: AppColors.quinaryColor, fontSize: 14 * scale),
         ),
-        SizedBox(height: screenHeight * 0.02),
+        SizedBox(height: 16 * scale),
         Material(
           color: AppColors.secondaryColor,
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(10.0 * scale),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: () => _showThemeSelectionDialog(context),
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(10.0 * scale),
             splashColor: AppColors.quaternaryColor.withValues(alpha:0.3),
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02, horizontal: screenWidth * 0.04),
+              padding: EdgeInsets.symmetric(vertical: 16 * scale, horizontal: 16 * scale),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     currentThemeName,
-                    style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.041, fontWeight: FontWeight.w500),
+                    style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: 16 * scale, fontWeight: FontWeight.w500),
                   ),
-                  Icon(Icons.arrow_forward_ios, color: AppColors.primaryColor.inverted, size: screenWidth * 0.04),
+                  Icon(Icons.arrow_forward_ios, color: AppColors.primaryColor.inverted, size: 16 * scale),
                 ],
               ),
             ),

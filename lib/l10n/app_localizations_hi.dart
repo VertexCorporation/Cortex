@@ -903,20 +903,20 @@ class AppLocalizationsHi extends AppLocalizations {
   String get help => 'मदद';
 
   @override
-  String get redeemCode => 'कोड रिडीम करें';
+  String get supportCreator => 'एक निर्माता का समर्थन करें';
 
   @override
-  String get enterYourCode =>
-      'अपने पसंदीदा रचनाकारों का समर्थन करें! अपनी Cortex खरीद का एक हिस्सा उन्हें देने के लिए नीचे उनका अद्वितीय कोड दर्ज करें।';
+  String get enterYourTag =>
+      'अपने पसंदीदा रचनाकारों का समर्थन करें! नीचे उनका अनूठा टैग दर्ज करें और उन्हें अपनी कॉर्टेक्स खरीदारी में हिस्सा दें।';
 
   @override
-  String get code => 'कोड';
+  String get creatorTag => 'निर्माता टैग';
 
   @override
-  String get redeem => 'रिडीम';
+  String get support => 'समर्थन करें';
 
   @override
-  String get codeCannotBeEmpty => 'कोड खाली नहीं हो सकता';
+  String get tagCannotBeEmpty => 'निर्माता टैग रिक्त नहीं हो सकता';
 
   @override
   String get userId => 'उपयोगकर्ता आईडी';
@@ -1507,11 +1507,11 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'अपने वर्टेक्स खाते में लॉग इन करें। तृतीय-पक्ष सेवाओं के माध्यम से साइन अप करने वाले नए उपयोगकर्ता हमारी शर्तों और गोपनीयता नीति से सहमत होते हैं। आप साइन अप स्क्रीन पर उनकी समीक्षा कर सकते हैं।';
+      'अपने वर्टेक्स खाते में लॉग इन करें। जारी रखकर, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।';
 
   @override
   String get registerSubtitle =>
-      'एक वर्टेक्स खाता बनाएं, जिसका उपयोग आप हमारी अन्य परियोजनाओं के लिए भी कर सकते हैं।';
+      'हमारी सभी सेवाओं तक निर्बाध पहुँच के लिए एक वर्टेक्स खाता बनाएँ। जारी रखकर, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।';
 
   @override
   String get photoWarningMessage =>
@@ -1984,7 +1984,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get channelFcmDescription =>
-      'कॉर्टेक्स से समाचार, अपडेट और अन्य सूचनाओं के बारे में सूचनाएं।';
+      'कॉर्टेक्स से समाचार, अपडेट और अन्य जानकारी के बारे में सूचनाएं।';
 
   @override
   String get channelEngagementName => 'मैत्रीपूर्ण अनुस्मारक';
@@ -2015,8 +2015,8 @@ class AppLocalizationsHi extends AppLocalizations {
       'नवीनतम अपडेट प्राप्त करने में समस्या हुई, कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें.';
 
   @override
-  String get codeNotFound =>
-      'आपके द्वारा प्रविष्ट कोड अमान्य है या उसकी समय सीमा समाप्त हो चुकी है।';
+  String get tagNotFound =>
+      'आपके द्वारा दर्ज किया गया टैग अमान्य है या उसकी समय सीमा समाप्त हो चुकी है।';
 
   @override
   String get whatIsNew => 'नया क्या है?';
@@ -2119,5 +2119,13 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return 'लगभग $price/माह';
+  }
+
+  @override
+  String get confirmDownloadTitle => 'क्या आप वाकई डाउनलोड करना चाहते हैं?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'यह मॉडल लगभग $size स्थान घेरेगा।';
   }
 }

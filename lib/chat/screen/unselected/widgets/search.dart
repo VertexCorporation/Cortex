@@ -5,18 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 
-/// A sophisticated search bar widget that now includes an adjacent filter button.
-/// The text field has a modern design with a background fill and a distinct border.
+/// A sophisticated search bar widget that includes an adjacent filter button.
+/// The layout adapts dynamically to the screen width, ensuring consistency
+/// across mobile and tablet devices.
 class SearchBarWidget extends StatelessWidget {
   final TextEditingController controller;
   final AppLocalizations localizations;
-  final VoidCallback? onFilterTap; // Callback for the new filter button
+  final VoidCallback? onFilterTap;
 
   const SearchBarWidget({
     super.key,
     required this.controller,
     required this.localizations,
-    this.onFilterTap, // Optional: to be implemented later
+    this.onFilterTap,
   });
 
   @override
@@ -24,14 +25,20 @@ class SearchBarWidget extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     // --- DYNAMIC SIZING CONSTANTS ---
-    final double borderRadiusValue = screenWidth * 0.04; // e.g., ~16 on a 400px wide screen
-    final double horizontalSpacing = screenWidth * 0.03; // e.g., ~12
+    // Scaled relative to screen width for responsiveness.
+
+    final double borderRadiusValue = screenWidth * 0.04;
+
+    // This prevents the search field and filter button from appearing
+    // too close together on wider tablet screens.
+    final double horizontalSpacing = screenWidth * 0.04;
+
     final double buttonPadding = screenWidth * 0.03;
-    final double textFieldVerticalPadding = screenWidth * 0.02; // e.g., ~8
+    final double textFieldVerticalPadding = screenWidth * 0.02;
 
     return Row(
       children: [
-        // The TextField is wrapped in Expanded to fill the available horizontal space.
+        // The TextField is wrapped in Expanded to occupy all remaining horizontal space.
         Expanded(
           child: TextField(
             controller: controller,
@@ -46,14 +53,27 @@ class SearchBarWidget extends StatelessWidget {
                 color: AppColors.primaryColor.inverted.withValues(alpha: 0.6),
                 fontSize: screenWidth * 0.04,
               ),
-              prefixIcon: Icon(
-                Icons.search,
-                color: AppColors.primaryColor.inverted.withValues(alpha: 0.8),
-                size: screenWidth * 0.06,
+              prefixIcon: Padding(
+                // Adds dynamic horizontal spacing around the icon.
+                // This effectively increases the gap between the search icon and the hint text,
+                // preventing them from looking crowded on larger tablet screens.
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                child: Icon(
+                  Icons.search,
+                  color: AppColors.primaryColor.inverted.withValues(alpha: 0.8),
+                  size: screenWidth * 0.06,
+                ),
+              ),
+              // We relax the default constraints to accommodate the extra padding
+              // and the dynamic icon size, ensuring proper alignment.
+              prefixIconConstraints: BoxConstraints(
+                minWidth: screenWidth * 0.12,
+                minHeight: 0,
               ),
               filled: true,
               fillColor: AppColors.background,
               contentPadding: EdgeInsets.symmetric(vertical: textFieldVerticalPadding),
+              // Unified border styling for all states
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(borderRadiusValue),
                 borderSide: BorderSide(
@@ -78,10 +98,12 @@ class SearchBarWidget extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: horizontalSpacing), // Spacing between search bar and filter button
+
+        // Dynamic spacing between search input and filter button
+        SizedBox(width: horizontalSpacing),
 
         // --- Filter Button ---
-        // A stylish, circular button with an icon.
+        // A distinct, icon-only button designed to complement the search bar.
         InkWell(
           onTap: onFilterTap ?? () {},
           borderRadius: BorderRadius.circular(borderRadiusValue),

@@ -878,20 +878,20 @@ class AppLocalizationsKo extends AppLocalizations {
   String get help => '도움말';
 
   @override
-  String get redeemCode => '코드 사용';
+  String get supportCreator => '크리에이터 지원하기';
 
   @override
-  String get enterYourCode =>
-      '좋아하는 크리에이터를 후원하세요! 아래에 고유 코드를 입력하여 Cortex 구매 금액의 일부를 그들에게 전달하세요.';
+  String get enterYourTag =>
+      '좋아하는 크리에이터를 응원하세요! 아래에 크리에이터의 고유 태그를 입력하여 Cortex 구매 시 발생하는 수익을 크리에이터에게 기부하세요.';
 
   @override
-  String get code => '코드';
+  String get creatorTag => '크리에이터 태그';
 
   @override
-  String get redeem => '사용하기';
+  String get support => '후원하기';
 
   @override
-  String get codeCannotBeEmpty => '코드는 비워둘 수 없습니다.';
+  String get tagCannotBeEmpty => '생성자 태그는 비어 있을 수 없습니다.';
 
   @override
   String get userId => '사용자 ID';
@@ -1456,10 +1456,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Vertex 계정에 로그인하세요. 타사 서비스를 통해 가입하는 신규 사용자는 당사의 이용 약관 및 개인정보 보호정책에 동의하는 것으로 간주됩니다. 가입 화면에서 해당 내용을 확인할 수 있습니다.';
+      'Vertex 계정에 로그인하세요. 계속 진행하면 당사의 서비스 약관 및 개인정보 처리방침에 동의하는 것으로 간주됩니다.';
 
   @override
-  String get registerSubtitle => 'Vertex 계정을 생성하면 다른 프로젝트에서도 사용할 수 있습니다.';
+  String get registerSubtitle =>
+      'Vertex 계정을 생성하시면 모든 서비스를 원활하게 이용하실 수 있습니다. 계속 진행하시면 당사의 서비스 약관 및 개인정보 처리방침에 동의하는 것으로 간주됩니다.';
 
   @override
   String get photoWarningMessage =>
@@ -1950,7 +1951,7 @@ class AppLocalizationsKo extends AppLocalizations {
       '최신 업데이트를 가져오는 중 문제가 발생했습니다. 연결 상태를 확인하고 다시 시도해 주세요.';
 
   @override
-  String get codeNotFound => '입력하신 코드가 잘못되었거나 만료되었습니다.';
+  String get tagNotFound => '입력하신 태그가 잘못되었거나 만료되었습니다.';
 
   @override
   String get whatIsNew => '새로운 소식은?';
@@ -2052,5 +2053,13 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return '약 $price/월';
+  }
+
+  @override
+  String get confirmDownloadTitle => '정말로 다운로드하시겠습니까?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return '이 모델은 약 $size의 공간을 차지합니다.';
   }
 }

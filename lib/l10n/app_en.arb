@@ -171,8 +171,8 @@
   },
   "downloadPaused": "Download paused.",
 
-  "purchaseSuccessful": "Purchase succesful!",
-  "purchaseFailed": "Purchase unsuccesful",
+  "purchaseSuccessful": "Purchase successful!",
+  "purchaseFailed": "Purchase unsuccessful",
   "creditProductNotFound": "The selected credit product could not be found.",
   "creditsAddedSuccessfully": "Credits were added to your account successfully!",
   "creditDeliveryFailed": "Failed to add credits to your account. Please contact support.",
@@ -426,11 +426,11 @@
   "user": "User",
   "voice": "Voice",
   "help": "Help",
-  "redeemCode": "Redeem Code",
-  "enterYourCode": "Support your favorite creators! Enter their unique code below to give them a share of your Cortex purchases.",
-  "code": "Code",
-  "redeem": "Redeem",
-  "codeCannotBeEmpty": "Code cannot be empty",
+  "supportCreator": "Support a Creator",
+  "enterYourTag": "Support your favorite creators! Enter their unique tag below to give them a share of your Cortex purchases.",
+  "creatorTag": "Creator Tag",
+  "support": "Support",
+  "tagCannotBeEmpty": "Creator tag cannot be empty",
   "userId": "User ID",
   "deleteAllConversationsConfirmTitle": "Delete All Chats?",
   "deleteAllConversationsConfirmMessage": "Are you sure you want to delete all of your chats? This cannot be undone.",
@@ -644,8 +644,8 @@
   "deleteAllConversationsDisabledInfo": "You cannot delete all conversations while in an active chat, please exit the current chat first to proceed.",
   "invalidCredentials": "Incorrect email or password.",
   "userDisabled": "This user account has been disabled.",
-  "loginSubtitle": "Log in to your Vertex account. New users signing up via third-party services agree to our Terms & Privacy Policy. You can review them on the Sign Up screen.",
-  "registerSubtitle": "Create a Vertex account, which you can also use for our other projects.",
+  "loginSubtitle": "Log in to your Vertex account. By continuing, you agree to our Terms of Service & Privacy Policy.",
+  "registerSubtitle": "Create a Vertex account for seamless access across all our services. By continuing, you agree to our Terms of Service & Privacy Policy.",
   "photoWarningMessage": "A photo is included. Models that don't support images may ignore it.",
   "loginRequiredForPurchase": "You must be logged in to make a purchase.",
   "storagePermissionRequired": "Storage permission is required to save downloaded models. Please grant permission to continue.",
@@ -918,37 +918,7 @@
     "description": "The user-visible name for the main notification channel."
   },
 
-  "channelFcmDescription": "Notifications about news, updates and other informations from Cortex.",
-  "@channelFcmName": {
-    "description": "The user-visible description for the main notification channel."
-  },
-
-  "channelEngagementName": "Friendly Reminders",
-  "@channelEngagementName": {
-    "description": "The user-visible name for the engagement notification channel."
-  },
-
-  "channelEngagementDescription": "Fun notifications to keep you engaged.",
-  "@channelEngagementDescription": {
-    "description": "The user-visible description for the engagement notification channel."
-  },
-
-  "channelGreetingsName": "Daily Greetings",
-  "@channelGreetingsName": {
-    "description": "The user-visible name for the greetings notification channel."
-  },
-
-  "channelGreetingsDescription": "The messages like good morning and good night.",
-  "@channelGreetingsDescription": {
-    "description": "The user-visible description for the greetings notification channel."
-  },
-
-  "channelFcmName": "Cortex Updates",
-  "@channelFcmName": {
-    "description": "The user-visible name for the main notification channel."
-  },
-
-  "channelFcmDescription": "Notifications about news, updates and other informations from Cortex.",
+  "channelFcmDescription": "Notifications about news, updates and other information from Cortex.",
   "@channelFcmName": {
     "description": "The user-visible description for the main notification channel."
   },
@@ -978,7 +948,7 @@
 
   "newsErrorTitle": "Failed to Load News",
   "newsErrorMessage": "There was a problem fetching the latest updates, please check your connection and try again.",
-  "codeNotFound": "The code you entered is invalid or has expired.",
+  "tagNotFound": "The tag you entered is invalid or has expired.",
   "whatIsNew": "What's new?",
 
   "onboardingTitle1": "Hey! We're the Cortex Team.",
@@ -1022,5 +992,7 @@
   "annualTotalDescription": "{price}/year, billed annually",
   "@annualTotalDescription": { "placeholders": { "price": {} } },
   "equivalentMonthlyDescription": "Approximately {price}/month",
-  "@equivalentMonthlyDescription": { "placeholders": { "price": {} } }
+  "@equivalentMonthlyDescription": { "placeholders": { "price": {} } },
+  "confirmDownloadTitle": "Are you sure you want to download?",
+  "downloadSizeDisclosure": "This model will occupy approximately {size} of space."
 }

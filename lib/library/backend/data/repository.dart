@@ -318,8 +318,12 @@ class ModelRepository {
         return <String>{};
       }
 
-      if (e.type == DioExceptionType.connectionError || e.error is SocketException) {
-        debugPrint("[ModelRepository] Network error. Using local cache.");
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.connectionError ||
+          e.error is SocketException) {
+        debugPrint("[ModelRepository] Network timeout or connection error (${e.type}). Using local cache.");
         return <String>{};
       }
 

@@ -11,14 +11,12 @@ import '../../../../../theme.dart';
 import '../../../backend/data/entity.dart';
 import '../../../providers/details.dart';
 
-/// This widget manages its own state (open/closed) for the overlay panel
-/// and can be controlled externally via a GlobalKey.
 class _ExtensionOverlayPanel extends StatefulWidget {
   final List<Map<String, dynamic>> options;
   final String selectedExtension;
   final String modelTitle;
   final Function(Map<String, dynamic>) onSelect;
-  final VoidCallback onClosed; // Callback for when the closing animation finishes.
+  final VoidCallback onClosed;
 
   const _ExtensionOverlayPanel({
     super.key,
@@ -42,7 +40,6 @@ class _ExtensionOverlayPanelState extends State<_ExtensionOverlayPanel>
   @override
   void initState() {
     super.initState();
-    // Initialize the animation controller and the animations themselves.
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 150),
@@ -55,21 +52,17 @@ class _ExtensionOverlayPanelState extends State<_ExtensionOverlayPanel>
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
 
-    // Start the animation as soon as the widget is built.
     _controller.forward();
   }
 
   @override
   void dispose() {
-    // It's crucial to dispose of the controller to prevent memory leaks.
     _controller.dispose();
     super.dispose();
   }
 
-  /// This method will be called from DetailAppBarState via the GlobalKey.
   void startClosing() {
     if (mounted && !_controller.isAnimating) {
-      // Reverse the animation and call the onClosed callback when it completes.
       _controller.reverse().then((_) {
         widget.onClosed();
       });
@@ -79,8 +72,17 @@ class _ExtensionOverlayPanelState extends State<_ExtensionOverlayPanel>
   @override
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
-    final marginPx = screenW * .02;
-    final topPx = kToolbarHeight + MediaQuery.of(context).padding.top;
+    final bool isTablet = screenW >= 600;
+
+    // --- LEFT MARGIN CORRECTION ---
+    // Previously fixed 32.0 was too far for tablet.
+    // Now using 2% dynamic width universally.
+    // This moves the panel much closer to the left edge (approx 16px on an 800px screen).
+    final marginPx = screenW * 0.02;
+
+    // IMPORTANT: Account for the taller AppBar on tablet
+    final double toolbarHeight = isTablet ? screenW * 0.14 : kToolbarHeight;
+    final topPx = toolbarHeight + MediaQuery.of(context).padding.top;
 
     return Material(
       color: Colors.transparent,
@@ -88,7 +90,7 @@ class _ExtensionOverlayPanelState extends State<_ExtensionOverlayPanel>
         children: [
           Positioned.fill(
             child: GestureDetector(
-              onTap: startClosing, // Close when tapping outside the panel
+              onTap: startClosing,
             ),
           ),
           Positioned(
@@ -100,7 +102,7 @@ class _ExtensionOverlayPanelState extends State<_ExtensionOverlayPanel>
                 scale: _scaleAnimation,
                 alignment: Alignment.topLeft,
                 child: GestureDetector(
-                  onTap: () {}, // Prevent taps inside the panel from closing it
+                  onTap: () {},
                   child: Extensions.buildExtensionPanelWidget(
                     context: context,
                     options: widget.options,
@@ -136,7 +138,7 @@ class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
   State<DetailAppBar> createState() => DetailAppBarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(120); // Generous size for tablet
 }
 
 class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixin {
@@ -230,13 +232,8 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
   Future<void> dismissExtensionOverlay() async {
     if (isPanelOpen && _overlayKey.currentState != null) {
       final completer = Completer<void>();
-
-      // Trigger the closing animation in the overlay panel.
       _overlayKey.currentState!.startClosing();
-
-      // Wait for the animation to complete before resolving the future.
       await Future.delayed(const Duration(milliseconds: 160));
-
       if (!completer.isCompleted) {
         completer.complete();
       }
@@ -254,6 +251,13 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth >= 600;
+
+    // --- RESPONSIVE HEIGHT ---
+    final double toolbarHeight = isTablet ? screenWidth * 0.14 : kToolbarHeight;
+
+    // --- ELEMENT SCALING ---
+    final double backIconSize = isTablet ? 36.0 : screenWidth * 0.07;
 
     return Listener(
       behavior: HitTestBehavior.translucent,
@@ -266,6 +270,7 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
       },
       child: AppBar(
         scrolledUnderElevation: 0,
+        toolbarHeight: toolbarHeight,
         backgroundColor: AppColors.background,
         elevation: 0,
         leading: Builder(builder: (context) {
@@ -273,37 +278,36 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
           return IconButton(
             icon: Icon(Icons.arrow_back,
                 color: AppColors.primaryColor.inverted,
-                size: screenWidth * 0.07),
+                size: backIconSize),
             onPressed: _handleBackPressed,
           );
         }),
         title: Row(
           children: [
             Expanded(
-              child: _buildTitleWidget(context),
+              child: _buildTitleWidget(context, isTablet, screenWidth),
             ),
-            SizedBox(width: screenWidth * 0.02),
-            _buildDownloadStatusIndicator(context),
+            SizedBox(width: isTablet ? 16.0 : screenWidth * 0.02),
+            _buildDownloadStatusIndicator(context, isTablet, screenWidth),
           ],
         ),
         actions: [
-          SizedBox(width: screenWidth * 0.04),
+          SizedBox(width: isTablet ? 32.0 : screenWidth * 0.04),
         ],
       ),
     );
   }
 
-  /// Builds the title section of the AppBar, handling both singular and plural models.
-  Widget _buildTitleWidget(BuildContext context) {
+  Widget _buildTitleWidget(BuildContext context, bool isTablet, double screenWidth) {
     final provider = widget.provider;
-    final screenWidth = MediaQuery.of(context).size.width;
 
-    // If the model does not have extensions (is not plural).
+    // Tablet: Large Fonts (32/20). Phone: Dynamic.
+    final double titleFontSize = isTablet ? 32.0 : screenWidth * 0.055;
+    final double subFontSize = isTablet ? 20.0 : screenWidth * 0.04;
+    final double iconSize = isTablet ? 24.0 : screenWidth * 0.04;
+    final double iconPadding = isTablet ? 10.0 : screenWidth * 0.015;
+
     if (!provider.isPluralModel) {
-      // Wrap the Text widget in a FittedBox.
-      // `BoxFit.scaleDown` ensures the text only shrinks if it's too large
-      // to fit the available space. Otherwise, it maintains its original size.
-      // `alignment` keeps the text left-aligned if it doesn't need to shrink.
       return FittedBox(
         fit: BoxFit.scaleDown,
         alignment: Alignment.centerLeft,
@@ -312,14 +316,13 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
           style: TextStyle(
               fontFamily: 'Roboto',
               color: AppColors.primaryColor.inverted,
-              fontSize: screenWidth * 0.055,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.bold),
           maxLines: 1,
         ),
       );
     }
 
-    // If the model has extensions (is plural), build the interactive title.
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _showExtensionOverlayPanel,
@@ -327,8 +330,6 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // The same FittedBox logic is applied here to ensure the main title
-          // scales down gracefully instead of truncating with an ellipsis.
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -337,7 +338,7 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
               style: TextStyle(
                   fontFamily: 'Roboto',
                   color: AppColors.primaryColor.inverted,
-                  fontSize: screenWidth * 0.055,
+                  fontSize: titleFontSize,
                   fontWeight: FontWeight.bold),
               maxLines: 1,
             ),
@@ -366,18 +367,18 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
                     key: ValueKey<String>(_currentDisplayExtensionName),
                     style: TextStyle(
                         color: AppColors.quinaryColor,
-                        fontSize: screenWidth * 0.04),
+                        fontSize: subFontSize),
                     maxLines: 1,
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: screenWidth * 0.015),
+                  padding: EdgeInsets.only(left: iconPadding),
                   child: Transform.rotate(
-                    angle: -1.57075, // -90 degrees in radians
+                    angle: -1.57075,
                     child: SvgPicture.asset(
                       'assets/icons/arrov.svg',
-                      width: screenWidth * 0.04,
-                      height: screenWidth * 0.04,
+                      width: iconSize,
+                      height: iconSize,
                       colorFilter: ColorFilter.mode(
                           AppColors.quinaryColor, BlendMode.srcIn),
                     ),
@@ -391,11 +392,11 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
     );
   }
 
-  /// Builds the download status indicator displayed in the AppBar actions.
-  Widget _buildDownloadStatusIndicator(BuildContext context) {
+  Widget _buildDownloadStatusIndicator(BuildContext context, bool isTablet, double screenWidth) {
     final provider = widget.provider;
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+
+    final double fontSize = isTablet ? 18.0 : screenWidth * 0.035;
 
     String downloadStatus = '';
     if (provider.isDownloading) {
@@ -423,7 +424,7 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
             textAlign: TextAlign.end,
             style: TextStyle(
                 color: AppColors.quinaryColor,
-                fontSize: screenWidth * 0.035),
+                fontSize: fontSize),
             softWrap: false,
           ),
         ),

@@ -5,18 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 
-// This enum is defined in the controller, but we can redefine it here
-// or move it to a shared file if it's used in multiple places.
-// For now, let's keep it self-contained.
+// Enum defining the available filter categories for the model list.
 enum FilterType { all, online, offline, characters, custom }
 
 /// Displays a modal bottom sheet for filtering models.
 ///
-/// This function encapsulates the entire presentation and state management logic
-/// for the filter selection UI, keeping the calling widget clean.
+/// This function encapsulates the presentation and state management logic
+/// for the filter selection UI. It ensures the sheet utilizes the full
+/// screen width, which is particularly important for tablet layouts.
 ///
-/// It takes the current active filter and returns the newly selected filter
-/// via a callback function [onFilterChanged].
+/// [onFilterChanged] callback is triggered when a new filter is selected.
 void showModelFilterSheet({
   required BuildContext context,
   required AppLocalizations localizations,
@@ -31,8 +29,10 @@ void showModelFilterSheet({
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
+    // CRITICAL: Forces the bottom sheet to take the full width of the screen.
+    // Without this, the sheet may center itself or shrink on larger tablet screens.
+    constraints: const BoxConstraints(maxWidth: double.infinity),
     builder: (BuildContext modalContext) {
-      // Use a StatefulWidget inside the sheet to manage the tapped filter state.
       return _FilterSheetContent(
         localizations: localizations,
         initialFilter: activeFilter,
@@ -45,7 +45,8 @@ void showModelFilterSheet({
   );
 }
 
-/// The stateful content of the modal bottom sheet.
+/// The internal stateful widget for the filter sheet content.
+/// Handles the selection animation and logic before returning the value.
 class _FilterSheetContent extends StatefulWidget {
   final AppLocalizations localizations;
   final FilterType initialFilter;
@@ -76,12 +77,15 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
     _selectedFilter = widget.initialFilter;
   }
 
+  /// Builds a single selectable filter chip with entry animations.
   Widget _buildFilterChip({
     required String title,
     required FilterType filter,
     required int index,
   }) {
     final bool isActive = _selectedFilter == filter;
+
+    // Staggered animation based on index
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: Duration(milliseconds: 300 + (index * 100)),
@@ -100,7 +104,7 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
           setState(() => _selectedFilter = filter);
           widget.onFilterChanged(_selectedFilter);
 
-          // Close the sheet after a short delay to show the selection feedback.
+          // Provides a brief delay before closing to allow visual feedback (ripple/color change).
           Future.delayed(const Duration(milliseconds: 250), () {
             if (mounted) {
               Navigator.of(context).pop();
@@ -111,8 +115,8 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeInOut,
           padding: EdgeInsets.symmetric(
-              horizontal: widget.screenWidth * 0.045,
-              vertical: widget.screenHeight * 0.012
+            horizontal: widget.screenWidth * 0.045,
+            vertical: widget.screenHeight * 0.012,
           ),
           decoration: BoxDecoration(
             color: isActive ? AppColors.primaryColor.inverted : Colors.transparent,
@@ -137,6 +141,7 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
 
   @override
   Widget build(BuildContext context) {
+    // Definition of filter options
     final filters = [
       {'title': widget.localizations.allModels, 'filter': FilterType.all},
       {'title': widget.localizations.onlineModels, 'filter': FilterType.online},
@@ -146,6 +151,7 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
     ];
 
     return Container(
+      // Ensures the container fills the constraints provided by the modal sheet
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: widget.screenHeight * 0.015),
       decoration: BoxDecoration(
@@ -156,7 +162,8 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container( // Drag handle
+          // Visual Drag Handle
+          Container(
             width: widget.screenWidth * 0.1,
             height: 5,
             decoration: BoxDecoration(
@@ -165,6 +172,8 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
             ),
           ),
           SizedBox(height: widget.screenHeight * 0.025),
+
+          // Filter Options Content
           Padding(
             padding: EdgeInsets.symmetric(horizontal: widget.screenWidth * 0.05),
             child: Column(
@@ -172,7 +181,11 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
                 Text(
                   widget.localizations.filters,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: widget.screenWidth * 0.05, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
+                  style: TextStyle(
+                    fontSize: widget.screenWidth * 0.05,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryColor.inverted,
+                  ),
                 ),
                 SizedBox(height: widget.screenHeight * 0.01),
                 Text(
@@ -184,6 +197,8 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
                   ),
                 ),
                 SizedBox(height: widget.screenHeight * 0.02),
+
+                // Flexible wrap for filter chips
                 Wrap(
                   alignment: WrapAlignment.center,
                   spacing: widget.screenWidth * 0.025,

@@ -12,11 +12,6 @@ import '../../../backend/data/service.dart';
 import '../../../utils.dart';
 
 /// A widget for selecting a base model, used in the 'Create' (roleplay) screen.
-///
-/// This widget displays the currently selected base model and provides an
-/// expandable panel to choose from a list of available models. It is a
-/// stateless widget that gets all its data and state (like `isPanelExpanded`)
-/// from a parent provider.
 class BaseModelSelector extends StatelessWidget {
   final List<ModelEntity> availableBaseModels;
   final String? selectedBaseModelId;
@@ -40,19 +35,29 @@ class BaseModelSelector extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final localizations = AppLocalizations.of(context)!;
     final modelService = context.read<ModelService>();
+    final bool isTablet = screenWidth >= 600;
+
+    // --- TABLET OPTIMIZATIONS ---
+    final double titleSize = isTablet ? 26.0 : screenWidth * 0.05;
+    final double descSize = isTablet ? 18.0 : screenWidth * 0.035;
+    final double textSize = isTablet ? 20.0 : screenWidth * 0.04;
+    final double borderRadius = isTablet ? 16.0 : screenWidth * 0.025;
+    final double iconSize = isTablet ? 28.0 : screenWidth * 0.05;
+    final double paddingV = isTablet ? 20.0 : 15.0;
+    final double paddingH = isTablet ? 24.0 : screenWidth * 0.04;
 
     if (availableBaseModels.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.secondaryColor,
-          borderRadius: BorderRadius.circular(screenWidth * 0.025),
+          borderRadius: BorderRadius.circular(borderRadius),
           border: Border.all(color: AppColors.border.withValues(alpha:0.5)),
         ),
         child: Text(
           localizations.noMatchingModels,
           textAlign: TextAlign.center,
-          style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.038),
+          style: TextStyle(color: AppColors.quinaryColor, fontSize: textSize),
         ),
       );
     }
@@ -72,42 +77,60 @@ class BaseModelSelector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // --- Section Title & Description ---
-        Text(localizations.baseModelTitle, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600)),
+        Text(
+            localizations.baseModelTitle,
+            style: TextStyle(
+                color: AppColors.primaryColor.inverted,
+                fontSize: titleSize,
+                fontWeight: FontWeight.w600
+            )
+        ),
         const SizedBox(height: 5),
-        Text(localizations.baseModelDescription, style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035)),
+        Text(
+            localizations.baseModelDescription,
+            style: TextStyle(
+                color: AppColors.quinaryColor,
+                fontSize: descSize
+            )
+        ),
         const SizedBox(height: 15),
 
         // --- Selection Button ---
         Material(
           color: AppColors.secondaryColor,
-          borderRadius: BorderRadius.circular(screenWidth * 0.025),
+          borderRadius: BorderRadius.circular(borderRadius),
           child: InkWell(
             onTap: onTogglePanel,
-            borderRadius: BorderRadius.circular(screenWidth * 0.025),
+            borderRadius: BorderRadius.circular(borderRadius),
+            // Button Splash/Highlight Removal
+            splashFactory: NoSplash.splashFactory,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            hoverColor: Colors.transparent,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: 15),
+              padding: EdgeInsets.symmetric(horizontal: paddingH, vertical: paddingV),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       selectedBaseModelDisplayTitle ?? localizations.selectBaseModel,
-                      style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.04),
+                      style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: textSize),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (isCurrentlySelectedPremium)
                     Padding(
-                      padding: EdgeInsets.only(right: screenWidth * 0.02),
+                      padding: EdgeInsets.only(right: isTablet ? 12.0 : screenWidth * 0.02),
                       child: SvgPicture.asset(
                         'assets/icons/sparkle.svg',
-                        width: screenWidth * 0.05,
+                        width: iconSize,
                         colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted.withValues(alpha:0.8), BlendMode.srcIn),
                       ),
                     ),
                   AnimatedRotation(
                     turns: isPanelExpanded ? 0.5 : 0.0,
                     duration: const Duration(milliseconds: 200),
-                    child: Icon(Icons.keyboard_arrow_down, color: AppColors.primaryColor.inverted),
+                    child: Icon(Icons.keyboard_arrow_down, color: AppColors.primaryColor.inverted, size: isTablet ? 32 : 24),
                   ),
                 ],
               ),
@@ -120,7 +143,7 @@ class BaseModelSelector extends StatelessWidget {
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           child: isPanelExpanded
-              ? _buildBaseModelList(context, modelService)
+              ? _buildBaseModelList(context, modelService, borderRadius, iconSize, textSize, isTablet)
               : const SizedBox.shrink(),
         ),
       ],
@@ -128,22 +151,24 @@ class BaseModelSelector extends StatelessWidget {
   }
 
   /// Builds the list of selectable base models.
-  Widget _buildBaseModelList(BuildContext context, ModelService modelService) {
-    final screenWidth = MediaQuery.of(context).size.width;
+  Widget _buildBaseModelList(BuildContext context, ModelService modelService, double radius, double iconSize, double textSize, bool isTablet) {
+    // List Layout Constants
+    final double listHeight = isTablet ? 350.0 : 250.0;
+    final double avatarRadius = isTablet ? 28.0 : 20.0;
+    final double itemVerticalPadding = isTablet ? 16.0 : 12.0;
+    final double itemHorizontalPadding = isTablet ? 24.0 : 16.0;
+
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      height: 200,
+      height: listHeight,
       decoration: BoxDecoration(
         color: AppColors.secondaryColor,
-        borderRadius: BorderRadius.circular(screenWidth * 0.025),
+        borderRadius: BorderRadius.circular(radius),
       ),
       child: ListView(
         padding: EdgeInsets.zero,
         children: availableBaseModels.expand<Widget>((series) {
-          // Safely default to empty map
-          final Map<String, dynamic> extensions =
-              series.extensions ?? const {};
-
+          final Map<String, dynamic> extensions = series.extensions ?? const {};
           if (extensions.isEmpty) return [];
 
           return extensions.entries.map((ext) {
@@ -157,29 +182,61 @@ class BaseModelSelector extends StatelessWidget {
                 ? AssetImage(imagePath) as ImageProvider
                 : FileImage(File(imagePath));
 
-            final isVariantPremium =
-                (variantData['tier'] as String? ?? 'free') == 'premium';
+            final isVariantPremium = (variantData['tier'] as String? ?? 'free') == 'premium';
 
-            return ListTile(
-              leading: CircleAvatar(
-                backgroundImage: imageProvider,
-                backgroundColor: Colors.transparent,
-              ),
-              title: Text(
-                modelTitle,
-                style: TextStyle(color: AppColors.primaryColor.inverted),
-              ),
-              trailing: isVariantPremium
-                  ? SvgPicture.asset(
-                'assets/icons/sparkle.svg',
-                width: screenWidth * 0.05,
-                colorFilter: ColorFilter.mode(
-                  AppColors.primaryColor.inverted.withValues(alpha: 0.8),
-                  BlendMode.srcIn,
+            // REPLACED ListTile WITH CUSTOM INKWELL TO KILL THE WHITE HIGHLIGHT
+            return Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => onSelectBaseModel(modelId, modelTitle),
+                // CRITICAL: All splash and highlight colors set to transparent
+                splashFactory: NoSplash.splashFactory,
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent, // This kills the white light
+                hoverColor: Colors.transparent,
+                focusColor: Colors.transparent,
+
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: itemHorizontalPadding,
+                      vertical: itemVerticalPadding
+                  ),
+                  child: Row(
+                    children: [
+                      // Leading: Avatar
+                      CircleAvatar(
+                        backgroundImage: imageProvider,
+                        backgroundColor: Colors.transparent,
+                        radius: avatarRadius,
+                      ),
+
+                      SizedBox(width: isTablet ? 24.0 : 16.0), // Gap
+
+                      // Title
+                      Expanded(
+                        child: Text(
+                          modelTitle,
+                          style: TextStyle(
+                              color: AppColors.primaryColor.inverted,
+                              fontSize: textSize
+                          ),
+                        ),
+                      ),
+
+                      // Trailing: Sparkle Icon (if premium)
+                      if (isVariantPremium)
+                        SvgPicture.asset(
+                          'assets/icons/sparkle.svg',
+                          width: iconSize,
+                          colorFilter: ColorFilter.mode(
+                            AppColors.primaryColor.inverted.withValues(alpha: 0.8),
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              )
-                  : null,
-              onTap: () => onSelectBaseModel(modelId, modelTitle),
+              ),
             );
           }).toList();
         }).toList(),

@@ -64,7 +64,7 @@ class SettingsActionProvider with ChangeNotifier {
       case 'invalid-argument':
         return localizations.invalidUsernameCharacters;
       case 'not-found':
-        return localizations.codeNotFound;
+        return localizations.tagNotFound;
       case 'resource-exhausted':
         return localizations.tooManyRequests;
       default:

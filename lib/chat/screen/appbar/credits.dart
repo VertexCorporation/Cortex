@@ -91,18 +91,24 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
     _creditsInfoKey.currentContext!.findRenderObject() as RenderBox;
     final size = renderBox.size;
     final offset = renderBox.localToGlobal(Offset.zero);
-    final screenWidth = MediaQuery.of(context).size.width;
+
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final bool isTablet = mediaQuery.size.shortestSide > 600;
     final localizations = AppLocalizations.of(context)!;
 
-    final double panelWidth = screenWidth * 0.65;
-    final double panelLeft = ((offset.dx + size.width / 2) - (panelWidth / 2));
+    // --- RESPONSIVE PANEL DIMENSIONS ---
+    final double panelWidth = isTablet ? screenWidth * 0.45 : screenWidth * 0.65;
 
+    // Calculate position
+    final double panelLeft = ((offset.dx + size.width / 2) - (panelWidth / 2));
     final double panelTop = offset.dy + size.height + 16;
 
-    final double titleFontSize = screenWidth * 0.04;
-    final double bodyFontSize = screenWidth * 0.035;
-    final double footerFontSize = screenWidth * 0.033;
-    final double iconSize = screenWidth * 0.045;
+    // --- RESPONSIVE FONT SIZES ---
+    final double titleFontSize = isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
+    final double bodyFontSize = isTablet ? screenWidth * 0.022 : screenWidth * 0.035;
+    final double footerFontSize = isTablet ? screenWidth * 0.02 : screenWidth * 0.033;
+    final double iconSize = isTablet ? screenWidth * 0.03 : screenWidth * 0.045;
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
@@ -125,8 +131,8 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                         onTap: () {},
                         child: Container(
                           width: panelWidth,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 12.0),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.04, vertical: screenWidth * 0.03),
                           decoration: BoxDecoration(
                             color: AppColors.secondaryColor,
                             borderRadius: BorderRadius.circular(14),
@@ -147,8 +153,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Padding(
-                                    padding:
-                                    const EdgeInsets.only(right: 24.0),
+                                    padding: EdgeInsets.only(right: screenWidth * 0.06),
                                     child: Text(
                                       localizations.creditsInfoPanelTitle,
                                       style: TextStyle(
@@ -159,7 +164,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: screenWidth * 0.02),
                                   Text(
                                     localizations.creditsInfoPanelBody,
                                     style: TextStyle(
@@ -170,7 +175,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                       decoration: TextDecoration.none,
                                     ),
                                   ),
-                                  const SizedBox(height: 10),
+                                  SizedBox(height: screenWidth * 0.025),
                                   Text(
                                     localizations.creditsInfoPanelFooter,
                                     style: TextStyle(
@@ -215,8 +220,40 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final bool isTablet = mediaQuery.size.shortestSide > 600;
+
+    // --- FULLY DYNAMIC DIMENSIONS ---
+
+    // 1. Container Width:
+    // Tablet: 22% width. Phone: 26%.
+    final double containerWidth = isTablet ? screenWidth * 0.21 : screenWidth * 0.26;
+
+    // 2. Container Height:
+    // Tablet: Increased to 7% to match the larger fonts/icons properly.
+    final double containerHeight = isTablet ? screenWidth * 0.07 : screenHeight * 0.045;
+
+    // 3. Icon Size:
+    final double iconSize = isTablet ? screenWidth * 0.03 : screenWidth * 0.05;
+
+    // 4. Panel Left Position:
+    // IMPORTANT: Adjusted for tablet (0.065) to be slightly to the right,
+    // creating space for the overlapping hexagon on the left.
+    final double leftPos = isTablet ? screenWidth * 0.04 : screenWidth * 0.06;
+
+    // 5. Vertical Position:
+    // Tablet AppBar is roughly 0.14. We center this.
+    final double topPos = isTablet ? screenWidth * 0.038 : screenHeight * 0.02;
+
+    // 6. Hexagon Left Position:
+    // This places the hexagon overlapping the left edge of the panel.
+    // Panel starts at 0.065, Hexagon starts at 0.025 -> Tight overlap.
+    final double hexagonLeft = isTablet ? screenWidth * 0.025 : screenWidth * 0.02;
+
+    // 7. Font Size:
+    final double creditsFontSize = isTablet ? screenWidth * 0.025 : 14.0;
 
     return ValueListenableBuilder<int?>(
       valueListenable: CreditsManager.instance.totalCreditsNotifier,
@@ -246,35 +283,38 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                 clipBehavior: Clip.none,
                 alignment: Alignment.centerLeft,
                 children: [
+                  // Background Container
                   Positioned(
-                    top: screenHeight * 0.02,
-                    left: screenWidth * 0.05,
+                    top: topPos,
+                    left: leftPos,
                     child: Container(
                       key: _creditsInfoKey,
-                      width: screenWidth * 0.26,
-                      height: screenHeight * 0.045,
+                      width: containerWidth,
+                      height: containerHeight,
                       decoration: BoxDecoration(
                         color: AppColors.secondaryColor,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(screenWidth * 0.03),
                         border: Border.all(color: AppColors.border, width: 0.5),
                       ),
                     ),
                   ),
+                  // Content Container
                   Positioned(
-                    top: screenHeight * 0.02,
-                    left: screenWidth * 0.05,
+                    top: topPos,
+                    left: leftPos,
                     child: Container(
-                      width: screenWidth * 0.26,
-                      height: screenHeight * 0.045,
-                      padding:
-                      EdgeInsets.symmetric(horizontal: screenWidth * 0.016),
+                      width: containerWidth,
+                      height: containerHeight,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: isTablet ? screenWidth * 0.015 : screenWidth * 0.016),
                       alignment: Alignment.center,
                       child: Row(
                         children: [
-                          SizedBox(width: screenWidth * 0.07),
+                          // Padding to account for the overlapping Hexagon
+                          SizedBox(width: isTablet ? screenWidth * 0.065 : screenWidth * 0.07),
                           Expanded(
                             child: FittedBox(
-                              fit: BoxFit.contain,
+                              fit: BoxFit.scaleDown,
                               alignment: Alignment.center,
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 5.0),
@@ -287,6 +327,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                         ghostText,
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
+                                          fontSize: creditsFontSize,
                                           color: AppColors.primaryColor.inverted,
                                         ),
                                       ),
@@ -304,6 +345,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                         key: ValueKey<String>(creditsText),
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
+                                          fontSize: creditsFontSize,
                                           color: AppColors.primaryColor.inverted,
                                         ),
                                       ),
@@ -315,11 +357,11 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                           ),
                           SvgPicture.asset(
                             'assets/icons/credit.svg',
-                            width: screenWidth * 0.05,
-                            height: screenWidth * 0.05,
+                            width: iconSize,
+                            height: iconSize,
                             colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
                           ),
-                          SizedBox(width: screenWidth * 0.01),
+                          SizedBox(width: isTablet ? screenWidth * 0.01 : screenWidth * 0.01),
                         ],
                       ),
                     ),
@@ -327,12 +369,15 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                 ],
               ),
             ),
+            // The Hexagon Button
             Positioned(
-              top: screenHeight * 0.02,
-              left: screenWidth * 0.02,
+              // Slight vertical offset for 3D/Centering effect
+              top: topPos - (isTablet ? screenWidth * 0.002 : 0),
+              left: hexagonLeft,
               child: _AnimatedHexagonButton(
                 screenWidth: screenWidth,
                 screenHeight: screenHeight,
+                isTablet: isTablet,
                 onTap: () {
                   hideCreditsInfo();
                   navigateToScreen(const FundsScreen(),
@@ -351,11 +396,13 @@ class _AnimatedHexagonButton extends StatefulWidget {
   final VoidCallback onTap;
   final double screenWidth;
   final double screenHeight;
+  final bool isTablet;
 
   const _AnimatedHexagonButton({
     required this.onTap,
     required this.screenWidth,
     required this.screenHeight,
+    required this.isTablet,
   });
 
   @override
@@ -390,6 +437,14 @@ class _AnimatedHexagonButtonState extends State<_AnimatedHexagonButton>
 
   @override
   Widget build(BuildContext context) {
+    // --- RESPONSIVE HEXAGON SIZE (Dynamic) ---
+    // Width: Tablet 8% of width (increased from 7% to prevent squashing)
+    final double width = widget.isTablet ? widget.screenWidth * 0.08 : widget.screenWidth * 0.1;
+    // Height: Tablet 7.5% of width (keeps aspect ratio closer to 1:1)
+    final double height = widget.isTablet ? widget.screenWidth * 0.075 : widget.screenHeight * 0.045;
+    // Icon: Tablet 3.5%
+    final double iconSize = widget.isTablet ? widget.screenWidth * 0.035 : widget.screenWidth * 0.045;
+
     const Gradient borderGradient = SweepGradient(
       center: FractionalOffset.center,
       colors: <Color>[
@@ -416,8 +471,8 @@ class _AnimatedHexagonButtonState extends State<_AnimatedHexagonButton>
       child: GestureDetector(
         onTap: widget.onTap,
         child: SizedBox(
-          width: widget.screenWidth * 0.1,
-          height: widget.screenHeight * 0.045,
+          width: width,
+          height: height,
           child: RepaintBoundary(
             child: CustomPaint(
               painter: _HexagonBorderPainter(
@@ -431,8 +486,8 @@ class _AnimatedHexagonButtonState extends State<_AnimatedHexagonButton>
                 child: SvgPicture.asset(
                   'assets/icons/sparkle.svg',
                   colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-                  width: widget.screenWidth * 0.045,
-                  height: widget.screenWidth * 0.045,
+                  width: iconSize,
+                  height: iconSize,
                 ),
               ),
             ),

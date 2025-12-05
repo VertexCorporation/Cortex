@@ -1,4 +1,4 @@
-// chat/screen/selected/widgets/input/input.dart
+// lib/chat/screen/selected/widgets/input/input.dart
 
 import 'dart:io';
 import 'package:cortex/app.dart';
@@ -12,21 +12,6 @@ import '../../../../../notifications/introvert.dart';
 import '../../../../../theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 
-/// A widget that represents the chat input area including
-/// a text field for message input, photo selection with preview,
-/// and the action buttons (send / add photo).
-///
-/// This widget supports editing mode by detecting changes in both
-/// the message text and photo. It uses a comparison that factors in:
-///   - The presence or absence of content,
-///   - Whether the text has been altered (via the [originalMessageText])
-///   - Whether the photo has changed. The photo comparison includes a check for:
-///       • File path differences,
-///       • File size differences,
-///       • Differences in the file’s content hash.
-/// In addition, if the user removes the original photo (by tapping the X)
-/// the widget clears its internal [_originalPhoto] variable so that any
-/// newly selected photo is automatically treated as different from the original.
 class InputField extends StatefulWidget {
   final AppLocalizations localizations;
   final bool isModelSelected;
@@ -91,18 +76,12 @@ class InputField extends StatefulWidget {
   InputFieldState createState() => InputFieldState();
 }
 
-/// The state for the [InputField] widget.
-/// This class handles photo selection, deletion, preview display,
-/// and determining whether the send button should be enabled.
 class InputFieldState extends State<InputField> {
   double _inputFieldHeight = 0.0;
   final GlobalKey _inputFieldKey = GlobalKey();
   File? _selectedPhoto;
   final ImagePicker _imagePicker = ImagePicker();
   Key _photoKey = UniqueKey();
-  /// Stores the original photo (if any) that came with the message in editing mode.
-  /// This is used to compare against a new selection. Once the original photo is removed,
-  /// this variable is cleared, so any new photo is considered a change.
   File? _originalPhoto;
   bool _photoRemoved = false;
 
@@ -126,50 +105,29 @@ class InputFieldState extends State<InputField> {
     super.didUpdateWidget(oldWidget);
 
     if (!oldWidget.isEditingMode && widget.isEditingMode) {
-      debugPrint(
-        "[InputField] Entering edit mode. preselectedPhoto=${widget.preselectedPhoto?.path}",
-      );
       setState(() {
         _selectedPhoto = widget.preselectedPhoto;
         _originalPhoto = widget.preselectedPhoto;
         _photoKey = UniqueKey();
         _photoRemoved = false;
       });
-      debugPrint(
-        "[InputField] Edit mode state → _selectedPhoto=${_selectedPhoto?.path}, "
-            "_originalPhoto=${_originalPhoto?.path}, _photoRemoved=$_photoRemoved",
-      );
     }
 
     if (oldWidget.isEditingMode && !widget.isEditingMode) {
-      debugPrint("[InputField] Exiting edit mode. Clearing photo panel.");
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) clearPhotoPanel();
       });
     }
   }
 
-  /// Removes the currently selected photo by setting _selectedPhoto to null,
-  /// and clearing the stored _originalPhoto so that the "no photo" state
-  /// is considered a real change in edit mode as well.
   void _removeSelectedPhoto() {
-    debugPrint(
-      "[InputField] _removeSelectedPhoto called. "
-          "isEditingMode=${widget.isEditingMode}, "
-          "before → selected=${_selectedPhoto?.path}, original=${_originalPhoto?.path}",
-    );
     setState(() {
       _selectedPhoto = null;
       _photoRemoved = true;
     });
-    debugPrint(
-      "[InputField] After remove → selected=${_selectedPhoto?.path}, "
-          "original=${_originalPhoto?.path}, _photoRemoved=$_photoRemoved",
-    );
     widget.onPhotoSelected?.call(null);
   }
 
-  /// Opens the image picker to allow the user to select a photo from the gallery.
   Future<void> _pickPhoto() async {
     try {
       final XFile? pickedFile = await _imagePicker.pickImage(
@@ -188,7 +146,6 @@ class InputFieldState extends State<InputField> {
     }
   }
 
-  /// Clears the photo selection panel and resets internal flags.
   void clearPhotoPanel() {
     setState(() {
       _selectedPhoto = null;
@@ -197,16 +154,15 @@ class InputFieldState extends State<InputField> {
     widget.onPhotoSelected?.call(null);
   }
 
-  /// Triggers the onStop callback from the parent.
   void _handleStop() {
     widget.onStop();
   }
 
-  // --- 🔥 THE FINAL, ALIGNED, AND STABLE SOLUTION 🔥 ---
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth >= 600;
+
     if (!widget.isModelSelected && !widget.isDynamicChatMode) {
       return const SizedBox.shrink();
     }
@@ -216,13 +172,16 @@ class InputFieldState extends State<InputField> {
         WidgetsBinding.instance
             .addPostFrameCallback((_) => updateInputFieldHeight());
 
+        // --- DYNAMIC BORDER RADIUS ---
+        final double radius = isTablet ? screenWidth * 0.025 : 16.0;
+
         return Container(
           key: _inputFieldKey,
           decoration: BoxDecoration(
             color: AppColors.background,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(16),
-              topRight: Radius.circular(16),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(radius),
+              topRight: Radius.circular(radius),
             ),
             border: Border(
               top: BorderSide(color: AppColors.border, width: 1.0),
@@ -232,7 +191,7 @@ class InputFieldState extends State<InputField> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (widget.canHandleImage)
-                _buildPhotoPreview(screenWidth),
+                _buildPhotoPreview(screenWidth, isTablet),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -240,14 +199,14 @@ class InputFieldState extends State<InputField> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        _buildAnimatedAddPhotoButton(screenWidth),
+                        _buildAnimatedAddPhotoButton(screenWidth, isTablet),
                         Expanded(
-                          child: _buildTextField(screenWidth),
+                          child: _buildTextField(screenWidth, isTablet),
                         ),
                       ],
                     ),
                   ),
-                  _buildSendButton(screenWidth),
+                  _buildSendButton(screenWidth, isTablet),
                 ],
               ),
             ],
@@ -257,10 +216,10 @@ class InputFieldState extends State<InputField> {
     );
   }
 
-  /// Builds the add photo button wrapped in an `AnimatedContainer`.
-  /// The container animates its width to create the slide effect.
-  Widget _buildAnimatedAddPhotoButton(double screenWidth) {
-    final double targetWidth = widget.canHandleImage ? 48.0 : 0.0;
+  Widget _buildAnimatedAddPhotoButton(double screenWidth, bool isTablet) {
+    // Dynamic width for the button container
+    final double buttonWidth = isTablet ? screenWidth * 0.08 : 48.0;
+    final double targetWidth = widget.canHandleImage ? buttonWidth : 0.0;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -268,21 +227,23 @@ class InputFieldState extends State<InputField> {
       width: targetWidth,
       child: ClipRect(
         child: SizedBox(
-          width: 48.0,
-          child: _buildAddPhotoButtonContent(screenWidth),
+          width: buttonWidth,
+          child: _buildAddPhotoButtonContent(screenWidth, isTablet),
         ),
       ),
     );
   }
 
-  /// The content of the add photo button, now simplified.
-  /// Its vertical alignment is handled entirely by the parent Row.
-  Widget _buildAddPhotoButtonContent(double screenWidth) {
+  Widget _buildAddPhotoButtonContent(double screenWidth, bool isTablet) {
     final bool hasPhoto = _selectedPhoto != null;
     final bool buttonDisabled = widget.isLimitExceeded || hasPhoto;
 
+    // --- DYNAMIC ICON SIZE ---
+    // Tablet: 3.5% of width. Phone: Fixed 28.
+    final double iconSize = isTablet ? screenWidth * 0.035 : 28.0;
+
     return GestureDetector(
-      behavior: HitTestBehavior.opaque, // Ensures the whole area is tappable
+      behavior: HitTestBehavior.opaque,
       onTap: widget.isPhotoLoading
           ? null
           : () {
@@ -300,19 +261,26 @@ class InputFieldState extends State<InputField> {
       },
       child: Opacity(
         opacity: (buttonDisabled || widget.isPhotoLoading) ? 0.5 : 1.0,
-        // The icon is now simply centered by the parent Row.
         child: Icon(
           Icons.add,
           color: AppColors.primaryColor.inverted,
-          size: 28, // Slightly larger for better visual balance
+          size: iconSize,
         ),
       ),
     );
   }
 
-  /// Builds the main text input field.
-  Widget _buildTextField(double screenWidth) {
+  Widget _buildTextField(double screenWidth, bool isTablet) {
     const Key textFieldKey = ValueKey('chat_input_field');
+
+    // --- DYNAMIC FONT SIZE ---
+    // Tablet: 2.5% of width (~20px on 800w). Phone: 4% of width (~16px on 400w).
+    final double fontSize = isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
+
+    // Dynamic Padding
+    final double verticalPadding = isTablet ? screenWidth * 0.02 : 10.0;
+    final double horizontalPadding = isTablet ? screenWidth * 0.015 : 8.0;
+
     return TextField(
       key: textFieldKey,
       focusNode: widget.textFieldFocusNode,
@@ -324,18 +292,18 @@ class InputFieldState extends State<InputField> {
       keyboardType: TextInputType.multiline,
       textInputAction: TextInputAction.newline,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
+        contentPadding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: horizontalPadding),
         hintText: widget.localizations.messageHint,
         hintStyle: TextStyle(
           color: Colors.grey[600],
-          fontSize: screenWidth * 0.04,
+          fontSize: fontSize,
         ),
         border: InputBorder.none,
         counterText: '',
       ),
       style: TextStyle(
         color: AppColors.primaryColor.inverted,
-        fontSize: screenWidth * 0.04,
+        fontSize: fontSize,
       ),
       onSubmitted: (value) async {
         if (isSendButtonEnabled) await widget.onSend();
@@ -343,14 +311,13 @@ class InputFieldState extends State<InputField> {
     );
   }
 
-  /// Builds the Send/Stop action button.
-  Widget _buildSendButton(double screenWidth) {
+  Widget _buildSendButton(double screenWidth, bool isTablet) {
     final bool isConnected = context.watch<InternetProvider>().isConnected;
 
     return Padding(
       padding: EdgeInsets.only(
-        right: screenWidth * 0.02,
-        bottom: 8.0,
+        right: isTablet ? screenWidth * 0.02 : screenWidth * 0.02,
+        bottom: isTablet ? screenWidth * 0.015 : 8.0,
       ),
       child: Builder(
         builder: (context) {
@@ -360,6 +327,8 @@ class InputFieldState extends State<InputField> {
             calculatedIsEnabled = false;
           }
 
+          // ActionButtonWidget handles its own sizing, but typically relies on parent limits
+          // or its own defaults. Ensure it scales if needed or let it be standard size.
           return ActionButtonWidget(
             isEnabled: calculatedIsEnabled,
             isSending: widget.isSending,
@@ -371,7 +340,6 @@ class InputFieldState extends State<InputField> {
     );
   }
 
-  /// Builds the photo preview panel which displays the selected photo with a close button.
   bool _isPngFile(File file) {
     try {
       final bytes = file.readAsBytesSync();
@@ -386,15 +354,17 @@ class InputFieldState extends State<InputField> {
     }
   }
 
-  /// Builds the photo preview panel which displays the selected photo with a close button.
-  Widget _buildPhotoPreview(double screenWidth) {
-    final double previewSize = screenWidth * 0.25;
+  Widget _buildPhotoPreview(double screenWidth, bool isTablet) {
+    // --- DYNAMIC PREVIEW SIZE ---
+    // Tablet: 18% of screen. Phone: 25%.
+    final double previewSize = isTablet ? screenWidth * 0.18 : screenWidth * 0.25;
     final bool hasPhoto = _selectedPhoto != null;
+    final double padding = isTablet ? screenWidth * 0.02 : screenWidth * 0.03;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      height: hasPhoto ? previewSize + (screenWidth * 0.03 * 2) : 0,
+      height: hasPhoto ? previewSize + (padding * 2) : 0,
       width: double.infinity,
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 200),
@@ -403,7 +373,7 @@ class InputFieldState extends State<InputField> {
           physics: const NeverScrollableScrollPhysics(),
           child: Padding(
             key: _photoKey,
-            padding: EdgeInsets.all(screenWidth * 0.03),
+            padding: EdgeInsets.all(padding),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
@@ -446,7 +416,8 @@ class InputFieldState extends State<InputField> {
                       ),
                       child: Icon(
                         Icons.close_rounded,
-                        size: screenWidth * 0.04,
+                        // Dynamic close icon
+                        size: isTablet ? screenWidth * 0.025 : screenWidth * 0.04,
                         color: Colors.white,
                       ),
                     ),
@@ -460,7 +431,6 @@ class InputFieldState extends State<InputField> {
     );
   }
 
-  /// Updates the input field container height if it changes.
   void updateInputFieldHeight() {
     final RenderBox? renderBox =
     _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
@@ -474,29 +444,22 @@ class InputFieldState extends State<InputField> {
     }
   }
 
-  /// Computes the MD5 hash of the given file’s contents.
   String computeFileHash(File file) {
     final bytes = file.readAsBytesSync();
     final digest = md5.convert(bytes);
     return digest.toString();
   }
 
-  /// Calculates the credit cost for the current operation.
-  /// This logic is now fully aligned with server-side validation (v3.0).
   int _requiredCredits() {
-    // Offline / Local Models
     if (!widget.isServerSideModel) return 0;
 
-    // --- DYNAMIC CHAT IS ALWAYS PREMIUM (AUTO ROUTER) ---
     if (widget.isDynamicChatMode) {
-      const base = 20; // Auto Router cost
+      const base = 20;
       final photo = (_selectedPhoto != null) ? 30 : 0;
       return base + photo;
     }
 
-    // Standard Server-Side Models
     if (widget.isServerSideModel) {
-      // Aligned with Server: Premium=20, Standard=5 (was 10 in old client code)
       final base = widget.isPremiumModel ? 20 : 5;
       final photo = (_selectedPhoto != null) ? 30 : 0;
       return base + photo;
@@ -505,8 +468,6 @@ class InputFieldState extends State<InputField> {
     return 0;
   }
 
-  /// Determines whether the send button should be enabled.
-  /// This getter is designed to be efficient for frequent calls.
   bool get isSendButtonEnabled {
     if (widget.modelMissing) return false;
     if (widget.isSending) return false;

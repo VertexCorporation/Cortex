@@ -6,10 +6,6 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../../theme.dart';
 
 /// The bottom navigation bar widget containing the primary save action button.
-///
-/// This widget handles the visual state of the save button, including enabled,
-/// disabled, and loading (saving) states. It is used across both 'Create' and
-/// 'Add' screens.
 class CreationSaveButton extends StatelessWidget {
   final bool isEnabled;
   final bool isSaving;
@@ -27,13 +23,21 @@ class CreationSaveButton extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final localizations = AppLocalizations.of(context)!;
+    final bool isTablet = screenWidth >= 600;
 
-    // Use SafeArea to avoid system intrusions at the bottom of the screen.
+    // --- TABLET OPTIMIZATIONS ---
+    final double fontSize = isTablet ? 22.0 : screenWidth * 0.04;
+    final double borderRadius = isTablet ? 20.0 : screenWidth * 0.03;
+    final double containerRadius = isTablet ? 32.0 : screenWidth * 0.05;
+
+    // IMPORTANT: Match the horizontal padding of the main form (12% on tablet)
+    final double horizontalPadding = screenWidth * 0.04;
+
     return SafeArea(
       top: false,
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.04,
+          horizontal: horizontalPadding,
           vertical: screenHeight * 0.01,
         ),
         decoration: BoxDecoration(
@@ -45,14 +49,12 @@ class CreationSaveButton extends StatelessWidget {
               offset: Offset(0, -2),
             )
           ],
-          // Apply a border radius only to the top corners for a clean look.
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(screenWidth * 0.05),
-            topRight: Radius.circular(screenWidth * 0.05),
+            topLeft: Radius.circular(containerRadius),
+            topRight: Radius.circular(containerRadius),
           ),
         ),
         child: AnimatedOpacity(
-          // Fade the button to indicate it's disabled.
           opacity: isEnabled ? 1.0 : 0.5,
           duration: const Duration(milliseconds: 300),
           child: SizedBox(
@@ -62,7 +64,6 @@ class CreationSaveButton extends StatelessWidget {
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith<Color>(
                       (Set<WidgetState> states) {
-                    // Show a dimmer color when the button is disabled.
                     if (states.contains(WidgetState.disabled)) {
                       return AppColors.senaryColor.withValues(alpha:0.5);
                     }
@@ -71,15 +72,14 @@ class CreationSaveButton extends StatelessWidget {
                 ),
                 foregroundColor: WidgetStateProperty.all(Colors.white),
                 padding: WidgetStateProperty.all(
-                    EdgeInsets.symmetric(vertical: screenHeight * 0.018)),
+                    EdgeInsets.symmetric(vertical: isTablet ? 20 : screenHeight * 0.018)),
                 shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                    borderRadius: BorderRadius.circular(borderRadius),
                   ),
                 ),
               ),
               child: isSaving
-              // Show a loading indicator when the save process is active.
                   ? const SizedBox(
                 width: 24,
                 height: 24,
@@ -88,11 +88,10 @@ class CreationSaveButton extends StatelessWidget {
                   color: Colors.white,
                 ),
               )
-              // Otherwise, show the button text.
                   : Text(
                 localizations.save,
                 style: TextStyle(
-                  fontSize: screenWidth * 0.04,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.bold,
                 ),
               ),

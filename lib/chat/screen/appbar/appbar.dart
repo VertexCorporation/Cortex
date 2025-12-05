@@ -1,11 +1,4 @@
 // appbar.dart
-//
-// This file defines a custom AppBar widget for the chat application.
-// The widget is responsible for rendering the navigation bar, displaying
-// title information, and handling actions such as exit and account tap.
-// It now delegates chat-specific title rendering to the ChatTitle widget
-// and displays an animated border for subscribed users. It also features
-// an aesthetic transition for the user avatar upon data changes.
 
 import 'dart:math';
 import 'package:cortex/app.dart';
@@ -20,7 +13,6 @@ import 'chat.dart';
 import 'credits.dart';
 
 /// A self-contained, animated painter for creating a rotating gradient border.
-/// It is used by the user avatar to indicate a subscription status.
 class AnimatedBorderPainter extends CustomPainter {
   final double animationValue;
 
@@ -91,25 +83,22 @@ class Appbar extends StatefulWidget implements PreferredSizeWidget {
   State<Appbar> createState() => AppbarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  // We return a generous height to ensure Scaffold allocates space.
+  Size get preferredSize => const Size.fromHeight(120);
 }
 
 class AppbarState extends State<Appbar> with TickerProviderStateMixin {
-  final GlobalKey<CreditsBarState> _creditsBarKey =
-  GlobalKey<CreditsBarState>();
+  final GlobalKey<CreditsBarState> _creditsBarKey = GlobalKey<CreditsBarState>();
 
   late AnimationController _animationController;
-  late AnimationController _borderAnimationController; // For the subscription border
-  late Animation<double> _borderAnimation; // Animation tween
+  late AnimationController _borderAnimationController;
+  late Animation<double> _borderAnimation;
   bool _isCreditsPanelVisible = false;
 
-  // Public method to check if any panel controlled by the AppBar is visible.
   bool isAPanelShowing() {
-    // It's visible if either the credits panel OR the extensions panel is open.
     return _isCreditsPanelVisible || widget.extensions.isPanelVisible;
   }
 
-  // Public method to close any open panel. This will be called from ChatScreen.
   void closeAnyOpenPanels() {
     if (_isCreditsPanelVisible) {
       _creditsBarKey.currentState?.hideCreditsInfo();
@@ -131,8 +120,7 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(seconds: 4),
     );
-    _borderAnimation =
-        Tween<double>(begin: 0, end: 2 * pi).animate(_borderAnimationController);
+    _borderAnimation = Tween<double>(begin: 0, end: 2 * pi).animate(_borderAnimationController);
   }
 
   @override
@@ -143,7 +131,6 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  /// Hides any open panels (extensions or credits info)
   void closeAllPanels() {
     if (widget.extensions.isPanelVisible) {
       widget.extensions.closePanel();
@@ -155,15 +142,33 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final size = MediaQuery.of(context).size;
+    final screenWidth = size.width;
+
+    // RESPONSIVE LOGIC
+    final bool isTablet = size.shortestSide > 600;
+
+    // --- DIMENSIONS & SCALING ---
+
+    // 1. Toolbar Height: Matches the "0.14" logic of other screens for Tablet.
+    final double toolbarHeight = isTablet ? screenWidth * 0.14 : kToolbarHeight;
+
+    // 2. Element Sizes: Scaled up for Tablet to fill the taller bar.
+    final double leadingWidth = isTablet ? 180.0 : screenWidth * 0.3;
+    final double titleFontSize = isTablet ? 32.0 : screenWidth * 0.08;
+    final double subtitleFontSize = isTablet ? 18.0 : screenWidth * 0.025;
+    final double iconSize = isTablet ? 36.0 : screenWidth * 0.06;
+
+    // Avatar is significantly larger on tablet
+    final double avatarRadius = isTablet ? 28.0 : screenWidth * 0.05;
+    final double avatarFontSize = isTablet ? 24.0 : screenWidth * 0.045;
+
     final localizations = AppLocalizations.of(context)!;
     final sessionProvider = context.watch<ChatSessionProvider>();
     final isUserSubscribed = sessionProvider.isUserSubscribed;
 
     final mode = sessionProvider.appBarMode;
 
-    // Reactively control the border animation based on provider state.
     if (isUserSubscribed && !_borderAnimationController.isAnimating) {
       _borderAnimationController.repeat();
     } else if (!isUserSubscribed && _borderAnimationController.isAnimating) {
@@ -198,20 +203,20 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
           key: const ValueKey('app_title'),
           style: GoogleFonts.mavenPro(
               color: AppColors.primaryColor.inverted,
-              fontSize: screenWidth * 0.08),
+              fontSize: titleFontSize),
         );
         break;
 
       case AppBarMode.dynamicChat:
         leadingWidget = Padding(
-          padding: const EdgeInsets.only(left: 8.0),
+          padding: EdgeInsets.only(left: isTablet ? 16.0 : 8.0),
           child: Align(
             alignment: Alignment.centerLeft,
             child: IconButton(
                 key: const ValueKey('exit_dynamic_chat_button'),
                 icon: Icon(Icons.arrow_back,
                     color: AppColors.primaryColor.inverted,
-                    size: screenWidth * 0.06),
+                    size: iconSize),
                 onPressed: handleExitPress),
           ),
         );
@@ -226,7 +231,7 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
                 widget.appTitle,
                 style: GoogleFonts.mavenPro(
                   color: AppColors.primaryColor.inverted,
-                  fontSize: screenWidth * 0.08,
+                  fontSize: titleFontSize,
                   height: 1.0,
                 ),
               ),
@@ -237,7 +242,8 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
                     begin: const Offset(0.0, -0.5),
                     end: Offset.zero,
                   ).animate(
-                      CurvedAnimation(parent: animation, curve: Curves.easeOut));
+                      CurvedAnimation(
+                          parent: animation, curve: Curves.easeOut));
                   return FadeTransition(
                     opacity: animation,
                     child: SlideTransition(
@@ -257,7 +263,7 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
                       style: GoogleFonts.mavenPro(
                         color:
                         AppColors.primaryColor.inverted.withValues(alpha: 0.8),
-                        fontSize: screenWidth * 0.025,
+                        fontSize: subtitleFontSize,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -272,14 +278,14 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
       case AppBarMode.inSelection:
       case AppBarMode.modelSelected:
         leadingWidget = Padding(
-          padding: const EdgeInsets.only(left: 8.0),
+          padding: EdgeInsets.only(left: isTablet ? 16.0 : 8.0),
           child: Align(
             alignment: Alignment.centerLeft,
             child: IconButton(
                 key: const ValueKey('back_button'),
                 icon: Icon(Icons.arrow_back,
                     color: AppColors.primaryColor.inverted,
-                    size: screenWidth * 0.06),
+                    size: iconSize),
                 onPressed: handleExitPress),
           ),
         );
@@ -291,7 +297,7 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
             localizations.explore,
             style: GoogleFonts.mavenPro(
               color: AppColors.primaryColor.inverted,
-              fontSize: screenWidth * 0.08,
+              fontSize: titleFontSize,
             ),
           ),
         )
@@ -306,7 +312,6 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
         break;
     }
 
-    // This allows us to use it for the ValueKey to trigger the animation.
     String initial = '?';
     final String? displayName = sessionProvider.displayName;
     final String? email = sessionProvider.email;
@@ -325,11 +330,11 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
     }
 
     return AppBar(
-      toolbarHeight: screenHeight * 0.08,
+      toolbarHeight: toolbarHeight,
       backgroundColor: AppColors.background,
       centerTitle: true,
       scrolledUnderElevation: 0,
-      leadingWidth: screenWidth * 0.3,
+      leadingWidth: leadingWidth,
       leading: AnimatedSwitcher(
         duration: const Duration(milliseconds: 350),
         transitionBuilder: (child, animation) {
@@ -373,41 +378,41 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
       ),
       actions: [
         SizedBox(
-          width: screenWidth * 0.3,
+          width: leadingWidth, // Balance the leading width
           child: Stack(
             children: [
               Positioned(
-                right: 16.0,
-                top: 8,
-                bottom: 0,
-                child: GestureDetector(
-                  key: widget.accountButtonKey,
-                  onTap: widget.onAccountTap,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 400),
-                    transitionBuilder: (child, animation) {
-                      // Combined scale and fade transition for a smooth effect.
-                      return FadeTransition(
-                        opacity: animation,
-                        child: ScaleTransition(
-                          scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                            CurvedAnimation(
-                              parent: animation,
-                              curve: Curves.easeOutBack, // A nice springy curve
+                right: isTablet ? 32.0 : 16.0,
+                top: 0,
+                bottom: 0, // Center vertically
+                child: Center(
+                  child: GestureDetector(
+                    key: widget.accountButtonKey,
+                    onTap: widget.onAccountTap,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 400),
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: ScaleTransition(
+                            scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                              CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.easeOutBack,
+                              ),
                             ),
+                            child: child,
                           ),
-                          child: child,
-                        ),
-                      );
-                    },
-                    // The key determines when to animate.
-                    // It triggers if the initial OR subscription status changes.
-                    child: _buildUserAvatar(
-                      key: ValueKey('$initial-$isUserSubscribed'),
-                      context: context,
-                      screenWidth: screenWidth,
-                      isUserSubscribed: isUserSubscribed,
-                      initial: initial,
+                        );
+                      },
+                      child: _buildUserAvatar(
+                        key: ValueKey('$initial-$isUserSubscribed'),
+                        context: context,
+                        radius: avatarRadius,
+                        fontSize: avatarFontSize,
+                        isUserSubscribed: isUserSubscribed,
+                        initial: initial,
+                      ),
                     ),
                   ),
                 ),
@@ -419,15 +424,14 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
     );
   }
 
-  // --- UPDATED: The _buildUserAvatar method is now simpler ---
   Widget _buildUserAvatar({
     required BuildContext context,
-    required double screenWidth,
+    required double radius,
+    required double fontSize,
     required bool isUserSubscribed,
-    required String initial, // The initial is now passed as a parameter
-    Key? key, // A key is accepted to be passed to the root widget
+    required String initial,
+    Key? key,
   }) {
-    // The logic to calculate the initial has been moved to the build method.
     Widget avatarCore = Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
@@ -437,7 +441,7 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
         ),
       ),
       child: CircleAvatar(
-        radius: screenWidth * 0.05,
+        radius: radius,
         backgroundColor: AppColors.quaternaryColor,
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
@@ -446,9 +450,9 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
           },
           child: Text(
             initial,
-            key: ValueKey<String>(initial), // Animate when the initial changes
+            key: ValueKey<String>(initial),
             style: TextStyle(
-              fontSize: screenWidth * 0.045,
+              fontSize: fontSize,
               color: AppColors.primaryColor.inverted,
             ),
           ),
@@ -479,7 +483,6 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
       finalAvatar = avatarCore;
     }
 
-    // The key is passed to the Center widget to ensure AnimatedSwitcher identifies it correctly.
     return Center(key: key, child: finalAvatar);
   }
 }

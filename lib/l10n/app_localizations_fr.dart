@@ -917,20 +917,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get help => 'Aide';
 
   @override
-  String get redeemCode => 'Utiliser un code';
+  String get supportCreator => 'Soutenez un créateur';
 
   @override
-  String get enterYourCode =>
-      'Soutenez vos créateurs préférés ! Saisissez leur code unique ci-dessous pour leur donner une part de vos achats Cortex.';
+  String get enterYourTag =>
+      'Soutenez vos créateurs préférés ! Saisissez leur identifiant unique ci-dessous pour leur reverser une part de vos achats Cortex.';
 
   @override
-  String get code => 'Code';
+  String get creatorTag => 'Étiquette du créateur';
 
   @override
-  String get redeem => 'Utiliser';
+  String get support => 'Soutien';
 
   @override
-  String get codeCannotBeEmpty => 'Le code ne peut pas être vide';
+  String get tagCannotBeEmpty => 'La balise Créateur ne peut pas être vide.';
 
   @override
   String get userId => 'ID Utilisateur';
@@ -1533,11 +1533,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Connectez-vous à votre compte Vertex. Les nouveaux utilisateurs s\'inscrivant via des services tiers acceptent nos Conditions d\'utilisation et notre Politique de confidentialité. Vous pouvez les consulter sur la page d\'inscription.';
+      'Connectez-vous à votre compte Vertex. En continuant, vous acceptez nos Conditions d\'utilisation et notre Politique de confidentialité.';
 
   @override
   String get registerSubtitle =>
-      'Créez un compte Vertex, que vous pourrez également utiliser pour nos autres projets.';
+      'Créez un compte Vertex pour accéder facilement à tous nos services. En continuant, vous acceptez nos Conditions d\'utilisation et notre Politique de confidentialité.';
 
   @override
   String get photoWarningMessage =>
@@ -2014,7 +2014,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get channelFcmDescription =>
-      'Notifications sur les actualités, les mises à jour et autres informations de Cortex.';
+      'Notifications concernant les actualités, les mises à jour et autres informations de Cortex.';
 
   @override
   String get channelEngagementName => 'Rappels amicaux';
@@ -2045,7 +2045,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Un problème est survenu lors de la récupération des dernières mises à jour, veuillez vérifier votre connexion et réessayer.';
 
   @override
-  String get codeNotFound =>
+  String get tagNotFound =>
       'Le code que vous avez saisi est invalide ou a expiré.';
 
   @override
@@ -2151,5 +2151,13 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return 'Environ $price/mois';
+  }
+
+  @override
+  String get confirmDownloadTitle => 'Êtes-vous sûr de vouloir télécharger ?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'Ce modèle occupera environ $size d\'espace.';
   }
 }

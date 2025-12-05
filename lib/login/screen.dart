@@ -41,19 +41,39 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final fontScale = screenWidth / 375;
+    // --- FINAL SCALING LOGIC ---
+    // 1. Phones (width < 450): Scale is close to 1.0. Keeps the compact look.
+    // 2. Tablets (width > 450): We apply a "brake" to the scaling.
+    //    Instead of growing 2x, it grows only 1.2x max.
+    //    This prevents the "giant UI" issue on iPad.
+    double fontScale = screenWidth / 375.0;
+
+    if (screenWidth > 450) {
+      // Damping logic: Grow very slowly after 450px width
+      fontScale = 1.2 + (screenWidth - 450) * 0.0005;
+    }
+
+    // Hard limits to ensure safety on all devices (Watches to TVs)
+    fontScale = fontScale.clamp(0.85, 1.35);
+
+    // Dynamic Container Width
+    final double containerMaxWidth = 400 * fontScale;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: AppColors.background,
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
+          constraints: BoxConstraints(maxWidth: containerMaxWidth),
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 32 * fontScale, vertical: 16 * fontScale),
+            padding: EdgeInsets.symmetric(
+                horizontal: 30 * fontScale,
+                vertical: 16 * fontScale
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // 1. FORMS (Login / Register CrossFade)
                 AnimatedCrossFade(
                   duration: const Duration(milliseconds: 300),
                   firstCurve: Curves.easeInOut,
@@ -64,7 +84,6 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                       ? CrossFadeState.showFirst
                       : CrossFadeState.showSecond,
 
-                  // CHILD 1: LOGIN FORM
                   firstChild: LoginForm(
                     key: const ValueKey('login_form'),
                     isLoading: _controller.isLoading,
@@ -72,14 +91,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                     passwordError: _controller.loginPasswordError,
                     emailShakeController: _controller.loginEmailShakeController,
                     passwordShakeController: _controller.loginPasswordShakeController,
-                    deviceHeight: screenHeight,
                     fontScale: fontScale,
                     onSubmit: (email, password, rememberMe) => _controller.submitLogin(context, email, password, rememberMe),
                     onForgotPassword: () => _controller.launchResetPasswordURL(context),
                     onInputChanged: _controller.clearErrorsOnInput,
                   ),
 
-                  // CHILD 2: REGISTER FORM
                   secondChild: RegisterForm(
                     key: const ValueKey('register_form'),
                     isLoading: _controller.isLoading,
@@ -90,28 +107,44 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                     usernameShakeController: _controller.registerUsernameShakeController,
                     emailShakeController: _controller.registerEmailShakeController,
                     passwordShakeController: _controller.registerPasswordShakeController,
-                    deviceHeight: screenHeight,
                     fontScale: fontScale,
                     onSubmit: (username, email, password) => _controller.submitRegister(context, username, email, password),
                     onInputChanged: _controller.clearErrorsOnInput,
                   ),
                 ),
 
-                SizedBox(height: 12 * screenHeight / 812),
+                SizedBox(height: 8 * fontScale),
 
+                // 2. OR DIVIDER
                 _buildOrDivider(l10n, fontScale),
 
-                SizedBox(height: 12 * screenHeight / 812),
+                SizedBox(height: 8 * fontScale),
 
+                // 3. SOCIAL BUTTONS
                 _buildSocialButtons(l10n, screenHeight, fontScale),
 
-                SizedBox(height: 12 * screenHeight / 812),
+                // 4. TERMS AND CONDITIONS (Register Only - Animated)
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  alignment: Alignment.topCenter,
+                  child: _controller.authMode == AuthMode.register
+                      ? Column(
+                    children: [
+                      SizedBox(height: 12 * fontScale),
+                      _buildTermsAndConditions(l10n, fontScale, screenHeight),
+                    ],
+                  )
+                      : const SizedBox.shrink(),
+                ),
 
-                _buildTermsAndConditions(l10n, fontScale, screenHeight),
+                SizedBox(height: 12 * fontScale),
 
-                _buildGuestLoginButton(l10n, fontScale, screenHeight),
-
+                // 5. SWITCH ACCOUNT
                 _buildSwitchAuthModeButton(l10n, fontScale),
+
+                // 6. GUEST LOGIN (Bottom - Always Visible)
+                _buildGuestLoginButton(l10n, fontScale, screenHeight),
               ],
             ),
           ),
@@ -123,62 +156,54 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   // --- Common UI Widgets ---
 
   Widget _buildGuestLoginButton(AppLocalizations l10n, double fontScale, double screenHeight) {
-    final isRegisterMode = _controller.authMode == AuthMode.register;
-    final isEnabled = isRegisterMode && _controller.agreeToTerms && !_controller.isLoading;
+    // No "isRegisterMode" check. It is now always visible.
+    // No "checkbox" requirement. It is frictionless.
 
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      alignment: Alignment.topCenter,
-      child: isRegisterMode
-          ? Column(
-        children: [
-          SizedBox(height: 12 * screenHeight / 812),
-          AnimatedOpacity(
-            opacity: isEnabled ? 1.0 : 0.4,
-            duration: const Duration(milliseconds: 300),
-            child: IgnorePointer(
-              ignoring: !isEnabled,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextButton(
-                    onPressed: () => _controller.submitAnonymousLogin(context),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      l10n.continueAsGuest,
-                      style: TextStyle(
-                        fontSize: 15 * fontScale,
-                        color: AppColors.primaryColor.inverted,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 6 * fontScale),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32 * fontScale),
-                    child: Text(
-                      l10n.guestModeWarning,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 11 * fontScale,
-                        color: AppColors.tertiaryColor,
-                        height: 1.3,
-                      ),
-                    ),
-                  ),
-                ],
+    return Column(
+      children: [
+        SizedBox(height: 16 * fontScale), // Spacing from the "Sign Up" button above
+
+        AnimatedOpacity(
+          opacity: _controller.isLoading ? 0.6 : 1.0,
+          duration: const Duration(milliseconds: 300),
+          child: TextButton(
+            onPressed: _controller.isLoading ? null : () => _controller.submitAnonymousLogin(context),
+            style: TextButton.styleFrom(
+              // Simple text style, no background
+              foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              l10n.continueAsGuest,
+              style: TextStyle(
+                fontSize: 15 * fontScale, // Original size
+                color: AppColors.primaryColor.inverted,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
-        ],
-      )
-          : const SizedBox.shrink(),
+        ),
+
+        SizedBox(height: 6 * fontScale),
+
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 32 * fontScale),
+          child: Text(
+            l10n.guestModeWarning,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 11 * fontScale,
+              color: AppColors.tertiaryColor,
+              height: 1.3,
+            ),
+          ),
+        ),
+
+        // Extra bottom padding for safety
+        SizedBox(height: 10 * fontScale),
+      ],
     );
   }
 
@@ -202,7 +227,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     final isRegisterMode = _controller.authMode == AuthMode.register;
     final isDisabled = _controller.isLoading || (isRegisterMode && !_controller.agreeToTerms);
 
-    final buttonPadding = EdgeInsets.symmetric(vertical: 14 * screenHeight / 812);
+    // Using fontScale for padding ensures icons don't get too big on iPad
+    final buttonPadding = EdgeInsets.symmetric(vertical: 14 * fontScale);
     final buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(10 * fontScale));
 
     final ButtonStyle elegantButtonStyle = ElevatedButton.styleFrom(
@@ -237,7 +263,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
               ),
             ),
 
-            SizedBox(height: 12 * screenHeight / 812),
+            SizedBox(height: 12 * fontScale),
 
             // --- Google Sign-In Button ---
             SizedBox(
@@ -276,51 +302,39 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildTermsAndConditions(AppLocalizations l10n, double fontScale, double screenHeight) {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-      alignment: Alignment.topCenter,
-      child: _controller.authMode == AuthMode.register
-          ? Column(
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10.0 * fontScale),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 12 * screenHeight / 812),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.0 * fontScale),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _controller.showTermsAndPolicy(context),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        l10n.iHaveReadAndAgree,
-                        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontSize: 12.6 * fontScale),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => _controller.showTermsAndPolicy(context),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l10n.iHaveReadAndAgree,
+                  style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontSize: 12.6 * fontScale),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(
-                  height: 20 * fontScale,
-                  width: 20 * fontScale,
-                  child: Checkbox(
-                    value: _controller.agreeToTerms,
-                    onChanged: (bool? value) => _controller.toggleAgreeToTerms(),
-                    checkColor: AppColors.primaryColor,
-                    activeColor: AppColors.primaryColor.inverted,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                ),
-              ],
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 20 * fontScale,
+            width: 20 * fontScale,
+            child: Checkbox(
+              value: _controller.agreeToTerms,
+              onChanged: (bool? value) => _controller.toggleAgreeToTerms(),
+              checkColor: AppColors.primaryColor,
+              activeColor: AppColors.primaryColor.inverted,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
           ),
         ],
-      )
-          : const SizedBox.shrink(),
+      ),
     );
   }
 
