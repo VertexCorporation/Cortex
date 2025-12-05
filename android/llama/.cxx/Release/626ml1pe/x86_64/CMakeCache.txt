@@ -241,7 +241,7 @@ CMAKE_READELF:FILEPATH=/home/baba/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/
 //No help, variable specified on the command line.
 CMAKE_RUNTIME_OUTPUT_DIRECTORY:UNINITIALIZED=/home/baba/Documents/cortex/build/llama/intermediates/cxx/Release/626ml1pe/obj/x86_64
 
-CMAKE_SHARED_LINKER_FLAGS:STRING=-static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,-z,max-page-size=16384 -Wl,-z,max-page-size=16384
+CMAKE_SHARED_LINKER_FLAGS:STRING=-static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,-z,max-page-size=16384
 
 //Flags used by the linker during the creation of shared libraries
 // during DEBUG builds.
@@ -295,8 +295,8 @@ CMAKE_SYSTEM_NAME:UNINITIALIZED=Android
 //No help, variable specified on the command line.
 CMAKE_SYSTEM_VERSION:UNINITIALIZED=26
 
-//No help, variable specified on the command line.
-CMAKE_TOOLCHAIN_FILE:UNINITIALIZED=/home/baba/Android/Sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake
+//The CMake toolchain file
+CMAKE_TOOLCHAIN_FILE:FILEPATH=/home/baba/Android/Sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake
 
 //If this value is on, makefiles will be generated without the
 // .SILENT directive, and all commands will be echoed to the console
@@ -397,9 +397,6 @@ GGML_CUDA:BOOL=OFF
 //ggml: cuda link binary compression mode; requires cuda 12.8+
 GGML_CUDA_COMPRESSION_MODE:STRING=size
 
-//ggml: use 16 bit floats for some calculations
-GGML_CUDA_F16:BOOL=OFF
-
 //ggml: compile ggml FlashAttention CUDA kernels
 GGML_CUDA_FA:BOOL=ON
 
@@ -438,9 +435,6 @@ GGML_HIP:BOOL=OFF
 
 //ggml: enable kernel perf metrics output
 GGML_HIP_EXPORT_METRICS:BOOL=OFF
-
-//ggml: enable rocWMMA FlashAttention on GFX12
-GGML_HIP_FORCE_ROCWMMA_FATTN_GFX12:BOOL=OFF
 
 //ggml: use HIP graph, experimental, slow
 GGML_HIP_GRAPHS:BOOL=OFF
@@ -490,9 +484,6 @@ GGML_METAL_SHADER_DEBUG:BOOL=OFF
 //ggml: metal standard version (-std flag)
 GGML_METAL_STD:STRING=
 
-//ggml: use bfloat if available
-GGML_METAL_USE_BF16:BOOL=OFF
-
 //ggml: use MUSA
 GGML_MUSA:BOOL=OFF
 
@@ -504,9 +495,6 @@ GGML_MUSA_MUDNN_COPY:BOOL=OFF
 
 //ggml: optimize the build for the current system
 GGML_NATIVE:BOOL=OFF
-
-//ggml: enable nnpa
-GGML_NNPA:BOOL=ON
 
 //ggml: use OpenCL
 GGML_OPENCL:BOOL=OFF
@@ -533,7 +521,7 @@ GGML_RPC:BOOL=OFF
 GGML_RVV:BOOL=ON
 
 //ggml: enable riscv zfh
-GGML_RV_ZFH:BOOL=OFF
+GGML_RV_ZFH:BOOL=ON
 
 //ggml: enable riscv zicbop
 GGML_RV_ZICBOP:BOOL=ON
@@ -930,7 +918,7 @@ CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding Git
-FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[/usr/bin/git][v2.51.0()]
+FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[/usr/bin/git][v2.51.1()]
 //Details about finding OpenMP
 FIND_PACKAGE_MESSAGE_DETAILS_OpenMP:INTERNAL=[TRUE][TRUE][c ][v5.0()]
 //Details about finding OpenMP_C

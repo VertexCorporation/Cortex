@@ -2,7 +2,7 @@
 //
 // A self-contained modal dialog for users to report an AI-generated message.
 // It handles user input, validation, internet checks, and submission to Firebase.
-// It accepts a callback to update the UI of the calling screen.
+// The UI is fully responsive, scaling typography and spacing based on screen width.
 //
 // ──────────────────────────────────────────────────────────────────────────────
 
@@ -107,7 +107,6 @@ class _ReportDialogState extends State<ReportDialog>
   }
 
   Future<void> _handleSubmission() async {
-    // This method's logic remains the same.
     const logPrefix = "[ReportDialog._handleSubmission]";
     if (_isSubmitting) {
       if (kDebugMode) debugPrint("$logPrefix Submission already in progress. Ignoring tap.");
@@ -186,21 +185,15 @@ class _ReportDialogState extends State<ReportDialog>
     if (kDebugMode) debugPrint("[ReportDialog] Submitting report to Firestore: $reportData");
     await FirebaseFirestore.instance.collection('reports').add(reportData);
 
-    // Call the success callback to update the parent UI (e.g., mark as reported)
     widget.onReportSuccess();
     if (kDebugMode) debugPrint("[ReportDialog] Called onReportSuccess callback to update parent UI.");
 
-    // We need to get the AppLocalizations for the notification message.
-    // Since this method might be called when the context is being torn down,
-    // it's safer to get it before the async gap if possible, or just use the
-    // current context which should still be valid here.
     if (mounted) {
       final localizations = AppLocalizations.of(context);
       if (localizations != null) {
         notificationService.showNotification(
-          message: localizations.reportSubmitted,
-          // e.g., "Report submitted successfully."
-          type: NotificationType.success
+            message: localizations.reportSubmitted,
+            type: NotificationType.success
         );
       }
     }
@@ -211,25 +204,29 @@ class _ReportDialogState extends State<ReportDialog>
     final localizations = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
 
+    // --- DYNAMIC SCALING ---
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double scale = screenWidth / 400.0; // Reference width of 400
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Dialog(
         backgroundColor: AppColors.background,
-        insetPadding: const EdgeInsets.all(16.0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        insetPadding: EdgeInsets.all(16.0 * scale),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12 * scale)),
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.85,
-              maxWidth: 600, // Good practice for tablet layouts.
+              maxWidth: 600 * scale, // Scaled constraint for tablets
             ),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 12.0),
+                    padding: EdgeInsets.fromLTRB(20.0 * scale, 20.0 * scale, 20.0 * scale, 12.0 * scale),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -239,56 +236,59 @@ class _ReportDialogState extends State<ReportDialog>
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: AppColors.primaryColor.inverted,
-                            fontSize: 20.0,
+                            fontSize: 20.0 * scale,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 16.0),
+                        SizedBox(height: 16.0 * scale),
                         TextField(
                           controller: _descriptionController,
                           maxLength: 150,
                           maxLines: 3,
-                          style: TextStyle(color: AppColors.tertiaryColor),
+                          style: TextStyle(color: AppColors.tertiaryColor, fontSize: 16 * scale),
                           decoration: InputDecoration(
                             labelText: localizations.reportDescriptionLabel,
                             alignLabelWithHint: true,
-                            labelStyle: TextStyle(color: AppColors.tertiaryColor),
+                            labelStyle: TextStyle(color: AppColors.tertiaryColor, fontSize: 16 * scale),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(8.0 * scale),
                               borderSide: BorderSide(color: AppColors.border),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(8.0 * scale),
                               borderSide: BorderSide(color: colors.primary),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8.0),
+                        SizedBox(height: 8.0 * scale),
                         _buildCheckRow(
                           label: localizations.reportHarmful,
                           subject: ReportSubject.harmful,
+                          scale: scale,
                         ),
                         _buildCheckRow(
                           label: localizations.reportNotTrue,
                           subject: ReportSubject.notTrue,
+                          scale: scale,
                         ),
                         _buildCheckRow(
                           label: localizations.reportNotHelpful,
                           subject: ReportSubject.notHelpful,
+                          scale: scale,
                         ),
-                        const SizedBox(height: 8.0),
+                        SizedBox(height: 8.0 * scale),
                         AnimatedOpacity(
                           opacity: _showError ? 1.0 : 0.0,
                           duration: const Duration(milliseconds: 300),
                           child: _showError
                               ? Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
+                            padding: EdgeInsets.only(bottom: 8.0 * scale),
                             child: Text(
                               _errorMessage,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: colors.error,
-                                fontSize: 14.0,
+                                fontSize: 14.0 * scale,
                               ),
                             ),
                           )
@@ -297,7 +297,7 @@ class _ReportDialogState extends State<ReportDialog>
                       ],
                     ),
                   ),
-                  _buildActionButtons(),
+                  _buildActionButtons(scale),
                 ],
               ),
             ),
@@ -310,10 +310,11 @@ class _ReportDialogState extends State<ReportDialog>
   Widget _buildCheckRow({
     required String label,
     required ReportSubject subject,
+    required double scale,
   }) {
     final bool isSelected = _selectedSubject == subject;
     return InkWell(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(8 * scale),
       onTap: () {
         setState(() {
           _selectedSubject = isSelected ? null : subject;
@@ -321,25 +322,28 @@ class _ReportDialogState extends State<ReportDialog>
         });
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        padding: EdgeInsets.symmetric(vertical: 4.0 * scale),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 12.0),
-              child: Text(label, style: TextStyle(color: AppColors.tertiaryColor)),
+              padding: EdgeInsets.only(left: 12.0 * scale),
+              child: Text(label, style: TextStyle(color: AppColors.tertiaryColor, fontSize: 16 * scale)),
             ),
-            Checkbox(
-              value: isSelected,
-              onChanged: (value) {
-                setState(() {
-                  _selectedSubject = (value ?? false) ? subject : null;
-                  if (_showError) _showError = false;
-                });
-              },
-              activeColor: Theme.of(context).colorScheme.primary,
-              checkColor: Theme.of(context).colorScheme.onPrimary,
-              visualDensity: VisualDensity.compact,
+            Transform.scale(
+              scale: scale, // Scale the checkbox widget itself
+              child: Checkbox(
+                value: isSelected,
+                onChanged: (value) {
+                  setState(() {
+                    _selectedSubject = (value ?? false) ? subject : null;
+                    if (_showError) _showError = false;
+                  });
+                },
+                activeColor: Theme.of(context).colorScheme.primary,
+                checkColor: Theme.of(context).colorScheme.onPrimary,
+                visualDensity: VisualDensity.compact,
+              ),
             ),
           ],
         ),
@@ -347,7 +351,7 @@ class _ReportDialogState extends State<ReportDialog>
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(double scale) {
     final localizations = AppLocalizations.of(context)!;
 
     final Color cancelColor = AppColors.senaryColor;
@@ -367,12 +371,12 @@ class _ReportDialogState extends State<ReportDialog>
                   highlightColor: cancelColor.withValues(alpha:0.10),
                   child: Container(
                     alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16 * scale),
                     child: Text(
                       localizations.closeButton,
                       style: TextStyle(
                         color: cancelColor,
-                        fontSize: 16,
+                        fontSize: 16 * scale,
                       ),
                     ),
                   ),
@@ -394,13 +398,13 @@ class _ReportDialogState extends State<ReportDialog>
                       : submitColor.withValues(alpha:0.12),
                   child: Container(
                     alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16 * scale),
                     child: _isSubmitting
                         ? SizedBox(
-                      width: 20,
-                      height: 20,
+                      width: 20 * scale,
+                      height: 20 * scale,
                       child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
+                        strokeWidth: 2.5 * scale,
                         color: submitColor,
                       ),
                     )
@@ -408,7 +412,7 @@ class _ReportDialogState extends State<ReportDialog>
                       localizations.submitButton,
                       style: TextStyle(
                         color: submitColor,
-                        fontSize: 16,
+                        fontSize: 16 * scale,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

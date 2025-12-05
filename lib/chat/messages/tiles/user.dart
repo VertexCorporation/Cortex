@@ -65,20 +65,20 @@ class UserMessageTileState extends State<UserMessageTile> with TickerProviderSta
     super.dispose();
   }
 
-  // --- FIX 3: Simplify the long press handler ---
   void _handleLongPress(BuildContext context, Offset tapPosition) {
     showMessageOptions(
       context: context,
       tapPosition: tapPosition,
-      // Pass the entire message object. The panel will handle the rest.
       message: widget.message,
-      // Only pass the relevant callback.
       onEdit: widget.onEdit,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final scale = screenWidth / 400;
+
     return FadeTransition(
       opacity: _fadeAnimation,
       child: RawGestureDetector(
@@ -91,7 +91,7 @@ class UserMessageTileState extends State<UserMessageTile> with TickerProviderSta
           ),
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          padding: EdgeInsets.symmetric(horizontal: 8.0 * scale),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -100,17 +100,20 @@ class UserMessageTileState extends State<UserMessageTile> with TickerProviderSta
                 child: Ink(
                   decoration: BoxDecoration(
                     color: AppColors.secondaryColor,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(24 * scale),
                   ),
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(24 * scale),
                     onTap: () => FocusScope.of(context).unfocus(),
                     child: Container(
-                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
-                      padding: const EdgeInsets.all(12),
+                      constraints: BoxConstraints(maxWidth: screenWidth * 0.7),
+                      padding: EdgeInsets.all(12 * scale),
                       child: Text(
                         widget.message.text,
-                        style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: 16),
+                        style: TextStyle(
+                          color: AppColors.primaryColor.inverted,
+                          fontSize: 16 * scale,
+                        ),
                       ),
                     ),
                   ),

@@ -1,6 +1,6 @@
-set(CMAKE_HOST_SYSTEM "Linux-6.16.4-200.fc42.x86_64")
+set(CMAKE_HOST_SYSTEM "Linux-6.17.8-200.fc42.x86_64")
 set(CMAKE_HOST_SYSTEM_NAME "Linux")
-set(CMAKE_HOST_SYSTEM_VERSION "6.16.4-200.fc42.x86_64")
+set(CMAKE_HOST_SYSTEM_VERSION "6.17.8-200.fc42.x86_64")
 set(CMAKE_HOST_SYSTEM_PROCESSOR "x86_64")
 
 include("/home/baba/Android/Sdk/ndk/26.1.10909125/build/cmake/android.toolchain.cmake")

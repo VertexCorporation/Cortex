@@ -12,8 +12,6 @@ import '../../../server/user.dart';
 import '../../../theme.dart';
 
 /// A banner that appears below the AppBar to notify the user that a premium model is selected.
-/// It features an animated RGB border, navigates to the premium screen on tap,
-/// and can be dismissed by swiping it up.
 class PremiumModelBanner extends StatefulWidget {
   final bool isVisible;
   final VoidCallback onTap;
@@ -29,7 +27,6 @@ class PremiumModelBanner extends StatefulWidget {
   @override
   State<PremiumModelBanner> createState() => PremiumModelBannerState();
 }
-
 
 class PremiumModelBannerState extends State<PremiumModelBanner>
     with TickerProviderStateMixin {
@@ -98,15 +95,35 @@ class PremiumModelBannerState extends State<PremiumModelBanner>
     final localizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    final double borderRadius = screenWidth * 0.03;
-    final double borderThickness = screenWidth * 0.005;
-    final double internalPaddingVertical = screenWidth * 0.03;
-    final double internalPaddingHorizontal = screenWidth * 0.04;
-    final double iconSize = screenWidth * 0.07;
-    final double gapBetweenIconAndText = screenWidth * 0.03;
-    final double gapBetweenTitleAndDesc = screenWidth * 0.01;
-    final double titleFontSize = screenWidth * 0.038;
-    final double descriptionFontSize = screenWidth * 0.033;
+
+    // RESPONSIVE LOGIC
+    final bool isTablet = screenWidth >= 600;
+
+    // --- TABLET OPTIMIZATIONS (Balanced) ---
+
+    // 1. Width / Margin:
+    // Tablet: 5% margin on sides (covers 90% of width). Phone: Fixed 12px.
+    final double horizontalMargin = isTablet ? screenWidth * 0.05 : 12.0;
+
+    // 2. Font Sizes (Middle Ground):
+    // Tablet: Title 22, Desc 17. Phone: Scaled.
+    final double titleFontSize = isTablet ? 22.0 : screenWidth * 0.038;
+    final double descriptionFontSize = isTablet ? 17.0 : screenWidth * 0.033;
+
+    // 3. Icon Size:
+    // Tablet: 32 (Visible but not giant). Phone: Scaled.
+    final double iconSize = isTablet ? 32.0 : screenWidth * 0.07;
+
+    // 4. Spacing & Padding:
+    final double borderRadius = isTablet ? 16.0 : screenWidth * 0.03;
+    final double borderThickness = isTablet ? 4.0 : screenWidth * 0.005;
+
+    final double internalPaddingVertical = isTablet ? 16.0 : screenWidth * 0.03;
+    final double internalPaddingHorizontal = isTablet ? 20.0 : screenWidth * 0.04;
+
+    final double gapBetweenIconAndText = isTablet ? 20.0 : screenWidth * 0.03;
+    final double gapBetweenTitleAndDesc = isTablet ? 6.0 : screenWidth * 0.01;
+
     final double maxBannerHeight = screenHeight * 0.2;
     final bool shouldBeVisible = widget.isVisible && !_isDismissedByUser;
 
@@ -118,16 +135,14 @@ class PremiumModelBannerState extends State<PremiumModelBanner>
         }
         return child!;
       },
-      // The ClipRect widget is added here to contain the slide animation.
-      // This ensures the banner appears to slide out from under the AppBar,
-      // not from the top of the screen.
       child: ClipRect(
         child: SlideTransition(
           position: _slideAnimation,
           child: SafeArea(
             bottom: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 0),
+              // Apply the new balanced margin here
+              padding: EdgeInsets.fromLTRB(horizontalMargin, 8.0, horizontalMargin, 0),
               child: GestureDetector(
                 onVerticalDragEnd: (details) {
                   if (details.primaryVelocity != null &&
@@ -159,18 +174,18 @@ class PremiumModelBannerState extends State<PremiumModelBanner>
                     color: AppColors.primaryColor,
                     borderRadius: BorderRadius.circular(borderRadius * 0.8),
                     child: InkWell(
-                        onTap: () {
-                          final isAnonymous = context
-                              .read<UserProvider>()
-                              .isAnonymous;
+                      onTap: () {
+                        final isAnonymous = context
+                            .read<UserProvider>()
+                            .isAnonymous;
 
-                          if (isAnonymous) {
-                            navigateToScreen(const UpgradeAccountScreen(), direction: const Offset(0.0, 1.0));
-                            FocusScope.of(context).unfocus();
-                          } else {
-                            widget.onTap();
-                          }
-                        },
+                        if (isAnonymous) {
+                          navigateToScreen(const UpgradeAccountScreen(), direction: const Offset(0.0, 1.0));
+                          FocusScope.of(context).unfocus();
+                        } else {
+                          widget.onTap();
+                        }
+                      },
                       borderRadius: BorderRadius.circular(borderRadius * 0.8),
                       splashColor: AppColors.primaryColor.withValues(alpha: 0.1),
                       highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),

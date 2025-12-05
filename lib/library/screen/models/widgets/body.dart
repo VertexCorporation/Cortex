@@ -9,46 +9,39 @@ import '../../../../error.dart';
 import '../../../../fog.dart';
 import '../../../backend/data/entity.dart';
 import '../../../backend/download/download.dart';
-import '../../../backend/search.dart';
+import 'search.dart';
 import '../../../backend/system.dart';
 import '../../../backend/utils.dart';
 import '../skeleton.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import '../../../../theme.dart';
 
-// Constants for animations and layout, ensuring consistency.
+// Constants for animations and layout
 const _kDefaultFadeDuration = Duration(milliseconds: 300);
 const _kSearchTransitionDuration = Duration(milliseconds: 260);
 const _kWarningPanelAnimDuration = Duration(milliseconds: 400);
-const _kHorizontalPaddingRatio = 0.04;
 const _kWarningPanelVisibleBottom = 16.0;
 const _kWarningPanelHiddenBottom = -150.0;
 
-/// A type definition for the download callback to keep the code clean.
 typedef DownloadCallback = Future<bool> Function({
 required String id,
 required String? url,
 required String title,
 });
 
-/// The main body component for the ModelsScreen.
 class ModelsBody extends StatelessWidget {
-  // State flags passed from the parent widget.
   final bool isLoading;
   final bool hasError;
   final bool showLocalizationWarning;
   final List<ModelEntity> allModels;
 
-  // Data and controllers from providers.
   final SystemInfoData? systemInfo;
   final Map<String, bool> downloadedStates;
   final Map<String, DownloadManager> downloadManagers;
   final ModelsSearchController searchController;
 
-  // Animation object for visual feedback.
   final Animation<double> pulseAnimation;
 
-  // Callbacks to interact with providers and parent widgets.
   final VoidCallback onRetry;
   final VoidCallback onDismissWarningPanel;
   final CompatibilityStatus Function(int?) getCompatibilityStatus;
@@ -87,9 +80,6 @@ class ModelsBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
 
-    // We use an AnimatedBuilder to listen for changes in the search text.
-    // This ensures that ONLY the parts of the UI that depend on the search state
-    // are rebuilt, not the entire ModelsBody.
     return AnimatedBuilder(
       animation: searchController.textController,
       builder: (context, child) {
@@ -97,18 +87,15 @@ class ModelsBody extends StatelessWidget {
 
         return Stack(
           children: [
-            // A GestureDetector to dismiss the keyboard when tapping outside the text field.
             GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: () => FocusScope.of(context).unfocus(),
-              // The top-level AnimatedSwitcher handles fading between loading/error/content states.
               child: AnimatedSwitcher(
                 duration: _kDefaultFadeDuration,
                 transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
                 child: _buildContentSwitcher(context, isSearching),
               ),
             ),
-            // The localization warning panel is a positioned overlay.
             _buildLocalizationWarningPanel(context, localizations),
           ],
         );
@@ -116,23 +103,31 @@ class ModelsBody extends StatelessWidget {
     );
   }
 
-  /// Builds the animated warning panel at the bottom of the screen.
   Widget _buildLocalizationWarningPanel(BuildContext context, AppLocalizations localizations) {
     final double bottomPosition = showLocalizationWarning ? _kWarningPanelVisibleBottom : _kWarningPanelHiddenBottom;
     final screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth >= 600;
+
+    // --- DYNAMIC WIDTH FOR TABLET ---
+    // Tablet: 5% margin (90% width). Phone: 4% margin (92% width).
+    final double horizontalMargin = isTablet ? screenWidth * 0.05 : screenWidth * 0.04;
 
     return AnimatedPositioned(
       duration: _kWarningPanelAnimDuration,
       curve: Curves.easeOutCubic,
       bottom: bottomPosition,
-      left: screenWidth * _kHorizontalPaddingRatio,
-      right: screenWidth * _kHorizontalPaddingRatio,
+      left: horizontalMargin,
+      right: horizontalMargin,
       child: GestureDetector(
         onTap: onDismissWarningPanel,
         child: Material(
           type: MaterialType.transparency,
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            // Taller padding on tablet for touch targets
+            padding: EdgeInsets.symmetric(
+                vertical: isTablet ? 16 : 12,
+                horizontal: isTablet ? 20 : 16
+            ),
             decoration: BoxDecoration(
               color: AppColors.secondaryColor,
               borderRadius: BorderRadius.circular(12),
@@ -150,8 +145,8 @@ class ModelsBody extends StatelessWidget {
                 SvgPicture.asset(
                   'assets/icons/warning.svg',
                   colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-                  width: 24,
-                  height: 24,
+                  width: isTablet ? 28 : 24,
+                  height: isTablet ? 28 : 24,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -159,7 +154,7 @@ class ModelsBody extends StatelessWidget {
                     localizations.aiTranslationWarning,
                     style: TextStyle(
                       color: AppColors.primaryColor.inverted,
-                      fontSize: 14,
+                      fontSize: isTablet ? 16 : 14,
                     ),
                   ),
                 ),
@@ -171,7 +166,6 @@ class ModelsBody extends StatelessWidget {
     );
   }
 
-  /// Determines whether to show the skeleton, error view, or the main content.
   Widget _buildContentSwitcher(BuildContext context, bool isSearching) {
     if (isLoading) {
       return const SkeletonScreen(key: ValueKey('skeleton'));
@@ -189,24 +183,25 @@ class ModelsBody extends StatelessWidget {
     return _buildContentView(context, isSearching);
   }
 
-  /// Builds the primary view, containing the search bar and the switchable content area.
   Widget _buildContentView(BuildContext context, bool isSearching) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height; // For ScrollFog
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return ScrollFog(
       scrollController: scrollController,
       fogColor: AppColors.background,
       topFogHeight: screenHeight * 0.02,
-      showTop: true,    // Enable only the top fog.
-      showBottom: false, // Disable the bottom fog.
+      showTop: true,
+      showBottom: false,
       child: SingleChildScrollView(
         key: const ValueKey('content'),
-        controller: scrollController, // Link the controller here.
+        controller: scrollController,
         clipBehavior: Clip.none,
         child: Column(
           children: [
+            // Search Bar handles its own internal responsiveness
             searchController.buildSearchBar(screenWidth),
+
             AnimatedSize(
               duration: _kSearchTransitionDuration,
               curve: Curves.easeInOut,
@@ -216,6 +211,7 @@ class ModelsBody extends StatelessWidget {
                 child: isSearching
                     ? Container(
                   key: const ValueKey('search-view'),
+                  // Search Body also handles its own internal responsiveness
                   child: searchController.buildSearchBody(screenWidth),
                 )
                     : Container(
@@ -230,106 +226,118 @@ class ModelsBody extends StatelessWidget {
     );
   }
 
-  /// Builds the default view with categorized lists of models.
   Widget _buildDefaultModelList(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final bool isTablet = screenWidth >= 600;
 
-    // Filter models into categories. This logic runs only when the widget rebuilds.
     final self = allModels.where((model) => model.category == 'self').toList();
     final serverSide = allModels.where((model) => model.isServerSide && model.category != 'self' && model.category != 'roleplay').toList();
     final local = allModels.where((model) => !model.isServerSide && model.category != 'self').toList();
     final role = allModels.where((model) => model.category == 'roleplay').toList();
 
-    // A helper callback to reduce boilerplate in ModelCategorySection.
     void openModelDetailCallback(ModelEntity model) {
       openModelDetail(model.id);
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: screenHeight * 0.01),
+    // --- TABLET OPTIMIZATION ---
+    // We wrap the content in a Center > ConstrainedBox.
+    // This prevents the lists and charts from stretching too wide on tablets.
+    // Max Width: 800px on tablet. Full width on phone.
 
-        ModelCategorySection(
-          title: loc.localModels,
-          models: local,
-          pulseAnimation: pulseAnimation,
-          downloadedStates: downloadedStates,
-          downloadManagers: downloadManagers,
-          getCompatibilityStatus: getCompatibilityStatus,
-          onModelTapped: openModelDetailCallback,
-          onRemovePressed: onRemovePressed,
-          onChatPressed: onChatPressed,
-          onDownloadPressed: onDownloadPressed,
-          onCancelDownload: onCancelDownload,
-          onResumeDownload: onResumeDownload,
+    return Center(
+      child: Container(
+        constraints: BoxConstraints(maxWidth: isTablet ? 800 : double.infinity),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: screenHeight * 0.01),
+
+            ModelCategorySection(
+              title: loc.localModels,
+              models: local,
+              pulseAnimation: pulseAnimation,
+              downloadedStates: downloadedStates,
+              downloadManagers: downloadManagers,
+              getCompatibilityStatus: getCompatibilityStatus,
+              onModelTapped: openModelDetailCallback,
+              onRemovePressed: onRemovePressed,
+              onChatPressed: onChatPressed,
+              onDownloadPressed: onDownloadPressed,
+              onCancelDownload: onCancelDownload,
+              onResumeDownload: onResumeDownload,
+            ),
+
+            ModelCategorySection(
+              title: loc.serverSideModels,
+              models: serverSide,
+              downloadedStates: downloadedStates,
+              downloadManagers: downloadManagers,
+              getCompatibilityStatus: getCompatibilityStatus,
+              onModelTapped: openModelDetailCallback,
+              onRemovePressed: onRemovePressed,
+              onChatPressed: onChatPressed,
+              onDownloadPressed: onDownloadPressed,
+              onCancelDownload: onCancelDownload,
+              onResumeDownload: onResumeDownload,
+            ),
+
+            ModelCategorySection(
+              title: loc.roleModels,
+              models: role,
+              downloadedStates: downloadedStates,
+              downloadManagers: downloadManagers,
+              getCompatibilityStatus: getCompatibilityStatus,
+              onModelTapped: openModelDetailCallback,
+              onRemovePressed: onRemovePressed,
+              onChatPressed: onChatPressed,
+              onDownloadPressed: onDownloadPressed,
+              onCancelDownload: onCancelDownload,
+              onResumeDownload: onResumeDownload,
+            ),
+
+            ModelCategorySection(
+              title: loc.myModels,
+              models: self,
+              downloadedStates: downloadedStates,
+              downloadManagers: downloadManagers,
+              getCompatibilityStatus: getCompatibilityStatus,
+              onModelTapped: openModelDetailCallback,
+              onRemovePressed: onRemovePressed,
+              onChatPressed: onChatPressed,
+              onDownloadPressed: onDownloadPressed,
+              onCancelDownload: onCancelDownload,
+              onResumeDownload: onResumeDownload,
+            ),
+
+            if (systemInfo != null) ...[
+              Padding(
+                // Dynamic padding for system info title
+                padding: EdgeInsets.symmetric(horizontal: isTablet ? 0 : screenWidth * 0.04) // 0 because container is already constrained
+                    .copyWith(
+                    top: isTablet ? 24.0 : screenWidth * 0.015,
+                    bottom: isTablet ? 16.0 : screenWidth * 0.015
+                ),
+                child: Text(loc.systemInfo,
+                    style: TextStyle(
+                        color: AppColors.primaryColor.inverted,
+                        fontSize: isTablet ? 26.0 : screenWidth * 0.05,
+                        fontWeight: FontWeight.bold)),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: isTablet ? 0 : screenWidth * 0.04),
+                child: SystemInfoChart(
+                    totalStorage: systemInfo!.totalStorage,
+                    usedStorage: systemInfo!.totalStorage - systemInfo!.freeStorage,
+                    totalMemory: systemInfo!.deviceMemory,
+                    usedMemory: systemInfo!.usedMemory),
+              ),
+            ],
+            SizedBox(height: isTablet ? 40.0 : screenWidth * 0.04),
+          ],
         ),
-
-        ModelCategorySection(
-          title: loc.serverSideModels,
-          models: serverSide,
-          downloadedStates: downloadedStates,
-          downloadManagers: downloadManagers,
-          getCompatibilityStatus: getCompatibilityStatus,
-          onModelTapped: openModelDetailCallback,
-          onRemovePressed: onRemovePressed,
-          onChatPressed: onChatPressed,
-          onDownloadPressed: onDownloadPressed,
-          onCancelDownload: onCancelDownload,
-          onResumeDownload: onResumeDownload,
-        ),
-
-        ModelCategorySection(
-          title: loc.roleModels,
-          models: role,
-          downloadedStates: downloadedStates,
-          downloadManagers: downloadManagers,
-          getCompatibilityStatus: getCompatibilityStatus,
-          onModelTapped: openModelDetailCallback,
-          onRemovePressed: onRemovePressed,
-          onChatPressed: onChatPressed,
-          onDownloadPressed: onDownloadPressed,
-          onCancelDownload: onCancelDownload,
-          onResumeDownload: onResumeDownload,
-        ),
-
-        ModelCategorySection(
-          title: loc.myModels,
-          models: self,
-          downloadedStates: downloadedStates,
-          downloadManagers: downloadManagers,
-          getCompatibilityStatus: getCompatibilityStatus,
-          onModelTapped: openModelDetailCallback,
-          onRemovePressed: onRemovePressed,
-          onChatPressed: onChatPressed,
-          onDownloadPressed: onDownloadPressed,
-          onCancelDownload: onCancelDownload,
-          onResumeDownload: onResumeDownload,
-        ),
-
-        if (systemInfo != null) ...[
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * _kHorizontalPaddingRatio)
-                .copyWith(top: screenWidth * 0.015, bottom: screenWidth * 0.015),
-            child: Text(loc.systemInfo,
-                style: TextStyle(
-                    color: AppColors.primaryColor.inverted,
-                    fontSize: screenWidth * 0.05,
-                    fontWeight: FontWeight.bold)),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * _kHorizontalPaddingRatio),
-            child: SystemInfoChart(
-                totalStorage: systemInfo!.totalStorage,
-                usedStorage: systemInfo!.totalStorage - systemInfo!.freeStorage,
-                totalMemory: systemInfo!.deviceMemory,
-                usedMemory: systemInfo!.usedMemory),
-          ),
-        ],
-        SizedBox(height: screenWidth * _kHorizontalPaddingRatio),
-      ],
+      ),
     );
   }
 }

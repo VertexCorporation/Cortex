@@ -5,10 +5,6 @@ import 'package:flutter/material.dart';
 import '../../../../../theme.dart';
 
 /// A reusable form section widget for the model creation process.
-///
-/// It standardizes the layout for sections that include a title, a description,
-/// and a multi-line text input field. This is used for inputs like the
-/// "AI Prompt" and "Model Explanation".
 class CreationFormSection extends StatelessWidget {
   final String title;
   final String description;
@@ -31,6 +27,13 @@ class CreationFormSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final bool isTablet = screenWidth >= 600;
+
+    // --- TABLET OPTIMIZATIONS ---
+    final double titleSize = isTablet ? 26.0 : screenWidth * 0.05;
+    final double descSize = isTablet ? 18.0 : screenWidth * 0.035;
+    final double borderRadius = isTablet ? 16.0 : screenWidth * 0.025;
+    final double inputTextSize = isTablet ? 18.0 : 16.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,7 +43,7 @@ class CreationFormSection extends StatelessWidget {
           title,
           style: TextStyle(
             color: AppColors.primaryColor.inverted,
-            fontSize: screenWidth * 0.05,
+            fontSize: titleSize,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -51,7 +54,7 @@ class CreationFormSection extends StatelessWidget {
           description,
           style: TextStyle(
             color: AppColors.quinaryColor,
-            fontSize: screenWidth * 0.035,
+            fontSize: descSize,
           ),
         ),
         SizedBox(height: screenHeight * 0.02),
@@ -61,25 +64,26 @@ class CreationFormSection extends StatelessWidget {
           controller: controller,
           maxLength: maxLength,
           maxLines: maxLines,
-          style: TextStyle(color: AppColors.primaryColor.inverted),
+          style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: inputTextSize),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(color: AppColors.quinaryColor),
+            hintStyle: TextStyle(color: AppColors.quinaryColor, fontSize: inputTextSize),
             filled: true,
             fillColor: AppColors.primaryColor,
             counterText: '',
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            // Taller input field on tablet
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: isTablet ? 20 : 12),
             border: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.border),
-              borderRadius: BorderRadius.circular(screenWidth * 0.025),
+              borderRadius: BorderRadius.circular(borderRadius),
             ),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.border),
-              borderRadius: BorderRadius.circular(screenWidth * 0.025),
+              borderRadius: BorderRadius.circular(borderRadius),
             ),
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.primaryColor.inverted),
-              borderRadius: BorderRadius.circular(screenWidth * 0.025),
+              borderRadius: BorderRadius.circular(borderRadius),
             ),
           ),
         ),

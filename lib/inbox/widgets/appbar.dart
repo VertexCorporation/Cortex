@@ -6,11 +6,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 import '../../app.dart';
 import '../../theme.dart';
 
-/// The AppBar used in the Inbox screen, matching the legacy design from MenuScreen.
-/// This includes:
-/// - Title
-/// - "New chat" action button
-/// - Underline TabBar (All / Starred)
+/// The AppBar used in the Inbox screen.
 class InboxAppBar extends StatelessWidget implements PreferredSizeWidget {
   final TabController tabController;
   final VoidCallback onNewChatPressed;
@@ -24,20 +20,56 @@ class InboxAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+
+    // RESPONSIVE LOGIC
+    final bool isTablet = screenWidth >= 600;
+
+    // --- DIMENSIONS & SCALING ---
+
+    // Main Toolbar Height:
+    // Phone: Default. Tablet: Explicitly requested screenWidth * 0.14
+    final double toolbarHeight = isTablet ? screenWidth * 0.14 : kToolbarHeight;
+
+    // Title Font Size:
+    // Phone: Scales (6%). Tablet: Fixed Large (36).
+    final double titleFontSize = isTablet ? 36.0 : screenWidth * 0.06;
+
+    // New Chat Icon Size:
+    // Phone: Scales (5.5%). Tablet: Fixed Large (32).
+    final double iconSize = isTablet ? 32.0 : screenWidth * 0.055;
+
+    // Tab Bar Container Height:
+    // Phone: Scales (12%). Tablet: Fixed Taller (60).
+    final double tabBarHeight = isTablet ? 60.0 : screenWidth * 0.12;
+
+    // Tab Label Font Size:
+    // Phone: Scales (4%). Tablet: Fixed (22).
+    final double tabLabelFontSize = isTablet ? 22.0 : screenWidth * 0.04;
+
+    // Tab Indicator Thickness:
+    final double indicatorThickness = isTablet ? 2.0 : screenWidth * 0.004;
 
     return AppBar(
       backgroundColor: AppColors.background,
       elevation: 0,
       scrolledUnderElevation: 0,
       centerTitle: false,
-      title: Text(
-        localizations.conversationsTitle,
-        style: TextStyle(
-          fontFamily: 'Roboto',
-          color: AppColors.primaryColor.inverted,
-          fontSize: screenWidth * 0.06,
-          fontWeight: FontWeight.bold,
+      toolbarHeight: toolbarHeight,
+
+      // --- TITLE WITH TABLET PADDING ---
+      // Wrapped in a Container to apply the exact same left padding as ModelsAppBar
+      title: Container(
+        padding: EdgeInsets.only(left: isTablet ? 16.0 : 0),
+        child: Text(
+          localizations.conversationsTitle,
+          style: TextStyle(
+            fontFamily: 'Roboto',
+            color: AppColors.primaryColor.inverted,
+            fontSize: titleFontSize,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
 
@@ -50,16 +82,16 @@ class InboxAppBar extends StatelessWidget implements PreferredSizeWidget {
               AppColors.primaryColor.inverted,
               BlendMode.srcIn,
             ),
-            width: screenWidth * 0.055,
-            height: screenWidth * 0.055,
+            width: iconSize,
+            height: iconSize,
           ),
           onPressed: onNewChatPressed,
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: isTablet ? 16.0 : 4), // Extra padding on tablet
       ],
 
       bottom: PreferredSize(
-        preferredSize: Size.fromHeight(screenWidth * 0.12),
+        preferredSize: Size.fromHeight(tabBarHeight),
         child: Theme(
           data: Theme.of(context).copyWith(
             splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
@@ -68,14 +100,14 @@ class InboxAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: Container(
             width: double.infinity,
             alignment: Alignment.center,
+            height: tabBarHeight,
             child: TabBar(
               controller: tabController,
               isScrollable: false,
 
-              // Underline indicator (legacy design)
               indicator: UnderlineTabIndicator(
                 borderSide: BorderSide(
-                  width: screenWidth * 0.004,
+                  width: indicatorThickness,
                   color: AppColors.primaryColor.inverted,
                 ),
                 insets: EdgeInsets.zero,
@@ -88,7 +120,7 @@ class InboxAppBar extends StatelessWidget implements PreferredSizeWidget {
               AppColors.primaryColor.inverted.withValues(alpha: 0.6),
 
               labelStyle: TextStyle(
-                fontSize: screenWidth * 0.04,
+                fontSize: tabLabelFontSize,
                 fontWeight: FontWeight.w600,
               ),
 
@@ -117,8 +149,6 @@ class InboxAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  /// Standard AppBar height + TabBar height
   @override
-  Size get preferredSize =>
-      const Size.fromHeight(kToolbarHeight + kTextTabBarHeight);
+  Size get preferredSize => const Size.fromHeight(160);
 }

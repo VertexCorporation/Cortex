@@ -907,20 +907,20 @@ class AppLocalizationsId extends AppLocalizations {
   String get help => 'Bantuan';
 
   @override
-  String get redeemCode => 'Tukarkan Kode';
+  String get supportCreator => 'Dukung Kreator';
 
   @override
-  String get enterYourCode =>
-      'Dukung kreator favorit Anda! Masukkan kode unik mereka di bawah ini untuk memberi mereka bagian dari pembelian Cortex Anda.';
+  String get enterYourTag =>
+      'Dukung kreator favoritmu! Masukkan tag unik mereka di bawah ini untuk mendapatkan bagian dari pembelian Cortex-mu.';
 
   @override
-  String get code => 'Kode';
+  String get creatorTag => 'Tag Pembuat';
 
   @override
-  String get redeem => 'Tukarkan';
+  String get support => 'Dukung';
 
   @override
-  String get codeCannotBeEmpty => 'Kode tidak boleh kosong';
+  String get tagCannotBeEmpty => 'Tag pembuat tidak boleh kosong';
 
   @override
   String get userId => 'ID Pengguna';
@@ -1516,11 +1516,11 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Masuk ke akun Vertex Anda. Pengguna baru yang mendaftar melalui layanan pihak ketiga menyetujui Syarat & Kebijakan Privasi kami. Anda dapat meninjaunya di layar Daftar.';
+      'Masuk ke akun Vertex Anda. Dengan melanjutkan, Anda menyetujui Persyaratan Layanan & Kebijakan Privasi kami.';
 
   @override
   String get registerSubtitle =>
-      'Buat akun Vertex, yang juga dapat Anda gunakan untuk proyek kami yang lain.';
+      'Buat akun Vertex untuk akses mudah ke semua layanan kami. Dengan melanjutkan, Anda menyetujui Persyaratan Layanan & Kebijakan Privasi kami.';
 
   @override
   String get photoWarningMessage =>
@@ -2029,8 +2029,8 @@ class AppLocalizationsId extends AppLocalizations {
       'Terjadi masalah saat mengambil pembaruan terkini, silakan periksa koneksi Anda dan coba lagi.';
 
   @override
-  String get codeNotFound =>
-      'Kode yang Anda masukkan tidak valid atau telah kedaluwarsa.';
+  String get tagNotFound =>
+      'Tag yang Anda masukkan tidak valid atau telah kedaluwarsa.';
 
   @override
   String get whatIsNew => 'Apa yang baru?';
@@ -2133,5 +2133,13 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return 'Sekitar $price/bulan';
+  }
+
+  @override
+  String get confirmDownloadTitle => 'Apakah Anda yakin ingin mengunduh?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'Model ini akan menempati ruang sekitar $size.';
   }
 }

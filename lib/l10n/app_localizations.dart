@@ -1055,13 +1055,13 @@ abstract class AppLocalizations {
   /// No description provided for @purchaseSuccessful.
   ///
   /// In en, this message translates to:
-  /// **'Purchase succesful!'**
+  /// **'Purchase successful!'**
   String get purchaseSuccessful;
 
   /// No description provided for @purchaseFailed.
   ///
   /// In en, this message translates to:
-  /// **'Purchase unsuccesful'**
+  /// **'Purchase unsuccessful'**
   String get purchaseFailed;
 
   /// No description provided for @creditProductNotFound.
@@ -1743,35 +1743,35 @@ abstract class AppLocalizations {
   /// **'Help'**
   String get help;
 
-  /// No description provided for @redeemCode.
+  /// No description provided for @supportCreator.
   ///
   /// In en, this message translates to:
-  /// **'Redeem Code'**
-  String get redeemCode;
+  /// **'Support a Creator'**
+  String get supportCreator;
 
-  /// No description provided for @enterYourCode.
+  /// No description provided for @enterYourTag.
   ///
   /// In en, this message translates to:
-  /// **'Support your favorite creators! Enter their unique code below to give them a share of your Cortex purchases.'**
-  String get enterYourCode;
+  /// **'Support your favorite creators! Enter their unique tag below to give them a share of your Cortex purchases.'**
+  String get enterYourTag;
 
-  /// No description provided for @code.
+  /// No description provided for @creatorTag.
   ///
   /// In en, this message translates to:
-  /// **'Code'**
-  String get code;
+  /// **'Creator Tag'**
+  String get creatorTag;
 
-  /// No description provided for @redeem.
+  /// No description provided for @support.
   ///
   /// In en, this message translates to:
-  /// **'Redeem'**
-  String get redeem;
+  /// **'Support'**
+  String get support;
 
-  /// No description provided for @codeCannotBeEmpty.
+  /// No description provided for @tagCannotBeEmpty.
   ///
   /// In en, this message translates to:
-  /// **'Code cannot be empty'**
-  String get codeCannotBeEmpty;
+  /// **'Creator tag cannot be empty'**
+  String get tagCannotBeEmpty;
 
   /// No description provided for @userId.
   ///
@@ -2832,13 +2832,13 @@ abstract class AppLocalizations {
   /// No description provided for @loginSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Log in to your Vertex account. New users signing up via third-party services agree to our Terms & Privacy Policy. You can review them on the Sign Up screen.'**
+  /// **'Log in to your Vertex account. By continuing, you agree to our Terms of Service & Privacy Policy.'**
   String get loginSubtitle;
 
   /// No description provided for @registerSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Create a Vertex account, which you can also use for our other projects.'**
+  /// **'Create a Vertex account for seamless access across all our services. By continuing, you agree to our Terms of Service & Privacy Policy.'**
   String get registerSubtitle;
 
   /// No description provided for @photoWarningMessage.
@@ -3637,7 +3637,7 @@ abstract class AppLocalizations {
   /// No description provided for @channelFcmDescription.
   ///
   /// In en, this message translates to:
-  /// **'Notifications about news, updates and other informations from Cortex.'**
+  /// **'Notifications about news, updates and other information from Cortex.'**
   String get channelFcmDescription;
 
   /// The user-visible name for the engagement notification channel.
@@ -3688,11 +3688,11 @@ abstract class AppLocalizations {
   /// **'There was a problem fetching the latest updates, please check your connection and try again.'**
   String get newsErrorMessage;
 
-  /// No description provided for @codeNotFound.
+  /// No description provided for @tagNotFound.
   ///
   /// In en, this message translates to:
-  /// **'The code you entered is invalid or has expired.'**
-  String get codeNotFound;
+  /// **'The tag you entered is invalid or has expired.'**
+  String get tagNotFound;
 
   /// No description provided for @whatIsNew.
   ///
@@ -3873,6 +3873,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Approximately {price}/month'**
   String equivalentMonthlyDescription(Object price);
+
+  /// No description provided for @confirmDownloadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to download?'**
+  String get confirmDownloadTitle;
+
+  /// No description provided for @downloadSizeDisclosure.
+  ///
+  /// In en, this message translates to:
+  /// **'This model will occupy approximately {size} of space.'**
+  String downloadSizeDisclosure(Object size);
 }
 
 class _AppLocalizationsDelegate

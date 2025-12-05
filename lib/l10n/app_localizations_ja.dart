@@ -880,20 +880,20 @@ class AppLocalizationsJa extends AppLocalizations {
   String get help => 'ヘルプ';
 
   @override
-  String get redeemCode => 'コードを引き換える';
+  String get supportCreator => 'クリエイターをサポートする';
 
   @override
-  String get enterYourCode =>
-      'お気に入りのクリエイターをサポートしよう！Cortexでの購入の一部を彼らに還元するために、以下のユニークなコードを入力してください。';
+  String get enterYourTag =>
+      'お気に入りのクリエイターを応援しましょう！以下のタグを入力すると、Cortex での購入の一部がクリエイターに寄付されます。';
 
   @override
-  String get code => 'コード';
+  String get creatorTag => 'クリエイタータグ';
 
   @override
-  String get redeem => '引き換える';
+  String get support => 'サポート';
 
   @override
-  String get codeCannotBeEmpty => 'コードを空にすることはできません';
+  String get tagCannotBeEmpty => '作成者タグは空にできません';
 
   @override
   String get userId => 'ユーザーID';
@@ -1459,10 +1459,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Vertexアカウントにログインしてください。サードパーティサービス経由で新規登録される方は、当社の利用規約とプライバシーポリシーに同意するものとします。利用規約とプライバシーポリシーはサインアップ画面でご確認いただけます。';
+      'Vertexアカウントにログインしてください。続行すると、利用規約とプライバシーポリシーに同意したことになります。';
 
   @override
-  String get registerSubtitle => 'Vertexアカウントを作成してください。これは当社の他のプロジェクトでも使用できます。';
+  String get registerSubtitle =>
+      'Vertexアカウントを作成すると、すべてのサービスにシームレスにアクセスできます。続行すると、利用規約とプライバシーポリシーに同意したことになります。';
 
   @override
   String get photoWarningMessage =>
@@ -1924,7 +1925,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get channelFcmName => 'Cortexのアップデート';
 
   @override
-  String get channelFcmDescription => 'Cortex からのニュース、更新、その他の情報に関する通知。';
+  String get channelFcmDescription => 'Cortex からのニュース、更新情報、その他の情報に関する通知。';
 
   @override
   String get channelEngagementName => 'フレンドリーなリマインダー';
@@ -1951,7 +1952,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get newsErrorMessage => '最新のアップデートの取得中に問題が発生しました。接続を確認してもう一度お試しください。';
 
   @override
-  String get codeNotFound => '入力したコードは無効または期限切れです。';
+  String get tagNotFound => '入力したタグは無効または期限切れです。';
 
   @override
   String get whatIsNew => '新着情報？';
@@ -2053,5 +2054,13 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return '月額約$price';
+  }
+
+  @override
+  String get confirmDownloadTitle => '本当にダウンロードしますか?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'このモデルは約 $size のスペースを占有します。';
   }
 }

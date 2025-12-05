@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../app.dart';
 import '../../cache.dart';
 import '../../notifications/introvert.dart';
 import '../backend/data/entity.dart';
@@ -17,6 +18,8 @@ import '../backend/download/download.dart';
 import '../backend/remove.dart';
 import '../backend/system.dart';
 import '../backend/utils.dart';
+import '../../../../darkener.dart';
+import '../../../../theme.dart';
 
 /// Data class for results from the background isolate.
 class _ProcessedStateData {
@@ -173,7 +176,6 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   }
 
   /// Handles the entire flow for starting a model download, including permission requests.
-  /// Handles the entire flow for starting a model download, including permission requests.
   Future<bool> requestPermissionAndStartDownload({
     required BuildContext context,
     required String id,
@@ -183,6 +185,8 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
       debugPrint("[ModelLocalStateProvider] Permission request already in progress. Ignoring tap.");
       return false;
     }
+    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+    final localizations = AppLocalizations.of(context)!;
 
     final manager = _downloadManagers[id];
     final isAlreadyCompleted = _downloadCompleted[id] ?? false;
@@ -195,8 +199,17 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
     _isRequestingPermission = true;
 
     try {
-      final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
-      final localizations = AppLocalizations.of(context)!;
+      if (Platform.isIOS) {
+        final model = _currentModels.firstWhere((m) => m.id == id, orElse: () => _currentModels.first);
+        final double sizeInGB = (model.size ?? 0) / 1024.0;
+
+        final bool confirmed = await _showDownloadConfirmationDialog(context, modelTitle, sizeInGB);
+
+        if (!confirmed) {
+          _isRequestingPermission = false;
+          return false;
+        }
+      }
 
       final notificationStatus = await Permission.notification.request();
 
@@ -220,7 +233,6 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
 
           if (!batteryStatus.isGranted) {
             debugPrint("[ModelLocalStateProvider] $manufacturer device found, requesting the battery optimization permission.");
-
             await Permission.ignoreBatteryOptimizations.request();
           }
         }
@@ -303,7 +315,6 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   //================================================================================
   // Private Logic & State Management
   //================================================================================
-
 
   Future<void> _initializeDependencies() async {
     if (_filesDirectoryPath.isEmpty) {
@@ -402,7 +413,7 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   }
 
   //================================================================================
-  // Private Helpers
+  // Private Helpers & Dialogs
   //================================================================================
 
   String? _getTitleById(String id) {
@@ -411,5 +422,145 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
     } catch (e) {
       return null;
     }
+  }
+
+  /// Shows a confirmation dialog required by Apple for large downloads.
+  /// Matches the app's visual style, handles MB/GB formatting, and uses updated colors.
+  Future<bool> _showDownloadConfirmationDialog(
+      BuildContext context, String modelTitle, double sizeInGB) async {
+    final localizations = AppLocalizations.of(context)!;
+    final restoreNavBar = Darkener.darken();
+
+    // Get screen dimensions once for responsive sizing.
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // 1. Smart Size Formatting (MB vs GB)
+    String sizeString;
+    if (sizeInGB < 1.0) {
+      // If less than 1 GB, show in MB (e.g. 0.3 GB -> 307 MB)
+      final int sizeInMB = (sizeInGB * 1024).round();
+      sizeString = "$sizeInMB MB";
+    } else {
+      // Otherwise keep GB (e.g. 2.4 GB)
+      sizeString = "${sizeInGB.toStringAsFixed(1)} GB";
+    }
+
+    final result = await showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'DownloadConfirmation',
+      transitionDuration: const Duration(milliseconds: 150),
+      pageBuilder: (ctx, _, __) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: screenWidth * 0.8,
+              decoration: BoxDecoration(
+                color: AppColors.secondaryColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(screenWidth * 0.05), // Dynamic padding
+                      child: Column(
+                        children: [
+                          // 1. Title: Are you sure?
+                          Text(
+                            localizations.confirmDownloadTitle,
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.045, // Dynamic font size
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryColor.inverted,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: screenHeight * 0.015), // Dynamic spacing
+
+                          // REMOVED: Huge Model Title (as requested)
+
+                          // 2. Size Disclosure (Apple Requirement)
+                          Text(
+                            localizations.downloadSizeDisclosure(sizeString),
+                            style: TextStyle(
+                              color: AppColors.primaryColor.inverted.withValues(alpha: 0.6),
+                              fontSize: screenWidth * 0.035,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Divider(color: AppColors.border, thickness: 0.5, height: 1),
+                    IntrinsicHeight(
+                      child: Row(
+                        children: [
+                          // Cancel Button
+                          Expanded(
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                // Ripple Effect: Senary color with low opacity
+                                splashColor: AppColors.senaryColor.withValues(alpha: 0.1),
+                                highlightColor: AppColors.senaryColor.withValues(alpha: 0.05),
+                                onTap: () => Navigator.of(ctx).pop(false),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: screenHeight * 0.02),
+                                  child: Text(localizations.cancel,
+                                      style: TextStyle(
+                                        color: AppColors.senaryColor, // Senary Color
+                                        fontSize: screenWidth * 0.04,
+                                      )),
+                                ),
+                              ),
+                            ),
+                          ),
+                          VerticalDivider(
+                              width: 1, thickness: 0.5, color: AppColors.border),
+                          // Download Button
+                          Expanded(
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                // Ripple Effect: Senary color with low opacity
+                                splashColor: AppColors.senaryColor.withValues(alpha: 0.1),
+                                highlightColor: AppColors.senaryColor.withValues(alpha: 0.05),
+                                onTap: () => Navigator.of(ctx).pop(true),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: screenHeight * 0.02),
+                                  child: Text(localizations.download,
+                                      style: TextStyle(
+                                        color: AppColors.senaryColor, // Senary Color
+                                        fontSize: screenWidth * 0.04,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      restoreNavBar();
+    });
+
+    return result ?? false;
   }
 }

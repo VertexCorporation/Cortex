@@ -913,20 +913,20 @@ class AppLocalizationsNl extends AppLocalizations {
   String get help => 'Hulp';
 
   @override
-  String get redeemCode => 'Code Inwisselen';
+  String get supportCreator => 'Steun een maker';
 
   @override
-  String get enterYourCode =>
-      'Steun je favoriete creators! Voer hun unieke code hieronder in om hen een deel van je Cortex-aankopen te geven.';
+  String get enterYourTag =>
+      'Steun je favoriete makers! Voer hieronder hun unieke tag in en ontvang een deel van je Cortex-aankopen.';
 
   @override
-  String get code => 'Code';
+  String get creatorTag => 'Creator-tag';
 
   @override
-  String get redeem => 'Inwisselen';
+  String get support => 'Steun';
 
   @override
-  String get codeCannotBeEmpty => 'Code mag niet leeg zijn';
+  String get tagCannotBeEmpty => 'Creator-tag mag niet leeg zijn';
 
   @override
   String get userId => 'Gebruikers-ID';
@@ -1524,11 +1524,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Meld u aan bij uw Vertex-account. Nieuwe gebruikers die zich aanmelden via services van derden, gaan akkoord met onze Algemene voorwaarden en ons Privacybeleid. U kunt deze bekijken op het aanmeldscherm.';
+      'Log in op uw Vertex-account. Door verder te gaan, gaat u akkoord met onze Servicevoorwaarden en ons Privacybeleid.';
 
   @override
   String get registerSubtitle =>
-      'Maak een Vertex-account aan, dat je ook voor onze andere projecten kunt gebruiken.';
+      'Maak een Vertex-account aan voor naadloze toegang tot al onze diensten. Door verder te gaan, gaat u akkoord met onze Servicevoorwaarden en ons Privacybeleid.';
 
   @override
   String get photoWarningMessage =>
@@ -2035,7 +2035,8 @@ class AppLocalizationsNl extends AppLocalizations {
       'Er is een probleem opgetreden bij het ophalen van de nieuwste updates. Controleer uw verbinding en probeer het opnieuw.';
 
   @override
-  String get codeNotFound => 'De ingevoerde code is ongeldig of verlopen.';
+  String get tagNotFound =>
+      'De tag die u hebt ingevoerd is ongeldig of verlopen.';
 
   @override
   String get whatIsNew => 'Wat is er nieuw?';
@@ -2138,5 +2139,13 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return 'Ongeveer $price/maand';
+  }
+
+  @override
+  String get confirmDownloadTitle => 'Weet u zeker dat u wilt downloaden?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'Dit model neemt ongeveer $size ruimte in beslag.';
   }
 }

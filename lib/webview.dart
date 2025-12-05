@@ -27,6 +27,8 @@ Future<void> showAppWebViewModal(BuildContext context, String title, String url)
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
+    // constraints ekleyerek max genişlik sınırını kaldırıyoruz
+    constraints: const BoxConstraints(maxWidth: double.infinity),
     builder: (BuildContext modalContext) {
       return _WebViewModalContent(url: url, title: title);
     },
@@ -143,10 +145,10 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
 
   @override
   Widget build(BuildContext context) {
-    // ... The rest of the build method is IDENTICAL ...
     final localizations = AppLocalizations.of(context)!;
 
     return Container(
+      width: double.infinity,
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
         color: AppColors.background,
@@ -154,19 +156,18 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
       ),
       child: Column(
         children: [
-          // --- Dynamic Header ---
+          // --- Header ---
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 8, 8, 8),
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 AnimatedOpacity(
                   opacity: _canGoBack ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOut,
                   child: IconButton(
                     icon: Transform.rotate(
-                      angle: -math.pi / 2, // -90 degrees in radians.
+                      angle: -math.pi / 2,
                       child: SvgPicture.asset(
                         'assets/icons/arrow.svg',
                         colorFilter: ColorFilter.mode(
@@ -176,7 +177,7 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
                     ),
                     onPressed: _canGoBack ? () {
                       _controller.goBack();
-                      _updateNavigationState(); // Update back button state immediately after tap
+                      _updateNavigationState();
                     } : null,
                   ),
                 ),
@@ -202,22 +203,26 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
             ),
           ),
           Divider(height: 1, thickness: 1, color: AppColors.quinaryColor.withValues(alpha: 0.2)),
-          // --- Main Content Stack ---
+
+          // --- Main Content ---
           Expanded(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                WebViewWidget(
-                  controller: _controller,
-                  gestureRecognizers: {
-                    Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer()),
-                  },
-                ),
-                if (_isLoading)
-                  _TriangleLoadingIndicator(animation: _animation),
-                if (_hasError)
-                  _ErrorDisplay(animation: _animation, localizations: localizations),
-              ],
+            child: ClipRRect(
+              borderRadius: BorderRadius.zero,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  WebViewWidget(
+                    controller: _controller,
+                    gestureRecognizers: {
+                      Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer()),
+                    },
+                  ),
+                  if (_isLoading)
+                    _TriangleLoadingIndicator(animation: _animation),
+                  if (_hasError)
+                    _ErrorDisplay(animation: _animation, localizations: localizations),
+                ],
+              ),
             ),
           ),
         ],

@@ -902,20 +902,20 @@ class AppLocalizationsTr extends AppLocalizations {
   String get help => 'Yardım';
 
   @override
-  String get redeemCode => 'Kod Kullan';
+  String get supportCreator => 'Bir Yaratıcıyı Destekleyin';
 
   @override
-  String get enterYourCode =>
-      'Favori içerik üreticilerinizi destekleyin! Cortex satın alımlarınızdan pay almalarını sağlamak için benzersiz kodlarını aşağıya girin.';
+  String get enterYourTag =>
+      'Favori içerik oluşturucularınızı destekleyin! Cortex satın alımlarınızdan pay almak için aşağıya benzersiz etiketlerini girin.';
 
   @override
-  String get code => 'Kod';
+  String get creatorTag => 'Yaratıcı Etiketi';
 
   @override
-  String get redeem => 'Kullan';
+  String get support => 'Destek';
 
   @override
-  String get codeCannotBeEmpty => 'Kod boş olamaz';
+  String get tagCannotBeEmpty => 'Oluşturucu etiketi boş olamaz';
 
   @override
   String get userId => 'Kullanıcı ID';
@@ -1507,11 +1507,11 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Vertex hesabınıza giriş yapın. Üçüncü taraf hizmetler aracılığıyla kaydolan yeni kullanıcılar, Şartlar ve Gizlilik Politikamızı kabul etmiş sayılır. Bunları Kayıt ekranında inceleyebilirsiniz.';
+      'Vertex hesabınıza giriş yapın. Devam ederek, Hizmet Şartlarımızı ve Gizlilik Politikamızı kabul etmiş olursunuz.';
 
   @override
   String get registerSubtitle =>
-      'Diğer projelerimizde de kullanabileceğiniz bir Vertex hesabı oluşturun.';
+      'Tüm hizmetlerimize kesintisiz erişim için bir Vertex hesabı oluşturun. Devam ederek, Hizmet Şartlarımızı ve Gizlilik Politikamızı kabul etmiş olursunuz.';
 
   @override
   String get photoWarningMessage =>
@@ -2013,7 +2013,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Son güncellemeler alınırken bir sorun oluştu, lütfen bağlantınızı kontrol edip tekrar deneyin.';
 
   @override
-  String get codeNotFound => 'Girdiğiniz kod geçersiz veya süresi dolmuş.';
+  String get tagNotFound => 'Girdiğiniz etiket geçersiz veya süresi dolmuş.';
 
   @override
   String get whatIsNew => 'Ne var ne yok?';
@@ -2116,5 +2116,13 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return 'Yaklaşık $price/ay';
+  }
+
+  @override
+  String get confirmDownloadTitle => 'İndirmek istediğinize emin misiniz?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'Bu model yaklaşık olarak $size büyüklüğünde yer kaplayacaktır.';
   }
 }

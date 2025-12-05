@@ -34,8 +34,14 @@ class ChatTitleState extends State<ChatTitle> {
   @override
   Widget build(BuildContext context) {
     final bool hasExtensions = widget.extensions.currentExtensions.isNotEmpty;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final double fontSize = screenWidth * 0.056;
+
+    final size = MediaQuery.of(context).size;
+    final screenWidth = size.width;
+    final bool isTablet = size.shortestSide > 600;
+
+    // RESPONSIVE: On tablet, use fixed readable size. On phone, use original %.
+    final double fontSize = isTablet ? screenWidth * 0.04: screenWidth * 0.056;
+    final double maxContainerWidth = isTablet ? screenWidth * 0.8: screenWidth * 0.65;
 
     final Widget titleContent = Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -47,7 +53,7 @@ class ChatTitleState extends State<ChatTitle> {
             child: _buildArrowIcon(fontSize),
           ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.015),
+          padding: EdgeInsets.symmetric(horizontal: isTablet ? 8.0 : screenWidth * 0.015),
           child: Text(
             widget.modelTitle ?? '',
             style: GoogleFonts.mavenPro(
@@ -69,7 +75,7 @@ class ChatTitleState extends State<ChatTitle> {
       behavior: HitTestBehavior.opaque,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: screenWidth * 0.65,
+          maxWidth: maxContainerWidth,
         ),
         child: FittedBox(
           fit: BoxFit.scaleDown,

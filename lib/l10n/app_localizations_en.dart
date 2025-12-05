@@ -505,10 +505,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get downloadPaused => 'Download paused.';
 
   @override
-  String get purchaseSuccessful => 'Purchase succesful!';
+  String get purchaseSuccessful => 'Purchase successful!';
 
   @override
-  String get purchaseFailed => 'Purchase unsuccesful';
+  String get purchaseFailed => 'Purchase unsuccessful';
 
   @override
   String get creditProductNotFound =>
@@ -903,20 +903,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get help => 'Help';
 
   @override
-  String get redeemCode => 'Redeem Code';
+  String get supportCreator => 'Support a Creator';
 
   @override
-  String get enterYourCode =>
-      'Support your favorite creators! Enter their unique code below to give them a share of your Cortex purchases.';
+  String get enterYourTag =>
+      'Support your favorite creators! Enter their unique tag below to give them a share of your Cortex purchases.';
 
   @override
-  String get code => 'Code';
+  String get creatorTag => 'Creator Tag';
 
   @override
-  String get redeem => 'Redeem';
+  String get support => 'Support';
 
   @override
-  String get codeCannotBeEmpty => 'Code cannot be empty';
+  String get tagCannotBeEmpty => 'Creator tag cannot be empty';
 
   @override
   String get userId => 'User ID';
@@ -1507,11 +1507,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Log in to your Vertex account. New users signing up via third-party services agree to our Terms & Privacy Policy. You can review them on the Sign Up screen.';
+      'Log in to your Vertex account. By continuing, you agree to our Terms of Service & Privacy Policy.';
 
   @override
   String get registerSubtitle =>
-      'Create a Vertex account, which you can also use for our other projects.';
+      'Create a Vertex account for seamless access across all our services. By continuing, you agree to our Terms of Service & Privacy Policy.';
 
   @override
   String get photoWarningMessage =>
@@ -1982,7 +1982,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get channelFcmDescription =>
-      'Notifications about news, updates and other informations from Cortex.';
+      'Notifications about news, updates and other information from Cortex.';
 
   @override
   String get channelEngagementName => 'Friendly Reminders';
@@ -2013,7 +2013,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'There was a problem fetching the latest updates, please check your connection and try again.';
 
   @override
-  String get codeNotFound => 'The code you entered is invalid or has expired.';
+  String get tagNotFound => 'The tag you entered is invalid or has expired.';
 
   @override
   String get whatIsNew => 'What\'s new?';
@@ -2116,5 +2116,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return 'Approximately $price/month';
+  }
+
+  @override
+  String get confirmDownloadTitle => 'Are you sure you want to download?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'This model will occupy approximately $size of space.';
   }
 }

@@ -6,17 +6,9 @@ import 'package:flutter_svg/svg.dart';
 import '../../../../theme.dart';
 
 /// A custom AppBar for the ModelsScreen, encapsulating the title and the 'Create' action button.
-///
-/// This widget is designed to be a self-contained and reusable component.
-/// It receives all necessary data via its constructor, making it independent of the screen's state.
 class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
-  /// The main title to be displayed in the AppBar.
   final String title;
-
-  /// The text for the create button.
   final String createButtonText;
-
-  /// The callback function that is triggered when the create button is tapped.
   final VoidCallback onOpenCreateScreen;
 
   const ModelsAppBar({
@@ -28,114 +20,156 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+
+    // RESPONSIVE LOGIC
+    final bool isTablet = screenWidth >= 600;
+
+    // --- Dynamic Height Logic ---
+    final double toolbarHeight = isTablet
+        ? screenWidth * 0.14
+        : kToolbarHeight * ((screenWidth / 400.0).clamp(0.8, 1.2));
+
+    // --- Tablet Scaling Factors ---
+    final double titleFontSize = isTablet ? 36.0 : screenWidth * 0.07;
+
+    // Create Button Dimensions
+    final double buttonWidth = isTablet ? 200.0 : 120.0 * ((screenWidth / 400.0).clamp(0.8, 1.2));
+    final double buttonHeight = isTablet ? 60.0 : 36.0 * ((screenWidth / 400.0).clamp(0.8, 1.2));
+    final double circleSize = isTablet ? 60.0 : 36.0 * ((screenWidth / 400.0).clamp(0.8, 1.2));
+
+    final double textSize = isTablet ? 20.0 : screenWidth * 0.036;
+    final double iconSize = isTablet ? 28.0 : screenWidth * 0.035;
+
+    // The entire action area width
+    final double actionAreaWidth = buttonWidth + (isTablet ? 32.0 : 20.0);
 
     return AppBar(
       scrolledUnderElevation: 0,
-      title: Text(
-        title,
-        style: TextStyle(
-          fontFamily: 'Roboto',
-          color: AppColors.primaryColor.inverted,
-          fontSize: screenWidth * 0.07,
-          fontWeight: FontWeight.bold,
+      toolbarHeight: toolbarHeight,
+      centerTitle: false,
+      backgroundColor: AppColors.background,
+      elevation: 0,
+
+      // --- TITLE ---
+      title: Container(
+        height: toolbarHeight,
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.only(left: isTablet ? 16.0 : 0),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontFamily: 'Roboto',
+            color: AppColors.primaryColor.inverted,
+            fontSize: titleFontSize,
+            fontWeight: FontWeight.bold,
+            height: 1.0,
+          ),
         ),
       ),
-      backgroundColor: AppColors.background,
-      centerTitle: false,
-      elevation: 0,
+
+      // --- CREATE BUTTON ---
       actions: [
-        // The "Create" button logic is now fully contained within this widget.
-        SizedBox(
-          width: screenWidth * 0.37,
-          height: screenHeight * 0.1,
-          child: Stack(
-            children: [
-              Positioned(
-                top: screenHeight * 0.0129,
-                left: screenWidth * 0.082,
-                child: Container(
-                  width: screenWidth * 0.26,
-                  height: screenHeight * 0.045,
-                  decoration: BoxDecoration(
-                    color: AppColors.senaryColor.withValues(alpha: 0.8),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        left: screenWidth * 0.02,
-                        right: screenWidth * 0.10,
+        Container(
+          width: actionAreaWidth,
+          height: toolbarHeight,
+          alignment: Alignment.centerRight,
+          padding: EdgeInsets.only(right: isTablet ? 24.0 : 16.0),
+          child: SizedBox(
+            width: buttonWidth,
+            height: buttonHeight,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                // 1. Pill Background
+                Positioned(
+                  right: 0,
+                  child: Container(
+                    width: buttonWidth - (circleSize / 2),
+                    height: buttonHeight,
+                    decoration: BoxDecoration(
+                      color: AppColors.senaryColor.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(isTablet ? 30 : 20),
+                    ),
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.only(
+                        left: isTablet ? 16 : 10,
+                        // Increased right padding for tablet to give text more breathing room
+                        right: isTablet ? circleSize * 0.9 : circleSize * 0.7
+                    ),
+                    child: Text(
+                      createButtonText,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: textSize,
+                        fontWeight: FontWeight.w600,
                       ),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          createButtonText,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: screenWidth * 0.036,
-                            fontWeight: FontWeight.w600,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+
+                // 2. Circle Icon
+                Positioned(
+                  right: 0,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: onOpenCreateScreen,
+                      borderRadius: BorderRadius.circular(100),
+                      splashFactory: NoSplash.splashFactory,
+                      child: Container(
+                        width: circleSize,
+                        height: circleSize,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.senaryColor,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              )
+                            ]
+                        ),
+                        child: Center(
+                          child: SvgPicture.asset(
+                            'assets/icons/plus.svg',
+                            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                            width: iconSize,
+                            height: iconSize,
                           ),
-                          maxLines: 1,
-                          softWrap: false,
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-              Positioned(
-                top: screenHeight * 0.0129,
-                left: screenWidth * 0.25,
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    // Use the provided callback function.
-                    onTap: onOpenCreateScreen,
-                    borderRadius: BorderRadius.circular(100),
-                    child: Container(
-                      width: screenWidth * 0.1,
-                      height: screenHeight * 0.045,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.senaryColor,
-                      ),
-                      padding: EdgeInsets.all(screenWidth * 0.026),
-                      child: SvgPicture.asset(
-                        'assets/icons/plus.svg',
-                        colorFilter:
-                        const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                        width: screenWidth * 0.02,
-                        height: screenWidth * 0.02,
-                      ),
+                // 3. Full Touch Area
+                Positioned.fill(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: onOpenCreateScreen,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      borderRadius: BorderRadius.circular(isTablet ? 30 : 20),
                     ),
                   ),
                 ),
-              ),
-              // This is the larger, invisible tappable area for the whole button.
-              Positioned.fill(
-                left: screenWidth * 0.07,
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    // It also triggers the same callback.
-                    onTap: onOpenCreateScreen,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
     );
   }
 
-  /// Defines the height of the AppBar. This is required by the `PreferredSizeWidget` interface.
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize {
+    return const Size.fromHeight(80);
+  }
 }

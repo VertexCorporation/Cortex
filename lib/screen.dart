@@ -25,11 +25,6 @@ import 'library/screen/models/controller.dart';
 import 'main.dart';
 import 'notifications/introvert.dart';
 
-/// The main screen containing bottom navigation and the three primary app
-/// sections:
-/// - Chat
-/// - Library
-/// - Menu
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -126,7 +121,6 @@ class MainScreenState extends State<MainScreen> {
   }
 
   void startNewConversation({bool isDynamic = false}) {
-    // FIX: Ensure this runs on the next frame to guarantee Context/Provider availability
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
@@ -140,7 +134,6 @@ class MainScreenState extends State<MainScreen> {
         tabProvider.setSelectedIndex(0);
       }
 
-      // Safe Access to Providers
       final ChatSessionProvider sessionProvider =
       context.read<ChatSessionProvider>();
       final ConversationProvider conversationProvider =
@@ -213,6 +206,9 @@ class MainScreenState extends State<MainScreen> {
     final double screenHeight = screenSize.height;
     final double screenWidth = screenSize.width;
 
+    // TABLET DETECTION
+    final bool isTablet = screenSize.shortestSide >= 600;
+
     if (_showOfflinePulse) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -229,13 +225,32 @@ class MainScreenState extends State<MainScreen> {
       ),
     );
 
-    final double bottomBarHeight = screenHeight * 0.09;
-    final double iconBaseSize = screenHeight * 0.028;
-    final double libraryIconSize = screenHeight * 0.022;
+    // --- RESPONSIVE DIMENSIONS ---
+
+    // 1. Bottom Bar Height
+    final double bottomBarHeight = isTablet ? 80.0 : screenHeight * 0.09;
+
+    // 2. Icon Sizes
+    final double iconBaseSize = isTablet ? 28.0 : screenHeight * 0.028;
+    final double libraryIconSize = isTablet ? 24.0 : screenHeight * 0.022;
+
+    // 3. Container Sizes
     final double iconContainerSize = iconBaseSize * 1.2;
-    final double labelSpacing = screenHeight * 0.002;
-    final double shadowBlurRadius = screenWidth * 0.02;
-    final double borderRadius = screenWidth * 0.04;
+
+    // 4. Spacing & Radius
+    final double labelSpacing = isTablet ? 6.0 : screenHeight * 0.002;
+    final double shadowBlurRadius = isTablet ? 10.0 : screenWidth * 0.02;
+    final double borderRadius = isTablet ? 24.0 : screenWidth * 0.04;
+
+    // 5. Tablet Layout Logic
+    // Tablette kenarlardan %15 boşluk bırakalım.
+    // Bu sayede butonlar ne çok bitişik ne çok ayrık olur.
+    final double horizontalPadding = isTablet ? screenWidth * 0.15 : 0.0;
+
+    // Tablette Expanded kullanmıyoruz, sabit genişlik veriyoruz.
+    // Telefondaysa Expanded kullanıyoruz.
+    final bool useExpandedButtons = !isTablet;
+
     final bool shouldHideBottomAppBar = hideBottomAppBar;
 
     return PopScope(
@@ -291,8 +306,6 @@ class MainScreenState extends State<MainScreen> {
           index: tabProvider.selectedIndex,
           duration: const Duration(milliseconds: 200),
           children: <Widget>[
-            // FIX: Wrap ChatController in Consumer to guarantee Provider visibility
-            // This prevents "ProviderNotFound" errors during fast switching or startup
             Consumer<ChatSessionProvider>(
               builder: (context, sessionProvider, _) {
                 return ChatController(
@@ -331,17 +344,24 @@ class MainScreenState extends State<MainScreen> {
                     color: AppColors.primaryColor.inverted
                         .withValues(alpha: 0.1),
                     blurRadius: shadowBlurRadius,
-                    offset: Offset(0, -screenHeight * 0.0025),
+                    offset: Offset(0, -2.0),
                   ),
                 ],
               ),
               child: BottomAppBar(
                 color: Colors.transparent,
                 elevation: 0,
-                child: SizedBox(
+                padding: EdgeInsets.zero, // Remove default padding
+                child: Container(
                   height: bottomBarHeight,
+                  // TABLET: Sağdan ve soldan boşluk bırakır (Horizontal Padding)
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    // TABLET: spaceBetween (Sol, Orta, Sağ)
+                    // TELEFON: spaceAround (Eşit dağılım)
+                    mainAxisAlignment: isTablet
+                        ? MainAxisAlignment.spaceBetween
+                        : MainAxisAlignment.spaceAround,
                     children: <Widget>[
                       BottomNavigationButton(
                         iconPath: 'assets/icons/inbox.svg',
@@ -351,6 +371,7 @@ class MainScreenState extends State<MainScreen> {
                         baseSize: iconBaseSize,
                         containerSize: iconContainerSize,
                         labelSpacing: labelSpacing,
+                        useExpanded: useExpandedButtons,
                       ),
                       BottomNavigationButton(
                         iconPath: 'assets/icons/chat.svg',
@@ -360,6 +381,7 @@ class MainScreenState extends State<MainScreen> {
                         baseSize: iconBaseSize,
                         containerSize: iconContainerSize,
                         labelSpacing: labelSpacing,
+                        useExpanded: useExpandedButtons,
                       ),
                       BottomNavigationButton(
                         iconPath: 'assets/icons/library.svg',
@@ -369,6 +391,7 @@ class MainScreenState extends State<MainScreen> {
                         baseSize: libraryIconSize,
                         containerSize: libraryIconSize * 1.2,
                         labelSpacing: labelSpacing,
+                        useExpanded: useExpandedButtons,
                       ),
                     ],
                   ),
@@ -391,6 +414,11 @@ class BottomNavigationButton extends StatelessWidget {
   final double baseSize;
   final double containerSize;
   final double labelSpacing;
+
+  /// Determines if the button should take up all available space (Phone)
+  /// or have a fixed width (Tablet).
+  final bool useExpanded;
+
   const BottomNavigationButton({
     super.key,
     required this.iconPath,
@@ -400,6 +428,7 @@ class BottomNavigationButton extends StatelessWidget {
     this.baseSize = 20.0,
     this.containerSize = 24.0,
     this.labelSpacing = 2.0,
+    this.useExpanded = true,
   });
 
   @override
@@ -408,61 +437,70 @@ class BottomNavigationButton extends StatelessWidget {
         ? AppColors.primaryColor.inverted
         : AppColors.tertiaryColor;
 
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              width: containerSize,
-              height: containerSize,
-              child: Center(
-                child: AnimatedScale(
-                  scale: isSelected ? 1.2 : 1.0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  child: SvgPicture.asset(
-                    iconPath,
-                    width: baseSize,
-                    height: baseSize,
-                    colorFilter: ColorFilter.mode(
-                      iconColor,
-                      BlendMode.srcIn,
-                    ),
+    // The core content of the button
+    Widget content = GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(
+            width: containerSize,
+            height: containerSize,
+            child: Center(
+              child: AnimatedScale(
+                scale: isSelected ? 1.2 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                child: SvgPicture.asset(
+                  iconPath,
+                  width: baseSize,
+                  height: baseSize,
+                  colorFilter: ColorFilter.mode(
+                    iconColor,
+                    BlendMode.srcIn,
                   ),
                 ),
               ),
             ),
-            SizedBox(height: labelSpacing),
-            AnimatedDefaultTextStyle(
+          ),
+          SizedBox(height: labelSpacing),
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: TextStyle(
+              fontSize: baseSize * 0.5,
+              color: iconColor,
+              fontWeight:
+              isSelected ? FontWeight.w500 : FontWeight.normal,
+            ),
+            child: AnimatedScale(
+              scale: isSelected ? 1.1 : 1.0,
               duration: const Duration(milliseconds: 200),
-              style: TextStyle(
-                fontSize: baseSize * 0.5,
-                color: iconColor,
-                fontWeight:
-                isSelected ? FontWeight.w500 : FontWeight.normal,
-              ),
-              child: AnimatedScale(
-                scale: isSelected ? 1.1 : 1.0,
-                duration: const Duration(milliseconds: 200),
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+
+    // If phone, use Expanded to fill space equally.
+    if (useExpanded) {
+      return Expanded(child: content);
+    }
+
+    // If tablet, use a fixed width container (e.g., 100px) so touch target is reasonable
+    // but they don't stretch across the entire screen gap.
+    return SizedBox(
+      width: 120.0,
+      child: content,
     );
   }
 }
 
-/// A custom widget that behaves like an [IndexedStack] (preserving state)
-/// but animates the transition.
 class FadeIndexedStack extends StatefulWidget {
   final int index;
   final List<Widget> children;
@@ -498,7 +536,6 @@ class _FadeIndexedStackState extends State<FadeIndexedStack> {
   }
 }
 
-/// Helper widget to manage the Offstage logic for a single item.
 class _SmartFadeItem extends StatefulWidget {
   final bool isActive;
   final Duration duration;
@@ -520,14 +557,12 @@ class _SmartFadeItemState extends State<_SmartFadeItem> {
   @override
   void initState() {
     super.initState();
-    // If starting inactive, go offstage immediately.
     _isOffstage = !widget.isActive;
   }
 
   @override
   void didUpdateWidget(_SmartFadeItem oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If becoming active, immediately bring Onstage to allow fade-in.
     if (widget.isActive && _isOffstage) {
       setState(() {
         _isOffstage = false;
@@ -537,20 +572,16 @@ class _SmartFadeItemState extends State<_SmartFadeItem> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. MaintainState: true -> Keeps the RAM/State alive (Critical for Models screen).
-    // 2. visible: !_isOffstage -> Removes paint/hitTest cost when hidden.
     return Visibility(
       visible: !_isOffstage,
       maintainState: true,
       maintainAnimation: true,
-      maintainSize: true, // Keeps the layout space to avoid shifts
+      maintainSize: true,
       child: AnimatedOpacity(
         opacity: widget.isActive ? 1.0 : 0.0,
         duration: widget.duration,
         curve: Curves.easeInOut,
         onEnd: () {
-          // OPTIMIZATION TRIGGER:
-          // Once the fade-out is COMPLETE, set the widget to Offstage.
           if (!widget.isActive) {
             setState(() {
               _isOffstage = true;

@@ -135,9 +135,9 @@ class _SettingsSectionState extends State<SettingsSection> with TickerProviderSt
                                   padding: EdgeInsets.all(screenWidth * 0.05),
                                   child: Column(
                                     children: [
-                                      Text(appLocalizations.redeemCode, style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
+                                      Text(appLocalizations.creatorTag, style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
                                       SizedBox(height: screenWidth * 0.03),
-                                      Text(appLocalizations.enterYourCode, style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035), textAlign: TextAlign.center),
+                                      Text(appLocalizations.enterYourTag, style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035), textAlign: TextAlign.center),
                                       SizedBox(height: screenWidth * 0.05),
                                       ShakeWidget(
                                         controller: _redeemCodeShakeController,
@@ -146,7 +146,7 @@ class _SettingsSectionState extends State<SettingsSection> with TickerProviderSt
                                           autofocus: true,
                                           style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.04),
                                           decoration: InputDecoration(
-                                            labelText: appLocalizations.code,
+                                            labelText: appLocalizations.support,
                                             labelStyle: TextStyle(color: AppColors.primaryColor.inverted),
                                             enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.quinaryColor), borderRadius: BorderRadius.circular(10.0)),
                                             focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor.inverted), borderRadius: BorderRadius.circular(10.0)),
@@ -185,7 +185,7 @@ class _SettingsSectionState extends State<SettingsSection> with TickerProviderSt
                                             onTap: isRedeeming ? null : () async {
                                               final code = codeController.text.trim();
                                               if (code.isEmpty) {
-                                                setDialogInnerState(() => errorText = appLocalizations.codeCannotBeEmpty);
+                                                setDialogInnerState(() => errorText = appLocalizations.tagCannotBeEmpty);
                                                 _redeemCodeShakeController.forward(from: 0);
                                                 return;
                                               }
@@ -204,7 +204,7 @@ class _SettingsSectionState extends State<SettingsSection> with TickerProviderSt
                                               padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04),
                                               child: isRedeeming
                                                   ? SizedBox(width: screenWidth * 0.05, height: screenWidth * 0.05, child: CircularProgressIndicator(strokeWidth: 2.0, color: AppColors.senaryColor))
-                                                  : Text(appLocalizations.redeem, style: TextStyle(color: AppColors.senaryColor, fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold)),
+                                                  : Text(appLocalizations.support, style: TextStyle(color: AppColors.senaryColor, fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold)),
                                             ),
                                           ),
                                         ),
@@ -286,7 +286,7 @@ class _SettingsSectionState extends State<SettingsSection> with TickerProviderSt
         case 'help': return appLocalizations.help;
         case 'shareApp': return appLocalizations.shareApp;
         case 'rateUs': return appLocalizations.rateUs;
-        case 'redeemCode': return appLocalizations.redeemCode;
+        case 'redeemCode': return appLocalizations.supportCreator;
         case 'termsOfService': return appLocalizations.termsOfService;
         case 'privacyPolicy': return appLocalizations.privacyPolicy;
         case 'copyrights': return appLocalizations.copyrights;

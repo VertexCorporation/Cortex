@@ -1,13 +1,8 @@
 // lib/screens/models/screen/new/create.dart
 
-// This file contains the VIEW for the "Create Roleplay Model" screen.
-// It is now a StatefulWidget to manage its own ScrollController, which enables a
-// scroll-aware fog effect. This enhances the UI without compromising the
-// separation of concerns, as all business logic remains in the ModelCreationProvider.
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../fog.dart'; // Import the ScrollFog widget.
+import '../../../../fog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../theme.dart';
 import '../../providers/new.dart';
@@ -15,7 +10,6 @@ import 'widgets/form.dart';
 import 'widgets/header.dart';
 import 'widgets/selector.dart';
 
-/// A widget that builds the body of the "Create Roleplay Model" form.
 class CreateForm extends StatefulWidget {
   const CreateForm({super.key});
 
@@ -24,7 +18,6 @@ class CreateForm extends StatefulWidget {
 }
 
 class _CreateFormState extends State<CreateForm> {
-  // A controller to manage the scroll position for the fog effect.
   late final ScrollController _scrollController;
 
   @override
@@ -43,17 +36,19 @@ class _CreateFormState extends State<CreateForm> {
   Widget build(BuildContext context) {
     final provider = context.watch<ModelCreationProvider>();
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     final localizations = AppLocalizations.of(context)!;
 
+    final double horizontalPadding = screenWidth * 0.04;
+
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04),
-      // The ScrollFog is now configured to show the effect only at the top.
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: ScrollFog(
         scrollController: _scrollController,
         fogColor: AppColors.background,
         topFogHeight: screenHeight * 0.02,
-        showTop: true,     // Explicitly enable the top fog.
-        showBottom: false,  // Explicitly disable the bottom fog.
+        showTop: true,
+        showBottom: false,
         child: SingleChildScrollView(
           controller: _scrollController,
           child: Column(

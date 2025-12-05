@@ -10,22 +10,12 @@ import 'package:cortex/theme.dart';
 import 'library/backend/data/entity.dart';
 
 /// Manages the UI and data for model extensions (variants of a base model).
-///
-/// This class is designed as a UI/utility helper. It is responsible for:
-/// 1.  Holding the available extensions for the *currently selected* model series.
-/// 2.  Displaying the extension selection panel (Overlay).
-/// 3.  Reporting the user's selection back to the calling widget (`ChatScreen`).
-///
-/// It does NOT manage persistent state like "what is the default extension?". That
-/// responsibility lies with the ChatScreen and the static helper methods below.
 class Extensions {
   // --- Instance State ---
-  // These variables are specific to the currently active model in the chat.
-  // They are reset/re-initialized whenever the model changes.
   List<String> currentExtensions = [];
   String currentBaseSeries = "";
-  String displayedExtensionLabel = ""; // The full ID of the extension to show in the UI.
-  Map<String, String> extensionDisplayNames = {}; // Maps full ID to user-friendly title.
+  String displayedExtensionLabel = "";
+  Map<String, String> extensionDisplayNames = {};
 
   // --- UI Controllers ---
   AnimationController? extensionFadeOutController;
@@ -47,13 +37,11 @@ class Extensions {
   }
 
   void dispose() {
-    closePanel(); // Ensure the overlay is removed on dispose.
+    closePanel();
     extensionFadeOutController?.dispose();
     extensionFadeInController?.dispose();
   }
 
-  /// Initializes or re-initializes the extension data for a given model.
-  /// This should be called by the `SelectionService` whenever a model is selected.
   void initialize({
     required String mainId,
     required String ext,
@@ -85,22 +73,17 @@ class Extensions {
     displayedExtensionLabel = chosenExt;
   }
 
-  /// Closes the extension selection panel if it's open.
   void closePanel() {
     if (_overlayEntry != null && !_panelIsClosing) {
-      // Trigger the closing animation. The overlay will be removed on animation end.
       _panelIsClosing = true;
       _overlayEntry!.markNeedsBuild();
     }
   }
 
-  /// Animates the change of the extension label in the UI.
-  /// This is purely a visual effect triggered by the `ChatScreen`.
   void animateExtensionChange(String newFullModelId) {
     if (displayedExtensionLabel == newFullModelId) return;
 
     extensionFadeOutController?.forward(from: 0.0).then((_) {
-      // Once the old label has faded out, update the text and fade the new one in.
       displayedExtensionLabel = newFullModelId;
       extensionFadeInController?.forward(from: 0.0);
     });
@@ -115,27 +98,17 @@ class Extensions {
   }
 
   // --- Static Helper Methods ---
-  // These methods manage persistent storage and can be called from anywhere.
 
-  /// Retrieves the last selected extension for a given model series from persistent storage.
   static Future<String> getLastSelectedExtension(String mainId) async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString("last_extension_$mainId") ?? "";
   }
 
-  /// Saves the selected extension for a model series to persistent storage.
   static Future<void> setLastSelectedExtension(String mainId, String extensionFullId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("last_extension_$mainId", extensionFullId);
   }
 
-  /// Displays the extension selection panel overlay.
-  ///
-  /// This method now prepares a rich list of data for each extension and
-  /// uses a simple `updateModelId` callback that expects the full ID of the
-  /// selected extension. This delegates state management responsibility back
-  /// to the calling widget (`ChatScreen`).
-  /// Displays the extension selection panel overlay.
   void showExtensionPanel({
     required BuildContext context,
     required GlobalKey extensionKey,
@@ -169,7 +142,11 @@ class Extensions {
 
     _overlayEntry = OverlayEntry(builder: (BuildContext context) {
       final screenWidth = MediaQuery.of(context).size.width;
-      final panelWidth = screenWidth * 0.9;
+      final bool isTablet = screenWidth >= 600;
+
+      // DYNAMIC WIDTH CALCULATION
+      // Tablet: 50% of screen width. Phone: 90% of screen width.
+      final panelWidth = isTablet ? screenWidth * 0.5 : screenWidth * 0.9;
       final horizontalMargin = (screenWidth - panelWidth) / 2;
 
       return StatefulBuilder(
@@ -182,7 +159,6 @@ class Extensions {
                   behavior: HitTestBehavior.translucent,
                   onTap: () {
                     debugPrint("$logPrefix Panel dismissed by tapping outside.");
-                    // Trigger internal closing animation
                     setState(() {
                       _panelIsClosing = true;
                     });
@@ -193,7 +169,8 @@ class Extensions {
               Positioned(
                 top: offset.dy,
                 left: horizontalMargin,
-                right: horizontalMargin,
+                // Explicit width constraint
+                width: panelWidth,
                 child: TweenAnimationBuilder<double>(
                   tween: Tween<double>(
                     begin: _panelIsClosing ? 1.0 : 0.4,
@@ -209,10 +186,8 @@ class Extensions {
                     );
                   },
                   onEnd: () {
-                    // When closing animation finishes (either by selection or tap outside)
                     if (_panelIsClosing) {
                       removeExtensionPanel();
-                      // Notify the controller so Briefing can reappear
                       onPanelClosed();
                     }
                   },
@@ -232,13 +207,7 @@ class Extensions {
                         final selectedId = selectedOption['id'] as String;
                         debugPrint("$logPrefix User selected extension: '$selectedId'.");
                         displayedExtensionLabel = selectedId;
-
-                        // 1. Update logic
                         await updateModelId(selectedId);
-
-                        // 2. Trigger close. This sets _panelIsClosing=true,
-                        // which runs the animation, hits onEnd, removes panel,
-                        // and finally calls onPanelClosed().
                         closePanel();
                       },
                     ),
@@ -269,10 +238,10 @@ class Extensions {
       opacity: arrowOpacity,
       duration: const Duration(milliseconds: 50),
       child: Transform.rotate(
-        angle: 4.7124, // Approximately 270 degrees (3*PI/2)
+        angle: 4.7124,
         child: SvgPicture.asset(
-          'assets/icons/arrov.svg', // Maybe it should be 'arrow.svg'? 'arrov.svg' could be a typo.
-          colorFilter: ColorFilter.mode(color.withValues(alpha: arrowOpacity), BlendMode.srcIn), // Using colorFilter is more appropriate
+          'assets/icons/arrov.svg',
+          colorFilter: ColorFilter.mode(color.withValues(alpha: arrowOpacity), BlendMode.srcIn),
           width: 20,
           height: 20,
         ),
@@ -289,7 +258,7 @@ class Extensions {
     return GestureDetector(
       onTap: onTap,
       child: Row(
-        mainAxisSize: MainAxisSize.max, // MainAxisSize.min is generally safer if the wrapping widget manages the size.
+        mainAxisSize: MainAxisSize.max,
         children: [
           buildAnimatedArrowIcon(fadeOut, fadeIn, color),
         ],
@@ -297,10 +266,6 @@ class Extensions {
     );
   }
 
-  /// Builds the main panel container with a list of extension options.
-  ///
-  /// This version has been heavily optimized for performance with long lists by using ListView.builder.
-  /// This ensures that the entrance/exit animations are smooth even with 100+ options.
   static Widget buildExtensionPanelWidget({
     required BuildContext context,
     required List<Map<String, dynamic>> options,
@@ -310,38 +275,34 @@ class Extensions {
     required Function(Map<String, dynamic>) onSelect,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final panelMaxWidth = screenWidth * 0.9;
-    final optionMinHeight = screenWidth * 0.12;
-    final horizontalPadding = screenWidth * 0.04;
-    final verticalPadding = screenWidth * 0.02;
-    final iconSize = screenWidth * 0.04;
-    final panelBorderRadius = screenWidth * 0.02;
+    final bool isTablet = screenWidth >= 600;
+
+    // --- FULLY DYNAMIC / PROPORTIONAL SCALING ---
+
+    // Width: Tablet 50%, Phone 90%
+    final panelWidth = isTablet ? screenWidth * 0.5 : screenWidth * 0.9;
+
+    // Row Height: Tablet 8% (e.g. 64px on 800w), Phone 12%
+    final optionMinHeight = isTablet ? screenWidth * 0.08 : screenWidth * 0.12;
+
+    // Padding: Tablet 3% (e.g. 24px), Phone 4%
+    final horizontalPadding = isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
+    final verticalPadding = isTablet ? screenWidth * 0.02 : screenWidth * 0.02;
+
+    // Icon Size: Tablet 3.5% (e.g. 28px), Phone 4%
+    final iconSize = isTablet ? screenWidth * 0.035 : screenWidth * 0.04;
+
+    // Font Size: Tablet 2.5% (e.g. 20px on 800w), Phone 4%
+    final fontSize = isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
+
+    // Border Radius: Tablet 1.5% (e.g. 12px), Phone 2%
+    final panelBorderRadius = isTablet ? screenWidth * 0.015 : screenWidth * 0.02;
 
     final textStyle = TextStyle(
       color: AppColors.primaryColor.inverted,
-      fontSize: screenWidth * 0.04,
+      fontSize: fontSize,
     );
 
-    // Calculate text width based on a sample of items or a fixed value for performance.
-    // For extreme performance, we avoid iterating the whole list here.
-    // A fixed reasonable width or calculating from the first few items is often sufficient.
-    double longestTextWidth = 0;
-    for (var entry in options.take(10)) { // Check first 10 items for a good estimate
-      final text = entry['title'] as String? ?? entry['id'];
-      final TextPainter tp = TextPainter(
-        text: TextSpan(text: text, style: textStyle),
-        maxLines: 1,
-        textDirection: TextDirection.ltr,
-      )..layout();
-
-      if (tp.width > longestTextWidth) {
-        longestTextWidth = tp.width;
-      }
-    }
-    double requiredPanelWidth = iconSize + (horizontalPadding * 0.5) + longestTextWidth + (horizontalPadding * 2);
-    double finalPanelWidth = requiredPanelWidth.clamp(screenWidth * 0.5, panelMaxWidth);
-
-    // --- PERFORMANCE CRITICAL CHANGE ---
     const int maxVisibleItems = 5;
     final double totalHeight = options.length * optionMinHeight;
     final double constrainedHeight = (maxVisibleItems * optionMinHeight).clamp(0, totalHeight);
@@ -349,7 +310,7 @@ class Extensions {
     Widget panelContent = SizedBox(
       height: constrainedHeight,
       child: ListView.builder(
-        padding: EdgeInsets.zero, // Remove default padding
+        padding: EdgeInsets.zero,
         shrinkWrap: true,
         itemCount: options.length,
         itemBuilder: (BuildContext context, int index) {
@@ -366,6 +327,8 @@ class Extensions {
             textStyle: textStyle,
             onTap: () => onSelect(optionData),
             showBottomBorder: index < options.length - 1,
+            // Pass down panelWidth for shine calculations
+            panelWidth: panelWidth,
           );
         },
       ),
@@ -380,22 +343,12 @@ class Extensions {
       shadowColor: Colors.black26,
       color: AppColors.secondaryColor,
       child: SizedBox(
-        width: finalPanelWidth,
+        width: panelWidth,
         child: panelContent,
       ),
     );
   }
 
-  /// Builds a single clickable row for an extension in the panel.
-  ///
-  /// This method now reads the 'tier' and 'title' from the provided map.
-  /// It conditionally renders the sparkle icon and wraps the row in the
-  /// shine animation if the tier is 'premium'.
-  /// Builds a single clickable row for an extension in the panel.
-  ///
-  /// This method now reads the 'tier' and 'title' from the provided map.
-  /// It conditionally renders the sparkle icon and wraps the row in the
-  /// shine animation if the tier is 'premium'.
   static Widget _buildExtensionButtonRow({
     required BuildContext context,
     required Map<String, dynamic> option,
@@ -408,18 +361,16 @@ class Extensions {
     required TextStyle textStyle,
     required VoidCallback onTap,
     required bool showBottomBorder,
+    required double panelWidth,
   }) {
-    // Extract tier and determine if the extension is premium.
     final String tier = option['tier'] as String? ?? 'free';
     final bool isPremium = tier == 'premium';
 
-    // Format the variant title to remove leading dashes and spaces for a cleaner UI.
     String variantTitle = (option['title'] as String? ?? option['id']).trim();
     while (variantTitle.startsWith('-') || variantTitle.startsWith(' ')) {
       variantTitle = variantTitle.substring(1).trim();
     }
 
-    // The base UI for the row content.
     Widget rowContent = Row(
       children: [
         Transform.scale(
@@ -437,7 +388,6 @@ class Extensions {
         SizedBox(width: horizontalPadding * 0.5),
         Expanded(
           child: _buildScrollableText(
-            // Use the newly formatted title.
             text: variantTitle,
             textStyle: textStyle.copyWith(
               fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
@@ -445,7 +395,6 @@ class Extensions {
             ),
           ),
         ),
-        // Conditionally display the sparkle icon for premium models.
         if (isPremium) ...[
           SizedBox(width: horizontalPadding * 0.25),
           SvgPicture.asset(
@@ -461,12 +410,16 @@ class Extensions {
       ],
     );
 
-    // The clickable container for the row.
     Widget clickableContainer = Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: borderRadius,
         onTap: onTap,
+        // --- SPLASH & HIGHLIGHT REMOVED ---
+        splashFactory: NoSplash.splashFactory,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
         child: Container(
           constraints: BoxConstraints(minHeight: minHeight),
           alignment: Alignment.centerLeft,
@@ -485,11 +438,11 @@ class Extensions {
       ),
     );
 
-    // Conditionally wrap the entire row in the shine animation widget.
     final finalWidget = ClipRRect(
       borderRadius: borderRadius,
       child: isPremium
-          ? _ShineAnimationWrapper(child: clickableContainer)
+      // Pass the calculated panel width to the shine wrapper
+          ? _ShineAnimationWrapper(panelWidth: panelWidth, child: clickableContainer)
           : clickableContainer,
     );
 
@@ -541,25 +494,25 @@ class Extensions {
 
   static BorderRadius getItemBorderRadius(int index, int total, double radius) {
     if (total == 1) {
-      return BorderRadius.circular(radius); // All corners if it's a single item
+      return BorderRadius.circular(radius);
     } else if (index == 0) {
-      return BorderRadius.only( // Top corners if it's the first item
+      return BorderRadius.only(
         topLeft: Radius.circular(radius),
         topRight: Radius.circular(radius),
       );
     } else if (index == total - 1) {
-      return BorderRadius.only( // Bottom corners if it's the last item
+      return BorderRadius.only(
         bottomLeft: Radius.circular(radius),
         bottomRight: Radius.circular(radius),
       );
     } else {
-      return BorderRadius.zero; // No corners for intermediate items
+      return BorderRadius.zero;
     }
   }
 
   static Future<String> onExtensionSelected(String? modelId, String newExtension) async {
     if (modelId == null || modelId.isEmpty) return '';
-    await setLastSelectedExtension(modelId, newExtension); // Direct modelId instead of modelId ?? '', null check done above.
+    await setLastSelectedExtension(modelId, newExtension);
     return newExtension;
   }
 
@@ -582,13 +535,11 @@ class Extensions {
   }
 }
 
-/// A stateful widget that wraps its child with a recurring shine animation.
-/// This logic is adapted from `credits.dart` to be reusable and is used
-/// to highlight premium extension options.
 class _ShineAnimationWrapper extends StatefulWidget {
   final Widget child;
+  final double panelWidth; // We need this to animate correctly across the dynamic width
 
-  const _ShineAnimationWrapper({required this.child});
+  const _ShineAnimationWrapper({required this.child, required this.panelWidth});
 
   @override
   State<_ShineAnimationWrapper> createState() => _ShineAnimationWrapperState();
@@ -612,7 +563,6 @@ class _ShineAnimationWrapperState extends State<_ShineAnimationWrapper> with Sin
 
     _shineController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        // Wait for a few seconds before the next shine.
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
             _shineController.forward(from: 0.0);
@@ -621,7 +571,6 @@ class _ShineAnimationWrapperState extends State<_ShineAnimationWrapper> with Sin
       }
     });
 
-    // Start the first animation after a short delay.
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         _shineController.forward();
@@ -637,26 +586,23 @@ class _ShineAnimationWrapperState extends State<_ShineAnimationWrapper> with Sin
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final widthToAnimate = widget.panelWidth;
 
     return Stack(
       children: [
-        // The original content (the extension row).
         widget.child,
-        // The animated shine effect on top.
         Positioned.fill(
-          child: IgnorePointer( // The shine effect should not capture touch events.
+          child: IgnorePointer(
             child: AnimatedBuilder(
               animation: _shineAnimation,
               builder: (context, child) {
                 return Transform.translate(
-                  // The panel width is 90% of the screen, so we adjust the translate distance.
-                  offset: Offset(screenWidth * 0.9 * _shineAnimation.value, 0),
+                  offset: Offset(widthToAnimate * _shineAnimation.value, 0),
                   child: child,
                 );
               },
               child: Container(
-                width: screenWidth * 0.25, // The width of the shine itself.
+                width: widthToAnimate * 0.3,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.centerLeft,

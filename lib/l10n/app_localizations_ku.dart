@@ -905,20 +905,20 @@ class AppLocalizationsKu extends AppLocalizations {
   String get help => 'Alîkarî';
 
   @override
-  String get redeemCode => 'Kodê Bikaranîn';
+  String get supportCreator => 'Piştgiriya afirînerekî bike';
 
   @override
-  String get enterYourCode =>
-      'Piştgiriya afirînerên xweyên bijare bike! Koda wan a yekta li jêr binivîse da ku parek ji kirînên xwe yên Cortex-ê bidî wan.';
+  String get enterYourTag =>
+      'Piştgiriya afirînerên xweyên bijare bikin! Etîketa wan a bêhempa li jêr binivîse da ku ji kirînên we yên Cortex para wan bigirin.';
 
   @override
-  String get code => 'Kod';
+  String get creatorTag => 'Etîketa Afirîner';
 
   @override
-  String get redeem => 'Bikaranîn';
+  String get support => 'Alîkarî';
 
   @override
-  String get codeCannotBeEmpty => 'Kod nikare vala be';
+  String get tagCannotBeEmpty => 'Etîketa afirîner nikare vala be';
 
   @override
   String get userId => 'Nasnameya Bikarhêner';
@@ -1511,11 +1511,11 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Têkeve hesabê xwe yê Vertex. Bikarhênerên nû yên ku bi rêya karûbarên partiya sêyemîn qeyd dibin, Merc û Siyaseta me ya Taybetîtiyê qebûl dikin. Hûn dikarin wan li ser ekrana Qeydkirinê binirxînin.';
+      'Têkeve hesabê xwe yê Vertex. Bi berdewamkirinê, hûn Mercên Xizmetê û Siyaseta me ya Taybetîtiyê qebûl dikin.';
 
   @override
   String get registerSubtitle =>
-      'Hesabek Vertex biafirîne, ku tu dikarî ji bo projeyên me yên din jî bikar bînî.';
+      'Ji bo gihîştina bênavber a hemî karûbarên me, hesabê Vertex-ê biafirînin. Bi berdewamkirinê, hûn bi Mercên Xizmetê û Siyaseta me ya Taybetîtiyê razî dibin.';
 
   @override
   String get photoWarningMessage =>
@@ -2018,8 +2018,8 @@ class AppLocalizationsKu extends AppLocalizations {
       'Di wergirtina nûvekirinên herî dawî de pirsgirêkek çêbû, ji kerema xwe girêdana xwe kontrol bikin û dîsa biceribînin.';
 
   @override
-  String get codeNotFound =>
-      'Koda ku te nivîsandiye nederbasdar e an jî dema wê derbas bûye.';
+  String get tagNotFound =>
+      'Etîketa ku te nivîsandiye nederbasdar e an jî dema wê derbas bûye.';
 
   @override
   String get whatIsNew => 'Çi nû ye?';
@@ -2122,5 +2122,13 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return 'Nêzîkî $price/meh';
+  }
+
+  @override
+  String get confirmDownloadTitle => 'Tu piştrast î ku dixwazî dakêşî?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'Ev model dê bi qasî $size cîh bigire.';
   }
 }

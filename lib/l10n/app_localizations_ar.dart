@@ -893,20 +893,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get help => 'مساعدة';
 
   @override
-  String get redeemCode => 'استرداد الرمز';
+  String get supportCreator => 'ادعم المبدع';
 
   @override
-  String get enterYourCode =>
-      'ادعم منشئي المحتوى المفضلين لديك! أدخل رمزهم الفريد أدناه لمنحهم حصة من مشترياتك في Cortex.';
+  String get enterYourTag =>
+      'ادعم مُنشئيك المُفضّلين! أدخل علامتهم الفريدة أدناه لتُشاركهم مشترياتك من Cortex.';
 
   @override
-  String get code => 'الرمز';
+  String get creatorTag => 'علامة المنشئ';
 
   @override
-  String get redeem => 'استرداد';
+  String get support => 'يدعم';
 
   @override
-  String get codeCannotBeEmpty => 'لا يمكن أن يكون الرمز فارغًا';
+  String get tagCannotBeEmpty => 'لا يمكن أن تكون علامة المنشئ فارغة';
 
   @override
   String get userId => 'معرف المستخدم';
@@ -1490,11 +1490,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'سجّل دخولك إلى حساب فيرتكس. يوافق المستخدمون الجدد الذين يسجلون عبر خدمات جهات خارجية على شروطنا وسياسة الخصوصية. يمكنك مراجعتها في صفحة التسجيل.';
+      'سجّل دخولك إلى حساب فيرتكس. بالمتابعة، أنت توافق على شروط الخدمة وسياسة الخصوصية.';
 
   @override
   String get registerSubtitle =>
-      'أنشئ حساب Vertex، والذي يمكنك استخدامه أيضًا لمشاريعنا الأخرى.';
+      'أنشئ حسابًا على Vertex للوصول السلس إلى جميع خدماتنا. بالمتابعة، أنت توافق على شروط الخدمة وسياسة الخصوصية.';
 
   @override
   String get photoWarningMessage =>
@@ -1993,7 +1993,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'حدثت مشكلة أثناء جلب أحدث التحديثات، يرجى التحقق من اتصالك ومحاولة مرة أخرى.';
 
   @override
-  String get codeNotFound => 'الرمز الذي أدخلته غير صالح أو منتهي الصلاحية.';
+  String get tagNotFound => 'العلامة التي أدخلتها غير صالحة أو انتهت صلاحيتها.';
 
   @override
   String get whatIsNew => 'ما الجديد؟';
@@ -2097,5 +2097,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return 'تقريبًا $price/شهريًا';
+  }
+
+  @override
+  String get confirmDownloadTitle => 'هل أنت متأكد أنك تريد التنزيل؟';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'سيشغل هذا النموذج مساحة تبلغ $size تقريبًا.';
   }
 }

@@ -239,8 +239,6 @@ class LoginController extends ChangeNotifier {
   Future<void> submitAnonymousLogin(BuildContext context) async {
     if (_isLoading) return;
 
-    if (!_agreeToTerms) return;
-
     _clearServerErrors();
     _setLoading(true);
 

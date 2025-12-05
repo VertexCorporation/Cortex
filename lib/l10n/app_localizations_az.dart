@@ -905,20 +905,20 @@ class AppLocalizationsAz extends AppLocalizations {
   String get help => 'Yardım';
 
   @override
-  String get redeemCode => 'Kodu Aktivləşdir';
+  String get supportCreator => 'Yaradanı dəstəkləyin';
 
   @override
-  String get enterYourCode =>
-      'Sevimli yaradıcılarınızı dəstəkləyin! Cortex alışlarınızdan onlara pay vermək üçün aşağıda onların unikal kodunu daxil edin.';
+  String get enterYourTag =>
+      'Sevimli yaradıcılarınızı dəstəkləyin! Cortex alışlarınızdan onlara pay vermək üçün aşağıya onların unikal etiketini daxil edin.';
 
   @override
-  String get code => 'Kod';
+  String get creatorTag => 'Yaradıcı etiketi';
 
   @override
-  String get redeem => 'Aktivləşdir';
+  String get support => 'Dəstəklə';
 
   @override
-  String get codeCannotBeEmpty => 'Kod boş ola bilməz';
+  String get tagCannotBeEmpty => 'Yaradıcı teqi boş ola bilməz';
 
   @override
   String get userId => 'İstifadəçi ID';
@@ -1509,11 +1509,11 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get loginSubtitle =>
-      'Vertex hesabınıza daxil olun. Üçüncü tərəf xidmətləri vasitəsilə qeydiyyatdan keçən yeni istifadəçilər Şərtlər və Məxfilik Siyasətimizlə razılaşırlar. Siz onlara Qeydiyyat ekranında baxa bilərsiniz.';
+      'Vertex hesabınıza daxil olun. Davam etməklə siz Xidmət Şərtlərimiz və Məxfilik Siyasətimizlə razılaşırsınız.';
 
   @override
   String get registerSubtitle =>
-      'Digər layihələrimiz üçün də istifadə edə biləcəyiniz bir Vertex hesabı yaradın.';
+      'Bütün xidmətlərimizə problemsiz giriş üçün Vertex hesabı yaradın. Davam etməklə siz Xidmət Şərtlərimiz və Məxfilik Siyasətimizlə razılaşırsınız.';
 
   @override
   String get photoWarningMessage =>
@@ -2015,8 +2015,8 @@ class AppLocalizationsAz extends AppLocalizations {
       'Ən son güncəlləmələri əldə edərkən problem baş verdi, əlaqənizi yoxlayın və yenidən cəhd edin.';
 
   @override
-  String get codeNotFound =>
-      'Daxil etdiyiniz kod etibarsızdır və ya vaxtı keçib.';
+  String get tagNotFound =>
+      'Daxil etdiyiniz teq etibarsızdır və ya vaxtı keçmişdir.';
 
   @override
   String get whatIsNew => 'Nə yenilik var?';
@@ -2119,5 +2119,13 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String equivalentMonthlyDescription(Object price) {
     return 'Təxminən $price/ay';
+  }
+
+  @override
+  String get confirmDownloadTitle => 'Endirmək istədiyinizə əminsiniz?';
+
+  @override
+  String downloadSizeDisclosure(Object size) {
+    return 'Bu model təxminən $size yer tutacaq.';
   }
 }

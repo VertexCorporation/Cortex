@@ -19,18 +19,34 @@ class EditPanelWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final bool isTablet = screenWidth >= 600;
     final localizations = AppLocalizations.of(context)!;
+
+    // --- DYNAMIC SCALING ---
+    // Using screenWidth for height calculations on tablet to maintain proportions
+
+    // Height: Tablet 6% of width. Phone 5% of height.
+    final double height = isTablet ? screenWidth * 0.06 : screenHeight * 0.05;
+
+    // Icon: Tablet 3% of width. Phone 5%.
+    final double iconSize = isTablet ? screenWidth * 0.03 : screenWidth * 0.05;
+
+    // Text: Tablet 2.2% of width. Phone 3.5%.
+    final double fontSize = isTablet ? screenWidth * 0.022 : screenWidth * 0.035;
+
+    // Radius: Tablet 2%. Phone 4%.
+    final double radius = isTablet ? screenWidth * 0.02 : screenWidth * 0.04;
 
     return SlideTransition(
       position: slideAnimation,
       child: Container(
         width: screenWidth,
-        height: screenHeight * 0.05,
+        height: height,
         decoration: BoxDecoration(
           color: AppColors.background,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(screenWidth * 0.04),
-            topRight: Radius.circular(screenWidth * 0.04),
+            topLeft: Radius.circular(radius),
+            topRight: Radius.circular(radius),
           ),
           border: Border(
             top: BorderSide(
@@ -44,8 +60,8 @@ class EditPanelWidget extends StatelessWidget {
           children: [
             SvgPicture.asset(
               'assets/icons/edit.svg',
-              width: screenWidth * 0.05,
-              height: screenWidth * 0.05,
+              width: iconSize,
+              height: iconSize,
               colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
             ),
             Expanded(
@@ -53,7 +69,7 @@ class EditPanelWidget extends StatelessWidget {
                 localizations.editingNotification,
                 style: TextStyle(
                   color: AppColors.primaryColor.inverted,
-                  fontSize: screenWidth * 0.035,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
@@ -65,7 +81,7 @@ class EditPanelWidget extends StatelessWidget {
                 onTap: onCancel,
                 child: Icon(
                   Icons.cancel,
-                  size: screenWidth * 0.05,
+                  size: iconSize,
                   color: AppColors.primaryColor.inverted,
                 ),
               ),

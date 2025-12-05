@@ -10,10 +10,6 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../../theme.dart';
 
 /// A widget for picking a GGUF model file, used in the 'Add' (offline) screen.
-///
-/// It displays a large tappable area for the user to select a file. Once a
-/// file is selected, it shows a confirmation icon and the file's name.
-/// All state and file picking logic is handled by the parent provider.
 class GgufFilePicker extends StatelessWidget {
   final File? ggufFile;
   final VoidCallback onPickFile;
@@ -29,6 +25,12 @@ class GgufFilePicker extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final localizations = AppLocalizations.of(context)!;
+    final bool isTablet = screenWidth >= 600;
+
+    // --- TABLET OPTIMIZATIONS ---
+    final double titleSize = isTablet ? 26.0 : screenWidth * 0.05;
+    final double descSize = isTablet ? 18.0 : screenWidth * 0.035;
+    final double borderRadius = isTablet ? 16.0 : screenWidth * 0.02;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,7 +40,7 @@ class GgufFilePicker extends StatelessWidget {
           localizations.modelUploadTitle,
           style: TextStyle(
             color: AppColors.primaryColor.inverted,
-            fontSize: screenWidth * 0.05,
+            fontSize: titleSize,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -47,7 +49,7 @@ class GgufFilePicker extends StatelessWidget {
           localizations.modelUploadDescription,
           style: TextStyle(
             color: AppColors.quinaryColor,
-            fontSize: screenWidth * 0.035,
+            fontSize: descSize,
           ),
         ),
         SizedBox(height: screenHeight * 0.02),
@@ -57,18 +59,19 @@ class GgufFilePicker extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: onPickFile,
-            borderRadius: BorderRadius.circular(screenWidth * 0.02),
+            borderRadius: BorderRadius.circular(borderRadius),
             child: Container(
               width: double.infinity,
-              height: screenHeight * 0.25,
+              // Make it taller on tablet for easier drag/drop feel
+              height: isTablet ? 320 : screenHeight * 0.25,
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.border, width: 2),
-                borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                borderRadius: BorderRadius.circular(borderRadius),
               ),
               child: Center(
                 child: ggufFile != null
-                    ? _buildFileSelectedView(context)
-                    : _buildFilePickerPrompt(context),
+                    ? _buildFileSelectedView(context, isTablet, screenWidth, screenHeight)
+                    : _buildFilePickerPrompt(context, isTablet, screenWidth, screenHeight, localizations),
               ),
             ),
           ),
@@ -77,26 +80,22 @@ class GgufFilePicker extends StatelessWidget {
     );
   }
 
-  /// The view to display when a file has been successfully selected.
-  Widget _buildFileSelectedView(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
+  Widget _buildFileSelectedView(BuildContext context, bool isTablet, double w, double h) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.check_circle_outline, color: AppColors.senaryColor, size: screenWidth * 0.1),
-        SizedBox(height: screenHeight * 0.01),
+        Icon(Icons.check_circle_outline, color: AppColors.senaryColor, size: isTablet ? 80.0 : w * 0.1),
+        SizedBox(height: h * 0.01),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Text(
-            path.basename(ggufFile!.path), // Show only the file name
+            path.basename(ggufFile!.path),
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
             style: TextStyle(
               color: AppColors.primaryColor.inverted,
-              fontSize: screenWidth * 0.035,
+              fontSize: isTablet ? 20.0 : w * 0.035,
             ),
           ),
         ),
@@ -104,39 +103,37 @@ class GgufFilePicker extends StatelessWidget {
     );
   }
 
-  /// The view to display when no file has been selected yet.
-  Widget _buildFilePickerPrompt(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final localizations = AppLocalizations.of(context)!;
-
+  Widget _buildFilePickerPrompt(BuildContext context, bool isTablet, double w, double h, AppLocalizations loc) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SvgPicture.asset(
           'assets/icons/upload.svg',
-          width: screenWidth * 0.1,
+          width: isTablet ? 80.0 : w * 0.1,
           colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted.withValues(alpha:0.8), BlendMode.srcIn),
         ),
-        SizedBox(height: screenHeight * 0.01),
+        SizedBox(height: h * 0.01),
         Text(
-          localizations.selectGGUFFile,
+          loc.selectGGUFFile,
           style: TextStyle(
             color: AppColors.primaryColor.inverted,
-            fontSize: screenWidth * 0.04,
+            fontSize: isTablet ? 24.0 : w * 0.04,
             fontWeight: FontWeight.w500,
           ),
         ),
-        SizedBox(height: screenHeight * 0.005),
+        SizedBox(height: h * 0.005),
         Text(
-          localizations.modelUploadShortDescription,
+          loc.modelUploadShortDescription,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: AppColors.quinaryColor,
-            fontSize: screenWidth * 0.035,
+            fontSize: isTablet ? 18.0 : w * 0.035,
           ),
         ),
       ],
     );
   }
 }
+
+
+

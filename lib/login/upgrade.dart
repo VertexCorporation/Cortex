@@ -25,6 +25,7 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
     _controller = LoginController();
     _controller.initialize(this, context);
 
+    // Prepare controller for Upgrade mode
     _controller.switchAuthMode();
     _controller.toggleAgreeToTerms();
 
@@ -80,7 +81,7 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
     final bool isTermsAccepted = _controller.agreeToTerms;
     final bool isDisabled = _controller.isLoading || !isTermsAccepted;
 
-    final buttonPadding = EdgeInsets.symmetric(vertical: 14 * screenHeight / 812);
+    final buttonPadding = EdgeInsets.symmetric(vertical: 14 * fontScale);
     final buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(10 * fontScale));
 
     final ButtonStyle elegantButtonStyle = ElevatedButton.styleFrom(
@@ -117,7 +118,7 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
               ),
             ),
 
-            SizedBox(height: 12 * screenHeight / 812),
+            SizedBox(height: 12 * fontScale),
 
             // --- Google Sign-In Button ---
             SizedBox(
@@ -160,124 +161,119 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
     final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    final fontScale = screenWidth / 375;
+
+    // --- SCALING LOGIC ---
+    double fontScale = screenWidth / 375.0;
+    if (screenWidth > 450) {
+      fontScale = 1.2 + (screenWidth - 450) * 0.0005;
+    }
+    fontScale = fontScale.clamp(0.85, 1.35);
+    final double containerMaxWidth = 400 * fontScale;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
+        child: Stack(
+          children: [
+            Center(
               child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
+                constraints: BoxConstraints(maxWidth: containerMaxWidth),
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: 30 * fontScale),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // --- 1. Header (X Button) ---
-                      SizedBox(height: screenHeight * 0.02),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: IconButton(
-                            icon: Icon(
-                                Icons.close,
-                                color: AppColors.primaryColor.inverted,
-                                size: screenWidth * 0.08
-                            ),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                        ),
+                      SizedBox(height: 40 * fontScale),
+
+                      // A) Form
+                      RegisterForm(
+                        key: const ValueKey('upgrade_register_form'),
+                        isLoading: _controller.isLoading,
+                        agreeToTerms: _controller.agreeToTerms,
+                        usernameError: _controller.registerUsernameError,
+                        emailError: _controller.registerEmailError,
+                        passwordError: _controller.registerPasswordError,
+                        usernameShakeController: _controller.registerUsernameShakeController,
+                        emailShakeController: _controller.registerEmailShakeController,
+                        passwordShakeController: _controller.registerPasswordShakeController,
+                        fontScale: fontScale,
+                        onInputChanged: _controller.clearErrorsOnInput,
+                        onSubmit: (username, email, password) =>
+                            _controller.submitUpgrade(context, username, email, password),
                       ),
 
-                      SizedBox(height: screenHeight * 0.01),
+                      // B) Divider
+                      _buildOrDivider(l10n, fontScale),
 
-                      // --- 2. Main Content ---
+                      // C) Social Buttons
+                      _buildSocialButtons(l10n, screenHeight, fontScale),
+
+                      // D) Terms Checkbox
+                      SizedBox(height: 16 * fontScale),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 500),
-                          child: Column(
-                            children: [
-                              // A) Form
-                              RegisterForm(
-                                key: const ValueKey('upgrade_register_form'),
-                                isLoading: _controller.isLoading,
-                                agreeToTerms: _controller.agreeToTerms,
-                                usernameError: _controller.registerUsernameError,
-                                emailError: _controller.registerEmailError,
-                                passwordError: _controller.registerPasswordError,
-                                usernameShakeController: _controller.registerUsernameShakeController,
-                                emailShakeController: _controller.registerEmailShakeController,
-                                passwordShakeController: _controller.registerPasswordShakeController,
-                                deviceHeight: screenHeight,
-                                fontScale: fontScale,
-                                onInputChanged: _controller.clearErrorsOnInput,
-                                onSubmit: (username, email, password) =>
-                                    _controller.submitUpgrade(context, username, email, password),
-                              ),
-
-                              // B) Divider
-                              _buildOrDivider(l10n, fontScale),
-
-                              // C) Social Buttons
-                              _buildSocialButtons(l10n, screenHeight, fontScale),
-
-                              // D) Terms Checkbox
-                              SizedBox(height: screenHeight * 0.02),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 4.0 * fontScale),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: () => _showTermsAndPolicy(context),
-                                        child: FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          alignment: Alignment.centerRight,
-                                          child: Text(
-                                            l10n.iHaveReadAndAgree,
-                                            style: TextStyle(
-                                              color: Theme.of(context).textTheme.bodyLarge?.color,
-                                              fontSize: 13.0 * fontScale,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ),
+                        padding: EdgeInsets.symmetric(horizontal: 4.0 * fontScale),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => _showTermsAndPolicy(context),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    l10n.iHaveReadAndAgree,
+                                    style: TextStyle(
+                                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                                      fontSize: 13.0 * fontScale,
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                    SizedBox(width: 10 * fontScale),
-                                    SizedBox(
-                                      height: 24 * fontScale,
-                                      width: 24 * fontScale,
-                                      child: Checkbox(
-                                        value: _controller.agreeToTerms,
-                                        onChanged: (bool? value) => _controller.toggleAgreeToTerms(),
-                                        checkColor: AppColors.primaryColor,
-                                        activeColor: AppColors.primaryColor.inverted,
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      ),
-                                    ),
-                                  ],
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(width: 10 * fontScale),
+                            SizedBox(
+                              height: 24 * fontScale,
+                              width: 24 * fontScale,
+                              child: Checkbox(
+                                value: _controller.agreeToTerms,
+                                onChanged: (bool? value) => _controller.toggleAgreeToTerms(),
+                                checkColor: AppColors.primaryColor,
+                                activeColor: AppColors.primaryColor.inverted,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
-                      SizedBox(height: screenHeight * 0.05),
+                      SizedBox(height: 20 * fontScale),
                     ],
                   ),
                 ),
               ),
-            );
-          },
+            ),
+
+            Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: EdgeInsets.only(top: 10 * fontScale),
+                child: IconButton(
+                  icon: Icon(
+                      Icons.close,
+                      color: AppColors.primaryColor.inverted,
+                      size: 30 * fontScale
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

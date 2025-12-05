@@ -1,13 +1,8 @@
 // lib/screens/models/screen/new/add.dart
 
-// This file contains the VIEW for the "Add Local Model" screen.
-// It is now a StatefulWidget to manage its own ScrollController, enabling a
-// visually pleasing fog effect at the top and bottom of the scrollable content area.
-// All business logic remains delegated to the `ModelCreationProvider`.
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../fog.dart'; // Import the ScrollFog widget.
+import '../../../../fog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../theme.dart';
 import '../../providers/new.dart';
@@ -15,7 +10,6 @@ import 'widgets/file.dart';
 import 'widgets/form.dart';
 import 'widgets/header.dart';
 
-/// A widget that builds the body of the "Add Local Model" (GGUF) form.
 class AddForm extends StatefulWidget {
   const AddForm({super.key});
 
@@ -24,7 +18,6 @@ class AddForm extends StatefulWidget {
 }
 
 class _AddFormState extends State<AddForm> {
-  // A controller to manage the scroll position for the fog effect.
   late final ScrollController _scrollController;
 
   @override
@@ -42,18 +35,20 @@ class _AddFormState extends State<AddForm> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     final localizations = AppLocalizations.of(context)!;
     final provider = context.watch<ModelCreationProvider>();
 
+    final double horizontalPadding = screenWidth * 0.04;
+
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04),
-      // The ScrollFog is now configured to show the effect only at the top.
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       child: ScrollFog(
         scrollController: _scrollController,
         fogColor: AppColors.background,
         topFogHeight: screenHeight * 0.02,
-        showTop: true,     // Explicitly enable the top fog.
-        showBottom: false,  // Explicitly disable the bottom fog.
+        showTop: true,
+        showBottom: false,
         child: SingleChildScrollView(
           controller: _scrollController,
           child: Column(
