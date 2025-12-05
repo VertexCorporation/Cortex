@@ -37,13 +37,11 @@ class MainScreenState extends State<MainScreen> {
   GlobalKey<ChatControllerState>();
   final GlobalKey<InboxScreenState> inboxScreenKey =
   GlobalKey<InboxScreenState>();
-
-  final PageStorageKey<String> libraryScreenKey =
-  const PageStorageKey('LibraryScreen');
+  final GlobalKey<LibraryScreenState> libraryScreenKey =
+  GlobalKey<LibraryScreenState>();
 
   int _previousTabIndex = 0;
   bool hideBottomAppBar = false;
-  bool _showOfflinePulse = false;
   bool _wasInAllModelsView = false;
 
   @override
@@ -71,9 +69,10 @@ class MainScreenState extends State<MainScreen> {
       chatScreenKey.currentState?.onReactivated();
     }
 
-    if (mounted && index == 1 && pulseOffline) {
-      setState(() {
-        _showOfflinePulse = true;
+    if (index == 1 && pulseOffline) {
+      debugPrint("[MainScreen] Explicit Pulse request received via Navigation.");
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        libraryScreenKey.currentState?.triggerPulseAnimation();
       });
     }
 
@@ -206,17 +205,7 @@ class MainScreenState extends State<MainScreen> {
     final double screenHeight = screenSize.height;
     final double screenWidth = screenSize.width;
 
-    // TABLET DETECTION
     final bool isTablet = screenSize.shortestSide >= 600;
-
-    if (_showOfflinePulse) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        setState(() {
-          _showOfflinePulse = false;
-        });
-      });
-    }
 
     SystemChrome.setApplicationSwitcherDescription(
       ApplicationSwitcherDescription(
@@ -225,32 +214,14 @@ class MainScreenState extends State<MainScreen> {
       ),
     );
 
-    // --- RESPONSIVE DIMENSIONS ---
-
-    // 1. Bottom Bar Height
     final double bottomBarHeight = isTablet ? 80.0 : screenHeight * 0.09;
-
-    // 2. Icon Sizes
     final double iconBaseSize = isTablet ? 28.0 : screenHeight * 0.028;
-    final double libraryIconSize = isTablet ? 24.0 : screenHeight * 0.022;
-
-    // 3. Container Sizes
     final double iconContainerSize = iconBaseSize * 1.2;
-
-    // 4. Spacing & Radius
     final double labelSpacing = isTablet ? 6.0 : screenHeight * 0.002;
     final double shadowBlurRadius = isTablet ? 10.0 : screenWidth * 0.02;
     final double borderRadius = isTablet ? 24.0 : screenWidth * 0.04;
-
-    // 5. Tablet Layout Logic
-    // Tablette kenarlardan %15 boşluk bırakalım.
-    // Bu sayede butonlar ne çok bitişik ne çok ayrık olur.
     final double horizontalPadding = isTablet ? screenWidth * 0.15 : 0.0;
-
-    // Tablette Expanded kullanmıyoruz, sabit genişlik veriyoruz.
-    // Telefondaysa Expanded kullanıyoruz.
     final bool useExpandedButtons = !isTablet;
-
     final bool shouldHideBottomAppBar = hideBottomAppBar;
 
     return PopScope(
@@ -319,7 +290,6 @@ class MainScreenState extends State<MainScreen> {
             ),
             LibraryScreen(
               key: libraryScreenKey,
-              showOfflineModelsPulse: _showOfflinePulse,
             ),
             InboxScreen(key: inboxScreenKey),
           ],
@@ -351,14 +321,11 @@ class MainScreenState extends State<MainScreen> {
               child: BottomAppBar(
                 color: Colors.transparent,
                 elevation: 0,
-                padding: EdgeInsets.zero, // Remove default padding
+                padding: EdgeInsets.zero,
                 child: Container(
                   height: bottomBarHeight,
-                  // TABLET: Sağdan ve soldan boşluk bırakır (Horizontal Padding)
                   padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                   child: Row(
-                    // TABLET: spaceBetween (Sol, Orta, Sağ)
-                    // TELEFON: spaceAround (Eşit dağılım)
                     mainAxisAlignment: isTablet
                         ? MainAxisAlignment.spaceBetween
                         : MainAxisAlignment.spaceAround,
@@ -367,6 +334,7 @@ class MainScreenState extends State<MainScreen> {
                         iconPath: 'assets/icons/inbox.svg',
                         label: appLocalizations.chats,
                         isSelected: tabProvider.selectedIndex == 2,
+                        // Fix 1: Inbox - No Pulse
                         onTap: () => onItemTapped(2),
                         baseSize: iconBaseSize,
                         containerSize: iconContainerSize,
@@ -377,6 +345,7 @@ class MainScreenState extends State<MainScreen> {
                         iconPath: 'assets/icons/chat.svg',
                         label: appLocalizations.chat,
                         isSelected: tabProvider.selectedIndex == 0,
+                        // Fix 2: Chat - No Pulse
                         onTap: () => onItemTapped(0),
                         baseSize: iconBaseSize,
                         containerSize: iconContainerSize,
@@ -387,9 +356,9 @@ class MainScreenState extends State<MainScreen> {
                         iconPath: 'assets/icons/library.svg',
                         label: appLocalizations.library,
                         isSelected: tabProvider.selectedIndex == 1,
-                        onTap: () => onItemTapped(1, pulseOffline: true),
-                        baseSize: libraryIconSize,
-                        containerSize: libraryIconSize * 1.2,
+                        onTap: () => onItemTapped(1),
+                        baseSize: iconBaseSize,
+                        containerSize: iconBaseSize * 1.2,
                         labelSpacing: labelSpacing,
                         useExpanded: useExpandedButtons,
                       ),
@@ -414,9 +383,6 @@ class BottomNavigationButton extends StatelessWidget {
   final double baseSize;
   final double containerSize;
   final double labelSpacing;
-
-  /// Determines if the button should take up all available space (Phone)
-  /// or have a fixed width (Tablet).
   final bool useExpanded;
 
   const BottomNavigationButton({
@@ -437,7 +403,6 @@ class BottomNavigationButton extends StatelessWidget {
         ? AppColors.primaryColor.inverted
         : AppColors.tertiaryColor;
 
-    // The core content of the button
     Widget content = GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -487,13 +452,10 @@ class BottomNavigationButton extends StatelessWidget {
       ),
     );
 
-    // If phone, use Expanded to fill space equally.
     if (useExpanded) {
       return Expanded(child: content);
     }
 
-    // If tablet, use a fixed width container (e.g., 100px) so touch target is reasonable
-    // but they don't stretch across the entire screen gap.
     return SizedBox(
       width: 120.0,
       child: content,

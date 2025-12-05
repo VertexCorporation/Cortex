@@ -92,7 +92,8 @@ class ModelsBody extends StatelessWidget {
               onTap: () => FocusScope.of(context).unfocus(),
               child: AnimatedSwitcher(
                 duration: _kDefaultFadeDuration,
-                transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                transitionBuilder: (child, animation) =>
+                    FadeTransition(opacity: animation, child: child),
                 child: _buildContentSwitcher(context, isSearching),
               ),
             ),
@@ -103,14 +104,18 @@ class ModelsBody extends StatelessWidget {
     );
   }
 
-  Widget _buildLocalizationWarningPanel(BuildContext context, AppLocalizations localizations) {
-    final double bottomPosition = showLocalizationWarning ? _kWarningPanelVisibleBottom : _kWarningPanelHiddenBottom;
+  Widget _buildLocalizationWarningPanel(
+      BuildContext context, AppLocalizations localizations) {
+    final double bottomPosition = showLocalizationWarning
+        ? _kWarningPanelVisibleBottom
+        : _kWarningPanelHiddenBottom;
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
 
     // --- DYNAMIC WIDTH FOR TABLET ---
     // Tablet: 5% margin (90% width). Phone: 4% margin (92% width).
-    final double horizontalMargin = isTablet ? screenWidth * 0.05 : screenWidth * 0.04;
+    final double horizontalMargin =
+    isTablet ? screenWidth * 0.05 : screenWidth * 0.04;
 
     return AnimatedPositioned(
       duration: _kWarningPanelAnimDuration,
@@ -125,13 +130,12 @@ class ModelsBody extends StatelessWidget {
           child: Container(
             // Taller padding on tablet for touch targets
             padding: EdgeInsets.symmetric(
-                vertical: isTablet ? 16 : 12,
-                horizontal: isTablet ? 20 : 16
-            ),
+                vertical: isTablet ? 16 : 12, horizontal: isTablet ? 20 : 16),
             decoration: BoxDecoration(
               color: AppColors.secondaryColor,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+              border: Border.all(
+                  color: AppColors.border.withValues(alpha: 0.5)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.15),
@@ -144,7 +148,8 @@ class ModelsBody extends StatelessWidget {
               children: [
                 SvgPicture.asset(
                   'assets/icons/warning.svg',
-                  colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                      AppColors.primaryColor.inverted, BlendMode.srcIn),
                   width: isTablet ? 28 : 24,
                   height: isTablet ? 28 : 24,
                 ),
@@ -207,7 +212,8 @@ class ModelsBody extends StatelessWidget {
               curve: Curves.easeInOut,
               child: AnimatedSwitcher(
                 duration: _kSearchTransitionDuration,
-                transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                transitionBuilder: (child, animation) =>
+                    FadeTransition(opacity: animation, child: child),
                 child: isSearching
                     ? Container(
                   key: const ValueKey('search-view'),
@@ -233,18 +239,21 @@ class ModelsBody extends StatelessWidget {
     final bool isTablet = screenWidth >= 600;
 
     final self = allModels.where((model) => model.category == 'self').toList();
-    final serverSide = allModels.where((model) => model.isServerSide && model.category != 'self' && model.category != 'roleplay').toList();
-    final local = allModels.where((model) => !model.isServerSide && model.category != 'self').toList();
-    final role = allModels.where((model) => model.category == 'roleplay').toList();
+    final serverSide = allModels
+        .where((model) =>
+    model.isServerSide &&
+        model.category != 'self' &&
+        model.category != 'roleplay')
+        .toList();
+    final local = allModels
+        .where((model) => !model.isServerSide && model.category != 'self')
+        .toList();
+    final role =
+    allModels.where((model) => model.category == 'roleplay').toList();
 
     void openModelDetailCallback(ModelEntity model) {
       openModelDetail(model.id);
     }
-
-    // --- TABLET OPTIMIZATION ---
-    // We wrap the content in a Center > ConstrainedBox.
-    // This prevents the lists and charts from stretching too wide on tablets.
-    // Max Width: 800px on tablet. Full width on phone.
 
     return Center(
       child: Container(
@@ -312,21 +321,29 @@ class ModelsBody extends StatelessWidget {
             ),
 
             if (systemInfo != null) ...[
+              // --- SYSTEM INFO HEADER ---
               Padding(
-                // Dynamic padding for system info title
-                padding: EdgeInsets.symmetric(horizontal: isTablet ? 0 : screenWidth * 0.04) // 0 because container is already constrained
-                    .copyWith(
-                    top: isTablet ? 24.0 : screenWidth * 0.015,
-                    bottom: isTablet ? 16.0 : screenWidth * 0.015
+                padding: EdgeInsets.symmetric(
+                    horizontal: isTablet ? screenWidth * 0.02 : screenWidth * 0.04
+                ).copyWith(
+                    top: isTablet ? 24.0 : screenWidth * 0.02,
+                    bottom: isTablet ? 16.0 : screenWidth * 0.01
                 ),
-                child: Text(loc.systemInfo,
-                    style: TextStyle(
-                        color: AppColors.primaryColor.inverted,
-                        fontSize: isTablet ? 26.0 : screenWidth * 0.05,
-                        fontWeight: FontWeight.bold)),
+                child: Text(
+                  loc.systemInfo,
+                  style: TextStyle(
+                    color: AppColors.primaryColor.inverted,
+                    fontSize: isTablet ? 36.0 : screenWidth * 0.05,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
+
+              // --- SYSTEM INFO CHART ---
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: isTablet ? 0 : screenWidth * 0.04),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isTablet ? screenWidth * 0.1 : screenWidth * 0.04,
+                ),
                 child: SystemInfoChart(
                     totalStorage: systemInfo!.totalStorage,
                     usedStorage: systemInfo!.totalStorage - systemInfo!.freeStorage,

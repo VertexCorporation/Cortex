@@ -14,11 +14,6 @@ import 'package:cortex/theme.dart';
 
 
 /// The main controller for the "unselected" chat screen state.
-///
-/// This widget acts as an orchestrator. It doesn't build detailed UI itself,
-/// but instead decides which of its child "Views" (`WelcomeView` or `ExploreView`)
-/// to display. It manages the top-level state for view switching, handles back
-/// navigation logic, and provides the necessary data and callbacks down to its children.
 class SelectionController extends StatefulWidget {
   final TextEditingController searchController;
   final List<ModelEntity> allModels;
@@ -48,11 +43,9 @@ class SelectionController extends StatefulWidget {
 }
 
 class SelectionControllerState extends State<SelectionController> {
-  /// The single source of truth for which view is currently active.
   bool _isShowingExploreView = false;
 
-  /// Switches the view to the initial welcome screen.
-  void showWelcomeView() { // <-- RENAMED and PUBLIC
+  void showWelcomeView() {
     if (mounted) {
       widget.searchController.clear();
       FocusScope.of(context).unfocus();
@@ -61,26 +54,23 @@ class SelectionControllerState extends State<SelectionController> {
     }
   }
 
-  /// Switches the view to the model exploration/search screen.
-  void showExploreView() { // <-- RENAMED and PUBLIC
+  void showExploreView() {
     if (mounted) {
       setState(() => _isShowingExploreView = true);
       widget.onViewModeChanged(true);
     }
   }
 
-  /// Handles the "Use Offline" feature request from the WelcomeView.
-  /// This logic lives in the controller because it needs to decide whether to
-  /// navigate to a different tab or switch to the ExploreView.
+  /// LOGIC: Decides where to go when "Offline" is tapped.
   Future<void> _onOfflineFeatureTap() async {
     final downloadedModelIds = (await UserModels.loadDownloadedModelPaths()).keys;
+
     if (downloadedModelIds.isEmpty) {
-      // If no models are downloaded, navigate to the downloads tab.
+
       mainScreenKey.currentState?.onItemTapped(1, pulseOffline: true);
       return;
     }
 
-    // This logic now correctly uses the passed-in `widget.allModels`.
     final bool hasDownloadedOfflineModels = widget.allModels.any((model) {
       return !model.isServerSide && downloadedModelIds.contains(model.id);
     });
@@ -88,19 +78,14 @@ class SelectionControllerState extends State<SelectionController> {
     if (!mounted) return;
 
     if (hasDownloadedOfflineModels) {
-      // If offline models exist, switch to the explore view.
-      // We will need to pass the "offline" filter down to ExploreView.
-      // For now, we just switch the view. The filter logic is in ExploreView.
+
       showExploreView();
-      // A more advanced implementation could pass an initial filter:
-      // setState(() => _initialFilterForExplore = FilterType.offline);
-      // _showExploreView();
+
     } else {
       mainScreenKey.currentState?.onItemTapped(1, pulseOffline: true);
     }
   }
 
-  /// Handles the "Start Dynamic Chat" request from the WelcomeView.
   void _onStartDynamicChat() {
     mainScreenKey.currentState?.startNewConversation(isDynamic: true);
   }
@@ -113,23 +98,16 @@ class SelectionControllerState extends State<SelectionController> {
       canPop: !_isShowingExploreView,
 
       onPopInvokedWithResult: (bool didPop, dynamic) {
-        if (didPop) {
-          return;
-        }
-
+        if (didPop) return;
         if (_isShowingExploreView) {
           showWelcomeView();
         }
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        // The body is a Stack to layer the background effects behind the main content.
         body: Stack(
           children: [
-            // Layer 1: The blurred background effects.
             ..._buildBackgroundEffects(context),
-
-            // Layer 2: The main interactive content, wrapped in a SafeArea.
             SafeArea(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
@@ -173,7 +151,6 @@ class SelectionControllerState extends State<SelectionController> {
     );
   }
 
-  /// Builds the blurred background effects, which are part of the controller's layout.
   List<Widget> _buildBackgroundEffects(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;

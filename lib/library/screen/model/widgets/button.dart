@@ -91,7 +91,7 @@ class BottomActionButtons extends StatelessWidget {
           transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
           child: provider.isDownloaded
               ? _buildRemoveOrChatButtons(context, provider, localizations)
-          // FIX 1: Pass the buttonHeight to ensure consistent sizing.
+          // Pass the buttonHeight to ensure consistent sizing.
               : _buildDownloadOrCancelButtons(context, provider, localizations, buttonHeight),
         ),
       );
@@ -191,7 +191,7 @@ class BottomActionButtons extends StatelessWidget {
       BuildContext context,
       ModelDetailProvider provider,
       AppLocalizations localizations,
-      // FIX 1: Accept buttonHeight as a parameter for consistent sizing.
+      // Accept buttonHeight as a parameter for consistent sizing.
       double buttonHeight,
       ) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -244,10 +244,10 @@ class BottomActionButtons extends StatelessWidget {
             )
                 : null,
             style: ElevatedButton.styleFrom(
-              // FIX 2: Changed button color to primaryColor.inverted.
+              // Changed button color to primaryColor.inverted.
               backgroundColor: AppColors.primaryColor.inverted,
               foregroundColor: Colors.white,
-              // FIX 2: Updated disabled color to match the new background color.
+              // Updated disabled color to match the new background color.
               disabledBackgroundColor: AppColors.primaryColor.inverted.withValues(alpha:0.5),
               disabledForegroundColor: Colors.white.withValues(alpha:0.7),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(screenWidth * 0.03)),

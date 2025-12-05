@@ -1,4 +1,4 @@
-// lib/library/models/controller.dart
+// lib/library/screen/models/controller.dart
 
 import 'dart:async';
 import 'package:cortex/library/screen/models/skeleton.dart';
@@ -16,14 +16,13 @@ import 'widgets/appbar.dart';
 const _kWarningPanelDelay = Duration(milliseconds: 700);
 
 class LibraryScreen extends StatefulWidget {
-  final bool showOfflineModelsPulse;
-  const LibraryScreen({super.key, this.showOfflineModelsPulse = false});
+  const LibraryScreen({super.key});
 
   @override
-  State<LibraryScreen> createState() => _LibraryScreenState();
+  State<LibraryScreen> createState() => LibraryScreenState();
 }
 
-class _LibraryScreenState extends State<LibraryScreen>
+class LibraryScreenState extends State<LibraryScreen>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<LibraryScreen> {
 
   ModelCatalogProvider? _catalogProvider;
@@ -32,11 +31,11 @@ class _LibraryScreenState extends State<LibraryScreen>
   ModelsSearchController? _searchCtrl;
   late final FocusNode _searchFocusNode;
   late final ScrollController _scrollController;
+
   late final AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
+  late final Animation<double> _pulseAnimation;
 
   bool _showLocalizationWarning = false;
-
   bool _isInitialized = false;
 
   @override
@@ -51,49 +50,68 @@ class _LibraryScreenState extends State<LibraryScreen>
 
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 500),
     );
-    _pulseAnimation =
-        Tween<double>(begin: 1.0, end: 1.0).animate(_pulseController);
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 0.92).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && !_isInitialized) {
-        _catalogProvider = context.read<ModelCatalogProvider>();
-        _localStateProvider = context.read<ModelLocalStateProvider>();
-        _localStateProvider!.initialize(context: context);
+        _initializeData();
+      }
+    });
+  }
 
-        _searchCtrl = ModelsSearchController(
-          context: context,
-          focusNode: _searchFocusNode,
-          allModels: _catalogProvider!.allModels,
-          downloadManagers: Map.from(_localStateProvider!.downloadManagers),
-          downloadedFileStates: _localStateProvider!.downloadCompleted,
-          getCompatibilityStatus: _localStateProvider!.getCompatibilityStatus,
-          openModelDetail: (String id) =>
-              _navigateAndHandleFocus(() =>
-                  _catalogProvider!.openModelDetail(context, id)),
-          removeModel: (id) async {
-            final modelToRemove = _catalogProvider!.allModels.firstWhere((m) => m.id == id);
-            await _catalogProvider!.removeModel(context, modelToRemove);
-          },
-          startChat: (id, _, {String? modelPath, isCustomModel = false}) =>
-              _catalogProvider!.startChatWithModel(id),
-          startDownload: ({required id, required url, required title}) =>
-              _localStateProvider!.requestPermissionAndStartDownload(
-                  context: context, id: id, url: url),
-          cancelDownload: _localStateProvider!.cancelDownload,
-          resumeDownload: _localStateProvider!.resumeDownload,
-        );
+  void _initializeData() {
+    _catalogProvider = context.read<ModelCatalogProvider>();
+    _localStateProvider = context.read<ModelLocalStateProvider>();
+    _localStateProvider!.initialize(context: context);
 
-        setState(() {
-          _isInitialized = true;
-        });
+    _searchCtrl = ModelsSearchController(
+      context: context,
+      focusNode: _searchFocusNode,
+      allModels: _catalogProvider!.allModels,
+      downloadManagers: Map.from(_localStateProvider!.downloadManagers),
+      downloadedFileStates: _localStateProvider!.downloadCompleted,
+      getCompatibilityStatus: _localStateProvider!.getCompatibilityStatus,
+      openModelDetail: (String id) =>
+          _navigateAndHandleFocus(() =>
+              _catalogProvider!.openModelDetail(context, id)),
+      removeModel: (id) async {
+        final modelToRemove = _catalogProvider!.allModels.firstWhere((m) => m.id == id);
+        await _catalogProvider!.removeModel(context, modelToRemove);
+      },
+      startChat: (id, _, {String? modelPath, isCustomModel = false}) =>
+          _catalogProvider!.startChatWithModel(id),
+      startDownload: ({required id, required url, required title}) =>
+          _localStateProvider!.requestPermissionAndStartDownload(
+              context: context, id: id, url: url),
+      cancelDownload: _localStateProvider!.cancelDownload,
+      resumeDownload: _localStateProvider!.resumeDownload,
+    );
 
-        if (widget.showOfflineModelsPulse) {
-          _startPulseAnimation();
-        }
+    setState(() {
+      _isInitialized = true;
+    });
 
-        _checkAndScheduleLocalizationWarning();
+    _checkAndScheduleLocalizationWarning();
+  }
+
+  void triggerPulseAnimation() {
+    debugPrint("[LibraryScreen] Pulse Animation Triggered Imperatively.");
+
+    if (!mounted) return;
+
+    _pulseController.stop();
+    _pulseController.reset();
+    _pulseController.repeat(reverse: true);
+
+    Timer(const Duration(milliseconds: 4000), () {
+      if (mounted) {
+        _pulseController.stop();
+        _pulseController.animateTo(0.0, duration: const Duration(milliseconds: 300));
       }
     });
   }
@@ -102,21 +120,16 @@ class _LibraryScreenState extends State<LibraryScreen>
     try {
       final prefs = await SharedPreferences.getInstance();
       const String key = 'last_localization_warning_ts';
-
       final int? lastShownTs = prefs.getInt(key);
       final DateTime now = DateTime.now();
       bool shouldShow = false;
-
       if (lastShownTs == null) {
         shouldShow = true;
       } else {
         final DateTime lastShownDate = DateTime.fromMillisecondsSinceEpoch(lastShownTs);
         final Duration diff = now.difference(lastShownDate);
-        if (diff.inDays >= 7) {
-          shouldShow = true;
-        }
+        if (diff.inDays >= 7) shouldShow = true;
       }
-
       if (shouldShow) {
         Future.delayed(_kWarningPanelDelay, () async {
           if (mounted) {
@@ -126,30 +139,8 @@ class _LibraryScreenState extends State<LibraryScreen>
         });
       }
     } catch (e) {
-      debugPrint("Warning scheduling error: $e");
+      debugPrint("Warning error: $e");
     }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  void _startPulseAnimation() {
-    _pulseController.reset();
-    _pulseAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.10), weight: 50),
-      TweenSequenceItem(tween: Tween(begin: 1.10, end: 1.0), weight: 50),
-    ]).animate(
-        CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut));
-    _pulseController.repeat();
-    Timer(const Duration(seconds: 3), () {
-      if(mounted) {
-        _pulseController.stop();
-        _pulseController.animateTo(0.0,
-            duration: const Duration(milliseconds: 400), curve: Curves.easeOut);
-      }
-    });
   }
 
   void _onSearchFocusChanged() {
@@ -168,6 +159,12 @@ class _LibraryScreenState extends State<LibraryScreen>
     }
   }
 
+  void _dismissWarningPanel() {
+    if (mounted && _showLocalizationWarning) {
+      setState(() => _showLocalizationWarning = false);
+    }
+  }
+
   @override
   void dispose() {
     _searchCtrl?.dispose();
@@ -176,14 +173,6 @@ class _LibraryScreenState extends State<LibraryScreen>
     _scrollController.dispose();
     _pulseController.dispose();
     super.dispose();
-  }
-
-  void _dismissWarningPanel() {
-    if (mounted && _showLocalizationWarning) {
-      setState(() {
-        _showLocalizationWarning = false;
-      });
-    }
   }
 
   @override
@@ -195,6 +184,7 @@ class _LibraryScreenState extends State<LibraryScreen>
       return Scaffold(
         backgroundColor: AppColors.background,
         appBar: ModelsAppBar(
+          context: context,
           title: localizations.modelsTitle,
           createButtonText: localizations.create,
           onOpenCreateScreen: () {},
@@ -216,6 +206,7 @@ class _LibraryScreenState extends State<LibraryScreen>
         return Scaffold(
           backgroundColor: AppColors.background,
           appBar: ModelsAppBar(
+            context: context,
             title: localizations.modelsTitle,
             createButtonText: localizations.create,
             onOpenCreateScreen: () => _navigateAndHandleFocus(() => catalog.openCreateScreen(context)),

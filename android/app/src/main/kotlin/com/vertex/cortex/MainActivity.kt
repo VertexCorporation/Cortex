@@ -20,7 +20,7 @@ class MainActivity : FlutterActivity() {
     private val TAG        = "CortexMainActivity"
 
     /* ───────────    FLUTTER BRIDGE   ─────────── */
-    @SuppressLint("ObsoleteSdkInt")   // Environment.getExternalStorageDirectory() is still OK for API < 30
+    @SuppressLint("ObsoleteSdkInt")
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
@@ -60,7 +60,6 @@ class MainActivity : FlutterActivity() {
 
                     "sendMessage"  -> {
                         val msg = call.argument<String>("message")
-
                         val photoPath = call.argument<String>("photoPath")
 
                         if (msg.isNullOrBlank()) {
@@ -68,7 +67,6 @@ class MainActivity : FlutterActivity() {
                             return@setMethodCallHandler
                         }
 
-                        // Servisi başlatırken artık "photoPath" gönderiyoruz
                         startLlamaService("sendMessage", "message" to msg, "photoPath" to (photoPath ?: ""))
                         result.success("Message sent: $msg")
                     }
@@ -100,9 +98,7 @@ class MainActivity : FlutterActivity() {
         val am       = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val info     = ActivityManager.MemoryInfo()
         am.getMemoryInfo(info)
-        val totalMB  = info.totalMem / (1024L * 1024L)
-        Log.d(TAG, "Total RAM  : $totalMB MB")
-        return totalMB
+        return info.totalMem / (1024L * 1024L)
     }
 
     /** Used RAM in **MB** (total - available). */
@@ -110,25 +106,19 @@ class MainActivity : FlutterActivity() {
         val am       = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val info     = ActivityManager.MemoryInfo()
         am.getMemoryInfo(info)
-        val usedMB   = (info.totalMem - info.availMem) / (1024L * 1024L)
-        Log.d(TAG, "Used  RAM   : $usedMB MB")
-        return usedMB
+        return (info.totalMem - info.availMem) / (1024L * 1024L)
     }
 
     /** Free internal storage in **MB**. */
     private fun getFreeStorageMB(): Long {
         val stat     = StatFs(Environment.getExternalStorageDirectory().path)
-        val freeMB   = stat.blockSizeLong * stat.availableBlocksLong / (1024L * 1024L)
-        Log.d(TAG, "Free storage: $freeMB MB")
-        return freeMB
+        return stat.blockSizeLong * stat.availableBlocksLong / (1024L * 1024L)
     }
 
     /** Total internal storage in **MB**. */
     private fun getTotalStorageMB(): Long {
         val stat     = StatFs(Environment.getExternalStorageDirectory().path)
-        val totalMB  = stat.blockSizeLong * stat.blockCountLong / (1024L * 1024L)
-        Log.d(TAG, "Total storage: $totalMB MB")
-        return totalMB
+        return stat.blockSizeLong * stat.blockCountLong / (1024L * 1024L)
     }
 
     /** Helper to start / communicate with the background service. */
@@ -138,16 +128,15 @@ class MainActivity : FlutterActivity() {
             extras.forEach { (k, v) -> putExtra(k, v) }
         }
 
-        // This ensures the service can communicate back to Flutter.
-        LlamaService.setMethodChannel(
-            MethodChannel(flutterEngine?.dartExecutor?.binaryMessenger ?: return, LLAMA_CH)
-        )
+        // Pass the binary messenger to the Service so it can talk back to Flutter
+        flutterEngine?.dartExecutor?.binaryMessenger?.let { messenger ->
+            LlamaService.setMethodChannel(MethodChannel(messenger, LLAMA_CH))
+        }
 
         try {
             startService(intent)
-            Log.d(TAG, "LlamaService started, action=$action extras=${extras.toMap()}")
         } catch (e: IllegalStateException) {
-            Log.w(TAG, "⚠️ BackgroundServiceStartNotAllowedException: App is in background. Ignored action: $action")
+            Log.w(TAG, "⚠️ App is in background, service start ignored: $action")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start LlamaService: ${e.message}")
         }

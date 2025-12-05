@@ -50,6 +50,8 @@ class LlamaService: NSObject, FlutterPlugin {
                 return
             }
 
+            let photoPath = args["photoPath"] as? String
+
             guard let context = self.llamaContext else {
                 result(FlutterError(code: "NO_MODEL", message: "Model not loaded", details: nil))
                 return
@@ -59,6 +61,10 @@ class LlamaService: NSObject, FlutterPlugin {
 
             Task {
                 await context.clear()
+
+                if let photo = photoPath, !photo.isEmpty {
+                     print("[LlamaService] Warning: Photo provided but iOS Vision support is currently implementation-pending.")
+                }
 
                 await context.completion_init(text: message)
 
