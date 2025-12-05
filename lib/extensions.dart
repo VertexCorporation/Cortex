@@ -120,7 +120,6 @@ class Extensions {
     if (currentExtensions.isEmpty) return;
     _panelIsClosing = false;
     const String logPrefix = "[Extensions.showExtensionPanel]";
-    debugPrint("$logPrefix Panel opened for model series '$currentBaseSeries'.");
 
     final langCode = Localizations.localeOf(context).languageCode;
     final modelSeriesEntity = modelService.getPreciseModelData(currentBaseSeries, langCode: langCode);
@@ -141,19 +140,10 @@ class Extensions {
     final Offset offset = renderBox.localToGlobal(Offset(0, renderBox.size.height + 12));
 
     _overlayEntry = OverlayEntry(builder: (BuildContext context) {
-      final screenWidth = MediaQuery.of(context).size.width;
-      final bool isTablet = screenWidth >= 600;
-
-      // DYNAMIC WIDTH CALCULATION
-      // Tablet: 50% of screen width. Phone: 90% of screen width.
-      final panelWidth = isTablet ? screenWidth * 0.5 : screenWidth * 0.9;
-      final horizontalMargin = (screenWidth - panelWidth) / 2;
-
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
           return Stack(
             children: [
-              // Full screen detector for "Tap Outside"
               Positioned.fill(
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
@@ -168,9 +158,8 @@ class Extensions {
               ),
               Positioned(
                 top: offset.dy,
-                left: horizontalMargin,
-                // Explicit width constraint
-                width: panelWidth,
+                left: 0,
+                right: 0,
                 child: TweenAnimationBuilder<double>(
                   tween: Tween<double>(
                     begin: _panelIsClosing ? 1.0 : 0.4,
@@ -266,6 +255,7 @@ class Extensions {
     );
   }
 
+  // --- RESTORED ORIGINAL SIGNATURE (No panelWidth arg) ---
   static Widget buildExtensionPanelWidget({
     required BuildContext context,
     required List<Map<String, dynamic>> options,
@@ -277,31 +267,49 @@ class Extensions {
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
 
-    // --- FULLY DYNAMIC / PROPORTIONAL SCALING ---
+    // --- 1. DEFINE CONSTANTS (Scaled for Tablet/Phone) ---
+    final double iconSize = isTablet ? screenWidth * 0.035 : screenWidth * 0.04;
+    final double fontSize = isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
+    final double horizontalPadding = isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
+    final double verticalPadding = isTablet ? screenWidth * 0.02 : screenWidth * 0.02;
+    final double panelBorderRadius = isTablet ? screenWidth * 0.015 : screenWidth * 0.02;
+    final double optionMinHeight = isTablet ? screenWidth * 0.08 : screenWidth * 0.12;
 
-    // Width: Tablet 50%, Phone 90%
-    final panelWidth = isTablet ? screenWidth * 0.5 : screenWidth * 0.9;
+    // --- 2. CALCULATE DYNAMIC WIDTH ---
+    // Constraints: Tablet Max 50%, Phone Max 90%.
+    final double maxAllowedWidth = isTablet ? screenWidth * 0.6 : screenWidth * 0.9;
+    final double minAllowedWidth = isTablet ? screenWidth * 0.25 : screenWidth * 0.5;
 
-    // Row Height: Tablet 8% (e.g. 64px on 800w), Phone 12%
-    final optionMinHeight = isTablet ? screenWidth * 0.08 : screenWidth * 0.12;
-
-    // Padding: Tablet 3% (e.g. 24px), Phone 4%
-    final horizontalPadding = isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
-    final verticalPadding = isTablet ? screenWidth * 0.02 : screenWidth * 0.02;
-
-    // Icon Size: Tablet 3.5% (e.g. 28px), Phone 4%
-    final iconSize = isTablet ? screenWidth * 0.035 : screenWidth * 0.04;
-
-    // Font Size: Tablet 2.5% (e.g. 20px on 800w), Phone 4%
-    final fontSize = isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
-
-    // Border Radius: Tablet 1.5% (e.g. 12px), Phone 2%
-    final panelBorderRadius = isTablet ? screenWidth * 0.015 : screenWidth * 0.02;
-
-    final textStyle = TextStyle(
+    final TextStyle textStyle = TextStyle(
       color: AppColors.primaryColor.inverted,
       fontSize: fontSize,
     );
+
+    // Measure longest text
+    double maxTextWidth = 0;
+    final TextStyle measureStyle = textStyle.copyWith(fontWeight: FontWeight.w500);
+
+    for (var option in options.take(15)) {
+      String text = (option['title'] as String? ?? option['id']).trim();
+      while (text.startsWith('-') || text.startsWith(' ')) {
+        text = text.substring(1).trim();
+      }
+      final TextPainter tp = TextPainter(
+        text: TextSpan(text: text, style: measureStyle),
+        maxLines: 1,
+        textDirection: TextDirection.ltr,
+        textScaler: MediaQuery.of(context).textScaler,
+      )..layout();
+
+      if (tp.width > maxTextWidth) maxTextWidth = tp.width;
+    }
+
+    // Calculate content width
+    double contentWidth = (horizontalPadding * 2) + iconSize + (horizontalPadding * 0.5) + maxTextWidth + (horizontalPadding * 0.5);
+    contentWidth += (iconSize * 1.5); // Space for sparkle icon
+
+    // Final Width
+    final double finalPanelWidth = contentWidth.clamp(minAllowedWidth, maxAllowedWidth);
 
     const int maxVisibleItems = 5;
     final double totalHeight = options.length * optionMinHeight;
@@ -327,8 +335,6 @@ class Extensions {
             textStyle: textStyle,
             onTap: () => onSelect(optionData),
             showBottomBorder: index < options.length - 1,
-            // Pass down panelWidth for shine calculations
-            panelWidth: panelWidth,
           );
         },
       ),
@@ -343,7 +349,7 @@ class Extensions {
       shadowColor: Colors.black26,
       color: AppColors.secondaryColor,
       child: SizedBox(
-        width: panelWidth,
+        width: finalPanelWidth,
         child: panelContent,
       ),
     );
@@ -361,7 +367,6 @@ class Extensions {
     required TextStyle textStyle,
     required VoidCallback onTap,
     required bool showBottomBorder,
-    required double panelWidth,
   }) {
     final String tier = option['tier'] as String? ?? 'free';
     final bool isPremium = tier == 'premium';
@@ -415,7 +420,6 @@ class Extensions {
       child: InkWell(
         borderRadius: borderRadius,
         onTap: onTap,
-        // --- SPLASH & HIGHLIGHT REMOVED ---
         splashFactory: NoSplash.splashFactory,
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
@@ -441,8 +445,8 @@ class Extensions {
     final finalWidget = ClipRRect(
       borderRadius: borderRadius,
       child: isPremium
-      // Pass the calculated panel width to the shine wrapper
-          ? _ShineAnimationWrapper(panelWidth: panelWidth, child: clickableContainer)
+      // No arguments needed! _ShineAnimationWrapper will calculate width itself using LayoutBuilder.
+          ? _ShineAnimationWrapper(child: clickableContainer)
           : clickableContainer,
     );
 
@@ -535,11 +539,12 @@ class Extensions {
   }
 }
 
+/// A wrapper for the premium shine animation.
+/// Uses LayoutBuilder to determine animation width dynamically without extra parameters.
 class _ShineAnimationWrapper extends StatefulWidget {
   final Widget child;
-  final double panelWidth; // We need this to animate correctly across the dynamic width
 
-  const _ShineAnimationWrapper({required this.child, required this.panelWidth});
+  const _ShineAnimationWrapper({required this.child});
 
   @override
   State<_ShineAnimationWrapper> createState() => _ShineAnimationWrapperState();
@@ -586,37 +591,43 @@ class _ShineAnimationWrapperState extends State<_ShineAnimationWrapper> with Sin
 
   @override
   Widget build(BuildContext context) {
-    final widthToAnimate = widget.panelWidth;
-
     return Stack(
       children: [
         widget.child,
         Positioned.fill(
-          child: IgnorePointer(
-            child: AnimatedBuilder(
-              animation: _shineAnimation,
-              builder: (context, child) {
-                return Transform.translate(
-                  offset: Offset(widthToAnimate * _shineAnimation.value, 0),
-                  child: child,
-                );
-              },
-              child: Container(
-                width: widthToAnimate * 0.3,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      AppColors.secondaryColor.withValues(alpha: 0.0),
-                      AppColors.secondaryColor.withValues(alpha: 0.5),
-                      AppColors.secondaryColor.withValues(alpha: 0.0),
-                    ],
-                    stops: const [0.4, 0.5, 0.6],
+          child: LayoutBuilder(
+            // KEY FIX: Use LayoutBuilder to get the exact width of this row
+            // without needing to pass it from the parent.
+            builder: (context, constraints) {
+              final widthToAnimate = constraints.maxWidth;
+
+              return IgnorePointer(
+                child: AnimatedBuilder(
+                  animation: _shineAnimation,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(widthToAnimate * _shineAnimation.value, 0),
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    width: widthToAnimate * 0.3,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          AppColors.secondaryColor.withValues(alpha: 0.0),
+                          AppColors.secondaryColor.withValues(alpha: 0.5),
+                          AppColors.secondaryColor.withValues(alpha: 0.0),
+                        ],
+                        stops: const [0.4, 0.5, 0.6],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ],

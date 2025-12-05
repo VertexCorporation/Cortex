@@ -11,58 +11,88 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String createButtonText;
   final VoidCallback onOpenCreateScreen;
 
-  const ModelsAppBar({
+  // Pre-calculated metrics
+  final double _toolbarHeight;
+  final bool _isTablet;
+  final double _titleFontSize;
+
+  // Button Metrics
+  final double _buttonWidth;
+  final double _buttonHeight;
+  final double _circleSize;
+  final double _textSize;
+  final double _iconSize;
+  final double _actionAreaPadding;
+
+  ModelsAppBar({
     super.key,
+    required BuildContext context, // Added context for pre-calculation
     required this.title,
     required this.createButtonText,
     required this.onOpenCreateScreen,
-  });
+  }) :
+  // 1. Determine Device Type
+        _isTablet = MediaQuery.of(context).size.width >= 600,
+
+  // 2. Calculate Toolbar Height
+  // Tablet: Dynamic (approx 14%). Phone: Standard 56.0.
+        _toolbarHeight = MediaQuery.of(context).size.width >= 600
+            ? MediaQuery.of(context).size.width * 0.14
+            : kToolbarHeight,
+
+  // 3. Calculate Font Size
+        _titleFontSize = MediaQuery.of(context).size.width >= 600
+            ? 36.0
+            : MediaQuery.of(context).size.width * 0.07,
+
+  // 4. Calculate Button Dimensions
+  // We keep the scaling logic for the button internals so it looks nice on different phone sizes,
+  // but we ensure it fits within the 56px toolbar.
+        _buttonWidth = MediaQuery.of(context).size.width >= 600
+            ? 200.0
+            : 120.0 * ((MediaQuery.of(context).size.width / 400.0).clamp(0.8, 1.2)),
+
+        _buttonHeight = MediaQuery.of(context).size.width >= 600
+            ? 60.0
+            : 36.0 * ((MediaQuery.of(context).size.width / 400.0).clamp(0.8, 1.2)),
+
+        _circleSize = MediaQuery.of(context).size.width >= 600
+            ? 60.0
+            : 36.0 * ((MediaQuery.of(context).size.width / 400.0).clamp(0.8, 1.2)),
+
+        _textSize = MediaQuery.of(context).size.width >= 600
+            ? 20.0
+            : MediaQuery.of(context).size.width * 0.036,
+
+        _iconSize = MediaQuery.of(context).size.width >= 600
+            ? 28.0
+            : MediaQuery.of(context).size.width * 0.035,
+
+        _actionAreaPadding = MediaQuery.of(context).size.width >= 600 ? 32.0 : 20.0;
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
-
-    // RESPONSIVE LOGIC
-    final bool isTablet = screenWidth >= 600;
-
-    // --- Dynamic Height Logic ---
-    final double toolbarHeight = isTablet
-        ? screenWidth * 0.14
-        : kToolbarHeight * ((screenWidth / 400.0).clamp(0.8, 1.2));
-
-    // --- Tablet Scaling Factors ---
-    final double titleFontSize = isTablet ? 36.0 : screenWidth * 0.07;
-
-    // Create Button Dimensions
-    final double buttonWidth = isTablet ? 200.0 : 120.0 * ((screenWidth / 400.0).clamp(0.8, 1.2));
-    final double buttonHeight = isTablet ? 60.0 : 36.0 * ((screenWidth / 400.0).clamp(0.8, 1.2));
-    final double circleSize = isTablet ? 60.0 : 36.0 * ((screenWidth / 400.0).clamp(0.8, 1.2));
-
-    final double textSize = isTablet ? 20.0 : screenWidth * 0.036;
-    final double iconSize = isTablet ? 28.0 : screenWidth * 0.035;
-
-    // The entire action area width
-    final double actionAreaWidth = buttonWidth + (isTablet ? 32.0 : 20.0);
+    // The entire action area width includes the button + padding
+    final double actionAreaWidth = _buttonWidth + _actionAreaPadding;
 
     return AppBar(
       scrolledUnderElevation: 0,
-      toolbarHeight: toolbarHeight,
+      toolbarHeight: _toolbarHeight,
       centerTitle: false,
       backgroundColor: AppColors.background,
       elevation: 0,
 
       // --- TITLE ---
       title: Container(
-        height: toolbarHeight,
+        height: _toolbarHeight,
         alignment: Alignment.centerLeft,
-        padding: EdgeInsets.only(left: isTablet ? 16.0 : 0),
+        padding: EdgeInsets.only(left: _isTablet ? 16.0 : 0),
         child: Text(
           title,
           style: TextStyle(
             fontFamily: 'Roboto',
             color: AppColors.primaryColor.inverted,
-            fontSize: titleFontSize,
+            fontSize: _titleFontSize,
             fontWeight: FontWeight.bold,
             height: 1.0,
           ),
@@ -73,12 +103,12 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         Container(
           width: actionAreaWidth,
-          height: toolbarHeight,
+          height: _toolbarHeight,
           alignment: Alignment.centerRight,
-          padding: EdgeInsets.only(right: isTablet ? 24.0 : 16.0),
+          padding: EdgeInsets.only(right: _isTablet ? 24.0 : 16.0),
           child: SizedBox(
-            width: buttonWidth,
-            height: buttonHeight,
+            width: _buttonWidth,
+            height: _buttonHeight,
             child: Stack(
               clipBehavior: Clip.none,
               alignment: Alignment.center,
@@ -87,23 +117,23 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
                 Positioned(
                   right: 0,
                   child: Container(
-                    width: buttonWidth - (circleSize / 2),
-                    height: buttonHeight,
+                    width: _buttonWidth - (_circleSize / 2),
+                    height: _buttonHeight,
                     decoration: BoxDecoration(
                       color: AppColors.senaryColor.withValues(alpha: 0.8),
-                      borderRadius: BorderRadius.circular(isTablet ? 30 : 20),
+                      borderRadius: BorderRadius.circular(_isTablet ? 30 : 20),
                     ),
                     alignment: Alignment.center,
                     padding: EdgeInsets.only(
-                        left: isTablet ? 16 : 10,
+                        left: _isTablet ? 16 : 2,
                         // Increased right padding for tablet to give text more breathing room
-                        right: isTablet ? circleSize * 0.9 : circleSize * 0.7
+                        right: _isTablet ? _circleSize * 0.9 : _circleSize * 0.7
                     ),
                     child: Text(
                       createButtonText,
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: textSize,
+                        fontSize: _textSize,
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
@@ -122,8 +152,8 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
                       borderRadius: BorderRadius.circular(100),
                       splashFactory: NoSplash.splashFactory,
                       child: Container(
-                        width: circleSize,
-                        height: circleSize,
+                        width: _circleSize,
+                        height: _circleSize,
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: AppColors.senaryColor,
@@ -139,8 +169,8 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
                           child: SvgPicture.asset(
                             'assets/icons/plus.svg',
                             colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                            width: iconSize,
-                            height: iconSize,
+                            width: _iconSize,
+                            height: _iconSize,
                           ),
                         ),
                       ),
@@ -156,7 +186,7 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
                       onTap: onOpenCreateScreen,
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(isTablet ? 30 : 20),
+                      borderRadius: BorderRadius.circular(_isTablet ? 30 : 20),
                     ),
                   ),
                 ),
@@ -169,7 +199,8 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
+  // Dynamic size: ~120px+ for Tablets, 56px for Phones.
   Size get preferredSize {
-    return const Size.fromHeight(80);
+    return Size.fromHeight(_toolbarHeight);
   }
 }

@@ -123,6 +123,7 @@ class ModelDetailView extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: DetailAppBar(
+          context: context,
           key: appBarKey,
           provider: provider,
           onBackPressed: handlePop,

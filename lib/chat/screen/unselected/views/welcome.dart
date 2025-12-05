@@ -42,7 +42,6 @@ class WelcomeView extends StatefulWidget {
 }
 
 class _WelcomeViewState extends State<WelcomeView> with SingleTickerProviderStateMixin {
-  // ... (Animation Controller ve Değişkenler AYNEN KALSIN) ...
   late final AnimationController _animationController;
   late final Animation<Offset> _greetingSlideAnimation;
   late final Animation<double> _greetingFadeAnimation;

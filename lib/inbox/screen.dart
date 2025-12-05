@@ -93,6 +93,7 @@ class InboxScreenState extends State<InboxScreen>
           // --- AppBar ---
           // Assembled using our specialized InboxAppBar widget.
           appBar: InboxAppBar(
+            context: context,
             tabController: _tabController,
             onNewChatPressed: () {
               mainScreenKey.currentState?.onItemTapped(0);

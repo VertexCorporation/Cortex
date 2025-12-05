@@ -2,7 +2,9 @@ package com.vertex.cortex
 
 import android.app.Service
 import android.content.Intent
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
@@ -18,21 +20,46 @@ class LlamaService : Service() {
         lateinit var resultChannel: MethodChannel
         var isChannelInitialized = false
 
-        // Static function to be called by JNI
+        // OPTIMIZATION: Created a single Handler instance.
+        // Previously, a new Handler was created for every single token, causing GC Trashing.
+        private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+
+        // Static function to be called by ViewModel
         @JvmStatic
         fun sendTokenToFlutter(token: String) {
             if (isChannelInitialized) {
-                val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
                 mainHandler.post {
-                    resultChannel.invokeMethod("onMessageResponse", token)
+                    try {
+                        resultChannel.invokeMethod("onMessageResponse", token)
+                    } catch (e: Exception) {
+                        Log.e("LlamaService", "Error sending token to Flutter: ${e.message}")
+                    }
                 }
-            } else {
-                Log.e("LlamaService", "MethodChannel not initialized.")
             }
         }
 
-        // This allows MainActivity to set the channel correctly on the service's static properties
-        // before the service instance, which will use these properties, is started.
+        @JvmStatic
+        fun sendCompletionToFlutter() {
+            if (isChannelInitialized) {
+                mainHandler.post {
+                    try {
+                        resultChannel.invokeMethod("onMessageComplete", null)
+                    } catch (e: Exception) {
+                        Log.e("LlamaService", "Error sending completion to Flutter: ${e.message}")
+                    }
+                }
+            }
+        }
+
+        @JvmStatic
+        fun sendModelLoadedToFlutter(path: String) {
+            if (isChannelInitialized) {
+                mainHandler.post {
+                    resultChannel.invokeMethod("onModelLoaded", "Model loaded: $path")
+                }
+            }
+        }
+
         fun setMethodChannel(channel: MethodChannel) {
             resultChannel = channel
             isChannelInitialized = true
@@ -41,7 +68,6 @@ class LlamaService : Service() {
     }
 
     private lateinit var viewModel: MainViewModel
-
     private val serviceScope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate() {
@@ -51,61 +77,47 @@ class LlamaService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.let { val action = it.getStringExtra("action")
+        intent?.let {
+            val action = it.getStringExtra("action")
             when (action) {
                 "cacheModel" -> {
                     val path = it.getStringExtra("modelPath")
-                    path?.let { cacheModel(it) }
+                    path?.let { p -> cacheModel(p) }
                 }
                 "sendMessage" -> {
                     val message = it.getStringExtra("message") ?: ""
                     val photoPath = it.getStringExtra("photoPath")
                     sendMessage(message, photoPath)
                 }
-                "stopGeneration" -> {
-                    stopGeneration()
-                }
-                "releaseModel" -> {
-                    releaseModel()
-                }
-                "resetKv" -> {
-                    resetKv()
-                }
-                else -> {
-                    Log.w("LlamaService", "Unknown action received: $action")
-                }
+                "stopGeneration" -> stopGeneration()
+                "releaseModel" -> releaseModel()
+                "resetKv" -> resetKv()
+                else -> Log.w("LlamaService", "Unknown action received: $action")
             }
         }
         return START_STICKY
     }
 
-    fun cacheModel(path: String) {
+    private fun cacheModel(path: String) {
         serviceScope.launch {
             withContext(Dispatchers.IO) {
                 viewModel.load(path)
             }
-            if (isChannelInitialized) {
-                resultChannel.invokeMethod("onModelLoaded", "Model loaded successfully: $path")
-            } else {
-                Log.e("LlamaService", "MethodChannel not initialized.")
-            }
+            sendModelLoadedToFlutter(path)
         }
     }
 
     private fun stopGeneration() {
-        Log.d("LlamaService", "Executing stopGeneration.")
         viewModel.stop()
     }
 
     private fun releaseModel() {
-        Log.d("LlamaService", "Executing unloadModel.")
         serviceScope.launch {
             viewModel.unload()
         }
     }
 
     private fun resetKv() {
-        Log.d("LlamaService", "Executing resetKv (clear KV cache).")
         serviceScope.launch {
             try {
                 viewModel.clearKv()
@@ -115,7 +127,7 @@ class LlamaService : Service() {
         }
     }
 
-    fun sendMessage(message: String?, photoPath: String?) {
+    private fun sendMessage(message: String?, photoPath: String?) {
         val safeMessage = message ?: ""
         serviceScope.launch {
             viewModel.updateMessage(safeMessage)
@@ -138,7 +150,7 @@ class LlamaService : Service() {
                     }
                 }
             }
-
+            // Trigger the generation
             viewModel.send(photoBase64)
         }
     }

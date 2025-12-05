@@ -75,12 +75,11 @@ class _ExtensionOverlayPanelState extends State<_ExtensionOverlayPanel>
     final bool isTablet = screenW >= 600;
 
     // --- LEFT MARGIN CORRECTION ---
-    // Previously fixed 32.0 was too far for tablet.
-    // Now using 2% dynamic width universally.
-    // This moves the panel much closer to the left edge (approx 16px on an 800px screen).
     final marginPx = screenW * 0.02;
 
-    // IMPORTANT: Account for the taller AppBar on tablet
+    // --- DYNAMIC TOP POSITIONING ---
+    // Must match the logic in DetailAppBar to align perfectly.
+    // Tablet: Dynamic (approx 14%). Phone: Standard 56.0.
     final double toolbarHeight = isTablet ? screenW * 0.14 : kToolbarHeight;
     final topPx = toolbarHeight + MediaQuery.of(context).padding.top;
 
@@ -91,6 +90,7 @@ class _ExtensionOverlayPanelState extends State<_ExtensionOverlayPanel>
           Positioned.fill(
             child: GestureDetector(
               onTap: startClosing,
+              behavior: HitTestBehavior.opaque, // Ensure clicks are caught
             ),
           ),
           Positioned(
@@ -102,7 +102,7 @@ class _ExtensionOverlayPanelState extends State<_ExtensionOverlayPanel>
                 scale: _scaleAnimation,
                 alignment: Alignment.topLeft,
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {}, // Prevent clicks passing through the panel
                   child: Extensions.buildExtensionPanelWidget(
                     context: context,
                     options: widget.options,
@@ -128,17 +128,27 @@ class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
   final ModelDetailProvider provider;
   final VoidCallback onBackPressed;
 
-  const DetailAppBar({
+  // Pre-calculated metrics for PreferredSize
+  final double _toolbarHeight;
+  final bool _isTablet;
+
+  DetailAppBar({
     super.key,
+    required BuildContext context, // Context required for sizing
     required this.provider,
     required this.onBackPressed,
-  });
+  }) :
+        _isTablet = MediaQuery.of(context).size.width >= 600,
+        _toolbarHeight = MediaQuery.of(context).size.width >= 600
+            ? MediaQuery.of(context).size.width * 0.14
+            : kToolbarHeight;
 
   @override
   State<DetailAppBar> createState() => DetailAppBarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(120); // Generous size for tablet
+  // Dynamically sized: ~120px+ for Tablets, 56px for Phones.
+  Size get preferredSize => Size.fromHeight(_toolbarHeight);
 }
 
 class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixin {
@@ -251,10 +261,10 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final bool isTablet = screenWidth >= 600;
 
-    // --- RESPONSIVE HEIGHT ---
-    final double toolbarHeight = isTablet ? screenWidth * 0.14 : kToolbarHeight;
+    // Use pre-calculated metrics from widget
+    final bool isTablet = widget._isTablet;
+    final double toolbarHeight = widget._toolbarHeight;
 
     // --- ELEMENT SCALING ---
     final double backIconSize = isTablet ? 36.0 : screenWidth * 0.07;
@@ -301,10 +311,11 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
   Widget _buildTitleWidget(BuildContext context, bool isTablet, double screenWidth) {
     final provider = widget.provider;
 
-    // Tablet: Large Fonts (32/20). Phone: Dynamic.
+    // Tablet: Large Fonts (32/20).
+    // Phone: Compact Fonts (20/14) to fit inside 56px height.
     final double titleFontSize = isTablet ? 32.0 : screenWidth * 0.055;
-    final double subFontSize = isTablet ? 20.0 : screenWidth * 0.04;
-    final double iconSize = isTablet ? 24.0 : screenWidth * 0.04;
+    final double subFontSize = isTablet ? 20.0 : screenWidth * 0.035;
+    final double iconSize = isTablet ? 24.0 : screenWidth * 0.035;
     final double iconPadding = isTablet ? 10.0 : screenWidth * 0.015;
 
     if (!provider.isPluralModel) {

@@ -222,38 +222,31 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
-    final screenHeight = mediaQuery.size.height;
     final bool isTablet = mediaQuery.size.shortestSide > 600;
 
-    // --- FULLY DYNAMIC DIMENSIONS ---
+    // --- FULLY DYNAMIC DIMENSIONS & OPTIMIZATION ---
 
     // 1. Container Width:
     // Tablet: 22% width. Phone: 26%.
     final double containerWidth = isTablet ? screenWidth * 0.21 : screenWidth * 0.26;
 
     // 2. Container Height:
-    // Tablet: Increased to 7% to match the larger fonts/icons properly.
-    final double containerHeight = isTablet ? screenWidth * 0.07 : screenHeight * 0.045;
+    // Tablet: Scaled to width. Phone: Fixed manageable height (38.0) to fit in 80.0 AppBar.
+    final double containerHeight = isTablet ? screenWidth * 0.07 : 38.0;
 
     // 3. Icon Size:
-    final double iconSize = isTablet ? screenWidth * 0.03 : screenWidth * 0.05;
+    final double iconSize = isTablet ? screenWidth * 0.03 : 20.0;
 
-    // 4. Panel Left Position:
-    // IMPORTANT: Adjusted for tablet (0.065) to be slightly to the right,
-    // creating space for the overlapping hexagon on the left.
-    final double leftPos = isTablet ? screenWidth * 0.04 : screenWidth * 0.06;
+    // 4. Panel Padding (Left Margin):
+    // Standardizes the start position from the edge of the screen.
+    final double leftMargin = isTablet ? screenWidth * 0.04 : 16.0;
 
-    // 5. Vertical Position:
-    // Tablet AppBar is roughly 0.14. We center this.
-    final double topPos = isTablet ? screenWidth * 0.038 : screenHeight * 0.02;
+    // 5. Hexagon Left Position:
+    // The Hexagon should overlap slightly. We calculate it relative to the margin.
+    final double hexagonOverlapOffset = isTablet ? - (screenWidth * 0.015) : -6.0;
 
-    // 6. Hexagon Left Position:
-    // This places the hexagon overlapping the left edge of the panel.
-    // Panel starts at 0.065, Hexagon starts at 0.025 -> Tight overlap.
-    final double hexagonLeft = isTablet ? screenWidth * 0.025 : screenWidth * 0.02;
-
-    // 7. Font Size:
-    final double creditsFontSize = isTablet ? screenWidth * 0.025 : 14.0;
+    // 6. Font Size:
+    final double creditsFontSize = isTablet ? screenWidth * 0.025 : 13.0;
 
     return ValueListenableBuilder<int?>(
       valueListenable: CreditsManager.instance.totalCreditsNotifier,
@@ -268,124 +261,125 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
           ghostText = creditsText;
         }
 
-        return Stack(
-          alignment: Alignment.centerLeft,
-          children: [
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: _toggleCreditsInfo,
-                behavior: HitTestBehavior.opaque,
-                child: Container(color: Colors.transparent),
+        // OPTIMIZATION: Removed 'top' positioning.
+        // We now use Alignment.centerLeft to ensure vertical centering inside the AppBar.
+        return Padding(
+          padding: EdgeInsets.only(left: leftMargin),
+          child: Stack(
+            alignment: Alignment.centerLeft, // Key fix for vertical alignment
+            clipBehavior: Clip.none,
+            children: [
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: _toggleCreditsInfo,
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(color: Colors.transparent),
+                ),
               ),
-            ),
-            IgnorePointer(
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.centerLeft,
-                children: [
-                  // Background Container
-                  Positioned(
-                    top: topPos,
-                    left: leftPos,
-                    child: Container(
-                      key: _creditsInfoKey,
-                      width: containerWidth,
-                      height: containerHeight,
-                      decoration: BoxDecoration(
-                        color: AppColors.secondaryColor,
-                        borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                        border: Border.all(color: AppColors.border, width: 0.5),
+
+              // The Content Container (Pill)
+              // We move it to the right to make room for the hexagon.
+              Padding(
+                padding: EdgeInsets.only(left: (isTablet ? screenWidth * 0.025 : 12.0)),
+                child: IgnorePointer(
+                  child: Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      // Background
+                      Container(
+                        key: _creditsInfoKey,
+                        width: containerWidth,
+                        height: containerHeight,
+                        decoration: BoxDecoration(
+                          color: AppColors.secondaryColor,
+                          borderRadius: BorderRadius.circular(isTablet ? screenWidth * 0.03 : 18.0),
+                          border: Border.all(color: AppColors.border, width: 0.5),
+                        ),
                       ),
-                    ),
-                  ),
-                  // Content Container
-                  Positioned(
-                    top: topPos,
-                    left: leftPos,
-                    child: Container(
-                      width: containerWidth,
-                      height: containerHeight,
-                      padding: EdgeInsets.symmetric(
-                          horizontal: isTablet ? screenWidth * 0.015 : screenWidth * 0.016),
-                      alignment: Alignment.center,
-                      child: Row(
-                        children: [
-                          // Padding to account for the overlapping Hexagon
-                          SizedBox(width: isTablet ? screenWidth * 0.065 : screenWidth * 0.07),
-                          Expanded(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 5.0),
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Opacity(
-                                      opacity: 0.0,
-                                      child: Text(
-                                        ghostText,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: creditsFontSize,
-                                          color: AppColors.primaryColor.inverted,
+                      // Text Content
+                      Container(
+                        width: containerWidth,
+                        height: containerHeight,
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        alignment: Alignment.center,
+                        child: Row(
+                          children: [
+                            SizedBox(width: isTablet ? screenWidth * 0.04 : 20.0), // Spacer for hexagon overlap
+                            Expanded(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.center,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 4.0),
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Opacity(
+                                        opacity: 0.0,
+                                        child: Text(
+                                          ghostText,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: creditsFontSize,
+                                            color: AppColors.primaryColor.inverted,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    AnimatedSwitcher(
-                                      duration: const Duration(milliseconds: 250),
-                                      transitionBuilder: (child, animation) {
-                                        return FadeTransition(
-                                          opacity: animation,
-                                          child: child,
-                                        );
-                                      },
-                                      child: Text(
-                                        creditsText,
-                                        key: ValueKey<String>(creditsText),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: creditsFontSize,
-                                          color: AppColors.primaryColor.inverted,
+                                      AnimatedSwitcher(
+                                        duration: const Duration(milliseconds: 250),
+                                        transitionBuilder: (child, animation) {
+                                          return FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          );
+                                        },
+                                        child: Text(
+                                          creditsText,
+                                          key: ValueKey<String>(creditsText),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: creditsFontSize,
+                                            color: AppColors.primaryColor.inverted,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          SvgPicture.asset(
-                            'assets/icons/credit.svg',
-                            width: iconSize,
-                            height: iconSize,
-                            colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-                          ),
-                          SizedBox(width: isTablet ? screenWidth * 0.01 : screenWidth * 0.01),
-                        ],
+                            SvgPicture.asset(
+                              'assets/icons/credit.svg',
+                              width: iconSize,
+                              height: iconSize,
+                              colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                            ),
+                            const SizedBox(width: 4.0),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-            // The Hexagon Button
-            Positioned(
-              // Slight vertical offset for 3D/Centering effect
-              top: topPos - (isTablet ? screenWidth * 0.002 : 0),
-              left: hexagonLeft,
-              child: _AnimatedHexagonButton(
-                screenWidth: screenWidth,
-                screenHeight: screenHeight,
-                isTablet: isTablet,
-                onTap: () {
-                  hideCreditsInfo();
-                  navigateToScreen(const FundsScreen(),
-                      direction: const Offset(0.0, 1.0));
-                },
+
+              // The Hexagon Button
+              // Aligned to the far left (plus overlap offset) and vertically centered automatically by Stack.
+              Positioned(
+                left: hexagonOverlapOffset,
+                child: _AnimatedHexagonButton(
+                  screenWidth: screenWidth,
+                  screenHeight: MediaQuery.of(context).size.height,
+                  isTablet: isTablet,
+                  onTap: () {
+                    hideCreditsInfo();
+                    navigateToScreen(const FundsScreen(),
+                        direction: const Offset(0.0, 1.0));
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -438,12 +432,13 @@ class _AnimatedHexagonButtonState extends State<_AnimatedHexagonButton>
   @override
   Widget build(BuildContext context) {
     // --- RESPONSIVE HEXAGON SIZE (Dynamic) ---
-    // Width: Tablet 8% of width (increased from 7% to prevent squashing)
-    final double width = widget.isTablet ? widget.screenWidth * 0.08 : widget.screenWidth * 0.1;
-    // Height: Tablet 7.5% of width (keeps aspect ratio closer to 1:1)
-    final double height = widget.isTablet ? widget.screenWidth * 0.075 : widget.screenHeight * 0.045;
-    // Icon: Tablet 3.5%
-    final double iconSize = widget.isTablet ? widget.screenWidth * 0.035 : widget.screenWidth * 0.045;
+    // Tablet: Dynamic based on width.
+    // Phone: Fixed size to ensure it fits the 80.0 AppBar perfectly.
+    final double width = widget.isTablet ? widget.screenWidth * 0.08 : 40.0;
+    final double height = widget.isTablet ? widget.screenWidth * 0.075 : 40.0;
+
+    // Icon: Scaled or fixed
+    final double iconSize = widget.isTablet ? widget.screenWidth * 0.035 : 18.0;
 
     const Gradient borderGradient = SweepGradient(
       center: FractionalOffset.center,
@@ -519,9 +514,9 @@ class _HexagonBorderPainter extends CustomPainter {
 
     if (hasGlow) {
       final Paint glowPaint = Paint()
-        ..color = const Color(0xFF833AB4).withValues(alpha: 0.6)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
-      canvas.drawPath(path.shift(const Offset(0, 2)), glowPaint);
+        ..color = const Color(0xFF833AB4)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.5);
+      canvas.drawPath(path.shift(const Offset(0, 1)), glowPaint);
     }
 
     final Paint fillPaint = Paint();
