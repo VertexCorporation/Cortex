@@ -45,10 +45,14 @@ struct SamplerParams {
 
 actor LlamaContext {
     private var model: OpaquePointer
-    private var context: OpaquePointer
+    private var context: OpaquePointer? // Optional to allow safe recreation
     private var vocab: OpaquePointer
     private var sampling: UnsafeMutablePointer<llama_sampler>
     private var batch: llama_batch
+
+    // Store initialization params for recreation (Crucial for the fix)
+    private let contextParams: llama_context_params
+    private let samplerParams: SamplerParams
 
     // State variables
     var is_done: Bool = false
@@ -63,9 +67,11 @@ actor LlamaContext {
 
     // MARK: - Initialization
 
-    init(model: OpaquePointer, context: OpaquePointer, params: SamplerParams) {
+    init(model: OpaquePointer, context: OpaquePointer, ctxParams: llama_context_params, params: SamplerParams) {
         self.model = model
         self.context = context
+        self.contextParams = ctxParams
+        self.samplerParams = params
         self.vocab = llama_model_get_vocab(model)
 
         // Initialize Batch (allocate for 2048 context size)
@@ -88,7 +94,9 @@ actor LlamaContext {
         // Free C resources safely
         llama_sampler_free(sampling)
         llama_batch_free(batch)
-        llama_free(context)
+        if let ctx = context {
+            llama_free(ctx)
+        }
         llama_model_free(model)
         llama_backend_free()
         print("[LlamaContext] Memory released.")
@@ -151,7 +159,7 @@ actor LlamaContext {
         }
 
         let params = calculateParams(path: path)
-        return LlamaContext(model: model, context: context, params: params)
+        return LlamaContext(model: model, context: context, ctxParams: ctx_params, params: params)
     }
 
     // MARK: - Control Methods
@@ -160,12 +168,25 @@ actor LlamaContext {
         self.is_interrupted = true
     }
 
-    func clear() {
+    // MARK: - Memory Management (The Fix)
 
+    // Equivalent to "clearKv" in Android.
+    // Since we cannot call internal C++ functions from Swift, we simply destroy
+    // and recreate the context. This guarantees a clean slate (0 byte memory).
+    private func resetContext() {
+        if let ctx = self.context {
+            llama_free(ctx) // Free old memory
+        }
+        // Initialize new memory
+        self.context = llama_init_from_model(self.model, self.contextParams)
+        print("[LlamaContext] Context recreated (Equivalent to Full KV Clear).")
+    }
+
+    func clear() {
         temporary_invalid_cchars.removeAll()
         n_cur = 0
         n_decode = 0
-        print("[LlamaContext] Context variables reset (Android Style Overwrite).")
+        resetContext()
     }
 
     // MARK: - Generation Logic
@@ -180,11 +201,20 @@ actor LlamaContext {
         n_cur = 0
         n_decode = 0
 
+        // Ensure absolutely clean state for the new turn
+        resetContext()
+
+        guard let ctx = self.context else {
+            print("[LlamaContext] Error: Context is null during init.")
+            is_done = true
+            return
+        }
+
         // Tokenize
         let tokens_list = tokenize(text: text, add_bos: true)
 
         // Check context limits
-        let n_ctx = llama_n_ctx(context)
+        let n_ctx = llama_n_ctx(ctx)
         let n_kv_req = tokens_list.count + (Int(n_len) - tokens_list.count)
 
         if n_kv_req > n_ctx {
@@ -204,22 +234,24 @@ actor LlamaContext {
         }
 
         // Decode Prompt
-        if llama_decode(context, batch) != 0 {
+        if llama_decode(ctx, batch) != 0 {
             print("[LlamaContext] Error: llama_decode failed during prompt processing.")
             is_done = true
         } else {
             n_cur = batch.n_tokens
         }
 
-        llama_synchronize(context)
+        llama_synchronize(ctx)
     }
 
     func completion_loop() -> String? {
         if is_interrupted { return nil }
 
+        guard let ctx = self.context else { return nil }
+
         // 1. Sample the next token
         // Use the index of the last token in the batch
-        let new_token_id = llama_sampler_sample(sampling, context, batch.n_tokens - 1)
+        let new_token_id = llama_sampler_sample(sampling, ctx, batch.n_tokens - 1)
 
         // 2. Check for End of Generation (EOG) or limit reached
         if llama_vocab_is_eog(vocab, new_token_id) || n_cur >= n_len {
@@ -256,11 +288,11 @@ actor LlamaContext {
         n_cur += 1
 
         // 5. Decode
-        if llama_decode(context, batch) != 0 {
+        if llama_decode(ctx, batch) != 0 {
             print("[LlamaContext] Error: llama_decode failed during generation.")
             return nil
         }
-        llama_synchronize(context)
+        llama_synchronize(ctx)
 
         return new_token_str
     }

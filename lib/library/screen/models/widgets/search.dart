@@ -67,12 +67,13 @@ class ModelsSearchController {
     final bool isTablet = w >= 600;
 
     final EdgeInsets outerPadding = isTablet
-        ? const EdgeInsets.only(top: 40, bottom: 8, left: 2, right: 2)
+        ? const EdgeInsets.fromLTRB(32, 40, 32, 12)
         : EdgeInsets.symmetric(horizontal: w * .05, vertical: w * .025);
+
+    final double maxBarWidth = double.infinity;
 
     final double iconSize = isTablet ? 36.0 : w * .06;
     final double borderRadius = isTablet ? 24.0 : w * .05;
-    final double maxBarWidth = isTablet ? 700 : double.infinity;
     final double? fontSize = isTablet ? 22.0 : null;
     final EdgeInsets? contentPadding = isTablet
         ? const EdgeInsets.symmetric(horizontal: 30, vertical: 26)
@@ -161,7 +162,7 @@ class ModelsSearchController {
       ..._exiting.where((m) => !currentResults.any((r) => r.id == m.id))
     ].where((model) => idsInMerged.add(model.id)).toList();
 
-    final double maxListWidth = isTablet ? 700 : double.infinity;
+    final double maxListWidth = double.infinity;
 
     // Check if we effectively have results to show (or are animating them out)
     final bool showResults = mergedDisplayList.isNotEmpty;

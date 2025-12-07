@@ -106,7 +106,6 @@ class LlamaService : Service() {
             sendModelLoadedToFlutter(path)
         }
     }
-
     private fun stopGeneration() {
         viewModel.stop()
     }

@@ -59,7 +59,7 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
       padding: EdgeInsets.symmetric(vertical: 10 * fontScale),
       child: Row(
         children: [
-          Expanded(child: Divider(color: Theme.of(context).dividerColor, thickness: 1)),
+          Expanded(child: Divider(color: Theme.of(context).dividerColor, thickness: 1 * fontScale)),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12 * fontScale),
             child: Text(
@@ -71,7 +71,7 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
               ),
             ),
           ),
-          Expanded(child: Divider(color: Theme.of(context).dividerColor, thickness: 1)),
+          Expanded(child: Divider(color: Theme.of(context).dividerColor, thickness: 1 * fontScale)),
         ],
       ),
     );
@@ -162,12 +162,19 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // --- SCALING LOGIC ---
+    // --- UPDATED SCALING LOGIC (Matches AuthScreen) ---
+    // 1. Base Scale on Phone (375px)
     double fontScale = screenWidth / 375.0;
-    if (screenWidth > 450) {
-      fontScale = 1.2 + (screenWidth - 450) * 0.0005;
+
+    // 2. Damping Logic for Tablets
+    if (screenWidth > 600) {
+      fontScale = 1.6 + (screenWidth - 600) * 0.0004;
     }
-    fontScale = fontScale.clamp(0.85, 1.35);
+
+    // 3. Clamp limits
+    fontScale = fontScale.clamp(0.85, 2.4);
+
+    // 4. Container Width
     final double containerMaxWidth = 400 * fontScale;
 
     return Scaffold(

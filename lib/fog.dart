@@ -26,8 +26,8 @@ class ScrollFog extends StatefulWidget {
     this.topFogHeight = 40.0,
     this.bottomFogHeight = 70.0,
     this.scrollThreshold = 10.0,
-    this.showTop = true, // New parameter with a default value
-    this.showBottom = true, // New parameter with a default value
+    this.showTop = true,
+    this.showBottom = true,
   });
 
   @override
@@ -79,12 +79,22 @@ class _ScrollFogState extends State<ScrollFog> {
       return;
     }
 
-    if (controller.positions.length > 1) {
-      debugPrint("[ScrollFog] Warning: ScrollController is attached to multiple positions. This is a transient state during animations. Skipping update.");
-      return;
-    }
+    // --- FIX: Handle multiple attached positions ---
+    // If attached to multiple views (e.g. during animations), try to use the most relevant one.
+    // Usually, `controller.position` throws if multiple exist.
+    // We safely grab the last attached position which is typically the active one.
 
-    final position = controller.position;
+    ScrollPosition position;
+    try {
+      position = controller.position;
+    } catch (_) {
+      // If multiple positions are attached, use the last one (most likely the visible one).
+      if (controller.positions.isNotEmpty) {
+        position = controller.positions.last;
+      } else {
+        return; // Should not happen if hasClients is true
+      }
+    }
 
     final bool shouldShowTop = widget.showTop && position.pixels > widget.scrollThreshold;
     final bool shouldShowBottom = widget.showBottom &&
@@ -106,7 +116,6 @@ class _ScrollFogState extends State<ScrollFog> {
         widget.child,
 
         // Top fog effect.
-        // It's only included in the widget tree if showTop is true.
         if (widget.showTop)
           Align(
             alignment: Alignment.topCenter,
@@ -130,7 +139,6 @@ class _ScrollFogState extends State<ScrollFog> {
           ),
 
         // Bottom fog effect.
-        // It's only included in the widget tree if showBottom is true.
         if (widget.showBottom)
           Align(
             alignment: Alignment.bottomCenter,

@@ -17,7 +17,6 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
         super.onCleared()
         unload()
     }
-
     fun unload() {
         Log.d(tag, "ViewModel received unload command.")
         viewModelScope.launch {
@@ -29,7 +28,6 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
             }
         }
     }
-
     fun clearKv() {
         viewModelScope.launch {
             try {
@@ -40,7 +38,6 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
             }
         }
     }
-
     fun stop() {
         Log.d(tag, "ViewModel received stop command.")
         viewModelScope.launch {
