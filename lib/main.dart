@@ -431,7 +431,8 @@ List<SingleChildWidget> _buildSettingsProviders() {
     Provider<ProfileService>(
       create: (_) => ProfileService(),
     ),
-    ChangeNotifierProxyProvider<InternetProvider, SettingsGeneralProvider>(
+
+    ChangeNotifierProxyProvider2<InternetProvider, UserProvider, SettingsGeneralProvider>(
       create: (BuildContext context) => SettingsGeneralProvider(
         authService: context.read<AuthService>(),
         profileService: context.read<ProfileService>(),
@@ -440,19 +441,24 @@ List<SingleChildWidget> _buildSettingsProviders() {
       update: (
           BuildContext context,
           InternetProvider internetProvider,
+          UserProvider userProvider,
           SettingsGeneralProvider? previous,
           ) {
         final provider = previous ??
             SettingsGeneralProvider(
               authService: context.read<AuthService>(),
               profileService: context.read<ProfileService>(),
-              notificationService:
-              context.read<IntrovertNotificationService>(),
+              notificationService: context.read<IntrovertNotificationService>(),
             );
+
         provider.updateConnectivity(internetProvider);
+
+        provider.updateUser(FirebaseAuth.instance.currentUser);
+
         return provider;
       },
     ),
+
     ChangeNotifierProvider<SettingsActionProvider>(
       create: (BuildContext context) => SettingsActionProvider(
         authService: context.read<AuthService>(),
@@ -487,8 +493,13 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
         return vm;
       },
     ),
-    ChangeNotifierProvider<ModelCatalogProvider>(
+    ChangeNotifierProxyProvider<UserProvider, ModelCatalogProvider>(
       create: (_) => ModelCatalogProvider(),
+      update: (_, userProvider, catalog) {
+        final provider = catalog ?? ModelCatalogProvider();
+        provider.updateUser(FirebaseAuth.instance.currentUser);
+        return provider;
+      },
     ),
     ChangeNotifierProvider<DownloadedModelsManager>(
       create: (_) => DownloadedModelsManager(),
