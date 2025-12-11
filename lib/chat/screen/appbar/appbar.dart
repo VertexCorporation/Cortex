@@ -154,7 +154,7 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
     final double toolbarHeight = isTablet ? screenWidth * 0.14 : kToolbarHeight;
 
     // 2. Element Sizes: Scaled up for Tablet to fill the taller bar.
-    final double leadingWidth = isTablet ? 180.0 : screenWidth * 0.3;
+    final double leadingWidth = isTablet ? screenWidth * 0.22 : screenWidth * 0.3;
     final double titleFontSize = isTablet ? 32.0 : screenWidth * 0.08;
     final double subtitleFontSize = isTablet ? 18.0 : screenWidth * 0.025;
     final double iconSize = isTablet ? 36.0 : screenWidth * 0.06;
