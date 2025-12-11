@@ -318,6 +318,13 @@ class ModelRepository {
         return <String>{};
       }
 
+      final errorString = e.toString();
+      if (errorString.contains("CERTIFICATE_VERIFY_FAILED") ||
+          errorString.contains("HandshakeException")) {
+        debugPrint("[ModelRepository] SSL/Certificate Error detected (Likely user network issue). Using local cache.");
+        return <String>{};
+      }
+
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.sendTimeout ||
           e.type == DioExceptionType.receiveTimeout ||

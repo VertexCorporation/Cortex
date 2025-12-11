@@ -11,54 +11,43 @@ import 'package:cortex/l10n/app_localizations.dart';
 /// fully supporting localization.
 class InviteService {
 
-  /// Creates a special Play Store link with a referrer and shares it
-  /// via the native device share sheet.
   Future<void> createAndShareReferralLink(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
 
-    // The user must be logged in to create a referral link.
     if (user == null) {
-      debugPrint('[InviteService] Error: User is not logged in. Cannot create a referral link.');
-      // It's good practice to show an error message to the user.
+      debugPrint('[InviteService] Error: User not logged in.');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('You must be logged in to share invites.')),
       );
       return;
     }
 
-    // IMPORTANT: Replace this with your own app's package name!
-    // This must match the 'package' attribute in your AndroidManifest.xml.
-    const String packageName = 'com.vertex.cortex';
+    const String androidPackageName = 'com.vertex.cortex';
+    const String iosAppStoreLink = 'https://apps.apple.com/app/id6755621587';
 
-    // We use the user's unique ID (uid) as the referrer.
     final String referrerId = user.uid;
-
-    // The parameter we will send to the Play Store: 'ref=USER_ID'.
-    // It is VERY IMPORTANT to encode this to make it URL-safe.
     final String encodedReferrer = Uri.encodeComponent('ref=$referrerId');
 
-    // This is our user-specific, "magic" Play Store link.
-    final String playStoreLink = 'https://play.google.com/store/apps/details?id=$packageName&referrer=$encodedReferrer';
+    // Platform-specific store link
+    late final String finalLink;
 
-    debugPrint('Generated Play Store link with referrer: $playStoreLink');
+    if (Theme.of(context).platform == TargetPlatform.iOS) {
+      // iOS → Direct App Store link (no referrer parameter supported)
+      finalLink = iosAppStoreLink;
+    } else {
+      // Android → Play Store link with referrer
+      finalLink =
+      'https://play.google.com/store/apps/details?id=$androidPackageName&referrer=$encodedReferrer';
+    }
 
-    // ================== LOCALIZATION LOGIC STARTS HERE ==================
+    debugPrint('Generated store link: $finalLink');
 
-    // 1. Get the current localization instance from the context.
-    // This will fetch the strings for the currently active device language.
+    // Localization
     final localizations = AppLocalizations.of(context)!;
-
-    // 2. Build the localized message by filling in the placeholder.
-    // The text is no longer hard-coded; it comes dynamically from the .arb file.
-    // The `inviteShareMessage` method expects the {playStoreLink} placeholder.
-    final String shareText = localizations.inviteShareMessage(playStoreLink);
-
-    // 3. (Optional but recommended) Localize the share subject as well.
+    final String shareText = localizations.inviteShareMessage(finalLink);
     final String shareSubject = localizations.inviteShareSubject;
 
-    // ====================================================================
-
-    // Open the native share sheet with our dynamically generated content.
+    // Share
     await SharePlus.instance.share(
       ShareParams(
         text: shareText,

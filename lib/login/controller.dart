@@ -338,10 +338,28 @@ class LoginController extends ChangeNotifier {
   // --- UI Helper Methods ---
 
   Future<void> launchResetPasswordURL(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
-    final Uri url = Uri.parse('https://vertexishere.com/reset-password');
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      _notificationService.showNotification(message: l10n.couldNotOpenLink, type: NotificationType.error);
+    const String url = 'https://vertexishere.com/reset-password';
+    final Uri uri = Uri.parse(url);
+
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        debugPrint("[LoginController] Browser is not found.");
+      }
+    } catch (e) {
+      debugPrint("[LoginController] Link opening error: $e");
+
+      if (context.mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        _notificationService.showNotification(
+          message: l10n.couldNotOpenLink,
+          type: NotificationType.error,
+        );
+      }
     }
   }
 

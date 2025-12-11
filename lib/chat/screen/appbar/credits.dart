@@ -85,7 +85,14 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
 
   void _showCreditsInfo() {
     if (_overlayEntry != null) return;
-    context.read<BannerService>().triggerBannerManually();
+    final TargetPlatform platform = Theme.of(context).platform;
+    final bool isIOS = platform == TargetPlatform.iOS;
+
+    // On Android: we can safely trigger the share/credits banner.
+    // On iOS: we completely skip it so the "invite & earn credits" banner never shows.
+    if (!isIOS) {
+      context.read<BannerService>().triggerBannerManually();
+    }
 
     final RenderBox renderBox =
     _creditsInfoKey.currentContext!.findRenderObject() as RenderBox;
@@ -227,22 +234,26 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
     // --- FULLY DYNAMIC DIMENSIONS & OPTIMIZATION ---
 
     // 1. Container Width:
-    final double containerWidth = isTablet ? screenWidth * 0.23 : screenWidth * 0.26;
+    // Tablet: 22% width. Phone: 26%.
+    final double containerWidth = isTablet ? screenWidth * 0.21 : screenWidth * 0.26;
 
     // 2. Container Height:
-    final double containerHeight = isTablet ? screenWidth * 0.065 : 38.0;
+    // Tablet: Scaled to width. Phone: Fixed manageable height (38.0) to fit in 80.0 AppBar.
+    final double containerHeight = isTablet ? screenWidth * 0.07 : 38.0;
 
     // 3. Icon Size:
     final double iconSize = isTablet ? screenWidth * 0.03 : 20.0;
 
     // 4. Panel Padding (Left Margin):
+    // Standardizes the start position from the edge of the screen.
     final double leftMargin = isTablet ? screenWidth * 0.04 : 16.0;
 
     // 5. Hexagon Left Position:
+    // The Hexagon should overlap slightly. We calculate it relative to the margin.
     final double hexagonOverlapOffset = isTablet ? - (screenWidth * 0.015) : -6.0;
 
-    // 6. Base Font Size:
-    final double baseFontSize = isTablet ? screenWidth * 0.025 : 14.0;
+    // 6. Font Size:
+    final double creditsFontSize = isTablet ? screenWidth * 0.025 : 13.0;
 
     return ValueListenableBuilder<int?>(
       valueListenable: CreditsManager.instance.totalCreditsNotifier,
@@ -257,18 +268,12 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
           ghostText = creditsText;
         }
 
-        double effectiveFontSize = baseFontSize;
-        if (creditsText.length >= 6) {
-          effectiveFontSize = baseFontSize * 0.80;
-        }
-        else if (creditsText.length >= 4) {
-          effectiveFontSize = baseFontSize * 0.90;
-        }
-
+        // OPTIMIZATION: Removed 'top' positioning.
+        // We now use Alignment.centerLeft to ensure vertical centering inside the AppBar.
         return Padding(
           padding: EdgeInsets.only(left: leftMargin),
           child: Stack(
-            alignment: Alignment.centerLeft,
+            alignment: Alignment.centerLeft, // Key fix for vertical alignment
             clipBehavior: Clip.none,
             children: [
               Positioned.fill(
@@ -280,6 +285,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
               ),
 
               // The Content Container (Pill)
+              // We move it to the right to make room for the hexagon.
               Padding(
                 padding: EdgeInsets.only(left: (isTablet ? screenWidth * 0.025 : 12.0)),
                 child: IgnorePointer(
@@ -301,13 +307,11 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                       Container(
                         width: containerWidth,
                         height: containerHeight,
-                        padding: const EdgeInsets.only(left: 8.0, right: 0.0),
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
                         alignment: Alignment.center,
                         child: Row(
                           children: [
-                            // Hexagon Spacer
-                            SizedBox(width: isTablet ? screenWidth * 0.04 : 20.0),
-
+                            SizedBox(width: isTablet ? screenWidth * 0.04 : 20.0), // Spacer for hexagon overlap
                             Expanded(
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
@@ -323,7 +327,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                           ghostText,
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: effectiveFontSize,
+                                            fontSize: creditsFontSize,
                                             color: AppColors.primaryColor.inverted,
                                           ),
                                         ),
@@ -341,7 +345,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                           key: ValueKey<String>(creditsText),
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: effectiveFontSize,
+                                            fontSize: creditsFontSize,
                                             color: AppColors.primaryColor.inverted,
                                           ),
                                         ),
@@ -351,17 +355,13 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
                                 ),
                               ),
                             ),
-
-                            SizedBox(width: isTablet ? screenWidth * 0.014 : screenWidth * 0.006),
-
                             SvgPicture.asset(
                               'assets/icons/credit.svg',
                               width: iconSize,
                               height: iconSize,
                               colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
                             ),
-
-                            SizedBox(width: isTablet ? screenWidth * 0.014 : screenWidth * 0.016),
+                            const SizedBox(width: 4.0),
                           ],
                         ),
                       ),
@@ -371,6 +371,7 @@ class CreditsBarState extends State<CreditsBar> with TickerProviderStateMixin {
               ),
 
               // The Hexagon Button
+              // Aligned to the far left (plus overlap offset) and vertically centered automatically by Stack.
               Positioned(
                 left: hexagonOverlapOffset,
                 child: _AnimatedHexagonButton(
@@ -440,8 +441,8 @@ class _AnimatedHexagonButtonState extends State<_AnimatedHexagonButton>
     // --- RESPONSIVE HEXAGON SIZE (Dynamic) ---
     // Tablet: Dynamic based on width.
     // Phone: Fixed size to ensure it fits the 80.0 AppBar perfectly.
-    final double width = widget.isTablet ? widget.screenWidth * 0.07 : 40.0;
-    final double height = widget.isTablet ? widget.screenWidth * 0.07 : 40.0;
+    final double width = widget.isTablet ? widget.screenWidth * 0.08 : 40.0;
+    final double height = widget.isTablet ? widget.screenWidth * 0.075 : 40.0;
 
     // Icon: Scaled or fixed
     final double iconSize = widget.isTablet ? widget.screenWidth * 0.035 : 18.0;

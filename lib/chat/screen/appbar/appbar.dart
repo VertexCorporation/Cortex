@@ -150,17 +150,18 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
 
     // --- DIMENSIONS & SCALING ---
 
+    // 1. Toolbar Height: Matches the "0.14" logic of other screens for Tablet.
     final double toolbarHeight = isTablet ? screenWidth * 0.14 : kToolbarHeight;
 
-    final double leadingWidth = isTablet ? screenWidth * 0.24 : screenWidth * 0.3;
+    // 2. Element Sizes: Scaled up for Tablet to fill the taller bar.
+    final double leadingWidth = isTablet ? 180.0 : screenWidth * 0.3;
+    final double titleFontSize = isTablet ? 32.0 : screenWidth * 0.08;
+    final double subtitleFontSize = isTablet ? 18.0 : screenWidth * 0.025;
+    final double iconSize = isTablet ? 36.0 : screenWidth * 0.06;
 
-    final double titleFontSize = isTablet ? screenWidth * 0.05 : screenWidth * 0.08;
-    final double subtitleFontSize = isTablet ? screenWidth * 0.015 : screenWidth * 0.025;
-
-    final double iconSize = isTablet ? screenWidth * 0.03 : screenWidth * 0.06;
-
-    final double avatarRadius = isTablet ? screenWidth * 0.03 : screenWidth * 0.05;
-    final double avatarFontSize = isTablet ? screenWidth * 0.025 : screenWidth * 0.045;
+    // Avatar is significantly larger on tablet
+    final double avatarRadius = isTablet ? 28.0 : screenWidth * 0.05;
+    final double avatarFontSize = isTablet ? 24.0 : screenWidth * 0.045;
 
     final localizations = AppLocalizations.of(context)!;
     final sessionProvider = context.watch<ChatSessionProvider>();

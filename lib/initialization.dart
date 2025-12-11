@@ -592,10 +592,15 @@ class AppInitializer with ChangeNotifier {
         final String msg = e.message?.toLowerCase() ?? '';
         final String code = e.code;
 
+        final bool isConnectionFailure = msg.contains('failed to connect') ||
+            msg.contains('connection refused') ||
+            msg.contains('network is unreachable');
+
         // A. TRANSIENT NETWORK ERRORS (DO NOT LOG OUT)
         // Includes: "unexpected end of stream", "network-request-failed", timeouts.
         final bool isNetworkGlitch =
             code == 'network-request-failed' ||
+                isConnectionFailure ||
                 msg.contains('end of stream') ||
                 msg.contains('connection closed') ||
                 msg.contains('socket') ||

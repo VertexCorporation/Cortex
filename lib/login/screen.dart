@@ -41,14 +41,22 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    // --- FINAL SCALING LOGIC ---
+    // 1. Phones (width < 450): Scale is close to 1.0. Keeps the compact look.
+    // 2. Tablets (width > 450): We apply a "brake" to the scaling.
+    //    Instead of growing 2x, it grows only 1.2x max.
+    //    This prevents the "giant UI" issue on iPad.
     double fontScale = screenWidth / 375.0;
 
-    if (screenWidth > 600) {
-      fontScale = 1.6 + (screenWidth - 600) * 0.0004;
+    if (screenWidth > 450) {
+      // Damping logic: Grow very slowly after 450px width
+      fontScale = 1.2 + (screenWidth - 450) * 0.0005;
     }
 
-    fontScale = fontScale.clamp(0.85, 2.4);
+    // Hard limits to ensure safety on all devices (Watches to TVs)
+    fontScale = fontScale.clamp(0.85, 1.35);
 
+    // Dynamic Container Width
     final double containerMaxWidth = 400 * fontScale;
 
     return Scaffold(

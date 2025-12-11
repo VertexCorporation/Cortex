@@ -137,10 +137,16 @@ class AppBootstrap {
     FlutterError.onError = (FlutterErrorDetails details) {
       FirebaseCrashlytics.instance.recordFlutterError(details);
     };
+
     PlatformDispatcher.instance.onError = (error, stack) {
-      if (error.toString().contains("System process kill detected")) {
+      final String errorString = error.toString();
+
+      if (errorString.contains("System process kill detected") ||
+          errorString.contains("DeadSystemException") ||
+          errorString.contains("DeadSystemRuntimeException")) {
         return true;
       }
+
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
       return true;
     };
@@ -431,8 +437,7 @@ List<SingleChildWidget> _buildSettingsProviders() {
     Provider<ProfileService>(
       create: (_) => ProfileService(),
     ),
-
-    ChangeNotifierProxyProvider2<InternetProvider, UserProvider, SettingsGeneralProvider>(
+    ChangeNotifierProxyProvider<InternetProvider, SettingsGeneralProvider>(
       create: (BuildContext context) => SettingsGeneralProvider(
         authService: context.read<AuthService>(),
         profileService: context.read<ProfileService>(),
@@ -441,24 +446,19 @@ List<SingleChildWidget> _buildSettingsProviders() {
       update: (
           BuildContext context,
           InternetProvider internetProvider,
-          UserProvider userProvider,
           SettingsGeneralProvider? previous,
           ) {
         final provider = previous ??
             SettingsGeneralProvider(
               authService: context.read<AuthService>(),
               profileService: context.read<ProfileService>(),
-              notificationService: context.read<IntrovertNotificationService>(),
+              notificationService:
+              context.read<IntrovertNotificationService>(),
             );
-
         provider.updateConnectivity(internetProvider);
-
-        provider.updateUser(FirebaseAuth.instance.currentUser);
-
         return provider;
       },
     ),
-
     ChangeNotifierProvider<SettingsActionProvider>(
       create: (BuildContext context) => SettingsActionProvider(
         authService: context.read<AuthService>(),
@@ -493,13 +493,8 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
         return vm;
       },
     ),
-    ChangeNotifierProxyProvider<UserProvider, ModelCatalogProvider>(
+    ChangeNotifierProvider<ModelCatalogProvider>(
       create: (_) => ModelCatalogProvider(),
-      update: (_, userProvider, catalog) {
-        final provider = catalog ?? ModelCatalogProvider();
-        provider.updateUser(FirebaseAuth.instance.currentUser);
-        return provider;
-      },
     ),
     ChangeNotifierProvider<DownloadedModelsManager>(
       create: (_) => DownloadedModelsManager(),

@@ -62,8 +62,9 @@ class Cortex extends StatelessWidget {
       navigatorKey: navigatorKey,
       theme: _buildTheme(themeProvider.currentTheme),
       builder: (BuildContext context, Widget? child) {
-        // Keep system UI in sync with current theme.
-        themeProvider.updateSystemUIOverlayStyle();
+        try {
+          themeProvider.updateSystemUIOverlayStyle();
+        } catch (_) {}
         return child!;
       },
       locale: localeProvider.locale,

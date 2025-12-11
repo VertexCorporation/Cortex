@@ -24,8 +24,12 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
+        val messenger = flutterEngine.dartExecutor.binaryMessenger
+
+        LlamaService.setMethodChannel(MethodChannel(messenger, LLAMA_CH))
+
         /* ---- MEMORY CHANNEL ---- */
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, MEMORY_CH)
+        MethodChannel(messenger, MEMORY_CH)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "getDeviceMemory" -> result.success(getTotalRamMB())
@@ -35,7 +39,7 @@ class MainActivity : FlutterActivity() {
             }
 
         /* ---- STORAGE CHANNEL ---- */
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, STORAGE_CH)
+        MethodChannel(messenger, STORAGE_CH)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "getFreeStorage"  -> result.success(getFreeStorageMB())
@@ -45,7 +49,7 @@ class MainActivity : FlutterActivity() {
             }
 
         /* ---- LLAMA CHANNEL ---- */
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, LLAMA_CH)
+        MethodChannel(messenger, LLAMA_CH)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "cacheModel"    -> {
@@ -91,6 +95,15 @@ class MainActivity : FlutterActivity() {
             }
     }
 
+    /* ─────────────   AIRBAG   ───────────── */
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        try {
+            super.onActivityResult(requestCode, resultCode, data)
+        } catch (e: Exception) {
+            Log.e(TAG, "FATAL ERROR CAUGHT IN onActivityResult: ${e.message}")
+        }
+    }
+
     /* ─────────────   NATIVE HELPERS   ───────────── */
 
     /** Total RAM in **MB**. */
@@ -126,11 +139,6 @@ class MainActivity : FlutterActivity() {
         val intent = Intent(this, LlamaService::class.java).apply {
             putExtra("action", action)
             extras.forEach { (k, v) -> putExtra(k, v) }
-        }
-
-        // Pass the binary messenger to the Service so it can talk back to Flutter
-        flutterEngine?.dartExecutor?.binaryMessenger?.let { messenger ->
-            LlamaService.setMethodChannel(MethodChannel(messenger, LLAMA_CH))
         }
 
         try {

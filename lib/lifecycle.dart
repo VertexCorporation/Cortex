@@ -79,16 +79,16 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
       builder: (BuildContext context, AppInitializer initializer, Widget? _) {
         final AppStatus currentStatus = initializer.status;
 
-        // We remove the splash as soon as we are NOT initializing.
-        // Since Bootstrap now returns 'ready' or 'needsLogin' immediately,
-        // this happens almost instantly.
         if (!_splashRemoved && currentStatus != AppStatus.initializing) {
           _splashRemoved = true;
 
-          // Defer removal slightly to ensure the MainScreen frame is painted.
           WidgetsBinding.instance.addPostFrameCallback((_) {
             debugPrint('AppLifecycleManager: UI Ready. Removing Native Splash.');
-            FlutterNativeSplash.remove();
+            try {
+              FlutterNativeSplash.remove();
+            } catch (e) {
+              debugPrint("Warning: Failed to remove splash screen: $e");
+            }
           });
         }
 
