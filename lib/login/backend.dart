@@ -1,4 +1,5 @@
 // lib/login/backend.dart
+// It's good practice to have a more generic name if it might handle more than just login in the future.
 
 import 'dart:async';
 import 'dart:developer' as dev;
@@ -20,7 +21,7 @@ import 'package:flutter/services.dart';
 import 'package:cortex/server/user.dart';
 import 'package:cortex/server/credits.dart';
 
-// --- Result Classes ---
+// --- Result Classes (Unchanged, they are perfect) ---
 
 /// Represents the exhaustive set of outcomes for an email/password login attempt.
 sealed class LoginResult {}
@@ -87,7 +88,7 @@ class LoginBackendService {
 
   /// Handles the entire email and password login flow.
   Future<LoginResult> loginWithEmail({
-    required BuildContext context,
+    required BuildContext context, // Used only for AppLocalizations.
     required IntrovertNotificationService notificationService,
     required String email,
     required String password,
@@ -125,9 +126,6 @@ class LoginBackendService {
 
         return LoginSuccess(freshUser);
       }
-
-      // Ensure the Firestore document is ready before proceeding to prevent UI null data errors.
-      await _waitForFirestoreDocument(freshUser.uid);
 
       dev.log('[Auth.Login] User verified. UID: ${freshUser.uid}. Running post-login tasks.', name: 'LoginBackend');
 
@@ -176,12 +174,14 @@ class LoginBackendService {
     try {
       initializer.setRegistrationStatus(true);
 
+      // --- ASYNC GAP 1 ---
       final isAvailable = await _isUsernameAvailable(username, notificationService, l10n);
       if (!isAvailable) {
         initializer.setRegistrationStatus(false);
         return RegistrationUsernameTaken();
       }
 
+      // --- ASYNC GAP 2 ---
       final userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       final user = userCredential.user;
       if (user == null) throw FirebaseAuthException(code: 'user-creation-returned-null');
@@ -242,22 +242,32 @@ class LoginBackendService {
     final extrovertNotificationService = context.read<ExtrovertNotificationService>();
 
     try {
+      // Step 0: Initialize GoogleSignIn with the required serverClientId.
+      // This is the new, correct way to configure the sign-in process before starting.
       await _googleSignIn.initialize(
         serverClientId: '561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com',
       );
 
+      // Step 1: Initiate the user-interactive sign-in process using authenticate().
+      // This shows the Google account picker UI.
       final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
+
+      // Step 2: Get the authentication tokens from the successful sign-in.
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+      // Step 3: Create a Firebase credential using the idToken.
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
 
+      // Step 4: Sign in to Firebase.
       final UserCredential userCredential = await _auth.signInWithCredential(credential);
       final User? user = userCredential.user;
       if (user == null) {
         throw Exception("Firebase sign in with Google returned a null user.");
       }
 
+      // --- Post-login logic ---
       final bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
       if (isNewUser) {
         _postUsernameSuggestion(uid: user.uid, username: null);
@@ -265,9 +275,6 @@ class LoginBackendService {
 
       await _secureStorage.write(key: 'remember_me', value: 'true');
       await _secureStorage.write(key: 'email', value: user.email);
-
-      // UPDATED: Wait for Firestore document creation to prevent 'null data' UI glitches.
-      await _waitForFirestoreDocument(user.uid);
 
       _safeTokenSync(extrovertNotificationService);
 
@@ -316,15 +323,10 @@ class LoginBackendService {
 
       if (user == null) throw FirebaseAuthException(code: 'anonymous-user-null');
 
-      dev.log('[Auth.Anonymous] Auth successful. Waiting for Firestore doc creation...', name: 'LoginBackend');
-
-      // UPDATED: Poll Firestore until the user document is created by Cloud Functions.
-      // This prevents the settings screen from crashing due to null user data.
-      await _waitForFirestoreDocument(user.uid);
-
       _safeTokenSync(extrovertNotificationService);
 
-      dev.log('[Auth.Anonymous] Firestore doc verified. Proceeding.', name: 'LoginBackend');
+      dev.log('[Auth.Anonymous] Signed in anonymously. UID: ${user.uid}', name: 'LoginBackend');
+
       return AnonymousSignInSuccess(user);
 
     } catch (e, st) {
@@ -344,6 +346,7 @@ class LoginBackendService {
   }
 
   /// Handles the Apple Sign-In flow.
+  /// Uses FirebaseAuth's Apple provider to avoid "missing initial state" issues caused by web redirects.
   Future<AppleSignInResult> signInWithApple({
     required BuildContext context,
     required IntrovertNotificationService notificationService,
@@ -352,6 +355,7 @@ class LoginBackendService {
     final extrovertNotificationService = context.read<ExtrovertNotificationService>();
 
     try {
+      // 1) Use Firebase's native provider flow
       final appleProvider = AppleAuthProvider()
         ..addScope('email')
         ..addScope('name');
@@ -364,9 +368,11 @@ class LoginBackendService {
         throw Exception("Firebase sign in with Apple returned a null user.");
       }
 
+      // 2) Post-login logic
       final bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
 
       if (isNewUser) {
+        // Apple provider may set displayName (not guaranteed). Prefer Firebase user fields when available.
         final String? displayName = user.displayName?.trim().isEmpty ?? true
             ? null
             : user.displayName?.trim();
@@ -378,14 +384,13 @@ class LoginBackendService {
         }
       }
 
+      // 3) Persist session
       await _secureStorage.write(key: 'remember_me', value: 'true');
       if (user.email != null) {
         await _secureStorage.write(key: 'email', value: user.email);
       }
 
-      // UPDATED: Wait for Firestore document creation.
-      await _waitForFirestoreDocument(user.uid);
-
+      // 4) Token sync (non-blocking)
       _safeTokenSync(extrovertNotificationService);
 
       dev.log('[Auth.Apple] Sign-in complete for UID: ${user.uid}.',
@@ -439,9 +444,6 @@ class LoginBackendService {
       final callable = _functions.httpsCallable('completeAnonymousRegistration');
       await callable.call();
 
-      // UPDATED: Wait for the Cloud Function to update the account type in Firestore.
-      await _waitForFirestoreDocument(user.uid);
-
       _safeTokenSync(extrovertNotificationService);
 
       return RegistrationSuccess();
@@ -466,30 +468,6 @@ class LoginBackendService {
   }
 
   // --- Private Helper Methods ---
-
-  /// UPDATED: Polls Firestore until the user document is created by Cloud Functions.
-  /// This robust polling mechanism prevents the UI from loading before critical data exists.
-  Future<void> _waitForFirestoreDocument(String uid) async {
-    int attempts = 0;
-    const int maxAttempts = 15; // Max ~7.5 seconds wait time
-
-    while (attempts < maxAttempts) {
-      try {
-        final doc = await _firestore.collection('users').doc(uid).get();
-        if (doc.exists) {
-          dev.log("[LoginBackend] User document found for $uid.", name: 'LoginBackend');
-          return;
-        }
-      } catch (e) {
-        // Ignore permission/network errors during polling, retry.
-      }
-
-      attempts++;
-      await Future.delayed(const Duration(milliseconds: 500));
-    }
-
-    dev.log("[LoginBackend] WARNING: Timeout waiting for user doc. Proceeding anyway.", name: 'LoginBackend');
-  }
 
   Future<void> _postUsernameSuggestion({required String uid, String? username}) async {
     try {

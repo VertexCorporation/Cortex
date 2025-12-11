@@ -91,9 +91,7 @@ class FundsBackend with ChangeNotifier {
 
   // --- Access and Manage FundsBackend Provider ----
 
-  FundsBackend() {
-    _startListeningToPurchases();
-  }
+  FundsBackend();
 
   void setNotificationService(IntrovertNotificationService service) {
     _notificationService = service;
@@ -114,17 +112,7 @@ class FundsBackend with ChangeNotifier {
 
     _purchaseStreamSubscription = _inAppPurchase.purchaseStream.listen(
       _onPurchaseUpdated,
-      onError: (error) {
-        log('Global Purchase Stream Error: $error', name: _logName);
-
-        try {
-          _notificationService.showNotification(
-            message: _localizations.purchaseStreamError,
-            type: NotificationType.error,
-            oneLine: false,
-          );
-        } catch (_) {}
-      },
+      onError: _onPurchaseStreamError
     );
     _listenToUserChanges();
   }
@@ -141,10 +129,7 @@ class FundsBackend with ChangeNotifier {
     _notificationService = notificationService;
     _localizations = localizations;
 
-    _purchaseStreamSubscription = _inAppPurchase.purchaseStream.listen(
-      _onPurchaseUpdated,
-      onError: _onPurchaseStreamError,
-    );
+    _startListeningToPurchases();
 
     _authSubscription?.cancel();
     _authSubscription = _auth.authStateChanges().listen((user) {
@@ -421,6 +406,7 @@ class FundsBackend with ChangeNotifier {
     } catch (e, stack) {
       bool isLikelyStaleProductError = false;
       bool isInvalidOfferTokenError = false;
+      bool isIOSStoreKitError = false;
 
       String message = '';
       String code = '';
@@ -429,33 +415,39 @@ class FundsBackend with ChangeNotifier {
         message = (e.message ?? '').toLowerCase();
         code = e.code.toLowerCase();
 
+        // Android: Stale Intent Errors
         if (message.contains('pendingintent') ||
             message.contains('null object reference') ||
             message.contains('getintentsender')) {
           isLikelyStaleProductError = true;
         }
 
+        // Android: Invalid Offer Token
         if (code.contains('invalid_offer_token') ||
             message.contains('invalid_offer_token')) {
           isInvalidOfferTokenError = true;
         }
+
+        // iOS: StoreKit Generic Errors (User Cancelled often masks as this)
+        if (defaultTargetPlatform == TargetPlatform.iOS) {
+          if (code == 'unknown' ||
+              message.contains('storekiterror') ||
+              message.contains('usercancelled')) {
+            isIOSStoreKitError = true;
+          }
+        }
       }
 
+      // String check fallback
       final errorString = e.toString().toLowerCase();
-      if (errorString.contains('pendingintent') ||
-          errorString.contains('null object reference') ||
-          errorString.contains('getintentsender')) {
-        isLikelyStaleProductError = true;
-      }
-      if (errorString.contains('invalid_offer_token')) {
-        isInvalidOfferTokenError = true;
+      if (errorString.contains('storekiterror')) {
+        isIOSStoreKitError = true;
       }
 
       log('Error initiating purchase flow: $e', name: _logName, error: e);
 
       if (isLikelyStaleProductError) {
-        log('Known native billing crash suppressed (PendingIntent). UI remains stable.', name: _logName);
-
+        log('Known native billing crash suppressed (PendingIntent).', name: _logName);
         _notificationService.showNotification(
           message: _localizations.anErrorOccurred,
           type: NotificationType.error,
@@ -467,13 +459,13 @@ class FundsBackend with ChangeNotifier {
           type: NotificationType.error,
           oneLine: false,
         );
+      } else if (isIOSStoreKitError) {
+        log('iOS StoreKit generic error (likely user cancelled). Ignored.', name: _logName);
       } else {
-        // Truly unknown client-side issue; still non-fatal (purchases must never crash the app).
         await _crashlytics.recordError(
           e,
           stack,
-          reason:
-          'UNKNOWN error on buy call for product ${freshProductDetails.id}',
+          reason: 'UNKNOWN error on buy call for product ${freshProductDetails.id}',
           fatal: false,
         );
         _notificationService.showNotification(
@@ -583,7 +575,10 @@ class FundsBackend with ChangeNotifier {
       oneLine: false,
     );
 
-    final verificationData = purchaseDetails.verificationData.serverVerificationData;
+    final verificationData =
+    defaultTargetPlatform == TargetPlatform.iOS
+        ? purchaseDetails.verificationData.localVerificationData
+        : purchaseDetails.verificationData.serverVerificationData;
 
     void safeAddEvent() {
       if (!_purchaseCompletedController.isClosed) {
@@ -591,27 +586,12 @@ class FundsBackend with ChangeNotifier {
       }
     }
 
-    // Guard against empty or invalid receipts
     if (verificationData.trim().isEmpty || verificationData.trim() == "{}" || verificationData.trim() == "[]") {
       log('Skipping cloud verification: invalid or empty receipt for ${purchaseDetails.productID}', name: _logName);
-      await _crashlytics.recordError(
-        'EmptyReceiptData',
-        StackTrace.current,
-        reason: 'Skipped verification for ${purchaseDetails.productID} due to empty or malformed receipt.',
-        fatal: false,
-      );
 
       if (purchaseDetails.pendingCompletePurchase) {
         await _inAppPurchase.completePurchase(purchaseDetails);
       }
-      _notificationService.showNotification(
-        message: _localizations.purchaseSuccessful,
-        type: NotificationType.success,
-        oneLine: false,
-      );
-
-      safeAddEvent();
-
       _setPurchasePending(false);
       return;
     }
@@ -636,17 +616,34 @@ class FundsBackend with ChangeNotifier {
       );
 
       AppDataState().markUserDataAsChanged();
-
       safeAddEvent();
 
     } on FirebaseFunctionsException catch (e, stack) {
-      log('Purchase verification failed with FirebaseFunctionsException: ${e.message}', name: _logName);
+      log('Purchase verification failed with FirebaseFunctionsException: ${e.message} (Code: ${e.code})', name: _logName);
+
+      if (e.code == 'invalid-argument' || e.code == 'not-found') {
+        log('Fatal validation error. Forcing local completion to clear queue.', name: _logName);
+
+        if (purchaseDetails.pendingCompletePurchase) {
+          await _inAppPurchase.completePurchase(purchaseDetails);
+        }
+
+        _notificationService.showNotification(
+          message: _localizations.purchaseError,
+          type: NotificationType.error,
+          oneLine: false,
+        );
+      } else {
+        // For other errors (internal, unavailable), keep it in queue to retry later.
+        _notificationService.showNotification(
+          message: _localizations.verificationDelayed,
+          type: NotificationType.error,
+          oneLine: false,
+        );
+      }
+
       await _crashlytics.recordError(e, stack, reason: 'Server returned HttpsError for ${purchaseDetails.productID}', fatal: false);
-      _notificationService.showNotification(
-        message: _localizations.verificationDelayed,
-        type: NotificationType.error,
-        oneLine: false,
-      );
+
     } catch (e, stack) {
       log('Unexpected verification exception: $e', name: _logName);
       await _crashlytics.recordError(e, stack, reason: 'Unexpected client-side error during verifyPurchase', fatal: false);

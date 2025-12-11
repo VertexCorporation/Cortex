@@ -90,8 +90,10 @@ class MainScreenState extends State<MainScreen> {
     Provider.of<IntrovertNotificationService>(context, listen: false);
     introvertService.updateBottomBarVisibility(!hideBottomAppBar);
 
-    Provider.of<ThemeProvider>(context, listen: false)
-        .updateSystemUIOverlayStyle();
+    try {
+      Provider.of<ThemeProvider>(context, listen: false)
+          .updateSystemUIOverlayStyle();
+    } catch (_) {}
   }
 
   void openConversation(ConversationManager manager) async {
@@ -204,15 +206,7 @@ class MainScreenState extends State<MainScreen> {
     final Size screenSize = MediaQuery.of(context).size;
     final double screenHeight = screenSize.height;
     final double screenWidth = screenSize.width;
-
     final bool isTablet = screenSize.shortestSide >= 600;
-
-    SystemChrome.setApplicationSwitcherDescription(
-      ApplicationSwitcherDescription(
-        label: 'Cortex',
-        primaryColor: AppColors.background.toARGB32(),
-      ),
-    );
 
     final double bottomBarHeight = isTablet ? 80.0 : screenHeight * 0.09;
     final double iconBaseSize = isTablet ? 28.0 : screenHeight * 0.028;
@@ -221,153 +215,157 @@ class MainScreenState extends State<MainScreen> {
     final double shadowBlurRadius = isTablet ? 10.0 : screenWidth * 0.02;
     final double borderRadius = isTablet ? 24.0 : screenWidth * 0.04;
     final double horizontalPadding = isTablet ? screenWidth * 0.15 : 0.0;
+
     final bool useExpandedButtons = !isTablet;
     final bool shouldHideBottomAppBar = hideBottomAppBar;
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (bool didPop, dynamic _) async {
-        if (didPop) return;
+    return Title(
+      title: 'Cortex',
+      color: AppColors.background,
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, dynamic _) async {
+          if (didPop) return;
 
-        final bool isKeyboardVisible =
-            MediaQuery.of(context).viewInsets.bottom > 0;
-        if (isKeyboardVisible) {
-          FocusScope.of(context).unfocus();
-          return;
-        }
+          final bool isKeyboardVisible =
+              MediaQuery.of(context).viewInsets.bottom > 0;
+          if (isKeyboardVisible) {
+            FocusScope.of(context).unfocus();
+            return;
+          }
 
-        final ChatControllerState? chatControllerState =
-            chatScreenKey.currentState;
+          final ChatControllerState? chatControllerState =
+              chatScreenKey.currentState;
 
-        if (chatControllerState == null) {
+          if (chatControllerState == null) {
+            final bool shouldExit = await showExitConfirmationDialog(context);
+            if (shouldExit) {
+              SystemNavigator.pop();
+            }
+            return;
+          }
+
+          if (!chatControllerState.handleSystemBackPress()) {
+            return;
+          }
+
+          final ChatSessionProvider sessionProvider =
+          context.read<ChatSessionProvider>();
+          final AppBarMode currentMode = sessionProvider.appBarMode;
+
+          if (currentMode == AppBarMode.inSelection) {
+            chatControllerState.inactiveChatViewKey.currentState
+                ?.showSelectionView();
+            return;
+          }
+
+          if (sessionProvider.isChatActive) {
+            await _handleChatExit();
+            return;
+          }
+
           final bool shouldExit = await showExitConfirmationDialog(context);
           if (shouldExit) {
             SystemNavigator.pop();
           }
-          return;
-        }
-
-        if (!chatControllerState.handleSystemBackPress()) {
-          return;
-        }
-
-        final ChatSessionProvider sessionProvider =
-        context.read<ChatSessionProvider>();
-        final AppBarMode currentMode = sessionProvider.appBarMode;
-
-        if (currentMode == AppBarMode.inSelection) {
-          chatControllerState.inactiveChatViewKey.currentState
-              ?.showSelectionView();
-          return;
-        }
-
-        if (sessionProvider.isChatActive) {
-          await _handleChatExit();
-          return;
-        }
-
-        final bool shouldExit = await showExitConfirmationDialog(context);
-        if (shouldExit) {
-          SystemNavigator.pop();
-        }
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        body: FadeIndexedStack(
-          index: tabProvider.selectedIndex,
-          duration: const Duration(milliseconds: 200),
-          children: <Widget>[
-            Consumer<ChatSessionProvider>(
-              builder: (context, sessionProvider, _) {
-                return ChatController(
-                  key: chatScreenKey,
-                  onModelSelectionChanged: (bool isSelected) {
-                    updateBottomAppBarVisibility(isSelected);
-                  },
-                  onExitRequest: _handleChatExit,
-                );
-              },
-            ),
-            LibraryScreen(
-              key: libraryScreenKey,
-            ),
-            InboxScreen(key: inboxScreenKey),
-          ],
-        ),
-        bottomNavigationBar: shouldHideBottomAppBar
-            ? null
-            : Consumer<ThemeProvider>(
-          builder: (
-              BuildContext context,
-              ThemeProvider themeProvider,
-              Widget? child,
-              ) {
-            return Container(
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(borderRadius),
-                  topRight: Radius.circular(borderRadius),
-                ),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: AppColors.primaryColor.inverted
-                        .withValues(alpha: 0.1),
-                    blurRadius: shadowBlurRadius,
-                    offset: Offset(0, -2.0),
-                  ),
-                ],
+        },
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
+          body: FadeIndexedStack(
+            index: tabProvider.selectedIndex,
+            duration: const Duration(milliseconds: 200),
+            children: <Widget>[
+              Consumer<ChatSessionProvider>(
+                builder: (context, sessionProvider, _) {
+                  return ChatController(
+                    key: chatScreenKey,
+                    onModelSelectionChanged: (bool isSelected) {
+                      updateBottomAppBarVisibility(isSelected);
+                    },
+                    onExitRequest: _handleChatExit,
+                  );
+                },
               ),
-              child: BottomAppBar(
-                color: Colors.transparent,
-                elevation: 0,
-                padding: EdgeInsets.zero,
-                child: Container(
-                  height: bottomBarHeight,
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: Row(
-                    mainAxisAlignment: isTablet
-                        ? MainAxisAlignment.spaceBetween
-                        : MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      BottomNavigationButton(
-                        iconPath: 'assets/icons/inbox.svg',
-                        label: appLocalizations.chats,
-                        isSelected: tabProvider.selectedIndex == 2,
-                        // Fix 1: Inbox - No Pulse
-                        onTap: () => onItemTapped(2),
-                        baseSize: iconBaseSize,
-                        containerSize: iconContainerSize,
-                        labelSpacing: labelSpacing,
-                        useExpanded: useExpandedButtons,
-                      ),
-                      BottomNavigationButton(
-                        iconPath: 'assets/icons/chat.svg',
-                        label: appLocalizations.chat,
-                        isSelected: tabProvider.selectedIndex == 0,
-                        // Fix 2: Chat - No Pulse
-                        onTap: () => onItemTapped(0),
-                        baseSize: iconBaseSize,
-                        containerSize: iconContainerSize,
-                        labelSpacing: labelSpacing,
-                        useExpanded: useExpandedButtons,
-                      ),
-                      BottomNavigationButton(
-                        iconPath: 'assets/icons/library.svg',
-                        label: appLocalizations.library,
-                        isSelected: tabProvider.selectedIndex == 1,
-                        onTap: () => onItemTapped(1),
-                        baseSize: iconBaseSize,
-                        containerSize: iconBaseSize * 1.2,
-                        labelSpacing: labelSpacing,
-                        useExpanded: useExpandedButtons,
-                      ),
-                    ],
+              LibraryScreen(
+                key: libraryScreenKey,
+              ),
+              InboxScreen(key: inboxScreenKey),
+            ],
+          ),
+          bottomNavigationBar: shouldHideBottomAppBar
+              ? null
+              : Consumer<ThemeProvider>(
+            builder: (
+                BuildContext context,
+                ThemeProvider themeProvider,
+                Widget? child,
+                ) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(borderRadius),
+                    topRight: Radius.circular(borderRadius),
+                  ),
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      color: AppColors.primaryColor.inverted
+                          .withValues(alpha: 0.1),
+                      blurRadius: shadowBlurRadius,
+                      offset: Offset(0, -2.0),
+                    ),
+                  ],
+                ),
+                child: BottomAppBar(
+                  color: Colors.transparent,
+                  elevation: 0,
+                  padding: EdgeInsets.zero,
+                  child: Container(
+                    height: bottomBarHeight,
+                    padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding),
+                    child: Row(
+                      mainAxisAlignment: isTablet
+                          ? MainAxisAlignment.spaceBetween
+                          : MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        BottomNavigationButton(
+                          iconPath: 'assets/icons/inbox.svg',
+                          label: appLocalizations.chats,
+                          isSelected: tabProvider.selectedIndex == 2,
+                          onTap: () => onItemTapped(2),
+                          baseSize: iconBaseSize,
+                          containerSize: iconContainerSize,
+                          labelSpacing: labelSpacing,
+                          useExpanded: useExpandedButtons,
+                        ),
+                        BottomNavigationButton(
+                          iconPath: 'assets/icons/chat.svg',
+                          label: appLocalizations.chat,
+                          isSelected: tabProvider.selectedIndex == 0,
+                          onTap: () => onItemTapped(0),
+                          baseSize: iconBaseSize,
+                          containerSize: iconContainerSize,
+                          labelSpacing: labelSpacing,
+                          useExpanded: useExpandedButtons,
+                        ),
+                        BottomNavigationButton(
+                          iconPath: 'assets/icons/library.svg',
+                          label: appLocalizations.library,
+                          isSelected: tabProvider.selectedIndex == 1,
+                          onTap: () => onItemTapped(1),
+                          baseSize: iconBaseSize,
+                          containerSize: iconBaseSize * 1.2,
+                          labelSpacing: labelSpacing,
+                          useExpanded: useExpandedButtons,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -435,8 +433,7 @@ class BottomNavigationButton extends StatelessWidget {
             style: TextStyle(
               fontSize: baseSize * 0.5,
               color: iconColor,
-              fontWeight:
-              isSelected ? FontWeight.w500 : FontWeight.normal,
+              fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
             ),
             child: AnimatedScale(
               scale: isSelected ? 1.1 : 1.0,
@@ -456,9 +453,11 @@ class BottomNavigationButton extends StatelessWidget {
       return Expanded(child: content);
     }
 
-    return SizedBox(
-      width: 120.0,
-      child: content,
+    return Flexible(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 120.0),
+        child: content,
+      ),
     );
   }
 }

@@ -19,7 +19,6 @@ class ReviewService {
   static const String _lastPromptedKey = 'review_prompt_last_shown_timestamp';
 
   // App-specific constants
-  static const String _appStoreId = 'com.vertex.cortex';
   final InAppReview _inAppReview = InAppReview.instance;
 
   // Cooldown duration
@@ -37,37 +36,52 @@ class ReviewService {
   /// This ensures the user can always access the rating page.
   Future<void> _launchStoreReview(BuildContext context) async {
     if (!context.mounted) return;
+
     final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
+    final platform = Theme.of(context).platform;
 
-    debugPrint("[ReviewService] Starting robust store review flow.");
+    debugPrint("[ReviewService] Starting platform-aware store review flow.");
+
+    // Correct IDs for each platform.
+    const String androidPackageName = "com.vertex.cortex";
+    const String iosAppId = "6755621587";
 
     try {
-      // --- METHOD 1: PREFERRED ---
-      // Use the dedicated package function to open the store listing.
-      debugPrint("[ReviewService] Attempting to open store listing via in_app_review package.");
-      await _inAppReview.openStoreListing(appStoreId: _appStoreId);
-      debugPrint("[ReviewService] Method 1 (openStoreListing) succeeded.");
-    } catch (e) {
-      // --- METHOD 2: FALLBACK ---
-      // If the primary method fails, launch the URL directly.
-      debugPrint("[ReviewService] Method 1 failed: $e. Falling back to URL launcher.");
-      final Uri url = Uri.parse('https://play.google.com/store/apps/details?id=$_appStoreId');
+      debugPrint("[ReviewService] Attempting to open store listing via in_app_review.");
 
-      // The async gap is here.
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-        debugPrint("[ReviewService] Method 2 (URL Launcher) succeeded.");
+      // Platform-aware native call
+      if (platform == TargetPlatform.iOS) {
+        await _inAppReview.openStoreListing(appStoreId: iosAppId);
       } else {
-        // --- FINAL RESORT: ERROR MESSAGE ---
-        // We are now after the async gap, but we are using the `notificationService`
-        // and `localizations` variables we safely captured earlier. No context is used here.
-        debugPrint("[ReviewService] Could not launch URL: $url");
-        notificationService.showNotification(
-          message: localizations.anErrorOccurred,
-          type: NotificationType.success,
-        );
+        await _inAppReview.openStoreListing(appStoreId: androidPackageName);
       }
+
+      debugPrint("[ReviewService] openStoreListing succeeded.");
+      return;
+
+    } catch (e) {
+      debugPrint("[ReviewService] openStoreListing failed: $e. Falling back to direct URL.");
+    }
+
+    // --- FALLBACK URL based on platform ---
+    late final Uri url;
+
+    if (platform== TargetPlatform.iOS) {
+      url = Uri.parse("https://apps.apple.com/app/id$iosAppId");
+    } else {
+      url = Uri.parse("https://play.google.com/store/apps/details?id=$androidPackageName");
+    }
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+      debugPrint("[ReviewService] Fallback URL succeeded.");
+    } else {
+      debugPrint("[ReviewService] Could not launch fallback URL: $url");
+      notificationService.showNotification(
+        message: localizations.anErrorOccurred,
+        type: NotificationType.success,
+      );
     }
   }
 

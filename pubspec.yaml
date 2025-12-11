@@ -26,21 +26,21 @@ dependencies:
   intl: ^0.20.2
   collection: ^1.18.0
 
-  # --- FIREBASE (UPDATED FOR COMPATIBILITY) ---
-  firebase_core: ^4.1.1                # Updated
-  firebase_auth: ^6.1.0                # Updated
-  cloud_firestore: ^6.0.2              # Updated
-  firebase_analytics: ^12.0.2          # Updated
-  firebase_remote_config: ^6.0.2       # Updated
-  cloud_functions: ^6.0.2              # Updated
-  firebase_crashlytics: ^5.0.2         # Updated
-  google_sign_in: ^7.2.0               # Updated
-  firebase_messaging: ^16.0.2          # Added
+  # --- FIREBASE ---
+  firebase_core: ^4.1.1
+  firebase_auth: ^6.1.0
+  cloud_firestore: ^6.0.2
+  firebase_analytics: ^12.0.2
+  firebase_remote_config: ^6.0.2
+  cloud_functions: ^6.0.2
+  firebase_crashlytics: ^5.0.2
+  google_sign_in: ^7.2.0
+  firebase_messaging: ^16.0.2
 
   # --- IN-APP PURCHASE ---
   in_app_purchase: ^3.2.3
-  in_app_purchase_android: ^0.4.0+7
-  in_app_purchase_storekit: ^0.4.6
+  in_app_purchase_android: ^0.4.0+8
+  in_app_purchase_storekit: ^0.4.6+2
   in_app_review: ^2.0.10
 
   # --- DEVICE & UTILITIES ---

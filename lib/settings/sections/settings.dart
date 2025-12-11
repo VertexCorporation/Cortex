@@ -90,8 +90,6 @@ class _SettingsSectionState extends State<SettingsSection> with TickerProviderSt
   }
 
   /// Displays the "Redeem Code" dialog, driven by `SettingsActionProvider`.
-  /// The dialog is responsive to the on-screen keyboard, animating upwards to keep the content visible,
-  /// and now displays localized error messages directly from the server.
   Future<void> _showRedeemCodeDialog(BuildContext context) async {
     // Guard against async gaps: Get providers and localizations before the dialog.
     final actionProvider = context.read<SettingsActionProvider>();
@@ -184,19 +182,25 @@ class _SettingsSectionState extends State<SettingsSection> with TickerProviderSt
                                             highlightColor: AppColors.senaryColor.withValues(alpha: 0.1),
                                             onTap: isRedeeming ? null : () async {
                                               final code = codeController.text.trim();
+
                                               if (code.isEmpty) {
-                                                setDialogInnerState(() => errorText = appLocalizations.tagCannotBeEmpty);
-                                                _redeemCodeShakeController.forward(from: 0);
+                                                if (ctx.mounted) {
+                                                  setDialogInnerState(() => errorText = appLocalizations.tagCannotBeEmpty);
+                                                  _redeemCodeShakeController.forward(from: 0);
+                                                }
                                                 return;
                                               }
 
                                               try {
                                                 await actionProvider.redeemCode(ctx, code);
                                                 await generalProvider.refreshData();
+
                                                 if (ctx.mounted) Navigator.of(ctx).pop();
                                               } catch (e) {
-                                                setDialogInnerState(() => errorText = e.toString());
-                                                _redeemCodeShakeController.forward(from: 0);
+                                                if (ctx.mounted) {
+                                                  setDialogInnerState(() => errorText = e.toString());
+                                                  _redeemCodeShakeController.forward(from: 0);
+                                                }
                                               }
                                             },
                                             child: Container(

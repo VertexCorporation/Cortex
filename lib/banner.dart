@@ -5,6 +5,8 @@
 // and a generic, self-animating FloatingInfoBanner widget that can display
 // various types of content and position itself relative to other widgets.
 
+import 'dart:io';
+
 import 'package:cortex/app.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,11 @@ class BannerService {
   static const int _showIntervalInHours = 24;
 
   Future<void> checkAndTriggerBanner() async {
+    if (Platform.isIOS) {
+      debugPrint("[BannerService] iOS detected → auto-banner disabled.");
+      return;
+    }
+
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final int? lastShownTimestamp = prefs.getInt(_bannerTimestampKey);
@@ -71,6 +78,10 @@ class BannerService {
   }
 
   void triggerBannerManually() {
+    if (Platform.isIOS) {
+      debugPrint("[BannerService] iOS → Manual banner trigger blocked.");
+      return;
+    }
     debugPrint("[BannerService] A manual request was made to show the invite banner.");
     _displayBanner();
   }

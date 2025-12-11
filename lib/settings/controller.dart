@@ -162,8 +162,8 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
       showBottom: true,
       child: Center(
         child: Container(
-          // UPDATED: Changed maxWidth from 800 to 1200 to utilize more screen space on large tablets.
-          constraints: BoxConstraints(maxWidth: isTablet ? 1200 : double.infinity),
+          // Tablet constraint: Max width 800px. Phone: Full width.
+          constraints: BoxConstraints(maxWidth: isTablet ? 800 : double.infinity),
           child: ListView.builder(
             controller: _scrollController,
             key: const ValueKey('settingsContent'),

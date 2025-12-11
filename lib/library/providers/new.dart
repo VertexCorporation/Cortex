@@ -6,6 +6,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -221,6 +222,13 @@ class ModelCreationProvider extends ChangeNotifier {
         } else {
           notificationService.showNotification(message: ggufErrorMessage, type: NotificationType.error);
         }
+      }
+    } catch (e) {
+      if (e is PlatformException && e.code == 'already_active') {
+        dev.log("[ModelCreationProvider] File picker already active. Ignoring double tap.", name: 'ModelCreation');
+      } else {
+        dev.log("[ModelCreationProvider] Error picking file: $e", name: 'ModelCreation');
+        notificationService.showNotification(message: localizations.anErrorOccurred, type: NotificationType.error);
       }
     } finally {
       _isPickerActive = false;

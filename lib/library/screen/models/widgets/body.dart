@@ -236,10 +236,7 @@ class ModelsBody extends StatelessWidget {
     final loc = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
     final bool isTablet = screenWidth >= 600;
-
-    final double contentMaxWidth = isTablet ? 1200.0 : double.infinity;
 
     final self = allModels.where((model) => model.category == 'self').toList();
     final serverSide = allModels
@@ -260,7 +257,7 @@ class ModelsBody extends StatelessWidget {
 
     return Center(
       child: Container(
-        constraints: BoxConstraints(maxWidth: contentMaxWidth),
+        constraints: BoxConstraints(maxWidth: isTablet ? 800 : double.infinity),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -327,7 +324,7 @@ class ModelsBody extends StatelessWidget {
               // --- SYSTEM INFO HEADER ---
               Padding(
                 padding: EdgeInsets.symmetric(
-                    horizontal: isTablet ? 24.0 : screenWidth * 0.04
+                    horizontal: isTablet ? screenWidth * 0.02 : screenWidth * 0.04
                 ).copyWith(
                     top: isTablet ? 24.0 : screenWidth * 0.02,
                     bottom: isTablet ? 16.0 : screenWidth * 0.01
@@ -345,7 +342,7 @@ class ModelsBody extends StatelessWidget {
               // --- SYSTEM INFO CHART ---
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: isTablet ? 24.0 : screenWidth * 0.04,
+                  horizontal: isTablet ? screenWidth * 0.1 : screenWidth * 0.04,
                 ),
                 child: SystemInfoChart(
                     totalStorage: systemInfo!.totalStorage,
