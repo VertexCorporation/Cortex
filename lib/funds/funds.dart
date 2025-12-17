@@ -4,8 +4,10 @@
 
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 import 'package:confetti/confetti.dart';
 import 'package:cortex/app.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -62,10 +64,30 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   int _uiActiveSubscriptionLevel = 0;
   String? _uiActiveSubscriptionOption;
   late FundsBackend _backend;
+  bool _isEmulator = false;
+
+  // Checks emulator
+  Future<void> _checkIfEmulator() async {
+    final deviceInfo = DeviceInfoPlugin();
+    bool isEm = false;
+    try {
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfo.androidInfo;
+        isEm = !androidInfo.isPhysicalDevice;
+      } else if (Platform.isIOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        isEm = !iosInfo.isPhysicalDevice;
+      }
+    } catch (e) {
+      log("Error checking device: $e");
+    }
+    if (mounted) setState(() => _isEmulator = isEm);
+  }
 
   @override
   void initState() {
     super.initState();
+    _checkIfEmulator();
     _pageController = PageController(initialPage: _currentPage);
     _scrollControllers = List.generate(4, (_) => ScrollController());
     _confettiController = ConfettiController(duration: const Duration(seconds: 1));
@@ -420,22 +442,45 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                             backend.isPurchasePending ? 0.95 : 1.0,
                             backend.isPurchasePending ? 0.95 : 1.0,
                           ),
-                          child: Opacity(
-                            opacity: backend.isPurchasePending ? 0.6 : 1.0,
-                            child: ElevatedButton(
-                              onPressed: _onPrimaryButtonPressed,
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: AppColors.primaryColor,
-                                backgroundColor: AppColors.primaryColor.inverted,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.018),
-                                minimumSize: Size(double.infinity, screenHeight * 0.06),
-                                splashFactory: backend.isPurchasePending ? NoSplash.splashFactory : InkSplash.splashFactory,
-                              ),
-                              child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 250),
-                                child: _buildButtonText(context, backend, screenWidth),
-                              ),
+                          child: ElevatedButton(
+                            onPressed: (backend.isPurchasePending || _isEmulator) ? null : _onPrimaryButtonPressed,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: AppColors.primaryColor,
+                              backgroundColor: AppColors.primaryColor.inverted,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.018),
+                              minimumSize: Size(double.infinity, screenHeight * 0.06),
+                              splashFactory: backend.isPurchasePending ? NoSplash.splashFactory : InkSplash.splashFactory,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 250),
+                                  child: _buildButtonText(context, backend, screenWidth),
+                                ),
+
+                                if (_isEmulator) ...[
+                                  SizedBox(height: screenHeight * 0.002),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        localizations.emulatorModeWarning,
+                                        textAlign: TextAlign.center,
+                                        maxLines: 3,
+                                        style: TextStyle(
+                                          fontSize: screenWidth * 0.025,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.primaryColor.withValues(alpha: 0.7),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ]
+                              ],
                             ),
                           ),
                         ),

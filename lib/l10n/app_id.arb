@@ -797,5 +797,6 @@
   "equivalentMonthlyDescription": "Sekitar {price}/bulan",
   "creatorTag": "Tag Pembuat",
   "confirmDownloadTitle": "Apakah Anda yakin ingin mengunduh?",
-  "downloadSizeDisclosure": "Model ini akan menempati ruang sekitar {size}."
+  "downloadSizeDisclosure": "Model ini akan menempati ruang sekitar {size}.",
+  "emulatorModeWarning": "Fitur ini dinonaktifkan dalam mode emulator."
 }

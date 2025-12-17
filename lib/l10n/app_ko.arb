@@ -797,5 +797,6 @@
   "equivalentMonthlyDescription": "약 {price}/월",
   "creatorTag": "크리에이터 태그",
   "confirmDownloadTitle": "정말로 다운로드하시겠습니까?",
-  "downloadSizeDisclosure": "이 모델은 약 {size}의 공간을 차지합니다."
+  "downloadSizeDisclosure": "이 모델은 약 {size}의 공간을 차지합니다.",
+  "emulatorModeWarning": "이 기능은 에뮬레이터 모드에서 비활성화됩니다."
 }

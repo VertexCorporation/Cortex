@@ -626,5 +626,6 @@
   "equivalentMonthlyDescription": "Təxminən {price}/ay",
   "creatorTag": "Yaradıcı etiketi",
   "confirmDownloadTitle": "Endirmək istədiyinizə əminsiniz?",
-  "downloadSizeDisclosure": "Bu model təxminən {size} yer tutacaq."
+  "downloadSizeDisclosure": "Bu model təxminən {size} yer tutacaq.",
+  "emulatorModeWarning": "Bu funksiya emulator rejimində deaktiv edilib"
 }

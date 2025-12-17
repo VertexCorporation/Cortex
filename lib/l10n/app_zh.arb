@@ -797,5 +797,6 @@
   "equivalentMonthlyDescription": "约 {price}/月",
   "creatorTag": "创作者标签",
   "confirmDownloadTitle": "您确定要下载吗？",
-  "downloadSizeDisclosure": "该模型将占用大约{size}的空间。"
+  "downloadSizeDisclosure": "该模型将占用大约{size}的空间。",
+  "emulatorModeWarning": "此功能在模拟器模式下禁用。"
 }

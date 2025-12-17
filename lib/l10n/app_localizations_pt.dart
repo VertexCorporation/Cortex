@@ -2136,4 +2136,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return 'Este modelo ocupará aproximadamente $size de espaço.';
   }
+
+  @override
+  String get emulatorModeWarning =>
+      'Essa função está desativada no modo emulador.';
 }

@@ -2063,4 +2063,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return 'このモデルは約 $size のスペースを占有します。';
   }
+
+  @override
+  String get emulatorModeWarning => 'この機能はエミュレータモードでは無効になっています';
 }

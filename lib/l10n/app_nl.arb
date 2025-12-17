@@ -797,5 +797,6 @@
   "equivalentMonthlyDescription": "Ongeveer {price}/maand",
   "creatorTag": "Creator-tag",
   "confirmDownloadTitle": "Weet u zeker dat u wilt downloaden?",
-  "downloadSizeDisclosure": "Dit model neemt ongeveer {size} ruimte in beslag."
+  "downloadSizeDisclosure": "Dit model neemt ongeveer {size} ruimte in beslag.",
+  "emulatorModeWarning": "Deze functie is uitgeschakeld in de emulatormodus."
 }

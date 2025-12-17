@@ -797,5 +797,6 @@
   "equivalentMonthlyDescription": "月額約{price}",
   "creatorTag": "クリエイタータグ",
   "confirmDownloadTitle": "本当にダウンロードしますか?",
-  "downloadSizeDisclosure": "このモデルは約 {size} のスペースを占有します。"
+  "downloadSizeDisclosure": "このモデルは約 {size} のスペースを占有します。",
+  "emulatorModeWarning": "この機能はエミュレータモードでは無効になっています"
 }

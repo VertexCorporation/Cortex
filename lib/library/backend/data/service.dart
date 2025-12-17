@@ -309,7 +309,7 @@ class ModelService with ChangeNotifier {
       return _createFallbackEntity(modelId, langCode: langCode);
     }
 
-    if (modelId == 'openrouter/auto') {
+    if (modelId == 'cortex/auto') {
       return ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
     }
 

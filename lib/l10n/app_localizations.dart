@@ -3885,6 +3885,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This model will occupy approximately {size} of space.'**
   String downloadSizeDisclosure(Object size);
+
+  /// No description provided for @emulatorModeWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature is disabled in emulator mode.'**
+  String get emulatorModeWarning;
 }
 
 class _AppLocalizationsDelegate

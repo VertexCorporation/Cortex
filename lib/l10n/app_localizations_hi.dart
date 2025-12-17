@@ -2128,4 +2128,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return 'यह मॉडल लगभग $size स्थान घेरेगा।';
   }
+
+  @override
+  String get emulatorModeWarning => 'एमुलेटर मोड में यह सुविधा निष्क्रिय है।';
 }

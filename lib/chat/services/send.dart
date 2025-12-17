@@ -121,7 +121,7 @@ class SendService {
             apiModelIdForSend = pinnedAssistantId;
             debugPrint("[SendService] Dynamic chat (Online) pinned model: $apiModelIdForSend");
           } else {
-            apiModelIdForSend = 'openrouter/auto';
+            apiModelIdForSend = 'cortex/auto';
             debugPrint("[SendService] Dynamic chat (Online) using Auto Router: $apiModelIdForSend");
           }
         } else {
@@ -190,8 +190,8 @@ class SendService {
       }
 
       // --- 2. Validate the Selected Model ---
-      // We check if it is 'openrouter/auto' specifically to skip standard validation
-      final isAutoRouter = apiModelIdForSend == 'openrouter/auto';
+      // We check if it is 'auto' specifically to skip standard validation
+      final isAutoRouter = apiModelIdForSend == 'cortex/auto';
 
       if (apiModelIdForSend == null || apiModelIdForSend.isEmpty) {
         // Error message is already set above for specific cases, fallback to default if needed.
@@ -328,7 +328,7 @@ class SendService {
       debugPrint("[SendService] InputProvider selectedPhoto cleared after send.");
 
       // --- 4. Delegate to the Appropriate Sending Logic ---
-      // If it is 'openrouter/auto', we skip the local model check because it is definitely server-side.
+      // If it is 'auto', we skip the local model check because it is definitely server-side.
       if (!isAutoRouter &&
           !Utils.isServerSideModel(apiModelIdForSend, langCode: langCode, modelService: _modelService)) {
         final offlineModerator = OfflineModeratorService();
@@ -353,7 +353,7 @@ class SendService {
       }
 
       // --- 5. Perform Post-Send Cleanup ---
-      // We don't save 'openrouter/auto' to recent models to avoid cluttering the UI with internal IDs.
+      // We don't save 'auto' to recent models to avoid cluttering the UI with internal IDs.
       if (!isAutoRouter) {
         try {
           await ChatStorageService.addRecentModel(
@@ -400,7 +400,7 @@ class SendService {
       int aiMessageIndex,
       String langCode,
       ) async {
-    final bool isAutoRouter = modelIdForRequest == 'openrouter/auto';
+    final bool isAutoRouter = modelIdForRequest == 'cortex/auto';
 
     // If it's the Auto Router, we don't fetch local entity data because the ID doesn't exist there.
     // We treat it as a generic premium, online model.

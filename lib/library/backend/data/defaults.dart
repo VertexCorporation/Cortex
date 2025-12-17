@@ -115,7 +115,7 @@ class ModelDefaults {
   // This map acts as a local hardcoded entry for the virtual Cortex model.
   // Updates require an app update, which aligns with adding new languages.
   static const Map<String, dynamic> cortexDynamicChatData = {
-    'id': 'openrouter/auto',
+    'id': 'cortex/auto',
     'title': 'Cortex',
     'producer': 'Vertex',
     'type': 'online',

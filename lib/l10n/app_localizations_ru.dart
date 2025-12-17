@@ -2136,4 +2136,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return 'Эта модель займет примерно $size пространства.';
   }
+
+  @override
+  String get emulatorModeWarning => 'Эта функция отключена в режиме эмулятора.';
 }

@@ -55,7 +55,19 @@ class MainScreenState extends State<MainScreen> {
     });
   }
 
+  /// Helper method to forcefully and safely dismiss the keyboard.
+  /// This is crucial for iOS where the back button doesn't implicitly close it,
+  /// and for navigation events where the keyboard might stick around.
+  void _forceCloseKeyboard() {
+    final FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+  }
+
   void onItemTapped(int index, {bool pulseOffline = false}) {
+    _forceCloseKeyboard();
+
     final TabProvider tabProvider =
     Provider.of<TabProvider>(context, listen: false);
 
@@ -97,6 +109,8 @@ class MainScreenState extends State<MainScreen> {
   }
 
   void openConversation(ConversationManager manager) async {
+    _forceCloseKeyboard();
+
     final TabProvider tabProvider =
     Provider.of<TabProvider>(context, listen: false);
 
@@ -121,17 +135,21 @@ class MainScreenState extends State<MainScreen> {
     });
   }
 
-  void startNewConversation({bool isDynamic = false}) {
+  void startNewConversation({bool isDynamic = false})
+  {
+    _forceCloseKeyboard();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
       final TabProvider tabProvider =
       Provider.of<TabProvider>(context, listen: false);
 
+      setState(() {
+        _previousTabIndex = tabProvider.selectedIndex == 0 ? 0 : tabProvider.selectedIndex;
+      });
+
       if (tabProvider.selectedIndex != 0) {
-        setState(() {
-          _previousTabIndex = tabProvider.selectedIndex;
-        });
         tabProvider.setSelectedIndex(0);
       }
 
@@ -155,6 +173,8 @@ class MainScreenState extends State<MainScreen> {
   }
 
   void startChatWithModel(ModelEntity model) {
+    _forceCloseKeyboard();
+
     final TabProvider tabProvider =
     Provider.of<TabProvider>(context, listen: false);
     final ChatSessionProvider sessionProvider =
@@ -181,6 +201,8 @@ class MainScreenState extends State<MainScreen> {
   }
 
   Future<void> _handleChatExit() async {
+    _forceCloseKeyboard();
+
     await chatScreenKey.currentState?.handleExit();
 
     if (mounted) {
@@ -230,7 +252,7 @@ class MainScreenState extends State<MainScreen> {
           final bool isKeyboardVisible =
               MediaQuery.of(context).viewInsets.bottom > 0;
           if (isKeyboardVisible) {
-            FocusScope.of(context).unfocus();
+            _forceCloseKeyboard(); // Use our robust helper here as well
             return;
           }
 

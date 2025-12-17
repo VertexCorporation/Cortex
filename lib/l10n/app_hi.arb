@@ -797,5 +797,6 @@
   "equivalentMonthlyDescription": "लगभग {price}/माह",
   "creatorTag": "निर्माता टैग",
   "confirmDownloadTitle": "क्या आप वाकई डाउनलोड करना चाहते हैं?",
-  "downloadSizeDisclosure": "यह मॉडल लगभग {size} स्थान घेरेगा।"
+  "downloadSizeDisclosure": "यह मॉडल लगभग {size} स्थान घेरेगा।",
+  "emulatorModeWarning": "एमुलेटर मोड में यह सुविधा निष्क्रिय है।"
 }

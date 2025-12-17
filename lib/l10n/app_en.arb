@@ -994,5 +994,6 @@
   "equivalentMonthlyDescription": "Approximately {price}/month",
   "@equivalentMonthlyDescription": { "placeholders": { "price": {} } },
   "confirmDownloadTitle": "Are you sure you want to download?",
-  "downloadSizeDisclosure": "This model will occupy approximately {size} of space."
+  "downloadSizeDisclosure": "This model will occupy approximately {size} of space.",
+  "emulatorModeWarning": "This feature is disabled in emulator mode."
 }
