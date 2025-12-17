@@ -135,6 +135,19 @@ class AppBootstrap {
 
     // 2. Wire Crashlytics.
     FlutterError.onError = (FlutterErrorDetails details) {
+      final String exceptionAsString = details.exception.toString();
+
+      bool isNetworkNoise = exceptionAsString.contains("SocketException") ||
+          exceptionAsString.contains("ClientException") ||
+          exceptionAsString.contains("No route to host") ||
+          exceptionAsString.contains("Connection failed") ||
+          exceptionAsString.contains("NetworkImage");
+
+      if (isNetworkNoise) {
+        debugPrint("Ignored Network/Image Error in FlutterError: $exceptionAsString");
+        return;
+      }
+
       FirebaseCrashlytics.instance.recordFlutterError(details);
     };
 
@@ -144,6 +157,12 @@ class AppBootstrap {
       if (errorString.contains("System process kill detected") ||
           errorString.contains("DeadSystemException") ||
           errorString.contains("DeadSystemRuntimeException")) {
+        return true;
+      }
+
+      if (errorString.contains("SocketException") ||
+          errorString.contains("No route to host")) {
+        debugPrint("Ignored Network Error in PlatformDispatcher: $errorString");
         return true;
       }
 

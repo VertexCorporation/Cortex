@@ -797,5 +797,6 @@
   "equivalentMonthlyDescription": "تقريبًا {price}/شهريًا",
   "creatorTag": "علامة المنشئ",
   "confirmDownloadTitle": "هل أنت متأكد أنك تريد التنزيل؟",
-  "downloadSizeDisclosure": "سيشغل هذا النموذج مساحة تبلغ {size} تقريبًا."
+  "downloadSizeDisclosure": "سيشغل هذا النموذج مساحة تبلغ {size} تقريبًا.",
+  "emulatorModeWarning": "هذه الميزة معطلة في وضع المحاكي"
 }

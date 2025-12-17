@@ -641,5 +641,6 @@
   "equivalentMonthlyDescription": "Environ {price}/mois",
   "creatorTag": "Étiquette du créateur",
   "confirmDownloadTitle": "Êtes-vous sûr de vouloir télécharger ?",
-  "downloadSizeDisclosure": "Ce modèle occupera environ {size} d'espace."
+  "downloadSizeDisclosure": "Ce modèle occupera environ {size} d'espace.",
+  "emulatorModeWarning": "Cette fonctionnalité est désactivée en mode émulateur."
 }

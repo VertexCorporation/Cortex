@@ -797,5 +797,6 @@
   "equivalentMonthlyDescription": "Yaklaşık {price}/ay",
   "creatorTag": "Yaratıcı Etiketi",
   "confirmDownloadTitle": "İndirmek istediğinize emin misiniz?",
-  "downloadSizeDisclosure": "Bu model yaklaşık olarak {size} büyüklüğünde yer kaplayacaktır."
+  "downloadSizeDisclosure": "Bu model yaklaşık olarak {size} büyüklüğünde yer kaplayacaktır.",
+  "emulatorModeWarning": "Bu özellik emülatör modunda devre dışıdır."
 }

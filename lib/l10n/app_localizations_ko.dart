@@ -2062,4 +2062,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return '이 모델은 약 $size의 공간을 차지합니다.';
   }
+
+  @override
+  String get emulatorModeWarning => '이 기능은 에뮬레이터 모드에서 비활성화됩니다.';
 }

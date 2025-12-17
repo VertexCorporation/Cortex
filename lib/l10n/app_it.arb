@@ -797,5 +797,6 @@
   "equivalentMonthlyDescription": "Circa {price}/mese",
   "creatorTag": "Tag del creatore",
   "confirmDownloadTitle": "Sei sicuro di voler scaricare?",
-  "downloadSizeDisclosure": "Questo modello occuperà circa {size} di spazio."
+  "downloadSizeDisclosure": "Questo modello occuperà circa {size} di spazio.",
+  "emulatorModeWarning": "Questa funzione è disabilitata in modalità emulatore"
 }

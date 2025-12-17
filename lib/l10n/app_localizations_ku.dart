@@ -2131,4 +2131,8 @@ class AppLocalizationsKu extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return 'Ev model dê bi qasî $size cîh bigire.';
   }
+
+  @override
+  String get emulatorModeWarning =>
+      'Ev taybetmendî di moda emulatorê de neçalak e';
 }

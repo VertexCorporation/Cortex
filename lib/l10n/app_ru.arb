@@ -797,5 +797,6 @@
   "equivalentMonthlyDescription": "Примерно {price}/месяц",
   "creatorTag": "Тег создателя",
   "confirmDownloadTitle": "Вы уверены, что хотите загрузить?",
-  "downloadSizeDisclosure": "Эта модель займет примерно {size} пространства."
+  "downloadSizeDisclosure": "Эта модель займет примерно {size} пространства.",
+  "emulatorModeWarning": "Эта функция отключена в режиме эмулятора."
 }

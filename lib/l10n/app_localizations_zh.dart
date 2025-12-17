@@ -2008,4 +2008,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return '该模型将占用大约$size的空间。';
   }
+
+  @override
+  String get emulatorModeWarning => '此功能在模拟器模式下禁用。';
 }

@@ -2156,4 +2156,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return 'Dieses Modell benötigt ungefähr $size Platz.';
   }
+
+  @override
+  String get emulatorModeWarning =>
+      'Diese Funktion ist im Emulatormodus deaktiviert.';
 }

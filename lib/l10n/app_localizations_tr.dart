@@ -2125,4 +2125,8 @@ class AppLocalizationsTr extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return 'Bu model yaklaşık olarak $size büyüklüğünde yer kaplayacaktır.';
   }
+
+  @override
+  String get emulatorModeWarning =>
+      'Bu özellik emülatör modunda devre dışıdır.';
 }

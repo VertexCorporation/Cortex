@@ -797,5 +797,6 @@
   "equivalentMonthlyDescription": "Nêzîkî {price}/meh",
   "creatorTag": "Etîketa Afirîner",
   "confirmDownloadTitle": "Tu piştrast î ku dixwazî dakêşî?",
-  "downloadSizeDisclosure": "Ev model dê bi qasî {size} cîh bigire."
+  "downloadSizeDisclosure": "Ev model dê bi qasî {size} cîh bigire.",
+  "emulatorModeWarning": "Ev taybetmendî di moda emulatorê de neçalak e"
 }

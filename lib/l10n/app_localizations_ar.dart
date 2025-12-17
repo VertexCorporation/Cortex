@@ -2106,4 +2106,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return 'سيشغل هذا النموذج مساحة تبلغ $size تقريبًا.';
   }
+
+  @override
+  String get emulatorModeWarning => 'هذه الميزة معطلة في وضع المحاكي';
 }

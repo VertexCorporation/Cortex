@@ -2128,4 +2128,8 @@ class AppLocalizationsAz extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return 'Bu model təxminən $size yer tutacaq.';
   }
+
+  @override
+  String get emulatorModeWarning =>
+      'Bu funksiya emulator rejimində deaktiv edilib';
 }

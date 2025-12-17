@@ -2142,4 +2142,8 @@ class AppLocalizationsId extends AppLocalizations {
   String downloadSizeDisclosure(Object size) {
     return 'Model ini akan menempati ruang sekitar $size.';
   }
+
+  @override
+  String get emulatorModeWarning =>
+      'Fitur ini dinonaktifkan dalam mode emulator.';
 }

@@ -10,6 +10,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
@@ -91,7 +92,60 @@ class FundsBackend with ChangeNotifier {
 
   // --- Access and Manage FundsBackend Provider ----
 
-  FundsBackend();
+  FundsBackend() {
+    _startListeningToPurchases();
+  }
+
+  bool _isPlaceholderReceipt(String s) {
+    final t = s.trim();
+    return t.isEmpty || t == "{}" || t == "[]";
+  }
+
+  bool _looksLikeJson(String s) {
+    final t = s.trimLeft();
+    return t.startsWith("{") || t.startsWith("[");
+  }
+
+  bool _looksLikeBase64(String s) {
+    final t = s.replaceAll(RegExp(r"\s+"), ""); // remove whitespace/newlines
+    if (t.length < 50) return false;
+    if (_looksLikeJson(t)) return false;
+    return RegExp(r'^[A-Za-z0-9+/=]+$').hasMatch(t);
+  }
+
+  Future<String?> _resolveIosReceiptBase64(PurchaseDetails purchaseDetails) async {
+    final v = purchaseDetails.verificationData;
+
+    final fromServer = (v.serverVerificationData).trim();
+    if (!_isPlaceholderReceipt(fromServer) && _looksLikeBase64(fromServer)) return fromServer;
+
+    final fromLocal = (v.localVerificationData).trim();
+    if (!_isPlaceholderReceipt(fromLocal) && _looksLikeBase64(fromLocal)) return fromLocal;
+
+    try {
+      final storekit = _inAppPurchase.getPlatformAddition<InAppPurchaseStoreKitPlatformAddition>();
+
+      try {
+        await storekit.sync();
+      } catch (_) {}
+
+      final refreshed = await storekit.refreshPurchaseVerificationData();
+      final refreshedReceipt = (refreshed?.serverVerificationData ?? refreshed?.localVerificationData ?? '').trim();
+
+      if (!_isPlaceholderReceipt(refreshedReceipt) && _looksLikeBase64(refreshedReceipt)) {
+        return refreshedReceipt;
+      }
+    } catch (e, stack) {
+      await _crashlytics.recordError(
+        e,
+        stack,
+        reason: 'Failed to refresh iOS receipt data (StoreKit).',
+        fatal: false,
+      );
+    }
+
+    return null;
+  }
 
   void setNotificationService(IntrovertNotificationService service) {
     _notificationService = service;
@@ -111,8 +165,8 @@ class FundsBackend with ChangeNotifier {
     _purchaseStreamSubscription?.cancel();
 
     _purchaseStreamSubscription = _inAppPurchase.purchaseStream.listen(
-      _onPurchaseUpdated,
-      onError: _onPurchaseStreamError
+        _onPurchaseUpdated,
+        onError: _onPurchaseStreamError
     );
     _listenToUserChanges();
   }
@@ -229,84 +283,6 @@ class FundsBackend with ChangeNotifier {
       _setPurchasePending(false);
       return;
     }
-
-    // --- PATH 1: DESIGNATED TESTER (Bypasses Google Play) ---
-    final isDesignatedTester = user.email == "mustawtfa@gmail.com";
-    if (isDesignatedTester) {
-      log('Initiating DIRECT test purchase for tester: ${product.id}', name: _logName);
-      try {
-        final callable = _functions.httpsCallable('verifyPurchase');
-        await callable.call<dynamic>({
-          'productId': product.id,
-          'platform': defaultTargetPlatform.name.toLowerCase(),
-          'packageName': appPackageName,
-        });
-
-        log('Test purchase for ${product.id} successfully processed by server.', name: _logName);
-
-        if (product.id == 'cancel_subscription_test') {
-          _notificationService.showNotification(
-            message: _localizations.subscriptionCancelled,
-            type: NotificationType.success,
-            oneLine: false,
-          );
-        } else {
-          _notificationService.showNotification(
-            message: _localizations.purchaseSuccessful,
-            type: NotificationType.success,
-            oneLine: false,
-          );
-          _purchaseCompletedController.add(product.id);
-        }
-        AppDataState().markUserDataAsChanged();
-      } on FirebaseFunctionsException catch (e) {
-        log('Test purchase failed: ${e.message}', name: _logName, error: e);
-        _setError('Test purchase failed: ${e.message}');
-        _notificationService.showNotification(
-          message: e.message ?? _localizations.purchaseError,
-          type: NotificationType.error,
-          oneLine: false,
-        );
-      } catch (e, stack) {
-        log('An unexpected client error occurred during test purchase.', name: _logName, error: e);
-        await _crashlytics.recordError(
-          e,
-          stack,
-          reason: 'Client-side error during test purchase for ${product.id}',
-          fatal: false,
-        );
-        _setError("An unexpected error occurred.");
-        _notificationService.showNotification(
-          message: _localizations.anErrorOccurred,
-          type: NotificationType.error,
-          oneLine: false,
-        );
-      } finally {
-        _setPurchasePending(false);
-      }
-      return;
-    }
-
-    if (!kReleaseMode) {
-      log('Running in Debug Mode. Simulating successful purchase for ${product.id}', name: _logName);
-
-      await Future.delayed(const Duration(seconds: 1));
-
-      _notificationService.showNotification(
-        message: "${_localizations.purchaseSuccessful} (Test)",
-        type: NotificationType.success,
-        oneLine: false,
-      );
-
-      _purchaseCompletedController.add(product.id);
-      AppDataState().markUserDataAsChanged();
-
-      _setPurchasePending(false);
-      return;
-    }
-
-    // --- PATH 2: REGULAR USER (Standard Google Play Flow) ---
-
     ProductDetails freshProductDetails;
     try {
       if (!await _inAppPurchase.isAvailable()) {
@@ -349,23 +325,18 @@ class FundsBackend with ChangeNotifier {
       final googlePlayProductDetails = freshProductDetails as GooglePlayProductDetails;
       final offerToken = googlePlayProductDetails.offerToken;
 
-      // --- INDUSTRY STANDARD BEHAVIOUR ---
-      // 1) Credits (one-time products) never require an offer token.
-      // 2) Subscriptions MUST have a valid offer token; otherwise we abort safely.
       final bool isSubscription = _subscriptionIds.contains(googlePlayProductDetails.id);
 
       if (isSubscription) {
         if (offerToken == null || offerToken.isEmpty) {
-          // Treat as a configuration / Play Store cache issue and DO NOT call buyNonConsumable.
           log(
-            'Subscription ${googlePlayProductDetails.id} is missing a valid offerToken. Aborting purchase to avoid INVALID_OFFER_TOKEN crash.',
+            'Subscription ${googlePlayProductDetails.id} is missing a valid offerToken.',
             name: _logName,
           );
           await _crashlytics.recordError(
             'MissingOfferToken',
             StackTrace.current,
-            reason:
-            'Attempted to purchase subscription ${googlePlayProductDetails.id} without a valid offer token. This is usually a Play Store configuration or cache issue.',
+            reason: 'Attempted to purchase subscription without offer token.',
             fatal: false,
           );
           _notificationService.showNotification(
@@ -383,14 +354,13 @@ class FundsBackend with ChangeNotifier {
           offerToken: offerToken,
         );
       } else {
-        // Non-subscription products (credits) use the regular PurchaseParam.
         purchaseParam = PurchaseParam(
           productDetails: freshProductDetails,
           applicationUserName: user.uid,
         );
       }
     } else {
-      // iOS and others: no offer token concept.
+      // iOS
       purchaseParam = PurchaseParam(
         productDetails: freshProductDetails,
         applicationUserName: user.uid,
@@ -407,74 +377,39 @@ class FundsBackend with ChangeNotifier {
       bool isLikelyStaleProductError = false;
       bool isInvalidOfferTokenError = false;
       bool isIOSStoreKitError = false;
-
       String message = '';
       String code = '';
 
       if (e is PlatformException) {
         message = (e.message ?? '').toLowerCase();
         code = e.code.toLowerCase();
-
-        // Android: Stale Intent Errors
-        if (message.contains('pendingintent') ||
-            message.contains('null object reference') ||
-            message.contains('getintentsender')) {
+        if (message.contains('pendingintent') || message.contains('null object reference') || message.contains('getintentsender')) {
           isLikelyStaleProductError = true;
         }
-
-        // Android: Invalid Offer Token
-        if (code.contains('invalid_offer_token') ||
-            message.contains('invalid_offer_token')) {
+        if (code.contains('invalid_offer_token') || message.contains('invalid_offer_token')) {
           isInvalidOfferTokenError = true;
         }
-
-        // iOS: StoreKit Generic Errors (User Cancelled often masks as this)
         if (defaultTargetPlatform == TargetPlatform.iOS) {
-          if (code == 'unknown' ||
-              message.contains('storekiterror') ||
-              message.contains('usercancelled')) {
+          if (code == 'unknown' || message.contains('storekiterror') || message.contains('usercancelled')) {
             isIOSStoreKitError = true;
           }
         }
       }
-
-      // String check fallback
       final errorString = e.toString().toLowerCase();
-      if (errorString.contains('storekiterror')) {
-        isIOSStoreKitError = true;
-      }
+      if (errorString.contains('storekiterror')) isIOSStoreKitError = true;
 
       log('Error initiating purchase flow: $e', name: _logName, error: e);
 
       if (isLikelyStaleProductError) {
-        log('Known native billing crash suppressed (PendingIntent).', name: _logName);
-        _notificationService.showNotification(
-          message: _localizations.anErrorOccurred,
-          type: NotificationType.error,
-        );
+        _notificationService.showNotification(message: _localizations.anErrorOccurred, type: NotificationType.error);
       } else if (isInvalidOfferTokenError) {
-        log('INVALID_OFFER_TOKEN encountered.', name: _logName);
-        _notificationService.showNotification(
-          message: _localizations.productNotFound,
-          type: NotificationType.error,
-          oneLine: false,
-        );
+        _notificationService.showNotification(message: _localizations.productNotFound, type: NotificationType.error, oneLine: false);
       } else if (isIOSStoreKitError) {
         log('iOS StoreKit generic error (likely user cancelled). Ignored.', name: _logName);
       } else {
-        await _crashlytics.recordError(
-          e,
-          stack,
-          reason: 'UNKNOWN error on buy call for product ${freshProductDetails.id}',
-          fatal: false,
-        );
-        _notificationService.showNotification(
-          message: _localizations.anErrorOccurred,
-          type: NotificationType.error,
-          oneLine: false,
-        );
+        await _crashlytics.recordError(e, stack, reason: 'UNKNOWN error on buy call', fatal: false);
+        _notificationService.showNotification(message: _localizations.anErrorOccurred, type: NotificationType.error, oneLine: false);
       }
-
       _setPurchasePending(false);
     }
   }
@@ -485,27 +420,6 @@ class FundsBackend with ChangeNotifier {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    final isDesignatedTester = user.email == "mustawtfa@gmail.com";
-
-    // --- PATH 1: DESIGNATED TESTER CANCELLATION ---
-    if (isDesignatedTester) {
-      log('Designated tester is managing subscription. Triggering test cancellation.', name: _logName);
-      // To cancel, the tester "purchases" a special, non-existent product ID.
-      // The server recognizes this ID and processes a cancellation.
-      final cancelProduct = ProductDetails(
-        id: 'cancel_subscription_test',
-        title: 'Cancel Test Subscription',
-        description: 'A virtual product to cancel a test subscription.',
-        price: '',
-        rawPrice: 0.0,
-        currencyCode: '',
-      );
-      // We reuse the main purchase function, which already has the tester logic.
-      await purchase(cancelProduct);
-      return;
-    }
-
-    // --- PATH 2: REGULAR USER MANAGEMENT (Platform Aware) ---
     Uri url;
     if (Platform.isIOS) {
       url = Uri.parse('https://apps.apple.com/account/subscriptions');
@@ -575,10 +489,39 @@ class FundsBackend with ChangeNotifier {
       oneLine: false,
     );
 
-    final verificationData =
-    defaultTargetPlatform == TargetPlatform.iOS
-        ? purchaseDetails.verificationData.localVerificationData
-        : purchaseDetails.verificationData.serverVerificationData;
+    String? verificationData;
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      verificationData = await _resolveIosReceiptBase64(purchaseDetails);
+
+      if (verificationData == null) {
+        log('iOS receipt could not be resolved. Will NOT complete purchase yet.', name: _logName);
+
+        _notificationService.showNotification(
+          message: _localizations.verificationDelayed,
+          type: NotificationType.error,
+          oneLine: false,
+        );
+
+        _setPurchasePending(false);
+        return;
+      }
+    } else {
+      final server = purchaseDetails.verificationData.serverVerificationData.trim();
+      final local = purchaseDetails.verificationData.localVerificationData.trim();
+
+      verificationData = !_isPlaceholderReceipt(server) ? server : (!_isPlaceholderReceipt(local) ? local : null);
+
+      if (verificationData == null) {
+        log('Skipping cloud verification: invalid or empty receipt for ${purchaseDetails.productID}', name: _logName);
+
+        if (purchaseDetails.pendingCompletePurchase) {
+          await _inAppPurchase.completePurchase(purchaseDetails);
+        }
+        _setPurchasePending(false);
+        return;
+      }
+    }
 
     void safeAddEvent() {
       if (!_purchaseCompletedController.isClosed) {
@@ -603,6 +546,7 @@ class FundsBackend with ChangeNotifier {
         'productId': purchaseDetails.productID,
         'platform': defaultTargetPlatform.name.toLowerCase(),
         'packageName': appPackageName,
+        'transactionId': purchaseDetails.purchaseID,
       });
 
       if (purchaseDetails.pendingCompletePurchase) {

@@ -198,12 +198,16 @@ class AppbarState extends State<Appbar> with TickerProviderStateMixin {
             if (mounted) setState(() => _isCreditsPanelVisible = false);
           },
         );
-        titleContentWidget = Text(
-          widget.appTitle,
-          key: const ValueKey('app_title'),
-          style: GoogleFonts.mavenPro(
-              color: AppColors.primaryColor.inverted,
-              fontSize: titleFontSize),
+        titleContentWidget = FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            widget.appTitle,
+            key: const ValueKey('app_title'),
+            maxLines: 1,
+            style: GoogleFonts.mavenPro(
+                color: AppColors.primaryColor.inverted,
+                fontSize: titleFontSize),
+          ),
         );
         break;
 
