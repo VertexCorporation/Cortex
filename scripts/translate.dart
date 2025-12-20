@@ -10,7 +10,7 @@ Future<void> main(List<String> args) async {
   if (renameArg.isNotEmpty) {
     final pairsString = renameArg.split('=')[1];
     if (pairsString.isEmpty) {
-      stderr.writeln('❌ Error: --rename argument have to take a value. Örn: --rename=old:new');
+      stderr.writeln('❌ Error: --rename argument have to take a value. Example: --rename=old:new');
       exit(1);
     }
 
