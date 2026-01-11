@@ -2,7 +2,6 @@
 
 import 'dart:io';
 import 'package:cortex/app.dart';
-import 'package:cortex/chat/screen/selected/widgets/input/buttons.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +10,8 @@ import '../../../../../internet.dart';
 import '../../../../../notifications/introvert.dart';
 import '../../../../../theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+
+import 'buttons.dart';
 
 class InputField extends StatefulWidget {
   final AppLocalizations localizations;

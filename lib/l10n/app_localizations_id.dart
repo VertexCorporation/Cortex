@@ -239,6 +239,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get starConversation => 'Bintangi';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => 'Judul percakapan diperbarui';
 
   @override
@@ -2146,4 +2149,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get emulatorModeWarning =>
       'Fitur ini dinonaktifkan dalam mode emulator.';
+
+  @override
+  String get newChat => 'New Chat';
 }

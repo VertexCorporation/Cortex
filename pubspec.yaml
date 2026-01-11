@@ -112,16 +112,10 @@ fonts:
 
       - asset: assets/fonts/roboto/Roboto-Bold.ttf
         weight: 700
-  - family: Maven Pro
+  - family: Ubuntu
     fonts:
-      - asset: assets/fonts/mavenpro/MavenPro-Regular.ttf
+      - asset: assets/fonts/ubuntu/Ubuntu-Regular.ttf
         weight: 400
-
-      - asset: assets/fonts/mavenpro/MavenPro-Medium.ttf
-        weight: 500
-
-      - asset: assets/fonts/mavenpro/MavenPro-SemiBold.ttf
-        weight: 600
 
 flutter_launcher_icons:
   android: true
@@ -159,7 +153,7 @@ flutter:
     - assets/characters/
     - assets/splash/
     - assets/fonts/roboto/
-    - assets/fonts/mavenpro/
+    - assets/fonts/ubuntu/
     - assets/models/
     - assets/producers/
     - assets/neuro/

@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/providers/local.dart';
-import '../screen/selected/dynamic.dart';
+import '../services/dynamic.dart';
 
 enum AppBarMode {
   notSelected,

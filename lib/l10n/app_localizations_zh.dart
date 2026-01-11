@@ -236,6 +236,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get starConversation => '收藏';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => '对话标题已更新';
 
   @override
@@ -2011,4 +2014,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get emulatorModeWarning => '此功能在模拟器模式下禁用。';
+
+  @override
+  String get newChat => 'New Chat';
 }

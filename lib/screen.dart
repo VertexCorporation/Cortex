@@ -3,27 +3,23 @@
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'app.dart';
 import 'chat/main/controller.dart';
 import 'chat/providers/conversation.dart';
 import 'chat/providers/input.dart';
 import 'chat/providers/session.dart';
 import 'chat/services/read.dart';
 import 'chat/services/select.dart';
+import 'chat/widgets/news/view.dart';
 import 'exit.dart';
 import 'inbox/manager.dart';
-import 'inbox/screen.dart';
 import 'initialization.dart';
-import 'l10n/app_localizations.dart';
 import 'language.dart';
 import 'library/backend/data/entity.dart';
 import 'library/providers/catalog.dart';
 import 'library/providers/local.dart';
 import 'library/screen/models/controller.dart';
-import 'main.dart';
-import 'notifications/introvert.dart';
+import 'sidebar.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -32,21 +28,25 @@ class MainScreen extends StatefulWidget {
   MainScreenState createState() => MainScreenState();
 }
 
-class MainScreenState extends State<MainScreen> {
-  final GlobalKey<ChatControllerState> chatScreenKey =
-  GlobalKey<ChatControllerState>();
-  final GlobalKey<InboxScreenState> inboxScreenKey =
-  GlobalKey<InboxScreenState>();
-  final GlobalKey<LibraryScreenState> libraryScreenKey =
-  GlobalKey<LibraryScreenState>();
+class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
+  final GlobalKey<ChatControllerState> chatScreenKey = GlobalKey<ChatControllerState>();
 
-  int _previousTabIndex = 0;
-  bool hideBottomAppBar = false;
-  bool _wasInAllModelsView = false;
+  late AnimationController _sidebarController;
+  AnimationController? _elasticController; // Dedicated controller for the spring-back
+
+  // Extra width dragged beyond the 85% mark
+  double _elasticWidth = 0.0;
+
+  bool _isSearchFocused = false;
 
   @override
   void initState() {
     super.initState();
+    _sidebarController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350), // Base duration
+      value: 0.0,
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -55,9 +55,197 @@ class MainScreenState extends State<MainScreen> {
     });
   }
 
-  /// Helper method to forcefully and safely dismiss the keyboard.
-  /// This is crucial for iOS where the back button doesn't implicitly close it,
-  /// and for navigation events where the keyboard might stick around.
+  @override
+  void dispose() {
+    _sidebarController.dispose();
+    _elasticController?.dispose();
+    super.dispose();
+  }
+
+  // --- DRAWER & GESTURE LOGIC ---
+
+  void toggleSidebar() {
+    if (_sidebarController.isDismissed) {
+      _animateSidebarTo(1.0);
+      FocusManager.instance.primaryFocus?.unfocus();
+    } else {
+      _closeSidebarWithAnimation();
+    }
+  }
+
+  void closeSidebar() {
+    if (!_sidebarController.isDismissed) {
+      _closeSidebarWithAnimation();
+    }
+  }
+
+  void _closeSidebarWithAnimation() {
+    if (_isSearchFocused) setState(() => _isSearchFocused = false);
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    // Snap elastic to 0 immediately if closing
+    if (_elasticWidth > 0) {
+      setState(() => _elasticWidth = 0.0);
+    }
+    _animateSidebarTo(0.0);
+  }
+
+  /// Animates the sidebar with dynamic duration based on distance
+  void _animateSidebarTo(double target) {
+    // Calculate how far we need to go (0.0 to 1.0)
+    final double dist = (target - _sidebarController.value).abs();
+
+    // Adjust duration: Short distance = faster, Long distance = slower (but capped)
+    // This fixes the "slow start" issue.
+    final int ms = (350 * dist).clamp(150, 350).toInt();
+
+    _sidebarController.animateTo(
+      target,
+      duration: Duration(milliseconds: ms),
+      curve: Curves.easeOutQuart, // Very smooth, mobile-native feel
+    );
+  }
+
+  void _onDragUpdate(DragUpdateDetails details) {
+    if (_isSearchFocused) return;
+
+    final double screenW = MediaQuery.of(context).size.width;
+    final double standardSidebarW = screenW * 0.85;
+    final double delta = details.primaryDelta!;
+
+    // 1. Elastic Drag (Pulling right when already Open)
+    if (_sidebarController.value >= 1.0 && delta > 0) {
+      setState(() {
+        // Resistance Factor: 0.25 (Feel free to tweak: 0.1 is stiff, 0.5 is loose)
+        // Logarithmic resistance makes it harder to pull the further you go
+        double resistance = 1.0 - (_elasticWidth / (screenW * 0.3)).clamp(0.0, 0.8);
+        _elasticWidth += delta * 0.25 * resistance;
+      });
+    }
+    // 2. Recovering from Elasticity (Pushing left back to standard width)
+    else if (_elasticWidth > 0) {
+      setState(() {
+        _elasticWidth += delta;
+        // If we pushed back past 0, start closing the sidebar normally
+        if (_elasticWidth < 0) {
+          double remainingDelta = _elasticWidth; // Negative value
+          _elasticWidth = 0.0;
+          _sidebarController.value += remainingDelta / standardSidebarW;
+        }
+      });
+    }
+    // 3. Normal Slide (0% to 100% of Sidebar)
+    else {
+      _sidebarController.value += delta / standardSidebarW;
+    }
+  }
+
+  void _onDragEnd(DragEndDetails details) {
+    if (_isSearchFocused) return;
+
+    final double velocity = details.primaryVelocity!;
+
+    // 1. Handle Elastic Spring Back
+    if (_elasticWidth > 0) {
+      _runElasticSpringBack();
+      // Ensure sidebar stays open
+      _sidebarController.value = 1.0;
+      return;
+    }
+
+    // 2. Fling Logic (Fast Swipe)
+    if (velocity.abs() > 300) {
+      if (velocity > 0) {
+        _animateSidebarTo(1.0); // Fling Open
+      } else {
+        _animateSidebarTo(0.0); // Fling Close
+      }
+      return;
+    }
+
+    // 3. Static Position Logic (No Fling)
+    if (_sidebarController.value > 0.5) {
+      _animateSidebarTo(1.0);
+    } else {
+      _animateSidebarTo(0.0);
+    }
+  }
+
+  void _runElasticSpringBack() {
+    _elasticController?.dispose();
+    _elasticController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600), // Longer duration for bouncy feel
+    );
+
+    final double startElastic = _elasticWidth;
+
+    // ElasticOut curve gives that nice "boing" effect
+    final Animation<double> curve = CurvedAnimation(
+      parent: _elasticController!,
+      curve: Curves.elasticOut,
+    );
+
+    _elasticController!.addListener(() {
+      setState(() {
+        _elasticWidth = startElastic * (1 - curve.value);
+      });
+    });
+
+    _elasticController!.forward();
+  }
+
+  // --- NAVIGATION HELPERS ---
+  void openLibraryScreen() => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LibraryScreen()));
+
+  void openConversation(ConversationManager manager) async {
+    _forceCloseKeyboard();
+    await context.read<AppInitializer>().onCoreServicesReady;
+    if (!mounted) return;
+    final ReadService readService = context.read<ReadService>();
+    final LocaleProvider localeProvider = context.read<LocaleProvider>();
+    await readService.loadConversation(manager, languageCode: localeProvider.locale.languageCode);
+    closeSidebar();
+  }
+
+  void startNewConversation({bool isDynamic = true}) {
+    _forceCloseKeyboard();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final session = context.read<ChatSessionProvider>();
+      final conv = context.read<ConversationProvider>();
+      final input = context.read<InputProvider>();
+      if (isDynamic) {
+        session.startDynamicConversation();
+      } else {
+        session.resetSessionState();
+      }
+      conv.clearConversation();
+      input.resetInputState();
+      closeSidebar();
+    });
+  }
+
+  void startChatWithModel(ModelEntity model) {
+    _forceCloseKeyboard();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<SelectionService>().selectModel(model);
+      if (Navigator.canPop(context)) Navigator.pop(context);
+      closeSidebar();
+    });
+  }
+
+  void _openNewsModal() {
+    showModalBottomSheet(
+      context: context, isScrollControlled: true, backgroundColor: AppColors.background,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.8, maxChildSize: 0.95, minChildSize: 0.5, expand: false,
+        builder: (_, __) => Container(padding: const EdgeInsets.all(16), child: const NewsSection()),
+      ),
+    );
+  }
+
   void _forceCloseKeyboard() {
     final FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
@@ -65,181 +253,10 @@ class MainScreenState extends State<MainScreen> {
     }
   }
 
-  void onItemTapped(int index, {bool pulseOffline = false}) {
-    _forceCloseKeyboard();
-
-    final TabProvider tabProvider =
-    Provider.of<TabProvider>(context, listen: false);
-
-    if (tabProvider.selectedIndex != index) {
-      setState(() {
-        _previousTabIndex = tabProvider.selectedIndex;
-      });
-    }
-
-    if (index == 0) {
-      chatScreenKey.currentState?.onReactivated();
-    }
-
-    if (index == 1 && pulseOffline) {
-      debugPrint("[MainScreen] Explicit Pulse request received via Navigation.");
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        libraryScreenKey.currentState?.triggerPulseAnimation();
-      });
-    }
-
-    tabProvider.setSelectedIndex(index);
-  }
-
-  void updateBottomAppBarVisibility([bool value = false]) {
-    if (hideBottomAppBar == value) return;
-
-    setState(() {
-      hideBottomAppBar = value;
-    });
-
-    final introvertService =
-    Provider.of<IntrovertNotificationService>(context, listen: false);
-    introvertService.updateBottomBarVisibility(!hideBottomAppBar);
-
-    try {
-      Provider.of<ThemeProvider>(context, listen: false)
-          .updateSystemUIOverlayStyle();
-    } catch (_) {}
-  }
-
-  void openConversation(ConversationManager manager) async {
-    _forceCloseKeyboard();
-
-    final TabProvider tabProvider =
-    Provider.of<TabProvider>(context, listen: false);
-
-    setState(() {
-      _previousTabIndex = tabProvider.selectedIndex;
-    });
-
-    tabProvider.setSelectedIndex(0);
-
-    await context.read<AppInitializer>().onCoreServicesReady;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-
-      final ReadService readService = context.read<ReadService>();
-      final LocaleProvider localeProvider = context.read<LocaleProvider>();
-
-      readService.loadConversation(
-        manager,
-        languageCode: localeProvider.locale.languageCode,
-      );
-    });
-  }
-
-  void startNewConversation({bool isDynamic = false})
-  {
-    _forceCloseKeyboard();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-
-      final TabProvider tabProvider =
-      Provider.of<TabProvider>(context, listen: false);
-
-      setState(() {
-        _previousTabIndex = tabProvider.selectedIndex == 0 ? 0 : tabProvider.selectedIndex;
-      });
-
-      if (tabProvider.selectedIndex != 0) {
-        tabProvider.setSelectedIndex(0);
-      }
-
-      final ChatSessionProvider sessionProvider =
-      context.read<ChatSessionProvider>();
-      final ConversationProvider conversationProvider =
-      context.read<ConversationProvider>();
-      final InputProvider inputProvider = context.read<InputProvider>();
-
-      if (isDynamic) {
-        sessionProvider.startDynamicConversation();
-      } else {
-        sessionProvider.resetSessionState();
-      }
-
-      conversationProvider.clearConversation();
-      inputProvider.resetInputState();
-
-      updateBottomAppBarVisibility(true);
-    });
-  }
-
-  void startChatWithModel(ModelEntity model) {
-    _forceCloseKeyboard();
-
-    final TabProvider tabProvider =
-    Provider.of<TabProvider>(context, listen: false);
-    final ChatSessionProvider sessionProvider =
-    context.read<ChatSessionProvider>();
-
-    if (sessionProvider.appBarMode == AppBarMode.inSelection) {
-      setState(() {
-        _wasInAllModelsView = true;
-      });
-    }
-
-    setState(() {
-      _previousTabIndex = tabProvider.selectedIndex;
-    });
-
-    tabProvider.setSelectedIndex(0);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final SelectionService selectionService =
-      context.read<SelectionService>();
-      selectionService.selectModel(model);
-    });
-  }
-
-  Future<void> _handleChatExit() async {
-    _forceCloseKeyboard();
-
-    await chatScreenKey.currentState?.handleExit();
-
-    if (mounted) {
-      Provider.of<TabProvider>(context, listen: false)
-          .setSelectedIndex(_previousTabIndex);
-    }
-
-    if (_wasInAllModelsView) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        chatScreenKey.currentState?.inactiveChatViewKey.currentState
-            ?.showAllModelsView();
-      });
-      setState(() {
-        _wasInAllModelsView = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final TabProvider tabProvider = Provider.of<TabProvider>(context);
-    final AppLocalizations appLocalizations = AppLocalizations.of(context)!;
-    final Size screenSize = MediaQuery.of(context).size;
-    final double screenHeight = screenSize.height;
-    final double screenWidth = screenSize.width;
-    final bool isTablet = screenSize.shortestSide >= 600;
-
-    final double bottomBarHeight = isTablet ? 80.0 : screenHeight * 0.09;
-    final double iconBaseSize = isTablet ? 28.0 : screenHeight * 0.028;
-    final double iconContainerSize = iconBaseSize * 1.2;
-    final double labelSpacing = isTablet ? 6.0 : screenHeight * 0.002;
-    final double shadowBlurRadius = isTablet ? 10.0 : screenWidth * 0.02;
-    final double borderRadius = isTablet ? 24.0 : screenWidth * 0.04;
-    final double horizontalPadding = isTablet ? screenWidth * 0.15 : 0.0;
-
-    final bool useExpandedButtons = !isTablet;
-    final bool shouldHideBottomAppBar = hideBottomAppBar;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final double standardSidebarWidth = screenWidth * 0.85;
 
     return Title(
       title: 'Cortex',
@@ -248,330 +265,126 @@ class MainScreenState extends State<MainScreen> {
         canPop: false,
         onPopInvokedWithResult: (bool didPop, dynamic _) async {
           if (didPop) return;
-
-          final bool isKeyboardVisible =
-              MediaQuery.of(context).viewInsets.bottom > 0;
-          if (isKeyboardVisible) {
-            _forceCloseKeyboard(); // Use our robust helper here as well
+          if (!_sidebarController.isDismissed) {
+            closeSidebar();
             return;
           }
-
-          final ChatControllerState? chatControllerState =
-              chatScreenKey.currentState;
-
-          if (chatControllerState == null) {
-            final bool shouldExit = await showExitConfirmationDialog(context);
-            if (shouldExit) {
-              SystemNavigator.pop();
-            }
+          if (MediaQuery.of(context).viewInsets.bottom > 0) {
+            _forceCloseKeyboard();
             return;
           }
-
-          if (!chatControllerState.handleSystemBackPress()) {
-            return;
-          }
-
-          final ChatSessionProvider sessionProvider =
-          context.read<ChatSessionProvider>();
-          final AppBarMode currentMode = sessionProvider.appBarMode;
-
-          if (currentMode == AppBarMode.inSelection) {
-            chatControllerState.inactiveChatViewKey.currentState
-                ?.showSelectionView();
-            return;
-          }
-
-          if (sessionProvider.isChatActive) {
-            await _handleChatExit();
-            return;
-          }
-
+          final ChatControllerState? chatControllerState = chatScreenKey.currentState;
+          if (chatControllerState != null && !chatControllerState.handleSystemBackPress()) return;
           final bool shouldExit = await showExitConfirmationDialog(context);
-          if (shouldExit) {
-            SystemNavigator.pop();
-          }
+          if (shouldExit) SystemNavigator.pop();
         },
         child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          body: FadeIndexedStack(
-            index: tabProvider.selectedIndex,
-            duration: const Duration(milliseconds: 200),
-            children: <Widget>[
-              Consumer<ChatSessionProvider>(
-                builder: (context, sessionProvider, _) {
-                  return ChatController(
-                    key: chatScreenKey,
-                    onModelSelectionChanged: (bool isSelected) {
-                      updateBottomAppBarVisibility(isSelected);
-                    },
-                    onExitRequest: _handleChatExit,
-                  );
-                },
-              ),
-              LibraryScreen(
-                key: libraryScreenKey,
-              ),
-              InboxScreen(key: inboxScreenKey),
-            ],
-          ),
-          bottomNavigationBar: shouldHideBottomAppBar
-              ? null
-              : Consumer<ThemeProvider>(
-            builder: (
-                BuildContext context,
-                ThemeProvider themeProvider,
-                Widget? child,
-                ) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(borderRadius),
-                    topRight: Radius.circular(borderRadius),
-                  ),
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: AppColors.primaryColor.inverted
-                          .withValues(alpha: 0.1),
-                      blurRadius: shadowBlurRadius,
-                      offset: Offset(0, -2.0),
+          backgroundColor: AppColors.background,
+          resizeToAvoidBottomInset: false,
+          body: GestureDetector(
+            onHorizontalDragUpdate: _onDragUpdate,
+            onHorizontalDragEnd: _onDragEnd,
+            child: AnimatedBuilder(
+              animation: Listenable.merge([_sidebarController, _elasticController]),
+              builder: (context, child) {
+
+                // Use the controller value directly for linear-mapped logic,
+                // but use a Curve for opacity to make it look nicer.
+                final double rawValue = _sidebarController.value;
+                final double curvedValue = Curves.easeOutQuad.transform(rawValue);
+
+                // --- CALCULATIONS ---
+
+                // 1. Sidebar Width Logic
+                // If search is focused, full screen.
+                // Else: Standard Width + Elastic Drag
+                final double currentSidebarWidth = _isSearchFocused
+                    ? screenWidth
+                    : (standardSidebarWidth + _elasticWidth);
+
+                // 2. Main Screen Translation (X Axis)
+                // Moves right by Standard Width * Progress + Elastic Drag
+                double mainScreenX = (standardSidebarWidth * rawValue);
+                if (!_isSearchFocused) mainScreenX += _elasticWidth;
+
+                // 3. Sidebar Translation (Parallax Effect)
+                // Starts at -25% (offset left). Moves to 0.
+                // This creates the depth effect.
+                // If elastic > 0, we lock it to 0 so it feels anchored while stretching.
+                double sidebarParallaxX = -(standardSidebarWidth * 0.25) * (1.0 - rawValue);
+
+                if (_isSearchFocused || _elasticWidth > 0) {
+                  sidebarParallaxX = 0;
+                }
+
+                // 4. Overlay Dimming
+                double dimOpacity = (curvedValue * 0.5).clamp(0.0, 1.0);
+
+                return Stack(
+                  children: [
+                    // --- LAYER 1: SIDEBAR ---
+                    Transform.translate(
+                      offset: Offset(sidebarParallaxX, 0),
+                      child: SizedBox(
+                        width: currentSidebarWidth,
+                        height: MediaQuery.of(context).size.height,
+                        child: Sidebar(
+                          onNewChatTap: () => startNewConversation(isDynamic: true),
+                          onLibraryTap: openLibraryScreen,
+                          onNewsTap: _openNewsModal,
+                          onOfflineModeChanged: (val) {},
+                          onSearchFocusChanged: (focused) {
+                            setState(() => _isSearchFocused = focused);
+                          },
+                          // Pass standard width so internal items don't stretch weirdly
+                          referenceWidth: standardSidebarWidth,
+                        ),
+                      ),
+                    ),
+
+                    // --- LAYER 2: MAIN SCREEN ---
+                    Transform.translate(
+                      offset: Offset(mainScreenX, 0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          boxShadow: [
+                            // Shadow grows as drawer opens
+                            if (rawValue > 0)
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.3 * rawValue),
+                                blurRadius: 30,
+                                spreadRadius: -5,
+                                offset: const Offset(-10, 0),
+                              )
+                          ],
+                        ),
+                        child: Stack(
+                          children: [
+                            // Chat Screen
+                            ChatController(key: chatScreenKey),
+
+                            // Dimming Overlay
+                            if (rawValue > 0 && !_isSearchFocused)
+                              IgnorePointer(
+                                ignoring: false,
+                                child: GestureDetector(
+                                  onTap: closeSidebar,
+                                  child: Container(
+                                    color: Colors.black.withValues(alpha: dimOpacity),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
-                ),
-                child: BottomAppBar(
-                  color: Colors.transparent,
-                  elevation: 0,
-                  padding: EdgeInsets.zero,
-                  child: Container(
-                    height: bottomBarHeight,
-                    padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding),
-                    child: Row(
-                      mainAxisAlignment: isTablet
-                          ? MainAxisAlignment.spaceBetween
-                          : MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        BottomNavigationButton(
-                          iconPath: 'assets/icons/inbox.svg',
-                          label: appLocalizations.chats,
-                          isSelected: tabProvider.selectedIndex == 2,
-                          onTap: () => onItemTapped(2),
-                          baseSize: iconBaseSize,
-                          containerSize: iconContainerSize,
-                          labelSpacing: labelSpacing,
-                          useExpanded: useExpandedButtons,
-                        ),
-                        BottomNavigationButton(
-                          iconPath: 'assets/icons/chat.svg',
-                          label: appLocalizations.chat,
-                          isSelected: tabProvider.selectedIndex == 0,
-                          onTap: () => onItemTapped(0),
-                          baseSize: iconBaseSize,
-                          containerSize: iconContainerSize,
-                          labelSpacing: labelSpacing,
-                          useExpanded: useExpandedButtons,
-                        ),
-                        BottomNavigationButton(
-                          iconPath: 'assets/icons/library.svg',
-                          label: appLocalizations.library,
-                          isSelected: tabProvider.selectedIndex == 1,
-                          onTap: () => onItemTapped(1),
-                          baseSize: iconBaseSize,
-                          containerSize: iconBaseSize * 1.2,
-                          labelSpacing: labelSpacing,
-                          useExpanded: useExpandedButtons,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// A reusable, animated bottom navigation button used in [MainScreen].
-class BottomNavigationButton extends StatelessWidget {
-  final String iconPath;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-  final double baseSize;
-  final double containerSize;
-  final double labelSpacing;
-  final bool useExpanded;
-
-  const BottomNavigationButton({
-    super.key,
-    required this.iconPath,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-    this.baseSize = 20.0,
-    this.containerSize = 24.0,
-    this.labelSpacing = 2.0,
-    this.useExpanded = true,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final Color iconColor = isSelected
-        ? AppColors.primaryColor.inverted
-        : AppColors.tertiaryColor;
-
-    Widget content = GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(
-            width: containerSize,
-            height: containerSize,
-            child: Center(
-              child: AnimatedScale(
-                scale: isSelected ? 1.2 : 1.0,
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                child: SvgPicture.asset(
-                  iconPath,
-                  width: baseSize,
-                  height: baseSize,
-                  colorFilter: ColorFilter.mode(
-                    iconColor,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: labelSpacing),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
-            style: TextStyle(
-              fontSize: baseSize * 0.5,
-              color: iconColor,
-              fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-            ),
-            child: AnimatedScale(
-              scale: isSelected ? 1.1 : 1.0,
-              duration: const Duration(milliseconds: 200),
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (useExpanded) {
-      return Expanded(child: content);
-    }
-
-    return Flexible(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 120.0),
-        child: content,
-      ),
-    );
-  }
-}
-
-class FadeIndexedStack extends StatefulWidget {
-  final int index;
-  final List<Widget> children;
-  final Duration duration;
-
-  const FadeIndexedStack({
-    super.key,
-    required this.index,
-    required this.children,
-    this.duration = const Duration(milliseconds: 250),
-  });
-
-  @override
-  State<FadeIndexedStack> createState() => _FadeIndexedStackState();
-}
-
-class _FadeIndexedStackState extends State<FadeIndexedStack> {
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: widget.children.asMap().entries.map((entry) {
-        final int childIndex = entry.key;
-        final Widget child = entry.value;
-        final bool isActive = childIndex == widget.index;
-
-        return _SmartFadeItem(
-          isActive: isActive,
-          duration: widget.duration,
-          child: child,
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _SmartFadeItem extends StatefulWidget {
-  final bool isActive;
-  final Duration duration;
-  final Widget child;
-
-  const _SmartFadeItem({
-    required this.isActive,
-    required this.duration,
-    required this.child,
-  });
-
-  @override
-  State<_SmartFadeItem> createState() => _SmartFadeItemState();
-}
-
-class _SmartFadeItemState extends State<_SmartFadeItem> {
-  late bool _isOffstage;
-
-  @override
-  void initState() {
-    super.initState();
-    _isOffstage = !widget.isActive;
-  }
-
-  @override
-  void didUpdateWidget(_SmartFadeItem oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.isActive && _isOffstage) {
-      setState(() {
-        _isOffstage = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Visibility(
-      visible: !_isOffstage,
-      maintainState: true,
-      maintainAnimation: true,
-      maintainSize: true,
-      child: AnimatedOpacity(
-        opacity: widget.isActive ? 1.0 : 0.0,
-        duration: widget.duration,
-        curve: Curves.easeInOut,
-        onEnd: () {
-          if (!widget.isActive) {
-            setState(() {
-              _isOffstage = true;
-            });
-          }
-        },
-        child: widget.child,
       ),
     );
   }

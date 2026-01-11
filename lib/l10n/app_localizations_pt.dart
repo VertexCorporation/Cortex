@@ -238,6 +238,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get starConversation => 'Favorito';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => 'Título da conversa atualizado';
 
   @override
@@ -2140,4 +2143,7 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get emulatorModeWarning =>
       'Essa função está desativada no modo emulador.';
+
+  @override
+  String get newChat => 'New Chat';
 }

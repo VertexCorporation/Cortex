@@ -237,6 +237,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get starConversation => 'Star';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => 'Conversation title updated';
 
   @override
@@ -274,7 +277,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rememberMe => 'Remember me';
 
   @override
-  String get forgotPassword => 'Forgot Password?';
+  String get forgotPassword => 'Forgot password?';
 
   @override
   String get or => 'Or';
@@ -2129,4 +2132,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get emulatorModeWarning =>
       'This feature is disabled in emulator mode.';
+
+  @override
+  String get newChat => 'New Chat';
 }

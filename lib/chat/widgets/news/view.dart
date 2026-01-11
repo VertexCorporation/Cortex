@@ -1,8 +1,8 @@
 // lib/chat/screen/unselected/widgets/news/view.dart
 
 import 'package:cortex/app.dart';
-import 'package:cortex/chat/screen/unselected/widgets/news/service.dart';
-import 'package:cortex/chat/screen/unselected/widgets/news/skeleton.dart';
+import 'package:cortex/chat/widgets/news/service.dart';
+import 'package:cortex/chat/widgets/news/skeleton.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

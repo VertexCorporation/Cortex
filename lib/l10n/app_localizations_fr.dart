@@ -242,6 +242,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get starConversation => 'Mettre en favori';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => 'Titre de la conversation mis à jour';
 
   @override
@@ -2164,4 +2167,7 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get emulatorModeWarning =>
       'Cette fonctionnalité est désactivée en mode émulateur.';
+
+  @override
+  String get newChat => 'New Chat';
 }

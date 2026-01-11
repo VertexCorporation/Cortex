@@ -6,28 +6,17 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../library/backend/data/entity.dart';
-import '../../../library/backend/data/service.dart';
+import '../../library/backend/data/entity.dart';
+import '../../library/backend/data/service.dart';
 
 /// A dedicated service class to handle all logic related to the Dynamic Chat feature.
-///
-/// This service manages the user's preference for a "pinned" dynamic assistant,
-/// handles the UI for selecting that assistant, and interacts exclusively with the
-/// ChatSessionProvider to read and modify the application's session state.
 class DynamicChatService {
-  /// A reference to the central session state management provider.
   final ChatSessionProvider _sessionProvider;
 
-  /// A private key for storing the pinned assistant's ID in SharedPreferences.
   static const String dynamicAssistantKey = 'dynamic_chat_assistant_id';
 
-  /// Constructs the DynamicChatService with its required dependency.
   DynamicChatService(this._sessionProvider);
 
-  /// Loads the user's preferred dynamic assistant from SharedPreferences.
-  ///
-  /// It validates the saved model ID against the models loaded in the provider
-  /// and triggers the appropriate state change via the provider's methods.
   /// Loads the user's preferred dynamic assistant from SharedPreferences.
   Future<void> loadDynamicAssistantPreference({
     required String langCode,
@@ -37,24 +26,18 @@ class DynamicChatService {
     final assistantId = prefs.getString(dynamicAssistantKey);
 
     if (assistantId == null || assistantId.isEmpty) {
-      debugPrint("[DynamicChatService] No dynamic assistant preference found.");
       if (_sessionProvider.isDynamicChat && _sessionProvider.modelId != null) {
         _sessionProvider.unpinDynamicAssistant();
       }
       return;
     }
 
-    // Fetch the entity with the required langCode, using the provided modelService.
     final model = modelService.getPreciseModelData(assistantId, langCode: langCode);
-
-    // A model is valid if its ID is not 'Unknown Model' (the fallback ID).
     final bool isValid = model.displayTitle != 'Unknown Model';
 
     if (isValid) {
-      debugPrint("[DynamicChatService] Valid dynamic assistant found: '$assistantId'. Pinning model.");
       _sessionProvider.pinDynamicAssistant(assistantId);
     } else {
-      debugPrint("[DynamicChatService] WARN: Saved assistant '$assistantId' is no longer available.");
       await _saveDynamicAssistantPreference(null);
       _sessionProvider.unpinDynamicAssistant();
     }
@@ -62,32 +45,33 @@ class DynamicChatService {
 
   /// Displays the overlay panel for the user to select their default dynamic assistant.
   ///
-  /// This method encapsulates all UI logic for creating, showing, and securely
-  /// dismissing the selection panel using a robust animation approach.
+  /// [anchorContext]: The BuildContext of the widget (usually the AppBar title)
+  /// under which the panel should appear.
   void showDynamicAssistantPanel({
     required BuildContext context,
-    required GlobalKey chatTitleKey,
+    required BuildContext anchorContext, // Changed: We now pass the specific context
   }) {
     debugPrint("[DynamicChatService] Attempting to show dynamic assistant panel.");
-    final RenderBox? renderBox = chatTitleKey.currentContext?.findRenderObject() as RenderBox?;
+
+    final RenderBox? renderBox = anchorContext.findRenderObject() as RenderBox?;
     if (renderBox == null) {
-      debugPrint("[DynamicChatService] CRITICAL: Could not find renderBox for chat title. Panel cannot be shown.");
+      debugPrint("[DynamicChatService] CRITICAL: Could not find renderBox for anchor. Panel cannot be shown.");
       return;
     }
 
-    // Pre-calculate options before triggering any UI updates.
     final modelService = context.read<ModelService>();
-
     final allOptions = _buildDynamicAssistantOptions(context, modelService: modelService);
+
     final currentlySelectedId = (_sessionProvider.isDynamicChat && _sessionProvider.modelId == null)
         ? '--dynamic--'
         : _sessionProvider.modelId;
 
     OverlayEntry? overlayEntry;
     final overlay = Overlay.of(context);
+
+    // Calculate position: Just below the anchor widget with a small gap
     final Offset offset = renderBox.localToGlobal(Offset(0, renderBox.size.height + 12));
 
-    // A local flag to track if the closing animation has started.
     bool isPanelClosing = false;
 
     overlayEntry = OverlayEntry(builder: (context) {
@@ -95,35 +79,30 @@ class DynamicChatService {
       final panelWidth = screenWidth * 0.9;
       final horizontalMargin = (screenWidth - panelWidth) / 2;
 
-      // StatefulBuilder is essential here to manage the local animation state of the overlay.
       return StatefulBuilder(builder: (context, setModalState) {
         return Stack(
           children: [
-            // A full-screen transparent detector to catch taps outside the panel.
+            // Transparent detector to close panel
             Positioned.fill(
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
-                onTap: () {
-                  // Start the closing animation.
-                  setModalState(() => isPanelClosing = true);
-                },
+                onTap: () => setModalState(() => isPanelClosing = true),
                 child: Container(color: Colors.transparent),
               ),
             ),
+            // The Panel
             Positioned(
               top: offset.dy,
               left: horizontalMargin,
               right: horizontalMargin,
               child: TweenAnimationBuilder<double>(
-                // Animate scale: 0.4 -> 1.0 (open), 1.0 -> 0.4 (close)
                 tween: Tween<double>(
                     begin: isPanelClosing ? 1.0 : 0.4,
                     end: isPanelClosing ? 0.4 : 1.0
                 ),
-                duration: const Duration(milliseconds: 150), // Smooth, quick animation.
+                duration: const Duration(milliseconds: 150),
                 curve: Curves.easeOutCubic,
                 onEnd: () {
-                  // CRITICAL: Only remove the overlay AFTER the closing animation finishes.
                   if (isPanelClosing) {
                     overlayEntry?.remove();
                     overlayEntry = null;
@@ -133,7 +112,6 @@ class DynamicChatService {
                   return Transform.scale(
                     scale: scale,
                     alignment: Alignment.topCenter,
-                    // Fade opacity concurrently with scale for a smoother effect.
                     child: Opacity(
                         opacity: (scale - 0.4) / (1.0 - 0.4),
                         child: child
@@ -147,7 +125,6 @@ class DynamicChatService {
                   modelTitle: AppLocalizations.of(context)!.dynamicChatTitle,
                   onDismiss: () => setModalState(() => isPanelClosing = true),
                   onSelect: (selectedOption) {
-                    // Trigger closing animation immediately upon selection.
                     setModalState(() => isPanelClosing = true);
                     final selectedId = selectedOption['id'] as String;
                     _handleDynamicAssistantSelection(selectedId);
@@ -163,14 +140,12 @@ class DynamicChatService {
     overlay.insert(overlayEntry!);
   }
 
-  /// Gathers, categorizes, and sorts all usable models for the assistant panel.
   List<Map<String, dynamic>> _buildDynamicAssistantOptions(
       BuildContext context, {
         required ModelService modelService,
       }) {
     final localizations = AppLocalizations.of(context)!;
     final langCode = Localizations.localeOf(context).languageCode;
-
     final allModelEntities = _sessionProvider.allModels;
 
     final List<ModelEntity> offlineOptions = [];
@@ -179,13 +154,13 @@ class DynamicChatService {
     final Map<String, List<ModelEntity>> onlineSeriesMap = {};
 
     for (final model in allModelEntities) {
-      if (!model.isServerSide) { // Offline
+      if (!model.isServerSide) {
         offlineOptions.add(model);
       } else if (model.category == 'roleplay') {
         characterOptions.add(model);
       } else if (model.category == 'self') {
         selfOptions.add(model);
-      } else { // Online models
+      } else {
         final seriesTitle = model.displayTitle;
         onlineSeriesMap.putIfAbsent(seriesTitle, () => []);
 
@@ -199,7 +174,6 @@ class DynamicChatService {
       }
     }
 
-    // Sort and flatten the online options.
     final List<ModelEntity> onlineOptions = [];
     int sorter(ModelEntity a, ModelEntity b) => a.displayTitle.toLowerCase().compareTo(b.displayTitle.toLowerCase());
 
@@ -215,22 +189,17 @@ class DynamicChatService {
     characterOptions.sort(sorter);
     selfOptions.sort(sorter);
 
-    // Combine into the final list with the "Random" option first.
     final List<Map<String, dynamic>> finalOptions = [
       {'id': '--dynamic--', 'title': localizations.dynamicChatTitle, 'tier': 'free'},
-      // Convert the sorted lists of entities into the map structure the UI expects.
       ...onlineOptions.map((m) => {'id': m.id, 'title': m.displayTitle, 'tier': m.tier}),
       ...offlineOptions.map((m) => {'id': m.id, 'title': m.displayTitle, 'tier': m.tier}),
       ...characterOptions.map((m) => {'id': m.id, 'title': m.displayTitle, 'tier': m.tier}),
       ...selfOptions.map((m) => {'id': m.id, 'title': m.displayTitle, 'tier': m.tier}),
     ];
 
-    debugPrint("[DynamicChatService] Built panel with ${finalOptions.length} options.");
     return finalOptions;
   }
 
-  /// Handles the state update logic after a user selects an assistant.
-  /// It updates persistent storage and delegates state changes to the provider.
   Future<void> _handleDynamicAssistantSelection(String selectedId) async {
     if (selectedId == '--dynamic--') {
       await _saveDynamicAssistantPreference(null);
@@ -241,15 +210,12 @@ class DynamicChatService {
     }
   }
 
-  /// Saves the user's choice to SharedPreferences.
   Future<void> _saveDynamicAssistantPreference(String? modelId) async {
     final prefs = await SharedPreferences.getInstance();
     if (modelId == null) {
       await prefs.remove(dynamicAssistantKey);
-      debugPrint("[DynamicChatService] Dynamic assistant preference cleared.");
     } else {
       await prefs.setString(dynamicAssistantKey, modelId);
-      debugPrint("[DynamicChatService] Saved '$modelId' as the new dynamic assistant.");
     }
   }
 }

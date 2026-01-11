@@ -237,6 +237,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get starConversation => 'Yıldızla';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => 'Sohbet başlığı güncellendi.';
 
   @override
@@ -2129,4 +2132,7 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get emulatorModeWarning =>
       'Bu özellik emülatör modunda devre dışıdır.';
+
+  @override
+  String get newChat => 'New Chat';
 }

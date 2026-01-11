@@ -38,20 +38,19 @@ import 'banner.dart';
 import 'chat/providers/conversation.dart';
 import 'chat/providers/input.dart';
 import 'chat/providers/session.dart';
-import 'chat/screen/unselected/widgets/news/service.dart';
 import 'chat/services/api.dart';
 import 'chat/services/context.dart';
 import 'chat/services/database.dart';
 import 'chat/services/offline.dart';
 import 'chat/services/read.dart';
-import 'chat/services/recent.dart';
 import 'chat/services/regenerate.dart';
 import 'chat/services/response.dart';
 import 'chat/services/scroll.dart';
 import 'chat/services/select.dart';
 import 'chat/services/send.dart';
 import 'chat/services/stop.dart';
-import 'chat/screen/selected/dynamic.dart';
+import 'chat/services/dynamic.dart';
+import 'chat/widgets/news/service.dart';
 import 'funds/backend.dart';
 import 'inbox/providers/general.dart';
 import 'initialization.dart';
@@ -568,13 +567,6 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
       create: (_) => InputProvider(),
     ),
 
-    // Recent models.
-    Provider<RecentModelsManager>(
-      create: (BuildContext context) => RecentModelsManager(
-        modelService: context.read<ModelService>(),
-      ),
-    ),
-
     // Core chat services.
     Provider<ApiService>(
       create: (_) => ApiService(),
@@ -629,7 +621,6 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
         apiService: context.read<ApiService>(),
         contextService: context.read<ContextService>(),
         scrollService: context.read<ScrollService>(),
-        recentModelsManager: context.read<RecentModelsManager>(),
         offlineService: context.read<OfflineService>(),
         modelService: context.read<ModelService>(),
       ),

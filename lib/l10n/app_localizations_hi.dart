@@ -238,6 +238,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get starConversation => 'तारांकित करें';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => 'बातचीत का शीर्षक अपडेट किया गया';
 
   @override
@@ -2131,4 +2134,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get emulatorModeWarning => 'एमुलेटर मोड में यह सुविधा निष्क्रिय है।';
+
+  @override
+  String get newChat => 'New Chat';
 }
