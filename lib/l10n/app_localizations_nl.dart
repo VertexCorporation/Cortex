@@ -240,6 +240,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get starConversation => 'Ster geven';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => 'Gesprekstitel bijgewerkt';
 
   @override
@@ -2152,4 +2155,7 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get emulatorModeWarning =>
       'Deze functie is uitgeschakeld in de emulatormodus.';
+
+  @override
+  String get newChat => 'New Chat';
 }

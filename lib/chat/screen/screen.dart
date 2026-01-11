@@ -4,15 +4,15 @@ import 'package:cortex/app.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:cortex/chat/screen/selected/tiles.dart';
+import 'package:cortex/chat/screen/tiles.dart';
 import 'package:provider/provider.dart';
 
-import '../../../fog.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../../theme.dart';
-import '../../providers/conversation.dart';
-import '../../providers/input.dart';
-import '../../providers/session.dart';
+import '../../fog.dart';
+import '../../l10n/app_localizations.dart';
+import '../../theme.dart';
+import '../providers/conversation.dart';
+import '../providers/input.dart';
+import '../providers/session.dart';
 
 /// Displays the active chat conversation, including the message list
 /// and the initial "empty state" for a new chat.

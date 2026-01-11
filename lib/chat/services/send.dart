@@ -18,7 +18,6 @@ import 'package:cortex/chat/services/api.dart';
 import 'package:cortex/chat/services/context.dart';
 import 'package:cortex/chat/services/moderator.dart';
 import 'package:cortex/chat/services/offline.dart';
-import 'package:cortex/chat/services/recent.dart';
 import 'package:cortex/chat/services/scroll.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:cortex/chat/services/utils.dart';
@@ -44,7 +43,6 @@ class SendService {
   final ApiService _apiService;
   final ContextService _contextService;
   final ScrollService _scrollService;
-  final RecentModelsManager _recentModelsManager;
   final OfflineService _offlineService;
   final Uuid _uuid = const Uuid();
   bool _isSending = false;
@@ -58,7 +56,6 @@ class SendService {
     required ApiService apiService,
     required ContextService contextService,
     required ScrollService scrollService,
-    required RecentModelsManager recentModelsManager,
     required OfflineService offlineService,
     required ModelService modelService,
   })  : _conversationProvider = conversationProvider,
@@ -67,7 +64,6 @@ class SendService {
         _apiService = apiService,
         _contextService = contextService,
         _scrollService = scrollService,
-        _recentModelsManager = recentModelsManager,
         _offlineService = offlineService,
         _modelService = modelService;
 
@@ -361,7 +357,6 @@ class SendService {
             langCode: langCode,
             modelService: _modelService,
           );
-          unawaited(_recentModelsManager.refresh(langCode: langCode));
         } catch (e) {
           debugPrint("[SendService] Could not update recent models for '$apiModelIdForSend'. Error: $e");
         }

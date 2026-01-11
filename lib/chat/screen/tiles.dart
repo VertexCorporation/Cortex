@@ -8,9 +8,9 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../library/backend/data/service.dart';
-import '../../messages/tiles/ai.dart';
-import '../../messages/tiles/user.dart';
+import '../../library/backend/data/service.dart';
+import '../messages/tiles/ai.dart';
+import '../messages/tiles/user.dart';
 
 /// A utility class that acts as a factory for building different types of message widgets.
 class Tiles {

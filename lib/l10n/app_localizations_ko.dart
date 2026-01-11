@@ -236,6 +236,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get starConversation => '별표 표시';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => '대화 제목이 업데이트되었습니다.';
 
   @override
@@ -2065,4 +2068,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get emulatorModeWarning => '이 기능은 에뮬레이터 모드에서 비활성화됩니다.';
+
+  @override
+  String get newChat => 'New Chat';
 }

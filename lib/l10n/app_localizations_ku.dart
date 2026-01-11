@@ -238,6 +238,9 @@ class AppLocalizationsKu extends AppLocalizations {
   String get starConversation => 'Stêrk';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => 'Sernavê sohbetê hate nûvekirin';
 
   @override
@@ -2135,4 +2138,7 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get emulatorModeWarning =>
       'Ev taybetmendî di moda emulatorê de neçalak e';
+
+  @override
+  String get newChat => 'New Chat';
 }

@@ -76,6 +76,7 @@
   "noStarredChatsMessage": "You didn't starred a chat yet.",
   "goToChats": "Star a chat",
   "starConversation": "Star",
+  "unstarConversation": "Unstar",
   "conversationTitleUpdated": "Conversation title updated",
   "youReachedConversationLimit": "You have reached the conversation limit.",
   "today": "Today",
@@ -600,9 +601,7 @@
   "@errorApiAuthentication": {},
   "@baseModelForCharacterDescription": {},
 
-  "forgotPassword": "Forgot Password?",
   "couldNotOpenLink": "Could not open the link",
-
   "downloadStarted": "Download started",
   "notAvailable": "Not Available",
 
@@ -919,7 +918,7 @@
   },
 
   "channelFcmDescription": "Notifications about news, updates and other information from Cortex.",
-  "@channelFcmName": {
+  "@channelFcmDescription": {
     "description": "The user-visible description for the main notification channel."
   },
 
@@ -995,5 +994,6 @@
   "@equivalentMonthlyDescription": { "placeholders": { "price": {} } },
   "confirmDownloadTitle": "Are you sure you want to download?",
   "downloadSizeDisclosure": "This model will occupy approximately {size} of space.",
-  "emulatorModeWarning": "This feature is disabled in emulator mode."
+  "emulatorModeWarning": "This feature is disabled in emulator mode.",
+  "newChat": "New Chat"
 }

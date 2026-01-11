@@ -9,7 +9,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
-import '../main.dart';
 import '../notifications/introvert.dart';
 import '../reconcile.dart';
 import '../screen.dart';
@@ -72,7 +71,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => MainScreen(key: mainScreenKey),
+            pageBuilder: (_, __, ___) => MainScreen(),
             transitionsBuilder: (_, animation, __, child) => FadeTransition(opacity: animation, child: child),
           ),
         );
@@ -181,7 +180,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     if(mounted) {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => MainScreen(key: mainScreenKey),
+          pageBuilder: (context, animation, secondaryAnimation) => MainScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },

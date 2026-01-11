@@ -554,6 +554,12 @@ abstract class AppLocalizations {
   /// **'Star'**
   String get starConversation;
 
+  /// No description provided for @unstarConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Unstar'**
+  String get unstarConversation;
+
   /// No description provided for @conversationTitleUpdated.
   ///
   /// In en, this message translates to:
@@ -629,7 +635,7 @@ abstract class AppLocalizations {
   /// No description provided for @forgotPassword.
   ///
   /// In en, this message translates to:
-  /// **'Forgot Password?'**
+  /// **'Forgot password?'**
   String get forgotPassword;
 
   /// No description provided for @or.
@@ -3628,13 +3634,13 @@ abstract class AppLocalizations {
   /// **'Your phone\'s charge might be running low, but my energy is always at 100%! Plug it in and let\'s keep chatting.'**
   String get notificationLowBatteryBody;
 
-  /// The user-visible description for the main notification channel.
+  /// The user-visible name for the main notification channel.
   ///
   /// In en, this message translates to:
   /// **'Cortex Updates'**
   String get channelFcmName;
 
-  /// No description provided for @channelFcmDescription.
+  /// The user-visible description for the main notification channel.
   ///
   /// In en, this message translates to:
   /// **'Notifications about news, updates and other information from Cortex.'**
@@ -3891,6 +3897,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This feature is disabled in emulator mode.'**
   String get emulatorModeWarning;
+
+  /// No description provided for @newChat.
+  ///
+  /// In en, this message translates to:
+  /// **'New Chat'**
+  String get newChat;
 }
 
 class _AppLocalizationsDelegate

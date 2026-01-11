@@ -238,6 +238,9 @@ class AppLocalizationsAz extends AppLocalizations {
   String get starConversation => 'Ulduzla';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => 'Söhbət başlığı yeniləndi';
 
   @override
@@ -2132,4 +2135,7 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get emulatorModeWarning =>
       'Bu funksiya emulator rejimində deaktiv edilib';
+
+  @override
+  String get newChat => 'New Chat';
 }

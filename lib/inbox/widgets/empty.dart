@@ -3,25 +3,19 @@
 import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import '../../app.dart';
-import '../../main.dart';
 import '../../theme.dart';
+import '../../main.dart';
 
 /// A widget that is displayed when a list of conversations is empty.
-///
-/// It provides a user-friendly message and a call-to-action button.
-/// The content (text and button action) can be customized for different
-/// contexts, such as an empty "All Chats" list versus an empty "Starred" list.
 class EmptyStateView extends StatelessWidget {
   /// Determines if the empty state is for the "Starred" tab.
-  /// If `true`, it shows a message about starring conversations.
-  /// If `false`, it shows a message about starting a new conversation.
+  /// (Note: In the new Sidebar design, this might be less relevant,
+  /// but kept for compatibility if you use this widget elsewhere).
   final bool isForStarred;
 
-  /// A callback that is triggered when the "Go to Chats" button is pressed.
-  /// This is used in the "Starred" context to switch the user back to the "All Chats" tab.
+  /// Callback mainly kept for backward compatibility or specific UI flows.
   final VoidCallback? onGoToAllChats;
 
-  /// Creates an instance of [EmptyStateView].
   const EmptyStateView({
     super.key,
     required this.isForStarred,
@@ -33,29 +27,29 @@ class EmptyStateView extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Determine the content based on the context (All Chats vs. Starred).
     final String title =
     isForStarred ? localizations.noStarredChats : localizations.noChats;
+
     final String message = isForStarred
         ? localizations.noStarredChatsMessage
         : localizations.noConversationsMessage;
+
     final String buttonText =
     isForStarred ? localizations.goToChats : localizations.startChat;
 
-    // Define the button's action based on the context.
+    // Define the button's action based on context.
     final VoidCallback onPressedAction = isForStarred
         ? () {
-      // Match old behavior: hide any snackbar, then switch to "All Chats".
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       onGoToAllChats?.call();
     }
         : () {
-      // For the "All Chats" empty state, navigate to the new chat screen.
+      // FIX: Changed from onItemTapped(0) to startNewConversation()
+      // This aligns with the new Single-Screen architecture.
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      mainScreenKey.currentState?.onItemTapped(0);
+      mainScreenKey.currentState?.startNewConversation();
     };
 
-    // Use a TweenAnimationBuilder to fade the widget in smoothly.
     return TweenAnimationBuilder<double>(
       key: ValueKey(isForStarred ? 'empty_starred_state' : 'empty_all_state'),
       tween: Tween<double>(begin: 0.0, end: 1.0),
@@ -79,7 +73,7 @@ class EmptyStateView extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Roboto',
                 color: AppColors.primaryColor.inverted,
-                fontSize: screenWidth * 0.07, // Responsive font size
+                fontSize: screenWidth * 0.07,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
@@ -91,8 +85,8 @@ class EmptyStateView extends StatelessWidget {
               message,
               style: TextStyle(
                 color: AppColors.tertiaryColor,
-                fontSize: screenWidth * 0.04, // Responsive font size
-                height: 1.5, // Improved line spacing for readability
+                fontSize: screenWidth * 0.04,
+                height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
@@ -104,7 +98,7 @@ class EmptyStateView extends StatelessWidget {
                 onPressed: onPressedAction,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryColor.inverted,
-                  foregroundColor: AppColors.primaryColor, // Text/icon color
+                  foregroundColor: AppColors.primaryColor,
                   padding: EdgeInsets.symmetric(
                     horizontal: screenWidth * 0.08,
                     vertical: screenWidth * 0.035,

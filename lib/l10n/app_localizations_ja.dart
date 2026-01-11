@@ -236,6 +236,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get starConversation => 'スター';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => '会話のタイトルを更新しました';
 
   @override
@@ -2066,4 +2069,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get emulatorModeWarning => 'この機能はエミュレータモードでは無効になっています';
+
+  @override
+  String get newChat => 'New Chat';
 }

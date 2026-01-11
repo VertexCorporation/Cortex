@@ -237,6 +237,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get starConversation => 'تمييز بنجمة';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => 'تم تحديث عنوان المحادثة';
 
   @override
@@ -2109,4 +2112,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get emulatorModeWarning => 'هذه الميزة معطلة في وضع المحاكي';
+
+  @override
+  String get newChat => 'New Chat';
 }

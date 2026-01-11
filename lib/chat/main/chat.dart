@@ -2,16 +2,10 @@
 //
 // ACTIVE CHAT VIEW — FLOATING BRIEFING + SMART SCROLL BUTTON
 //
-// What changed (high level):
-// - The BriefingOverlay is NO LONGER inside the input/bottom panel Column.
-//   It is now a true floating layer (Positioned in the root Stack), so it
-//   does not reserve layout height or push anything.
-// - We track two heights:
-//     (a) base bottom panel height (edit panel + input field),
-//     (b) floating briefing visible height (animation + drag aware).
-//   The scroll-to-bottom button sits above the *sum* of these heights, so it
-//   follows the briefing as you drag it down.
-// - No behavioral changes to send/edit flows; only layout + positioning logic.
+// Changes:
+// - Removed 'onModelSelectionChanged' (Legacy).
+// - Optimized for Single-Activity architecture.
+// - Integration with the new Empty State in SelectedScreen.
 
 import 'dart:async';
 import 'dart:io';
@@ -19,7 +13,7 @@ import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/screen/appbar/premium.dart';
-import 'package:cortex/chat/screen/selected/screen.dart';
+import 'package:cortex/chat/screen/screen.dart';
 import 'package:cortex/chat/services/edit.dart';
 import 'package:cortex/chat/services/regenerate.dart';
 import 'package:cortex/chat/services/review.dart';
@@ -42,18 +36,16 @@ import '../../server/user.dart';
 import '../messages/options/report.dart';
 import '../messages/skeleton.dart';
 import '../messages/tiles/ai.dart';
-import '../screen/selected/widgets/input/input.dart';
-import '../screen/selected/widgets/input/panels/briefing.dart';
-import '../screen/selected/widgets/input/panels/edit.dart';
+import '../screen/widgets/input/input.dart';
+import '../screen/widgets/input/panels/briefing.dart';
+import '../screen/widgets/input/panels/edit.dart';
 import '../services/offline.dart';
 
 class ActiveChatView extends StatefulWidget {
-  final void Function(bool isSelected)? onModelSelectionChanged;
   final Extensions extensions;
 
   const ActiveChatView({
     super.key,
-    required this.onModelSelectionChanged,
     required this.extensions,
   });
 
@@ -84,15 +76,9 @@ class ActiveChatViewState extends State<ActiveChatView>
   late final OfflineService _offlineService;
 
   // Notifiers:
-  // 1) Should the scroll-down button show?
-  final ValueNotifier<bool> showScrollDownButtonNotifier =
-  ValueNotifier<bool>(false);
-  // 2) Measured height of the base bottom panel (edit + input) — dynamic.
-  final ValueNotifier<double> bottomPanelHeightNotifier =
-  ValueNotifier<double>(0.0);
-  // 3) *Visible* height of the floating Briefing overlay — dynamic (animation + drag).
-  final ValueNotifier<double> briefingVisibleHeightNotifier =
-  ValueNotifier<double>(0.0);
+  final ValueNotifier<bool> showScrollDownButtonNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<double> bottomPanelHeightNotifier = ValueNotifier<double>(0.0);
+  final ValueNotifier<double> briefingVisibleHeightNotifier = ValueNotifier<double>(0.0);
   static const double _briefingBottomOffset = 8.0;
 
   // Other state.
@@ -141,7 +127,6 @@ class ActiveChatViewState extends State<ActiveChatView>
       if (mounted) {
         _updateBottomPanelHeight();
         _scrollService.jumpToBottom();
-        widget.onModelSelectionChanged?.call(true);
       }
     });
   }
@@ -243,6 +228,7 @@ class ActiveChatViewState extends State<ActiveChatView>
           child: Column(
             children: [
               Expanded(
+                // This will now render SelectedScreen, which handles the "Empty State" internally.
                 child: _buildChatContent(localizations),
               ),
               _buildBottomPanelWrapper(),
@@ -276,6 +262,10 @@ class ActiveChatViewState extends State<ActiveChatView>
             final basePanelHeight = bottomPanelHeightNotifier.value;
             const horizontalPadding = 16.0;
 
+            // In the new Chat-First architecture, the chat is technically always "active".
+            // However, we might want to hide specific model info if we are in the "Empty/Dynamic" state
+            // and the user hasn't selected a specific model yet.
+            // For now, we rely on sessionProvider flags.
             final bool shouldBeVisible = sessionProvider.isChatActive;
 
             return Positioned(
@@ -320,7 +310,7 @@ class ActiveChatViewState extends State<ActiveChatView>
           },
         ),
 
-        // LAYER 4: Scroll-to-bottom button — now correctly compensates keyboard height.
+        // LAYER 4: Scroll-to-bottom button
         AnimatedBuilder(
           animation: Listenable.merge([
             showScrollDownButtonNotifier,
@@ -332,9 +322,6 @@ class ActiveChatViewState extends State<ActiveChatView>
             final double basePanel = bottomPanelHeightNotifier.value;
             final double briefingH = briefingVisibleHeightNotifier.value;
 
-            // This is the vertical size of everything sitting directly
-            // above the very bottom of the *content area*:
-            //   edit panel + input + (optional) briefing + small gap.
             final double combinedPanelHeight =
                 basePanel + briefingH + _briefingBottomOffset;
 
@@ -369,9 +356,7 @@ class ActiveChatViewState extends State<ActiveChatView>
     );
   }
 
-  /// The base bottom panel: Edit panel + InputField.
   Widget _buildBottomPanel() {
-    // Read from all providers needed here.
     final sessionProvider = context.watch<ChatSessionProvider>();
     final conversationProvider = context.watch<ConversationProvider>();
     final inputProvider = context.watch<InputProvider>();
@@ -400,7 +385,6 @@ class ActiveChatViewState extends State<ActiveChatView>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // EDIT PANEL (slides within the base panel space)
         SizeTransition(
           sizeFactor: CurvedAnimation(
             parent: editPanelController,
@@ -410,22 +394,17 @@ class ActiveChatViewState extends State<ActiveChatView>
           child: EditPanelWidget(
             slideAnimation: slideAnimation,
             onCancel: () {
-              // 1) Exit editing mode
               editService.cancelEditingMode();
-              // 2) Re-evaluate scroll-down button visibility.
-              //    If the user is not at the bottom and there are enough messages,
-              //    the button will show itself again automatically.
               _scrollService.updateButtonVisibility();
             },
           ),
         ),
 
-        // INPUT FIELD
         InputField(
           key: inputFieldKey,
           localizations: localizations,
           isDynamicChatMode: sessionProvider.isDynamicChat,
-          isModelSelected: sessionProvider.isModelSelected,
+          isModelSelected: true, // Always true in single-activity mode
           isLimitExceeded: isLimitExceeded,
           isPhotoLoading: inputProvider.isPhotoLoading,
           isSending: conversationProvider.isWaitingForResponse,
@@ -518,14 +497,11 @@ class ActiveChatViewState extends State<ActiveChatView>
 
     return NotificationListener<AiStreamFinishedNotification>(
       onNotification: (notification) {
-        debugPrint("[ActiveChatView] AI Stream visual animation finished.");
-
         Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
             ReviewService().triggerReviewPromptIfNeeded(context);
           }
         });
-
         return true;
       },
       child: SelectedScreen(
@@ -575,27 +551,19 @@ class ActiveChatViewState extends State<ActiveChatView>
 
   void _attachOfflineReviewListener() {
     final conversationProvider = context.read<ConversationProvider>();
-
-    if (!conversationProvider.isWaitingForResponse) {
-      return;
-    }
+    if (!conversationProvider.isWaitingForResponse) return;
 
     late VoidCallback listener;
-
     listener = () {
       if (!mounted) {
         conversationProvider.removeListener(listener);
         return;
       }
-
       if (!conversationProvider.isWaitingForResponse) {
         conversationProvider.removeListener(listener);
-        unawaited(
-          ReviewService().triggerReviewPromptIfNeeded(context),
-        );
+        unawaited(ReviewService().triggerReviewPromptIfNeeded(context));
       }
     };
-
     conversationProvider.addListener(listener);
   }
 

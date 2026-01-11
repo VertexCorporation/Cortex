@@ -238,6 +238,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get starConversation => 'В избранное';
 
   @override
+  String get unstarConversation => 'Unstar';
+
+  @override
   String get conversationTitleUpdated => 'Название чата обновлено';
 
   @override
@@ -2139,4 +2142,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get emulatorModeWarning => 'Эта функция отключена в режиме эмулятора.';
+
+  @override
+  String get newChat => 'New Chat';
 }
