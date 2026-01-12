@@ -9,9 +9,6 @@ class AppLocalizationsHi extends AppLocalizations {
   AppLocalizationsHi([String locale = 'hi']) : super(locale);
 
   @override
-  String get understood => 'समझ गया।';
-
-  @override
   String get cancel => 'रद्द करें';
 
   @override
@@ -30,9 +27,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get chat => 'चैट';
 
   @override
-  String get darkMode => 'डार्क मोड';
-
-  @override
   String get light => 'लाइट';
 
   @override
@@ -46,9 +40,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get done => 'हो गया';
-
-  @override
-  String get comingSoon => 'जल्द आ रहा है';
 
   @override
   String get bestValue => 'सबसे अच्छा मूल्य';
@@ -66,14 +57,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get messageHint => 'कुछ भी पूछें';
 
   @override
-  String get modelLoading => 'मॉडल लोड हो रहा है...';
-
-  @override
   String get messageCopied => 'संदेश क्लिपबोर्ड पर कॉपी किया गया।';
-
-  @override
-  String get storeUnavailable =>
-      'स्टोर वर्तमान में अनुपलब्ध है। कृपया बाद में पुनः प्रयास करें';
 
   @override
   String get retry => 'पुनः प्रयास करें';
@@ -84,16 +68,6 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String deviceMemory(Object memory) {
     return 'डिवाइस मेमोरी: $memory GB';
-  }
-
-  @override
-  String storageSpace(Object storage) {
-    return 'स्टोरेज स्पेस: $storage GB';
-  }
-
-  @override
-  String freeStorageSpace(Object freeStorage) {
-    return 'फ्री स्टोरेज स्पेस: $freeStorage GB';
   }
 
   @override
@@ -118,9 +92,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get usedMemory => 'प्रयुक्त मेमोरी';
 
   @override
-  String get requirements => 'आवश्यकताएँ';
-
-  @override
   String get modelsTitle => 'लाइब्रेरी';
 
   @override
@@ -130,34 +101,10 @@ class AppLocalizationsHi extends AppLocalizations {
   String get serverSideModels => 'ऑनलाइन मॉडल';
 
   @override
-  String get uploadYourOwnModel => 'अपना खुद का मॉडल अपलोड करें!';
-
-  @override
   String get selectGGUFFile => 'GGUF फ़ाइल चुनें';
 
   @override
   String get errorGGUF => 'कृपया केवल GGUF प्रारूप में एक फ़ाइल चुनें।';
-
-  @override
-  String get modelAlreadyExists => 'मॉडल पहले से मौजूद है।';
-
-  @override
-  String get modelAddedSuccessfully => 'मॉडल सफलतापूर्वक जोड़ा गया।';
-
-  @override
-  String get modelRemoved => 'मॉडल सफलतापूर्वक हटा दिया गया।';
-
-  @override
-  String get removeError => 'मॉडल हटाते समय एक त्रुटि हुई।';
-
-  @override
-  String get fileNotFound => 'फ़ाइल नहीं मिली।';
-
-  @override
-  String get fileUploadError => 'फ़ाइल अपलोड करते समय एक त्रुटि हुई।';
-
-  @override
-  String get noFileSelected => 'कोई फ़ाइल नहीं चुनी गई।';
 
   @override
   String get myModels => 'मेरे मॉडल';
@@ -166,36 +113,14 @@ class AppLocalizationsHi extends AppLocalizations {
   String get create => 'बनाएं';
 
   @override
-  String get seeAll => 'सभी देखें';
-
-  @override
   String modelProducer(Object producer) {
     return 'निर्माता: $producer';
-  }
-
-  @override
-  String modelRAM(Object ram) {
-    return 'रैम: $ram';
-  }
-
-  @override
-  String modelSize(Object size) {
-    return 'आकार: $size';
   }
 
   @override
   String modelDescription(Object description) {
     return '$description';
   }
-
-  @override
-  String get conversationsTitle => 'बातचीत';
-
-  @override
-  String get conversationDeleted => 'बातचीत हटा दी गई।';
-
-  @override
-  String get conversationUpdated => 'बातचीत अपडेट की गई।';
 
   @override
   String get editConversationTitle => 'नाम बदलें';
@@ -207,9 +132,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get save => 'सहेजें';
 
   @override
-  String get titleCannotBeEmpty => 'शीर्षक खाली नहीं हो सकता।';
-
-  @override
   String get noConversationsMessage => 'कोई बातचीत नहीं, चैट करना शुरू करें!';
 
   @override
@@ -217,12 +139,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get noChats => 'कोई चैट नहीं';
-
-  @override
-  String get starredChats => 'तारांकित चैट';
-
-  @override
-  String get allChats => 'सभी चैट';
 
   @override
   String get noStarredChats => 'कोई तारांकित चैट नहीं';
@@ -239,19 +155,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get unstarConversation => 'Unstar';
-
-  @override
-  String get conversationTitleUpdated => 'बातचीत का शीर्षक अपडेट किया गया';
-
-  @override
-  String get youReachedConversationLimit =>
-      'आप बातचीत की सीमा तक पहुंच गए हैं।';
-
-  @override
-  String get today => 'आज';
-
-  @override
-  String get yesterday => 'कल';
 
   @override
   String get loginToYourAccount => 'लॉगिन करें';
@@ -302,9 +205,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get passwordsDoNotMatch => 'पासवर्ड मेल नहीं खाते।';
 
   @override
-  String get userNotFound => 'उपयोगकर्ता नहीं मिला।';
-
-  @override
   String get wrongPassword => 'गलत पासवर्ड।';
 
   @override
@@ -317,38 +217,13 @@ class AppLocalizationsHi extends AppLocalizations {
   String get authError => 'प्रमाणीकरण त्रुटि';
 
   @override
-  String get invalidUsername => 'कृपया एक उपयोगकर्ता नाम दर्ज करें।';
-
-  @override
   String get usernameTaken => 'यह उपयोगकर्ता नाम पहले ही ले लिया गया है।';
 
   @override
   String get username => 'उपयोगकर्ता नाम';
 
   @override
-  String get authenticationFailed => 'प्रमाणीकरण विफल। कृपया पुनः प्रयास करें।';
-
-  @override
-  String get emailTooLong => 'ईमेल अधिकतम 30 अक्षरों का हो सकता है।';
-
-  @override
-  String get deviceLimitReached =>
-      'आप इस डिवाइस के लिए खाता निर्माण सीमा तक पहुंच गए हैं।';
-
-  @override
-  String get verificationEmailLimitReached => 'हम और नहीं भेजेंगे';
-
-  @override
-  String get verificationEmailSent => 'सत्यापन ई-मेल भेजा गया!';
-
-  @override
-  String get emailNotVerified => 'ई-मेल सत्यापित नहीं किया गया है';
-
-  @override
   String get resendCode => 'सत्यापन ई-मेल पुनः भेजें';
-
-  @override
-  String get remainingSeconds => 'सत्यापन के लिए शेष समय';
 
   @override
   String get pleaseCheckYourEmail =>
@@ -356,9 +231,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get verifyYourEmail => 'अपना ईमेल सत्यापित करें';
-
-  @override
-  String get backToLogin => 'वापस जाएं';
 
   @override
   String get seconds => 'सेकंड';
@@ -387,9 +259,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get verifyNow => 'अभी सत्यापित करें';
 
   @override
-  String get accountVerified => 'आपका खाता सत्यापित हो गया है।';
-
-  @override
   String get linkSent => 'लिंक भेजा गया';
 
   @override
@@ -406,13 +275,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get confirmDeleteAccount => 'क्या आप वाकई अपना खाता हटाना चाहते हैं?';
 
   @override
-  String get enterPasswordToDelete => 'हटाने के लिए अपना पासवर्ड दर्ज करें।';
-
-  @override
   String get deleteAccount => 'खाता हटाएं';
-
-  @override
-  String get deleteAccountError => 'खाता हटाते समय एक त्रुटि हुई।';
 
   @override
   String get delete => 'हटाएं';
@@ -434,29 +297,10 @@ class AppLocalizationsHi extends AppLocalizations {
   String get displayName => 'प्रदर्शित होने वाला नाम';
 
   @override
-  String get tapToChangeProfilePicture =>
-      'प्रोफ़ाइल चित्र बदलने के लिए टैप करें';
-
-  @override
   String get profileUpdated => 'प्रोफ़ाइल सफलतापूर्वक अपडेट की गई';
 
   @override
-  String get updateFailed => 'प्रोफ़ाइल अपडेट करने में विफल';
-
-  @override
-  String get nameCannotBeEmpty => 'नाम खाली नहीं हो सकता';
-
-  @override
   String get logout => 'लॉगआउट';
-
-  @override
-  String get noDisplayName => 'कोई प्रदर्शन नाम सेट नहीं है';
-
-  @override
-  String get noEmail => 'कोई ईमेल पता नहीं';
-
-  @override
-  String get noUserLoggedIn => 'वर्तमान में कोई उपयोगकर्ता लॉग इन नहीं है';
 
   @override
   String get profile => 'प्रोफ़ाइल';
@@ -485,15 +329,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get downloading => 'डाउनलोड हो रहा है...';
 
   @override
-  String get downloadError => 'डाउनलोड के दौरान एक त्रुटि हुई।';
-
-  @override
-  String get downloadCancelled => 'डाउनलोड रद्द कर दिया गया।';
-
-  @override
-  String get downloadResumed => 'डाउनलोड फिर से शुरू हो गया।';
-
-  @override
   String get downloadSuccess => 'डाउनलोड सफल';
 
   @override
@@ -511,27 +346,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get purchaseSuccessful => 'खरीद सफल!';
 
   @override
-  String get purchaseFailed => 'खरीद असफल';
-
-  @override
-  String get creditProductNotFound => 'चयनित क्रेडिट उत्पाद नहीं मिला।';
-
-  @override
-  String get creditsAddedSuccessfully =>
-      'क्रेडिट आपके खाते में सफलतापूर्वक जोड़ दिए गए!';
-
-  @override
-  String get creditDeliveryFailed =>
-      'आपके खाते में क्रेडिट जोड़ने में विफल। कृपया सहायता से संपर्क करें।';
-
-  @override
-  String get invalidPurchase => 'अमान्य खरीद';
-
-  @override
   String get purchaseError => 'खरीद त्रुटि';
-
-  @override
-  String get purchaseVertexPlusToUpload => 'यह एक प्लस सुविधा है';
 
   @override
   String get purchasePlus => 'Cortex प्लस खरीदें';
@@ -579,33 +394,6 @@ class AppLocalizationsHi extends AppLocalizations {
       'Cortex की और भी अधिक सुविधाओं तक पहुँचें और AI का और भी अधिक अनुभव करें!';
 
   @override
-  String get alreadySubscribed => 'आप पहले से ही सदस्य हैं';
-
-  @override
-  String get subscriptionInfo => 'आपकी सदस्यता सक्रिय है।';
-
-  @override
-  String get alreadySubscribedMessage =>
-      'आपके पास पहले से ही एक प्लस सदस्यता है। यदि आप अपनी सदस्यता रद्द करना चाहते हैं, तो आप इसे प्ले स्टोर प्रबंधक के माध्यम से कर सकते हैं।';
-
-  @override
-  String get cancelSubscription => 'सदस्यता रद्द';
-
-  @override
-  String get cancelSubscriptionInfo =>
-      'यदि आप अपनी सदस्यता रद्द करना चाहते हैं, तो कृपया प्ले स्टोर सदस्यता प्रबंधक के माध्यम से आगे बढ़ें।';
-
-  @override
-  String get goToPlayStore => 'प्ले स्टोर पर जाएं';
-
-  @override
-  String get alreadySubscribedPlus => 'आपके पास प्लस प्लान है!';
-
-  @override
-  String get alreadySubscribedPlusMessage =>
-      'आपकी प्लस योजना सक्रिय है। आप सभी लाभों का आनंद ले सकते हैं।';
-
-  @override
   String get purchaseUltra => 'Cortex अल्ट्रा खरीदें';
 
   @override
@@ -613,28 +401,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'Cortex की सभी सुविधाओं तक पूरी पहुँच प्राप्त करें और AI का पूरा अनुभव करें!';
 
   @override
-  String get noSubscription => 'कोई सदस्यता नहीं';
-
-  @override
-  String get noSubscriptionMessage => 'आपके पास अभी तक कोई सदस्यता नहीं है।';
-
-  @override
-  String get alreadyAtHighestPlan => 'आप पहले से ही उच्चतम योजना पर हैं।';
-
-  @override
-  String get unableToOpenSubscription =>
-      'सदस्यता प्रबंधन पृष्ठ खोलने में असमर्थ।';
-
-  @override
   String get upgradeSubscription => 'सदस्यता अपग्रेड करें';
-
-  @override
-  String get confirmUpgrade =>
-      'क्या आप वाकई अपनी सदस्यता अपग्रेड करना चाहते हैं?';
-
-  @override
-  String get unsupportedPlatform =>
-      'सदस्यता रद्द करने के लिए असमर्थित प्लेटफ़ॉर्म।';
 
   @override
   String get purchaseStreamError => 'खरीद स्ट्रीम त्रुटि।';
@@ -643,43 +410,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get productNotFound => 'उत्पाद नहीं मिला';
 
   @override
-  String get productDetailsError =>
-      'उत्पाद विवरण प्राप्त करते समय एक त्रुटि हुई।';
-
-  @override
   String get noProductsFound => 'कोई उत्पाद नहीं मिला';
-
-  @override
-  String get loadCreditsButton => 'क्रेडिट लोड करें';
-
-  @override
-  String get creditsTitle => 'क्रेडिट';
-
-  @override
-  String get creditsScreenDescription =>
-      'यह स्क्रीन उपयोगकर्ता के क्रेडिट दिखाती है। \n\nउपयोगकर्ता के वर्तमान क्रेडिट: 100\n\nविस्तृत क्रेडिट जानकारी यहां प्रदर्शित की जा सकती है।';
-
-  @override
-  String get creditsLoaded => 'क्रेडिट लोड हो गए!';
-
-  @override
-  String get currentCredits => 'वर्तमान क्रेडिट';
-
-  @override
-  String get pleaseSelectCreditPackage => 'कृपया एक क्रेडिट पैकेज चुनें';
-
-  @override
-  String get purchaseCreditsTitle => 'क्रेडिट खरीदें';
-
-  @override
-  String get purchaseCreditsDescription =>
-      'एक क्रेडिट पैकेज चुनें जो आपकी आवश्यकताओं के अनुरूप हो और हमारे ऐप का अधिक उपयोग करें।';
-
-  @override
-  String get purchaseButton => 'खरीदें';
-
-  @override
-  String get productNotFoundMessage => 'चयनित उत्पाद मौजूद नहीं है।';
 
   @override
   String get buyCredits => 'क्रेडिट खरीदें';
@@ -692,72 +423,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get buyCredit => 'क्रेडिट खरीदें';
 
   @override
-  String buyCreditPackage(Object amount) {
-    return '$amount क्रेडिट खरीदें';
-  }
-
-  @override
-  String get subscribedPlan => 'सदस्यता ली';
-
-  @override
-  String get errorResponseNotReceived => 'प्रतिक्रिया प्राप्त नहीं हुई';
-
-  @override
-  String googleApiRequestFailed(int attempt, String error) {
-    return 'Google API अनुरोध $attempt बार विफल रहा: $error';
-  }
-
-  @override
-  String openRouterResponseStatus(int statusCode) {
-    return 'OpenRouter प्रतिक्रिया स्थिति: $statusCode';
-  }
-
-  @override
-  String openRouterDecodedResponseBody(String body) {
-    return 'OpenRouter डिकोडेड प्रतिक्रिया निकाय: $body';
-  }
-
-  @override
-  String decodedJson(String data) {
-    return 'डिकोडेड JSON: $data';
-  }
-
-  @override
-  String get responseStructureUnexpectedMessageContentMissing =>
-      'प्रतिक्रिया संरचना अप्रत्याशित है: संदेश या सामग्री गायब है';
-
-  @override
-  String get responseStructureUnexpectedChoicesMissing =>
-      'प्रतिक्रिया संरचना अप्रत्याशित है: विकल्प गायब या खाली हैं';
-
-  @override
-  String openRouterApiRequestFailed(int statusCode, String body) {
-    return 'OpenRouter API अनुरोध विफल: $statusCode - $body';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterAttempts(int attempt, String error) {
-    return 'OpenRouter API अनुरोध $attempt बार विफल रहा: $error';
-  }
-
-  @override
   String get internetRequired =>
       'इस मॉडल का उपयोग करने के लिए इंटरनेट कनेक्शन आवश्यक है';
-
-  @override
-  String get pleaseWaitBeforeTryingAgain =>
-      'कृपया पुनः प्रयास करने से पहले कुछ क्षण प्रतीक्षा करें';
-
-  @override
-  String openRouterQuotaExceeded(int statusCode, String decodedBody) {
-    return 'कोटा पार हो गया। स्थिति कोड: $statusCode, निकाय: $decodedBody';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterPaidAttempts(
-      int attempts, String error) {
-    return 'API अनुरोध $attempts भुगतान किए गए प्रयासों के बाद विफल रहा। त्रुटि: $error';
-  }
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
@@ -800,12 +467,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get capabilitiesSection => 'क्षमताएं';
 
   @override
-  String get ratingsSection => 'रेटिंग';
-
-  @override
-  String get noRatingDataFound => 'कोई रेटिंग डेटा नहीं मिला';
-
-  @override
   String get featurePhotoTitle => 'फोटो स्कैनिंग';
 
   @override
@@ -818,13 +479,6 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get featureOfflineDescription =>
       'अपने डेटा को सुरक्षित रखने के लिए इंटरनेट कनेक्शन के बिना मॉडल चलाएं।';
-
-  @override
-  String get featureSupermodelTitle => 'सुपर मॉडल';
-
-  @override
-  String get featureSupermodelDescription =>
-      'यह 10 बिलियन से अधिक मापदंडों वाला एक विशाल मॉडल है, जो उच्च प्रदर्शन और व्यापक क्षमताएं प्रदान करता है।';
 
   @override
   String get featureRoleplayTitle => 'रोल प्ले';
@@ -843,26 +497,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get context => 'संदर्भ';
 
   @override
-  String get millions => 'मिलियन';
-
-  @override
-  String get billions => 'बिलियन';
-
-  @override
-  String get trillions => 'ट्रिलियन';
-
-  @override
-  String get thousand => 'हजार';
-
-  @override
-  String get estimated => 'अनुमानित';
-
-  @override
   String get finalPreparation => 'अंतिम तैयारी की जा रही है।';
-
-  @override
-  String get allEvaluationsByTestTeam =>
-      'सभी मूल्यांकन हमारी परीक्षण टीम द्वारा किए गए थे';
 
   @override
   String get shareApp => 'ऐप साझा करें';
@@ -898,9 +533,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get user => 'उपयोगकर्ता';
-
-  @override
-  String get voice => 'आवाज़';
 
   @override
   String get help => 'मदद';
@@ -950,9 +582,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get chinese => 'चीनी';
 
   @override
-  String get arabic => 'अरबी';
-
-  @override
   String get french => 'फ्रेंच';
 
   @override
@@ -969,9 +598,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get korean => 'कोरियाई';
-
-  @override
-  String get deutsch => 'Deutsch';
 
   @override
   String get english => 'अंग्रेज़ी';
@@ -1015,9 +641,6 @@ class AppLocalizationsHi extends AppLocalizations {
       'उपयोगकर्ता नाम में केवल ये अक्षर: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' और वर्ण \'.\', \'-\', \'_\' का उपयोग किया जा सकता है।';
 
   @override
-  String get passwordTooLong => 'पासवर्ड 64 अक्षरों से अधिक नहीं हो सकता।';
-
-  @override
   String get noInternetConnection => 'कोई इंटरनेट कनेक्शन नहीं।';
 
   @override
@@ -1027,15 +650,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get library => 'लाइब्रेरी';
 
   @override
-  String get inappropriateMessageWarning => 'अनुचित संदेश का पता चला!';
-
-  @override
-  String get myModelDescription => 'मेरा मॉडल।';
-
-  @override
-  String get noModelsDownloaded => 'आपने अभी तक कोई मॉडल डाउनलोड नहीं किया है।';
-
-  @override
   String get appTitle => 'Cortex';
 
   @override
@@ -1043,9 +657,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get removeModel => 'मॉडल हटाएं';
-
-  @override
-  String get modelUploadedSuccessfully => 'मॉडल सफलतापूर्वक अपलोड किया गया।';
 
   @override
   String get insufficientRAM => 'कम मेमोरी';
@@ -1070,9 +681,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get benefit1 => 'ऑनलाइन एआई के लिए और भी बहुत कुछ बातचीत की सीमा';
 
   @override
-  String get benefit2 => 'अपने खुद के मॉडल अपलोड करें';
-
-  @override
   String get benefit3 => 'प्रोफ़ाइल प्रभाव';
 
   @override
@@ -1080,9 +688,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get benefit5 => 'और अधिक ऑनलाइन कृत्रिम बुद्धिमत्ता बनाएं';
-
-  @override
-  String get benefit6 => 'असीमित चैट';
 
   @override
   String benefit7(Object credits) {
@@ -1094,9 +699,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get benefit9 => 'नई थीम';
-
-  @override
-  String get benefit10 => 'ऑफ़लाइन वॉयस चैट';
 
   @override
   String get oldBenefits => 'निचली योजनाओं से सभी लाभ';
@@ -1135,21 +737,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get copyrights => 'योगदान';
 
   @override
-  String get downloadingTitle => 'डाउनलोड हो रहा है';
-
-  @override
-  String get downloadCompletedTitle => 'डाउनलोड पूरा हुआ';
-
-  @override
-  String get downloadPausedTitle => 'डाउनलोड रुका';
-
-  @override
-  String get downloadErrorTitle => 'डाउनलोड त्रुटि';
-
-  @override
-  String get cancelButtonText => 'रद्द करें';
-
-  @override
   String get love => 'प्यार';
 
   @override
@@ -1184,13 +771,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get editingNotification => 'आप अभी संपादन मोड में हैं';
 
   @override
-  String get featureIndulgentTitle => 'अनुग्रहशील';
-
-  @override
-  String get featureIndulgentDescription =>
-      'यह मॉडल 100,000 से अधिक टोकन वाले संदर्भों को सहजता से समायोजित और संसाधित कर सकता है, जिससे यह प्रदर्शन से समझौता किए बिना व्यापक और विस्तृत इनपुट को संभालने में सक्षम होता है।';
-
-  @override
   String get featurePluralTitle => 'बहुल';
 
   @override
@@ -1198,30 +778,10 @@ class AppLocalizationsHi extends AppLocalizations {
       'यह मॉडल स्वचालित रूप से अतिरिक्त एक्सटेंशन को एकीकृत कर सकता है, जिससे इसकी कार्यात्मक क्षमताओं का विस्तार हो सकता है ताकि उन्नत प्रदर्शन के साथ विविध प्रकार के संचालन का समर्थन किया जा सके।';
 
   @override
-  String get featureWiseTitle => 'बुद्धिमान';
-
-  @override
-  String get featureWiseDescription =>
-      'यह मॉडल निर्णय लेने और जटिल समस्या-समाधान के लिए परिष्कृत समर्थन प्रदान करने के लिए गहरी विश्लेषणात्मक अंतर्दृष्टि और दूरंदेशी तर्क का लाभ उठा सकता है।';
-
-  @override
-  String get featureResearcherTitle => 'शोधकर्ता';
-
-  @override
-  String get featureResearcherDescription =>
-      'उन्नत अनुसंधान और विश्लेषणात्मक क्षमताओं से लैस मॉडलों में विशेष रूप से उपलब्ध, यह सुविधा विविध डोमेन में उच्च-सटीक अंतर्दृष्टि और व्यापक विश्लेषण प्रदान करने के लिए डिज़ाइन की गई है।';
-
-  @override
   String get nameLabel => 'एआई नाम';
 
   @override
-  String get nameHint => 'अपने एआई का नाम दर्ज करें';
-
-  @override
   String get summaryLabel => 'एआई सारांश';
-
-  @override
-  String get summaryHint => 'अपने एआई का सारांश दर्ज करें';
 
   @override
   String get add => 'जोड़ें';
@@ -1251,20 +811,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get summary => 'सारांश';
 
   @override
-  String get characterPoliceTitle => 'पुलिस';
-
-  @override
-  String get characterPoliceRole =>
-      'आप कानून के एक सतर्क प्रवर्तक हैं, जो नागरिकों की रक्षा करने और अटूट प्रतिबद्धता के साथ व्यवस्था बनाए रखने के लिए समर्पित हैं, आप एक पुलिस हैं';
-
-  @override
-  String get characterPoliceShortDescription =>
-      'एक दृढ़ और साहसी कानून प्रवर्तक।';
-
-  @override
-  String get purchaseSubscription => 'खरीदें';
-
-  @override
   String get modelUploadTitle => 'कृत्रिम बुद्धिमत्ता फ़ाइल';
 
   @override
@@ -1276,13 +822,6 @@ class AppLocalizationsHi extends AppLocalizations {
       'अपने डिवाइस से .gguf फ़ाइल चुनने के लिए यहां टैप करें';
 
   @override
-  String get addServerTitle => 'कृत्रिम बुद्धिमत्ता सर्वर';
-
-  @override
-  String get addServerDescription =>
-      'बाहरी रूप से होस्ट किए गए मॉडल से जुड़ने के लिए अपने रिमोट सर्वर का URL दर्ज करें। इस सुविधा के लिए एक सक्रिय इंटरनेट कनेक्शन की आवश्यकता है, और किसी भी सर्वर-संबंधी समस्या या त्रुटि का कारण Cortex नहीं है। सुनिश्चित करें कि आपका सर्वर सही ढंग से कॉन्फ़िगर किया गया है, आपके नेटवर्क से सुलभ है, और एक सहज अनुभव के लिए एक मान्य मॉडल एंडपॉइंट है।';
-
-  @override
   String get you => 'आप';
 
   @override
@@ -1292,24 +831,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get confirmRemovePhoto => 'क्या आप वाकई फोटो हटाना चाहते हैं?';
 
   @override
-  String get serverLink => 'सर्वर लिंक';
-
-  @override
-  String get enterURL => 'सर्वर URL दर्ज करें';
-
-  @override
   String get chatLengthLimitExceeded =>
       'यह चैट वर्ण सीमा को पार कर गई है। कृपया एक नई चैट शुरू करें या सदस्यता खरीदें।';
-
-  @override
-  String get aiNameError => 'इस नाम का एक एआई पहले से मौजूद है।';
-
-  @override
-  String get modelLimitExceeded =>
-      'आप अपनी योजना के लिए अधिकतम मॉडल निर्माण सीमा तक पहुंच गए हैं।';
-
-  @override
-  String get modelVertexProducer => 'वर्टेक्स';
 
   @override
   String get photoLimitReachedMessage => 'केवल एक फोटो जोड़ा जा सकता है';
@@ -1324,14 +847,6 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String insufficientCredits(Object available, Object required) {
     return 'इस अनुरोध को पूरा करने के लिए आपके पास पर्याप्त क्रेडिट नहीं हैं। इस कार्रवाई के लिए $required क्रेडिट की आवश्यकता है, लेकिन आपके पास केवल $available हैं। अधिक क्रेडिट प्राप्त करने के लिए, आप अपनी योजना को अपग्रेड कर सकते हैं या उन्हें सीधे खरीद सकते हैं। हे हम पूरी तरह से समझते हैं कि क्रेडिट खत्म होना थोड़ा निराशाजनक हो सकता है लेकिन गंभीरता से हमारे मॉडल से वे भयानक उत्तर प्राप्त करना मुफ्त नहीं है इसलिए ये क्रेडिट वास्तव में हमें अच्छे समय को जारी रखने में मदद करते हैं और सुनो अगर आप में से अधिक लोग इसमें शामिल होते हैं और क्रेडिट प्राप्त करते हैं तो हम पूरी तरह से सभी के लिए उन मुफ्त दैनिक सीमाओं को बढ़ाने पर विचार कर सकते हैं';
-  }
-
-  @override
-  String get regenerateInProgress => 'उत्तर निर्माण पहले से ही प्रगति पर है।';
-
-  @override
-  String errorOccurredDuringRegeneration(String errorDetails) {
-    return 'पुनः उत्पन्न करने का प्रयास करते समय एक त्रुटि हुई: $errorDetails';
   }
 
   @override
@@ -1361,10 +876,6 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get errorInsufficientCredits =>
       'आपके पास अपर्याप्त क्रेडिट हैं। जारी रखने के लिए कृपया टॉप अप करें।';
-
-  @override
-  String get errorRateLimitExceeded =>
-      'बहुत सारे अनुरोध। कृपया कुछ क्षण में पुनः प्रयास करें।';
 
   @override
   String get errorServer =>
@@ -1415,24 +926,6 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get noModelsFoundMessage =>
       'अपनी खोज शब्दों को समायोजित करने या फ़िल्टर को साफ़ करने का प्रयास करें।';
-
-  @override
-  String get usernameRateLimitExceeded =>
-      'आप हर 14 दिनों में केवल दो बार अपना उपयोगकर्ता नाम बदल सकते हैं।';
-
-  @override
-  String get usernameUnchanged =>
-      'यह पहले से ही आपका वर्तमान उपयोगकर्ता नाम है।';
-
-  @override
-  String get creditsInfoPanelTitle => 'क्रेडिट कैसे काम करते हैं';
-
-  @override
-  String get creditsInfoPanelBody =>
-      'क्रेडिट ऑनलाइन एआई मॉडलों के साथ चैट करने के लिए उपयोग किए जाते हैं। हर मैसेज सच में हमारी जेब से जाता है और यही क्रेडिट हमें पूरा कंगाल होने से बचा रहे होते हैं, थोड़ा मजाकिया लगे लेकिन सीन tam olarak bu. अब सिस्टम को जल्दी और साफ तरीके से समझ लेते हैं:\n\n• किसी मुफ्त ऑनलाइन मॉडल को भेजे जाने वाले हर संदेश की कीमत 5 क्रेडिट है।\n• किसी प्रीमियम ऑनलाइन मॉडल को भेजे जाने वाले हर संदेश की कीमत 20 क्रेडिट है।\n• कोई अटैचमेंट जोड़ने पर 30 अतिरिक्त क्रेडिट लगते हैं。\n• फ्री प्लान उपयोगकर्ताओं को रोज़ाना रीसेट होने वाला 200 क्रेडिट का बोनस मिलता है。';
-
-  @override
-  String get creditsInfoPanelFooter => 'हैप्पी चैटिंग!';
 
   @override
   String get disclaimerMessage =>
@@ -1519,10 +1012,6 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get photoWarningMessage =>
       'एक फोटो शामिल है। जो मॉडल छवियों का समर्थन नहीं करते हैं, वे इसे अनदेखा कर सकते हैं।';
-
-  @override
-  String get loginRequiredForPurchase =>
-      'खरीदारी करने के लिए आपको लॉग इन होना चाहिए।';
 
   @override
   String get storagePermissionRequired =>
@@ -1627,34 +1116,14 @@ class AppLocalizationsHi extends AppLocalizations {
       'आपने प्रीमियम मॉडल के लिए अपने सभी निःशुल्क दैनिक संदेशों का उपयोग कर लिया है, कृपया असीमित पहुंच के लिए अपग्रेड करें।';
 
   @override
-  String selectionScreenGreetingUser(String userName) {
-    return 'आज मैं आपकी किस प्रकार सहायता कर सकता हूँ, $userName?';
-  }
-
-  @override
   String get selectionScreenGreetingGeneric =>
       'आज मैं आपकी किस प्रकार मदद कर सकता हूँ?';
-
-  @override
-  String get selectionScreenRecentModels => 'हाल के मॉडल';
-
-  @override
-  String get selectionScreenFeatureDynamicChat => 'गतिशील चैट';
 
   @override
   String get selectionScreenFeatureOffline => 'इंटरनेट के बिना उपयोग करें';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'मॉडल चुनें';
-
-  @override
   String get explore => 'खोजें';
-
-  @override
-  String get subscriptionCancelled => 'सदस्यता सफलतापूर्वक रद्द कर दी गई!';
-
-  @override
-  String get selectionScreenPinnedModels => 'पिन किए गए मॉडल';
 
   @override
   String get selectionScreenNewsAndUpdates => 'समाचार और अपडेट';
@@ -1691,13 +1160,6 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get errorNoModelsAvailable =>
       'वर्तमान में कोई मॉडल उपलब्ध नहीं है। कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।';
-
-  @override
-  String get errorNoModelsForRequest =>
-      'आपके वर्तमान अनुरोध के लिए कोई उपयुक्त मॉडल नहीं मिला (उदाहरणार्थ, ऑफ़लाइन मोड या छवि संदेश)।';
-
-  @override
-  String get dynamicChatWelcome => 'मैं आपकी कैसे मदद कर सकता हूँ?';
 
   @override
   String get notificationComebackTitle => 'हमें आपकी याद आती है!';
@@ -2011,13 +1473,6 @@ class AppLocalizationsHi extends AppLocalizations {
       'क्या आप वाकई इस अद्भुत मंच को छोड़ना चाहते हैं?';
 
   @override
-  String get newsErrorTitle => 'समाचार लोड करने में विफल';
-
-  @override
-  String get newsErrorMessage =>
-      'नवीनतम अपडेट प्राप्त करने में समस्या हुई, कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें.';
-
-  @override
   String get tagNotFound =>
       'आपके द्वारा दर्ज किया गया टैग अमान्य है या उसकी समय सीमा समाप्त हो चुकी है।';
 
@@ -2095,9 +1550,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get createAccount => 'खाता बनाएं';
-
-  @override
-  String get upgradeTitle => 'पंजीकरण को अंतिम रूप दें';
 
   @override
   String get accountLinkedSuccess => 'खाता सफलतापूर्वक बनाया गया!';

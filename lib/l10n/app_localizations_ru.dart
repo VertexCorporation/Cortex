@@ -9,9 +9,6 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
-  String get understood => 'Понятно.';
-
-  @override
   String get cancel => 'Отмена';
 
   @override
@@ -30,9 +27,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chat => 'Чат';
 
   @override
-  String get darkMode => 'Тёмная тема';
-
-  @override
   String get light => 'Светлая';
 
   @override
@@ -46,9 +40,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get done => 'Готово';
-
-  @override
-  String get comingSoon => 'СКОРО';
 
   @override
   String get bestValue => 'Лучшее предложение';
@@ -66,14 +57,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get messageHint => 'Спросите что угодно';
 
   @override
-  String get modelLoading => 'Модель загружается...';
-
-  @override
   String get messageCopied => 'Сообщение скопировано в буфер обмена.';
-
-  @override
-  String get storeUnavailable =>
-      'Магазин временно недоступен. Пожалуйста, попробуйте позже.';
 
   @override
   String get retry => 'Повторить';
@@ -84,16 +68,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String deviceMemory(Object memory) {
     return 'Память устройства: $memory ГБ';
-  }
-
-  @override
-  String storageSpace(Object storage) {
-    return 'Объём хранилища: $storage ГБ';
-  }
-
-  @override
-  String freeStorageSpace(Object freeStorage) {
-    return 'Свободное место: $freeStorage ГБ';
   }
 
   @override
@@ -118,9 +92,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get usedMemory => 'Использовано памяти';
 
   @override
-  String get requirements => 'Требования';
-
-  @override
   String get modelsTitle => 'Библиотека';
 
   @override
@@ -130,34 +101,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get serverSideModels => 'Онлайн-модели';
 
   @override
-  String get uploadYourOwnModel => 'Загрузите свою модель!';
-
-  @override
   String get selectGGUFFile => 'Выберите файл GGUF';
 
   @override
   String get errorGGUF => 'Пожалуйста, выберите файл только в формате GGUF.';
-
-  @override
-  String get modelAlreadyExists => 'Модель уже существует.';
-
-  @override
-  String get modelAddedSuccessfully => 'Модель успешно добавлена.';
-
-  @override
-  String get modelRemoved => 'Модель успешно удалена.';
-
-  @override
-  String get removeError => 'Произошла ошибка при удалении модели.';
-
-  @override
-  String get fileNotFound => 'Файл не найден.';
-
-  @override
-  String get fileUploadError => 'Произошла ошибка при загрузке файла.';
-
-  @override
-  String get noFileSelected => 'Файл не выбран.';
 
   @override
   String get myModels => 'Мои модели';
@@ -166,36 +113,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get create => 'Создать';
 
   @override
-  String get seeAll => 'Показать все';
-
-  @override
   String modelProducer(Object producer) {
     return 'Производитель: $producer';
-  }
-
-  @override
-  String modelRAM(Object ram) {
-    return 'ОЗУ: $ram';
-  }
-
-  @override
-  String modelSize(Object size) {
-    return 'Размер: $size';
   }
 
   @override
   String modelDescription(Object description) {
     return '$description';
   }
-
-  @override
-  String get conversationsTitle => 'Чаты';
-
-  @override
-  String get conversationDeleted => 'Чат удалён.';
-
-  @override
-  String get conversationUpdated => 'Чат обновлён.';
 
   @override
   String get editConversationTitle => 'Переименовать';
@@ -207,9 +132,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get save => 'Сохранить';
 
   @override
-  String get titleCannotBeEmpty => 'Название не может быть пустым.';
-
-  @override
   String get noConversationsMessage => 'Нет чатов, начните общаться!';
 
   @override
@@ -217,12 +139,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get noChats => 'Нет чатов';
-
-  @override
-  String get starredChats => 'Избранные чаты';
-
-  @override
-  String get allChats => 'Все чаты';
 
   @override
   String get noStarredChats => 'Нет избранных чатов';
@@ -239,18 +155,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get unstarConversation => 'Unstar';
-
-  @override
-  String get conversationTitleUpdated => 'Название чата обновлено';
-
-  @override
-  String get youReachedConversationLimit => 'Вы достигли лимита чатов.';
-
-  @override
-  String get today => 'Сегодня';
-
-  @override
-  String get yesterday => 'Вчера';
 
   @override
   String get loginToYourAccount => 'Вход';
@@ -301,9 +205,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get passwordsDoNotMatch => 'Пароли не совпадают.';
 
   @override
-  String get userNotFound => 'Пользователь не найден.';
-
-  @override
   String get wrongPassword => 'Неверный пароль.';
 
   @override
@@ -316,40 +217,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get authError => 'Ошибка аутентификации';
 
   @override
-  String get invalidUsername => 'Пожалуйста, введите имя пользователя.';
-
-  @override
   String get usernameTaken => 'Это имя пользователя уже занято.';
 
   @override
   String get username => 'Имя пользователя';
 
   @override
-  String get authenticationFailed =>
-      'Аутентификация не удалась. Пожалуйста, попробуйте снова.';
-
-  @override
-  String get emailTooLong => 'Email не может превышать 30 символов.';
-
-  @override
-  String get deviceLimitReached =>
-      'Вы достигли лимита создания аккаунтов для этого устройства.';
-
-  @override
-  String get verificationEmailLimitReached =>
-      'Мы больше не будем отправлять письма.';
-
-  @override
-  String get verificationEmailSent => 'Письмо с подтверждением отправлено!';
-
-  @override
-  String get emailNotVerified => 'Email не подтверждён.';
-
-  @override
   String get resendCode => 'Отправить письмо с подтверждением повторно';
-
-  @override
-  String get remainingSeconds => 'Оставшееся время для подтверждения';
 
   @override
   String get pleaseCheckYourEmail =>
@@ -357,9 +231,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get verifyYourEmail => 'Подтвердите ваш Email';
-
-  @override
-  String get backToLogin => 'Вернуться ко входу';
 
   @override
   String get seconds => 'секунд';
@@ -388,9 +259,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get verifyNow => 'Подтвердить сейчас';
 
   @override
-  String get accountVerified => 'Ваш аккаунт подтверждён.';
-
-  @override
   String get linkSent => 'Ссылка отправлена';
 
   @override
@@ -408,13 +276,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Вы уверены, что хотите удалить свой аккаунт?';
 
   @override
-  String get enterPasswordToDelete => 'Введите ваш пароль для удаления.';
-
-  @override
   String get deleteAccount => 'Удалить аккаунт';
-
-  @override
-  String get deleteAccountError => 'Произошла ошибка при удалении аккаунта.';
 
   @override
   String get delete => 'Удалить';
@@ -436,29 +298,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get displayName => 'Отображаемое имя';
 
   @override
-  String get tapToChangeProfilePicture =>
-      'Нажмите, чтобы изменить фото профиля';
-
-  @override
   String get profileUpdated => 'Профиль успешно обновлён';
 
   @override
-  String get updateFailed => 'Не удалось обновить профиль';
-
-  @override
-  String get nameCannotBeEmpty => 'Имя не может быть пустым';
-
-  @override
   String get logout => 'Выйти';
-
-  @override
-  String get noDisplayName => 'Отображаемое имя не установлено';
-
-  @override
-  String get noEmail => 'Нет адреса электронной почты';
-
-  @override
-  String get noUserLoggedIn => 'Нет вошедшего пользователя';
 
   @override
   String get profile => 'Профиль';
@@ -487,15 +330,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get downloading => 'Загрузка...';
 
   @override
-  String get downloadError => 'Произошла ошибка во время загрузки.';
-
-  @override
-  String get downloadCancelled => 'Загрузка отменена.';
-
-  @override
-  String get downloadResumed => 'Загрузка возобновлена.';
-
-  @override
   String get downloadSuccess => 'Загрузка успешна';
 
   @override
@@ -513,27 +347,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get purchaseSuccessful => 'Покупка успешна!';
 
   @override
-  String get purchaseFailed => 'Покупка не удалась';
-
-  @override
-  String get creditProductNotFound => 'Выбранный пакет кредитов не найден.';
-
-  @override
-  String get creditsAddedSuccessfully =>
-      'Кредиты успешно зачислены на ваш счёт!';
-
-  @override
-  String get creditDeliveryFailed =>
-      'Не удалось зачислить кредиты на ваш счёт. Пожалуйста, свяжитесь с поддержкой.';
-
-  @override
-  String get invalidPurchase => 'Недействительная покупка';
-
-  @override
   String get purchaseError => 'Ошибка покупки';
-
-  @override
-  String get purchaseVertexPlusToUpload => 'Это функция Plus';
 
   @override
   String get purchasePlus => 'Купить Cortex Plus';
@@ -582,33 +396,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Получите доступ к ещё большему количеству функций Cortex и испытайте ИИ на ещё более высоком уровне!';
 
   @override
-  String get alreadySubscribed => 'Вы уже подписаны';
-
-  @override
-  String get subscriptionInfo => 'Ваша подписка активна.';
-
-  @override
-  String get alreadySubscribedMessage =>
-      'У вас уже есть подписка Plus. Если вы хотите отменить подписку, вы можете сделать это через менеджер Play Store.';
-
-  @override
-  String get cancelSubscription => 'Отменить подписку';
-
-  @override
-  String get cancelSubscriptionInfo =>
-      'Если вы хотите отменить подписку, пожалуйста, сделайте это через менеджер подписок Play Store.';
-
-  @override
-  String get goToPlayStore => 'Перейти в Play Store';
-
-  @override
-  String get alreadySubscribedPlus => 'У вас есть план Plus!';
-
-  @override
-  String get alreadySubscribedPlusMessage =>
-      'Ваш план Plus активен. Вы можете пользоваться всеми преимуществами.';
-
-  @override
   String get purchaseUltra => 'Купить Cortex Ultra';
 
   @override
@@ -616,27 +403,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Получите полный доступ ко всем функциям Cortex и испытайте ИИ на максимум!';
 
   @override
-  String get noSubscription => 'Нет подписки';
-
-  @override
-  String get noSubscriptionMessage => 'У вас ещё нет подписки.';
-
-  @override
-  String get alreadyAtHighestPlan => 'У вас уже самый высокий план.';
-
-  @override
-  String get unableToOpenSubscription =>
-      'Не удалось открыть страницу управления подпиской.';
-
-  @override
   String get upgradeSubscription => 'Улучшить подписку';
-
-  @override
-  String get confirmUpgrade => 'Вы уверены, что хотите улучшить свою подписку?';
-
-  @override
-  String get unsupportedPlatform =>
-      'Платформа не поддерживает отмену подписки.';
 
   @override
   String get purchaseStreamError => 'Ошибка потока покупки.';
@@ -645,43 +412,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get productNotFound => 'Продукт не найден';
 
   @override
-  String get productDetailsError =>
-      'Произошла ошибка при получении сведений о продукте.';
-
-  @override
   String get noProductsFound => 'Продукты не найдены';
-
-  @override
-  String get loadCreditsButton => 'Пополнить кредиты';
-
-  @override
-  String get creditsTitle => 'Кредиты';
-
-  @override
-  String get creditsScreenDescription =>
-      'Этот экран показывает кредиты пользователя. \n\nТекущие кредиты пользователя: 100\n\nЗдесь может отображаться подробная информация о кредитах.';
-
-  @override
-  String get creditsLoaded => 'Кредиты пополнены!';
-
-  @override
-  String get currentCredits => 'Текущие кредиты';
-
-  @override
-  String get pleaseSelectCreditPackage => 'Пожалуйста, выберите пакет кредитов';
-
-  @override
-  String get purchaseCreditsTitle => 'Купить кредиты';
-
-  @override
-  String get purchaseCreditsDescription =>
-      'Выберите пакет кредитов, который соответствует вашим потребностям, и используйте наше приложение больше.';
-
-  @override
-  String get purchaseButton => 'Купить';
-
-  @override
-  String get productNotFoundMessage => 'Выбранный продукт не существует.';
 
   @override
   String get buyCredits => 'Купить кредиты';
@@ -694,72 +425,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get buyCredit => 'Купить кредиты';
 
   @override
-  String buyCreditPackage(Object amount) {
-    return 'Купить $amount кредитов';
-  }
-
-  @override
-  String get subscribedPlan => 'Подписан';
-
-  @override
-  String get errorResponseNotReceived => 'Ответ не получен';
-
-  @override
-  String googleApiRequestFailed(int attempt, String error) {
-    return 'Запрос к Google API не удался $attempt раз(а): $error';
-  }
-
-  @override
-  String openRouterResponseStatus(int statusCode) {
-    return 'Статус ответа OpenRouter: $statusCode';
-  }
-
-  @override
-  String openRouterDecodedResponseBody(String body) {
-    return 'Декодированное тело ответа OpenRouter: $body';
-  }
-
-  @override
-  String decodedJson(String data) {
-    return 'Декодированный JSON: $data';
-  }
-
-  @override
-  String get responseStructureUnexpectedMessageContentMissing =>
-      'Неожиданная структура ответа: отсутствует сообщение или контент';
-
-  @override
-  String get responseStructureUnexpectedChoicesMissing =>
-      'Неожиданная структура ответа: отсутствует или пуст массив choices';
-
-  @override
-  String openRouterApiRequestFailed(int statusCode, String body) {
-    return 'Запрос к OpenRouter API не удался: $statusCode - $body';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterAttempts(int attempt, String error) {
-    return 'Запрос к OpenRouter API не удался $attempt раз(а): $error';
-  }
-
-  @override
   String get internetRequired =>
       'Для использования этой модели требуется подключение к интернету';
-
-  @override
-  String get pleaseWaitBeforeTryingAgain =>
-      'Пожалуйста, подождите немного, прежде чем пытаться снова';
-
-  @override
-  String openRouterQuotaExceeded(int statusCode, String decodedBody) {
-    return 'Квота исчерпана. Код состояния: $statusCode, Тело ответа: $decodedBody';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterPaidAttempts(
-      int attempts, String error) {
-    return 'Запрос к API не удался после $attempts платных попыток. Ошибка: $error';
-  }
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
@@ -803,12 +470,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get capabilitiesSection => 'Возможности';
 
   @override
-  String get ratingsSection => 'Рейтинги';
-
-  @override
-  String get noRatingDataFound => 'Данные о рейтинге не найдены';
-
-  @override
   String get featurePhotoTitle => 'Сканирование фото';
 
   @override
@@ -821,13 +482,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get featureOfflineDescription =>
       'Запускайте модель без подключения к интернету, чтобы сохранить ваши данные в безопасности.';
-
-  @override
-  String get featureSupermodelTitle => 'Супермодель';
-
-  @override
-  String get featureSupermodelDescription =>
-      'Это огромная модель с более чем 10 миллиардами параметров, предлагающая высокую производительность и широкие возможности.';
 
   @override
   String get featureRoleplayTitle => 'Ролевая игра';
@@ -846,26 +500,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get context => 'Контекст';
 
   @override
-  String get millions => 'миллионов';
-
-  @override
-  String get billions => 'миллиардов';
-
-  @override
-  String get trillions => 'триллионов';
-
-  @override
-  String get thousand => 'тысяч';
-
-  @override
-  String get estimated => 'примерно';
-
-  @override
   String get finalPreparation => 'Идут последние приготовления.';
-
-  @override
-  String get allEvaluationsByTestTeam =>
-      'Все оценки были сделаны нашей командой тестировщиков';
 
   @override
   String get shareApp => 'Поделиться приложением';
@@ -901,9 +536,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get user => 'Пользователь';
-
-  @override
-  String get voice => 'Голос';
 
   @override
   String get help => 'Помощь';
@@ -953,9 +585,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chinese => 'Китайский';
 
   @override
-  String get arabic => 'Арабский';
-
-  @override
   String get french => 'Французский';
 
   @override
@@ -972,9 +601,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get korean => 'Корейский';
-
-  @override
-  String get deutsch => 'Немецкий';
 
   @override
   String get english => 'Английский';
@@ -1018,9 +644,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'В имени пользователя можно использовать только латинские буквы, а также символы \'.\', \'-\', \'_\'.';
 
   @override
-  String get passwordTooLong => 'Пароль не может превышать 64 символа.';
-
-  @override
   String get noInternetConnection => 'Нет подключения к интернету.';
 
   @override
@@ -1030,16 +653,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get library => 'Библиотека';
 
   @override
-  String get inappropriateMessageWarning =>
-      'Обнаружено неприемлемое сообщение!';
-
-  @override
-  String get myModelDescription => 'Моя модель.';
-
-  @override
-  String get noModelsDownloaded => 'Вы ещё не скачали ни одной модели.';
-
-  @override
   String get appTitle => 'Cortex';
 
   @override
@@ -1047,9 +660,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get removeModel => 'Удалить модель';
-
-  @override
-  String get modelUploadedSuccessfully => 'Модель успешно загружена.';
 
   @override
   String get insufficientRAM => 'Недостаточно памяти';
@@ -1074,9 +684,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get benefit1 => 'Гораздо больший лимит чатов для онлайн ИИ';
 
   @override
-  String get benefit2 => 'Загружайте собственные модели';
-
-  @override
   String get benefit3 => 'Эффект для профиля';
 
   @override
@@ -1084,9 +691,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get benefit5 => 'Создавайте больше онлайн-ИИ';
-
-  @override
-  String get benefit6 => 'Безлимитный чат';
 
   @override
   String benefit7(Object credits) {
@@ -1098,9 +702,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get benefit9 => 'Новые темы';
-
-  @override
-  String get benefit10 => 'Оффлайн голосовой чат';
 
   @override
   String get oldBenefits => 'Все преимущества предыдущих планов';
@@ -1139,21 +740,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get copyrights => 'Источники';
 
   @override
-  String get downloadingTitle => 'Загрузка';
-
-  @override
-  String get downloadCompletedTitle => 'Загрузка завершена';
-
-  @override
-  String get downloadPausedTitle => 'Загрузка приостановлена';
-
-  @override
-  String get downloadErrorTitle => 'Ошибка загрузки';
-
-  @override
-  String get cancelButtonText => 'Отмена';
-
-  @override
   String get love => 'Любовь';
 
   @override
@@ -1188,13 +774,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get editingNotification => 'Вы сейчас в режиме редактирования';
 
   @override
-  String get featureIndulgentTitle => 'Всеобъемлющая';
-
-  @override
-  String get featureIndulgentDescription =>
-      'Эта модель может беспрепятственно обрабатывать контексты, превышающие 100 000 токенов, что позволяет ей работать с обширными и подробными входными данными без снижения производительности.';
-
-  @override
   String get featurePluralTitle => 'Множественная';
 
   @override
@@ -1202,30 +781,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Эта модель может автоматически интегрировать дополнительные расширения, тем самым расширяя свои функциональные возможности для поддержки разнообразных операций с повышенной производительностью.';
 
   @override
-  String get featureWiseTitle => 'Мудрая';
-
-  @override
-  String get featureWiseDescription =>
-      'Эта модель может использовать глубокие аналитические данные и дальновидные рассуждения для оказания сложной поддержки в принятии решений и решении комплексных проблем.';
-
-  @override
-  String get featureResearcherTitle => 'Исследователь';
-
-  @override
-  String get featureResearcherDescription =>
-      'Эта функция, доступная исключительно в моделях с передовыми исследовательскими и аналитическими возможностями, предназначена для предоставления высокоточных данных и всестороннего анализа в различных областях.';
-
-  @override
   String get nameLabel => 'Имя ИИ';
 
   @override
-  String get nameHint => 'Введите имя вашего ИИ';
-
-  @override
   String get summaryLabel => 'Краткое описание ИИ';
-
-  @override
-  String get summaryHint => 'Введите краткое описание вашего ИИ';
 
   @override
   String get add => 'Добавить';
@@ -1255,20 +814,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get summary => 'Описание';
 
   @override
-  String get characterPoliceTitle => 'Полицейский';
-
-  @override
-  String get characterPoliceRole =>
-      'Ты бдительный страж закона, посвятивший себя защите граждан и поддержанию порядка с непоколебимой решимостью, ты полицейский';
-
-  @override
-  String get characterPoliceShortDescription =>
-      'Стойкий и отважный страж порядка.';
-
-  @override
-  String get purchaseSubscription => 'Купить';
-
-  @override
   String get modelUploadTitle => 'Файл искусственного интеллекта';
 
   @override
@@ -1280,13 +825,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Нажмите здесь, чтобы выбрать файл .gguf с вашего устройства';
 
   @override
-  String get addServerTitle => 'Сервер искусственного интеллекта';
-
-  @override
-  String get addServerDescription =>
-      'Введите URL вашего удалённого сервера для подключения к внешне размещённой модели. Эта функция требует активного интернет-соединения, и любые проблемы или ошибки, связанные с сервером, не вызваны Cortex. Убедитесь, что ваш сервер правильно настроен, доступен из вашей сети и имеет действительную конечную точку модели для бесперебойной работы.';
-
-  @override
   String get you => 'Вы';
 
   @override
@@ -1296,24 +834,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get confirmRemovePhoto => 'Вы уверены, что хотите удалить фото?';
 
   @override
-  String get serverLink => 'Ссылка на сервер';
-
-  @override
-  String get enterURL => 'Введите URL сервера';
-
-  @override
   String get chatLengthLimitExceeded =>
       'Этот чат превысил лимит символов. Пожалуйста, начните новый чат или приобретите подписку.';
-
-  @override
-  String get aiNameError => 'ИИ с таким именем уже существует.';
-
-  @override
-  String get modelLimitExceeded =>
-      'Вы достигли максимального лимита создания моделей для вашего плана.';
-
-  @override
-  String get modelVertexProducer => 'Vertex';
 
   @override
   String get photoLimitReachedMessage => 'Можно добавить только одно фото';
@@ -1328,14 +850,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String insufficientCredits(Object available, Object required) {
     return 'У вас недостаточно кредитов для выполнения этого запроса. Это действие требует $required кредитов, а у вас только $available. Чтобы получить больше кредитов, вы можете улучшить свой план или купить их напрямую. хей мы прекрасно понимаем что остаться без кредитов это тот ещё облом но серьёзно получение этих крутых ответов от наших моделей не бесплатно так что эти кредиты на самом деле помогают нам поддерживать движуху и слушайте если больше из вас ребята начнут покупать кредиты мы вполне можем рассмотреть возможность увеличения бесплатных дневных лимитов для всех';
-  }
-
-  @override
-  String get regenerateInProgress => 'Генерация ответа уже в процессе.';
-
-  @override
-  String errorOccurredDuringRegeneration(String errorDetails) {
-    return 'Произошла ошибка при попытке регенерации: $errorDetails';
   }
 
   @override
@@ -1365,10 +879,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get errorInsufficientCredits =>
       'У вас недостаточно кредитов. Пожалуйста, пополните счёт, чтобы продолжить.';
-
-  @override
-  String get errorRateLimitExceeded =>
-      'Слишком много запросов. Пожалуйста, попробуйте снова через мгновение.';
 
   @override
   String get errorServer =>
@@ -1419,23 +929,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get noModelsFoundMessage =>
       'Попробуйте изменить условия поиска или сбросить фильтр.';
-
-  @override
-  String get usernameRateLimitExceeded =>
-      'Вы можете менять имя пользователя только дважды каждые 14 дней.';
-
-  @override
-  String get usernameUnchanged => 'Это уже ваше текущее имя пользователя.';
-
-  @override
-  String get creditsInfoPanelTitle => 'Как работают кредиты';
-
-  @override
-  String get creditsInfoPanelBody =>
-      'Кредиты используются для общения с онлайн-моделями. Каждое сообщение стоит нам денег, и эти кредиты спасают нас от банкротства. Теперь давайте объясним систему. \n\n• Каждое сообщение бесплатной онлайн-модели стоит 5 кредитов. \n• Каждое сообщение онлайн-модели премиум-класса стоит 20 кредитов. \n• Добавление вложения добавляет еще 30 кредитов. \n• Пользователи бесплатного плана получают бонус в размере 200 кредитов, который обнуляется ежедневно.';
-
-  @override
-  String get creditsInfoPanelFooter => 'Приятного общения!';
 
   @override
   String get disclaimerMessage =>
@@ -1522,10 +1015,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get photoWarningMessage =>
       'Прикреплено фото. Модели, не поддерживающие изображения, могут его проигнорировать.';
-
-  @override
-  String get loginRequiredForPurchase =>
-      'Вы должны войти в систему, чтобы совершить покупку.';
 
   @override
   String get storagePermissionRequired =>
@@ -1631,33 +1120,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Вы использовали все бесплатные ежедневные сообщения для премиум-моделей. Пожалуйста, перейдите на более высокий уровень, чтобы получить неограниченный доступ.';
 
   @override
-  String selectionScreenGreetingUser(String userName) {
-    return 'Чем я могу вам помочь, $userName?';
-  }
-
-  @override
   String get selectionScreenGreetingGeneric => 'Чем я могу вам помочь сегодня?';
-
-  @override
-  String get selectionScreenRecentModels => 'Последние модели';
-
-  @override
-  String get selectionScreenFeatureDynamicChat => 'Динамический чат';
 
   @override
   String get selectionScreenFeatureOffline => 'Использовать без Интернета';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Выберите модель';
-
-  @override
   String get explore => 'Исследовать';
-
-  @override
-  String get subscriptionCancelled => 'Подписка успешно отменена!';
-
-  @override
-  String get selectionScreenPinnedModels => 'Закрепленные модели';
 
   @override
   String get selectionScreenNewsAndUpdates => 'Новости и обновления';
@@ -1694,13 +1163,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get errorNoModelsAvailable =>
       'В настоящее время нет доступных моделей. Проверьте подключение к интернету и повторите попытку.';
-
-  @override
-  String get errorNoModelsForRequest =>
-      'Не найдено подходящих моделей для вашего текущего запроса (например, автономный режим или сообщение с изображением).';
-
-  @override
-  String get dynamicChatWelcome => 'Могу я чем-нибудь помочь?';
 
   @override
   String get notificationComebackTitle => 'Мы скучаем по тебе!';
@@ -2019,13 +1481,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Вы уверены, что хотите покинуть эту замечательную платформу?';
 
   @override
-  String get newsErrorTitle => 'Не удалось загрузить новости';
-
-  @override
-  String get newsErrorMessage =>
-      'Возникла проблема при загрузке последних обновлений. Проверьте соединение и повторите попытку.';
-
-  @override
   String get tagNotFound => 'Введенный вами тег недействителен или устарел.';
 
   @override
@@ -2102,9 +1557,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get createAccount => 'Зарегистрироваться';
-
-  @override
-  String get upgradeTitle => 'Завершить регистрацию';
 
   @override
   String get accountLinkedSuccess => 'Учетная запись успешно создана!';

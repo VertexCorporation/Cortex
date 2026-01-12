@@ -9,9 +9,6 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get understood => 'Anlaşıldı.';
-
-  @override
   String get cancel => 'İptal';
 
   @override
@@ -30,9 +27,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get chat => 'Sohbet';
 
   @override
-  String get darkMode => 'Karanlık Mod';
-
-  @override
   String get light => 'Aydınlık';
 
   @override
@@ -46,9 +40,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get done => 'Bitti';
-
-  @override
-  String get comingSoon => 'YAKINDA';
 
   @override
   String get bestValue => 'En İyi Fiyat';
@@ -66,14 +57,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get messageHint => 'Herhangi bir şey sor';
 
   @override
-  String get modelLoading => 'Model yükleniyor...';
-
-  @override
   String get messageCopied => 'Mesaj panoya kopyalandı.';
-
-  @override
-  String get storeUnavailable =>
-      'Mağaza şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.';
 
   @override
   String get retry => 'Tekrar Dene';
@@ -84,16 +68,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String deviceMemory(Object memory) {
     return 'Cihaz Belleği: $memory GB';
-  }
-
-  @override
-  String storageSpace(Object storage) {
-    return 'Depolama Alanı: $storage GB';
-  }
-
-  @override
-  String freeStorageSpace(Object freeStorage) {
-    return 'Boş Depolama Alanı: $freeStorage GB';
   }
 
   @override
@@ -118,9 +92,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get usedMemory => 'Kullanılan Bellek';
 
   @override
-  String get requirements => 'Gereksinimler';
-
-  @override
   String get modelsTitle => 'Kütüphane';
 
   @override
@@ -130,34 +101,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get serverSideModels => 'Çevrimiçi Modeller';
 
   @override
-  String get uploadYourOwnModel => 'Kendi Modelini Yükle!';
-
-  @override
   String get selectGGUFFile => 'GGUF Dosyası Seç';
 
   @override
   String get errorGGUF => 'Lütfen sadece GGUF formatında bir dosya seçin.';
-
-  @override
-  String get modelAlreadyExists => 'Model zaten mevcut.';
-
-  @override
-  String get modelAddedSuccessfully => 'Model başarıyla eklendi.';
-
-  @override
-  String get modelRemoved => 'Model başarıyla kaldırıldı.';
-
-  @override
-  String get removeError => 'Modeli kaldırırken bir hata oluştu.';
-
-  @override
-  String get fileNotFound => 'Dosya bulunamadı.';
-
-  @override
-  String get fileUploadError => 'Dosyayı yüklerken bir hata oluştu.';
-
-  @override
-  String get noFileSelected => 'Dosya seçilmedi.';
 
   @override
   String get myModels => 'Modellerim';
@@ -166,36 +113,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String get create => 'Oluştur';
 
   @override
-  String get seeAll => 'Tümünü Gör';
-
-  @override
   String modelProducer(Object producer) {
     return 'Üretici: $producer';
-  }
-
-  @override
-  String modelRAM(Object ram) {
-    return 'RAM: $ram';
-  }
-
-  @override
-  String modelSize(Object size) {
-    return 'Boyut: $size';
   }
 
   @override
   String modelDescription(Object description) {
     return '$description';
   }
-
-  @override
-  String get conversationsTitle => 'Sohbetler';
-
-  @override
-  String get conversationDeleted => 'Sohbet silindi.';
-
-  @override
-  String get conversationUpdated => 'Sohbet güncellendi.';
 
   @override
   String get editConversationTitle => 'Yeniden Adlandır';
@@ -207,9 +132,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get save => 'Kaydet';
 
   @override
-  String get titleCannotBeEmpty => 'Başlık boş olamaz.';
-
-  @override
   String get noConversationsMessage => 'Hiç sohbet yok, sohbete başla!';
 
   @override
@@ -217,12 +139,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get noChats => 'Sohbet Yok';
-
-  @override
-  String get starredChats => 'Yıldızlı Sohbetler';
-
-  @override
-  String get allChats => 'Tüm Sohbetler';
 
   @override
   String get noStarredChats => 'Yıldızlı Sohbet Yok';
@@ -238,18 +154,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get unstarConversation => 'Unstar';
-
-  @override
-  String get conversationTitleUpdated => 'Sohbet başlığı güncellendi.';
-
-  @override
-  String get youReachedConversationLimit => 'Sohbet limitine ulaştınız.';
-
-  @override
-  String get today => 'Bugün';
-
-  @override
-  String get yesterday => 'Dün';
 
   @override
   String get loginToYourAccount => 'Giriş Yap';
@@ -300,9 +204,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get passwordsDoNotMatch => 'Şifreler eşleşmiyor.';
 
   @override
-  String get userNotFound => 'Kullanıcı bulunamadı.';
-
-  @override
   String get wrongPassword => 'Yanlış şifre.';
 
   @override
@@ -315,39 +216,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get authError => 'Kimlik Doğrulama Hatası';
 
   @override
-  String get invalidUsername => 'Lütfen bir kullanıcı adı girin.';
-
-  @override
   String get usernameTaken => 'Bu kullanıcı adı zaten alınmış.';
 
   @override
   String get username => 'Kullanıcı Adı';
 
   @override
-  String get authenticationFailed =>
-      'Kimlik doğrulama başarısız oldu. Lütfen tekrar deneyin.';
-
-  @override
-  String get emailTooLong => 'E-posta en fazla 30 karakter olabilir.';
-
-  @override
-  String get deviceLimitReached =>
-      'Bu cihaz için hesap oluşturma limitine ulaştınız.';
-
-  @override
-  String get verificationEmailLimitReached => 'Daha fazla göndermeyeceğiz';
-
-  @override
-  String get verificationEmailSent => 'Doğrulama e-postası gönderildi!';
-
-  @override
-  String get emailNotVerified => 'E-posta doğrulanmadı';
-
-  @override
   String get resendCode => 'Doğrulama e-postasını yeniden gönder';
-
-  @override
-  String get remainingSeconds => 'Doğrulama için kalan süre';
 
   @override
   String get pleaseCheckYourEmail =>
@@ -355,9 +230,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get verifyYourEmail => 'E-postanızı Doğrulayın';
-
-  @override
-  String get backToLogin => 'Geri Dön';
 
   @override
   String get seconds => 'saniye';
@@ -386,9 +258,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get verifyNow => 'Şimdi Doğrula';
 
   @override
-  String get accountVerified => 'Hesabınız doğrulandı.';
-
-  @override
   String get linkSent => 'Bağlantı gönderildi';
 
   @override
@@ -406,13 +275,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Hesabınızı silmek istediğinizden emin misiniz?';
 
   @override
-  String get enterPasswordToDelete => 'Silmek için şifrenizi girin.';
-
-  @override
   String get deleteAccount => 'Hesabı Sil';
-
-  @override
-  String get deleteAccountError => 'Hesabı silerken bir hata oluştu.';
 
   @override
   String get delete => 'Sil';
@@ -434,29 +297,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get displayName => 'Görünen Ad';
 
   @override
-  String get tapToChangeProfilePicture =>
-      'Profil resmini değiştirmek için dokun';
-
-  @override
   String get profileUpdated => 'Profil başarıyla güncellendi';
 
   @override
-  String get updateFailed => 'Profil güncellenemedi';
-
-  @override
-  String get nameCannotBeEmpty => 'İsim boş olamaz';
-
-  @override
   String get logout => 'Çıkış Yap';
-
-  @override
-  String get noDisplayName => 'Görünen ad ayarlanmamış';
-
-  @override
-  String get noEmail => 'E-posta adresi yok';
-
-  @override
-  String get noUserLoggedIn => 'Şu anda giriş yapmış kullanıcı yok';
 
   @override
   String get profile => 'Profil';
@@ -484,15 +328,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get downloading => 'İndiriliyor...';
 
   @override
-  String get downloadError => 'İndirme sırasında bir hata oluştu.';
-
-  @override
-  String get downloadCancelled => 'İndirme iptal edildi.';
-
-  @override
-  String get downloadResumed => 'İndirme devam ettirildi.';
-
-  @override
   String get downloadSuccess => 'İndirme başarılı';
 
   @override
@@ -510,27 +345,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get purchaseSuccessful => 'Satın alma başarılı!';
 
   @override
-  String get purchaseFailed => 'Satın alma başarısız';
-
-  @override
-  String get creditProductNotFound => 'Seçilen kredi ürünü bulunamadı.';
-
-  @override
-  String get creditsAddedSuccessfully =>
-      'Krediler hesabınıza başarıyla eklendi!';
-
-  @override
-  String get creditDeliveryFailed =>
-      'Hesabınıza kredi eklenemedi. Lütfen destek ile iletişime geçin.';
-
-  @override
-  String get invalidPurchase => 'Geçersiz satın alma';
-
-  @override
   String get purchaseError => 'Satın alma hatası';
-
-  @override
-  String get purchaseVertexPlusToUpload => 'Bu bir Plus özelliğidir';
 
   @override
   String get purchasePlus => 'Cortex Plus Satın Al';
@@ -578,33 +393,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Cortex\'in daha da fazla özelliğine erişin ve yapay zekayı daha da fazla deneyimleyin!';
 
   @override
-  String get alreadySubscribed => 'Zaten abonesiniz';
-
-  @override
-  String get subscriptionInfo => 'Aboneliğiniz aktif.';
-
-  @override
-  String get alreadySubscribedMessage =>
-      'Zaten bir Plus aboneliğiniz var. Aboneliğinizi iptal etmek isterseniz, Play Store yöneticisi aracılığıyla yapabilirsiniz.';
-
-  @override
-  String get cancelSubscription => 'Aboneliği İptal Et';
-
-  @override
-  String get cancelSubscriptionInfo =>
-      'Aboneliğinizi iptal etmek isterseniz, lütfen Play Store abonelik yöneticisi aracılığıyla devam edin.';
-
-  @override
-  String get goToPlayStore => 'Play Store\'a Git';
-
-  @override
-  String get alreadySubscribedPlus => 'Plus Planınız Var!';
-
-  @override
-  String get alreadySubscribedPlusMessage =>
-      'Plus planınız aktif. Tüm avantajlardan yararlanabilirsiniz.';
-
-  @override
   String get purchaseUltra => 'Cortex Ultra Satın Al';
 
   @override
@@ -612,28 +400,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Cortex\'in tüm özelliklerine tam erişim sağlayın ve yapay zekayı sonuna kadar deneyimleyin!';
 
   @override
-  String get noSubscription => 'Abonelik Yok';
-
-  @override
-  String get noSubscriptionMessage => 'Henüz bir aboneliğiniz yok.';
-
-  @override
-  String get alreadyAtHighestPlan => 'Zaten en yüksek plandasınız.';
-
-  @override
-  String get unableToOpenSubscription =>
-      'Abonelik yönetimi sayfası açılamıyor.';
-
-  @override
   String get upgradeSubscription => 'Aboneliği Yükselt';
-
-  @override
-  String get confirmUpgrade =>
-      'Aboneliğinizi yükseltmek istediğinizden emin misiniz?';
-
-  @override
-  String get unsupportedPlatform =>
-      'Abonelik iptali için desteklenmeyen platform.';
 
   @override
   String get purchaseStreamError => 'Satın alma akışı hatası.';
@@ -642,43 +409,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get productNotFound => 'Ürün bulunamadı';
 
   @override
-  String get productDetailsError =>
-      'Ürün ayrıntıları alınırken bir hata oluştu.';
-
-  @override
   String get noProductsFound => 'Ürün bulunamadı';
-
-  @override
-  String get loadCreditsButton => 'Kredi Yükle';
-
-  @override
-  String get creditsTitle => 'Krediler';
-
-  @override
-  String get creditsScreenDescription =>
-      'Bu ekran kullanıcının kredilerini gösterir. \n\nKullanıcının mevcut kredileri: 100\n\nAyrıntılı kredi bilgileri burada görüntülenebilir.';
-
-  @override
-  String get creditsLoaded => 'Krediler yüklendi!';
-
-  @override
-  String get currentCredits => 'Mevcut Krediler';
-
-  @override
-  String get pleaseSelectCreditPackage => 'Lütfen bir kredi paketi seçin';
-
-  @override
-  String get purchaseCreditsTitle => 'Kredi Satın Al';
-
-  @override
-  String get purchaseCreditsDescription =>
-      'İhtiyaçlarınıza uygun bir kredi paketi seçin ve uygulamamızı daha fazla kullanın.';
-
-  @override
-  String get purchaseButton => 'Satın Al';
-
-  @override
-  String get productNotFoundMessage => 'Seçilen ürün mevcut değil.';
 
   @override
   String get buyCredits => 'Kredi Satın Al';
@@ -691,72 +422,8 @@ class AppLocalizationsTr extends AppLocalizations {
   String get buyCredit => 'Kredi Satın Al';
 
   @override
-  String buyCreditPackage(Object amount) {
-    return '$amount Kredi Satın Al';
-  }
-
-  @override
-  String get subscribedPlan => 'Abone Olundu';
-
-  @override
-  String get errorResponseNotReceived => 'Yanıt alınamadı';
-
-  @override
-  String googleApiRequestFailed(int attempt, String error) {
-    return 'Google API isteği $attempt kez başarısız oldu: $error';
-  }
-
-  @override
-  String openRouterResponseStatus(int statusCode) {
-    return 'OpenRouter Yanıt Durumu: $statusCode';
-  }
-
-  @override
-  String openRouterDecodedResponseBody(String body) {
-    return 'OpenRouter Çözülmüş Yanıt Gövdesi: $body';
-  }
-
-  @override
-  String decodedJson(String data) {
-    return 'Çözülmüş JSON: $data';
-  }
-
-  @override
-  String get responseStructureUnexpectedMessageContentMissing =>
-      'Yanıt yapısı beklenmedik: mesaj veya içerik eksik';
-
-  @override
-  String get responseStructureUnexpectedChoicesMissing =>
-      'Yanıt yapısı beklenmedik: seçimler eksik veya boş';
-
-  @override
-  String openRouterApiRequestFailed(int statusCode, String body) {
-    return 'OpenRouter API isteği başarısız oldu: $statusCode - $body';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterAttempts(int attempt, String error) {
-    return 'OpenRouter API isteği $attempt kez başarısız oldu: $error';
-  }
-
-  @override
   String get internetRequired =>
       'Bu modeli kullanmak için internet bağlantısı gereklidir';
-
-  @override
-  String get pleaseWaitBeforeTryingAgain =>
-      'Lütfen tekrar denemeden önce bir an bekleyin';
-
-  @override
-  String openRouterQuotaExceeded(int statusCode, String decodedBody) {
-    return 'Kota aşıldı. Durum kodu: $statusCode, Gövde: $decodedBody';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterPaidAttempts(
-      int attempts, String error) {
-    return 'API isteği $attempts ücretli denemeden sonra başarısız oldu. Hata: $error';
-  }
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
@@ -799,12 +466,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get capabilitiesSection => 'Yetenekler';
 
   @override
-  String get ratingsSection => 'Değerlendirmeler';
-
-  @override
-  String get noRatingDataFound => 'Değerlendirme verisi bulunamadı';
-
-  @override
   String get featurePhotoTitle => 'Fotoğraf Tarama';
 
   @override
@@ -817,13 +478,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get featureOfflineDescription =>
       'Verilerinizi güvende tutmak için modeli internet bağlantısı olmadan çalıştırın.';
-
-  @override
-  String get featureSupermodelTitle => 'Süper Model';
-
-  @override
-  String get featureSupermodelDescription =>
-      'Bu, 10 milyardan fazla parametreye sahip, yüksek performans ve geniş yetenekler sunan devasa bir modeldir.';
 
   @override
   String get featureRoleplayTitle => 'Rol Yapma';
@@ -842,26 +496,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get context => 'Bağlam';
 
   @override
-  String get millions => 'milyon';
-
-  @override
-  String get billions => 'milyar';
-
-  @override
-  String get trillions => 'trilyon';
-
-  @override
-  String get thousand => 'bin';
-
-  @override
-  String get estimated => 'tahmini';
-
-  @override
   String get finalPreparation => 'Son hazırlıklar yapılıyor.';
-
-  @override
-  String get allEvaluationsByTestTeam =>
-      'Tüm değerlendirmeler test ekibimiz tarafından yapılmıştır';
 
   @override
   String get shareApp => 'Uygulamayı Paylaş';
@@ -897,9 +532,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get user => 'Kullanıcı';
-
-  @override
-  String get voice => 'Ses';
 
   @override
   String get help => 'Yardım';
@@ -949,9 +581,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get chinese => 'Çince';
 
   @override
-  String get arabic => 'Arapça';
-
-  @override
   String get french => 'Fransızca';
 
   @override
@@ -968,9 +597,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get korean => 'Korece';
-
-  @override
-  String get deutsch => 'Almanca (Deutsch)';
 
   @override
   String get english => 'İngilizce';
@@ -1013,9 +639,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Kullanıcı adında sadece şu harfler: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' ve \'.\', \'-\', \'_\' karakterleri kullanılabilir.';
 
   @override
-  String get passwordTooLong => 'Şifre 64 karakteri aşamaz.';
-
-  @override
   String get noInternetConnection => 'İnternet bağlantısı yok.';
 
   @override
@@ -1025,15 +648,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get library => 'Kütüphane';
 
   @override
-  String get inappropriateMessageWarning => 'Uygunsuz mesaj tespit edildi!';
-
-  @override
-  String get myModelDescription => 'Benim modelim.';
-
-  @override
-  String get noModelsDownloaded => 'Henüz herhangi bir model indirmediniz.';
-
-  @override
   String get appTitle => 'Cortex';
 
   @override
@@ -1041,9 +655,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get removeModel => 'Modeli Kaldır';
-
-  @override
-  String get modelUploadedSuccessfully => 'Model başarıyla yüklendi.';
 
   @override
   String get insufficientRAM => 'Yetersiz Bellek';
@@ -1069,9 +680,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Çevrimiçi yapay zekalar için çok daha fazla sohbet limiti';
 
   @override
-  String get benefit2 => 'Kendi modellerinizi yükleyin';
-
-  @override
   String get benefit3 => 'Profil efekti';
 
   @override
@@ -1079,9 +687,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get benefit5 => 'Daha fazla çevrimiçi yapay zeka oluşturun';
-
-  @override
-  String get benefit6 => 'Sınırsız sohbet';
 
   @override
   String benefit7(Object credits) {
@@ -1093,9 +698,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get benefit9 => 'Yeni temalar';
-
-  @override
-  String get benefit10 => 'Çevrimdışı sesli sohbet';
 
   @override
   String get oldBenefits => 'Alt planlardaki tüm avantajlar';
@@ -1135,21 +737,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get copyrights => 'Atıflar';
 
   @override
-  String get downloadingTitle => 'İndiriliyor';
-
-  @override
-  String get downloadCompletedTitle => 'İndirme Tamamlandı';
-
-  @override
-  String get downloadPausedTitle => 'İndirme Duraklatıldı';
-
-  @override
-  String get downloadErrorTitle => 'İndirme Hatası';
-
-  @override
-  String get cancelButtonText => 'İptal';
-
-  @override
   String get love => 'Aşk';
 
   @override
@@ -1184,13 +771,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get editingNotification => 'Şu anda düzenleme modundasınız';
 
   @override
-  String get featureIndulgentTitle => 'Hoşgörülü';
-
-  @override
-  String get featureIndulgentDescription =>
-      'Bu model, 100.000 jetonu aşan bağlamları sorunsuzca barındırabilir ve işleyebilir, bu da performanstan ödün vermeden kapsamlı ve ayrıntılı girdileri yönetmesini sağlar.';
-
-  @override
   String get featurePluralTitle => 'Çoğulcu';
 
   @override
@@ -1198,30 +778,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu model, ek uzantıları otomatik olarak entegre edebilir, böylece işlevsel yeteneklerini genişleterek çeşitli işlemleri gelişmiş performansla destekler.';
 
   @override
-  String get featureWiseTitle => 'Bilge';
-
-  @override
-  String get featureWiseDescription =>
-      'Bu model, karar verme ve karmaşık problem çözme için sofistike destek sağlamak üzere derin analitik içgörülerden ve ileri görüşlü akıl yürütmeden yararlanabilir.';
-
-  @override
-  String get featureResearcherTitle => 'Araştırmacı';
-
-  @override
-  String get featureResearcherDescription =>
-      'Yalnızca gelişmiş araştırma ve analitik kapasitelerle donatılmış modellerde bulunan bu özellik, çeşitli alanlarda yüksek hassasiyetli içgörüler ve kapsamlı analizler sağlamak üzere tasarlanmıştır.';
-
-  @override
   String get nameLabel => 'YZ adı';
 
   @override
-  String get nameHint => 'YZ\'nizin adını girin';
-
-  @override
   String get summaryLabel => 'YZ Özeti';
-
-  @override
-  String get summaryHint => 'YZ\'nizin özetini girin';
 
   @override
   String get add => 'Ekle';
@@ -1251,20 +811,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get summary => 'Özet';
 
   @override
-  String get characterPoliceTitle => 'Polis';
-
-  @override
-  String get characterPoliceRole =>
-      'Sen, vatandaşları korumaya ve sarsılmaz bir bağlılıkla düzeni sağlamaya adanmış, kanunun uyanık bir uygulayıcısısın, sen bir polissin.';
-
-  @override
-  String get characterPoliceShortDescription =>
-      'Kararlı ve cesur bir kanun uygulayıcısı.';
-
-  @override
-  String get purchaseSubscription => 'Satın Al';
-
-  @override
   String get modelUploadTitle => 'Yapay Zeka Dosyası';
 
   @override
@@ -1274,13 +820,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get modelUploadShortDescription =>
       'Cihazınızdan bir .gguf dosyası seçmek için buraya dokunun';
-
-  @override
-  String get addServerTitle => 'Yapay Zeka Sunucusu';
-
-  @override
-  String get addServerDescription =>
-      'Harici olarak barındırılan bir modele bağlanmak için uzak sunucunuzun URL\'sini girin. Bu özellik aktif bir internet bağlantısı gerektirir ve sunucuyla ilgili herhangi bir sorun veya hata Cortex kaynaklı değildir. Sorunsuz bir deneyim için sunucunuzun doğru yapılandırıldığından, ağınızdan erişilebilir olduğundan ve geçerli bir model uç noktasına sahip olduğundan emin olun.';
 
   @override
   String get you => 'Siz';
@@ -1293,24 +832,8 @@ class AppLocalizationsTr extends AppLocalizations {
       'Fotoğrafı kaldırmak istediğinizden emin misiniz?';
 
   @override
-  String get serverLink => 'Sunucu Bağlantısı';
-
-  @override
-  String get enterURL => 'Sunucu URL\'sini girin';
-
-  @override
   String get chatLengthLimitExceeded =>
       'Bu sohbet karakter sınırını aştı. Lütfen yeni bir sohbet başlatın veya bir abonelik satın alın.';
-
-  @override
-  String get aiNameError => 'Bu isimde bir yapay zeka zaten var.';
-
-  @override
-  String get modelLimitExceeded =>
-      'Planınız için maksimum model oluşturma sınırına ulaştınız.';
-
-  @override
-  String get modelVertexProducer => 'Vertex';
 
   @override
   String get photoLimitReachedMessage => 'Sadece bir fotoğraf eklenebilir';
@@ -1325,14 +848,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String insufficientCredits(Object available, Object required) {
     return 'Bu isteği tamamlamak için yeterli krediniz yok. Bu eylem $required kredi gerektiriyor, ancak sizde yalnızca $available var. Daha fazla kredi kazanmak için planınızı yükseltebilir veya doğrudan satın alabilirsiniz. kanka biliyoruz bu kredi mevzusu can sıkıcı ama modellerden cevap almak biraz pahalı yani bu krediler aslında gerekli yoksaBata.rizOglum satın alım yapanlar fazla olursa az para kazanırsak limitleri de artırabiliriz o zamana kadar aynı devam';
-  }
-
-  @override
-  String get regenerateInProgress => 'Yanıt oluşturma zaten devam ediyor.';
-
-  @override
-  String errorOccurredDuringRegeneration(String errorDetails) {
-    return 'Yeniden oluşturmaya çalışırken bir hata oluştu: $errorDetails';
   }
 
   @override
@@ -1362,10 +877,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errorInsufficientCredits =>
       'Yetersiz krediniz var. Devam etmek için lütfen kredi yükleyin.';
-
-  @override
-  String get errorRateLimitExceeded =>
-      'Çok fazla istek. Lütfen bir süre sonra tekrar deneyin.';
 
   @override
   String get errorServer =>
@@ -1416,23 +927,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get noModelsFoundMessage =>
       'Arama terimlerinizi değiştirmeyi veya filtreyi temizlemeyi deneyin.';
-
-  @override
-  String get usernameRateLimitExceeded =>
-      'Kullanıcı adınızı her 14 günde yalnızca iki kez değiştirebilirsiniz.';
-
-  @override
-  String get usernameUnchanged => 'Bu zaten mevcut kullanıcı adınız.';
-
-  @override
-  String get creditsInfoPanelTitle => 'Krediler Nasıl Çalışır?';
-
-  @override
-  String get creditsInfoPanelBody =>
-      'Krediler, çevrimiçi modellerle sohbet etmek için kullanılır. her mesajın bize bi maliyeti var ve bu krediler batmamızı engelliyo neyse hadi sistemi anlatalım\n\n• Ücretsiz bir çevrimiçi modele mesaj göndermek 5 kredidir.\n• Premium bir çevrimiçi modele mesaj göndermek 20 kredidir.\n• Bir ek dahil etmek 30 kredi daha ekler.\n• Ücretsiz plan kullanıcıları her gün sıfırlanan 200 kredi bonusu alır.';
-
-  @override
-  String get creditsInfoPanelFooter => 'İyi sohbetler!';
 
   @override
   String get disclaimerMessage =>
@@ -1519,10 +1013,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get photoWarningMessage =>
       'Bir fotoğraf eklenmiştir. Görüntüleri desteklemeyen modeller bunu yok sayabilir.';
-
-  @override
-  String get loginRequiredForPurchase =>
-      'Satın alma işlemi yapmak için giriş yapmalısınız.';
 
   @override
   String get storagePermissionRequired =>
@@ -1627,34 +1117,14 @@ class AppLocalizationsTr extends AppLocalizations {
       'Premium modeller için tüm ücretsiz günlük mesajlarınızı kullandınız, sınırsız erişim için lütfen yükseltin.';
 
   @override
-  String selectionScreenGreetingUser(String userName) {
-    return 'Bugün sana nasıl yardımcı olabilirim, $userName?';
-  }
-
-  @override
   String get selectionScreenGreetingGeneric =>
       'Bugün size nasıl yardımcı olabilirim?';
-
-  @override
-  String get selectionScreenRecentModels => 'Son Modeller';
-
-  @override
-  String get selectionScreenFeatureDynamicChat => 'Dinamik Sohbet';
 
   @override
   String get selectionScreenFeatureOffline => 'İnternetsiz Kullan';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Model Seç';
-
-  @override
   String get explore => 'Keşfet';
-
-  @override
-  String get subscriptionCancelled => 'Abonelik başarıyla iptal edildi!';
-
-  @override
-  String get selectionScreenPinnedModels => 'Sabitlenmiş Modeller';
 
   @override
   String get selectionScreenNewsAndUpdates => 'Haberler ve Güncellemeler';
@@ -1691,13 +1161,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errorNoModelsAvailable =>
       'Şu anda hiçbir model mevcut değil. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.';
-
-  @override
-  String get errorNoModelsForRequest =>
-      'Mevcut isteğiniz için uygun model bulunamadı (örneğin, çevrimdışı mod veya resim mesajı).';
-
-  @override
-  String get dynamicChatWelcome => 'Size nasıl yardım edebilirim?';
 
   @override
   String get notificationComebackTitle => 'Özledik!';
@@ -2009,13 +1472,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu harika platformdan ayrılmak istediğinize emin misiniz?';
 
   @override
-  String get newsErrorTitle => 'Haberler Yüklenemedi';
-
-  @override
-  String get newsErrorMessage =>
-      'Son güncellemeler alınırken bir sorun oluştu, lütfen bağlantınızı kontrol edip tekrar deneyin.';
-
-  @override
   String get tagNotFound => 'Girdiğiniz etiket geçersiz veya süresi dolmuş.';
 
   @override
@@ -2092,9 +1548,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get createAccount => 'Hesap Oluştur';
-
-  @override
-  String get upgradeTitle => 'Kaydı Tamamla';
 
   @override
   String get accountLinkedSuccess => 'Hesap başarıyla oluşturuldu!';

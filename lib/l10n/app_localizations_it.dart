@@ -9,9 +9,6 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
-  String get understood => 'Capito.';
-
-  @override
   String get cancel => 'Annulla';
 
   @override
@@ -30,9 +27,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
-  String get darkMode => 'Modalità Scura';
-
-  @override
   String get light => 'Chiara';
 
   @override
@@ -46,9 +40,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get done => 'Fatto';
-
-  @override
-  String get comingSoon => 'PROSSIMAMENTE';
 
   @override
   String get bestValue => 'Miglior Valore';
@@ -66,14 +57,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get messageHint => 'Chiedi qualsiasi cosa';
 
   @override
-  String get modelLoading => 'Caricamento del modello...';
-
-  @override
   String get messageCopied => 'Messaggio copiato negli appunti.';
-
-  @override
-  String get storeUnavailable =>
-      'Il negozio non è attualmente disponibile. Riprova più tardi';
 
   @override
   String get retry => 'Riprova';
@@ -84,16 +68,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String deviceMemory(Object memory) {
     return 'Memoria del Dispositivo: $memory GB';
-  }
-
-  @override
-  String storageSpace(Object storage) {
-    return 'Spazio di Archiviazione: $storage GB';
-  }
-
-  @override
-  String freeStorageSpace(Object freeStorage) {
-    return 'Spazio di Archiviazione Libero: $freeStorage GB';
   }
 
   @override
@@ -118,9 +92,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get usedMemory => 'Memoria Usata';
 
   @override
-  String get requirements => 'Requisiti';
-
-  @override
   String get modelsTitle => 'Libreria';
 
   @override
@@ -130,36 +101,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get serverSideModels => 'Modelli Online';
 
   @override
-  String get uploadYourOwnModel => 'Carica il Tuo Modello!';
-
-  @override
   String get selectGGUFFile => 'Seleziona File GGUF';
 
   @override
   String get errorGGUF => 'Seleziona solo un file in formato GGUF.';
-
-  @override
-  String get modelAlreadyExists => 'Il modello esiste già.';
-
-  @override
-  String get modelAddedSuccessfully => 'Modello aggiunto con successo.';
-
-  @override
-  String get modelRemoved => 'Modello rimosso con successo.';
-
-  @override
-  String get removeError =>
-      'Si è verificato un errore durante la rimozione del modello.';
-
-  @override
-  String get fileNotFound => 'File non trovato.';
-
-  @override
-  String get fileUploadError =>
-      'Si è verificato un errore durante il caricamento del file.';
-
-  @override
-  String get noFileSelected => 'Nessun file selezionato.';
 
   @override
   String get myModels => 'I Miei Modelli';
@@ -168,36 +113,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String get create => 'Crea';
 
   @override
-  String get seeAll => 'Vedi Tutti';
-
-  @override
   String modelProducer(Object producer) {
     return 'Produttore: $producer';
-  }
-
-  @override
-  String modelRAM(Object ram) {
-    return 'RAM: $ram';
-  }
-
-  @override
-  String modelSize(Object size) {
-    return 'Dimensione: $size';
   }
 
   @override
   String modelDescription(Object description) {
     return '$description';
   }
-
-  @override
-  String get conversationsTitle => 'Conversazioni';
-
-  @override
-  String get conversationDeleted => 'Conversazione eliminata.';
-
-  @override
-  String get conversationUpdated => 'Conversazione aggiornata.';
 
   @override
   String get editConversationTitle => 'Rinomina';
@@ -209,9 +132,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get save => 'Salva';
 
   @override
-  String get titleCannotBeEmpty => 'Il titolo non può essere vuoto.';
-
-  @override
   String get noConversationsMessage =>
       'Nessuna conversazione, inizia a chattare!';
 
@@ -220,12 +140,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get noChats => 'Nessuna Chat';
-
-  @override
-  String get starredChats => 'Chat Preferite';
-
-  @override
-  String get allChats => 'Tutte le Chat';
 
   @override
   String get noStarredChats => 'Nessuna Chat Preferita';
@@ -242,20 +156,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get unstarConversation => 'Unstar';
-
-  @override
-  String get conversationTitleUpdated =>
-      'Titolo della conversazione aggiornato';
-
-  @override
-  String get youReachedConversationLimit =>
-      'Hai raggiunto il limite di conversazioni.';
-
-  @override
-  String get today => 'Oggi';
-
-  @override
-  String get yesterday => 'Ieri';
 
   @override
   String get loginToYourAccount => 'Accedi';
@@ -307,9 +207,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get passwordsDoNotMatch => 'Le password non coincidono.';
 
   @override
-  String get userNotFound => 'Utente non trovato.';
-
-  @override
   String get wrongPassword => 'Password errata.';
 
   @override
@@ -322,38 +219,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get authError => 'Errore di Autenticazione';
 
   @override
-  String get invalidUsername => 'Inserisci un nome utente.';
-
-  @override
   String get usernameTaken => 'Questo nome utente è già stato preso.';
 
   @override
   String get username => 'Nome Utente';
 
   @override
-  String get authenticationFailed => 'Autenticazione fallita. Riprova.';
-
-  @override
-  String get emailTooLong => 'L\'email può contenere al massimo 30 caratteri.';
-
-  @override
-  String get deviceLimitReached =>
-      'Hai raggiunto il limite di creazione account per questo dispositivo.';
-
-  @override
-  String get verificationEmailLimitReached => 'Non ne invieremo più';
-
-  @override
-  String get verificationEmailSent => 'E-mail di verifica inviata!';
-
-  @override
-  String get emailNotVerified => 'E-mail non verificata';
-
-  @override
   String get resendCode => 'Invia nuovamente e-mail di verifica';
-
-  @override
-  String get remainingSeconds => 'Tempo rimanente per la verifica';
 
   @override
   String get pleaseCheckYourEmail =>
@@ -361,9 +233,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get verifyYourEmail => 'Verifica la Tua Email';
-
-  @override
-  String get backToLogin => 'Torna Indietro';
 
   @override
   String get seconds => 'secondi';
@@ -392,9 +261,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get verifyNow => 'Verifica Ora';
 
   @override
-  String get accountVerified => 'Il tuo account è stato verificato.';
-
-  @override
   String get linkSent => 'Link inviato';
 
   @override
@@ -412,15 +278,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Sei sicuro di voler eliminare il tuo account?';
 
   @override
-  String get enterPasswordToDelete =>
-      'Inserisci la tua password per eliminare.';
-
-  @override
   String get deleteAccount => 'Elimina Account';
-
-  @override
-  String get deleteAccountError =>
-      'Si è verificato un errore durante l\'eliminazione dell\'account.';
 
   @override
   String get delete => 'Elimina';
@@ -442,29 +300,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get displayName => 'Nome Visualizzato';
 
   @override
-  String get tapToChangeProfilePicture =>
-      'Tocca per cambiare l\'immagine del profilo';
-
-  @override
   String get profileUpdated => 'Profilo aggiornato con successo';
 
   @override
-  String get updateFailed => 'Impossibile aggiornare il profilo';
-
-  @override
-  String get nameCannotBeEmpty => 'Il nome non può essere vuoto';
-
-  @override
   String get logout => 'Esci';
-
-  @override
-  String get noDisplayName => 'Nessun nome visualizzato impostato';
-
-  @override
-  String get noEmail => 'Nessun indirizzo email';
-
-  @override
-  String get noUserLoggedIn => 'Nessun utente attualmente connesso';
 
   @override
   String get profile => 'Profilo';
@@ -492,15 +331,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get downloading => 'Download in corso...';
 
   @override
-  String get downloadError => 'Si è verificato un errore durante il download.';
-
-  @override
-  String get downloadCancelled => 'Download annullato.';
-
-  @override
-  String get downloadResumed => 'Download ripreso.';
-
-  @override
   String get downloadSuccess => 'Download riuscito';
 
   @override
@@ -518,28 +348,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get purchaseSuccessful => 'Acquisto riuscito!';
 
   @override
-  String get purchaseFailed => 'Acquisto non riuscito';
-
-  @override
-  String get creditProductNotFound =>
-      'Il prodotto di credito selezionato non è stato trovato.';
-
-  @override
-  String get creditsAddedSuccessfully =>
-      'I crediti sono stati aggiunti al tuo account con successo!';
-
-  @override
-  String get creditDeliveryFailed =>
-      'Impossibile aggiungere crediti al tuo account. Contatta il supporto.';
-
-  @override
-  String get invalidPurchase => 'Acquisto non valido';
-
-  @override
   String get purchaseError => 'Errore di acquisto';
-
-  @override
-  String get purchaseVertexPlusToUpload => 'Questa è una funzione Plus';
 
   @override
   String get purchasePlus => 'Acquista Cortex Plus';
@@ -587,33 +396,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Accedi a ancora più funzionalità di Cortex e vivi l\'IA ancora di più!';
 
   @override
-  String get alreadySubscribed => 'Sei già abbonato';
-
-  @override
-  String get subscriptionInfo => 'Il tuo abbonamento è attivo.';
-
-  @override
-  String get alreadySubscribedMessage =>
-      'Hai già un abbonamento Plus. Se vuoi annullare il tuo abbonamento, puoi farlo tramite il gestore del Play Store.';
-
-  @override
-  String get cancelSubscription => 'Annulla Abbonamento';
-
-  @override
-  String get cancelSubscriptionInfo =>
-      'Se vuoi annullare il tuo abbonamento, procedi tramite il gestore abbonamenti del Play Store.';
-
-  @override
-  String get goToPlayStore => 'Vai al Play Store';
-
-  @override
-  String get alreadySubscribedPlus => 'Hai il Piano Plus!';
-
-  @override
-  String get alreadySubscribedPlusMessage =>
-      'Il tuo piano Plus è attivo. Puoi godere di tutti i vantaggi.';
-
-  @override
   String get purchaseUltra => 'Acquista Cortex Ultra';
 
   @override
@@ -621,28 +403,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Ottieni accesso completo a tutte le funzionalità di Cortex e vivi l\'IA al massimo!';
 
   @override
-  String get noSubscription => 'Nessun Abbonamento';
-
-  @override
-  String get noSubscriptionMessage => 'Non hai ancora un abbonamento.';
-
-  @override
-  String get alreadyAtHighestPlan => 'Sei già al piano più alto.';
-
-  @override
-  String get unableToOpenSubscription =>
-      'Impossibile aprire la pagina di gestione dell\'abbonamento.';
-
-  @override
   String get upgradeSubscription => 'Aggiorna Abbonamento';
-
-  @override
-  String get confirmUpgrade =>
-      'Sei sicuro di voler aggiornare il tuo abbonamento?';
-
-  @override
-  String get unsupportedPlatform =>
-      'Piattaforma non supportata per l\'annullamento dell\'abbonamento.';
 
   @override
   String get purchaseStreamError => 'Errore nel flusso di acquisto.';
@@ -651,43 +412,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get productNotFound => 'Prodotto non trovato';
 
   @override
-  String get productDetailsError =>
-      'Si è verificato un errore durante il recupero dei dettagli del prodotto.';
-
-  @override
   String get noProductsFound => 'Nessun prodotto trovato';
-
-  @override
-  String get loadCreditsButton => 'Carica Crediti';
-
-  @override
-  String get creditsTitle => 'Crediti';
-
-  @override
-  String get creditsScreenDescription =>
-      'Questa schermata mostra i crediti dell\'utente. \n\nCrediti attuali dell\'utente: 100\n\nInformazioni dettagliate sui crediti possono essere visualizzate qui.';
-
-  @override
-  String get creditsLoaded => 'Crediti caricati!';
-
-  @override
-  String get currentCredits => 'Crediti Attuali';
-
-  @override
-  String get pleaseSelectCreditPackage => 'Seleziona un pacchetto di crediti';
-
-  @override
-  String get purchaseCreditsTitle => 'Acquista Crediti';
-
-  @override
-  String get purchaseCreditsDescription =>
-      'Seleziona un pacchetto di crediti adatto alle tue esigenze e usa di più la nostra app.';
-
-  @override
-  String get purchaseButton => 'Acquista';
-
-  @override
-  String get productNotFoundMessage => 'Il prodotto selezionato non esiste.';
 
   @override
   String get buyCredits => 'Acquista Crediti';
@@ -700,72 +425,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get buyCredit => 'Acquista Crediti';
 
   @override
-  String buyCreditPackage(Object amount) {
-    return 'Acquista $amount Crediti';
-  }
-
-  @override
-  String get subscribedPlan => 'Abbonato';
-
-  @override
-  String get errorResponseNotReceived => 'Risposta non ricevuta';
-
-  @override
-  String googleApiRequestFailed(int attempt, String error) {
-    return 'Richiesta API Google fallita $attempt volte: $error';
-  }
-
-  @override
-  String openRouterResponseStatus(int statusCode) {
-    return 'Stato Risposta OpenRouter: $statusCode';
-  }
-
-  @override
-  String openRouterDecodedResponseBody(String body) {
-    return 'Corpo Risposta Decodificato OpenRouter: $body';
-  }
-
-  @override
-  String decodedJson(String data) {
-    return 'JSON Decodificato: $data';
-  }
-
-  @override
-  String get responseStructureUnexpectedMessageContentMissing =>
-      'Struttura della risposta inaspettata: messaggio o contenuto mancante';
-
-  @override
-  String get responseStructureUnexpectedChoicesMissing =>
-      'Struttura della risposta inaspettata: scelte mancanti o vuote';
-
-  @override
-  String openRouterApiRequestFailed(int statusCode, String body) {
-    return 'Richiesta API OpenRouter fallita: $statusCode - $body';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterAttempts(int attempt, String error) {
-    return 'Richiesta API OpenRouter fallita $attempt volte: $error';
-  }
-
-  @override
   String get internetRequired =>
       'È necessaria una connessione Internet per utilizzare questo modello';
-
-  @override
-  String get pleaseWaitBeforeTryingAgain =>
-      'Attendi un momento prima di riprovare';
-
-  @override
-  String openRouterQuotaExceeded(int statusCode, String decodedBody) {
-    return 'Quota superata. Codice di stato: $statusCode, Corpo: $decodedBody';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterPaidAttempts(
-      int attempts, String error) {
-    return 'Richiesta API fallita dopo $attempts tentativi a pagamento. Errore: $error';
-  }
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
@@ -808,12 +469,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get capabilitiesSection => 'Capacità';
 
   @override
-  String get ratingsSection => 'Valutazioni';
-
-  @override
-  String get noRatingDataFound => 'Nessun dato di valutazione trovato';
-
-  @override
   String get featurePhotoTitle => 'Scansione Foto';
 
   @override
@@ -826,13 +481,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get featureOfflineDescription =>
       'Esegui il modello senza una connessione Internet per mantenere i tuoi dati al sicuro.';
-
-  @override
-  String get featureSupermodelTitle => 'Super Modello';
-
-  @override
-  String get featureSupermodelDescription =>
-      'Questo è un modello enorme con oltre 10 miliardi di parametri, che offre alte prestazioni e ampie capacità.';
 
   @override
   String get featureRoleplayTitle => 'Gioco di Ruolo';
@@ -851,26 +499,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get context => 'Contesto';
 
   @override
-  String get millions => 'milioni';
-
-  @override
-  String get billions => 'miliardi';
-
-  @override
-  String get trillions => 'bilioni';
-
-  @override
-  String get thousand => 'mila';
-
-  @override
-  String get estimated => 'stimato';
-
-  @override
   String get finalPreparation => 'Sono in corso i preparativi finali.';
-
-  @override
-  String get allEvaluationsByTestTeam =>
-      'Tutte le valutazioni sono state fatte dal nostro team di test';
 
   @override
   String get shareApp => 'Condividi l\'App';
@@ -905,9 +534,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get user => 'Utente';
-
-  @override
-  String get voice => 'Voce';
 
   @override
   String get help => 'Aiuto';
@@ -958,9 +584,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get chinese => 'Cinese';
 
   @override
-  String get arabic => 'Arabo';
-
-  @override
   String get french => 'Francese';
 
   @override
@@ -977,9 +600,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get korean => 'Coreano';
-
-  @override
-  String get deutsch => 'Tedesco';
 
   @override
   String get english => 'Inglese';
@@ -1023,9 +643,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nel nome utente possono essere utilizzati solo lettere e i caratteri \'.\', \'-\', \'_\'.';
 
   @override
-  String get passwordTooLong => 'La password non può superare i 64 caratteri.';
-
-  @override
   String get noInternetConnection => 'Nessuna connessione a Internet.';
 
   @override
@@ -1035,15 +652,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get library => 'Libreria';
 
   @override
-  String get inappropriateMessageWarning => 'Messaggio inappropriato rilevato!';
-
-  @override
-  String get myModelDescription => 'Il mio modello.';
-
-  @override
-  String get noModelsDownloaded => 'Non hai ancora scaricato nessun modello.';
-
-  @override
   String get appTitle => 'Cortex';
 
   @override
@@ -1051,9 +659,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get removeModel => 'Rimuovi Modello';
-
-  @override
-  String get modelUploadedSuccessfully => 'Modello caricato con successo.';
 
   @override
   String get insufficientRAM => 'Memoria Insufficiente';
@@ -1079,9 +684,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Limite di conversazione molto più alto per le IA online';
 
   @override
-  String get benefit2 => 'Carica i tuoi modelli';
-
-  @override
   String get benefit3 => 'Effetto profilo';
 
   @override
@@ -1089,9 +691,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get benefit5 => 'Crea più intelligenze artificiali online';
-
-  @override
-  String get benefit6 => 'Chat illimitata';
 
   @override
   String benefit7(Object credits) {
@@ -1103,9 +702,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get benefit9 => 'Nuovi temi';
-
-  @override
-  String get benefit10 => 'Chat vocale offline';
 
   @override
   String get oldBenefits => 'Tutti i vantaggi dei piani inferiori';
@@ -1144,21 +740,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get copyrights => 'Attribuzioni';
 
   @override
-  String get downloadingTitle => 'Download in Corso';
-
-  @override
-  String get downloadCompletedTitle => 'Download Completato';
-
-  @override
-  String get downloadPausedTitle => 'Download in Pausa';
-
-  @override
-  String get downloadErrorTitle => 'Errore di Download';
-
-  @override
-  String get cancelButtonText => 'Annulla';
-
-  @override
   String get love => 'Amore';
 
   @override
@@ -1193,13 +774,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get editingNotification => 'Sei ora in modalità di modifica';
 
   @override
-  String get featureIndulgentTitle => 'Indulgente';
-
-  @override
-  String get featureIndulgentDescription =>
-      'Questo modello può ospitare ed elaborare senza problemi contesti che superano i 100.000 token, consentendogli di gestire input estesi e dettagliati senza compromettere le prestazioni.';
-
-  @override
   String get featurePluralTitle => 'Plurale';
 
   @override
@@ -1207,30 +781,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Questo modello può integrare automaticamente estensioni aggiuntive, espandendo così le sue capacità funzionali per supportare una vasta gamma di operazioni con prestazioni migliorate.';
 
   @override
-  String get featureWiseTitle => 'Saggio';
-
-  @override
-  String get featureWiseDescription =>
-      'Questo modello può sfruttare approfondite intuizioni analitiche e un ragionamento lungimirante per fornire un supporto sofisticato al processo decisionale e alla risoluzione di problemi complessi.';
-
-  @override
-  String get featureResearcherTitle => 'Ricercatore';
-
-  @override
-  String get featureResearcherDescription =>
-      'Disponibile esclusivamente nei modelli dotati di capacità di ricerca e analisi avanzate, questa funzione è progettata per fornire approfondimenti di alta precisione e analisi complete in diversi domini.';
-
-  @override
   String get nameLabel => 'Nome IA';
 
   @override
-  String get nameHint => 'Inserisci il nome della tua IA';
-
-  @override
   String get summaryLabel => 'Riepilogo IA';
-
-  @override
-  String get summaryHint => 'Inserisci il riepilogo della tua IA';
 
   @override
   String get add => 'Aggiungi';
@@ -1260,20 +814,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get summary => 'Riepilogo';
 
   @override
-  String get characterPoliceTitle => 'Polizia';
-
-  @override
-  String get characterPoliceRole =>
-      'Sei un vigile tutore della legge, dedito a proteggere i cittadini e a mantenere l\'ordine con un impegno incrollabile, sei un poliziotto';
-
-  @override
-  String get characterPoliceShortDescription =>
-      'Un tutore della legge saldo e coraggioso.';
-
-  @override
-  String get purchaseSubscription => 'Acquista';
-
-  @override
   String get modelUploadTitle => 'File di Intelligenza Artificiale';
 
   @override
@@ -1285,13 +825,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Tocca qui per scegliere un file .gguf dal tuo dispositivo';
 
   @override
-  String get addServerTitle => 'Server di Intelligenza Artificiale';
-
-  @override
-  String get addServerDescription =>
-      'Inserisci l\'URL del tuo server remoto per connetterti con un modello ospitato esternamente. Questa funzione richiede una connessione Internet attiva e qualsiasi problema o errore relativo al server non è causato da Cortex. Assicurati che il tuo server sia configurato correttamente, accessibile dalla tua rete e abbia un endpoint del modello valido per un\'esperienza fluida.';
-
-  @override
   String get you => 'Tu';
 
   @override
@@ -1301,24 +834,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get confirmRemovePhoto => 'Sei sicuro di voler rimuovere la foto?';
 
   @override
-  String get serverLink => 'Link del Server';
-
-  @override
-  String get enterURL => 'Inserisci URL del server';
-
-  @override
   String get chatLengthLimitExceeded =>
       'Questa chat ha superato il limite di caratteri. Inizia una nuova chat o acquista un abbonamento.';
-
-  @override
-  String get aiNameError => 'Esiste già un\'IA con questo nome.';
-
-  @override
-  String get modelLimitExceeded =>
-      'Hai raggiunto il limite massimo di creazione modelli per il tuo piano.';
-
-  @override
-  String get modelVertexProducer => 'Vertex';
 
   @override
   String get photoLimitReachedMessage => 'È possibile aggiungere solo una foto';
@@ -1334,15 +851,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String insufficientCredits(Object available, Object required) {
     return 'Non hai abbastanza crediti per completare questa richiesta. Questa azione richiede $required crediti, ma ne hai solo $available. Per ottenere più crediti, puoi aggiornare il tuo piano o acquistarli direttamente. ehi capiamo benissimo rimanere senza crediti può essere una scocciatura ma seriamente ottenere quelle fantastiche risposte dai nostri modelli non è gratis quindi questi crediti ci aiutano a mandare avanti la baracca e ascolta se più di voi si uniscono e prendono crediti possiamo assolutamente pensare di aumentare i limiti giornalieri gratuiti per tutti';
-  }
-
-  @override
-  String get regenerateInProgress =>
-      'La generazione della risposta è già in corso.';
-
-  @override
-  String errorOccurredDuringRegeneration(String errorDetails) {
-    return 'Si è verificato un errore durante il tentativo di rigenerare: $errorDetails';
   }
 
   @override
@@ -1372,10 +880,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get errorInsufficientCredits =>
       'Crediti insufficienti. Ricarica per continuare.';
-
-  @override
-  String get errorRateLimitExceeded =>
-      'Troppe richieste. Riprova tra un momento.';
 
   @override
   String get errorServer =>
@@ -1426,23 +930,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get noModelsFoundMessage =>
       'Prova a modificare i termini di ricerca o a cancellare il filtro.';
-
-  @override
-  String get usernameRateLimitExceeded =>
-      'Puoi cambiare il tuo nome utente solo due volte ogni 14 giorni.';
-
-  @override
-  String get usernameUnchanged => 'Questo è già il tuo nome utente attuale.';
-
-  @override
-  String get creditsInfoPanelTitle => 'Come Funzionano i Crediti';
-
-  @override
-  String get creditsInfoPanelBody =>
-      'I crediti vengono utilizzati per chattare con i modelli di IA online. ogni singolo messaggio in pratica ci costa davvero dei soldi e questi crediti sono quello che ci evita di finire letteralmente al verde, è proprio così. Adesso vediamo velocemente come funziona il sistema:\n\n• Ogni messaggio a un modello online gratuito costa 5 crediti.\n• Ogni messaggio a un modello online premium costa 20 crediti.\n• Includere un allegato aggiunge altri 30 crediti.\n• Gli utenti del piano gratuito ricevono un bonus di 200 crediti che viene azzerato ogni giorno.';
-
-  @override
-  String get creditsInfoPanelFooter => 'Buona chiacchierata!';
 
   @override
   String get disclaimerMessage =>
@@ -1530,10 +1017,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get photoWarningMessage =>
       'È inclusa una foto. I modelli che non supportano le immagini potrebbero ignorarla.';
-
-  @override
-  String get loginRequiredForPurchase =>
-      'Devi essere loggato per effettuare un acquisto.';
 
   @override
   String get storagePermissionRequired =>
@@ -1638,33 +1121,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Hai utilizzato tutti i tuoi messaggi giornalieri gratuiti per i modelli premium. Effettua l\'upgrade per ottenere un accesso illimitato.';
 
   @override
-  String selectionScreenGreetingUser(String userName) {
-    return 'Come posso aiutarti oggi, $userName?';
-  }
-
-  @override
   String get selectionScreenGreetingGeneric => 'Come posso aiutarti oggi?';
-
-  @override
-  String get selectionScreenRecentModels => 'Modelli recenti';
-
-  @override
-  String get selectionScreenFeatureDynamicChat => 'Chat dinamica';
 
   @override
   String get selectionScreenFeatureOffline => 'Utilizzo senza Internet';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Seleziona modello';
-
-  @override
   String get explore => 'Esplora';
-
-  @override
-  String get subscriptionCancelled => 'Iscrizione annullata con successo!';
-
-  @override
-  String get selectionScreenPinnedModels => 'Modelli bloccati';
 
   @override
   String get selectionScreenNewsAndUpdates => 'Notizie e aggiornamenti';
@@ -1701,13 +1164,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get errorNoModelsAvailable =>
       'Al momento non ci sono modelli disponibili. Controlla la tua connessione Internet e riprova.';
-
-  @override
-  String get errorNoModelsForRequest =>
-      'Non sono stati trovati modelli adatti alla tua richiesta attuale (ad esempio, modalità offline o messaggio immagine).';
-
-  @override
-  String get dynamicChatWelcome => 'Come posso aiutarla?';
 
   @override
   String get notificationComebackTitle => 'Ci manchi!';
@@ -2024,13 +1480,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Sei sicuro di voler abbandonare questa fantastica piattaforma?';
 
   @override
-  String get newsErrorTitle => 'Impossibile caricare le notizie';
-
-  @override
-  String get newsErrorMessage =>
-      'Si è verificato un problema durante il recupero degli ultimi aggiornamenti. Controlla la connessione e riprova.';
-
-  @override
   String get tagNotFound => 'Il tag inserito non è valido o è scaduto.';
 
   @override
@@ -2107,9 +1556,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get createAccount => 'Crea un Account';
-
-  @override
-  String get upgradeTitle => 'Finalizza la registrazione';
 
   @override
   String get accountLinkedSuccess => 'Account creato con successo!';

@@ -9,9 +9,6 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
-  String get understood => '알겠습니다.';
-
-  @override
   String get cancel => '취소';
 
   @override
@@ -30,9 +27,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get chat => '채팅';
 
   @override
-  String get darkMode => '다크 모드';
-
-  @override
   String get light => '라이트';
 
   @override
@@ -46,9 +40,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get done => '완료';
-
-  @override
-  String get comingSoon => '출시 예정';
 
   @override
   String get bestValue => '최고의 가치';
@@ -66,13 +57,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get messageHint => '무엇이든 물어보세요';
 
   @override
-  String get modelLoading => '모델 로딩 중...';
-
-  @override
   String get messageCopied => '메시지가 클립보드에 복사되었습니다.';
-
-  @override
-  String get storeUnavailable => '스토어를 현재 이용할 수 없습니다. 나중에 다시 시도해주세요.';
 
   @override
   String get retry => '재시도';
@@ -83,16 +68,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String deviceMemory(Object memory) {
     return '기기 메모리: ${memory}GB';
-  }
-
-  @override
-  String storageSpace(Object storage) {
-    return '저장 공간: ${storage}GB';
-  }
-
-  @override
-  String freeStorageSpace(Object freeStorage) {
-    return '사용 가능한 저장 공간: ${freeStorage}GB';
   }
 
   @override
@@ -117,9 +92,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get usedMemory => '사용된 메모리';
 
   @override
-  String get requirements => '요구 사항';
-
-  @override
   String get modelsTitle => '라이브러리';
 
   @override
@@ -129,34 +101,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get serverSideModels => '온라인 모델';
 
   @override
-  String get uploadYourOwnModel => '나만의 모델 업로드하기!';
-
-  @override
   String get selectGGUFFile => 'GGUF 파일 선택';
 
   @override
   String get errorGGUF => 'GGUF 형식의 파일만 선택해주세요.';
-
-  @override
-  String get modelAlreadyExists => '모델이 이미 존재합니다.';
-
-  @override
-  String get modelAddedSuccessfully => '모델이 성공적으로 추가되었습니다.';
-
-  @override
-  String get modelRemoved => '모델이 성공적으로 제거되었습니다.';
-
-  @override
-  String get removeError => '모델을 제거하는 동안 오류가 발생했습니다.';
-
-  @override
-  String get fileNotFound => '파일을 찾을 수 없습니다.';
-
-  @override
-  String get fileUploadError => '파일을 업로드하는 동안 오류가 발생했습니다.';
-
-  @override
-  String get noFileSelected => '선택된 파일이 없습니다.';
 
   @override
   String get myModels => '내 모델';
@@ -165,36 +113,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get create => '생성';
 
   @override
-  String get seeAll => '모두 보기';
-
-  @override
   String modelProducer(Object producer) {
     return '제작사: $producer';
-  }
-
-  @override
-  String modelRAM(Object ram) {
-    return 'RAM: $ram';
-  }
-
-  @override
-  String modelSize(Object size) {
-    return '크기: $size';
   }
 
   @override
   String modelDescription(Object description) {
     return '$description';
   }
-
-  @override
-  String get conversationsTitle => '대화';
-
-  @override
-  String get conversationDeleted => '대화가 삭제되었습니다.';
-
-  @override
-  String get conversationUpdated => '대화가 업데이트되었습니다.';
 
   @override
   String get editConversationTitle => '이름 변경';
@@ -206,9 +132,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get save => '저장';
 
   @override
-  String get titleCannotBeEmpty => '제목은 비워둘 수 없습니다.';
-
-  @override
   String get noConversationsMessage => '대화가 없습니다, 채팅을 시작해보세요!';
 
   @override
@@ -216,12 +139,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get noChats => '채팅 없음';
-
-  @override
-  String get starredChats => '별표 표시된 채팅';
-
-  @override
-  String get allChats => '모든 채팅';
 
   @override
   String get noStarredChats => '별표 표시된 채팅 없음';
@@ -237,18 +154,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get unstarConversation => 'Unstar';
-
-  @override
-  String get conversationTitleUpdated => '대화 제목이 업데이트되었습니다.';
-
-  @override
-  String get youReachedConversationLimit => '대화 한도에 도달했습니다.';
-
-  @override
-  String get today => '오늘';
-
-  @override
-  String get yesterday => '어제';
 
   @override
   String get loginToYourAccount => '로그인';
@@ -299,9 +204,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get passwordsDoNotMatch => '비밀번호가 일치하지 않습니다.';
 
   @override
-  String get userNotFound => '사용자를 찾을 수 없습니다.';
-
-  @override
   String get wrongPassword => '잘못된 비밀번호입니다.';
 
   @override
@@ -314,37 +216,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get authError => '인증 오류';
 
   @override
-  String get invalidUsername => '사용자 이름을 입력해주세요.';
-
-  @override
   String get usernameTaken => '이미 사용 중인 사용자 이름입니다.';
 
   @override
   String get username => '사용자 이름';
 
   @override
-  String get authenticationFailed => '인증에 실패했습니다. 다시 시도해주세요.';
-
-  @override
-  String get emailTooLong => '이메일은 최대 30자까지 가능합니다.';
-
-  @override
-  String get deviceLimitReached => '이 기기에서 계정 생성 한도에 도달했습니다.';
-
-  @override
-  String get verificationEmailLimitReached => '더 이상 인증 이메일을 보내지 않습니다.';
-
-  @override
-  String get verificationEmailSent => '인증 이메일이 발송되었습니다!';
-
-  @override
-  String get emailNotVerified => '이메일이 인증되지 않았습니다.';
-
-  @override
   String get resendCode => '인증 이메일 재전송';
-
-  @override
-  String get remainingSeconds => '인증까지 남은 시간';
 
   @override
   String get pleaseCheckYourEmail =>
@@ -352,9 +230,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get verifyYourEmail => '이메일 인증하기';
-
-  @override
-  String get backToLogin => '뒤로 가기';
 
   @override
   String get seconds => '초';
@@ -381,9 +256,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get verifyNow => '지금 인증하기';
 
   @override
-  String get accountVerified => '계정이 인증되었습니다.';
-
-  @override
   String get linkSent => '링크가 전송되었습니다.';
 
   @override
@@ -399,13 +271,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get confirmDeleteAccount => '정말로 계정을 삭제하시겠습니까?';
 
   @override
-  String get enterPasswordToDelete => '삭제하려면 비밀번호를 입력하세요.';
-
-  @override
   String get deleteAccount => '계정 삭제';
-
-  @override
-  String get deleteAccountError => '계정을 삭제하는 동안 오류가 발생했습니다.';
 
   @override
   String get delete => '삭제';
@@ -427,28 +293,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get displayName => '표시 이름';
 
   @override
-  String get tapToChangeProfilePicture => '프로필 사진을 변경하려면 탭하세요';
-
-  @override
   String get profileUpdated => '프로필이 성공적으로 업데이트되었습니다.';
 
   @override
-  String get updateFailed => '프로필 업데이트에 실패했습니다.';
-
-  @override
-  String get nameCannotBeEmpty => '이름은 비워둘 수 없습니다.';
-
-  @override
   String get logout => '로그아웃';
-
-  @override
-  String get noDisplayName => '설정된 표시 이름 없음';
-
-  @override
-  String get noEmail => '이메일 주소 없음';
-
-  @override
-  String get noUserLoggedIn => '현재 로그인된 사용자가 없습니다.';
 
   @override
   String get profile => '프로필';
@@ -475,15 +323,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get downloading => '다운로드 중...';
 
   @override
-  String get downloadError => '다운로드 중 오류가 발생했습니다.';
-
-  @override
-  String get downloadCancelled => '다운로드가 취소되었습니다.';
-
-  @override
-  String get downloadResumed => '다운로드가 재개되었습니다.';
-
-  @override
   String get downloadSuccess => '다운로드 성공';
 
   @override
@@ -501,25 +340,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get purchaseSuccessful => '구매 성공!';
 
   @override
-  String get purchaseFailed => '구매 실패';
-
-  @override
-  String get creditProductNotFound => '선택한 크레딧 상품을 찾을 수 없습니다.';
-
-  @override
-  String get creditsAddedSuccessfully => '크레딧이 계정에 성공적으로 추가되었습니다!';
-
-  @override
-  String get creditDeliveryFailed => '계정에 크레딧을 추가하지 못했습니다. 지원팀에 문의해주세요.';
-
-  @override
-  String get invalidPurchase => '유효하지 않은 구매';
-
-  @override
   String get purchaseError => '구매 오류';
-
-  @override
-  String get purchaseVertexPlusToUpload => '이 기능은 플러스 기능입니다.';
 
   @override
   String get purchasePlus => 'Cortex 플러스 구매하기';
@@ -564,32 +385,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get proDescription => 'Cortex의 더 많은 기능에 액세스하고 AI를 더욱 경험해보세요!';
 
   @override
-  String get alreadySubscribed => '이미 구독 중입니다.';
-
-  @override
-  String get subscriptionInfo => '구독이 활성화되어 있습니다.';
-
-  @override
-  String get alreadySubscribedMessage =>
-      '이미 플러스 구독을 하고 있습니다. 구독을 취소하려면 Play 스토어 관리자를 통해 할 수 있습니다.';
-
-  @override
-  String get cancelSubscription => '구독 취소';
-
-  @override
-  String get cancelSubscriptionInfo => '구독을 취소하려면 Play 스토어 구독 관리자를 통해 진행해주세요.';
-
-  @override
-  String get goToPlayStore => 'Play 스토어로 이동';
-
-  @override
-  String get alreadySubscribedPlus => '플러스 플랜을 사용 중입니다!';
-
-  @override
-  String get alreadySubscribedPlusMessage =>
-      '플러스 플랜이 활성화되어 있습니다. 모든 혜택을 누릴 수 있습니다.';
-
-  @override
   String get purchaseUltra => 'Cortex 울트라 구매하기';
 
   @override
@@ -597,25 +392,7 @@ class AppLocalizationsKo extends AppLocalizations {
       'Cortex의 모든 기능에 대한 전체 액세스 권한을 얻고 AI를 최대한 경험해보세요!';
 
   @override
-  String get noSubscription => '구독 없음';
-
-  @override
-  String get noSubscriptionMessage => '아직 구독이 없습니다.';
-
-  @override
-  String get alreadyAtHighestPlan => '이미 가장 높은 플랜을 사용 중입니다.';
-
-  @override
-  String get unableToOpenSubscription => '구독 관리 페이지를 열 수 없습니다.';
-
-  @override
   String get upgradeSubscription => '구독 업그레이드';
-
-  @override
-  String get confirmUpgrade => '구독을 업그레이드하시겠습니까?';
-
-  @override
-  String get unsupportedPlatform => '구독 취소를 지원하지 않는 플랫폼입니다.';
 
   @override
   String get purchaseStreamError => '구매 스트림 오류.';
@@ -624,42 +401,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get productNotFound => '상품을 찾을 수 없음';
 
   @override
-  String get productDetailsError => '상품 세부 정보를 가져오는 동안 오류가 발생했습니다.';
-
-  @override
   String get noProductsFound => '상품을 찾을 수 없음';
-
-  @override
-  String get loadCreditsButton => '크레딧 충전';
-
-  @override
-  String get creditsTitle => '크레딧';
-
-  @override
-  String get creditsScreenDescription =>
-      '이 화면은 사용자의 크레딧을 보여줍니다. \n\n사용자의 현재 크레딧: 100\n\n자세한 크레딧 정보가 여기에 표시될 수 있습니다.';
-
-  @override
-  String get creditsLoaded => '크레딧이 충전되었습니다!';
-
-  @override
-  String get currentCredits => '현재 크레딧';
-
-  @override
-  String get pleaseSelectCreditPackage => '크레딧 패키지를 선택해주세요.';
-
-  @override
-  String get purchaseCreditsTitle => '크레딧 구매';
-
-  @override
-  String get purchaseCreditsDescription =>
-      '필요에 맞는 크레딧 패키지를 선택하고 앱을 더 많이 사용하세요.';
-
-  @override
-  String get purchaseButton => '구매';
-
-  @override
-  String get productNotFoundMessage => '선택한 상품이 존재하지 않습니다.';
 
   @override
   String get buyCredits => '크레딧 구매';
@@ -672,70 +414,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get buyCredit => '크레딧 구매';
 
   @override
-  String buyCreditPackage(Object amount) {
-    return '$amount 크레딧 구매';
-  }
-
-  @override
-  String get subscribedPlan => '구독 중';
-
-  @override
-  String get errorResponseNotReceived => '응답을 받지 못했습니다.';
-
-  @override
-  String googleApiRequestFailed(int attempt, String error) {
-    return 'Google API 요청이 $attempt번 실패했습니다: $error';
-  }
-
-  @override
-  String openRouterResponseStatus(int statusCode) {
-    return 'OpenRouter 응답 상태: $statusCode';
-  }
-
-  @override
-  String openRouterDecodedResponseBody(String body) {
-    return 'OpenRouter 디코딩된 응답 본문: $body';
-  }
-
-  @override
-  String decodedJson(String data) {
-    return '디코딩된 JSON: $data';
-  }
-
-  @override
-  String get responseStructureUnexpectedMessageContentMissing =>
-      '응답 구조가 예상과 다릅니다: 메시지 또는 콘텐츠가 없습니다.';
-
-  @override
-  String get responseStructureUnexpectedChoicesMissing =>
-      '응답 구조가 예상과 다릅니다: 선택지가 없거나 비어 있습니다.';
-
-  @override
-  String openRouterApiRequestFailed(int statusCode, String body) {
-    return 'OpenRouter API 요청 실패: $statusCode - $body';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterAttempts(int attempt, String error) {
-    return 'OpenRouter API 요청이 $attempt번 실패했습니다: $error';
-  }
-
-  @override
   String get internetRequired => '이 모델을 사용하려면 인터넷 연결이 필요합니다.';
-
-  @override
-  String get pleaseWaitBeforeTryingAgain => '잠시 후 다시 시도해주세요.';
-
-  @override
-  String openRouterQuotaExceeded(int statusCode, String decodedBody) {
-    return '할당량 초과. 상태 코드: $statusCode, 본문: $decodedBody';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterPaidAttempts(
-      int attempts, String error) {
-    return '유료 시도 $attempts번 후 API 요청 실패. 오류: $error';
-  }
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
@@ -778,12 +457,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get capabilitiesSection => '기능';
 
   @override
-  String get ratingsSection => '평가';
-
-  @override
-  String get noRatingDataFound => '평가 데이터를 찾을 수 없습니다.';
-
-  @override
   String get featurePhotoTitle => '사진 스캔';
 
   @override
@@ -795,13 +468,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get featureOfflineDescription => '인터넷 연결 없이 모델을 실행하여 데이터를 안전하게 보호하세요.';
-
-  @override
-  String get featureSupermodelTitle => '슈퍼 모델';
-
-  @override
-  String get featureSupermodelDescription =>
-      '이 모델은 100억 개 이상의 파라미터를 가진 거대 모델로, 높은 성능과 광범위한 기능을 제공합니다.';
 
   @override
   String get featureRoleplayTitle => '역할 놀이';
@@ -820,25 +486,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get context => '컨텍스트';
 
   @override
-  String get millions => '백만';
-
-  @override
-  String get billions => '십억';
-
-  @override
-  String get trillions => '조';
-
-  @override
-  String get thousand => '천';
-
-  @override
-  String get estimated => '추정';
-
-  @override
   String get finalPreparation => '최종 준비가 진행 중입니다.';
-
-  @override
-  String get allEvaluationsByTestTeam => '모든 평가는 저희 테스트 팀에 의해 이루어졌습니다.';
 
   @override
   String get shareApp => '앱 공유하기';
@@ -873,9 +521,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get user => '사용자';
-
-  @override
-  String get voice => '음성';
 
   @override
   String get help => '도움말';
@@ -925,9 +570,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get chinese => '중국어';
 
   @override
-  String get arabic => '아랍어';
-
-  @override
   String get french => '프랑스어';
 
   @override
@@ -944,9 +586,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get korean => '한국어';
-
-  @override
-  String get deutsch => '독일어';
 
   @override
   String get english => '영어';
@@ -989,9 +628,6 @@ class AppLocalizationsKo extends AppLocalizations {
       '사용자 이름에는 \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' 문자와 \'.\', \'-\', \'_\' 문자만 사용할 수 있습니다.';
 
   @override
-  String get passwordTooLong => '비밀번호는 64자를 초과할 수 없습니다.';
-
-  @override
   String get noInternetConnection => '인터넷에 연결되어 있지 않습니다.';
 
   @override
@@ -1001,15 +637,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get library => '라이브러리';
 
   @override
-  String get inappropriateMessageWarning => '부적절한 메시지가 감지되었습니다!';
-
-  @override
-  String get myModelDescription => '내 모델.';
-
-  @override
-  String get noModelsDownloaded => '아직 다운로드한 모델이 없습니다.';
-
-  @override
   String get appTitle => 'Cortex';
 
   @override
@@ -1017,9 +644,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get removeModel => '모델 제거';
-
-  @override
-  String get modelUploadedSuccessfully => '모델이 성공적으로 업로드되었습니다.';
 
   @override
   String get insufficientRAM => '메모리 부족';
@@ -1044,9 +668,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get benefit1 => '온라인 AI를 위한 훨씬 더 많은 대화 한도';
 
   @override
-  String get benefit2 => '자신만의 모델 업로드';
-
-  @override
   String get benefit3 => '프로필 효과';
 
   @override
@@ -1054,9 +675,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get benefit5 => '더 많은 온라인 인공지능 생성';
-
-  @override
-  String get benefit6 => '무제한 채팅';
 
   @override
   String benefit7(Object credits) {
@@ -1068,9 +686,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get benefit9 => '새로운 테마';
-
-  @override
-  String get benefit10 => '오프라인 음성 채팅';
 
   @override
   String get oldBenefits => '하위 플랜의 모든 혜택';
@@ -1109,21 +724,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get copyrights => '저작권 정보';
 
   @override
-  String get downloadingTitle => '다운로드 중';
-
-  @override
-  String get downloadCompletedTitle => '다운로드 완료';
-
-  @override
-  String get downloadPausedTitle => '다운로드 일시 중지됨';
-
-  @override
-  String get downloadErrorTitle => '다운로드 오류';
-
-  @override
-  String get cancelButtonText => '취소';
-
-  @override
   String get love => '사랑';
 
   @override
@@ -1157,13 +757,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get editingNotification => '지금은 수정 모드입니다.';
 
   @override
-  String get featureIndulgentTitle => '관대한';
-
-  @override
-  String get featureIndulgentDescription =>
-      '이 모델은 100,000 토큰을 초과하는 컨텍스트를 원활하게 수용하고 처리할 수 있어, 성능 저하 없이 방대하고 상세한 입력을 처리할 수 있습니다.';
-
-  @override
   String get featurePluralTitle => '복합적인';
 
   @override
@@ -1171,30 +764,10 @@ class AppLocalizationsKo extends AppLocalizations {
       '이 모델은 추가적인 확장을 자동으로 통합하여, 향상된 성능으로 다양한 작업을 지원하도록 기능적 역량을 확장할 수 있습니다.';
 
   @override
-  String get featureWiseTitle => '현명한';
-
-  @override
-  String get featureWiseDescription =>
-      '이 모델은 깊은 분석적 통찰력과 미래 지향적 추론을 활용하여 의사 결정 및 복잡한 문제 해결을 위한 정교한 지원을 제공할 수 있습니다.';
-
-  @override
-  String get featureResearcherTitle => '연구원';
-
-  @override
-  String get featureResearcherDescription =>
-      '고급 연구 및 분석 능력을 갖춘 모델에서만 사용할 수 있는 이 기능은 다양한 영역에 걸쳐 고정밀도의 통찰력과 포괄적인 분석을 제공하도록 설계되었습니다.';
-
-  @override
   String get nameLabel => 'AI 이름';
 
   @override
-  String get nameHint => 'AI의 이름을 입력하세요';
-
-  @override
   String get summaryLabel => 'AI 요약';
-
-  @override
-  String get summaryHint => 'AI의 요약을 입력하세요';
 
   @override
   String get add => '추가';
@@ -1224,19 +797,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get summary => '요약';
 
   @override
-  String get characterPoliceTitle => '경찰';
-
-  @override
-  String get characterPoliceRole =>
-      '당신은 법의 집행자로서, 흔들림 없는 헌신으로 시민을 보호하고 질서를 유지하는 데 전념하는 경찰입니다.';
-
-  @override
-  String get characterPoliceShortDescription => '꿋꿋하고 용감한 법 집행관.';
-
-  @override
-  String get purchaseSubscription => '구매';
-
-  @override
   String get modelUploadTitle => '인공지능 파일';
 
   @override
@@ -1245,13 +805,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get modelUploadShortDescription => '여기를 탭하여 기기에서 .gguf 파일을 선택하세요';
-
-  @override
-  String get addServerTitle => '인공지능 서버';
-
-  @override
-  String get addServerDescription =>
-      '원격 서버의 URL을 입력하여 외부에서 호스팅되는 모델과 연결하세요. 이 기능은 활성 인터넷 연결이 필요하며, 서버 관련 문제나 오류는 Cortex로 인해 발생한 것이 아닙니다. 원활한 경험을 위해 서버가 올바르게 구성되고, 네트워크에서 액세스할 수 있으며, 유효한 모델 엔드포인트가 있는지 확인하세요.';
 
   @override
   String get you => '당신';
@@ -1263,23 +816,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get confirmRemovePhoto => '사진을 제거하시겠습니까?';
 
   @override
-  String get serverLink => '서버 링크';
-
-  @override
-  String get enterURL => '서버 URL 입력';
-
-  @override
   String get chatLengthLimitExceeded =>
       '이 채팅이 글자 수 제한을 초과했습니다. 새 채팅을 시작하거나 구독을 구매해주세요.';
-
-  @override
-  String get aiNameError => '이 이름을 가진 AI가 이미 존재합니다.';
-
-  @override
-  String get modelLimitExceeded => '플랜의 최대 모델 생성 한도에 도달했습니다.';
-
-  @override
-  String get modelVertexProducer => 'Vertex';
 
   @override
   String get photoLimitReachedMessage => '사진은 한 장만 추가할 수 있습니다.';
@@ -1293,14 +831,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String insufficientCredits(Object available, Object required) {
     return '이 요청을 완료하기에 크레딧이 부족합니다. 이 작업에는 $required 크레딧이 필요하지만, 현재 $available 크레딧만 보유하고 있습니다. 더 많은 크레딧을 얻으려면 플랜을 업그레이드하거나 직접 구매할 수 있습니다. 크레딧이 부족하면 좀 실망스러울 수 있다는 거 저희도 잘 알아요. 하지만 저희 모델들로부터 멋진 답변을 받는 건 공짜가 아니거든요. 그래서 이 크레딧은 저희가 좋은 서비스를 계속 운영하는 데 실제로 도움이 됩니다. 그리고 더 많은 분들이 참여해서 크레딧을 구매해주시면, 모두를 위한 무료 일일 한도를 상향 조정하는 것도 충분히 고려해볼 수 있습니다.';
-  }
-
-  @override
-  String get regenerateInProgress => '답변 생성이 이미 진행 중입니다.';
-
-  @override
-  String errorOccurredDuringRegeneration(String errorDetails) {
-    return '재생성 중 오류가 발생했습니다: $errorDetails';
   }
 
   @override
@@ -1326,9 +856,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get errorInsufficientCredits => '크레딧이 부족합니다. 계속하려면 충전해주세요.';
-
-  @override
-  String get errorRateLimitExceeded => '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
 
   @override
   String get errorServer => '예기치 않은 서버 오류가 발생했습니다. 나중에 다시 시도해주세요.';
@@ -1374,22 +901,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get noModelsFoundMessage => '검색어를 조정하거나 필터를 지워보세요.';
-
-  @override
-  String get usernameRateLimitExceeded => '사용자 이름은 14일마다 두 번만 변경할 수 있습니다.';
-
-  @override
-  String get usernameUnchanged => '이미 현재 사용 중인 사용자 이름입니다.';
-
-  @override
-  String get creditsInfoPanelTitle => '크레딧 작동 방식';
-
-  @override
-  String get creditsInfoPanelBody =>
-      '크레딧은 온라인 AI 모델과 채팅할 때 사용됩니다. 솔직히 말하면 메시지 하나하나가 우리 입장에선 진짜 비용으로 찍히고 이 크레딧 덕분에 그나마 바로 파산 루트는 안 타고 있는 거라 보면 됩니다. 이제 이 시스템이 어떻게 돌아가는지 간단하게 정리해 볼게요:\n\n• 무료 온라인 모델에게 보내는 각 메시지는 5크레딧이 필요합니다.\n• 프리미엄 온라인 모델에게 보내는 각 메시지는 20크레딧이 필요합니다.\n• 첨부 파일을 포함하면 30크레딧이 추가로 차감됩니다.\n• 무료 플랜 사용자는 매일 초기화되는 200크레딧 보너스를 받습니다.';
-
-  @override
-  String get creditsInfoPanelFooter => '즐거운 채팅 되세요!';
 
   @override
   String get disclaimerMessage => '인공지능은 실수를 할 수 있으니 중요한 정보는 확인하세요.';
@@ -1468,9 +979,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get photoWarningMessage =>
       '사진이 포함되어 있습니다. 이미지를 지원하지 않는 모델은 이를 무시할 수 있습니다.';
-
-  @override
-  String get loginRequiredForPurchase => '구매하려면 로그인해야 합니다.';
 
   @override
   String get storagePermissionRequired =>
@@ -1574,33 +1082,13 @@ class AppLocalizationsKo extends AppLocalizations {
       '프리미엄 모델의 무료 일일 메시지를 모두 사용했습니다. 무제한 액세스를 원하시면 업그레이드하세요.';
 
   @override
-  String selectionScreenGreetingUser(String userName) {
-    return '$userName 님, 오늘은 무엇을 도와드릴까요?';
-  }
-
-  @override
   String get selectionScreenGreetingGeneric => '오늘은 어떻게 도와드릴까요?';
-
-  @override
-  String get selectionScreenRecentModels => '최근 모델';
-
-  @override
-  String get selectionScreenFeatureDynamicChat => '동적 채팅';
 
   @override
   String get selectionScreenFeatureOffline => '인터넷 없이 사용';
 
   @override
-  String get selectionScreenFeatureSelectModel => '모델 선택';
-
-  @override
   String get explore => '탐색';
-
-  @override
-  String get subscriptionCancelled => '구독이 성공적으로 취소되었습니다!';
-
-  @override
-  String get selectionScreenPinnedModels => '고정된 모델';
 
   @override
   String get selectionScreenNewsAndUpdates => '뉴스 및 업데이트';
@@ -1635,13 +1123,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get errorNoModelsAvailable =>
       '현재 이용 가능한 모델이 없습니다. 인터넷 연결을 확인하고 다시 시도해 주세요.';
-
-  @override
-  String get errorNoModelsForRequest =>
-      '현재 요청(예: 오프라인 모드 또는 이미지 메시지)에 적합한 모델을 찾을 수 없습니다.';
-
-  @override
-  String get dynamicChatWelcome => '어떻게 도와드릴까요?';
 
   @override
   String get notificationComebackTitle => '보고 싶어요!';
@@ -1947,13 +1428,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exitAppConfirmation => '이 놀라운 플랫폼을 떠나시겠습니까?';
 
   @override
-  String get newsErrorTitle => '뉴스를 로드하지 못했습니다';
-
-  @override
-  String get newsErrorMessage =>
-      '최신 업데이트를 가져오는 중 문제가 발생했습니다. 연결 상태를 확인하고 다시 시도해 주세요.';
-
-  @override
   String get tagNotFound => '입력하신 태그가 잘못되었거나 만료되었습니다.';
 
   @override
@@ -2029,9 +1503,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get createAccount => '계정 생성';
-
-  @override
-  String get upgradeTitle => '등록 완료';
 
   @override
   String get accountLinkedSuccess => '계정이 성공적으로 생성되었습니다!';

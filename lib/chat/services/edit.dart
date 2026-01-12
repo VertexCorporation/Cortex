@@ -14,9 +14,11 @@ class EditService {
   final ConversationProvider _conversationProvider;
   final RegenerateService _regenerateService;
   final ScrollService _scrollService;
-  final TextEditingController _controller;
-  final FocusNode _focusNode;
   final AnimationController _panelController;
+
+  // CHANGED: Made non-final to allow updates from ChatInputPanel
+  TextEditingController _controller;
+  FocusNode _focusNode;
 
   List<Message>? _messagesBeforeEdit;
 
@@ -35,6 +37,15 @@ class EditService {
         _controller = controller,
         _focusNode = focusNode,
         _panelController = panelController;
+
+  // NEW: Method to update controller references when ChatInputPanel rebuilds
+  void updateControllers({
+    required TextEditingController controller,
+    required FocusNode focusNode,
+  }) {
+    _controller = controller;
+    _focusNode = focusNode;
+  }
 
   Future<void> applyEditedMessage(BuildContext context) async {
     final int? editingIndex = _inputProvider.editingMessageIndex;

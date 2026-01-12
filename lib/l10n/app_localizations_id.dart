@@ -9,9 +9,6 @@ class AppLocalizationsId extends AppLocalizations {
   AppLocalizationsId([String locale = 'id']) : super(locale);
 
   @override
-  String get understood => 'Mengerti.';
-
-  @override
   String get cancel => 'Batal';
 
   @override
@@ -30,9 +27,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
-  String get darkMode => 'Mode Gelap';
-
-  @override
   String get light => 'Terang';
 
   @override
@@ -46,9 +40,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get done => 'Selesai';
-
-  @override
-  String get comingSoon => 'SEGERA HADIR';
 
   @override
   String get bestValue => 'Penawaran Terbaik';
@@ -66,14 +57,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get messageHint => 'Tanyakan apa saja';
 
   @override
-  String get modelLoading => 'Model sedang dimuat...';
-
-  @override
   String get messageCopied => 'Pesan disalin ke papan klip.';
-
-  @override
-  String get storeUnavailable =>
-      'Toko saat ini tidak tersedia. Silakan coba lagi nanti';
 
   @override
   String get retry => 'Coba Lagi';
@@ -84,16 +68,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String deviceMemory(Object memory) {
     return 'Memori Perangkat: $memory GB';
-  }
-
-  @override
-  String storageSpace(Object storage) {
-    return 'Ruang Penyimpanan: $storage GB';
-  }
-
-  @override
-  String freeStorageSpace(Object freeStorage) {
-    return 'Ruang Penyimpanan Tersisa: $freeStorage GB';
   }
 
   @override
@@ -118,9 +92,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get usedMemory => 'Memori Terpakai';
 
   @override
-  String get requirements => 'Persyaratan';
-
-  @override
   String get modelsTitle => 'Perpustakaan';
 
   @override
@@ -130,34 +101,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get serverSideModels => 'Model Online';
 
   @override
-  String get uploadYourOwnModel => 'Unggah Model Anda Sendiri!';
-
-  @override
   String get selectGGUFFile => 'Pilih File GGUF';
 
   @override
   String get errorGGUF => 'Harap pilih file dalam format GGUF saja.';
-
-  @override
-  String get modelAlreadyExists => 'Model sudah ada.';
-
-  @override
-  String get modelAddedSuccessfully => 'Model berhasil ditambahkan.';
-
-  @override
-  String get modelRemoved => 'Model berhasil dihapus.';
-
-  @override
-  String get removeError => 'Terjadi kesalahan saat menghapus model.';
-
-  @override
-  String get fileNotFound => 'File tidak ditemukan.';
-
-  @override
-  String get fileUploadError => 'Terjadi kesalahan saat mengunggah file.';
-
-  @override
-  String get noFileSelected => 'Tidak ada file yang dipilih.';
 
   @override
   String get myModels => 'Model Saya';
@@ -166,36 +113,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get create => 'Buat';
 
   @override
-  String get seeAll => 'Lihat Semua';
-
-  @override
   String modelProducer(Object producer) {
     return 'Produsen: $producer';
-  }
-
-  @override
-  String modelRAM(Object ram) {
-    return 'RAM: $ram';
-  }
-
-  @override
-  String modelSize(Object size) {
-    return 'Ukuran: $size';
   }
 
   @override
   String modelDescription(Object description) {
     return '$description';
   }
-
-  @override
-  String get conversationsTitle => 'Percakapan';
-
-  @override
-  String get conversationDeleted => 'Percakapan dihapus.';
-
-  @override
-  String get conversationUpdated => 'Percakapan diperbarui.';
 
   @override
   String get editConversationTitle => 'Ganti Nama';
@@ -207,9 +132,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get save => 'Simpan';
 
   @override
-  String get titleCannotBeEmpty => 'Judul tidak boleh kosong.';
-
-  @override
   String get noConversationsMessage =>
       'Tidak ada percakapan, mulailah mengobrol!';
 
@@ -218,12 +140,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get noChats => 'Tidak Ada Obrolan';
-
-  @override
-  String get starredChats => 'Obrolan Berbintang';
-
-  @override
-  String get allChats => 'Semua Obrolan';
 
   @override
   String get noStarredChats => 'Tidak Ada Obrolan Berbintang';
@@ -240,19 +156,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get unstarConversation => 'Unstar';
-
-  @override
-  String get conversationTitleUpdated => 'Judul percakapan diperbarui';
-
-  @override
-  String get youReachedConversationLimit =>
-      'Anda telah mencapai batas percakapan.';
-
-  @override
-  String get today => 'Hari Ini';
-
-  @override
-  String get yesterday => 'Kemarin';
 
   @override
   String get loginToYourAccount => 'Masuk';
@@ -304,9 +207,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get passwordsDoNotMatch => 'Kata sandi tidak cocok.';
 
   @override
-  String get userNotFound => 'Pengguna tidak ditemukan.';
-
-  @override
   String get wrongPassword => 'Kata sandi salah.';
 
   @override
@@ -319,38 +219,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get authError => 'Kesalahan Otentikasi';
 
   @override
-  String get invalidUsername => 'Harap masukkan nama pengguna.';
-
-  @override
   String get usernameTaken => 'Nama pengguna ini sudah diambil.';
 
   @override
   String get username => 'Nama Pengguna';
 
   @override
-  String get authenticationFailed => 'Otentikasi gagal. Silakan coba lagi.';
-
-  @override
-  String get emailTooLong => 'Email maksimal 30 karakter.';
-
-  @override
-  String get deviceLimitReached =>
-      'Anda telah mencapai batas pembuatan akun untuk perangkat ini.';
-
-  @override
-  String get verificationEmailLimitReached => 'Kami tidak akan mengirim lagi';
-
-  @override
-  String get verificationEmailSent => 'Email verifikasi terkirim!';
-
-  @override
-  String get emailNotVerified => 'Email belum diverifikasi';
-
-  @override
   String get resendCode => 'Kirim ulang email verifikasi';
-
-  @override
-  String get remainingSeconds => 'Sisa waktu untuk verifikasi';
 
   @override
   String get pleaseCheckYourEmail =>
@@ -358,9 +233,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get verifyYourEmail => 'Verifikasi Email Anda';
-
-  @override
-  String get backToLogin => 'Kembali';
 
   @override
   String get seconds => 'detik';
@@ -389,9 +261,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get verifyNow => 'Verifikasi Sekarang';
 
   @override
-  String get accountVerified => 'Akun Anda telah diverifikasi.';
-
-  @override
   String get linkSent => 'Tautan terkirim';
 
   @override
@@ -409,14 +278,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Apakah Anda yakin ingin menghapus akun Anda?';
 
   @override
-  String get enterPasswordToDelete =>
-      'Masukkan kata sandi Anda untuk menghapus.';
-
-  @override
   String get deleteAccount => 'Hapus Akun';
-
-  @override
-  String get deleteAccountError => 'Terjadi kesalahan saat menghapus akun.';
 
   @override
   String get delete => 'Hapus';
@@ -438,28 +300,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get displayName => 'Nama Tampilan';
 
   @override
-  String get tapToChangeProfilePicture => 'Ketuk untuk mengubah gambar profil';
-
-  @override
   String get profileUpdated => 'Profil berhasil diperbarui';
 
   @override
-  String get updateFailed => 'Gagal memperbarui profil';
-
-  @override
-  String get nameCannotBeEmpty => 'Nama tidak boleh kosong';
-
-  @override
   String get logout => 'Keluar';
-
-  @override
-  String get noDisplayName => 'Nama tampilan belum diatur';
-
-  @override
-  String get noEmail => 'Tidak ada alamat email';
-
-  @override
-  String get noUserLoggedIn => 'Tidak ada pengguna yang sedang masuk';
 
   @override
   String get profile => 'Profil';
@@ -488,15 +332,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get downloading => 'Mengunduh...';
 
   @override
-  String get downloadError => 'Terjadi kesalahan saat mengunduh.';
-
-  @override
-  String get downloadCancelled => 'Pengunduhan dibatalkan.';
-
-  @override
-  String get downloadResumed => 'Pengunduhan dilanjutkan.';
-
-  @override
   String get downloadSuccess => 'Pengunduhan berhasil';
 
   @override
@@ -514,28 +349,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get purchaseSuccessful => 'Pembelian berhasil!';
 
   @override
-  String get purchaseFailed => 'Pembelian tidak berhasil';
-
-  @override
-  String get creditProductNotFound =>
-      'Produk kredit yang dipilih tidak dapat ditemukan.';
-
-  @override
-  String get creditsAddedSuccessfully =>
-      'Kredit berhasil ditambahkan ke akun Anda!';
-
-  @override
-  String get creditDeliveryFailed =>
-      'Gagal menambahkan kredit ke akun Anda. Silakan hubungi dukungan.';
-
-  @override
-  String get invalidPurchase => 'Pembelian tidak valid';
-
-  @override
   String get purchaseError => 'Kesalahan pembelian';
-
-  @override
-  String get purchaseVertexPlusToUpload => 'Ini adalah fitur Plus';
 
   @override
   String get purchasePlus => 'Beli Cortex Plus';
@@ -583,33 +397,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Akses lebih banyak fitur Cortex dan rasakan pengalaman AI yang lebih kaya!';
 
   @override
-  String get alreadySubscribed => 'Anda sudah berlangganan';
-
-  @override
-  String get subscriptionInfo => 'Langganan Anda aktif.';
-
-  @override
-  String get alreadySubscribedMessage =>
-      'Anda sudah memiliki langganan Plus. Jika Anda ingin membatalkan langganan, Anda dapat melakukannya melalui pengelola Play Store.';
-
-  @override
-  String get cancelSubscription => 'Batalkan Langganan';
-
-  @override
-  String get cancelSubscriptionInfo =>
-      'Jika Anda ingin membatalkan langganan, silakan lanjutkan melalui pengelola langganan Play Store.';
-
-  @override
-  String get goToPlayStore => 'Buka Play Store';
-
-  @override
-  String get alreadySubscribedPlus => 'Anda Memiliki Paket Plus!';
-
-  @override
-  String get alreadySubscribedPlusMessage =>
-      'Paket Plus Anda aktif. Anda dapat menikmati semua manfaatnya.';
-
-  @override
   String get purchaseUltra => 'Beli Cortex Ultra';
 
   @override
@@ -617,28 +404,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Dapatkan akses penuh ke semua fitur Cortex dan rasakan pengalaman AI secara maksimal!';
 
   @override
-  String get noSubscription => 'Tidak Ada Langganan';
-
-  @override
-  String get noSubscriptionMessage => 'Anda belum memiliki langganan.';
-
-  @override
-  String get alreadyAtHighestPlan => 'Anda sudah berada di paket tertinggi.';
-
-  @override
-  String get unableToOpenSubscription =>
-      'Tidak dapat membuka halaman manajemen langganan.';
-
-  @override
   String get upgradeSubscription => 'Tingkatkan Langganan';
-
-  @override
-  String get confirmUpgrade =>
-      'Apakah Anda yakin ingin meningkatkan langganan Anda?';
-
-  @override
-  String get unsupportedPlatform =>
-      'Platform tidak didukung untuk pembatalan langganan.';
 
   @override
   String get purchaseStreamError => 'Kesalahan aliran pembelian.';
@@ -647,43 +413,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get productNotFound => 'Produk tidak ditemukan';
 
   @override
-  String get productDetailsError =>
-      'Terjadi kesalahan saat mengambil detail produk.';
-
-  @override
   String get noProductsFound => 'Tidak ada produk yang ditemukan';
-
-  @override
-  String get loadCreditsButton => 'Isi Kredit';
-
-  @override
-  String get creditsTitle => 'Kredit';
-
-  @override
-  String get creditsScreenDescription =>
-      'Layar ini menampilkan kredit pengguna. \n\nKredit pengguna saat ini: 100\n\nInformasi kredit terperinci dapat ditampilkan di sini.';
-
-  @override
-  String get creditsLoaded => 'Kredit dimuat!';
-
-  @override
-  String get currentCredits => 'Kredit Saat Ini';
-
-  @override
-  String get pleaseSelectCreditPackage => 'Silakan pilih paket kredit';
-
-  @override
-  String get purchaseCreditsTitle => 'Beli Kredit';
-
-  @override
-  String get purchaseCreditsDescription =>
-      'Pilih paket kredit yang sesuai dengan kebutuhan Anda dan gunakan aplikasi kami lebih banyak.';
-
-  @override
-  String get purchaseButton => 'Beli';
-
-  @override
-  String get productNotFoundMessage => 'Produk yang dipilih tidak ada.';
 
   @override
   String get buyCredits => 'Beli Kredit';
@@ -696,72 +426,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get buyCredit => 'Beli Kredit';
 
   @override
-  String buyCreditPackage(Object amount) {
-    return 'Beli $amount Kredit';
-  }
-
-  @override
-  String get subscribedPlan => 'Berlangganan';
-
-  @override
-  String get errorResponseNotReceived => 'Respons tidak diterima';
-
-  @override
-  String googleApiRequestFailed(int attempt, String error) {
-    return 'Permintaan Google API gagal $attempt kali: $error';
-  }
-
-  @override
-  String openRouterResponseStatus(int statusCode) {
-    return 'Status Respons OpenRouter: $statusCode';
-  }
-
-  @override
-  String openRouterDecodedResponseBody(String body) {
-    return 'Isi Respons OpenRouter yang Didekode: $body';
-  }
-
-  @override
-  String decodedJson(String data) {
-    return 'JSON yang Didekode: $data';
-  }
-
-  @override
-  String get responseStructureUnexpectedMessageContentMissing =>
-      'Struktur respons tidak terduga: pesan atau konten hilang';
-
-  @override
-  String get responseStructureUnexpectedChoicesMissing =>
-      'Struktur respons tidak terduga: pilihan hilang atau kosong';
-
-  @override
-  String openRouterApiRequestFailed(int statusCode, String body) {
-    return 'Permintaan OpenRouter API gagal: $statusCode - $body';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterAttempts(int attempt, String error) {
-    return 'Permintaan OpenRouter API gagal $attempt kali: $error';
-  }
-
-  @override
   String get internetRequired =>
       'Koneksi internet diperlukan untuk menggunakan model ini';
-
-  @override
-  String get pleaseWaitBeforeTryingAgain =>
-      'Harap tunggu sejenak sebelum mencoba lagi';
-
-  @override
-  String openRouterQuotaExceeded(int statusCode, String decodedBody) {
-    return 'Kuota terlampaui. Kode status: $statusCode, Isi: $decodedBody';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterPaidAttempts(
-      int attempts, String error) {
-    return 'Permintaan API gagal setelah $attempts percobaan berbayar. Kesalahan: $error';
-  }
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
@@ -804,12 +470,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get capabilitiesSection => 'Kemampuan';
 
   @override
-  String get ratingsSection => 'Peringkat';
-
-  @override
-  String get noRatingDataFound => 'Tidak ada data peringkat yang ditemukan';
-
-  @override
   String get featurePhotoTitle => 'Pemindaian Foto';
 
   @override
@@ -822,13 +482,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get featureOfflineDescription =>
       'Jalankan model tanpa koneksi internet untuk menjaga keamanan data Anda.';
-
-  @override
-  String get featureSupermodelTitle => 'Model Super';
-
-  @override
-  String get featureSupermodelDescription =>
-      'Ini adalah model masif dengan lebih dari 10 miliar parameter, menawarkan kinerja tinggi dan kemampuan yang luas.';
 
   @override
   String get featureRoleplayTitle => 'Bermain Peran';
@@ -847,26 +500,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get context => 'Konteks';
 
   @override
-  String get millions => 'juta';
-
-  @override
-  String get billions => 'miliar';
-
-  @override
-  String get trillions => 'triliun';
-
-  @override
-  String get thousand => 'ribu';
-
-  @override
-  String get estimated => 'diperkirakan';
-
-  @override
   String get finalPreparation => 'Persiapan akhir sedang dilakukan.';
-
-  @override
-  String get allEvaluationsByTestTeam =>
-      'Semua evaluasi dilakukan oleh tim penguji kami';
 
   @override
   String get shareApp => 'Bagikan Aplikasi';
@@ -902,9 +536,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get user => 'Pengguna';
-
-  @override
-  String get voice => 'Suara';
 
   @override
   String get help => 'Bantuan';
@@ -954,9 +585,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get chinese => 'Cina';
 
   @override
-  String get arabic => 'Arab';
-
-  @override
   String get french => 'Prancis';
 
   @override
@@ -973,9 +601,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get korean => 'Korea';
-
-  @override
-  String get deutsch => 'Jerman';
 
   @override
   String get english => 'Inggris';
@@ -1019,10 +644,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Hanya huruf-huruf ini: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' dan karakter \'.\', \'-\', \'_\' yang dapat digunakan dalam nama pengguna.';
 
   @override
-  String get passwordTooLong =>
-      'Kata sandi tidak boleh lebih dari 64 karakter.';
-
-  @override
   String get noInternetConnection => 'Tidak ada koneksi internet.';
 
   @override
@@ -1032,15 +653,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get library => 'Perpustakaan';
 
   @override
-  String get inappropriateMessageWarning => 'Pesan tidak pantas terdeteksi!';
-
-  @override
-  String get myModelDescription => 'Model saya.';
-
-  @override
-  String get noModelsDownloaded => 'Anda belum mengunduh model apa pun.';
-
-  @override
   String get appTitle => 'Cortex';
 
   @override
@@ -1048,9 +660,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get removeModel => 'Hapus Model';
-
-  @override
-  String get modelUploadedSuccessfully => 'Model berhasil diunggah.';
 
   @override
   String get insufficientRAM => 'Memori Rendah';
@@ -1076,9 +685,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Batas percakapan yang jauh lebih banyak untuk AI online';
 
   @override
-  String get benefit2 => 'Unggah model Anda sendiri';
-
-  @override
   String get benefit3 => 'Efek profil';
 
   @override
@@ -1086,9 +692,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get benefit5 => 'Buat lebih banyak kecerdasan buatan online';
-
-  @override
-  String get benefit6 => 'Obrolan tak terbatas';
 
   @override
   String benefit7(Object credits) {
@@ -1100,9 +703,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get benefit9 => 'Tema baru';
-
-  @override
-  String get benefit10 => 'Obrolan suara offline';
 
   @override
   String get oldBenefits => 'Semua manfaat dari paket yang lebih rendah';
@@ -1141,21 +741,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get copyrights => 'Atribusi';
 
   @override
-  String get downloadingTitle => 'Mengunduh';
-
-  @override
-  String get downloadCompletedTitle => 'Pengunduhan Selesai';
-
-  @override
-  String get downloadPausedTitle => 'Pengunduhan Dijeda';
-
-  @override
-  String get downloadErrorTitle => 'Kesalahan Pengunduhan';
-
-  @override
-  String get cancelButtonText => 'Batal';
-
-  @override
   String get love => 'Cinta';
 
   @override
@@ -1190,13 +775,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get editingNotification => 'Anda sekarang dalam mode edit';
 
   @override
-  String get featureIndulgentTitle => 'Memanjakan';
-
-  @override
-  String get featureIndulgentDescription =>
-      'Model ini dapat dengan lancar mengakomodasi dan memproses konteks yang melebihi 100.000 token, memungkinkannya menangani input yang luas dan mendetail tanpa mengorbankan kinerja.';
-
-  @override
   String get featurePluralTitle => 'Jamak';
 
   @override
@@ -1204,30 +782,10 @@ class AppLocalizationsId extends AppLocalizations {
       'Model ini dapat secara otomatis mengintegrasikan ekstensi tambahan, sehingga memperluas kemampuan fungsionalnya untuk mendukung beragam operasi dengan kinerja yang ditingkatkan.';
 
   @override
-  String get featureWiseTitle => 'Bijaksana';
-
-  @override
-  String get featureWiseDescription =>
-      'Model ini dapat memanfaatkan wawasan analitis yang mendalam dan penalaran yang berwawasan ke depan untuk memberikan dukungan canggih untuk pengambilan keputusan dan pemecahan masalah yang kompleks.';
-
-  @override
-  String get featureResearcherTitle => 'Peneliti';
-
-  @override
-  String get featureResearcherDescription =>
-      'Tersedia secara eksklusif dalam model yang dilengkapi dengan kapasitas penelitian dan analitis tingkat lanjut, fitur ini dirancang untuk memberikan wawasan presisi tinggi dan analisis komprehensif di berbagai domain.';
-
-  @override
   String get nameLabel => 'Nama AI';
 
   @override
-  String get nameHint => 'Masukkan nama AI Anda';
-
-  @override
   String get summaryLabel => 'Ringkasan AI';
-
-  @override
-  String get summaryHint => 'Masukkan ringkasan AI Anda';
 
   @override
   String get add => 'Tambah';
@@ -1257,20 +815,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get summary => 'Ringkasan';
 
   @override
-  String get characterPoliceTitle => 'Polisi';
-
-  @override
-  String get characterPoliceRole =>
-      'Anda adalah penegak hukum yang waspada, berdedikasi untuk melindungi warga dan menjaga ketertiban dengan komitmen yang tak tergoyahkan, Anda adalah seorang polisi';
-
-  @override
-  String get characterPoliceShortDescription =>
-      'Seorang penegak hukum yang teguh dan berani.';
-
-  @override
-  String get purchaseSubscription => 'Beli';
-
-  @override
   String get modelUploadTitle => 'File Kecerdasan Buatan';
 
   @override
@@ -1282,13 +826,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Ketuk di sini untuk memilih file .gguf dari perangkat Anda';
 
   @override
-  String get addServerTitle => 'Server Kecerdasan Buatan';
-
-  @override
-  String get addServerDescription =>
-      'Masukkan URL server jarak jauh Anda untuk terhubung dengan model yang dihosting secara eksternal. Fitur ini memerlukan koneksi internet aktif, dan masalah atau kesalahan terkait server apa pun tidak disebabkan oleh Cortex. Pastikan server Anda dikonfigurasi dengan benar, dapat diakses dari jaringan Anda, dan memiliki titik akhir model yang valid untuk pengalaman yang lancar.';
-
-  @override
   String get you => 'Anda';
 
   @override
@@ -1298,24 +835,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get confirmRemovePhoto => 'Apakah Anda yakin ingin menghapus foto?';
 
   @override
-  String get serverLink => 'Tautan Server';
-
-  @override
-  String get enterURL => 'Masukkan URL server';
-
-  @override
   String get chatLengthLimitExceeded =>
       'Obrolan ini telah melebihi batas karakter. Silakan mulai obrolan baru atau beli langganan.';
-
-  @override
-  String get aiNameError => 'AI dengan nama ini sudah ada.';
-
-  @override
-  String get modelLimitExceeded =>
-      'Anda telah mencapai batas maksimum pembuatan model untuk paket Anda.';
-
-  @override
-  String get modelVertexProducer => 'Vertex';
 
   @override
   String get photoLimitReachedMessage =>
@@ -1331,15 +852,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String insufficientCredits(Object available, Object required) {
     return 'Anda tidak memiliki cukup kredit untuk menyelesaikan permintaan ini. Tindakan ini memerlukan $required kredit, tetapi Anda hanya memiliki $available. Untuk mendapatkan lebih banyak kredit, Anda dapat meningkatkan paket Anda atau membelinya secara langsung. hei kami paham kok kehabisan kredit itu agak menyebalkan tapi serius deh dapetin balasan keren dari model kami itu gak gratis jadi kredit ini sebenarnya bantu kami buat terus jalan dan dengerin ya kalo lebih banyak dari kalian yang beli kredit kami pastinya bisa naikin batas harian gratis untuk semua orang';
-  }
-
-  @override
-  String get regenerateInProgress =>
-      'Pembuatan jawaban sudah sedang berlangsung.';
-
-  @override
-  String errorOccurredDuringRegeneration(String errorDetails) {
-    return 'Terjadi kesalahan saat mencoba membuat ulang: $errorDetails';
   }
 
   @override
@@ -1369,10 +881,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get errorInsufficientCredits =>
       'Kredit Anda tidak mencukupi. Silakan isi ulang untuk melanjutkan.';
-
-  @override
-  String get errorRateLimitExceeded =>
-      'Terlalu banyak permintaan. Silakan coba lagi sebentar.';
 
   @override
   String get errorServer =>
@@ -1423,24 +931,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get noModelsFoundMessage =>
       'Coba sesuaikan istilah pencarian Anda atau hapus filter.';
-
-  @override
-  String get usernameRateLimitExceeded =>
-      'Anda hanya dapat mengubah nama pengguna dua kali setiap 14 hari.';
-
-  @override
-  String get usernameUnchanged =>
-      'Ini sudah menjadi nama pengguna Anda saat ini.';
-
-  @override
-  String get creditsInfoPanelTitle => 'Cara Kerja Kredit';
-
-  @override
-  String get creditsInfoPanelBody =>
-      'Credit digunakan untuk mengobrol dengan model AI secara online. tiap pesan itu beneran jadi biaya buat kami dan credit inilah yang sebenernya nyelametin kami dari jalur bangkrut total haha. Sekarang kita jelaskan sebentar bagaimana sistem ini bekerja:\n\n• Setiap pesan ke model online gratis dikenai biaya 5 credit.\n• Setiap pesan ke model online premium dikenai biaya 20 credit.\n• Menambahkan lampiran akan menambah 30 credit lagi.\n• Pengguna paket gratis mendapatkan bonus 200 credit yang direset setiap hari.';
-
-  @override
-  String get creditsInfoPanelFooter => 'Selamat mengobrol!';
 
   @override
   String get disclaimerMessage =>
@@ -1528,10 +1018,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get photoWarningMessage =>
       'Sebuah foto disertakan. Model yang tidak mendukung gambar mungkin akan mengabaikannya.';
-
-  @override
-  String get loginRequiredForPurchase =>
-      'Anda harus masuk untuk melakukan pembelian.';
 
   @override
   String get storagePermissionRequired =>
@@ -1636,34 +1122,14 @@ class AppLocalizationsId extends AppLocalizations {
       'Anda telah menggunakan semua pesan harian gratis untuk model premium, silakan tingkatkan untuk akses tak terbatas.';
 
   @override
-  String selectionScreenGreetingUser(String userName) {
-    return 'Ada yang bisa saya bantu hari ini, $userName?';
-  }
-
-  @override
   String get selectionScreenGreetingGeneric =>
       'Bagaimana saya bisa membantu Anda hari ini?';
-
-  @override
-  String get selectionScreenRecentModels => 'Model Terbaru';
-
-  @override
-  String get selectionScreenFeatureDynamicChat => 'Obrolan Dinamis';
 
   @override
   String get selectionScreenFeatureOffline => 'Gunakan tanpa Internet';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Pilih Model';
-
-  @override
   String get explore => 'Jelajahi';
-
-  @override
-  String get subscriptionCancelled => 'Langganan berhasil dibatalkan!';
-
-  @override
-  String get selectionScreenPinnedModels => 'Model yang Disematkan';
 
   @override
   String get selectionScreenNewsAndUpdates => 'Berita & Pembaruan';
@@ -1700,13 +1166,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get errorNoModelsAvailable =>
       'Saat ini tidak ada model yang tersedia. Silakan periksa koneksi internet Anda dan coba lagi.';
-
-  @override
-  String get errorNoModelsForRequest =>
-      'Tidak ada model yang cocok ditemukan untuk permintaan Anda saat ini (misalnya, mode offline atau pesan gambar).';
-
-  @override
-  String get dynamicChatWelcome => 'Bagaimana saya bisa membantu Anda?';
 
   @override
   String get notificationComebackTitle => 'Kami merindukanmu!';
@@ -2025,13 +1484,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Apakah Anda yakin ingin meninggalkan platform menakjubkan ini?';
 
   @override
-  String get newsErrorTitle => 'Gagal Memuat Berita';
-
-  @override
-  String get newsErrorMessage =>
-      'Terjadi masalah saat mengambil pembaruan terkini, silakan periksa koneksi Anda dan coba lagi.';
-
-  @override
   String get tagNotFound =>
       'Tag yang Anda masukkan tidak valid atau telah kedaluwarsa.';
 
@@ -2109,9 +1561,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get createAccount => 'Buat Akun';
-
-  @override
-  String get upgradeTitle => 'Selesaikan Pendaftaran';
 
   @override
   String get accountLinkedSuccess => 'Akun berhasil dibuat!';

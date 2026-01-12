@@ -128,12 +128,6 @@ abstract class AppLocalizations {
     Locale('zh')
   ];
 
-  /// No description provided for @understood.
-  ///
-  /// In en, this message translates to:
-  /// **'Understood.'**
-  String get understood;
-
   /// No description provided for @cancel.
   ///
   /// In en, this message translates to:
@@ -170,12 +164,6 @@ abstract class AppLocalizations {
   /// **'Chat'**
   String get chat;
 
-  /// No description provided for @darkMode.
-  ///
-  /// In en, this message translates to:
-  /// **'Dark Mode'**
-  String get darkMode;
-
   /// No description provided for @light.
   ///
   /// In en, this message translates to:
@@ -205,12 +193,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get done;
-
-  /// No description provided for @comingSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'COMING SOON'**
-  String get comingSoon;
 
   /// No description provided for @bestValue.
   ///
@@ -242,23 +224,11 @@ abstract class AppLocalizations {
   /// **'Ask anything'**
   String get messageHint;
 
-  /// No description provided for @modelLoading.
-  ///
-  /// In en, this message translates to:
-  /// **'Model is loading...'**
-  String get modelLoading;
-
   /// No description provided for @messageCopied.
   ///
   /// In en, this message translates to:
   /// **'Message copied to clipboard.'**
   String get messageCopied;
-
-  /// No description provided for @storeUnavailable.
-  ///
-  /// In en, this message translates to:
-  /// **'Store is currently unavailable. Please try again later'**
-  String get storeUnavailable;
 
   /// No description provided for @retry.
   ///
@@ -277,18 +247,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Device Memory: {memory} GB'**
   String deviceMemory(Object memory);
-
-  /// No description provided for @storageSpace.
-  ///
-  /// In en, this message translates to:
-  /// **'Storage Space: {storage} GB'**
-  String storageSpace(Object storage);
-
-  /// No description provided for @freeStorageSpace.
-  ///
-  /// In en, this message translates to:
-  /// **'Free Storage Space: {freeStorage} GB'**
-  String freeStorageSpace(Object freeStorage);
 
   /// No description provided for @memory.
   ///
@@ -332,12 +290,6 @@ abstract class AppLocalizations {
   /// **'Used Memory'**
   String get usedMemory;
 
-  /// No description provided for @requirements.
-  ///
-  /// In en, this message translates to:
-  /// **'Requirements'**
-  String get requirements;
-
   /// No description provided for @modelsTitle.
   ///
   /// In en, this message translates to:
@@ -356,12 +308,6 @@ abstract class AppLocalizations {
   /// **'Online Models'**
   String get serverSideModels;
 
-  /// No description provided for @uploadYourOwnModel.
-  ///
-  /// In en, this message translates to:
-  /// **'Upload Your Own Model!'**
-  String get uploadYourOwnModel;
-
   /// No description provided for @selectGGUFFile.
   ///
   /// In en, this message translates to:
@@ -373,48 +319,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please select a file in GGUF format only.'**
   String get errorGGUF;
-
-  /// No description provided for @modelAlreadyExists.
-  ///
-  /// In en, this message translates to:
-  /// **'Model already exists.'**
-  String get modelAlreadyExists;
-
-  /// No description provided for @modelAddedSuccessfully.
-  ///
-  /// In en, this message translates to:
-  /// **'Model added successfully.'**
-  String get modelAddedSuccessfully;
-
-  /// No description provided for @modelRemoved.
-  ///
-  /// In en, this message translates to:
-  /// **'Model removed successfully.'**
-  String get modelRemoved;
-
-  /// No description provided for @removeError.
-  ///
-  /// In en, this message translates to:
-  /// **'An error occurred while removing the model.'**
-  String get removeError;
-
-  /// No description provided for @fileNotFound.
-  ///
-  /// In en, this message translates to:
-  /// **'File not found.'**
-  String get fileNotFound;
-
-  /// No description provided for @fileUploadError.
-  ///
-  /// In en, this message translates to:
-  /// **'An error occurred while uploading the file.'**
-  String get fileUploadError;
-
-  /// No description provided for @noFileSelected.
-  ///
-  /// In en, this message translates to:
-  /// **'No file selected.'**
-  String get noFileSelected;
 
   /// No description provided for @myModels.
   ///
@@ -428,53 +332,17 @@ abstract class AppLocalizations {
   /// **'Create'**
   String get create;
 
-  /// No description provided for @seeAll.
-  ///
-  /// In en, this message translates to:
-  /// **'See All'**
-  String get seeAll;
-
   /// No description provided for @modelProducer.
   ///
   /// In en, this message translates to:
   /// **'Producer: {producer}'**
   String modelProducer(Object producer);
 
-  /// No description provided for @modelRAM.
-  ///
-  /// In en, this message translates to:
-  /// **'RAM: {ram}'**
-  String modelRAM(Object ram);
-
-  /// No description provided for @modelSize.
-  ///
-  /// In en, this message translates to:
-  /// **'Size: {size}'**
-  String modelSize(Object size);
-
   /// No description provided for @modelDescription.
   ///
   /// In en, this message translates to:
   /// **'{description}'**
   String modelDescription(Object description);
-
-  /// No description provided for @conversationsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Conversations'**
-  String get conversationsTitle;
-
-  /// No description provided for @conversationDeleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Conversation deleted.'**
-  String get conversationDeleted;
-
-  /// No description provided for @conversationUpdated.
-  ///
-  /// In en, this message translates to:
-  /// **'Conversation updated.'**
-  String get conversationUpdated;
 
   /// No description provided for @editConversationTitle.
   ///
@@ -494,12 +362,6 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get save;
 
-  /// No description provided for @titleCannotBeEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'Title cannot be empty.'**
-  String get titleCannotBeEmpty;
-
   /// No description provided for @noConversationsMessage.
   ///
   /// In en, this message translates to:
@@ -517,18 +379,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No Chats'**
   String get noChats;
-
-  /// No description provided for @starredChats.
-  ///
-  /// In en, this message translates to:
-  /// **'Starred Chats'**
-  String get starredChats;
-
-  /// No description provided for @allChats.
-  ///
-  /// In en, this message translates to:
-  /// **'All Chats'**
-  String get allChats;
 
   /// No description provided for @noStarredChats.
   ///
@@ -559,30 +409,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unstar'**
   String get unstarConversation;
-
-  /// No description provided for @conversationTitleUpdated.
-  ///
-  /// In en, this message translates to:
-  /// **'Conversation title updated'**
-  String get conversationTitleUpdated;
-
-  /// No description provided for @youReachedConversationLimit.
-  ///
-  /// In en, this message translates to:
-  /// **'You have reached the conversation limit.'**
-  String get youReachedConversationLimit;
-
-  /// No description provided for @today.
-  ///
-  /// In en, this message translates to:
-  /// **'Today'**
-  String get today;
-
-  /// No description provided for @yesterday.
-  ///
-  /// In en, this message translates to:
-  /// **'Yesterday'**
-  String get yesterday;
 
   /// No description provided for @loginToYourAccount.
   ///
@@ -680,12 +506,6 @@ abstract class AppLocalizations {
   /// **'Passwords do not match.'**
   String get passwordsDoNotMatch;
 
-  /// No description provided for @userNotFound.
-  ///
-  /// In en, this message translates to:
-  /// **'User not found.'**
-  String get userNotFound;
-
   /// No description provided for @wrongPassword.
   ///
   /// In en, this message translates to:
@@ -710,12 +530,6 @@ abstract class AppLocalizations {
   /// **'Authentication Error'**
   String get authError;
 
-  /// No description provided for @invalidUsername.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a username.'**
-  String get invalidUsername;
-
   /// No description provided for @usernameTaken.
   ///
   /// In en, this message translates to:
@@ -728,53 +542,11 @@ abstract class AppLocalizations {
   /// **'Username'**
   String get username;
 
-  /// No description provided for @authenticationFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Authentication failed. Please try again.'**
-  String get authenticationFailed;
-
-  /// No description provided for @emailTooLong.
-  ///
-  /// In en, this message translates to:
-  /// **'Email can be at most 30 characters.'**
-  String get emailTooLong;
-
-  /// No description provided for @deviceLimitReached.
-  ///
-  /// In en, this message translates to:
-  /// **'You have reached the account creation limit for this device.'**
-  String get deviceLimitReached;
-
-  /// No description provided for @verificationEmailLimitReached.
-  ///
-  /// In en, this message translates to:
-  /// **'We wont send anymore'**
-  String get verificationEmailLimitReached;
-
-  /// No description provided for @verificationEmailSent.
-  ///
-  /// In en, this message translates to:
-  /// **'Verification e-mail sent!'**
-  String get verificationEmailSent;
-
-  /// No description provided for @emailNotVerified.
-  ///
-  /// In en, this message translates to:
-  /// **'E-mail has not verified'**
-  String get emailNotVerified;
-
   /// No description provided for @resendCode.
   ///
   /// In en, this message translates to:
   /// **'Resend verification e-mail'**
   String get resendCode;
-
-  /// No description provided for @remainingSeconds.
-  ///
-  /// In en, this message translates to:
-  /// **'Remaining time for verification'**
-  String get remainingSeconds;
 
   /// No description provided for @pleaseCheckYourEmail.
   ///
@@ -787,12 +559,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verify Your Email'**
   String get verifyYourEmail;
-
-  /// No description provided for @backToLogin.
-  ///
-  /// In en, this message translates to:
-  /// **'Go Back'**
-  String get backToLogin;
 
   /// No description provided for @seconds.
   ///
@@ -836,12 +602,6 @@ abstract class AppLocalizations {
   /// **'Verify Now'**
   String get verifyNow;
 
-  /// No description provided for @accountVerified.
-  ///
-  /// In en, this message translates to:
-  /// **'Your account has been verified.'**
-  String get accountVerified;
-
   /// No description provided for @linkSent.
   ///
   /// In en, this message translates to:
@@ -872,23 +632,11 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to delete your account?'**
   String get confirmDeleteAccount;
 
-  /// No description provided for @enterPasswordToDelete.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your password to delete.'**
-  String get enterPasswordToDelete;
-
   /// No description provided for @deleteAccount.
   ///
   /// In en, this message translates to:
   /// **'Delete Account'**
   String get deleteAccount;
-
-  /// No description provided for @deleteAccountError.
-  ///
-  /// In en, this message translates to:
-  /// **'An error occurred while deleting the account.'**
-  String get deleteAccountError;
 
   /// No description provided for @delete.
   ///
@@ -926,53 +674,17 @@ abstract class AppLocalizations {
   /// **'Display Name'**
   String get displayName;
 
-  /// No description provided for @tapToChangeProfilePicture.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap to change profile picture'**
-  String get tapToChangeProfilePicture;
-
   /// No description provided for @profileUpdated.
   ///
   /// In en, this message translates to:
   /// **'Profile updated successfully'**
   String get profileUpdated;
 
-  /// No description provided for @updateFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to update profile'**
-  String get updateFailed;
-
-  /// No description provided for @nameCannotBeEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'Name cannot be empty'**
-  String get nameCannotBeEmpty;
-
   /// No description provided for @logout.
   ///
   /// In en, this message translates to:
   /// **'Logout'**
   String get logout;
-
-  /// No description provided for @noDisplayName.
-  ///
-  /// In en, this message translates to:
-  /// **'No display name set'**
-  String get noDisplayName;
-
-  /// No description provided for @noEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'No email address'**
-  String get noEmail;
-
-  /// No description provided for @noUserLoggedIn.
-  ///
-  /// In en, this message translates to:
-  /// **'No user is currently logged in'**
-  String get noUserLoggedIn;
 
   /// No description provided for @profile.
   ///
@@ -1016,24 +728,6 @@ abstract class AppLocalizations {
   /// **'Downloading...'**
   String get downloading;
 
-  /// No description provided for @downloadError.
-  ///
-  /// In en, this message translates to:
-  /// **'An error occurred during download.'**
-  String get downloadError;
-
-  /// No description provided for @downloadCancelled.
-  ///
-  /// In en, this message translates to:
-  /// **'Download cancelled.'**
-  String get downloadCancelled;
-
-  /// No description provided for @downloadResumed.
-  ///
-  /// In en, this message translates to:
-  /// **'Download resumed.'**
-  String get downloadResumed;
-
   /// No description provided for @downloadSuccess.
   ///
   /// In en, this message translates to:
@@ -1064,47 +758,11 @@ abstract class AppLocalizations {
   /// **'Purchase successful!'**
   String get purchaseSuccessful;
 
-  /// No description provided for @purchaseFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Purchase unsuccessful'**
-  String get purchaseFailed;
-
-  /// No description provided for @creditProductNotFound.
-  ///
-  /// In en, this message translates to:
-  /// **'The selected credit product could not be found.'**
-  String get creditProductNotFound;
-
-  /// No description provided for @creditsAddedSuccessfully.
-  ///
-  /// In en, this message translates to:
-  /// **'Credits were added to your account successfully!'**
-  String get creditsAddedSuccessfully;
-
-  /// No description provided for @creditDeliveryFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to add credits to your account. Please contact support.'**
-  String get creditDeliveryFailed;
-
-  /// No description provided for @invalidPurchase.
-  ///
-  /// In en, this message translates to:
-  /// **'Invalid purchase'**
-  String get invalidPurchase;
-
   /// No description provided for @purchaseError.
   ///
   /// In en, this message translates to:
   /// **'Purchasing error'**
   String get purchaseError;
-
-  /// No description provided for @purchaseVertexPlusToUpload.
-  ///
-  /// In en, this message translates to:
-  /// **'This is a Plus feature'**
-  String get purchaseVertexPlusToUpload;
 
   /// No description provided for @purchasePlus.
   ///
@@ -1178,54 +836,6 @@ abstract class AppLocalizations {
   /// **'Access even more features of Cortex and experience AI even more!'**
   String get proDescription;
 
-  /// No description provided for @alreadySubscribed.
-  ///
-  /// In en, this message translates to:
-  /// **'You are already subscribed'**
-  String get alreadySubscribed;
-
-  /// No description provided for @subscriptionInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Your subscription is active.'**
-  String get subscriptionInfo;
-
-  /// No description provided for @alreadySubscribedMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'You already have a Plus subscription. If you want to cancel your subscription, you can do so through the Play Store manager.'**
-  String get alreadySubscribedMessage;
-
-  /// No description provided for @cancelSubscription.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel Subscription'**
-  String get cancelSubscription;
-
-  /// No description provided for @cancelSubscriptionInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'If you want to cancel your subscription, please proceed through the Play Store subscription manager.'**
-  String get cancelSubscriptionInfo;
-
-  /// No description provided for @goToPlayStore.
-  ///
-  /// In en, this message translates to:
-  /// **'Go to Play Store'**
-  String get goToPlayStore;
-
-  /// No description provided for @alreadySubscribedPlus.
-  ///
-  /// In en, this message translates to:
-  /// **'You Have the Plus Plan!'**
-  String get alreadySubscribedPlus;
-
-  /// No description provided for @alreadySubscribedPlusMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Your Plus plan is active. You can enjoy all the benefits.'**
-  String get alreadySubscribedPlusMessage;
-
   /// No description provided for @purchaseUltra.
   ///
   /// In en, this message translates to:
@@ -1238,47 +848,11 @@ abstract class AppLocalizations {
   /// **'Gain full access to all features of Cortex and experience AI to the fullest!'**
   String get ultraDescription;
 
-  /// No description provided for @noSubscription.
-  ///
-  /// In en, this message translates to:
-  /// **'No Subscription'**
-  String get noSubscription;
-
-  /// No description provided for @noSubscriptionMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'You do not have a subscription yet.'**
-  String get noSubscriptionMessage;
-
-  /// No description provided for @alreadyAtHighestPlan.
-  ///
-  /// In en, this message translates to:
-  /// **'You are already on the highest plan.'**
-  String get alreadyAtHighestPlan;
-
-  /// No description provided for @unableToOpenSubscription.
-  ///
-  /// In en, this message translates to:
-  /// **'Unable to open the subscription management page.'**
-  String get unableToOpenSubscription;
-
   /// No description provided for @upgradeSubscription.
   ///
   /// In en, this message translates to:
   /// **'Upgrade Subscription'**
   String get upgradeSubscription;
-
-  /// No description provided for @confirmUpgrade.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to upgrade your subscription?'**
-  String get confirmUpgrade;
-
-  /// No description provided for @unsupportedPlatform.
-  ///
-  /// In en, this message translates to:
-  /// **'Unsupported platform for subscription cancellation.'**
-  String get unsupportedPlatform;
 
   /// No description provided for @purchaseStreamError.
   ///
@@ -1292,77 +866,11 @@ abstract class AppLocalizations {
   /// **'Product not found'**
   String get productNotFound;
 
-  /// No description provided for @productDetailsError.
-  ///
-  /// In en, this message translates to:
-  /// **'An error occurred while fetching product details.'**
-  String get productDetailsError;
-
   /// No description provided for @noProductsFound.
   ///
   /// In en, this message translates to:
   /// **'No products found'**
   String get noProductsFound;
-
-  /// No description provided for @loadCreditsButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Load Credits'**
-  String get loadCreditsButton;
-
-  /// No description provided for @creditsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Credits'**
-  String get creditsTitle;
-
-  /// No description provided for @creditsScreenDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'This screen shows the user\'s credits. \n\nUser\'s current credits: 100\n\nDetailed credit information can be displayed here.'**
-  String get creditsScreenDescription;
-
-  /// No description provided for @creditsLoaded.
-  ///
-  /// In en, this message translates to:
-  /// **'Credits loaded!'**
-  String get creditsLoaded;
-
-  /// No description provided for @currentCredits.
-  ///
-  /// In en, this message translates to:
-  /// **'Current Credits'**
-  String get currentCredits;
-
-  /// No description provided for @pleaseSelectCreditPackage.
-  ///
-  /// In en, this message translates to:
-  /// **'Please select a credit package'**
-  String get pleaseSelectCreditPackage;
-
-  /// No description provided for @purchaseCreditsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Buy Credits'**
-  String get purchaseCreditsTitle;
-
-  /// No description provided for @purchaseCreditsDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a credit package that suits your needs and use our app more.'**
-  String get purchaseCreditsDescription;
-
-  /// No description provided for @purchaseButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Buy'**
-  String get purchaseButton;
-
-  /// No description provided for @productNotFoundMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'The selected product does not exist.'**
-  String get productNotFoundMessage;
 
   /// No description provided for @buyCredits.
   ///
@@ -1382,96 +890,11 @@ abstract class AppLocalizations {
   /// **'Buy Credits'**
   String get buyCredit;
 
-  /// No description provided for @buyCreditPackage.
-  ///
-  /// In en, this message translates to:
-  /// **'Buy {amount} Credits'**
-  String buyCreditPackage(Object amount);
-
-  /// No description provided for @subscribedPlan.
-  ///
-  /// In en, this message translates to:
-  /// **'Subscribed'**
-  String get subscribedPlan;
-
-  /// No description provided for @errorResponseNotReceived.
-  ///
-  /// In en, this message translates to:
-  /// **'Response not received'**
-  String get errorResponseNotReceived;
-
-  /// Error message used when Google API request fails
-  ///
-  /// In en, this message translates to:
-  /// **'Google API request failed {attempt} times: {error}'**
-  String googleApiRequestFailed(int attempt, String error);
-
-  /// Log the response status code from OpenRouter API
-  ///
-  /// In en, this message translates to:
-  /// **'OpenRouter Response Status: {statusCode}'**
-  String openRouterResponseStatus(int statusCode);
-
-  /// Log the response body from OpenRouter API
-  ///
-  /// In en, this message translates to:
-  /// **'OpenRouter Decoded Response Body: {body}'**
-  String openRouterDecodedResponseBody(String body);
-
-  /// Log the decoded JSON data
-  ///
-  /// In en, this message translates to:
-  /// **'Decoded JSON: {data}'**
-  String decodedJson(String data);
-
-  /// No description provided for @responseStructureUnexpectedMessageContentMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'Response structure is unexpected: message or content missing'**
-  String get responseStructureUnexpectedMessageContentMissing;
-
-  /// No description provided for @responseStructureUnexpectedChoicesMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'Response structure is unexpected: choices missing or empty'**
-  String get responseStructureUnexpectedChoicesMissing;
-
-  /// Error message used when OpenRouter API request fails
-  ///
-  /// In en, this message translates to:
-  /// **'OpenRouter API request failed: {statusCode} - {body}'**
-  String openRouterApiRequestFailed(int statusCode, String body);
-
-  /// Error message used when OpenRouter API request fails after certain attempts
-  ///
-  /// In en, this message translates to:
-  /// **'OpenRouter API request failed {attempt} times: {error}'**
-  String openRouterApiRequestFailedAfterAttempts(int attempt, String error);
-
   /// No description provided for @internetRequired.
   ///
   /// In en, this message translates to:
   /// **'Internet connection is required to use this model'**
   String get internetRequired;
-
-  /// No description provided for @pleaseWaitBeforeTryingAgain.
-  ///
-  /// In en, this message translates to:
-  /// **'Please wait a moment before trying again'**
-  String get pleaseWaitBeforeTryingAgain;
-
-  /// Indicates that the API quota has been exceeded.
-  ///
-  /// In en, this message translates to:
-  /// **'Quota exceeded. Status code: {statusCode}, Body: {decodedBody}'**
-  String openRouterQuotaExceeded(int statusCode, String decodedBody);
-
-  /// Indicates that the API request failed after a certain number of paid model attempts.
-  ///
-  /// In en, this message translates to:
-  /// **'API request failed after {attempts} paid attempts. Error: {error}'**
-  String openRouterApiRequestFailedAfterPaidAttempts(
-      int attempts, String error);
 
   /// No description provided for @termsOfServiceAndPrivacyPolicyWarning.
   ///
@@ -1551,18 +974,6 @@ abstract class AppLocalizations {
   /// **'Capabilities'**
   String get capabilitiesSection;
 
-  /// No description provided for @ratingsSection.
-  ///
-  /// In en, this message translates to:
-  /// **'Ratings'**
-  String get ratingsSection;
-
-  /// No description provided for @noRatingDataFound.
-  ///
-  /// In en, this message translates to:
-  /// **'No rating data found'**
-  String get noRatingDataFound;
-
   /// No description provided for @featurePhotoTitle.
   ///
   /// In en, this message translates to:
@@ -1586,18 +997,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Run the model without an internet connection to keep your data safe.'**
   String get featureOfflineDescription;
-
-  /// No description provided for @featureSupermodelTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Super Model'**
-  String get featureSupermodelTitle;
-
-  /// No description provided for @featureSupermodelDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'This is a massive model with over 10 billion parameters, offering high performance and extensive capabilities.'**
-  String get featureSupermodelDescription;
 
   /// No description provided for @featureRoleplayTitle.
   ///
@@ -1629,47 +1028,11 @@ abstract class AppLocalizations {
   /// **'Context'**
   String get context;
 
-  /// No description provided for @millions.
-  ///
-  /// In en, this message translates to:
-  /// **'million'**
-  String get millions;
-
-  /// No description provided for @billions.
-  ///
-  /// In en, this message translates to:
-  /// **'billion'**
-  String get billions;
-
-  /// No description provided for @trillions.
-  ///
-  /// In en, this message translates to:
-  /// **'trillion'**
-  String get trillions;
-
-  /// No description provided for @thousand.
-  ///
-  /// In en, this message translates to:
-  /// **'thousand'**
-  String get thousand;
-
-  /// No description provided for @estimated.
-  ///
-  /// In en, this message translates to:
-  /// **'estimated'**
-  String get estimated;
-
   /// No description provided for @finalPreparation.
   ///
   /// In en, this message translates to:
   /// **'Final preparations are being made.'**
   String get finalPreparation;
-
-  /// No description provided for @allEvaluationsByTestTeam.
-  ///
-  /// In en, this message translates to:
-  /// **'All evaluations were made by our testing team'**
-  String get allEvaluationsByTestTeam;
 
   /// No description provided for @shareApp.
   ///
@@ -1736,12 +1099,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'User'**
   String get user;
-
-  /// No description provided for @voice.
-  ///
-  /// In en, this message translates to:
-  /// **'Voice'**
-  String get voice;
 
   /// No description provided for @help.
   ///
@@ -1833,12 +1190,6 @@ abstract class AppLocalizations {
   /// **'Chinese'**
   String get chinese;
 
-  /// No description provided for @arabic.
-  ///
-  /// In en, this message translates to:
-  /// **'Arabic'**
-  String get arabic;
-
   /// No description provided for @french.
   ///
   /// In en, this message translates to:
@@ -1874,12 +1225,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Korean'**
   String get korean;
-
-  /// No description provided for @deutsch.
-  ///
-  /// In en, this message translates to:
-  /// **'Deutsch'**
-  String get deutsch;
 
   /// No description provided for @english.
   ///
@@ -1959,12 +1304,6 @@ abstract class AppLocalizations {
   /// **'Only these letters: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' and the characters \'.\', \'-\', \'_\' can be used in the username.'**
   String get invalidUsernameCharacters;
 
-  /// No description provided for @passwordTooLong.
-  ///
-  /// In en, this message translates to:
-  /// **'Password cannot exceed 64 characters.'**
-  String get passwordTooLong;
-
   /// No description provided for @noInternetConnection.
   ///
   /// In en, this message translates to:
@@ -1983,24 +1322,6 @@ abstract class AppLocalizations {
   /// **'Library'**
   String get library;
 
-  /// No description provided for @inappropriateMessageWarning.
-  ///
-  /// In en, this message translates to:
-  /// **'Inappropriate message detected!'**
-  String get inappropriateMessageWarning;
-
-  /// No description provided for @myModelDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'My model.'**
-  String get myModelDescription;
-
-  /// No description provided for @noModelsDownloaded.
-  ///
-  /// In en, this message translates to:
-  /// **'You haven\'t downloaded any models yet.'**
-  String get noModelsDownloaded;
-
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
@@ -2018,12 +1339,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove Model'**
   String get removeModel;
-
-  /// No description provided for @modelUploadedSuccessfully.
-  ///
-  /// In en, this message translates to:
-  /// **'Model uploaded successfully.'**
-  String get modelUploadedSuccessfully;
 
   /// No description provided for @insufficientRAM.
   ///
@@ -2061,12 +1376,6 @@ abstract class AppLocalizations {
   /// **'Many more conversation limit for online AIs'**
   String get benefit1;
 
-  /// No description provided for @benefit2.
-  ///
-  /// In en, this message translates to:
-  /// **'Upload your own models'**
-  String get benefit2;
-
   /// No description provided for @benefit3.
   ///
   /// In en, this message translates to:
@@ -2085,12 +1394,6 @@ abstract class AppLocalizations {
   /// **'Create more online artificial intelligences'**
   String get benefit5;
 
-  /// No description provided for @benefit6.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlimited chat'**
-  String get benefit6;
-
   /// No description provided for @benefit7.
   ///
   /// In en, this message translates to:
@@ -2108,12 +1411,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New themes'**
   String get benefit9;
-
-  /// No description provided for @benefit10.
-  ///
-  /// In en, this message translates to:
-  /// **'Offline voice chat'**
-  String get benefit10;
 
   /// No description provided for @oldBenefits.
   ///
@@ -2187,36 +1484,6 @@ abstract class AppLocalizations {
   /// **'Attributions'**
   String get copyrights;
 
-  /// No description provided for @downloadingTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Downloading'**
-  String get downloadingTitle;
-
-  /// No description provided for @downloadCompletedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Download Completed'**
-  String get downloadCompletedTitle;
-
-  /// No description provided for @downloadPausedTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Download Paused'**
-  String get downloadPausedTitle;
-
-  /// No description provided for @downloadErrorTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Download Error'**
-  String get downloadErrorTitle;
-
-  /// No description provided for @cancelButtonText.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get cancelButtonText;
-
   /// No description provided for @love.
   ///
   /// In en, this message translates to:
@@ -2283,18 +1550,6 @@ abstract class AppLocalizations {
   /// **'You are in editing mode now'**
   String get editingNotification;
 
-  /// No description provided for @featureIndulgentTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Indulgent'**
-  String get featureIndulgentTitle;
-
-  /// No description provided for @featureIndulgentDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'This model can seamlessly accommodate and process contexts exceeding 100,000 tokens, enabling it to handle extensive and detailed inputs without compromising performance.'**
-  String get featureIndulgentDescription;
-
   /// No description provided for @featurePluralTitle.
   ///
   /// In en, this message translates to:
@@ -2307,53 +1562,17 @@ abstract class AppLocalizations {
   /// **'This model can automatically integrate additional extensions, thereby expanding its functional capabilities to support a diverse range of operations with enhanced performance.'**
   String get featurePluralDescription;
 
-  /// No description provided for @featureWiseTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Wise'**
-  String get featureWiseTitle;
-
-  /// No description provided for @featureWiseDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'This model can leverage deep analytical insights and forward-thinking reasoning to deliver sophisticated support for decision-making and complex problem-solving.'**
-  String get featureWiseDescription;
-
-  /// No description provided for @featureResearcherTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Researcher'**
-  String get featureResearcherTitle;
-
-  /// No description provided for @featureResearcherDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Exclusively available in models equipped with advanced research and analytical capacities, this feature is designed to provide high-precision insights and comprehensive analysis across diverse domains.'**
-  String get featureResearcherDescription;
-
   /// No description provided for @nameLabel.
   ///
   /// In en, this message translates to:
   /// **'AI name'**
   String get nameLabel;
 
-  /// No description provided for @nameHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your AI\'s name'**
-  String get nameHint;
-
   /// No description provided for @summaryLabel.
   ///
   /// In en, this message translates to:
   /// **'AI Summary'**
   String get summaryLabel;
-
-  /// No description provided for @summaryHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your AI\'s summary'**
-  String get summaryHint;
 
   /// No description provided for @add.
   ///
@@ -2403,30 +1622,6 @@ abstract class AppLocalizations {
   /// **'Summary'**
   String get summary;
 
-  /// No description provided for @characterPoliceTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Police'**
-  String get characterPoliceTitle;
-
-  /// No description provided for @characterPoliceRole.
-  ///
-  /// In en, this message translates to:
-  /// **'You are a vigilant enforcer of the law, dedicated to protecting citizens and maintaining order with unwavering commitment, you are a police'**
-  String get characterPoliceRole;
-
-  /// No description provided for @characterPoliceShortDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'A steadfast and courageous law enforcer.'**
-  String get characterPoliceShortDescription;
-
-  /// No description provided for @purchaseSubscription.
-  ///
-  /// In en, this message translates to:
-  /// **'Purchase'**
-  String get purchaseSubscription;
-
   /// No description provided for @modelUploadTitle.
   ///
   /// In en, this message translates to:
@@ -2444,18 +1639,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap here to pick a .gguf file from your device'**
   String get modelUploadShortDescription;
-
-  /// No description provided for @addServerTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Artificial Intelligence Server'**
-  String get addServerTitle;
-
-  /// No description provided for @addServerDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the URL of your remote server to connect with an externally hosted model. This feature requires an active internet connection, and any server-related issues or errors are not caused by Cortex. Ensure your server is correctly configured, accessible from your network, and has a valid model endpoint for a smooth experience.'**
-  String get addServerDescription;
 
   /// No description provided for @you.
   ///
@@ -2475,41 +1658,11 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to remove the photo?'**
   String get confirmRemovePhoto;
 
-  /// No description provided for @serverLink.
-  ///
-  /// In en, this message translates to:
-  /// **'Server Link'**
-  String get serverLink;
-
-  /// No description provided for @enterURL.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter server URL'**
-  String get enterURL;
-
   /// No description provided for @chatLengthLimitExceeded.
   ///
   /// In en, this message translates to:
   /// **'This chat has exceeded the character limit. Please start a new chat or purchase a subscription.'**
   String get chatLengthLimitExceeded;
-
-  /// No description provided for @aiNameError.
-  ///
-  /// In en, this message translates to:
-  /// **'An AI with this name already exists.'**
-  String get aiNameError;
-
-  /// No description provided for @modelLimitExceeded.
-  ///
-  /// In en, this message translates to:
-  /// **'You have reached the maximum model creation limit for your plan.'**
-  String get modelLimitExceeded;
-
-  /// No description provided for @modelVertexProducer.
-  ///
-  /// In en, this message translates to:
-  /// **'Vertex'**
-  String get modelVertexProducer;
 
   /// No description provided for @photoLimitReachedMessage.
   ///
@@ -2532,20 +1685,8 @@ abstract class AppLocalizations {
   /// No description provided for @insufficientCredits.
   ///
   /// In en, this message translates to:
-  /// **'You do not have enough credits to complete this request. This action requires {required} credits, but you only have {available}. To gain more credits, you can upgrade your plan or purchase them directly. hey we totally get it running out of credits can be a bit of a bummer but seriously getting those awesome replies from our models isnt free so these credits actually help us keep the good times rolling and listen if more of you guys jump in and get credits we can totally look at bumping up those free daily limits for everyone'**
+  /// **'You do not have enough credits to complete this request. This action requires {required} credits, but you only have {available}. To gain more credits, you can upgrade your plan or purchase them directly. hey we totally get it running out of credits can be a bit of a bummer but seriously getting those awesome replies from our models isnt free so these limits actually help us keep the good times rolling and listen if more of you guys jump in and get more limits we can totally look at bumping up those free daily limits for everyone'**
   String insufficientCredits(Object available, Object required);
-
-  /// No description provided for @regenerateInProgress.
-  ///
-  /// In en, this message translates to:
-  /// **'Answer generation is already in progress.'**
-  String get regenerateInProgress;
-
-  /// No description provided for @errorOccurredDuringRegeneration.
-  ///
-  /// In en, this message translates to:
-  /// **'An error occurred while trying to regenerate: {errorDetails}'**
-  String errorOccurredDuringRegeneration(String errorDetails);
 
   /// No description provided for @modality.
   ///
@@ -2594,12 +1735,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You have insufficient credits. Please top up to continue.'**
   String get errorInsufficientCredits;
-
-  /// No description provided for @errorRateLimitExceeded.
-  ///
-  /// In en, this message translates to:
-  /// **'Too many requests. Please try again in a moment.'**
-  String get errorRateLimitExceeded;
 
   /// No description provided for @errorServer.
   ///
@@ -2684,36 +1819,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try adjusting your search terms or clearing the filter.'**
   String get noModelsFoundMessage;
-
-  /// No description provided for @usernameRateLimitExceeded.
-  ///
-  /// In en, this message translates to:
-  /// **'You can only change your username twice every 14 days.'**
-  String get usernameRateLimitExceeded;
-
-  /// No description provided for @usernameUnchanged.
-  ///
-  /// In en, this message translates to:
-  /// **'This is already your current username.'**
-  String get usernameUnchanged;
-
-  /// No description provided for @creditsInfoPanelTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'How Credits Work'**
-  String get creditsInfoPanelTitle;
-
-  /// No description provided for @creditsInfoPanelBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Credits are used to chat with online models. every single message costs us cash and these credits keepin us from going broke now lets explain the system \n\n• Each message to a free online model costs 5 credits.\n• Each message to an online premium model costs 20 credits.\n• Including an attachment adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.'**
-  String get creditsInfoPanelBody;
-
-  /// No description provided for @creditsInfoPanelFooter.
-  ///
-  /// In en, this message translates to:
-  /// **'Happy chatting!'**
-  String get creditsInfoPanelFooter;
 
   /// No description provided for @disclaimerMessage.
   ///
@@ -2852,12 +1957,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A photo is included. Models that don\'t support images may ignore it.'**
   String get photoWarningMessage;
-
-  /// No description provided for @loginRequiredForPurchase.
-  ///
-  /// In en, this message translates to:
-  /// **'You must be logged in to make a purchase.'**
-  String get loginRequiredForPurchase;
 
   /// No description provided for @storagePermissionRequired.
   ///
@@ -3033,29 +2132,11 @@ abstract class AppLocalizations {
   /// **'You have used all your free daily messages for premium models, please upgrade for unlimited access.'**
   String get premiumTrialExhaustedMessage;
 
-  /// Greeting on the selection screen when the user's name is known.
-  ///
-  /// In en, this message translates to:
-  /// **'How may I help you today, {userName}?'**
-  String selectionScreenGreetingUser(String userName);
-
   /// Generic greeting on the selection screen when the user's name is not available.
   ///
   /// In en, this message translates to:
   /// **'How can I help you today?'**
   String get selectionScreenGreetingGeneric;
-
-  /// The header text for the recent models section on the selection screen.
-  ///
-  /// In en, this message translates to:
-  /// **'Recent Models'**
-  String get selectionScreenRecentModels;
-
-  /// Text for the 'Dynamic Chat' feature card. The newline is intentional.
-  ///
-  /// In en, this message translates to:
-  /// **'Dynamic Chat'**
-  String get selectionScreenFeatureDynamicChat;
 
   /// Text for the 'Use without Internet' feature card. The newline is intentional.
   ///
@@ -3063,29 +2144,11 @@ abstract class AppLocalizations {
   /// **'Use without Internet'**
   String get selectionScreenFeatureOffline;
 
-  /// Text for the 'Select Model' feature card. The newline is intentional.
-  ///
-  /// In en, this message translates to:
-  /// **'Select Model'**
-  String get selectionScreenFeatureSelectModel;
-
   /// It's so clear i think.
   ///
   /// In en, this message translates to:
   /// **'Explore'**
   String get explore;
-
-  /// No description provided for @subscriptionCancelled.
-  ///
-  /// In en, this message translates to:
-  /// **'Subscription successfully canceled!'**
-  String get subscriptionCancelled;
-
-  /// No description provided for @selectionScreenPinnedModels.
-  ///
-  /// In en, this message translates to:
-  /// **'Pinned Models'**
-  String get selectionScreenPinnedModels;
 
   /// No description provided for @selectionScreenNewsAndUpdates.
   ///
@@ -3152,18 +2215,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No models are currently available. Please check your internet connection and try again.'**
   String get errorNoModelsAvailable;
-
-  /// Error message when no models match the specific criteria for a dynamic chat request.
-  ///
-  /// In en, this message translates to:
-  /// **'No suitable models found for your current request (e.g., offline mode or image message).'**
-  String get errorNoModelsForRequest;
-
-  /// Welcome message displayed in the center of the dynamic chat screen before the first message.
-  ///
-  /// In en, this message translates to:
-  /// **'How can I help you?'**
-  String get dynamicChatWelcome;
 
   /// No description provided for @notificationComebackTitle.
   ///
@@ -3682,18 +2733,6 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to leave this amazing platform?'**
   String get exitAppConfirmation;
 
-  /// No description provided for @newsErrorTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to Load News'**
-  String get newsErrorTitle;
-
-  /// No description provided for @newsErrorMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'There was a problem fetching the latest updates, please check your connection and try again.'**
-  String get newsErrorMessage;
-
   /// No description provided for @tagNotFound.
   ///
   /// In en, this message translates to:
@@ -3831,12 +2870,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create Account'**
   String get createAccount;
-
-  /// No description provided for @upgradeTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Finalize Registration'**
-  String get upgradeTitle;
 
   /// No description provided for @accountLinkedSuccess.
   ///

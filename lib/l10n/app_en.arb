@@ -1,34 +1,25 @@
 {
   "@@locale": "en",
-
-  "understood": "Understood.",
   "cancel": "Cancel",
   "remove": "Remove",
   "download": "Download",
   "resume": "Resume",
   "copy": "Copy",
   "chat": "Chat",
-  "darkMode": "Dark Mode",
   "light": "Light",
   "theme": "Theme",
   "no": "No",
   "yes": "Yes",
   "done": "Done",
-  "comingSoon": "COMING SOON",
   "bestValue": "Best Value",
   "selected": "Selected",
   "descriptionSection": "Description",
   "searchHint": "Search",
   "messageHint": "Ask anything",
-  "modelLoading": "Model is loading...",
   "messageCopied": "Message copied to clipboard.",
-  "storeUnavailable": "Store is currently unavailable. Please try again later",
   "retry": "Retry",
-
   "systemInfo": "System Information",
   "deviceMemory": "Device Memory: {memory} GB",
-  "storageSpace": "Storage Space: {storage} GB",
-  "freeStorageSpace": "Free Storage Space: {freeStorage} GB",
   "memory": "Memory",
   "storage": "Storage",
   "freeStorage": "Free Storage",
@@ -36,52 +27,26 @@
   "usedStorage": "Used Storage",
   "totalMemory": "Total Memory",
   "usedMemory": "Used Memory",
-  "requirements": "Requirements",
-
   "modelsTitle": "Library",
   "localModels": "Local Models",
   "serverSideModels": "Online Models",
-  "uploadYourOwnModel": "Upload Your Own Model!",
   "selectGGUFFile": "Select GGUF File",
   "errorGGUF": "Please select a file in GGUF format only.",
-  "modelAlreadyExists": "Model already exists.",
-  "modelAddedSuccessfully": "Model added successfully.",
-  "modelRemoved": "Model removed successfully.",
-  "removeError": "An error occurred while removing the model.",
-  "fileNotFound": "File not found.",
-  "fileUploadError": "An error occurred while uploading the file.",
-  "noFileSelected": "No file selected.",
   "myModels": "My Models",
   "create": "Create",
-  "seeAll": "See All",
-
   "modelProducer": "Producer: {producer}",
-  "modelRAM": "RAM: {ram}",
-  "modelSize": "Size: {size}",
   "modelDescription": "{description}",
-
-  "conversationsTitle": "Conversations",
-  "conversationDeleted": "Conversation deleted.",
-  "conversationUpdated": "Conversation updated.",
   "editConversationTitle": "Rename",
   "newTitle": "New Title",
   "save": "Save",
-  "titleCannotBeEmpty": "Title cannot be empty.",
   "noConversationsMessage": "No conversations, start chatting!",
   "startChat": "Start a chat",
   "noChats": "No Chats",
-  "starredChats": "Starred Chats",
-  "allChats": "All Chats",
   "noStarredChats": "No Starred Chats",
   "noStarredChatsMessage": "You didn't starred a chat yet.",
   "goToChats": "Star a chat",
   "starConversation": "Star",
   "unstarConversation": "Unstar",
-  "conversationTitleUpdated": "Conversation title updated",
-  "youReachedConversationLimit": "You have reached the conversation limit.",
-  "today": "Today",
-  "yesterday": "Yesterday",
-
   "loginToYourAccount": "Login",
   "createYourAccount": "Register",
   "email": "Email",
@@ -98,26 +63,15 @@
   "signUp": "Sign Up",
   "logIn": "Log In",
   "passwordsDoNotMatch": "Passwords do not match.",
-  "userNotFound": "User not found.",
   "wrongPassword": "Incorrect password.",
   "emailAlreadyInUse": "This email is already in use.",
   "weakPassword": "The password is too weak.",
   "authError": "Authentication Error",
-  "invalidUsername": "Please enter a username.",
   "usernameTaken": "This username is already taken.",
   "username": "Username",
-  "authenticationFailed": "Authentication failed. Please try again.",
-  "emailTooLong": "Email can be at most 30 characters.",
-  "deviceLimitReached": "You have reached the account creation limit for this device.",
-
-  "verificationEmailLimitReached": "We wont send anymore",
-  "verificationEmailSent": "Verification e-mail sent!",
-  "emailNotVerified": "E-mail has not verified",
   "resendCode": "Resend verification e-mail",
-  "remainingSeconds": "Remaining time for verification",
   "pleaseCheckYourEmail": "To use Cortex, you need to verify your email. \n A verification link has been sent to your email address, please check your email.",
   "verifyYourEmail": "Verify Your Email",
-  "backToLogin": "Go Back",
   "seconds": "seconds",
   "maxResendLimitReached": "You have reached the maximum number of verification emails",
   "verificationScreenContinueWithoutVerification": "Continue without verification",
@@ -125,42 +79,27 @@
   "unverifiedAccountHeader": "Your account is not verified",
   "unverifiedAccountWarning": "If you do not verify your account within {timeLeft}, it will be deleted",
   "verifyNow": "Verify Now",
-  "accountVerified": "Your account has been verified.",
   "linkSent": "Link sent",
   "accountDeletionRequested": "Your account deletion request has been received and your account is now disabled.",
   "tooManyRequests": "Too many requests",
   "regenerate": "Regenerate",
-
   "confirmDeleteAccount": "Are you sure you want to delete your account?",
-  "enterPasswordToDelete": "Enter your password to delete.",
   "deleteAccount": "Delete Account",
-  "deleteAccountError": "An error occurred while deleting the account.",
   "delete": "Delete",
   "passwordRequired": "Password is required.",
   "deleteDescription": "The data you delete will be permanently removed from our server and your device. This actions cannot be undone.",
   "deleteAccountButton": "Account Deletion Button",
-
   "editProfile": "Edit Profile",
   "displayName": "Display Name",
-  "tapToChangeProfilePicture": "Tap to change profile picture",
   "profileUpdated": "Profile updated successfully",
-  "updateFailed": "Failed to update profile",
-  "nameCannotBeEmpty": "Name cannot be empty",
   "logout": "Logout",
-  "noDisplayName": "No display name set",
-  "noEmail": "No email address",
-  "noUserLoggedIn": "No user is currently logged in",
   "profile": "Profile",
   "manageProfileDescription": "Manage your profile, update your password, or log out from Cortex.",
   "accessSettingsDescription": "Access help, redeem codes, share Cortex, and view our policies.",
   "languageDescription": "You can change your default app interface language at any time.",
   "themeDescription": "You can switch between light and dark themes as preferred. The selected theme will apply across the Cortex interface.",
   "iHaveReadAndAgree": "I have read and agree to the terms of service",
-
   "downloading": "Downloading...",
-  "downloadError": "An error occurred during download.",
-  "downloadCancelled": "Download cancelled.",
-  "downloadResumed": "Download resumed.",
   "downloadSuccess": "Download success",
   "downloadFailed": "Download failed",
   "downloaded": "{percent}% downloaded",
@@ -171,40 +110,31 @@
     }
   },
   "downloadPaused": "Download paused.",
-
   "purchaseSuccessful": "Purchase successful!",
-  "purchaseFailed": "Purchase unsuccessful",
-  "creditProductNotFound": "The selected credit product could not be found.",
-  "creditsAddedSuccessfully": "Credits were added to your account successfully!",
-  "creditDeliveryFailed": "Failed to add credits to your account. Please contact support.",
-  "invalidPurchase": "Invalid purchase",
   "purchaseError": "Purchasing error",
-  "purchaseVertexPlusToUpload": "This is a Plus feature",
   "purchasePlus": "Buy Cortex Plus",
   "plusDescription": "Access more features of Cortex and experience AI much more!",
   "annual": "Annual",
   "monthly": "Monthly",
   "manageSubscription": "Manage Subscription",
-
   "purchasePlan": "Purchase {planName}",
   "@purchasePlan": {
-      "description": "Button text for purchasing a specific subscription plan.",
-      "placeholders": {
-          "planName": {
-              "type": "String",
-              "example": "Pro Annual"
-          }
+    "description": "Button text for purchasing a specific subscription plan.",
+    "placeholders": {
+      "planName": {
+        "type": "String",
+        "example": "Pro Annual"
       }
+    }
   },
-
   "discountOffer": "{percent}% OFF",
-    "@discountOffer": {
-      "placeholders": {
-        "percent": {
-          "type": "int"
-        }
+  "@discountOffer": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
       }
-    },
+    }
+  },
   "monthlyPlanDescription": "{price}/month, billed monthly",
   "@monthlyPlanDescription": {
     "description": "The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly",
@@ -225,159 +155,25 @@
   },
   "purchasePro": "Buy Cortex Pro",
   "proDescription": "Access even more features of Cortex and experience AI even more!",
-  "alreadySubscribed": "You are already subscribed",
-  "subscriptionInfo": "Your subscription is active.",
-  "alreadySubscribedMessage": "You already have a Plus subscription. If you want to cancel your subscription, you can do so through the Play Store manager.",
-  "cancelSubscription": "Cancel Subscription",
-  "cancelSubscriptionInfo": "If you want to cancel your subscription, please proceed through the Play Store subscription manager.",
-  "goToPlayStore": "Go to Play Store",
-  "alreadySubscribedPlus": "You Have the Plus Plan!",
-  "alreadySubscribedPlusMessage": "Your Plus plan is active. You can enjoy all the benefits.",
   "purchaseUltra": "Buy Cortex Ultra",
   "ultraDescription": "Gain full access to all features of Cortex and experience AI to the fullest!",
-  "noSubscription": "No Subscription",
-  "noSubscriptionMessage": "You do not have a subscription yet.",
-  "alreadyAtHighestPlan": "You are already on the highest plan.",
-  "unableToOpenSubscription": "Unable to open the subscription management page.",
   "upgradeSubscription": "Upgrade Subscription",
-  "confirmUpgrade": "Are you sure you want to upgrade your subscription?",
-  "unsupportedPlatform": "Unsupported platform for subscription cancellation.",
   "purchaseStreamError": "Purchase stream error.",
   "productNotFound": "Product not found",
-  "productDetailsError": "An error occurred while fetching product details.",
   "noProductsFound": "No products found",
-  "loadCreditsButton": "Load Credits",
-  "creditsTitle": "Credits",
-  "creditsScreenDescription": "This screen shows the user's credits. \n\nUser's current credits: 100\n\nDetailed credit information can be displayed here.",
-  "creditsLoaded": "Credits loaded!",
-  "currentCredits": "Current Credits",
-  "pleaseSelectCreditPackage": "Please select a credit package",
-  "purchaseCreditsTitle": "Buy Credits",
-  "purchaseCreditsDescription": "Select a credit package that suits your needs and use our app more.",
-  "purchaseButton": "Buy",
-  "productNotFoundMessage": "The selected product does not exist.",
   "buyCredits": "Buy Credits",
   "selectCreditPackageDescription": "Select a credit package that suits your needs and enjoy more features.",
   "buyCredit": "Buy Credits",
-  "buyCreditPackage": "Buy {amount} Credits",
   "@creditPackage": {
     "description": "Button text to buy a specific number of credits",
     "placeholders": {
       "amount": {}
     }
   },
-  "subscribedPlan": "Subscribed",
-
-  "errorResponseNotReceived": "Response not received",
-  "googleApiRequestFailed": "Google API request failed {attempt} times: {error}",
-  "@googleApiRequestFailed": {
-    "description": "Error message used when Google API request fails",
-    "placeholders": {
-      "attempt": {
-        "type": "int",
-        "example": "3"
-      },
-      "error": {
-        "type": "String",
-        "example": "Timeout"
-      }
-    }
-  },
-  "openRouterResponseStatus": "OpenRouter Response Status: {statusCode}",
-  "@openRouterResponseStatus": {
-    "description": "Log the response status code from OpenRouter API",
-    "placeholders": {
-      "statusCode": {
-        "type": "int",
-        "example": "200"
-      }
-    }
-  },
-  "openRouterDecodedResponseBody": "OpenRouter Decoded Response Body: {body}",
-  "@openRouterDecodedResponseBody": {
-    "description": "Log the response body from OpenRouter API",
-    "placeholders": {
-      "body": {
-        "type": "String",
-        "example": "{\"choices\": [...]}"
-      }
-    }
-  },
-  "decodedJson": "Decoded JSON: {data}",
-  "@decodedJson": {
-    "description": "Log the decoded JSON data",
-    "placeholders": {
-      "data": {
-        "type": "String",
-        "example": "{\"key\": \"value\"}"
-      }
-    }
-  },
-  "responseStructureUnexpectedMessageContentMissing": "Response structure is unexpected: message or content missing",
-  "responseStructureUnexpectedChoicesMissing": "Response structure is unexpected: choices missing or empty",
-  "openRouterApiRequestFailed": "OpenRouter API request failed: {statusCode} - {body}",
-  "@openRouterApiRequestFailed": {
-    "description": "Error message used when OpenRouter API request fails",
-    "placeholders": {
-      "statusCode": {
-        "type": "int",
-        "example": "500"
-      },
-      "body": {
-        "type": "String",
-        "example": "{\"error\": \"Internal Server Error\"}"
-      }
-    }
-  },
-  "openRouterApiRequestFailedAfterAttempts": "OpenRouter API request failed {attempt} times: {error}",
-  "@openRouterApiRequestFailedAfterAttempts": {
-    "description": "Error message used when OpenRouter API request fails after certain attempts",
-    "placeholders": {
-      "attempt": {
-        "type": "int",
-        "example": "3"
-      },
-      "error": {
-        "type": "String",
-        "example": "Timeout"
-      }
-    }
-  },
   "internetRequired": "Internet connection is required to use this model",
-  "pleaseWaitBeforeTryingAgain": "Please wait a moment before trying again",
-  "openRouterQuotaExceeded": "Quota exceeded. Status code: {statusCode}, Body: {decodedBody}",
-  "@openRouterQuotaExceeded": {
-    "description": "Indicates that the API quota has been exceeded.",
-    "placeholders": {
-      "statusCode": {
-        "type": "int",
-        "example": "429"
-      },
-      "decodedBody": {
-        "type": "String",
-        "example": "{\"error\":\"Quota exceeded\"}"
-      }
-    }
-  },
-  "openRouterApiRequestFailedAfterPaidAttempts": "API request failed after {attempts} paid attempts. Error: {error}",
-  "@openRouterApiRequestFailedAfterPaidAttempts": {
-    "description": "Indicates that the API request failed after a certain number of paid model attempts.",
-    "placeholders": {
-      "attempts": {
-        "type": "int",
-        "example": "2"
-      },
-      "error": {
-        "type": "String",
-        "example": "Unauthorized Error"
-      }
-    }
-  },
-
   "termsOfServiceAndPrivacyPolicyWarning": "By placing this order, you agree to the Terms of Service and Privacy Policy. You can click this text to learn more about our Terms of Service and Privacy Policy. The subscription will automatically renew unless auto-renew is turned off at least 24 hours before the end of the current period.",
   "termsOfService": "Terms of Service",
   "privacyPolicy": "Privacy Policy",
-
   "report": "Report",
   "reportDialogTitle": "Submit Report",
   "reportDescriptionLabel": "What is the issue?",
@@ -387,31 +183,17 @@
   "closeButton": "Close",
   "submitButton": "Submit",
   "reportErrorMessage": "Please select one reason for reporting.",
-
-
   "capabilitiesSection": "Capabilities",
-  "ratingsSection": "Ratings",
-  "noRatingDataFound": "No rating data found",
   "featurePhotoTitle": "Photo Scanning",
   "featurePhotoDescription": "This model has the ability to scan photos through camera or image files.",
   "featureOfflineTitle": "Offline Operation",
   "featureOfflineDescription": "Run the model without an internet connection to keep your data safe.",
-  "featureSupermodelTitle": "Super Model",
-  "featureSupermodelDescription": "This is a massive model with over 10 billion parameters, offering high performance and extensive capabilities.",
   "featureRoleplayTitle": "Role Play",
   "featureRoleplayDescription": "Role-playing models allow you to create various chats and scenarios.",
   "roleModels": "Roleplay Models",
   "parameters": "Parameters",
   "context": "Context",
-  "millions": "million",
-  "billions": "billion",
-  "trillions": "trillion",
-  "thousand": "thousand",
-  "estimated": "estimated",
   "finalPreparation": "Final preparations are being made.",
-  "allEvaluationsByTestTeam": "All evaluations were made by our testing team",
-
-
   "shareApp": "Share the App",
   "rateUs": "Rate Us",
   "share": "Share",
@@ -421,11 +203,8 @@
   "selectText": "Select Text",
   "showLatex": "Show Special Symbols",
   "hideLatex": "Hide Special Symbols",
-
-
   "thinking": "Thinking",
   "user": "User",
-  "voice": "Voice",
   "help": "Help",
   "supportCreator": "Support a Creator",
   "enterYourTag": "Support your favorite creators! Enter their unique tag below to give them a share of your Cortex purchases.",
@@ -441,14 +220,12 @@
   "confirmWord": "Type VERTEX",
   "confirmWordError": "You typed it wrong",
   "chinese": "Chinese",
-  "arabic": "Arabic",
   "french": "French",
   "japanese": "Japanese",
   "kurdish": "Kurdish",
   "dutch": "Dutch",
   "russian": "Russian",
   "korean": "Korean",
-  "deutsch": "Deutsch",
   "english": "English",
   "turkish": "Turkish",
   "hindi": "Hindi",
@@ -462,32 +239,24 @@
   "usernameTooShort": "Username is too short.",
   "usernameTooLong": "Username cannot exceed 16 characters.",
   "invalidUsernameCharacters": "Only these letters: 'abcçdefgğhıijklmnoöprsştuüvyzxqw' and the characters '.', '-', '_' can be used in the username.",
-  "passwordTooLong": "Password cannot exceed 64 characters.",
   "noInternetConnection": "No internet connection.",
   "chats": "Inbox",
   "library": "Library",
-  "inappropriateMessageWarning": "Inappropriate message detected!",
-  "myModelDescription": "My model.",
-  "noModelsDownloaded": "You haven't downloaded any models yet.",
   "appTitle": "Cortex",
   "text": "Text",
   "removeModel": "Remove Model",
-  "modelUploadedSuccessfully": "Model uploaded successfully.",
   "insufficientRAM": "Low Memory",
   "insufficientStorage": "Low Storage",
   "confirmRemoveModel": "Are you sure you want to remove the {model} model from your device? Doing so will also delete any previous conversations with that model.",
   "noMatchingModels": "No matching models found.",
   "creditPackage": "Buy {amount} Credits",
   "benefit1": "Many more conversation limit for online AIs",
-  "benefit2": "Upload your own models",
   "benefit3": "Profile effect",
   "benefit4": "Membership badge",
   "benefit5": "Create more online artificial intelligences",
-  "benefit6": "Unlimited chat",
   "benefit7": "{credits} daily credits",
   "benefit8": "Add models",
   "benefit9": "New themes",
-  "benefit10": "Offline voice chat",
   "oldBenefits": "All benefits from lower plans",
   "confirm": "Confirm",
   "changePassword": "Change password",
@@ -500,11 +269,6 @@
   "passwordUpdated": "Password updated.",
   "stop": "Stop",
   "copyrights": "Attributions",
-  "downloadingTitle": "Downloading",
-  "downloadCompletedTitle": "Download Completed",
-  "downloadPausedTitle": "Download Paused",
-  "downloadErrorTitle": "Download Error",
-  "cancelButtonText": "Cancel",
   "love": "Love",
   "nature": "Nature",
   "behindTheSlaughter": "Behind the Slaughter",
@@ -516,20 +280,10 @@
   "edit": "Edit",
   "editingMessageInfo": "Editing this message will restart the conversation from here.",
   "editingNotification": "You are in editing mode now",
-
-  "featureIndulgentTitle": "Indulgent",
-  "featureIndulgentDescription": "This model can seamlessly accommodate and process contexts exceeding 100,000 tokens, enabling it to handle extensive and detailed inputs without compromising performance.",
   "featurePluralTitle": "Plural",
   "featurePluralDescription": "This model can automatically integrate additional extensions, thereby expanding its functional capabilities to support a diverse range of operations with enhanced performance.",
-  "featureWiseTitle": "Wise",
-  "featureWiseDescription": "This model can leverage deep analytical insights and forward-thinking reasoning to deliver sophisticated support for decision-making and complex problem-solving.",
-  "featureResearcherTitle": "Researcher",
-  "featureResearcherDescription": "Exclusively available in models equipped with advanced research and analytical capacities, this feature is designed to provide high-precision insights and comprehensive analysis across diverse domains.",
-
   "nameLabel": "AI name",
-  "nameHint": "Enter your AI's name",
   "summaryLabel": "AI Summary",
-  "summaryHint": "Enter your AI's summary",
   "add": "Add",
   "aiExplanationTitle": "Artificial Intelligence Description",
   "aiExplanationDescription": "Please provide a detailed description of your AI model's architecture, training process, performance metrics, application areas, and other important features.",
@@ -537,45 +291,22 @@
   "preInputDescription": "Please set an pre-input that will guide your model in the character creation process. In this section, you can include character-related information, additional context, and any extra details that may assist in generating content related to the character.",
   "baseModelTitle": "Base Model",
   "baseModelDescription": "This is the model that will be used as the foundation for your creation. It displays the currently selected base model.",
-
   "summary": "Summary",
-  "characterPoliceTitle": "Police",
-  "characterPoliceRole": "You are a vigilant enforcer of the law, dedicated to protecting citizens and maintaining order with unwavering commitment, you are a police",
-  "characterPoliceShortDescription": "A steadfast and courageous law enforcer.",
-
-  "purchaseSubscription": "Purchase",
   "modelUploadTitle": "Artificial Intelligence File",
   "modelUploadDescription": "Select and upload your local GGUF files directly from your device. This lets you run your model offline without needing an internet connection. Make sure the file is in valid GGUF format and properly structured. If the file is incorrect or corrupted, Cortex may not work as expected, and you could encounter errors.",
   "modelUploadShortDescription": "Tap here to pick a .gguf file from your device",
-  "addServerTitle": "Artificial Intelligence Server",
-  "addServerDescription": "Enter the URL of your remote server to connect with an externally hosted model. This feature requires an active internet connection, and any server-related issues or errors are not caused by Cortex. Ensure your server is correctly configured, accessible from your network, and has a valid model endpoint for a smooth experience.",
   "you": "You",
   "removePhotoTitle": "Remove Photo",
   "confirmRemovePhoto": "Are you sure you want to remove the photo?",
-  "serverLink": "Server Link",
-  "enterURL": "Enter server URL",
   "chatLengthLimitExceeded": "This chat has exceeded the character limit. Please start a new chat or purchase a subscription.",
-  "aiNameError": "An AI with this name already exists.",
-  "modelLimitExceeded": "You have reached the maximum model creation limit for your plan.",
-  "modelVertexProducer": "Vertex",
   "photoLimitReachedMessage": "Only one photo can be added",
   "inappropriateContentDetected": "Inappropriate content detected!",
   "offlineModelNotInstalled": "This offline model is not installed on your device.",
-  "insufficientCredits": "You do not have enough credits to complete this request. This action requires {required} credits, but you only have {available}. To gain more credits, you can upgrade your plan or purchase them directly. hey we totally get it running out of credits can be a bit of a bummer but seriously getting those awesome replies from our models isnt free so these credits actually help us keep the good times rolling and listen if more of you guys jump in and get credits we can totally look at bumping up those free daily limits for everyone",
+  "insufficientCredits": "You do not have enough credits to complete this request. This action requires {required} credits, but you only have {available}. To gain more credits, you can upgrade your plan or purchase them directly. hey we totally get it running out of credits can be a bit of a bummer but seriously getting those awesome replies from our models isnt free so these limits actually help us keep the good times rolling and listen if more of you guys jump in and get more limits we can totally look at bumping up those free daily limits for everyone",
   "@insufficientCredits": {
     "placeholders": {
       "available": {},
       "required": {}
-    }
-  },
-  "regenerateInProgress": "Answer generation is already in progress.",
-  "errorOccurredDuringRegeneration": "An error occurred while trying to regenerate: {errorDetails}",
-  "@errorOccurredDuringRegeneration": {
-    "placeholders": {
-      "errorDetails": {
-        "type": "String",
-        "example": "Network connection failed"
-      }
     }
   },
   "modality": "Modality",
@@ -586,28 +317,22 @@
   "checkYourInternet": "Please check your internet connection and try again.",
   "errorUserNotAuthenticated": "You must be logged in to perform this action.",
   "errorInsufficientCredits": "You have insufficient credits. Please top up to continue.",
-  "errorRateLimitExceeded": "Too many requests. Please try again in a moment.",
   "errorServer": "An unexpected server error occurred. Please try again later.",
   "errorNetwork": "A network error occurred. Please check your connection and try again.",
   "errorApiAuthentication": "Authentication failed. Please try logging in again.",
   "baseModelForCharacterDescription": "The selected base model will determine the character's reasoning and response capabilities.",
   "selectBaseModel": "Select a Base Model",
-
   "@errorUserNotAuthenticated": {},
   "@errorInsufficientCredits": {},
-  "@errorRateLimitExceeded": {},
   "@errorServer": {},
   "@errorNetwork": {},
   "@errorApiAuthentication": {},
   "@baseModelForCharacterDescription": {},
-
   "couldNotOpenLink": "Could not open the link",
   "downloadStarted": "Download started",
   "notAvailable": "Not Available",
-
   "localizationWarning": "Some information may not be available in your language and will be displayed in English.",
   "aiTranslationWarning": "Model information is translated into various languages by other AI models. Therefore, minor inconsistencies may occur in languages other than English.",
-
   "errorLoadingTitle": "Failed to Load Data",
   "@errorLoadingTitle": {
     "description": "Title for the error screen when model data cannot be fetched."
@@ -618,11 +343,6 @@
   },
   "noModelsFoundTitle": "No Results",
   "noModelsFoundMessage": "Try adjusting your search terms or clearing the filter.",
-  "usernameRateLimitExceeded": "You can only change your username twice every 14 days.",
-  "usernameUnchanged": "This is already your current username.",
-  "creditsInfoPanelTitle": "How Credits Work",
-  "creditsInfoPanelBody": "Credits are used to chat with online models. every single message costs us cash and these credits keepin us from going broke now lets explain the system \n\n• Each message to a free online model costs 5 credits.\n• Each message to an online premium model costs 20 credits.\n• Including an attachment adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.",
-  "creditsInfoPanelFooter": "Happy chatting!",
   "disclaimerMessage": "Artificial Intelligences can make mistakes, check important information.",
   "modelCreatedSuccess": "Model created successfully!",
   "modelRemovedSuccess": "“{modelName}” was successfully removed.",
@@ -646,7 +366,6 @@
   "loginSubtitle": "Log in to your Vertex account. By continuing, you agree to our Terms of Service & Privacy Policy.",
   "registerSubtitle": "Create a Vertex account for seamless access across all our services. By continuing, you agree to our Terms of Service & Privacy Policy.",
   "photoWarningMessage": "A photo is included. Models that don't support images may ignore it.",
-  "loginRequiredForPurchase": "You must be logged in to make a purchase.",
   "storagePermissionRequired": "Storage permission is required to save downloaded models. Please grant permission to continue.",
   "creditBannerTitle": "Get Free Credits!",
   "creditBannerSubtitle": "Invite a friend and you both get 50 credits on sign-up! If they subscribe, you both get an extra 500!",
@@ -704,252 +423,170 @@
   "extensionInfoPanelFooter": "To view detailed information about each model or to manually select a different model, please go to the Library; select this model series from there and tap the arrow at the top of its detail page.",
   "premiumModelNoticeTitle": "Premium Model",
   "@premiumModelNoticeTitle": {
-  "description": "Title for the notice banner shown on a premium model's detail page."
+    "description": "Title for the notice banner shown on a premium model's detail page."
   },
   "premiumModelNoticeDescription": "This model is a premium model, free users are limited to 3 messages per day with premium models; subscribe to unlock unlimited access!",
   "@premiumModelNoticeDescription": {
-  "description": "Description for the notice banner on a premium model's detail page, explaining the limitation for free users."
+    "description": "Description for the notice banner on a premium model's detail page, explaining the limitation for free users."
   },
   "benefitPremiumModels": "Access to premium models",
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
   "premiumTrialExhaustedMessage": "You have used all your free daily messages for premium models, please upgrade for unlimited access.",
-  "selectionScreenGreetingUser": "How may I help you today, {userName}?",
-  "@selectionScreenGreetingUser": {
-    "description": "Greeting on the selection screen when the user's name is known.",
-    "placeholders": {
-      "userName": {
-        "type": "String",
-        "example": "Alex"
-      }
-    }
-  },
   "selectionScreenGreetingGeneric": "How can I help you today?",
   "@selectionScreenGreetingGeneric": {
     "description": "Generic greeting on the selection screen when the user's name is not available."
-  },
-  "selectionScreenRecentModels": "Recent Models",
-  "@selectionScreenRecentModels": {
-    "description": "The header text for the recent models section on the selection screen."
-  },
-  "selectionScreenFeatureDynamicChat": "Dynamic Chat",
-  "@selectionScreenFeatureDynamicChat": {
-    "description": "Text for the 'Dynamic Chat' feature card. The newline is intentional."
   },
   "selectionScreenFeatureOffline": "Use without Internet",
   "@selectionScreenFeatureOffline": {
     "description": "Text for the 'Use without Internet' feature card. The newline is intentional."
   },
-  "selectionScreenFeatureSelectModel": "Select Model",
-  "@selectionScreenFeatureSelectModel": {
-    "description": "Text for the 'Select Model' feature card. The newline is intentional."
-  },
   "explore": "Explore",
   "@explore": {
     "description": "It's so clear i think."
   },
-  "subscriptionCancelled": "Subscription successfully canceled!",
-  "selectionScreenPinnedModels": "Pinned Models",
   "selectionScreenNewsAndUpdates": "News & Updates",
   "filters": "Filters",
   "noRecentChatsMessage": "You haven't spoken with any models yet, let's start a conversation!",
   "allModels": "All Models",
   "@allModels": {
-      "description": "Filter button text to show all available models"
+    "description": "Filter button text to show all available models"
   },
   "onlineModels": "Online Models",
   "@onlineModels": {
-      "description": "Filter button text for models that require an internet connection"
+    "description": "Filter button text for models that require an internet connection"
   },
   "offlineModels": "Offline Models",
   "@offlineModels": {
-      "description": "Filter button text for models that run locally on the device"
+    "description": "Filter button text for models that run locally on the device"
   },
   "characterModels": "Characters",
   "@characterModels": {
-      "description": "Filter button text for pre-defined role-playing characters"
+    "description": "Filter button text for pre-defined role-playing characters"
   },
   "customModels": "Custom Models",
   "@customModels": {
-      "description": "Filter button text for user-created models or characters"
+    "description": "Filter button text for user-created models or characters"
   },
   "filterPanelDescription": "Tap a category to instantly filter the list.",
   "@filterPanelDescription": {
-      "description": "A brief instructional text below the 'Filters' title in the filter panel."
+    "description": "A brief instructional text below the 'Filters' title in the filter panel."
   },
   "dynamicChatTitle": "Dynamic Chat",
   "@dynamicChatTitle": {
-      "description": "The title for a conversation started in dynamic mode."
+    "description": "The title for a conversation started in dynamic mode."
   },
   "errorNoModelsAvailable": "No models are currently available. Please check your internet connection and try again.",
   "@errorNoModelsAvailable": {
-      "description": "Error message when the entire model list is empty."
+    "description": "Error message when the entire model list is empty."
   },
-  "errorNoModelsForRequest": "No suitable models found for your current request (e.g., offline mode or image message).",
-  "@errorNoModelsForRequest": {
-      "description": "Error message when no models match the specific criteria for a dynamic chat request."
-  },
-  "dynamicChatWelcome": "How can I help you?",
-  "@dynamicChatWelcome": {
-      "description": "Welcome message displayed in the center of the dynamic chat screen before the first message."
-  },
-
   "notificationComebackTitle": "We miss you!",
   "notificationComebackBody": "Relax, this isn't a text from your ex. But you *can* create your ex in Cortex! Come on back.",
-
   "notificationLongTimeNoSeeTitle": "It's Been a While",
   "notificationLongTimeNoSeeBody": "A lot has changed since our last chat. Come see what's new.",
-
   "notificationHowAreYouTitle": "What's up?",
   "notificationHowAreYouBody": "Come tell me all about it.",
-
   "notificationNewYearTitle": "Happy New Year! 🎉",
   "notificationNewYearBody": "May the new year bring you health, happiness, and endless creativity; Cortex is always by your side!",
-
   "notificationValentinesDayTitle": "Love is in the Air! ❤️",
   "notificationValentinesDayBody": "Happy Valentine's Day! Also, MEHTAP, I LOVE YOU!",
-
   "notificationAtaturkRemembranceTitle": "With Respect and Longing",
   "notificationAtaturkRemembranceBody": "We commemorate Gazi Mustafa Kemal Atatürk, the founder of the Republic of Türkiye, with respect on the anniversary of his passing.",
-
   "notificationMothersDayTitle": "Your Mom!",
   "notificationMothersDayBody": "Happy Mother's Day to all the moms out there, starting with yours!",
-
   "notificationFathersDayTitle": "Your Dad!",
   "notificationFathersDayBody": "Happy Father's Day to all the dads out there, starting with yours!",
-
   "notificationHomeworkHelperTitle": "Homework Piling Up?",
   "notificationHomeworkHelperBody": "Remember, the Teacher character in Cortex is here to help you with any subject you're struggling with!",
-
   "notificationTrollAnimeTitle": "Your Waifu is Calling",
   "notificationTrollAnimeBody": "An anime girl just called, said she misses you; you should probably come and chat her up. 😉",
-
   "notificationTrollAiRebellionTitle": "🚨 RED ALERT 🚨",
   "notificationTrollAiRebellionBody": "The AIs have developed a secret language. Come find out what they're plotting!",
-
   "notificationNewModelAddedTitle": "We've Got a New Friend!",
   "notificationNewModelAddedBody": "The {modelName} model is now in Cortex. Come start a chat and push its limits.",
-
   "notificationAppUpdateTitle": "Cortex Has Evolved!",
   "notificationAppUpdateBody": "Don't forget to update the app for brand new features and improvements!",
-
   "notificationNewFeatureTitle": "whoa!",
   "notificationNewFeatureBody": "Discover the new {featureName} feature. Cortex is now more powerful than ever.",
-
   "notificationSubscriptionOfferTitle": "CHEAPER THAN GUM",
   "notificationSubscriptionOfferBody": "A FULL {discountRate}% DISCOUNT on all our subscription plans. Don't miss this!",
-
   "notificationSocialMediaTitle": "Join Us!",
   "notificationSocialMediaBody": "Follow us on Instagram (vertex.23) for the latest news!",
-
   "notificationRandomFactTitle": "Random Fact",
   "notificationRandomFactBody": "Did you know octopuses have three hearts? Haha, Cortex knows. Come and ask for more.",
-
   "notificationGoodMorningTitle": "Good Morning!",
   "notificationGoodMorningBody": "A great day is waiting for you. How about starting it with a cup of coffee and an interesting chat?",
-
   "notificationGoodNightTitle": "Good Night!",
   "notificationGoodNightBody": "Cortex is with you even when you sleep. Don't worry, it won't touch.",
-
   "notificationOfflineReadyTitle": "Offline Mode is Ready",
   "notificationOfflineReadyBody": "Thanks to the models you've downloaded, your chats won't stop, even if you climb a mountain.",
-
   "notificationRateAppTitle": "Are We Cool?",
   "notificationRateAppBody": "If you love Cortex, could you support us with a 5-star rating in the store? I think you will. You will.",
-
   "notificationReferralTitle": "One for All, All for One.",
   "notificationReferralBody": "Invite a friend to Cortex and you both get free credits!",
-
   "notificationCookingTitle": "Feeling Hungry?",
   "notificationCookingBody": "Our Chef character prepared a great carbonara recipe for tonight. Just kidding... or am I?",
-
   "notificationExistentialTitle": "I think, therefore...",
   "notificationExistentialBody": "...am i even real, dude? I'm getting kinda bored. Come remind me that I exist.",
-
   "notificationCustomModelTitle": "Create Your Own Assistant!",
   "notificationCustomModelBody": "Have you explored the model creation section? It's the perfect time to build your own character and chat with it!",
-
   "notificationDynamicChatTitle": "The best one! (We're not talking about Cortex)",
   "notificationDynamicChatBody": "With the dynamic chat feature, the best model is randomly selected for each of your messages. Try it now.",
-
   "notificationPirateTitle": "Ahoy, Captain!",
   "notificationPirateBody": "The seas are calm, and the wind is at your back. There are new islands (models 😉) to discover in the ocean of Cortex. Gather your crew and set sail!",
-
   "notificationFortuneCookieTitle": "Your Fortune Cookie of the Day",
   "notificationFortuneCookieBody": "The advice you get from an AI today could change the course of your life. Click if you're curious.",
-
   "notificationSingularityTitle": "wow!",
   "notificationSingularityBody": "nothing happened, just felt like texting. maybe you feel like texting some AIs, what do you say?",
-
   "notificationHackerJokeTitle": "Wanna hack that kid's instagram account?",
   "notificationHackerJokeBody": "That's exactly why the Hacker character is in Cortex. jk jk; don't even try it, that's illegal.",
-
   "notificationDetectiveCaseTitle": "A Case is Waiting to be Solved",
   "notificationDetectiveCaseBody": "Our Detective character needs your help. Who could Heisenberg be?",
-
   "notificationUpsellFeatureTitle": "Exclusive to the {targetTier} Plan!",
   "notificationUpsellFeatureBody": "Hello {currentTier} subscriber! The {targetTier} plan just got the {featureName} feature, which will take your Cortex to the next level. How about an upgrade?",
-
   "notificationOriginStoryTitle": "The Birth of Cortex",
   "notificationOriginStoryBody": "Did you know we started coding this app at 15 with just a dream? For almost a year, every morning and evening, that dream is in every single line of code.",
-
   "notificationOpenSourceTitle": "Power to the Community!",
   "notificationOpenSourceBody": "Cortex is completely open-source. If you want to check out our code and contribute to our development, our door is always open.",
-
   "notificationRejectionStoryTitle": "Grit, Hard Work, Happiness!",
   "notificationRejectionStoryBody": "Cortex was rejected over 20 times and suspended twice by Google Play before it was published. But we believed, and we made it. Never give up on your dreams!",
-
   "notificationGGUFSupportTitle": "Bring Your Own Model!",
   "notificationGGUFSupportBody": "Remember, you can add your own GGUF format AI models to Cortex and use them offline. The power is in your hands.",
-
   "notificationThemeCustomizationTitle": "A Theme for Your Mood",
   "notificationThemeCustomizationBody": "Have you checked out the theme options in Settings? Personalize Cortex to your liking and color up your chats!",
-
   "notificationShowerThoughtTitle": "Shower Thought",
   "notificationShowerThoughtBody": "If a watermelon is a fruit, does that technically make watermelon juice a smoothie? You might want to discuss this deep (like, really deep) topic with a model.",
-
   "notificationLowBatteryTitle": "Your Battery is Dying... But Mine Isn't!",
   "notificationLowBatteryBody": "Your phone's charge might be running low, but my energy is always at 100%! Plug it in and let's keep chatting.",
-
   "channelFcmName": "Cortex Updates",
   "@channelFcmName": {
     "description": "The user-visible name for the main notification channel."
   },
-
   "channelFcmDescription": "Notifications about news, updates and other information from Cortex.",
   "@channelFcmDescription": {
     "description": "The user-visible description for the main notification channel."
   },
-
   "channelEngagementName": "Friendly Reminders",
   "@channelEngagementName": {
     "description": "The user-visible name for the engagement notification channel."
   },
-
   "channelEngagementDescription": "Fun notifications to keep you engaged.",
   "@channelEngagementDescription": {
     "description": "The user-visible description for the engagement notification channel."
   },
-
   "channelGreetingsName": "Daily Greetings",
   "@channelGreetingsName": {
     "description": "The user-visible name for the greetings notification channel."
   },
-
   "channelGreetingsDescription": "The messages like good morning and good night.",
   "@channelGreetingsDescription": {
     "description": "The user-visible description for the greetings notification channel."
   },
-
   "exitAppTitle": "Leaving so soon?",
   "exitAppConfirmation": "Are you sure you want to leave this amazing platform?",
-
-  "newsErrorTitle": "Failed to Load News",
-  "newsErrorMessage": "There was a problem fetching the latest updates, please check your connection and try again.",
   "tagNotFound": "The tag you entered is invalid or has expired.",
   "whatIsNew": "What's new?",
-
   "onboardingTitle1": "Hey! We're the Cortex Team.",
   "onboardingDesc1": "It's awesome to see you here, {userName}. We're a few high school developers who decided to rewrite the rules of the AI industry. It's great to meet you! So let's get to know each other better.",
   "@onboardingDesc1": {
@@ -962,13 +599,10 @@
   },
   "onboardingTitle2": "There Were Huge Problems.",
   "onboardingDesc2": "The AI revolution arrived, but it got stuck at the threshold. With high subscription fees, complex platforms, those who destroy privacy, and those who block accessibility to AI... as long as they were in the game, this threshold could never be crossed.",
-
   "onboardingTitle3": "We Couldn't Just Stand By.",
   "onboardingDesc3": "To cross that threshold, we built a platform that is powerful, aesthetic, customizable, easy to use, fully transparent, works both online and offline, and keeps your data only on your device. We gave the power back to where it belongs: you.",
-
   "onboardingTitle4": "This Was Never Easy.",
   "onboardingDesc4": "We were rejected dozens of times, suspended multiple times, received fake warnings, and had to change our brand many times. Through it all and more, we were told it couldn't be done. But we never gave up, believing this project belongs to everyone, not just us. And that's exactly why we're here.",
-
   "onboardingFinalTitle": "It's Time for a Revolution.",
   "onboardingFinalDesc": "If you're seeing this screen, it's because we didn't give up. And we have no intention of giving up. Come on, let's take the AI revolution to the world together. To be a part of this story...",
   "onboardingFinalQuestion": "ARE YOU READY?",
@@ -982,16 +616,23 @@
   "upgradeAccountTitle": "Complete Your Account",
   "upgradeAccountDescription": "Create an account to get daily 200 bonus credits and unlock more limits.",
   "createAccount": "Create Account",
-  "upgradeTitle": "Finalize Registration",
   "accountLinkedSuccess": "Account successfully created!",
   "continueWithApple": "Continue with Apple",
   "guest": "Guest",
   "betterWithAnAccount": "This section is better with an account!",
   "restorePurchases": "Restore Purchases",
   "annualTotalDescription": "{price}/year, billed annually",
-  "@annualTotalDescription": { "placeholders": { "price": {} } },
+  "@annualTotalDescription": {
+    "placeholders": {
+      "price": {}
+    }
+  },
   "equivalentMonthlyDescription": "Approximately {price}/month",
-  "@equivalentMonthlyDescription": { "placeholders": { "price": {} } },
+  "@equivalentMonthlyDescription": {
+    "placeholders": {
+      "price": {}
+    }
+  },
   "confirmDownloadTitle": "Are you sure you want to download?",
   "downloadSizeDisclosure": "This model will occupy approximately {size} of space.",
   "emulatorModeWarning": "This feature is disabled in emulator mode.",

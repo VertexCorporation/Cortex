@@ -1,12 +1,14 @@
 // funds.dart (FINAL & UNIFIED BRAIN ARCHITECTURE)
 // This version establishes _FundsScreenViewState as the single source of truth for the UI,
 // eliminating all race conditions and ensuring instant, consistent UI updates.
+// Refactored: Removed all Credit functionality.
 
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:confetti/confetti.dart';
 import 'package:cortex/app.dart';
+import 'package:cortex/funds/widgets/subscriptions.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,11 +22,9 @@ import '../login/upgrade.dart';
 import '../navigation.dart';
 import '../notifications/introvert.dart';
 import '../server/user.dart';
+import '../settings/skeleton.dart';
 import '../theme.dart';
 import 'backend.dart';
-import 'credits/credits.dart';
-import 'subscriptions/subscriptions.dart';
-import 'subscriptions/skeleton.dart';
 
 class FundsScreen extends StatelessWidget {
   const FundsScreen({super.key});
@@ -46,12 +46,17 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   // --- UI State ---
   final List<String> _planTypes = ['plus', 'pro', 'ultra'];
   late final PageController _pageController;
+
+  // Initial page 1 maps to "Pro" (0=Plus, 1=Pro, 2=Ultra)
   int _currentPage = 1;
-  CreditPackage? _selectedCreditPackage;
+
   late final Map<String, String> _selectedBillingOptions = {
     'plus': 'monthly', 'pro': 'monthly', 'ultra': 'monthly',
   };
+
+  // Reduced to 3 for the 3 subscription plans
   late final List<ScrollController> _scrollControllers;
+
   bool _isContentLoaded = false;
   Offset _contentOffset = const Offset(0.0, 0.03);
   bool _hasAnyBenefitListAnimated = false;
@@ -88,8 +93,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   void initState() {
     super.initState();
     _checkIfEmulator();
+    // Initialize page controller to start at 'Pro' (Index 1)
     _pageController = PageController(initialPage: _currentPage);
-    _scrollControllers = List.generate(4, (_) => ScrollController());
+    _scrollControllers = List.generate(_planTypes.length, (_) => ScrollController());
     _confettiController = ConfettiController(duration: const Duration(seconds: 1));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -131,6 +137,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       _uiActiveSubscriptionOption = backend.activeSubscriptionOption;
       final userLevel = _uiActiveSubscriptionLevel;
       final activeOption = _uiActiveSubscriptionOption;
+
+      // Map user level to plan type. Level 1=Plus(0), 2=Pro(1), 3=Ultra(2)
       if (userLevel > 0 && activeOption != null && userLevel - 1 < _planTypes.length) {
         final activePlanType = _planTypes[userLevel - 1];
         _selectedBillingOptions[activePlanType] = activeOption;
@@ -208,24 +216,27 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       _showCustomNotification(message: localizations.productNotFound, isSuccess: NotificationType.error);
       return;
     }
+
+    // New logic: _currentPage maps directly to indices [0, 1, 2] corresponding to [plus, pro, ultra]
+    // Plan Levels are 1-based: Plus=1, Pro=2, Ultra=3.
+    final planType = _planTypes[_currentPage];
+    final int planLevel = _currentPage + 1;
+    final billingOption = _selectedBillingOptions[planType]!;
+
     String? productIdToPurchase;
-    int planLevel = _currentPage;
-    if (_currentPage == 0) {
-      productIdToPurchase = _selectedCreditPackage?.productId;
-    } else {
-      final planType = _planTypes[_currentPage - 1];
-      final billingOption = _selectedBillingOptions[planType]!;
-      // Use the local UI state for button logic to be consistent.
-      if (_uiActiveSubscriptionLevel > planLevel ||
-          (_uiActiveSubscriptionLevel == planLevel && billingOption == _uiActiveSubscriptionOption)) {
-        backend.manageSubscription();
-        return;
-      }
-      final isAnnual = billingOption == 'annual';
-      if (planType == 'plus') productIdToPurchase = isAnnual ? FundsBackend.annualSubscriptionPlus : FundsBackend.monthlySubscriptionPlus;
-      if (planType == 'pro') productIdToPurchase = isAnnual ? FundsBackend.annualSubscriptionPro : FundsBackend.monthlySubscriptionPro;
-      if (planType == 'ultra') productIdToPurchase = isAnnual ? FundsBackend.annualSubscriptionUltra : FundsBackend.monthlySubscriptionUltra;
+
+    // Use the local UI state for button logic to be consistent.
+    if (_uiActiveSubscriptionLevel > planLevel ||
+        (_uiActiveSubscriptionLevel == planLevel && billingOption == _uiActiveSubscriptionOption)) {
+      backend.manageSubscription();
+      return;
     }
+
+    final isAnnual = billingOption == 'annual';
+    if (planType == 'plus') productIdToPurchase = isAnnual ? FundsBackend.annualSubscriptionPlus : FundsBackend.monthlySubscriptionPlus;
+    if (planType == 'pro') productIdToPurchase = isAnnual ? FundsBackend.annualSubscriptionPro : FundsBackend.monthlySubscriptionPro;
+    if (planType == 'ultra') productIdToPurchase = isAnnual ? FundsBackend.annualSubscriptionUltra : FundsBackend.monthlySubscriptionUltra;
+
     if (productIdToPurchase != null) {
       try {
         final productDetails = backend.allProducts.firstWhere((p) => p.id == productIdToPurchase);
@@ -397,11 +408,6 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       controller: _pageController,
                       onPageChanged: _onPageChanged,
                       children: [
-                        CreditContentWidget(
-                          availableProducts: backend.creditProducts,
-                          onCreditPackageSelected: (package) => setState(() => _selectedCreditPackage = package),
-                          scrollController: _scrollControllers[0],
-                        ),
                         for (int i = 0; i < _planTypes.length; i++)
                           SubscriptionContentWidget(
                             planType: _planTypes[i],
@@ -412,7 +418,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                             onBillingOptionChanged: (newOption) {
                               setState(() { _selectedBillingOptions[_planTypes[i]] = newOption; });
                             },
-                            scrollController: _scrollControllers[i + 1],
+                            scrollController: _scrollControllers[i],
                             animateBenefits: !_hasAnyBenefitListAnimated,
                             onBenefitsAnimated: () {
                               if (!_hasAnyBenefitListAnimated) {
@@ -559,7 +565,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   Widget _buildPageIndicator(double screenWidth) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(4, (index) {
+      children: List.generate(_planTypes.length, (index) {
         final bool isSelected = _currentPage == index;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 350),
@@ -580,16 +586,10 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final localizations = AppLocalizations.of(context)!;
     final textStyle = TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold, color: AppColors.primaryColor);
 
-    if (_currentPage == 0) {
-      return Text(
-        _selectedCreditPackage != null ? localizations.creditPackage(_selectedCreditPackage!.amount) : localizations.buyCredit,
-        key: ValueKey('credits-${_selectedCreditPackage?.amount ?? 'default'}'),
-        style: textStyle,
-      );
-    }
-
-    final planIndex = _currentPage - 1;
-    final currentPlanLevel = _currentPage;
+    // Current page is 0, 1, or 2 (Plus, Pro, Ultra).
+    // Plan Levels are 1, 2, 3.
+    final planIndex = _currentPage;
+    final currentPlanLevel = _currentPage + 1;
     final currentPlanType = _planTypes[planIndex];
     final selectedBillingOption = _selectedBillingOptions[currentPlanType]!;
 
@@ -597,6 +597,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     if (_uiActiveSubscriptionLevel > currentPlanLevel) {
       return Text(localizations.manageSubscription, key: ValueKey('downgrade-$currentPlanType'), style: textStyle);
     }
+
     final isTierUpgrade = _uiActiveSubscriptionLevel != 0 && _uiActiveSubscriptionLevel < currentPlanLevel;
     final isBillingUpgrade = _uiActiveSubscriptionLevel == currentPlanLevel && selectedBillingOption == 'annual' && _uiActiveSubscriptionOption == 'monthly';
 

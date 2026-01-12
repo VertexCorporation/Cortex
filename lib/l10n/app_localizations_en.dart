@@ -9,9 +9,6 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get understood => 'Understood.';
-
-  @override
   String get cancel => 'Cancel';
 
   @override
@@ -30,9 +27,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
-  String get darkMode => 'Dark Mode';
-
-  @override
   String get light => 'Light';
 
   @override
@@ -46,9 +40,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get done => 'Done';
-
-  @override
-  String get comingSoon => 'COMING SOON';
 
   @override
   String get bestValue => 'Best Value';
@@ -66,14 +57,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messageHint => 'Ask anything';
 
   @override
-  String get modelLoading => 'Model is loading...';
-
-  @override
   String get messageCopied => 'Message copied to clipboard.';
-
-  @override
-  String get storeUnavailable =>
-      'Store is currently unavailable. Please try again later';
 
   @override
   String get retry => 'Retry';
@@ -84,16 +68,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String deviceMemory(Object memory) {
     return 'Device Memory: $memory GB';
-  }
-
-  @override
-  String storageSpace(Object storage) {
-    return 'Storage Space: $storage GB';
-  }
-
-  @override
-  String freeStorageSpace(Object freeStorage) {
-    return 'Free Storage Space: $freeStorage GB';
   }
 
   @override
@@ -118,9 +92,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get usedMemory => 'Used Memory';
 
   @override
-  String get requirements => 'Requirements';
-
-  @override
   String get modelsTitle => 'Library';
 
   @override
@@ -130,34 +101,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serverSideModels => 'Online Models';
 
   @override
-  String get uploadYourOwnModel => 'Upload Your Own Model!';
-
-  @override
   String get selectGGUFFile => 'Select GGUF File';
 
   @override
   String get errorGGUF => 'Please select a file in GGUF format only.';
-
-  @override
-  String get modelAlreadyExists => 'Model already exists.';
-
-  @override
-  String get modelAddedSuccessfully => 'Model added successfully.';
-
-  @override
-  String get modelRemoved => 'Model removed successfully.';
-
-  @override
-  String get removeError => 'An error occurred while removing the model.';
-
-  @override
-  String get fileNotFound => 'File not found.';
-
-  @override
-  String get fileUploadError => 'An error occurred while uploading the file.';
-
-  @override
-  String get noFileSelected => 'No file selected.';
 
   @override
   String get myModels => 'My Models';
@@ -166,36 +113,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get create => 'Create';
 
   @override
-  String get seeAll => 'See All';
-
-  @override
   String modelProducer(Object producer) {
     return 'Producer: $producer';
-  }
-
-  @override
-  String modelRAM(Object ram) {
-    return 'RAM: $ram';
-  }
-
-  @override
-  String modelSize(Object size) {
-    return 'Size: $size';
   }
 
   @override
   String modelDescription(Object description) {
     return '$description';
   }
-
-  @override
-  String get conversationsTitle => 'Conversations';
-
-  @override
-  String get conversationDeleted => 'Conversation deleted.';
-
-  @override
-  String get conversationUpdated => 'Conversation updated.';
 
   @override
   String get editConversationTitle => 'Rename';
@@ -207,9 +132,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get save => 'Save';
 
   @override
-  String get titleCannotBeEmpty => 'Title cannot be empty.';
-
-  @override
   String get noConversationsMessage => 'No conversations, start chatting!';
 
   @override
@@ -217,12 +139,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noChats => 'No Chats';
-
-  @override
-  String get starredChats => 'Starred Chats';
-
-  @override
-  String get allChats => 'All Chats';
 
   @override
   String get noStarredChats => 'No Starred Chats';
@@ -238,19 +154,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unstarConversation => 'Unstar';
-
-  @override
-  String get conversationTitleUpdated => 'Conversation title updated';
-
-  @override
-  String get youReachedConversationLimit =>
-      'You have reached the conversation limit.';
-
-  @override
-  String get today => 'Today';
-
-  @override
-  String get yesterday => 'Yesterday';
 
   @override
   String get loginToYourAccount => 'Login';
@@ -301,9 +204,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordsDoNotMatch => 'Passwords do not match.';
 
   @override
-  String get userNotFound => 'User not found.';
-
-  @override
   String get wrongPassword => 'Incorrect password.';
 
   @override
@@ -316,38 +216,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authError => 'Authentication Error';
 
   @override
-  String get invalidUsername => 'Please enter a username.';
-
-  @override
   String get usernameTaken => 'This username is already taken.';
 
   @override
   String get username => 'Username';
 
   @override
-  String get authenticationFailed => 'Authentication failed. Please try again.';
-
-  @override
-  String get emailTooLong => 'Email can be at most 30 characters.';
-
-  @override
-  String get deviceLimitReached =>
-      'You have reached the account creation limit for this device.';
-
-  @override
-  String get verificationEmailLimitReached => 'We wont send anymore';
-
-  @override
-  String get verificationEmailSent => 'Verification e-mail sent!';
-
-  @override
-  String get emailNotVerified => 'E-mail has not verified';
-
-  @override
   String get resendCode => 'Resend verification e-mail';
-
-  @override
-  String get remainingSeconds => 'Remaining time for verification';
 
   @override
   String get pleaseCheckYourEmail =>
@@ -355,9 +230,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get verifyYourEmail => 'Verify Your Email';
-
-  @override
-  String get backToLogin => 'Go Back';
 
   @override
   String get seconds => 'seconds';
@@ -386,9 +258,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verifyNow => 'Verify Now';
 
   @override
-  String get accountVerified => 'Your account has been verified.';
-
-  @override
   String get linkSent => 'Link sent';
 
   @override
@@ -406,14 +275,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Are you sure you want to delete your account?';
 
   @override
-  String get enterPasswordToDelete => 'Enter your password to delete.';
-
-  @override
   String get deleteAccount => 'Delete Account';
-
-  @override
-  String get deleteAccountError =>
-      'An error occurred while deleting the account.';
 
   @override
   String get delete => 'Delete';
@@ -435,28 +297,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get displayName => 'Display Name';
 
   @override
-  String get tapToChangeProfilePicture => 'Tap to change profile picture';
-
-  @override
   String get profileUpdated => 'Profile updated successfully';
 
   @override
-  String get updateFailed => 'Failed to update profile';
-
-  @override
-  String get nameCannotBeEmpty => 'Name cannot be empty';
-
-  @override
   String get logout => 'Logout';
-
-  @override
-  String get noDisplayName => 'No display name set';
-
-  @override
-  String get noEmail => 'No email address';
-
-  @override
-  String get noUserLoggedIn => 'No user is currently logged in';
 
   @override
   String get profile => 'Profile';
@@ -485,15 +329,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get downloading => 'Downloading...';
 
   @override
-  String get downloadError => 'An error occurred during download.';
-
-  @override
-  String get downloadCancelled => 'Download cancelled.';
-
-  @override
-  String get downloadResumed => 'Download resumed.';
-
-  @override
   String get downloadSuccess => 'Download success';
 
   @override
@@ -511,28 +346,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get purchaseSuccessful => 'Purchase successful!';
 
   @override
-  String get purchaseFailed => 'Purchase unsuccessful';
-
-  @override
-  String get creditProductNotFound =>
-      'The selected credit product could not be found.';
-
-  @override
-  String get creditsAddedSuccessfully =>
-      'Credits were added to your account successfully!';
-
-  @override
-  String get creditDeliveryFailed =>
-      'Failed to add credits to your account. Please contact support.';
-
-  @override
-  String get invalidPurchase => 'Invalid purchase';
-
-  @override
   String get purchaseError => 'Purchasing error';
-
-  @override
-  String get purchaseVertexPlusToUpload => 'This is a Plus feature';
 
   @override
   String get purchasePlus => 'Buy Cortex Plus';
@@ -580,33 +394,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Access even more features of Cortex and experience AI even more!';
 
   @override
-  String get alreadySubscribed => 'You are already subscribed';
-
-  @override
-  String get subscriptionInfo => 'Your subscription is active.';
-
-  @override
-  String get alreadySubscribedMessage =>
-      'You already have a Plus subscription. If you want to cancel your subscription, you can do so through the Play Store manager.';
-
-  @override
-  String get cancelSubscription => 'Cancel Subscription';
-
-  @override
-  String get cancelSubscriptionInfo =>
-      'If you want to cancel your subscription, please proceed through the Play Store subscription manager.';
-
-  @override
-  String get goToPlayStore => 'Go to Play Store';
-
-  @override
-  String get alreadySubscribedPlus => 'You Have the Plus Plan!';
-
-  @override
-  String get alreadySubscribedPlusMessage =>
-      'Your Plus plan is active. You can enjoy all the benefits.';
-
-  @override
   String get purchaseUltra => 'Buy Cortex Ultra';
 
   @override
@@ -614,28 +401,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Gain full access to all features of Cortex and experience AI to the fullest!';
 
   @override
-  String get noSubscription => 'No Subscription';
-
-  @override
-  String get noSubscriptionMessage => 'You do not have a subscription yet.';
-
-  @override
-  String get alreadyAtHighestPlan => 'You are already on the highest plan.';
-
-  @override
-  String get unableToOpenSubscription =>
-      'Unable to open the subscription management page.';
-
-  @override
   String get upgradeSubscription => 'Upgrade Subscription';
-
-  @override
-  String get confirmUpgrade =>
-      'Are you sure you want to upgrade your subscription?';
-
-  @override
-  String get unsupportedPlatform =>
-      'Unsupported platform for subscription cancellation.';
 
   @override
   String get purchaseStreamError => 'Purchase stream error.';
@@ -644,43 +410,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get productNotFound => 'Product not found';
 
   @override
-  String get productDetailsError =>
-      'An error occurred while fetching product details.';
-
-  @override
   String get noProductsFound => 'No products found';
-
-  @override
-  String get loadCreditsButton => 'Load Credits';
-
-  @override
-  String get creditsTitle => 'Credits';
-
-  @override
-  String get creditsScreenDescription =>
-      'This screen shows the user\'s credits. \n\nUser\'s current credits: 100\n\nDetailed credit information can be displayed here.';
-
-  @override
-  String get creditsLoaded => 'Credits loaded!';
-
-  @override
-  String get currentCredits => 'Current Credits';
-
-  @override
-  String get pleaseSelectCreditPackage => 'Please select a credit package';
-
-  @override
-  String get purchaseCreditsTitle => 'Buy Credits';
-
-  @override
-  String get purchaseCreditsDescription =>
-      'Select a credit package that suits your needs and use our app more.';
-
-  @override
-  String get purchaseButton => 'Buy';
-
-  @override
-  String get productNotFoundMessage => 'The selected product does not exist.';
 
   @override
   String get buyCredits => 'Buy Credits';
@@ -693,72 +423,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buyCredit => 'Buy Credits';
 
   @override
-  String buyCreditPackage(Object amount) {
-    return 'Buy $amount Credits';
-  }
-
-  @override
-  String get subscribedPlan => 'Subscribed';
-
-  @override
-  String get errorResponseNotReceived => 'Response not received';
-
-  @override
-  String googleApiRequestFailed(int attempt, String error) {
-    return 'Google API request failed $attempt times: $error';
-  }
-
-  @override
-  String openRouterResponseStatus(int statusCode) {
-    return 'OpenRouter Response Status: $statusCode';
-  }
-
-  @override
-  String openRouterDecodedResponseBody(String body) {
-    return 'OpenRouter Decoded Response Body: $body';
-  }
-
-  @override
-  String decodedJson(String data) {
-    return 'Decoded JSON: $data';
-  }
-
-  @override
-  String get responseStructureUnexpectedMessageContentMissing =>
-      'Response structure is unexpected: message or content missing';
-
-  @override
-  String get responseStructureUnexpectedChoicesMissing =>
-      'Response structure is unexpected: choices missing or empty';
-
-  @override
-  String openRouterApiRequestFailed(int statusCode, String body) {
-    return 'OpenRouter API request failed: $statusCode - $body';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterAttempts(int attempt, String error) {
-    return 'OpenRouter API request failed $attempt times: $error';
-  }
-
-  @override
   String get internetRequired =>
       'Internet connection is required to use this model';
-
-  @override
-  String get pleaseWaitBeforeTryingAgain =>
-      'Please wait a moment before trying again';
-
-  @override
-  String openRouterQuotaExceeded(int statusCode, String decodedBody) {
-    return 'Quota exceeded. Status code: $statusCode, Body: $decodedBody';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterPaidAttempts(
-      int attempts, String error) {
-    return 'API request failed after $attempts paid attempts. Error: $error';
-  }
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
@@ -801,12 +467,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get capabilitiesSection => 'Capabilities';
 
   @override
-  String get ratingsSection => 'Ratings';
-
-  @override
-  String get noRatingDataFound => 'No rating data found';
-
-  @override
   String get featurePhotoTitle => 'Photo Scanning';
 
   @override
@@ -819,13 +479,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get featureOfflineDescription =>
       'Run the model without an internet connection to keep your data safe.';
-
-  @override
-  String get featureSupermodelTitle => 'Super Model';
-
-  @override
-  String get featureSupermodelDescription =>
-      'This is a massive model with over 10 billion parameters, offering high performance and extensive capabilities.';
 
   @override
   String get featureRoleplayTitle => 'Role Play';
@@ -844,26 +497,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get context => 'Context';
 
   @override
-  String get millions => 'million';
-
-  @override
-  String get billions => 'billion';
-
-  @override
-  String get trillions => 'trillion';
-
-  @override
-  String get thousand => 'thousand';
-
-  @override
-  String get estimated => 'estimated';
-
-  @override
   String get finalPreparation => 'Final preparations are being made.';
-
-  @override
-  String get allEvaluationsByTestTeam =>
-      'All evaluations were made by our testing team';
 
   @override
   String get shareApp => 'Share the App';
@@ -898,9 +532,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get user => 'User';
-
-  @override
-  String get voice => 'Voice';
 
   @override
   String get help => 'Help';
@@ -951,9 +582,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chinese => 'Chinese';
 
   @override
-  String get arabic => 'Arabic';
-
-  @override
   String get french => 'French';
 
   @override
@@ -970,9 +598,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get korean => 'Korean';
-
-  @override
-  String get deutsch => 'Deutsch';
 
   @override
   String get english => 'English';
@@ -1015,9 +640,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Only these letters: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' and the characters \'.\', \'-\', \'_\' can be used in the username.';
 
   @override
-  String get passwordTooLong => 'Password cannot exceed 64 characters.';
-
-  @override
   String get noInternetConnection => 'No internet connection.';
 
   @override
@@ -1027,15 +649,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get library => 'Library';
 
   @override
-  String get inappropriateMessageWarning => 'Inappropriate message detected!';
-
-  @override
-  String get myModelDescription => 'My model.';
-
-  @override
-  String get noModelsDownloaded => 'You haven\'t downloaded any models yet.';
-
-  @override
   String get appTitle => 'Cortex';
 
   @override
@@ -1043,9 +656,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get removeModel => 'Remove Model';
-
-  @override
-  String get modelUploadedSuccessfully => 'Model uploaded successfully.';
 
   @override
   String get insufficientRAM => 'Low Memory';
@@ -1070,9 +680,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get benefit1 => 'Many more conversation limit for online AIs';
 
   @override
-  String get benefit2 => 'Upload your own models';
-
-  @override
   String get benefit3 => 'Profile effect';
 
   @override
@@ -1080,9 +687,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get benefit5 => 'Create more online artificial intelligences';
-
-  @override
-  String get benefit6 => 'Unlimited chat';
 
   @override
   String benefit7(Object credits) {
@@ -1094,9 +698,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get benefit9 => 'New themes';
-
-  @override
-  String get benefit10 => 'Offline voice chat';
 
   @override
   String get oldBenefits => 'All benefits from lower plans';
@@ -1135,21 +736,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copyrights => 'Attributions';
 
   @override
-  String get downloadingTitle => 'Downloading';
-
-  @override
-  String get downloadCompletedTitle => 'Download Completed';
-
-  @override
-  String get downloadPausedTitle => 'Download Paused';
-
-  @override
-  String get downloadErrorTitle => 'Download Error';
-
-  @override
-  String get cancelButtonText => 'Cancel';
-
-  @override
   String get love => 'Love';
 
   @override
@@ -1184,13 +770,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editingNotification => 'You are in editing mode now';
 
   @override
-  String get featureIndulgentTitle => 'Indulgent';
-
-  @override
-  String get featureIndulgentDescription =>
-      'This model can seamlessly accommodate and process contexts exceeding 100,000 tokens, enabling it to handle extensive and detailed inputs without compromising performance.';
-
-  @override
   String get featurePluralTitle => 'Plural';
 
   @override
@@ -1198,30 +777,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This model can automatically integrate additional extensions, thereby expanding its functional capabilities to support a diverse range of operations with enhanced performance.';
 
   @override
-  String get featureWiseTitle => 'Wise';
-
-  @override
-  String get featureWiseDescription =>
-      'This model can leverage deep analytical insights and forward-thinking reasoning to deliver sophisticated support for decision-making and complex problem-solving.';
-
-  @override
-  String get featureResearcherTitle => 'Researcher';
-
-  @override
-  String get featureResearcherDescription =>
-      'Exclusively available in models equipped with advanced research and analytical capacities, this feature is designed to provide high-precision insights and comprehensive analysis across diverse domains.';
-
-  @override
   String get nameLabel => 'AI name';
 
   @override
-  String get nameHint => 'Enter your AI\'s name';
-
-  @override
   String get summaryLabel => 'AI Summary';
-
-  @override
-  String get summaryHint => 'Enter your AI\'s summary';
 
   @override
   String get add => 'Add';
@@ -1251,20 +810,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summary => 'Summary';
 
   @override
-  String get characterPoliceTitle => 'Police';
-
-  @override
-  String get characterPoliceRole =>
-      'You are a vigilant enforcer of the law, dedicated to protecting citizens and maintaining order with unwavering commitment, you are a police';
-
-  @override
-  String get characterPoliceShortDescription =>
-      'A steadfast and courageous law enforcer.';
-
-  @override
-  String get purchaseSubscription => 'Purchase';
-
-  @override
   String get modelUploadTitle => 'Artificial Intelligence File';
 
   @override
@@ -1276,13 +821,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tap here to pick a .gguf file from your device';
 
   @override
-  String get addServerTitle => 'Artificial Intelligence Server';
-
-  @override
-  String get addServerDescription =>
-      'Enter the URL of your remote server to connect with an externally hosted model. This feature requires an active internet connection, and any server-related issues or errors are not caused by Cortex. Ensure your server is correctly configured, accessible from your network, and has a valid model endpoint for a smooth experience.';
-
-  @override
   String get you => 'You';
 
   @override
@@ -1292,24 +830,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmRemovePhoto => 'Are you sure you want to remove the photo?';
 
   @override
-  String get serverLink => 'Server Link';
-
-  @override
-  String get enterURL => 'Enter server URL';
-
-  @override
   String get chatLengthLimitExceeded =>
       'This chat has exceeded the character limit. Please start a new chat or purchase a subscription.';
-
-  @override
-  String get aiNameError => 'An AI with this name already exists.';
-
-  @override
-  String get modelLimitExceeded =>
-      'You have reached the maximum model creation limit for your plan.';
-
-  @override
-  String get modelVertexProducer => 'Vertex';
 
   @override
   String get photoLimitReachedMessage => 'Only one photo can be added';
@@ -1323,16 +845,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String insufficientCredits(Object available, Object required) {
-    return 'You do not have enough credits to complete this request. This action requires $required credits, but you only have $available. To gain more credits, you can upgrade your plan or purchase them directly. hey we totally get it running out of credits can be a bit of a bummer but seriously getting those awesome replies from our models isnt free so these credits actually help us keep the good times rolling and listen if more of you guys jump in and get credits we can totally look at bumping up those free daily limits for everyone';
-  }
-
-  @override
-  String get regenerateInProgress =>
-      'Answer generation is already in progress.';
-
-  @override
-  String errorOccurredDuringRegeneration(String errorDetails) {
-    return 'An error occurred while trying to regenerate: $errorDetails';
+    return 'You do not have enough credits to complete this request. This action requires $required credits, but you only have $available. To gain more credits, you can upgrade your plan or purchase them directly. hey we totally get it running out of credits can be a bit of a bummer but seriously getting those awesome replies from our models isnt free so these limits actually help us keep the good times rolling and listen if more of you guys jump in and get more limits we can totally look at bumping up those free daily limits for everyone';
   }
 
   @override
@@ -1362,10 +875,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorInsufficientCredits =>
       'You have insufficient credits. Please top up to continue.';
-
-  @override
-  String get errorRateLimitExceeded =>
-      'Too many requests. Please try again in a moment.';
 
   @override
   String get errorServer =>
@@ -1416,23 +925,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get noModelsFoundMessage =>
       'Try adjusting your search terms or clearing the filter.';
-
-  @override
-  String get usernameRateLimitExceeded =>
-      'You can only change your username twice every 14 days.';
-
-  @override
-  String get usernameUnchanged => 'This is already your current username.';
-
-  @override
-  String get creditsInfoPanelTitle => 'How Credits Work';
-
-  @override
-  String get creditsInfoPanelBody =>
-      'Credits are used to chat with online models. every single message costs us cash and these credits keepin us from going broke now lets explain the system \n\n• Each message to a free online model costs 5 credits.\n• Each message to an online premium model costs 20 credits.\n• Including an attachment adds 30 more credits.\n• Free plan users get a 200 credit bonus that resets daily.';
-
-  @override
-  String get creditsInfoPanelFooter => 'Happy chatting!';
 
   @override
   String get disclaimerMessage =>
@@ -1519,10 +1011,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get photoWarningMessage =>
       'A photo is included. Models that don\'t support images may ignore it.';
-
-  @override
-  String get loginRequiredForPurchase =>
-      'You must be logged in to make a purchase.';
 
   @override
   String get storagePermissionRequired =>
@@ -1627,33 +1115,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'You have used all your free daily messages for premium models, please upgrade for unlimited access.';
 
   @override
-  String selectionScreenGreetingUser(String userName) {
-    return 'How may I help you today, $userName?';
-  }
-
-  @override
   String get selectionScreenGreetingGeneric => 'How can I help you today?';
-
-  @override
-  String get selectionScreenRecentModels => 'Recent Models';
-
-  @override
-  String get selectionScreenFeatureDynamicChat => 'Dynamic Chat';
 
   @override
   String get selectionScreenFeatureOffline => 'Use without Internet';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Select Model';
-
-  @override
   String get explore => 'Explore';
-
-  @override
-  String get subscriptionCancelled => 'Subscription successfully canceled!';
-
-  @override
-  String get selectionScreenPinnedModels => 'Pinned Models';
 
   @override
   String get selectionScreenNewsAndUpdates => 'News & Updates';
@@ -1690,13 +1158,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorNoModelsAvailable =>
       'No models are currently available. Please check your internet connection and try again.';
-
-  @override
-  String get errorNoModelsForRequest =>
-      'No suitable models found for your current request (e.g., offline mode or image message).';
-
-  @override
-  String get dynamicChatWelcome => 'How can I help you?';
 
   @override
   String get notificationComebackTitle => 'We miss you!';
@@ -2009,13 +1470,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Are you sure you want to leave this amazing platform?';
 
   @override
-  String get newsErrorTitle => 'Failed to Load News';
-
-  @override
-  String get newsErrorMessage =>
-      'There was a problem fetching the latest updates, please check your connection and try again.';
-
-  @override
   String get tagNotFound => 'The tag you entered is invalid or has expired.';
 
   @override
@@ -2092,9 +1546,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createAccount => 'Create Account';
-
-  @override
-  String get upgradeTitle => 'Finalize Registration';
 
   @override
   String get accountLinkedSuccess => 'Account successfully created!';

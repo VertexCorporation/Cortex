@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/screen/appbar/appbar.dart';
+import 'package:cortex/chat/screen/view.dart';
 import 'package:cortex/chat/services/offline.dart';
 import 'package:cortex/chat/services/read.dart';
 import 'package:cortex/chat/services/select.dart';
@@ -12,16 +13,15 @@ import 'package:cortex/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../banner.dart';
-import '../../initialization.dart';
-import '../../l10n/app_localizations.dart';
-import '../../library/backend/data/service.dart';
-import '../../navigation.dart';
-import '../../settings/controller.dart';
-import '../../theme.dart';
-import '../services/dynamic.dart';
-import '../widgets/news/service.dart';
-import 'chat.dart';
+import '../banner.dart';
+import '../initialization.dart';
+import '../l10n/app_localizations.dart';
+import '../library/backend/data/service.dart';
+import '../navigation.dart';
+import '../settings/controller.dart';
+import '../theme.dart';
+import 'services/dynamic.dart';
+import 'widgets/news/service.dart';
 
 class ChatController extends StatefulWidget {
   final String? conversationID;
@@ -42,7 +42,7 @@ class ChatControllerState extends State<ChatController>
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<AppbarState> appbarKey = GlobalKey<AppbarState>();
   final GlobalKey _extensionKey = GlobalKey();
-  final GlobalKey<ActiveChatViewState> activeChatViewKey = GlobalKey<ActiveChatViewState>();
+  final GlobalKey<ChatViewState> chatViewKey = GlobalKey<ChatViewState>();
   final GlobalKey _exitButtonKey = GlobalKey();
   final GlobalKey _accountButtonKey = GlobalKey();
   final GlobalKey<FloatingInfoBannerState> _extensionBannerKey = GlobalKey<FloatingInfoBannerState>();
@@ -132,7 +132,7 @@ class ChatControllerState extends State<ChatController>
 
     // 3. Cancel Message Editing Mode
     if (context.read<InputProvider>().isEditingMode) {
-      activeChatViewKey.currentState?.cancelAnyActiveEdit();
+      chatViewKey.currentState?.cancelAnyActiveEdit();
       return false; // Handled
     }
 
@@ -159,7 +159,7 @@ class ChatControllerState extends State<ChatController>
   }
 
   void _focusTextField() {
-    activeChatViewKey.currentState?.focusTextField();
+    chatViewKey.currentState?.focusTextField();
   }
 
   void _scheduleAutoShowExtensionInfoIfNeeded() {
@@ -314,8 +314,8 @@ class ChatControllerState extends State<ChatController>
 
                 // Active Chat View
                 Expanded(
-                  child: ActiveChatView(
-                    key: activeChatViewKey,
+                  child: ChatView(
+                    key: chatViewKey,
                     extensions: extensions,
                   ),
                 ),

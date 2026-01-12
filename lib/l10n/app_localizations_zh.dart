@@ -9,9 +9,6 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
-  String get understood => '已了解。';
-
-  @override
   String get cancel => '取消';
 
   @override
@@ -30,9 +27,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat => '聊天';
 
   @override
-  String get darkMode => '深色模式';
-
-  @override
   String get light => '浅色';
 
   @override
@@ -46,9 +40,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get done => '完成';
-
-  @override
-  String get comingSoon => '即将推出';
 
   @override
   String get bestValue => '最超值';
@@ -66,13 +57,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get messageHint => '随便问点什么';
 
   @override
-  String get modelLoading => '模型加载中...';
-
-  @override
   String get messageCopied => '消息已复制到剪贴板。';
-
-  @override
-  String get storeUnavailable => '商店当前不可用。请稍后再试';
 
   @override
   String get retry => '重试';
@@ -83,16 +68,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String deviceMemory(Object memory) {
     return '设备内存: $memory GB';
-  }
-
-  @override
-  String storageSpace(Object storage) {
-    return '存储空间: $storage GB';
-  }
-
-  @override
-  String freeStorageSpace(Object freeStorage) {
-    return '可用存储空间: $freeStorage GB';
   }
 
   @override
@@ -117,9 +92,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get usedMemory => '已用内存';
 
   @override
-  String get requirements => '要求';
-
-  @override
   String get modelsTitle => '库';
 
   @override
@@ -129,34 +101,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverSideModels => '在线模型';
 
   @override
-  String get uploadYourOwnModel => '上传您自己的模型！';
-
-  @override
   String get selectGGUFFile => '选择 GGUF 文件';
 
   @override
   String get errorGGUF => '请仅选择 GGUF 格式的文件。';
-
-  @override
-  String get modelAlreadyExists => '模型已存在。';
-
-  @override
-  String get modelAddedSuccessfully => '模型添加成功。';
-
-  @override
-  String get modelRemoved => '模型移除成功。';
-
-  @override
-  String get removeError => '移除模型时出错。';
-
-  @override
-  String get fileNotFound => '文件未找到。';
-
-  @override
-  String get fileUploadError => '上传文件时出错。';
-
-  @override
-  String get noFileSelected => '未选择文件。';
 
   @override
   String get myModels => '我的模型';
@@ -165,36 +113,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get create => '创建';
 
   @override
-  String get seeAll => '查看全部';
-
-  @override
   String modelProducer(Object producer) {
     return '开发者: $producer';
-  }
-
-  @override
-  String modelRAM(Object ram) {
-    return '内存: $ram';
-  }
-
-  @override
-  String modelSize(Object size) {
-    return '大小: $size';
   }
 
   @override
   String modelDescription(Object description) {
     return '$description';
   }
-
-  @override
-  String get conversationsTitle => '对话';
-
-  @override
-  String get conversationDeleted => '对话已删除。';
-
-  @override
-  String get conversationUpdated => '对话已更新。';
 
   @override
   String get editConversationTitle => '重命名';
@@ -206,9 +132,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get save => '保存';
 
   @override
-  String get titleCannotBeEmpty => '标题不能为空。';
-
-  @override
   String get noConversationsMessage => '没有对话，开始聊天吧！';
 
   @override
@@ -216,12 +139,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noChats => '无聊天';
-
-  @override
-  String get starredChats => '已收藏的聊天';
-
-  @override
-  String get allChats => '所有聊天';
 
   @override
   String get noStarredChats => '无已收藏的聊天';
@@ -237,18 +154,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unstarConversation => 'Unstar';
-
-  @override
-  String get conversationTitleUpdated => '对话标题已更新';
-
-  @override
-  String get youReachedConversationLimit => '您已达到对话数量上限。';
-
-  @override
-  String get today => '今天';
-
-  @override
-  String get yesterday => '昨天';
 
   @override
   String get loginToYourAccount => '登录';
@@ -299,9 +204,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get passwordsDoNotMatch => '密码不匹配。';
 
   @override
-  String get userNotFound => '用户未找到。';
-
-  @override
   String get wrongPassword => '密码不正确。';
 
   @override
@@ -314,37 +216,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get authError => '认证错误';
 
   @override
-  String get invalidUsername => '请输入用户名。';
-
-  @override
   String get usernameTaken => '此用户名已被占用。';
 
   @override
   String get username => '用户名';
 
   @override
-  String get authenticationFailed => '认证失败。请重试。';
-
-  @override
-  String get emailTooLong => '邮箱最多可包含30个字符。';
-
-  @override
-  String get deviceLimitReached => '您已达到此设备的账户创建上限。';
-
-  @override
-  String get verificationEmailLimitReached => '我们不会再发送邮件';
-
-  @override
-  String get verificationEmailSent => '验证邮件已发送！';
-
-  @override
-  String get emailNotVerified => '邮箱尚未验证';
-
-  @override
   String get resendCode => '重新发送验证邮件';
-
-  @override
-  String get remainingSeconds => '剩余验证时间';
 
   @override
   String get pleaseCheckYourEmail =>
@@ -352,9 +230,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get verifyYourEmail => '验证您的邮箱';
-
-  @override
-  String get backToLogin => '返回';
 
   @override
   String get seconds => '秒';
@@ -381,9 +256,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get verifyNow => '立即验证';
 
   @override
-  String get accountVerified => '您的账户已验证。';
-
-  @override
   String get linkSent => '链接已发送';
 
   @override
@@ -399,13 +271,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmDeleteAccount => '您确定要删除您的账户吗？';
 
   @override
-  String get enterPasswordToDelete => '输入您的密码以删除。';
-
-  @override
   String get deleteAccount => '删除账户';
-
-  @override
-  String get deleteAccountError => '删除账户时出错。';
 
   @override
   String get delete => '删除';
@@ -426,28 +292,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get displayName => '显示名称';
 
   @override
-  String get tapToChangeProfilePicture => '点击更换头像';
-
-  @override
   String get profileUpdated => '个人资料更新成功';
 
   @override
-  String get updateFailed => '更新个人资料失败';
-
-  @override
-  String get nameCannotBeEmpty => '名称不能为空';
-
-  @override
   String get logout => '登出';
-
-  @override
-  String get noDisplayName => '未设置显示名称';
-
-  @override
-  String get noEmail => '无邮箱地址';
-
-  @override
-  String get noUserLoggedIn => '当前无用户登录';
 
   @override
   String get profile => '个人资料';
@@ -471,15 +319,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get downloading => '下载中...';
 
   @override
-  String get downloadError => '下载过程中出错。';
-
-  @override
-  String get downloadCancelled => '下载已取消。';
-
-  @override
-  String get downloadResumed => '下载已恢复。';
-
-  @override
   String get downloadSuccess => '下载成功';
 
   @override
@@ -497,25 +336,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get purchaseSuccessful => '购买成功！';
 
   @override
-  String get purchaseFailed => '购买失败';
-
-  @override
-  String get creditProductNotFound => '找不到所选的积分产品。';
-
-  @override
-  String get creditsAddedSuccessfully => '积分已成功添加到您的账户！';
-
-  @override
-  String get creditDeliveryFailed => '向您的账户添加积分失败。请联系支持。';
-
-  @override
-  String get invalidPurchase => '无效购买';
-
-  @override
   String get purchaseError => '购买错误';
-
-  @override
-  String get purchaseVertexPlusToUpload => '这是一个 Plus 功能';
 
   @override
   String get purchasePlus => '购买 Cortex Plus';
@@ -560,56 +381,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get proDescription => '解锁 Cortex 更多功能，体验更强大的 AI！';
 
   @override
-  String get alreadySubscribed => '您已订阅';
-
-  @override
-  String get subscriptionInfo => '您的订阅处于激活状态。';
-
-  @override
-  String get alreadySubscribedMessage =>
-      '您已经拥有 Plus 订阅。如果您想取消订阅，可以通过 Play Store 管理器进行操作。';
-
-  @override
-  String get cancelSubscription => '取消订阅';
-
-  @override
-  String get cancelSubscriptionInfo => '如果您想取消订阅，请通过 Play Store 订阅管理器进行操作。';
-
-  @override
-  String get goToPlayStore => '前往 Play Store';
-
-  @override
-  String get alreadySubscribedPlus => '您已拥有 Plus 计划！';
-
-  @override
-  String get alreadySubscribedPlusMessage => '您的 Plus 计划已激活。您可以享受所有权益。';
-
-  @override
   String get purchaseUltra => '购买 Cortex Ultra';
 
   @override
   String get ultraDescription => '获得 Cortex 所有功能的完全访问权限，尽情体验 AI！';
 
   @override
-  String get noSubscription => '无订阅';
-
-  @override
-  String get noSubscriptionMessage => '您还没有任何订阅。';
-
-  @override
-  String get alreadyAtHighestPlan => '您已经是最高等级的计划。';
-
-  @override
-  String get unableToOpenSubscription => '无法打开订阅管理页面。';
-
-  @override
   String get upgradeSubscription => '升级订阅';
-
-  @override
-  String get confirmUpgrade => '您确定要升级您的订阅吗？';
-
-  @override
-  String get unsupportedPlatform => '不支持此平台的订阅取消。';
 
   @override
   String get purchaseStreamError => '购买流错误。';
@@ -618,41 +396,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get productNotFound => '产品未找到';
 
   @override
-  String get productDetailsError => '获取产品详情时出错。';
-
-  @override
   String get noProductsFound => '未找到产品';
-
-  @override
-  String get loadCreditsButton => '加载积分';
-
-  @override
-  String get creditsTitle => '积分';
-
-  @override
-  String get creditsScreenDescription =>
-      '此屏幕显示用户的积分。\n\n用户当前积分: 100\n\n此处可显示详细的积分信息。';
-
-  @override
-  String get creditsLoaded => '积分已加载！';
-
-  @override
-  String get currentCredits => '当前积分';
-
-  @override
-  String get pleaseSelectCreditPackage => '请选择一个积分套餐';
-
-  @override
-  String get purchaseCreditsTitle => '购买积分';
-
-  @override
-  String get purchaseCreditsDescription => '选择适合您需求的积分套餐，更多地使用我们的应用。';
-
-  @override
-  String get purchaseButton => '购买';
-
-  @override
-  String get productNotFoundMessage => '所选产品不存在。';
 
   @override
   String get buyCredits => '购买积分';
@@ -664,69 +408,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get buyCredit => '购买积分';
 
   @override
-  String buyCreditPackage(Object amount) {
-    return '购买 $amount 积分';
-  }
-
-  @override
-  String get subscribedPlan => '已订阅';
-
-  @override
-  String get errorResponseNotReceived => '未收到响应';
-
-  @override
-  String googleApiRequestFailed(int attempt, String error) {
-    return 'Google API 请求失败 $attempt 次: $error';
-  }
-
-  @override
-  String openRouterResponseStatus(int statusCode) {
-    return 'OpenRouter 响应状态: $statusCode';
-  }
-
-  @override
-  String openRouterDecodedResponseBody(String body) {
-    return 'OpenRouter 解码的响应体: $body';
-  }
-
-  @override
-  String decodedJson(String data) {
-    return '解码的 JSON: $data';
-  }
-
-  @override
-  String get responseStructureUnexpectedMessageContentMissing =>
-      '响应结构异常：缺少消息或内容';
-
-  @override
-  String get responseStructureUnexpectedChoicesMissing => '响应结构异常：缺少选项或选项为空';
-
-  @override
-  String openRouterApiRequestFailed(int statusCode, String body) {
-    return 'OpenRouter API 请求失败: $statusCode - $body';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterAttempts(int attempt, String error) {
-    return 'OpenRouter API 请求失败 $attempt 次: $error';
-  }
-
-  @override
   String get internetRequired => '使用此模型需要互联网连接';
-
-  @override
-  String get pleaseWaitBeforeTryingAgain => '请稍等片刻再试';
-
-  @override
-  String openRouterQuotaExceeded(int statusCode, String decodedBody) {
-    return '配额已超出。状态码: $statusCode, 响应体: $decodedBody';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterPaidAttempts(
-      int attempts, String error) {
-    return '在 $attempts 次付费尝试后 API 请求失败。错误: $error';
-  }
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
@@ -769,12 +451,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get capabilitiesSection => '能力';
 
   @override
-  String get ratingsSection => '评级';
-
-  @override
-  String get noRatingDataFound => '未找到评级数据';
-
-  @override
   String get featurePhotoTitle => '照片扫描';
 
   @override
@@ -785,12 +461,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get featureOfflineDescription => '无需互联网连接即可运行模型，确保您的数据安全。';
-
-  @override
-  String get featureSupermodelTitle => '超级模型';
-
-  @override
-  String get featureSupermodelDescription => '这是一个拥有超过100亿参数的大型模型，提供高性能和广泛的能力。';
 
   @override
   String get featureRoleplayTitle => '角色扮演';
@@ -808,25 +478,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get context => '上下文';
 
   @override
-  String get millions => '百万';
-
-  @override
-  String get billions => '十亿';
-
-  @override
-  String get trillions => '万亿';
-
-  @override
-  String get thousand => '千';
-
-  @override
-  String get estimated => '估计';
-
-  @override
   String get finalPreparation => '正在进行最后的准备。';
-
-  @override
-  String get allEvaluationsByTestTeam => '所有评估均由我们的测试团队进行';
 
   @override
   String get shareApp => '分享应用';
@@ -861,9 +513,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get user => '用户';
-
-  @override
-  String get voice => '语音';
 
   @override
   String get help => '帮助';
@@ -911,9 +560,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chinese => '中文';
 
   @override
-  String get arabic => '阿拉伯语';
-
-  @override
   String get french => '法语';
 
   @override
@@ -930,9 +576,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get korean => '韩语';
-
-  @override
-  String get deutsch => '德语 (Deutsch)';
 
   @override
   String get english => '英语';
@@ -975,9 +618,6 @@ class AppLocalizationsZh extends AppLocalizations {
       '用户名只能使用字母 \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' 以及字符 \'.\'、\'-\'、\'_\'。';
 
   @override
-  String get passwordTooLong => '密码不能超过64个字符。';
-
-  @override
   String get noInternetConnection => '无网络连接。';
 
   @override
@@ -987,15 +627,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get library => '库';
 
   @override
-  String get inappropriateMessageWarning => '检测到不当消息！';
-
-  @override
-  String get myModelDescription => '我的模型。';
-
-  @override
-  String get noModelsDownloaded => '您还没有下载任何模型。';
-
-  @override
   String get appTitle => 'Cortex';
 
   @override
@@ -1003,9 +634,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get removeModel => '移除模型';
-
-  @override
-  String get modelUploadedSuccessfully => '模型上传成功。';
 
   @override
   String get insufficientRAM => '内存不足';
@@ -1030,9 +658,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get benefit1 => '在线 AI 的更多对话限制';
 
   @override
-  String get benefit2 => '上传您自己的模型';
-
-  @override
   String get benefit3 => '个人资料特效';
 
   @override
@@ -1040,9 +665,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get benefit5 => '创建更多在线人工智能';
-
-  @override
-  String get benefit6 => '无限聊天';
 
   @override
   String benefit7(Object credits) {
@@ -1054,9 +676,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get benefit9 => '新主题';
-
-  @override
-  String get benefit10 => '离线语音聊天';
 
   @override
   String get oldBenefits => '包含所有较低级别计划的权益';
@@ -1095,21 +714,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get copyrights => '版权归属';
 
   @override
-  String get downloadingTitle => '下载中';
-
-  @override
-  String get downloadCompletedTitle => '下载完成';
-
-  @override
-  String get downloadPausedTitle => '下载暂停';
-
-  @override
-  String get downloadErrorTitle => '下载错误';
-
-  @override
-  String get cancelButtonText => '取消';
-
-  @override
   String get love => '爱';
 
   @override
@@ -1143,13 +747,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get editingNotification => '您现在处于编辑模式';
 
   @override
-  String get featureIndulgentTitle => '宽容';
-
-  @override
-  String get featureIndulgentDescription =>
-      '该模型可以无缝容纳和处理超过100,000个令牌的上下文，使其能够处理大量详细的输入而不会影响性能。';
-
-  @override
   String get featurePluralTitle => '多元';
 
   @override
@@ -1157,30 +754,10 @@ class AppLocalizationsZh extends AppLocalizations {
       '该模型可以自动集成其他扩展，从而扩展其功能，以支持具有增强性能的各种操作。';
 
   @override
-  String get featureWiseTitle => '智慧';
-
-  @override
-  String get featureWiseDescription =>
-      '该模型可以利用深入的分析见解和前瞻性推理，为决策和复杂问题解决提供复杂的支持。';
-
-  @override
-  String get featureResearcherTitle => '研究员';
-
-  @override
-  String get featureResearcherDescription =>
-      '此功能专为配备先进研究和分析能力的模型提供，旨在在不同领域提供高精度的见解和全面的分析。';
-
-  @override
   String get nameLabel => 'AI 名称';
 
   @override
-  String get nameHint => '输入您的 AI 名称';
-
-  @override
   String get summaryLabel => 'AI 摘要';
-
-  @override
-  String get summaryHint => '输入您的 AI 摘要';
 
   @override
   String get add => '添加';
@@ -1209,18 +786,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get summary => '摘要';
 
   @override
-  String get characterPoliceTitle => '警察';
-
-  @override
-  String get characterPoliceRole => '你是一名警惕的执法者，致力于保护公民和维护秩序，以坚定不移的承诺，你是一名警察';
-
-  @override
-  String get characterPoliceShortDescription => '一名坚定而勇敢的执法者。';
-
-  @override
-  String get purchaseSubscription => '购买';
-
-  @override
   String get modelUploadTitle => '人工智能文件';
 
   @override
@@ -1229,13 +794,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get modelUploadShortDescription => '点击此处从您的设备选择一个 .gguf 文件';
-
-  @override
-  String get addServerTitle => '人工智能服务器';
-
-  @override
-  String get addServerDescription =>
-      '输入您的远程服务器 URL 以连接外部托管的模型。此功能需要有效的互联网连接，任何与服务器相关的问题或错误均非由 Cortex 引起。请确保您的服务器配置正确，可从您的网络访问，并具有有效的模型端点以获得流畅的体验。';
 
   @override
   String get you => '您';
@@ -1247,22 +805,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmRemovePhoto => '您确定要移除照片吗？';
 
   @override
-  String get serverLink => '服务器链接';
-
-  @override
-  String get enterURL => '输入服务器 URL';
-
-  @override
   String get chatLengthLimitExceeded => '此聊天已超出字符限制。请开始新的聊天或购买订阅。';
-
-  @override
-  String get aiNameError => '已存在同名的 AI。';
-
-  @override
-  String get modelLimitExceeded => '您已达到您计划的最大模型创建限制。';
-
-  @override
-  String get modelVertexProducer => 'Vertex';
 
   @override
   String get photoLimitReachedMessage => '只能添加一张照片';
@@ -1276,14 +819,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String insufficientCredits(Object available, Object required) {
     return '您没有足够的积分来完成此请求。此操作需要 $required 积分，但您只有 $available。要获得更多积分，您可以升级您的套餐或直接购买。嘿 我们完全理解积分用完确实有点烦但说真的从模特那里得到那些超棒的回复可不是免费的所以这些积分实际上帮助我们保持一切顺利进行听着如果更多人加入并购买积分我们完全可以考虑为所有人提高免费每日额度';
-  }
-
-  @override
-  String get regenerateInProgress => '答案生成已在进行中。';
-
-  @override
-  String errorOccurredDuringRegeneration(String errorDetails) {
-    return '尝试重新生成时出错: $errorDetails';
   }
 
   @override
@@ -1309,9 +844,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get errorInsufficientCredits => '您的积分不足。请充值以继续。';
-
-  @override
-  String get errorRateLimitExceeded => '请求过于频繁。请稍后再试。';
 
   @override
   String get errorServer => '发生意外的服务器错误。请稍后再试。';
@@ -1355,22 +887,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noModelsFoundMessage => '尝试调整您的搜索词或清除过滤器。';
-
-  @override
-  String get usernameRateLimitExceeded => '您每14天只能更改两次用户名。';
-
-  @override
-  String get usernameUnchanged => '这已经是您当前的用户名。';
-
-  @override
-  String get creditsInfoPanelTitle => '积分如何运作';
-
-  @override
-  String get creditsInfoPanelBody =>
-      '积分用于和在线 AI 模型聊天。每一条消息对我们来说都是真金白银的成本，这些积分说白了就是不让我们直接亏到破产的救命稻草。现在简单说一下这个系统是怎么工作的：\n\n• 给免费的在线模型发送每条消息需要 5 点积分。\n• 给高级在线模型发送每条消息需要 20 点积分。\n• 附加一个文件会额外多花 30 点积分。\n• 免费套餐用户每天都会获得 200 点积分奖励，并且每天重置。';
-
-  @override
-  String get creditsInfoPanelFooter => '聊天愉快！';
 
   @override
   String get disclaimerMessage => '人工智能可能会犯错，请核对重要信息。';
@@ -1445,9 +961,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get photoWarningMessage => '包含一张照片。不支持图像的模型可能会忽略它。';
-
-  @override
-  String get loginRequiredForPurchase => '您必须登录才能进行购买。';
 
   @override
   String get storagePermissionRequired => '需要存储权限才能保存下载的模型。请授予权限以继续。';
@@ -1543,33 +1056,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get premiumTrialExhaustedMessage => '您已使用高级模型的所有免费每日消息，请升级以获得无限制访问权限。';
 
   @override
-  String selectionScreenGreetingUser(String userName) {
-    return '今天我能为您做些什么，$userName？';
-  }
-
-  @override
   String get selectionScreenGreetingGeneric => '今天我能为您做些什么？';
-
-  @override
-  String get selectionScreenRecentModels => '近期模型';
-
-  @override
-  String get selectionScreenFeatureDynamicChat => '动态聊天';
 
   @override
   String get selectionScreenFeatureOffline => '无需互联网即可使用';
 
   @override
-  String get selectionScreenFeatureSelectModel => '选择模型';
-
-  @override
   String get explore => '探索';
-
-  @override
-  String get subscriptionCancelled => '订阅取消成功！';
-
-  @override
-  String get selectionScreenPinnedModels => '固定模型';
 
   @override
   String get selectionScreenNewsAndUpdates => '新闻与更新';
@@ -1603,12 +1096,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get errorNoModelsAvailable => '目前没有可用的型号。请检查您的网络连接，然后重试。';
-
-  @override
-  String get errorNoModelsForRequest => '未找到适合您当前请求的模型（例如离线模式或图像消息）。';
-
-  @override
-  String get dynamicChatWelcome => '我怎么帮你？';
 
   @override
   String get notificationComebackTitle => '我们想你！';
@@ -1896,12 +1383,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exitAppConfirmation => '您确定要离开这个令人惊叹的平台吗？';
 
   @override
-  String get newsErrorTitle => '新闻加载失败';
-
-  @override
-  String get newsErrorMessage => '获取最新更新时出现问题，请检查您的连接并重试。';
-
-  @override
   String get tagNotFound => '您输入的标签无效或已过期。';
 
   @override
@@ -1975,9 +1456,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get createAccount => '创建账户';
-
-  @override
-  String get upgradeTitle => '完成注册';
 
   @override
   String get accountLinkedSuccess => '账户创建成功！';
