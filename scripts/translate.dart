@@ -4,9 +4,63 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:path/path.dart' as p;
 
-Future<void> main(List<String> args) async {
-  final renameArg = args.firstWhere((arg) => arg.startsWith('--rename='), orElse: () => '');
+Future<void> main(List<String> rawArgs) async {
+  // 1. Setup Paths
+  final scriptPath = Platform.script.toFilePath();
+  final projectRoot = p.dirname(p.dirname(scriptPath));
+  final arbDir = p.join(projectRoot, 'lib', 'l10n');
+  final libDir = p.join(projectRoot, 'lib');
+  final backupDir = Directory(p.join(arbDir, '.backup'));
 
+  // --- ARGUMENT SANITIZATION ---
+  List<String> args = List.from(rawArgs);
+  String? forcedRemoveValue;
+
+  final keyArgIndex = args.indexWhere((arg) => arg.startsWith('--key='));
+  if (keyArgIndex != -1) {
+    final val = args[keyArgIndex].split('=')[1];
+
+    if (val.startsWith('--remove')) {
+      args.removeAt(keyArgIndex);
+      args.add('--remove');
+      if (val.contains('=')) forcedRemoveValue = val.split('=')[1];
+    } else if (val.startsWith('--restore')) {
+      args.removeAt(keyArgIndex);
+      args.add('--restore');
+    } else if (val.startsWith('--rename')) {
+      args.removeAt(keyArgIndex);
+      args.add(val);
+    }
+  }
+
+  // --- COMMAND: RESTORE ---
+  if (args.contains('--restore')) {
+    if (!await backupDir.exists()) {
+      stderr.writeln('❌ Error: No backup found to restore.');
+      stderr.writeln('   Backups are created automatically only when you run --remove.');
+      exit(1);
+    }
+
+    stdout.writeln('↺  Restoring ARB files from backup...');
+    final backupFiles = backupDir.listSync().whereType<File>();
+
+    int restoredCount = 0;
+    for (final backupFile in backupFiles) {
+      final fileName = p.basename(backupFile.path);
+      final targetPath = p.join(arbDir, fileName);
+      await backupFile.copy(targetPath);
+      restoredCount++;
+    }
+
+    // Clean up backup folder after restore
+    await backupDir.delete(recursive: true);
+
+    stdout.writeln('✅ Successfully restored $restoredCount files.');
+    return;
+  }
+
+  // --- COMMAND: RENAME ---
+  final renameArg = args.firstWhere((arg) => arg.startsWith('--rename='), orElse: () => '');
   if (renameArg.isNotEmpty) {
     final pairsString = renameArg.split('=')[1];
     if (pairsString.isEmpty) {
@@ -27,12 +81,9 @@ Future<void> main(List<String> args) async {
     stdout.writeln('🔄 Key renaming mode is active.');
     stdout.writeln('Keys that will be changed: $renameMap');
 
-    final scriptPath = Platform.script.toFilePath();
-    final projectRoot = p.dirname(p.dirname(scriptPath));
-    final arbDir = p.join(projectRoot, 'lib', 'l10n');
     final arbFiles = Directory(arbDir).listSync().where((f) => f.path.endsWith('.arb'));
-
     int filesChanged = 0;
+
     for (final fileEntity in arbFiles) {
       final file = File(fileEntity.path);
       String content = await file.readAsString();
@@ -62,7 +113,133 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final Map<String, Map<String, String>> manualOverrides = {};
+  // --- COMMAND: REMOVE ---
+  final hasRemoveFlag = args.any((arg) => arg.startsWith('--remove'));
+
+  if (hasRemoveFlag) {
+    final removeArg = args.firstWhere((arg) => arg.startsWith('--remove'), orElse: () => '');
+    List<String> keysToRemove = [];
+
+    String val = '';
+    if (forcedRemoveValue != null) {
+      val = forcedRemoveValue;
+    } else if (removeArg.contains('=')) {
+      val = removeArg.split('=')[1];
+    }
+
+    if (val.isNotEmpty) {
+      // 1. Specific Keys Mode
+      keysToRemove = val.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+      stdout.writeln('🗑️  Manual removal mode: Removing ${keysToRemove.length} specific keys...');
+    } else {
+      // 2. Auto-Clean Mode
+      stdout.writeln('🧹 Auto-cleanup mode: Scanning project for unused keys...');
+      stdout.writeln('   (Excluding "l10n" and "generated" folders to prevent false positives)');
+
+      final templateFile = File(p.join(arbDir, 'app_en.arb'));
+      if (!await templateFile.exists()) {
+        stderr.writeln('❌ Error: app_en.arb not found, cannot calculate unused keys.');
+        exit(1);
+      }
+
+      final Map<String, dynamic> jsonMap = jsonDecode(await templateFile.readAsString());
+      final Set<String> allKeys = jsonMap.keys.where((k) => !k.startsWith('@')).toSet();
+
+      stdout.writeln('   Scanning lib/ folder for usage references...');
+
+      final Set<String> usedTokens = {};
+      final dartFiles = Directory(libDir).listSync(recursive: true).where((f) => f.path.endsWith('.dart'));
+
+      int filesScanned = 0;
+      for (final entity in dartFiles) {
+        final segments = p.split(entity.path);
+        if (segments.contains('l10n') || segments.contains('generated')) {
+          continue;
+        }
+
+        filesScanned++;
+        final file = File(entity.path);
+        final content = await file.readAsString();
+        final tokens = content.split(RegExp(r'[^a-zA-Z0-9_]'));
+        usedTokens.addAll(tokens);
+      }
+
+      stdout.writeln('   Scanned $filesScanned Dart files.');
+
+      for (final key in allKeys) {
+        if (!usedTokens.contains(key)) {
+          keysToRemove.add(key);
+        }
+      }
+
+      if (keysToRemove.isEmpty) {
+        stdout.writeln('✨ No unused keys found. Your ARB files are clean!');
+        return;
+      }
+
+      stdout.writeln('⚠️  Found ${keysToRemove.length} unused keys.');
+    }
+
+    if (keysToRemove.isEmpty) {
+      stderr.writeln('❌ Error: No keys to remove found.');
+      exit(1);
+    }
+
+    // --- AUTOMATIC BACKUP START ---
+    stdout.writeln('📦 Creating backup before modification...');
+    if (!await backupDir.exists()) await backupDir.create();
+
+    final arbFilesForBackup = Directory(arbDir).listSync().where((f) => f.path.endsWith('.arb'));
+    for (final f in arbFilesForBackup) {
+      if (f is File) {
+        await f.copy(p.join(backupDir.path, p.basename(f.path)));
+      }
+    }
+    stdout.writeln('   Backup saved to: lib/l10n/.backup/');
+    // --- AUTOMATIC BACKUP END ---
+
+    // Process Removal
+    final arbFiles = Directory(arbDir).listSync().where((f) => f.path.endsWith('.arb'));
+    int filesChanged = 0;
+
+    for (final fileEntity in arbFiles) {
+      final file = File(fileEntity.path);
+      try {
+        final contentStr = await file.readAsString();
+        if (contentStr.trim().isEmpty) continue;
+
+        final Map<String, dynamic> contentJson = jsonDecode(contentStr);
+        bool modified = false;
+
+        for (final key in keysToRemove) {
+          if (contentJson.containsKey(key)) {
+            contentJson.remove(key);
+            modified = true;
+          }
+          final metaKey = '@$key';
+          if (contentJson.containsKey(metaKey)) {
+            contentJson.remove(metaKey);
+            modified = true;
+          }
+        }
+
+        if (modified) {
+          await file.writeAsString(JsonEncoder.withIndent('  ').convert(contentJson));
+          stdout.writeln('   ✂️  Removed keys from: ${p.basename(file.path)}');
+          filesChanged++;
+        }
+      } catch (e) {
+        stderr.writeln('   ❌ Error processing ${p.basename(file.path)}: $e');
+      }
+    }
+
+    stdout.writeln('\n✨ Removal completed. Updated $filesChanged files.');
+    stdout.writeln('💡 Mistake? Run "translate --restore" to undo.');
+    return;
+  }
+
+  // --- COMMAND: TRANSLATE (Default) ---
+  final manualOverrides = <String, Map<String, String>>{};
 
   List<String> keysToUpdate = [];
   final keyArg = args.firstWhere((arg) => arg.startsWith('--key='), orElse: () => '');
@@ -76,9 +253,6 @@ Future<void> main(List<String> args) async {
     keysToUpdate = keysString.split(',').map((k) => k.trim()).toList();
   }
 
-  final scriptPath = Platform.script.toFilePath();
-  final projectRoot = p.dirname(p.dirname(scriptPath));
-  final arbDir = p.join(projectRoot, 'lib', 'l10n');
   final templateArbFileName = 'app_en.arb';
   final sourceLocale = 'en';
   final targetLocales = [

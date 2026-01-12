@@ -9,9 +9,6 @@ class AppLocalizationsKu extends AppLocalizations {
   AppLocalizationsKu([String locale = 'ku']) : super(locale);
 
   @override
-  String get understood => 'Têgihiştim.';
-
-  @override
   String get cancel => 'Betal bike';
 
   @override
@@ -30,9 +27,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get chat => 'Sohbet';
 
   @override
-  String get darkMode => 'Moda Tarî';
-
-  @override
   String get light => 'Ronî';
 
   @override
@@ -46,9 +40,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get done => 'Çêbû';
-
-  @override
-  String get comingSoon => 'DI DEMEKE NÊZ DE';
 
   @override
   String get bestValue => 'Nirxa Herî Baş';
@@ -66,14 +57,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get messageHint => 'Tiştekî bipirse';
 
   @override
-  String get modelLoading => 'Model tê barkirin...';
-
-  @override
   String get messageCopied => 'Peyam li panoyê hate kopîkirin.';
-
-  @override
-  String get storeUnavailable =>
-      'Firoşgeh niha ne berdest e. Ji kerema xwe paşê dîsa biceribîne';
 
   @override
   String get retry => 'Dîsa biceribîne';
@@ -84,16 +68,6 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String deviceMemory(Object memory) {
     return 'Bîra Amûrê: $memory GB';
-  }
-
-  @override
-  String storageSpace(Object storage) {
-    return 'Cihê Depokirinê: $storage GB';
-  }
-
-  @override
-  String freeStorageSpace(Object freeStorage) {
-    return 'Cihê Depokirinê yê Azad: $freeStorage GB';
   }
 
   @override
@@ -118,9 +92,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get usedMemory => 'Bîra Bikaranî';
 
   @override
-  String get requirements => 'Pêdivî';
-
-  @override
   String get modelsTitle => 'Pirtûkxane';
 
   @override
@@ -130,35 +101,11 @@ class AppLocalizationsKu extends AppLocalizations {
   String get serverSideModels => 'Modelên Serhêl';
 
   @override
-  String get uploadYourOwnModel => 'Modela Xwe Bar Bike!';
-
-  @override
   String get selectGGUFFile => 'Pelê GGUF Hilbijêre';
 
   @override
   String get errorGGUF =>
       'Ji kerema xwe tenê pelên bi formata GGUF hilbijêrin.';
-
-  @override
-  String get modelAlreadyExists => 'Model jixwe heye.';
-
-  @override
-  String get modelAddedSuccessfully => 'Model bi serkeftî hate zêdekirin.';
-
-  @override
-  String get modelRemoved => 'Model bi serkeftî hate rakirin.';
-
-  @override
-  String get removeError => 'Dema rakirina modelê de xeletiyek çêbû.';
-
-  @override
-  String get fileNotFound => 'Pel nehat dîtin.';
-
-  @override
-  String get fileUploadError => 'Dema barkirina pelê de xeletiyek çêbû.';
-
-  @override
-  String get noFileSelected => 'Tu pel nehat hilbijartin.';
 
   @override
   String get myModels => 'Modelên Min';
@@ -167,36 +114,14 @@ class AppLocalizationsKu extends AppLocalizations {
   String get create => 'Çêke';
 
   @override
-  String get seeAll => 'Hemî Bibîne';
-
-  @override
   String modelProducer(Object producer) {
     return 'Hilberîner: $producer';
-  }
-
-  @override
-  String modelRAM(Object ram) {
-    return 'RAM: $ram';
-  }
-
-  @override
-  String modelSize(Object size) {
-    return 'Mezinahî: $size';
   }
 
   @override
   String modelDescription(Object description) {
     return '$description';
   }
-
-  @override
-  String get conversationsTitle => 'Sohbet';
-
-  @override
-  String get conversationDeleted => 'Sohbet hate jêbirin.';
-
-  @override
-  String get conversationUpdated => 'Sohbet hate nûvekirin.';
 
   @override
   String get editConversationTitle => 'Navê biguherîne';
@@ -208,9 +133,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get save => 'Tomar bike';
 
   @override
-  String get titleCannotBeEmpty => 'Sernav nikare vala be.';
-
-  @override
   String get noConversationsMessage => 'Sohbet tune ne, dest bi sohbetê bike!';
 
   @override
@@ -218,12 +140,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get noChats => 'Sohbet Tune';
-
-  @override
-  String get starredChats => 'Sohbetên bi Stêrk';
-
-  @override
-  String get allChats => 'Hemî Sohbet';
 
   @override
   String get noStarredChats => 'Sohbetên bi Stêrk Tune';
@@ -239,18 +155,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get unstarConversation => 'Unstar';
-
-  @override
-  String get conversationTitleUpdated => 'Sernavê sohbetê hate nûvekirin';
-
-  @override
-  String get youReachedConversationLimit => 'Tu gihîştî sînorê sohbetê.';
-
-  @override
-  String get today => 'Îro';
-
-  @override
-  String get yesterday => 'Duh';
 
   @override
   String get loginToYourAccount => 'Têkeve';
@@ -302,9 +206,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get passwordsDoNotMatch => 'Şîfre li hev nakin.';
 
   @override
-  String get userNotFound => 'Bikarhêner nehat dîtin.';
-
-  @override
   String get wrongPassword => 'Şîfreya çewt.';
 
   @override
@@ -317,39 +218,13 @@ class AppLocalizationsKu extends AppLocalizations {
   String get authError => 'Çewtiya Nasnameyê';
 
   @override
-  String get invalidUsername => 'Ji kerema xwe navekî bikarhêner binivîse.';
-
-  @override
   String get usernameTaken => 'Ev navê bikarhêner jixwe hatiye girtin.';
 
   @override
   String get username => 'Navê bikarhêner';
 
   @override
-  String get authenticationFailed =>
-      'Nasnameyê bi ser neket. Ji kerema xwe dîsa biceribîne.';
-
-  @override
-  String get emailTooLong => 'E-name dikare herî zêde 30 tîpan be.';
-
-  @override
-  String get deviceLimitReached =>
-      'Tu gihîştî sînorê çêkirina hesabê ji bo vê amûrê.';
-
-  @override
-  String get verificationEmailLimitReached => 'Em êdî naşînin';
-
-  @override
-  String get verificationEmailSent => 'E-nameya verastkirinê hate şandin!';
-
-  @override
-  String get emailNotVerified => 'E-name nehatiye verastkirin';
-
-  @override
   String get resendCode => 'E-nameya verastkirinê dîsa bişîne';
-
-  @override
-  String get remainingSeconds => 'Dema mayî ji bo verastkirinê';
 
   @override
   String get pleaseCheckYourEmail =>
@@ -357,9 +232,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get verifyYourEmail => 'E-nameya Xwe Piştrast bike';
-
-  @override
-  String get backToLogin => 'Vegere Paş';
 
   @override
   String get seconds => 'saniye';
@@ -388,9 +260,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get verifyNow => 'Niha Piştrast bike';
 
   @override
-  String get accountVerified => 'Hesabê te hate piştrastkirin.';
-
-  @override
   String get linkSent => 'Zencîre hate şandin';
 
   @override
@@ -407,13 +276,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get confirmDeleteAccount => 'Tu bi rastî dixwazî hesabê xwe jê bibî?';
 
   @override
-  String get enterPasswordToDelete => 'Ji bo jêbirinê şîfreya xwe binivîse.';
-
-  @override
   String get deleteAccount => 'Hesabê Jê bibe';
-
-  @override
-  String get deleteAccountError => 'Dema jêbirina hesabê de xeletiyek çêbû.';
 
   @override
   String get delete => 'Jê bibe';
@@ -435,29 +298,10 @@ class AppLocalizationsKu extends AppLocalizations {
   String get displayName => 'Navê Nîşandanê';
 
   @override
-  String get tapToChangeProfilePicture =>
-      'Ji bo guhertina wêneyê profîlê bitikîne';
-
-  @override
   String get profileUpdated => 'Profîl bi serkeftî hate nûvekirin';
 
   @override
-  String get updateFailed => 'Nûvekirina profîlê bi ser neket';
-
-  @override
-  String get nameCannotBeEmpty => 'Nav nikare vala be';
-
-  @override
   String get logout => 'Derketin';
-
-  @override
-  String get noDisplayName => 'Navê nîşandanê nehatiye danîn';
-
-  @override
-  String get noEmail => 'Navnîşana e-nameyê tune';
-
-  @override
-  String get noUserLoggedIn => 'Niha tu bikarhêner têketî nîne';
 
   @override
   String get profile => 'Profîl';
@@ -485,15 +329,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get downloading => 'Tê daxistin...';
 
   @override
-  String get downloadError => 'Di dema daxistinê de xeletiyek çêbû.';
-
-  @override
-  String get downloadCancelled => 'Daxistin hate betalkirin.';
-
-  @override
-  String get downloadResumed => 'Daxistin ji nû ve dest pê kir.';
-
-  @override
   String get downloadSuccess => 'Daxistin bi ser ket';
 
   @override
@@ -511,28 +346,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get purchaseSuccessful => 'Kirîn serkeftî bû!';
 
   @override
-  String get purchaseFailed => 'Kirîn bi ser neket';
-
-  @override
-  String get creditProductNotFound =>
-      'Hilbera krediyê ya hilbijartî nehat dîtin.';
-
-  @override
-  String get creditsAddedSuccessfully =>
-      'Kredî bi serkeftî li hesabê te hatin zêdekirin!';
-
-  @override
-  String get creditDeliveryFailed =>
-      'Zêdekirina krediyan li hesabê te bi ser neket. Ji kerema xwe bi piştgiriyê re têkilî daynin.';
-
-  @override
-  String get invalidPurchase => 'Kirîna nederbasdar';
-
-  @override
   String get purchaseError => 'Çewtiya kirînê';
-
-  @override
-  String get purchaseVertexPlusToUpload => 'Ev taybetmendiyek Plus e';
 
   @override
   String get purchasePlus => 'Cortex Plus bikire';
@@ -580,33 +394,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Zêdetir taybetmendiyên Cortex-ê bi kar bîne û AI-yê hê bêtir biceribîne!';
 
   @override
-  String get alreadySubscribed => 'Tu jixwe aboneyî';
-
-  @override
-  String get subscriptionInfo => 'Abonetiya te çalak e.';
-
-  @override
-  String get alreadySubscribedMessage =>
-      'Jixwe abonetiya te ya Plus heye. Heke tu dixwazî abonetiya xwe betal bikî, tu dikarî vê yekê bi rêya rêveberê Play Store-ê bikî.';
-
-  @override
-  String get cancelSubscription => 'Abonetiyê Betal bike';
-
-  @override
-  String get cancelSubscriptionInfo =>
-      'Heke tu dixwazî abonetiya xwe betal bikî, ji kerema xwe bi rêya rêveberê abonetiya Play Store-ê bidomîne.';
-
-  @override
-  String get goToPlayStore => 'Here Play Store';
-
-  @override
-  String get alreadySubscribedPlus => 'Plana te ya Plus heye!';
-
-  @override
-  String get alreadySubscribedPlusMessage =>
-      'Plana te ya Plus çalak e. Tu dikarî ji hemî feydeyan sûd werbigirî.';
-
-  @override
   String get purchaseUltra => 'Cortex Ultra bikire';
 
   @override
@@ -614,27 +401,7 @@ class AppLocalizationsKu extends AppLocalizations {
       'Gihîştina tevahî ya hemî taybetmendiyên Cortex-ê bi dest bixe û AI-yê bi tevahî biceribîne!';
 
   @override
-  String get noSubscription => 'Abonetî Tune';
-
-  @override
-  String get noSubscriptionMessage => 'Hîna abonetiya te tune.';
-
-  @override
-  String get alreadyAtHighestPlan => 'Tu jixwe di plana herî bilind de yî.';
-
-  @override
-  String get unableToOpenSubscription =>
-      'Nikare rûpela rêveberiya abonetiyê veke.';
-
-  @override
   String get upgradeSubscription => 'Abonetiyê Nûjen bike';
-
-  @override
-  String get confirmUpgrade => 'Tu bi rastî dixwazî abonetiya xwe nûjen bikî?';
-
-  @override
-  String get unsupportedPlatform =>
-      'Platforma ji bo betalkirina abonetiyê nayê piştgirî kirin.';
 
   @override
   String get purchaseStreamError => 'Çewtiya herika kirînê.';
@@ -643,44 +410,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get productNotFound => 'Hilber nehat dîtin';
 
   @override
-  String get productDetailsError =>
-      'Dema anîna hûrguliyên hilberê de xeletiyek çêbû.';
-
-  @override
   String get noProductsFound => 'Tu hilber nehat dîtin';
-
-  @override
-  String get loadCreditsButton => 'Krediyan Bar bike';
-
-  @override
-  String get creditsTitle => 'Kredî';
-
-  @override
-  String get creditsScreenDescription =>
-      'Ev ekran krediyên bikarhêner nîşan dide. \n\nKrediyên heyî yên bikarhêner: 100\n\nAgahdariyên krediyê yên berfireh dikarin li vir werin nîşandan.';
-
-  @override
-  String get creditsLoaded => 'Kredî hatin barkirin!';
-
-  @override
-  String get currentCredits => 'Krediyên Heyî';
-
-  @override
-  String get pleaseSelectCreditPackage =>
-      'Ji kerema xwe pakêtek krediyê hilbijêre';
-
-  @override
-  String get purchaseCreditsTitle => 'Krediyan Bikire';
-
-  @override
-  String get purchaseCreditsDescription =>
-      'Pakêtek krediyê ya ku li gorî hewcedariyên te ye hilbijêre û sepana me bêtir bikar bîne.';
-
-  @override
-  String get purchaseButton => 'Bikire';
-
-  @override
-  String get productNotFoundMessage => 'Hilbera hilbijartî tune.';
 
   @override
   String get buyCredits => 'Krediyan Bikire';
@@ -693,72 +423,8 @@ class AppLocalizationsKu extends AppLocalizations {
   String get buyCredit => 'Krediyan Bikire';
 
   @override
-  String buyCreditPackage(Object amount) {
-    return '$amount Kredî Bikire';
-  }
-
-  @override
-  String get subscribedPlan => 'Abone';
-
-  @override
-  String get errorResponseNotReceived => 'Bersiv nehat wergirtin';
-
-  @override
-  String googleApiRequestFailed(int attempt, String error) {
-    return 'Daxwaza Google API $attempt caran bi ser neket: $error';
-  }
-
-  @override
-  String openRouterResponseStatus(int statusCode) {
-    return 'Rewşa Bersiva OpenRouter: $statusCode';
-  }
-
-  @override
-  String openRouterDecodedResponseBody(String body) {
-    return 'Laşê Bersiva Dekodkirî ya OpenRouter: $body';
-  }
-
-  @override
-  String decodedJson(String data) {
-    return 'JSON-a Dekodkirî: $data';
-  }
-
-  @override
-  String get responseStructureUnexpectedMessageContentMissing =>
-      'Struktura bersivê nediyar e: peyam an naverok winda ye';
-
-  @override
-  String get responseStructureUnexpectedChoicesMissing =>
-      'Struktura bersivê nediyar e: hilbijartin winda ne an vala ne';
-
-  @override
-  String openRouterApiRequestFailed(int statusCode, String body) {
-    return 'Daxwaza OpenRouter API bi ser neket: $statusCode - $body';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterAttempts(int attempt, String error) {
-    return 'Daxwaza OpenRouter API $attempt caran bi ser neket: $error';
-  }
-
-  @override
   String get internetRequired =>
       'Ji bo bikaranîna vê modelê girêdana înternetê pêwîst e';
-
-  @override
-  String get pleaseWaitBeforeTryingAgain =>
-      'Ji kerema xwe berî ku dîsa biceribînî demekê bisekine';
-
-  @override
-  String openRouterQuotaExceeded(int statusCode, String decodedBody) {
-    return 'Kota derbas bû. Koda rewşê: $statusCode, Laş: $decodedBody';
-  }
-
-  @override
-  String openRouterApiRequestFailedAfterPaidAttempts(
-      int attempts, String error) {
-    return 'Daxwaza API piştî $attempts hewildanên bi pere bi ser neket. Çewtî: $error';
-  }
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
@@ -802,12 +468,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get capabilitiesSection => 'Qabiliyet';
 
   @override
-  String get ratingsSection => 'Nirxandin';
-
-  @override
-  String get noRatingDataFound => 'Daneyên nirxandinê nehatin dîtin';
-
-  @override
   String get featurePhotoTitle => 'Şopandina Wêneyan';
 
   @override
@@ -820,13 +480,6 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get featureOfflineDescription =>
       'Modelê bêyî girêdana înternetê bixebitîne da ku daneyên xwe ewle bihêlî.';
-
-  @override
-  String get featureSupermodelTitle => 'Super Model';
-
-  @override
-  String get featureSupermodelDescription =>
-      'Ev modelek mezin e ku zêdeyî 10 mîlyar parametreyan heye, performansa bilind û kapasîteyên berfireh pêşkêşî dike.';
 
   @override
   String get featureRoleplayTitle => 'Lîstika Rolan';
@@ -845,26 +498,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get context => 'Mijar';
 
   @override
-  String get millions => 'milyon';
-
-  @override
-  String get billions => 'milyar';
-
-  @override
-  String get trillions => 'trîlyon';
-
-  @override
-  String get thousand => 'hezar';
-
-  @override
-  String get estimated => 'texmînî';
-
-  @override
   String get finalPreparation => 'Amadekariyên dawî têne kirin.';
-
-  @override
-  String get allEvaluationsByTestTeam =>
-      'Hemû nirxandin ji hêla tîma me ya ceribandinê ve hatine çêkirin';
 
   @override
   String get shareApp => 'Sepanê Parve bike';
@@ -900,9 +534,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get user => 'Bikarhêner';
-
-  @override
-  String get voice => 'Deng';
 
   @override
   String get help => 'Alîkarî';
@@ -953,9 +584,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get chinese => 'Çînî';
 
   @override
-  String get arabic => 'Erebî';
-
-  @override
   String get french => 'Fransî';
 
   @override
@@ -972,9 +600,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get korean => 'Koreyî';
-
-  @override
-  String get deutsch => 'Deutsch';
 
   @override
   String get english => 'Îngilîzî';
@@ -1018,9 +643,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Di navê bikarhêner de tenê van tîpan: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' û karakterên \'.\', \'-\', \'_\' dikarin werin bikaranîn.';
 
   @override
-  String get passwordTooLong => 'Şîfre nikare ji 64 tîpan zêdetir be.';
-
-  @override
   String get noInternetConnection => 'Girêdana înternetê tune.';
 
   @override
@@ -1030,15 +652,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get library => 'Pirtûkxane';
 
   @override
-  String get inappropriateMessageWarning => 'Peyama neguncaw hat tespîtkirin!';
-
-  @override
-  String get myModelDescription => 'Modela min.';
-
-  @override
-  String get noModelsDownloaded => 'Te hîna tu model daxistiye.';
-
-  @override
   String get appTitle => 'Cortex';
 
   @override
@@ -1046,9 +659,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get removeModel => 'Modelê Rake';
-
-  @override
-  String get modelUploadedSuccessfully => 'Model bi serkeftî hate barkirin.';
 
   @override
   String get insufficientRAM => 'Bîra Kêm';
@@ -1073,9 +683,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get benefit1 => 'Sînorê sohbetê yê pir zêde ji bo AI-yên serhêl';
 
   @override
-  String get benefit2 => 'Modelên xwe bar bike';
-
-  @override
   String get benefit3 => 'Efekta profîlê';
 
   @override
@@ -1083,9 +690,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get benefit5 => 'Zêdetir îstîxbaratên çêkirî yên serhêl biafirîne';
-
-  @override
-  String get benefit6 => 'Sohbeta bêsînor';
 
   @override
   String benefit7(Object credits) {
@@ -1097,9 +701,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get benefit9 => 'Temayên nû';
-
-  @override
-  String get benefit10 => 'Sohbeta dengî ya negirêdayî';
 
   @override
   String get oldBenefits => 'Hemî feydeyên ji planên jêrîn';
@@ -1138,21 +739,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get copyrights => 'Girêdan';
 
   @override
-  String get downloadingTitle => 'Tê Daxistin';
-
-  @override
-  String get downloadCompletedTitle => 'Daxistin Temam Bû';
-
-  @override
-  String get downloadPausedTitle => 'Daxistin Hat Rawestandin';
-
-  @override
-  String get downloadErrorTitle => 'Çewtiya Daxistinê';
-
-  @override
-  String get cancelButtonText => 'Betal bike';
-
-  @override
   String get love => 'Evîn';
 
   @override
@@ -1187,13 +773,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get editingNotification => 'Tu niha di moda guherandinê de yî';
 
   @override
-  String get featureIndulgentTitle => 'Bêhnfireh';
-
-  @override
-  String get featureIndulgentDescription =>
-      'Ev model dikare bi hêsanî naverokên ku ji 100,000 tokenan zêdetir in bi cih bike û pêvajoyê bike, ku dihêle ew têketinên berfireh û hûrgulî bêyî ku tawîzê bide performansê bi rê ve bibe.';
-
-  @override
   String get featurePluralTitle => 'Pircar';
 
   @override
@@ -1201,30 +780,10 @@ class AppLocalizationsKu extends AppLocalizations {
       'Ev model dikare bixweber dirêjkirinên din yek bike, bi vî rengî kapasîteyên xwe yên fonksiyonel berfireh dike da ku bi performansa pêşkeftî piştgirî bide cûrbecûr operasyonan.';
 
   @override
-  String get featureWiseTitle => 'Zana';
-
-  @override
-  String get featureWiseDescription =>
-      'Ev model dikare têgihiştinên kûr ên analîtîk û ramana pêşbînker bikar bîne da ku piştgiriyek sofîstîke ji bo biryargirtinê û çareserkirina pirsgirêkên tevlihev peyda bike.';
-
-  @override
-  String get featureResearcherTitle => 'Lêkolîner';
-
-  @override
-  String get featureResearcherDescription =>
-      'Ev taybetmendî, ku bi tenê di modelên ku bi kapasîteyên lêkolîn û analîtîk ên pêşkeftî ve hatine stendine de heye, ji bo peydakirina têgihiştinên bi rastbûna bilind û analîzên berfireh li seranserê warên cihêreng hatîye sêwirandin.';
-
-  @override
   String get nameLabel => 'Navê AI';
 
   @override
-  String get nameHint => 'Navê AI-ya xwe binivîse';
-
-  @override
   String get summaryLabel => 'Kurteya AI';
-
-  @override
-  String get summaryHint => 'Kurteya AI-ya xwe binivîse';
 
   @override
   String get add => 'Lê zêde bike';
@@ -1254,20 +813,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get summary => 'Kurte';
 
   @override
-  String get characterPoliceTitle => 'Polîs';
-
-  @override
-  String get characterPoliceRole =>
-      'Tu pêkanînerekî hişyar î yê qanûnê, ji bo parastina welatiyan û domandina nîzamê bi pabendbûneke bêdawî veqetandî yî, tu polîs î';
-
-  @override
-  String get characterPoliceShortDescription =>
-      'Pêkanînerekî qanûnê yê bi sebir û wêrek.';
-
-  @override
-  String get purchaseSubscription => 'Bikire';
-
-  @override
   String get modelUploadTitle => 'Pela Îstîxbarata Çêkirî';
 
   @override
@@ -1279,13 +824,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Li vir bitikîne da ku pelek .gguf ji amûra xwe hilbijêrî';
 
   @override
-  String get addServerTitle => 'Servera Îstîxbarata Çêkirî';
-
-  @override
-  String get addServerDescription =>
-      'URL-a servera xweya dûr binivîse da ku bi modelek ku li derve tê mêvandar kirin ve girêbide. Ev taybetmendî hewceyê girêdanek înternetê ya çalak e, û her pirsgirêk an çewtiyên têkildarî serverê ji ber Cortex-ê nînin. Piştrast be ku servera te rast hatîye vesaz kirin, ji tora te tê gihîştin, û ji bo ezmûnek bêkêmasî xwedan xalek dawî ya modelek derbasdar e.';
-
-  @override
   String get you => 'Tu';
 
   @override
@@ -1295,24 +833,8 @@ class AppLocalizationsKu extends AppLocalizations {
   String get confirmRemovePhoto => 'Tu bi rastî dixwazî wêneyê rakî?';
 
   @override
-  String get serverLink => 'Zencîreya Serverê';
-
-  @override
-  String get enterURL => 'URL-a serverê binivîse';
-
-  @override
   String get chatLengthLimitExceeded =>
       'Vê sohbetê sînorê karakteran derbas kiriye. Ji kerema xwe sohbetek nû dest pê bike an abonetiyek bikire.';
-
-  @override
-  String get aiNameError => 'Jixwe AI-yek bi vî navî heye.';
-
-  @override
-  String get modelLimitExceeded =>
-      'Tu gihîştî sînorê herî zêde yê afirandina modelê ji bo plana xwe.';
-
-  @override
-  String get modelVertexProducer => 'Vertex';
 
   @override
   String get photoLimitReachedMessage => 'Tenê yek wêne dikare were zêdekirin';
@@ -1328,14 +850,6 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String insufficientCredits(Object available, Object required) {
     return 'Krediyên te yên têr nînin ji bo temamkirina vê daxwazê. Ev çalakî $required krediyan hewce dike, lê tenê $available krediyên te hene. Ji bo ku bêtir krediyan bi dest bixî, tu dikarî plana xwe nûjen bikî an wan rasterast bikirî. hey em bi tevahî fêm dikin ku kêmbûna krediyan dikare hinekî xemgîn be lê bi ciddî girtina wan bersivên ecêb ji modelên me ne belaş e ji ber vê yekê ev kredî bi rastî alîkariya me dikin ku demên xweş bidomînin û guhdarî bikin heke bêtir ji we hevalan bikevin nav û krediyan bistînin em dikarin bi tevahî li ber çavan bigirin ku sînorên rojane yên belaş ji bo her kesî zêde bikin';
-  }
-
-  @override
-  String get regenerateInProgress => 'Hilberandina bersivê jixwe di pêş de ye.';
-
-  @override
-  String errorOccurredDuringRegeneration(String errorDetails) {
-    return 'Dema hewildana ji nû ve hilberandinê de çewtiyek çêbû: $errorDetails';
   }
 
   @override
@@ -1365,10 +879,6 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get errorInsufficientCredits =>
       'Krediyên te kêm in. Ji kerema xwe ji bo berdewamiyê dagire.';
-
-  @override
-  String get errorRateLimitExceeded =>
-      'Pir zêde daxwaz. Ji kerema xwe di demek kurt de dîsa biceribîne.';
 
   @override
   String get errorServer =>
@@ -1419,23 +929,6 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get noModelsFoundMessage =>
       'Biceribîne ku şertên lêgerîna xwe biguherînî an parzûnê paqij bikî.';
-
-  @override
-  String get usernameRateLimitExceeded =>
-      'Tu dikarî tenê her 14 rojan carekê navê bikarhênerê xwe biguherînî.';
-
-  @override
-  String get usernameUnchanged => 'Ev jixwe navê bikarhênerê te yê heyî ye.';
-
-  @override
-  String get creditsInfoPanelTitle => 'Kredî Çawa Dixebitin';
-
-  @override
-  String get creditsInfoPanelBody =>
-      'Kredî têne bikar anîn ji bo sohbetkirin bi modelên zêrek (AI) yên serhêl. rastî her peyamek wekî xwe tê dibin bi lêçûna pereyê û ev kredî ne tenê numre ne, bi rastî ew in ku naxêlin me bi qasî rewşê bi xêrê ve biçin şûnê muflîsî. Niha em ê bi awayekî hêsan şîrove bikin ka sistem çawa dixebite:\n\n• Her peyamek ji bo modelek serhêl a belaş 5 kredîyan lêçûn dike.\n• Her peyamek ji bo modelek serhêl a premium 20 kredîyan lêçûn dike.\n• Heke pêvek an belgeyek were zêdekirin, 30 kredî yên din ji bo tevahî têne derxistin.\n• Bikarhênerên plana belaş bonusek 200 kredîyan distînin ku her roj ji nû ve tê sazkirin.';
-
-  @override
-  String get creditsInfoPanelFooter => 'Sohbeta xweş!';
 
   @override
   String get disclaimerMessage =>
@@ -1523,9 +1016,6 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get photoWarningMessage =>
       'Wêneyek tê de ye. Modelên ku wêneyan piştgirî nakin dibe ku wê paşguh bikin.';
-
-  @override
-  String get loginRequiredForPurchase => 'Ji bo kirînê divê tu têketî bî.';
 
   @override
   String get storagePermissionRequired =>
@@ -1630,34 +1120,14 @@ class AppLocalizationsKu extends AppLocalizations {
       'Te hemû peyamên xwe yên rojane yên belaş ji bo modelên premium bi kar anîne, ji kerema xwe ji bo gihîştina bêsînor nûve bike.';
 
   @override
-  String selectionScreenGreetingUser(String userName) {
-    return 'Ez çawa dikarim îro alîkariya te bikim, $userName?';
-  }
-
-  @override
   String get selectionScreenGreetingGeneric =>
       'Ez çawa dikarim îro alîkariya te bikim?';
-
-  @override
-  String get selectionScreenRecentModels => 'Modelên Dawî';
-
-  @override
-  String get selectionScreenFeatureDynamicChat => 'Sohbeta Dînamîk';
 
   @override
   String get selectionScreenFeatureOffline => 'Bêyî Înternetê bikar bînin';
 
   @override
-  String get selectionScreenFeatureSelectModel => 'Modelê Hilbijêre';
-
-  @override
   String get explore => 'Lêkolîn';
-
-  @override
-  String get subscriptionCancelled => 'Abonetî bi serkeftî hate betalkirin!';
-
-  @override
-  String get selectionScreenPinnedModels => 'Modelên Pinkirî';
 
   @override
   String get selectionScreenNewsAndUpdates => 'Nûçe û Nûvekirin';
@@ -1694,13 +1164,6 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get errorNoModelsAvailable =>
       'Niha ti model tune ne. Ji kerema xwe girêdana xwe ya înternetê kontrol bikin û dîsa biceribînin.';
-
-  @override
-  String get errorNoModelsForRequest =>
-      'Ji bo daxwaza we ya niha modelên guncaw nehatin dîtin (mînak, moda negirêdayî an peyama wêneyê).';
-
-  @override
-  String get dynamicChatWelcome => 'Carek dî?';
 
   @override
   String get notificationComebackTitle => 'Em bêriya te dikin!';
@@ -2014,13 +1477,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Ma hûn piştrast in ku hûn dixwazin ji vê platforma ecêb derkevin?';
 
   @override
-  String get newsErrorTitle => 'Barkirina Nûçeyan Bi Ser Neket';
-
-  @override
-  String get newsErrorMessage =>
-      'Di wergirtina nûvekirinên herî dawî de pirsgirêkek çêbû, ji kerema xwe girêdana xwe kontrol bikin û dîsa biceribînin.';
-
-  @override
   String get tagNotFound =>
       'Etîketa ku te nivîsandiye nederbasdar e an jî dema wê derbas bûye.';
 
@@ -2098,9 +1554,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get createAccount => 'Hesabê Biafirîne';
-
-  @override
-  String get upgradeTitle => 'Qeydkirinê Biqedîne';
 
   @override
   String get accountLinkedSuccess => 'Hesab bi serkeftî hat afirandin!';
