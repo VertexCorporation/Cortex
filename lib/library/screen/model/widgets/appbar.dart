@@ -5,33 +5,33 @@ import 'dart:async';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../../../extensions.dart';
+import '../../../../../variants.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../theme.dart';
 import '../../../backend/data/entity.dart';
 import '../../../providers/details.dart';
 
-class _ExtensionOverlayPanel extends StatefulWidget {
+class _VariantOverlayPanel extends StatefulWidget {
   final List<Map<String, dynamic>> options;
-  final String selectedExtension;
+  final String selectedVariant;
   final String modelTitle;
   final Function(Map<String, dynamic>) onSelect;
   final VoidCallback onClosed;
 
-  const _ExtensionOverlayPanel({
+  const _VariantOverlayPanel({
     super.key,
     required this.options,
-    required this.selectedExtension,
+    required this.selectedVariant,
     required this.modelTitle,
     required this.onSelect,
     required this.onClosed,
   });
 
   @override
-  _ExtensionOverlayPanelState createState() => _ExtensionOverlayPanelState();
+  _VariantOverlayPanelState createState() => _VariantOverlayPanelState();
 }
 
-class _ExtensionOverlayPanelState extends State<_ExtensionOverlayPanel>
+class _VariantOverlayPanelState extends State<_VariantOverlayPanel>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scaleAnimation;
@@ -103,10 +103,10 @@ class _ExtensionOverlayPanelState extends State<_ExtensionOverlayPanel>
                 alignment: Alignment.topLeft,
                 child: GestureDetector(
                   onTap: () {}, // Prevent clicks passing through the panel
-                  child: Extensions.buildExtensionPanelWidget(
+                  child: Variants.buildVariantPanelWidget(
                     context: context,
                     options: widget.options,
-                    selectedExtension: widget.selectedExtension,
+                    selectedVariant: widget.selectedVariant,
                     modelTitle: widget.modelTitle,
                     onDismiss: startClosing,
                     onSelect: (selectedMap) {
@@ -152,35 +152,35 @@ class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixin {
-  OverlayEntry? _extensionOverlayEntry;
+  OverlayEntry? _variantOverlayEntry;
   BuildContext? _exitButtonContext;
 
-  final GlobalKey<_ExtensionOverlayPanelState> _overlayKey = GlobalKey<_ExtensionOverlayPanelState>();
+  final GlobalKey<_VariantOverlayPanelState> _overlayKey = GlobalKey<_VariantOverlayPanelState>();
 
-  String _currentDisplayExtensionName = '';
+  String _currentDisplayVariantName = '';
 
-  bool get isPanelOpen => _extensionOverlayEntry != null;
+  bool get isPanelOpen => _variantOverlayEntry != null;
 
   @override
   void initState() {
     super.initState();
-    _currentDisplayExtensionName =
-        widget.provider.selectedExtension?.displayTitle ??
-            widget.provider.selectedExtensionName ??
+    _currentDisplayVariantName =
+        widget.provider.selectedVariant?.displayTitle ??
+            widget.provider.selectedVariantName ??
             '';
 
     widget.provider.addListener(_onProviderChanged);
   }
 
   void _onProviderChanged() {
-    final newExtensionName =
-        widget.provider.selectedExtension?.displayTitle ??
-            widget.provider.selectedExtensionName ??
+    final newVariantName =
+        widget.provider.selectedVariant?.displayTitle ??
+            widget.provider.selectedVariantName ??
             '';
-    if (_currentDisplayExtensionName != newExtensionName) {
+    if (_currentDisplayVariantName != newVariantName) {
       if (mounted) {
         setState(() {
-          _currentDisplayExtensionName = newExtensionName;
+          _currentDisplayVariantName = newVariantName;
         });
       }
     }
@@ -194,52 +194,52 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
   }
 
   void _removeOverlayEntry() {
-    _extensionOverlayEntry?.remove();
-    _extensionOverlayEntry = null;
+    _variantOverlayEntry?.remove();
+    _variantOverlayEntry = null;
   }
 
-  void _showExtensionOverlayPanel() {
+  void _showVariantOverlayPanel() {
     if (isPanelOpen) return;
 
     final provider = widget.provider;
     final langCode = Localizations.localeOf(context).languageCode;
 
-    final List<ModelEntity> extensionEntities = provider.mainModel?.extensions?.values
+    final List<ModelEntity> variantEntities = provider.mainModel?.variants?.values
         .whereType<Map<String, dynamic>>()
         .map((extMap) => ModelEntity.fromMap(extMap, langCode))
         .toList() ?? [];
 
-    if (extensionEntities.isEmpty) return;
+    if (variantEntities.isEmpty) return;
 
     final overlay = Overlay.of(context, rootOverlay: true);
 
-    _extensionOverlayEntry = OverlayEntry(
+    _variantOverlayEntry = OverlayEntry(
       builder: (context) {
-        return _ExtensionOverlayPanel(
+        return _VariantOverlayPanel(
           key: _overlayKey,
-          options: List<Map<String, dynamic>>.from(extensionEntities.map((e) => e.toMap())),
-          selectedExtension: provider.selectedExtensionName ?? '',
+          options: List<Map<String, dynamic>>.from(variantEntities.map((e) => e.toMap())),
+          selectedVariant: provider.selectedVariantName ?? '',
           modelTitle: provider.displayTitle,
           onClosed: _removeOverlayEntry,
           onSelect: (selectedMap) {
-            provider.selectExtension(context, selectedMap['id'] as String);
+            provider.selectVariant(context, selectedMap['id'] as String);
           },
         );
       },
     );
 
-    overlay.insert(_extensionOverlayEntry!);
+    overlay.insert(_variantOverlayEntry!);
   }
 
   Future<void> _handleBackPressed() async {
     if (isPanelOpen) {
-      await dismissExtensionOverlay();
+      await dismissVariantOverlay();
       if (!mounted) return;
     }
     widget.onBackPressed();
   }
 
-  Future<void> dismissExtensionOverlay() async {
+  Future<void> dismissVariantOverlay() async {
     if (isPanelOpen && _overlayKey.currentState != null) {
       final completer = Completer<void>();
       _overlayKey.currentState!.startClosing();
@@ -275,7 +275,7 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
         if (isPanelOpen &&
             _exitButtonContext != null &&
             !_isTapInsideWidget(_exitButtonContext!, event.position)) {
-          dismissExtensionOverlay();
+          dismissVariantOverlay();
         }
       },
       child: AppBar(
@@ -336,7 +336,7 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: _showExtensionOverlayPanel,
+      onTap: _showVariantOverlayPanel,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -374,8 +374,8 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
                     );
                   },
                   child: Text(
-                    _currentDisplayExtensionName,
-                    key: ValueKey<String>(_currentDisplayExtensionName),
+                    _currentDisplayVariantName,
+                    key: ValueKey<String>(_currentDisplayVariantName),
                     style: TextStyle(
                         color: AppColors.quinaryColor,
                         fontSize: subFontSize),

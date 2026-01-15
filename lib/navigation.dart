@@ -11,7 +11,8 @@ import 'main.dart';
 /// [screen]: The widget for the screen to navigate to.
 /// [direction]: The starting offset for the slide animation.
 ///              For example, Offset(0.05, 0.0) creates a subtle horizontal slide.
-Future<T?> navigateToScreen<T extends Object?>(Widget screen, {required Offset direction}) {
+Future<T?> navigateToScreen<T extends Object?>(Widget screen,
+    {required Offset direction}) {
   final context = navigatorKey.currentContext;
   if (context == null) {
     debugPrint("Navigation failed: Navigator context is not available.");

@@ -1,56 +1,47 @@
 // lib/banner.dart
-//
-// This file defines reusable banner components for the application.
-// It includes a service for managing the "invite" banner's cooldown logic
-// and a generic, self-animating FloatingInfoBanner widget that can display
-// various types of content and position itself relative to other widgets.
 
 import 'dart:io';
-
-import 'package:cortex/app.dart';
+import 'dart:math';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'dart:math';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'invite.dart';
 
 class BannerService {
-  final ValueNotifier<bool> showInviteBannerNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> showInviteBannerNotifier = ValueNotifier<bool>(
+      false);
   final InviteService _inviteService = InviteService();
 
   bool _isSharingLink = false;
 
-  static const String _bannerTimestampKey = 'inviteBannerLastShownTimestamp';
-  static const int _showIntervalInHours = 24;
+  // Key to track the NEXT allowed appearance time
+  static const String _nextShowTimestampKey = 'inviteBannerNextShowTimestamp';
 
   Future<void> checkAndTriggerBanner() async {
+    // 1. SECURITY: iOS detected → Auto-banner logic completely disabled.
     if (Platform.isIOS) {
-      debugPrint("[BannerService] iOS detected → auto-banner disabled.");
+      debugPrint("[BannerService] iOS detected → Auto-banner logic disabled.");
       return;
     }
 
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final int? lastShownTimestamp = prefs.getInt(_bannerTimestampKey);
+      final int? nextShowTimestamp = prefs.getInt(_nextShowTimestampKey);
+      final int now = DateTime
+          .now()
+          .millisecondsSinceEpoch;
 
-      if (lastShownTimestamp == null) {
-        debugPrint("[BannerService] No dismissal timestamp found. Displaying banner.");
-        _displayBanner();
-        return;
-      }
-
-      final DateTime lastDismissalTime = DateTime.fromMillisecondsSinceEpoch(lastShownTimestamp);
-      final Duration difference = DateTime.now().difference(lastDismissalTime);
-
-      if (difference.inHours >= _showIntervalInHours) {
-        debugPrint("[BannerService] More than 24 hours have passed. Showing again.");
+      // Logic: If no timestamp exists (first run) OR current time >= next allowed time
+      if (nextShowTimestamp == null || now >= nextShowTimestamp) {
+        debugPrint("[BannerService] Time condition met. Displaying banner.");
         _displayBanner();
       } else {
-        debugPrint("[BannerService] Banner dismissed within the last 24 hours. Skipping.");
+        final double remainingHours = (nextShowTimestamp - now) / 1000 / 3600;
+        debugPrint(
+            "[BannerService] Still in cooldown. Remaining hours: ${remainingHours
+                .toStringAsFixed(1)}");
       }
     } catch (e) {
       debugPrint("[BannerService] SharedPreferences error: $e");
@@ -58,20 +49,42 @@ class BannerService {
   }
 
   void _displayBanner() {
+    if (Platform.isIOS) return;
+
     if (!showInviteBannerNotifier.value) {
       showInviteBannerNotifier.value = true;
       debugPrint("[BannerService] Banner visibility set to true.");
     }
   }
 
+  /// Called when the banner is swiped away.
+  /// Sets a random cooldown of 24, 48, 72, or 96 hours.
   Future<void> startCooldown() async {
+    // Hide from UI immediately
     if (showInviteBannerNotifier.value) {
       showInviteBannerNotifier.value = false;
     }
+
+    if (Platform.isIOS) return;
+
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(_bannerTimestampKey, DateTime.now().millisecondsSinceEpoch);
-      debugPrint("[BannerService] Dismissal confirmed. 24-hour cooldown started.");
+
+      // CHANCE FACTOR: Pick one random interval
+      final List<int> intervals = [24, 48, 72, 96];
+      final int randomHours = intervals[Random().nextInt(intervals.length)];
+
+      // Calculate the next allowed show time
+      final DateTime nextShowTime = DateTime.now().add(
+          Duration(hours: randomHours));
+
+      await prefs.setInt(
+          _nextShowTimestampKey, nextShowTime.millisecondsSinceEpoch);
+
+      debugPrint(
+          "[BannerService] Banner dismissed. Random cooldown set: $randomHours hours.");
+      debugPrint(
+          "[BannerService] Next appearance allowed after: $nextShowTime");
     } catch (e) {
       debugPrint("[BannerService] Failed to set cooldown timestamp: $e");
     }
@@ -82,11 +95,13 @@ class BannerService {
       debugPrint("[BannerService] iOS → Manual banner trigger blocked.");
       return;
     }
-    debugPrint("[BannerService] A manual request was made to show the invite banner.");
+    debugPrint("[BannerService] Manual trigger requested.");
     _displayBanner();
   }
 
   Future<void> generateAndShareInviteLink(BuildContext context) async {
+    if (Platform.isIOS) return;
+
     if (_isSharingLink) return;
     _isSharingLink = true;
 
@@ -104,24 +119,18 @@ class BannerService {
   }
 }
 
-/// An enum to define the different types of content the banner can display.
 enum BannerType {
   discount,
   inviteCredits,
-  extensionInfo,
 }
 
-/// A highly reusable, self-animating, and dynamically positioned banner.
-///
-/// This widget is designed to be a direct child of a `Stack`. It manages its own
-/// animations and can be anchored relative to another widget using `anchorKey`.
 class FloatingInfoBanner extends StatefulWidget {
   final BannerType bannerType;
   final VoidCallback? onDismissed;
   final VoidCallback? onTap;
-  /// An optional GlobalKey to anchor the banner's position to.
-  /// If provided, the banner will appear relative to this widget.
   final GlobalKey? anchorKey;
+  final bool isEmbedded;
+  final double? referenceWidth;
 
   const FloatingInfoBanner({
     super.key,
@@ -129,34 +138,70 @@ class FloatingInfoBanner extends StatefulWidget {
     this.onDismissed,
     this.onTap,
     this.anchorKey,
+    this.isEmbedded = false,
+    this.referenceWidth,
   });
 
   @override
   State<FloatingInfoBanner> createState() => FloatingInfoBannerState();
 }
 
-class FloatingInfoBannerState extends State<FloatingInfoBanner> {
+class FloatingInfoBannerState extends State<FloatingInfoBanner>
+    with TickerProviderStateMixin {
+  // Visibility for AnimatedSize (Shrink effect)
   bool _isVisible = false;
+
+  // Animation Controller for Sliding (Slide Out effect)
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
+
   Offset _anchorOffset = Offset.zero;
   Size _anchorSize = Size.zero;
 
   @override
   void initState() {
     super.initState();
-    debugPrint("[FloatingInfoBanner] initState: Banner type '${widget.bannerType}' is being added.");
+
+    // iOS Check on Init
+    if (Platform.isIOS && widget.bannerType == BannerType.inviteCredits) {
+      debugPrint("[FloatingInfoBanner] iOS detected on Init. Skipped.");
+      return;
+    }
+
+    // Setup Slide Animation (Slides Downwards)
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+
+    // Moves from position 0 (start) to 1.5 (downwards off view)
+    _slideAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, 1.5),
+    ).animate(
+        CurvedAnimation(parent: _slideController, curve: Curves.easeInBack));
+
+    debugPrint("[FloatingInfoBanner] initState: Type '${widget
+        .bannerType}', Embedded: ${widget.isEmbedded}");
+
+    // Trigger Entry Animation
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        // The position is now calculated in build(), so we just trigger the animation here.
-        debugPrint("[FloatingInfoBanner] Triggering entry animation.");
         setState(() => _isVisible = true);
       }
     });
   }
 
-  /// Calculates the position and size of the anchor widget if a key is provided.
+  @override
+  void dispose() {
+    _slideController.dispose();
+    super.dispose();
+  }
+
   void _updateAnchorPosition() {
     if (widget.anchorKey?.currentContext != null) {
-      final RenderBox? renderBox = widget.anchorKey!.currentContext!.findRenderObject() as RenderBox?;
+      final RenderBox? renderBox = widget.anchorKey!.currentContext!
+          .findRenderObject() as RenderBox?;
       if (renderBox != null) {
         _anchorSize = renderBox.size;
         _anchorOffset = renderBox.localToGlobal(Offset.zero);
@@ -164,70 +209,112 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner> {
     }
   }
 
+  /// Handles the dismiss logic: Slide Down -> Shrink -> Callback
   void dismiss() {
-    if (!mounted || !_isVisible) return;
-    debugPrint("[FloatingInfoBanner] Triggering exit animation.");
-    setState(() => _isVisible = false);
-    // Give time for the animation to complete before calling the callback.
-    Future.delayed(const Duration(milliseconds: 300), () {
-      debugPrint("[FloatingInfoBanner] Exit animation complete. Calling onDismissed.");
-      widget.onDismissed?.call();
+    if (!mounted) return;
+    debugPrint("[FloatingInfoBanner] Swipe down detected. Dismissing...");
+
+    // 1. Play Slide Out Animation
+    _slideController.forward().then((_) {
+      // 2. Shrink the space
+      if (mounted) {
+        setState(() => _isVisible = false);
+
+        // 3. Trigger the actual logic (Cooldown) after animation
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (mounted) {
+            widget.onDismissed?.call();
+          }
+        });
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // By calling this in every build, we ensure the anchor position is never stale,
-    // even if the keyboard appears or other layout changes happen.
-    _updateAnchorPosition();
+    // 2. SECURITY: UI Layer protection for iOS
+    if (Platform.isIOS && widget.bannerType == BannerType.inviteCredits) {
+      return const SizedBox.shrink();
+    }
 
     final localizations = AppLocalizations.of(context)!;
-    final Size screenSize = MediaQuery.of(context).size;
-    final double screenWidth = screenSize.width;
-    final double screenHeight = screenSize.height;
-    final double topSafeArea = MediaQuery.of(context).padding.top;
-    final double bottomSafeArea = MediaQuery.of(context).padding.bottom;
+    final Size screenSize = MediaQuery
+        .of(context)
+        .size;
+    final double refWidth = widget.referenceWidth ?? screenSize.width;
 
-    // --- Banner Type Specific Configurations ---
+    // --- Embedded Mode (Inside Scroll View) ---
+    if (widget.isEmbedded) {
+      return AnimatedSize(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+        child: _isVisible
+            ? SlideTransition(
+          position: _slideAnimation,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: refWidth * 0.04), // Dynamic Margin
+            child: GestureDetector(
+              // TAP: Performs action but DOES NOT dismiss
+              onTap: widget.onTap,
+
+              // SWIPE: Vertical Drag Update
+              onVerticalDragUpdate: (details) {
+                // Detect swipe down (positive delta)
+                if (details.primaryDelta! > 3) {
+                  dismiss();
+                }
+              },
+              child: _buildDefaultContent(context, localizations, refWidth),
+            ),
+          ),
+        )
+            : const SizedBox(width: double.infinity, height: 0),
+      );
+    }
+
+    // --- Overlay Mode ---
+    _updateAnchorPosition();
+
+    final double screenHeight = screenSize.height;
+    final double topSafeArea = MediaQuery
+        .of(context)
+        .padding
+        .top;
+    final double bottomSafeArea = MediaQuery
+        .of(context)
+        .padding
+        .bottom;
+
     bool isTopBanner;
     double verticalMargin;
     Widget content;
-    bool useSpecialAnimation = false; // Flag for the new animation
 
     switch (widget.bannerType) {
-      case BannerType.extensionInfo:
-        isTopBanner = true; // Anchored to the app bar title
-        verticalMargin = screenHeight * 0.02;
-        content = _buildExtensionInfoContent(context, localizations);
-        useSpecialAnimation = true; // Enable the new animation for this type
-        break;
       case BannerType.discount:
         isTopBanner = true;
         verticalMargin = screenHeight * 0.06;
-        content = _buildDefaultContent(context, localizations);
+        content = _buildDefaultContent(context, localizations, refWidth);
         break;
       case BannerType.inviteCredits:
-      isTopBanner = false;
+        isTopBanner = false;
         verticalMargin = screenHeight * 0.02;
-        content = _buildDefaultContent(context, localizations);
+        content = _buildDefaultContent(context, localizations, refWidth);
         break;
     }
 
-    // --- Positioning Logic ---
     double? onScreenTop, onScreenBottom, onScreenLeft, onScreenRight;
-    double offscreenTop = -(screenHeight * 0.3); // Default offscreen positions
+    double offscreenTop = -(screenHeight * 0.3);
     double offscreenBottom = -(screenHeight * 0.3);
 
     if (widget.anchorKey != null && _anchorOffset != Offset.zero) {
-      // Anchored positioning (used for extensionInfo)
-      final double panelWidth = screenWidth * 0.8;
-      onScreenLeft = _anchorOffset.dx + _anchorSize.width / 2 - (panelWidth / 2);
-      // Clamp to screen edges
-      onScreenLeft = max(screenWidth * 0.04, min(onScreenLeft, screenWidth - panelWidth - (screenWidth * 0.04)));
+      final double panelWidth = refWidth * 0.8;
+      onScreenLeft =
+          _anchorOffset.dx + _anchorSize.width / 2 - (panelWidth / 2);
+      onScreenLeft = max(refWidth * 0.04,
+          min(onScreenLeft, refWidth - panelWidth - (refWidth * 0.04)));
       onScreenTop = _anchorOffset.dy + _anchorSize.height + verticalMargin;
     } else {
-      // Standard top/bottom positioning
-      final double horizontalMargin = screenWidth * 0.02;
+      final double horizontalMargin = refWidth * 0.02;
       onScreenLeft = horizontalMargin;
       onScreenRight = horizontalMargin;
       if (isTopBanner) {
@@ -237,139 +324,47 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner> {
       }
     }
 
-    if (useSpecialAnimation) {
-      // For extensionInfo: Use a static Positioned and animate scale/opacity internally.
-      return Positioned(
-        top: onScreenTop,
-        left: onScreenLeft,
-        right: onScreenRight,
-        child: GestureDetector(
-          // Allow taps on the banner itself to dismiss it
-          onTap: dismiss,
-          child: AnimatedScale(
-            scale: _isVisible ? 1.0 : 0.85,
-            duration: const Duration(milliseconds: 300),
-            alignment: Alignment.topCenter,
-            curve: Curves.easeOutBack,
-            child: AnimatedOpacity(
-              opacity: _isVisible ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOut,
-              child: content,
-            ),
-          ),
-        ),
-      );
-    } else {
-      // For all other banners: Use the original AnimatedPositioned for the sliding effect.
-      return AnimatedPositioned(
-        duration: Duration(milliseconds: _isVisible ? 800 : 400),
-        curve: _isVisible ? Curves.elasticOut : Curves.easeOutCubic,
-        top: isTopBanner ? (_isVisible ? onScreenTop : offscreenTop) : null,
-        bottom: !isTopBanner ? (_isVisible ? onScreenBottom : offscreenBottom) : null,
-        left: onScreenLeft,
-        right: onScreenRight,
-        child: GestureDetector(
-          onTap: () {
-            widget.onTap?.call();
+    return AnimatedPositioned(
+      duration: Duration(milliseconds: _isVisible ? 800 : 400),
+      curve: _isVisible ? Curves.elasticOut : Curves.easeOutCubic,
+      top: isTopBanner ? (_isVisible ? onScreenTop : offscreenTop) : null,
+      bottom: !isTopBanner
+          ? (_isVisible ? onScreenBottom : offscreenBottom)
+          : null,
+      left: onScreenLeft,
+      right: onScreenRight,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        onVerticalDragUpdate: (details) {
+          if (isTopBanner && details.primaryDelta! < -2) {
+            // Swipe Up to dismiss top banner
             dismiss();
-          },
-          onVerticalDragUpdate: (details) {
-            if (isTopBanner && details.primaryDelta! < -2) {
-              dismiss();
-            } else if (!isTopBanner && details.primaryDelta! > 2) {dismiss();}
-          },
-          child: content,
-        ),
-      );
-    }
-  }
-
-  /// Builds the new, custom content for the Extension Info banner.
-  Widget _buildExtensionInfoContent(BuildContext context, AppLocalizations localizations) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    // Sizing values migrated from ChatTitleState
-    final double panelWidth = screenWidth * 0.8;
-    final double borderRadiusValue = screenWidth * 0.04;
-    final double borderWidth = screenWidth * 0.002;
-    final double shadowBlurRadius = screenWidth * 0.05;
-    final double shadowOffsetY = screenHeight * 0.01;
-    final double titleFontSize = screenWidth * 0.042;
-    final double bodyFontSize = screenWidth * 0.035;
-    final double footerFontSize = screenWidth * 0.033;
-    final double horizontalPadding = screenWidth * 0.045;
-    final double verticalPadding = screenWidth * 0.035;
-    final double smallSpacing = screenHeight * 0.012;
-    final double mediumSpacing = screenHeight * 0.015;
-
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        width: panelWidth,
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
-        decoration: BoxDecoration(
-          color: AppColors.secondaryColor,
-          borderRadius: BorderRadius.circular(borderRadiusValue),
-          border: Border.all(color: AppColors.border, width: borderWidth),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: shadowBlurRadius,
-              offset: Offset(0, shadowOffsetY),
-            )
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(localizations.extensionInfoPanelTitle,
-                style: TextStyle(
-                    color: AppColors.primaryColor.inverted,
-                    fontSize: titleFontSize,
-                    fontWeight: FontWeight.bold)),
-            SizedBox(height: smallSpacing),
-            Text(localizations.extensionInfoPanelBody1,
-                style: TextStyle(
-                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.9),
-                    fontSize: bodyFontSize,
-                    height: 1.5)),
-            SizedBox(height: smallSpacing),
-            Text(localizations.extensionInfoPanelBody2,
-                style: TextStyle(
-                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.9),
-                    fontSize: bodyFontSize,
-                    height: 1.5)),
-            SizedBox(height: mediumSpacing),
-            Text(localizations.extensionInfoPanelFooter,
-                style: TextStyle(
-                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
-                    fontSize: footerFontSize,
-                    fontStyle: FontStyle.italic)),
-          ],
-        ),
+          } else if (!isTopBanner && details.primaryDelta! > 2) {
+            // Swipe Down to dismiss bottom banner
+            dismiss();
+          }
+        },
+        child: content,
       ),
     );
   }
 
   /// Builds the default banner content with an icon, title, and subtitle.
-  Widget _buildDefaultContent(BuildContext context, AppLocalizations localizations) {
-    final screenSize = MediaQuery.of(context).size;
-    final screenWidth = screenSize.width;
-    final screenHeight = screenSize.height;
-
-    final double internalHorizontalPadding = screenWidth * 0.04;
-    final double internalVerticalPadding = screenHeight * 0.015;
-    final double iconSpacing = screenWidth * 0.04;
-    final double iconSize = screenWidth * 0.1;
-    final double baseFontSize = screenWidth * 0.04;
+  /// Updated to use AppColors.premium with subtle opacity and fully dynamic sizing.
+  Widget _buildDefaultContent(BuildContext context,
+      AppLocalizations localizations, double refWidth) {
+    // --- Dynamic Dimensions ---
+    final double internalHorizontalPadding = refWidth * 0.04;
+    final double internalVerticalPadding = refWidth * 0.035;
+    final double iconSpacing = refWidth * 0.03;
+    final double iconSize = refWidth * 0.08;
+    final double baseFontSize = refWidth * 0.04;
     final double titleFontSize = baseFontSize;
-    final double subtitleFontSize = baseFontSize * 0.85;
-    final double borderRadius = screenWidth * 0.04;
-    final double shadowBlurRadius = screenWidth * 0.03;
-    final double shadowOffsetY = screenHeight * 0.006;
+    final double subtitleFontSize = baseFontSize * 0.80;
+    final double borderRadius = refWidth * 0.04;
+    final double gapBetweenText = refWidth *
+        0.01; // Dynamic gap (replaces fixed 4.0)
+    final double borderWidth = refWidth * 0.003;
 
     final String title;
     final String subtitle;
@@ -377,8 +372,8 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner> {
 
     switch (widget.bannerType) {
       case BannerType.inviteCredits:
-        title = localizations.creditBannerTitle;
-        subtitle = localizations.creditBannerSubtitle;
+        title = localizations.plusBannerTitle;
+        subtitle = localizations.plusBannerSubtitle;
         iconPath = 'assets/icons/credit.svg';
         break;
       case BannerType.discount:
@@ -386,72 +381,84 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner> {
         subtitle = localizations.discountBannerSubtitle;
         iconPath = 'assets/icons/warning.svg';
         break;
-      case BannerType.extensionInfo:
-      // This case is handled by the custom builder, but we provide a fallback.
-        title = "Info";
-        subtitle = "Additional information is available.";
-        iconPath = 'assets/icons/info.svg';
-        break;
     }
+
+    // --- Premium Styling Colors ---
+    // Background: Premium color with very low opacity (tint)
+    final Color backgroundColor = AppColors.premium.withValues(alpha: 0.15);
+    // Border: Solid Premium color
+    final Color borderColor = AppColors.premium;
+    // Text/Icon: Solid Premium color for readability
+    final Color contentColor = AppColors.premium;
+    final Color subtitleColor = AppColors.premium.withValues(alpha: 0.8);
 
     return Material(
       color: Colors.transparent,
       child: Container(
+        width: widget.isEmbedded ? refWidth * 0.9 : null,
         padding: EdgeInsets.symmetric(
           horizontal: internalHorizontalPadding,
           vertical: internalVerticalPadding,
         ),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.senaryColor, AppColors.septenaryColor],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(borderRadius),
+          border: Border.all(
+            color: borderColor,
+            width: borderWidth,
+          ),
+          // Clean look (No Shadow), or extremely subtle if needed
           boxShadow: [
             BoxShadow(
-              color: AppColors.senaryColor.withValues(alpha: 0.5),
-              blurRadius: shadowBlurRadius,
-              offset: Offset(0, shadowOffsetY),
+              color: AppColors.premium.withValues(alpha: 0.05),
+              blurRadius: refWidth * 0.02,
+              offset: Offset(0, refWidth * 0.01),
             )
           ],
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              iconPath,
-              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-              width: iconSize,
-              height: iconSize,
-            ),
-            SizedBox(width: iconSpacing),
-            Expanded(
-              child: Column(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(
+                iconPath,
+                colorFilter: ColorFilter.mode(contentColor, BlendMode.srcIn),
+                width: iconSize,
+                height: iconSize,
+              ),
+              SizedBox(width: iconSpacing),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     title,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: contentColor,
                       fontSize: titleFontSize,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
+                      height: 1.1,
                     ),
                   ),
-                  SizedBox(height: screenHeight * 0.0025),
+                  SizedBox(height: gapBetweenText), // Dynamic spacing
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: subtitleColor,
                       fontSize: subtitleFontSize,
+                      height: 1.1,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

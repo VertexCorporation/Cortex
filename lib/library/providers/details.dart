@@ -67,8 +67,8 @@ class ModelDetailProvider extends ChangeNotifier {
   // --- Selection State ---
   String? selectedBaseModelId;
   ModelEntity? selectedBaseModel;
-  String? selectedExtensionName;
-  ModelEntity? selectedExtension;
+  String? selectedVariantName;
+  ModelEntity? selectedVariant;
   bool _isUserSubscribed = false;
 
   // --- Dynamic Getters ---
@@ -80,7 +80,7 @@ class ModelDetailProvider extends ChangeNotifier {
   bool get isUserCreatedModel => _mainModel?.category == 'self';
   bool get isCharacterModel => _mainModel?.category == 'roleplay' || _mainModel?.category == 'self';
   bool get shouldShowPremiumWarning => isPremiumModelSelected && !_isUserSubscribed;
-  bool get isPluralModel => _mainModel?.isServerSide == true && (_mainModel?.extensions?.isNotEmpty ?? false);
+  bool get isPluralModel => _mainModel?.isServerSide == true && (_mainModel?.variants?.isNotEmpty ?? false);
 
   //================================================================================
   // Initialization & Lifecycle
@@ -129,8 +129,8 @@ class ModelDetailProvider extends ChangeNotifier {
     }
 
     selectedBaseModelId = _mainModel!.baseModelId;
-    if (_mainModel!.extensions?.isNotEmpty ?? false) {
-      selectedExtensionName = _mainModel!.extensions!.keys.first;
+    if (_mainModel!.variants?.isNotEmpty ?? false) {
+      selectedVariantName = _mainModel!.variants!.keys.first;
     }
 
     availableBaseModels = _modelService.getCachedModelsSync().where((model) {
@@ -196,8 +196,8 @@ class ModelDetailProvider extends ChangeNotifier {
     }
   }
 
-  void selectExtension(BuildContext context, String newExtensionName) {
-    selectedExtensionName = newExtensionName;
+  void selectVariant(BuildContext context, String newVariantName) {
+    selectedVariantName = newVariantName;
     final localizations = AppLocalizations.of(context)!;
     _processData(localizations); // Re-process data based on the new selection
     notifyListeners();
@@ -282,10 +282,10 @@ class ModelDetailProvider extends ChangeNotifier {
           : null;
       _currentCapabilitiesSource = selectedBaseModel ?? _mainModel;
     } else if (isPluralModel) {
-      selectedExtension = (selectedExtensionName != null && selectedExtensionName!.isNotEmpty)
-          ? _modelService.getPreciseModelData(selectedExtensionName!, langCode: langCode)
+      selectedVariant = (selectedVariantName != null && selectedVariantName!.isNotEmpty)
+          ? _modelService.getPreciseModelData(selectedVariantName!, langCode: langCode)
           : null;
-      _currentCapabilitiesSource = selectedExtension ?? _mainModel;
+      _currentCapabilitiesSource = selectedVariant ?? _mainModel;
     } else {
       _currentCapabilitiesSource = _mainModel;
     }
@@ -295,8 +295,8 @@ class ModelDetailProvider extends ChangeNotifier {
     if (_mainModel == null) return;
 
     if (isPluralModel) {
-      displaySummary = selectedExtension?.displaySummary ?? _mainModel!.displaySummary;
-      displayDescription = selectedExtension?.displayDescription ?? _mainModel!.displayDescription;
+      displaySummary = selectedVariant?.displaySummary ?? _mainModel!.displaySummary;
+      displayDescription = selectedVariant?.displayDescription ?? _mainModel!.displayDescription;
     } else if (isCharacterModel) {
       displaySummary = _mainModel!.displaySummary;
       displayDescription = _mainModel!.displayDescription;

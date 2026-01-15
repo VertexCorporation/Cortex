@@ -26,7 +26,8 @@ class ModelService with ChangeNotifier {
   final ModelRepository _repository;
 
   // --- Constructor
-  ModelService({required ModelRepository repository}) : _repository = repository;
+  ModelService({required ModelRepository repository})
+      : _repository = repository;
 
   // --- Private State ---
 
@@ -35,6 +36,7 @@ class ModelService with ChangeNotifier {
 
   /// Returns true if the service is actively fetching/processing model data.
   bool get isLoading => _isLoading;
+
   bool get hasError => _hasError;
 
   /// In-memory cache for processed, type-safe [ModelEntity] objects.
@@ -73,7 +75,8 @@ class ModelService with ChangeNotifier {
       }
 
       _cachedImagePaths = null;
-      debugPrint("$logPrefix: Invalidated in-memory image path cache to prepare for full refresh.");
+      debugPrint(
+          "$logPrefix: Invalidated in-memory image path cache to prepare for full refresh.");
 
       debugPrint("$logPrefix: Fetching raw models from repository.");
       final rawModels = await _repository.getAllModels(
@@ -83,7 +86,8 @@ class ModelService with ChangeNotifier {
 
       // --- Handle Empty List as Error ---
       if (rawModels == null || rawModels.isEmpty) {
-        debugPrint("$logPrefix: Repository returned null or empty list. Marking as Error.");
+        debugPrint(
+            "$logPrefix: Repository returned null or empty list. Marking as Error.");
         _hasError = true;
         return null;
       }
@@ -94,9 +98,14 @@ class ModelService with ChangeNotifier {
         return tempEntity.copyWith(imagePath: resolvedPath);
       }).toList();
 
-      final offlineModels = finalEntities.where((m) => m.type == 'offline').toList();
-      final otherModels = finalEntities.where((m) => m.type != 'offline').toList();
-      otherModels.sort((a, b) => a.displayTitle.toLowerCase().compareTo(b.displayTitle.toLowerCase()));
+      final offlineModels = finalEntities
+          .where((m) => m.type == 'offline')
+          .toList();
+      final otherModels = finalEntities
+          .where((m) => m.type != 'offline')
+          .toList();
+      otherModels.sort((a, b) =>
+          a.displayTitle.toLowerCase().compareTo(b.displayTitle.toLowerCase()));
       offlineModels.sort((a, b) {
         final ramA = a.ram ?? 99999;
         final ramB = b.ram ?? 99999;
@@ -107,7 +116,8 @@ class ModelService with ChangeNotifier {
         return sizeA.compareTo(sizeB);
       });
       finalEntities = [...otherModels, ...offlineModels];
-      final neuroIndex = finalEntities.indexWhere((model) => model.id == 'neuro');
+      final neuroIndex = finalEntities.indexWhere((model) =>
+      model.id == 'neuro');
       if (neuroIndex != -1) {
         final neuroModel = finalEntities.removeAt(neuroIndex);
         finalEntities.insert(0, neuroModel);
@@ -120,11 +130,11 @@ class ModelService with ChangeNotifier {
       }
 
       _cachedEntities = finalEntities;
-      debugPrint("$logPrefix: Caching ${finalEntities.length} ENRICHED model entities.");
+      debugPrint("$logPrefix: Caching ${finalEntities
+          .length} ENRICHED model entities.");
       unawaited(_validateAndAssignDefaultBaseModels());
 
       return _cachedEntities;
-
     } catch (e, s) {
       debugPrint("$logPrefix: Exception caught: $e\n$s");
       _hasError = true; // Mark error on exception
@@ -143,15 +153,16 @@ class ModelService with ChangeNotifier {
 
     final defaultBaseModelId = findDefaultBaseModel(allModelsInCache);
     if (defaultBaseModelId == null) {
-      debugPrint("[ModelService] CRITICAL: No suitable default online model found. Aborting base model validation.");
+      debugPrint(
+          "[ModelService] CRITICAL: No suitable default online model found. Aborting base model validation.");
       return;
     }
 
     final allOnlineVariantIds = <String>{};
     final allModels = getCachedModelsSync();
     allModels.where((m) => m.type == 'online').forEach((model) {
-      if (model.extensions != null && model.extensions!.isNotEmpty) {
-        allOnlineVariantIds.addAll(model.extensions!.keys);
+      if (model.variants != null && model.variants!.isNotEmpty) {
+        allOnlineVariantIds.addAll(model.variants!.keys);
       } else {
         allOnlineVariantIds.add(model.id);
       }
@@ -160,10 +171,12 @@ class ModelService with ChangeNotifier {
     for (final model in allModels) {
       if (model.category == 'roleplay' || model.category == 'self') {
         String? currentBaseId = model.baseModelId;
-        bool requiresRepair = (currentBaseId == null || currentBaseId.isEmpty || !allOnlineVariantIds.contains(currentBaseId));
+        bool requiresRepair = (currentBaseId == null || currentBaseId.isEmpty ||
+            !allOnlineVariantIds.contains(currentBaseId));
 
         if (requiresRepair) {
-          debugPrint("[ModelService] Repairing base model for '${model.id}' to '$defaultBaseModelId'.");
+          debugPrint("[ModelService] Repairing base model for '${model
+              .id}' to '$defaultBaseModelId'.");
           await updateBaseModel(model.id, defaultBaseModelId);
         }
       }
@@ -174,16 +187,17 @@ class ModelService with ChangeNotifier {
   /// PRIORITIZES Gemini series models first.
   String? findDefaultBaseModel(List<Map<String, dynamic>> modelsAsMaps) {
     if (modelsAsMaps.isEmpty) {
-      debugPrint("[ModelRepository] findDefaultBaseModel called with an empty list.");
+      debugPrint(
+          "[ModelRepository] findDefaultBaseModel called with an empty list.");
       return null;
     }
 
     // This helper function finds the best text-only, non-pro variant within a series.
-    String? findBestSafeVariant(Map<String, dynamic>? extensions) {
-      if (extensions == null || extensions.isEmpty) return null;
+    String? findBestSafeVariant(Map<String, dynamic>? variants) {
+      if (variants == null || variants.isEmpty) return null;
 
       final textOnlyVariants = Map.fromEntries(
-        extensions.entries.where((entry) {
+        variants.entries.where((entry) {
           final variantData = entry.value;
           if (variantData is Map<String, dynamic>) {
             final outputs = variantData['outputs'] as Map<String, dynamic>?;
@@ -196,7 +210,9 @@ class ModelService with ChangeNotifier {
       if (textOnlyVariants.isNotEmpty) {
         // Prefer a non-"pro" model if available, otherwise take the first text-only one.
         final nonProEntry = textOnlyVariants.entries.firstWhere(
-              (e) => e.value['title'] is String && !(e.value['title'] as String).toLowerCase().contains('pro'),
+              (e) =>
+          e.value['title'] is String &&
+              !(e.value['title'] as String).toLowerCase().contains('pro'),
           orElse: () => textOnlyVariants.entries.first,
         );
         return nonProEntry.key;
@@ -208,19 +224,25 @@ class ModelService with ChangeNotifier {
 
     // --- STEP 1: Prioritize Gemini ---
     // Try to find the Gemini model series first.
-    final geminiModel = modelsAsMaps.firstWhere((m) => m['id'] == 'gemini', orElse: () => {});
+    final geminiModel = modelsAsMaps.firstWhere((m) => m['id'] == 'gemini',
+        orElse: () => {});
     if (geminiModel.isNotEmpty) {
-      debugPrint("[ModelRepository] Attempt 1: Searching for a safe variant within the Gemini series.");
-      defaultBaseModelId = findBestSafeVariant(geminiModel['extensions'] as Map<String, dynamic>?);
+      debugPrint(
+          "[ModelRepository] Attempt 1: Searching for a safe variant within the Gemini series.");
+      defaultBaseModelId = findBestSafeVariant(
+          geminiModel['variants'] as Map<String, dynamic>?);
     }
 
     // --- STEP 2: Fallback to other online models if Gemini is not found or has no suitable variant ---
     if (defaultBaseModelId == null) {
-      debugPrint("[ModelRepository] Attempt 1 Failed. Attempt 2: Searching other online series.");
-      final otherOnlineSeries = modelsAsMaps.where((m) => m['type'] == 'online' && m['id'] != 'gemini');
+      debugPrint(
+          "[ModelRepository] Attempt 1 Failed. Attempt 2: Searching other online series.");
+      final otherOnlineSeries = modelsAsMaps.where((m) =>
+      m['type'] == 'online' && m['id'] != 'gemini');
 
       for (final model in otherOnlineSeries) {
-        defaultBaseModelId = findBestSafeVariant(model['extensions'] as Map<String, dynamic>?);
+        defaultBaseModelId =
+            findBestSafeVariant(model['variants'] as Map<String, dynamic>?);
         if (defaultBaseModelId != null) {
           // Found a suitable model, stop searching.
           break;
@@ -229,9 +251,11 @@ class ModelService with ChangeNotifier {
     }
 
     if (defaultBaseModelId != null) {
-      debugPrint("[ModelRepository] Selected '$defaultBaseModelId' as the final default base model.");
+      debugPrint(
+          "[ModelRepository] Selected '$defaultBaseModelId' as the final default base model.");
     } else {
-      debugPrint("[ModelRepository] CRITICAL: Could not find any suitable text-only variant in any series.");
+      debugPrint(
+          "[ModelRepository] CRITICAL: Could not find any suitable text-only variant in any series.");
     }
 
     return defaultBaseModelId;
@@ -289,11 +313,13 @@ class ModelService with ChangeNotifier {
 
     final allModels = getCachedModelsSync();
     if (allModels.isEmpty) {
-      return fullId.contains('/') ? fullId.split('/').first : fullId;
+      return fullId.contains('/') ? fullId
+          .split('/')
+          .first : fullId;
     }
     if (allModels.any((model) => model.id == fullId)) return fullId;
     for (final modelSeries in allModels) {
-      if (modelSeries.extensions?.containsKey(fullId) ?? false) {
+      if (modelSeries.variants?.containsKey(fullId) ?? false) {
         return modelSeries.id;
       }
     }
@@ -305,7 +331,8 @@ class ModelService with ChangeNotifier {
   ModelEntity getPreciseModelData(String modelId, {required String langCode}) {
     final allModels = getCachedModelsSync();
     if (allModels.isEmpty) {
-      debugPrint("[ModelService] CRITICAL WARNING: getPreciseModelData called when entity cache is empty.");
+      debugPrint(
+          "[ModelService] CRITICAL WARNING: getPreciseModelData called when entity cache is empty.");
       return _createFallbackEntity(modelId, langCode: langCode);
     }
 
@@ -317,13 +344,15 @@ class ModelService with ChangeNotifier {
     try {
       return allModels.firstWhere((model) => model.id == modelId);
     } catch (_) {
-      // Not found, proceed to search in extensions.
+      // Not found, proceed to search in variants.
     }
 
-    // Search 2: Match within a series' extensions.
+    // Search 2: Match within a series' variants.
     for (final modelSeries in allModels) {
-      if (modelSeries.extensions?.containsKey(modelId) ?? false) {
-        final variantData = modelSeries.extensions![modelId] as Map<String, dynamic>;
+      if (modelSeries.variants?.containsKey(modelId) ?? false) {
+        final variantData = modelSeries.variants![modelId] as Map<
+            String,
+            dynamic>;
         // Merge series data with variant-specific data.
         final mergedMap = {
           ...modelSeries.toMap(),
@@ -332,12 +361,13 @@ class ModelService with ChangeNotifier {
           'title': variantData['title'],
           'imagePath': modelSeries.imagePath,
         };
-        mergedMap.remove('extensions');
+        mergedMap.remove('variants');
         return ModelEntity.fromMap(mergedMap, langCode);
       }
     }
 
-    debugPrint("[ModelService] WARN: Model '$modelId' not found in cache. Creating fallback.");
+    debugPrint(
+        "[ModelService] WARN: Model '$modelId' not found in cache. Creating fallback.");
     return _createFallbackEntity(modelId, langCode: langCode);
   }
 
@@ -415,19 +445,25 @@ class ModelService with ChangeNotifier {
     }
 
     // If we found a best match, return its corresponding path from the map.
-    return bestMatchKey != null ? ModelDefaults.localAssetImageMap[bestMatchKey] : null;
+    return bestMatchKey != null
+        ? ModelDefaults.localAssetImageMap[bestMatchKey]
+        : null;
   }
 
   /// Checks if a model or its underlying base model supports a specific modality.
-  bool hasModality(String modelId, {required String langCode, String? modality}) {
+  bool hasModality(String modelId,
+      {required String langCode, String? modality}) {
     final model = getPreciseModelData(modelId, langCode: langCode);
 
     bool check(Map<String, dynamic> modalitiesMap) {
-      return modality == null ? modalitiesMap.isNotEmpty : modalitiesMap[modality] == true;
+      return modality == null
+          ? modalitiesMap.isNotEmpty
+          : modalitiesMap[modality] == true;
     }
     if (check(model.modalities)) return true;
 
-    final isCharacter = model.category == 'roleplay' || model.category == 'self';
+    final isCharacter = model.category == 'roleplay' ||
+        model.category == 'self';
     final baseModelId = model.baseModelId;
     if (isCharacter && baseModelId != null && baseModelId.isNotEmpty) {
       final baseModel = getPreciseModelData(baseModelId, langCode: langCode);
@@ -442,7 +478,8 @@ class ModelService with ChangeNotifier {
     if (success) {
       // If the DB was updated, we need to reflect this in our entity cache.
       // A simple way is to find and update the entity.
-      final entity = getPreciseModelData(modelId, langCode: 'en'); // langCode might need to be dynamic
+      final entity = getPreciseModelData(
+          modelId, langCode: 'en'); // langCode might need to be dynamic
       final updatedEntity = entity.copyWith(baseModelId: newBaseModelId);
       updateCachedEntity(updatedEntity);
       notifyListeners();
@@ -452,7 +489,8 @@ class ModelService with ChangeNotifier {
 
   // --- PRIVATE HELPERS ---
 
-  ModelEntity _createFallbackEntity(String modelId, {required String langCode}) {
+  ModelEntity _createFallbackEntity(String modelId,
+      {required String langCode}) {
     return ModelEntity.fromMap({
       'id': modelId,
       'title': 'Unknown Model',

@@ -147,13 +147,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get noStarredChatsMessage => '아직 별표 표시한 채팅이 없습니다.';
 
   @override
-  String get goToChats => '채팅에 별표 표시하기';
-
-  @override
   String get starConversation => '별표 표시';
 
   @override
-  String get unstarConversation => 'Unstar';
+  String get unstarConversation => '언스타';
 
   @override
   String get loginToYourAccount => '로그인';
@@ -226,7 +223,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get pleaseCheckYourEmail =>
-      'Cortex를 사용하려면 이메일을 인증해야 합니다. \n 인증 링크가 이메일 주소로 전송되었으니 확인해주세요.';
+      'Cortex를 사용하려면 이메일을 인증해야 합니다. \n인증 링크가 이메일 주소로 전송되었으니 확인해주세요.';
 
   @override
   String get verifyYourEmail => '이메일 인증하기';
@@ -404,19 +401,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get noProductsFound => '상품을 찾을 수 없음';
 
   @override
-  String get buyCredits => '크레딧 구매';
-
-  @override
-  String get selectCreditPackageDescription =>
-      '필요에 맞는 크레딧 패키지를 선택하고 더 많은 기능을 즐기세요.';
-
-  @override
-  String get buyCredit => '크레딧 구매';
-
-  @override
-  String get internetRequired => '이 모델을 사용하려면 인터넷 연결이 필요합니다.';
-
-  @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
       '이 주문을 함으로써 귀하는 서비스 약관 및 개인정보 처리방침에 동의하게 됩니다. 이 텍스트를 클릭하여 서비스 약관 및 개인정보 처리방침에 대해 자세히 알아볼 수 있습니다. 현재 기간이 종료되기 최소 24시간 전에 자동 갱신을 해제하지 않으면 구독은 자동으로 갱신됩니다.';
 
@@ -501,8 +485,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String get shareMessage =>
-      'Cortex 앱을 확인해보세요, 정말 놀랍습니다! 여기서 다운로드하세요: https://play.google.com/store/apps/details?id=com.vertex.cortex';
+  String shareMessage(String cortexLink) {
+    return 'Cortex 앱을 확인해보세요, 정말 놀랍습니다! 여기서 다운로드하세요: $cortexLink';
+  }
 
   @override
   String get shareFailed => '앱 공유에 실패했습니다. 나중에 다시 시도해주세요.';
@@ -550,6 +535,9 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get deleteAllConversationsConfirmMessage =>
       '정말로 모든 채팅을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.';
+
+  @override
+  String get conversationDeleted => '대화 내용이 삭제되었습니다!';
 
   @override
   String get allConversationsDeleted => '모든 대화가 성공적으로 삭제되었습니다!';
@@ -660,11 +648,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get noMatchingModels => '일치하는 모델을 찾을 수 없습니다.';
 
   @override
-  String creditPackage(Object amount) {
-    return '$amount 크레딧 구매';
-  }
-
-  @override
   String get benefit1 => '온라인 AI를 위한 훨씬 더 많은 대화 한도';
 
   @override
@@ -677,9 +660,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get benefit5 => '더 많은 온라인 인공지능 생성';
 
   @override
-  String benefit7(Object credits) {
-    return '매일 $credits 크레딧';
-  }
+  String get benefit7 => '추가 사용 제한';
 
   @override
   String get benefit8 => '모델 추가';
@@ -829,9 +810,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get offlineModelNotInstalled => '이 오프라인 모델은 기기에 설치되어 있지 않습니다.';
 
   @override
-  String insufficientCredits(Object available, Object required) {
-    return '이 요청을 완료하기에 크레딧이 부족합니다. 이 작업에는 $required 크레딧이 필요하지만, 현재 $available 크레딧만 보유하고 있습니다. 더 많은 크레딧을 얻으려면 플랜을 업그레이드하거나 직접 구매할 수 있습니다. 크레딧이 부족하면 좀 실망스러울 수 있다는 거 저희도 잘 알아요. 하지만 저희 모델들로부터 멋진 답변을 받는 건 공짜가 아니거든요. 그래서 이 크레딧은 저희가 좋은 서비스를 계속 운영하는 데 실제로 도움이 됩니다. 그리고 더 많은 분들이 참여해서 크레딧을 구매해주시면, 모두를 위한 무료 일일 한도를 상향 조정하는 것도 충분히 고려해볼 수 있습니다.';
-  }
+  String get reachedLimit =>
+      '사용량 한도에 도달하셨습니다. 사용량을 늘리려면 요금제를 업그레이드하세요. (물론 사용량 한도가 소진되면 아쉽겠지만, 멋진 답변들을 얻는 데는 돈이 들기 때문에 이러한 사용량 제한은 저희가 계속해서 좋은 서비스를 제공할 수 있도록 도와주는 중요한 요소입니다.)';
 
   @override
   String get modality => '모달리티';
@@ -855,7 +835,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get errorUserNotAuthenticated => '이 작업을 수행하려면 로그인해야 합니다.';
 
   @override
-  String get errorInsufficientCredits => '크레딧이 부족합니다. 계속하려면 충전해주세요.';
+  String get errorReachedLimit =>
+      '채팅 한도에 도달했습니다. 업그레이드하여 더 많은 기능을 이용하고 계속 채팅하세요.';
 
   @override
   String get errorServer => '예기치 않은 서버 오류가 발생했습니다. 나중에 다시 시도해주세요.';
@@ -897,10 +878,10 @@ class AppLocalizationsKo extends AppLocalizations {
       '서버에서 필요한 데이터를 가져올 수 없었습니다. 인터넷 연결을 확인하고 다시 시도해주세요.';
 
   @override
-  String get noModelsFoundTitle => '결과 없음';
+  String get noFoundTitle => '결과 없음';
 
   @override
-  String get noModelsFoundMessage => '검색어를 조정하거나 필터를 지워보세요.';
+  String get noFoundMessage => '검색어를 조정하거나 필터를 지워보세요.';
 
   @override
   String get disclaimerMessage => '인공지능은 실수를 할 수 있으니 중요한 정보는 확인하세요.';
@@ -985,18 +966,17 @@ class AppLocalizationsKo extends AppLocalizations {
       '다운로드한 모델을 저장하려면 저장소 권한이 필요합니다. 계속하려면 권한을 허용해주세요.';
 
   @override
-  String get creditBannerTitle => '무료 크레딧 받기!';
+  String get plusBannerTitle => '플러스 혜택을 무료로 받으세요!';
 
   @override
-  String get creditBannerSubtitle =>
-      '친구를 초대하면 가입 시 두 분 모두 50 크레딧을 받습니다! 친구가 구독하면 두 분 모두 추가로 500 크레딧을 더 받습니다!';
+  String get plusBannerSubtitle => '친구를 초대하면 둘 다 플러스 1일을 무료로 받을 수 있어!';
 
   @override
   String get inviteShareSubject => 'Cortex에 저와 함께해요!';
 
   @override
-  String inviteShareMessage(String playStoreLink) {
-    return '야 너 이 앱 코텍스 꼭 써봐 진짜 미쳤어 내 링크로 가입하면 우리 둘 다 50크레딧 받고 너가 구독하면 추가로 500크레딧씩 더 받아 완전 대박이니까 빨리 다운받아\n\n$playStoreLink';
+  String inviteShareMessage(String cortexLink) {
+    return '야, 너 이 앱 꼭 해봐. Cortex 진짜 대박이야. 내 링크 쓰면 우리 둘 다 무료로 받을 수 있어. 진짜 대박이야. 지금 바로 다운로드해! \n\n$cortexLink';
   }
 
   @override
@@ -1053,21 +1033,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get errorImageLoad => '생성된 이미지를 로드하는 데 실패했습니다.';
 
   @override
-  String get extensionInfoPanelTitle => '모델 탐색';
-
-  @override
-  String get extensionInfoPanelBody1 =>
-      '이 화살표를 사용하면 이 시리즈 내의 다른 모델로 전환할 수 있습니다.';
-
-  @override
-  String get extensionInfoPanelBody2 =>
-      '이 시리즈에서 처음 채팅을 시작하면 기본 모델이 자동으로 선택되며, 채팅 중 언제든지 선택 항목을 변경할 수 있습니다.';
-
-  @override
-  String get extensionInfoPanelFooter =>
-      '각 모델에 대한 자세한 정보를 보거나 다른 모델을 수동으로 선택하려면 라이브러리로 이동하세요. 거기에서 해당 모델 시리즈를 선택하고 세부 정보 페이지 상단에 있는 화살표를 탭하세요.';
-
-  @override
   String get premiumModelNoticeTitle => '프리미엄 모델';
 
   @override
@@ -1082,22 +1047,13 @@ class AppLocalizationsKo extends AppLocalizations {
       '프리미엄 모델의 무료 일일 메시지를 모두 사용했습니다. 무제한 액세스를 원하시면 업그레이드하세요.';
 
   @override
-  String get selectionScreenGreetingGeneric => '오늘은 어떻게 도와드릴까요?';
-
-  @override
-  String get selectionScreenFeatureOffline => '인터넷 없이 사용';
+  String get useOffline => '인터넷 없이 사용';
 
   @override
   String get explore => '탐색';
 
   @override
-  String get selectionScreenNewsAndUpdates => '뉴스 및 업데이트';
-
-  @override
-  String get filters => '필터';
-
-  @override
-  String get noRecentChatsMessage => '아직 모델과 대화를 나누지 않으셨나요? 대화를 시작해 보세요!';
+  String get news => '소식';
 
   @override
   String get allModels => '모든 모델';
@@ -1113,9 +1069,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get customModels => '사용자 정의 모델';
-
-  @override
-  String get filterPanelDescription => '카테고리를 탭하면 목록이 즉시 필터링됩니다.';
 
   @override
   String get dynamicChatTitle => '동적 채팅';
@@ -1277,7 +1230,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get notificationReferralBody =>
-      '친구를 Cortex에 초대하면 두 분 모두 무료 크레딧을 받으세요!';
+      '친구를 Cortex에 초대하면 초대받은 사람과 초대받은 사람 모두 하루 무료 이용 혜택을 받으실 수 있습니다!';
 
   @override
   String get notificationCookingTitle => '배고프신가요?';
@@ -1422,12 +1375,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get channelGreetingsDescription => '좋은 아침, 좋은 밤과 같은 메시지.';
 
   @override
-  String get exitAppTitle => '곧 떠나시나요?';
-
-  @override
-  String get exitAppConfirmation => '이 놀라운 플랫폼을 떠나시겠습니까?';
-
-  @override
   String get tagNotFound => '입력하신 태그가 잘못되었거나 만료되었습니다.';
 
   @override
@@ -1498,8 +1445,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get upgradeAccountTitle => '계정 완료';
 
   @override
-  String get upgradeAccountDescription =>
-      '계정을 생성하면 매일 200개의 보너스 크레딧을 받고 더 많은 한도를 잠금 해제할 수 있습니다.';
+  String get upgradeAccountDescription => '계정을 생성하여 더 많은 제한을 해제하세요.';
 
   @override
   String get createAccount => '계정 생성';
@@ -1541,5 +1487,24 @@ class AppLocalizationsKo extends AppLocalizations {
   String get emulatorModeWarning => '이 기능은 에뮬레이터 모드에서 비활성화됩니다.';
 
   @override
-  String get newChat => 'New Chat';
+  String get newChat => '새 채팅';
+
+  @override
+  String get howCanIHelpWith => '어떻게 도와드릴까요?';
+
+  @override
+  String get variants => '버전';
+
+  @override
+  String get variantsDescription =>
+      '변형은 동일한 AI 계열의 여러 버전입니다. 메인 카드를 탭하면 자동으로 최적의 버전이 선택되지만, 원하시면 여기에서 특정 버전을 직접 선택할 수도 있습니다!';
+
+  @override
+  String get fluxChatTitle => '플럭스 채팅';
+
+  @override
+  String get fluxChatDescription => 'Flux 채팅은 임시 채팅이며 기기에 저장되지 않습니다.';
+
+  @override
+  String get alwaysBest => '언제나 최고';
 }

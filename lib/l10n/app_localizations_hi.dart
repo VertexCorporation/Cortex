@@ -12,7 +12,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get cancel => 'रद्द करें';
 
   @override
-  String get remove => 'हटाएं';
+  String get remove => 'निकालना';
 
   @override
   String get download => 'डाउनलोड करें';
@@ -148,13 +148,10 @@ class AppLocalizationsHi extends AppLocalizations {
       'आपने अभी तक किसी चैट को तारांकित नहीं किया है।';
 
   @override
-  String get goToChats => 'एक चैट को तारांकित करें';
-
-  @override
   String get starConversation => 'तारांकित करें';
 
   @override
-  String get unstarConversation => 'Unstar';
+  String get unstarConversation => 'अतारांकित';
 
   @override
   String get loginToYourAccount => 'लॉगिन करें';
@@ -227,7 +224,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get pleaseCheckYourEmail =>
-      'Cortex का उपयोग करने के लिए, आपको अपना ईमेल सत्यापित करना होगा। \n आपके ईमेल पते पर एक सत्यापन लिंक भेजा गया है, कृपया अपना ईमेल जांचें।';
+      'Cortex का उपयोग करने के लिए, आपको अपना ईमेल सत्यापित करना होगा। \nआपके ईमेल पते पर एक सत्यापन लिंक भेजा गया है, कृपया अपना ईमेल जांचें।';
 
   @override
   String get verifyYourEmail => 'अपना ईमेल सत्यापित करें';
@@ -413,20 +410,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get noProductsFound => 'कोई उत्पाद नहीं मिला';
 
   @override
-  String get buyCredits => 'क्रेडिट खरीदें';
-
-  @override
-  String get selectCreditPackageDescription =>
-      'एक क्रेडिट पैकेज चुनें जो आपकी आवश्यकताओं के अनुरूप हो और अधिक सुविधाओं का आनंद लें।';
-
-  @override
-  String get buyCredit => 'क्रेडिट खरीदें';
-
-  @override
-  String get internetRequired =>
-      'इस मॉडल का उपयोग करने के लिए इंटरनेट कनेक्शन आवश्यक है';
-
-  @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
       'इस आदेश को देकर, आप सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं। आप हमारी सेवा की शर्तों और गोपनीयता नीति के बारे में अधिक जानने के लिए इस टेक्स्ट पर क्लिक कर सकते हैं। सदस्यता स्वचालित रूप से नवीनीकृत हो जाएगी जब तक कि वर्तमान अवधि के अंत से कम से कम 24 घंटे पहले स्वतः-नवीनीकरण बंद न हो।';
 
@@ -512,8 +495,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String get shareMessage =>
-      'Cortex ऐप देखें, यह बहुत अद्भुत है! इसे यहाँ डाउनलोड करें: https://play.google.com/store/apps/details?id=com.vertex.cortex';
+  String shareMessage(String cortexLink) {
+    return 'Cortex ऐप देखें, यह बहुत अद्भुत है! इसे यहाँ डाउनलोड करें: $cortexLink';
+  }
 
   @override
   String get shareFailed =>
@@ -562,6 +546,9 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get deleteAllConversationsConfirmMessage =>
       'क्या आप वाकई अपनी सभी चैट हटाना चाहते हैं? यह पूर्ववत नहीं किया जा सकता।';
+
+  @override
+  String get conversationDeleted => 'बातचीत हटा दी गई!';
 
   @override
   String get allConversationsDeleted => 'सभी बातचीत सफलतापूर्वक हटा दी गई!';
@@ -673,11 +660,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get noMatchingModels => 'कोई मेल खाने वाला मॉडल नहीं मिला।';
 
   @override
-  String creditPackage(Object amount) {
-    return '$amount क्रेडिट खरीदें';
-  }
-
-  @override
   String get benefit1 => 'ऑनलाइन एआई के लिए और भी बहुत कुछ बातचीत की सीमा';
 
   @override
@@ -690,9 +672,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get benefit5 => 'और अधिक ऑनलाइन कृत्रिम बुद्धिमत्ता बनाएं';
 
   @override
-  String benefit7(Object credits) {
-    return '$credits दैनिक क्रेडिट';
-  }
+  String get benefit7 => 'अधिक उपयोग सीमाएँ';
 
   @override
   String get benefit8 => 'मॉडल जोड़ें';
@@ -845,9 +825,8 @@ class AppLocalizationsHi extends AppLocalizations {
       'यह ऑफ़लाइन मॉडल आपके डिवाइस पर स्थापित नहीं है।';
 
   @override
-  String insufficientCredits(Object available, Object required) {
-    return 'इस अनुरोध को पूरा करने के लिए आपके पास पर्याप्त क्रेडिट नहीं हैं। इस कार्रवाई के लिए $required क्रेडिट की आवश्यकता है, लेकिन आपके पास केवल $available हैं। अधिक क्रेडिट प्राप्त करने के लिए, आप अपनी योजना को अपग्रेड कर सकते हैं या उन्हें सीधे खरीद सकते हैं। हे हम पूरी तरह से समझते हैं कि क्रेडिट खत्म होना थोड़ा निराशाजनक हो सकता है लेकिन गंभीरता से हमारे मॉडल से वे भयानक उत्तर प्राप्त करना मुफ्त नहीं है इसलिए ये क्रेडिट वास्तव में हमें अच्छे समय को जारी रखने में मदद करते हैं और सुनो अगर आप में से अधिक लोग इसमें शामिल होते हैं और क्रेडिट प्राप्त करते हैं तो हम पूरी तरह से सभी के लिए उन मुफ्त दैनिक सीमाओं को बढ़ाने पर विचार कर सकते हैं';
-  }
+  String get reachedLimit =>
+      'आप अपनी उपयोग सीमा तक पहुँच चुके हैं; अधिक सीमाएँ प्राप्त करने के लिए, आप अपना प्लान अपग्रेड कर सकते हैं। (हाँ, हम समझते हैं कि सीमा समाप्त होना निराशाजनक होता है। लेकिन सच में, उन शानदार जवाबों को पाना मुफ़्त नहीं है, इसलिए ये सीमाएँ वास्तव में हमें इस मज़े को जारी रखने में मदद करती हैं।)';
 
   @override
   String get modality => 'मोडैलिटी';
@@ -874,8 +853,8 @@ class AppLocalizationsHi extends AppLocalizations {
       'इस क्रिया को करने के लिए आपको लॉग इन होना चाहिए।';
 
   @override
-  String get errorInsufficientCredits =>
-      'आपके पास अपर्याप्त क्रेडिट हैं। जारी रखने के लिए कृपया टॉप अप करें।';
+  String get errorReachedLimit =>
+      'आप अपनी सीमा तक पहुँच चुके हैं, अधिक अनलॉक करने और चैट जारी रखने के लिए अपग्रेड करें।';
 
   @override
   String get errorServer =>
@@ -921,10 +900,10 @@ class AppLocalizationsHi extends AppLocalizations {
       'हम अपने सर्वर से आवश्यक डेटा प्राप्त नहीं कर सके। कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।';
 
   @override
-  String get noModelsFoundTitle => 'कोई परिणाम नहीं';
+  String get noFoundTitle => 'कोई परिणाम नहीं';
 
   @override
-  String get noModelsFoundMessage =>
+  String get noFoundMessage =>
       'अपनी खोज शब्दों को समायोजित करने या फ़िल्टर को साफ़ करने का प्रयास करें।';
 
   @override
@@ -1018,18 +997,18 @@ class AppLocalizationsHi extends AppLocalizations {
       'डाउनलोड किए गए मॉडल को सहेजने के लिए स्टोरेज अनुमति की आवश्यकता है। जारी रखने के लिए कृपया अनुमति दें।';
 
   @override
-  String get creditBannerTitle => 'मुफ्त क्रेडिट प्राप्त करें!';
+  String get plusBannerTitle => 'फ्री प्लस पाएं!';
 
   @override
-  String get creditBannerSubtitle =>
-      'एक दोस्त को आमंत्रित करें और आप दोनों को साइन-अप पर 50 क्रेडिट मिलते हैं! यदि वे सदस्यता लेते हैं, तो आप दोनों को अतिरिक्त 500 मिलते हैं!';
+  String get plusBannerSubtitle =>
+      'अपने किसी दोस्त को आमंत्रित करें और आप दोनों को 1 दिन का प्लस सब्सक्रिप्शन मुफ्त मिलेगा!';
 
   @override
   String get inviteShareSubject => 'Cortex पर मेरे साथ जुड़ें!';
 
   @override
-  String inviteShareMessage(String playStoreLink) {
-    return 'अरे यार तुम्हें यह ऐप कॉर्टेक्स देखना होगा यह वास्तव में पागल है यदि आप मेरे लिंक का उपयोग करते हैं तो हम दोनों को 50 क्रेडिट मिलते हैं और यदि आप सदस्यता लेते हैं तो हम दोनों को अतिरिक्त 500 मिलते हैं यह एक पागल सौदा है इसे जल्द से जल्द डाउनलोड करें\n\n$playStoreLink';
+  String inviteShareMessage(String cortexLink) {
+    return 'अरे भाई cortex नाम का एक खतरनाक ऐप है अगर इनवाइट करोगे तो हम दोनों को फ्री प्लस मिलेगा ज़बरदस्त डील है जल्दी डाउनलोड करो\n\n$cortexLink';
   }
 
   @override
@@ -1087,21 +1066,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get errorImageLoad => 'उत्पन्न छवि लोड करने में विफल.';
 
   @override
-  String get extensionInfoPanelTitle => 'मॉडल देखें';
-
-  @override
-  String get extensionInfoPanelBody1 =>
-      'यह तीर आपको इस श्रृंखला के विभिन्न मॉडलों के बीच स्विच करने की सुविधा देता है।';
-
-  @override
-  String get extensionInfoPanelBody2 =>
-      'जब आप पहली बार इस श्रृंखला के साथ चैट शुरू करते हैं, तो डिफ़ॉल्ट मॉडल स्वचालित रूप से चयनित हो जाता है और आप चैट के दौरान किसी भी समय अपना चयन बदल सकते हैं।';
-
-  @override
-  String get extensionInfoPanelFooter =>
-      'प्रत्येक मॉडल के बारे में विस्तृत जानकारी देखने या मैन्युअल रूप से एक अलग मॉडल का चयन करने के लिए, कृपया लाइब्रेरी पर जाएं; वहां से इस मॉडल श्रृंखला का चयन करें और इसके विवरण पृष्ठ के शीर्ष पर स्थित तीर पर टैप करें।';
-
-  @override
   String get premiumModelNoticeTitle => 'प्रीमियम मॉडल';
 
   @override
@@ -1116,24 +1080,13 @@ class AppLocalizationsHi extends AppLocalizations {
       'आपने प्रीमियम मॉडल के लिए अपने सभी निःशुल्क दैनिक संदेशों का उपयोग कर लिया है, कृपया असीमित पहुंच के लिए अपग्रेड करें।';
 
   @override
-  String get selectionScreenGreetingGeneric =>
-      'आज मैं आपकी किस प्रकार मदद कर सकता हूँ?';
-
-  @override
-  String get selectionScreenFeatureOffline => 'इंटरनेट के बिना उपयोग करें';
+  String get useOffline => 'इंटरनेट के बिना उपयोग करें';
 
   @override
   String get explore => 'खोजें';
 
   @override
-  String get selectionScreenNewsAndUpdates => 'समाचार और अपडेट';
-
-  @override
-  String get filters => 'फिल्टर';
-
-  @override
-  String get noRecentChatsMessage =>
-      'आपने अभी तक किसी मॉडल से बात नहीं की है, चलिए बातचीत शुरू करते हैं!';
+  String get news => 'समाचार';
 
   @override
   String get allModels => 'सभी मॉडल';
@@ -1149,10 +1102,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get customModels => 'कस्टम मॉडल';
-
-  @override
-  String get filterPanelDescription =>
-      'सूची को तुरंत फ़िल्टर करने के लिए किसी श्रेणी पर टैप करें.';
 
   @override
   String get dynamicChatTitle => 'गतिशील चैट';
@@ -1315,7 +1264,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get notificationReferralBody =>
-      'किसी मित्र को कॉर्टेक्स में आमंत्रित करें और आप दोनों को मुफ्त क्रेडिट मिलेगा!';
+      'अपने किसी दोस्त को कॉर्टेक्स में आमंत्रित करें और आप दोनों को एक दिन का मुफ्त ट्रायल मिलेगा!';
 
   @override
   String get notificationCookingTitle => 'भूख लगना?';
@@ -1466,13 +1415,6 @@ class AppLocalizationsHi extends AppLocalizations {
       'शुभ प्रभात और शुभ रात्रि जैसे संदेश।';
 
   @override
-  String get exitAppTitle => 'इतनी जल्दी जाना?';
-
-  @override
-  String get exitAppConfirmation =>
-      'क्या आप वाकई इस अद्भुत मंच को छोड़ना चाहते हैं?';
-
-  @override
   String get tagNotFound =>
       'आपके द्वारा दर्ज किया गया टैग अमान्य है या उसकी समय सीमा समाप्त हो चुकी है।';
 
@@ -1546,7 +1488,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get upgradeAccountDescription =>
-      'प्रतिदिन 200 बोनस क्रेडिट प्राप्त करने और अधिक सीमाएं अनलॉक करने के लिए एक खाता बनाएं।';
+      'अधिक सीमाओं को अनलॉक करने के लिए एक खाता बनाएं।';
 
   @override
   String get createAccount => 'खाता बनाएं';
@@ -1588,5 +1530,25 @@ class AppLocalizationsHi extends AppLocalizations {
   String get emulatorModeWarning => 'एमुलेटर मोड में यह सुविधा निष्क्रिय है।';
 
   @override
-  String get newChat => 'New Chat';
+  String get newChat => 'नई चैट';
+
+  @override
+  String get howCanIHelpWith => 'मैं किस प्रकार सहायता कर सकता हूँ?';
+
+  @override
+  String get variants => 'वेरिएंट';
+
+  @override
+  String get variantsDescription =>
+      'वेरिएंट एक ही एआई परिवार के अलग-अलग संस्करण हैं। मुख्य कार्ड पर टैप करने पर हम स्वचालित रूप से सबसे अच्छा विकल्प चुन लेते हैं, लेकिन यदि आप चाहें तो यहां से मैन्युअल रूप से एक विशिष्ट विकल्प भी चुन सकते हैं!';
+
+  @override
+  String get fluxChatTitle => 'फ्लक्स चैट';
+
+  @override
+  String get fluxChatDescription =>
+      'फ्लक्स चैट अस्थायी चैट होती हैं और आपके डिवाइस पर सेव नहीं होती हैं।';
+
+  @override
+  String get alwaysBest => 'हमेशा सर्वश्रेष्ठ';
 }

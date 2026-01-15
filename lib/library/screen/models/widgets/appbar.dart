@@ -4,17 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../../app.dart';
 import '../../../../theme.dart';
+import '../../../../screen.dart';
 
-/// A custom AppBar for the ModelsScreen, encapsulating the title and the 'Create' action button.
 class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String createButtonText;
   final VoidCallback onOpenCreateScreen;
 
-  // Pre-calculated metrics
+  // Pre-calculated metrics for layout
   final double _toolbarHeight;
   final bool _isTablet;
   final double _titleFontSize;
+  final double _horizontalPadding; // New dynamic padding for symmetry
 
   // Button Metrics
   final double _buttonWidth;
@@ -22,7 +23,6 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double _circleSize;
   final double _textSize;
   final double _iconSize;
-  final double _actionAreaPadding;
 
   ModelsAppBar({
     super.key,
@@ -33,17 +33,20 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
   }) :
         _isTablet = MediaQuery.of(context).size.width >= 600,
 
+  // Calculate a dynamic horizontal padding (approx 4% of width) to match body content
+        _horizontalPadding = MediaQuery.of(context).size.width * 0.045,
+
         _toolbarHeight = MediaQuery.of(context).size.width >= 600
             ? MediaQuery.of(context).size.width * 0.14
             : kToolbarHeight,
 
         _titleFontSize = MediaQuery.of(context).size.width >= 600
-            ? 32.0 // Slightly smaller for better centering
+            ? 32.0
             : MediaQuery.of(context).size.width * 0.06,
 
         _buttonWidth = MediaQuery.of(context).size.width >= 600
             ? 180.0
-            : 110.0, // Adjusted width to fit with centered title
+            : 110.0,
 
         _buttonHeight = MediaQuery.of(context).size.width >= 600
             ? 56.0
@@ -55,54 +58,59 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
 
         _textSize = MediaQuery.of(context).size.width >= 600
             ? 18.0
-            : 13.0,
+            : 12.0,
 
         _iconSize = MediaQuery.of(context).size.width >= 600
             ? 26.0
-            : 16.0,
-
-        _actionAreaPadding = MediaQuery.of(context).size.width >= 600 ? 24.0 : 16.0;
+            : 16.0;
 
   @override
   Widget build(BuildContext context) {
-    // The total width reserved for the action area (button + padding)
-    final double actionAreaTotalWidth = _buttonWidth + _actionAreaPadding;
+    final double leadingIconSize = _isTablet ? 36.0 : 26.0;
 
-    // Icon size for the menu button
-    final double leadingIconSize = _isTablet ? 36.0 : 24.0;
+    // We increase leadingWidth to accommodate the new padding + the button size
+    final double dynamicLeadingWidth = leadingIconSize + (_horizontalPadding * 2) + 20;
 
     return AppBar(
       scrolledUnderElevation: 0,
       toolbarHeight: _toolbarHeight,
-      centerTitle: true, // CENTERED TITLE
+      centerTitle: true,
       backgroundColor: AppColors.background,
       elevation: 0,
 
-      // --- LEADING (Menu/Back) ---
-      // If used in a Scaffold with a Drawer, this will automatically show the menu icon.
-      // Or we can force it if we are pushing this screen.
+      // Defines the width of the leading area to prevent the icon from being squashed
+      leadingWidth: dynamicLeadingWidth,
+
+      // --- LEADING ---
       leading: Builder(
         builder: (context) {
-          // Check if we can pop (Back) or if we should open drawer (Menu)
           final canPop = Navigator.of(context).canPop();
 
-          return IconButton(
-            icon: SvgPicture.asset(
-              'assets/icons/sidebar.svg', // Use standard icon
-              width: leadingIconSize,
-              height: leadingIconSize,
-              colorFilter: ColorFilter.mode(
-                  AppColors.primaryColor.inverted,
-                  BlendMode.srcIn
+          return Container(
+            // Apply left padding to move the icon inward
+            padding: EdgeInsets.only(left: _horizontalPadding),
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+              // Remove default constraints to control size manually if needed
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: SvgPicture.asset(
+                'assets/icons/sidebar.svg',
+                width: leadingIconSize,
+                height: leadingIconSize,
+                colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted,
+                    BlendMode.srcIn
+                ),
               ),
+              onPressed: () {
+                if (canPop) {
+                  Navigator.of(context).pop();
+                } else {
+                  context.findAncestorStateOfType<MainScreenState>()?.toggleAxon();
+                }
+              },
             ),
-            onPressed: () {
-              if (canPop) {
-                Navigator.of(context).pop();
-              } else {
-                Scaffold.of(context).openDrawer();
-              }
-            },
           );
         },
       ),
@@ -121,10 +129,10 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
       // --- CREATE BUTTON ---
       actions: [
         Container(
-          width: actionAreaTotalWidth,
           height: _toolbarHeight,
           alignment: Alignment.centerRight,
-          padding: EdgeInsets.only(right: _isTablet ? 24.0 : 16.0),
+          // Apply matching right padding for symmetry
+          padding: EdgeInsets.only(right: _horizontalPadding),
           child: SizedBox(
             width: _buttonWidth,
             height: _buttonHeight,
@@ -139,13 +147,13 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
                     width: _buttonWidth - (_circleSize / 2),
                     height: _buttonHeight,
                     decoration: BoxDecoration(
-                      color: AppColors.senaryColor.withValues(alpha:0.9),
+                      color: AppColors.senaryColor.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(_isTablet ? 30 : 20),
                     ),
                     alignment: Alignment.center,
                     padding: EdgeInsets.only(
                         left: _isTablet ? 12 : 4,
-                        right: _circleSize * 0.6 // Space for the circle overlap
+                        right: _circleSize * 1
                     ),
                     child: Text(
                       createButtonText,
@@ -177,7 +185,7 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
                             color: AppColors.senaryColor,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha:0.2),
+                                color: Colors.black.withValues(alpha: 0.2),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
                               )

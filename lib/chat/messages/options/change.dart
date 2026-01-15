@@ -66,7 +66,7 @@ Future<void> showModelSelectionDialog({
   if (isDynamicMode) {
     itemsForDialog = _buildCategorizedModelList(l10n, downloadedModelIds, langCode, modelService: modelService);
   } else if (modelSeriesData != null) {
-    itemsForDialog = _buildExtensionList(modelSeriesData, langCode: langCode, modelService: modelService);
+    itemsForDialog = _buildVariantList(modelSeriesData, langCode: langCode, modelService: modelService);
   } else {
     itemsForDialog = [];
   }
@@ -136,12 +136,12 @@ ModelEntity? _findParentSeriesData(String modelId, {required String langCode, re
   try {
     return allCachedModels.firstWhere((model) => model.id == modelId);
   } catch (e) {
-    // Not a direct match, check extensions
+    // Not a direct match, check variants
   }
 
-  // If not, search within extensions
+  // If not, search within variants
   for (final seriesEntity in allCachedModels) {
-    if (seriesEntity.extensions?.containsKey(modelId) ?? false) {
+    if (seriesEntity.variants?.containsKey(modelId) ?? false) {
       return seriesEntity;
     }
   }
@@ -160,10 +160,10 @@ String _formatModelId(String rawText) {
   return parts.join(' ');
 }
 
-/// Builds the list of model extensions for Standard Mode.
-List<Map<String, dynamic>> _buildExtensionList(ModelEntity modelSeries, {required String langCode, required ModelService modelService}) {
-  final allExtensionsMap = modelSeries.extensions ?? {};
-  final items = allExtensionsMap.entries.map((entry) {
+/// Builds the list of model variants for Standard Mode.
+List<Map<String, dynamic>> _buildVariantList(ModelEntity modelSeries, {required String langCode, required ModelService modelService}) {
+  final allVariantsMap = modelSeries.variants ?? {};
+  final items = allVariantsMap.entries.map((entry) {
     final data = entry.value as Map<String, dynamic>;
     return {
       'code': entry.key,
@@ -195,8 +195,8 @@ List<Map<String, dynamic>> _buildCategorizedModelList(
       }
     } else {
       final targetCategory = categories[series.category] ?? categories['online']!;
-      if (series.extensions != null && series.extensions!.isNotEmpty) {
-        for (final extId in series.extensions!.keys) {
+      if (series.variants != null && series.variants!.isNotEmpty) {
+        for (final extId in series.variants!.keys) {
           targetCategory.add(modelService.getPreciseModelData(extId, langCode: langCode));
         }
       } else {
@@ -308,7 +308,7 @@ class _ModelSelectionDialogContentState extends State<_ModelSelectionDialogConte
               children: [
                 SizedBox(height: screenHeight * _UIFactors.verticalSpacingFactor),
                 SvgPicture.asset(
-                  'assets/icons/extension.svg',
+                  'assets/icons/variant.svg',
                   width: screenWidth * _UIFactors.iconSizeFactor,
                   height: screenWidth * _UIFactors.iconSizeFactor,
                   colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),

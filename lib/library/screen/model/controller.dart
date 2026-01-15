@@ -113,7 +113,7 @@ class ModelDetailView extends StatelessWidget {
         if (provider.isButtonLocked) return;
         final appBarState = appBarKey.currentState;
         if (appBarState != null && appBarState.isPanelOpen) {
-          await appBarState.dismissExtensionOverlay();
+          await appBarState.dismissVariantOverlay();
           if (!context.mounted) return;
           handlePop();
         } else {

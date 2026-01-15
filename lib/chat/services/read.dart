@@ -7,7 +7,7 @@ import 'package:cortex/chat/services/database.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
-import '../../inbox/manager.dart';
+import '../../axon/inbox/logic/manager.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/backend/data/user.dart';

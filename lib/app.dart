@@ -3,7 +3,7 @@
 // Root application widget and shared app-level utilities.
 //
 // - Cortex: wraps [MaterialApp] with theming, localization, and navigator key.
-// - InvertedColor: small color utility extension used across the app.
+// - InvertedColor: small color utility variant used across the app.
 // - kUnsupportedMaterialLocales: locales with incomplete Material translations.
 
 import 'package:cortex/l10n/app_localizations.dart';
@@ -88,7 +88,7 @@ class Cortex extends StatelessWidget {
   }
 }
 
-/// Helper extension to make color inversion cleaner and reusable.
+/// Helper variant to make color inversion cleaner and reusable.
 extension InvertedColor on Color {
   /// Returns the inverted version of this color.
   Color get inverted {

@@ -23,7 +23,9 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class LibraryScreenState extends State<LibraryScreen>
-    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<LibraryScreen> {
+    with
+        TickerProviderStateMixin,
+        AutomaticKeepAliveClientMixin<LibraryScreen> {
 
   ModelCatalogProvider? _catalogProvider;
   ModelLocalStateProvider? _localStateProvider;
@@ -80,7 +82,8 @@ class LibraryScreenState extends State<LibraryScreen>
           _navigateAndHandleFocus(() =>
               _catalogProvider!.openModelDetail(context, id)),
       removeModel: (id) async {
-        final modelToRemove = _catalogProvider!.allModels.firstWhere((m) => m.id == id);
+        final modelToRemove = _catalogProvider!.allModels.firstWhere((m) =>
+        m.id == id);
         await _catalogProvider!.removeModel(context, modelToRemove);
       },
       startChat: (id, _, {String? modelPath, isCustomModel = false}) =>
@@ -111,7 +114,8 @@ class LibraryScreenState extends State<LibraryScreen>
     Timer(const Duration(milliseconds: 4000), () {
       if (mounted) {
         _pulseController.stop();
-        _pulseController.animateTo(0.0, duration: const Duration(milliseconds: 300));
+        _pulseController.animateTo(
+            0.0, duration: const Duration(milliseconds: 300));
       }
     });
   }
@@ -126,7 +130,8 @@ class LibraryScreenState extends State<LibraryScreen>
       if (lastShownTs == null) {
         shouldShow = true;
       } else {
-        final DateTime lastShownDate = DateTime.fromMillisecondsSinceEpoch(lastShownTs);
+        final DateTime lastShownDate = DateTime.fromMillisecondsSinceEpoch(
+            lastShownTs);
         final Duration diff = now.difference(lastShownDate);
         if (diff.inDays >= 7) shouldShow = true;
       }
@@ -149,7 +154,8 @@ class LibraryScreenState extends State<LibraryScreen>
     }
   }
 
-  Future<void> _navigateAndHandleFocus(Future<void> Function() pageBuilder) async {
+  Future<void> _navigateAndHandleFocus(
+      Future<void> Function() pageBuilder) async {
     FocusManager.instance.primaryFocus?.unfocus();
     await pageBuilder();
     if (mounted) {
@@ -209,7 +215,9 @@ class LibraryScreenState extends State<LibraryScreen>
             context: context,
             title: localizations.modelsTitle,
             createButtonText: localizations.create,
-            onOpenCreateScreen: () => _navigateAndHandleFocus(() => catalog.openCreateScreen(context)),
+            onOpenCreateScreen: () =>
+                _navigateAndHandleFocus(() =>
+                    catalog.openCreateScreen(context)),
           ),
           body: ModelsBody(
             scrollController: _scrollController,
@@ -226,16 +234,21 @@ class LibraryScreenState extends State<LibraryScreen>
             showLocalizationWarning: _showLocalizationWarning,
             onDismissWarningPanel: _dismissWarningPanel,
             onRemovePressed: (id, title) async {
-              final modelToRemove = catalog.allModels.firstWhere((m) => m.id == id);
+              final modelToRemove = catalog.allModels.firstWhere((m) =>
+              m.id == id);
               await catalog.removeModel(context, modelToRemove);
             },
-            onChatPressed: (id, _, {String? modelPath, isCustomModel = false}) =>
+            onChatPressed: (id, _,
+                {String? modelPath, isCustomModel = false}) =>
                 catalog.startChatWithModel(id),
             onDownloadPressed: ({required id, required url, required title}) =>
-                localState.requestPermissionAndStartDownload(context: context, id: id, url: url),
+                localState.requestPermissionAndStartDownload(
+                    context: context, id: id, url: url),
             onCancelDownload: localState.cancelDownload,
             onResumeDownload: localState.resumeDownload,
-            openModelDetail: (id) => _navigateAndHandleFocus(() => catalog.openModelDetail(context, id)),
+            openModelDetail: (id) =>
+                _navigateAndHandleFocus(() =>
+                    catalog.openModelDetail(context, id)),
           ),
         );
       },

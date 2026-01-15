@@ -41,11 +41,13 @@ class ChatInputPanel extends StatefulWidget {
   State<ChatInputPanel> createState() => _ChatInputPanelState();
 }
 
-class _ChatInputPanelState extends State<ChatInputPanel> with TickerProviderStateMixin {
+class _ChatInputPanelState extends State<ChatInputPanel>
+    with TickerProviderStateMixin {
   // Local controllers for the InputField
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  final GlobalKey<InputFieldState> _inputFieldKey = GlobalKey<InputFieldState>();
+  final GlobalKey<InputFieldState> _inputFieldKey = GlobalKey<
+      InputFieldState>();
 
   // Animation for warning fade inside InputField
   late AnimationController _warningController;
@@ -85,7 +87,9 @@ class _ChatInputPanelState extends State<ChatInputPanel> with TickerProviderStat
     final localizations = AppLocalizations.of(context)!;
 
     // --- Model Status Checks ---
-    final langCode = Localizations.localeOf(context).languageCode;
+    final langCode = Localizations
+        .localeOf(context)
+        .languageCode;
     final isOffline = !Utils.isServerSideModel(
       sessionProvider.modelId,
       langCode: langCode,
@@ -96,7 +100,8 @@ class _ChatInputPanelState extends State<ChatInputPanel> with TickerProviderStat
         localStateProvider.downloadCompleted[sessionProvider.modelId] ?? false;
 
     // Check if model is missing (Only for offline non-dynamic models)
-    final modelMissing = !sessionProvider.isDynamicChat && isOffline && !isDownloaded;
+    final modelMissing = !sessionProvider.isDynamicChat && isOffline &&
+        !isDownloaded;
 
     final bool isLimitExceeded = sessionProvider.chatLimitManager
         ?.isLimitExceeded(conversationProvider.messages) ?? false;
@@ -156,17 +161,20 @@ class _ChatInputPanelState extends State<ChatInputPanel> with TickerProviderStat
             fadeAnimation: _warningFadeAnimation,
 
             // --- Actions ---
-            onSend: () async => _handleSend(
-                localizations,
-                isLimitExceeded,
-                langCode,
-                modelService,
-                inputProvider,
-                conversationProvider
-            ),
+            onSend: () async =>
+                _handleSend(
+                    localizations,
+                    isLimitExceeded,
+                    langCode,
+                    modelService,
+                    inputProvider,
+                    conversationProvider
+                ),
             onApplyEditedMessage: () async =>
             await widget.editService.applyEditedMessage(context),
-            onStop: context.read<StopService>().stopResponse,
+            onStop: context
+                .read<StopService>()
+                .stopResponse,
             onPhotoSelected: (photo) =>
                 context.read<InputProvider>().selectPhoto(photo),
             onCancelEditing: () {
@@ -181,14 +189,12 @@ class _ChatInputPanelState extends State<ChatInputPanel> with TickerProviderStat
 
   // --- Logic Helpers ---
 
-  Future<void> _handleSend(
-      AppLocalizations localizations,
+  Future<void> _handleSend(AppLocalizations localizations,
       bool isLimitExceeded,
       String langCode,
       ModelService modelService,
       InputProvider inputProvider,
-      ConversationProvider conversationProvider,
-      ) async {
+      ConversationProvider conversationProvider,) async {
     // Basic validation
     final isEnabled = _inputFieldKey.currentState?.isSendButtonEnabled ?? false;
     if (!isEnabled || conversationProvider.isWaitingForResponse) return;

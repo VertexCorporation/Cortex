@@ -8,6 +8,7 @@ import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/providers/local.dart';
 import '../services/dynamic.dart';
+import '../services/storage.dart';
 
 enum AppBarMode {
   notSelected,
@@ -30,6 +31,7 @@ class ChatSessionProvider with ChangeNotifier {
   bool _isPersistentlyDynamic = false;
   bool _isExitingChat = false;
   bool _wasDynamicOnExit = false;
+  bool _isFluxMode = false;
 
   // -------------------- Model List State --------------------
   // --- All selected model data is now encapsulated in a single, nullable entity. ---
@@ -56,13 +58,21 @@ class ChatSessionProvider with ChangeNotifier {
   // ===========================================================================
 
   AppBarMode get appBarMode => _appBarMode;
+
   bool get isModelSelected => _isModelSelected;
+
   bool get isDynamicChat => _isPersistentlyDynamic;
+
   bool get isChatActive => _isModelSelected || _isPersistentlyDynamic;
+
   bool get isExitingChat => _isExitingChat;
+
   bool get wasDynamicOnExit => _wasDynamicOnExit;
+
   List<ModelEntity> get allModels => _modelService.getCachedModelsSync();
+
   bool get areModelsLoading => _modelService.isLoading;
+
   bool get modelsLoadError => _modelService.hasError;
 
   String? get modelId => _selectedModel?.id;
@@ -74,14 +84,16 @@ class ChatSessionProvider with ChangeNotifier {
     }
 
     final langCode = _currentLocale.languageCode;
-    final baseId = _modelService.getBaseIdFromFullId(currentModel.id, langCode: langCode);
+    final baseId = _modelService.getBaseIdFromFullId(
+        currentModel.id, langCode: langCode);
 
     if (baseId == currentModel.id) {
       return currentModel.displayTitle;
     }
 
     try {
-      final seriesModel = _modelService.getPreciseModelData(baseId, langCode: langCode);
+      final seriesModel = _modelService.getPreciseModelData(
+          baseId, langCode: langCode);
       return seriesModel.displayTitle;
     } catch (e) {
       // Fallback remains the same, which is robust.
@@ -95,6 +107,7 @@ class ChatSessionProvider with ChangeNotifier {
   }
 
   String? get role => _selectedModel?.role;
+
   String? get modelPath {
     if (_selectedModel == null || _selectedModel!.isServerSide) {
       return null;
@@ -102,24 +115,37 @@ class ChatSessionProvider with ChangeNotifier {
 
     return _localStateProvider?.getFilePathById(_selectedModel!.id);
   }
+
   bool get canHandleImage => _selectedModel?.modalities['image'] == true;
 
   // Local model loading state is transient and remains separate.
   bool _isLocalModelLoaded = false;
+
   bool get isLocalModelLoaded => _isLocalModelLoaded;
 
   bool get isUserSubscribed => _isUserSubscribed;
+
   int get premiumTrialUses => _premiumTrialUses;
+
   ChatLimitManager? get chatLimitManager => _chatLimitManager;
+
   String? get displayName => _displayName;
+
   String? get email => _email;
-  bool get showDisclaimer => isChatActive && _showDisclaimer && !_hasDismissedDisclaimerThisSession;
+
+  bool get showDisclaimer =>
+      isChatActive && _showDisclaimer && !_hasDismissedDisclaimerThisSession;
+
   bool get showPremiumBanner => _showPremiumBanner;
+
   bool get isCurrentModelPremium {
     final model = _isExitingChat ? _lastExitedModel : _selectedModel;
     return model?.isPremium ?? false;
   }
+
   bool get isStorageSufficient => _isStorageSufficient;
+
+  bool get isFluxMode => _isFluxMode;
 
   // Returns the current locale used by the session for localization.
   Locale getLocale() => _currentLocale;
@@ -128,8 +154,9 @@ class ChatSessionProvider with ChangeNotifier {
   // SECTION 3: CONSTRUCTOR
   // ===========================================================================
 
-  ChatSessionProvider({required ModelService modelService}) : _modelService = modelService;
-  
+  ChatSessionProvider({required ModelService modelService})
+      : _modelService = modelService;
+
   // ===========================================================================
   // SECTION 4: STATE MUTATION METHODS (ACTIONS)
   // ===========================================================================
@@ -137,6 +164,11 @@ class ChatSessionProvider with ChangeNotifier {
   /// Sets the current locale for the session, required for localization.
   void setLocale(Locale locale) {
     _currentLocale = locale;
+  }
+
+  void setFluxMode(bool value) {
+    _isFluxMode = value;
+    notifyListeners();
   }
 
   void selectModel(ModelEntity entity) {
@@ -203,6 +235,8 @@ class ChatSessionProvider with ChangeNotifier {
     _isLocalModelLoaded = false;
     _showPremiumBanner = false;
     _hasDismissedPremiumBannerThisSession = false;
+    _isFluxMode = false;
+    ChatStorageService.isFluxMode = false;
 
     notifyListeners();
 
@@ -227,16 +261,18 @@ class ChatSessionProvider with ChangeNotifier {
     }
   }
 
-  void updateActiveModelExtension(String newModelId) {
+  void updateActiveModelVariant(String newModelId) {
     final langCode = _currentLocale.languageCode;
-    _selectedModel = _modelService.getPreciseModelData(newModelId, langCode: langCode);
+    _selectedModel =
+        _modelService.getPreciseModelData(newModelId, langCode: langCode);
     updatePremiumBannerVisibility(_selectedModel?.isPremium ?? false);
     notifyListeners();
   }
 
   void pinDynamicAssistant(String modelId) {
     final langCode = _currentLocale.languageCode;
-    final entity = _modelService.getPreciseModelData(modelId, langCode: langCode);
+    final entity = _modelService.getPreciseModelData(
+        modelId, langCode: langCode);
 
     _isPersistentlyDynamic = true;
     _isModelSelected = false;
@@ -267,20 +303,24 @@ class ChatSessionProvider with ChangeNotifier {
       lastResetTimestamp = lastResetValue;
     } else if (lastResetValue is String) {
       final parsedDate = DateTime.tryParse(lastResetValue);
-      if (parsedDate != null) lastResetTimestamp = Timestamp.fromDate(parsedDate);
+      if (parsedDate != null) {
+        lastResetTimestamp = Timestamp.fromDate(parsedDate);
+      }
     }
 
     int trialUses = data['premiumModelTrialUses'] as int? ?? 0;
     if (lastResetTimestamp != null) {
       final lastResetDate = lastResetTimestamp.toDate();
       final now = DateTime.now();
-      if (lastResetDate.year != now.year || lastResetDate.month != now.month || lastResetDate.day != now.day) {
+      if (lastResetDate.year != now.year || lastResetDate.month != now.month ||
+          lastResetDate.day != now.day) {
         trialUses = 0;
       }
     }
     _premiumTrialUses = trialUses;
 
-    _displayName = data['displayName'] as String? ?? data['username'] as String?;
+    _displayName =
+        data['displayName'] as String? ?? data['username'] as String?;
     _email = data['email'] as String?;
 
     final dynamic expiresValue = data['subscriptionExpiresAt'];
@@ -289,7 +329,9 @@ class ChatSessionProvider with ChangeNotifier {
       subscriptionExpiresAt = expiresValue;
     } else if (expiresValue is String) {
       final parsedDate = DateTime.tryParse(expiresValue);
-      if (parsedDate != null) subscriptionExpiresAt = Timestamp.fromDate(parsedDate);
+      if (parsedDate != null) {
+        subscriptionExpiresAt = Timestamp.fromDate(parsedDate);
+      }
     }
 
     _chatLimitManager = ChatLimitManager(
@@ -304,7 +346,8 @@ class ChatSessionProvider with ChangeNotifier {
   }
 
   void updatePremiumBannerVisibility(bool isPremiumModel) {
-    final shouldShow = isPremiumModel && !_isUserSubscribed && !_hasDismissedPremiumBannerThisSession;
+    final shouldShow = isPremiumModel && !_isUserSubscribed &&
+        !_hasDismissedPremiumBannerThisSession;
 
     if (_showPremiumBanner != shouldShow) {
       _showPremiumBanner = shouldShow;
@@ -328,7 +371,8 @@ class ChatSessionProvider with ChangeNotifier {
       if (lastShownTs == null) {
         shouldShow = true;
       } else {
-        final DateTime lastShownDate = DateTime.fromMillisecondsSinceEpoch(lastShownTs);
+        final DateTime lastShownDate = DateTime.fromMillisecondsSinceEpoch(
+            lastShownTs);
         final Duration diff = now.difference(lastShownDate);
 
         if (diff.inDays >= 3) {

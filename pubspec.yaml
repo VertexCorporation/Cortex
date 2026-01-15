@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 4.5.1+451
+version: 5.0.0+500
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -111,11 +111,12 @@ fonts:
         weight: 500
 
       - asset: assets/fonts/roboto/Roboto-Bold.ttf
-        weight: 700
+        weight: 600
+
   - family: Ubuntu
     fonts:
-      - asset: assets/fonts/ubuntu/Ubuntu-Regular.ttf
-        weight: 400
+      - asset: assets/fonts/roboto/Ubuntu-Medium.ttf
+        weight: 500
 
 flutter_launcher_icons:
   android: true

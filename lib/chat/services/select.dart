@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import '../../main.dart';
-import '../../extensions.dart';
+import '../../variants.dart';
 
 /// Service responsible for all logic related to model selection and updates.
 ///
@@ -30,7 +30,7 @@ class SelectionService {
   /// It orchestrates a full reset of the chat state by:
   /// 1. Navigating to the chat tab if called from an external screen.
   /// 2. Clearing the previous conversation's state.
-  /// 3. Resolving the precise model/extension to use (e.g., last used).
+  /// 3. Resolving the precise model/variant to use (e.g., last used).
   /// 4. Setting the new model details in the session provider.
   Future<void> selectModel(ModelEntity aiEntity, {BuildContext? context}) async {
     const String logPrefix = "[SelectionService.selectModel]";
@@ -49,15 +49,15 @@ class SelectionService {
     // 1. Clear any previous conversation.
     _conversationProvider.clearConversation();
 
-    // 2. Resolve the precise model ID to use (if it's a series with extensions).
-    final extensionsMap = aiEntity.extensions;
+    // 2. Resolve the precise model ID to use (if it's a series with variants).
+    final variantsMap = aiEntity.variants;
     String finalModelId;
 
-    if (extensionsMap != null && extensionsMap.isNotEmpty) {
-      String lastUsedId = await Extensions.getLastSelectedExtension(aiEntity.id);
-      finalModelId = (lastUsedId.isNotEmpty && extensionsMap.containsKey(lastUsedId))
+    if (variantsMap != null && variantsMap.isNotEmpty) {
+      String lastUsedId = await Variants.getLastSelectedVariant(aiEntity.id);
+      finalModelId = (lastUsedId.isNotEmpty && variantsMap.containsKey(lastUsedId))
           ? lastUsedId
-          : extensionsMap.keys.first;
+          : variantsMap.keys.first;
     } else {
       finalModelId = aiEntity.id;
     }
@@ -74,25 +74,25 @@ class SelectionService {
     debugPrint("$logPrefix: Session and Conversation providers updated for new chat session.");
   }
 
-  /// Changes the active model to a different extension within the same series.
+  /// Changes the active model to a different variant within the same series.
   ///
   /// This method updates the session state without resetting the conversation,
   /// preserving the message history.
-  Future<void> changeExtension(String newFullModelId) async {
-    const String logPrefix = "[SelectionService.changeExtension]";
-    debugPrint("$logPrefix: Changing extension to '$newFullModelId'.");
+  Future<void> changeVariant(String newFullModelId) async {
+    const String logPrefix = "[SelectionService.changeVariant]";
+    debugPrint("$logPrefix: Changing variant to '$newFullModelId'.");
 
     if (_sessionProvider.modelId == newFullModelId) return;
 
     final langCode = _sessionProvider.getLocale().languageCode;
     final baseId = _modelService.getBaseIdFromFullId(newFullModelId, langCode: langCode);
-    await Extensions.setLastSelectedExtension(baseId, newFullModelId);
+    await Variants.setLastSelectedVariant(baseId, newFullModelId);
 
     // Call the specific provider method that updates the model details
     // WITHOUT clearing the message list. This is a session-level change.
-    _sessionProvider.updateActiveModelExtension(newFullModelId);
+    _sessionProvider.updateActiveModelVariant(newFullModelId);
 
-    debugPrint("$logPrefix: Session provider updated with new extension details.");
+    debugPrint("$logPrefix: Session provider updated with new variant details.");
   }
 
   /// Refreshes the active chat's model details from the latest available data.
@@ -103,9 +103,9 @@ class SelectionService {
     const String logPrefix = "[SelectionService.refreshActiveChatModelDetails]";
     debugPrint("$logPrefix: Refreshing details for active model '$activeModelId'.");
 
-    // This method is identical in function to changing an extension: it updates
+    // This method is identical in function to changing an variant: it updates
     // the model's metadata without resetting the chat.
-    _sessionProvider.updateActiveModelExtension(activeModelId);
+    _sessionProvider.updateActiveModelVariant(activeModelId);
 
     debugPrint("$logPrefix: Session provider refreshed with latest model details.");
   }

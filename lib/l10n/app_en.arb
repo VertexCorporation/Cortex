@@ -44,7 +44,6 @@
   "noChats": "No Chats",
   "noStarredChats": "No Starred Chats",
   "noStarredChatsMessage": "You didn't starred a chat yet.",
-  "goToChats": "Star a chat",
   "starConversation": "Star",
   "unstarConversation": "Unstar",
   "loginToYourAccount": "Login",
@@ -70,7 +69,7 @@
   "usernameTaken": "This username is already taken.",
   "username": "Username",
   "resendCode": "Resend verification e-mail",
-  "pleaseCheckYourEmail": "To use Cortex, you need to verify your email. \n A verification link has been sent to your email address, please check your email.",
+  "pleaseCheckYourEmail": "To use Cortex, you need to verify your email. \nA verification link has been sent to your email address, please check your email.",
   "verifyYourEmail": "Verify Your Email",
   "seconds": "seconds",
   "maxResendLimitReached": "You have reached the maximum number of verification emails",
@@ -161,16 +160,6 @@
   "purchaseStreamError": "Purchase stream error.",
   "productNotFound": "Product not found",
   "noProductsFound": "No products found",
-  "buyCredits": "Buy Credits",
-  "selectCreditPackageDescription": "Select a credit package that suits your needs and enjoy more features.",
-  "buyCredit": "Buy Credits",
-  "@creditPackage": {
-    "description": "Button text to buy a specific number of credits",
-    "placeholders": {
-      "amount": {}
-    }
-  },
-  "internetRequired": "Internet connection is required to use this model",
   "termsOfServiceAndPrivacyPolicyWarning": "By placing this order, you agree to the Terms of Service and Privacy Policy. You can click this text to learn more about our Terms of Service and Privacy Policy. The subscription will automatically renew unless auto-renew is turned off at least 24 hours before the end of the current period.",
   "termsOfService": "Terms of Service",
   "privacyPolicy": "Privacy Policy",
@@ -198,7 +187,16 @@
   "rateUs": "Rate Us",
   "share": "Share",
   "shareSubject": "Cortex",
-  "shareMessage": "Check out the Cortex app, it is so amazing! Download it here: https://play.google.com/store/apps/details?id=com.vertex.cortex",
+  "shareMessage": "Check out the Cortex app, it is so amazing! Download it here: {cortexLink}",
+  "@shareMessage": {
+    "description": "The message sent when sharing the app",
+    "placeholders": {
+      "cortexLink": {
+        "type": "String",
+        "example": "https://vertexishere.com"
+      }
+    }
+  },
   "shareFailed": "Failed to share the app. Please try again later",
   "selectText": "Select Text",
   "showLatex": "Show Special Symbols",
@@ -214,6 +212,7 @@
   "userId": "User ID",
   "deleteAllConversationsConfirmTitle": "Delete All Chats?",
   "deleteAllConversationsConfirmMessage": "Are you sure you want to delete all of your chats? This cannot be undone.",
+  "conversationDeleted": "Conversation deleted!",
   "allConversationsDeleted": "All conversations were deleted successfully!",
   "deleteAll": "Delete All",
   "deleteAllConversationsButton": "Delete All Conversations",
@@ -249,12 +248,11 @@
   "insufficientStorage": "Low Storage",
   "confirmRemoveModel": "Are you sure you want to remove the {model} model from your device? Doing so will also delete any previous conversations with that model.",
   "noMatchingModels": "No matching models found.",
-  "creditPackage": "Buy {amount} Credits",
   "benefit1": "Many more conversation limit for online AIs",
   "benefit3": "Profile effect",
   "benefit4": "Membership badge",
   "benefit5": "Create more online artificial intelligences",
-  "benefit7": "{credits} daily credits",
+  "benefit7": "More usage limits",
   "benefit8": "Add models",
   "benefit9": "New themes",
   "oldBenefits": "All benefits from lower plans",
@@ -281,7 +279,7 @@
   "editingMessageInfo": "Editing this message will restart the conversation from here.",
   "editingNotification": "You are in editing mode now",
   "featurePluralTitle": "Plural",
-  "featurePluralDescription": "This model can automatically integrate additional extensions, thereby expanding its functional capabilities to support a diverse range of operations with enhanced performance.",
+  "featurePluralDescription": "This model can automatically integrate additional variants, thereby expanding its functional capabilities to support a diverse range of operations with enhanced performance.",
   "nameLabel": "AI name",
   "summaryLabel": "AI Summary",
   "add": "Add",
@@ -302,13 +300,7 @@
   "photoLimitReachedMessage": "Only one photo can be added",
   "inappropriateContentDetected": "Inappropriate content detected!",
   "offlineModelNotInstalled": "This offline model is not installed on your device.",
-  "insufficientCredits": "You do not have enough credits to complete this request. This action requires {required} credits, but you only have {available}. To gain more credits, you can upgrade your plan or purchase them directly. hey we totally get it running out of credits can be a bit of a bummer but seriously getting those awesome replies from our models isnt free so these limits actually help us keep the good times rolling and listen if more of you guys jump in and get more limits we can totally look at bumping up those free daily limits for everyone",
-  "@insufficientCredits": {
-    "placeholders": {
-      "available": {},
-      "required": {}
-    }
-  },
+  "reachedLimit": "You have reached your usage limit; to gain more limits, you can upgrade your plan. (hey, we totally get it running out of limits is a bummer. but seriously, getting those awesome replies isn't free, so these limits actually help us keep the good times rolllliiiiiiiiiing.)",
   "modality": "Modality",
   "multimodal": "Multimodal",
   "anErrorOccurred": "An Error Occurred",
@@ -316,14 +308,14 @@
   "pageCouldNotBeLoaded": "Page Could Not Be Loaded",
   "checkYourInternet": "Please check your internet connection and try again.",
   "errorUserNotAuthenticated": "You must be logged in to perform this action.",
-  "errorInsufficientCredits": "You have insufficient credits. Please top up to continue.",
+  "errorReachedLimit": "You have hit your limit, upgrade to unlock more and keep chatting.",
   "errorServer": "An unexpected server error occurred. Please try again later.",
   "errorNetwork": "A network error occurred. Please check your connection and try again.",
   "errorApiAuthentication": "Authentication failed. Please try logging in again.",
   "baseModelForCharacterDescription": "The selected base model will determine the character's reasoning and response capabilities.",
   "selectBaseModel": "Select a Base Model",
   "@errorUserNotAuthenticated": {},
-  "@errorInsufficientCredits": {},
+  "@errorReachedLimit": {},
   "@errorServer": {},
   "@errorNetwork": {},
   "@errorApiAuthentication": {},
@@ -341,8 +333,8 @@
   "@errorLoadingMessage": {
     "description": "Message for the error screen explaining the issue."
   },
-  "noModelsFoundTitle": "No Results",
-  "noModelsFoundMessage": "Try adjusting your search terms or clearing the filter.",
+  "noFoundTitle": "No Results",
+  "noFoundMessage": "Try adjusting your search terms or clearing the filter.",
   "disclaimerMessage": "Artificial Intelligences can make mistakes, check important information.",
   "modelCreatedSuccess": "Model created successfully!",
   "modelRemovedSuccess": "“{modelName}” was successfully removed.",
@@ -367,19 +359,19 @@
   "registerSubtitle": "Create a Vertex account for seamless access across all our services. By continuing, you agree to our Terms of Service & Privacy Policy.",
   "photoWarningMessage": "A photo is included. Models that don't support images may ignore it.",
   "storagePermissionRequired": "Storage permission is required to save downloaded models. Please grant permission to continue.",
-  "creditBannerTitle": "Get Free Credits!",
-  "creditBannerSubtitle": "Invite a friend and you both get 50 credits on sign-up! If they subscribe, you both get an extra 500!",
+  "plusBannerTitle": "Get Free Plus!",
+  "plusBannerSubtitle": "Invite a friend and you both get 1 Day of Plus for free!",
   "inviteShareSubject": "Join me on Cortex!",
   "@inviteShareMessage": {
     "description": "The text message to share with a friend for an invite.",
     "placeholders": {
-      "playStoreLink": {
+      "cortexLink": {
         "type": "String",
         "example": "https://play.google.com/store/..."
       }
     }
   },
-  "inviteShareMessage": "yo you gotta check out this app cortex its actually insane if you use my link we both get 50 credits and if you sub we both get an extra 500 its a crazy deal download it asap\n\n{playStoreLink}",
+  "inviteShareMessage": "yo you gotta check out this app cortex its actually insane if you use my link we both get free plus wow its a crazy deal DOWNLOAD IT ASAP\n\n{cortexLink}",
   "reviewEnjoyingAppTitle": "Enjoying Cortex?",
   "reviewHelpUsGrow": "Your rating is a huge support for our young indie team and helps us make Cortex even better for you.",
   "reviewMaybeLater": "Maybe Later",
@@ -417,10 +409,6 @@
   "@errorImageLoad": {
     "description": "Error message shown in an AI message bubble when the generated image data is corrupt or cannot be saved to the device."
   },
-  "extensionInfoPanelTitle": "Explore Models",
-  "extensionInfoPanelBody1": "This arrow lets you switch between different models within this series.",
-  "extensionInfoPanelBody2": "When you first start a chat with this series, the default model is automatically selected and you can change your selection at any time during a chat.",
-  "extensionInfoPanelFooter": "To view detailed information about each model or to manually select a different model, please go to the Library; select this model series from there and tap the arrow at the top of its detail page.",
   "premiumModelNoticeTitle": "Premium Model",
   "@premiumModelNoticeTitle": {
     "description": "Title for the notice banner shown on a premium model's detail page."
@@ -434,21 +422,15 @@
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
   "premiumTrialExhaustedMessage": "You have used all your free daily messages for premium models, please upgrade for unlimited access.",
-  "selectionScreenGreetingGeneric": "How can I help you today?",
-  "@selectionScreenGreetingGeneric": {
-    "description": "Generic greeting on the selection screen when the user's name is not available."
-  },
-  "selectionScreenFeatureOffline": "Use without Internet",
-  "@selectionScreenFeatureOffline": {
+  "useOffline": "Use without Internet",
+  "@useOffline": {
     "description": "Text for the 'Use without Internet' feature card. The newline is intentional."
   },
   "explore": "Explore",
   "@explore": {
     "description": "It's so clear i think."
   },
-  "selectionScreenNewsAndUpdates": "News & Updates",
-  "filters": "Filters",
-  "noRecentChatsMessage": "You haven't spoken with any models yet, let's start a conversation!",
+  "news": "News",
   "allModels": "All Models",
   "@allModels": {
     "description": "Filter button text to show all available models"
@@ -468,10 +450,6 @@
   "customModels": "Custom Models",
   "@customModels": {
     "description": "Filter button text for user-created models or characters"
-  },
-  "filterPanelDescription": "Tap a category to instantly filter the list.",
-  "@filterPanelDescription": {
-    "description": "A brief instructional text below the 'Filters' title in the filter panel."
   },
   "dynamicChatTitle": "Dynamic Chat",
   "@dynamicChatTitle": {
@@ -524,7 +502,7 @@
   "notificationRateAppTitle": "Are We Cool?",
   "notificationRateAppBody": "If you love Cortex, could you support us with a 5-star rating in the store? I think you will. You will.",
   "notificationReferralTitle": "One for All, All for One.",
-  "notificationReferralBody": "Invite a friend to Cortex and you both get free credits!",
+  "notificationReferralBody": "Invite a friend to Cortex and you both get one-day free plus!",
   "notificationCookingTitle": "Feeling Hungry?",
   "notificationCookingBody": "Our Chef character prepared a great carbonara recipe for tonight. Just kidding... or am I?",
   "notificationExistentialTitle": "I think, therefore...",
@@ -583,8 +561,6 @@
   "@channelGreetingsDescription": {
     "description": "The user-visible description for the greetings notification channel."
   },
-  "exitAppTitle": "Leaving so soon?",
-  "exitAppConfirmation": "Are you sure you want to leave this amazing platform?",
   "tagNotFound": "The tag you entered is invalid or has expired.",
   "whatIsNew": "What's new?",
   "onboardingTitle1": "Hey! We're the Cortex Team.",
@@ -614,7 +590,7 @@
   "guestModeWarning": "Guest mode has limited features to ensure the best service quality.",
   "anonymousEntity": "Anonymous Entity",
   "upgradeAccountTitle": "Complete Your Account",
-  "upgradeAccountDescription": "Create an account to get daily 200 bonus credits and unlock more limits.",
+  "upgradeAccountDescription": "Create an account to unlock more limits.",
   "createAccount": "Create Account",
   "accountLinkedSuccess": "Account successfully created!",
   "continueWithApple": "Continue with Apple",
@@ -636,5 +612,11 @@
   "confirmDownloadTitle": "Are you sure you want to download?",
   "downloadSizeDisclosure": "This model will occupy approximately {size} of space.",
   "emulatorModeWarning": "This feature is disabled in emulator mode.",
-  "newChat": "New Chat"
+  "newChat": "New Chat",
+  "howCanIHelpWith": "How can I help with?",
+  "variants": "Variants",
+  "variantsDescription": "Variants are different versions of the same AI family. We automatically select the best one when you tap the main card, but you can manually choose a specific one here if you prefer!",
+  "fluxChatTitle": "Flux Chat",
+  "fluxChatDescription": "Flux chats are temporary chats and are not saved on your device.",
+  "alwaysBest": "Always Best"
 }

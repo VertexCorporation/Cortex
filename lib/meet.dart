@@ -61,6 +61,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   // Tracks the current page index for the "point of no return" logic.
   int _currentPage = 0;
+
   // Prevents listener from firing while an auto-scroll is in progress.
   bool _isAnimatingAutomatically = false;
 
@@ -75,7 +76,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   /// If the user swipes more than 15% towards the next page,
   /// the animation completes automatically, preventing them from swiping back.
   void _scrollListener() {
-    if (_isPageReady && !_isAnimatingAutomatically && _pageController.page! > _currentPage + 0.15) {
+    if (_isPageReady && !_isAnimatingAutomatically &&
+        _pageController.page! > _currentPage + 0.15) {
       _isAnimatingAutomatically = true;
       _pageController.animateToPage(
         _currentPage + 1,
@@ -154,7 +156,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           onPageChanged: (int page) {
             setState(() {
               _isPageReady = false;
-              _currentPage = page; // Update current page for the scroll listener.
+              _currentPage =
+                  page; // Update current page for the scroll listener.
             });
           },
           itemCount: pages.length + 1,
@@ -218,24 +221,27 @@ class _OnboardingContentPageState extends State<_OnboardingContentPage>
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 2500),
       vsync: this,
-    )..repeat();
+    )
+      ..repeat();
 
     // Staggered animations for a more fluid feel
-    _textSlideAnimation = Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero)
-        .animate(CurvedAnimation(
-      parent: _mainController,
-      curve: const Interval(0.2, 0.7, curve: Curves.easeOutCubic),
-    ));
+    _textSlideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero)
+            .animate(CurvedAnimation(
+          parent: _mainController,
+          curve: const Interval(0.2, 0.7, curve: Curves.easeOutCubic),
+        ));
     _textFadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
         .animate(CurvedAnimation(
       parent: _mainController,
       curve: const Interval(0.2, 0.7, curve: Curves.easeOut),
     ));
-    _imageSlideAnimation = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero)
-        .animate(CurvedAnimation(
-      parent: _mainController,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
-    ));
+    _imageSlideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero)
+            .animate(CurvedAnimation(
+          parent: _mainController,
+          curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
+        ));
     _imageFadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
         .animate(CurvedAnimation(
       parent: _mainController,
@@ -433,12 +439,15 @@ class _OnboardingContentPageState extends State<_OnboardingContentPage>
           builder: (context, child) {
             return Stack(
               children: List.generate(arrowCount, (i) {
-                final double offsetValue = (_slideController.value + (i / arrowCount)) % 1.0;
-                final double leftPosition = (offsetValue * totalTravelDistance) - iconSize;
+                final double offsetValue = (_slideController.value +
+                    (i / arrowCount)) % 1.0;
+                final double leftPosition = (offsetValue *
+                    totalTravelDistance) - iconSize;
 
                 double opacity = 1.0;
                 if (leftPosition + (iconSize / 2) > fadeStartPoint) {
-                  final double fadeProgress = (leftPosition + (iconSize / 2) - fadeStartPoint) / (fadeEndPoint - fadeStartPoint);
+                  final double fadeProgress = (leftPosition + (iconSize / 2) -
+                      fadeStartPoint) / (fadeEndPoint - fadeStartPoint);
                   opacity = (1.0 - fadeProgress).clamp(0.0, 1.0);
                 }
 
@@ -471,6 +480,7 @@ class _OnboardingContentPageState extends State<_OnboardingContentPage>
 
 class _FinalOnboardingPage extends StatefulWidget {
   final Future<void> Function() onFinish;
+
   const _FinalOnboardingPage({required this.onFinish});
 
   @override
@@ -494,13 +504,17 @@ class _FinalOnboardingPageState extends State<_FinalOnboardingPage>
     _buttonPulseController = AnimationController(
         duration: const Duration(milliseconds: 800),
         vsync: this
-    )..repeat(reverse: true);
+    )
+      ..repeat(reverse: true);
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.6, curve: Curves.easeOut)));
+        CurvedAnimation(parent: _controller,
+            curve: const Interval(0.0, 0.6, curve: Curves.easeOut)));
 
-    _contentSlideAnimation = Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
-        CurvedAnimation(parent: _controller, curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic)));
+    _contentSlideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
+            CurvedAnimation(parent: _controller,
+                curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic)));
 
     _buttonPulseAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
         CurvedAnimation(parent: _buttonPulseController, curve: Curves.easeInOut)

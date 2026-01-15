@@ -83,7 +83,8 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
           _splashRemoved = true;
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            debugPrint('AppLifecycleManager: UI Ready. Removing Native Splash.');
+            debugPrint(
+                'AppLifecycleManager: UI Ready. Removing Native Splash.');
             try {
               FlutterNativeSplash.remove();
             } catch (e) {
@@ -129,7 +130,6 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
 
         if (!_firstLaunchConversationStarted &&
             currentStatus == AppStatus.ready) {
-
           _firstLaunchConversationStarted = true;
 
           WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -12,7 +12,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get cancel => '取消';
 
   @override
-  String get remove => '移除';
+  String get remove => '消除';
 
   @override
   String get download => '下载';
@@ -147,13 +147,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noStarredChatsMessage => '您还没有收藏任何聊天。';
 
   @override
-  String get goToChats => '收藏一个聊天';
-
-  @override
   String get starConversation => '收藏';
 
   @override
-  String get unstarConversation => 'Unstar';
+  String get unstarConversation => '不星';
 
   @override
   String get loginToYourAccount => '登录';
@@ -399,18 +396,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noProductsFound => '未找到产品';
 
   @override
-  String get buyCredits => '购买积分';
-
-  @override
-  String get selectCreditPackageDescription => '选择适合您需求的积分套餐，享受更多功能。';
-
-  @override
-  String get buyCredit => '购买积分';
-
-  @override
-  String get internetRequired => '使用此模型需要互联网连接';
-
-  @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
       '下订单即表示您同意服务条款和隐私政策。您可以点击此文本以了解有关我们服务条款和隐私政策的更多信息。订阅将自动续订，除非在当前周期结束前至少24小时关闭自动续订。';
 
@@ -493,8 +478,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String get shareMessage =>
-      '快来看看 Cortex 应用，它太棒了！在这里下载：https://play.google.com/store/apps/details?id=com.vertex.cortex';
+  String shareMessage(String cortexLink) {
+    return '快来看看 Cortex 应用，它太棒了！在这里下载：$cortexLink';
+  }
 
   @override
   String get shareFailed => '分享应用失败。请稍后再试';
@@ -540,6 +526,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deleteAllConversationsConfirmMessage => '您确定要删除所有聊天吗？此操作无法撤销。';
+
+  @override
+  String get conversationDeleted => '对话已删除！';
 
   @override
   String get allConversationsDeleted => '所有对话已成功删除！';
@@ -650,11 +639,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noMatchingModels => '未找到匹配的模型。';
 
   @override
-  String creditPackage(Object amount) {
-    return '购买 $amount 积分';
-  }
-
-  @override
   String get benefit1 => '在线 AI 的更多对话限制';
 
   @override
@@ -667,9 +651,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get benefit5 => '创建更多在线人工智能';
 
   @override
-  String benefit7(Object credits) {
-    return '每日 $credits 积分';
-  }
+  String get benefit7 => '更多使用限制';
 
   @override
   String get benefit8 => '添加模型';
@@ -817,9 +799,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get offlineModelNotInstalled => '此离线模型未安装在您的设备上。';
 
   @override
-  String insufficientCredits(Object available, Object required) {
-    return '您没有足够的积分来完成此请求。此操作需要 $required 积分，但您只有 $available。要获得更多积分，您可以升级您的套餐或直接购买。嘿 我们完全理解积分用完确实有点烦但说真的从模特那里得到那些超棒的回复可不是免费的所以这些积分实际上帮助我们保持一切顺利进行听着如果更多人加入并购买积分我们完全可以考虑为所有人提高免费每日额度';
-  }
+  String get reachedLimit =>
+      '您的使用量已达上限；如需获得更多限额，您可以升级套餐。（嘿，我们完全理解限额用完很扫兴。但说真的，获得那些精彩的回复可不是免费的，所以这些限额实际上有助于我们继续提供优质服务。）';
 
   @override
   String get modality => '模态';
@@ -843,7 +824,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorUserNotAuthenticated => '您必须登录才能执行此操作。';
 
   @override
-  String get errorInsufficientCredits => '您的积分不足。请充值以继续。';
+  String get errorReachedLimit => '您已达到聊天次数上限，升级即可解锁更多聊天内容并继续聊天。';
 
   @override
   String get errorServer => '发生意外的服务器错误。请稍后再试。';
@@ -883,10 +864,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorLoadingMessage => '我们无法从服务器检索必要的数据。请检查您的网络连接并重试。';
 
   @override
-  String get noModelsFoundTitle => '无结果';
+  String get noFoundTitle => '无结果';
 
   @override
-  String get noModelsFoundMessage => '尝试调整您的搜索词或清除过滤器。';
+  String get noFoundMessage => '尝试调整您的搜索词或清除过滤器。';
 
   @override
   String get disclaimerMessage => '人工智能可能会犯错，请核对重要信息。';
@@ -966,18 +947,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get storagePermissionRequired => '需要存储权限才能保存下载的模型。请授予权限以继续。';
 
   @override
-  String get creditBannerTitle => '获取免费积分！';
+  String get plusBannerTitle => '免费获取Plus！';
 
   @override
-  String get creditBannerSubtitle =>
-      '邀请一位朋友，注册后双方均可获得 50 积分！如果他们订阅，你们双方都将额外获得 500 积分！';
+  String get plusBannerSubtitle => '邀请一位朋友，你们双方即可免费获得 1 天 Plus 会员资格！';
 
   @override
   String get inviteShareSubject => '快来加入Cortex！';
 
   @override
-  String inviteShareMessage(String playStoreLink) {
-    return '兄弟 快看这个叫Cortex的神仙app 简直了 用我的链接注册咱俩直接拿50积分 你要是再订阅了咱俩还能一人多搞500积分 这好事儿上哪找去 快下\n\n$playStoreLink';
+  String inviteShareMessage(String cortexLink) {
+    return '哎有个叫cortex的神仙app邀请人咱俩都能拿免费plus会员 绝世好羊毛赶紧下载\n\n$cortexLink';
   }
 
   @override
@@ -1029,20 +1009,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorImageLoad => '无法加载生成的图像。';
 
   @override
-  String get extensionInfoPanelTitle => '探索模型';
-
-  @override
-  String get extensionInfoPanelBody1 => '此箭头可让您在此系列内的不同模型之间切换。';
-
-  @override
-  String get extensionInfoPanelBody2 =>
-      '当您第一次开始与该系列聊天时，会自动选择默认模型，并且您可以在聊天过程中随时更改您的选择。';
-
-  @override
-  String get extensionInfoPanelFooter =>
-      '要查看每个模型的详细信息或手动选择不同的模型，请前往库；从那里选择此模型系列，然后点击其详细信息页面顶部的箭头。';
-
-  @override
   String get premiumModelNoticeTitle => '高级型号';
 
   @override
@@ -1056,22 +1022,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get premiumTrialExhaustedMessage => '您已使用高级模型的所有免费每日消息，请升级以获得无限制访问权限。';
 
   @override
-  String get selectionScreenGreetingGeneric => '今天我能为您做些什么？';
-
-  @override
-  String get selectionScreenFeatureOffline => '无需互联网即可使用';
+  String get useOffline => '无需互联网即可使用';
 
   @override
   String get explore => '探索';
 
   @override
-  String get selectionScreenNewsAndUpdates => '新闻与更新';
-
-  @override
-  String get filters => '筛选器';
-
-  @override
-  String get noRecentChatsMessage => '您还没有与任何模型对话过，让我们开始聊天吧！';
+  String get news => '消息';
 
   @override
   String get allModels => '所有模型';
@@ -1087,9 +1044,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get customModels => '定制模型';
-
-  @override
-  String get filterPanelDescription => '点击一个类别即可立即过滤列表。';
 
   @override
   String get dynamicChatTitle => '动态聊天';
@@ -1237,7 +1191,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notificationReferralTitle => '我为人人，人人为我。';
 
   @override
-  String get notificationReferralBody => '邀请朋友加入 Cortex，你们俩都可以获得免费积分！';
+  String get notificationReferralBody => '邀请一位朋友加入 Cortex，你们双方都可以获得一天的免费体验！';
 
   @override
   String get notificationCookingTitle => '感觉饿了吗？';
@@ -1377,12 +1331,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get channelGreetingsDescription => '诸如早上好和晚安之类的信息。';
 
   @override
-  String get exitAppTitle => '这么快就走？';
-
-  @override
-  String get exitAppConfirmation => '您确定要离开这个令人惊叹的平台吗？';
-
-  @override
   String get tagNotFound => '您输入的标签无效或已过期。';
 
   @override
@@ -1452,7 +1400,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get upgradeAccountTitle => '完善您的账户';
 
   @override
-  String get upgradeAccountDescription => '创建账户即可每日获得 200 奖励积分并解锁更多限额。';
+  String get upgradeAccountDescription => '创建账户即可解锁更多权限。';
 
   @override
   String get createAccount => '创建账户';
@@ -1494,5 +1442,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get emulatorModeWarning => '此功能在模拟器模式下禁用。';
 
   @override
-  String get newChat => 'New Chat';
+  String get newChat => '新聊天';
+
+  @override
+  String get howCanIHelpWith => '我能帮上什么忙？';
+
+  @override
+  String get variants => '变体';
+
+  @override
+  String get variantsDescription =>
+      '变体是同一人工智能家族的不同版本。当您点击主卡片时，我们会自动选择最佳版本，但如果您愿意，也可以在此处手动选择特定版本！';
+
+  @override
+  String get fluxChatTitle => 'Flux 聊天';
+
+  @override
+  String get fluxChatDescription => 'Flux聊天记录是临时聊天记录，不会保存在您的设备上。';
+
+  @override
+  String get alwaysBest => '永远最好';
 }

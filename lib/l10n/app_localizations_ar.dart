@@ -147,13 +147,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noStarredChatsMessage => 'لم تقم بتمييز أي محادثة بنجمة بعد.';
 
   @override
-  String get goToChats => 'ميّز محادثة بنجمة';
-
-  @override
   String get starConversation => 'تمييز بنجمة';
 
   @override
-  String get unstarConversation => 'Unstar';
+  String get unstarConversation => 'أنستار';
 
   @override
   String get loginToYourAccount => 'تسجيل الدخول';
@@ -226,7 +223,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pleaseCheckYourEmail =>
-      'لاستخدام Cortex، تحتاج إلى التحقق من بريدك الإلكتروني. \n تم إرسال رابط تحقق إلى عنوان بريدك الإلكتروني، يرجى التحقق من بريدك.';
+      'لاستخدام Cortex، تحتاج إلى التحقق من بريدك الإلكتروني. \nتم إرسال رابط تحقق إلى عنوان بريدك الإلكتروني، يرجى التحقق من بريدك.';
 
   @override
   String get verifyYourEmail => 'تحقق من بريدك الإلكتروني';
@@ -410,19 +407,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noProductsFound => 'لم يتم العثور على منتجات';
 
   @override
-  String get buyCredits => 'شراء أرصدة';
-
-  @override
-  String get selectCreditPackageDescription =>
-      'حدد باقة رصيد تناسب احتياجاتك واستمتع بمزيد من الميزات.';
-
-  @override
-  String get buyCredit => 'شراء أرصدة';
-
-  @override
-  String get internetRequired => 'مطلوب اتصال بالإنترنت لاستخدام هذا النموذج';
-
-  @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
       'بإتمام هذا الطلب، فإنك توافق على شروط الخدمة وسياسة الخصوصية. يمكنك النقر على هذا النص لمعرفة المزيد عن شروط الخدمة وسياسة الخصوصية. سيتم تجديد الاشتراك تلقائيًا ما لم يتم إيقاف التجديد التلقائي قبل 24 ساعة على الأقل من نهاية الفترة الحالية.';
 
@@ -508,8 +492,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String get shareMessage =>
-      'جرب تطبيق Cortex، إنه مذهل حقًا! قم بتنزيله من هنا: https://play.google.com/store/apps/details?id=com.vertex.cortex';
+  String shareMessage(String cortexLink) {
+    return 'جرب تطبيق Cortex، إنه مذهل حقًا! قم بتنزيله من هنا: $cortexLink';
+  }
 
   @override
   String get shareFailed => 'فشل مشاركة التطبيق. يرجى المحاولة مرة أخرى لاحقًا';
@@ -557,6 +542,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get deleteAllConversationsConfirmMessage =>
       'هل أنت متأكد أنك تريد حذف جميع محادثاتك؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get conversationDeleted => 'تم حذف المحادثة!';
 
   @override
   String get allConversationsDeleted => 'تم حذف جميع المحادثات بنجاح!';
@@ -667,11 +655,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noMatchingModels => 'لم يتم العثور على نماذج مطابقة.';
 
   @override
-  String creditPackage(Object amount) {
-    return 'شراء $amount رصيد';
-  }
-
-  @override
   String get benefit1 => 'حد محادثات أكبر بكثير للذكاء الاصطناعي عبر الإنترنت';
 
   @override
@@ -684,9 +667,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get benefit5 => 'إنشاء المزيد من الذكاء الاصطناعي عبر الإنترنت';
 
   @override
-  String benefit7(Object credits) {
-    return '$credits رصيد يومي';
-  }
+  String get benefit7 => 'حدود استخدام إضافية';
 
   @override
   String get benefit8 => 'إضافة نماذج';
@@ -839,9 +820,8 @@ class AppLocalizationsAr extends AppLocalizations {
       'هذا النموذج غير متصل بالإنترنت وغير مثبت على جهازك.';
 
   @override
-  String insufficientCredits(Object available, Object required) {
-    return 'ليس لديك أرصدة كافية لإكمال هذا الطلب. يتطلب هذا الإجراء $required رصيدًا، لكن لديك $available فقط. للحصول على المزيد من الأرصدة، يمكنك ترقية خطتك أو شرائها مباشرة. مرحبًا، نتفهم تمامًا أن نفاد الأرصدة يمكن أن يكون محبطًا بعض الشيء، ولكن بجدية، الحصول على تلك الردود الرائعة من نماذجنا ليس مجانيًا، لذا تساعدنا هذه الأرصدة بالفعل في استمرار الأوقات الجيدة، واسمع، إذا انضم المزيد منكم واشترى أرصدة، يمكننا بالتأكيد النظر في زيادة الحدود اليومية المجانية للجميع';
-  }
+  String get reachedLimit =>
+      'لقد وصلت إلى الحد الأقصى لاستخدامك؛ للحصول على المزيد من الحدود، يمكنك ترقية باقتك. (نعلم تمامًا أن نفاد الحدود أمر مزعج، ولكن بجدية، الحصول على تلك الردود الرائعة ليس مجانيًا، لذا فإن هذه الحدود تساعدنا في الحفاظ على استمرار المتعة!)';
 
   @override
   String get modality => 'النمط';
@@ -868,8 +848,8 @@ class AppLocalizationsAr extends AppLocalizations {
       'يجب عليك تسجيل الدخول لتنفيذ هذا الإجراء.';
 
   @override
-  String get errorInsufficientCredits =>
-      'ليس لديك أرصدة كافية. يرجى الشحن للمتابعة.';
+  String get errorReachedLimit =>
+      'لقد وصلت إلى الحد الأقصى، قم بالترقية لفتح المزيد واستمر في الدردشة.';
 
   @override
   String get errorServer =>
@@ -915,10 +895,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'لم نتمكن من استرداد البيانات اللازمة من خوادمنا. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.';
 
   @override
-  String get noModelsFoundTitle => 'لا توجد نتائج';
+  String get noFoundTitle => 'لا توجد نتائج';
 
   @override
-  String get noModelsFoundMessage => 'حاول تعديل مصطلحات البحث أو مسح الفلتر.';
+  String get noFoundMessage => 'حاول تعديل مصطلحات البحث أو مسح الفلتر.';
 
   @override
   String get disclaimerMessage =>
@@ -1008,18 +988,18 @@ class AppLocalizationsAr extends AppLocalizations {
       'إذن التخزين مطلوب لحفظ النماذج التي تم تنزيلها. يرجى منح الإذن للمتابعة.';
 
   @override
-  String get creditBannerTitle => 'احصل على أرصدة مجانية!';
+  String get plusBannerTitle => 'احصل على باقة Free Plus!';
 
   @override
-  String get creditBannerSubtitle =>
-      'ادعُ صديقًا واحصل كلاكما على 50 رصيدًا عند التسجيل! إذا اشترك، ستحصلان كلاكما على 500 رصيد إضافي!';
+  String get plusBannerSubtitle =>
+      'قم بدعوة صديق واحصلوا كلاكما على يوم واحد من خدمة Plus مجاناً!';
 
   @override
   String get inviteShareSubject => 'انضم إلي في Cortex!';
 
   @override
-  String inviteShareMessage(String playStoreLink) {
-    return 'يا صاحبي لازم تشوف تطبيق كورتكس ذا مجنون حرفيا لو استخدمت الرابط حقي بناخذ انا وانت 50 كريدت ولو اشترك بناخذ 500 زيادة صفقة رهيبة نزله بأسرع وقت\n\n$playStoreLink';
+  String inviteShareMessage(String cortexLink) {
+    return 'يا صاحبي فيه تطبيق مجنون اسمه cortex لو دعيت احد يجيلنا بلس مجانا فرصة خيالية حمل بسرعة\n\n$cortexLink';
   }
 
   @override
@@ -1077,21 +1057,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorImageLoad => 'فشل تحميل الصورة المولدة.';
 
   @override
-  String get extensionInfoPanelTitle => 'استكشاف النماذج';
-
-  @override
-  String get extensionInfoPanelBody1 =>
-      'يتيح لك هذا السهم التبديل بين النماذج المختلفة ضمن هذه السلسلة.';
-
-  @override
-  String get extensionInfoPanelBody2 =>
-      'عند بدء الدردشة لأول مرة باستخدام هذه السلسلة، سيتم تحديد النموذج الافتراضي تلقائيًا ويمكنك تغيير اختيارك في أي وقت أثناء الدردشة.';
-
-  @override
-  String get extensionInfoPanelFooter =>
-      'لعرض معلومات مفصلة حول كل طراز أو لتحديد طراز مختلف يدويًا، يرجى الانتقال إلى المكتبة؛ حدد سلسلة الطراز هذه من هناك واضغط على السهم الموجود في أعلى صفحة التفاصيل الخاصة بها.';
-
-  @override
   String get premiumModelNoticeTitle => 'نموذج مميز';
 
   @override
@@ -1106,23 +1071,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'لقد استخدمت جميع رسائلك اليومية المجانية للنماذج المميزة، يرجى الترقية للحصول على وصول غير محدود.';
 
   @override
-  String get selectionScreenGreetingGeneric => 'كيف يمكنني مساعدتك اليوم؟';
-
-  @override
-  String get selectionScreenFeatureOffline => 'استخدم بدون انترنت';
+  String get useOffline => 'استخدم بدون انترنت';
 
   @override
   String get explore => 'استكشاف';
 
   @override
-  String get selectionScreenNewsAndUpdates => 'الأخبار والتحديثات';
-
-  @override
-  String get filters => 'المرشحات';
-
-  @override
-  String get noRecentChatsMessage =>
-      'لم تتحدث مع أي نماذج بعد، دعنا نبدأ المحادثة!';
+  String get news => 'أخبار';
 
   @override
   String get allModels => 'جميع الموديلات';
@@ -1138,9 +1093,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get customModels => 'نماذج مخصصة';
-
-  @override
-  String get filterPanelDescription => 'اضغط على فئة لتصفية القائمة على الفور.';
 
   @override
   String get dynamicChatTitle => 'الدردشة الديناميكية';
@@ -1303,7 +1255,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notificationReferralBody =>
-      'قم بدعوة صديق إلى Cortex وسوف تحصلان على رصيد مجاني!';
+      'قم بدعوة صديق إلى كورتكس واحصل كلاكما على يوم مجاني بالإضافة إلى ذلك!';
 
   @override
   String get notificationCookingTitle => 'هل تشعر بالجوع؟';
@@ -1451,13 +1403,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get channelGreetingsDescription => 'رسائل مثل صباح الخير ومساء الخير.';
 
   @override
-  String get exitAppTitle => 'المغادرة قريبا؟';
-
-  @override
-  String get exitAppConfirmation =>
-      'هل أنت متأكد أنك تريد مغادرة هذه المنصة الرائعة؟';
-
-  @override
   String get tagNotFound => 'العلامة التي أدخلتها غير صالحة أو انتهت صلاحيتها.';
 
   @override
@@ -1530,8 +1475,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get upgradeAccountTitle => 'أكمل حسابك';
 
   @override
-  String get upgradeAccountDescription =>
-      'قم بإنشاء حساب للحصول على 200 رصيد إضافي يوميًا وفتح المزيد من الحدود.';
+  String get upgradeAccountDescription => 'أنشئ حسابًا لفتح المزيد من الحدود.';
 
   @override
   String get createAccount => 'إنشاء حساب';
@@ -1573,5 +1517,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get emulatorModeWarning => 'هذه الميزة معطلة في وضع المحاكي';
 
   @override
-  String get newChat => 'New Chat';
+  String get newChat => 'دردشة جديدة';
+
+  @override
+  String get howCanIHelpWith => 'كيف يمكنني المساعدة؟';
+
+  @override
+  String get variants => 'الإصدارات';
+
+  @override
+  String get variantsDescription =>
+      'المتغيرات هي إصدارات مختلفة من نفس عائلة الذكاء الاصطناعي. نختار تلقائيًا أفضلها عند النقر على البطاقة الرئيسية، ولكن يمكنك اختيار متغير محدد يدويًا هنا إذا كنت تفضل ذلك!';
+
+  @override
+  String get fluxChatTitle => 'فلوكس تشات';
+
+  @override
+  String get fluxChatDescription =>
+      'محادثات Flux هي محادثات مؤقتة ولا يتم حفظها على جهازك.';
+
+  @override
+  String get alwaysBest => 'الأفضل دائماً';
 }

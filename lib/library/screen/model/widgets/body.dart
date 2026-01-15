@@ -46,7 +46,7 @@ class BodyContent extends StatelessWidget {
         },
         transitionBuilder: (child, animation) {
           final expectedKey = ValueKey(
-            '${provider.selectedExtensionName}_${provider.selectedBaseModelId ?? ''}',
+            '${provider.selectedVariantName}_${provider.selectedBaseModelId ?? ''}',
           );
           final isIncoming =
               child.key is ValueKey && (child.key as ValueKey).value == expectedKey.value;
@@ -63,7 +63,7 @@ class BodyContent extends StatelessWidget {
         },
         child: Column(
           key: ValueKey(
-              '${provider.selectedExtensionName}_${provider.selectedBaseModelId ?? ''}'),
+              '${provider.selectedVariantName}_${provider.selectedBaseModelId ?? ''}'),
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ModelHeader(provider: provider),

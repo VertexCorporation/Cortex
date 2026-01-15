@@ -123,10 +123,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
     if (widget.availableCredits != null &&
         _requiredCredits() > widget.availableCredits!) {
-      return loc.insufficientCredits(
-        widget.availableCredits!,
-        _requiredCredits(),
-      );
+      return loc.reachedLimit;
     }
     if (widget.showPhotoWarning) return loc.photoWarningMessage;
     if (widget.showDisclaimer) return loc.disclaimerMessage;
@@ -223,7 +220,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     if (_currentMessageText == null && _slideController.isDismissed) {
       if (_measuredPanelHeight != 0) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if(mounted) widget.onVisibleHeightChanged?.call(0.0);
+          if (mounted) widget.onVisibleHeightChanged?.call(0.0);
         });
       }
       return const SizedBox.shrink();
@@ -235,7 +232,9 @@ class _BriefingOverlayState extends State<BriefingOverlay>
         position: _slideAnimation,
         child: GestureDetector(
           onPanUpdate: _isCurrentMessageDismissible
-              ? (details) { _handleDismiss(); }
+              ? (details) {
+            _handleDismiss();
+          }
               : null,
           onPanEnd: _isCurrentMessageDismissible ? _handlePanEnd : null,
           onTap: _isCurrentMessageDismissible ? _handleDismiss : null,
@@ -258,11 +257,15 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
 class _BriefingPanelContent extends StatelessWidget {
   final String message;
+
   const _BriefingPanelContent({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final bool isTablet = screenWidth >= 600;
 
     // --- DYNAMIC SCALING ---
@@ -294,7 +297,8 @@ class _BriefingPanelContent extends StatelessWidget {
     );
 
     return Container(
-      padding: EdgeInsets.symmetric(vertical: paddingVertical, horizontal: paddingHorizontal),
+      padding: EdgeInsets.symmetric(
+          vertical: paddingVertical, horizontal: paddingHorizontal),
       decoration: boxDecoration,
       child: Row(
         children: [

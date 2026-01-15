@@ -36,7 +36,8 @@ class UpdateRequiredScreen extends StatefulWidget {
   State<UpdateRequiredScreen> createState() => _UpdateRequiredScreenState();
 }
 
-class _UpdateRequiredScreenState extends State<UpdateRequiredScreen> with SingleTickerProviderStateMixin {
+class _UpdateRequiredScreenState extends State<UpdateRequiredScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -132,7 +133,9 @@ class _UpdateRequiredScreenState extends State<UpdateRequiredScreen> with Single
     appInitializer.configureUpgrader(l10n);
     final upgrader = appInitializer.upgrader;
 
-    final safeArea = MediaQuery.of(context).padding;
+    final safeArea = MediaQuery
+        .of(context)
+        .padding;
     final screenHeight = constraints.maxHeight;
 
     return Padding(
@@ -153,19 +156,22 @@ class _UpdateRequiredScreenState extends State<UpdateRequiredScreen> with Single
           // It takes up all available remaining space, providing a bounded
           // height for its child, which can then scroll internally if needed.
           Flexible(
-            child: _buildReleaseNotes(context, l10n, constraints, upgrader.releaseNotes),
+            child: _buildReleaseNotes(
+                context, l10n, constraints, upgrader.releaseNotes),
           ),
 
           SizedBox(height: screenHeight * 0.03),
           // Button takes up its required space.
-          _buildUpdateButton(context, l10n, constraints, upgrader.currentAppStoreListingURL),
+          _buildUpdateButton(
+              context, l10n, constraints, upgrader.currentAppStoreListingURL),
         ],
       ),
     );
   }
 
   /// Builds the "Update Required" title and descriptive message.
-  Widget _buildHeader(BuildContext context, AppLocalizations l10n, BoxConstraints constraints) {
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n,
+      BoxConstraints constraints) {
     final screenWidth = constraints.maxWidth;
     final screenHeight = constraints.maxHeight;
     final titleFontSize = (screenWidth * 0.07).clamp(26.0, 42.0);
@@ -198,8 +204,8 @@ class _UpdateRequiredScreenState extends State<UpdateRequiredScreen> with Single
   }
 
   /// Builds the "What's New" section with internal scrolling.
-  Widget _buildReleaseNotes(
-      BuildContext context, AppLocalizations l10n, BoxConstraints constraints, String? releaseNotes) {
+  Widget _buildReleaseNotes(BuildContext context, AppLocalizations l10n,
+      BoxConstraints constraints, String? releaseNotes) {
     if (releaseNotes == null || releaseNotes.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -248,8 +254,8 @@ class _UpdateRequiredScreenState extends State<UpdateRequiredScreen> with Single
   }
 
   /// Builds the "Update Now" button.
-  Widget _buildUpdateButton(
-      BuildContext context, AppLocalizations l10n, BoxConstraints constraints, String? storeUrlString) {
+  Widget _buildUpdateButton(BuildContext context, AppLocalizations l10n,
+      BoxConstraints constraints, String? storeUrlString) {
     final screenWidth = constraints.maxWidth;
     final screenHeight = constraints.maxHeight;
     final buttonFontSize = (screenWidth * 0.04).clamp(15.0, 20.0);

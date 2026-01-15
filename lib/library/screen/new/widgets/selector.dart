@@ -65,8 +65,8 @@ class BaseModelSelector extends StatelessWidget {
     bool isCurrentlySelectedPremium = false;
     if (selectedBaseModelId != null) {
       for (var series in availableBaseModels) {
-        if (series.extensions?.containsKey(selectedBaseModelId) ?? false) {
-          final variantData = series.extensions![selectedBaseModelId]!;
+        if (series.variants?.containsKey(selectedBaseModelId) ?? false) {
+          final variantData = series.variants![selectedBaseModelId]!;
           isCurrentlySelectedPremium = (variantData['tier'] as String? ?? 'free') == 'premium';
           break;
         }
@@ -168,10 +168,10 @@ class BaseModelSelector extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: availableBaseModels.expand<Widget>((series) {
-          final Map<String, dynamic> extensions = series.extensions ?? const {};
-          if (extensions.isEmpty) return [];
+          final Map<String, dynamic> variants = series.variants ?? const {};
+          if (variants.isEmpty) return [];
 
-          return extensions.entries.map((ext) {
+          return variants.entries.map((ext) {
             final modelId = ext.key;
             final variantData = ext.value as Map<String, dynamic>? ?? {};
             var modelTitle = variantData['title'] as String? ?? modelId;

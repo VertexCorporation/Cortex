@@ -27,11 +27,13 @@ class ReferralHandler {
     // Guard Clause: If this check has successfully completed in the past, do nothing.
     // This prevents re-running the logic on subsequent app starts.
     if (prefs.getBool(_referrerCheckedKey) ?? false) {
-      debugPrint('[ReferralHandler] Referrer check has already been completed. Skipping.');
+      debugPrint(
+          '[ReferralHandler] Referrer check has already been completed. Skipping.');
       return;
     }
 
-    debugPrint('[ReferralHandler] Performing first-time referrer check with resilient retry logic...');
+    debugPrint(
+        '[ReferralHandler] Performing first-time referrer check with resilient retry logic...');
 
     // Configuration for the retry mechanism.
     const int maxRetries = 3;
@@ -39,22 +41,26 @@ class ReferralHandler {
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        final ReferrerDetails referrerDetails = await PlayInstallReferrer.installReferrer;
+        final ReferrerDetails referrerDetails = await PlayInstallReferrer
+            .installReferrer;
         final String? referrerUrl = referrerDetails.installReferrer;
 
         // If data is found, process it and exit immediately.
         if (referrerUrl != null && referrerUrl.isNotEmpty) {
-          debugPrint('[ReferralHandler] Success: Referrer data found on attempt #$attempt: "$referrerUrl"');
+          debugPrint(
+              '[ReferralHandler] Success: Referrer data found on attempt #$attempt: "$referrerUrl"');
 
           // The data is expected in a format like 'ref=USER_ID'. We parse it.
           final Uri uri = Uri.parse('http://dummy.com?$referrerUrl');
           final String? referrerId = uri.queryParameters['ref'];
 
           if (referrerId != null && referrerId.isNotEmpty) {
-            debugPrint('[ReferralHandler] Successfully parsed referrer ID: $referrerId. Saving to SharedPreferences.');
+            debugPrint(
+                '[ReferralHandler] Successfully parsed referrer ID: $referrerId. Saving to SharedPreferences.');
             await prefs.setString(_savedReferrerIdKey, referrerId);
           } else {
-            debugPrint('[ReferralHandler] Data found, but "ref" parameter was missing or empty.');
+            debugPrint(
+                '[ReferralHandler] Data found, but "ref" parameter was missing or empty.');
           }
 
           // CRITICAL: Mark the check as complete and exit the function.
@@ -65,7 +71,6 @@ class ReferralHandler {
 
         // If we reach here, the referrerUrl was null or empty.
         debugPrint('[ReferralHandler] No referrer data on attempt #$attempt.');
-
       } catch (e) {
         // Log any errors from the plugin itself, but continue to the next attempt.
         debugPrint('[ReferralHandler] Error during attempt #$attempt: $e');
@@ -73,14 +78,16 @@ class ReferralHandler {
 
       // If this is not the last attempt, wait before trying again.
       if (attempt < maxRetries) {
-        debugPrint('[ReferralHandler] Retrying in ${retryDelay.inSeconds} seconds...');
+        debugPrint(
+            '[ReferralHandler] Retrying in ${retryDelay.inSeconds} seconds...');
         await Future.delayed(retryDelay);
       }
     }
 
     // If the loop completes without finding data, we can assume there is no referrer.
     // Mark the check as complete to prevent it from running again on the next app launch.
-    debugPrint('[ReferralHandler] All attempts failed to find referrer data. Marking check as complete.');
+    debugPrint(
+        '[ReferralHandler] All attempts failed to find referrer data. Marking check as complete.');
     await prefs.setBool(_referrerCheckedKey, true);
   }
 

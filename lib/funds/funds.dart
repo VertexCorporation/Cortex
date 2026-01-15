@@ -95,8 +95,10 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     _checkIfEmulator();
     // Initialize page controller to start at 'Pro' (Index 1)
     _pageController = PageController(initialPage: _currentPage);
-    _scrollControllers = List.generate(_planTypes.length, (_) => ScrollController());
-    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
+    _scrollControllers =
+        List.generate(_planTypes.length, (_) => ScrollController());
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 1));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _backend = Provider.of<FundsBackend>(context, listen: false);
@@ -107,12 +109,13 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       _backend.addListener(_onBackendUpdate);
       _initializeUiStateFromBackend();
 
-      _purchaseCompletedSubscription = _backend.onPurchaseCompleted.listen((String purchasedProductId) {
-        if (mounted) {
-          _confettiController.play();
-          _updateUiAfterPurchase(purchasedProductId);
-        }
-      });
+      _purchaseCompletedSubscription =
+          _backend.onPurchaseCompleted.listen((String purchasedProductId) {
+            if (mounted) {
+              _confettiController.play();
+              _updateUiAfterPurchase(purchasedProductId);
+            }
+          });
     });
   }
 
@@ -139,7 +142,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       final activeOption = _uiActiveSubscriptionOption;
 
       // Map user level to plan type. Level 1=Plus(0), 2=Pro(1), 3=Ultra(2)
-      if (userLevel > 0 && activeOption != null && userLevel - 1 < _planTypes.length) {
+      if (userLevel > 0 && activeOption != null &&
+          userLevel - 1 < _planTypes.length) {
         final activePlanType = _planTypes[userLevel - 1];
         _selectedBillingOptions[activePlanType] = activeOption;
       }
@@ -153,13 +157,17 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final backend = Provider.of<FundsBackend>(context, listen: false);
     final newLevel = backend.currentUserSubscriptionLevel;
     final newOption = backend.activeSubscriptionOption;
-    final bool hasDataChanged = newLevel != _uiActiveSubscriptionLevel || newOption != _uiActiveSubscriptionOption;
+    final bool hasDataChanged = newLevel != _uiActiveSubscriptionLevel ||
+        newOption != _uiActiveSubscriptionOption;
     if (hasDataChanged) {
-      log("Real backend data change detected. Syncing UI Brain. New state: L$newLevel '$newOption'.", name: "FundsScreenView");
+      log(
+          "Real backend data change detected. Syncing UI Brain. New state: L$newLevel '$newOption'.",
+          name: "FundsScreenView");
       setState(() {
         _uiActiveSubscriptionLevel = newLevel;
         _uiActiveSubscriptionOption = newOption;
-        if (newLevel > 0 && newOption != null && newLevel - 1 < _planTypes.length) {
+        if (newLevel > 0 && newOption != null &&
+            newLevel - 1 < _planTypes.length) {
           final activePlanType = _planTypes[newLevel - 1];
           _selectedBillingOptions[activePlanType] = newOption;
         }
@@ -175,21 +183,41 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
     switch (purchasedProductId) {
       case FundsBackend.monthlySubscriptionPlus:
-        planType = 'plus'; billingOption = 'monthly'; planLevel = 1; break;
+        planType = 'plus';
+        billingOption = 'monthly';
+        planLevel = 1;
+        break;
       case FundsBackend.annualSubscriptionPlus:
-        planType = 'plus'; billingOption = 'annual'; planLevel = 1; break;
+        planType = 'plus';
+        billingOption = 'annual';
+        planLevel = 1;
+        break;
       case FundsBackend.monthlySubscriptionPro:
-        planType = 'pro'; billingOption = 'monthly'; planLevel = 2; break;
+        planType = 'pro';
+        billingOption = 'monthly';
+        planLevel = 2;
+        break;
       case FundsBackend.annualSubscriptionPro:
-        planType = 'pro'; billingOption = 'annual'; planLevel = 2; break;
+        planType = 'pro';
+        billingOption = 'annual';
+        planLevel = 2;
+        break;
       case FundsBackend.monthlySubscriptionUltra:
-        planType = 'ultra'; billingOption = 'monthly'; planLevel = 3; break;
+        planType = 'ultra';
+        billingOption = 'monthly';
+        planLevel = 3;
+        break;
       case FundsBackend.annualSubscriptionUltra:
-        planType = 'ultra'; billingOption = 'annual'; planLevel = 3; break;
+        planType = 'ultra';
+        billingOption = 'annual';
+        planLevel = 3;
+        break;
     }
 
     if (planType != null && billingOption != null && planLevel != null) {
-      log("Proactive UI Update: Purchase of '$purchasedProductId' detected. Updating UI Brain.", name: "FundsScreenView");
+      log(
+          "Proactive UI Update: Purchase of '$purchasedProductId' detected. Updating UI Brain.",
+          name: "FundsScreenView");
       setState(() {
         // 1. Update the selection map (for the blue border)
         _selectedBillingOptions[planType!] = billingOption!;
@@ -203,17 +231,22 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   void _onPrimaryButtonPressed() {
     final backend = Provider.of<FundsBackend>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
-    final isAnonymous = context.read<UserProvider>().isAnonymous;
+    final isAnonymous = context
+        .read<UserProvider>()
+        .isAnonymous;
 
     if (isAnonymous) {
-      navigateToScreen(const UpgradeAccountScreen(), direction: const Offset(0.0, 1.0));
+      navigateToScreen(
+          const UpgradeAccountScreen(), direction: const Offset(0.0, 1.0));
       FocusScope.of(context).unfocus();
       return;
     }
     if (backend.isPurchasePending) return;
     if (backend.allProducts.isEmpty) {
-      log('Purchase blocked: Product details are not loaded yet.', name: 'FundsScreen');
-      _showCustomNotification(message: localizations.productNotFound, isSuccess: NotificationType.error);
+      log('Purchase blocked: Product details are not loaded yet.',
+          name: 'FundsScreen');
+      _showCustomNotification(message: localizations.productNotFound,
+          isSuccess: NotificationType.error);
       return;
     }
 
@@ -227,23 +260,39 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
     // Use the local UI state for button logic to be consistent.
     if (_uiActiveSubscriptionLevel > planLevel ||
-        (_uiActiveSubscriptionLevel == planLevel && billingOption == _uiActiveSubscriptionOption)) {
+        (_uiActiveSubscriptionLevel == planLevel &&
+            billingOption == _uiActiveSubscriptionOption)) {
       backend.manageSubscription();
       return;
     }
 
     final isAnnual = billingOption == 'annual';
-    if (planType == 'plus') productIdToPurchase = isAnnual ? FundsBackend.annualSubscriptionPlus : FundsBackend.monthlySubscriptionPlus;
-    if (planType == 'pro') productIdToPurchase = isAnnual ? FundsBackend.annualSubscriptionPro : FundsBackend.monthlySubscriptionPro;
-    if (planType == 'ultra') productIdToPurchase = isAnnual ? FundsBackend.annualSubscriptionUltra : FundsBackend.monthlySubscriptionUltra;
+    if (planType == 'plus') {
+      productIdToPurchase =
+      isAnnual ? FundsBackend.annualSubscriptionPlus : FundsBackend
+          .monthlySubscriptionPlus;
+    }
+    if (planType == 'pro') {
+      productIdToPurchase =
+      isAnnual ? FundsBackend.annualSubscriptionPro : FundsBackend
+          .monthlySubscriptionPro;
+    }
+    if (planType == 'ultra') {
+      productIdToPurchase =
+      isAnnual ? FundsBackend.annualSubscriptionUltra : FundsBackend
+          .monthlySubscriptionUltra;
+    }
 
     if (productIdToPurchase != null) {
       try {
-        final productDetails = backend.allProducts.firstWhere((p) => p.id == productIdToPurchase);
+        final productDetails = backend.allProducts.firstWhere((p) =>
+        p.id == productIdToPurchase);
         backend.purchase(productDetails);
       } catch (e) {
-        log('Attempted to purchase a product not found: $productIdToPurchase', name: 'FundsScreen', error: e);
-        _showCustomNotification(message: localizations.productNotFound, isSuccess: NotificationType.error);
+        log('Attempted to purchase a product not found: $productIdToPurchase',
+            name: 'FundsScreen', error: e);
+        _showCustomNotification(message: localizations.productNotFound,
+            isSuccess: NotificationType.error);
       }
     }
   }
@@ -263,10 +312,17 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     await showAppWebViewModal(context, localizations.privacyPolicy, policyUrl);
   }
 
-  void _showCustomNotification({required String message, required NotificationType isSuccess}) {
+  void _showCustomNotification(
+      {required String message, required NotificationType isSuccess}) {
     if (mounted) {
-      Provider.of<IntrovertNotificationService>(context, listen: false).showNotification(
-          message: message, type: isSuccess, oneLine: false, fontSize: 0.025, bottomOffset: 0.01);
+      Provider
+          .of<IntrovertNotificationService>(context, listen: false)
+          .showNotification(
+          message: message,
+          type: isSuccess,
+          oneLine: false,
+          fontSize: 0.025,
+          bottomOffset: 0.01);
     }
   }
 
@@ -301,7 +357,11 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                 minBlastForce: 8,
                 particleDrag: 0.05,
                 colors: const [
-                  Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple
+                  Colors.green,
+                  Colors.blue,
+                  Colors.pink,
+                  Colors.orange,
+                  Colors.purple
                 ],
               ),
             ),
@@ -313,17 +373,21 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   Widget _buildErrorScreen(BuildContext context, String message) {
     final localizations = AppLocalizations.of(context)!;
-    final screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery
+        .of(context)
+        .size;
     return SafeArea(
       key: const ValueKey('error_screen'),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05, vertical: screenSize.height * 0.01),
+        padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05,
+            vertical: screenSize.height * 0.01),
         child: Column(
           children: [
             Align(
               alignment: Alignment.topCenter,
               child: IconButton(
-                icon: Icon(Icons.close, color: AppColors.primaryColor.inverted, size: screenSize.width * 0.07),
+                icon: Icon(Icons.close, color: AppColors.primaryColor.inverted,
+                    size: screenSize.width * 0.07),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ),
@@ -334,31 +398,45 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   SvgPicture.asset(
                     'assets/icons/warning.svg',
                     width: screenSize.width * 0.25,
-                    colorFilter: ColorFilter.mode(AppColors.septenaryColor, BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(
+                        AppColors.septenaryColor, BlendMode.srcIn),
                   ),
                   SizedBox(height: screenSize.height * 0.04),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: screenSize.width * 0.05),
                     child: Text(
                       message,
-                      style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenSize.width * 0.045, height: 1.4),
+                      style: TextStyle(color: AppColors.primaryColor.inverted,
+                          fontSize: screenSize.width * 0.045,
+                          height: 1.4),
                       textAlign: TextAlign.center,
                     ),
                   ),
                   SizedBox(height: screenSize.height * 0.05),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+                      backgroundColor: AppColors.primaryColor.inverted
+                          .withValues(alpha: 0.1),
                       foregroundColor: AppColors.primaryColor.inverted,
-                      padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.1, vertical: screenSize.height * 0.018),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: screenSize.width * 0.1,
+                          vertical: screenSize.height * 0.018),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0)),
                     ),
                     onPressed: () {
-                      final backend = Provider.of<FundsBackend>(context, listen: false);
-                      final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
-                      backend.initialize(notificationService: notificationService, localizations: localizations);
+                      final backend = Provider.of<FundsBackend>(
+                          context, listen: false);
+                      final notificationService = Provider.of<
+                          IntrovertNotificationService>(context, listen: false);
+                      backend.initialize(
+                          notificationService: notificationService,
+                          localizations: localizations);
                     },
-                    child: Text(localizations.retry, style: TextStyle(fontSize: screenSize.width * 0.04, fontWeight: FontWeight.bold)),
+                    child: Text(localizations.retry, style: TextStyle(
+                        fontSize: screenSize.width * 0.04,
+                        fontWeight: FontWeight.bold)),
                   )
                 ],
               ),
@@ -371,12 +449,23 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   Widget _buildMainContent(BuildContext context, FundsBackend backend) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     if (!backend.isLoading && !_isContentLoaded) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) setState(() { _isContentLoaded = true; _contentOffset = Offset.zero; });
+        if (mounted) {
+          setState(() {
+            _isContentLoaded = true;
+            _contentOffset = Offset.zero;
+          });
+        }
       });
     }
 
@@ -394,11 +483,14 @@ class _FundsScreenViewState extends State<FundsScreenView> {
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.04),
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: IconButton(
-                        icon: Icon(Icons.close, color: AppColors.primaryColor.inverted, size: screenWidth * 0.07),
+                        icon: Icon(
+                            Icons.close, color: AppColors.primaryColor.inverted,
+                            size: screenWidth * 0.07),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ),
@@ -416,13 +508,18 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                             activeSubscriptionLevel: _uiActiveSubscriptionLevel,
                             activeSubscriptionOption: _uiActiveSubscriptionOption,
                             onBillingOptionChanged: (newOption) {
-                              setState(() { _selectedBillingOptions[_planTypes[i]] = newOption; });
+                              setState(() {
+                                _selectedBillingOptions[_planTypes[i]] =
+                                    newOption;
+                              });
                             },
                             scrollController: _scrollControllers[i],
                             animateBenefits: !_hasAnyBenefitListAnimated,
                             onBenefitsAnimated: () {
                               if (!_hasAnyBenefitListAnimated) {
-                                setState(() { _hasAnyBenefitListAnimated = true; });
+                                setState(() {
+                                  _hasAnyBenefitListAnimated = true;
+                                });
                               }
                             },
                           ),
@@ -431,7 +528,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   ),
 
                   Padding(
-                    padding: EdgeInsets.fromLTRB(screenWidth * 0.06, screenHeight * 0.01, screenWidth * 0.06, screenHeight * 0.02),
+                    padding: EdgeInsets.fromLTRB(
+                        screenWidth * 0.06, screenHeight * 0.01,
+                        screenWidth * 0.06, screenHeight * 0.02),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -442,21 +541,28 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                           duration: const Duration(milliseconds: 250),
                           curve: Curves.easeInOut,
                           transformAlignment: Alignment.center,
-                          transform: Matrix4.identity()..scaleByDouble(
-                            backend.isPurchasePending ? 0.95 : 1.0,
-                            backend.isPurchasePending ? 0.95 : 1.0,
-                            backend.isPurchasePending ? 0.95 : 1.0,
-                            backend.isPurchasePending ? 0.95 : 1.0,
-                          ),
+                          transform: Matrix4.identity()
+                            ..scaleByDouble(
+                              backend.isPurchasePending ? 0.95 : 1.0,
+                              backend.isPurchasePending ? 0.95 : 1.0,
+                              backend.isPurchasePending ? 0.95 : 1.0,
+                              backend.isPurchasePending ? 0.95 : 1.0,
+                            ),
                           child: ElevatedButton(
-                            onPressed: (backend.isPurchasePending || _isEmulator) ? null : _onPrimaryButtonPressed,
+                            onPressed: (backend.isPurchasePending ||
+                                _isEmulator) ? null : _onPrimaryButtonPressed,
                             style: ElevatedButton.styleFrom(
                               foregroundColor: AppColors.primaryColor,
                               backgroundColor: AppColors.primaryColor.inverted,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.018),
-                              minimumSize: Size(double.infinity, screenHeight * 0.06),
-                              splashFactory: backend.isPurchasePending ? NoSplash.splashFactory : InkSplash.splashFactory,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30)),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: screenHeight * 0.018),
+                              minimumSize: Size(
+                                  double.infinity, screenHeight * 0.06),
+                              splashFactory: backend.isPurchasePending
+                                  ? NoSplash.splashFactory
+                                  : InkSplash.splashFactory,
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -464,13 +570,15 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                               children: [
                                 AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 250),
-                                  child: _buildButtonText(context, backend, screenWidth),
+                                  child: _buildButtonText(
+                                      context, backend, screenWidth),
                                 ),
 
                                 if (_isEmulator) ...[
                                   SizedBox(height: screenHeight * 0.002),
                                   Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.04),
                                     child: FittedBox(
                                       fit: BoxFit.scaleDown,
                                       child: Text(
@@ -480,7 +588,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                                         style: TextStyle(
                                           fontSize: screenWidth * 0.025,
                                           fontWeight: FontWeight.w500,
-                                          color: AppColors.primaryColor.withValues(alpha: 0.7),
+                                          color: AppColors.primaryColor
+                                              .withValues(alpha: 0.7),
                                         ),
                                       ),
                                     ),
@@ -495,14 +604,17 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
                         // --- RESTORE BUTTON ---
                         TextButton(
-                          onPressed: backend.isPurchasePending ? null : () async {
+                          onPressed: backend.isPurchasePending
+                              ? null
+                              : () async {
                             await backend.restorePurchases();
                           },
                           style: TextButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
@@ -512,7 +624,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                               color: AppColors.primaryColor.inverted,
                               fontSize: screenWidth * 0.035,
                               fontWeight: FontWeight.w600,
-                              decorationColor: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                              decorationColor: AppColors.primaryColor.inverted
+                                  .withValues(alpha: 0.5),
                             ),
                           ),
                         ),
@@ -525,12 +638,14 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(6.0),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: Text(
-                            AppLocalizations.of(context)!.termsOfServiceAndPrivacyPolicyWarning,
+                            AppLocalizations.of(context)!
+                                .termsOfServiceAndPrivacyPolicyWarning,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: AppColors.tertiaryColor,
@@ -575,16 +690,20 @@ class _FundsScreenViewState extends State<FundsScreenView> {
           height: screenWidth * 0.022,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(screenWidth * 0.022),
-            color: isSelected ? AppColors.primaryColor.inverted : AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+            color: isSelected ? AppColors.primaryColor.inverted : AppColors
+                .primaryColor.inverted.withValues(alpha: 0.5),
           ),
         );
       }),
     );
   }
 
-  Widget _buildButtonText(BuildContext context, FundsBackend backend, double screenWidth) {
+  Widget _buildButtonText(BuildContext context, FundsBackend backend,
+      double screenWidth) {
     final localizations = AppLocalizations.of(context)!;
-    final textStyle = TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold, color: AppColors.primaryColor);
+    final textStyle = TextStyle(fontSize: screenWidth * 0.04,
+        fontWeight: FontWeight.bold,
+        color: AppColors.primaryColor);
 
     // Current page is 0, 1, or 2 (Plus, Pro, Ultra).
     // Plan Levels are 1, 2, 3.
@@ -595,21 +714,31 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
     // Use the local UI state for button text logic as well for consistency.
     if (_uiActiveSubscriptionLevel > currentPlanLevel) {
-      return Text(localizations.manageSubscription, key: ValueKey('downgrade-$currentPlanType'), style: textStyle);
+      return Text(localizations.manageSubscription,
+          key: ValueKey('downgrade-$currentPlanType'), style: textStyle);
     }
 
-    final isTierUpgrade = _uiActiveSubscriptionLevel != 0 && _uiActiveSubscriptionLevel < currentPlanLevel;
-    final isBillingUpgrade = _uiActiveSubscriptionLevel == currentPlanLevel && selectedBillingOption == 'annual' && _uiActiveSubscriptionOption == 'monthly';
+    final isTierUpgrade = _uiActiveSubscriptionLevel != 0 &&
+        _uiActiveSubscriptionLevel < currentPlanLevel;
+    final isBillingUpgrade = _uiActiveSubscriptionLevel == currentPlanLevel &&
+        selectedBillingOption == 'annual' &&
+        _uiActiveSubscriptionOption == 'monthly';
 
     if (isTierUpgrade || isBillingUpgrade) {
-      return Text(localizations.upgradeSubscription, key: ValueKey('upgrade-$currentPlanType-$selectedBillingOption'), style: textStyle);
+      return Text(localizations.upgradeSubscription,
+          key: ValueKey('upgrade-$currentPlanType-$selectedBillingOption'),
+          style: textStyle);
     }
-    if (_uiActiveSubscriptionLevel == currentPlanLevel && selectedBillingOption == _uiActiveSubscriptionOption) {
-      return Text(localizations.manageSubscription, key: ValueKey('cancel-$currentPlanType'), style: textStyle);
+    if (_uiActiveSubscriptionLevel == currentPlanLevel &&
+        selectedBillingOption == _uiActiveSubscriptionOption) {
+      return Text(localizations.manageSubscription,
+          key: ValueKey('cancel-$currentPlanType'), style: textStyle);
     }
 
     final planDisplayName = currentPlanType.capitalize();
-    final billingName = selectedBillingOption == 'annual' ? localizations.annual : localizations.monthly;
+    final billingName = selectedBillingOption == 'annual'
+        ? localizations.annual
+        : localizations.monthly;
     final fullPlanName = "$planDisplayName $billingName";
     return Text(
       localizations.purchasePlan(fullPlanName),

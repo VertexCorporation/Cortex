@@ -149,13 +149,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noStarredChatsMessage => 'Todavía no has destacado ningún chat.';
 
   @override
-  String get goToChats => 'Destacar un chat';
-
-  @override
   String get starConversation => 'Destacar';
 
   @override
-  String get unstarConversation => 'Unstar';
+  String get unstarConversation => 'Desmarcar';
 
   @override
   String get loginToYourAccount => 'Iniciar Sesión';
@@ -230,7 +227,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pleaseCheckYourEmail =>
-      'Para usar Cortex, necesitas verificar tu correo electrónico. \n Se ha enviado un enlace de verificación a tu dirección de correo electrónico, por favor, revisa tu correo.';
+      'Para usar Cortex, necesitas verificar tu correo electrónico. \nSe ha enviado un enlace de verificación a tu dirección de correo electrónico, por favor, revisa tu correo.';
 
   @override
   String get verifyYourEmail => 'Verifica Tu Correo Electrónico';
@@ -417,20 +414,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noProductsFound => 'No se encontraron productos';
 
   @override
-  String get buyCredits => 'Comprar Créditos';
-
-  @override
-  String get selectCreditPackageDescription =>
-      'Selecciona un paquete de créditos que se ajuste a tus necesidades y disfruta de más funciones.';
-
-  @override
-  String get buyCredit => 'Comprar Créditos';
-
-  @override
-  String get internetRequired =>
-      'Se requiere conexión a internet para usar este modelo';
-
-  @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
       'Al realizar este pedido, aceptas los Términos de Servicio y la Política de Privacidad. Puedes hacer clic en este texto para obtener más información sobre nuestros Términos de Servicio y Política de Privacidad. La suscripción se renovará automáticamente a menos que la renovación automática se desactive al menos 24 horas antes del final del período actual.';
 
@@ -518,8 +501,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String get shareMessage =>
-      '¡Echa un vistazo a la app Cortex, es increíble! Descárgala aquí: https://play.google.com/store/apps/details?id=com.vertex.cortex';
+  String shareMessage(String cortexLink) {
+    return '¡Echa un vistazo a la app Cortex, es increíble! Descárgala aquí: $cortexLink';
+  }
 
   @override
   String get shareFailed =>
@@ -568,6 +552,9 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get deleteAllConversationsConfirmMessage =>
       '¿Estás seguro de que quieres eliminar todos tus chats? Esto no se puede deshacer.';
+
+  @override
+  String get conversationDeleted => '¡Conversación eliminada!';
 
   @override
   String get allConversationsDeleted =>
@@ -681,11 +668,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noMatchingModels => 'No se encontraron modelos coincidentes.';
 
   @override
-  String creditPackage(Object amount) {
-    return 'Comprar $amount Créditos';
-  }
-
-  @override
   String get benefit1 => 'Mucho más límite de conversación para IAs en línea';
 
   @override
@@ -698,9 +680,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get benefit5 => 'Crea más inteligencias artificiales en línea';
 
   @override
-  String benefit7(Object credits) {
-    return '$credits créditos diarios';
-  }
+  String get benefit7 => 'Mayor capacidad de uso';
 
   @override
   String get benefit8 => 'Añadir modelos';
@@ -784,7 +764,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get featurePluralDescription =>
-      'Este modelo puede integrar automáticamente extensiones adicionales, expandiendo así sus capacidades funcionales para soportar una diversa gama de operaciones con un rendimiento mejorado.';
+      'Este modelo puede integrar automáticamente variantes adicionales, expandiendo así sus capacidades funcionales para soportar una diversa gama de operaciones con un rendimiento mejorado.';
 
   @override
   String get nameLabel => 'Nombre de la IA';
@@ -856,9 +836,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'Este modelo sin conexión no está instalado en tu dispositivo.';
 
   @override
-  String insufficientCredits(Object available, Object required) {
-    return 'No tienes suficientes créditos para completar esta solicitud. Esta acción requiere $required créditos, pero solo tienes $available. Para obtener más créditos, puedes mejorar tu plan o comprarlos directamente. oye, lo entendemos perfectamente, quedarse sin créditos es un fastidio, pero en serio, obtener esas respuestas geniales de nuestros modelos no es gratis, así que estos créditos realmente nos ayudan a que todo siga funcionando y escucha, si más de ustedes se animan y compran créditos, definitivamente podemos considerar aumentar los límites diarios gratuitos para todos';
-  }
+  String get reachedLimit =>
+      'Has alcanzado tu límite; mejora tu plan para más. (hey, entendemos que es un fastidio. pero en serio, esas respuestas increíbles cuestan dinero, así que estos límites nos ayudan a que la magia siga fluuyyeeeenndao.)';
 
   @override
   String get modality => 'Modalidad';
@@ -885,8 +864,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'Debes iniciar sesión para realizar esta acción.';
 
   @override
-  String get errorInsufficientCredits =>
-      'No tienes suficientes créditos. Por favor, recarga para continuar.';
+  String get errorReachedLimit =>
+      'Has alcanzado tu límite, actualiza para desbloquear más y seguir chateando.';
 
   @override
   String get errorServer =>
@@ -932,10 +911,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'No pudimos recuperar los datos necesarios de nuestros servidores. Por favor, comprueba tu conexión a internet e inténtalo de nuevo.';
 
   @override
-  String get noModelsFoundTitle => 'Sin Resultados';
+  String get noFoundTitle => 'Sin Resultados';
 
   @override
-  String get noModelsFoundMessage =>
+  String get noFoundMessage =>
       'Intenta ajustar tus términos de búsqueda o limpiar el filtro.';
 
   @override
@@ -1031,18 +1010,18 @@ class AppLocalizationsEs extends AppLocalizations {
       'Se requiere permiso de almacenamiento para guardar los modelos descargados. Por favor, concede el permiso para continuar.';
 
   @override
-  String get creditBannerTitle => '¡Consigue Créditos Gratis!';
+  String get plusBannerTitle => '¡Obtén Plus gratis!';
 
   @override
-  String get creditBannerSubtitle =>
-      '¡Invita a un amigo y ambos obtendrán 50 créditos al registrarse! Si se suscriben, ¡ambos obtendrán 500 extra!';
+  String get plusBannerSubtitle =>
+      '¡Invita a un amigo y llévense 1 Día de Plus gratis los dos!';
 
   @override
   String get inviteShareSubject => '¡Únete a mí en Cortex!';
 
   @override
-  String inviteShareMessage(String playStoreLink) {
-    return 'oye tienes que checar esta app cortex es una locura si usas mi enlace ambos nos llevamos 50 créditos y si te suscribes ambos nos llevamos 500 extra es un ofertón descárgala ya\n\n$playStoreLink';
+  String inviteShareMessage(String cortexLink) {
+    return 'Hola, tienes que probar esta aplicación, Cortex. Es una locura. Si usas mi enlace, ambos obtenemos algo gratis. ¡Vaya! Es una oferta increíble. Descárgala lo antes posible. \n\n$cortexLink';
   }
 
   @override
@@ -1100,21 +1079,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorImageLoad => 'No se pudo cargar la imagen generada.';
 
   @override
-  String get extensionInfoPanelTitle => 'Explorar modelos';
-
-  @override
-  String get extensionInfoPanelBody1 =>
-      'Esta flecha le permite cambiar entre diferentes modelos dentro de esta serie.';
-
-  @override
-  String get extensionInfoPanelBody2 =>
-      'Cuando inicias un chat con esta serie, el modelo predeterminado se selecciona automáticamente y puedes cambiar tu selección en cualquier momento durante el chat.';
-
-  @override
-  String get extensionInfoPanelFooter =>
-      'Para ver información detallada sobre cada modelo o seleccionar manualmente un modelo diferente, vaya a la Biblioteca; seleccione esta serie de modelos desde allí y toque la flecha en la parte superior de su página de detalles.';
-
-  @override
   String get premiumModelNoticeTitle => 'Modelo Premium';
 
   @override
@@ -1129,23 +1093,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Has utilizado todos tus mensajes diarios gratuitos para modelos premium, actualízate para obtener acceso ilimitado.';
 
   @override
-  String get selectionScreenGreetingGeneric => '¿Cómo puedo ayudarte hoy?';
-
-  @override
-  String get selectionScreenFeatureOffline => 'Usar sin Internet';
+  String get useOffline => 'Usar sin Internet';
 
   @override
   String get explore => 'Explorar';
 
   @override
-  String get selectionScreenNewsAndUpdates => 'Noticias y actualizaciones';
-
-  @override
-  String get filters => 'Filtros';
-
-  @override
-  String get noRecentChatsMessage =>
-      'Aún no has hablado con ningún modelo, ¡iniciemos una conversación!';
+  String get news => 'Noticias';
 
   @override
   String get allModels => 'Todos los modelos';
@@ -1161,10 +1115,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get customModels => 'Modelos personalizados';
-
-  @override
-  String get filterPanelDescription =>
-      'Toque una categoría para filtrar la lista instantáneamente.';
 
   @override
   String get dynamicChatTitle => 'Chat dinámico';
@@ -1327,7 +1277,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get notificationReferralBody =>
-      '¡Invita a un amigo a Cortex y ambos obtendrán créditos gratis!';
+      '¡Invita a un amigo a Cortex y ambos obtendrán un día gratis!';
 
   @override
   String get notificationCookingTitle => '¿Tienes hambre?';
@@ -1481,13 +1431,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Los mensajes como buenos días y buenas noches.';
 
   @override
-  String get exitAppTitle => '¿Te vas tan pronto?';
-
-  @override
-  String get exitAppConfirmation =>
-      '¿Estás seguro de que deseas abandonar esta increíble plataforma?';
-
-  @override
   String get tagNotFound => 'La etiqueta ingresada no es válida o ha expirado.';
 
   @override
@@ -1560,7 +1503,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get upgradeAccountDescription =>
-      'Crea una cuenta para obtener 200 créditos de bonificación diarios y desbloquear más límites.';
+      'Crea una cuenta para desbloquear más límites.';
 
   @override
   String get createAccount => 'Crear una cuenta';
@@ -1603,5 +1546,25 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esta función está deshabilitada en el modo emulador.';
 
   @override
-  String get newChat => 'New Chat';
+  String get newChat => 'Nuevo chat';
+
+  @override
+  String get howCanIHelpWith => '¿Cómo puedo ayudar?';
+
+  @override
+  String get variants => 'Variantes';
+
+  @override
+  String get variantsDescription =>
+      'Las variantes son versiones diferentes de la misma familia de IA. Seleccionamos automáticamente la mejor al tocar la tarjeta principal, pero puedes elegir una específica manualmente aquí si lo prefieres.';
+
+  @override
+  String get fluxChatTitle => 'Chat Flux';
+
+  @override
+  String get fluxChatDescription =>
+      'Los chats de Flux son chats temporales y no se guardan en tu dispositivo.';
+
+  @override
+  String get alwaysBest => 'Siempre lo mejor';
 }

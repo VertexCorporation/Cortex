@@ -203,7 +203,7 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 SvgPicture.asset(
-                                  'assets/icons/upload.svg',
+                                  'assets/icons/share.svg',
                                   width: screenSize.width * 0.05,
                                   height: screenSize.width * 0.05,
                                   colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
@@ -233,13 +233,13 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                               try {
                                 final tempDir = await getTemporaryDirectory();
                                 final baseName = 'cortex';
-                                const extension = '.jpg';
+                                const variant = '.jpg';
                                 int i = 0;
                                 late File localFile;
                                 while (true) {
                                   final fileName = i == 0
-                                      ? '$baseName$extension'
-                                      : '$baseName-$i$extension';
+                                      ? '$baseName$variant'
+                                      : '$baseName-$i$variant';
                                   localFile =
                                       File(path.join(tempDir.path, fileName));
                                   if (!(await localFile.exists())) {

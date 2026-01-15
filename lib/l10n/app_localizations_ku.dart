@@ -148,13 +148,10 @@ class AppLocalizationsKu extends AppLocalizations {
   String get noStarredChatsMessage => 'Te hîna sohbetek stêrk nekiriye.';
 
   @override
-  String get goToChats => 'Sohbetekê stêrk bike';
-
-  @override
   String get starConversation => 'Stêrk';
 
   @override
-  String get unstarConversation => 'Unstar';
+  String get unstarConversation => 'Rakirina stêrkê';
 
   @override
   String get loginToYourAccount => 'Têkeve';
@@ -228,7 +225,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get pleaseCheckYourEmail =>
-      'Ji bo ku Cortex bikar bînî, divê tu e-nameya xwe piştrast bikî. \n Zencîreyek piştrastkirinê ji navnîşana e-nameya te re hate şandin, ji kerema xwe e-nameya xwe kontrol bike.';
+      'Ji bo ku Cortex bikar bînî, divê tu e-nameya xwe piştrast bikî. \nZencîreyek piştrastkirinê ji navnîşana e-nameya te re hate şandin, ji kerema xwe e-nameya xwe kontrol bike.';
 
   @override
   String get verifyYourEmail => 'E-nameya Xwe Piştrast bike';
@@ -413,20 +410,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get noProductsFound => 'Tu hilber nehat dîtin';
 
   @override
-  String get buyCredits => 'Krediyan Bikire';
-
-  @override
-  String get selectCreditPackageDescription =>
-      'Pakêtek krediyê ya ku li gorî hewcedariyên te ye hilbijêre û ji taybetmendiyên zêdetir sûd werbigire.';
-
-  @override
-  String get buyCredit => 'Krediyan Bikire';
-
-  @override
-  String get internetRequired =>
-      'Ji bo bikaranîna vê modelê girêdana înternetê pêwîst e';
-
-  @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
       'Bi danîna vê sîparîşê, tu bi Şertên Xizmetê û Polîtîkaya Nepenîtiyê razî dibî. Tu dikarî vê nivîsê bitikînî da ku li ser Şertên Xizmetê û Polîtîkaya Nepenîtiyê ya me bêtir fêr bibî. Abonetî dê bixweber nû bibe heya ku nûvekirina otomatîk herî kêm 24 saetan berî dawiya heyama heyî neyê girtin.';
 
@@ -513,8 +496,9 @@ class AppLocalizationsKu extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String get shareMessage =>
-      'Li sepana Cortex binêre, ew pir ecêb e! Ji vir daxe: https://play.google.com/store/apps/details?id=com.vertex.cortex';
+  String shareMessage(String cortexLink) {
+    return 'Li sepana Cortex binêre, ew pir ecêb e! Ji vir daxe: $cortexLink';
+  }
 
   @override
   String get shareFailed =>
@@ -563,6 +547,9 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get deleteAllConversationsConfirmMessage =>
       'Tu bi rastî dixwazî hemî sohbetên xwe jê bibî? Ev nayê paşvegerandin.';
+
+  @override
+  String get conversationDeleted => 'Axaftin hat jêbirin!';
 
   @override
   String get allConversationsDeleted =>
@@ -675,11 +662,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get noMatchingModels => 'Tu modelên lihevhatî nehatin dîtin.';
 
   @override
-  String creditPackage(Object amount) {
-    return '$amount Kredî Bikire';
-  }
-
-  @override
   String get benefit1 => 'Sînorê sohbetê yê pir zêde ji bo AI-yên serhêl';
 
   @override
@@ -692,9 +674,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get benefit5 => 'Zêdetir îstîxbaratên çêkirî yên serhêl biafirîne';
 
   @override
-  String benefit7(Object credits) {
-    return '$credits krediyên rojane';
-  }
+  String get benefit7 => 'Sînorên karanîna zêdetir';
 
   @override
   String get benefit8 => 'Modelan zêde bike';
@@ -848,9 +828,8 @@ class AppLocalizationsKu extends AppLocalizations {
       'Ev modela negirêdayî li ser amûra te nehatiye saz kirin.';
 
   @override
-  String insufficientCredits(Object available, Object required) {
-    return 'Krediyên te yên têr nînin ji bo temamkirina vê daxwazê. Ev çalakî $required krediyan hewce dike, lê tenê $available krediyên te hene. Ji bo ku bêtir krediyan bi dest bixî, tu dikarî plana xwe nûjen bikî an wan rasterast bikirî. hey em bi tevahî fêm dikin ku kêmbûna krediyan dikare hinekî xemgîn be lê bi ciddî girtina wan bersivên ecêb ji modelên me ne belaş e ji ber vê yekê ev kredî bi rastî alîkariya me dikin ku demên xweş bidomînin û guhdarî bikin heke bêtir ji we hevalan bikevin nav û krediyan bistînin em dikarin bi tevahî li ber çavan bigirin ku sînorên rojane yên belaş ji bo her kesî zêde bikin';
-  }
+  String get reachedLimit =>
+      'Te sînorê bikaranîna xwe gihandiye; ji bo ku tu sînorên zêdetir bi dest bixî, tu dikarî plana xwe nûve bikî. (hey, em bi tevahî fêm dikin ku derbasbûna ji sînoran xemgîn e. lê bi rastî, wergirtina wan bersivên ecêb ne belaş e, ji ber vê yekê ev sînor bi rastî alîkariya me dikin ku demên xweş berdewam bikin.)';
 
   @override
   String get modality => 'Modality';
@@ -877,8 +856,8 @@ class AppLocalizationsKu extends AppLocalizations {
       'Ji bo pêkanîna vê çalakiyê divê tu têketî bî.';
 
   @override
-  String get errorInsufficientCredits =>
-      'Krediyên te kêm in. Ji kerema xwe ji bo berdewamiyê dagire.';
+  String get errorReachedLimit =>
+      'Te sînorê xwe gihandiye, ji bo vekirina bêtir nûve bike û sohbetê bidomîne.';
 
   @override
   String get errorServer =>
@@ -924,10 +903,10 @@ class AppLocalizationsKu extends AppLocalizations {
       'Me nekarî daneyên pêwîst ji serverên xwe bistînin. Ji kerema xwe girêdana xweya înternetê kontrol bikin û dîsa biceribînin.';
 
   @override
-  String get noModelsFoundTitle => 'Encam Tune';
+  String get noFoundTitle => 'Encam Tune';
 
   @override
-  String get noModelsFoundMessage =>
+  String get noFoundMessage =>
       'Biceribîne ku şertên lêgerîna xwe biguherînî an parzûnê paqij bikî.';
 
   @override
@@ -1022,18 +1001,18 @@ class AppLocalizationsKu extends AppLocalizations {
       'Ji bo tomarkirina modelên daxistî destûra hilanînê pêwîst e. Ji kerema xwe ji bo berdewamiyê destûrê bide.';
 
   @override
-  String get creditBannerTitle => 'Krediyên Belaş Bistîne!';
+  String get plusBannerTitle => 'Plus Belaş Bistînin!';
 
   @override
-  String get creditBannerSubtitle =>
-      'Hevalekî xwe vexwîne û hûn herdu jî li ser qeydkirinê 50 kredî distînin! Ger ew bibin abone, hûn herdu jî 500 krediyên zêde distînin!';
+  String get plusBannerSubtitle =>
+      'Hevalekî vexwîne û her du jî 1 Roja Plus belaş distînin!';
 
   @override
   String get inviteShareSubject => 'Tevlî min bibe li ser Cortex!';
 
   @override
-  String inviteShareMessage(String playStoreLink) {
-    return 'yaw divê tu li vê sepana cortexê binêrî bi rastî dîn e heke tu lînka min bikar bînî em herdu jî 50 kredî distînin û heke tu bibî abone em herdu jî 500ên zêde distînin danûstandineke dîn e zûtirîn dem daxe\n\n$playStoreLink';
+  String inviteShareMessage(String cortexLink) {
+    return 'lo kuro sepanek dîn heye bi navê cortex heke tu hevalan vexwînî em herdu jî plusa bêpere distînin DERFETEKE DÎN E ZÛ DAKÊŞÎNE\n\n$cortexLink';
   }
 
   @override
@@ -1091,21 +1070,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get errorImageLoad => 'Barkirina wêneya çêkirî bi ser neket.';
 
   @override
-  String get extensionInfoPanelTitle => 'Modelan Bigere';
-
-  @override
-  String get extensionInfoPanelBody1 =>
-      'Ev tîra dihêle hûn di navbera modelên cûda yên di vê rêzefîlmê de biguherin.';
-
-  @override
-  String get extensionInfoPanelBody2 =>
-      'Dema ku hûn cara yekem bi vê rêzefîlmê re sohbetekê dest pê dikin, modela xwerû bixweber tê hilbijartin û hûn dikarin hilbijartina xwe di her kêliyê de di dema sohbetê de biguherînin.';
-
-  @override
-  String get extensionInfoPanelFooter =>
-      'Ji bo dîtina agahdariya berfireh li ser her modelekê an jî ji bo hilbijartina bi destan modelek cûda, ji kerema xwe biçin Pirtûkxaneyê; vê rêzeya modelan ji wir hilbijêrin û li ser tîra li jorê rûpela hûrguliyan bikirtînin.';
-
-  @override
   String get premiumModelNoticeTitle => 'Modela Premium';
 
   @override
@@ -1120,24 +1084,13 @@ class AppLocalizationsKu extends AppLocalizations {
       'Te hemû peyamên xwe yên rojane yên belaş ji bo modelên premium bi kar anîne, ji kerema xwe ji bo gihîştina bêsînor nûve bike.';
 
   @override
-  String get selectionScreenGreetingGeneric =>
-      'Ez çawa dikarim îro alîkariya te bikim?';
-
-  @override
-  String get selectionScreenFeatureOffline => 'Bêyî Înternetê bikar bînin';
+  String get useOffline => 'Bêyî Înternetê bikar bînin';
 
   @override
   String get explore => 'Lêkolîn';
 
   @override
-  String get selectionScreenNewsAndUpdates => 'Nûçe û Nûvekirin';
-
-  @override
-  String get filters => 'Fîlter';
-
-  @override
-  String get noRecentChatsMessage =>
-      'Te hîn bi ti modelan re neaxiviye, werin em dest bi axaftinekê bikin!';
+  String get news => 'Nûçe';
 
   @override
   String get allModels => 'Hemû Model';
@@ -1153,10 +1106,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get customModels => 'Modelên Taybet';
-
-  @override
-  String get filterPanelDescription =>
-      'Ji bo ku navnîşê tavilê fîltre bikin, li kategoriyekê bikirtînin.';
 
   @override
   String get dynamicChatTitle => 'Sohbeta Dînamîk';
@@ -1319,7 +1268,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get notificationReferralBody =>
-      'Hevalekî vexwîne Cortexê û her du jî krediyên belaş distînin!';
+      'Hevalekî vexwîne Cortexê û her du jî rojek belaş distînin!';
 
   @override
   String get notificationCookingTitle => 'Birçîbûn hîs dikî?';
@@ -1470,13 +1419,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get channelGreetingsDescription => 'Peyamên mîna sibeha baş û şevbaş.';
 
   @override
-  String get exitAppTitle => 'Hûn ewqas zû diçin?';
-
-  @override
-  String get exitAppConfirmation =>
-      'Ma hûn piştrast in ku hûn dixwazin ji vê platforma ecêb derkevin?';
-
-  @override
   String get tagNotFound =>
       'Etîketa ku te nivîsandiye nederbasdar e an jî dema wê derbas bûye.';
 
@@ -1550,7 +1492,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get upgradeAccountDescription =>
-      'Hesabê xwe çêke da ku rojane 200 kredîyên bonus bistînî û sînorên zêdetir vebikî.';
+      'Ji bo vekirina sînorên bêtir hesabê xwe çêbikin.';
 
   @override
   String get createAccount => 'Hesabê Biafirîne';
@@ -1593,5 +1535,25 @@ class AppLocalizationsKu extends AppLocalizations {
       'Ev taybetmendî di moda emulatorê de neçalak e';
 
   @override
-  String get newChat => 'New Chat';
+  String get newChat => 'Sohbeta Nû';
+
+  @override
+  String get howCanIHelpWith => 'Ez çawa dikarim alîkariyê bikim?';
+
+  @override
+  String get variants => 'Guhertoyên';
+
+  @override
+  String get variantsDescription =>
+      'Guherto guhertoyên cuda yên heman malbata AI ne. Dema ku hûn li ser karta sereke bitikînin, em bixweber ya çêtirîn hildibijêrin, lê heke hûn tercîh bikin, hûn dikarin li vir yeka taybetî bi destan hilbijêrin!';
+
+  @override
+  String get fluxChatTitle => 'Sohbeta Flux';
+
+  @override
+  String get fluxChatDescription =>
+      'Sohbetên Flux sohbetên demkî ne û li ser cîhaza we nayên tomarkirin.';
+
+  @override
+  String get alwaysBest => 'Herdem Baştirîn';
 }

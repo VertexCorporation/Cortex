@@ -36,6 +36,7 @@ class ModelRepository {
   /// fast access after the initial load. This cache is considered the source of truth
   /// for this repository once populated.
   List<Map<String, dynamic>>? _rawModelsCache;
+
   List<Map<String, dynamic>>? get rawModelsCache => _rawModelsCache;
 
   // Configuration constants for data synchronization.
@@ -48,7 +49,8 @@ class ModelRepository {
   final Dio _dio;
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(region: 'europe-west1');
+  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(
+      region: 'europe-west1');
 
   /// A completer used as a concurrency lock to prevent multiple simultaneous
   /// synchronization processes from running.
@@ -65,10 +67,13 @@ class ModelRepository {
   /// is loaded efficiently, either from the in-memory cache or by triggering a
   /// full initialization and sync process.
   /// Returns a list of raw model data maps, or null on a critical failure.
-  Future<List<Map<String, dynamic>>?> getAllModels({required String langCode, required Map<String, String> localAssetMap}) async {
+  Future<List<Map<String, dynamic>>?> getAllModels(
+      {required String langCode, required Map<String,
+          String> localAssetMap}) async {
     // If a sync process is already running, await its completion to ensure consistency.
     if (_syncCompleter != null) {
-      debugPrint("[ModelRepository] A sync process is already running. Awaiting its completion.");
+      debugPrint(
+          "[ModelRepository] A sync process is already running. Awaiting its completion.");
       await _syncCompleter!.future;
       return _rawModelsCache;
     }
@@ -82,11 +87,13 @@ class ModelRepository {
     debugPrint("[ModelRepository] Starting new data initialization process.");
     _syncCompleter = Completer<void>();
     try {
-      await _initializeAndSync(langCode: langCode, localAssetMap: localAssetMap);
+      await _initializeAndSync(
+          langCode: langCode, localAssetMap: localAssetMap);
       _syncCompleter!.complete();
       return _rawModelsCache;
     } catch (e, s) {
-      debugPrint("[ModelRepository] CRITICAL Error during initialization: $e\n$s");
+      debugPrint(
+          "[ModelRepository] CRITICAL Error during initialization: $e\n$s");
       _syncCompleter!.completeError(e);
       return null; // Return null to indicate a failure to the service layer.
     } finally {
@@ -103,49 +110,62 @@ class ModelRepository {
     const String logPrefix = "[ModelRepository.updateBaseModel]";
     try {
       final db = await _dbHelper.database;
-      final results = await db.query('models', where: 'id = ?', whereArgs: [modelId]);
+      final results = await db.query(
+          'models', where: 'id = ?', whereArgs: [modelId]);
 
       if (results.isEmpty) {
-        debugPrint("$logPrefix: Model with ID '$modelId' not found in the database.");
+        debugPrint(
+            "$logPrefix: Model with ID '$modelId' not found in the database.");
         return false;
       }
 
       final rawJsonString = results.first['raw_json'] as String;
-      final isCustomModel = modelId.startsWith('self_') || modelId.startsWith('local_');
+      final isCustomModel = modelId.startsWith('self_') ||
+          modelId.startsWith('local_');
 
       Map<String, dynamic> updatedJsonData;
       String? finalJsonToSave;
 
       if (isCustomModel) {
         final currentUser = _auth.currentUser;
-        if (currentUser == null) throw Exception("User not authenticated for encrypted operation.");
+        if (currentUser == null) {
+          throw Exception(
+              "User not authenticated for encrypted operation.");
+        }
 
-        final decryptedJson = CryptoHelper.decrypt(rawJsonString, currentUser.uid);
-        if (decryptedJson == null) throw Exception("Failed to decrypt model data for '$modelId'.");
+        final decryptedJson = CryptoHelper.decrypt(
+            rawJsonString, currentUser.uid);
+        if (decryptedJson == null) {
+          throw Exception(
+              "Failed to decrypt model data for '$modelId'.");
+        }
 
         updatedJsonData = json.decode(decryptedJson);
         updatedJsonData['baseModelId'] = newBaseModelId;
-        finalJsonToSave = CryptoHelper.encrypt(json.encode(updatedJsonData), currentUser.uid);
+        finalJsonToSave =
+            CryptoHelper.encrypt(json.encode(updatedJsonData), currentUser.uid);
       } else {
         updatedJsonData = json.decode(rawJsonString);
         updatedJsonData['baseModelId'] = newBaseModelId;
         finalJsonToSave = json.encode(updatedJsonData);
       }
 
-      await db.update('models', {'raw_json': finalJsonToSave}, where: 'id = ?', whereArgs: [modelId]);
+      await db.update('models', {'raw_json': finalJsonToSave}, where: 'id = ?',
+          whereArgs: [modelId]);
 
       // Update the in-memory raw cache to reflect the change immediately.
       if (_rawModelsCache != null) {
         final index = _rawModelsCache!.indexWhere((m) => m['id'] == modelId);
         if (index != -1) {
           _rawModelsCache![index] = updatedJsonData;
-          debugPrint("$logPrefix: Hot-patched raw in-memory cache for model '$modelId'.");
+          debugPrint(
+              "$logPrefix: Hot-patched raw in-memory cache for model '$modelId'.");
         }
       }
 
-      debugPrint("$logPrefix: Successfully updated baseModelId for '$modelId'.");
+      debugPrint(
+          "$logPrefix: Successfully updated baseModelId for '$modelId'.");
       return true;
-
     } catch (e) {
       if (e.toString().contains("SQLITE_FULL")) {
         debugPrint("$logPrefix: DISK FULL. Could not update base model.");
@@ -165,29 +185,38 @@ class ModelRepository {
   // --- Private Core Logic ---
 
   /// Orchestrates the entire data initialization and synchronization pipeline.
-  Future<void> _initializeAndSync({required String langCode, required Map<String, String> localAssetMap}) async {
+  Future<void> _initializeAndSync({required String langCode, required Map<
+      String,
+      String> localAssetMap}) async {
     final prefs = await SharedPreferences.getInstance();
     final lastSyncTimeString = prefs.getString(_prefsKeyLastSync);
-    final lastSyncTime = lastSyncTimeString != null ? DateTime.tryParse(lastSyncTimeString) : null;
+    final lastSyncTime = lastSyncTimeString != null ? DateTime.tryParse(
+        lastSyncTimeString) : null;
     final lastSyncLangCode = prefs.getString(_prefsKeyLastSyncLang);
 
-    final initialDbMaps = await _dbHelper.getAllModels(userId: _auth.currentUser?.uid);
+    final initialDbMaps = await _dbHelper.getAllModels(
+        userId: _auth.currentUser?.uid);
 
     final isDbEmpty = initialDbMaps.isEmpty;
-    final isCacheStale = lastSyncTime == null || DateTime.now().difference(lastSyncTime) > _cacheStaleDuration;
+    final isCacheStale = lastSyncTime == null ||
+        DateTime.now().difference(lastSyncTime) > _cacheStaleDuration;
     final hasInternet = await InternetConnection().hasInternetAccess;
-    final isLangChanged = lastSyncLangCode != null && lastSyncLangCode != langCode;
+    final isLangChanged = lastSyncLangCode != null &&
+        lastSyncLangCode != langCode;
 
     if (hasInternet && (isDbEmpty || isCacheStale || isLangChanged)) {
-      debugPrint("[ModelRepository] Sync required. DB Empty: $isDbEmpty, Stale: $isCacheStale, Lang Changed: $isLangChanged");
+      debugPrint(
+          "[ModelRepository] Sync required. DB Empty: $isDbEmpty, Stale: $isCacheStale, Lang Changed: $isLangChanged");
       await _syncWithServer(langCode);
     } else {
       debugPrint("[ModelRepository] Sync not required. Loading from local DB.");
     }
 
-    final mapsFromDb = await _dbHelper.getAllModels(userId: _auth.currentUser?.uid);
+    final mapsFromDb = await _dbHelper.getAllModels(
+        userId: _auth.currentUser?.uid);
     _rawModelsCache = mapsFromDb;
-    debugPrint("[ModelRepository] Raw cache initialized with ${_rawModelsCache?.length ?? 0} models from database.");
+    debugPrint("[ModelRepository] Raw cache initialized with ${_rawModelsCache
+        ?.length ?? 0} models from database.");
 
     if (hasInternet && _rawModelsCache != null) {
       await _syncModelImages(_rawModelsCache!, localAssetMap);
@@ -196,7 +225,8 @@ class ModelRepository {
       // This forces the ModelService to re-load the fresh data from persistent storage
       // instead of using a stale in-memory version.
       ModelImageCache.invalidateInMemoryCache();
-      debugPrint("[ModelRepository] Invalidated image path cache to force a fresh read.");
+      debugPrint(
+          "[ModelRepository] Invalidated image path cache to force a fresh read.");
     }
   }
 
@@ -205,15 +235,17 @@ class ModelRepository {
     debugPrint("[ModelRepository] Starting full model sync with server...");
     try {
       final validPublicIds = await _fetchAndStorePublicModels(langCode);
-      debugPrint("[ModelRepository] Public model sync complete. Found ${validPublicIds.length} valid IDs.");
+      debugPrint(
+          "[ModelRepository] Public model sync complete. Found ${validPublicIds
+              .length} valid IDs.");
 
       await _cleanupStaleModels(validPublicIds);
 
       await _updateLastSyncState(langCode);
       debugPrint("[ModelRepository] Sync process fully complete.");
-
     } catch (e, s) {
-      debugPrint("[ModelRepository] CRITICAL ERROR during sync orchestration: $e\n$s");
+      debugPrint(
+          "[ModelRepository] CRITICAL ERROR during sync orchestration: $e\n$s");
       throw Exception("Sync with server failed.");
     }
   }
@@ -241,7 +273,8 @@ class ModelRepository {
       );
 
       if (response.statusCode != 200) {
-        debugPrint("[ModelRepository] Server returned status ${response.statusCode}. Skipping sync.");
+        debugPrint("[ModelRepository] Server returned status ${response
+            .statusCode}. Skipping sync.");
         return <String>{};
       }
 
@@ -253,17 +286,21 @@ class ModelRepository {
       final rawServerData = response.data!;
 
       // 1. Offload heavy JSON parsing to a background isolate.
-      debugPrint("[ModelRepository] Parsing server data in background isolate...");
+      debugPrint(
+          "[ModelRepository] Parsing server data in background isolate...");
       final parsedServerModels = await compute(
         _parseServerDataIsolate,
         {'data': rawServerData, 'langCode': langCode},
       );
 
-      final validServerIds = parsedServerModels.map((m) => m['id'] as String).toSet();
+      final validServerIds = parsedServerModels
+          .map((m) => m['id'] as String)
+          .toSet();
 
       // Filter out local/custom models just in case the server sent something weird.
       final modelsToInsert = parsedServerModels.where((modelData) {
-        return !modelData['id'].startsWith('self_') && !modelData['id'].startsWith('local_');
+        return !modelData['id'].startsWith('self_') &&
+            !modelData['id'].startsWith('local_');
       }).toList();
 
       if (modelsToInsert.isNotEmpty) {
@@ -271,7 +308,9 @@ class ModelRepository {
         const int batchSize = 50; // Optimal chunk size to prevent locking
 
         for (var i = 0; i < modelsToInsert.length; i += batchSize) {
-          final end = (i + batchSize < modelsToInsert.length) ? i + batchSize : modelsToInsert.length;
+          final end = (i + batchSize < modelsToInsert.length)
+              ? i + batchSize
+              : modelsToInsert.length;
           final currentBatch = modelsToInsert.sublist(i, end);
 
           final batch = db.batch();
@@ -294,7 +333,8 @@ class ModelRepository {
             await Future.delayed(Duration.zero);
           } catch (e) {
             if (e.toString().contains("SQLITE_FULL")) {
-              debugPrint("[ModelRepository] DISK FULL. Aborting model sync save.");
+              debugPrint(
+                  "[ModelRepository] DISK FULL. Aborting model sync save.");
               break;
             } else {
               rethrow;
@@ -310,18 +350,20 @@ class ModelRepository {
       await _dbHelper.optimizeDatabase();
 
       return validServerIds;
-
     } on DioException catch (e, s) {
       if (e.response?.statusCode == 500) {
-        debugPrint("[ModelRepository] Server Error (500). Using local cache instead.");
-        FirebaseCrashlytics.instance.log("Server 500 error on model sync. Skipping.");
+        debugPrint(
+            "[ModelRepository] Server Error (500). Using local cache instead.");
+        FirebaseCrashlytics.instance.log(
+            "Server 500 error on model sync. Skipping.");
         return <String>{};
       }
 
       final errorString = e.toString();
       if (errorString.contains("CERTIFICATE_VERIFY_FAILED") ||
           errorString.contains("HandshakeException")) {
-        debugPrint("[ModelRepository] SSL/Certificate Error detected (Likely user network issue). Using local cache.");
+        debugPrint(
+            "[ModelRepository] SSL/Certificate Error detected (Likely user network issue). Using local cache.");
         return <String>{};
       }
 
@@ -330,17 +372,19 @@ class ModelRepository {
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.connectionError ||
           e.error is SocketException) {
-        debugPrint("[ModelRepository] Network timeout or connection error (${e.type}). Using local cache.");
+        debugPrint("[ModelRepository] Network timeout or connection error (${e
+            .type}). Using local cache.");
         return <String>{};
       }
 
       debugPrint("[ModelRepository] Unexpected DioException: $e");
-      FirebaseCrashlytics.instance.recordError(e, s, reason: 'Failed to sync public models');
+      FirebaseCrashlytics.instance.recordError(
+          e, s, reason: 'Failed to sync public models');
       return <String>{};
-
     } catch (e, s) {
       debugPrint("[ModelRepository] Generic error: $e");
-      FirebaseCrashlytics.instance.recordError(e, s, reason: 'Unexpected failure in public model sync');
+      FirebaseCrashlytics.instance.recordError(
+          e, s, reason: 'Unexpected failure in public model sync');
       return <String>{};
     }
   }
@@ -360,8 +404,11 @@ class ModelRepository {
       );
 
       if (staleModels.isNotEmpty) {
-        debugPrint("[ModelRepository] Found ${staleModels.length} stale public models to clean up.");
-        final staleModelIds = staleModels.map((m) => m['id'] as String).toList();
+        debugPrint("[ModelRepository] Found ${staleModels
+            .length} stale public models to clean up.");
+        final staleModelIds = staleModels
+            .map((m) => m['id'] as String)
+            .toList();
 
         // Concurrently delete associated images from cache.
         await _deleteStaleImages(staleModels);
@@ -371,11 +418,13 @@ class ModelRepository {
           where: "id IN (${List.filled(staleModelIds.length, '?').join(',')})",
           whereArgs: staleModelIds,
         );
-        debugPrint("[ModelRepository] Cleaned up $count stale models from database.");
+        debugPrint(
+            "[ModelRepository] Cleaned up $count stale models from database.");
       }
     } catch (e) {
       if (e.toString().contains("SQLITE_FULL")) {
-        debugPrint("[ModelRepository] Disk full during cleanup. Skipping delete operation.");
+        debugPrint(
+            "[ModelRepository] Disk full during cleanup. Skipping delete operation.");
         return;
       }
       debugPrint("[ModelRepository] Error during cleanup: $e");
@@ -383,7 +432,8 @@ class ModelRepository {
   }
 
   /// Deletes cached images associated with a list of stale models.
-  Future<void> _deleteStaleImages(List<Map<String, dynamic>> staleModels) async {
+  Future<void> _deleteStaleImages(
+      List<Map<String, dynamic>> staleModels) async {
     final cachedPaths = await ModelImageCache.loadPaths();
     final List<String> idsToRemoveFromImageCache = [];
 
@@ -402,7 +452,8 @@ class ModelRepository {
                 await file.delete();
               }
             } catch (e) {
-              debugPrint("[ModelRepository] Error deleting stale image file: $e");
+              debugPrint(
+                  "[ModelRepository] Error deleting stale image file: $e");
             }
           }
         }
@@ -416,10 +467,14 @@ class ModelRepository {
   }
 
   /// Downloads and caches model images from Firebase Storage.
-  Future<void> _syncModelImages(List<Map<String, dynamic>> allModels, Map<String, String> localAssetMap) async {
+  Future<void> _syncModelImages(List<Map<String, dynamic>> allModels,
+      Map<String, String> localAssetMap) async {
     final docsDir = await getApplicationDocumentsDirectory();
     final imageCacheDir = Directory(p.join(docsDir.path, 'model_images'));
-    if (!await imageCacheDir.exists()) await imageCacheDir.create(recursive: true);
+    if (!await imageCacheDir.exists()) {
+      await imageCacheDir.create(
+          recursive: true);
+    }
 
     final cachedImagePaths = await ModelImageCache.loadPaths();
 
@@ -427,9 +482,11 @@ class ModelRepository {
       final modelId = modelData['id'] as String;
       final serverImagePath = modelData['imagePath'] as String?;
       final producer = modelData['producer'] as String? ?? '';
-      final isCustomModel = modelId.startsWith('self_') || modelId.startsWith('local_');
+      final isCustomModel = modelId.startsWith('self_') ||
+          modelId.startsWith('local_');
 
-      if (isCustomModel || serverImagePath == null || serverImagePath.startsWith('assets/')) {
+      if (isCustomModel || serverImagePath == null ||
+          serverImagePath.startsWith('assets/')) {
         continue;
       }
 
@@ -446,16 +503,21 @@ class ModelRepository {
         hasLocalAsset = true;
       }
 
-      final bool needsDownload = !cachedImagePaths.containsKey(modelId) && !hasLocalAsset;
+      final bool needsDownload = !cachedImagePaths.containsKey(modelId) &&
+          !hasLocalAsset;
 
       if (needsDownload) {
         try {
-          debugPrint("[ModelRepository] Attempting to download image for '$modelId' from path: '$serverImagePath'");
-          final result = await _functions.httpsCallable('getCoverDownloadUrl').call({'filePath': serverImagePath});
+          debugPrint(
+              "[ModelRepository] Attempting to download image for '$modelId' from path: '$serverImagePath'");
+          final result = await _functions
+              .httpsCallable('getCoverDownloadUrl')
+              .call({'filePath': serverImagePath});
 
           final signedUrl = result.data?['signedUrl'] as String?;
           if (signedUrl == null || signedUrl.isEmpty) {
-            throw Exception('Cloud Function returned null or empty signedUrl for $serverImagePath');
+            throw Exception(
+                'Cloud Function returned null or empty signedUrl for $serverImagePath');
           }
 
           final response = await _dio.get<List<int>>(
@@ -468,33 +530,46 @@ class ModelRepository {
             final localFile = File(p.join(imageCacheDir.path, fileName));
             await localFile.writeAsBytes(response.data!);
             await ModelImageCache.add(modelId, localFile.path);
-            debugPrint("[ModelRepository] Successfully downloaded and cached image for '$modelId'.");
+            debugPrint(
+                "[ModelRepository] Successfully downloaded and cached image for '$modelId'.");
           } else {
             throw DioException(
               requestOptions: response.requestOptions,
               response: response,
-              error: 'Failed image download for $signedUrl with status: ${response.statusCode}',
+              error: 'Failed image download for $signedUrl with status: ${response
+                  .statusCode}',
             );
           }
         }
 
         on FirebaseFunctionsException catch (e, s) {
           if (e.code == 'unavailable' || e.code == 'deadline-exceeded') {
-            debugPrint("[ModelRepository] A predictable network error ('${e.code}') occurred during image sync for '$modelId'. This is not a bug. Error: ${e.message}");
+            debugPrint("[ModelRepository] A predictable network error ('${e
+                .code}') occurred during image sync for '$modelId'. This is not a bug. Error: ${e
+                .message}");
           } else {
-            debugPrint("[ModelRepository] An unexpected FirebaseFunctionsException occurred for '$modelId': ${e.code} - ${e.message}");
-            FirebaseCrashlytics.instance.recordError(e, s, reason: 'Unexpected Firebase Functions error in image sync for $modelId');
+            debugPrint(
+                "[ModelRepository] An unexpected FirebaseFunctionsException occurred for '$modelId': ${e
+                    .code} - ${e.message}");
+            FirebaseCrashlytics.instance.recordError(e, s,
+                reason: 'Unexpected Firebase Functions error in image sync for $modelId');
           }
         } on DioException catch (e, s) {
-          if (e.type == DioExceptionType.connectionError || e.error is SocketException) {
-            debugPrint("[ModelRepository] A predictable network error occurred during image download for '$modelId'. This is not a bug. Error: $e");
+          if (e.type == DioExceptionType.connectionError ||
+              e.error is SocketException) {
+            debugPrint(
+                "[ModelRepository] A predictable network error occurred during image download for '$modelId'. This is not a bug. Error: $e");
           } else {
-            debugPrint("[ModelRepository] CRITICAL: Dio download failed for model '$modelId' image. Error: $e");
-            FirebaseCrashlytics.instance.recordError(e, s, reason: 'Failed to download model image for $modelId with Dio');
+            debugPrint(
+                "[ModelRepository] CRITICAL: Dio download failed for model '$modelId' image. Error: $e");
+            FirebaseCrashlytics.instance.recordError(e, s,
+                reason: 'Failed to download model image for $modelId with Dio');
           }
         } catch (e, s) {
-          debugPrint("[ModelRepository] An unexpected generic error occurred during image sync for '$modelId': $e");
-          FirebaseCrashlytics.instance.recordError(e, s, reason: 'Unexpected generic failure in image sync for $modelId');
+          debugPrint(
+              "[ModelRepository] An unexpected generic error occurred during image sync for '$modelId': $e");
+          FirebaseCrashlytics.instance.recordError(e, s,
+              reason: 'Unexpected generic failure in image sync for $modelId');
         }
       }
     }
@@ -503,13 +578,15 @@ class ModelRepository {
   // --- STATIC PARSING HELPERS (ISOLATE-READY) ---
 
   /// Static entry point for the isolate to parse server data.
-  static List<Map<String, dynamic>> _parseServerDataIsolate(Map<String, dynamic> params) {
+  static List<Map<String, dynamic>> _parseServerDataIsolate(
+      Map<String, dynamic> params) {
     final rawData = params['data'] as Map<String, dynamic>;
     final langCode = params['langCode'] as String;
     return _staticParseAndGroupServerModels(rawData, langCode);
   }
 
-  static List<Map<String, dynamic>> _staticParseAndGroupServerModels(Map<String, dynamic> rawData, String langCode) {
+  static List<Map<String, dynamic>> _staticParseAndGroupServerModels(
+      Map<String, dynamic> rawData, String langCode) {
     final List<Map<String, dynamic>> finalList = [];
     final producers = rawData['producers'] as Map<String, dynamic>? ?? {};
 
@@ -520,12 +597,16 @@ class ModelRepository {
 
         final cleanSeriesValue = _staticSanitizeRawData(seriesValue);
 
-        final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)..remove('series_description');
+        final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)
+          ..remove('series_description');
         if (variantsMap.isEmpty) return;
 
-        final model = (variantsMap.length == 1 && variantsMap.containsKey('Default'))
-            ? _staticParseSingleVariantModel(seriesName, producerName, variantsMap['Default'], langCode)
-            : _staticParseMultiVariantSeries(seriesName, producerName, cleanSeriesValue, langCode);
+        final model = (variantsMap.length == 1 &&
+            variantsMap.containsKey('Default'))
+            ? _staticParseSingleVariantModel(
+            seriesName, producerName, variantsMap['Default'], langCode)
+            : _staticParseMultiVariantSeries(
+            seriesName, producerName, cleanSeriesValue, langCode);
 
         if (model != null) finalList.add(model);
       });
@@ -533,13 +614,15 @@ class ModelRepository {
     return finalList;
   }
 
-  static Map<String, dynamic>? _staticParseSingleVariantModel(String seriesName, String producerName, Map<String, dynamic> variantData, String langCode) {
+  static Map<String, dynamic>? _staticParseSingleVariantModel(String seriesName,
+      String producerName, Map<String, dynamic> variantData, String langCode) {
     final cleanVariantData = _staticSanitizeRawData(variantData);
 
     final serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
     final modelId = cleanVariantData['id'] as String? ?? seriesName;
     final details = cleanVariantData['details'] as Map<String, dynamic>? ?? {};
-    final localizedDetails = (details[serverLangKey] as Map<String, dynamic>?) ?? {};
+    final localizedDetails = (details[serverLangKey] as Map<String,
+        dynamic>?) ?? {};
     final englishDetails = (details['en'] as Map<String, dynamic>?) ?? {};
 
     final modelCategory = cleanVariantData['category']?.toString() ??
@@ -561,50 +644,59 @@ class ModelRepository {
       'type': cleanVariantData['type'] ?? 'online',
       'category': modelCategory,
       'summary': localizedDetails['summary'] ?? englishDetails['summary'] ?? '',
-      'description': localizedDetails['description'] ?? englishDetails['description'] ?? '',
+      'description': localizedDetails['description'] ??
+          englishDetails['description'] ?? '',
       'role': localizedDetails['role'] ?? englishDetails['role'],
       'isFullyLocalized': isLocalized,
     };
   }
 
-  static Map<String, dynamic>? _staticParseMultiVariantSeries(String seriesName, String producerName, Map<String, dynamic> seriesValue, String langCode) {
+  static Map<String, dynamic>? _staticParseMultiVariantSeries(String seriesName,
+      String producerName, Map<String, dynamic> seriesValue, String langCode) {
     final cleanSeriesValue = _staticSanitizeRawData(seriesValue);
 
     final serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
-    final seriesDetails = cleanSeriesValue['series_description'] as Map<String, dynamic>? ?? {};
+    final seriesDetails = cleanSeriesValue['series_description'] as Map<
+        String,
+        dynamic>? ?? {};
 
     final bool isSeriesLocalized = (langCode == 'en' || langCode == 'zh') ||
-        (seriesDetails[serverLangKey] != null && (seriesDetails[serverLangKey] as String).isNotEmpty);
+        (seriesDetails[serverLangKey] != null &&
+            (seriesDetails[serverLangKey] as String).isNotEmpty);
 
-    final localizedSeriesSummary = seriesDetails[serverLangKey] as String? ?? seriesDetails['en'] as String? ?? '';
+    final localizedSeriesSummary = seriesDetails[serverLangKey] as String? ??
+        seriesDetails['en'] as String? ?? '';
 
     final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)
-      ..remove('series_description')
-      ..remove('reasoning');
+      ..remove('series_description')..remove('reasoning');
     if (variantsMap.isEmpty) return null;
 
-    final extensions = <String, dynamic>{};
+    final variants = <String, dynamic>{};
     variantsMap.forEach((variantKey, variantData) {
       if (variantData is! Map<String, dynamic>) return;
 
       final cleanVariantData = _staticSanitizeRawData(variantData);
 
-      final descriptionMap = cleanVariantData['description'] as Map<String, dynamic>? ?? {};
+      final descriptionMap = cleanVariantData['description'] as Map<
+          String,
+          dynamic>? ?? {};
 
       final bool isVariantLocalized = (langCode == 'en' || langCode == 'zh') ||
-          (descriptionMap[serverLangKey] != null && (descriptionMap[serverLangKey] as String).isNotEmpty);
+          (descriptionMap[serverLangKey] != null &&
+              (descriptionMap[serverLangKey] as String).isNotEmpty);
 
-      extensions[cleanVariantData['id'] as String] = {
+      variants[cleanVariantData['id'] as String] = {
         ...cleanVariantData,
         'id': cleanVariantData['id'],
         'title': cleanVariantData['title'] ?? variantKey,
         'summary': localizedSeriesSummary,
-        'description': descriptionMap[serverLangKey] ?? descriptionMap['en'] ?? '',
+        'description': descriptionMap[serverLangKey] ?? descriptionMap['en'] ??
+            '',
         'isFullyLocalized': isVariantLocalized,
       };
     });
 
-    if (extensions.isEmpty) return null;
+    if (variants.isEmpty) return null;
 
     return {
       ...cleanSeriesValue,
@@ -616,12 +708,13 @@ class ModelRepository {
       'category': cleanSeriesValue['category'] ?? 'online',
       'summary': localizedSeriesSummary,
       'description': localizedSeriesSummary,
-      'extensions': extensions,
+      'variants': variants,
       'isFullyLocalized': isSeriesLocalized,
     };
   }
 
-  static Map<String, dynamic> _staticSanitizeRawData(Map<String, dynamic> source) {
+  static Map<String, dynamic> _staticSanitizeRawData(
+      Map<String, dynamic> source) {
     final Map<String, dynamic> cleanMap = Map<String, dynamic>.from(source);
 
     cleanMap.remove('processing_status');
@@ -636,7 +729,8 @@ class ModelRepository {
     for (final key in cleanMap.keys.toList()) {
       final value = cleanMap[key];
       if (value is Map) {
-        cleanMap[key] = _staticSanitizeRawData(Map<String, dynamic>.from(value));
+        cleanMap[key] =
+            _staticSanitizeRawData(Map<String, dynamic>.from(value));
       }
     }
 
@@ -647,7 +741,8 @@ class ModelRepository {
 
   /// Finds the best possible asset path by checking if a model identifier contains
   /// any of the keys from the asset map. It prioritizes longer matches.
-  String? _findBestAssetMatch(String modelIdentifier, Map<String, String> localAssetMap) {
+  String? _findBestAssetMatch(String modelIdentifier,
+      Map<String, String> localAssetMap) {
     String? bestMatchKey;
     final identifier = modelIdentifier.toLowerCase();
 
@@ -670,7 +765,8 @@ class ModelRepository {
   Future<void> _updateLastSyncState(String langCode) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefsKeyLastSync, DateTime.now().toIso8601String());
+      await prefs.setString(
+          _prefsKeyLastSync, DateTime.now().toIso8601String());
       await prefs.setString(_prefsKeyLastSyncLang, langCode);
     } catch (e) {
       debugPrint("[ModelRepository] Error saving sync state: $e");

@@ -23,35 +23,21 @@ class ActionButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isConnected = context.watch<InternetProvider>().isConnected;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isConnected = context
+        .watch<InternetProvider>()
+        .isConnected;
 
-    // RESPONSIVE LOGIC
-    final bool isTablet = screenWidth >= 600;
-
-    // --- FULLY DYNAMIC DIMENSIONS ---
-
-    // Button Size (Container dimensions)
-    // Tablet: 6% of screen width (e.g. 48px on 800w). Phone: ~9% (approx 36px).
-    // This reduction on tablet gives it breathing room inside the input field padding.
-    final double buttonSize = isTablet ? screenWidth * 0.052 : screenWidth * 0.09;
-
-    // Send Icon Size (Arrow)
-    // Tablet: 3.5% of width. Phone: 6%.
-    final double sendIconSize = isTablet ? screenWidth * 0.035 : screenWidth * 0.06;
-
-    // Stop Icon Size (SVG)
-    // Tablet: 3% of width. Phone: 5.5%.
-    final double stopIconSize = isTablet ? screenWidth * 0.03 : screenWidth * 0.055;
-
-    // Border Radius for Stop Button
-    // Half of buttonSize to keep it circular/rounded.
-    final double stopBorderRadius = buttonSize / 2;
+    // Fixed size to match the '+' and 'Model' buttons in input.dart
+    const double buttonSize = 36.0;
+    const double sendIconSize = 20.0; // Proportional to 36.0
+    const double stopIconSize = 14.0; // Proportional to 36.0
+    const double stopBorderRadius = buttonSize / 2;
 
     final Duration currentDuration = isEnabled
         ? const Duration(milliseconds: 100)
         : const Duration(milliseconds: 200);
 
+    // Color Logic: Keeps the button 'Filled' (Solid) because it's the Primary Action.
     Color backgroundColor;
     if (isSending || isEnabled) {
       backgroundColor = AppColors.primaryColor.inverted;
@@ -65,6 +51,7 @@ class ActionButtonWidget extends StatelessWidget {
         ? AppColors.primaryColor
         : AppColors.tertiaryColor;
 
+    // SEND BUTTON
     Widget sendButton = GestureDetector(
       key: const ValueKey('sendButton'),
       onTap: isEnabled ? onSend : null,
@@ -82,7 +69,7 @@ class ActionButtonWidget extends StatelessWidget {
           opacity: (isSending || isEnabled) ? 1.0 : 0.5,
           curve: Curves.easeInOut,
           child: Icon(
-            Icons.arrow_upward,
+            Icons.arrow_upward_rounded, // Rounded variant looks cleaner
             color: iconColor,
             size: sendIconSize,
           ),
@@ -90,6 +77,7 @@ class ActionButtonWidget extends StatelessWidget {
       ),
     );
 
+    // STOP BUTTON
     Widget stopButton = GestureDetector(
       key: const ValueKey('stopButton'),
       onTap: onStop,
@@ -100,14 +88,22 @@ class ActionButtonWidget extends StatelessWidget {
         height: buttonSize,
         decoration: BoxDecoration(
           color: AppColors.primaryColor.inverted,
+          // Solid background for stop too
           borderRadius: BorderRadius.circular(stopBorderRadius),
+          border: Border.all(
+            color: AppColors.border, // Optional subtle border for stop
+            width: 1.0,
+          ),
         ),
         child: Center(
           child: SvgPicture.asset(
             'assets/icons/stop.svg',
             width: stopIconSize,
             height: stopIconSize,
-            colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(
+                AppColors.primaryColor,
+                BlendMode.srcIn
+            ),
           ),
         ),
       ),

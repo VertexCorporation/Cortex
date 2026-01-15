@@ -48,12 +48,14 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 /// Builds the final notification content from a data payload.
 /// This is a shared helper used by both background and foreground handlers
 /// to ensure consistent, localized content.
-Future<Map<String, String>> _buildLocalizedContent(Map<String, dynamic> data) async {
+Future<Map<String, String>> _buildLocalizedContent(
+    Map<String, dynamic> data) async {
   final String? titleKey = data['notification_title_key'];
   final String? bodyKey = data['notification_body_key'];
 
   if (titleKey == null || bodyKey == null) {
-    debugPrint("[Content Builder] Title or body key is missing in the payload.");
+    debugPrint(
+        "[Content Builder] Title or body key is missing in the payload.");
     return {}; // Return an empty map to signify failure.
   }
 
@@ -62,9 +64,12 @@ Future<Map<String, String>> _buildLocalizedContent(Map<String, dynamic> data) as
 
   final locale = savedLocaleCode != null
       ? Locale(savedLocaleCode)
-      : Locale(Platform.localeName.split('_').first);
+      : Locale(Platform.localeName
+      .split('_')
+      .first);
 
-  debugPrint("[Content Builder] Using '${locale.languageCode}' for notification language.");
+  debugPrint("[Content Builder] Using '${locale
+      .languageCode}' for notification language.");
 
   final l10n = await AppLocalizations.delegate.load(locale);
 
@@ -74,13 +79,17 @@ Future<Map<String, String>> _buildLocalizedContent(Map<String, dynamic> data) as
     switch (key) {
     // --- PARAMETERIZED STRINGS ---
       case 'notificationNewModelAddedBody':
-        return l10n.notificationNewModelAddedBody(data['modelName'] ?? '[Model]');
+        return l10n.notificationNewModelAddedBody(
+            data['modelName'] ?? '[Model]');
       case 'notificationNewFeatureBody':
-        return l10n.notificationNewFeatureBody(data['featureName'] ?? '[Feature]');
+        return l10n.notificationNewFeatureBody(
+            data['featureName'] ?? '[Feature]');
       case 'notificationSubscriptionOfferBody':
-        return l10n.notificationSubscriptionOfferBody(data['discountRate'] ?? '0');
+        return l10n.notificationSubscriptionOfferBody(
+            data['discountRate'] ?? '0');
       case 'notificationUpsellFeatureTitle':
-        return l10n.notificationUpsellFeatureTitle(data['targetTier'] ?? '[Plan]');
+        return l10n.notificationUpsellFeatureTitle(
+            data['targetTier'] ?? '[Plan]');
       case 'notificationUpsellFeatureBody':
         return l10n.notificationUpsellFeatureBody(
             data['currentTier'] ?? '[Current Plan]',
@@ -89,80 +98,154 @@ Future<Map<String, String>> _buildLocalizedContent(Map<String, dynamic> data) as
         );
 
     // --- NON-PARAMETERIZED STRINGS (unchanged from your original code) ---
-      case 'notificationComebackTitle': return l10n.notificationComebackTitle;
-      case 'notificationComebackBody': return l10n.notificationComebackBody;
-      case 'notificationLongTimeNoSeeTitle': return l10n.notificationLongTimeNoSeeTitle;
-      case 'notificationLongTimeNoSeeBody': return l10n.notificationLongTimeNoSeeBody;
-      case 'notificationHowAreYouTitle': return l10n.notificationHowAreYouTitle;
-      case 'notificationHowAreYouBody': return l10n.notificationHowAreYouBody;
-      case 'notificationNewYearTitle': return l10n.notificationNewYearTitle;
-      case 'notificationNewYearBody': return l10n.notificationNewYearBody;
-      case 'notificationValentinesDayTitle': return l10n.notificationValentinesDayTitle;
-      case 'notificationValentinesDayBody': return l10n.notificationValentinesDayBody;
-      case 'notificationAtaturkRemembranceTitle': return l10n.notificationAtaturkRemembranceTitle;
-      case 'notificationAtaturkRemembranceBody': return l10n.notificationAtaturkRemembranceBody;
-      case 'notificationMothersDayTitle': return l10n.notificationMothersDayTitle;
-      case 'notificationMothersDayBody': return l10n.notificationMothersDayBody;
-      case 'notificationFathersDayTitle': return l10n.notificationFathersDayTitle;
-      case 'notificationFathersDayBody': return l10n.notificationFathersDayBody;
-      case 'notificationHomeworkHelperTitle': return l10n.notificationHomeworkHelperTitle;
-      case 'notificationHomeworkHelperBody': return l10n.notificationHomeworkHelperBody;
-      case 'notificationTrollAnimeTitle': return l10n.notificationTrollAnimeTitle;
-      case 'notificationTrollAnimeBody': return l10n.notificationTrollAnimeBody;
-      case 'notificationTrollAiRebellionTitle': return l10n.notificationTrollAiRebellionTitle;
-      case 'notificationTrollAiRebellionBody': return l10n.notificationTrollAiRebellionBody;
-      case 'notificationNewModelAddedTitle': return l10n.notificationNewModelAddedTitle;
-      case 'notificationAppUpdateTitle': return l10n.notificationAppUpdateTitle;
-      case 'notificationAppUpdateBody': return l10n.notificationAppUpdateBody;
-      case 'notificationNewFeatureTitle': return l10n.notificationNewFeatureTitle;
-      case 'notificationSubscriptionOfferTitle': return l10n.notificationSubscriptionOfferTitle;
-      case 'notificationSocialMediaTitle': return l10n.notificationSocialMediaTitle;
-      case 'notificationSocialMediaBody': return l10n.notificationSocialMediaBody;
-      case 'notificationRandomFactTitle': return l10n.notificationRandomFactTitle;
-      case 'notificationRandomFactBody': return l10n.notificationRandomFactBody;
-      case 'notificationGoodMorningTitle': return l10n.notificationGoodMorningTitle;
-      case 'notificationGoodMorningBody': return l10n.notificationGoodMorningBody;
-      case 'notificationGoodNightTitle': return l10n.notificationGoodNightTitle;
-      case 'notificationGoodNightBody': return l10n.notificationGoodNightBody;
-      case 'notificationOfflineReadyTitle': return l10n.notificationOfflineReadyTitle;
-      case 'notificationOfflineReadyBody': return l10n.notificationOfflineReadyBody;
-      case 'notificationRateAppTitle': return l10n.notificationRateAppTitle;
-      case 'notificationRateAppBody': return l10n.notificationRateAppBody;
-      case 'notificationReferralTitle': return l10n.notificationReferralTitle;
-      case 'notificationReferralBody': return l10n.notificationReferralBody;
-      case 'notificationCookingTitle': return l10n.notificationCookingTitle;
-      case 'notificationCookingBody': return l10n.notificationCookingBody;
-      case 'notificationExistentialTitle': return l10n.notificationExistentialTitle;
-      case 'notificationExistentialBody': return l10n.notificationExistentialBody;
-      case 'notificationCustomModelTitle': return l10n.notificationCustomModelTitle;
-      case 'notificationCustomModelBody': return l10n.notificationCustomModelBody;
-      case 'notificationDynamicChatTitle': return l10n.notificationDynamicChatTitle;
-      case 'notificationDynamicChatBody': return l10n.notificationDynamicChatBody;
-      case 'notificationPirateTitle': return l10n.notificationPirateTitle;
-      case 'notificationPirateBody': return l10n.notificationPirateBody;
-      case 'notificationFortuneCookieTitle': return l10n.notificationFortuneCookieTitle;
-      case 'notificationFortuneCookieBody': return l10n.notificationFortuneCookieBody;
-      case 'notificationSingularityTitle': return l10n.notificationSingularityTitle;
-      case 'notificationSingularityBody': return l10n.notificationSingularityBody;
-      case 'notificationHackerJokeTitle': return l10n.notificationHackerJokeTitle;
-      case 'notificationHackerJokeBody': return l10n.notificationHackerJokeBody;
-      case 'notificationDetectiveCaseTitle': return l10n.notificationDetectiveCaseTitle;
-      case 'notificationDetectiveCaseBody': return l10n.notificationDetectiveCaseBody;
-      case 'notificationOriginStoryTitle': return l10n.notificationOriginStoryTitle;
-      case 'notificationOriginStoryBody': return l10n.notificationOriginStoryBody;
-      case 'notificationOpenSourceTitle': return l10n.notificationOpenSourceTitle;
-      case 'notificationOpenSourceBody': return l10n.notificationOpenSourceBody;
-      case 'notificationRejectionStoryTitle': return l10n.notificationRejectionStoryTitle;
-      case 'notificationRejectionStoryBody': return l10n.notificationRejectionStoryBody;
-      case 'notificationGGUFSupportTitle': return l10n.notificationGGUFSupportTitle;
-      case 'notificationGGUFSupportBody': return l10n.notificationGGUFSupportBody;
-      case 'notificationThemeCustomizationTitle': return l10n.notificationThemeCustomizationTitle;
-      case 'notificationThemeCustomizationBody': return l10n.notificationThemeCustomizationBody;
-      case 'notificationShowerThoughtTitle': return l10n.notificationShowerThoughtTitle;
-      case 'notificationShowerThoughtBody': return l10n.notificationShowerThoughtBody;
-      case 'notificationLowBatteryTitle': return l10n.notificationLowBatteryTitle;
-      case 'notificationLowBatteryBody': return l10n.notificationLowBatteryBody;
-      default: return '';
+      case 'notificationComebackTitle':
+        return l10n.notificationComebackTitle;
+      case 'notificationComebackBody':
+        return l10n.notificationComebackBody;
+      case 'notificationLongTimeNoSeeTitle':
+        return l10n.notificationLongTimeNoSeeTitle;
+      case 'notificationLongTimeNoSeeBody':
+        return l10n.notificationLongTimeNoSeeBody;
+      case 'notificationHowAreYouTitle':
+        return l10n.notificationHowAreYouTitle;
+      case 'notificationHowAreYouBody':
+        return l10n.notificationHowAreYouBody;
+      case 'notificationNewYearTitle':
+        return l10n.notificationNewYearTitle;
+      case 'notificationNewYearBody':
+        return l10n.notificationNewYearBody;
+      case 'notificationValentinesDayTitle':
+        return l10n.notificationValentinesDayTitle;
+      case 'notificationValentinesDayBody':
+        return l10n.notificationValentinesDayBody;
+      case 'notificationAtaturkRemembranceTitle':
+        return l10n.notificationAtaturkRemembranceTitle;
+      case 'notificationAtaturkRemembranceBody':
+        return l10n.notificationAtaturkRemembranceBody;
+      case 'notificationMothersDayTitle':
+        return l10n.notificationMothersDayTitle;
+      case 'notificationMothersDayBody':
+        return l10n.notificationMothersDayBody;
+      case 'notificationFathersDayTitle':
+        return l10n.notificationFathersDayTitle;
+      case 'notificationFathersDayBody':
+        return l10n.notificationFathersDayBody;
+      case 'notificationHomeworkHelperTitle':
+        return l10n.notificationHomeworkHelperTitle;
+      case 'notificationHomeworkHelperBody':
+        return l10n.notificationHomeworkHelperBody;
+      case 'notificationTrollAnimeTitle':
+        return l10n.notificationTrollAnimeTitle;
+      case 'notificationTrollAnimeBody':
+        return l10n.notificationTrollAnimeBody;
+      case 'notificationTrollAiRebellionTitle':
+        return l10n.notificationTrollAiRebellionTitle;
+      case 'notificationTrollAiRebellionBody':
+        return l10n.notificationTrollAiRebellionBody;
+      case 'notificationNewModelAddedTitle':
+        return l10n.notificationNewModelAddedTitle;
+      case 'notificationAppUpdateTitle':
+        return l10n.notificationAppUpdateTitle;
+      case 'notificationAppUpdateBody':
+        return l10n.notificationAppUpdateBody;
+      case 'notificationNewFeatureTitle':
+        return l10n.notificationNewFeatureTitle;
+      case 'notificationSubscriptionOfferTitle':
+        return l10n.notificationSubscriptionOfferTitle;
+      case 'notificationSocialMediaTitle':
+        return l10n.notificationSocialMediaTitle;
+      case 'notificationSocialMediaBody':
+        return l10n.notificationSocialMediaBody;
+      case 'notificationRandomFactTitle':
+        return l10n.notificationRandomFactTitle;
+      case 'notificationRandomFactBody':
+        return l10n.notificationRandomFactBody;
+      case 'notificationGoodMorningTitle':
+        return l10n.notificationGoodMorningTitle;
+      case 'notificationGoodMorningBody':
+        return l10n.notificationGoodMorningBody;
+      case 'notificationGoodNightTitle':
+        return l10n.notificationGoodNightTitle;
+      case 'notificationGoodNightBody':
+        return l10n.notificationGoodNightBody;
+      case 'notificationOfflineReadyTitle':
+        return l10n.notificationOfflineReadyTitle;
+      case 'notificationOfflineReadyBody':
+        return l10n.notificationOfflineReadyBody;
+      case 'notificationRateAppTitle':
+        return l10n.notificationRateAppTitle;
+      case 'notificationRateAppBody':
+        return l10n.notificationRateAppBody;
+      case 'notificationReferralTitle':
+        return l10n.notificationReferralTitle;
+      case 'notificationReferralBody':
+        return l10n.notificationReferralBody;
+      case 'notificationCookingTitle':
+        return l10n.notificationCookingTitle;
+      case 'notificationCookingBody':
+        return l10n.notificationCookingBody;
+      case 'notificationExistentialTitle':
+        return l10n.notificationExistentialTitle;
+      case 'notificationExistentialBody':
+        return l10n.notificationExistentialBody;
+      case 'notificationCustomModelTitle':
+        return l10n.notificationCustomModelTitle;
+      case 'notificationCustomModelBody':
+        return l10n.notificationCustomModelBody;
+      case 'notificationDynamicChatTitle':
+        return l10n.notificationDynamicChatTitle;
+      case 'notificationDynamicChatBody':
+        return l10n.notificationDynamicChatBody;
+      case 'notificationPirateTitle':
+        return l10n.notificationPirateTitle;
+      case 'notificationPirateBody':
+        return l10n.notificationPirateBody;
+      case 'notificationFortuneCookieTitle':
+        return l10n.notificationFortuneCookieTitle;
+      case 'notificationFortuneCookieBody':
+        return l10n.notificationFortuneCookieBody;
+      case 'notificationSingularityTitle':
+        return l10n.notificationSingularityTitle;
+      case 'notificationSingularityBody':
+        return l10n.notificationSingularityBody;
+      case 'notificationHackerJokeTitle':
+        return l10n.notificationHackerJokeTitle;
+      case 'notificationHackerJokeBody':
+        return l10n.notificationHackerJokeBody;
+      case 'notificationDetectiveCaseTitle':
+        return l10n.notificationDetectiveCaseTitle;
+      case 'notificationDetectiveCaseBody':
+        return l10n.notificationDetectiveCaseBody;
+      case 'notificationOriginStoryTitle':
+        return l10n.notificationOriginStoryTitle;
+      case 'notificationOriginStoryBody':
+        return l10n.notificationOriginStoryBody;
+      case 'notificationOpenSourceTitle':
+        return l10n.notificationOpenSourceTitle;
+      case 'notificationOpenSourceBody':
+        return l10n.notificationOpenSourceBody;
+      case 'notificationRejectionStoryTitle':
+        return l10n.notificationRejectionStoryTitle;
+      case 'notificationRejectionStoryBody':
+        return l10n.notificationRejectionStoryBody;
+      case 'notificationGGUFSupportTitle':
+        return l10n.notificationGGUFSupportTitle;
+      case 'notificationGGUFSupportBody':
+        return l10n.notificationGGUFSupportBody;
+      case 'notificationThemeCustomizationTitle':
+        return l10n.notificationThemeCustomizationTitle;
+      case 'notificationThemeCustomizationBody':
+        return l10n.notificationThemeCustomizationBody;
+      case 'notificationShowerThoughtTitle':
+        return l10n.notificationShowerThoughtTitle;
+      case 'notificationShowerThoughtBody':
+        return l10n.notificationShowerThoughtBody;
+      case 'notificationLowBatteryTitle':
+        return l10n.notificationLowBatteryTitle;
+      case 'notificationLowBatteryBody':
+        return l10n.notificationLowBatteryBody;
+      default:
+        return '';
     }
   }
 
@@ -177,7 +260,8 @@ Future<Map<String, String>> _buildLocalizedContent(Map<String, dynamic> data) as
 Future<void> _showLocalizedNotification(Map<String, dynamic> data) async {
   final notificationContent = await _buildLocalizedContent(data);
   if (notificationContent.isEmpty || notificationContent['title']!.isEmpty) {
-    debugPrint("[Notification Displayer] Could not build localized content. Aborting display.");
+    debugPrint(
+        "[Notification Displayer] Could not build localized content. Aborting display.");
     return;
   }
 
@@ -187,7 +271,8 @@ Future<void> _showLocalizedNotification(Map<String, dynamic> data) async {
   // Dynamically determine the channel ID from the payload, with a fallback.
   final String channelId = data['channel_id'] ?? 'cortex_notifications';
   final String channelName = data['channel_name'] ?? 'Cortex Updates';
-  final String channelDescription = data['channel_desc'] ?? 'Notifications about news and updates from Cortex.';
+  final String channelDescription = data['channel_desc'] ??
+      'Notifications about news and updates from Cortex.';
 
 
   final BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
@@ -216,7 +301,10 @@ Future<void> _showLocalizedNotification(Map<String, dynamic> data) async {
   );
 
   await FlutterLocalNotificationsPlugin().show(
-    DateTime.now().millisecondsSinceEpoch.toSigned(31), // Unique ID
+    DateTime
+        .now()
+        .millisecondsSinceEpoch
+        .toSigned(31), // Unique ID
     title,
     body,
     platformDetails,
@@ -256,17 +344,22 @@ class ExtrovertNotificationService {
       try {
         final _ = timezone.local;
       } catch (e) {
-        debugPrint("[ExtrovertNotificationService] Timezone local not set. Defaulting to UTC to prevent crash.");
+        debugPrint(
+            "[ExtrovertNotificationService] Timezone local not set. Defaulting to UTC to prevent crash.");
         timezone.setLocalLocation(timezone.getLocation('UTC'));
       }
     } catch (e) {
-      debugPrint("[ExtrovertNotificationService] Error initializing timezones: $e");
+      debugPrint(
+          "[ExtrovertNotificationService] Error initializing timezones: $e");
     }
 
     // Load localization data safely.
     final prefs = await SharedPreferences.getInstance();
     final savedLocaleCode = prefs.getString('language_code');
-    final locale = savedLocaleCode != null ? Locale(savedLocaleCode) : Locale(Platform.localeName.split('_').first);
+    final locale = savedLocaleCode != null ? Locale(savedLocaleCode) : Locale(
+        Platform.localeName
+            .split('_')
+            .first);
     final l10n = await AppLocalizations.delegate.load(locale);
 
     // Initialize channels with localized names.
@@ -299,11 +392,18 @@ class ExtrovertNotificationService {
   /// Sets up Flutter Local Notifications, including channels and tap handlers.
   Future<void> _initializeLocalNotifications() async {
     // Create Android notification channels upfront.
-    await _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(_fcmChannel);
-    await _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(_engagementChannel);
-    await _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(_greetingsChannel);
+    await _localNotifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(
+        _fcmChannel);
+    await _localNotifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(
+        _engagementChannel);
+    await _localNotifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(
+        _greetingsChannel);
 
-    const AndroidInitializationSettings initSettingsAndroid = AndroidInitializationSettings('ic_notification');
+    const AndroidInitializationSettings initSettingsAndroid = AndroidInitializationSettings(
+        'ic_notification');
     const DarwinInitializationSettings initSettingsIOS = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -329,7 +429,8 @@ class ExtrovertNotificationService {
       //
       final bool fcmAvailable = await _fcm.isSupported();
       if (!fcmAvailable) {
-        debugPrint("[Extrovert] FCM not supported on this device. Skipping FCM init.");
+        debugPrint(
+            "[Extrovert] FCM not supported on this device. Skipping FCM init.");
         return;
       }
 
@@ -360,29 +461,37 @@ class ExtrovertNotificationService {
           final String errorStr = e.toString();
 
           // Check for specific recoverable errors
-          final bool isServiceNotAvailable = errorStr.contains("SERVICE_NOT_AVAILABLE") ||
+          final bool isServiceNotAvailable = errorStr.contains(
+              "SERVICE_NOT_AVAILABLE") ||
               errorStr.contains("java.io.IOException");
-          final bool isTooManyRegistrations = errorStr.contains("TOO_MANY_REGISTRATIONS");
+          final bool isTooManyRegistrations = errorStr.contains(
+              "TOO_MANY_REGISTRATIONS");
 
           if (isServiceNotAvailable || isTooManyRegistrations) {
             retryCount++;
             if (retryCount < maxRetries) {
-              debugPrint("[Extrovert] FCM Token fetch failed ($errorStr). Retrying ($retryCount/$maxRetries) in ${retryCount * 2} seconds...");
-              await Future.delayed(Duration(seconds: retryCount * 2)); // Exponential backoff: 2s, 4s, 6s
+              debugPrint(
+                  "[Extrovert] FCM Token fetch failed ($errorStr). Retrying ($retryCount/$maxRetries) in ${retryCount *
+                      2} seconds...");
+              await Future.delayed(Duration(
+                  seconds: retryCount * 2)); // Exponential backoff: 2s, 4s, 6s
             } else {
-              debugPrint("[Extrovert] FCM Token fetch gave up after $maxRetries attempts. Using cached token if available.");
+              debugPrint(
+                  "[Extrovert] FCM Token fetch gave up after $maxRetries attempts. Using cached token if available.");
               token = cachedToken; // Fallback to cache
             }
           } else {
             // If it's a different error (e.g. invalid config), don't retry, just log.
-            debugPrint("[Extrovert] Unrecoverable error fetching FCM token: $e");
+            debugPrint(
+                "[Extrovert] Unrecoverable error fetching FCM token: $e");
             break;
           }
         }
       }
 
       if (token == null) {
-        debugPrint("[Extrovert] Could not obtain an FCM token (Network issue or Service Unavailable). Skipping setup this session.");
+        debugPrint(
+            "[Extrovert] Could not obtain an FCM token (Network issue or Service Unavailable). Skipping setup this session.");
         return;
       }
 
@@ -426,15 +535,16 @@ class ExtrovertNotificationService {
               () => _handleTapLogic(initialMessage.data),
         );
       }
-
     } catch (e, s) {
       // Final safety net.
       // We verify if it is the known "SERVICE_NOT_AVAILABLE" to avoid spamming Crashlytics
       if (e.toString().contains("SERVICE_NOT_AVAILABLE")) {
-        debugPrint("[Extrovert] FCM Service Not Available (Ignored in Crashlytics): $e");
+        debugPrint(
+            "[Extrovert] FCM Service Not Available (Ignored in Crashlytics): $e");
       } else {
         debugPrint("[Extrovert] UNEXPECTED ERROR during FCM init: $e");
-        FirebaseCrashlytics.instance.recordError(e, s, reason: "FCM Initialization Failed (Fatal)");
+        FirebaseCrashlytics.instance.recordError(
+            e, s, reason: "FCM Initialization Failed (Fatal)");
       }
     }
   }
@@ -443,7 +553,8 @@ class ExtrovertNotificationService {
   /// This method is now protected against concurrent calls.
   Future<void> requestPermission() async {
     if (_isRequestingPermission) {
-      debugPrint("[ExtrovertNotificationService] A permission request is already in progress. Ignoring new request.");
+      debugPrint(
+          "[ExtrovertNotificationService] A permission request is already in progress. Ignoring new request.");
       return;
     }
 
@@ -458,7 +569,8 @@ class ExtrovertNotificationService {
 
       if (Platform.isIOS) {
         await _localNotifications
-            .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+            .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
             ?.requestPermissions(
           alert: true,
           badge: true,
@@ -467,10 +579,13 @@ class ExtrovertNotificationService {
       }
     } catch (e, s) {
       if (e is! FirebaseException || e.code != 'failed-precondition') {
-        debugPrint("[ExtrovertNotificationService] Error requesting notification permission: $e");
-        FirebaseCrashlytics.instance.recordError(e, s, reason: "FCM Permission Request Failed");
+        debugPrint(
+            "[ExtrovertNotificationService] Error requesting notification permission: $e");
+        FirebaseCrashlytics.instance.recordError(
+            e, s, reason: "FCM Permission Request Failed");
       } else {
-        debugPrint("[ExtrovertNotificationService] Handled a known 'failed-precondition' error during permission request.");
+        debugPrint(
+            "[ExtrovertNotificationService] Handled a known 'failed-precondition' error during permission request.");
       }
     } finally {
       _isRequestingPermission = false;
@@ -480,7 +595,8 @@ class ExtrovertNotificationService {
   /// Handles app lifecycle changes to schedule or cancel notifications.
   void handleAppLifecycleStateChange(AppLifecycleState state) async {
     if (!_isInitialized) {
-      debugPrint("[ExtrovertNotificationService] App lifecycle changed, but service not initialized. Skipping.");
+      debugPrint(
+          "[ExtrovertNotificationService] App lifecycle changed, but service not initialized. Skipping.");
       return;
     }
 
@@ -488,25 +604,34 @@ class ExtrovertNotificationService {
 
     if (state == AppLifecycleState.resumed) {
       await _localNotifications.cancel(lowBatteryNotificationId);
-      debugPrint("[ExtrovertNotificationService] App resumed. Canceled any pending low-battery notification (ID: $lowBatteryNotificationId).");
+      debugPrint(
+          "[ExtrovertNotificationService] App resumed. Canceled any pending low-battery notification (ID: $lowBatteryNotificationId).");
 
       if (_auth.currentUser != null) {
-        final pendingRequests = await _localNotifications.pendingNotificationRequests();
-        final engagementRequests = pendingRequests.where((p) => p.id != lowBatteryNotificationId).toList();
+        final pendingRequests = await _localNotifications
+            .pendingNotificationRequests();
+        final engagementRequests = pendingRequests.where((p) =>
+        p.id != lowBatteryNotificationId).toList();
         if (engagementRequests.isEmpty) {
-          debugPrint("[ExtrovertNotificationService] No pending engagement notifications. Scheduling a recovery notification.");
+          debugPrint(
+              "[ExtrovertNotificationService] No pending engagement notifications. Scheduling a recovery notification.");
           await _scheduleNextEngagementNotification();
         }
       }
-    } else if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
       if (_auth.currentUser != null) {
-        debugPrint("[ExtrovertNotificationService] App paused/detached. Checking conditions to schedule notifications.");
+        debugPrint(
+            "[ExtrovertNotificationService] App paused/detached. Checking conditions to schedule notifications.");
         try {
           final batteryLevel = await Battery().batteryLevel;
           if (batteryLevel < 20) {
             final prefs = await SharedPreferences.getInstance();
-            final lastSentTime = prefs.getInt('lowBatteryNotificationSentTime') ?? 0;
-            final now = DateTime.now().millisecondsSinceEpoch;
+            final lastSentTime = prefs.getInt(
+                'lowBatteryNotificationSentTime') ?? 0;
+            final now = DateTime
+                .now()
+                .millisecondsSinceEpoch;
             if (now - lastSentTime > const Duration(hours: 12).inMilliseconds) {
               if (Random().nextDouble() < 0.1) {
                 await _scheduleLowBatteryNotification();
@@ -516,7 +641,8 @@ class ExtrovertNotificationService {
             }
           }
         } catch (e) {
-          debugPrint("[ExtrovertNotificationService] Could not check battery level: $e");
+          debugPrint(
+              "[ExtrovertNotificationService] Could not check battery level: $e");
         }
         _scheduleNextEngagementNotification();
       }
@@ -548,30 +674,34 @@ class ExtrovertNotificationService {
   /// the token is immediately associated with the user account.
   Future<void> syncTokenAfterLogin() async {
     if (!_isInitialized) {
-      debugPrint("[ExtrovertNotificationService] syncTokenAfterLogin called before initialization. Initializing now.");
+      debugPrint(
+          "[ExtrovertNotificationService] syncTokenAfterLogin called before initialization. Initializing now.");
       await initialize();
     }
 
     if (_auth.currentUser == null) {
-      debugPrint("[ExtrovertNotificationService] syncTokenAfterLogin called but no user is logged in. Aborting.");
+      debugPrint(
+          "[ExtrovertNotificationService] syncTokenAfterLogin called but no user is logged in. Aborting.");
       return;
     }
 
     try {
       final String? token = await _fcm.getToken();
       if (token == null) {
-        debugPrint("[ExtrovertNotificationService] Failed to get FCM token during syncAfterLogin.");
+        debugPrint(
+            "[ExtrovertNotificationService] Failed to get FCM token during syncAfterLogin.");
         return;
       }
 
-      debugPrint("[ExtrovertNotificationService] Token fetched on login/register: $token");
+      debugPrint(
+          "[ExtrovertNotificationService] Token fetched on login/register: $token");
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('fcm_token', token);
       await _saveTokenToDatabase(token);
-
     } catch (e) {
-      debugPrint("[ExtrovertNotificationService] Error during syncTokenAfterLogin: $e");
+      debugPrint(
+          "[ExtrovertNotificationService] Error during syncTokenAfterLogin: $e");
     }
   }
 
@@ -586,45 +716,57 @@ class ExtrovertNotificationService {
       final prefs = await SharedPreferences.getInstance();
       final String? localToken = prefs.getString('fcm_token');
       await prefs.remove('fcm_token');
-      debugPrint("[ExtrovertNotificationService] Local FCM token cleared on sign out.");
+      debugPrint(
+          "[ExtrovertNotificationService] Local FCM token cleared on sign out.");
 
       String? tokenToRemove = localToken;
 
       // Fallback: If the token wasn't in local storage for some reason,
       // get the current token directly from FCM to ensure it's removed from the backend.
       if (tokenToRemove == null) {
-        debugPrint("[ExtrovertNotificationService] Local token not found. Fetching current token as a fallback.");
+        debugPrint(
+            "[ExtrovertNotificationService] Local token not found. Fetching current token as a fallback.");
         tokenToRemove = await _fcm.getToken();
       }
 
       if (tokenToRemove != null) {
         final userRef = _db.collection('users').doc(user.uid);
-        await userRef.update({'fcmTokens': FieldValue.arrayRemove([tokenToRemove])});
-        debugPrint("[ExtrovertNotificationService] FCM token removed from Firestore for user ${user.uid}.");
+        await userRef.update(
+            {'fcmTokens': FieldValue.arrayRemove([tokenToRemove])});
+        debugPrint(
+            "[ExtrovertNotificationService] FCM token removed from Firestore for user ${user
+                .uid}.");
       }
     } catch (e, s) {
-      debugPrint("[ExtrovertNotificationService] Error removing FCM token on sign-out: $e");
-      FirebaseCrashlytics.instance.recordError(e, s, reason: "FCM Token Cleanup Failed");
+      debugPrint(
+          "[ExtrovertNotificationService] Error removing FCM token on sign-out: $e");
+      FirebaseCrashlytics.instance.recordError(
+          e, s, reason: "FCM Token Cleanup Failed");
     }
   }
 
   /// Records the timestamp of the app being opened for scheduling logic.
   Future<void> recordAppOpen() async {
     final prefs = await SharedPreferences.getInstance();
-    final now = DateTime.now().millisecondsSinceEpoch;
+    final now = DateTime
+        .now()
+        .millisecondsSinceEpoch;
     if (prefs.getInt('firstAppOpenTime') == null) {
       await prefs.setInt('firstAppOpenTime', now);
     }
     await prefs.setInt('lastAppOpenTime', now);
-    debugPrint("[ExtrovertNotificationService] App open recorded at ${DateTime.now()}.");
+    debugPrint("[ExtrovertNotificationService] App open recorded at ${DateTime
+        .now()}.");
   }
 
   /// The main scheduler for engagement notifications with richer content pools.
   Future<void> _scheduleNextEngagementNotification() async {
     if (!_isInitialized) return;
     if (await checkMaintenanceMode()) {
-      debugPrint("[ExtrovertNotificationService] Maintenance mode active. Deferring notification scheduling.");
-      await SharedPreferences.getInstance().then((p) => p.setBool('pendingNotificationDueToMaintenance', true));
+      debugPrint(
+          "[ExtrovertNotificationService] Maintenance mode active. Deferring notification scheduling.");
+      await SharedPreferences.getInstance().then((p) =>
+          p.setBool('pendingNotificationDueToMaintenance', true));
       return;
     }
     try {
@@ -632,28 +774,37 @@ class ExtrovertNotificationService {
       await _localNotifications.cancel(engagementNotificationId);
 
       final prefs = await SharedPreferences.getInstance();
-      final now = DateTime.now(); // Standart DateTime
+      final now = DateTime.now(); // DateTime
 
       final firstOpenTime = prefs.getInt('firstAppOpenTime');
-      final lastOpenTime = prefs.getInt('lastAppOpenTime') ?? now.millisecondsSinceEpoch;
+      final lastOpenTime = prefs.getInt('lastAppOpenTime') ??
+          now.millisecondsSinceEpoch;
       final lastScheduledTime = prefs.getInt('lastSmartScheduleTime') ?? 0;
 
-      if (now.millisecondsSinceEpoch - lastScheduledTime < const Duration(hours: 24).inMilliseconds) {
-        debugPrint("[ExtrovertNotificationService] Smart notification scheduled recently. Skipping.");
+      if (now.millisecondsSinceEpoch - lastScheduledTime <
+          const Duration(hours: 24).inMilliseconds) {
+        debugPrint(
+            "[ExtrovertNotificationService] Smart notification scheduled recently. Skipping.");
         return;
       }
 
-      final welcomeNotificationSent = prefs.getBool('welcomeNotificationSent') ?? false;
+      final welcomeNotificationSent = prefs.getBool(
+          'welcomeNotificationSent') ?? false;
       if (firstOpenTime != null && !welcomeNotificationSent) {
-        final firstOpenDate = DateTime.fromMillisecondsSinceEpoch(firstOpenTime);
-        if (now.difference(firstOpenDate).inHours < 24) {
+        final firstOpenDate = DateTime.fromMillisecondsSinceEpoch(
+            firstOpenTime);
+        if (now
+            .difference(firstOpenDate)
+            .inHours < 24) {
           final scheduledDateTime = now.add(const Duration(hours: 1));
           await _scheduleWelcomeNotification(scheduledDateTime);
           return;
         }
       }
 
-      final daysSinceLastOpen = now.difference(DateTime.fromMillisecondsSinceEpoch(lastOpenTime)).inDays;
+      final daysSinceLastOpen = now
+          .difference(DateTime.fromMillisecondsSinceEpoch(lastOpenTime))
+          .inDays;
       Duration scheduleDelay;
       if (daysSinceLastOpen <= 2) {
         scheduleDelay = Duration(hours: 48 + Random().nextInt(12));
@@ -669,37 +820,78 @@ class ExtrovertNotificationService {
       Map<String, String> selectedNotification;
 
       if (now.hour >= 20) {
-        selectedNotification = {'title': 'notificationGoodMorningTitle', 'body': 'notificationGoodMorningBody'};
+        selectedNotification = {
+          'title': 'notificationGoodMorningTitle',
+          'body': 'notificationGoodMorningBody'
+        };
         final tomorrow = now.add(const Duration(days: 1));
-        final finalScheduleTime = DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9);
-        await _scheduleFinalNotification(engagementNotificationId, selectedNotification, finalScheduleTime, _greetingsChannel);
+        final finalScheduleTime = DateTime(
+            tomorrow.year, tomorrow.month, tomorrow.day, 9);
+        await _scheduleFinalNotification(
+            engagementNotificationId, selectedNotification, finalScheduleTime,
+            _greetingsChannel);
       } else if (now.hour < 18) {
-        selectedNotification = {'title': 'notificationGoodNightTitle', 'body': 'notificationGoodNightBody'};
+        selectedNotification = {
+          'title': 'notificationGoodNightTitle',
+          'body': 'notificationGoodNightBody'
+        };
         final finalScheduleTime = DateTime(now.year, now.month, now.day, 22);
-        await _scheduleFinalNotification(engagementNotificationId, selectedNotification, finalScheduleTime, _greetingsChannel);
+        await _scheduleFinalNotification(
+            engagementNotificationId, selectedNotification, finalScheduleTime,
+            _greetingsChannel);
       } else {
         if (daysSinceLastOpen > 14) {
           const comebackPool = [
-            {'title': 'notificationComebackTitle', 'body': 'notificationComebackBody'},
-            {'title': 'notificationLongTimeNoSeeTitle', 'body': 'notificationLongTimeNoSeeBody'}
+            {
+              'title': 'notificationComebackTitle',
+              'body': 'notificationComebackBody'
+            },
+            {
+              'title': 'notificationLongTimeNoSeeTitle',
+              'body': 'notificationLongTimeNoSeeBody'
+            }
           ];
-          selectedNotification = comebackPool[Random().nextInt(comebackPool.length)];
+          selectedNotification =
+          comebackPool[Random().nextInt(comebackPool.length)];
         } else {
           const generalPool = [
-            {'title': 'notificationHowAreYouTitle', 'body': 'notificationHowAreYouBody'},
-            {'title': 'notificationRandomFactTitle', 'body': 'notificationRandomFactBody'},
-            {'title': 'notificationShowerThoughtTitle', 'body': 'notificationShowerThoughtBody'},
-            {'title': 'notificationFortuneCookieTitle', 'body': 'notificationFortuneCookieBody'},
-            {'title': 'notificationHackerJokeTitle', 'body': 'notificationHackerJokeBody'},
-            {'title': 'notificationExistentialTitle', 'body': 'notificationExistentialBody'}
+            {
+              'title': 'notificationHowAreYouTitle',
+              'body': 'notificationHowAreYouBody'
+            },
+            {
+              'title': 'notificationRandomFactTitle',
+              'body': 'notificationRandomFactBody'
+            },
+            {
+              'title': 'notificationShowerThoughtTitle',
+              'body': 'notificationShowerThoughtBody'
+            },
+            {
+              'title': 'notificationFortuneCookieTitle',
+              'body': 'notificationFortuneCookieBody'
+            },
+            {
+              'title': 'notificationHackerJokeTitle',
+              'body': 'notificationHackerJokeBody'
+            },
+            {
+              'title': 'notificationExistentialTitle',
+              'body': 'notificationExistentialBody'
+            }
           ];
-          selectedNotification = generalPool[Random().nextInt(generalPool.length)];
+          selectedNotification =
+          generalPool[Random().nextInt(generalPool.length)];
         }
-        await _scheduleFinalNotification(engagementNotificationId, selectedNotification, scheduledDateTime, _engagementChannel);
+        await _scheduleFinalNotification(
+            engagementNotificationId, selectedNotification, scheduledDateTime,
+            _engagementChannel);
       }
     } catch (e, s) {
-      debugPrint("[ExtrovertNotificationService] Error during smart scheduling: $e");
-      FirebaseCrashlytics.instance.recordError(e, s, reason: "SmartSchedulingFailed");
+      debugPrint(
+          "[ExtrovertNotificationService] Error during smart scheduling: $e");
+      FirebaseCrashlytics.instance.recordError(
+          e, s, reason: "SmartSchedulingFailed");
     }
   }
 
@@ -708,25 +900,39 @@ class ExtrovertNotificationService {
   /// instead of just re-running the main scheduler.
   Future<void> schedulePendingNotification() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!(prefs.getBool('pendingNotificationDueToMaintenance') ?? false)) return;
+    if (!(prefs.getBool('pendingNotificationDueToMaintenance') ?? false)) {
+      return;
+    }
 
-    debugPrint("[ExtrovertNotificationService] Maintenance is over. Intelligently scheduling deferred notification.");
+    debugPrint(
+        "[ExtrovertNotificationService] Maintenance is over. Intelligently scheduling deferred notification.");
 
-    final welcomeNotificationSent = prefs.getBool('welcomeNotificationSent') ?? false;
+    final welcomeNotificationSent = prefs.getBool('welcomeNotificationSent') ??
+        false;
 
     if (!welcomeNotificationSent) {
-      debugPrint("[ExtrovertNotificationService] The pending notification was a 'Welcome' notification. Scheduling it now.");
+      debugPrint(
+          "[ExtrovertNotificationService] The pending notification was a 'Welcome' notification. Scheduling it now.");
       final scheduledTime = DateTime.now().add(const Duration(minutes: 5));
       await _scheduleWelcomeNotification(scheduledTime);
     } else {
-      debugPrint("[ExtrovertNotificationService] Scheduling a general engagement notification after maintenance.");
+      debugPrint(
+          "[ExtrovertNotificationService] Scheduling a general engagement notification after maintenance.");
       const generalPool = [
-        {'title': 'notificationHowAreYouTitle', 'body': 'notificationHowAreYouBody'},
-        {'title': 'notificationLongTimeNoSeeTitle', 'body': 'notificationLongTimeNoSeeBody'},
+        {
+          'title': 'notificationHowAreYouTitle',
+          'body': 'notificationHowAreYouBody'
+        },
+        {
+          'title': 'notificationLongTimeNoSeeTitle',
+          'body': 'notificationLongTimeNoSeeBody'
+        },
       ];
-      final selectedNotification = generalPool[Random().nextInt(generalPool.length)];
+      final selectedNotification = generalPool[Random().nextInt(
+          generalPool.length)];
       final scheduledTime = DateTime.now().add(const Duration(minutes: 5));
-      await _scheduleFinalNotification(2, selectedNotification, scheduledTime, _engagementChannel);
+      await _scheduleFinalNotification(
+          2, selectedNotification, scheduledTime, _engagementChannel);
     }
 
     await prefs.setBool('pendingNotificationDueToMaintenance', false);
@@ -736,27 +942,57 @@ class ExtrovertNotificationService {
   Future<void> _scheduleWelcomeNotification(DateTime scheduledTime) async {
     const int welcomeNotificationId = 1;
     const welcomePool = [
-      {'title': 'notificationDynamicChatTitle', 'body': 'notificationDynamicChatBody'},
+      {
+        'title': 'notificationDynamicChatTitle',
+        'body': 'notificationDynamicChatBody'
+      },
       {'title': 'notificationPirateTitle', 'body': 'notificationPirateBody'},
-      {'title': 'notificationFortuneCookieTitle', 'body': 'notificationFortuneCookieBody'},
-      {'title': 'notificationSingularityTitle', 'body': 'notificationSingularityBody'},
-      {'title': 'notificationHackerJokeTitle', 'body': 'notificationHackerJokeBody'},
-      {'title': 'notificationDetectiveCaseTitle', 'body': 'notificationDetectiveCaseBody'},
-      {'title': 'notificationOriginStoryTitle', 'body': 'notificationOriginStoryBody'},
-      {'title': 'notificationOpenSourceTitle', 'body': 'notificationOpenSourceBody'},
-      {'title': 'notificationHomeworkHelperTitle', 'body': 'notificationHomeworkHelperBody'},
+      {
+        'title': 'notificationFortuneCookieTitle',
+        'body': 'notificationFortuneCookieBody'
+      },
+      {
+        'title': 'notificationSingularityTitle',
+        'body': 'notificationSingularityBody'
+      },
+      {
+        'title': 'notificationHackerJokeTitle',
+        'body': 'notificationHackerJokeBody'
+      },
+      {
+        'title': 'notificationDetectiveCaseTitle',
+        'body': 'notificationDetectiveCaseBody'
+      },
+      {
+        'title': 'notificationOriginStoryTitle',
+        'body': 'notificationOriginStoryBody'
+      },
+      {
+        'title': 'notificationOpenSourceTitle',
+        'body': 'notificationOpenSourceBody'
+      },
+      {
+        'title': 'notificationHomeworkHelperTitle',
+        'body': 'notificationHomeworkHelperBody'
+      },
     ];
-    final selectedNotification = welcomePool[Random().nextInt(welcomePool.length)];
+    final selectedNotification = welcomePool[Random().nextInt(
+        welcomePool.length)];
 
-    await _scheduleFinalNotification(welcomeNotificationId, selectedNotification, scheduledTime, _engagementChannel);
+    await _scheduleFinalNotification(
+        welcomeNotificationId, selectedNotification, scheduledTime,
+        _engagementChannel);
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('welcomeNotificationSent', true);
-    debugPrint("[ExtrovertNotificationService] Welcome notification scheduled with ID 1 for $scheduledTime.");
+    debugPrint(
+        "[ExtrovertNotificationService] Welcome notification scheduled with ID 1 for $scheduledTime.");
   }
 
   /// Helper to build and schedule a notification, centralizing the logic.
-  Future<void> _scheduleFinalNotification(int id, Map<String, String> notificationKeys, DateTime scheduledTime, AndroidNotificationChannel channel) async {
+  Future<void> _scheduleFinalNotification(int id,
+      Map<String, String> notificationKeys, DateTime scheduledTime,
+      AndroidNotificationChannel channel) async {
     final dataPayload = {
       'notification_title_key': notificationKeys['title']!,
       'notification_body_key': notificationKeys['body']!,
@@ -766,30 +1002,32 @@ class ExtrovertNotificationService {
     };
     final content = await _buildLocalizedContent(dataPayload);
     if (content.isNotEmpty) {
-      await _zonedScheduleNotification(id, content, scheduledTime, dataPayload, channel);
+      await _zonedScheduleNotification(
+          id, content, scheduledTime, dataPayload, channel);
     }
   }
 
   /// Performs the actual zoned scheduling with FlutterLocalNotifications.
-  Future<void> _zonedScheduleNotification(
-      int id,
+  Future<void> _zonedScheduleNotification(int id,
       Map<String, String> content,
       DateTime scheduledDateTime,
       Map<String, dynamic> payload,
-      AndroidNotificationChannel channel,
-      ) async {
-
+      AndroidNotificationChannel channel,) async {
     timezone.TZDateTime timezoneScheduled;
     try {
-      timezoneScheduled = timezone.TZDateTime.from(scheduledDateTime, timezone.local);
+      timezoneScheduled =
+          timezone.TZDateTime.from(scheduledDateTime, timezone.local);
     } catch (e) {
-      debugPrint("[Extrovert] Timezone conversion failed. Re-initializing fallback.");
+      debugPrint(
+          "[Extrovert] Timezone conversion failed. Re-initializing fallback.");
       try {
         data.initializeTimeZones();
         timezone.setLocalLocation(timezone.getLocation('UTC'));
-        timezoneScheduled = timezone.TZDateTime.from(scheduledDateTime, timezone.local);
+        timezoneScheduled =
+            timezone.TZDateTime.from(scheduledDateTime, timezone.local);
       } catch (innerE) {
-        debugPrint("[Extrovert] CRITICAL: Timezone fatal error. Cannot schedule notification.");
+        debugPrint(
+            "[Extrovert] CRITICAL: Timezone fatal error. Cannot schedule notification.");
         return;
       }
     }
@@ -827,8 +1065,12 @@ class ExtrovertNotificationService {
     );
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('lastSmartScheduleTime', DateTime.now().millisecondsSinceEpoch);
-    debugPrint("[ExtrovertNotificationService] Scheduled '${payload['notification_title_key']}' for ${timezoneScheduled.toString()}.");
+    await prefs.setInt('lastSmartScheduleTime', DateTime
+        .now()
+        .millisecondsSinceEpoch);
+    debugPrint(
+        "[ExtrovertNotificationService] Scheduled '${payload['notification_title_key']}' for ${timezoneScheduled
+            .toString()}.");
   }
 
   /// Saves or updates the user's FCM token in their Firestore document.
@@ -840,9 +1082,11 @@ class ExtrovertNotificationService {
       await userRef.set({
         'fcmTokens': FieldValue.arrayUnion([token])
       }, SetOptions(merge: true));
-      debugPrint("[ExtrovertNotificationService] FCM Token successfully saved to Firestore.");
+      debugPrint(
+          "[ExtrovertNotificationService] FCM Token successfully saved to Firestore.");
     } catch (e) {
-      debugPrint("[ExtrovertNotificationService] CRITICAL: Error saving FCM token to Firestore: $e");
+      debugPrint(
+          "[ExtrovertNotificationService] CRITICAL: Error saving FCM token to Firestore: $e");
     }
   }
 
@@ -854,14 +1098,16 @@ class ExtrovertNotificationService {
         final Map<String, dynamic> data = jsonDecode(response.payload!);
         _handleTapLogic(data);
       } catch (e) {
-        debugPrint('[ExtrovertNotificationService] Error decoding notification payload: $e');
+        debugPrint(
+            '[ExtrovertNotificationService] Error decoding notification payload: $e');
       }
     }
   }
 
   /// Centralized logic for handling a tap from any notification source.
   void _handleTapLogic(Map<String, dynamic> data) {
-    debugPrint("[ExtrovertNotificationService] Handling notification tap. Data: $data");
+    debugPrint(
+        "[ExtrovertNotificationService] Handling notification tap. Data: $data");
 
     Map<String, dynamic> finalData = Map.from(data);
     if (data['dataPayloadJson'] is String) {
@@ -870,8 +1116,9 @@ class ExtrovertNotificationService {
         if (decodedPayload is Map<String, dynamic>) {
           finalData.addAll(decodedPayload);
         }
-      } catch(e) {
-        debugPrint("[ExtrovertNotificationService] Could not decode dataPayloadJson: $e");
+      } catch (e) {
+        debugPrint(
+            "[ExtrovertNotificationService] Could not decode dataPayloadJson: $e");
       }
     }
 
@@ -880,11 +1127,13 @@ class ExtrovertNotificationService {
       final slug = finalData['slug'];
       debugPrint("TODO: Navigate to news article with slug: $slug");
       // Example: navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => NewsDetailScreen(slug: slug)));
-    } else if (finalData['notification_title_key'] == 'notificationRateAppTitle') {
+    } else
+    if (finalData['notification_title_key'] == 'notificationRateAppTitle') {
       debugPrint("TODO: Open the app store for rating.");
       // Example: InAppReview.instance.openStoreListing();
     } else {
-      debugPrint("No specific navigation action for this notification. Defaulting to home screen.");
+      debugPrint(
+          "No specific navigation action for this notification. Defaulting to home screen.");
     }
   }
 }
