@@ -345,12 +345,12 @@ class BaseModelSelectionSection extends StatelessWidget {
     final List<Widget> variantListTiles = [];
 
     for (final series in provider.availableBaseModels) {
-      final extensions = series.extensions;
-      if (extensions == null || extensions.isEmpty) {
+      final variants = series.variants;
+      if (variants == null || variants.isEmpty) {
         continue;
       }
 
-      for (final entry in extensions.entries) {
+      for (final entry in variants.entries) {
         final variantId = entry.key;
         if (entry.value is Map<String, dynamic>) {
           final variantData = entry.value as Map<String, dynamic>;

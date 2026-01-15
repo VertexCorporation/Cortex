@@ -49,7 +49,9 @@ class ModelCatalogProvider extends ChangeNotifier {
   //================================================================================
 
   bool get isLoading => _isLoading;
+
   bool get loadError => _loadError;
+
   List<ModelEntity> get allModels => List.unmodifiable(_allModels);
 
   //================================================================================
@@ -69,7 +71,8 @@ class ModelCatalogProvider extends ChangeNotifier {
 
     _isInitialized = true;
 
-    debugPrint("[ModelCatalogProvider] Initialized. Triggering initial data load.");
+    debugPrint(
+        "[ModelCatalogProvider] Initialized. Triggering initial data load.");
 
     // Trigger the initial data load manually.
     _loadCatalogData();
@@ -91,7 +94,8 @@ class ModelCatalogProvider extends ChangeNotifier {
   /// This should be called on language change or when the user manually requests a refresh.
   void refreshCatalog() {
     if (_isLoading) {
-      debugPrint("[ModelCatalogProvider.refreshCatalog] A load is already in progress. Ignoring.");
+      debugPrint(
+          "[ModelCatalogProvider.refreshCatalog] A load is already in progress. Ignoring.");
       return;
     }
     debugPrint("[ModelCatalogProvider.refreshCatalog] Full refresh requested.");
@@ -118,14 +122,17 @@ class ModelCatalogProvider extends ChangeNotifier {
     final notificationService = context.read<IntrovertNotificationService>();
     final localStateProvider = context.read<ModelLocalStateProvider>();
 
-    final confirmed = await showRemoveConfirmationDialog(context, model.displayTitle, localizations);
+    final confirmed = await showRemoveConfirmationDialog(
+        context, model.displayTitle, localizations);
     if (confirmed != true) return false;
 
     bool success = false;
     try {
       if (model.category == 'self') {
         if (!InternetService().currentStatus) {
-          notificationService.showNotification(message: localizations.noInternetConnection, type: NotificationType.error);
+          notificationService.showNotification(
+              message: localizations.noInternetConnection,
+              type: NotificationType.error);
           return false;
         }
         success = await ModelRemoveService.deleteCustomModel(
@@ -155,7 +162,8 @@ class ModelCatalogProvider extends ChangeNotifier {
 
       if (success) {
         debugPrint(
-          "[ModelCatalogProvider] Model removed (${model.id}). Syncing catalog with ModelService cache.",
+          "[ModelCatalogProvider] Model removed (${model
+              .id}). Syncing catalog with ModelService cache.",
         );
         _onDataSourceChanged();
       }
@@ -218,7 +226,8 @@ class ModelCatalogProvider extends ChangeNotifier {
     }
 
     if (needsRefresh) {
-      debugPrint("[ModelCatalogProvider] Received 'model_updated' signal. Refreshing data.");
+      debugPrint(
+          "[ModelCatalogProvider] Received 'model_updated' signal. Refreshing data.");
       // Trigger a refresh through the central listener system.
       _onDataSourceChanged();
     }
@@ -232,7 +241,8 @@ class ModelCatalogProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('selected_model_id', id);
     } catch (e) {
-      debugPrint("[ModelCatalogProvider.startChat] Error: Model with ID '$id' not found. $e");
+      debugPrint(
+          "[ModelCatalogProvider.startChat] Error: Model with ID '$id' not found. $e");
     }
   }
 
@@ -243,9 +253,9 @@ class ModelCatalogProvider extends ChangeNotifier {
   /// The central callback that is triggered when any of the underlying
   /// data sources (like `ModelService` or `LocaleProvider`) change.
   void _onDataSourceChanged() {
-
     if (_isLoading) {
-      debugPrint("[ModelCatalogProvider] A data source changed, but a reload is already in progress. Ignoring.");
+      debugPrint(
+          "[ModelCatalogProvider] A data source changed, but a reload is already in progress. Ignoring.");
       return;
     }
 
@@ -256,12 +266,15 @@ class ModelCatalogProvider extends ChangeNotifier {
 
     // If the cached list from the service is not empty and is different from our current list,
     // we update our list. This avoids a full, expensive reload cycle.
-    if (modelsFromServiceCache.isNotEmpty && !listEquals(_allModels, modelsFromServiceCache)) {
-      debugPrint("[ModelCatalogProvider] Detected change in ModelService cache. Performing a lightweight refresh.");
+    if (modelsFromServiceCache.isNotEmpty &&
+        !listEquals(_allModels, modelsFromServiceCache)) {
+      debugPrint(
+          "[ModelCatalogProvider] Detected change in ModelService cache. Performing a lightweight refresh.");
       _allModels = modelsFromServiceCache;
       notifyListeners(); // This is safe now because it doesn't trigger a reload loop.
     } else {
-      debugPrint("[ModelCatalogProvider] Data source changed, but no new data in service cache. Likely a language change. Triggering full reload.");
+      debugPrint(
+          "[ModelCatalogProvider] Data source changed, but no new data in service cache. Likely a language change. Triggering full reload.");
       // This will now only be called for language changes or retries, breaking the loop.
       retryLoad();
     }
@@ -288,12 +301,18 @@ class ModelCatalogProvider extends ChangeNotifier {
   }
 
   /// Displays a modern, centralized dialog to confirm model deletion.
-  Future<bool> showRemoveConfirmationDialog(
-      BuildContext context, String title, AppLocalizations localizations) async {
+  Future<bool> showRemoveConfirmationDialog(BuildContext context, String title,
+      AppLocalizations localizations) async {
     final restoreNavBar = Darkener.darken();
     // Get screen dimensions once for responsive sizing.
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     final result = await showGeneralDialog<bool>(
       context: context,
@@ -316,24 +335,29 @@ class ModelCatalogProvider extends ChangeNotifier {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Padding(
-                      padding: EdgeInsets.all(screenWidth * 0.05), // Dynamic padding
+                      padding: EdgeInsets.all(screenWidth * 0.05),
+                      // Dynamic padding
                       child: Column(
                         children: [
                           Text(
                             localizations.removeModel,
                             style: TextStyle(
-                              fontSize: screenWidth * 0.045, // Dynamic font size
+                              fontSize: screenWidth * 0.045,
+                              // Dynamic font size
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryColor.inverted,
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(height: screenHeight * 0.02), // Dynamic spacing
+                          SizedBox(height: screenHeight * 0.02),
+                          // Dynamic spacing
                           Text(
                             localizations.confirmRemoveModel(title),
                             style: TextStyle(
-                              color: AppColors.primaryColor.inverted.withValues(alpha:0.6),
-                              fontSize: screenWidth * 0.035, // Dynamic font size
+                              color: AppColors.primaryColor.inverted.withValues(
+                                  alpha: 0.6),
+                              fontSize: screenWidth *
+                                  0.035, // Dynamic font size
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -351,17 +375,22 @@ class ModelCatalogProvider extends ChangeNotifier {
                                 onTap: () => Navigator.of(ctx).pop(false),
                                 child: Container(
                                   alignment: Alignment.center,
-                                  padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), // Dynamic padding
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: screenHeight * 0.02),
+                                  // Dynamic padding
                                   child: Text(localizations.cancel,
                                       style: TextStyle(
                                         color: AppColors.senaryColor,
-                                        fontSize: screenWidth * 0.04, // Dynamic font size
+                                        fontSize: screenWidth *
+                                            0.04, // Dynamic font size
                                       )),
                                 ),
                               ),
                             ),
                           ),
-                          VerticalDivider(width: 1, thickness: 0.5, color: AppColors.border),
+                          VerticalDivider(width: 1,
+                              thickness: 0.5,
+                              color: AppColors.border),
                           Expanded(
                             child: Material(
                               color: Colors.transparent,
@@ -369,11 +398,14 @@ class ModelCatalogProvider extends ChangeNotifier {
                                 onTap: () => Navigator.of(ctx).pop(true),
                                 child: Container(
                                   alignment: Alignment.center,
-                                  padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02), // Dynamic padding
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: screenHeight * 0.02),
+                                  // Dynamic padding
                                   child: Text(localizations.remove,
                                       style: TextStyle(
                                         color: AppColors.septenaryColor,
-                                        fontSize: screenWidth * 0.04, // Dynamic font size
+                                        fontSize: screenWidth *
+                                            0.04, // Dynamic font size
                                       )),
                                 ),
                               ),

@@ -56,8 +56,8 @@ class ModelEntity {
   /// A map defining the output capabilities of the model (e.g., {'text': true}).
   final Map<String, dynamic> outputs;
 
-  /// A map containing extension data for variant models.
-  final Map<String, dynamic>? extensions;
+  /// A map containing variant data for variant models.
+  final Map<String, dynamic>? variants;
 
   /// The URL for downloading the model.
   final String? url;
@@ -90,7 +90,7 @@ class ModelEntity {
     this.ram,
     required this.modalities,
     required this.outputs,
-    this.extensions,
+    this.variants,
     this.url,
     this.context,
     required this.isFullyLocalized,
@@ -128,7 +128,7 @@ class ModelEntity {
 
       modalities: Map<String, dynamic>.from(map['modalities'] as Map? ?? {}),
       outputs: Map<String, dynamic>.from(map['outputs'] as Map? ?? {}),
-      extensions: map['extensions'] as Map<String, dynamic>?,
+      variants: map['variants'] as Map<String, dynamic>?,
 
       url: getStringOrLocalized(map['url']),
       context: getStringOrLocalized(map['context']),
@@ -158,7 +158,7 @@ class ModelEntity {
     int? ram,
     Map<String, dynamic>? modalities,
     Map<String, dynamic>? outputs,
-    Map<String, dynamic>? extensions,
+    Map<String, dynamic>? variants,
     String? url,
     String? context,
     bool? isFullyLocalized,
@@ -181,7 +181,7 @@ class ModelEntity {
       ram: ram ?? this.ram,
       modalities: modalities ?? this.modalities,
       outputs: outputs ?? this.outputs,
-      extensions: extensions ?? this.extensions,
+      variants: variants ?? this.variants,
       url: url ?? this.url,
       context: context ?? this.context,
       isFullyLocalized: isFullyLocalized ?? this.isFullyLocalized,
@@ -208,7 +208,7 @@ class ModelEntity {
       'ram': ram,
       'modalities': modalities,
       'outputs': outputs,
-      'extensions': extensions,
+      'variants': variants,
       'url': url,
       'context': context,
       'isFullyLocalized': isFullyLocalized,

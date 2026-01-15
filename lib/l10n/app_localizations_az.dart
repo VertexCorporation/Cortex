@@ -148,13 +148,10 @@ class AppLocalizationsAz extends AppLocalizations {
   String get noStarredChatsMessage => 'Hələ heç bir söhbəti ulduzlamamısınız.';
 
   @override
-  String get goToChats => 'Söhbəti ulduzla';
-
-  @override
   String get starConversation => 'Ulduzla';
 
   @override
-  String get unstarConversation => 'Unstar';
+  String get unstarConversation => 'Ulduzdan silin';
 
   @override
   String get loginToYourAccount => 'Daxil ol';
@@ -228,7 +225,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get pleaseCheckYourEmail =>
-      'Cortex-dən istifadə etmək üçün e-poçtunuzu təsdiqləməlisiniz. \n E-poçt ünvanınıza bir təsdiq linki göndərildi, zəhmət olmasa e-poçtunuzu yoxlayın.';
+      'Cortex-dən istifadə etmək üçün e-poçtunuzu təsdiqləməlisiniz. \nE-poçt ünvanınıza bir təsdiq linki göndərildi, zəhmət olmasa e-poçtunuzu yoxlayın.';
 
   @override
   String get verifyYourEmail => 'E-poçtunuzu təsdiqləyin';
@@ -413,20 +410,6 @@ class AppLocalizationsAz extends AppLocalizations {
   String get noProductsFound => 'Heç bir məhsul tapılmadı';
 
   @override
-  String get buyCredits => 'Kredit Al';
-
-  @override
-  String get selectCreditPackageDescription =>
-      'Ehtiyaclarınıza uyğun bir kredit paketi seçin və daha çox xüsusiyyətdən zövq alın.';
-
-  @override
-  String get buyCredit => 'Kredit Al';
-
-  @override
-  String get internetRequired =>
-      'Bu modeli istifadə etmək üçün internet bağlantısı tələb olunur';
-
-  @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
       'Bu sifarişi yerləşdirməklə, Xidmət Şərtləri və Məxfilik Siyasəti ilə razılaşırsınız. Xidmət Şərtlərimiz və Məxfilik Siyasətimiz haqqında daha çox məlumat əldə etmək üçün bu mətnə klikləyə bilərsiniz. Cari dövrün bitməsindən ən azı 24 saat əvvəl avtomatik yeniləmə söndürülmədikcə, abunəlik avtomatik olaraq yenilənəcək.';
 
@@ -513,8 +496,9 @@ class AppLocalizationsAz extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String get shareMessage =>
-      'Cortex tətbiqinə bax, çox heyrətamizdir! Buradan yükləyin: https://play.google.com/store/apps/details?id=com.vertex.cortex';
+  String shareMessage(String cortexLink) {
+    return 'Cortex tətbiqinə bax, çox heyrətamizdir! Buradan yükləyin: $cortexLink';
+  }
 
   @override
   String get shareFailed =>
@@ -563,6 +547,9 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get deleteAllConversationsConfirmMessage =>
       'Bütün söhbətlərinizi silmək istədiyinizə əminsinizmi? Bu əməliyyat geri qaytarıla bilməz.';
+
+  @override
+  String get conversationDeleted => 'Söhbət silindi!';
 
   @override
   String get allConversationsDeleted => 'Bütün söhbətlər uğurla silindi!';
@@ -673,11 +660,6 @@ class AppLocalizationsAz extends AppLocalizations {
   String get noMatchingModels => 'Uyğun model tapılmadı.';
 
   @override
-  String creditPackage(Object amount) {
-    return '$amount Kredit Al';
-  }
-
-  @override
   String get benefit1 => 'Onlayn süni intellektlər üçün daha çox söhbət limiti';
 
   @override
@@ -690,9 +672,7 @@ class AppLocalizationsAz extends AppLocalizations {
   String get benefit5 => 'Daha çox onlayn süni intellekt yaradın';
 
   @override
-  String benefit7(Object credits) {
-    return 'Gündəlik $credits kredit';
-  }
+  String get benefit7 => 'Daha çox istifadə limitləri';
 
   @override
   String get benefit8 => 'Modellər əlavə edin';
@@ -846,9 +826,8 @@ class AppLocalizationsAz extends AppLocalizations {
       'Bu oflayn model cihazınızda quraşdırılmayıb.';
 
   @override
-  String insufficientCredits(Object available, Object required) {
-    return 'bu istəyi tamamlamaq üçün kifayət qədər kreditiniz yoxdur. bu əməliyyat üçün $required kredit tələb olunur, ancaq sizdə yalnız $available var. daha çox kredit əldə etmək üçün planınızı yüksəldə bilərsiniz və ya birbaşa satın ala bilərsiniz. hey biz tam başa düşürük kreditlərin bitməsi bir az məyusedici ola bilər amma ciddi olaraq modellərimizdən o möhtəşəm cavabları almaq pulsuzdur ona görə də bu kreditlər əslində əyləncəni davam etdirməyimizə kömək edir və dinləyin əgər sizdən daha çox adam iştirak edib kredit alsa biz hamı üçün gündəlik pulsuz limitləri artırmağı tamamilə nəzərdən keçirə bilərik';
-  }
+  String get reachedLimit =>
+      'İstifadə limitinə çatdın; artırmaq üçün planını yeniləyə bilərsən. (hey, limitin bitməsi pisdir, başa düşürük. amma düzü, o cavabları almaq pulsuz deyil, bu limitlər işlərin əla getməsinə kömək eddiiiir.)';
 
   @override
   String get modality => 'Modallıq';
@@ -875,8 +854,8 @@ class AppLocalizationsAz extends AppLocalizations {
       'Bu əməliyyatı yerinə yetirmək üçün daxil olmalısınız.';
 
   @override
-  String get errorInsufficientCredits =>
-      'Kifayət qədər kreditiniz yoxdur. Davam etmək üçün lütfən balansınızı artırın.';
+  String get errorReachedLimit =>
+      'Limitinizə çatdınız, daha çox kilidini açmaq üçün təkmilləşdirin və söhbətə davam edin.';
 
   @override
   String get errorServer =>
@@ -922,10 +901,10 @@ class AppLocalizationsAz extends AppLocalizations {
       'Serverlərimizdən lazımi məlumatları ala bilmədik. Zəhmət olmasa internet bağlantınızı yoxlayın və yenidən cəhd edin.';
 
   @override
-  String get noModelsFoundTitle => 'Nəticə Yoxdur';
+  String get noFoundTitle => 'Nəticə Yoxdur';
 
   @override
-  String get noModelsFoundMessage =>
+  String get noFoundMessage =>
       'Axtarış şərtlərinizi dəyişdirməyə və ya filtri təmizləməyə cəhd edin.';
 
   @override
@@ -1019,18 +998,18 @@ class AppLocalizationsAz extends AppLocalizations {
       'Yüklənmiş modelləri saxlamaq üçün yaddaş icazəsi tələb olunur. Davam etmək üçün lütfən icazə verin.';
 
   @override
-  String get creditBannerTitle => 'Pulsuz Kreditlər Qazanın!';
+  String get plusBannerTitle => 'Pulsuz Plus Qazan!';
 
   @override
-  String get creditBannerSubtitle =>
-      'Bir dostunuzu dəvət edin və hər ikiniz qeydiyyatdan keçdikdə 50 kredit qazanın! Əgər abunə olsalar, hər ikiniz əlavə 500 kredit qazanacaqsınız!';
+  String get plusBannerSubtitle =>
+      'Dostunu dəvət et və hər ikiniz de 1 Günlük Plus qazanın!';
 
   @override
   String get inviteShareSubject => 'Cortex üzrə qoşulun!';
 
   @override
-  String inviteShareMessage(String playStoreLink) {
-    return 'yo bu tətbiqə baxmalısan cortex əslində dəhşətdi mənim linkimi istifadə etsən ikimiz də 50 kredit qazanırıq və abunə olsan ikimiz də əlavə 500 qazanırıq bu dəli bir sövdələşmədi tez yüklə\n\n$playStoreLink';
+  String inviteShareMessage(String cortexLink) {
+    return 'qaqa cortex deyə dəhşət bir tətbiq var adam dəvət edəndə ikimizə də pulsuz plus gəlir ƏLA FÜRSƏT TEZ YÜKLƏ\n\n$cortexLink';
   }
 
   @override
@@ -1088,21 +1067,6 @@ class AppLocalizationsAz extends AppLocalizations {
   String get errorImageLoad => 'Yaradılmış şəkli yükləmək alınmadı.';
 
   @override
-  String get extensionInfoPanelTitle => 'Modelləri araşdırın';
-
-  @override
-  String get extensionInfoPanelBody1 =>
-      'Bu ox bu seriyada müxtəlif modellər arasında keçid etməyə imkan verir.';
-
-  @override
-  String get extensionInfoPanelBody2 =>
-      'Bu seriya ilə ilk söhbətə başladığınız zaman defolt model avtomatik seçilir və siz söhbət zamanı istənilən vaxt seçiminizi dəyişə bilərsiniz.';
-
-  @override
-  String get extensionInfoPanelFooter =>
-      'Hər bir model haqqında ətraflı məlumatı görmək və ya fərqli modeli əl ilə seçmək üçün Kitabxanaya daxil olun; oradan bu model seriyasını seçin və onun ətraflı səhifəsinin yuxarısındakı oka toxunun.';
-
-  @override
   String get premiumModelNoticeTitle => 'Premium Model';
 
   @override
@@ -1117,24 +1081,13 @@ class AppLocalizationsAz extends AppLocalizations {
       'Siz bütün pulsuz gündəlik mesajlarınızı premium modellər üçün istifadə etmisiniz, lütfən, limitsiz giriş üçün təkmilləşdirin.';
 
   @override
-  String get selectionScreenGreetingGeneric =>
-      'Bu gün sizə necə kömək edə bilərəm?';
-
-  @override
-  String get selectionScreenFeatureOffline => 'İnternetsiz istifadə et';
+  String get useOffline => 'İnternetsiz istifadə et';
 
   @override
   String get explore => 'Araşdır';
 
   @override
-  String get selectionScreenNewsAndUpdates => 'Xəbərlər və Yeniləmələr';
-
-  @override
-  String get filters => 'Filtrlər';
-
-  @override
-  String get noRecentChatsMessage =>
-      'Hələ heç bir modellə danışmamısınız, gəlin söhbətə başlayaq!';
+  String get news => 'Xəbərlər';
 
   @override
   String get allModels => 'Bütün Modellər';
@@ -1150,10 +1103,6 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get customModels => 'Xüsusi Modellər';
-
-  @override
-  String get filterPanelDescription =>
-      'Siyahını dərhal filtrləmək üçün kateqoriyaya toxunun.';
 
   @override
   String get dynamicChatTitle => 'Dinamik Söhbət';
@@ -1316,7 +1265,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get notificationReferralBody =>
-      'Dostunuzu Cortex-ə dəvət edin və hər ikiniz pulsuz kredit əldə edin!';
+      'Bir dostunuzu Cortex-ə dəvət edin və hər ikiniz bir günlük pulsuz üstəgəl qazanın!';
 
   @override
   String get notificationCookingTitle => 'Aclıq hiss edirsiniz?';
@@ -1466,13 +1415,6 @@ class AppLocalizationsAz extends AppLocalizations {
       'Sabahınız xeyir və gecəniz xeyir kimi mesajlar.';
 
   @override
-  String get exitAppTitle => 'Bu qədər tez ayrılırsınız?';
-
-  @override
-  String get exitAppConfirmation =>
-      'Bu heyrətamiz platformanı tərk etmək istədiyinizə əminsiniz?';
-
-  @override
   String get tagNotFound =>
       'Daxil etdiyiniz teq etibarsızdır və ya vaxtı keçmişdir.';
 
@@ -1546,7 +1488,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get upgradeAccountDescription =>
-      'Gündəlik 200 bonus krediti əldə etmək və daha çox limiti açmaq üçün hesab yaradın.';
+      'Daha çox limit açmaq üçün hesab yaradın.';
 
   @override
   String get createAccount => 'Hesab Yaradın';
@@ -1589,5 +1531,25 @@ class AppLocalizationsAz extends AppLocalizations {
       'Bu funksiya emulator rejimində deaktiv edilib';
 
   @override
-  String get newChat => 'New Chat';
+  String get newChat => 'Yeni Söhbət';
+
+  @override
+  String get howCanIHelpWith => 'Necə kömək edə bilərəm?';
+
+  @override
+  String get variants => 'Variantlar';
+
+  @override
+  String get variantsDescription =>
+      'Variantlar eyni süni intellekt ailəsinin fərqli versiyalarıdır. Əsas karta toxunduğunuz zaman avtomatik olaraq ən yaxşısını seçirik, lakin istəsəniz, burada əl ilə müəyyən bir kart seçə bilərsiniz!';
+
+  @override
+  String get fluxChatTitle => 'Flux Chat';
+
+  @override
+  String get fluxChatDescription =>
+      'Flux söhbətləri müvəqqəti söhbətlərdir və cihazınızda saxlanılmır.';
+
+  @override
+  String get alwaysBest => 'Həmişə Ən Yaxşısı';
 }

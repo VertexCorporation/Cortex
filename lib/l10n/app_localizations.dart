@@ -392,12 +392,6 @@ abstract class AppLocalizations {
   /// **'You didn\'t starred a chat yet.'**
   String get noStarredChatsMessage;
 
-  /// No description provided for @goToChats.
-  ///
-  /// In en, this message translates to:
-  /// **'Star a chat'**
-  String get goToChats;
-
   /// No description provided for @starConversation.
   ///
   /// In en, this message translates to:
@@ -551,7 +545,7 @@ abstract class AppLocalizations {
   /// No description provided for @pleaseCheckYourEmail.
   ///
   /// In en, this message translates to:
-  /// **'To use Cortex, you need to verify your email. \n A verification link has been sent to your email address, please check your email.'**
+  /// **'To use Cortex, you need to verify your email. \nA verification link has been sent to your email address, please check your email.'**
   String get pleaseCheckYourEmail;
 
   /// No description provided for @verifyYourEmail.
@@ -872,30 +866,6 @@ abstract class AppLocalizations {
   /// **'No products found'**
   String get noProductsFound;
 
-  /// No description provided for @buyCredits.
-  ///
-  /// In en, this message translates to:
-  /// **'Buy Credits'**
-  String get buyCredits;
-
-  /// No description provided for @selectCreditPackageDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a credit package that suits your needs and enjoy more features.'**
-  String get selectCreditPackageDescription;
-
-  /// No description provided for @buyCredit.
-  ///
-  /// In en, this message translates to:
-  /// **'Buy Credits'**
-  String get buyCredit;
-
-  /// No description provided for @internetRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Internet connection is required to use this model'**
-  String get internetRequired;
-
   /// No description provided for @termsOfServiceAndPrivacyPolicyWarning.
   ///
   /// In en, this message translates to:
@@ -1058,11 +1028,11 @@ abstract class AppLocalizations {
   /// **'Cortex'**
   String get shareSubject;
 
-  /// No description provided for @shareMessage.
+  /// The message sent when sharing the app
   ///
   /// In en, this message translates to:
-  /// **'Check out the Cortex app, it is so amazing! Download it here: https://play.google.com/store/apps/details?id=com.vertex.cortex'**
-  String get shareMessage;
+  /// **'Check out the Cortex app, it is so amazing! Download it here: {cortexLink}'**
+  String shareMessage(String cortexLink);
 
   /// No description provided for @shareFailed.
   ///
@@ -1153,6 +1123,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to delete all of your chats? This cannot be undone.'**
   String get deleteAllConversationsConfirmMessage;
+
+  /// No description provided for @conversationDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation deleted!'**
+  String get conversationDeleted;
 
   /// No description provided for @allConversationsDeleted.
   ///
@@ -1364,12 +1340,6 @@ abstract class AppLocalizations {
   /// **'No matching models found.'**
   String get noMatchingModels;
 
-  /// Button text to buy a specific number of credits
-  ///
-  /// In en, this message translates to:
-  /// **'Buy {amount} Credits'**
-  String creditPackage(Object amount);
-
   /// No description provided for @benefit1.
   ///
   /// In en, this message translates to:
@@ -1397,8 +1367,8 @@ abstract class AppLocalizations {
   /// No description provided for @benefit7.
   ///
   /// In en, this message translates to:
-  /// **'{credits} daily credits'**
-  String benefit7(Object credits);
+  /// **'More usage limits'**
+  String get benefit7;
 
   /// No description provided for @benefit8.
   ///
@@ -1559,7 +1529,7 @@ abstract class AppLocalizations {
   /// No description provided for @featurePluralDescription.
   ///
   /// In en, this message translates to:
-  /// **'This model can automatically integrate additional extensions, thereby expanding its functional capabilities to support a diverse range of operations with enhanced performance.'**
+  /// **'This model can automatically integrate additional variants, thereby expanding its functional capabilities to support a diverse range of operations with enhanced performance.'**
   String get featurePluralDescription;
 
   /// No description provided for @nameLabel.
@@ -1682,11 +1652,11 @@ abstract class AppLocalizations {
   /// **'This offline model is not installed on your device.'**
   String get offlineModelNotInstalled;
 
-  /// No description provided for @insufficientCredits.
+  /// No description provided for @reachedLimit.
   ///
   /// In en, this message translates to:
-  /// **'You do not have enough credits to complete this request. This action requires {required} credits, but you only have {available}. To gain more credits, you can upgrade your plan or purchase them directly. hey we totally get it running out of credits can be a bit of a bummer but seriously getting those awesome replies from our models isnt free so these limits actually help us keep the good times rolling and listen if more of you guys jump in and get more limits we can totally look at bumping up those free daily limits for everyone'**
-  String insufficientCredits(Object available, Object required);
+  /// **'You have reached your usage limit; to gain more limits, you can upgrade your plan. (hey, we totally get it running out of limits is a bummer. but seriously, getting those awesome replies isn\'t free, so these limits actually help us keep the good times rolllliiiiiiiiiing.)'**
+  String get reachedLimit;
 
   /// No description provided for @modality.
   ///
@@ -1730,11 +1700,11 @@ abstract class AppLocalizations {
   /// **'You must be logged in to perform this action.'**
   String get errorUserNotAuthenticated;
 
-  /// No description provided for @errorInsufficientCredits.
+  /// No description provided for @errorReachedLimit.
   ///
   /// In en, this message translates to:
-  /// **'You have insufficient credits. Please top up to continue.'**
-  String get errorInsufficientCredits;
+  /// **'You have hit your limit, upgrade to unlock more and keep chatting.'**
+  String get errorReachedLimit;
 
   /// No description provided for @errorServer.
   ///
@@ -1808,17 +1778,17 @@ abstract class AppLocalizations {
   /// **'We couldn\'t retrieve the necessary data from our servers. Please check your internet connection and try again.'**
   String get errorLoadingMessage;
 
-  /// No description provided for @noModelsFoundTitle.
+  /// No description provided for @noFoundTitle.
   ///
   /// In en, this message translates to:
   /// **'No Results'**
-  String get noModelsFoundTitle;
+  String get noFoundTitle;
 
-  /// No description provided for @noModelsFoundMessage.
+  /// No description provided for @noFoundMessage.
   ///
   /// In en, this message translates to:
   /// **'Try adjusting your search terms or clearing the filter.'**
-  String get noModelsFoundMessage;
+  String get noFoundMessage;
 
   /// No description provided for @disclaimerMessage.
   ///
@@ -1964,17 +1934,17 @@ abstract class AppLocalizations {
   /// **'Storage permission is required to save downloaded models. Please grant permission to continue.'**
   String get storagePermissionRequired;
 
-  /// No description provided for @creditBannerTitle.
+  /// No description provided for @plusBannerTitle.
   ///
   /// In en, this message translates to:
-  /// **'Get Free Credits!'**
-  String get creditBannerTitle;
+  /// **'Get Free Plus!'**
+  String get plusBannerTitle;
 
-  /// No description provided for @creditBannerSubtitle.
+  /// No description provided for @plusBannerSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Invite a friend and you both get 50 credits on sign-up! If they subscribe, you both get an extra 500!'**
-  String get creditBannerSubtitle;
+  /// **'Invite a friend and you both get 1 Day of Plus for free!'**
+  String get plusBannerSubtitle;
 
   /// No description provided for @inviteShareSubject.
   ///
@@ -1985,8 +1955,8 @@ abstract class AppLocalizations {
   /// The text message to share with a friend for an invite.
   ///
   /// In en, this message translates to:
-  /// **'yo you gotta check out this app cortex its actually insane if you use my link we both get 50 credits and if you sub we both get an extra 500 its a crazy deal download it asap\n\n{playStoreLink}'**
-  String inviteShareMessage(String playStoreLink);
+  /// **'yo you gotta check out this app cortex its actually insane if you use my link we both get free plus wow its a crazy deal DOWNLOAD IT ASAP\n\n{cortexLink}'**
+  String inviteShareMessage(String cortexLink);
 
   /// No description provided for @reviewEnjoyingAppTitle.
   ///
@@ -2084,30 +2054,6 @@ abstract class AppLocalizations {
   /// **'Failed to load the generated image.'**
   String get errorImageLoad;
 
-  /// No description provided for @extensionInfoPanelTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Explore Models'**
-  String get extensionInfoPanelTitle;
-
-  /// No description provided for @extensionInfoPanelBody1.
-  ///
-  /// In en, this message translates to:
-  /// **'This arrow lets you switch between different models within this series.'**
-  String get extensionInfoPanelBody1;
-
-  /// No description provided for @extensionInfoPanelBody2.
-  ///
-  /// In en, this message translates to:
-  /// **'When you first start a chat with this series, the default model is automatically selected and you can change your selection at any time during a chat.'**
-  String get extensionInfoPanelBody2;
-
-  /// No description provided for @extensionInfoPanelFooter.
-  ///
-  /// In en, this message translates to:
-  /// **'To view detailed information about each model or to manually select a different model, please go to the Library; select this model series from there and tap the arrow at the top of its detail page.'**
-  String get extensionInfoPanelFooter;
-
   /// Title for the notice banner shown on a premium model's detail page.
   ///
   /// In en, this message translates to:
@@ -2132,17 +2078,11 @@ abstract class AppLocalizations {
   /// **'You have used all your free daily messages for premium models, please upgrade for unlimited access.'**
   String get premiumTrialExhaustedMessage;
 
-  /// Generic greeting on the selection screen when the user's name is not available.
-  ///
-  /// In en, this message translates to:
-  /// **'How can I help you today?'**
-  String get selectionScreenGreetingGeneric;
-
   /// Text for the 'Use without Internet' feature card. The newline is intentional.
   ///
   /// In en, this message translates to:
   /// **'Use without Internet'**
-  String get selectionScreenFeatureOffline;
+  String get useOffline;
 
   /// It's so clear i think.
   ///
@@ -2150,23 +2090,11 @@ abstract class AppLocalizations {
   /// **'Explore'**
   String get explore;
 
-  /// No description provided for @selectionScreenNewsAndUpdates.
+  /// No description provided for @news.
   ///
   /// In en, this message translates to:
-  /// **'News & Updates'**
-  String get selectionScreenNewsAndUpdates;
-
-  /// No description provided for @filters.
-  ///
-  /// In en, this message translates to:
-  /// **'Filters'**
-  String get filters;
-
-  /// No description provided for @noRecentChatsMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'You haven\'t spoken with any models yet, let\'s start a conversation!'**
-  String get noRecentChatsMessage;
+  /// **'News'**
+  String get news;
 
   /// Filter button text to show all available models
   ///
@@ -2197,12 +2125,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom Models'**
   String get customModels;
-
-  /// A brief instructional text below the 'Filters' title in the filter panel.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap a category to instantly filter the list.'**
-  String get filterPanelDescription;
 
   /// The title for a conversation started in dynamic mode.
   ///
@@ -2477,7 +2399,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationReferralBody.
   ///
   /// In en, this message translates to:
-  /// **'Invite a friend to Cortex and you both get free credits!'**
+  /// **'Invite a friend to Cortex and you both get one-day free plus!'**
   String get notificationReferralBody;
 
   /// No description provided for @notificationCookingTitle.
@@ -2721,18 +2643,6 @@ abstract class AppLocalizations {
   /// **'The messages like good morning and good night.'**
   String get channelGreetingsDescription;
 
-  /// No description provided for @exitAppTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Leaving so soon?'**
-  String get exitAppTitle;
-
-  /// No description provided for @exitAppConfirmation.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to leave this amazing platform?'**
-  String get exitAppConfirmation;
-
   /// No description provided for @tagNotFound.
   ///
   /// In en, this message translates to:
@@ -2862,7 +2772,7 @@ abstract class AppLocalizations {
   /// No description provided for @upgradeAccountDescription.
   ///
   /// In en, this message translates to:
-  /// **'Create an account to get daily 200 bonus credits and unlock more limits.'**
+  /// **'Create an account to unlock more limits.'**
   String get upgradeAccountDescription;
 
   /// No description provided for @createAccount.
@@ -2936,6 +2846,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New Chat'**
   String get newChat;
+
+  /// No description provided for @howCanIHelpWith.
+  ///
+  /// In en, this message translates to:
+  /// **'How can I help with?'**
+  String get howCanIHelpWith;
+
+  /// No description provided for @variants.
+  ///
+  /// In en, this message translates to:
+  /// **'Variants'**
+  String get variants;
+
+  /// No description provided for @variantsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Variants are different versions of the same AI family. We automatically select the best one when you tap the main card, but you can manually choose a specific one here if you prefer!'**
+  String get variantsDescription;
+
+  /// No description provided for @fluxChatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Flux Chat'**
+  String get fluxChatTitle;
+
+  /// No description provided for @fluxChatDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Flux chats are temporary chats and are not saved on your device.'**
+  String get fluxChatDescription;
+
+  /// No description provided for @alwaysBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Always Best'**
+  String get alwaysBest;
 }
 
 class _AppLocalizationsDelegate

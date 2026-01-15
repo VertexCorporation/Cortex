@@ -52,7 +52,8 @@ class MaintenanceScreen extends StatefulWidget {
   State<MaintenanceScreen> createState() => _MaintenanceScreenState();
 }
 
-class _MaintenanceScreenState extends State<MaintenanceScreen> with SingleTickerProviderStateMixin {
+class _MaintenanceScreenState extends State<MaintenanceScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -142,7 +143,9 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> with SingleTicker
   /// Builds the main content column that sits on top of the background image.
   Widget _buildContentColumn(BuildContext context, BoxConstraints constraints) {
     final l10n = AppLocalizations.of(context)!;
-    final safeArea = MediaQuery.of(context).padding;
+    final safeArea = MediaQuery
+        .of(context)
+        .padding;
     final screenHeight = constraints.maxHeight;
 
     return Padding(
@@ -169,7 +172,8 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> with SingleTicker
   }
 
   /// Builds the "Under Maintenance" title and descriptive message.
-  Widget _buildHeader(BuildContext context, AppLocalizations l10n, BoxConstraints constraints) {
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n,
+      BoxConstraints constraints) {
     final screenWidth = constraints.maxWidth;
     final screenHeight = constraints.maxHeight;
 

@@ -2,10 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-// --- Internal Imports ---
-import 'package:cortex/theme.dart';
-import 'package:cortex/fog.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -33,52 +29,47 @@ class ChatMessageList extends StatelessWidget {
     final inputProvider = context.watch<InputProvider>();
 
     final messages = conversationProvider.messages;
-    final screenHeight = MediaQuery.of(context).size.height;
 
     return Column(
       children: [
         Expanded(
-          child: ScrollFog(
+          child: Tiles.buildMessagesList(
+            context: context,
+            messages: messages.toList(),
             scrollController: scrollController,
-            fogColor: AppColors.background,
-            topFogHeight: screenHeight * 0.02,
-            bottomFogHeight: screenHeight * 0.02,
-            child: Tiles.buildMessagesList(
-              context: context,
-              messages: messages.toList(),
-              scrollController: scrollController,
 
-              modelId: sessionProvider.modelId ?? '',
-              isEditingMode: inputProvider.isEditingMode,
-              editingMessageIndex: inputProvider.editingMessageIndex,
+            modelId: sessionProvider.modelId ?? '',
+            isEditingMode: inputProvider.isEditingMode,
+            editingMessageIndex: inputProvider.editingMessageIndex,
 
-              onStop: context.read<StopService>().stopResponse,
+            onStop: context
+                .read<StopService>()
+                .stopResponse,
 
-              onEdit: (index) => editService.startEditingMessage(index),
+            onEdit: (index) => editService.startEditingMessage(index),
 
-              onFadeOutComplete: (index) =>
-                  context.read<ConversationProvider>().removeMessageAtIndex(index),
+            onFadeOutComplete: (index) =>
+                context.read<ConversationProvider>().removeMessageAtIndex(
+                    index),
 
-              onRegenerate: (int index, {String? newModelId}) {
-                _handleRegenerate(context, index, newModelId, sessionProvider.isDynamicChat);
-              },
+            onRegenerate: (int index, {String? newModelId}) {
+              _handleRegenerate(
+                  context, index, newModelId, sessionProvider.isDynamicChat);
+            },
 
-              onReport: (index) {
-                _handleReport(context, index, conversationProvider);
-              },
-            ),
+            onReport: (index) {
+              _handleReport(context, index, conversationProvider);
+            },
           ),
         ),
       ],
     );
   }
 
-  void _handleRegenerate(
-      BuildContext context,
+  void _handleRegenerate(BuildContext context,
       int index,
       String? newModelId,
-      bool isDynamic
-      ) {
+      bool isDynamic) {
     context.read<RegenerateService>().onRegenerate(
       index,
       context: context,
@@ -87,11 +78,9 @@ class ChatMessageList extends StatelessWidget {
     );
   }
 
-  void _handleReport(
-      BuildContext context,
+  void _handleReport(BuildContext context,
       int index,
-      ConversationProvider conversationProvider
-      ) {
+      ConversationProvider conversationProvider) {
     final messages = conversationProvider.messages;
     if (index < 0 || index >= messages.length) return;
 

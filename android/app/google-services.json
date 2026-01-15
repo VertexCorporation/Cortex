@@ -1,0 +1,147 @@
+{
+  "project_info": {
+    "project_number": "561391430514",
+    "firebase_url": "https://vertex-ai-1618-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "vertex-ai-1618",
+    "storage_bucket": "vertex-ai-1618.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561391430514:android:bb7e4f1ca60d5e4bb10beb",
+        "android_client_info": {
+          "package_name": "com.VertexGames.AllStar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561391430514-ff16q77t0184nuup8mjug5g4oga945v7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VertexGames.AllStar",
+            "certificate_hash": "f921d5dbb48bbaa0b7ba6c8a4eadbbd30b960545"
+          }
+        },
+        {
+          "client_id": "561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaNXY_dmb7cV9iFWffX-2B6e13Tbichx0"
+        },
+        {
+          "current_key": "AIzaSyD8nmvwCjZvaz3OWnqJDfZLOTXXJyUG_sY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561391430514:android:0de290ae306149efb10beb",
+        "android_client_info": {
+          "package_name": "com.vertex.cortex"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561391430514-c9hpmcp0viaa3jhskq9eq8r8oqqsdpg1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vertex.cortex",
+            "certificate_hash": "66b5ade774b4030cc44a9447529458701e9e7956"
+          }
+        },
+        {
+          "client_id": "561391430514-oev227g86caak1pcm0eh2539e76mmr01.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vertex.cortex",
+            "certificate_hash": "2acbd83f47ae9f4740ed70ef25b398c8e1b19419"
+          }
+        },
+        {
+          "client_id": "561391430514-q4ukoe1tacuuh9fa84b4s0snv390cce0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vertex.cortex",
+            "certificate_hash": "58c17b666e4e61319e8cf5e5ec390a1b5f868368"
+          }
+        },
+        {
+          "client_id": "561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaNXY_dmb7cV9iFWffX-2B6e13Tbichx0"
+        },
+        {
+          "current_key": "AIzaSyD8nmvwCjZvaz3OWnqJDfZLOTXXJyUG_sY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561391430514:android:a32b9ea375a8e09bb10beb",
+        "android_client_info": {
+          "package_name": "com.vertex.solar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561391430514-lbsm8orbsif6em9rd78eo366m3ihoo2k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vertex.solar",
+            "certificate_hash": "09aac9ae51cf94843de86a464b1e40d42c65e947"
+          }
+        },
+        {
+          "client_id": "561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaNXY_dmb7cV9iFWffX-2B6e13Tbichx0"
+        },
+        {
+          "current_key": "AIzaSyD8nmvwCjZvaz3OWnqJDfZLOTXXJyUG_sY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

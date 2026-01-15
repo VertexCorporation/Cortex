@@ -148,9 +148,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noStarredChatsMessage => 'Je hebt nog geen chat een ster gegeven.';
 
   @override
-  String get goToChats => 'Geef een chat een ster';
-
-  @override
   String get starConversation => 'Ster geven';
 
   @override
@@ -227,7 +224,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get pleaseCheckYourEmail =>
-      'Om Cortex te gebruiken, moet je je e-mailadres verifiëren. \n Er is een verificatielink naar je e-mailadres gestuurd, controleer je e-mail.';
+      'Om Cortex te gebruiken, moet je je e-mailadres verifiëren. \nEr is een verificatielink naar je e-mailadres gestuurd, controleer je e-mail.';
 
   @override
   String get verifyYourEmail => 'Verifieer Je E-mail';
@@ -414,20 +411,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noProductsFound => 'Geen producten gevonden';
 
   @override
-  String get buyCredits => 'Credits Kopen';
-
-  @override
-  String get selectCreditPackageDescription =>
-      'Selecteer een creditpakket dat bij je behoeften past en geniet van meer functies.';
-
-  @override
-  String get buyCredit => 'Credits Kopen';
-
-  @override
-  String get internetRequired =>
-      'Internetverbinding is vereist om dit model te gebruiken';
-
-  @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
       'Door deze bestelling te plaatsen, ga je akkoord met de Servicevoorwaarden en het Privacybeleid. Je kunt op deze tekst klikken om meer te weten te komen over onze Servicevoorwaarden en Privacybeleid. Het abonnement wordt automatisch verlengd, tenzij automatisch verlengen ten minste 24 uur voor het einde van de huidige periode wordt uitgeschakeld.';
 
@@ -514,8 +497,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String get shareMessage =>
-      'Bekijk de Cortex-app, hij is geweldig! Download hem hier: https://play.google.com/store/apps/details?id=com.vertex.cortex';
+  String shareMessage(String cortexLink) {
+    return 'Bekijk de Cortex-app, hij is geweldig! Download hem hier: $cortexLink';
+  }
 
   @override
   String get shareFailed =>
@@ -564,6 +548,9 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get deleteAllConversationsConfirmMessage =>
       'Weet je zeker dat je al je chats wilt verwijderen? Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get conversationDeleted => 'Gesprek verwijderd!';
 
   @override
   String get allConversationsDeleted =>
@@ -676,11 +663,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noMatchingModels => 'Geen overeenkomende modellen gevonden.';
 
   @override
-  String creditPackage(Object amount) {
-    return 'Koop $amount Credits';
-  }
-
-  @override
   String get benefit1 => 'Veel hogere gesprekslimiet voor online AI\'s';
 
   @override
@@ -693,9 +675,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get benefit5 => 'Creëer meer online kunstmatige intelligenties';
 
   @override
-  String benefit7(Object credits) {
-    return '$credits dagelijkse credits';
-  }
+  String get benefit7 => 'Meer gebruikslimieten';
 
   @override
   String get benefit8 => 'Modellen toevoegen';
@@ -851,9 +831,8 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit offline model is niet op je apparaat geïnstalleerd.';
 
   @override
-  String insufficientCredits(Object available, Object required) {
-    return 'Je hebt niet genoeg credits om dit verzoek te voltooien. Deze actie vereist $required credits, maar je hebt er slechts $available. Om meer credits te krijgen, kun je je abonnement upgraden of ze direct kopen. hey we snappen het helemaal zonder credits komen te zitten is een beetje een domper maar serieus die geweldige antwoorden van onze modellen zijn niet gratis dus deze credits helpen ons eigenlijk om de boel draaiende te houden en luister als meer van jullie meedoen en credits kopen kunnen we zeker kijken naar het verhogen van die gratis dagelijkse limieten voor iedereen';
-  }
+  String get reachedLimit =>
+      'Je hebt je gebruikslimiet bereikt; om meer limieten te krijgen, kun je je abonnement upgraden. (We snappen natuurlijk helemaal dat het balen is als je limiet op is. Maar serieus, die geweldige reacties krijgen is niet gratis, dus deze limieten helpen ons juist om de leuke momenten te blijven voortzetten.)';
 
   @override
   String get modality => 'Modaliteit';
@@ -880,8 +859,8 @@ class AppLocalizationsNl extends AppLocalizations {
       'Je moet ingelogd zijn om deze actie uit te voeren.';
 
   @override
-  String get errorInsufficientCredits =>
-      'Je hebt onvoldoende credits. Vul aan om door te gaan.';
+  String get errorReachedLimit =>
+      'Je hebt je limiet bereikt, upgrade om meer te ontgrendelen en blijf chatten.';
 
   @override
   String get errorServer =>
@@ -927,10 +906,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'We konden de benodigde gegevens niet van onze servers ophalen. Controleer je internetverbinding en probeer het opnieuw.';
 
   @override
-  String get noModelsFoundTitle => 'Geen Resultaten';
+  String get noFoundTitle => 'Geen Resultaten';
 
   @override
-  String get noModelsFoundMessage =>
+  String get noFoundMessage =>
       'Probeer je zoektermen aan te passen of het filter te wissen.';
 
   @override
@@ -1026,18 +1005,18 @@ class AppLocalizationsNl extends AppLocalizations {
       'Opslagtoestemming is vereist om gedownloade modellen op te slaan. Geef toestemming om door te gaan.';
 
   @override
-  String get creditBannerTitle => 'Krijg Gratis Credits!';
+  String get plusBannerTitle => 'Ontvang Free Plus!';
 
   @override
-  String get creditBannerSubtitle =>
-      'Nodig een vriend uit en jullie krijgen allebei 50 credits bij aanmelding! Als ze een abonnement nemen, krijgen jullie allebei 500 extra!';
+  String get plusBannerSubtitle =>
+      'Nodig een vriend uit en jullie krijgen allebei 1 dag Plus gratis!';
 
   @override
   String get inviteShareSubject => 'Doe mee met mij op Cortex!';
 
   @override
-  String inviteShareMessage(String playStoreLink) {
-    return 'yo je moet deze app cortex checken het is echt te gek als je mijn link gebruikt krijgen we allebei 50 credits en als je een abo neemt krijgen we allebei 500 extra is een waanzinnige deal download het zsm\n\n$playStoreLink';
+  String inviteShareMessage(String cortexLink) {
+    return 'yo er is zo\'n zieke app cortex als je mensen uitnodigt krijgen we allebei gratis plus GEKKE DEAL SNEL DOWNLOADEN\n\n$cortexLink';
   }
 
   @override
@@ -1096,21 +1075,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Het is niet gelukt om de gegenereerde afbeelding te laden.';
 
   @override
-  String get extensionInfoPanelTitle => 'Modellen verkennen';
-
-  @override
-  String get extensionInfoPanelBody1 =>
-      'Met deze pijl kunt u wisselen tussen verschillende modellen binnen deze serie.';
-
-  @override
-  String get extensionInfoPanelBody2 =>
-      'Wanneer u voor het eerst een chat met deze serie start, wordt automatisch het standaardmodel geselecteerd. U kunt uw selectie op elk gewenst moment tijdens de chat wijzigen.';
-
-  @override
-  String get extensionInfoPanelFooter =>
-      'Voor gedetailleerde informatie over elk model of om handmatig een ander model te selecteren, gaat u naar de Bibliotheek. Selecteer daar de desbetreffende modelserie en tik op de pijl bovenaan de detailpagina.';
-
-  @override
   String get premiumModelNoticeTitle => 'Premiummodel';
 
   @override
@@ -1125,23 +1089,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Je hebt al je gratis dagelijkse berichten voor premiummodellen gebruikt. Upgrade voor onbeperkte toegang.';
 
   @override
-  String get selectionScreenGreetingGeneric => 'Hoe kan ik u vandaag helpen?';
-
-  @override
-  String get selectionScreenFeatureOffline => 'Gebruik zonder internet';
+  String get useOffline => 'Gebruik zonder internet';
 
   @override
   String get explore => 'Ontdek';
 
   @override
-  String get selectionScreenNewsAndUpdates => 'Nieuws en updates';
-
-  @override
-  String get filters => 'Filters';
-
-  @override
-  String get noRecentChatsMessage =>
-      'Je hebt nog niet met een model gesproken, laten we een gesprek beginnen!';
+  String get news => 'Nieuws';
 
   @override
   String get allModels => 'Alle modellen';
@@ -1157,10 +1111,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get customModels => 'Aangepaste modellen';
-
-  @override
-  String get filterPanelDescription =>
-      'Tik op een categorie om de lijst direct te filteren.';
 
   @override
   String get dynamicChatTitle => 'Dynamische chat';
@@ -1325,7 +1275,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get notificationReferralBody =>
-      'Nodig een vriend uit voor Cortex en jullie krijgen allebei gratis credits!';
+      'Nodig een vriend uit bij Cortex en jullie krijgen allebei een dag gratis!';
 
   @override
   String get notificationCookingTitle => 'Heb je honger?';
@@ -1477,13 +1427,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'De berichten zoals goedemorgen en welterusten.';
 
   @override
-  String get exitAppTitle => 'Gaat u al zo snel weg?';
-
-  @override
-  String get exitAppConfirmation =>
-      'Weet u zeker dat u dit geweldige platform wilt verlaten?';
-
-  @override
   String get tagNotFound =>
       'De tag die u hebt ingevoerd is ongeldig of verlopen.';
 
@@ -1557,7 +1500,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get upgradeAccountDescription =>
-      'Maak een account aan en ontvang dagelijks 200 bonuscredits en ontgrendel meer limieten.';
+      'Maak een account aan om meer mogelijkheden te ontgrendelen.';
 
   @override
   String get createAccount => 'Account aanmaken';
@@ -1600,5 +1543,25 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deze functie is uitgeschakeld in de emulatormodus.';
 
   @override
-  String get newChat => 'New Chat';
+  String get newChat => 'Nieuwe chat';
+
+  @override
+  String get howCanIHelpWith => 'Hoe kan ik helpen?';
+
+  @override
+  String get variants => 'Varianten';
+
+  @override
+  String get variantsDescription =>
+      'Varianten zijn verschillende versies van dezelfde AI-familie. We selecteren automatisch de beste wanneer je op de hoofdkaart tikt, maar je kunt hier handmatig een specifieke variant kiezen als je dat wilt!';
+
+  @override
+  String get fluxChatTitle => 'Flux Chat';
+
+  @override
+  String get fluxChatDescription =>
+      'Flux-chats zijn tijdelijke chats en worden niet op je apparaat opgeslagen.';
+
+  @override
+  String get alwaysBest => 'Altijd het beste';
 }

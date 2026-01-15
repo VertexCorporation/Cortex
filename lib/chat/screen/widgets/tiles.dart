@@ -27,7 +27,8 @@ class Tiles {
     required double screenWidth,
     required double screenHeight,
   }) {
-    final isEditingThisMessage = isEditingMode && (editingMessageIndex == index);
+    final isEditingThisMessage = isEditingMode &&
+        (editingMessageIndex == index);
     final bool isTablet = screenWidth >= 600;
 
     // --- DYNAMIC DIMENSIONS ---
@@ -59,13 +60,15 @@ class Tiles {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.info_outline, color: AppColors.primaryColor.inverted, size: iconSize),
+              Icon(Icons.info_outline, color: AppColors.primaryColor.inverted,
+                  size: iconSize),
               SizedBox(width: screenWidth * 0.02),
               Expanded(
                 child: Text(
                   AppLocalizations.of(context)!.editingMessageInfo,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fontSize),
+                  style: TextStyle(color: AppColors.primaryColor.inverted,
+                      fontSize: fontSize),
                 ),
               ),
             ],
@@ -104,7 +107,8 @@ class Tiles {
     // Image Width: Tablet 30% (prevents huge images), Phone 40%.
     final double imageWidth = isTablet ? screenWidth * 0.3 : screenWidth * 0.4;
     // Padding: Tablet 3%, Phone 4%.
-    final double rightPadding = isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
+    final double rightPadding = isTablet ? screenWidth * 0.03 : screenWidth *
+        0.04;
     final double borderRadius = isTablet ? screenWidth * 0.015 : 8.0;
 
     return Column(
@@ -120,7 +124,9 @@ class Tiles {
             child: Align(
               alignment: Alignment.centerRight,
               child: GestureDetector(
-                onTap: () => Navigator.push(context, PhotoViewer.route(File(message.photoPath!))),
+                onTap: () =>
+                    Navigator.push(
+                        context, PhotoViewer.route(File(message.photoPath!))),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(borderRadius),
                   child: Image.file(
@@ -128,24 +134,30 @@ class Tiles {
                     width: imageWidth,
                     height: imageWidth, // Square aspect ratio
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image, color: AppColors.tertiaryColor),
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(
+                            Icons.broken_image, color: AppColors.tertiaryColor),
                   ),
                 ),
               ),
             ),
           )
-        else if (hasPhoto && !isImage)
-          Container(
-            margin: EdgeInsets.only(right: rightPadding, bottom: 8),
-            padding: EdgeInsets.all(screenWidth * 0.03),
-            decoration: BoxDecoration(
-                color: AppColors.tertiaryColor,
-                borderRadius: BorderRadius.circular(borderRadius)
+        else
+          if (hasPhoto && !isImage)
+            Container(
+              margin: EdgeInsets.only(right: rightPadding, bottom: 8),
+              padding: EdgeInsets.all(screenWidth * 0.03),
+              decoration: BoxDecoration(
+                  color: AppColors.tertiaryColor,
+                  borderRadius: BorderRadius.circular(borderRadius)
+              ),
+              child: Icon(Icons.insert_drive_file, color: Colors.black54,
+                  size: screenWidth * 0.06),
             ),
-            child: Icon(Icons.insert_drive_file, color: Colors.black54, size: screenWidth * 0.06),
-          ),
 
-        if (message.text.trim().isNotEmpty)
+        if (message.text
+            .trim()
+            .isNotEmpty)
           UserMessageTile(
             message: message,
             key: key,
@@ -169,20 +181,28 @@ class Tiles {
     required ModelService modelService,
   }) {
     final bool isTablet = screenWidth >= 600;
-    final langCode = Localizations.localeOf(context).languageCode;
+    final langCode = Localizations
+        .localeOf(context)
+        .languageCode;
     final preciseModelId = message.model ?? modelId;
 
-    final model = modelService.getPreciseModelData(preciseModelId, langCode: langCode);
+    final model = modelService.getPreciseModelData(
+        preciseModelId, langCode: langCode);
     final correctImagePath = modelService.getModelImagePath(model);
 
-    final bool hasPhoto = message.photoPath != null && message.photoPath!.isNotEmpty;
+    final bool hasPhoto = message.photoPath != null &&
+        message.photoPath!.isNotEmpty;
     final bool isImage = hasPhoto && _isImageFile(message.photoPath!);
 
-    final bool hasText = message.text.trim().isNotEmpty;
-    final bool isThinkingWithoutContent = message.isThinking && !hasPhoto && !hasText;
+    final bool hasText = message.text
+        .trim()
+        .isNotEmpty;
+    final bool isThinkingWithoutContent = message.isThinking && !hasPhoto &&
+        !hasText;
 
     // --- DYNAMIC DIMENSIONS ---
-    final double leftPadding = isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
+    final double leftPadding = isTablet ? screenWidth * 0.03 : screenWidth *
+        0.04;
     // Image Width: Tablet 30%, Phone 40%.
     final double imageWidth = isTablet ? screenWidth * 0.3 : screenWidth * 0.4;
     final double borderRadius = isTablet ? screenWidth * 0.015 : 8.0;
@@ -192,7 +212,8 @@ class Tiles {
       avatarPath: correctImagePath,
       onReport: onReport,
       onRegenerate: ({String? newModelId}) {
-        debugPrint("[Tiles.buildAIMessageTile] Callback forwarding: '$newModelId'");
+        debugPrint(
+            "[Tiles.buildAIMessageTile] Callback forwarding: '$newModelId'");
         onRegenerate(newModelId: newModelId);
       },
       onStop: onStop,
@@ -205,12 +226,16 @@ class Tiles {
       photoWidget = Padding(
         padding: EdgeInsets.only(
           left: leftPadding,
-          bottom: (hasText || isThinkingWithoutContent) ? screenHeight * 0.006 : 0,
+          bottom: (hasText || isThinkingWithoutContent)
+              ? screenHeight * 0.006
+              : 0,
         ),
         child: Align(
           alignment: Alignment.centerLeft,
           child: GestureDetector(
-            onTap: () => Navigator.push(context, PhotoViewer.route(File(message.photoPath!))),
+            onTap: () =>
+                Navigator.push(
+                    context, PhotoViewer.route(File(message.photoPath!))),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(borderRadius),
               child: Image.file(
@@ -218,7 +243,8 @@ class Tiles {
                 width: imageWidth,
                 height: imageWidth,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.grey),
+                errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.broken_image, color: Colors.grey),
               ),
             ),
           ),
@@ -228,7 +254,9 @@ class Tiles {
       photoWidget = Padding(
         padding: EdgeInsets.only(
           left: leftPadding,
-          bottom: (hasText || isThinkingWithoutContent) ? screenHeight * 0.006 : 0,
+          bottom: (hasText || isThinkingWithoutContent)
+              ? screenHeight * 0.006
+              : 0,
         ),
         child: Align(
           alignment: Alignment.centerLeft,
@@ -236,13 +264,14 @@ class Tiles {
             width: imageWidth,
             padding: EdgeInsets.all(screenWidth * 0.03),
             decoration: BoxDecoration(
-                color: AppColors.tertiaryColor.withValues(alpha:0.2),
+                color: AppColors.tertiaryColor.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(borderRadius)
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.description, color: AppColors.primaryColor.inverted, size: screenWidth * 0.08),
+                Icon(Icons.description, color: AppColors.primaryColor.inverted,
+                    size: screenWidth * 0.08),
                 const SizedBox(height: 4),
                 Text(
                   message.photoPath!.split('/').last,
@@ -332,20 +361,39 @@ class Tiles {
     required void Function(int index, {String? newModelId}) onRegenerate,
     required ValueChanged<int> onReport,
   }) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final modelService = context.read<ModelService>();
+
+    final double statusBarHeight = MediaQuery
+        .of(context)
+        .padding
+        .top;
+
+    final double totalTopPadding = statusBarHeight;
 
     return ListView.separated(
       controller: scrollController,
-      // Dynamic padding for top/bottom
-      padding: EdgeInsets.only(top: screenHeight * 0.01, bottom: screenHeight * 0.01),
+
+      padding: EdgeInsets.only(
+          top: totalTopPadding,
+          bottom: screenHeight * 0.01
+      ),
+
       cacheExtent: 500,
       itemCount: messages.length,
-      separatorBuilder: (context, index) => SizedBox(height: screenHeight * 0.01),
+      separatorBuilder: (context, index) =>
+          SizedBox(height: screenHeight * 0.01),
       itemBuilder: (context, index) {
         Message message = messages[index];
-        final bool isMessageUnderEdit = isEditingMode && editingMessageIndex != null && index > editingMessageIndex;
+        final bool isMessageUnderEdit = isEditingMode &&
+            editingMessageIndex != null && index > editingMessageIndex;
         if (isMessageUnderEdit) {
           message = message.copyWith(opacity: 0.0);
         }
@@ -358,7 +406,8 @@ class Tiles {
           isEditingMode: isEditingMode,
           editingMessageIndex: editingMessageIndex,
           onEdit: () => onEdit(index),
-          onFadeOutComplete: isMessageUnderEdit ? null : () => onFadeOutComplete?.call(index),
+          onFadeOutComplete: isMessageUnderEdit ? null : () =>
+              onFadeOutComplete?.call(index),
           screenWidth: screenWidth,
           screenHeight: screenHeight,
           modelId: modelId,
@@ -374,7 +423,10 @@ class Tiles {
   }
 
   static bool _isImageFile(String path) {
-    final ext = path.split('.').last.toLowerCase();
+    final ext = path
+        .split('.')
+        .last
+        .toLowerCase();
     return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'].contains(ext);
   }
 }

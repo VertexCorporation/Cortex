@@ -157,7 +157,7 @@ class ApiService {
                         finalMessage = localizations.premiumTrialExhaustedMessage;
                         break;
                       case 'INSUFFICIENT_USER_CREDITS':
-                        finalMessage = localizations.errorInsufficientCredits;
+                        finalMessage = localizations.errorReachedLimit;
                         break;
                       case 'CONTENT_FLAGGED':
                         finalMessage = localizations.errorPromptFlagged;

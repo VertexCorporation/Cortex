@@ -376,7 +376,7 @@ class OfflineService {
         String? end,
         required String content,
       }) {
-    // start + \n + content + \n + end? + \n
+    // start + \n+ content + \n+ end? + \n
     sb..write(start)..write('\n');
     sb..write(content)..write('\n');
     if ((end ?? '').isNotEmpty) sb.write(end);

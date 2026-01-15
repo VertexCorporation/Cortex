@@ -51,19 +51,24 @@ class OverflowText extends StatelessWidget {
   ///
   /// This method uses a binary search algorithm for efficient calculation and
   /// operates on runes to correctly handle multi-byte characters like emojis.
-  int _findFittingTextLength(String textToMeasure, TextStyle? style, BoxConstraints constraints, BuildContext context) {
+  int _findFittingTextLength(String textToMeasure, TextStyle? style,
+      BoxConstraints constraints, BuildContext context) {
     // Sanitize the text before any measurement to prevent crashes from malformed strings.
     final sanitizedText = _sanitizeText(textToMeasure);
     if (sanitizedText.isEmpty) return 0;
 
-    final TextStyle effectiveStyle = style ?? DefaultTextStyle.of(context).style;
+    final TextStyle effectiveStyle = style ?? DefaultTextStyle
+        .of(context)
+        .style;
     final TextPainter textPainter = TextPainter(
       text: TextSpan(text: sanitizedText, style: effectiveStyle),
       maxLines: maxLines,
       textDirection: ui.TextDirection.ltr,
     );
 
-    final double maxWidth = constraints.maxWidth > 0 ? constraints.maxWidth : double.infinity;
+    final double maxWidth = constraints.maxWidth > 0
+        ? constraints.maxWidth
+        : double.infinity;
     textPainter.layout(maxWidth: maxWidth);
 
     // If the entire text fits, return its full length in runes.
@@ -109,7 +114,8 @@ class OverflowText extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         // First, calculate how many characters of the original text will fit.
-        final fittingRuneLength = _findFittingTextLength(text, style, constraints, context);
+        final fittingRuneLength = _findFittingTextLength(
+            text, style, constraints, context);
 
         if (fittingRuneLength == 0) {
           return const SizedBox.shrink();
@@ -132,7 +138,8 @@ class OverflowText extends StatelessWidget {
         // --- Build the faded text using RichText for character-by-character styling ---
 
         // Truncate the text based on the calculated number of fitting runes.
-        final String displayText = String.fromCharCodes(sanitizedText.runes.take(fittingRuneLength));
+        final String displayText = String.fromCharCodes(
+            sanitizedText.runes.take(fittingRuneLength));
         final int displayRunesLength = displayText.runes.length;
         final int actualCharsToFade = math.min(displayRunesLength, fadeLength);
 
@@ -148,8 +155,10 @@ class OverflowText extends StatelessWidget {
 
         // Split the display text into the solid part and the part to be faded.
         final int solidPartRuneLength = displayRunesLength - actualCharsToFade;
-        final String solidText = String.fromCharCodes(displayText.runes.take(solidPartRuneLength));
-        final String fadingText = String.fromCharCodes(displayText.runes.skip(solidPartRuneLength));
+        final String solidText = String.fromCharCodes(
+            displayText.runes.take(solidPartRuneLength));
+        final String fadingText = String.fromCharCodes(
+            displayText.runes.skip(solidPartRuneLength));
 
         final List<InlineSpan> spans = [];
         if (solidText.isNotEmpty) {
@@ -157,9 +166,13 @@ class OverflowText extends StatelessWidget {
         }
 
         // Prepare colors for the fade effect.
-        final Color defaultColor = DefaultTextStyle.of(context).style.color ?? Colors.black;
+        final Color defaultColor = DefaultTextStyle
+            .of(context)
+            .style
+            .color ?? Colors.black;
         final Color effectiveColor = style?.color ?? defaultColor;
-        final Color baseColorForFade = effectiveColor.withAlpha(255); // A fully opaque version of the color.
+        final Color baseColorForFade = effectiveColor.withAlpha(
+            255); // A fully opaque version of the color.
         // This comment will tell the faulty linter to ignore this specific line,
         // permanently removing the warning from your IDE.
         // ignore: deprecated_member_use
@@ -171,10 +184,14 @@ class OverflowText extends StatelessWidget {
 
         final fadingRunes = fadingText.runes.toList();
         for (int i = 0; i < fadingRunes.length; i++) {
-          final double relativeFadeProgress = (actualCharsToFade <= 1) ? 1.0 : i / (actualCharsToFade - 1);
+          final double relativeFadeProgress = (actualCharsToFade <= 1)
+              ? 1.0
+              : i / (actualCharsToFade - 1);
 
-          final double charOpacity = originalStyleAlpha * (1.0 - relativeFadeProgress * (1.0 - fadeTargetMinRelativeOpacity));
-          final double animatedOpacity = (animation?.value ?? 1.0) * charOpacity;
+          final double charOpacity = originalStyleAlpha * (1.0 -
+              relativeFadeProgress * (1.0 - fadeTargetMinRelativeOpacity));
+          final double animatedOpacity = (animation?.value ?? 1.0) *
+              charOpacity;
 
           // Correctly convert the 0.0-1.0 opacity double into a 0-255 integer for the alpha channel.
           final int newAlpha = (animatedOpacity * 255).round().clamp(0, 255);

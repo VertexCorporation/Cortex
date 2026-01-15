@@ -89,7 +89,9 @@ class UserProvider with ChangeNotifier {
   /// The first initial of the user's name for use in avatars. Defaults to '?'.
   String get profileInitial {
     final name = username;
-    if (name.trim().isEmpty || name == 'Guest') {
+    if (name
+        .trim()
+        .isEmpty || name == 'Guest') {
       return '?';
     }
     return name.trim()[0].toUpperCase();
@@ -116,7 +118,8 @@ class UserProvider with ChangeNotifier {
           _userData = data;
           _cacheUserData(data); // Persist updated data to local cache.
 
-          debugPrint("[LOG | UserProvider] Firing notifyListeners() due to Firestore snapshot update.");
+          debugPrint(
+              "[LOG | UserProvider] Firing notifyListeners() due to Firestore snapshot update.");
           notifyListeners();
           debugPrint("[UserProvider] User data updated for: ${user.uid}");
         }
@@ -153,7 +156,8 @@ class UserProvider with ChangeNotifier {
           _userData = data;
           await _cacheUserData(data);
           notifyListeners(); // Rebuild with fresh data.
-          debugPrint("[UserProvider] Initial user data fetched for: ${user.uid}");
+          debugPrint(
+              "[UserProvider] Initial user data fetched for: ${user.uid}");
         }
       }
     } catch (e) {
@@ -202,7 +206,7 @@ class UserProvider with ChangeNotifier {
     if (jsonString != null) {
       try {
         _userData = jsonDecode(jsonString);
-      } catch(e) {
+      } catch (e) {
         debugPrint("[UserProvider] Failed to parse cached user data: $e");
       }
     }

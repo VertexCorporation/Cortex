@@ -12,7 +12,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get cancel => 'Batal';
 
   @override
-  String get remove => 'Hapus';
+  String get remove => 'Menghapus';
 
   @override
   String get download => 'Unduh';
@@ -149,9 +149,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Anda belum menandai obrolan dengan bintang.';
 
   @override
-  String get goToChats => 'Beri bintang pada obrolan';
-
-  @override
   String get starConversation => 'Bintangi';
 
   @override
@@ -229,7 +226,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get pleaseCheckYourEmail =>
-      'Untuk menggunakan Cortex, Anda perlu memverifikasi email Anda. \n Tautan verifikasi telah dikirim ke alamat email Anda, silakan periksa email Anda.';
+      'Untuk menggunakan Cortex, Anda perlu memverifikasi email Anda. \nTautan verifikasi telah dikirim ke alamat email Anda, silakan periksa email Anda.';
 
   @override
   String get verifyYourEmail => 'Verifikasi Email Anda';
@@ -416,20 +413,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get noProductsFound => 'Tidak ada produk yang ditemukan';
 
   @override
-  String get buyCredits => 'Beli Kredit';
-
-  @override
-  String get selectCreditPackageDescription =>
-      'Pilih paket kredit yang sesuai dengan kebutuhan Anda dan nikmati lebih banyak fitur.';
-
-  @override
-  String get buyCredit => 'Beli Kredit';
-
-  @override
-  String get internetRequired =>
-      'Koneksi internet diperlukan untuk menggunakan model ini';
-
-  @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
       'Dengan menempatkan pesanan ini, Anda menyetujui Persyaratan Layanan dan Kebijakan Privasi. Anda dapat mengklik teks ini untuk mempelajari lebih lanjut tentang Persyaratan Layanan dan Kebijakan Privasi kami. Langganan akan diperpanjang secara otomatis kecuali perpanjangan otomatis dimatikan setidaknya 24 jam sebelum akhir periode berjalan.';
 
@@ -515,8 +498,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String get shareMessage =>
-      'Cek aplikasi Cortex, keren banget! Unduh di sini: https://play.google.com/store/apps/details?id=com.vertex.cortex';
+  String shareMessage(String cortexLink) {
+    return 'Cek aplikasi Cortex, keren banget! Unduh di sini: $cortexLink';
+  }
 
   @override
   String get shareFailed =>
@@ -565,6 +549,9 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get deleteAllConversationsConfirmMessage =>
       'Apakah Anda yakin ingin menghapus semua obrolan Anda? Tindakan ini tidak dapat dibatalkan.';
+
+  @override
+  String get conversationDeleted => 'Percakapan dihapus!';
 
   @override
   String get allConversationsDeleted => 'Semua percakapan berhasil dihapus!';
@@ -676,11 +663,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get noMatchingModels => 'Tidak ada model yang cocok ditemukan.';
 
   @override
-  String creditPackage(Object amount) {
-    return 'Beli $amount Kredit';
-  }
-
-  @override
   String get benefit1 =>
       'Batas percakapan yang jauh lebih banyak untuk AI online';
 
@@ -694,9 +676,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get benefit5 => 'Buat lebih banyak kecerdasan buatan online';
 
   @override
-  String benefit7(Object credits) {
-    return '$credits kredit harian';
-  }
+  String get benefit7 => 'Batasan penggunaan lebih lanjut';
 
   @override
   String get benefit8 => 'Tambah model';
@@ -850,9 +830,8 @@ class AppLocalizationsId extends AppLocalizations {
       'Model offline ini tidak terpasang di perangkat Anda.';
 
   @override
-  String insufficientCredits(Object available, Object required) {
-    return 'Anda tidak memiliki cukup kredit untuk menyelesaikan permintaan ini. Tindakan ini memerlukan $required kredit, tetapi Anda hanya memiliki $available. Untuk mendapatkan lebih banyak kredit, Anda dapat meningkatkan paket Anda atau membelinya secara langsung. hei kami paham kok kehabisan kredit itu agak menyebalkan tapi serius deh dapetin balasan keren dari model kami itu gak gratis jadi kredit ini sebenarnya bantu kami buat terus jalan dan dengerin ya kalo lebih banyak dari kalian yang beli kredit kami pastinya bisa naikin batas harian gratis untuk semua orang';
-  }
+  String get reachedLimit =>
+      'Kamu sudah mencapai batas; upgrade untuk dapat lebih banyak. (hei, kami tahu ini menyebalkan. tapi serius, jawaban keren itu nggak gratis, jadi batas ini bantu kami biar semuanya tetap lancaaaaaarrjaya.)';
 
   @override
   String get modality => 'Modalitas';
@@ -879,8 +858,8 @@ class AppLocalizationsId extends AppLocalizations {
       'Anda harus masuk untuk melakukan tindakan ini.';
 
   @override
-  String get errorInsufficientCredits =>
-      'Kredit Anda tidak mencukupi. Silakan isi ulang untuk melanjutkan.';
+  String get errorReachedLimit =>
+      'Anda telah mencapai batas, tingkatkan untuk membuka lebih banyak dan terus mengobrol.';
 
   @override
   String get errorServer =>
@@ -926,10 +905,10 @@ class AppLocalizationsId extends AppLocalizations {
       'Kami tidak dapat mengambil data yang diperlukan dari server kami. Harap periksa koneksi internet Anda dan coba lagi.';
 
   @override
-  String get noModelsFoundTitle => 'Tidak Ada Hasil';
+  String get noFoundTitle => 'Tidak Ada Hasil';
 
   @override
-  String get noModelsFoundMessage =>
+  String get noFoundMessage =>
       'Coba sesuaikan istilah pencarian Anda atau hapus filter.';
 
   @override
@@ -1024,18 +1003,18 @@ class AppLocalizationsId extends AppLocalizations {
       'Izin penyimpanan diperlukan untuk menyimpan model yang diunduh. Harap berikan izin untuk melanjutkan.';
 
   @override
-  String get creditBannerTitle => 'Dapatkan Kredit Gratis!';
+  String get plusBannerTitle => 'Dapatkan Gratis Plus!';
 
   @override
-  String get creditBannerSubtitle =>
-      'Undang teman dan kalian berdua mendapatkan 50 kredit saat mendaftar! Jika mereka berlangganan, kalian berdua mendapatkan tambahan 500!';
+  String get plusBannerSubtitle =>
+      'Ajak teman dan kalian berdua akan mendapatkan 1 Hari Plus gratis!';
 
   @override
   String get inviteShareSubject => 'Bergabunglah dengan saya di Cortex!';
 
   @override
-  String inviteShareMessage(String playStoreLink) {
-    return 'woi lu harus cek aplikasi cortex ini gila banget sumpah kalo pake link gua kita berdua dapet 50 kredit trus kalo lu langganan kita dapet tambahan 500 lagi dealnya mantep banget buruan download\n\n$playStoreLink';
+  String inviteShareMessage(String cortexLink) {
+    return 'eh ada aplikasi gila namanya cortex kalau undang teman kita berdua dapat plus gratis PROMO GILA BURUAN DOWNLOAD\n\n$cortexLink';
   }
 
   @override
@@ -1093,21 +1072,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get errorImageLoad => 'Gagal memuat gambar yang dihasilkan.';
 
   @override
-  String get extensionInfoPanelTitle => 'Jelajahi Model';
-
-  @override
-  String get extensionInfoPanelBody1 =>
-      'Panah ini memungkinkan Anda beralih di antara berbagai model dalam seri ini.';
-
-  @override
-  String get extensionInfoPanelBody2 =>
-      'Saat pertama kali memulai obrolan dengan seri ini, model default dipilih secara otomatis dan Anda dapat mengubah pilihan kapan saja selama obrolan.';
-
-  @override
-  String get extensionInfoPanelFooter =>
-      'Untuk melihat informasi terperinci tentang setiap model atau memilih model lain secara manual, silakan buka Perpustakaan; pilih seri model ini dari sana dan ketuk tanda panah di bagian atas halaman detailnya.';
-
-  @override
   String get premiumModelNoticeTitle => 'Model Premium';
 
   @override
@@ -1122,24 +1086,13 @@ class AppLocalizationsId extends AppLocalizations {
       'Anda telah menggunakan semua pesan harian gratis untuk model premium, silakan tingkatkan untuk akses tak terbatas.';
 
   @override
-  String get selectionScreenGreetingGeneric =>
-      'Bagaimana saya bisa membantu Anda hari ini?';
-
-  @override
-  String get selectionScreenFeatureOffline => 'Gunakan tanpa Internet';
+  String get useOffline => 'Gunakan tanpa Internet';
 
   @override
   String get explore => 'Jelajahi';
 
   @override
-  String get selectionScreenNewsAndUpdates => 'Berita & Pembaruan';
-
-  @override
-  String get filters => 'Filter';
-
-  @override
-  String get noRecentChatsMessage =>
-      'Anda belum berbicara dengan model mana pun, mari kita mulai percakapan!';
+  String get news => 'Berita';
 
   @override
   String get allModels => 'Semua Model';
@@ -1155,10 +1108,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get customModels => 'Model Kustom';
-
-  @override
-  String get filterPanelDescription =>
-      'Ketuk kategori untuk langsung memfilter daftar.';
 
   @override
   String get dynamicChatTitle => 'Obrolan Dinamis';
@@ -1323,7 +1272,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get notificationReferralBody =>
-      'Undang teman ke Cortex dan Anda berdua mendapatkan kredit gratis!';
+      'Undang teman ke Cortex, kalian berdua dapat gratis Plus seharian!';
 
   @override
   String get notificationCookingTitle => 'Merasa Lapar?';
@@ -1477,13 +1426,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Pesannya seperti selamat pagi dan selamat malam.';
 
   @override
-  String get exitAppTitle => 'Akan pergi secepat ini?';
-
-  @override
-  String get exitAppConfirmation =>
-      'Apakah Anda yakin ingin meninggalkan platform menakjubkan ini?';
-
-  @override
   String get tagNotFound =>
       'Tag yang Anda masukkan tidak valid atau telah kedaluwarsa.';
 
@@ -1557,7 +1499,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get upgradeAccountDescription =>
-      'Buat akun untuk mendapatkan 200 kredit bonus harian dan membuka lebih banyak batasan.';
+      'Buat akun untuk membuka lebih banyak batasan.';
 
   @override
   String get createAccount => 'Buat Akun';
@@ -1600,5 +1542,25 @@ class AppLocalizationsId extends AppLocalizations {
       'Fitur ini dinonaktifkan dalam mode emulator.';
 
   @override
-  String get newChat => 'New Chat';
+  String get newChat => 'Obrolan Baru';
+
+  @override
+  String get howCanIHelpWith => 'Bagaimana saya bisa membantu?';
+
+  @override
+  String get variants => 'Varian';
+
+  @override
+  String get variantsDescription =>
+      'Varian adalah versi berbeda dari keluarga AI yang sama. Kami secara otomatis memilih yang terbaik saat Anda mengetuk kartu utama, tetapi Anda dapat memilih yang spesifik secara manual di sini jika Anda mau!';
+
+  @override
+  String get fluxChatTitle => 'Obrolan Flux';
+
+  @override
+  String get fluxChatDescription =>
+      'Obrolan Flux bersifat sementara dan tidak tersimpan di perangkat Anda.';
+
+  @override
+  String get alwaysBest => 'Selalu Terbaik';
 }

@@ -1,7 +1,7 @@
 // lib/chat/services/dynamic.dart
 
 import 'package:cortex/chat/providers/session.dart';
-import 'package:cortex/extensions.dart';
+import 'package:cortex/variants.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -118,10 +118,10 @@ class DynamicChatService {
                     ),
                   );
                 },
-                child: Extensions.buildExtensionPanelWidget(
+                child: Variants.buildVariantPanelWidget(
                   context: context,
                   options: allOptions,
-                  selectedExtension: currentlySelectedId ?? '--dynamic--',
+                  selectedVariant: currentlySelectedId ?? '--dynamic--',
                   modelTitle: AppLocalizations.of(context)!.dynamicChatTitle,
                   onDismiss: () => setModalState(() => isPanelClosing = true),
                   onSelect: (selectedOption) {
@@ -164,8 +164,8 @@ class DynamicChatService {
         final seriesTitle = model.displayTitle;
         onlineSeriesMap.putIfAbsent(seriesTitle, () => []);
 
-        if (model.extensions != null && model.extensions!.isNotEmpty) {
-          for (final extId in model.extensions!.keys) {
+        if (model.variants != null && model.variants!.isNotEmpty) {
+          for (final extId in model.variants!.keys) {
             onlineSeriesMap[seriesTitle]!.add(modelService.getPreciseModelData(extId, langCode: langCode));
           }
         } else {
@@ -179,10 +179,10 @@ class DynamicChatService {
 
     final sortedSeriesTitles = onlineSeriesMap.keys.toList()..sort();
     for (final seriesTitle in sortedSeriesTitles) {
-      final extensionsInSeries = onlineSeriesMap[seriesTitle]!;
-      if (extensionsInSeries.isEmpty) continue;
-      extensionsInSeries.sort(sorter);
-      onlineOptions.addAll(extensionsInSeries);
+      final variantsInSeries = onlineSeriesMap[seriesTitle]!;
+      if (variantsInSeries.isEmpty) continue;
+      variantsInSeries.sort(sorter);
+      onlineOptions.addAll(variantsInSeries);
     }
 
     offlineOptions.sort(sorter);

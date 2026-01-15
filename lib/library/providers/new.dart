@@ -33,7 +33,8 @@ class ModelCreationProvider extends ChangeNotifier {
   //================================================================================
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(region: 'europe-west1');
+  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(
+      region: 'europe-west1');
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
   final ModelService _modelService;
 
@@ -72,37 +73,50 @@ class ModelCreationProvider extends ChangeNotifier {
   //================================================================================
 
   File? get pickedImage => _pickedImage;
+
   File? get ggufFile => _ggufFile;
+
   String? get selectedBaseModelId => _selectedBaseModelId;
+
   String? get selectedBaseModelDisplayTitle => _selectedBaseModelDisplayTitle;
+
   bool get isBaseModelPanelExpanded => _isBaseModelPanelExpanded;
+
   bool get isSaving => _isSaving;
+
   bool get isSubscriptionLoading => _isSubscriptionLoading;
+
   List<ModelEntity> get availableBaseModels => _availableBaseModels;
 
   bool get isCreateSaveEnabled =>
-      nameController.text.trim().isNotEmpty &&
+      nameController.text
+          .trim()
+          .isNotEmpty &&
           _selectedBaseModelId != null &&
           !_isSaving;
 
   bool get isAddSaveEnabled =>
-      nameController.text.trim().isNotEmpty &&
+      nameController.text
+          .trim()
+          .isNotEmpty &&
           _ggufFile != null &&
           !_isSaving;
+
   bool get isPickerActive => _isPickerActive;
 
   //================================================================================
   // Initialization & Lifecycle
   //================================================================================
 
-  ModelCreationProvider(
-      TickerProvider vsync,
+  ModelCreationProvider(TickerProvider vsync,
       BuildContext context,
       List<ModelEntity> baseModels, {
         required ModelService modelService,
       }) : _modelService = modelService {
-    nameShakeController = AnimationController(vsync: vsync, duration: const Duration(milliseconds: 500));
-    summaryShakeController = AnimationController(vsync: vsync, duration: const Duration(milliseconds: 500));
+    nameShakeController = AnimationController(
+        vsync: vsync, duration: const Duration(milliseconds: 500));
+    summaryShakeController = AnimationController(
+        vsync: vsync, duration: const Duration(milliseconds: 500));
     nameController.addListener(notifyListeners);
 
     _availableBaseModels = baseModels;
@@ -205,7 +219,8 @@ class ModelCreationProvider extends ChangeNotifier {
   Future<void> pickGgufFile(BuildContext context) async {
     if (_isPickerActive) return;
 
-    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+    final notificationService = Provider.of<IntrovertNotificationService>(
+        context, listen: false);
     final localizations = AppLocalizations.of(context)!;
     final ggufErrorMessage = localizations.errorGGUF;
 
@@ -220,15 +235,21 @@ class ModelCreationProvider extends ChangeNotifier {
         if (filePath.toLowerCase().endsWith('.gguf')) {
           _ggufFile = File(filePath);
         } else {
-          notificationService.showNotification(message: ggufErrorMessage, type: NotificationType.error);
+          notificationService.showNotification(
+              message: ggufErrorMessage, type: NotificationType.error);
         }
       }
     } catch (e) {
       if (e is PlatformException && e.code == 'already_active') {
-        dev.log("[ModelCreationProvider] File picker already active. Ignoring double tap.", name: 'ModelCreation');
+        dev.log(
+            "[ModelCreationProvider] File picker already active. Ignoring double tap.",
+            name: 'ModelCreation');
       } else {
-        dev.log("[ModelCreationProvider] Error picking file: $e", name: 'ModelCreation');
-        notificationService.showNotification(message: localizations.anErrorOccurred, type: NotificationType.error);
+        dev.log("[ModelCreationProvider] Error picking file: $e",
+            name: 'ModelCreation');
+        notificationService.showNotification(
+            message: localizations.anErrorOccurred,
+            type: NotificationType.error);
       }
     } finally {
       _isPickerActive = false;
@@ -249,21 +270,28 @@ class ModelCreationProvider extends ChangeNotifier {
     notifyListeners();
 
     final localizations = AppLocalizations.of(context)!;
-    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+    final notificationService = Provider.of<IntrovertNotificationService>(
+        context, listen: false);
     final internetService = InternetService();
     final user = _auth.currentUser;
 
     if (!internetService.currentStatus || user == null) {
-      notificationService.showNotification(message: localizations.noInternetConnection, type: NotificationType.success);
+      notificationService.showNotification(
+          message: localizations.noInternetConnection,
+          type: NotificationType.success);
       _isSaving = false;
       notifyListeners();
       return false;
     }
 
-    final modelId = 'self_${user.uid}_${DateTime.now().millisecondsSinceEpoch}';
+    final modelId = 'self_${user.uid}_${DateTime
+        .now()
+        .millisecondsSinceEpoch}';
 
     try {
-      dev.log("[ModelCreationProvider] Authorizing roleplay model with server...", name: "ModelCreation");
+      dev.log(
+          "[ModelCreationProvider] Authorizing roleplay model with server...",
+          name: "ModelCreation");
       final String? base64Image = await _imageFileToBase64(_pickedImage);
 
       // --- STEP 1: Server-Side Authorization & Moderation ---
@@ -282,9 +310,41 @@ class ModelCreationProvider extends ChangeNotifier {
         'clientModelId': modelId,
       });
 
-      dev.log("[ModelCreationProvider] Server authorization successful. Saving to local DB.", name: "ModelCreation");
+      dev.log(
+          "[ModelCreationProvider] Server authorization successful. Saving to local DB.",
+          name: "ModelCreation");
 
-      // --- STEP 2: Local Database Creation ---
+      // --- STEP 2: Persist Image to App Documents ---
+      // We must copy the image from the temporary cache (ImagePicker) to the
+      // app's permanent storage, otherwise the OS will delete it later.
+      String? permanentImagePath;
+      if (_pickedImage != null) {
+        try {
+          final appDocsDir = await getApplicationDocumentsDirectory();
+          final userModelsDir = Directory(
+              p.join(appDocsDir.path, 'user_models', modelId));
+
+          if (!await userModelsDir.exists()) {
+            await userModelsDir.create(recursive: true);
+          }
+
+          final fileName = p.basename(_pickedImage!.path);
+          final permanentFile = await _pickedImage!.copy(
+              p.join(userModelsDir.path, fileName));
+          permanentImagePath = permanentFile.path;
+
+          dev.log(
+              "[ModelCreationProvider] Image copied to persistent storage: $permanentImagePath",
+              name: "ModelCreation");
+        } catch (e) {
+          dev.log(
+              "[ModelCreationProvider] Failed to copy image to permanent storage. Fallback to temp path: $e",
+              name: "ModelCreation");
+          permanentImagePath = _pickedImage?.path;
+        }
+      }
+
+      // --- STEP 3: Local Database Creation ---
       // This only runs if the server call succeeds.
       final Map<String, dynamic> modelData = {
         'id': modelId,
@@ -293,7 +353,7 @@ class ModelCreationProvider extends ChangeNotifier {
         'description': modelExplanationController.text.trim(),
         'role': aiPromptController.text.trim(),
         'baseModelId': _selectedBaseModelId,
-        'imagePath': _pickedImage?.path,
+        'imagePath': permanentImagePath, // Use the permanent path here
         'type': 'roleplay',
         'category': 'self',
         'producer': '_USER_',
@@ -312,26 +372,40 @@ class ModelCreationProvider extends ChangeNotifier {
         userId: user.uid,
       );
 
-      // --- STEP 3: Update In-Memory State ---
-      _modelService.addModelToEntityCache(ModelEntity.fromMap(modelData, localizations.localeName));
-      notificationService.showNotification(message: localizations.modelCreatedSuccess, type: NotificationType.success);
+      // --- STEP 4: Update In-Memory State ---
+      _modelService.addModelToEntityCache(
+          ModelEntity.fromMap(modelData, localizations.localeName));
+      notificationService.showNotification(
+          message: localizations.modelCreatedSuccess,
+          type: NotificationType.success);
       clearCreateForm();
       return true;
-
     } on FirebaseFunctionsException catch (e) {
-      dev.log("[ModelCreationProvider] Firebase Functions Error: ${e.code} - ${e.message}", name: "ModelCreation");
+      dev.log("[ModelCreationProvider] Firebase Functions Error: ${e.code} - ${e
+          .message}", name: "ModelCreation");
       String errorMessage = e.message ?? localizations.anErrorOccurred;
 
-      if (e.code == 'deadline-exceeded') errorMessage = localizations.anErrorOccurred;
-      if (e.code == 'resource-exhausted') errorMessage = localizations.errorRateLimit;
-      if (e.code == 'invalid-argument') errorMessage = localizations.errorContentFlagged;
+      if (e.code == 'deadline-exceeded') {
+        errorMessage = localizations.anErrorOccurred;
+      }
+      if (e.code == 'resource-exhausted') {
+        errorMessage = localizations.errorRateLimit;
+      }
+      if (e.code == 'invalid-argument') {
+        errorMessage = localizations.errorContentFlagged;
+      }
       if (e.code == 'permission-denied') nameShakeController.forward(from: 0.0);
 
-      notificationService.showNotification(message: errorMessage, type: NotificationType.error);
+      notificationService.showNotification(
+          message: errorMessage, type: NotificationType.error);
       return false;
     } catch (e) {
-      dev.log("[ModelCreationProvider] Unexpected error saving roleplay model: $e", name: "ModelCreation", error: e);
-      notificationService.showNotification(message: localizations.errorCreatingModel, type: NotificationType.error);
+      dev.log(
+          "[ModelCreationProvider] Unexpected error saving roleplay model: $e",
+          name: "ModelCreation", error: e);
+      notificationService.showNotification(
+          message: localizations.errorCreatingModel,
+          type: NotificationType.error);
       return false;
     } finally {
       _isSaving = false;
@@ -345,13 +419,16 @@ class ModelCreationProvider extends ChangeNotifier {
     if (!isAddSaveEnabled) return false;
 
     final localizations = AppLocalizations.of(context)!;
-    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+    final notificationService = Provider.of<IntrovertNotificationService>(
+        context, listen: false);
     final user = _auth.currentUser;
 
     if (user == null) return false;
 
     if (![3, 6].contains(_subscriptionTier)) {
-      notificationService.showNotification(message: localizations.ultraFeatureOnly, type: NotificationType.error);
+      notificationService.showNotification(
+          message: localizations.ultraFeatureOnly,
+          type: NotificationType.error);
       return false;
     }
 
@@ -359,27 +436,34 @@ class ModelCreationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final modelId = 'local_${user.uid}_${DateTime.now().millisecondsSinceEpoch}';
+      final modelId = 'local_${user.uid}_${DateTime
+          .now()
+          .millisecondsSinceEpoch}';
 
       // --- STEP 1: Copy files to permanent app storage ---
       // This prevents data loss if the system clears the cache where picked files reside.
       final appDocsDir = await getApplicationDocumentsDirectory();
-      final userModelsDir = Directory(p.join(appDocsDir.path, 'user_models', modelId));
+      final userModelsDir = Directory(
+          p.join(appDocsDir.path, 'user_models', modelId));
       await userModelsDir.create(recursive: true);
 
       // Copy GGUF file
       final ggufFileName = p.basename(_ggufFile!.path);
-      final permanentGgufFile = await _ggufFile!.copy(p.join(userModelsDir.path, ggufFileName));
+      final permanentGgufFile = await _ggufFile!.copy(
+          p.join(userModelsDir.path, ggufFileName));
 
       // Copy Image file (if provided)
       String? permanentImagePath;
       if (_pickedImage != null) {
         final imageFileName = p.basename(_pickedImage!.path);
-        final permanentImageFile = await _pickedImage!.copy(p.join(userModelsDir.path, imageFileName));
+        final permanentImageFile = await _pickedImage!.copy(
+            p.join(userModelsDir.path, imageFileName));
         permanentImagePath = permanentImageFile.path;
       }
 
-      dev.log("[ModelCreationProvider] Copied offline model files to ${userModelsDir.path}", name: "ModelCreation");
+      dev.log(
+          "[ModelCreationProvider] Copied offline model files to ${userModelsDir
+              .path}", name: "ModelCreation");
 
       // --- STEP 2: Local Database Creation ---
       final Map<String, dynamic> modelData = {
@@ -408,14 +492,20 @@ class ModelCreationProvider extends ChangeNotifier {
       );
 
       // --- STEP 3: Update In-Memory State ---
-      _modelService.addModelToEntityCache(ModelEntity.fromMap(modelData, localizations.localeName));
-      notificationService.showNotification(message: localizations.modelCreatedSuccess, type: NotificationType.success);
+      _modelService.addModelToEntityCache(
+          ModelEntity.fromMap(modelData, localizations.localeName));
+      notificationService.showNotification(
+          message: localizations.modelCreatedSuccess,
+          type: NotificationType.success);
       clearAddForm();
       return true;
-
     } catch (e) {
-      dev.log("[ModelCreationProvider] Unexpected error saving offline model: $e", name: "ModelCreation", error: e);
-      notificationService.showNotification(message: localizations.errorCreatingModel, type: NotificationType.error);
+      dev.log(
+          "[ModelCreationProvider] Unexpected error saving offline model: $e",
+          name: "ModelCreation", error: e);
+      notificationService.showNotification(
+          message: localizations.errorCreatingModel,
+          type: NotificationType.error);
       return false;
     } finally {
       _isSaving = false;
@@ -428,13 +518,17 @@ class ModelCreationProvider extends ChangeNotifier {
   //================================================================================
 
   /// Sets a default base model when the provider is first created.
-  void _initializeDefaultBaseModel(BuildContext context, List<ModelEntity> availableBaseModels) {
+  void _initializeDefaultBaseModel(BuildContext context,
+      List<ModelEntity> availableBaseModels) {
     final modelMaps = availableBaseModels.map((e) => e.toMap()).toList();
     final defaultId = _modelService.findDefaultBaseModel(modelMaps);
 
     if (defaultId != null) {
-      final langCode = Localizations.localeOf(context).languageCode;
-      final modelEntity = _modelService.getPreciseModelData(defaultId, langCode: langCode);
+      final langCode = Localizations
+          .localeOf(context)
+          .languageCode;
+      final modelEntity = _modelService.getPreciseModelData(
+          defaultId, langCode: langCode);
 
       _selectedBaseModelId = defaultId;
 

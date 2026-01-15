@@ -105,7 +105,7 @@ class OptionsPanelViewModel {
       }
       if (option == MessageOption.changeModel) {
         if (!isDynamicContext && modelSeriesData != null) {
-          final int validExtCount = ModelDataUtils.validExtensionCountForChangingModel(
+          final int validExtCount = ModelDataUtils.validVariantCountForChangingModel(
             parentSeries: modelSeriesData,
             conversationHasPhoto: conversationHasPhoto,
           );
@@ -302,7 +302,7 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
                           case MessageOption.changeModel:
                             return OptionPanelItem(
                               label: localizations.changeModel,
-                              iconAsset: 'assets/icons/extension.svg',
+                              iconAsset: 'assets/icons/variant.svg',
                               onTap: _onChangeModelTapped,
                               padding: EdgeInsets.symmetric(
                                 horizontal: screenSize.width * _UIFactors.horizontalPaddingFactor,

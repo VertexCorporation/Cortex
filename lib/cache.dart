@@ -38,7 +38,9 @@ enum CacheKey {
 /// A singleton class to track the state of app-wide data.
 class AppDataState {
   static final AppDataState _instance = AppDataState._internal();
+
   factory AppDataState() => _instance;
+
   AppDataState._internal();
 
   bool _hasUserDataChanged = false;
@@ -51,7 +53,8 @@ class AppDataState {
   bool get needsRefresh {
     if (_hasUserDataChanged) {
       _hasUserDataChanged = false; // Reset the flag after checking.
-      debugPrint("[AppDataState] Change flag was TRUE. Reporting need for refresh.");
+      debugPrint(
+          "[AppDataState] Change flag was TRUE. Reporting need for refresh.");
       return true;
     }
     return false;
@@ -79,7 +82,8 @@ class CacheService {
     CacheKey.settingsUserData: Duration(minutes: 3),
     CacheKey.premiumProducts: Duration(minutes: 10),
     CacheKey.modelsScreenData: Duration(minutes: 5),
-    CacheKey.newsImageUrls: Duration(minutes: 8), // URLs expire in 10, so 8 is safer.
+    CacheKey.newsImageUrls: Duration(minutes: 8),
+    // URLs expire in 10, so 8 is safer.
   };
 
   /// Retrieves a value from the cache.
@@ -129,11 +133,13 @@ class CacheService {
     // Cancel any existing timer for this key.
     _timers[key]?.cancel();
 
-    final timeout = _defaultTimeouts[key] ?? const Duration(minutes: 5); // Fallback timeout
+    final timeout = _defaultTimeouts[key] ??
+        const Duration(minutes: 5); // Fallback timeout
 
     _timers[key] = Timer(timeout, () {
       invalidate(key);
-      debugPrint('CacheService ▸ Cache for [${key.name}] cleared due to timeout.');
+      debugPrint(
+          'CacheService ▸ Cache for [${key.name}] cleared due to timeout.');
       onClear?.call();
     });
   }

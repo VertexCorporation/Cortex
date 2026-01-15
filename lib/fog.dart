@@ -54,7 +54,8 @@ class _ScrollFogState extends State<ScrollFog> {
       _updateFogVisibility();
     }
     // Also re-check visibility if the showTop/showBottom props change.
-    if (widget.showTop != oldWidget.showTop || widget.showBottom != oldWidget.showBottom) {
+    if (widget.showTop != oldWidget.showTop ||
+        widget.showBottom != oldWidget.showBottom) {
       _updateFogVisibility();
     }
   }
@@ -80,13 +81,15 @@ class _ScrollFogState extends State<ScrollFog> {
     }
 
     if (controller.positions.length > 1) {
-      debugPrint("[ScrollFog] Warning: ScrollController is attached to multiple positions. This is a transient state during animations. Skipping update.");
+      debugPrint(
+          "[ScrollFog] Warning: ScrollController is attached to multiple positions. This is a transient state during animations. Skipping update.");
       return;
     }
 
     final position = controller.position;
 
-    final bool shouldShowTop = widget.showTop && position.pixels > widget.scrollThreshold;
+    final bool shouldShowTop = widget.showTop &&
+        position.pixels > widget.scrollThreshold;
     final bool shouldShowBottom = widget.showBottom &&
         position.maxScrollExtent > 0 &&
         position.pixels < position.maxScrollExtent - widget.scrollThreshold;
@@ -120,7 +123,10 @@ class _ScrollFogState extends State<ScrollFog> {
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
-                      colors: [widget.fogColor.withValues(alpha:0.0), widget.fogColor],
+                      colors: [
+                        widget.fogColor.withValues(alpha: 0.0),
+                        widget.fogColor
+                      ],
                       stops: const [0.0, 0.9],
                     ),
                   ),
@@ -144,7 +150,10 @@ class _ScrollFogState extends State<ScrollFog> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [widget.fogColor.withValues(alpha:0.0), widget.fogColor],
+                      colors: [
+                        widget.fogColor.withValues(alpha: 0.0),
+                        widget.fogColor
+                      ],
                       stops: const [0.0, 0.9],
                     ),
                   ),

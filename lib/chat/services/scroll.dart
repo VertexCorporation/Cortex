@@ -5,123 +5,139 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 /// A service class to manage all scrolling-related logic.
-/// It is initialized without a ScrollController and is configured later by the UI layer.
 class ScrollService {
-  // The ScrollController is now nullable and set later.
   ScrollController? _scrollController;
-
-  // Internal state for the listener and the UI notifier.
   ValueNotifier<bool>? _showScrollDownButtonNotifier;
   VoidCallback? _listener;
 
-  /// The constructor is now empty, allowing this service to be created
-  /// in main.dart before a ScrollController exists.
   ScrollService();
 
-  /// Sets the ScrollController for this service to manage.
-  /// This method MUST be called from the UI layer (e.g., ChatScreenState's initState)
-  /// before any other methods are used.
+  /// Sets the ScrollController. MUST be called before usage (e.g. in initState).
   void setController(ScrollController controller) {
-    // If a controller was previously set, detach the old listener first.
     if (_scrollController != null) {
       detachListener();
     }
     _scrollController = controller;
-    debugPrint("[ScrollService] Controller has been set.");
+  }
+
+  /// Manually forces the button to hide and resets internal state.
+  /// Call this when leaving the chat (dispose) or switching conversations.
+  void reset() {
+    detachListener();
+    _scrollController = null;
   }
 
   ScrollPosition? _getSafePosition() {
     final controller = _scrollController;
-    if (controller == null || !controller.hasClients) {
-      return null;
-    }
-
-    final positions = controller.positions;
-    if (positions.length != 1) {
-      debugPrint(
-        "[ScrollService] Multiple (${positions.length}) scroll positions attached. "
-            "Skipping scroll computation for safety.",
-      );
-      return null;
-    }
+    if (controller == null || !controller.hasClients) return null;
+    if (controller.positions.length != 1) return null;
 
     try {
       return controller.position;
-    } catch (e, s) {
-      debugPrint(
-        "[ScrollService] Error accessing ScrollController.position: $e\n$s",
-      );
+    } catch (e) {
       return null;
     }
   }
 
-  /// Checks if the user is near the bottom of the scrollable area.
   bool isUserAtBottom({double threshold = 100.0}) {
     final position = _getSafePosition();
-    if (position == null) return true;
-
-    final maxScroll = position.maxScrollExtent;
-    final currentScroll = position.pixels;
-    if (maxScroll == 0.0) return true;
-    return (maxScroll - currentScroll) <= threshold;
+    if (position == null) {
+      return true;
+    }
+    if (position.maxScrollExtent == 0.0) return true;
+    return (position.maxScrollExtent - position.pixels) <= threshold;
   }
 
   void hideButtonImmediately() {
-    if (_showScrollDownButtonNotifier != null && _showScrollDownButtonNotifier!.value) {
-      _showScrollDownButtonNotifier!.value = false;
+    if (_showScrollDownButtonNotifier != null) {
+      try {
+        if (_showScrollDownButtonNotifier!.value) {
+          _showScrollDownButtonNotifier!.value = false;
+        }
+      } catch (e) {
+        // wow
+      }
     }
   }
 
-  /// Manually triggers the logic within the scroll listener.
   void updateButtonVisibility() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _listener?.call();
     });
   }
 
-  /// Attaches a listener to the scroll controller to manage UI state.
   void attachListener({
     required ValueNotifier<bool> notifier,
     required int Function() messageCountProvider,
   }) {
-    if (_scrollController == null) {
-      debugPrint("[ScrollService] Cannot attach listener: Controller has not been set.");
-      return;
+    if (_scrollController == null) return;
+
+    if (_listener != null) {
+      detachListener();
     }
+
     _showScrollDownButtonNotifier = notifier;
+
     _listener = () {
-      if (_scrollController == null || !_scrollController!.hasClients || _showScrollDownButtonNotifier == null) return;
+      if (_scrollController == null || !_scrollController!.hasClients ||
+          _showScrollDownButtonNotifier == null) {
+        return;
+      }
+
+      final int msgCount = messageCountProvider();
+
+      if (msgCount <= 2) {
+        if (_showScrollDownButtonNotifier!.value) {
+          _showScrollDownButtonNotifier!.value = false;
+        }
+        return;
+      }
+      // ---------------------------
 
       final bool isAtBottom = isUserAtBottom();
-      final bool shouldShow = !isAtBottom && messageCountProvider() > 1;
 
-      if (_showScrollDownButtonNotifier!.value != shouldShow) {
-        _showScrollDownButtonNotifier!.value = shouldShow;
+      final bool shouldShow = !isAtBottom && msgCount > 0;
+
+      try {
+        if (_showScrollDownButtonNotifier!.value != shouldShow) {
+          _showScrollDownButtonNotifier!.value = shouldShow;
+        }
+      } catch (e) {
+        detachListener();
       }
     };
-    _scrollController!.addListener(_listener!);
-    debugPrint("[ScrollService] Listener attached successfully.");
-  }
 
-  /// Removes the listener from the scroll controller to prevent memory leaks.
-  void detachListener() {
-    if (_listener != null && _scrollController != null) {
-      // Use a try-catch as a safeguard in case the controller is already disposed.
-      try {
-        _scrollController!.removeListener(_listener!);
-      } catch (e) {
-        debugPrint("[ScrollService] Error removing listener (might be already disposed): $e");
-      }
-      _listener = null;
+    try {
+      _scrollController!.addListener(_listener!);
+    } catch (e) {
+      debugPrint("[ScrollService] Listener attach error: $e");
     }
-    // Clear the notifier reference to avoid memory leaks.
-    _showScrollDownButtonNotifier = null;
-    debugPrint("[ScrollService] Listener detached.");
   }
 
-  /// Smoothly animates the scroll position to the very bottom of the list.
-  /// This version includes enhanced safety checks to prevent crashes during rapid rebuilds.
-  /// Smoothly animates the scroll position to the very bottom of the list.
+  /// Removes the listener and ensures the button is hidden.
+  void detachListener() {
+    if (_showScrollDownButtonNotifier != null) {
+      try {
+        _showScrollDownButtonNotifier!.value = false;
+      } catch (e) {
+// wow
+      }
+    }
+
+    if (_listener != null && _scrollController != null) {
+      try {
+        if (_scrollController!.hasClients) {
+          _scrollController!.removeListener(_listener!);
+        }
+      } catch (e) {
+// wow
+      }
+    }
+
+    _listener = null;
+    _showScrollDownButtonNotifier = null;
+  }
+
   Future<void> scrollToBottom({
     double threshold = 10.0,
     Duration duration = const Duration(milliseconds: 300),
@@ -129,50 +145,31 @@ class ScrollService {
     await WidgetsBinding.instance.endOfFrame;
 
     final position = _getSafePosition();
-    if (position == null) {
-      debugPrint(
-        "[ScrollService] scrollToBottom skipped: No safe ScrollPosition available.",
-      );
-      return;
-    }
+    if (position == null) return;
 
     try {
       final targetOffset = position.maxScrollExtent;
-      final currentOffset = position.pixels;
-
-      if ((targetOffset - currentOffset).abs() < threshold) return;
+      if ((targetOffset - position.pixels).abs() < threshold) return;
 
       await _scrollController!.animateTo(
         targetOffset,
         duration: duration,
         curve: Curves.easeOut,
       );
-    } catch (e, s) {
-      debugPrint(
-        "[ScrollService] Could not complete scrollToBottom due to an error. "
-            "Error: $e\n$s",
-      );
+    } catch (e) {
+      // wow
     }
   }
 
-  /// Instantly jumps the scroll position to the bottom of the list.
   void jumpToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final position = _getSafePosition();
-      if (position == null) {
-        debugPrint(
-          "[ScrollService] Jump to bottom skipped: No safe ScrollPosition.",
-        );
-        return;
+      if (position != null) {
+        _scrollController!.jumpTo(position.maxScrollExtent);
       }
-
-      final maxScroll = position.maxScrollExtent;
-      _scrollController!.jumpTo(maxScroll);
-      debugPrint("[ScrollService] Safely jumped to bottom (max: $maxScroll).");
     });
   }
 
-  /// If the user is already near the bottom, this scrolls to the absolute bottom.
   Future<void> maintainScrollAtBottom({double threshold = 100.0}) async {
     if (_scrollController == null || !_scrollController!.hasClients) return;
     if (isUserAtBottom(threshold: threshold)) {
@@ -183,11 +180,11 @@ class ScrollService {
   Widget buildScrollDownButton({
     required double screenWidth,
     required double screenHeight,
-    required double bottomPanelHeight,      // height of panel (edit + input + briefing)
+    required double bottomPanelHeight,
     required bool showScrollDownButton,
-    required double safeAreaBottomPadding,  // typically MediaQuery.padding.bottom
+    required double safeAreaBottomPadding,
     required bool isKeyboardOpen,
-    required double keyboardHeight,         // MediaQuery.viewInsets.bottom
+    required double keyboardHeight,
   }) {
     final themeColors = AppColors.getThemeColors(AppColors.currentTheme);
     final Color iconColor =
@@ -195,41 +192,14 @@ class ScrollService {
         ? Colors.white.withValues(alpha: 0.9)
         : Colors.black.withValues(alpha: 0.8);
 
-    // Base: distance from the *top of the bottom panel* up to the button.
     final double panelTopMargin = screenHeight * 0.02;
 
-    // ————————————————————————————————————————————————
-    // Compute distance from SCREEN BOTTOM to button:
-    //
-    // 1) When keyboard is OPEN:
-    //    screen bottom → keyboard top     = keyboardHeight
-    //    keyboard top → panel top         = bottomPanelHeight
-    //    panel top → button               = panelTopMargin
-    //
-    //    => bottomOffset = keyboardHeight + bottomPanelHeight + panelTopMargin
-    //
-    // 2) When keyboard is CLOSED:
-    //    screen bottom → panel top        = bottomPanelHeight + safeAreaBottomPadding
-    //    panel top → button               = panelTopMargin
-    //
-    //    => bottomOffset = bottomPanelHeight + safeAreaBottomPadding + panelTopMargin
-    //       and then clamped so it doesn’t hug the very bottom.
-    // ————————————————————————————————————————————————
-
     double bottomOffset;
-
     if (isKeyboardOpen) {
-      bottomOffset = keyboardHeight +
-          bottomPanelHeight +
-          panelTopMargin;
+      bottomOffset = keyboardHeight + bottomPanelHeight + panelTopMargin;
     } else {
-      bottomOffset = bottomPanelHeight +
-          safeAreaBottomPadding +
-          panelTopMargin;
-
-      // Keep it at least some distance from the absolute bottom when
-      // keyboard is not visible, so it doesn't visually merge with the input.
-      final double minBottomOffset = screenHeight * 0.02; // 2% of screen height
+      bottomOffset = bottomPanelHeight + safeAreaBottomPadding + panelTopMargin;
+      final double minBottomOffset = screenHeight * 0.02;
       if (bottomOffset < minBottomOffset) {
         bottomOffset = minBottomOffset;
       }

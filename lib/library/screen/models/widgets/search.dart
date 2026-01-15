@@ -273,8 +273,8 @@ class ModelsSearchController {
         mainAxisSize: MainAxisSize.min, // Takes minimal vertical space
         children: [
           ErrorView(
-            title: loc.noModelsFoundTitle,
-            message: loc.noModelsFoundMessage,
+            title: loc.noFoundTitle,
+            message: loc.noFoundMessage,
           ),
         ],
       ),

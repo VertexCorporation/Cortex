@@ -28,7 +28,8 @@ class FundsBackend with ChangeNotifier {
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(region: 'europe-west1');
+  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(
+      region: 'europe-west1');
   final FirebaseCrashlytics _crashlytics = FirebaseCrashlytics.instance;
 
   // --- Stream Subscriptions ---
@@ -47,13 +48,20 @@ class FundsBackend with ChangeNotifier {
 
   // --- Public Getters ---
   bool get isLoading => _isLoading;
+
   bool get isPurchasePending => _isPurchasePending;
+
   String? get errorMessage => _errorMessage;
+
   bool get hasError => _errorMessage != null;
+
   List<ProductDetails> get allProducts => _products;
-  List<ProductDetails> get creditProducts => _products.where((p) => _creditProductIds.contains(p.id)).toList();
-  List<ProductDetails> get subscriptionProducts => _products.where((p) => _subscriptionIds.contains(p.id)).toList();
+
+  List<ProductDetails> get subscriptionProducts =>
+      _products.where((p) => _subscriptionIds.contains(p.id)).toList();
+
   int get currentUserSubscriptionLevel => _currentUserSubscriptionLevel;
+
   String? get activeSubscriptionOption => _activeSubscriptionOption;
 
   // --- Product Identifiers & Mocks ---
@@ -65,27 +73,59 @@ class FundsBackend with ChangeNotifier {
   static const String monthlySubscriptionUltra = 'cortex_ultra_monthly';
   static const String annualSubscriptionUltra = 'cortex_ultra_annual';
 
-  static const Set<String> _subscriptionIds = { monthlySubscriptionPlus, annualSubscriptionPlus, monthlySubscriptionPro, annualSubscriptionPro, monthlySubscriptionUltra, annualSubscriptionUltra };
-  static const Set<String> _creditProductIds = { 'cortex_credits_250', 'credits_500', 'credits_1000', 'credits_2500', 'credits_5000' };
+  static const Set<String> _subscriptionIds = {
+    monthlySubscriptionPlus,
+    annualSubscriptionPlus,
+    monthlySubscriptionPro,
+    annualSubscriptionPro,
+    monthlySubscriptionUltra,
+    annualSubscriptionUltra
+  };
 
   final _purchaseCompletedController = StreamController<String>.broadcast();
+
   Stream<String> get onPurchaseCompleted => _purchaseCompletedController.stream;
 
   late IntrovertNotificationService _notificationService;
   late AppLocalizations _localizations;
 
   static final List<ProductDetails> _mockProducts = [
-    ProductDetails(id: 'cortex_credits_250', title: '250 Credits', description: 'Test', price: '\$2.49', rawPrice: 2.49, currencyCode: 'USD'),
-    ProductDetails(id: 'credits_500', title: '500 Credits', description: 'Test', price: '\$4.99', rawPrice: 4.99, currencyCode: 'USD'),
-    ProductDetails(id: 'credits_1000', title: '1000 Credits', description: 'Test', price: '\$9.99', rawPrice: 9.99, currencyCode: 'USD'),
-    ProductDetails(id: 'credits_2500', title: '2500 Credits', description: 'Test', price: '\$24.99', rawPrice: 24.99, currencyCode: 'USD'),
-    ProductDetails(id: 'credits_5000', title: '5000 Credits', description: 'Test', price: '\$49.99', rawPrice: 49.99, currencyCode: 'USD'),
-    ProductDetails(id: 'vertex_ai_monthly_sub', title: 'Plus Monthly', description: 'Test', price: '\$4.99', rawPrice: 4.99, currencyCode: 'USD'),
-    ProductDetails(id: 'vertex_ai_annual_sub', title: 'Plus Annual', description: 'Test', price: '\$49.99', rawPrice: 49.99, currencyCode: 'USD'),
-    ProductDetails(id: 'cortex_pro_monthly', title: 'Pro Monthly', description: 'Test', price: '\$9.99', rawPrice: 9.99, currencyCode: 'USD'),
-    ProductDetails(id: 'cortex_pro_annual', title: 'Pro Annual', description: 'Test', price: '\$99.99', rawPrice: 99.99, currencyCode: 'USD'),
-    ProductDetails(id: 'cortex_ultra_monthly', title: 'Ultra Monthly', description: 'Test', price: '\$19.99', rawPrice: 19.99, currencyCode: 'USD'),
-    ProductDetails(id: 'cortex_ultra_annual', title: 'Ultra Annual', description: 'Test', price: '\$199.99', rawPrice: 199.99, currencyCode: 'USD'),
+    ProductDetails(id: 'vertex_ai_monthly_sub',
+        title: 'Plus Monthly',
+        description: 'Test',
+        price: '\$4.99',
+        rawPrice: 4.99,
+        currencyCode: 'USD'),
+    ProductDetails(id: 'vertex_ai_annual_sub',
+        title: 'Plus Annual',
+        description: 'Test',
+        price: '\$49.99',
+        rawPrice: 49.99,
+        currencyCode: 'USD'),
+    ProductDetails(id: 'cortex_pro_monthly',
+        title: 'Pro Monthly',
+        description: 'Test',
+        price: '\$9.99',
+        rawPrice: 9.99,
+        currencyCode: 'USD'),
+    ProductDetails(id: 'cortex_pro_annual',
+        title: 'Pro Annual',
+        description: 'Test',
+        price: '\$99.99',
+        rawPrice: 99.99,
+        currencyCode: 'USD'),
+    ProductDetails(id: 'cortex_ultra_monthly',
+        title: 'Ultra Monthly',
+        description: 'Test',
+        price: '\$19.99',
+        rawPrice: 19.99,
+        currencyCode: 'USD'),
+    ProductDetails(id: 'cortex_ultra_annual',
+        title: 'Ultra Annual',
+        description: 'Test',
+        price: '\$199.99',
+        rawPrice: 199.99,
+        currencyCode: 'USD'),
   ];
 
   static const String appPackageName = "com.vertex.cortex";
@@ -113,26 +153,34 @@ class FundsBackend with ChangeNotifier {
     return RegExp(r'^[A-Za-z0-9+/=]+$').hasMatch(t);
   }
 
-  Future<String?> _resolveIosReceiptBase64(PurchaseDetails purchaseDetails) async {
+  Future<String?> _resolveIosReceiptBase64(
+      PurchaseDetails purchaseDetails) async {
     final v = purchaseDetails.verificationData;
 
-    final fromServer = (v.serverVerificationData).trim();
-    if (!_isPlaceholderReceipt(fromServer) && _looksLikeBase64(fromServer)) return fromServer;
-
     final fromLocal = (v.localVerificationData).trim();
-    if (!_isPlaceholderReceipt(fromLocal) && _looksLikeBase64(fromLocal)) return fromLocal;
+    if (!_isPlaceholderReceipt(fromLocal) && _looksLikeBase64(fromLocal)) {
+      return fromLocal;
+    }
+
+    final fromServer = (v.serverVerificationData).trim();
+    if (!_isPlaceholderReceipt(fromServer) && _looksLikeBase64(fromServer)) {
+      return fromServer;
+    }
 
     try {
-      final storekit = _inAppPurchase.getPlatformAddition<InAppPurchaseStoreKitPlatformAddition>();
+      final storekit = _inAppPurchase.getPlatformAddition<
+          InAppPurchaseStoreKitPlatformAddition>();
 
       try {
         await storekit.sync();
       } catch (_) {}
 
       final refreshed = await storekit.refreshPurchaseVerificationData();
-      final refreshedReceipt = (refreshed?.serverVerificationData ?? refreshed?.localVerificationData ?? '').trim();
+      final refreshedReceipt = (refreshed?.serverVerificationData ??
+          refreshed?.localVerificationData ?? '').trim();
 
-      if (!_isPlaceholderReceipt(refreshedReceipt) && _looksLikeBase64(refreshedReceipt)) {
+      if (!_isPlaceholderReceipt(refreshedReceipt) &&
+          _looksLikeBase64(refreshedReceipt)) {
         return refreshedReceipt;
       }
     } catch (e, stack) {
@@ -200,7 +248,8 @@ class FundsBackend with ChangeNotifier {
     }
 
     // 2. Attempt to load from cache first for instant UI
-    final cachedProducts = CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
+    final cachedProducts = CacheService.get<List<ProductDetails>>(
+        CacheKey.premiumProducts);
 
     if (cachedProducts != null && cachedProducts.isNotEmpty) {
       log('Cache hit! Initializing with cached product data.', name: _logName);
@@ -235,7 +284,7 @@ class FundsBackend with ChangeNotifier {
     }
 
     try {
-      final allProductIds = {..._subscriptionIds, ..._creditProductIds};
+      final allProductIds = {..._subscriptionIds};
       final response = await _inAppPurchase.queryProductDetails(allProductIds);
 
       if (response.error != null) {
@@ -244,15 +293,17 @@ class FundsBackend with ChangeNotifier {
 
       // --- Handle Empty List as an Error (Without Crashlytics) ---
       if (response.productDetails.isEmpty) {
-        log('Store returned zero products. Treating as failure to trigger Retry UI.', name: _logName);
+        log(
+            'Store returned zero products. Treating as failure to trigger Retry UI.',
+            name: _logName);
         // Throwing forces catch block
-        throw Exception("Store returned no products. This implies a Store connection issue.");
+        throw Exception(
+            "Store returned no products. This implies a Store connection issue.");
       }
 
       _products = response.productDetails;
       CacheService.set(CacheKey.premiumProducts, _products);
       _errorMessage = null;
-
     } catch (e, stack) {
       log('Error fetching product details: $e', name: _logName, error: e);
 
@@ -260,7 +311,8 @@ class FundsBackend with ChangeNotifier {
         _setError(_localizations.noProductsFound);
       } else {
         await _crashlytics.recordError(
-          e, stack, reason: 'Failed in _fetchProductDetails catch block.', fatal: true,
+          e, stack, reason: 'Failed in _fetchProductDetails catch block.',
+          fatal: true,
         );
         _setError(_localizations.anErrorOccurred);
       }
@@ -271,7 +323,8 @@ class FundsBackend with ChangeNotifier {
 
   Future<void> purchase(ProductDetails product) async {
     if (_isPurchasePending) {
-      log('Purchase attempt ignored: Another purchase is already pending.', name: _logName);
+      log('Purchase attempt ignored: Another purchase is already pending.',
+          name: _logName);
       return;
     }
 
@@ -286,25 +339,31 @@ class FundsBackend with ChangeNotifier {
     ProductDetails freshProductDetails;
     try {
       if (!await _inAppPurchase.isAvailable()) {
-        throw Exception("Billing service is not available at the moment of purchase.");
+        throw Exception(
+            "Billing service is not available at the moment of purchase.");
       }
 
       final response = await _inAppPurchase.queryProductDetails({product.id});
       if (response.error != null) {
-        throw Exception('Store error while refreshing product: ${response.error!.message}');
+        throw Exception(
+            'Store error while refreshing product: ${response.error!.message}');
       }
       if (response.productDetails.isEmpty) {
-        throw Exception('Product with ID ${product.id} not found on the store. It might have been removed.');
+        throw Exception('Product with ID ${product
+            .id} not found on the store. It might have been removed.');
       }
 
       freshProductDetails = response.productDetails.first;
-      log('Successfully refreshed product details for ${product.id}', name: _logName);
+      log('Successfully refreshed product details for ${product.id}',
+          name: _logName);
     } catch (e, stack) {
-      log('Could not refresh product details before purchase: $e', name: _logName, error: e);
+      log('Could not refresh product details before purchase: $e',
+          name: _logName, error: e);
       await _crashlytics.recordError(
         e,
         stack,
-        reason: 'Failed to refresh product details for ${product.id} right before purchase.',
+        reason: 'Failed to refresh product details for ${product
+            .id} right before purchase.',
         fatal: false,
       );
       _notificationService.showNotification(
@@ -325,12 +384,14 @@ class FundsBackend with ChangeNotifier {
       final googlePlayProductDetails = freshProductDetails as GooglePlayProductDetails;
       final offerToken = googlePlayProductDetails.offerToken;
 
-      final bool isSubscription = _subscriptionIds.contains(googlePlayProductDetails.id);
+      final bool isSubscription = _subscriptionIds.contains(
+          googlePlayProductDetails.id);
 
       if (isSubscription) {
         if (offerToken == null || offerToken.isEmpty) {
           log(
-            'Subscription ${googlePlayProductDetails.id} is missing a valid offerToken.',
+            'Subscription ${googlePlayProductDetails
+                .id} is missing a valid offerToken.',
             name: _logName,
           );
           await _crashlytics.recordError(
@@ -368,11 +429,7 @@ class FundsBackend with ChangeNotifier {
     }
 
     try {
-      if (_creditProductIds.contains(freshProductDetails.id)) {
-        await _inAppPurchase.buyConsumable(purchaseParam: purchaseParam);
-      } else {
-        await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
-      }
+      await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
     } catch (e, stack) {
       bool isLikelyStaleProductError = false;
       bool isInvalidOfferTokenError = false;
@@ -383,14 +440,18 @@ class FundsBackend with ChangeNotifier {
       if (e is PlatformException) {
         message = (e.message ?? '').toLowerCase();
         code = e.code.toLowerCase();
-        if (message.contains('pendingintent') || message.contains('null object reference') || message.contains('getintentsender')) {
+        if (message.contains('pendingintent') ||
+            message.contains('null object reference') ||
+            message.contains('getintentsender')) {
           isLikelyStaleProductError = true;
         }
-        if (code.contains('invalid_offer_token') || message.contains('invalid_offer_token')) {
+        if (code.contains('invalid_offer_token') ||
+            message.contains('invalid_offer_token')) {
           isInvalidOfferTokenError = true;
         }
         if (defaultTargetPlatform == TargetPlatform.iOS) {
-          if (code == 'unknown' || message.contains('storekiterror') || message.contains('usercancelled')) {
+          if (code == 'unknown' || message.contains('storekiterror') ||
+              message.contains('usercancelled')) {
             isIOSStoreKitError = true;
           }
         }
@@ -401,14 +462,24 @@ class FundsBackend with ChangeNotifier {
       log('Error initiating purchase flow: $e', name: _logName, error: e);
 
       if (isLikelyStaleProductError) {
-        _notificationService.showNotification(message: _localizations.anErrorOccurred, type: NotificationType.error);
+        _notificationService.showNotification(
+            message: _localizations.anErrorOccurred,
+            type: NotificationType.error);
       } else if (isInvalidOfferTokenError) {
-        _notificationService.showNotification(message: _localizations.productNotFound, type: NotificationType.error, oneLine: false);
+        _notificationService.showNotification(
+            message: _localizations.productNotFound,
+            type: NotificationType.error,
+            oneLine: false);
       } else if (isIOSStoreKitError) {
-        log('iOS StoreKit generic error (likely user cancelled). Ignored.', name: _logName);
+        log('iOS StoreKit generic error (likely user cancelled). Ignored.',
+            name: _logName);
       } else {
-        await _crashlytics.recordError(e, stack, reason: 'UNKNOWN error on buy call', fatal: false);
-        _notificationService.showNotification(message: _localizations.anErrorOccurred, type: NotificationType.error, oneLine: false);
+        await _crashlytics.recordError(
+            e, stack, reason: 'UNKNOWN error on buy call', fatal: false);
+        _notificationService.showNotification(
+            message: _localizations.anErrorOccurred,
+            type: NotificationType.error,
+            oneLine: false);
       }
       _setPurchasePending(false);
     }
@@ -424,7 +495,8 @@ class FundsBackend with ChangeNotifier {
     if (Platform.isIOS) {
       url = Uri.parse('https://apps.apple.com/account/subscriptions');
     } else {
-      url = Uri.parse('https://play.google.com/store/account/subscriptions?package=$appPackageName');
+      url = Uri.parse(
+          'https://play.google.com/store/account/subscriptions?package=$appPackageName');
     }
 
     try {
@@ -434,8 +506,11 @@ class FundsBackend with ChangeNotifier {
         throw Exception('Could not launch URL');
       }
     } catch (e, stack) {
-      log('Could not launch subscription management URL.', name: _logName, error: e);
-      await _crashlytics.recordError(e, stack, reason: 'Failed to launch subscription management URL.', fatal: false);
+      log('Could not launch subscription management URL.', name: _logName,
+          error: e);
+      await _crashlytics.recordError(
+          e, stack, reason: 'Failed to launch subscription management URL.',
+          fatal: false);
     }
   }
 
@@ -452,14 +527,15 @@ class FundsBackend with ChangeNotifier {
 
       Future.delayed(const Duration(seconds: 3), () {
         if (_isPurchasePending) {
-          log('Restore timeout or no purchases found. Resetting UI.', name: _logName);
+          log('Restore timeout or no purchases found. Resetting UI.',
+              name: _logName);
           _setPurchasePending(false);
         }
       });
-
     } catch (e, stack) {
       log('Restore failed: $e', name: _logName, error: e);
-      await _crashlytics.recordError(e, stack, reason: 'Restore purchases failed');
+      await _crashlytics.recordError(
+          e, stack, reason: 'Restore purchases failed');
 
       _notificationService.showNotification(
         message: _localizations.anErrorOccurred,
@@ -473,16 +549,25 @@ class FundsBackend with ChangeNotifier {
   void _onPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) {
     for (final purchaseDetails in purchaseDetailsList) {
       switch (purchaseDetails.status) {
-        case PurchaseStatus.pending:   _setPurchasePending(true); break;
-        case PurchaseStatus.error:     _handleFailedPurchase(purchaseDetails); break;
+        case PurchaseStatus.pending:
+          _setPurchasePending(true);
+          break;
+        case PurchaseStatus.error:
+          _handleFailedPurchase(purchaseDetails);
+          break;
         case PurchaseStatus.purchased:
-        case PurchaseStatus.restored:  _verifyAndCompletePurchase(purchaseDetails); break;
-        case PurchaseStatus.canceled:  _handleCanceledPurchase(purchaseDetails); break;
+        case PurchaseStatus.restored:
+          _verifyAndCompletePurchase(purchaseDetails);
+          break;
+        case PurchaseStatus.canceled:
+          _handleCanceledPurchase(purchaseDetails);
+          break;
       }
     }
   }
 
-  Future<void> _verifyAndCompletePurchase(PurchaseDetails purchaseDetails) async {
+  Future<void> _verifyAndCompletePurchase(
+      PurchaseDetails purchaseDetails) async {
     _notificationService.showNotification(
       message: _localizations.purchaseReceived,
       type: NotificationType.neutral,
@@ -495,7 +580,9 @@ class FundsBackend with ChangeNotifier {
       verificationData = await _resolveIosReceiptBase64(purchaseDetails);
 
       if (verificationData == null) {
-        log('iOS receipt could not be resolved. Will NOT complete purchase yet.', name: _logName);
+        log(
+            'iOS receipt could not be resolved. Will NOT complete purchase yet.',
+            name: _logName);
 
         _notificationService.showNotification(
           message: _localizations.verificationDelayed,
@@ -507,13 +594,20 @@ class FundsBackend with ChangeNotifier {
         return;
       }
     } else {
-      final server = purchaseDetails.verificationData.serverVerificationData.trim();
-      final local = purchaseDetails.verificationData.localVerificationData.trim();
+      final server = purchaseDetails.verificationData.serverVerificationData
+          .trim();
+      final local = purchaseDetails.verificationData.localVerificationData
+          .trim();
 
-      verificationData = !_isPlaceholderReceipt(server) ? server : (!_isPlaceholderReceipt(local) ? local : null);
+      verificationData =
+      !_isPlaceholderReceipt(server) ? server : (!_isPlaceholderReceipt(local)
+          ? local
+          : null);
 
       if (verificationData == null) {
-        log('Skipping cloud verification: invalid or empty receipt for ${purchaseDetails.productID}', name: _logName);
+        log(
+            'Skipping cloud verification: invalid or empty receipt for ${purchaseDetails
+                .productID}', name: _logName);
 
         if (purchaseDetails.pendingCompletePurchase) {
           await _inAppPurchase.completePurchase(purchaseDetails);
@@ -529,8 +623,13 @@ class FundsBackend with ChangeNotifier {
       }
     }
 
-    if (verificationData.trim().isEmpty || verificationData.trim() == "{}" || verificationData.trim() == "[]") {
-      log('Skipping cloud verification: invalid or empty receipt for ${purchaseDetails.productID}', name: _logName);
+    if (verificationData
+        .trim()
+        .isEmpty || verificationData.trim() == "{}" ||
+        verificationData.trim() == "[]") {
+      log(
+          'Skipping cloud verification: invalid or empty receipt for ${purchaseDetails
+              .productID}', name: _logName);
 
       if (purchaseDetails.pendingCompletePurchase) {
         await _inAppPurchase.completePurchase(purchaseDetails);
@@ -561,12 +660,13 @@ class FundsBackend with ChangeNotifier {
 
       AppDataState().markUserDataAsChanged();
       safeAddEvent();
-
     } on FirebaseFunctionsException catch (e, stack) {
-      log('Purchase verification failed with FirebaseFunctionsException: ${e.message} (Code: ${e.code})', name: _logName);
+      log('Purchase verification failed with FirebaseFunctionsException: ${e
+          .message} (Code: ${e.code})', name: _logName);
 
       if (e.code == 'invalid-argument' || e.code == 'not-found') {
-        log('Fatal validation error. Forcing local completion to clear queue.', name: _logName);
+        log('Fatal validation error. Forcing local completion to clear queue.',
+            name: _logName);
 
         if (purchaseDetails.pendingCompletePurchase) {
           await _inAppPurchase.completePurchase(purchaseDetails);
@@ -586,11 +686,14 @@ class FundsBackend with ChangeNotifier {
         );
       }
 
-      await _crashlytics.recordError(e, stack, reason: 'Server returned HttpsError for ${purchaseDetails.productID}', fatal: false);
-
+      await _crashlytics.recordError(e, stack,
+          reason: 'Server returned HttpsError for ${purchaseDetails.productID}',
+          fatal: false);
     } catch (e, stack) {
       log('Unexpected verification exception: $e', name: _logName);
-      await _crashlytics.recordError(e, stack, reason: 'Unexpected client-side error during verifyPurchase', fatal: false);
+      await _crashlytics.recordError(e, stack,
+          reason: 'Unexpected client-side error during verifyPurchase',
+          fatal: false);
       _notificationService.showNotification(
         message: _localizations.anErrorOccurred,
         type: NotificationType.error,
@@ -603,10 +706,12 @@ class FundsBackend with ChangeNotifier {
 
   void _handleFailedPurchase(PurchaseDetails purchaseDetails) {
     final errorCode = purchaseDetails.error?.code ?? '';
-    final errorMessage = purchaseDetails.error?.message ?? _localizations.purchaseStreamError;
+    final errorMessage = purchaseDetails.error?.message ??
+        _localizations.purchaseStreamError;
     final errorString = purchaseDetails.error?.toString().toLowerCase() ?? '';
 
-    final isUserCancelled = errorCode == 'canceled' || errorString.contains('user canceled');
+    final isUserCancelled = errorCode == 'canceled' ||
+        errorString.contains('user canceled');
     final isInsufficientFunds = errorCode == 'purchase_error' &&
         (errorMessage.contains('insufficient funds') ||
             errorMessage.contains('Payment declined') ||
@@ -614,7 +719,8 @@ class FundsBackend with ChangeNotifier {
     final isAlreadyOwned = errorCode == 'item_already_owned';
 
     if (!isUserCancelled && !isInsufficientFunds && !isAlreadyOwned) {
-      log('Purchase error: $errorMessage', name: _logName, error: purchaseDetails.error);
+      log('Purchase error: $errorMessage', name: _logName,
+          error: purchaseDetails.error);
       _crashlytics.recordError(
         purchaseDetails.error ?? 'Unknown Purchase Error',
         StackTrace.current,
@@ -622,7 +728,9 @@ class FundsBackend with ChangeNotifier {
         fatal: false,
       );
     } else {
-      log('Purchase failed due to user/billing status (Ignored from Crashlytics): $errorMessage', name: _logName);
+      log(
+          'Purchase failed due to user/billing status (Ignored from Crashlytics): $errorMessage',
+          name: _logName);
     }
 
     _notificationService.showNotification(
@@ -641,7 +749,8 @@ class FundsBackend with ChangeNotifier {
   void _onPurchaseStreamError(dynamic error, StackTrace? stack) {
     log('Purchase Stream Error: $error', name: _logName, error: error);
     _crashlytics.recordError(
-      error, stack, reason: 'An error occurred in the global purchase stream.', fatal: true,
+      error, stack, reason: 'An error occurred in the global purchase stream.',
+      fatal: true,
     );
 
     // THE FIX: Show a generic error notification for stream-level failures.
@@ -672,31 +781,50 @@ class FundsBackend with ChangeNotifier {
       return;
     }
 
-    _userSubscription = _firestore.collection('users').doc(user.uid).snapshots().listen((snapshot) {
-      if (!snapshot.exists) {
-        _currentUserSubscriptionLevel = 0;
-        _activeSubscriptionOption = null;
-      } else {
-        final data = snapshot.data();
-        _currentUserSubscriptionLevel = data?['hasCortexSubscription'] ?? 0;
-        _activeSubscriptionOption = data?['activeSubscriptionOption'];
-      }
-      notifyListeners();
-    }, onError: (error, stack) {
-      if (error.toString().contains("permission-denied")) {
-        log('Firestore permission denied (User signed out during sync). Subscription cancelled.', name: _logName);
-        _userSubscription?.cancel();
-        return;
-      }
+    _userSubscription =
+        _firestore.collection('users').doc(user.uid).snapshots().listen((
+            snapshot) {
+          if (!snapshot.exists) {
+            _currentUserSubscriptionLevel = 0;
+            _activeSubscriptionOption = null;
+          } else {
+            final data = snapshot.data();
+            _currentUserSubscriptionLevel = data?['hasCortexSubscription'] ?? 0;
+            _activeSubscriptionOption = data?['activeSubscriptionOption'];
+          }
+          notifyListeners();
+        }, onError: (error, stack) {
+          if (error.toString().contains("permission-denied")) {
+            log(
+                'Firestore permission denied (User signed out during sync). Subscription cancelled.',
+                name: _logName);
+            _userSubscription?.cancel();
+            return;
+          }
 
-      log('Error listening to user document: $error', name: _logName, error: error);
-      _crashlytics.recordError(error, stack, reason: 'Firestore user snapshot listener failed.', fatal: false);
-    });
+          log('Error listening to user document: $error', name: _logName,
+              error: error);
+          _crashlytics.recordError(
+              error, stack, reason: 'Firestore user snapshot listener failed.',
+              fatal: false);
+        });
   }
 
-  void _setLoading(bool value) { _isLoading = value; notifyListeners(); }
-  void _setPurchasePending(bool value) { _isPurchasePending = value; notifyListeners(); }
-  void _setError(String message) { _errorMessage = message; _isLoading = false; notifyListeners(); }
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  void _setPurchasePending(bool value) {
+    _isPurchasePending = value;
+    notifyListeners();
+  }
+
+  void _setError(String message) {
+    _errorMessage = message;
+    _isLoading = false;
+    notifyListeners();
+  }
 
   @override
   void dispose() {

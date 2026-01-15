@@ -31,7 +31,8 @@ class ThemeProvider extends ChangeNotifier {
       SystemUiOverlayStyle(
         systemNavigationBarColor: themeColors.navigationBarColor,
         statusBarColor: themeColors.statusBarColor,
-        systemNavigationBarIconBrightness: themeColors.navigationBarIconBrightness,
+        systemNavigationBarIconBrightness: themeColors
+            .navigationBarIconBrightness,
         statusBarIconBrightness: themeColors.statusBarIconBrightness,
       ),
     );
@@ -48,8 +49,7 @@ class ThemeColors {
   final Color septenaryColor;
   final Color background;
   final Color border;
-
-  // UI Overlay Style özellikleri
+  final Color premium;
   final Color navigationBarColor;
   final Color statusBarColor;
   final Brightness navigationBarIconBrightness;
@@ -65,6 +65,7 @@ class ThemeColors {
     required this.septenaryColor,
     required this.background,
     required this.border,
+    required this.premium,
     required this.navigationBarColor,
     required this.statusBarColor,
     required this.navigationBarIconBrightness,
@@ -87,6 +88,7 @@ class AppColors {
         septenaryColor: const Color(0xFFFA2626),
         background: const Color(0xFFFFFFFF),
         border: const Color(0xFFBFBFBF),
+        premium: const Color(0xFF9900FF),
         navigationBarColor: Colors.white,
         statusBarColor: Colors.transparent,
         navigationBarIconBrightness: Brightness.dark,
@@ -102,6 +104,7 @@ class AppColors {
         septenaryColor: const Color(0xFFD32F2F),
         background: const Color(0xFF090909),
         border: const Color(0xFF303030),
+        premium: const Color(0xFFBB86FC),
         navigationBarColor: const Color(0xFF090909),
         statusBarColor: const Color(0xFF090909),
         navigationBarIconBrightness: Brightness.light,
@@ -117,6 +120,7 @@ class AppColors {
         septenaryColor: const Color(0xffff607d),
         background: const Color(0xFFffb3c6),
         border: const Color(0xFFFFE5EC),
+        premium: const Color(0xFFF900D0),
         navigationBarColor: const Color(0xFFffb3c6),
         statusBarColor: Colors.transparent,
         navigationBarIconBrightness: Brightness.dark,
@@ -132,6 +136,7 @@ class AppColors {
         septenaryColor: const Color(0xFF388E3C),
         background: const Color(0xff16392a),
         border: const Color(0xff275a44),
+        premium: const Color(0xFF00FF95),
         navigationBarColor: const Color(0xFF16392a),
         statusBarColor: Colors.transparent,
         navigationBarIconBrightness: Brightness.light,
@@ -147,6 +152,7 @@ class AppColors {
         septenaryColor: const Color(0xFFE0AAFF),
         background: const Color(0xFF240046),
         border: const Color(0xFF4A00A0),
+        premium: const Color(0xFF0A16FF),
         navigationBarColor: const Color(0xFF240046),
         statusBarColor: Colors.transparent,
         navigationBarIconBrightness: Brightness.light,
@@ -162,6 +168,7 @@ class AppColors {
         septenaryColor: const Color(0xFF373739),
         background: const Color(0xFF1F2225),
         border: const Color(0xFF4D5359),
+        premium: const Color(0xFFE5E4E2),
         navigationBarColor: const Color(0xFF1F2225),
         statusBarColor: Colors.transparent,
         navigationBarIconBrightness: Brightness.light,
@@ -177,6 +184,7 @@ class AppColors {
         septenaryColor: const Color(0xFF135083),
         background: const Color(0xff013077),
         border: const Color(0xff68a0f1),
+        premium: const Color(0xFF00E5FF),
         navigationBarColor: const Color(0xff013077),
         statusBarColor: Colors.transparent,
         navigationBarIconBrightness: Brightness.light,
@@ -192,6 +200,7 @@ class AppColors {
         septenaryColor: const Color(0xFF950D21),
         background: const Color(0xFF4D0012),
         border: const Color(0xFFFD8686),
+        premium: const Color(0xFFFF0777),
         navigationBarColor: const Color(0xFF4D0012),
         statusBarColor: Colors.transparent,
         navigationBarIconBrightness: Brightness.light,
@@ -215,37 +224,53 @@ class AppColors {
   }
 
   static Color get primaryColor => getThemeColors(currentTheme).primaryColor;
-  static Color get secondaryColor => getThemeColors(currentTheme).secondaryColor;
+
+  static Color get secondaryColor =>
+      getThemeColors(currentTheme).secondaryColor;
+
   static Color get tertiaryColor => getThemeColors(currentTheme).tertiaryColor;
-  static Color get quaternaryColor => getThemeColors(currentTheme).quaternaryColor;
+
+  static Color get quaternaryColor =>
+      getThemeColors(currentTheme).quaternaryColor;
+
   static Color get quinaryColor => getThemeColors(currentTheme).quinaryColor;
+
   static Color get senaryColor => getThemeColors(currentTheme).senaryColor;
-  static Color get septenaryColor => getThemeColors(currentTheme).septenaryColor;
+
+  static Color get septenaryColor =>
+      getThemeColors(currentTheme).septenaryColor;
+
   static Color get background => getThemeColors(currentTheme).background;
+
   static Color get border => getThemeColors(currentTheme).border;
 
+  // Yeni Getter
+  static Color get premium => getThemeColors(currentTheme).premium;
+
   static Map<String, Map<String, dynamic>> get overlayStyles {
-    return themeDefinitions.map((key, value) => MapEntry(
-      key,
-      {
-        'navigationBarColor': value.navigationBarColor,
-        'statusBarColor': value.statusBarColor,
-        'navigationBarIconBrightness': value.navigationBarIconBrightness,
-        'statusBarIconBrightness': value.statusBarIconBrightness,
-      },
-    ));
+    return themeDefinitions.map((key, value) =>
+        MapEntry(
+          key,
+          {
+            'navigationBarColor': value.navigationBarColor,
+            'statusBarColor': value.statusBarColor,
+            'navigationBarIconBrightness': value.navigationBarIconBrightness,
+            'statusBarIconBrightness': value.statusBarIconBrightness,
+          },
+        ));
   }
 
-  static List<Color> get animatedBorderGradientColors => [
-    Colors.red,
-    Colors.orange,
-    Colors.yellow,
-    Colors.green,
-    Colors.blue,
-    Colors.indigo,
-    Colors.purple,
-    Colors.red,
-  ];
+  static List<Color> get animatedBorderGradientColors =>
+      [
+        Colors.red,
+        Colors.orange,
+        Colors.yellow,
+        Colors.green,
+        Colors.blue,
+        Colors.indigo,
+        Colors.purple,
+        Colors.red,
+      ];
 
   static Color darken(Color color, double amount) {
     final luminance = color.computeLuminance();
@@ -256,5 +281,6 @@ class AppColors {
   }
 
   static Color get shimmerBase => darken(background, 0.1);
+
   static Color get shimmerHighlight => darken(background, 0.02);
 }

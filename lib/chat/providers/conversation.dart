@@ -29,11 +29,17 @@ class ConversationProvider with ChangeNotifier {
   // SECTION 2: PUBLIC GETTERS
   // ===========================================================================
   bool get isLoadingMessages => _isLoadingMessages;
+
   List<Message> get messages => _messages;
+
   String? get conversationID => _conversationID;
+
   String? get conversationTitle => _conversationTitle;
+
   bool get isWaitingForResponse => _isWaitingForResponse;
+
   bool get wasResponseStopped => _responseStopped;
+
   bool get justFinishedLoading => _justFinishedLoading;
 
   // ===========================================================================
@@ -87,7 +93,8 @@ class ConversationProvider with ChangeNotifier {
   /// Starts a new conversation session with the first user message.
   /// This atomic operation sets the conversation ID, title, and adds the
   /// initial user message and a "thinking" bubble.
-  void startNewConversationSession(String id, String title, String modelIdForStorage, Message userMessage) {
+  void startNewConversationSession(String id, String title,
+      String modelIdForStorage, Message userMessage) {
     _conversationID = id;
     _conversationTitle = title;
 
@@ -103,7 +110,8 @@ class ConversationProvider with ChangeNotifier {
     _responseStopped = false;
 
     // Persist the new conversation structure asynchronously.
-    ChatStorageService.saveConversation(id, title, [], modelId: modelIdForStorage).then((_) {
+    ChatStorageService.saveConversation(
+        id, title, [], modelId: modelIdForStorage).then((_) {
       ChatStorageService.upsertMessage(id, 0, userMessage);
     });
     CacheService.invalidateConversationCache();
@@ -127,7 +135,8 @@ class ConversationProvider with ChangeNotifier {
     _responseStopped = false;
 
     if (_conversationID != null) {
-      ChatStorageService.upsertMessage(_conversationID!, _messages.length - 2, userMessage);
+      ChatStorageService.upsertMessage(
+          _conversationID!, _messages.length - 2, userMessage);
     }
 
     notifyListeners();
@@ -147,7 +156,8 @@ class ConversationProvider with ChangeNotifier {
   /// - [newModelId]: The model ID to associate with the new "thinking" message.
   void prepareForRegeneration(int aiMessageIndex, String newModelId) {
     if (aiMessageIndex < 0) {
-      debugPrint("[ConversationProvider] Invalid negative index for regeneration. Aborting.");
+      debugPrint(
+          "[ConversationProvider] Invalid negative index for regeneration. Aborting.");
       return;
     }
 
@@ -156,7 +166,9 @@ class ConversationProvider with ChangeNotifier {
     if (aiMessageIndex <= _messages.length) {
       _messages = _messages.sublist(0, aiMessageIndex);
     } else {
-      debugPrint("[ConversationProvider] Invalid index $aiMessageIndex for list of length ${_messages.length}. Aborting regeneration prep.");
+      debugPrint(
+          "[ConversationProvider] Invalid index $aiMessageIndex for list of length ${_messages
+              .length}. Aborting regeneration prep.");
       return;
     }
 
@@ -166,7 +178,8 @@ class ConversationProvider with ChangeNotifier {
       isThinking: true,
       isUserMessage: false,
       isError: false,
-      opacity: 1.0, // Ensure it's visible.
+      opacity: 1.0,
+      // Ensure it's visible.
       model: newModelId,
     );
     _messages.add(thinkingPlaceholder);
@@ -176,7 +189,8 @@ class ConversationProvider with ChangeNotifier {
     _responseStopped = false;
 
     notifyListeners();
-    debugPrint("[ConversationProvider] Atomically prepared for regeneration. List truncated to index $aiMessageIndex and 'thinking' bubble added.");
+    debugPrint(
+        "[ConversationProvider] Atomically prepared for regeneration. List truncated to index $aiMessageIndex and 'thinking' bubble added.");
   }
 
   /// Appends a chunk of text to the last AI message in the list (for streaming responses).
@@ -188,7 +202,8 @@ class ConversationProvider with ChangeNotifier {
       );
     } else {
       // This case handles a stream starting before the thinking bubble is in place.
-      _messages.add(Message(text: chunk, isUserMessage: false, isThinking: true));
+      _messages.add(
+          Message(text: chunk, isUserMessage: false, isThinking: true));
     }
     notifyListeners();
   }
@@ -222,10 +237,12 @@ class ConversationProvider with ChangeNotifier {
     if (index >= 0 && index < _messages.length) {
       final msg = _messages[index];
       if (msg.isThinking) {
-        _messages[index] = msg.copyWith(isThinking: false, includeInContext: true);
+        _messages[index] =
+            msg.copyWith(isThinking: false, includeInContext: true);
       }
       if (_conversationID != null) {
-        ChatStorageService.upsertMessage(_conversationID!, index, _messages[index]);
+        ChatStorageService.upsertMessage(
+            _conversationID!, index, _messages[index]);
       }
     }
     _isWaitingForResponse = false;
@@ -235,13 +252,15 @@ class ConversationProvider with ChangeNotifier {
   // -------------------- Error Handling Actions --------------------
 
   /// Updates an existing AI message with an error state.
-  void setErrorMessage(int index, String errorMessage, bool isContentFlagError) {
+  void setErrorMessage(int index, String errorMessage,
+      bool isContentFlagError) {
     if (index < 0 || index >= _messages.length) return;
 
     final aiMessage = _messages[index];
 
     if (aiMessage.isThinking && aiMessage.text.isEmpty) {
-      debugPrint("[ConversationProvider] Error occurred during thinking phase. Removing empty bubble to prevent whitespace.");
+      debugPrint(
+          "[ConversationProvider] Error occurred during thinking phase. Removing empty bubble to prevent whitespace.");
       _messages.removeAt(index);
       _isWaitingForResponse = false;
       notifyListeners();
@@ -259,9 +278,11 @@ class ConversationProvider with ChangeNotifier {
       final userMessageIndex = index - 1;
       final userMessage = _messages[userMessageIndex];
       if (userMessage.isUserMessage) {
-        _messages[userMessageIndex] = userMessage.copyWith(includeInContext: false);
+        _messages[userMessageIndex] =
+            userMessage.copyWith(includeInContext: false);
         if (_conversationID != null) {
-          ChatStorageService.updateStoredMessage(_conversationID!, _messages[userMessageIndex], userMessageIndex);
+          ChatStorageService.updateStoredMessage(
+              _conversationID!, _messages[userMessageIndex], userMessageIndex);
         }
       }
     }
@@ -271,20 +292,26 @@ class ConversationProvider with ChangeNotifier {
   }
 
   /// Adds a new user message and a corresponding error message to the list.
-  void showSendError(Message userMessage, String errorMessage, bool isContentFlagError) {
+  void showSendError(Message userMessage, String errorMessage,
+      bool isContentFlagError) {
     if (_messages.isNotEmpty && _messages.last.isThinking) {
       setErrorMessage(_messages.length - 1, errorMessage, isContentFlagError);
       return;
     }
 
-    final finalUserMessage = userMessage.copyWith(includeInContext: !isContentFlagError);
-    final errorAIMessage = Message(text: errorMessage, isUserMessage: false, isError: true, includeInContext: false);
+    final finalUserMessage = userMessage.copyWith(
+        includeInContext: !isContentFlagError);
+    final errorAIMessage = Message(text: errorMessage,
+        isUserMessage: false,
+        isError: true,
+        includeInContext: false);
 
     _messages.add(finalUserMessage);
     _messages.add(errorAIMessage);
 
     if (_conversationID != null) {
-      ChatStorageService.upsertMessage(_conversationID!, _messages.length - 2, finalUserMessage);
+      ChatStorageService.upsertMessage(
+          _conversationID!, _messages.length - 2, finalUserMessage);
     }
 
     _isWaitingForResponse = false;

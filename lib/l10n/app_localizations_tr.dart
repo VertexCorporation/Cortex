@@ -12,7 +12,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get cancel => 'İptal';
 
   @override
-  String get remove => 'Kaldır';
+  String get remove => 'Kaldırmak';
 
   @override
   String get download => 'İndir';
@@ -147,9 +147,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noStarredChatsMessage => 'Henüz bir sohbeti yıldızlamadınız.';
 
   @override
-  String get goToChats => 'Bir sohbeti yıldızla';
-
-  @override
   String get starConversation => 'Yıldızla';
 
   @override
@@ -226,7 +223,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get pleaseCheckYourEmail =>
-      'Cortex\'i kullanmak için e-postanızı doğrulamanız gerekir. \n E-posta adresinize bir doğrulama bağlantısı gönderildi, lütfen e-postanızı kontrol edin.';
+      'Cortex\'i kullanmak için e-postanızı doğrulamanız gerekir. \nE-posta adresinize bir doğrulama bağlantısı gönderildi, lütfen e-postanızı kontrol edin.';
 
   @override
   String get verifyYourEmail => 'E-postanızı Doğrulayın';
@@ -412,20 +409,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noProductsFound => 'Ürün bulunamadı';
 
   @override
-  String get buyCredits => 'Kredi Satın Al';
-
-  @override
-  String get selectCreditPackageDescription =>
-      'İhtiyaçlarınıza uygun bir kredi paketi seçin ve daha fazla özelliğin keyfini çıkarın.';
-
-  @override
-  String get buyCredit => 'Kredi Satın Al';
-
-  @override
-  String get internetRequired =>
-      'Bu modeli kullanmak için internet bağlantısı gereklidir';
-
-  @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
       'Bu siparişi vererek, Hizmet Şartları ve Gizlilik Politikası\'nı kabul etmiş olursunuz. Hizmet Şartlarımız ve Gizlilik Politikamız hakkında daha fazla bilgi edinmek için bu metne tıklayabilirsiniz. Abonelik, mevcut dönemin bitiminden en az 24 saat önce otomatik yenileme kapatılmadığı sürece otomatik olarak yenilenecektir.';
 
@@ -511,8 +494,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String get shareMessage =>
-      'Cortex uygulamasına bir göz at, harika! Buradan indir: https://play.google.com/store/apps/details?id=com.vertex.cortex';
+  String shareMessage(String cortexLink) {
+    return 'Cortex uygulamasına bir göz at, harika! Buradan indir: $cortexLink';
+  }
 
   @override
   String get shareFailed =>
@@ -561,6 +545,9 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get deleteAllConversationsConfirmMessage =>
       'Tüm sohbetlerinizi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.';
+
+  @override
+  String get conversationDeleted => 'Konuşma silindi!';
 
   @override
   String get allConversationsDeleted => 'Tüm sohbetler başarıyla silindi!';
@@ -671,11 +658,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noMatchingModels => 'Eşleşen model bulunamadı.';
 
   @override
-  String creditPackage(Object amount) {
-    return '$amount Kredi Satın Al';
-  }
-
-  @override
   String get benefit1 =>
       'Çevrimiçi yapay zekalar için çok daha fazla sohbet limiti';
 
@@ -689,9 +671,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get benefit5 => 'Daha fazla çevrimiçi yapay zeka oluşturun';
 
   @override
-  String benefit7(Object credits) {
-    return 'Günlük $credits kredi';
-  }
+  String get benefit7 => 'Daha fazla kullanım sınırı';
 
   @override
   String get benefit8 => 'Model ekle';
@@ -846,9 +826,8 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu çevrimdışı model cihazınızda yüklü değil.';
 
   @override
-  String insufficientCredits(Object available, Object required) {
-    return 'Bu isteği tamamlamak için yeterli krediniz yok. Bu eylem $required kredi gerektiriyor, ancak sizde yalnızca $available var. Daha fazla kredi kazanmak için planınızı yükseltebilir veya doğrudan satın alabilirsiniz. kanka biliyoruz bu kredi mevzusu can sıkıcı ama modellerden cevap almak biraz pahalı yani bu krediler aslında gerekli yoksaBata.rizOglum satın alım yapanlar fazla olursa az para kazanırsak limitleri de artırabiliriz o zamana kadar aynı devam';
-  }
+  String get reachedLimit =>
+      'Kullanım limitinize ulaştınız; daha fazla limit kazanmak için planınızı yükseltebilirsiniz. (kanka, biliyoruz limitlerin bitmesi can sıkıcı. ama o harika cevapları almanın bize maliyeti çok fazla, bu yüzden bu limitler aslında güzel zamanların devam etmesine yardımcı olluuuuyor.)';
 
   @override
   String get modality => 'Modalite';
@@ -875,8 +854,8 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu eylemi gerçekleştirmek için giriş yapmış olmalısınız.';
 
   @override
-  String get errorInsufficientCredits =>
-      'Yetersiz krediniz var. Devam etmek için lütfen kredi yükleyin.';
+  String get errorReachedLimit =>
+      'Limitinize ulaştınız, daha fazlasının kilidini açmak ve sohbete devam etmek için yükseltme yapın.';
 
   @override
   String get errorServer =>
@@ -922,10 +901,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Sunucularımızdan gerekli verileri alamadık. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.';
 
   @override
-  String get noModelsFoundTitle => 'Sonuç Bulunamadı';
+  String get noFoundTitle => 'Sonuç Bulunamadı';
 
   @override
-  String get noModelsFoundMessage =>
+  String get noFoundMessage =>
       'Arama terimlerinizi değiştirmeyi veya filtreyi temizlemeyi deneyin.';
 
   @override
@@ -1012,25 +991,25 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get photoWarningMessage =>
-      'Bir fotoğraf eklenmiştir. Görüntüleri desteklemeyen modeller bunu yok sayabilir.';
+      'Bir fotoğraf eklenmiştir, görüntüleri desteklemeyen modeller bunu yok sayabilir.';
 
   @override
   String get storagePermissionRequired =>
       'İndirilen modelleri kaydetmek için depolama izni gereklidir. Devam etmek için lütfen izin verin.';
 
   @override
-  String get creditBannerTitle => 'Bedava Kredi Kazan!';
+  String get plusBannerTitle => 'Bedava Plus!';
 
   @override
-  String get creditBannerSubtitle =>
-      'Bir arkadaşını davet et, ikiniz de anında 50 kredi kazanın! Abone olursa, ikinize de tam 500 kredi daha hediye!';
+  String get plusBannerSubtitle =>
+      'Kankanı davet et ve ikiniz de 1 günlük ücretsiz Plus kapın!';
 
   @override
   String get inviteShareSubject => 'Cortex\'e Katıl!';
 
   @override
-  String inviteShareMessage(String playStoreLink) {
-    return 'kanka cortex diye manyak bi uygulama var birilerini davet edince 50 kredi geliyo bizim hesaplara hatta abonelik alırsan ikimiz de 500 kazancaz EFSANE FIRSAT İNDİR İNDİR HIZLI\n\n$playStoreLink';
+  String inviteShareMessage(String cortexLink) {
+    return 'kanka cortex diye manyak bi uygulama var birilerini davet edince bedava plus abonelik geliyo bizim hesaplara EFSANE FIRSAT İNDİR İNDİR HIZLI\n\n$cortexLink';
   }
 
   @override
@@ -1088,21 +1067,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get errorImageLoad => 'Oluşturulan görüntü yüklenemedi.';
 
   @override
-  String get extensionInfoPanelTitle => 'Modelleri Keşfedin';
-
-  @override
-  String get extensionInfoPanelBody1 =>
-      'Bu ok, bu serideki farklı modeller arasında geçiş yapmanızı sağlar.';
-
-  @override
-  String get extensionInfoPanelBody2 =>
-      'Bu seriyle ilk kez sohbete başladığınızda varsayılan model otomatik olarak seçilir ve sohbet sırasında seçiminizi istediğiniz zaman değiştirebilirsiniz.';
-
-  @override
-  String get extensionInfoPanelFooter =>
-      'Her model hakkında detaylı bilgi görüntülemek veya farklı bir modeli manuel olarak seçmek için lütfen Kütüphane\'ye gidin; oradan bu model serisini seçin ve detay sayfasının üst kısmındaki oka dokunun.';
-
-  @override
   String get premiumModelNoticeTitle => 'Premium Model';
 
   @override
@@ -1117,24 +1081,13 @@ class AppLocalizationsTr extends AppLocalizations {
       'Premium modeller için tüm ücretsiz günlük mesajlarınızı kullandınız, sınırsız erişim için lütfen yükseltin.';
 
   @override
-  String get selectionScreenGreetingGeneric =>
-      'Bugün size nasıl yardımcı olabilirim?';
-
-  @override
-  String get selectionScreenFeatureOffline => 'İnternetsiz Kullan';
+  String get useOffline => 'İnternetsiz Kullan';
 
   @override
   String get explore => 'Keşfet';
 
   @override
-  String get selectionScreenNewsAndUpdates => 'Haberler ve Güncellemeler';
-
-  @override
-  String get filters => 'Filtreler';
-
-  @override
-  String get noRecentChatsMessage =>
-      'Henüz hiçbir modelle konuşmadınız, gelin sohbete başlayalım!';
+  String get news => 'Haberler';
 
   @override
   String get allModels => 'Tüm Modeller';
@@ -1150,10 +1103,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get customModels => 'Özel Modeller';
-
-  @override
-  String get filterPanelDescription =>
-      'Listeyi anında filtrelemek için bir kategoriye dokunun.';
 
   @override
   String get dynamicChatTitle => 'Dinamik Sohbet';
@@ -1316,7 +1265,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get notificationReferralBody =>
-      'Arkadaşını Cortex\'e davet et ve ikiniz de hediye krediler kazanın!';
+      'Kankanı Cortex\'e davet et, ikiniz de bir günlük ücretsiz plus kazanın!';
 
   @override
   String get notificationCookingTitle => 'Acıktın mı?';
@@ -1465,13 +1414,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Günaydın, iyi geceler gibi mesajlar.';
 
   @override
-  String get exitAppTitle => 'Bu kadar erken mi gidiyorsun?';
-
-  @override
-  String get exitAppConfirmation =>
-      'Bu harika platformdan ayrılmak istediğinize emin misiniz?';
-
-  @override
   String get tagNotFound => 'Girdiğiniz etiket geçersiz veya süresi dolmuş.';
 
   @override
@@ -1544,7 +1486,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get upgradeAccountDescription =>
-      'Günlük 200 bonus kredisi kazanmak ve daha fazla limitin kilidini açmak için bir hesap oluşturun.';
+      'Daha fazla özelliğe erişmek için hesap oluşturun.';
 
   @override
   String get createAccount => 'Hesap Oluştur';
@@ -1587,5 +1529,25 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu özellik emülatör modunda devre dışıdır.';
 
   @override
-  String get newChat => 'New Chat';
+  String get newChat => 'Yeni Sohbet';
+
+  @override
+  String get howCanIHelpWith => 'Nasıl yardımcı olabilirim?';
+
+  @override
+  String get variants => 'Varyantlar';
+
+  @override
+  String get variantsDescription =>
+      'Varyantlar, aynı yapay zeka ailesinin farklı sürümleridir. Ana karta dokunduğunuzda otomatik olarak en iyisini seçiyoruz, ancak isterseniz buradan belirli birini manuel olarak seçebilirsiniz!';
+
+  @override
+  String get fluxChatTitle => 'Flux Sohbet';
+
+  @override
+  String get fluxChatDescription =>
+      'Flux sohbetler geçici sohbetlerdir ve cihazınıza kaydedilmez.';
+
+  @override
+  String get alwaysBest => 'Her zaman en iyisi';
 }

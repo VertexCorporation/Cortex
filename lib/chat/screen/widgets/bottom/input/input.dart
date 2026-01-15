@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:cortex/app.dart';
+import 'package:cortex/library/backend/data/entity.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,7 +11,8 @@ import '../../../../../internet.dart';
 import '../../../../../notifications/introvert.dart';
 import '../../../../../theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-
+import '../../../../providers/session.dart';
+import '../selection/sheet.dart';
 import 'buttons.dart';
 
 class InputField extends StatefulWidget {
@@ -161,7 +163,10 @@ class InputFieldState extends State<InputField> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final bool isTablet = screenWidth >= 600;
 
     if (!widget.isModelSelected && !widget.isDynamicChatMode) {
@@ -193,17 +198,18 @@ class InputFieldState extends State<InputField> {
             children: [
               if (widget.canHandleImage)
                 _buildPhotoPreview(screenWidth, isTablet),
+
+              // FIX: Restored the Layout Logic
+              // Row -> Expanded Column (TextField + Tools) -> Send Button (Right)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildAnimatedAddPhotoButton(screenWidth, isTablet),
-                        Expanded(
-                          child: _buildTextField(screenWidth, isTablet),
-                        ),
+                        _buildTextField(screenWidth, isTablet),
+                        _buildToolRow(screenWidth, isTablet),
                       ],
                     ),
                   ),
@@ -217,57 +223,208 @@ class InputFieldState extends State<InputField> {
     );
   }
 
-  Widget _buildAnimatedAddPhotoButton(double screenWidth, bool isTablet) {
-    // Dynamic width for the button container
-    final double buttonWidth = isTablet ? screenWidth * 0.08 : 48.0;
-    final double targetWidth = widget.canHandleImage ? buttonWidth : 0.0;
+  // NEW: Only contains Add Photo and Model Selector
+  // This allows the Send Button to live outside in the parent Row
+  Widget _buildToolRow(double screenWidth, bool isTablet) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: isTablet ? screenWidth * 0.02 : 12.0,
+        right: 8.0,
+        top: 2.0,
+        bottom: isTablet ? screenWidth * 0.015 : 12.0,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildAnimatedAddPhotoButton(screenWidth, isTablet),
+          const SizedBox(width: 10.0),
+          _buildModelSelectButton(screenWidth, isTablet),
+        ],
+      ),
+    );
+  }
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      width: targetWidth,
-      child: ClipRect(
-        child: SizedBox(
-          width: buttonWidth,
-          child: _buildAddPhotoButtonContent(screenWidth, isTablet),
+  Widget _buildAnimatedAddPhotoButton(double screenWidth, bool isTablet) {
+    final double buttonSize = 36.0;
+    final double iconSize = 20.0;
+
+    final bool hasPhoto = _selectedPhoto != null;
+    final bool buttonDisabled = widget.isLimitExceeded || hasPhoto;
+
+    return Opacity(
+      opacity: (buttonDisabled || widget.isPhotoLoading) ? 0.5 : 1.0,
+      child: GestureDetector(
+        onTap: widget.isPhotoLoading
+            ? null
+            : () {
+          if (hasPhoto) {
+            Provider.of<IntrovertNotificationService>(context,
+                listen: false)
+                .showNotification(
+              message: widget.localizations.photoLimitReachedMessage,
+              type: NotificationType.error,
+              bottomOffset: 0.22,
+              fontSize: 0.032,
+            );
+          } else {
+            _pickPhoto();
+          }
+        },
+        child: Container(
+          width: buttonSize,
+          height: buttonSize,
+          decoration: BoxDecoration(
+            color: AppColors.background, // FIX: Background color
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.border, // FIX: Added Border
+              width: 1.0,
+            ),
+          ),
+          child: Center(
+            child: Icon(
+              Icons.add,
+              color: AppColors.tertiaryColor, // Visible color
+              size: iconSize,
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildAddPhotoButtonContent(double screenWidth, bool isTablet) {
-    final bool hasPhoto = _selectedPhoto != null;
-    final bool buttonDisabled = widget.isLimitExceeded || hasPhoto;
+  Widget _buildModelSelectButton(double screenWidth, bool isTablet) {
+    final sessionProvider = context.watch<ChatSessionProvider>();
+    final bool isDynamic = sessionProvider.isDynamicChat;
 
-    // --- DYNAMIC ICON SIZE ---
-    // Tablet: 3.5% of width. Phone: Fixed 28.
-    final double iconSize = isTablet ? screenWidth * 0.035 : 28.0;
+    final String displayText = isDynamic
+        ? widget.localizations.dynamicChatTitle
+        : (sessionProvider.modelTitle ?? "Model");
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: widget.isPhotoLoading
-          ? null
-          : () {
-        if (hasPhoto) {
-          Provider.of<IntrovertNotificationService>(context, listen: false)
-              .showNotification(
-            message: widget.localizations.photoLimitReachedMessage,
-            type: NotificationType.error,
-            bottomOffset: 0.22,
-            fontSize: 0.032,
-          );
-        } else {
-          _pickPhoto();
-        }
-      },
-      child: Opacity(
-        opacity: (buttonDisabled || widget.isPhotoLoading) ? 0.5 : 1.0,
-        child: Icon(
-          Icons.add,
-          color: AppColors.primaryColor.inverted,
-          size: iconSize,
+    final double borderRadius = 30.0;
+    final double fontSize = isTablet ? screenWidth * 0.02 : 13.0;
+
+    return Flexible(
+      fit: FlexFit.loose,
+      child: GestureDetector(
+        onTap: () => _openModelSelectionSheet(sessionProvider),
+        child: Stack(
+          alignment: Alignment.centerLeft,
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                maxWidth: screenWidth * 0.55,
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: isTablet ? 16.0 : 14.0,
+                vertical: 8.0,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(borderRadius),
+                border: Border.all(
+                  color: AppColors.border,
+                  width: 1.0,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      displayText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.primaryColor.inverted,
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  // FIX: Rotated -90 degrees (approx -1.57 radians)
+                  Transform.rotate(
+                    angle: -1.5708,
+                    child: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: AppColors.tertiaryColor,
+                      size: fontSize * 1.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isDynamic)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.senaryColor.withValues(alpha: 0.1),
+                          Colors.transparent,
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
+    );
+  }
+
+  void _openModelSelectionSheet(ChatSessionProvider sessionProvider) {
+    final String currentId = sessionProvider.modelId ?? '';
+    showModelSelectionSheet(
+      context: context,
+      localizations: widget.localizations,
+      currentModelId: currentId,
+      onModelSelected: (String newModelId) {
+        try {
+          final allModels = sessionProvider.allModels;
+          ModelEntity? targetModel;
+
+          try {
+            targetModel = allModels.firstWhere((m) => m.id == newModelId);
+          } catch (_) {
+            for (final parent in allModels) {
+              if (parent.variants != null &&
+                  parent.variants!.containsKey(newModelId)) {
+                final variantMap = parent.variants![newModelId];
+                if (variantMap is Map<String, dynamic>) {
+                  final mergedMap = {
+                    ...parent.toMap(),
+                    ...variantMap,
+                    'id': variantMap['id'] ?? newModelId,
+                    'title': variantMap['title'],
+                  };
+                  mergedMap.remove('variants');
+                  final langCode = sessionProvider
+                      .getLocale()
+                      .languageCode;
+                  targetModel = ModelEntity.fromMap(mergedMap, langCode);
+                }
+                break;
+              }
+            }
+          }
+
+          if (targetModel != null) {
+            sessionProvider.selectModel(targetModel);
+          } else {
+            sessionProvider.updateActiveModelVariant(newModelId);
+          }
+        } catch (e) {
+          debugPrint("Error switching model from input: $e");
+          sessionProvider.updateActiveModelVariant(newModelId);
+        }
+      },
     );
   }
 
@@ -275,61 +432,69 @@ class InputFieldState extends State<InputField> {
     const Key textFieldKey = ValueKey('chat_input_field');
 
     // --- DYNAMIC FONT SIZE ---
-    // Tablet: 2.5% of width (~20px on 800w). Phone: 4% of width (~16px on 400w).
     final double fontSize = isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
 
-    // Dynamic Padding
-    final double verticalPadding = isTablet ? screenWidth * 0.02 : 10.0;
+    final double verticalPadding = isTablet ? screenWidth * 0.015 : 12.0;
     final double horizontalPadding = isTablet ? screenWidth * 0.015 : 8.0;
 
-    return TextField(
-      key: textFieldKey,
-      focusNode: widget.textFieldFocusNode,
-      cursorColor: AppColors.primaryColor.inverted,
-      controller: widget.controller,
-      maxLength: 4000,
-      minLines: 1,
-      maxLines: 6,
-      keyboardType: TextInputType.multiline,
-      textInputAction: TextInputAction.newline,
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: horizontalPadding),
-        hintText: widget.localizations.messageHint,
-        hintStyle: TextStyle(
-          color: Colors.grey[600],
+    return Padding(
+      padding: EdgeInsets.symmetric(
+          horizontal: isTablet ? screenWidth * 0.02 : screenWidth * 0.02),
+      child: TextField(
+        key: textFieldKey,
+        focusNode: widget.textFieldFocusNode,
+        cursorColor: AppColors.primaryColor.inverted,
+        controller: widget.controller,
+        maxLength: 4000,
+        minLines: 1,
+        maxLines: 6,
+        keyboardType: TextInputType.multiline,
+        textInputAction: TextInputAction.newline,
+        decoration: InputDecoration(
+          isDense: true,
+          // FIX: Removes default extra vertical space
+          contentPadding: EdgeInsets.symmetric(
+              vertical: verticalPadding, horizontal: horizontalPadding),
+          hintText: widget.localizations.messageHint,
+          hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: fontSize,
+          ),
+          border: InputBorder.none,
+          counterText: '',
+        ),
+        style: TextStyle(
+          // FIX: Standard text color to ensure visibility against background
+          color: AppColors.primaryColor.inverted,
           fontSize: fontSize,
         ),
-        border: InputBorder.none,
-        counterText: '',
+        onSubmitted: (value) async {
+          if (isSendButtonEnabled) await widget.onSend();
+        },
       ),
-      style: TextStyle(
-        color: AppColors.primaryColor.inverted,
-        fontSize: fontSize,
-      ),
-      onSubmitted: (value) async {
-        if (isSendButtonEnabled) await widget.onSend();
-      },
     );
   }
 
   Widget _buildSendButton(double screenWidth, bool isTablet) {
-    final bool isConnected = context.watch<InternetProvider>().isConnected;
+    final bool isConnected = context
+        .watch<InternetProvider>()
+        .isConnected;
 
+    // Standard positioning to right corner
     return Padding(
       padding: EdgeInsets.only(
-        right: isTablet ? screenWidth * 0.02 : screenWidth * 0.02,
-        bottom: isTablet ? screenWidth * 0.015 : 8.0,
+        right: isTablet ? screenWidth * 0.02 : 16.0,
+        bottom: isTablet ? screenWidth * 0.015 : 12.0,
       ),
       child: Builder(
         builder: (context) {
           bool calculatedIsEnabled = isSendButtonEnabled;
 
-          if ((widget.isServerSideModel || widget.isDynamicChatMode) && !isConnected) {
+          if ((widget.isServerSideModel || widget.isDynamicChatMode) &&
+              !isConnected) {
             calculatedIsEnabled = false;
           }
 
-          // ActionButtonWidget handles its own sizing, but typically relies on parent limits
-          // or its own defaults. Ensure it scales if needed or let it be standard size.
           return ActionButtonWidget(
             isEnabled: calculatedIsEnabled,
             isSending: widget.isSending,
@@ -356,9 +521,8 @@ class InputFieldState extends State<InputField> {
   }
 
   Widget _buildPhotoPreview(double screenWidth, bool isTablet) {
-    // --- DYNAMIC PREVIEW SIZE ---
-    // Tablet: 18% of screen. Phone: 25%.
-    final double previewSize = isTablet ? screenWidth * 0.18 : screenWidth * 0.25;
+    final double previewSize = isTablet ? screenWidth * 0.18 : screenWidth *
+        0.25;
     final bool hasPhoto = _selectedPhoto != null;
     final double padding = isTablet ? screenWidth * 0.02 : screenWidth * 0.03;
 
@@ -386,16 +550,20 @@ class InputFieldState extends State<InputField> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        if (_selectedPhoto != null && _isPngFile(_selectedPhoto!))
+                        if (_selectedPhoto != null &&
+                            _isPngFile(_selectedPhoto!))
                           Container(
-                            color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                            color: AppColors.primaryColor.inverted
+                                .withValues(alpha: 0.5),
                           ),
                         if (_selectedPhoto != null)
                           Image.file(
                             _selectedPhoto!,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
-                                Icon(Icons.broken_image, color: AppColors.tertiaryColor),
+                                Icon(
+                                    Icons.broken_image,
+                                    color: AppColors.tertiaryColor),
                           ),
                       ],
                     ),
@@ -412,13 +580,17 @@ class InputFieldState extends State<InputField> {
                         color: Colors.black87,
                         shape: BoxShape.circle,
                         boxShadow: [
-                          BoxShadow(color: Colors.black38, blurRadius: 4, offset: Offset(0, 1)),
+                          BoxShadow(
+                              color: Colors.black38,
+                              blurRadius: 4,
+                              offset: Offset(0, 1)),
                         ],
                       ),
                       child: Icon(
                         Icons.close_rounded,
-                        // Dynamic close icon
-                        size: isTablet ? screenWidth * 0.025 : screenWidth * 0.04,
+                        size: isTablet
+                            ? screenWidth * 0.025
+                            : screenWidth * 0.04,
                         color: Colors.white,
                       ),
                     ),
@@ -475,7 +647,9 @@ class InputFieldState extends State<InputField> {
     if (!widget.isStorageSufficient) return false;
     if (widget.isLimitExceeded) return false;
 
-    if (widget.isPremiumModel && !widget.isSubscribed && widget.premiumTrialUses >= 3) {
+    if (widget.isPremiumModel &&
+        !widget.isSubscribed &&
+        widget.premiumTrialUses >= 3) {
       return false;
     }
 
@@ -483,7 +657,8 @@ class InputFieldState extends State<InputField> {
     final bool hasPhoto = _selectedPhoto != null;
 
     final needed = _requiredCredits();
-    if ((widget.isDynamicChatMode || widget.isServerSideModel) && widget.totalCredits < needed) {
+    if ((widget.isDynamicChatMode || widget.isServerSideModel) &&
+        widget.totalCredits < needed) {
       return false;
     }
 

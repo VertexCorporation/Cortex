@@ -40,12 +40,12 @@ class ModelDataUtils {
       final directMatch = allCachedModels.firstWhere((model) => model.id == modelId);
       return directMatch;
     } catch(e) {
-      // Not a direct match, proceed to check extensions.
+      // Not a direct match, proceed to check variants.
     }
 
-    // Next, search within the extensions of each series.
+    // Next, search within the variants of each series.
     for (final seriesEntity in allCachedModels) {
-      if (seriesEntity.extensions?.containsKey(modelId) ?? false) {
+      if (seriesEntity.variants?.containsKey(modelId) ?? false) {
         return seriesEntity; // Found the parent.
       }
     }
@@ -59,11 +59,11 @@ class ModelDataUtils {
   /// This is used to determine if the "Change Model" option should be displayed.
   /// If a conversation contains a photo, it only counts variants that can handle images.
   /// Returns 0 if there are no other valid options to switch to.
-  static int validExtensionCountForChangingModel({
+  static int validVariantCountForChangingModel({
     required ModelEntity parentSeries,
     required bool conversationHasPhoto,
   }) {
-    final extMap = parentSeries.extensions;
+    final extMap = parentSeries.variants;
     if (extMap == null || extMap.isEmpty) {
       return 0;
     }
@@ -73,13 +73,13 @@ class ModelDataUtils {
       final data = entry.value;
       if (data is Map<String, dynamic>) {
         if (conversationHasPhoto) {
-          // In a photo chat, only count extensions that support images.
+          // In a photo chat, only count variants that support images.
           final modalities = data['modalities'] as Map<String, dynamic>? ?? {};
           if (modalities['image'] == true) {
             count++;
           }
         } else {
-          // In a text-only chat, all extensions are valid.
+          // In a text-only chat, all variants are valid.
           count++;
         }
       }

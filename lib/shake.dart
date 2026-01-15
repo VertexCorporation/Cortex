@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 class ShakeWidget extends StatefulWidget {
   final Widget child;
   final AnimationController controller;
+
   const ShakeWidget({super.key, required this.child, required this.controller});
 
   @override
