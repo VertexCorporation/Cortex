@@ -18,6 +18,9 @@ android/app/build/
 .swiftpm/
 migrate_working_dir/
 *.env
+.venv/
+venv/
+ENV/
 
 # IntelliJ related
 *.iml
