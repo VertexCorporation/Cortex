@@ -19,25 +19,45 @@ class AppLanguageSection extends StatelessWidget {
   const AppLanguageSection({super.key});
 
   /// Returns the localized language name corresponding to the given language code.
-  String _getLocalizedLanguageName(AppLocalizations localizations, String code) {
+  String _getLocalizedLanguageName(AppLocalizations localizations,
+      String code) {
     switch (code) {
-      case 'en': return localizations.english;
-      case 'tr': return localizations.turkish;
-      case 'zh': return localizations.chinese;
-      case 'fr': return localizations.french;
-      case 'hi': return localizations.hindi;
-      case 'pt': return localizations.portuguese;
-      case 'id': return localizations.indonesian;
-      case 'az': return localizations.azerbaijani;
-      case 'de': return localizations.german;
-      case 'es': return localizations.spanish;
-      case 'it': return localizations.italian;
-      case 'ja': return localizations.japanese;
-      case 'ku': return localizations.kurdish;
-      case 'nl': return localizations.dutch;
-      case 'ru': return localizations.russian;
-      case 'ko': return localizations.korean;
-      default: return code; // Fallback for unknown codes
+      case 'en':
+        return localizations.english;
+      case 'tr':
+        return localizations.turkish;
+      case 'zh':
+        return localizations.chinese;
+      case 'fr':
+        return localizations.french;
+      case 'hi':
+        return localizations.hindi;
+      case 'pt':
+        return localizations.portuguese;
+      case 'id':
+        return localizations.indonesian;
+      case 'az':
+        return localizations.azerbaijani;
+      case 'de':
+        return localizations.german;
+      case 'es':
+        return localizations.spanish;
+      case 'it':
+        return localizations.italian;
+      case 'ja':
+        return localizations.japanese;
+      case 'ku':
+        return localizations.kurdish;
+      case 'nl':
+        return localizations.dutch;
+      case 'ru':
+        return localizations.russian;
+      case 'ko':
+        return localizations.korean;
+      case 'ar':
+        return localizations.arabic;
+      default:
+        return code; // Fallback for unknown codes
     }
   }
 
@@ -46,8 +66,14 @@ class AppLanguageSection extends StatelessWidget {
   Future<void> _showLanguageSelectionDialog(BuildContext context) async {
     final localeProvider = context.read<LocaleProvider>();
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final modelCatalogProvider = context.read<ModelCatalogProvider>();
 
     final languages = [
@@ -67,6 +93,7 @@ class AppLanguageSection extends StatelessWidget {
       {'code': 'nl', 'name': appLocalizations.dutch},
       {'code': 'ru', 'name': appLocalizations.russian},
       {'code': 'ko', 'name': appLocalizations.korean},
+      {'code': 'ar', 'name': appLocalizations.arabic},
     ];
 
     // Temporarily holds the selected language within the dialog.
@@ -99,10 +126,11 @@ class AppLanguageSection extends StatelessWidget {
                         // --- Dialog Header with Icon ---
                         SizedBox(height: screenHeight * 0.02),
                         SvgPicture.asset(
-                          'assets/icons/language.svg',
+                          'assets/icons/world.svg',
                           width: screenWidth * 0.07,
                           height: screenWidth * 0.07,
-                          colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(
+                              AppColors.primaryColor.inverted, BlendMode.srcIn),
                         ),
                         SizedBox(height: screenHeight * 0.008),
                         Text(
@@ -115,25 +143,34 @@ class AppLanguageSection extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: screenHeight * 0.008),
-                        Divider(height: 1, thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha:0.7)),
+                        Divider(height: 1,
+                            thickness: 0.5,
+                            color: AppColors.quinaryColor.withValues(
+                                alpha: 0.7)),
 
                         // --- Language List ---
                         ConstrainedBox(
-                          constraints: BoxConstraints(maxHeight: screenHeight * 0.4),
+                          constraints: BoxConstraints(
+                              maxHeight: screenHeight * 0.4),
                           child: ListView.builder(
                             shrinkWrap: true,
-                            padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01, horizontal: screenWidth * 0.02),
+                            padding: EdgeInsets.symmetric(
+                                vertical: screenHeight * 0.01,
+                                horizontal: screenWidth * 0.02),
                             itemCount: languages.length,
                             itemBuilder: (context, index) {
                               final lang = languages[index];
                               final String langCode = lang['code']!;
-                              final bool isSelected = (tempSelectedLanguageCode == langCode);
+                              final bool isSelected = (tempSelectedLanguageCode ==
+                                  langCode);
 
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 curve: Curves.easeInOut,
                                 decoration: BoxDecoration(
-                                  color: isSelected ? AppColors.primaryColor.inverted.withValues(alpha:0.02) : Colors.transparent,
+                                  color: isSelected ? AppColors.primaryColor
+                                      .inverted.withValues(alpha: 0.02) : Colors
+                                      .transparent,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: ListTile(
@@ -146,22 +183,29 @@ class AppLanguageSection extends StatelessWidget {
                                   ),
                                   leading: AnimatedSwitcher(
                                     duration: const Duration(milliseconds: 200),
-                                    transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                                    transitionBuilder: (child, animation) =>
+                                        FadeTransition(
+                                            opacity: animation, child: child),
                                     child: Icon(
-                                      isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                                      key: ValueKey<bool>(isSelected), // Important for AnimatedSwitcher
+                                      isSelected
+                                          ? Icons.radio_button_checked
+                                          : Icons.radio_button_unchecked,
+                                      key: ValueKey<bool>(isSelected),
+                                      // Important for AnimatedSwitcher
                                       color: AppColors.primaryColor.inverted,
                                     ),
                                   ),
                                   onTap: () {
                                     if (!isSelected) {
-                                      setStateDialog(() => tempSelectedLanguageCode = langCode);
+                                      setStateDialog(() =>
+                                      tempSelectedLanguageCode = langCode);
                                     }
                                   },
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.02),
                                 ),
                               );
                             },
@@ -169,13 +213,19 @@ class AppLanguageSection extends StatelessWidget {
                         ),
 
                         // --- Dialog Footer with "Done" Button ---
-                        Divider(height: 1, thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha:0.7)),
+                        Divider(height: 1,
+                            thickness: 0.5,
+                            color: AppColors.quinaryColor.withValues(
+                                alpha: 0.7)),
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            splashColor: AppColors.senaryColor.withValues(alpha:0.1),
-                            highlightColor: AppColors.senaryColor.withValues(alpha:0.1),
-                            onTap: () => Navigator.of(ctx).pop(tempSelectedLanguageCode),
+                            splashColor: AppColors.senaryColor.withValues(
+                                alpha: 0.1),
+                            highlightColor: AppColors.senaryColor.withValues(
+                                alpha: 0.1),
+                            onTap: () =>
+                                Navigator.of(ctx).pop(tempSelectedLanguageCode),
                             child: Container(
                               height: screenHeight * 0.065,
                               alignment: Alignment.center,
@@ -203,7 +253,8 @@ class AppLanguageSection extends StatelessWidget {
 
     restoreNavBar();
 
-    if (selectedLangCode == null || selectedLangCode == localeProvider.locale.languageCode) {
+    if (selectedLangCode == null ||
+        selectedLangCode == localeProvider.locale.languageCode) {
       return;
     }
 
@@ -215,7 +266,8 @@ class AppLanguageSection extends StatelessWidget {
     // 2. Manually trigger a full refresh on the ModelCatalogProvider.
     modelCatalogProvider.refreshCatalog();
 
-    debugPrint("[AppLanguageSection] Language changed to '$selectedLangCode'. All caches cleared, models are refreshing.");
+    debugPrint(
+        "[AppLanguageSection] Language changed to '$selectedLangCode'. All caches cleared, models are refreshing.");
   }
 
   @override
@@ -227,10 +279,17 @@ class AppLanguageSection extends StatelessWidget {
     final appLocalizations = AppLocalizations.of(context)!;
 
     final currentLanguageCode = localeProvider.locale.languageCode;
-    final currentLanguageName = _getLocalizedLanguageName(appLocalizations, currentLanguageCode);
+    final currentLanguageName = _getLocalizedLanguageName(
+        appLocalizations, currentLanguageCode);
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,9 +321,10 @@ class AppLanguageSection extends StatelessWidget {
           child: InkWell(
             onTap: () => _showLanguageSelectionDialog(context),
             borderRadius: BorderRadius.circular(10.0),
-            splashColor: AppColors.quaternaryColor.withValues(alpha:0.3),
+            splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02, horizontal: screenWidth * 0.04),
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02,
+                  horizontal: screenWidth * 0.04),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

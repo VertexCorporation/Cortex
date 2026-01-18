@@ -1,6 +1,7 @@
 // lib/screens/models/screen/new/controller.dart
 
 import 'package:cortex/app.dart';
+import 'package:cortex/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -22,50 +23,63 @@ class ModelCreationHost extends StatefulWidget {
   State<ModelCreationHost> createState() => _ModelCreationHostState();
 }
 
-class _ModelCreationHostState extends State<ModelCreationHost> with TickerProviderStateMixin {
+class _ModelCreationHostState extends State<ModelCreationHost>
+    with TickerProviderStateMixin {
   bool _showCreateScreen = true;
+
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _switchScreen() {
     setState(() {
       _showCreateScreen = !_showCreateScreen;
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(0);
+      }
     });
-  }
-
-  Size _getTextSize(String text, TextStyle style, BuildContext context) {
-    final defaultStyle = Theme.of(context).appBarTheme.titleTextStyle ?? Theme.of(context).textTheme.titleLarge;
-    final effectiveStyle = defaultStyle?.merge(style) ?? style;
-    final TextPainter textPainter = TextPainter(
-      text: TextSpan(text: text, style: effectiveStyle),
-      maxLines: 1,
-      textDirection: TextDirection.ltr,
-    )..layout(minWidth: 0, maxWidth: double.infinity);
-    return textPainter.size;
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final bool isTablet = screenWidth >= 600;
 
-    final double appBarHeight = isTablet ? screenWidth * 0.14 : kToolbarHeight;
-
-    final double backIconSize = isTablet ? 32.0 : 24.0;
-    final double transitionIconSize = isTablet ? 32.0 : screenWidth * 0.06;
-
-    final double titleFontSize = isTablet ? 24.0 : 20.0;
+    final double transitionIconSize = isTablet ? 24.0 : 20.0;
+    final double titleFontSize = isTablet ? 20.0 : 18.0;
 
     final titleStyle = TextStyle(
       color: AppColors.primaryColor.inverted,
       fontSize: titleFontSize,
-      fontWeight: FontWeight.normal,
+      fontWeight: FontWeight.w500,
+      fontFamily: 'Ubuntu',
     );
 
-    final currentTitleText = _showCreateScreen ? localizations.create : localizations.add;
-    final titleWidth = _getTextSize(currentTitleText, titleStyle, context).width;
+    final currentTitleText =
+    _showCreateScreen ? localizations.create : localizations.add;
 
     return ChangeNotifierProvider(
-      create: (ctx) => ModelCreationProvider(this, ctx, widget.availableBaseModels, modelService: context.read<ModelService>(),),
+      create: (ctx) =>
+          ModelCreationProvider(
+            this,
+            ctx,
+            widget.availableBaseModels,
+            modelService: context.read<ModelService>(),
+          ),
       child: Consumer<ModelCreationProvider>(
         builder: (context, provider, child) {
           return PopScope(
@@ -73,69 +87,92 @@ class _ModelCreationHostState extends State<ModelCreationHost> with TickerProvid
             child: AbsorbPointer(
               absorbing: provider.isSaving,
               child: Scaffold(
-                appBar: AppBar(
-                  scrolledUnderElevation: 0,
-                  toolbarHeight: appBarHeight,
-                  title: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    width: titleWidth,
-                    child: Center(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        transitionBuilder: (Widget child, Animation<double> animation) {
-                          return FadeTransition(opacity: animation, child: child);
-                        },
-                        child: Text(
-                          currentTitleText,
-                          key: ValueKey<String>(currentTitleText),
-                          style: titleStyle,
-                          maxLines: 1,
-                          overflow: TextOverflow.visible,
-                        ),
-                      ),
-                    ),
-                  ),
-                  backgroundColor: AppColors.background,
-                  elevation: 0,
-                  iconTheme: IconThemeData(
-                    color: AppColors.primaryColor.inverted,
-                    size: backIconSize,
-                  ),
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: provider.isSaving ? null : () => Navigator.of(context).pop(),
-                  ),
-                  actions: [
-                    Opacity(
-                      opacity: provider.isSaving ? 0.5 : 1.0,
-                      child: IconButton(
-                        icon: SvgPicture.asset(
-                          'assets/icons/transition.svg',
-                          width: transitionIconSize,
-                          height: transitionIconSize,
-                          colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-                        ),
-                        onPressed: provider.isSaving ? null : _switchScreen,
-                      ),
-                    ),
-                    SizedBox(width: isTablet ? 16.0 : 0),
-                  ],
-                ),
                 backgroundColor: AppColors.background,
+                extendBodyBehindAppBar: true,
+
+                appBar: CortexAppBar(
+                  leadingMode: CortexLeadingMode.back,
+                  showGradient: true,
+                  onLeadingPressed: provider.isSaving
+                      ? () {}
+                      : () => Navigator.of(context).pop(),
+
+                  title: AnimatedBuilder(
+                    animation: _scrollController,
+                    builder: (context, child) {
+                      final bool isVisible = !_scrollController.hasClients ||
+                          _scrollController.offset <= 20.0;
+
+                      return AnimatedOpacity(
+                        duration: const Duration(milliseconds: 200),
+                        opacity: isVisible ? 1.0 : 0.0,
+                        child: child,
+                      );
+                    },
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(0.0, 0.2),
+                              end: Offset.zero,
+                            ).animate(animation),
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: Text(
+                        currentTitleText,
+                        key: ValueKey<String>(currentTitleText),
+                        style: titleStyle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+
+                  actionButton: AppBarButton(
+                    onTap: provider.isSaving ? () {} : _switchScreen,
+                    child: Opacity(
+                      opacity: provider.isSaving ? 0.5 : 1.0,
+                      child: SvgPicture.asset(
+                        'assets/icons/transition.svg',
+                        width: transitionIconSize,
+                        height: transitionIconSize,
+                        colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
                 body: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (Widget child, Animation<double> animation) {
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
                     return FadeTransition(opacity: animation, child: child);
                   },
                   child: _showCreateScreen
-                      ? CreateForm(key: const ValueKey('CreateForm'))
-                      : AddForm(key: const ValueKey('AddForm')),
+                      ? CreateForm(
+                    key: const ValueKey('CreateForm'),
+                    scrollController: _scrollController,
+                  )
+                      : AddForm(
+                    key: const ValueKey('AddForm'),
+                    scrollController: _scrollController,
+                  ),
                 ),
+
                 bottomNavigationBar: IntrinsicHeight(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    transitionBuilder: (Widget child, Animation<double> animation) {
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
                       return FadeTransition(opacity: animation, child: child);
                     },
                     child: _showCreateScreen
@@ -144,7 +181,8 @@ class _ModelCreationHostState extends State<ModelCreationHost> with TickerProvid
                       isEnabled: provider.isCreateSaveEnabled,
                       isSaving: provider.isSaving,
                       onPressed: () async {
-                        final success = await provider.saveRoleplayModel(context);
+                        final success =
+                        await provider.saveRoleplayModel(context);
                         if (success && context.mounted) {
                           Navigator.of(context).pop(true);
                         }
@@ -155,7 +193,8 @@ class _ModelCreationHostState extends State<ModelCreationHost> with TickerProvid
                       isEnabled: provider.isAddSaveEnabled,
                       isSaving: provider.isSaving,
                       onPressed: () async {
-                        final success = await provider.saveOfflineModel(context);
+                        final success =
+                        await provider.saveOfflineModel(context);
                         if (success && context.mounted) {
                           Navigator.of(context).pop(true);
                         }

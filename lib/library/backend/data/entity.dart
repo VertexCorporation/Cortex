@@ -99,20 +99,22 @@ class ModelEntity {
 
   /// Factory constructor to create a [ModelEntity] from a raw map.
   factory ModelEntity.fromMap(Map<String, dynamic> map, String langCode) {
-
     String? getStringOrLocalized(dynamic value) {
       if (value == null) return null;
       if (value is String) return value;
       if (value is Map) {
-        final localizedMap = Map<String, String>.from(value.map((key, val) => MapEntry(key.toString(), val.toString())));
-        return localizedMap[langCode] ?? localizedMap['en'] ?? localizedMap.values.firstOrNull;
+        final localizedMap = Map<String, String>.from(
+            value.map((key, val) => MapEntry(key.toString(), val.toString())));
+        return localizedMap[langCode] ?? localizedMap['en'] ??
+            localizedMap.values.firstOrNull;
       }
       return value.toString();
     }
 
     return ModelEntity(
       id: map['id']?.toString() ?? 'unknown',
-      displayTitle: getStringOrLocalized(map['title']) ?? getStringOrLocalized(map['id']) ?? 'Unknown Model',
+      displayTitle: getStringOrLocalized(map['title']) ??
+          getStringOrLocalized(map['id']) ?? 'Unknown Model',
       producer: getStringOrLocalized(map['producer']) ?? 'Unknown',
       type: getStringOrLocalized(map['type']) ?? 'online',
       category: getStringOrLocalized(map['category']) ?? 'online',
@@ -219,11 +221,14 @@ class ModelEntity {
   // --- Getters for convenience ---
 
   bool get isCustomModel => id.startsWith('self_') || id.startsWith('local_');
+
   bool get isServerSide => type != 'offline';
+
   bool get isPremium => tier == 'premium';
 
   @override
-  String toString() => 'ModelEntity(id: $id, title: $displayTitle, type: $type)';
+  String toString() =>
+      'ModelEntity(id: $id, title: $displayTitle, type: $type)';
 
   @override
   bool operator ==(Object other) {

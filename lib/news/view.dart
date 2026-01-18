@@ -9,21 +9,19 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_svg/svg.dart';
 import 'dart:convert';
-import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/fog.dart';
 import 'package:cortex/news/search.dart';
-import 'package:cortex/news/appbar.dart';
 import '../../../../../cache.dart';
 import '../../../../../initialization.dart';
 import '../error.dart';
+import 'appbar.dart';
 import 'cards.dart';
 import 'data.dart';
 
-/// An extension on the [NewsArticle] model to handle localization logic.
 extension NewsArticleLocalization on NewsArticle {
   String titleFor(BuildContext context) {
     final languageCode = Localizations
@@ -55,7 +53,6 @@ extension NewsArticleLocalization on NewsArticle {
   }
 }
 
-/// The main UI screen that displays the news feed with search and fog effects.
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
 
@@ -63,10 +60,14 @@ class NewsScreen extends StatefulWidget {
   State<NewsScreen> createState() => _NewsScreenState();
 }
 
-class _NewsScreenState extends State<NewsScreen> {
+class _NewsScreenState extends State<NewsScreen>
+    with AutomaticKeepAliveClientMixin {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void dispose() {
@@ -83,35 +84,46 @@ class _NewsScreenState extends State<NewsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     context.watch<ThemeProvider>();
     final newsService = Provider.of<NewsService>(context);
     final l10n = AppLocalizations.of(context);
 
-    // Calculate dynamic dimensions based on screen size
     final Size screenSize = MediaQuery
         .of(context)
         .size;
     final double screenHeight = screenSize.height;
     final double screenWidth = screenSize.width;
 
-    // Dynamic layout constants
-    final double blobTop = screenHeight * 0.12; // ~100px on 844h
-    final double blobLeft = -screenWidth * 0.1; // ~-40px on 390w
-    final double blobWidth = screenWidth * 0.82; // ~320px on 390w
-    final double blobHeight = screenHeight * 0.83; // ~700px on 844h
-    final double topSpacing = screenHeight * 0.015;
-    final double searchGap = screenHeight * 0.012;
-    final double fogTopHeight = screenHeight * 0.025;
-    final double fogBottomHeight = screenHeight * 0.05;
+    // Background Blob Constants
+    final double blobTop = screenHeight * 0.00;
+    final double blobLeft = -screenWidth * 0.2;
+    final double blobWidth = screenWidth * 0.82;
+    final double blobHeight = screenHeight * 0.83;
+
+    // Spacing Constants
+    final double horizontalPadding = screenWidth * 0.041;
+    final double searchGap = screenHeight * 0.02;
+
+    final double topSafeArea = MediaQuery
+        .of(context)
+        .padding
+        .top;
+    final double appBarHeight = kToolbarHeight;
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      extendBodyBehindAppBar: true,
+
+      // --- UPDATED APP BAR ---
       appBar: NewsAppBar(
-        title: l10n!.news,
+        scrollController: _scrollController,
       ),
+
       body: Stack(
         children: [
-          // Dynamic Background Blob
+          // 1. Background Gradient Blob
           Positioned(
             top: blobTop,
             left: blobLeft,
@@ -119,62 +131,62 @@ class _NewsScreenState extends State<NewsScreen> {
               width: blobWidth,
               height: blobHeight,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.senaryColor.withValues(alpha: 0.15),
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 90, sigmaY: 90),
-                child: Container(color: Colors.transparent),
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.senaryColor.withValues(alpha: 0.4),
+                    AppColors.background.withValues(alpha: 0.0),
+                  ],
+                  stops: const [0.0, 0.7],
+                  center: Alignment.center,
+                  radius: 0.8,
+                ),
               ),
             ),
           ),
 
+          // 2. Scrollable Content
           ScrollFog(
             scrollController: _scrollController,
             fogColor: AppColors.background,
-            topFogHeight: fogTopHeight,
-            bottomFogHeight: fogBottomHeight,
-            child: SingleChildScrollView(
+            topFogHeight: 0,
+            bottomFogHeight: screenHeight * 0.05,
+            child: CustomScrollView(
               controller: _scrollController,
-              child: Column(
-                children: [
-                  SizedBox(height: topSpacing),
+              cacheExtent: screenHeight * 0.8,
+              slivers: [
 
-                  NewsSearchBar(
+                // --- TOP SPACER ---
+                SliverToBoxAdapter(
+                  child: SizedBox(height: topSafeArea + appBarHeight + 10),
+                ),
+
+                // C. Search Bar
+                SliverToBoxAdapter(
+                  child: NewsSearchBar(
                     controller: _searchController,
                     onChanged: _onSearchChanged,
                     onClear: () {
                       _searchController.clear();
                       _onSearchChanged('');
                     },
-                    hintText: l10n.searchHint,
+                    hintText: l10n!.searchHint,
                   ),
+                ),
 
-                  SizedBox(height: searchGap),
+                SliverToBoxAdapter(child: SizedBox(height: searchGap)),
 
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    switchInCurve: Curves.easeOut,
-                    switchOutCurve: Curves.easeIn,
-                    layoutBuilder: (Widget? currentChild,
-                        List<Widget> previousChildren) {
-                      return Stack(
-                        alignment: Alignment.topCenter,
-                        children: <Widget>[
-                          ...previousChildren,
-                          if (currentChild != null) currentChild,
-                        ],
-                      );
-                    },
-                    transitionBuilder: (Widget child,
-                        Animation<double> animation) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                    child: _buildContent(
-                        newsService, l10n, screenWidth, screenHeight),
-                  ),
-                ],
-              ),
+                // D. Content List
+                _buildContent(
+                  newsService,
+                  l10n,
+                  screenWidth,
+                  screenHeight,
+                  horizontalPadding,
+                ),
+
+                SliverToBoxAdapter(
+                    child: SizedBox(height: screenHeight * 0.1)),
+              ],
             ),
           ),
         ],
@@ -185,62 +197,66 @@ class _NewsScreenState extends State<NewsScreen> {
   Widget _buildContent(NewsService newsService,
       AppLocalizations l10n,
       double screenWidth,
-      double screenHeight) {
-    // Dynamic horizontal padding (approx 4% of width)
-    final double horizontalPadding = screenWidth * 0.041;
+      double screenHeight,
+      double horizontalPadding,) {
     final double itemSpacing = screenHeight * 0.01;
 
-    switch (newsService.state) {
-      case NewsState.initial:
-      case NewsState.loading:
-        return Padding(
-          key: const ValueKey('loading'),
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: const ShimmerNewsList(),
-        );
-
-      case NewsState.success:
-        final articles = newsService.articles.where((article) {
-          if (_searchQuery.isEmpty) return true;
-          final title = article.titleFor(context).toLowerCase();
-          final summary = article.summaryFor(context).toLowerCase();
-          return title.contains(_searchQuery) || summary.contains(_searchQuery);
-        }).toList();
-
-        if (articles.isNotEmpty) {
-          return ListView.builder(
-            key: ValueKey('list_${articles.length}_$_searchQuery'),
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: articles.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: EdgeInsets.only(bottom: itemSpacing),
-                child: NewsArticleCard(
-                  article: articles[index],
-                  index: index,
-                ),
-              );
-            },
-          );
-        } else {
-          return Column(
-            key: const ValueKey('empty'),
-            children: [
-              SizedBox(height: screenHeight * 0.15),
-              ErrorView(
-                title: l10n.noFoundTitle,
-                message: l10n.noFoundMessage,
-              ),
-            ],
-          );
-        }
+    if (newsService.state == NewsState.initial ||
+        newsService.state == NewsState.loading) {
+      return SliverPadding(
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        sliver: const SliverToBoxAdapter(
+          key: ValueKey('loading'),
+          child: ShimmerNewsList(),
+        ),
+      );
     }
+
+    final articles = newsService.articles.where((article) {
+      if (_searchQuery.isEmpty) return true;
+      final title = article.titleFor(context).toLowerCase();
+      final summary = article.summaryFor(context).toLowerCase();
+      return title.contains(_searchQuery) || summary.contains(_searchQuery);
+    }).toList();
+
+    if (articles.isEmpty) {
+      return SliverToBoxAdapter(
+        key: const ValueKey('empty'),
+        child: Column(
+          children: [
+            SizedBox(height: screenHeight * 0.1),
+            ErrorView(
+              title: l10n.noFoundTitle,
+              message: l10n.noFoundMessage,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+              (context, index) {
+            final isLast = index == articles.length - 1;
+            return Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : itemSpacing),
+              child: NewsArticleCard(
+                key: ValueKey(articles[index].id),
+                article: articles[index],
+                index: index,
+              ),
+            );
+          },
+          childCount: articles.length,
+        ),
+      ),
+    );
   }
 }
 
-/// A widget to securely load and display an image from Firebase Storage.
+// --- Firebase Image Loader & Error State ---
 class FirebaseStorageImage extends StatefulWidget {
   final String imagePath;
 
@@ -252,7 +268,8 @@ class FirebaseStorageImage extends StatefulWidget {
 
 class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
   Future<String?>? _imageUrlFuture;
-  static const String _getDownloadUrlEndpoint = "https://europe-west1-vertex-ai-1618.cloudfunctions.net/getCoverDownloadUrl";
+  static const String _getDownloadUrlEndpoint =
+      "https://europe-west1-vertex-ai-1618.cloudfunctions.net/getCoverDownloadUrl";
 
   @override
   void didChangeDependencies() {
@@ -278,8 +295,8 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
   Future<String?> _getCachedOrFetchDownloadUrl() async {
     try {
       return await Future.sync(() async {
-        final inMemoryUrls = CacheService.get<Map<String, String>>(
-            CacheKey.newsImageUrls);
+        final inMemoryUrls =
+        CacheService.get<Map<String, String>>(CacheKey.newsImageUrls);
         if (inMemoryUrls?[widget.imagePath] != null) {
           return inMemoryUrls![widget.imagePath];
         }
@@ -292,10 +309,13 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
             final Map<String, dynamic> cachedData = jsonDecode(cachedDataJson);
             if (DateTime
                 .now()
-                .millisecondsSinceEpoch < (cachedData['expires'] as int)) {
+                .millisecondsSinceEpoch <
+                (cachedData['expires'] as int)) {
               final String persistentUrl = cachedData['url'] as String;
-              final currentInMemoryUrls = CacheService.get<Map<String, String>>(
-                  CacheKey.newsImageUrls) ?? {};
+              final currentInMemoryUrls =
+                  CacheService.get<Map<String, String>>(
+                      CacheKey.newsImageUrls) ??
+                      {};
               currentInMemoryUrls[widget.imagePath] = persistentUrl;
               CacheService.set(CacheKey.newsImageUrls, currentInMemoryUrls);
               return persistentUrl;
@@ -304,8 +324,8 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
         }
 
         if (!mounted) return null;
-        final appInitializer = Provider.of<AppInitializer>(
-            context, listen: false);
+        final appInitializer =
+        Provider.of<AppInitializer>(context, listen: false);
         final dio = Provider.of<Dio>(context, listen: false);
 
         await appInitializer.onCoreServicesReady;
@@ -320,7 +340,9 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
 
         final response = await dio.post(
           _getDownloadUrlEndpoint,
-          data: jsonEncode({'data': {'filePath': widget.imagePath}}),
+          data: jsonEncode({
+            'data': {'filePath': widget.imagePath}
+          }),
           options: Options(headers: {
             "Authorization": "Bearer $idToken",
             "Content-Type": "application/json"
@@ -332,8 +354,9 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
         if (response.statusCode == 200 && response.data != null) {
           final newUrl = response.data['result']?['signedUrl'] as String?;
           if (newUrl != null) {
-            final currentUrls = CacheService.get<Map<String, String>>(
-                CacheKey.newsImageUrls) ?? {};
+            final currentUrls =
+                CacheService.get<Map<String, String>>(CacheKey.newsImageUrls) ??
+                    {};
             currentUrls[widget.imagePath] = newUrl;
             CacheService.set(CacheKey.newsImageUrls, currentUrls);
 
@@ -349,7 +372,7 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
         return null;
       }).timeout(const Duration(seconds: 25));
     } catch (e) {
-      debugPrint("Failed to get image download URL within timeout: $e");
+      debugPrint("Failed to get image download URL: $e");
       return null;
     }
   }
@@ -362,14 +385,16 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
         Widget child;
         if (snapshot.connectionState == ConnectionState.waiting) {
           child = const ShimmerPlaceholder(key: ValueKey('loading'));
-        } else
-        if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+        } else if (snapshot.hasError ||
+            !snapshot.hasData ||
+            snapshot.data == null) {
           child = _ErrorState(key: const ValueKey('error'), onRetry: _retry);
         } else {
           child = CachedNetworkImage(
             key: ValueKey(snapshot.data!),
             imageUrl: snapshot.data!,
             fit: BoxFit.cover,
+            memCacheHeight: 400,
             placeholder: (context, url) => const ShimmerPlaceholder(),
             errorWidget: (context, url, error) => _ErrorState(onRetry: _retry),
           );
@@ -384,63 +409,31 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
   }
 }
 
-class _ErrorState extends StatefulWidget {
+class _ErrorState extends StatelessWidget {
   final VoidCallback onRetry;
 
-  const _ErrorState({super.key, required this.onRetry});
-
-  @override
-  State<_ErrorState> createState() => __ErrorStateState();
-}
-
-class __ErrorStateState extends State<_ErrorState> {
-  bool _isRetrying = false;
-
-  void _handleTap() {
-    if (_isRetrying) return;
-
-    setState(() {
-      _isRetrying = true;
-    });
-
-    Future.delayed(const Duration(milliseconds: 100), () {
-      widget.onRetry();
-    });
-  }
+  const _ErrorState({required this.onRetry, super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Dynamic size for the error icon
     final screenWidth = MediaQuery
         .of(context)
         .size
         .width;
     final iconSize = screenWidth * 0.08;
-
-    Widget child;
-    if (_isRetrying) {
-      child = const ShimmerPlaceholder(key: ValueKey('retrying_shimmer'));
-    } else {
-      child = Center(
-        key: const ValueKey('error_icon'),
-        child: SvgPicture.asset(
-          'assets/icons/warning.svg',
-          width: iconSize,
-          height: iconSize,
-          colorFilter: ColorFilter.mode(
-              AppColors.primaryColor.inverted.withValues(alpha: 0.6),
-              BlendMode.srcIn),
-        ),
-      );
-    }
-
     return Material(
       color: AppColors.border.withValues(alpha: 0.5),
       child: InkWell(
-        onTap: _handleTap,
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          child: child,
+        onTap: onRetry,
+        child: Center(
+          child: SvgPicture.asset(
+            'assets/icons/warning.svg',
+            width: iconSize,
+            height: iconSize,
+            colorFilter: ColorFilter.mode(
+                AppColors.primaryColor.inverted.withValues(alpha: 0.6),
+                BlendMode.srcIn),
+          ),
         ),
       ),
     );

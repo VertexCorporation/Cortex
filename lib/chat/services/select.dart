@@ -21,7 +21,8 @@ class SelectionService {
     required ChatSessionProvider sessionProvider,
     required ConversationProvider conversationProvider,
     required ModelService modelService,
-  })  : _sessionProvider = sessionProvider,
+  })
+      : _sessionProvider = sessionProvider,
         _conversationProvider = conversationProvider,
         _modelService = modelService;
 
@@ -31,10 +32,12 @@ class SelectionService {
   /// 1. Navigating to the chat tab if called from an external screen.
   /// 2. Clearing the previous conversation's state.
   /// 3. Resolving the precise model/variant to use (e.g., last used).
-  /// 4. Setting the new model details in the session provider.
-  Future<void> selectModel(ModelEntity aiEntity, {BuildContext? context}) async {
+  /// 4. Setting the new model details in the session provider and PERSISTING it as default.
+  Future<void> selectModel(ModelEntity aiEntity,
+      {BuildContext? context}) async {
     const String logPrefix = "[SelectionService.selectModel]";
-    debugPrint("$logPrefix: Processing selection for model series '${aiEntity.id}'.");
+    debugPrint(
+        "$logPrefix: Processing selection for model series '${aiEntity.id}'.");
 
     // This part handles navigation from outside the chat screen (e.g., Library).
     // It now passes the ModelEntity directly to MainScreen.
@@ -55,7 +58,8 @@ class SelectionService {
 
     if (variantsMap != null && variantsMap.isNotEmpty) {
       String lastUsedId = await Variants.getLastSelectedVariant(aiEntity.id);
-      finalModelId = (lastUsedId.isNotEmpty && variantsMap.containsKey(lastUsedId))
+      finalModelId =
+      (lastUsedId.isNotEmpty && variantsMap.containsKey(lastUsedId))
           ? lastUsedId
           : variantsMap.keys.first;
     } else {
@@ -64,49 +68,63 @@ class SelectionService {
     debugPrint("$logPrefix: Resolved final model ID to: '$finalModelId'");
 
     // 3. Get the precise entity for the final selected model.
-    final langCode = _sessionProvider.getLocale().languageCode;
-    final finalModelEntity = _modelService.getPreciseModelData(finalModelId, langCode: langCode);
-    _sessionProvider.selectModel(finalModelEntity);
+    final langCode = _sessionProvider
+        .getLocale()
+        .languageCode;
+    final finalModelEntity = _modelService.getPreciseModelData(
+        finalModelId, langCode: langCode);
 
     // 4. Update the session provider directly with the final ModelEntity.
+    // IMPORTANT: savePreference is true by default, so this choice becomes the default for new chats.
     _sessionProvider.selectModel(finalModelEntity);
 
-    debugPrint("$logPrefix: Session and Conversation providers updated for new chat session.");
+    debugPrint(
+        "$logPrefix: Session updated and preference saved for new chat session.");
   }
 
   /// Changes the active model to a different variant within the same series.
   ///
   /// This method updates the session state without resetting the conversation,
-  /// preserving the message history.
+  /// preserving the message history. It also PERSISTS this new variant as the default.
   Future<void> changeVariant(String newFullModelId) async {
     const String logPrefix = "[SelectionService.changeVariant]";
     debugPrint("$logPrefix: Changing variant to '$newFullModelId'.");
 
     if (_sessionProvider.modelId == newFullModelId) return;
 
-    final langCode = _sessionProvider.getLocale().languageCode;
-    final baseId = _modelService.getBaseIdFromFullId(newFullModelId, langCode: langCode);
+    final langCode = _sessionProvider
+        .getLocale()
+        .languageCode;
+    final baseId = _modelService.getBaseIdFromFullId(
+        newFullModelId, langCode: langCode);
     await Variants.setLastSelectedVariant(baseId, newFullModelId);
 
     // Call the specific provider method that updates the model details
     // WITHOUT clearing the message list. This is a session-level change.
+    // IMPORTANT: savePreference is true by default.
     _sessionProvider.updateActiveModelVariant(newFullModelId);
 
-    debugPrint("$logPrefix: Session provider updated with new variant details.");
+    debugPrint("$logPrefix: Session provider updated and preference saved.");
   }
 
   /// Refreshes the active chat's model details from the latest available data.
   ///
   /// This is called after a global model data reload (e.g., language change)
   /// to ensure the UI reflects the most current information.
+  ///
+  /// Note: We do NOT save preference here as this is just a data refresh,
+  /// not a user action.
   void refreshActiveChatModelDetails(String activeModelId) {
     const String logPrefix = "[SelectionService.refreshActiveChatModelDetails]";
-    debugPrint("$logPrefix: Refreshing details for active model '$activeModelId'.");
+    debugPrint(
+        "$logPrefix: Refreshing details for active model '$activeModelId'.");
 
-    // This method is identical in function to changing an variant: it updates
-    // the model's metadata without resetting the chat.
-    _sessionProvider.updateActiveModelVariant(activeModelId);
+    // We pass savePreference: false because this is an automated refresh,
+    // not a user explicitly choosing a new default.
+    _sessionProvider.updateActiveModelVariant(
+        activeModelId, savePreference: false);
 
-    debugPrint("$logPrefix: Session provider refreshed with latest model details.");
+    debugPrint(
+        "$logPrefix: Session provider refreshed with latest model details.");
   }
 }

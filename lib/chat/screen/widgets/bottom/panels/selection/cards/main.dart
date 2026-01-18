@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import '../../../../../../app.dart';
+import '../../../../../../../app.dart';
 
 class ModelCard extends StatelessWidget {
   final String title;
@@ -29,15 +29,13 @@ class ModelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
-    // Dynamic styling based on screen width
     final bool isTablet = MediaQuery
         .of(context)
         .size
         .width >= 600;
     final double borderRadius = isTablet ? 24 : 20;
 
-    // Define colors once
+    // --- Visual State Colors ---
     final Color backgroundColor = isSelected
         ? AppColors.primaryColor.inverted
         : AppColors.background;
@@ -54,6 +52,10 @@ class ModelCard extends StatelessWidget {
         ? Colors.transparent
         : AppColors.border;
 
+    final Color arrowColor = isSelected
+        ? AppColors.primaryColor
+        : AppColors.primaryColor.inverted.withValues(alpha: 0.6);
+
     return Material(
       color: backgroundColor,
       shape: RoundedRectangleBorder(
@@ -61,35 +63,48 @@ class ModelCard extends StatelessWidget {
         side: BorderSide(color: borderColor, width: 1.0),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Stack(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. MAIN BODY
-          Positioned.fill(
+          // 1. LEFT SIDE: Main Body (Selects Default)
+          Expanded(
             child: InkWell(
               onTap: onBodyTap,
-              splashColor: AppColors.primaryColor.withValues(alpha: 0.15),
-              highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),
+              splashColor: isSelected
+                  ? AppColors.primaryColor.withValues(alpha: 0.2)
+                  : AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+              highlightColor: isSelected
+                  ? AppColors.primaryColor.withValues(alpha: 0.1)
+                  : AppColors.primaryColor.inverted.withValues(alpha: 0.05),
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Row(
                   children: [
                     // Icon/Image
                     Container(
-                      width: 44,
-                      height: 44,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
                         color: AppColors.quaternaryColor,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       clipBehavior: Clip.antiAlias,
                       child: imagePath.isNotEmpty
                           ? (imagePath.startsWith('assets')
-                          ? Image.asset(imagePath, fit: BoxFit.cover)
-                          : Image.file(File(imagePath), fit: BoxFit.cover))
+                          ? Image.asset(
+                        imagePath,
+                        fit: BoxFit.cover,
+                        cacheWidth: 90,
+                      )
+                          : Image.file(
+                        File(imagePath),
+                        fit: BoxFit.cover,
+                        cacheWidth: 90,
+                      ))
                           : Icon(Icons.token, color: AppColors.tertiaryColor),
                     ),
-                    const SizedBox(width: 12),
-                    // Texts
+                    const SizedBox(width: 10),
+                    // Text
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,7 +114,7 @@ class ModelCard extends StatelessWidget {
                             title,
                             style: TextStyle(
                               fontFamily: 'Roboto',
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: textColor,
                             ),
@@ -107,46 +122,43 @@ class ModelCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           if (showExpansionArrow) ...[
-                            const SizedBox(height: 2),
-                            Text(
-                              l10n.alwaysBest,
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: 11,
-                                fontWeight: FontWeight.normal,
-                                color: subTextColor,
+                            const SizedBox(height: 1),
+                            FittedBox(
+                              child: Text(
+                                l10n.alwaysBest,
+                                style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.normal,
+                                  color: subTextColor,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            )
                           ],
                         ],
                       ),
                     ),
-                    // Spacer
-                    if (showExpansionArrow) const SizedBox(width: 32),
                   ],
                 ),
               ),
             ),
           ),
 
-          // 2. EXPANSION ARROW
-          if (showExpansionArrow && onArrowTap != null)
-            Positioned(
-              right: 0,
-              top: 0,
-              bottom: 0,
-              width: 48,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: onArrowTap,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(borderRadius),
-                    bottomRight: Radius.circular(borderRadius),
-                  ),
-                  splashColor: AppColors.primaryColor.withValues(alpha: 0.2),
+          // 2. RIGHT SIDE: Expansion Arrow (Only if requested)
+          if (showExpansionArrow && onArrowTap != null) ...[
+
+            // Arrow Area
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onArrowTap,
+                splashColor: isSelected
+                    ? AppColors.primaryColor.withValues(alpha: 0.2)
+                    : AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+                child: SizedBox(
+                  width: 44,
                   child: Center(
                     child: AnimatedRotation(
                       turns: isExpanded ? 0.25 : 0.0,
@@ -154,7 +166,7 @@ class ModelCard extends StatelessWidget {
                       curve: Curves.easeOutBack,
                       child: Icon(
                         Icons.chevron_right_rounded,
-                        color: textColor.withValues(alpha: 0.6),
+                        color: arrowColor,
                         size: 24,
                       ),
                     ),
@@ -162,6 +174,7 @@ class ModelCard extends StatelessWidget {
                 ),
               ),
             ),
+          ]
         ],
       ),
     );

@@ -71,7 +71,10 @@ class _VariantOverlayPanelState extends State<_VariantOverlayPanel>
 
   @override
   Widget build(BuildContext context) {
-    final screenW = MediaQuery.of(context).size.width;
+    final screenW = MediaQuery
+        .of(context)
+        .size
+        .width;
     final bool isTablet = screenW >= 600;
 
     // --- LEFT MARGIN CORRECTION ---
@@ -81,7 +84,10 @@ class _VariantOverlayPanelState extends State<_VariantOverlayPanel>
     // Must match the logic in DetailAppBar to align perfectly.
     // Tablet: Dynamic (approx 14%). Phone: Standard 56.0.
     final double toolbarHeight = isTablet ? screenW * 0.14 : kToolbarHeight;
-    final topPx = toolbarHeight + MediaQuery.of(context).padding.top;
+    final topPx = toolbarHeight + MediaQuery
+        .of(context)
+        .padding
+        .top;
 
     return Material(
       color: Colors.transparent,
@@ -137,10 +143,20 @@ class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
     required BuildContext context, // Context required for sizing
     required this.provider,
     required this.onBackPressed,
-  }) :
-        _isTablet = MediaQuery.of(context).size.width >= 600,
-        _toolbarHeight = MediaQuery.of(context).size.width >= 600
-            ? MediaQuery.of(context).size.width * 0.14
+  })
+      :
+        _isTablet = MediaQuery
+            .of(context)
+            .size
+            .width >= 600,
+        _toolbarHeight = MediaQuery
+            .of(context)
+            .size
+            .width >= 600
+            ? MediaQuery
+            .of(context)
+            .size
+            .width * 0.14
             : kToolbarHeight;
 
   @override
@@ -151,11 +167,13 @@ class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(_toolbarHeight);
 }
 
-class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixin {
+class DetailAppBarState extends State<DetailAppBar>
+    with TickerProviderStateMixin {
   OverlayEntry? _variantOverlayEntry;
   BuildContext? _exitButtonContext;
 
-  final GlobalKey<_VariantOverlayPanelState> _overlayKey = GlobalKey<_VariantOverlayPanelState>();
+  final GlobalKey<_VariantOverlayPanelState> _overlayKey = GlobalKey<
+      _VariantOverlayPanelState>();
 
   String _currentDisplayVariantName = '';
 
@@ -202,9 +220,12 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
     if (isPanelOpen) return;
 
     final provider = widget.provider;
-    final langCode = Localizations.localeOf(context).languageCode;
+    final langCode = Localizations
+        .localeOf(context)
+        .languageCode;
 
-    final List<ModelEntity> variantEntities = provider.mainModel?.variants?.values
+    final List<ModelEntity> variantEntities = provider.mainModel?.variants
+        ?.values
         .whereType<Map<String, dynamic>>()
         .map((extMap) => ModelEntity.fromMap(extMap, langCode))
         .toList() ?? [];
@@ -217,7 +238,8 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
       builder: (context) {
         return _VariantOverlayPanel(
           key: _overlayKey,
-          options: List<Map<String, dynamic>>.from(variantEntities.map((e) => e.toMap())),
+          options: List<Map<String, dynamic>>.from(
+              variantEntities.map((e) => e.toMap())),
           selectedVariant: provider.selectedVariantName ?? '',
           modelTitle: provider.displayTitle,
           onClosed: _removeOverlayEntry,
@@ -260,7 +282,10 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     // Use pre-calculated metrics from widget
     final bool isTablet = widget._isTablet;
@@ -308,7 +333,8 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
     );
   }
 
-  Widget _buildTitleWidget(BuildContext context, bool isTablet, double screenWidth) {
+  Widget _buildTitleWidget(BuildContext context, bool isTablet,
+      double screenWidth) {
     final provider = widget.provider;
 
     // Tablet: Large Fonts (32/20).
@@ -403,7 +429,8 @@ class DetailAppBarState extends State<DetailAppBar> with TickerProviderStateMixi
     );
   }
 
-  Widget _buildDownloadStatusIndicator(BuildContext context, bool isTablet, double screenWidth) {
+  Widget _buildDownloadStatusIndicator(BuildContext context, bool isTablet,
+      double screenWidth) {
     final provider = widget.provider;
     final localizations = AppLocalizations.of(context)!;
 

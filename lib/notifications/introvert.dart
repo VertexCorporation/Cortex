@@ -1,17 +1,12 @@
-// introvert.dart
-//
-// Manages "introverted" notifications: custom, in-app overlays (toasts)
-// that provide immediate feedback within the app's own UI.
-// These notifications do not interact with the external operating system and are
-// responsible for showing ephemeral messages like success, error, or info alerts.
+// lib/notifications/introvert.dart
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../banner.dart'; // BannerService'e erişim için
 
-/// Defines the visual style of the in-app notification.
 enum NotificationType { success, error, neutral }
 
-/// A helper class to map [NotificationType] to concrete styles.
 class _NotificationStyle {
   final Color backgroundColor;
   final IconData? icon;
@@ -39,8 +34,6 @@ class _NotificationStyle {
   }
 }
 
-/// Internal handle that tracks the currently active notification.
-/// This lets the service dismiss it with animation, without using a GlobalKey.
 class _ActiveNotificationHandle {
   final OverlayEntry entry;
   final VoidCallback dismiss;
@@ -53,37 +46,13 @@ class _ActiveNotificationHandle {
   });
 }
 
-/// A dedicated service for displaying custom, animated in-app notifications (overlays).
-///
-/// This service is self-contained and handles the entire lifecycle of an overlay
-/// notification, from creation and animation to dismissal. It requires a
-/// [GlobalKey<NavigatorState>] to access the application's overlay stack.
 class IntrovertNotificationService {
   final GlobalKey<NavigatorState> navigatorKey;
 
   IntrovertNotificationService({required this.navigatorKey});
 
-  /// Tracks the currently visible notification overlay.
-  OverlayEntry? _currentOverlayEntry;
-
-  /// Tracks the currently active notification (entry + dismiss callback).
   _ActiveNotificationHandle? _activeNotification;
 
-  /// Displays a custom notification overlay with a message.
-  ///
-  /// If a notification is already visible, it will be dismissed gracefully
-  /// before the new one is displayed (with its own exit animation).
-  ///
-  /// - [message]: The text to be displayed.
-  /// - [type]: The style of the notification. Determines color and icon.
-  ///   Defaults to [NotificationType.neutral].
-  /// - [bottomOffset]: The proportional vertical offset from the bottom of the screen.
-  /// - [fontSize]: The proportional font size based on the screen width.
-  /// - [oneLine]: If true, forces the message to a single, ellipsis-truncated line.
-  /// - [duration]: How long the notification stays on screen before auto-dismissing.
-  /// - [onTap]: An optional callback to execute when the notification is tapped.
-  /// - [isAxonMode]: Controls whether the notification appears in the sidebar (Axon).
-  /// - [axonWidth]: The width of the sidebar, used for centering within that area.
   void showNotification({
     required String message,
     NotificationType type = NotificationType.neutral,
@@ -97,6 +66,19 @@ class IntrovertNotificationService {
   }) {
     dismissCurrentNotification();
 
+    final context = navigatorKey.currentContext;
+    bool isBannerVisible = false;
+
+    if (context != null) {
+      try {
+        final bannerService = Provider.of<BannerService>(
+            context, listen: false);
+        isBannerVisible = bannerService.showInviteBannerNotifier.value;
+      } catch (e) {
+        // CATCH
+      }
+    }
+
     _showOverlayNotification(
       message: message,
       type: type,
@@ -107,6 +89,7 @@ class IntrovertNotificationService {
       onTap: onTap,
       isAxonMode: isAxonMode,
       axonWidth: axonWidth,
+      isBannerVisible: isBannerVisible,
     );
   }
 
@@ -120,6 +103,7 @@ class IntrovertNotificationService {
     VoidCallback? onTap,
     required bool isAxonMode,
     required double axonWidth,
+    required bool isBannerVisible,
   }) {
     final overlay = navigatorKey.currentState?.overlay;
     if (overlay == null) return;
@@ -132,100 +116,106 @@ class IntrovertNotificationService {
         final media = MediaQuery.of(context);
 
         // --- POSITIONING LOGIC ---
-        // Variables to determine where the Positioned widget sits.
         double? leftPos;
         double? rightPos;
-        double? explicitWidth; // Defines the bounding box width for centering
+        double? explicitWidth;
         double bottomPosition;
-        double widthConstraint; // Inner max-width for the bubble itself
+        double widthConstraint;
+
+        final double bannerHeightPadding = isBannerVisible ? (media.size
+            .height * 0.16) : 0.0;
 
         if (isAxonMode && axonWidth > 0) {
-          // SIDEBAR (AXON) MODE:
-          // Instead of aligning left with a margin, we set the Positioned width
-          // to exactly match the sidebar width. The child 'Center' widget
-          // will then handle centering the toast within that specific strip.
-
+          // SIDEBAR (AXON) MODE
           leftPos = 0;
           rightPos = null;
-          explicitWidth = axonWidth; // Force overlay container to sidebar width
+          explicitWidth = axonWidth;
 
-          // Position just above the Settings button (approx 100px from bottom)
-          bottomPosition = 100.0;
-
-          // Ensure the bubble doesn't touch the edges of the sidebar
+          bottomPosition = 80.0 + bannerHeightPadding;
           widthConstraint = axonWidth - 32.0;
         } else {
-          // DEFAULT MODE:
-          // Spans the entire screen width (left:0, right:0), creating a context
-          // where 'Center' aligns to the middle of the device screen.
-
+          // DEFAULT MODE
           leftPos = 0;
           rightPos = 0;
-          explicitWidth = null; // Let left/right control width
+          explicitWidth = null;
 
           final keyboardInset = media.viewInsets.bottom;
           final baseOffset = bottomOffset * media.size.height;
-          bottomPosition = keyboardInset + baseOffset;
+
+          // Klavye varsa banner zaten görünmez/altta kalır, o yüzden max() kullanıyoruz
+          // Klavye yoksa banner payını ekliyoruz.
+          bottomPosition = keyboardInset + baseOffset +
+              (keyboardInset > 0 ? 0 : bannerHeightPadding);
+
           widthConstraint = media.size.width * 0.95;
         }
 
         final actualFontSize = fontSizeProportion * media.size.width;
 
-        return Positioned(
-          bottom: bottomPosition,
-          left: leftPos,
-          right: rightPos,
-          width: explicitWidth,
-          // Applies primarily in Axon mode
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: widthConstraint),
-              child: _AnimatedNotification(
-                message: message,
-                backgroundColor: style.backgroundColor,
-                icon: style.icon,
-                textColor: Colors.white,
-                duration: duration,
-                fontSize: actualFontSize,
-                oneLine: oneLine,
-                registerDismiss: (dismissFn) {
-                  _activeNotification = _ActiveNotificationHandle(
-                    entry: entry,
-                    dismiss: dismissFn,
-                    isAxonMode: isAxonMode,
-                  );
-                },
-                onRemove: () {
-                  entry.remove();
-                  if (_activeNotification?.entry == entry) {
-                    _activeNotification = null;
-                  }
-                  if (_currentOverlayEntry == entry) {
-                    _currentOverlayEntry = null;
-                  }
-                },
+        return Stack(
+          children: [
+            // Layer 1: Şeffaf Dedektör (Ekrana dokunmayı yakalar)
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
                 onTap: () {
                   dismissCurrentNotification();
-                  onTap?.call();
                 },
+                child: const SizedBox.expand(),
               ),
             ),
-          ),
+
+            // Layer 2: Bildirim Baloncuğu
+            Positioned(
+              bottom: bottomPosition,
+              left: leftPos,
+              right: rightPos,
+              width: explicitWidth,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: widthConstraint),
+                  child: _AnimatedNotification(
+                    message: message,
+                    backgroundColor: style.backgroundColor,
+                    icon: style.icon,
+                    textColor: Colors.white,
+                    duration: duration,
+                    fontSize: actualFontSize,
+                    oneLine: oneLine,
+                    registerDismiss: (dismissFn) {
+                      _activeNotification = _ActiveNotificationHandle(
+                        entry: entry,
+                        dismiss: dismissFn,
+                        isAxonMode: isAxonMode,
+                      );
+                    },
+                    onRemove: () {
+                      try {
+                        entry.remove();
+                      } catch (_) {
+                        // Zaten silinmişse hata vermesin
+                      }
+                      if (_activeNotification?.entry == entry) {
+                        _activeNotification = null;
+                      }
+                    },
+                    onTap: () {
+                      dismissCurrentNotification();
+                      onTap?.call();
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
 
-    _currentOverlayEntry = entry;
     overlay.insert(entry);
   }
 
-  /// Programmatically dismisses the currently visible notification, if any.
-  ///
-  /// This triggers the notification's exit animation. The `OverlayEntry`
-  /// is removed from the screen after the animation completes by the widget
-  /// itself via its `onRemove` callback.
   void dismissCurrentNotification() {
-    // If there is an active notification handle, trigger its dismiss animation.
     _activeNotification?.dismiss();
   }
 
@@ -236,9 +226,6 @@ class IntrovertNotificationService {
   }
 }
 
-/// The private widget that renders the animated notification.
-///
-/// It handles its own animations for appearing and disappearing.
 class _AnimatedNotification extends StatefulWidget {
   final String message;
   final Color backgroundColor;
@@ -247,14 +234,8 @@ class _AnimatedNotification extends StatefulWidget {
   final Duration duration;
   final double fontSize;
   final bool oneLine;
-
-  /// Called by the widget to report its dismiss function back to the service.
   final void Function(VoidCallback dismiss) registerDismiss;
-
-  /// Called after the exit animation is fully complete.
   final VoidCallback onRemove;
-
-  /// Called when the notification is tapped.
   final VoidCallback onTap;
 
   const _AnimatedNotification({
@@ -280,6 +261,7 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
   Timer? _dismissTimer;
+  bool _isDismissing = false;
 
   @override
   void initState() {
@@ -290,25 +272,39 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
       vsync: this,
     );
 
+    // Giriş: Hafif aşağıdan yukarı
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.5), // Subtle slide up
+      begin: const Offset(0, 0.5),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
     _fadeAnimation =
         CurvedAnimation(parent: _controller, curve: Curves.easeOut);
 
+    // Servis'e "beni kapatmak istersen bu fonksiyonu çağır" diyoruz
     widget.registerDismiss(dismiss);
+
     _controller.forward();
+
+    // Otomatik kapanma zamanlayıcısı
     _dismissTimer = Timer(widget.duration, dismiss);
   }
 
   void dismiss() {
-    if (!mounted) return;
-    if (_controller.status == AnimationStatus.dismissed) return;
+    if (!mounted || _isDismissing) return;
+    _isDismissing = true;
+
     _dismissTimer?.cancel();
+
+    // Çıkış: Yukarıdan aşağı düşerek (Drop) kaybol
+    // Reverse animasyonunu başlat, bitince overlay'den sil
     _controller.reverse().then((_) {
-      if (mounted) widget.onRemove();
+      if (mounted) {
+        widget.onRemove();
+      } else {
+        // Widget dispose olduysa bile remove çağrılmalı ki Overlay temizlensin
+        widget.onRemove();
+      }
     });
   }
 
@@ -325,6 +321,7 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
       position: _slideAnimation,
       child: FadeTransition(
         opacity: _fadeAnimation,
+        // Bu GestureDetector baloncuk üzerindeki tıklamayı yakalar
         child: GestureDetector(
           onTap: widget.onTap,
           child: Material(
@@ -353,7 +350,6 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
                       widget.message,
                       style: TextStyle(
                         color: widget.textColor,
-                        // Use a slightly smaller font for sidebar compatibility
                         fontSize: 13.5,
                         fontWeight: FontWeight.w500,
                         height: 1.2,

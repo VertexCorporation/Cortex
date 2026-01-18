@@ -11,7 +11,7 @@ import '../../../../library/providers/catalog.dart';
 import '../../../../library/providers/local.dart';
 import '../../../../main.dart';
 import '../../services/select.dart';
-import '../widgets/bottom/selection/sheet.dart';
+import '../widgets/bottom/panels/selection/sheet.dart';
 import 'cards.dart';
 
 class ChatEmptyState extends StatefulWidget {
@@ -143,7 +143,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
 
   @override
   Widget build(BuildContext context) {
-    // We watch only for rebuilds, animation logic is in didChangeDependencies
+    context.watch<ThemeProvider>();
     context.watch<ChatSessionProvider>();
 
     final mediaQuery = MediaQuery.of(context);
@@ -228,7 +228,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                             child: ScaleTransition(
                               scale: _breathingScaleAnimation,
                               child: SvgPicture.asset(
-                                'assets/icons/ghost.svg',
+                                'assets/icons/on/ghost.svg',
                                 width: logoSize,
                                 height: logoSize,
                                 fit: BoxFit.contain,

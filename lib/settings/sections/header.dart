@@ -95,16 +95,18 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 4),
-    )..repeat();
-    _animation = Tween<double>(begin: 0, end: 2 * pi).animate(_animationController);
+    )
+      ..repeat();
+    _animation =
+        Tween<double>(begin: 0, end: 2 * pi).animate(_animationController);
     // Use `setState` only to rebuild and show the animation.
-    if(mounted) setState(() => _isAnimationInitialized = true);
+    if (mounted) setState(() => _isAnimationInitialized = true);
   }
 
   void _disposeAnimation() {
     if (_isAnimationInitialized) {
       _animationController.dispose();
-      if(mounted) setState(() => _isAnimationInitialized = false);
+      if (mounted) setState(() => _isAnimationInitialized = false);
     }
   }
 
@@ -119,16 +121,29 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
 
   String _getSubscriptionLabel(int activeLevel) {
     switch (activeLevel) {
-      case 1: case 4: return "Plus";
-      case 2: case 5: return "Pro";
-      case 3: case 6: return "Ultra";
-      default: return "";
+      case 1:
+      case 4:
+        return "Plus";
+      case 2:
+      case 5:
+        return "Pro";
+      case 3:
+      case 6:
+        return "Ultra";
+      default:
+        return "";
     }
   }
 
   Widget _buildBadge(BuildContext context, IconData icon, String label) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: screenWidth * 0.025,
@@ -141,9 +156,12 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: AppColors.primaryColor.inverted, size: screenWidth * 0.045),
+          Icon(icon, color: AppColors.primaryColor.inverted,
+              size: screenWidth * 0.045),
           SizedBox(width: screenWidth * 0.015),
-          Text(label, style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.032, fontWeight: FontWeight.w500)),
+          Text(label, style: TextStyle(color: AppColors.primaryColor.inverted,
+              fontSize: screenWidth * 0.032,
+              fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -179,7 +197,10 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
 
     final isAlphaUser = userData?['alphaUser'] as bool? ?? false;
 
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final double avatarSize = screenWidth * 0.25;
 
     Widget avatar = Container(
@@ -191,7 +212,8 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
         backgroundColor: AppColors.secondaryColor,
         child: Text(
           isAnonymous
-              ? (displayName.isNotEmpty ? displayName.characters.first.toUpperCase() : '?')
+              ? (displayName.isNotEmpty ? displayName.characters.first
+              .toUpperCase() : '?')
               : (displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U'),
 
           style: TextStyle(
@@ -252,18 +274,23 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
                         email,
                         style: TextStyle(
                             color: AppColors.quinaryColor,
-                            fontSize: screenWidth * 0.035, // Slightly smaller for guest warning
+                            fontSize: screenWidth * 0.035,
+                            // Slightly smaller for guest warning
                             fontWeight: FontWeight.w400
                         ),
                         maxLines: 2, // Allow 2 lines for the guest warning
                         overflow: TextOverflow.ellipsis
                     ),
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  SizedBox(height: MediaQuery
+                      .of(context)
+                      .size
+                      .height * 0.01),
                   Row(
                     children: [
                       if (activeLevel >= 1)
-                        _buildBadge(context, Icons.star_rounded, _getSubscriptionLabel(activeLevel)),
+                        _buildBadge(context, Icons.star_rounded,
+                            _getSubscriptionLabel(activeLevel)),
                       if (activeLevel >= 1 && isAlphaUser)
                         SizedBox(width: screenWidth * 0.02),
                       if (isAlphaUser)

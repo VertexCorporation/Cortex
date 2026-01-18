@@ -203,7 +203,7 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 SvgPicture.asset(
-                                  'assets/icons/share.svg',
+                                  'assets/icons/world.svg',
                                   width: screenSize.width * 0.05,
                                   height: screenSize.width * 0.05,
                                   colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),

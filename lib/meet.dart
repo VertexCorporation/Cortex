@@ -618,7 +618,7 @@ class _FinalOnboardingPageState extends State<_FinalOnboardingPage>
 
                               // Description paragraph
                               Text(
-                                l10n.onboardingFinalDesc,
+                                l10n.onboardingFinalDescription,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: descFontSize,

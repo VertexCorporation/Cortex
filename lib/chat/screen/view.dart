@@ -1,7 +1,7 @@
 // lib/chat/view.dart
 
 import 'package:cortex/chat/screen/widgets/bottom/bottom.dart';
-import 'package:cortex/chat/screen/widgets/bottom/input/panels/briefing.dart';
+import 'package:cortex/chat/screen/widgets/bottom/panels/briefing.dart';
 import 'package:cortex/chat/screen/widgets/list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -58,7 +58,6 @@ class ChatViewState extends State<ChatView>
 
   // --- Flags ---
   final bool _showInappropriateContentWarning = false;
-  bool _showPhotoModelWarning = false;
   String? _lastActiveOfflineModelId;
 
   @override
@@ -106,6 +105,8 @@ class ChatViewState extends State<ChatView>
 
   void _handleModelChange(ChatSessionProvider session) {
     final modelService = context.read<ModelService>();
+    final inputProvider = context.read<InputProvider>();
+
     final langCode = session
         .getLocale()
         .languageCode;
@@ -122,6 +123,14 @@ class ChatViewState extends State<ChatView>
     final isNewModelOffline = newModelId != null &&
         !Utils.isServerSideModel(
             newModelId, langCode: langCode, modelService: modelService);
+
+    if (isNewModelOffline) {
+      inputProvider.setFeatureMode(ChatInputMode.offline);
+    } else {
+      if (inputProvider.featureMode == ChatInputMode.offline) {
+        inputProvider.clearFeatureMode();
+      }
+    }
 
     if (isNewModelOffline && newModelPath != null && newModelPath.isNotEmpty) {
       _offlineService.cacheModel(newModelPath);
@@ -246,14 +255,12 @@ class ChatViewState extends State<ChatView>
           builder: (context, _) {
             final basePanelHeight = bottomPanelHeightNotifier.value;
             const horizontalPadding = 16.0;
-            final bool shouldBeVisible = sessionProvider.isChatActive;
 
             return Positioned(
               left: horizontalPadding,
               right: horizontalPadding,
               bottom: basePanelHeight + bottomSafe + _briefingBottomOffset,
               child: BriefingOverlay(
-                isVisible: shouldBeVisible,
                 availableCredits: context
                     .watch<CreditsManager>()
                     .totalCreditsNotifier
@@ -267,9 +274,6 @@ class ChatViewState extends State<ChatView>
                 isStorageSufficient: context
                     .watch<ChatSessionProvider>()
                     .isStorageSufficient,
-                showDisclaimer: context
-                    .watch<ChatSessionProvider>()
-                    .showDisclaimer,
                 isPremiumModel: context
                     .watch<ChatSessionProvider>()
                     .isCurrentModelPremium,
@@ -280,13 +284,6 @@ class ChatViewState extends State<ChatView>
                     .watch<ChatSessionProvider>()
                     .premiumTrialUses,
                 inappropriate: _showInappropriateContentWarning,
-                showPhotoWarning: _showPhotoModelWarning,
-                onDisclaimerDismissed: () {
-                  if (mounted) {
-                    context.read<ChatSessionProvider>().dismissDisclaimer();
-                    setState(() => _showPhotoModelWarning = false);
-                  }
-                },
                 onVisibleHeightChanged: (h) {
                   if (briefingVisibleHeightNotifier.value != h) {
                     briefingVisibleHeightNotifier.value = h;

@@ -352,8 +352,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get purchasePlus => 'Beli Cortex Plus';
 
   @override
-  String get plusDescription =>
-      'Akses lebih banyak fitur Cortex dan rasakan pengalaman AI yang lebih kaya!';
+  String get plusDescription => 'Pengalaman Kecerdasan Buatan Tingkat Tinggi';
 
   @override
   String get annual => 'Tahunan';
@@ -380,25 +379,16 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get discountBannerTitle => 'SPESIAL PELUNCURAN: DISKON 80%!';
-
-  @override
-  String get discountBannerSubtitle =>
-      'Diskon eksklusif untuk SEMUA paket langganan untuk merayakan peluncuran kami. Jangan sampai ketinggalan!';
-
-  @override
   String get purchasePro => 'Beli Cortex Pro';
 
   @override
-  String get proDescription =>
-      'Akses lebih banyak fitur Cortex dan rasakan pengalaman AI yang lebih kaya!';
+  String get proDescription => 'Pengalaman Kecerdasan Buatan Terbaik';
 
   @override
   String get purchaseUltra => 'Beli Cortex Ultra';
 
   @override
-  String get ultraDescription =>
-      'Dapatkan akses penuh ke semua fitur Cortex dan rasakan pengalaman AI secara maksimal!';
+  String get ultraDescription => 'Puncak Kecerdasan Buatan';
 
   @override
   String get upgradeSubscription => 'Tingkatkan Langganan';
@@ -617,6 +607,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get italian => 'Italia';
 
   @override
+  String get arabic => 'Arab';
+
+  @override
   String get ram => 'RAM';
 
   @override
@@ -640,9 +633,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get library => 'Perpustakaan';
 
   @override
-  String get appTitle => 'Cortex';
-
-  @override
   String get text => 'Teks';
 
   @override
@@ -663,8 +653,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get noMatchingModels => 'Tidak ada model yang cocok ditemukan.';
 
   @override
-  String get benefit1 =>
-      'Batas percakapan yang jauh lebih banyak untuk AI online';
+  String get benefit1 => 'Batasan percakapan yang ditingkatkan';
 
   @override
   String get benefit3 => 'Efek profil';
@@ -912,10 +901,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Coba sesuaikan istilah pencarian Anda atau hapus filter.';
 
   @override
-  String get disclaimerMessage =>
-      'Kecerdasan Buatan dapat membuat kesalahan, periksa informasi penting.';
-
-  @override
   String get modelCreatedSuccess => 'Model berhasil dibuat!';
 
   @override
@@ -993,10 +978,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get registerSubtitle =>
       'Buat akun Vertex untuk akses mudah ke semua layanan kami. Dengan melanjutkan, Anda menyetujui Persyaratan Layanan & Kebijakan Privasi kami.';
-
-  @override
-  String get photoWarningMessage =>
-      'Sebuah foto disertakan. Model yang tidak mendukung gambar mungkin akan mengabaikannya.';
 
   @override
   String get storagePermissionRequired =>
@@ -1465,7 +1446,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingFinalTitle => 'Waktunya Revolusi.';
 
   @override
-  String get onboardingFinalDesc =>
+  String get onboardingFinalDescription =>
       'Jika Anda melihat layar ini, itu karena kami tidak menyerah. Dan kami tidak berniat menyerah. Ayo, kita bawa revolusi AI ke dunia bersama-sama. Untuk menjadi bagian dari kisah ini...';
 
   @override
@@ -1563,4 +1544,47 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get alwaysBest => 'Selalu Terbaik';
+
+  @override
+  String get featuresTitle => 'Fitur';
+
+  @override
+  String get useOfflineDescription =>
+      'Ngobrol secara pribadi tanpa koneksi internet';
+
+  @override
+  String get featureCreateImageTitle => 'Buat Gambar';
+
+  @override
+  String get featureCreateImageDescription =>
+      'Hasilkan karya seni AI dari teks.';
+
+  @override
+  String get featureStudyTitle => 'Belajar & Mengajar';
+
+  @override
+  String get featureStudyDescription => 'Dapatkan penjelasan dan ringkasan';
+
+  @override
+  String get featureQuizzesTitle => 'Kuis';
+
+  @override
+  String get featureQuizzesDescription => 'Uji pengetahuan Anda';
+
+  @override
+  String get featureExploreDescription => 'Temukan semua model yang tersedia';
+
+  @override
+  String get featureStudyMessage =>
+      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+
+  @override
+  String get featureQuizMessage =>
+      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+
+  @override
+  String get myPlan => 'Rencana Saya';
+
+  @override
+  String get discountText => 'Diskon 80% untuk semua paket!';
 }

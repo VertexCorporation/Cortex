@@ -767,7 +767,7 @@ abstract class AppLocalizations {
   /// No description provided for @plusDescription.
   ///
   /// In en, this message translates to:
-  /// **'Access more features of Cortex and experience AI much more!'**
+  /// **'Elite Artificial Intelligence Experience'**
   String get plusDescription;
 
   /// No description provided for @annual.
@@ -806,18 +806,6 @@ abstract class AppLocalizations {
   /// **'{price}/month, billed monthly'**
   String monthlyPlanDescription(String price);
 
-  /// The main headline for the promotional banner, emphasizing a special launch discount.
-  ///
-  /// In en, this message translates to:
-  /// **'LAUNCH SPECIAL: 80% OFF!'**
-  String get discountBannerTitle;
-
-  /// The secondary text for the promotional banner, clarifying the offer applies to all plans and adding a sense of urgency.
-  ///
-  /// In en, this message translates to:
-  /// **'Exclusive discount on ALL subscription plans to celebrate our launch. Don\'t miss out!'**
-  String get discountBannerSubtitle;
-
   /// No description provided for @purchasePro.
   ///
   /// In en, this message translates to:
@@ -827,7 +815,7 @@ abstract class AppLocalizations {
   /// No description provided for @proDescription.
   ///
   /// In en, this message translates to:
-  /// **'Access even more features of Cortex and experience AI even more!'**
+  /// **'Premier Artificial Intelligence Experience'**
   String get proDescription;
 
   /// No description provided for @purchaseUltra.
@@ -839,7 +827,7 @@ abstract class AppLocalizations {
   /// No description provided for @ultraDescription.
   ///
   /// In en, this message translates to:
-  /// **'Gain full access to all features of Cortex and experience AI to the fullest!'**
+  /// **'The Peak of Artificial Intelligence'**
   String get ultraDescription;
 
   /// No description provided for @upgradeSubscription.
@@ -1256,6 +1244,12 @@ abstract class AppLocalizations {
   /// **'Italian'**
   String get italian;
 
+  /// No description provided for @arabic.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get arabic;
+
   /// No description provided for @ram.
   ///
   /// In en, this message translates to:
@@ -1298,12 +1292,6 @@ abstract class AppLocalizations {
   /// **'Library'**
   String get library;
 
-  /// No description provided for @appTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Cortex'**
-  String get appTitle;
-
   /// No description provided for @text.
   ///
   /// In en, this message translates to:
@@ -1343,49 +1331,49 @@ abstract class AppLocalizations {
   /// No description provided for @benefit1.
   ///
   /// In en, this message translates to:
-  /// **'Many more conversation limit for online AIs'**
+  /// **'Increased Conversation Limits'**
   String get benefit1;
 
   /// No description provided for @benefit3.
   ///
   /// In en, this message translates to:
-  /// **'Profile effect'**
+  /// **'Profile Effect'**
   String get benefit3;
 
   /// No description provided for @benefit4.
   ///
   /// In en, this message translates to:
-  /// **'Membership badge'**
+  /// **'Membership Badge'**
   String get benefit4;
 
   /// No description provided for @benefit5.
   ///
   /// In en, this message translates to:
-  /// **'Create more online artificial intelligences'**
+  /// **'Create More Online Artificial Intelligences'**
   String get benefit5;
 
   /// No description provided for @benefit7.
   ///
   /// In en, this message translates to:
-  /// **'More usage limits'**
+  /// **'More Usage Limits'**
   String get benefit7;
 
   /// No description provided for @benefit8.
   ///
   /// In en, this message translates to:
-  /// **'Add models'**
+  /// **'Add Models'**
   String get benefit8;
 
   /// No description provided for @benefit9.
   ///
   /// In en, this message translates to:
-  /// **'New themes'**
+  /// **'New Themes'**
   String get benefit9;
 
   /// No description provided for @oldBenefits.
   ///
   /// In en, this message translates to:
-  /// **'All benefits from lower plans'**
+  /// **'All Benefits From Lower Plans'**
   String get oldBenefits;
 
   /// No description provided for @confirm.
@@ -1790,12 +1778,6 @@ abstract class AppLocalizations {
   /// **'Try adjusting your search terms or clearing the filter.'**
   String get noFoundMessage;
 
-  /// No description provided for @disclaimerMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Artificial Intelligences can make mistakes, check important information.'**
-  String get disclaimerMessage;
-
   /// No description provided for @modelCreatedSuccess.
   ///
   /// In en, this message translates to:
@@ -1921,12 +1903,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create a Vertex account for seamless access across all our services. By continuing, you agree to our Terms of Service & Privacy Policy.'**
   String get registerSubtitle;
-
-  /// No description provided for @photoWarningMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'A photo is included. Models that don\'t support images may ignore it.'**
-  String get photoWarningMessage;
 
   /// No description provided for @storagePermissionRequired.
   ///
@@ -2709,11 +2685,11 @@ abstract class AppLocalizations {
   /// **'It\'s Time for a Revolution.'**
   String get onboardingFinalTitle;
 
-  /// No description provided for @onboardingFinalDesc.
+  /// No description provided for @onboardingFinalDescription.
   ///
   /// In en, this message translates to:
   /// **'If you\'re seeing this screen, it\'s because we didn\'t give up. And we have no intention of giving up. Come on, let\'s take the AI revolution to the world together. To be a part of this story...'**
-  String get onboardingFinalDesc;
+  String get onboardingFinalDescription;
 
   /// No description provided for @onboardingFinalQuestion.
   ///
@@ -2882,6 +2858,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Always Best'**
   String get alwaysBest;
+
+  /// No description provided for @featuresTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Features'**
+  String get featuresTitle;
+
+  /// No description provided for @useOfflineDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat privately without internet connection'**
+  String get useOfflineDescription;
+
+  /// No description provided for @featureCreateImageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Image'**
+  String get featureCreateImageTitle;
+
+  /// No description provided for @featureCreateImageDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate AI art from text'**
+  String get featureCreateImageDescription;
+
+  /// No description provided for @featureStudyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Study & Learn'**
+  String get featureStudyTitle;
+
+  /// No description provided for @featureStudyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Get explanations and summaries'**
+  String get featureStudyDescription;
+
+  /// No description provided for @featureQuizzesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quizzes'**
+  String get featureQuizzesTitle;
+
+  /// No description provided for @featureQuizzesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Test your knowledge'**
+  String get featureQuizzesDescription;
+
+  /// No description provided for @featureExploreDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover all available models'**
+  String get featureExploreDescription;
+
+  /// No description provided for @featureStudyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:'**
+  String get featureStudyMessage;
+
+  /// No description provided for @featureQuizMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:'**
+  String get featureQuizMessage;
+
+  /// No description provided for @myPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'My Plan'**
+  String get myPlan;
+
+  /// No description provided for @discountText.
+  ///
+  /// In en, this message translates to:
+  /// **'%80 Discount on all plans!'**
+  String get discountText;
 }
 
 class _AppLocalizationsDelegate

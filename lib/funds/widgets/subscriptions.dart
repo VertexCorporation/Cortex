@@ -1,8 +1,9 @@
-// subscriptions.dart (FINAL, REFINED & PRODUCTION-READY)
-// This version integrates the central ScrollFog widget internally to apply
-// the effect only to this scrollable page, maintaining a clean architecture.
+// subscriptions.dart (FINAL, REFINED & CLEANED - NO LOGOS)
+// This version integrates the central ScrollFog widget internally and removes
+// heavy PNG assets for a cleaner, faster UI.
 
 import 'dart:async';
+import 'dart:ui';
 import 'package:cortex/app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -101,43 +102,31 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     final screenHeight = screenSize.height;
 
     final double horizontalPadding = screenWidth * 0.06;
-    final double verticalSpacingSmall = screenHeight * 0.01;
-    final double verticalSpacingMedium = screenHeight * 0.02;
+    final double verticalSpacingSmall = screenHeight * 0.005;
+    final double verticalSpacingMedium = screenHeight * 0.01;
     final double verticalSpacingLarge = screenHeight * 0.03;
-    final double logoHeight = screenWidth * 0.25;
 
-    String purchaseKey, descriptionKey, logoPath, monthlyId, annualId;
+    String purchaseKey, descriptionKey, monthlyId, annualId;
     int currentPlanLevel;
 
     switch (widget.planType) {
       case 'pro':
         purchaseKey = localizations.purchasePro;
         descriptionKey = localizations.proDescription;
-        logoPath = AppColors.currentTheme == 'dark'
-            ? 'assets/icons/subscriptions/whitepro.png'
-            : 'assets/icons/subscriptions/prologo.png';
         monthlyId = FundsBackend.monthlySubscriptionPro;
         annualId = FundsBackend.annualSubscriptionPro;
         currentPlanLevel = 2;
         break;
-
       case 'ultra':
         purchaseKey = localizations.purchaseUltra;
         descriptionKey = localizations.ultraDescription;
-        logoPath = AppColors.currentTheme == 'dark'
-            ? 'assets/icons/subscriptions/whiteultra.png'
-            : 'assets/icons/subscriptions/ultralogo.png';
         monthlyId = FundsBackend.monthlySubscriptionUltra;
         annualId = FundsBackend.annualSubscriptionUltra;
         currentPlanLevel = 3;
         break;
-
       default: // 'plus'
         purchaseKey = localizations.purchasePlus;
         descriptionKey = localizations.plusDescription;
-        logoPath = AppColors.currentTheme == 'dark'
-            ? 'assets/icons/subscriptions/whiteplus.png'
-            : 'assets/icons/subscriptions/pluslogo.png';
         monthlyId = FundsBackend.monthlySubscriptionPlus;
         annualId = FundsBackend.annualSubscriptionPlus;
         currentPlanLevel = 1;
@@ -156,28 +145,24 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     if (annualProductDetails != null && annualProductDetails.rawPrice > 0) {
       final currencySymbol =
       annualProductDetails.price.replaceAll(RegExp(r'[\d.,\s]'), '');
-      final monthlyPrice = (annualProductDetails.rawPrice / 12).toStringAsFixed(
-          2);
+      final monthlyPrice =
+      (annualProductDetails.rawPrice / 12).toStringAsFixed(2);
       formattedMonthlyEquivalentPrice = "$currencySymbol$monthlyPrice";
     } else {
       formattedMonthlyEquivalentPrice = '...';
     }
 
     final bool isIOS = defaultTargetPlatform == TargetPlatform.iOS;
-
     final String annualTotalPrice =
         annualProductDetails?.price ?? _getPriceForId(annualId);
-
     final String annualPrimaryDesc =
     localizations.annualTotalDescription(annualTotalPrice);
-
     final String? annualSecondaryDesc = isIOS
         ? null
         : localizations.equivalentMonthlyDescription(
         formattedMonthlyEquivalentPrice);
-
-    final bool isActivePlan = widget.activeSubscriptionLevel ==
-        currentPlanLevel;
+    final bool isActivePlan =
+        widget.activeSubscriptionLevel == currentPlanLevel;
 
     return ScrollFog(
       scrollController: widget.scrollController!,
@@ -190,27 +175,32 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: Column(
             children: [
+              // Header Title
               Text(
                 purchaseKey,
                 style: TextStyle(
-                  fontSize: screenWidth * 0.07,
+                  fontSize: screenWidth * 0.1,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryColor.inverted,
                 ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: verticalSpacingSmall),
-              Text(
-                descriptionKey,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: screenWidth * 0.035,
-                  color: AppColors.tertiaryColor,
+
+              // Description Text
+              FittedBox(
+                child: Text(
+                  descriptionKey,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.032,
+                    color: AppColors.tertiaryColor,
+                  ),
                 ),
               ),
-              SizedBox(height: verticalSpacingMedium),
-              Image.asset(logoPath, height: logoHeight),
-              SizedBox(height: verticalSpacingMedium),
+
+              // Spacing (Replaces old logo area)
+              SizedBox(height: verticalSpacingLarge),
 
               // --- Annual option ---
               _buildSubscriptionOption(
@@ -227,7 +217,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                 activeSubscriptionOption: widget.activeSubscriptionOption ?? '',
               ),
 
-              SizedBox(height: verticalSpacingSmall),
+              SizedBox(height: verticalSpacingMedium),
 
               // --- Monthly option ---
               _buildSubscriptionOption(
@@ -236,8 +226,8 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                 option: 'monthly',
                 title: "${localizations.monthly} ${widget.planType
                     .capitalize()}",
-                primaryDescription:
-                localizations.monthlyPlanDescription(_getPriceForId(monthlyId)),
+                primaryDescription: localizations
+                    .monthlyPlanDescription(_getPriceForId(monthlyId)),
                 secondaryDescription: null,
                 isBestValue: false,
                 isSelected: widget.selectedBillingOption == 'monthly',
@@ -290,8 +280,9 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
           horizontal: screenWidth * 0.02,
         ),
         decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(6),
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: AppColors.premium, width: 0.2)
         ),
         child: FittedBox(
           fit: BoxFit.scaleDown,
@@ -336,7 +327,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: screenWidth * 0.045,
+                      fontSize: screenWidth * 0.05,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryColor.inverted,
                     ),
@@ -350,7 +341,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                     child: Text(
                       primaryDescription,
                       style: TextStyle(
-                        fontSize: screenWidth * 0.040,
+                        fontSize: screenWidth * 0.035,
                         fontWeight: FontWeight.w600,
                         color: AppColors.tertiaryColor,
                       ),
@@ -369,7 +360,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                       child: Text(
                         secondaryDescription,
                         style: TextStyle(
-                          fontSize: screenWidth * 0.032,
+                          fontSize: screenWidth * 0.025,
                           color: AppColors.tertiaryColor.withValues(
                               alpha: 0.85),
                         ),
@@ -416,14 +407,15 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                       maintainAnimation: true,
                       maintainState: true,
                       child: buildBadge(
-                        backgroundColor: Colors.green,
-                        textColor: Colors.white,
+                        backgroundColor: AppColors.primaryColor.inverted,
+                        textColor: AppColors.primaryColor,
                         text: localizations.bestValue,
                       ),
                     ),
                     buildBadge(
-                      backgroundColor: AppColors.primaryColor.inverted,
-                      textColor: AppColors.primaryColor,
+                      backgroundColor: AppColors.premium.withValues(
+                          alpha: 0.15),
+                      textColor: AppColors.premium,
                       text: localizations.discountOffer(80),
                     ),
                   ],
@@ -527,15 +519,17 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     }
 
     return Wrap(
-      spacing: screenWidth * 0.02,
-      runSpacing: screenWidth * 0.02,
+      alignment: WrapAlignment.center,
+      runAlignment: WrapAlignment.center,
+      spacing: screenWidth * 0.012,
+      runSpacing: screenWidth * 0.057,
       children: benefits
           .asMap()
           .entries
           .map((entry) {
         final int index = entry.key;
         final String benefit = entry.value;
-        final double iconSize = screenWidth * 0.05;
+        final double iconSize = screenWidth * 0.057;
 
         final benefitContent = SizedBox(
           width: (screenWidth - (horizontalPadding * 2) -
@@ -543,14 +537,17 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SvgPicture.asset('assets/icons/checkmark.svg', width: iconSize,
+              SvgPicture.asset('assets/icons/checkmark.svg',
+                  width: iconSize,
                   height: iconSize,
                   colorFilter: ColorFilter.mode(
                       AppColors.primaryColor.inverted, BlendMode.srcIn)),
-              SizedBox(width: screenWidth * 0.02),
-              Expanded(child: Text(benefit, style: TextStyle(
-                  fontSize: screenWidth * 0.035,
-                  color: AppColors.primaryColor.inverted))),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                  child: Text(benefit,
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.034,
+                          color: AppColors.primaryColor.inverted))),
             ],
           ),
         );

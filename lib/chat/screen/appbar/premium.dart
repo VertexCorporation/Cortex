@@ -34,66 +34,62 @@ class PremiumButton extends StatelessWidget {
         scale;
     final double borderWidth = 0.8 * scale;
 
-    final Color baseColor = AppColors.premium;
-    final Color backgroundColor = baseColor.withValues(alpha: 0.5);
-    final Color contentColor = Color.lerp(
-        baseColor, AppColors.primaryColor, 0.9) ??
-        baseColor;
-    final Color borderColor = baseColor.withValues(alpha: 0.6);
+    final Color baseColor = AppColors.premium.withValues(alpha: 0.15);
+    final Color backgroundColor = Color.alphaBlend(
+        baseColor, AppColors.background);
+    final Color contentColor = AppColors.premium;
+    final Color borderColor = baseColor.withValues(alpha: 0.8);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Material(
-          color: Colors.transparent,
-          child: Ink(
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(borderRadius),
-              border: Border.all(
-                color: borderColor,
-                width: borderWidth,
-              ),
+      child: Material(
+        color: Colors.transparent,
+        child: Ink(
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(
+              color: borderColor,
+              width: borderWidth,
             ),
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(borderRadius),
-              splashColor: contentColor.withValues(alpha: 0.1),
-              highlightColor: contentColor.withValues(alpha: 0.05),
-              child: Container(
-                height: buttonHeight,
-                padding: EdgeInsets.symmetric(horizontal: paddingH),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/sparkle.svg',
-                      colorFilter: ColorFilter.mode(
-                        contentColor,
-                        BlendMode.srcIn,
-                      ),
-                      width: iconSize,
-                      height: iconSize,
+          ),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(borderRadius),
+            splashColor: contentColor.withValues(alpha: 0.1),
+            highlightColor: contentColor.withValues(alpha: 0.05),
+            child: Container(
+              height: buttonHeight,
+              padding: EdgeInsets.symmetric(horizontal: paddingH),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/sparkle.svg',
+                    colorFilter: ColorFilter.mode(
+                      contentColor,
+                      BlendMode.srcIn,
                     ),
-                    SizedBox(width: gap),
+                    width: iconSize,
+                    height: iconSize,
+                  ),
+                  SizedBox(width: gap),
 
-                    Flexible(
-                      child: Text(
-                        "Cortex Premium",
-                        style: GoogleFonts.ubuntu(
-                          fontSize: fontSize,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: -0.5,
-                          color: contentColor,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                  Flexible(
+                    child: Text(
+                      "Cortex Premium",
+                      style: GoogleFonts.ubuntu(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: -0.5,
+                        color: contentColor,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

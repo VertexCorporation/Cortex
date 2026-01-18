@@ -12,7 +12,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get cancel => '취소';
 
   @override
-  String get remove => '제거';
+  String get remove => '제거하다';
 
   @override
   String get download => '다운로드';
@@ -343,7 +343,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get purchasePlus => 'Cortex 플러스 구매하기';
 
   @override
-  String get plusDescription => 'Cortex의 더 많은 기능에 액세스하고 AI를 훨씬 더 많이 경험해보세요!';
+  String get plusDescription => '엘리트 인공지능 체험';
 
   @override
   String get annual => '연간';
@@ -370,23 +370,16 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get discountBannerTitle => '출시 기념 특가: 80% 할인!';
-
-  @override
-  String get discountBannerSubtitle => '출시를 기념하여 모든 구독 플랜에 대한 독점 할인. 놓치지 마세요!';
-
-  @override
   String get purchasePro => 'Cortex 프로 구매하기';
 
   @override
-  String get proDescription => 'Cortex의 더 많은 기능에 액세스하고 AI를 더욱 경험해보세요!';
+  String get proDescription => '최고의 인공지능 경험';
 
   @override
   String get purchaseUltra => 'Cortex 울트라 구매하기';
 
   @override
-  String get ultraDescription =>
-      'Cortex의 모든 기능에 대한 전체 액세스 권한을 얻고 AI를 최대한 경험해보세요!';
+  String get ultraDescription => '인공지능의 정점';
 
   @override
   String get upgradeSubscription => '구독 업그레이드';
@@ -603,6 +596,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get italian => '이탈리아어';
 
   @override
+  String get arabic => '아라비아 말';
+
+  @override
   String get ram => 'RAM';
 
   @override
@@ -625,9 +621,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get library => '라이브러리';
 
   @override
-  String get appTitle => 'Cortex';
-
-  @override
   String get text => '텍스트';
 
   @override
@@ -648,7 +641,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get noMatchingModels => '일치하는 모델을 찾을 수 없습니다.';
 
   @override
-  String get benefit1 => '온라인 AI를 위한 훨씬 더 많은 대화 한도';
+  String get benefit1 => '대화 제한 증가';
 
   @override
   String get benefit3 => '프로필 효과';
@@ -884,9 +877,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get noFoundMessage => '검색어를 조정하거나 필터를 지워보세요.';
 
   @override
-  String get disclaimerMessage => '인공지능은 실수를 할 수 있으니 중요한 정보는 확인하세요.';
-
-  @override
   String get modelCreatedSuccess => '모델이 성공적으로 생성되었습니다!';
 
   @override
@@ -956,10 +946,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get registerSubtitle =>
       'Vertex 계정을 생성하시면 모든 서비스를 원활하게 이용하실 수 있습니다. 계속 진행하시면 당사의 서비스 약관 및 개인정보 처리방침에 동의하는 것으로 간주됩니다.';
-
-  @override
-  String get photoWarningMessage =>
-      '사진이 포함되어 있습니다. 이미지를 지원하지 않는 모델은 이를 무시할 수 있습니다.';
 
   @override
   String get storagePermissionRequired =>
@@ -1413,7 +1399,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get onboardingFinalTitle => '혁명의 시간이에요.';
 
   @override
-  String get onboardingFinalDesc =>
+  String get onboardingFinalDescription =>
       '이 화면을 보고 있다면, 저희가 포기하지 않았다는 뜻이에요. 그리고 앞으로도 포기할 생각은 없어요. 자, 함께 AI 혁명을 세상에 알려요. 이 이야기의 일부가 될 준비...';
 
   @override
@@ -1507,4 +1493,45 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get alwaysBest => '언제나 최고';
+
+  @override
+  String get featuresTitle => '특징';
+
+  @override
+  String get useOfflineDescription => '인터넷 연결 없이 비공개 채팅';
+
+  @override
+  String get featureCreateImageTitle => '이미지 생성';
+
+  @override
+  String get featureCreateImageDescription => '텍스트를 기반으로 AI 아트 생성';
+
+  @override
+  String get featureStudyTitle => '공부하고 배우세요';
+
+  @override
+  String get featureStudyDescription => '설명과 요약을 확인하세요';
+
+  @override
+  String get featureQuizzesTitle => '퀴즈';
+
+  @override
+  String get featureQuizzesDescription => '지식을 테스트해 보세요';
+
+  @override
+  String get featureExploreDescription => '모든 모델을 확인해 보세요';
+
+  @override
+  String get featureStudyMessage =>
+      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+
+  @override
+  String get featureQuizMessage =>
+      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+
+  @override
+  String get myPlan => '내 계획';
+
+  @override
+  String get discountText => '모든 요금제 80% 할인!';
 }

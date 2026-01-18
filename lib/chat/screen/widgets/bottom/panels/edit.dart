@@ -9,6 +9,7 @@ import 'package:cortex/theme.dart';
 class EditPanelWidget extends StatelessWidget {
   final Animation<Offset> slideAnimation;
   final VoidCallback onCancel;
+
   const EditPanelWidget({
     super.key,
     required this.slideAnimation,
@@ -17,8 +18,14 @@ class EditPanelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final bool isTablet = screenWidth >= 600;
     final localizations = AppLocalizations.of(context)!;
 
@@ -32,7 +39,8 @@ class EditPanelWidget extends StatelessWidget {
     final double iconSize = isTablet ? screenWidth * 0.03 : screenWidth * 0.05;
 
     // Text: Tablet 2.2% of width. Phone 3.5%.
-    final double fontSize = isTablet ? screenWidth * 0.022 : screenWidth * 0.035;
+    final double fontSize = isTablet ? screenWidth * 0.022 : screenWidth *
+        0.035;
 
     // Radius: Tablet 2%. Phone 4%.
     final double radius = isTablet ? screenWidth * 0.02 : screenWidth * 0.04;
@@ -62,7 +70,8 @@ class EditPanelWidget extends StatelessWidget {
               'assets/icons/edit.svg',
               width: iconSize,
               height: iconSize,
-              colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(
+                  AppColors.primaryColor.inverted, BlendMode.srcIn),
             ),
             Expanded(
               child: Text(

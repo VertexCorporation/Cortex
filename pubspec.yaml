@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 5.0.0+500
+version: 5.2.0+520
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -150,7 +150,8 @@ flutter:
   generate: true
   assets:
     - assets/icons/
-    - assets/icons/subscriptions/
+    - assets/icons/on/
+    - assets/icons/off/
     - assets/characters/
     - assets/splash/
     - assets/fonts/roboto/

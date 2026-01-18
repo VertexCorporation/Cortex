@@ -12,7 +12,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get cancel => 'Betal bike';
 
   @override
-  String get remove => 'Rake';
+  String get remove => 'Dûrxistin';
 
   @override
   String get download => 'Daxe';
@@ -349,8 +349,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get purchasePlus => 'Cortex Plus bikire';
 
   @override
-  String get plusDescription =>
-      'Zêdetir taybetmendiyên Cortex-ê bi kar bîne û AI-yê pir zêdetir biceribîne!';
+  String get plusDescription => 'Ezmûna Zekaya Sûni ya Elît';
 
   @override
   String get annual => 'Salane';
@@ -377,25 +376,16 @@ class AppLocalizationsKu extends AppLocalizations {
   }
 
   @override
-  String get discountBannerTitle => 'TAYBET JI BO DESTPÊKÊ: 80% ERZANÎ!';
-
-  @override
-  String get discountBannerSubtitle =>
-      'Erzaniya taybet li ser HEMÛ planên abonetiyê ji bo pîrozkirina destpêka me. Vê fersendê ji dest nede!';
-
-  @override
   String get purchasePro => 'Cortex Pro bikire';
 
   @override
-  String get proDescription =>
-      'Zêdetir taybetmendiyên Cortex-ê bi kar bîne û AI-yê hê bêtir biceribîne!';
+  String get proDescription => 'Ezmûna Sereke ya Zekaya Sûni';
 
   @override
   String get purchaseUltra => 'Cortex Ultra bikire';
 
   @override
-  String get ultraDescription =>
-      'Gihîştina tevahî ya hemî taybetmendiyên Cortex-ê bi dest bixe û AI-yê bi tevahî biceribîne!';
+  String get ultraDescription => 'Lûtkeya Zekaya Sûni';
 
   @override
   String get upgradeSubscription => 'Abonetiyê Nûjen bike';
@@ -616,6 +606,9 @@ class AppLocalizationsKu extends AppLocalizations {
   String get italian => 'Îtalî';
 
   @override
+  String get arabic => 'Erebî';
+
+  @override
   String get ram => 'RAM';
 
   @override
@@ -639,9 +632,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get library => 'Pirtûkxane';
 
   @override
-  String get appTitle => 'Cortex';
-
-  @override
   String get text => 'Nivîs';
 
   @override
@@ -662,7 +652,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get noMatchingModels => 'Tu modelên lihevhatî nehatin dîtin.';
 
   @override
-  String get benefit1 => 'Sînorê sohbetê yê pir zêde ji bo AI-yên serhêl';
+  String get benefit1 => 'Sînorên danûstendinê yên zêdekirî';
 
   @override
   String get benefit3 => 'Efekta profîlê';
@@ -910,10 +900,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Biceribîne ku şertên lêgerîna xwe biguherînî an parzûnê paqij bikî.';
 
   @override
-  String get disclaimerMessage =>
-      'Îstîxbaratên Çêkirî dikarin xeletiyan bikin, agahdariyên girîng kontrol bikin.';
-
-  @override
   String get modelCreatedSuccess => 'Model bi serkeftî hate afirandin!';
 
   @override
@@ -991,10 +977,6 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get registerSubtitle =>
       'Ji bo gihîştina bênavber a hemî karûbarên me, hesabê Vertex-ê biafirînin. Bi berdewamkirinê, hûn bi Mercên Xizmetê û Siyaseta me ya Taybetîtiyê razî dibin.';
-
-  @override
-  String get photoWarningMessage =>
-      'Wêneyek tê de ye. Modelên ku wêneyan piştgirî nakin dibe ku wê paşguh bikin.';
 
   @override
   String get storagePermissionRequired =>
@@ -1458,7 +1440,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get onboardingFinalTitle => 'Dema Şoreşê ye.';
 
   @override
-  String get onboardingFinalDesc =>
+  String get onboardingFinalDescription =>
       'Eger hûn vê ekranê dibînin, ev ji ber wê yekê ye ku me dev jê berneda. Û niyeta me ya devjêberdanê tune. Werin, em bi hev re şoreşa AI bigihînin cîhanê. Ji bo ku hûn bibin beşek ji vê çîrokê...';
 
   @override
@@ -1556,4 +1538,46 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get alwaysBest => 'Herdem Baştirîn';
+
+  @override
+  String get featuresTitle => 'Taybetmendî';
+
+  @override
+  String get useOfflineDescription =>
+      'Bêyî girêdana înternetê bi awayekî taybet sohbet bikin';
+
+  @override
+  String get featureCreateImageTitle => 'Wêneyekî Biafirîne';
+
+  @override
+  String get featureCreateImageDescription => 'Ji nivîsê hunera AI-ê çêbikin';
+
+  @override
+  String get featureStudyTitle => 'Xwendin û Fêrbûn';
+
+  @override
+  String get featureStudyDescription => 'Şirove û kurteyan bistînin';
+
+  @override
+  String get featureQuizzesTitle => 'Quiz';
+
+  @override
+  String get featureQuizzesDescription => 'Zanîna xwe biceribîne';
+
+  @override
+  String get featureExploreDescription => 'Hemû modelên berdest bibînin';
+
+  @override
+  String get featureStudyMessage =>
+      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+
+  @override
+  String get featureQuizMessage =>
+      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+
+  @override
+  String get myPlan => 'Plana Min';
+
+  @override
+  String get discountText => '%80 Daxistin li ser hemû planan!';
 }

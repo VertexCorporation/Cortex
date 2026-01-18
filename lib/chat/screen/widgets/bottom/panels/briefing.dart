@@ -14,13 +14,9 @@ class BriefingOverlay extends StatefulWidget {
   final bool inappropriate;
   final bool limitReached;
   final bool isStorageSufficient;
-  final bool showDisclaimer;
-  final VoidCallback onDisclaimerDismissed;
-  final bool showPhotoWarning;
   final bool isPremiumModel;
   final bool isSubscribed;
   final int premiumTrialUses;
-  final bool isVisible;
   final bool isDynamicChat;
 
   final ValueChanged<double>? onVisibleHeightChanged;
@@ -33,14 +29,10 @@ class BriefingOverlay extends StatefulWidget {
     required this.modelMissing,
     required this.inappropriate,
     required this.limitReached,
-    required this.showDisclaimer,
-    required this.onDisclaimerDismissed,
     required this.isStorageSufficient,
-    required this.showPhotoWarning,
     required this.isPremiumModel,
     required this.isSubscribed,
     required this.premiumTrialUses,
-    required this.isVisible,
     required this.isDynamicChat,
     this.onVisibleHeightChanged,
   });
@@ -57,7 +49,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   late final Animation<double> _fadeAnimation;
 
   String? _currentMessageText;
-  bool _isCurrentMessageDismissible = false;
 
   final GlobalKey _panelKey = GlobalKey();
   double _measuredPanelHeight = 0.0;
@@ -109,8 +100,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   }
 
   String? _evaluateMessageText(AppLocalizations loc) {
-    if (!widget.isVisible) return null;
-
     if (widget.isPremiumModel &&
         !widget.isSubscribed &&
         widget.premiumTrialUses >= 3) {
@@ -125,15 +114,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
         _requiredCredits() > widget.availableCredits!) {
       return loc.reachedLimit;
     }
-    if (widget.showPhotoWarning) return loc.photoWarningMessage;
-    if (widget.showDisclaimer) return loc.disclaimerMessage;
     return null;
-  }
-
-  bool _isMessageDismissible(String? messageText, AppLocalizations loc) {
-    if (messageText == null) return false;
-    return messageText == loc.photoWarningMessage ||
-        messageText == loc.disclaimerMessage;
   }
 
   void _evaluateAndAnimate() {
@@ -141,8 +122,11 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     final loc = AppLocalizations.of(context)!;
     final nextMessageText = _evaluateMessageText(loc);
 
+    if (nextMessageText == _currentMessageText && _slideController.value > 0) {
+      return;
+    }
+
     if (nextMessageText != _currentMessageText) {
-      final nextIsDismissible = _isMessageDismissible(nextMessageText, loc);
       final bool isShowingMessage = _slideController.value > 0.0;
       final bool hasNewMessage = nextMessageText != null;
 
@@ -153,7 +137,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
           if (hasNewMessage) {
             setState(() {
               _currentMessageText = nextMessageText;
-              _isCurrentMessageDismissible = nextIsDismissible;
             });
             _slideController.forward(from: 0.0);
           } else {
@@ -164,7 +147,6 @@ class _BriefingOverlayState extends State<BriefingOverlay>
       } else if (hasNewMessage) {
         setState(() {
           _currentMessageText = nextMessageText;
-          _isCurrentMessageDismissible = nextIsDismissible;
         });
         _slideController.forward(from: 0.0);
         _measurePanelHeightAndReport();
@@ -178,15 +160,17 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   }
 
   void _handlePanEnd(DragEndDetails details) {
-    _handleDismiss();
+    if (details.primaryVelocity != null && details.primaryVelocity! > 0) {
+      _handleDismiss();
+    }
   }
 
   void _handleDismiss() {
-    if (_isCurrentMessageDismissible && _slideController.isCompleted) {
+    if (_slideController.isCompleted) {
       _slideController.reverse().then((_) {
         if (!mounted) return;
-        widget.onDisclaimerDismissed();
         setState(() {});
+        _reportVisibleHeight();
       });
     }
   }
@@ -217,13 +201,14 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
   @override
   Widget build(BuildContext context) {
-    if (_currentMessageText == null && _slideController.isDismissed) {
-      if (_measuredPanelHeight != 0) {
+    if (_currentMessageText == null ||
+        (_currentMessageText != null && _slideController.isDismissed)) {
+      if (_measuredPanelHeight != 0 && _slideController.isDismissed) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) widget.onVisibleHeightChanged?.call(0.0);
         });
       }
-      return const SizedBox.shrink();
+      if (_slideController.isDismissed) return const SizedBox.shrink();
     }
 
     return FadeTransition(
@@ -231,13 +216,14 @@ class _BriefingOverlayState extends State<BriefingOverlay>
       child: SlideTransition(
         position: _slideAnimation,
         child: GestureDetector(
-          onPanUpdate: _isCurrentMessageDismissible
-              ? (details) {
-            _handleDismiss();
-          }
-              : null,
-          onPanEnd: _isCurrentMessageDismissible ? _handlePanEnd : null,
-          onTap: _isCurrentMessageDismissible ? _handleDismiss : null,
+          onVerticalDragUpdate: (details) {
+            if (details.primaryDelta! > 0) {
+              _slideController.value -=
+                  details.primaryDelta! / _measuredPanelHeight;
+            }
+          },
+          onVerticalDragEnd: _handlePanEnd,
+          onTap: _handleDismiss,
           child: _BriefingPanelContent(
             key: _panelKey,
             message: _currentMessageText ?? "",
@@ -267,10 +253,6 @@ class _BriefingPanelContent extends StatelessWidget {
         .size
         .width;
     final bool isTablet = screenWidth >= 600;
-
-    // --- DYNAMIC SCALING ---
-    // Tablet: Scaled down percentage to look crisp (2.2% font).
-    // Phone: Default percentage (4%).
 
     final double fontSize = isTablet ? screenWidth * 0.022 : 14.0;
     final double iconSize = isTablet ? screenWidth * 0.035 : 24.0;

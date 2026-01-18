@@ -10,7 +10,8 @@ import 'main.dart';
 ///
 /// [screen]: The widget for the screen to navigate to.
 /// [direction]: The starting offset for the slide animation.
-///              For example, Offset(0.05, 0.0) creates a subtle horizontal slide.
+///              For example, Offset(1.0, 0.0) slides in from the right in LTR.
+///              In RTL mode, this automatically flips to slide in from the left.
 Future<T?> navigateToScreen<T extends Object?>(Widget screen,
     {required Offset direction}) {
   final context = navigatorKey.currentContext;
@@ -18,6 +19,16 @@ Future<T?> navigateToScreen<T extends Object?>(Widget screen,
     debugPrint("Navigation failed: Navigator context is not available.");
     return Future.value(null); // This is a safe fallback
   }
+
+  // Detect if the app is currently in Right-to-Left mode (e.g., Arabic).
+  final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+
+  // If RTL, flip the horizontal direction (X-axis).
+  // Example: If direction is (1.0, 0.0) [From Right],
+  // in RTL it becomes (-1.0, 0.0) [From Left].
+  final Offset effectiveDirection = isRtl
+      ? Offset(-direction.dx, direction.dy)
+      : direction;
 
   return Navigator.push<T>(
     context,
@@ -31,7 +42,7 @@ Future<T?> navigateToScreen<T extends Object?>(Widget screen,
       // The core of the custom animation.
       transitionsBuilder: (_, animation, secondaryAnimation, child) {
         final slideTween = Tween<Offset>(
-          begin: direction,
+          begin: effectiveDirection, // Use the language-aware direction
           end: Offset.zero,
         );
         final curvedAnimation = CurvedAnimation(

@@ -12,7 +12,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get cancel => 'Отмена';
 
   @override
-  String get remove => 'Удалить';
+  String get remove => 'Удалять';
 
   @override
   String get download => 'Скачать';
@@ -351,7 +351,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get plusDescription =>
-      'Получите доступ к большему количеству функций Cortex и испытайте ИИ на новом уровне!';
+      'Элитный опыт в области искусственного интеллекта';
 
   @override
   String get annual => 'Годовая';
@@ -378,26 +378,17 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get discountBannerTitle =>
-      'СПЕЦИАЛЬНОЕ ПРЕДЛОЖЕНИЕ В ЧЕСТЬ ЗАПУСКА: СКИДКА 80%!';
-
-  @override
-  String get discountBannerSubtitle =>
-      'Эксклюзивная скидка на ВСЕ планы подписки в честь нашего запуска. Не пропустите!';
-
-  @override
   String get purchasePro => 'Купить Cortex Pro';
 
   @override
   String get proDescription =>
-      'Получите доступ к ещё большему количеству функций Cortex и испытайте ИИ на ещё более высоком уровне!';
+      'Превосходный опыт в области искусственного интеллекта';
 
   @override
   String get purchaseUltra => 'Купить Cortex Ultra';
 
   @override
-  String get ultraDescription =>
-      'Получите полный доступ ко всем функциям Cortex и испытайте ИИ на максимум!';
+  String get ultraDescription => 'Вершина искусственного интеллекта';
 
   @override
   String get upgradeSubscription => 'Улучшить подписку';
@@ -617,6 +608,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get italian => 'Итальянский';
 
   @override
+  String get arabic => 'арабский';
+
+  @override
   String get ram => 'ОЗУ';
 
   @override
@@ -640,9 +634,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get library => 'Библиотека';
 
   @override
-  String get appTitle => 'Cortex';
-
-  @override
   String get text => 'Текст';
 
   @override
@@ -663,7 +654,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noMatchingModels => 'Подходящих моделей не найдено.';
 
   @override
-  String get benefit1 => 'Гораздо больший лимит чатов для онлайн ИИ';
+  String get benefit1 => 'Увеличены лимиты на количество разговоров';
 
   @override
   String get benefit3 => 'Эффект для профиля';
@@ -910,10 +901,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Попробуйте изменить условия поиска или сбросить фильтр.';
 
   @override
-  String get disclaimerMessage =>
-      'Искусственный интеллект может ошибаться, проверяйте важную информацию.';
-
-  @override
   String get modelCreatedSuccess => 'Модель успешно создана!';
 
   @override
@@ -990,10 +977,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get registerSubtitle =>
       'Создайте учётную запись Vertex для беспрепятственного доступа ко всем нашим сервисам. Продолжая, вы соглашаетесь с нашими Условиями обслуживания и Политикой конфиденциальности.';
-
-  @override
-  String get photoWarningMessage =>
-      'Прикреплено фото. Модели, не поддерживающие изображения, могут его проигнорировать.';
 
   @override
   String get storagePermissionRequired =>
@@ -1462,7 +1445,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingFinalTitle => 'Пришло время революции.';
 
   @override
-  String get onboardingFinalDesc =>
+  String get onboardingFinalDescription =>
       'Если ты видишь этот экран, значит, мы не сдались. И не собираемся сдаваться. Давай вместе нести миру революцию искусственного интеллекта. Чтобы стать частью этой истории...';
 
   @override
@@ -1560,4 +1543,48 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get alwaysBest => 'Всегда лучшие';
+
+  @override
+  String get featuresTitle => 'Функции';
+
+  @override
+  String get useOfflineDescription =>
+      'Общайтесь в приватном чате без подключения к интернету.';
+
+  @override
+  String get featureCreateImageTitle => 'Создать изображение';
+
+  @override
+  String get featureCreateImageDescription =>
+      'Создание изображений с помощью ИИ из текста';
+
+  @override
+  String get featureStudyTitle => 'Учитесь и получайте знания';
+
+  @override
+  String get featureStudyDescription => 'Получите пояснения и краткие обзоры.';
+
+  @override
+  String get featureQuizzesTitle => 'Викторины';
+
+  @override
+  String get featureQuizzesDescription => 'Проверьте свои знания';
+
+  @override
+  String get featureExploreDescription =>
+      'Ознакомьтесь со всеми доступными моделями';
+
+  @override
+  String get featureStudyMessage =>
+      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+
+  @override
+  String get featureQuizMessage =>
+      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+
+  @override
+  String get myPlan => 'Мой план';
+
+  @override
+  String get discountText => 'Скидка 80% на все тарифные планы!';
 }
