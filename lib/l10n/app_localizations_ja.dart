@@ -12,7 +12,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get cancel => 'キャンセル';
 
   @override
-  String get remove => '削除';
+  String get remove => '取り除く';
 
   @override
   String get download => 'ダウンロード';
@@ -344,7 +344,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get purchasePlus => 'Cortex Plusを購入';
 
   @override
-  String get plusDescription => 'Cortexのさらに多くの機能にアクセスし、AIをさらに体験してください！';
+  String get plusDescription => 'エリート人工知能体験';
 
   @override
   String get annual => '年間';
@@ -371,23 +371,16 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get discountBannerTitle => 'ローンチスペシャル：80% OFF！';
-
-  @override
-  String get discountBannerSubtitle =>
-      'ローンチを記念して、すべてのサブスクリプションプランが特別割引。お見逃しなく！';
-
-  @override
   String get purchasePro => 'Cortex Proを購入';
 
   @override
-  String get proDescription => 'Cortexのさらに多くの機能にアクセスし、AIをさらに体験してください！';
+  String get proDescription => 'プレミア人工知能体験';
 
   @override
   String get purchaseUltra => 'Cortex Ultraを購入';
 
   @override
-  String get ultraDescription => 'Cortexのすべての機能へのフルアクセス権を獲得し、AIを最大限に体験してください！';
+  String get ultraDescription => '人工知能のピーク';
 
   @override
   String get upgradeSubscription => 'サブスクリプションをアップグレード';
@@ -604,6 +597,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get italian => 'イタリア語';
 
   @override
+  String get arabic => 'アラビア語';
+
+  @override
   String get ram => 'RAM';
 
   @override
@@ -626,9 +622,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get library => 'ライブラリ';
 
   @override
-  String get appTitle => 'Cortex';
-
-  @override
   String get text => 'テキスト';
 
   @override
@@ -649,7 +642,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get noMatchingModels => '一致するモデルが見つかりませんでした。';
 
   @override
-  String get benefit1 => 'オンラインAIの会話制限が大幅に増加';
+  String get benefit1 => '会話制限の拡大';
 
   @override
   String get benefit3 => 'プロフィールエフェクト';
@@ -885,9 +878,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get noFoundMessage => '検索語を調整するか、フィルターをクリアしてみてください。';
 
   @override
-  String get disclaimerMessage => 'AIは間違いを犯すことがあります。重要な情報は確認してください。';
-
-  @override
   String get modelCreatedSuccess => 'モデルが正常に作成されました！';
 
   @override
@@ -957,10 +947,6 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get registerSubtitle =>
       'Vertexアカウントを作成すると、すべてのサービスにシームレスにアクセスできます。続行すると、利用規約とプライバシーポリシーに同意したことになります。';
-
-  @override
-  String get photoWarningMessage =>
-      '写真が含まれています。画像をサポートしていないモデルはそれを無視する場合があります。';
 
   @override
   String get storagePermissionRequired =>
@@ -1413,7 +1399,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboardingFinalTitle => '革命の時が来た。';
 
   @override
-  String get onboardingFinalDesc =>
+  String get onboardingFinalDescription =>
       'この画面を見ているのは、私たちが諦めなかったからです。そして、諦めるつもりもありません。さあ、一緒にAI革命を世界へ広げましょう。この物語の一部となるために…';
 
   @override
@@ -1507,4 +1493,45 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get alwaysBest => '常に最高';
+
+  @override
+  String get featuresTitle => '特徴';
+
+  @override
+  String get useOfflineDescription => 'インターネットに接続せずにプライベートチャット';
+
+  @override
+  String get featureCreateImageTitle => '画像を作成';
+
+  @override
+  String get featureCreateImageDescription => 'テキストからAIアートを生成する';
+
+  @override
+  String get featureStudyTitle => '勉強と学習';
+
+  @override
+  String get featureStudyDescription => '説明と要約を入手する';
+
+  @override
+  String get featureQuizzesTitle => 'クイズ';
+
+  @override
+  String get featureQuizzesDescription => 'あなたの知識をテストしましょう';
+
+  @override
+  String get featureExploreDescription => '利用可能なすべてのモデルを見る';
+
+  @override
+  String get featureStudyMessage =>
+      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+
+  @override
+  String get featureQuizMessage =>
+      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+
+  @override
+  String get myPlan => '私の計画';
+
+  @override
+  String get discountText => '全プラン80%割引！';
 }

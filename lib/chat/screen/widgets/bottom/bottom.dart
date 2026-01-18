@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:cortex/chat/screen/widgets/bottom/panels/edit.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,9 +20,7 @@ import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/server/credits.dart';
-
 import 'input/input.dart';
-import 'input/panels/edit.dart';
 
 class ChatInputPanel extends StatefulWidget {
   final EditService editService;

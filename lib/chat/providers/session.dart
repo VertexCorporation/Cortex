@@ -7,15 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/providers/local.dart';
-import '../services/dynamic.dart';
 import '../services/storage.dart';
-
-enum AppBarMode {
-  notSelected,
-  inSelection,
-  modelSelected,
-  dynamicChat,
-}
 
 class ChatSessionProvider with ChangeNotifier {
   // ===========================================================================
@@ -25,18 +17,14 @@ class ChatSessionProvider with ChangeNotifier {
   final ModelService _modelService;
   ModelLocalStateProvider? _localStateProvider;
 
-  // -------------------- Session & UI Mode State --------------------
-  AppBarMode _appBarMode = AppBarMode.notSelected;
-  bool _isModelSelected = false;
-  bool _isPersistentlyDynamic = false;
-  bool _isExitingChat = false;
-  bool _wasDynamicOnExit = false;
+  // -------------------- Session State --------------------
   bool _isFluxMode = false;
 
+  bool _isExitingChat = false;
+  ModelEntity? _lastExitedModel;
+
   // -------------------- Model List State --------------------
-  // --- All selected model data is now encapsulated in a single, nullable entity. ---
   ModelEntity? _selectedModel;
-  ModelEntity? _lastExitedModel; // To preserve data during exit animations.
 
   // -------------------- User & Subscription State --------------------
   bool _isUserSubscribed = false;
@@ -44,30 +32,22 @@ class ChatSessionProvider with ChangeNotifier {
   ChatLimitManager? _chatLimitManager;
   String? _displayName;
   String? _email;
-  Locale _currentLocale = const Locale('en'); // Default to English.
+  Locale _currentLocale = const Locale('en');
+  static const String _prefDefaultModelKey = 'cortex';
 
   // -------------------- Session-wide UI Flags --------------------
-  bool _showDisclaimer = false;
-  bool _showPremiumBanner = false;
   bool _isStorageSufficient = true;
-  static bool _hasDismissedDisclaimerThisSession = false;
-  bool _hasDismissedPremiumBannerThisSession = false;
 
   // ===========================================================================
   // SECTION 2: PUBLIC GETTERS
   // ===========================================================================
 
-  AppBarMode get appBarMode => _appBarMode;
+  bool get isModelSelected => _selectedModel != null;
 
-  bool get isModelSelected => _isModelSelected;
-
-  bool get isDynamicChat => _isPersistentlyDynamic;
-
-  bool get isChatActive => _isModelSelected || _isPersistentlyDynamic;
+  bool get isDynamicChat =>
+      _selectedModel == null || _selectedModel?.id == 'cortex/auto';
 
   bool get isExitingChat => _isExitingChat;
-
-  bool get wasDynamicOnExit => _wasDynamicOnExit;
 
   List<ModelEntity> get allModels => _modelService.getCachedModelsSync();
 
@@ -75,10 +55,11 @@ class ChatSessionProvider with ChangeNotifier {
 
   bool get modelsLoadError => _modelService.hasError;
 
-  String? get modelId => _selectedModel?.id;
+  String? get modelId => _selectedModel?.id ?? 'cortex/auto';
 
   String? get modelTitle {
     final currentModel = _isExitingChat ? _lastExitedModel : _selectedModel;
+
     if (currentModel == null) {
       return null;
     }
@@ -96,7 +77,6 @@ class ChatSessionProvider with ChangeNotifier {
           baseId, langCode: langCode);
       return seriesModel.displayTitle;
     } catch (e) {
-      // Fallback remains the same, which is robust.
       return currentModel.displayTitle;
     }
   }
@@ -112,13 +92,11 @@ class ChatSessionProvider with ChangeNotifier {
     if (_selectedModel == null || _selectedModel!.isServerSide) {
       return null;
     }
-
     return _localStateProvider?.getFilePathById(_selectedModel!.id);
   }
 
   bool get canHandleImage => _selectedModel?.modalities['image'] == true;
 
-  // Local model loading state is transient and remains separate.
   bool _isLocalModelLoaded = false;
 
   bool get isLocalModelLoaded => _isLocalModelLoaded;
@@ -133,11 +111,6 @@ class ChatSessionProvider with ChangeNotifier {
 
   String? get email => _email;
 
-  bool get showDisclaimer =>
-      isChatActive && _showDisclaimer && !_hasDismissedDisclaimerThisSession;
-
-  bool get showPremiumBanner => _showPremiumBanner;
-
   bool get isCurrentModelPremium {
     final model = _isExitingChat ? _lastExitedModel : _selectedModel;
     return model?.isPremium ?? false;
@@ -147,7 +120,6 @@ class ChatSessionProvider with ChangeNotifier {
 
   bool get isFluxMode => _isFluxMode;
 
-  // Returns the current locale used by the session for localization.
   Locale getLocale() => _currentLocale;
 
   // ===========================================================================
@@ -161,7 +133,6 @@ class ChatSessionProvider with ChangeNotifier {
   // SECTION 4: STATE MUTATION METHODS (ACTIONS)
   // ===========================================================================
 
-  /// Sets the current locale for the session, required for localization.
   void setLocale(Locale locale) {
     _currentLocale = locale;
   }
@@ -171,10 +142,9 @@ class ChatSessionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void selectModel(ModelEntity entity) {
-    _isModelSelected = true;
-    _isPersistentlyDynamic = false;
-    _appBarMode = AppBarMode.modelSelected;
+  /// Selects a specific model entity for the session.
+  /// [savePreference]: If true, remembers this model as the default for future new chats.
+  void selectModel(ModelEntity entity, {bool savePreference = true}) {
     _isExitingChat = false;
     _selectedModel = entity;
 
@@ -182,59 +152,83 @@ class ChatSessionProvider with ChangeNotifier {
       _isLocalModelLoaded = false;
     }
 
-    updatePremiumBannerVisibility(entity.isPremium);
+    if (savePreference) {
+      _savePreference(entity.id);
+    }
+
     notifyListeners();
+  }
+
+  /// Initializes the session based on the user's last selected preference.
+  /// This is called when the app starts or "New Chat" is clicked.
+  Future<void> initializeDefaultSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    String savedId = prefs.getString(_prefDefaultModelKey) ?? 'cortex/auto';
+
+    if (savedId == 'dynamic') savedId = 'cortex/auto';
+
+    final langCode = _currentLocale.languageCode;
+    try {
+      final entity = _modelService.getPreciseModelData(
+          savedId, langCode: langCode);
+      selectModel(entity, savePreference: false);
+    } catch (e) {
+      startDynamicConversation(savePreference: false);
+    }
+  }
+
+  /// Sets up the session for Dynamic Chat (Implicitly cortex/auto).
+  /// This effectively just sets selectedModel to null.
+  void startDynamicConversation({bool savePreference = true}) {
+    _isExitingChat = false;
+    _selectedModel = null;
+    _isLocalModelLoaded = false;
+
+    if (savePreference) {
+      _savePreference('cortex/auto');
+    }
+
+    notifyListeners();
+  }
+
+  /// Updates the variant of the currently active model.
+  void updateActiveModelVariant(String newModelId,
+      {bool savePreference = true}) {
+    final langCode = _currentLocale.languageCode;
+    _selectedModel =
+        _modelService.getPreciseModelData(newModelId, langCode: langCode);
+
+    if (savePreference) {
+      _savePreference(newModelId);
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> _savePreference(String value) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_prefDefaultModelKey, value);
+    } catch (e) {
+      debugPrint("Failed to save model preference: $e");
+    }
   }
 
   void configureForStandardChat({
     required ModelEntity model,
     required bool isPremium,
   }) {
-    _isExitingChat = false;
-    _isPersistentlyDynamic = false;
-    _isModelSelected = true;
-    _appBarMode = AppBarMode.modelSelected;
-
-    _selectedModel = model;
-
-    if (!model.isServerSide) {
-      _isLocalModelLoaded = false;
-    }
-
-    _showPremiumBanner = isPremium && !_isUserSubscribed;
-    notifyListeners();
+    selectModel(model, savePreference: false);
   }
 
-  Future<void> startDynamicConversation() async {
-    _isModelSelected = false;
-    _isPersistentlyDynamic = true;
-    _appBarMode = AppBarMode.dynamicChat;
-    _isExitingChat = false;
-    _selectedModel = null;
-    _isLocalModelLoaded = false;
-    _showPremiumBanner = false;
-    notifyListeners();
-    final dynamicChatService = DynamicChatService(this);
-    await dynamicChatService.loadDynamicAssistantPreference(
-      langCode: _currentLocale.languageCode,
-      modelService: _modelService,
-    );
-  }
-
+  /// Resets session flags (Flux etc) but DOES NOT close the chat view.
+  /// Used when starting a new conversation to clear temporary states.
   void resetSessionState() {
-    if (!_isExitingChat) {
-      _isExitingChat = true;
-      _wasDynamicOnExit = _isPersistentlyDynamic;
-    }
     _lastExitedModel = _selectedModel;
+    _isExitingChat = true;
 
-    _isModelSelected = false;
-    _isPersistentlyDynamic = false;
-    _appBarMode = AppBarMode.notSelected;
-    _selectedModel = null;
+    // Reset flags
     _isLocalModelLoaded = false;
-    _showPremiumBanner = false;
-    _hasDismissedPremiumBannerThisSession = false;
     _isFluxMode = false;
     ChatStorageService.isFluxMode = false;
 
@@ -244,12 +238,11 @@ class ChatSessionProvider with ChangeNotifier {
       if (_isExitingChat) {
         _isExitingChat = false;
         _lastExitedModel = null;
+        notifyListeners();
       }
     });
   }
 
-  /// Sets the required dependency for local model state management.
-  /// This must be called by the ProxyProvider in main.dart.
   void setDependencies(ModelLocalStateProvider localStateProvider) {
     _localStateProvider ??= localStateProvider;
   }
@@ -259,38 +252,6 @@ class ChatSessionProvider with ChangeNotifier {
       _isLocalModelLoaded = isLoaded;
       notifyListeners();
     }
-  }
-
-  void updateActiveModelVariant(String newModelId) {
-    final langCode = _currentLocale.languageCode;
-    _selectedModel =
-        _modelService.getPreciseModelData(newModelId, langCode: langCode);
-    updatePremiumBannerVisibility(_selectedModel?.isPremium ?? false);
-    notifyListeners();
-  }
-
-  void pinDynamicAssistant(String modelId) {
-    final langCode = _currentLocale.languageCode;
-    final entity = _modelService.getPreciseModelData(
-        modelId, langCode: langCode);
-
-    _isPersistentlyDynamic = true;
-    _isModelSelected = false;
-    _appBarMode = AppBarMode.dynamicChat;
-    _selectedModel = entity;
-
-    updatePremiumBannerVisibility(entity.isPremium);
-    notifyListeners();
-  }
-
-  void unpinDynamicAssistant() {
-    _isPersistentlyDynamic = true;
-    _isModelSelected = false;
-    _appBarMode = AppBarMode.dynamicChat;
-    _selectedModel = null;
-
-    updatePremiumBannerVisibility(false);
-    notifyListeners();
   }
 
   void updateUserData(Map<String, dynamic> data) {
@@ -339,82 +300,12 @@ class ChatSessionProvider with ChangeNotifier {
       subscriptionExpiresAt: subscriptionExpiresAt,
     );
 
-    if (_selectedModel != null) {
-      updatePremiumBannerVisibility(_selectedModel!.isPremium);
-    }
     notifyListeners();
-  }
-
-  void updatePremiumBannerVisibility(bool isPremiumModel) {
-    final shouldShow = isPremiumModel && !_isUserSubscribed &&
-        !_hasDismissedPremiumBannerThisSession;
-
-    if (_showPremiumBanner != shouldShow) {
-      _showPremiumBanner = shouldShow;
-      notifyListeners();
-    }
-  }
-
-  /// Checks if the disclaimer should be shown based on time elapsed since last shown.
-  /// If 3 days (72 hours) have passed, it sets the flag to true.
-  Future<void> triggerDisclaimer() async {
-    if (_hasDismissedDisclaimerThisSession || _showDisclaimer) return;
-
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      const String key = 'last_disclaimer_shown_ts';
-      final int? lastShownTs = prefs.getInt(key);
-      final DateTime now = DateTime.now();
-
-      bool shouldShow = false;
-
-      if (lastShownTs == null) {
-        shouldShow = true;
-      } else {
-        final DateTime lastShownDate = DateTime.fromMillisecondsSinceEpoch(
-            lastShownTs);
-        final Duration diff = now.difference(lastShownDate);
-
-        if (diff.inDays >= 3) {
-          shouldShow = true;
-        }
-      }
-
-      if (shouldShow) {
-        _showDisclaimer = true;
-        notifyListeners();
-
-        await prefs.setInt(key, now.millisecondsSinceEpoch);
-      }
-    } catch (e) {
-      debugPrint("Disclaimer check error: $e");
-    }
-  }
-
-  void dismissDisclaimer() {
-    if (_hasDismissedDisclaimerThisSession) return;
-    _hasDismissedDisclaimerThisSession = true;
-    notifyListeners();
-  }
-
-  void dismissPremiumBanner() {
-    if (!_hasDismissedPremiumBannerThisSession) {
-      _hasDismissedPremiumBannerThisSession = true;
-      _showPremiumBanner = false;
-      notifyListeners();
-    }
   }
 
   void setStorageSufficient(bool isSufficient) {
     if (_isStorageSufficient != isSufficient) {
       _isStorageSufficient = isSufficient;
-      notifyListeners();
-    }
-  }
-
-  void setAppBarMode(AppBarMode mode) {
-    if (_appBarMode != mode) {
-      _appBarMode = mode;
       notifyListeners();
     }
   }

@@ -349,8 +349,7 @@ class AppLocalizationsAz extends AppLocalizations {
   String get purchasePlus => 'Cortex Plus al';
 
   @override
-  String get plusDescription =>
-      'Cortex-in daha çox xüsusiyyətinə daxil olun və süni intellekti daha çox təcrübə edin!';
+  String get plusDescription => 'Elit Süni İntellekt Təcrübəsi';
 
   @override
   String get annual => 'İllik';
@@ -377,25 +376,16 @@ class AppLocalizationsAz extends AppLocalizations {
   }
 
   @override
-  String get discountBannerTitle => 'BAŞLANĞIC XÜSUSİ: 80% ENDİRİM!';
-
-  @override
-  String get discountBannerSubtitle =>
-      'Başlanğıcımızı qeyd etmək üçün BÜTÜN abunəlik planlarında eksklüziv endirim. Qaçırmayın!';
-
-  @override
   String get purchasePro => 'Cortex Pro al';
 
   @override
-  String get proDescription =>
-      'Cortex-in daha da çox xüsusiyyətinə daxil olun və süni intellekti daha da çox təcrübə edin!';
+  String get proDescription => 'Premyer Süni İntellekt Təcrübəsi';
 
   @override
   String get purchaseUltra => 'Cortex Ultra al';
 
   @override
-  String get ultraDescription =>
-      'Cortex-in bütün xüsusiyyətlərinə tam giriş əldə edin və süni intellekti tam şəkildə təcrübə edin!';
+  String get ultraDescription => 'Süni intellektin zirvəsi';
 
   @override
   String get upgradeSubscription => 'Abunəliyi Yüksəlt';
@@ -615,6 +605,9 @@ class AppLocalizationsAz extends AppLocalizations {
   String get italian => 'İtalyan dili';
 
   @override
+  String get arabic => 'Ərəb';
+
+  @override
   String get ram => 'RAM';
 
   @override
@@ -637,9 +630,6 @@ class AppLocalizationsAz extends AppLocalizations {
   String get library => 'Kitabxana';
 
   @override
-  String get appTitle => 'Cortex';
-
-  @override
   String get text => 'Mətn';
 
   @override
@@ -660,7 +650,7 @@ class AppLocalizationsAz extends AppLocalizations {
   String get noMatchingModels => 'Uyğun model tapılmadı.';
 
   @override
-  String get benefit1 => 'Onlayn süni intellektlər üçün daha çox söhbət limiti';
+  String get benefit1 => 'Artan söhbət limitləri';
 
   @override
   String get benefit3 => 'Profil effekti';
@@ -908,10 +898,6 @@ class AppLocalizationsAz extends AppLocalizations {
       'Axtarış şərtlərinizi dəyişdirməyə və ya filtri təmizləməyə cəhd edin.';
 
   @override
-  String get disclaimerMessage =>
-      'Süni intellektlər səhv edə bilər, vacib məlumatları yoxlayın.';
-
-  @override
   String get modelCreatedSuccess => 'Model uğurla yaradıldı!';
 
   @override
@@ -988,10 +974,6 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get registerSubtitle =>
       'Bütün xidmətlərimizə problemsiz giriş üçün Vertex hesabı yaradın. Davam etməklə siz Xidmət Şərtlərimiz və Məxfilik Siyasətimizlə razılaşırsınız.';
-
-  @override
-  String get photoWarningMessage =>
-      'Bir şəkil daxil edilib. Şəkilləri dəstəkləməyən modellər onu nəzərə almaya bilər.';
 
   @override
   String get storagePermissionRequired =>
@@ -1454,7 +1436,7 @@ class AppLocalizationsAz extends AppLocalizations {
   String get onboardingFinalTitle => 'İnqilab vaxtıdır.';
 
   @override
-  String get onboardingFinalDesc =>
+  String get onboardingFinalDescription =>
       'Əgər bu ekranı görürsənsə, bunun səbəbi təslim olmamağımızdır. Və bizim təslim olmaq fikrimiz yoxdur. Gəl, AI inqilabını birlikdə dünyaya aparaq. Bu hekayənin bir hissəsi olmaq üçün...';
 
   @override
@@ -1552,4 +1534,47 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get alwaysBest => 'Həmişə Ən Yaxşısı';
+
+  @override
+  String get featuresTitle => 'Xüsusiyyətlər';
+
+  @override
+  String get useOfflineDescription =>
+      'İnternet bağlantısı olmadan şəxsi söhbət edin';
+
+  @override
+  String get featureCreateImageTitle => 'Şəkil Yarat';
+
+  @override
+  String get featureCreateImageDescription =>
+      'Mətndən süni intellekt sənəti yaradın';
+
+  @override
+  String get featureStudyTitle => 'Oxu və Öyrən';
+
+  @override
+  String get featureStudyDescription => 'İzahatlar və xülasələr alın';
+
+  @override
+  String get featureQuizzesTitle => 'Testlər';
+
+  @override
+  String get featureQuizzesDescription => 'Biliklərinizi sınayın';
+
+  @override
+  String get featureExploreDescription => 'Bütün mövcud modelləri kəşf edin';
+
+  @override
+  String get featureStudyMessage =>
+      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+
+  @override
+  String get featureQuizMessage =>
+      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+
+  @override
+  String get myPlan => 'Planım';
+
+  @override
+  String get discountText => 'Bütün planlara 80% endirim!';
 }

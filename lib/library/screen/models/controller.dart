@@ -189,11 +189,13 @@ class LibraryScreenState extends State<LibraryScreen>
     if (!_isInitialized || _searchCtrl == null) {
       return Scaffold(
         backgroundColor: AppColors.background,
+        // UPDATED: Ensure body extends behind AppBar for transparency
+        extendBodyBehindAppBar: true,
         appBar: ModelsAppBar(
-          context: context,
           title: localizations.modelsTitle,
-          createButtonText: localizations.create,
           onOpenCreateScreen: () {},
+          // UPDATED: Pass null scroll controller here or use a dummy if needed for loading state,
+          // but usually null is fine for static title.
         ),
         body: const SkeletonScreen(),
       );
@@ -211,14 +213,19 @@ class LibraryScreenState extends State<LibraryScreen>
 
         return Scaffold(
           backgroundColor: AppColors.background,
+
+          // UPDATED: This allows the content/fog to scroll BEHIND the app bar
+          extendBodyBehindAppBar: true,
+
           appBar: ModelsAppBar(
-            context: context,
             title: localizations.modelsTitle,
-            createButtonText: localizations.create,
+            // UPDATED: Pass the controller so the title fades!
+            scrollController: _scrollController,
             onOpenCreateScreen: () =>
                 _navigateAndHandleFocus(() =>
                     catalog.openCreateScreen(context)),
           ),
+
           body: ModelsBody(
             scrollController: _scrollController,
             isLoading: showLoadingSkeleton,

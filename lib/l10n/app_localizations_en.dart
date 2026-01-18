@@ -349,8 +349,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get purchasePlus => 'Buy Cortex Plus';
 
   @override
-  String get plusDescription =>
-      'Access more features of Cortex and experience AI much more!';
+  String get plusDescription => 'Elite Artificial Intelligence Experience';
 
   @override
   String get annual => 'Annual';
@@ -377,25 +376,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get discountBannerTitle => 'LAUNCH SPECIAL: 80% OFF!';
-
-  @override
-  String get discountBannerSubtitle =>
-      'Exclusive discount on ALL subscription plans to celebrate our launch. Don\'t miss out!';
-
-  @override
   String get purchasePro => 'Buy Cortex Pro';
 
   @override
-  String get proDescription =>
-      'Access even more features of Cortex and experience AI even more!';
+  String get proDescription => 'Premier Artificial Intelligence Experience';
 
   @override
   String get purchaseUltra => 'Buy Cortex Ultra';
 
   @override
-  String get ultraDescription =>
-      'Gain full access to all features of Cortex and experience AI to the fullest!';
+  String get ultraDescription => 'The Peak of Artificial Intelligence';
 
   @override
   String get upgradeSubscription => 'Upgrade Subscription';
@@ -614,6 +604,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get italian => 'Italian';
 
   @override
+  String get arabic => 'Arabic';
+
+  @override
   String get ram => 'RAM';
 
   @override
@@ -636,9 +629,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get library => 'Library';
 
   @override
-  String get appTitle => 'Cortex';
-
-  @override
   String get text => 'Text';
 
   @override
@@ -659,28 +649,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noMatchingModels => 'No matching models found.';
 
   @override
-  String get benefit1 => 'Many more conversation limit for online AIs';
+  String get benefit1 => 'Increased Conversation Limits';
 
   @override
-  String get benefit3 => 'Profile effect';
+  String get benefit3 => 'Profile Effect';
 
   @override
-  String get benefit4 => 'Membership badge';
+  String get benefit4 => 'Membership Badge';
 
   @override
-  String get benefit5 => 'Create more online artificial intelligences';
+  String get benefit5 => 'Create More Online Artificial Intelligences';
 
   @override
-  String get benefit7 => 'More usage limits';
+  String get benefit7 => 'More Usage Limits';
 
   @override
-  String get benefit8 => 'Add models';
+  String get benefit8 => 'Add Models';
 
   @override
-  String get benefit9 => 'New themes';
+  String get benefit9 => 'New Themes';
 
   @override
-  String get oldBenefits => 'All benefits from lower plans';
+  String get oldBenefits => 'All Benefits From Lower Plans';
 
   @override
   String get confirm => 'Confirm';
@@ -906,10 +896,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Try adjusting your search terms or clearing the filter.';
 
   @override
-  String get disclaimerMessage =>
-      'Artificial Intelligences can make mistakes, check important information.';
-
-  @override
   String get modelCreatedSuccess => 'Model created successfully!';
 
   @override
@@ -986,10 +972,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get registerSubtitle =>
       'Create a Vertex account for seamless access across all our services. By continuing, you agree to our Terms of Service & Privacy Policy.';
-
-  @override
-  String get photoWarningMessage =>
-      'A photo is included. Models that don\'t support images may ignore it.';
 
   @override
   String get storagePermissionRequired =>
@@ -1451,7 +1433,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingFinalTitle => 'It\'s Time for a Revolution.';
 
   @override
-  String get onboardingFinalDesc =>
+  String get onboardingFinalDescription =>
       'If you\'re seeing this screen, it\'s because we didn\'t give up. And we have no intention of giving up. Come on, let\'s take the AI revolution to the world together. To be a part of this story...';
 
   @override
@@ -1549,4 +1531,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alwaysBest => 'Always Best';
+
+  @override
+  String get featuresTitle => 'Features';
+
+  @override
+  String get useOfflineDescription =>
+      'Chat privately without internet connection';
+
+  @override
+  String get featureCreateImageTitle => 'Create Image';
+
+  @override
+  String get featureCreateImageDescription => 'Generate AI art from text';
+
+  @override
+  String get featureStudyTitle => 'Study & Learn';
+
+  @override
+  String get featureStudyDescription => 'Get explanations and summaries';
+
+  @override
+  String get featureQuizzesTitle => 'Quizzes';
+
+  @override
+  String get featureQuizzesDescription => 'Test your knowledge';
+
+  @override
+  String get featureExploreDescription => 'Discover all available models';
+
+  @override
+  String get featureStudyMessage =>
+      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+
+  @override
+  String get featureQuizMessage =>
+      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+
+  @override
+  String get myPlan => 'My Plan';
+
+  @override
+  String get discountText => '%80 Discount on all plans!';
 }

@@ -223,7 +223,6 @@ class InboxViewModel extends ChangeNotifier {
         debugPrint(
             "[InboxViewModel] Active conversation deleted. Triggering reset.");
         mainScreenKey.currentState?.startNewConversation(
-            isDynamic: true,
             closeSidebar: false
         );
       }

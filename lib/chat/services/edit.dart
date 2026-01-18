@@ -15,8 +15,6 @@ class EditService {
   final RegenerateService _regenerateService;
   final ScrollService _scrollService;
   final AnimationController _panelController;
-
-  // CHANGED: Made non-final to allow updates from ChatInputPanel
   TextEditingController _controller;
   FocusNode _focusNode;
 
@@ -30,7 +28,8 @@ class EditService {
     required TextEditingController controller,
     required FocusNode focusNode,
     required AnimationController panelController,
-  })  : _inputProvider = inputProvider,
+  })
+      : _inputProvider = inputProvider,
         _conversationProvider = conversationProvider,
         _regenerateService = regenerateService,
         _scrollService = scrollService,
@@ -119,7 +118,9 @@ class EditService {
 
     debugPrint(
       "[EditService] Triggering regenerate for newAiMessageIndex=$newAiMessageIndex. "
-          "LastUser.photoPath=${updatedList.lastWhere((m) => m.isUserMessage).photoPath}",
+          "LastUser.photoPath=${updatedList
+          .lastWhere((m) => m.isUserMessage)
+          .photoPath}",
     );
 
     if (context.mounted) {
@@ -136,7 +137,8 @@ class EditService {
   void startEditingMessage(int index) async {
     // Do not start a new edit session if one is already active.
     if (_inputProvider.isEditingMode) {
-      debugPrint("[EditService] startEditingMessage ignored: already in editing mode.");
+      debugPrint(
+          "[EditService] startEditingMessage ignored: already in editing mode.");
       return;
     }
 
@@ -147,7 +149,8 @@ class EditService {
     );
 
     if (index < 0 || index >= messages.length) {
-      debugPrint("[EditService] startEditingMessage aborted: index out of range.");
+      debugPrint(
+          "[EditService] startEditingMessage aborted: index out of range.");
       return;
     }
 
@@ -159,7 +162,8 @@ class EditService {
     // - use it as the source of truth when regenerating the AI reply
     _messagesBeforeEdit = List<Message>.from(messages);
     debugPrint(
-      "[EditService] Backup of messages created. backupLength=${_messagesBeforeEdit!.length}",
+      "[EditService] Backup of messages created. backupLength=${_messagesBeforeEdit!
+          .length}",
     );
 
     // Build a "visible" subset that only includes messages up to (and including)
@@ -168,7 +172,8 @@ class EditService {
     // - any photos in later messages are completely removed from the list
     final List<Message> visibleSubset = messages.sublist(0, index + 1);
     debugPrint(
-      "[EditService] Visible subset created. visibleSubset.length=${visibleSubset.length}",
+      "[EditService] Visible subset created. visibleSubset.length=${visibleSubset
+          .length}",
     );
 
     // Load the truncated list into the conversation provider so the UI behaves
@@ -179,7 +184,8 @@ class EditService {
     final messageToEdit = visibleSubset[index];
     debugPrint(
       "[EditService] messageToEdit index=$index → "
-          "text='${messageToEdit.text.substring(0, messageToEdit.text.length.clamp(0, 50))}', "
+          "text='${messageToEdit.text.substring(
+          0, messageToEdit.text.length.clamp(0, 50))}', "
           "photoPath=${messageToEdit.photoPath}",
     );
 

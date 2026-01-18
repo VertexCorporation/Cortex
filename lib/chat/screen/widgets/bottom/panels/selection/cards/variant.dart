@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import '../../../../../../app.dart';
-import '../../../../../../theme.dart';
+import '../../../../../../../app.dart';
+import '../../../../../../../theme.dart';
 
 class ModelVariantCard extends StatelessWidget {
   final String title;
@@ -51,8 +51,12 @@ class ModelVariantCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        splashColor: AppColors.primaryColor.withValues(alpha: 0.15),
-        highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),
+        splashColor: isSelected
+            ? AppColors.primaryColor.withValues(alpha: 0.2)
+            : AppColors.primaryColor.inverted.withValues(alpha: 0.15),
+        highlightColor: isSelected
+            ? AppColors.primaryColor.withValues(alpha: 0.1)
+            : AppColors.primaryColor.inverted.withValues(alpha: 0.05),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
@@ -102,9 +106,6 @@ class _ScrollableText extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Optimized check: Don't build TextPainter unless needed logic is complex.
-        // But here we need to know if it overflows to decide between Text vs Scroll.
-
         final TextPainter textPainter = TextPainter(
           text: TextSpan(text: text, style: style),
           maxLines: 1,

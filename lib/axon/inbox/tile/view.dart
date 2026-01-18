@@ -125,8 +125,8 @@ class _AxonConversationTileState extends State<AxonConversationTile>
         // --- 2. Star/Pin Button ---
         ActionPanelButton(
           iconAsset: manager.isStarred
-              ? 'assets/icons/star.svg'
-              : 'assets/icons/starBordered.svg',
+              ? 'assets/icons/on/star.svg'
+              : 'assets/icons/off/star.svg',
           iconColor: manager.isStarred
               ? Colors.amber
               : AppColors.primaryColor.inverted,

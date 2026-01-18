@@ -1,10 +1,12 @@
+// funds/skeleton.dart
+
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:cortex/theme.dart';
 
 /// A standalone skeleton loader widget extracted from FundsScreen.
-class SkeletonLoader extends StatelessWidget {
-  const SkeletonLoader({super.key});
+class FundsSkeletonLoader extends StatelessWidget {
+  const FundsSkeletonLoader({super.key});
 
   @override
   Widget build(BuildContext context) {

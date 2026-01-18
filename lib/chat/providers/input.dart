@@ -4,6 +4,13 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:cortex/chat/messages/messages.dart';
 
+enum ChatInputMode {
+  none,
+  study,
+  quiz,
+  offline,
+}
+
 /// A dedicated provider responsible for managing the transient state of the user input area.
 ///
 /// This provider's single responsibility is to manage the state directly related to
@@ -24,21 +31,40 @@ class InputProvider with ChangeNotifier {
 
   File? _selectedPhoto;
   bool _isPhotoLoading = false;
+  ChatInputMode _featureMode = ChatInputMode.none;
 
   // ===========================================================================
   // SECTION 2: PUBLIC GETTERS
   // ===========================================================================
 
+  ChatInputMode get featureMode => _featureMode;
+
   bool get isEditingMode => _isEditingMode;
+
   int? get editingMessageIndex => _editingMessageIndex;
+
   String? get originalMessageText => _originalMessageText;
 
   File? get selectedPhoto => _selectedPhoto;
+
   bool get isPhotoLoading => _isPhotoLoading;
 
   // ===========================================================================
   // SECTION 3: STATE MUTATION METHODS (ACTIONS)
   // ===========================================================================
+
+  /// Sets the current input mode (Study, Quiz, etc.) and notifies listeners
+  /// so the UI can update the button color to secondaryColor.
+  void setFeatureMode(ChatInputMode mode) {
+    _featureMode = mode;
+    notifyListeners();
+  }
+
+  /// Clears the current mode (e.g., after sending).
+  void clearFeatureMode() {
+    _featureMode = ChatInputMode.none;
+    notifyListeners();
+  }
 
   // -------------------- Editing Mode Actions --------------------
 

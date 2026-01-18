@@ -352,7 +352,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get plusDescription =>
-      'Aceda a mais funcionalidades do Cortex e experimente a IA muito mais!';
+      'Experiência de Inteligência Artificial de Elite';
 
   @override
   String get annual => 'Anual';
@@ -379,25 +379,17 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get discountBannerTitle => 'ESPECIAL DE LANÇAMENTO: 80% DE DESCONTO!';
-
-  @override
-  String get discountBannerSubtitle =>
-      'Desconto exclusivo em TODOS os planos de subscrição para celebrar o nosso lançamento. Não perca!';
-
-  @override
   String get purchasePro => 'Comprar Cortex Pro';
 
   @override
   String get proDescription =>
-      'Aceda a ainda mais funcionalidades do Cortex e experimente a IA ainda mais!';
+      'Experiência de Inteligência Artificial de Primeira Classe';
 
   @override
   String get purchaseUltra => 'Comprar Cortex Ultra';
 
   @override
-  String get ultraDescription =>
-      'Obtenha acesso total a todas as funcionalidades do Cortex e experimente a IA ao máximo!';
+  String get ultraDescription => 'O auge da inteligência artificial';
 
   @override
   String get upgradeSubscription => 'Atualizar Subscrição';
@@ -618,6 +610,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get italian => 'Italiano';
 
   @override
+  String get arabic => 'árabe';
+
+  @override
   String get ram => 'RAM';
 
   @override
@@ -641,9 +636,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get library => 'Biblioteca';
 
   @override
-  String get appTitle => 'Cortex';
-
-  @override
   String get text => 'Texto';
 
   @override
@@ -664,7 +656,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get noMatchingModels => 'Nenhum modelo correspondente encontrado.';
 
   @override
-  String get benefit1 => 'Limite de conversas muito maior para IAs online';
+  String get benefit1 => 'Aumento dos limites de conversa';
 
   @override
   String get benefit3 => 'Efeito de perfil';
@@ -912,10 +904,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Tente ajustar os seus termos de pesquisa ou limpar o filtro.';
 
   @override
-  String get disclaimerMessage =>
-      'As Inteligências Artificiais podem cometer erros, verifique informações importantes.';
-
-  @override
   String get modelCreatedSuccess => 'Modelo criado com sucesso!';
 
   @override
@@ -992,10 +980,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get registerSubtitle =>
       'Crie uma conta Vertex para acesso integrado a todos os nossos serviços. Ao continuar, você concorda com nossos Termos de Serviço e Política de Privacidade.';
-
-  @override
-  String get photoWarningMessage =>
-      'Uma foto está incluída. Modelos que não suportam imagens podem ignorá-la.';
 
   @override
   String get storagePermissionRequired =>
@@ -1460,7 +1444,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get onboardingFinalTitle => 'Chegou a hora da revolução.';
 
   @override
-  String get onboardingFinalDesc =>
+  String get onboardingFinalDescription =>
       'Se você está vendo esta tela, é porque não desistimos. E não temos nenhuma intenção de desistir. Vamos lá, vamos levar a revolução da IA para o mundo juntos. Para fazer parte dessa história...';
 
   @override
@@ -1558,4 +1542,48 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get alwaysBest => 'Sempre o melhor';
+
+  @override
+  String get featuresTitle => 'Características';
+
+  @override
+  String get useOfflineDescription =>
+      'Converse em particular sem conexão com a internet.';
+
+  @override
+  String get featureCreateImageTitle => 'Criar imagem';
+
+  @override
+  String get featureCreateImageDescription =>
+      'Gere arte com IA a partir de texto.';
+
+  @override
+  String get featureStudyTitle => 'Estudar e aprender';
+
+  @override
+  String get featureStudyDescription => 'Obtenha explicações e resumos.';
+
+  @override
+  String get featureQuizzesTitle => 'Questionários';
+
+  @override
+  String get featureQuizzesDescription => 'Teste seus conhecimentos';
+
+  @override
+  String get featureExploreDescription =>
+      'Descubra todos os modelos disponíveis';
+
+  @override
+  String get featureStudyMessage =>
+      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+
+  @override
+  String get featureQuizMessage =>
+      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+
+  @override
+  String get myPlan => 'Meu plano';
+
+  @override
+  String get discountText => '80% de desconto em todos os planos!';
 }

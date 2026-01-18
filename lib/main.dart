@@ -50,7 +50,6 @@ import 'chat/services/scroll.dart';
 import 'chat/services/select.dart';
 import 'chat/services/send.dart';
 import 'chat/services/stop.dart';
-import 'chat/services/dynamic.dart';
 import 'funds/backend.dart';
 import 'initialization.dart';
 import 'internet.dart';
@@ -580,10 +579,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
     Provider<ScrollService>(
       create: (_) => ScrollService(),
     ),
-    Provider<DynamicChatService>(
-      create: (BuildContext context) =>
-          DynamicChatService(context.read<ChatSessionProvider>()),
-    ),
+
     Provider<ResponseService>(
       create: (BuildContext context) =>
           ResponseService(

@@ -42,6 +42,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   MainScreenView _currentView = MainScreenView.chat;
 
+  Animation<double> get axonAnimation => _axonController;
   late AnimationController _axonController;
   late AnimationController _searchModeController;
   AnimationController? _elasticController;
@@ -127,17 +128,28 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-// --- DRAWER & GESTURE LOGIC ---
+  // --- DRAWER & GESTURE LOGIC (RTL ADAPTED) ---
 
   void _onDragStart(DragStartDetails details) {
     final double screenW = MediaQuery
         .of(context)
         .size
         .width;
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
 
-    if (details.globalPosition.dx > screenW - 25.0) {
-      _ignoreDrag = true;
-      return;
+    // In LTR: we ignore drags starting from the far right edge (ScreenW - 25).
+    // In RTL: we ignore drags starting from the far left edge (25).
+    // Because the drawer is always at the "Start" edge.
+    if (isRtl) {
+      if (details.globalPosition.dx < 25.0) {
+        _ignoreDrag = true;
+        return;
+      }
+    } else {
+      if (details.globalPosition.dx > screenW - 25.0) {
+        _ignoreDrag = true;
+        return;
+      }
     }
 
     _ignoreDrag = false;
@@ -156,7 +168,13 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         .width;
     final double standardAxonW = screenW * 0.85;
     final double searchGapW = screenW - standardAxonW;
-    final double delta = details.primaryDelta!;
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+
+    // In RTL, dragging LEFT (negative delta) means "Opening/Pulling from Right".
+    // In LTR, dragging RIGHT (positive delta) means "Opening/Pulling from Left".
+    // We normalize delta so positive always means "Opening".
+    final double rawDelta = details.primaryDelta!;
+    final double delta = isRtl ? -rawDelta : rawDelta;
 
     if (_isSearchFocused) {
       if (delta > 0) {
@@ -201,7 +219,10 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       return;
     }
 
-    final double velocity = details.primaryVelocity!;
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    final double rawVelocity = details.primaryVelocity!;
+    // Normalize velocity: Positive = Opening direction, Negative = Closing direction
+    final double velocity = isRtl ? -rawVelocity : rawVelocity;
 
     if (_isSearchFocused) {
       if (velocity < -1200) {
@@ -278,7 +299,6 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   // --- VIEW SWITCHING ---
 
   void switchToLibrary({bool pulse = false}) {
-    // If we are already on the library screen and a pulse is requested
     if (_currentView == MainScreenView.library && pulse) {
       libraryScreenKey.currentState?.triggerPulseAnimation();
       closeAxon();
@@ -288,7 +308,6 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     setState(() => _currentView = MainScreenView.library);
     closeAxon();
 
-    // If pulse is requested, wait for the frame to build so the key is attached
     if (pulse) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -320,9 +339,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     closeAxon();
   }
 
-  void startNewConversation({bool isDynamic = true, bool closeSidebar = true}) {
+  void startNewConversation({bool closeSidebar = true}) {
     _forceCloseKeyboard();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       setState(() => _currentView = MainScreenView.chat);
 
@@ -330,11 +349,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       final conv = context.read<ConversationProvider>();
       final input = context.read<InputProvider>();
 
-      if (isDynamic) {
-        session.startDynamicConversation();
-      } else {
-        session.resetSessionState();
-      }
+      await session.initializeDefaultSession();
 
       conv.clearConversation();
       input.resetInputState();
@@ -404,6 +419,11 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         .width;
     final double standardAxonWidth = screenWidth * 0.85;
 
+    // Detect layout direction
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    // Multiplier to flip X-axis translations: 1 for LTR, -1 for RTL
+    final double directionMultiplier = isRtl ? -1.0 : 1.0;
+
     return Title(
       title: 'Cortex',
       color: AppColors.background,
@@ -412,13 +432,10 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         onPopInvokedWithResult: (bool didPop, dynamic _) async {
           if (didPop) return;
 
-          // --- FIX: System Back Button Logic for Search ---
           if (_isSearchFocused) {
             if (_searchModeController.value > 0.1) {
-              // 1. If full screen, shrink first
               _searchModeController.reverse();
             } else {
-              // 2. If already standard width, close search mode
               FocusManager.instance.primaryFocus?.unfocus();
               setState(() => _isSearchFocused = false);
             }
@@ -475,19 +492,26 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     (standardAxonWidth * rawValue) + _elasticWidth;
                 final double searchOffset =
                     (screenWidth - axonOpenOffset) * searchValue;
-                final double mainScreenX = axonOpenOffset + searchOffset;
+
+                // Determine final X translation based on direction
+                final double mainScreenX =
+                    (axonOpenOffset + searchOffset) * directionMultiplier;
 
                 double axonParallaxX =
                     -(standardAxonWidth * 0.25) * (1.0 - rawValue);
                 if (searchValue > 0) {
                   axonParallaxX = axonParallaxX * (1.0 - searchValue);
                 }
+                // Flip parallax for RTL
+                axonParallaxX *= directionMultiplier;
 
                 final double overlayOpacity = (0.3 * rawValue).clamp(0.0, 1.0);
 
                 return Stack(
                   children: [
                     // --- LAYER 1: Axon (Sidebar) ---
+                    // Back layer remains physically same Z-index,
+                    // but visual position flips via Transform.
                     Transform.translate(
                       offset: Offset(axonParallaxX, 0),
                       child: SizedBox(
@@ -496,16 +520,19 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                             .of(context)
                             .size
                             .height,
-                        child: Axon(
-                          onNewChatTap: () =>
-                              startNewConversation(isDynamic: true),
-                          onLibraryTap: switchToLibrary,
-                          onNewsTap: openNewsScreen,
-                          onCloseAxon: closeAxon,
-                          onOpenAxon: () => _animateAxonTo(1.0),
-                          onSearchFocusChanged: _handleSearchFocusChanged,
-                          referenceWidth: standardAxonWidth,
-                          activeTab: _getCurrentViewIndex(),
+                        // Ensure Sidebar aligns to the correct start edge
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Axon(
+                            onNewChatTap: () => startNewConversation(),
+                            onLibraryTap: switchToLibrary,
+                            onNewsTap: openNewsScreen,
+                            onCloseAxon: closeAxon,
+                            onOpenAxon: () => _animateAxonTo(1.0),
+                            onSearchFocusChanged: _handleSearchFocusChanged,
+                            referenceWidth: standardAxonWidth,
+                            activeTab: _getCurrentViewIndex(),
+                          ),
                         ),
                       ),
                     ),
@@ -515,18 +542,23 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       offset: Offset(mainScreenX, 0),
                       child: Transform.scale(
                         scale: 1.0 - (0.08 * rawValue),
-                        alignment: Alignment.centerLeft,
+                        // Scale anchor flips based on direction
+                        alignment: isRtl
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
                         child: Container(
                           decoration: BoxDecoration(
                             color: AppColors.background,
                             boxShadow: [
                               if (rawValue > 0)
                                 BoxShadow(
-                                  color: Colors.black
-                                      .withValues(alpha: 0.2 * rawValue),
+                                  color:
+                                  Colors.black.withValues(
+                                      alpha: 0.2 * rawValue),
                                   blurRadius: 30,
                                   spreadRadius: -5,
-                                  offset: const Offset(-15, 0),
+                                  // Shadow flips to the other side in RTL
+                                  offset: Offset(-15 * directionMultiplier, 0),
                                 )
                             ],
                             borderRadius:
@@ -535,8 +567,6 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           child: ClipRRect(
                             borderRadius:
                             BorderRadius.circular(30.0 * rawValue),
-                            // FIX: Override MediaQuery to zero out viewInsets
-                            // when Sidebar/Search is active.
                             child: MediaQuery(
                               data: MediaQuery.of(context).copyWith(
                                 viewInsets: (rawValue > 0 || searchValue > 0)
@@ -573,8 +603,11 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                       ),
                                     ),
 
+                                  // Vertical separator line on the "hinge"
                                   Align(
-                                    alignment: Alignment.centerLeft,
+                                    alignment: isRtl
+                                        ? Alignment.centerRight
+                                        : Alignment.centerLeft,
                                     child: Container(
                                       width: 1.0,
                                       height: (MediaQuery

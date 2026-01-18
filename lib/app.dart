@@ -58,6 +58,8 @@ class Cortex extends StatelessWidget {
     final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
     final LocaleProvider localeProvider = Provider.of<LocaleProvider>(context);
 
+    context.watch<ThemeProvider>();
+
     return MaterialApp(
       navigatorKey: navigatorKey,
       theme: _buildTheme(themeProvider.currentTheme),

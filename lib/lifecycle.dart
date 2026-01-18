@@ -134,7 +134,7 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
-              mainScreenKey.currentState?.startNewConversation(isDynamic: true);
+              mainScreenKey.currentState?.startNewConversation();
             }
           });
         }

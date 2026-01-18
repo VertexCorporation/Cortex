@@ -17,15 +17,25 @@ class ConversationManager extends ChangeNotifier {
 
   // Getters for UI and Logic
   ModelEntity get model => _model;
+
   String get modelId => _model.id;
+
   String get modelTitle => _model.displayTitle;
+
   String get modelImagePath => _modelService.getModelImagePath(_model);
+
   String get modelDescription => _model.displayDescription;
+
   String get modelProducer => _model.producer;
+
   bool get canHandleImage => _model.modalities['image'] == true;
+
   String? get role => _model.role;
+
   String? get modelPath => null;
+
   String get modelCategory => _model.category;
+
   bool get isServerSide => _model.isServerSide;
 
   DateTime _lastMessageDate;
@@ -34,7 +44,9 @@ class ConversationManager extends ChangeNotifier {
 
   // Getters for Last Message details (Used by ViewModel for sorting/search)
   DateTime get lastMessageDate => _lastMessageDate;
+
   String get lastMessageText => _lastMessageText;
+
   String get lastMessagePhotoPath => _lastMessagePhotoPath;
 
   ConversationManager({
@@ -47,11 +59,11 @@ class ConversationManager extends ChangeNotifier {
     String lastMessageText = '',
     String lastMessagePhotoPath = '',
     required ModelService modelService,
-  })  : _lastMessageText = lastMessageText,
+  })
+      : _lastMessageText = lastMessageText,
         _lastMessageDate = lastMessageDate,
         _lastMessagePhotoPath = lastMessagePhotoPath,
         _modelService = modelService {
-
     if (initialModelId == 'dynamic') {
       _model = ModelEntity.fromMap({
         'id': 'dynamic',
@@ -63,15 +75,19 @@ class ConversationManager extends ChangeNotifier {
         'category': 'dynamic',
       }, langCode);
     } else {
-      _model = _modelService.getPreciseModelData(initialModelId, langCode: langCode);
+      _model =
+          _modelService.getPreciseModelData(initialModelId, langCode: langCode);
     }
   }
 
-  static Future<ConversationManager?> fromId(String conversationId, {required String langCode, required ModelService modelService}) async {
+  static Future<ConversationManager?> fromId(String conversationId,
+      {required String langCode, required ModelService modelService}) async {
     try {
       final db = await DbHelper().db;
       final List<Map<String, dynamic>> convData = await db.query(
-          'conversations', where: 'id = ?', whereArgs: [conversationId], limit: 1);
+          'conversations', where: 'id = ?',
+          whereArgs: [conversationId],
+          limit: 1);
 
       if (convData.isEmpty) return null;
       final convRow = convData.first;
@@ -85,14 +101,16 @@ class ConversationManager extends ChangeNotifier {
         isStarred: (convRow['isStarred'] as int? ?? 0) == 1,
         lastMessageDate: lastMsg?['ts'] != null
             ? DateTime.fromMillisecondsSinceEpoch(lastMsg!['ts'] as int)
-            : DateTime.fromMillisecondsSinceEpoch(convRow['lastMessageDate'] as int? ?? 0),
+            : DateTime.fromMillisecondsSinceEpoch(
+            convRow['lastMessageDate'] as int? ?? 0),
         lastMessageText: lastMsg?['text'] as String? ?? '',
         lastMessagePhotoPath: lastMsg?['photoPath'] as String? ?? '',
         langCode: langCode,
         modelService: modelService,
       );
     } catch (e) {
-      debugPrint("[ConversationManager] Error creating instance from ID '$conversationId': $e");
+      debugPrint(
+          "[ConversationManager] Error creating instance from ID '$conversationId': $e");
       return null;
     }
   }
@@ -101,12 +119,16 @@ class ConversationManager extends ChangeNotifier {
     try {
       final db = await DbHelper().db;
       final List<Map<String, dynamic>> result = await db.query(
-          'conversations', columns: ['modelId'], where: 'id = ?', whereArgs: [conversationID], limit: 1);
+          'conversations', columns: ['modelId'],
+          where: 'id = ?',
+          whereArgs: [conversationID],
+          limit: 1);
 
       if (result.isNotEmpty) {
         final latestModelId = result.first['modelId'] as String?;
         if (latestModelId != null && latestModelId != modelId) {
-          _model = _modelService.getPreciseModelData(latestModelId, langCode: langCode);
+          _model = _modelService.getPreciseModelData(
+              latestModelId, langCode: langCode);
           notifyListeners();
           return true;
         }
@@ -117,7 +139,8 @@ class ConversationManager extends ChangeNotifier {
     return false;
   }
 
-  void updateLastMessage(String newText, String newPhotoPath, DateTime newDate) {
+  void updateLastMessage(String newText, String newPhotoPath,
+      DateTime newDate) {
     bool needsNotify = false;
     if (_lastMessageText != newText) {
       _lastMessageText = newText;

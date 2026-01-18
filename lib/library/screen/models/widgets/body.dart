@@ -46,7 +46,8 @@ class ModelsBody extends StatelessWidget {
   final VoidCallback onDismissWarningPanel;
   final CompatibilityStatus Function(int?) getCompatibilityStatus;
   final Future<void> Function(String, String) onRemovePressed;
-  final Future<void> Function(String, bool, {bool isCustomModel, String? modelPath}) onChatPressed;
+  final Future<
+      void> Function(String, bool, {bool isCustomModel, String? modelPath}) onChatPressed;
   final DownloadCallback onDownloadPressed;
   final void Function(String) onCancelDownload;
   final void Function(String) onResumeDownload;
@@ -104,12 +105,15 @@ class ModelsBody extends StatelessWidget {
     );
   }
 
-  Widget _buildLocalizationWarningPanel(
-      BuildContext context, AppLocalizations localizations) {
+  Widget _buildLocalizationWarningPanel(BuildContext context,
+      AppLocalizations localizations) {
     final double bottomPosition = showLocalizationWarning
         ? _kWarningPanelVisibleBottom
         : _kWarningPanelHiddenBottom;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final bool isTablet = screenWidth >= 600;
 
     // --- DYNAMIC WIDTH FOR TABLET ---
@@ -189,8 +193,19 @@ class ModelsBody extends StatelessWidget {
   }
 
   Widget _buildContentView(BuildContext context, bool isSearching) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
+    final topPadding = MediaQuery
+        .of(context)
+        .padding
+        .top;
+    final double safeTopPadding = topPadding;
 
     return ScrollFog(
       scrollController: scrollController,
@@ -202,6 +217,12 @@ class ModelsBody extends StatelessWidget {
         key: const ValueKey('content'),
         controller: scrollController,
         clipBehavior: Clip.none,
+
+        padding: EdgeInsets.only(
+          top: safeTopPadding,
+        ),
+        // -------------------------
+
         child: Column(
           children: [
             // Search Bar handles its own internal responsiveness
@@ -234,8 +255,14 @@ class ModelsBody extends StatelessWidget {
 
   Widget _buildDefaultModelList(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final bool isTablet = screenWidth >= 600;
 
     final self = allModels.where((model) => model.category == 'self').toList();
@@ -324,7 +351,8 @@ class ModelsBody extends StatelessWidget {
               // --- SYSTEM INFO HEADER ---
               Padding(
                 padding: EdgeInsets.symmetric(
-                    horizontal: isTablet ? screenWidth * 0.02 : screenWidth * 0.04
+                    horizontal: isTablet ? screenWidth * 0.02 : screenWidth *
+                        0.04
                 ).copyWith(
                     top: isTablet ? 24.0 : screenWidth * 0.02,
                     bottom: isTablet ? 16.0 : screenWidth * 0.01
@@ -346,7 +374,8 @@ class ModelsBody extends StatelessWidget {
                 ),
                 child: SystemInfoChart(
                     totalStorage: systemInfo!.totalStorage,
-                    usedStorage: systemInfo!.totalStorage - systemInfo!.freeStorage,
+                    usedStorage: systemInfo!.totalStorage -
+                        systemInfo!.freeStorage,
                     totalMemory: systemInfo!.deviceMemory,
                     usedMemory: systemInfo!.usedMemory),
               ),

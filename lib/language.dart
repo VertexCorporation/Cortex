@@ -23,6 +23,7 @@ class LocaleProvider extends ChangeNotifier {
     'nl', // Dutch
     'ru', // Russian
     'ko', // Korean
+    'ar', // Arabic
   ];
 
   LocaleProvider() : _locale = const Locale('en') {
@@ -35,7 +36,8 @@ class LocaleProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final savedLanguageCode = prefs.getString('language_code');
 
-    if (savedLanguageCode != null && _allowedLanguageCodes.contains(savedLanguageCode)) {
+    if (savedLanguageCode != null &&
+        _allowedLanguageCodes.contains(savedLanguageCode)) {
       _locale = Locale(savedLanguageCode);
     } else {
       final dispatcher = ui.PlatformDispatcher.instance;

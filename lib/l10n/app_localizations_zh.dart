@@ -339,7 +339,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get purchasePlus => '购买 Cortex Plus';
 
   @override
-  String get plusDescription => '解锁 Cortex 的更多功能，体验更强大的 AI！';
+  String get plusDescription => '精英人工智能体验';
 
   @override
   String get annual => '年度';
@@ -366,22 +366,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get discountBannerTitle => '上线特惠：2折优惠！';
-
-  @override
-  String get discountBannerSubtitle => '为庆祝我们的上线，所有订阅计划均享独家优惠，千万不要错过！';
-
-  @override
   String get purchasePro => '购买 Cortex Pro';
 
   @override
-  String get proDescription => '解锁 Cortex 更多功能，体验更强大的 AI！';
+  String get proDescription => '顶级人工智能体验';
 
   @override
   String get purchaseUltra => '购买 Cortex Ultra';
 
   @override
-  String get ultraDescription => '获得 Cortex 所有功能的完全访问权限，尽情体验 AI！';
+  String get ultraDescription => '人工智能的巅峰';
 
   @override
   String get upgradeSubscription => '升级订阅';
@@ -594,6 +588,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get italian => '意大利语';
 
   @override
+  String get arabic => '阿拉伯';
+
+  @override
   String get ram => '内存';
 
   @override
@@ -616,9 +613,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get library => '库';
 
   @override
-  String get appTitle => 'Cortex';
-
-  @override
   String get text => '文本';
 
   @override
@@ -639,7 +633,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noMatchingModels => '未找到匹配的模型。';
 
   @override
-  String get benefit1 => '在线 AI 的更多对话限制';
+  String get benefit1 => '提高对话上限';
 
   @override
   String get benefit3 => '个人资料特效';
@@ -870,9 +864,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noFoundMessage => '尝试调整您的搜索词或清除过滤器。';
 
   @override
-  String get disclaimerMessage => '人工智能可能会犯错，请核对重要信息。';
-
-  @override
   String get modelCreatedSuccess => '模型创建成功！';
 
   @override
@@ -939,9 +930,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get registerSubtitle =>
       '创建 Vertex 帐户，即可无缝访问我们的所有服务。继续操作即表示您同意我们的服务条款和隐私政策。';
-
-  @override
-  String get photoWarningMessage => '包含一张照片。不支持图像的模型可能会忽略它。';
 
   @override
   String get storagePermissionRequired => '需要存储权限才能保存下载的模型。请授予权限以继续。';
@@ -1369,7 +1357,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingFinalTitle => '是时候进行一场革命了。';
 
   @override
-  String get onboardingFinalDesc =>
+  String get onboardingFinalDescription =>
       '如果你看到了这个屏幕，那是因为我们没有放弃。而且我们绝不会放弃。来吧，让我们一起将人工智能革命带给全世界。成为这段故事的一部分……';
 
   @override
@@ -1462,4 +1450,45 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get alwaysBest => '永远最好';
+
+  @override
+  String get featuresTitle => '特征';
+
+  @override
+  String get useOfflineDescription => '无需网络连接即可私密聊天';
+
+  @override
+  String get featureCreateImageTitle => '创建图像';
+
+  @override
+  String get featureCreateImageDescription => '从文本生成人工智能艺术作品';
+
+  @override
+  String get featureStudyTitle => '学习';
+
+  @override
+  String get featureStudyDescription => '获取解释和摘要';
+
+  @override
+  String get featureQuizzesTitle => '测验';
+
+  @override
+  String get featureQuizzesDescription => '测试你的知识';
+
+  @override
+  String get featureExploreDescription => '探索所有可用型号';
+
+  @override
+  String get featureStudyMessage =>
+      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+
+  @override
+  String get featureQuizMessage =>
+      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+
+  @override
+  String get myPlan => '我的计划';
+
+  @override
+  String get discountText => '所有套餐享2折特惠！';
 }

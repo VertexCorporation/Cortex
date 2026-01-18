@@ -425,12 +425,12 @@ class _SettingsSectionState extends State<SettingsSection>
       },
       {
         'key': 'shareApp',
-        'icon': 'assets/icons/share.svg',
+        'icon': 'assets/icons/world.svg',
         'action': () => _shareApp(context)
       },
       {
         'key': 'rateUs',
-        'icon': 'assets/icons/star.svg',
+        'icon': 'assets/icons/on/star.svg',
         'action': () =>
             _launchURL(context,
                 "https://play.google.com/store/apps/details?id=com.vertex.cortex")

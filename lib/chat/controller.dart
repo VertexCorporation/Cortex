@@ -11,7 +11,6 @@ import 'package:cortex/chat/services/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../initialization.dart';
-import '../l10n/app_localizations.dart';
 import '../library/backend/data/service.dart';
 import '../news/service.dart';
 import '../theme.dart';
@@ -36,8 +35,6 @@ class ChatControllerState extends State<ChatController>
   final GlobalKey<AppbarState> appbarKey = GlobalKey<AppbarState>();
 
   final GlobalKey<ChatViewState> chatViewKey = GlobalKey<ChatViewState>();
-  final GlobalKey _exitButtonKey = GlobalKey();
-  final GlobalKey _accountButtonKey = GlobalKey();
 
   // --- Providers ---
   late final ChatSessionProvider _sessionProvider;
@@ -89,15 +86,21 @@ class ChatControllerState extends State<ChatController>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    if (_sessionProvider.isChatActive) {
-      final langCode = _sessionProvider
-          .getLocale()
-          .languageCode;
-      if (Utils.isLocalModel(_sessionProvider.modelId, langCode: langCode,
-          modelService: _modelService)) {
-        _offlineService.releaseModel();
-      }
+
+    // --- FIX: Removed isChatActive check ---
+    // We assume if modelId is not null, we might need to release resources.
+    // Or we check if model is local directly.
+    final langCode = _sessionProvider
+        .getLocale()
+        .languageCode;
+    final currentModelId = _sessionProvider.modelId;
+
+    if (currentModelId != null &&
+        Utils.isLocalModel(
+            currentModelId, langCode: langCode, modelService: _modelService)) {
+      _offlineService.releaseModel();
     }
+
     super.dispose();
   }
 
@@ -131,29 +134,18 @@ class ChatControllerState extends State<ChatController>
         widget.conversationID!,
         languageCode: langCode,
       );
-    } else if (!_sessionProvider.isChatActive) {
-      await _sessionProvider.startDynamicConversation();
+    } else {
+      await _sessionProvider.initializeDefaultSession();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
-
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.background,
-
       extendBodyBehindAppBar: true,
-
-      appBar: Appbar(
-        key: appbarKey,
-        appTitle: localizations.appTitle,
-        exitButtonKey: _exitButtonKey,
-        accountButtonKey: _accountButtonKey,
-        onTitleTap: () {},
-      ),
-
+      appBar: Appbar(key: appbarKey),
       body: ChatView(
         key: chatViewKey,
       ),
