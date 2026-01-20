@@ -371,42 +371,47 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
             ),
             SizedBox(width: iconSpacing),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: contentColor,
-                      fontSize: titleFontSize,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                      height: 1.1,
+              child: AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOutCubic,
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: contentColor,
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                        height: 1.1,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: gapBetweenText),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: subtitleFontSize * 1.2 * 4.5,
-                    ),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      physics: const ClampingScrollPhysics(),
-                      child: Text(
-                        subtitle,
-                        style: TextStyle(
-                          color: subtitleColor,
-                          fontSize: subtitleFontSize,
-                          height: 1.2,
+                    SizedBox(height: gapBetweenText),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: subtitleFontSize * 1.2 * 4.5,
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        physics: const ClampingScrollPhysics(),
+                        child: Text(
+                          subtitle,
+                          style: TextStyle(
+                            color: subtitleColor,
+                            fontSize: subtitleFontSize,
+                            height: 1.2,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
