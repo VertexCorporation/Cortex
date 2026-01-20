@@ -42,7 +42,8 @@ class AIMessageTile extends StatefulWidget {
   State<AIMessageTile> createState() => _AIMessageTileState();
 }
 
-class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateMixin {
+class _AIMessageTileState extends State<AIMessageTile>
+    with TickerProviderStateMixin {
   // Animation controllers
   late final AnimationController _entryCtl;
   late final Animation<double> _entryScaleAnim;
@@ -71,17 +72,22 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _entryCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
-    _entryScaleAnim = CurvedAnimation(parent: _entryCtl, curve: Curves.elasticOut);
-    _fadeCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+    _entryCtl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 300));
+    _entryScaleAnim =
+        CurvedAnimation(parent: _entryCtl, curve: Curves.elasticOut);
+    _fadeCtl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200));
     _fadeAnim = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _fadeCtl, curve: Curves.easeOut),
     );
-    _thinkPulseCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
+    _thinkPulseCtl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 1000));
     _thinkPulseAnim = Tween<double>(begin: 1.0, end: 1.15).animate(
       CurvedAnimation(parent: _thinkPulseCtl, curve: Curves.easeInOut),
     );
-    _thinkRotateCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 4000));
+    _thinkRotateCtl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 4000));
 
     if (widget.message.isThinking && !widget.message.isError) {
       _thinkPulseCtl.repeat(reverse: true);
@@ -89,9 +95,12 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
       _entryCtl.forward();
     }
 
-    _headerEntryCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
-    _headerEntryAnim = CurvedAnimation(parent: _headerEntryCtl, curve: Curves.easeOut);
-    _textAnimCtl = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _headerEntryCtl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 400));
+    _headerEntryAnim =
+        CurvedAnimation(parent: _headerEntryCtl, curve: Curves.easeOut);
+    _textAnimCtl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 150));
 
     _textAnimCtl.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -111,7 +120,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
     _errorSlideAnim = Tween<Offset>(
       begin: const Offset(0, -0.5),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _errorSlideCtl, curve: Curves.easeOutQuad));
+    ).animate(
+        CurvedAnimation(parent: _errorSlideCtl, curve: Curves.easeOutQuad));
 
     _errorFadeOutCtl = AnimationController(
       vsync: this,
@@ -164,15 +174,18 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
     final String logPrefix = "[AIMessageTile.didUpdateWidget]";
 
     // 1. Stream Starting Logic
-    final bool isStreamStarting = old.message.text.isEmpty && widget.message.text.isNotEmpty && widget.message.isThinking;
+    final bool isStreamStarting = old.message.text.isEmpty &&
+        widget.message.text.isNotEmpty && widget.message.isThinking;
 
     if (isStreamStarting && !widget.message.isError) {
       debugPrint("$logPrefix Stream starting. Revealing header.");
       if (_thinkPulseCtl.isAnimating) _thinkPulseCtl.stop();
       if (_thinkRotateCtl.isAnimating) _thinkRotateCtl.stop();
 
-      _thinkPulseCtl.animateTo(1.0, duration: const Duration(milliseconds: 400), curve: Curves.easeOutBack);
-      _thinkRotateCtl.animateTo(_thinkRotateCtl.value.roundToDouble(), duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
+      _thinkPulseCtl.animateTo(1.0, duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutBack);
+      _thinkRotateCtl.animateTo(_thinkRotateCtl.value.roundToDouble(),
+          duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
       _headerEntryCtl.forward();
     }
 
@@ -181,7 +194,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
       if (widget.message.isError) {
         debugPrint("$logPrefix Error detected. Halting thinking animations.");
 
-        final bool hasContent = _stableText.isNotEmpty || widget.message.text.isNotEmpty;
+        final bool hasContent = _stableText.isNotEmpty ||
+            widget.message.text.isNotEmpty;
 
         if (_thinkPulseCtl.isAnimating) _thinkPulseCtl.stop();
         if (_thinkRotateCtl.isAnimating) _thinkRotateCtl.stop();
@@ -203,7 +217,6 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
         _errorFadeOutCtl
           ..value = 0.0
           ..forward();
-
       } else {
         _errorFadeOutCtl.reverse();
         _fadeCtl.forward();
@@ -211,7 +224,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
     }
 
     // 3. Stream Finished Logic
-    if (!widget.message.isError && old.message.isThinking && !widget.message.isThinking) {
+    if (!widget.message.isError && old.message.isThinking &&
+        !widget.message.isThinking) {
       debugPrint("$logPrefix Stream finished successfully.");
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -244,7 +258,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
     }
 
     // 4. Regeneration Logic
-    if (!old.message.isThinking && widget.message.isThinking && !widget.message.isError) {
+    if (!old.message.isThinking && widget.message.isThinking &&
+        !widget.message.isError) {
       debugPrint("$logPrefix Regeneration started.");
       _entryCtl.forward(from: 0);
       _headerEntryCtl.reverse();
@@ -255,7 +270,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
     }
 
     // 5. Text Update Logic
-    if (!widget.message.isError && widget.message.text != old.message.text && widget.message.isThinking) {
+    if (!widget.message.isError && widget.message.text != old.message.text &&
+        widget.message.isThinking) {
       setState(() {
         if (_textAnimCtl.isAnimating) {
           _stableText += _animatingText;
@@ -280,7 +296,9 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
     }
 
     // 6. Static Text Change
-    else if (!widget.message.isError && widget.message.text != old.message.text && !widget.message.isThinking) {
+    else
+    if (!widget.message.isError && widget.message.text != old.message.text &&
+        !widget.message.isThinking) {
       setState(() {
         _stableText = widget.message.text;
         _animatingText = "";
@@ -290,7 +308,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
     }
 
     // 7. Opacity Updates
-    if (old.message.opacity != widget.message.opacity && !widget.message.isError) {
+    if (old.message.opacity != widget.message.opacity &&
+        !widget.message.isError) {
       if (widget.message.opacity == 1.0) {
         _fadeCtl.forward();
       } else if (widget.message.opacity == 0.0) {
@@ -317,7 +336,7 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
   void _flushAnimation() {
     if (_textAnimCtl.isAnimating) {
       _textAnimCtl.stop();
-      if(mounted) {
+      if (mounted) {
         setState(() {
           _stableText += _animatingText;
           _animatingText = "";
@@ -331,7 +350,10 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
   // and the error widget using a cross-fade animation.
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final scale = screenWidth / 400;
 
     return AnimatedSwitcher(
@@ -343,7 +365,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
       // Unique Keys are essential here for the animation to trigger correctly.
       child: widget.message.isError
           ? _buildErrorWidget(context, scale, key: const ValueKey('error_view'))
-          : _buildStandardTile(context, scale, key: const ValueKey('standard_view')),
+          : _buildStandardTile(
+          context, scale, key: const ValueKey('standard_view')),
     );
   }
 
@@ -361,16 +384,22 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
           child: RawGestureDetector(
             behavior: HitTestBehavior.deferToChild,
             gestures: {
-              ShortLongPressGestureRecognizer: GestureRecognizerFactoryWithHandlers<ShortLongPressGestureRecognizer>(
-                    () => ShortLongPressGestureRecognizer(debugOwner: this, shortPressDuration: const Duration(milliseconds: 330)),
-                    (inst) => inst.onLongPressStart = (d) => _onLongPress(context, d.globalPosition),
+              ShortLongPressGestureRecognizer: GestureRecognizerFactoryWithHandlers<
+                  ShortLongPressGestureRecognizer>(
+                    () =>
+                    ShortLongPressGestureRecognizer(debugOwner: this,
+                        shortPressDuration: const Duration(milliseconds: 330)),
+                    (inst) =>
+                inst.onLongPressStart =
+                    (d) => _onLongPress(context, d.globalPosition),
               ),
             },
             child: Material(
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(26),
-                splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+                splashColor: AppColors.primaryColor.inverted.withValues(
+                    alpha: 0.1),
                 onTap: _flushAnimation,
                 onLongPress: () {},
                 child: Padding(
@@ -384,7 +413,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
                       SizeTransition(
                         sizeFactor: _headerEntryAnim,
                         child: Padding(
-                          padding: EdgeInsets.only(top: 8 * scale, left: 2.0 * scale),
+                          padding: EdgeInsets.only(
+                              top: 8 * scale, left: 2.0 * scale),
                           child: _buildContent(scale),
                         ),
                       ),
@@ -401,20 +431,33 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
 
   // Added the 'key' parameter to support AnimatedSwitcher.
   Widget _buildErrorWidget(BuildContext context, double scale, {Key? key}) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final dynamicFontSize = screenWidth * 0.04;
     final iconSize = screenWidth * 0.06;
 
     return GestureDetector(
       key: key, // Critical for animation
-      onTap: () => setState(() {
-        if (_isExpandedError) {
-          _errorSlideCtl.reverse().then((_) { if (mounted) setState(() { _isExpandedError = false; _showErrorText = false; }); });
-        } else {
-          _isExpandedError = true;
-          _errorSlideCtl.forward().whenComplete(() { if (mounted) setState(() => _showErrorText = true); });
-        }
-      }),
+      onTap: () =>
+          setState(() {
+            if (_isExpandedError) {
+              _errorSlideCtl.reverse().then((_) {
+                if (mounted) {
+                  setState(() {
+                    _isExpandedError = false;
+                    _showErrorText = false;
+                  });
+                }
+              });
+            } else {
+              _isExpandedError = true;
+              _errorSlideCtl.forward().whenComplete(() {
+                if (mounted) setState(() => _showErrorText = true);
+              });
+            }
+          }),
       child: FadeTransition(
         opacity: _errorFadeOutAnim, // Uses the specific error fade controller
         child: Padding(
@@ -470,7 +513,9 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
                         position: _errorSlideAnim,
                         child: Padding(
                           padding: EdgeInsets.only(top: screenWidth * 0.02),
-                          child: SelectableText(widget.message.text, style: TextStyle(color: AppColors.septenaryColor, fontSize: dynamicFontSize * 0.9)),
+                          child: SelectableText(widget.message.text,
+                              style: TextStyle(color: AppColors.septenaryColor,
+                                  fontSize: dynamicFontSize * 0.9)),
                         ),
                       ),
                     ),
@@ -486,8 +531,11 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
 
   Widget _buildHeader(double s) {
     final modelService = context.read<ModelService>();
-    final langCode = Localizations.localeOf(context).languageCode;
-    final model = modelService.getPreciseModelData(widget.message.model ?? '', langCode: langCode);
+    final langCode = Localizations
+        .localeOf(context)
+        .languageCode;
+    final model = modelService.getPreciseModelData(
+        widget.message.model ?? '', langCode: langCode);
 
     String? textToDisplay;
     if (model.category == 'self') {
@@ -499,16 +547,6 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
         textToDisplay = model.id;
       }
     }
-
-    final bool isDarkBackground = AppColors.background.computeLuminance() < 0.5;
-    final ColorFilter? smartCortexFilter = isDarkBackground
-        ? const ColorFilter.matrix([
-      -1,  0,  0, 0, 255,
-      0, -1,  0, 0, 255,
-      0,  0, -1, 0, 255,
-      0,  0,  0, 1,   0,
-    ])
-        : null;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -523,7 +561,10 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
                 'assets/cortex.svg',
                 width: 26 * s,
                 height: 26 * s,
-                colorFilter: smartCortexFilter,
+                colorFilter: ColorFilter.mode(
+                  AppColors.primaryColor.inverted,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),
@@ -541,11 +582,20 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
                 _buildAvatar(s * 0.7),
                 if (textToDisplay != null && textToDisplay.isNotEmpty) ...[
                   SizedBox(width: 6 * s),
-                  Text("•", style: TextStyle(color: AppColors.primaryColor.inverted.withValues(alpha:0.5), fontSize: 14 * s, fontWeight: FontWeight.bold)),
+                  Text("•", style: TextStyle(
+                      color: AppColors.primaryColor.inverted.withValues(
+                          alpha: 0.5),
+                      fontSize: 14 * s,
+                      fontWeight: FontWeight.bold)),
                   SizedBox(width: 6 * s),
                   Text(
                     ModelDataUtils.formatModelName(textToDisplay),
-                    style: TextStyle(color: AppColors.primaryColor.inverted.withValues(alpha:0.7), fontSize: 12 * s, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+                    style: TextStyle(
+                        color: AppColors.primaryColor.inverted.withValues(
+                            alpha: 0.7),
+                        fontSize: 12 * s,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5),
                   ),
                 ],
               ],
@@ -559,7 +609,12 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
   Widget _buildAvatar(double s) {
     final containerSize = 30 * s;
     final iconSize = 24 * s;
-    final fallbackWidget = SvgPicture.asset('assets/icons/self.svg', width: iconSize, height: iconSize, fit: BoxFit.contain, colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn));
+    final fallbackWidget = SvgPicture.asset(
+        'assets/icons/self.svg', width: iconSize,
+        height: iconSize,
+        fit: BoxFit.contain,
+        colorFilter: ColorFilter.mode(
+            AppColors.primaryColor.inverted, BlendMode.srcIn));
     Widget imageWidget;
     if (widget.avatarPath.isEmpty || widget.avatarPath.endsWith('self.svg')) {
       imageWidget = fallbackWidget;
@@ -568,22 +623,44 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
       final isAsset = widget.avatarPath.startsWith('assets/');
       if (isSvg) {
         imageWidget = isAsset
-            ? SvgPicture.asset(widget.avatarPath, width: iconSize, height: iconSize, fit: BoxFit.contain, placeholderBuilder: (_) => fallbackWidget)
-            : SvgPicture.file(File(widget.avatarPath), width: iconSize, height: iconSize, fit: BoxFit.contain, placeholderBuilder: (_) => fallbackWidget);
+            ? SvgPicture.asset(widget.avatarPath, width: iconSize,
+            height: iconSize,
+            fit: BoxFit.contain,
+            placeholderBuilder: (_) => fallbackWidget)
+            : SvgPicture.file(File(widget.avatarPath), width: iconSize,
+            height: iconSize,
+            fit: BoxFit.contain,
+            placeholderBuilder: (_) => fallbackWidget);
       } else {
-        final imageProvider = isAsset ? AssetImage(widget.avatarPath) as ImageProvider : FileImage(File(widget.avatarPath));
-        imageWidget = Image(image: imageProvider, width: containerSize, height: containerSize, fit: BoxFit.cover, errorBuilder: (_, __, ___) => fallbackWidget);
+        final imageProvider = isAsset ? AssetImage(
+            widget.avatarPath) as ImageProvider : FileImage(
+            File(widget.avatarPath));
+        imageWidget = Image(image: imageProvider,
+            width: containerSize,
+            height: containerSize,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => fallbackWidget);
       }
     }
     return Container(
       padding: EdgeInsets.all(1.5 * s),
-      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: AppColors.primaryColor.inverted.withValues(alpha:0.2), width: 1.0)),
-      child: Container(width: containerSize, height: containerSize, clipBehavior: Clip.antiAlias, decoration: BoxDecoration(color: AppColors.secondaryColor, shape: BoxShape.circle), alignment: Alignment.center, child: imageWidget),
+      decoration: BoxDecoration(shape: BoxShape.circle,
+          border: Border.all(
+              color: AppColors.primaryColor.inverted.withValues(alpha: 0.2),
+              width: 1.0)),
+      child: Container(width: containerSize,
+          height: containerSize,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+              color: AppColors.secondaryColor, shape: BoxShape.circle),
+          alignment: Alignment.center,
+          child: imageWidget),
     );
   }
 
   Widget _buildContent(double s) {
-    final baseStyle = TextStyle(fontSize: 16 * s, height: 1.35, color: AppColors.primaryColor.inverted);
+    final baseStyle = TextStyle(
+        fontSize: 16 * s, height: 1.35, color: AppColors.primaryColor.inverted);
 
     // If there's no text at all, render nothing.
     if (_stableText.isEmpty && _animatingText.isEmpty) {
@@ -592,7 +669,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
 
     // If not animating, just show the fully parsed, stable text.
     if (!_textAnimCtl.isAnimating && _animatingText.isEmpty) {
-      return RichText(text: TextSpan(children: _getParsedSpans(_stableText), style: baseStyle));
+      return RichText(text: TextSpan(
+          children: _getParsedSpans(_stableText), style: baseStyle));
     }
 
     // Otherwise, build the animated text.
@@ -607,7 +685,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
             style: baseStyle,
             children: [
               ..._getParsedSpans(_stableText),
-              if (_animatingText.isNotEmpty) ..._getParsedSpans(_animatingText).map((span) => _applyOpacity(span, opacity, sigma)),
+              if (_animatingText.isNotEmpty) ..._getParsedSpans(_animatingText)
+                  .map((span) => _applyOpacity(span, opacity, sigma)),
             ],
           ),
         );
@@ -631,7 +710,8 @@ class _AIMessageTileState extends State<AIMessageTile> with TickerProviderStateM
 
       return TextSpan(
         text: span.text,
-        children: span.children?.map((child) => _applyOpacity(child, opacity, sigma)).toList(),
+        children: span.children?.map((child) =>
+            _applyOpacity(child, opacity, sigma)).toList(),
         style: span.style?.copyWith(
           color: baseColor.withValues(alpha: opacity),
           foreground: null,

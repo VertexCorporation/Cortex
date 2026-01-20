@@ -28,14 +28,6 @@ class AxonHeader extends StatelessWidget {
     required this.onSearchChanged,
   });
 
-  // OPTIMIZATION: Static constant prevents object recreation on every build
-  static const ColorFilter _darkCortexFilter = ColorFilter.matrix([
-    -1, 0, 0, 0, 255,
-    0, -1, 0, 0, 255,
-    0, 0, -1, 0, 255,
-    0, 0, 0, 1, 0,
-  ]);
-
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -46,11 +38,6 @@ class AxonHeader extends StatelessWidget {
     final double searchIconSize = referenceWidth * 0.06;
     final double brandIconHeight = screenHeight * 0.035;
     final double fontSizeBody = referenceWidth * 0.045;
-
-    // --- Theme Logic ---
-    final bool isDarkMode = Theme
-        .of(context)
-        .brightness == Brightness.dark;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -162,7 +149,10 @@ class AxonHeader extends StatelessWidget {
                         SvgPicture.asset(
                           'assets/cortex.svg',
                           height: brandIconHeight,
-                          colorFilter: isDarkMode ? _darkCortexFilter : null,
+                          colorFilter: ColorFilter.mode(
+                            AppColors.primaryColor.inverted,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ],
                     ),

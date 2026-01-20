@@ -154,17 +154,6 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
 
     // Colors
     final Color contentColor = AppColors.primaryColor.inverted;
-    final bool isDarkBackground = AppColors.background.computeLuminance() < 0.5;
-
-    // Filter for Cortex Logo (Standard)
-    final ColorFilter? smartCortexFilter = isDarkBackground
-        ? const ColorFilter.matrix([
-      -1, 0, 0, 0, 255,
-      0, -1, 0, 0, 255,
-      0, 0, -1, 0, 255,
-      0, 0, 0, 1, 0,
-    ])
-        : null;
 
     // Dimensions
     final double logoSize = isTablet ? screenWidth * 0.15 : screenWidth * 0.22;
@@ -213,7 +202,10 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                 width: logoSize,
                                 height: logoSize,
                                 fit: BoxFit.contain,
-                                colorFilter: smartCortexFilter,
+                                colorFilter: ColorFilter.mode(
+                                  AppColors.primaryColor.inverted,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                             ),
                           ),
