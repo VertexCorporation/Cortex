@@ -2,3 +2,4 @@
 "NSPhotoLibraryUsageDescription" = "Cortex 需要访问您的相册以上传图片。";
 "NSPhotoLibraryAddUsageDescription" = "Cortex 需要权限将图片保存到您的相册。";
 "NSMicrophoneUsageDescription" = "Cortex 需要访问麦克风以进行语音聊天。";
+"NSSpeechRecognitionUsageDescription" = "Cortex 需要语音识别权限才能将您的声音转换为文本。";

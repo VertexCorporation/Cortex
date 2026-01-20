@@ -145,21 +145,27 @@ class AxonHeader extends StatelessWidget {
             child: AnimatedSize(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOutCubic,
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.centerRight, // Shrink from Left
               child: SizedBox(
                 width: isSearchActive ? 0 : null,
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 200),
-                  opacity: isSearchActive ? 0.0 : 1.0,
-                  child: Row(
-                    children: [
-                      SizedBox(width: referenceWidth * 0.03),
-                      SvgPicture.asset(
-                        'assets/cortex.svg',
-                        height: brandIconHeight,
-                        colorFilter: isDarkMode ? _darkCortexFilter : null,
-                      ),
-                    ],
+                child: AnimatedSlide(
+                  offset: isSearchActive ? const Offset(-0.5, 0) : Offset.zero,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutCubic,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 400),
+                    curve: isSearchActive ? Curves.easeInQuint : Curves.easeOut,
+                    opacity: isSearchActive ? 0.0 : 1.0,
+                    child: Row(
+                      children: [
+                        SizedBox(width: referenceWidth * 0.03),
+                        SvgPicture.asset(
+                          'assets/cortex.svg',
+                          height: brandIconHeight,
+                          colorFilter: isDarkMode ? _darkCortexFilter : null,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

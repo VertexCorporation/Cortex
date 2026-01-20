@@ -2,3 +2,4 @@
 "NSPhotoLibraryUsageDescription" = "Cortex에서 이미지를 업로드하려면 갤러리 접근 권한이 필요합니다.";
 "NSPhotoLibraryAddUsageDescription" = "Cortex에서 이미지를 갤러리에 저장하려면 권한이 필요합니다.";
 "NSMicrophoneUsageDescription" = "Cortex에서 음성 채팅을 하려면 마이크 접근 권한이 필요합니다.";
+"NSSpeechRecognitionUsageDescription" = "Cortex가 음성을 텍스트로 변환하기 위해 음성 인식 권한이 필요합니다.";

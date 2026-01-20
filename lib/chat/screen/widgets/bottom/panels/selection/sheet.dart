@@ -213,6 +213,9 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     return widget.currentModelId.startsWith('${series.id}-');
   }
 
+  // Internal controller for the list content
+  final ScrollController _internalScrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     final double topRadius = sw * 0.07;
@@ -224,7 +227,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
       snap: true,
       snapSizes: const [0.55, 1.0],
       expand: false,
-      builder: (context, scrollController) {
+      builder: (context, sheetScrollController) {
         return Material(
           color: AppColors.background,
           borderRadius: BorderRadius.vertical(top: Radius.circular(topRadius)),
@@ -235,84 +238,93 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
               color: AppColors.primaryColor.inverted,
             ),
           )
-              : FadeTransition(
-            opacity: _fadeAnimation,
-            child: ScrollFog(
-              scrollController: scrollController,
-              fogColor: AppColors.background,
-              topFogHeight: 20,
-              bottomFogHeight: 50,
-              child: CustomScrollView(
-                controller: scrollController,
+              : Column(
+            children: [
+              // 1. DRAG HANDLE AREA (Attached to Sheet Controller)
+              SingleChildScrollView(
+                controller: sheetScrollController,
                 physics: const ClampingScrollPhysics(),
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {},
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(height: sw * 0.08),
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            width: sw * 0.12,
-                            height: 5,
-                            decoration: BoxDecoration(
-                              color: AppColors.quaternaryColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ],
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {}, // Capture taps to prevent click-through
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(height: sw * 0.08),
+                      // Handle Bar
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        width: sw * 0.12,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: AppColors.quaternaryColor,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
-                    ),
-                  ),
-
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: Center(
-                        child: Text(
-                          widget.localizations.allModels,
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: titleSize,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryColor.inverted,
+                      // Title
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Center(
+                          child: Text(
+                            widget.localizations.allModels,
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                              fontSize: titleSize,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryColor.inverted,
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-
-                  if (_selfModels.isNotEmpty) ...[
-                    _buildSliverHeader(widget.localizations.customModels),
-                    _buildSliverGrid(_selfModels),
-                  ],
-                  if (_offlineModels.isNotEmpty) ...[
-                    _buildSliverHeader(widget.localizations.offlineModels),
-                    _buildSliverGrid(_offlineModels),
-                  ],
-                  if (_onlineSeries.isNotEmpty) ...[
-                    _buildSliverHeader(widget.localizations.onlineModels),
-                    _buildSliverOnlineList(),
-                  ],
-                  if (_characterModels.isNotEmpty) ...[
-                    _buildSliverHeader(widget.localizations.characterModels),
-                    _buildSliverGrid(_characterModels),
-                  ],
-
-                  SliverPadding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery
-                          .of(context)
-                          .padding
-                          .bottom + 20,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+
+              // 2. SCROLLABLE CONTENT (Independent Controller)
+              Expanded(
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: ScrollFog(
+                    scrollController: _internalScrollController,
+                    fogColor: AppColors.background,
+                    topFogHeight: 20,
+                    bottomFogHeight: 50,
+                    child: CustomScrollView(
+                      controller: _internalScrollController,
+                      physics: const ClampingScrollPhysics(),
+                      slivers: [
+                        if (_selfModels.isNotEmpty) ...[
+                          _buildSliverHeader(widget.localizations.customModels),
+                          _buildSliverGrid(_selfModels),
+                        ],
+                        if (_offlineModels.isNotEmpty) ...[
+                          _buildSliverHeader(widget.localizations.offlineModels),
+                          _buildSliverGrid(_offlineModels),
+                        ],
+                        if (_onlineSeries.isNotEmpty) ...[
+                          _buildSliverHeader(widget.localizations.onlineModels),
+                          _buildSliverOnlineList(),
+                        ],
+                        if (_characterModels.isNotEmpty) ...[
+                          _buildSliverHeader(widget.localizations.characterModels),
+                          _buildSliverGrid(_characterModels),
+                        ],
+
+                        SliverPadding(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery
+                                .of(context)
+                                .padding
+                                .bottom + 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },

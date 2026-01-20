@@ -49,6 +49,7 @@ import 'chat/services/response.dart';
 import 'chat/services/scroll.dart';
 import 'chat/services/select.dart';
 import 'chat/services/send.dart';
+import 'chat/services/speech.dart';
 import 'chat/services/stop.dart';
 import 'funds/backend.dart';
 import 'initialization.dart';
@@ -651,6 +652,9 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
             sendService: context.read<SendService>(),
             scrollService: context.read<ScrollService>(),
           ),
+    ),
+    ChangeNotifierProvider<SpeechService>(
+      create: (_) => SpeechService(),
     ),
   ];
 }

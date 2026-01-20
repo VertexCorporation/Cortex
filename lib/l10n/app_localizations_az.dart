@@ -1577,4 +1577,19 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get discountText => 'Bütün planlara 80% endirim!';
+
+  @override
+  String get attachmentSheetTitle => 'Attachments';
+
+  @override
+  String get actionCamera => 'Camera';
+
+  @override
+  String get actionGallery => 'Gallery';
+
+  @override
+  String get actionFile => 'File';
+
+  @override
+  String get listening => 'Listening';
 }

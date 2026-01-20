@@ -5,6 +5,7 @@ import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -13,21 +14,78 @@ import '../panels/selection/sheet.dart';
 class InputService {
   final ImagePicker _imagePicker = ImagePicker();
 
-  // --- Image Handling ---
+  // --- Image Handling (with Compression & Size Check) ---
 
   Future<void> pickPhoto(BuildContext context,
-      {required VoidCallback onPhotoSelected}) async {
+      {required ImageSource source,
+        required VoidCallback onPhotoSelected}) async {
     try {
+      // 1. Pick and compress the image
       final XFile? pickedFile = await _imagePicker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 85,
+        source: source,
+        imageQuality: 80, // Compress to 80% quality
+        maxWidth: 1920, // Resize large images to FHD
+        maxHeight: 1920,
       );
-      if (pickedFile != null && context.mounted) {
-        context.read<InputProvider>().selectPhoto(File(pickedFile.path));
+
+      if (pickedFile == null) return;
+
+      final File file = File(pickedFile.path);
+
+      // 2. Async operation: Get file size
+      final int sizeInBytes = await file.length();
+      const int maxPhotoSize = 10 * 1024 * 1024; // 10 MB
+
+      // 3. Safety Check: Ensure context is still valid after the 'await' above
+      if (!context.mounted) return;
+
+      // 4. Update State
+      if (sizeInBytes <= maxPhotoSize) {
+        context.read<InputProvider>().selectPhoto(file);
         onPhotoSelected();
+      } else {
+        debugPrint("Photo ignored: Size > 10MB even after compression.");
       }
     } catch (e) {
       debugPrint("Error picking photo: $e");
+    }
+  }
+
+  // --- File Selection (Check Only) ---
+
+  Future<void> pickFile(BuildContext context) async {
+    try {
+      // 1. Define allowed extensions (No .exe, etc.)
+      const List<String> allowedExtensions = [
+        'pdf', 'doc', 'docx', 'txt', 'md', 'csv', 'xls', 'xlsx', 'json'
+      ];
+
+      // 2. Pick the file
+      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: allowedExtensions,
+      );
+
+      if (result == null || result.files.single.path == null) return;
+
+      final File file = File(result.files.single.path!);
+
+      // 3. Async operation: Get file size
+      final int sizeInBytes = await file.length();
+      const int maxFileSize = 10 * 1024 * 1024; // 10 MB
+
+      // 4. Safety Check: Ensure context is still valid after the 'await' above
+      if (!context.mounted) return;
+
+      // 5. Update State
+      if (sizeInBytes <= maxFileSize) {
+        context.read<InputProvider>().selectPhoto(file);
+      } else {
+        // Silently ignore or show a local notification if preferred
+        debugPrint("File ignored: Size > 10MB");
+      }
+    } catch (e) {
+      debugPrint("Error picking file: $e");
     }
   }
 
@@ -153,7 +211,6 @@ class InputService {
     if (inputProvider.isEditingMode) {
       final String originalText = inputProvider.originalMessageText ?? '';
       final bool textChanged = currentText != originalText;
-      // Note: A more complex photo comparison check could go here if needed
       return (textChanged || hasPhoto) && (currentText.isNotEmpty || hasPhoto);
     }
 

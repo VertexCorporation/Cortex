@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import '../../../../../internet.dart';
 import '../../../../../theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import '../../../../services/speech.dart';
+import '../../wave.dart';
 import 'buttons.dart';
 import 'service.dart';
 
@@ -83,9 +85,12 @@ class InputFieldState extends State<InputField> {
   @override
   void initState() {
     super.initState();
-    // Rebuild on text change to update Send button state
     widget.controller.addListener(() {
       if (mounted) setState(() {});
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<SpeechService>().checkAvailability();
     });
   }
 
@@ -93,7 +98,6 @@ class InputFieldState extends State<InputField> {
     context.read<InputProvider>().selectPhoto(null);
   }
 
-  // Exposed getter for the parent widget to check validity
   bool get isSendButtonEnabled {
     return _inputService.isSendButtonEnabled(
       context: context,
@@ -119,6 +123,9 @@ class InputFieldState extends State<InputField> {
         .width;
     final bool isTablet = screenWidth >= 600;
 
+    final inputProvider = context.watch<InputProvider>();
+    final bool isRecording = inputProvider.isVoiceRecording;
+
     if (!widget.isModelSelected && !widget.isDynamicChatMode) {
       return const SizedBox.shrink();
     }
@@ -143,6 +150,7 @@ class InputFieldState extends State<InputField> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Photo Preview (Always visible if photo exists)
               if (widget.canHandleImage)
                 _PhotoPreviewSection(
                     screenWidth: screenWidth, isTablet: isTablet),
@@ -154,29 +162,58 @@ class InputFieldState extends State<InputField> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _TextFieldSection(
-                          controller: widget.controller,
-                          focusNode: widget.textFieldFocusNode,
-                          localizations: widget.localizations,
-                          screenWidth: screenWidth,
-                          isTablet: isTablet,
-                          onEnterPressed: () {
-                            if (isSendButtonEnabled) widget.onSend();
-                          },
+                        // Animated Switcher: Text Field <-> Waveform
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOutCubic,
+                          alignment: Alignment.bottomCenter,
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder: (Widget child, Animation<
+                                double> animation) {
+                              // Smooth expansion
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                            child: isRecording
+                                ? const _WaveformSection(key: ValueKey(
+                                'waveform'))
+                                : _TextFieldSection(
+                              key: const ValueKey('textfield'),
+                              controller: widget.controller,
+                              focusNode: widget.textFieldFocusNode,
+                              localizations: widget.localizations,
+                              screenWidth: screenWidth,
+                              isTablet: isTablet,
+                              onEnterPressed: () {
+                                if (isSendButtonEnabled) widget.onSend();
+                              },
+                            ),
+                          ),
                         ),
-                        _ToolsSection(
-                          screenWidth: screenWidth,
-                          isTablet: isTablet,
-                          widget: widget,
+
+                        // Tools Section (Sequenced Transition)
+                        _SequencedToolsTransition(
+                          isVisible: !isRecording,
+                          child: _ToolsSection(
+                            screenWidth: screenWidth,
+                            isTablet: isTablet,
+                            widget: widget,
+                          ),
                         ),
                       ],
                     ),
                   ),
+
+                  // Send / Mic / Stop Button
                   _SendButtonSection(
                     screenWidth: screenWidth,
                     isTablet: isTablet,
                     widget: widget,
                     isEnabled: isSendButtonEnabled,
+                    controller: widget.controller,
                   ),
                 ],
               ),
@@ -199,9 +236,24 @@ class InputFieldState extends State<InputField> {
   }
 }
 
-// -----------------------------------------------------------------------------
-// INTERNAL WIDGET COMPONENTS
-// -----------------------------------------------------------------------------
+// --- WIDGET COMPONENTS ---
+
+class _WaveformSection extends StatelessWidget {
+  const _WaveformSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Pure Waveform with adjusted padding to sit lower
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(12.0, 28.0, 0, 12.0),
+      child: WaveformVisualizer(),
+    );
+  }
+}
+
+// ... [_PhotoPreviewSection, _TextFieldSection, _ToolsSection, _SendButtonSection] ...
+// (Keep these exactly as they were in the previous corrected version,
+// just ensure _SendButtonSection logic for 'isRecording' is present)
 
 class _PhotoPreviewSection extends StatelessWidget {
   final double screenWidth;
@@ -245,8 +297,7 @@ class _PhotoPreviewSection extends StatelessWidget {
                       photo,
                       fit: BoxFit.cover,
                       errorBuilder: (ctx, err, stack) =>
-                          Icon(
-                              Icons.broken_image,
+                          Icon(Icons.broken_image,
                               color: AppColors.tertiaryColor),
                     )
                         : null,
@@ -264,17 +315,17 @@ class _PhotoPreviewSection extends StatelessWidget {
                         color: Colors.black87,
                         shape: BoxShape.circle,
                         boxShadow: [
-                          BoxShadow(
-                              color: Colors.black38,
+                          BoxShadow(color: Colors.black38,
                               blurRadius: 4,
                               offset: Offset(0, 1))
                         ],
                       ),
-                      child: Icon(Icons.close_rounded,
-                          size: isTablet
-                              ? screenWidth * 0.025
-                              : screenWidth * 0.04,
-                          color: Colors.white),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: isTablet ? screenWidth * 0.025 : screenWidth *
+                            0.04,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -296,6 +347,7 @@ class _TextFieldSection extends StatelessWidget {
   final VoidCallback onEnterPressed;
 
   const _TextFieldSection({
+    super.key,
     required this.controller,
     required this.focusNode,
     required this.localizations,
@@ -344,14 +396,112 @@ class _TextFieldSection extends StatelessWidget {
   }
 }
 
+class _SequencedToolsTransition extends StatefulWidget {
+  final bool isVisible;
+  final Widget child;
+
+  const _SequencedToolsTransition({
+    required this.isVisible,
+    required this.child,
+  });
+
+  @override
+  State<_SequencedToolsTransition> createState() =>
+      _SequencedToolsTransitionState();
+}
+
+class _SequencedToolsTransitionState extends State<_SequencedToolsTransition>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacityAnimation;
+  late Animation<double> _sizeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    // HIDING SEQUENCE (Forward: Visible -> Hidden)
+    // 1. Fade Out: 0ms - 200ms (0.0 - 0.4)
+    // 2. Shrink: 200ms - 500ms (0.4 - 1.0)
+
+    // SHOWING SEQUENCE (Reverse: Hidden -> Visible)
+    // 1. Expand: 500ms - 200ms (1.0 - 0.4)
+    // 2. Fade In: 200ms - 0ms (0.4 - 0.0)
+
+    // Opacity: Visible (1.0) at start (0.0 progress). Invisible (0.0) at 0.4 progress.
+    _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
+        reverseCurve: const Interval(0.0, 0.4, curve: Curves.easeIn),
+      ),
+    );
+
+    // Size: Full (1.0) at 0.4 progress. None (0.0) at 1.0 progress.
+    _sizeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.4, 1.0, curve: Curves.easeInOutCubic),
+        reverseCurve: const Interval(0.4, 1.0, curve: Curves.easeInOutCubic),
+      ),
+    );
+
+    // Initialize state
+    if (!widget.isVisible) {
+      _controller.value = 1.0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(_SequencedToolsTransition oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isVisible != oldWidget.isVisible) {
+      if (widget.isVisible) {
+        // Hidden -> Visible (Reverse)
+        _controller.reverse();
+      } else {
+        // Visible -> Hidden (Forward)
+        _controller.forward();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return SizeTransition(
+          sizeFactor: _sizeAnimation,
+          axis: Axis.vertical,
+          axisAlignment: -1.0, // Shrink upwards
+          child: FadeTransition(
+            opacity: _opacityAnimation,
+            child: widget.child,
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _ToolsSection extends StatelessWidget {
   final double screenWidth;
   final bool isTablet;
   final InputField widget;
 
-  const _ToolsSection({required this.screenWidth,
-    required this.isTablet,
-    required this.widget});
+  const _ToolsSection(
+      {required this.screenWidth, required this.isTablet, required this.widget});
 
   @override
   Widget build(BuildContext context) {
@@ -365,19 +515,14 @@ class _ToolsSection extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // 1. Add Photo Button
           AddPhotoButton(
             isLimitExceeded: widget.isLimitExceeded,
             isPhotoLoading: widget.isPhotoLoading,
             localizations: widget.localizations,
           ),
           SizedBox(width: screenWidth * 0.02),
-
-          // 2. Features Button
           FeaturesButton(controller: widget.controller),
           SizedBox(width: screenWidth * 0.02),
-
-          // 3. Model Select Button
           ModelSelectButton(
             screenWidth: screenWidth,
             isTablet: isTablet,
@@ -394,12 +539,14 @@ class _SendButtonSection extends StatelessWidget {
   final bool isTablet;
   final InputField widget;
   final bool isEnabled;
+  final TextEditingController controller;
 
   const _SendButtonSection({
     required this.screenWidth,
     required this.isTablet,
     required this.widget,
     required this.isEnabled,
+    required this.controller,
   });
 
   @override
@@ -407,11 +554,23 @@ class _SendButtonSection extends StatelessWidget {
     final bool isConnected = context
         .watch<InternetProvider>()
         .isConnected;
-    bool effectiveEnabled = isEnabled;
+    final inputProvider = context.watch<InputProvider>();
+    final speechService = context.watch<SpeechService>();
 
+    bool effectiveEnabled = isEnabled;
     if ((widget.isServerSideModel || widget.isDynamicChatMode) &&
         !isConnected) {
       effectiveEnabled = false;
+    }
+
+    VoidCallback? effectiveOnStop;
+    if (inputProvider.isVoiceRecording) {
+      effectiveOnStop = () async {
+        await speechService.stopListening();
+        inputProvider.setVoiceRecording(false);
+      };
+    } else {
+      effectiveOnStop = widget.onStop;
     }
 
     return Padding(
@@ -422,8 +581,13 @@ class _SendButtonSection extends StatelessWidget {
       child: ActionButtonWidget(
         isEnabled: effectiveEnabled,
         isSending: widget.isSending,
+        isRecording: inputProvider.isVoiceRecording,
+        isTextEmpty: controller.text
+            .trim()
+            .isEmpty,
         onSend: widget.onSend,
-        onStop: widget.onStop,
+        onStop: effectiveOnStop,
+        controller: controller,
       ),
     );
   }

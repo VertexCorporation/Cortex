@@ -621,5 +621,10 @@
   "featureStudyMessage": "You are an expert tutor. Your goal is to explain the user's topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:",
   "featureQuizMessage": "You are a quiz master. Generate a specific multiple-choice question based on the user's topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:",
   "myPlan": "My Plan",
-  "discountText": "%80 Discount on all plans!"
+  "discountText": "%80 Discount on all plans!",
+  "attachmentSheetTitle": "Attachments",
+  "actionCamera": "Camera",
+  "actionGallery": "Gallery",
+  "actionFile": "File",
+  "listening": "Listening"
 }

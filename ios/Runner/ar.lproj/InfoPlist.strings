@@ -2,3 +2,4 @@
 "NSPhotoLibraryUsageDescription" = "يحتاج Cortex إلى الوصول لمعرض الصور لرفع الصور.";
 "NSPhotoLibraryAddUsageDescription" = "يحتاج Cortex إلى إذن لحفظ الصور في المعرض.";
 "NSMicrophoneUsageDescription" = "يحتاج Cortex إلى الوصول للميكروفون للدردشة الصوتية.";
+"NSSpeechRecognitionUsageDescription" = "يحتاج Cortex إلى التعرف على الكلام لتحويل صوتك إلى نص.";

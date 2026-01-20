@@ -1580,4 +1580,19 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get discountText => '%80 Daxistin li ser hemû planan!';
+
+  @override
+  String get attachmentSheetTitle => 'Attachments';
+
+  @override
+  String get actionCamera => 'Camera';
+
+  @override
+  String get actionGallery => 'Gallery';
+
+  @override
+  String get actionFile => 'File';
+
+  @override
+  String get listening => 'Listening';
 }

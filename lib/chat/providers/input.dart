@@ -31,6 +31,7 @@ class InputProvider with ChangeNotifier {
 
   File? _selectedPhoto;
   bool _isPhotoLoading = false;
+  bool _isVoiceRecording = false;
   ChatInputMode _featureMode = ChatInputMode.none;
 
   // ===========================================================================
@@ -49,6 +50,8 @@ class InputProvider with ChangeNotifier {
 
   bool get isPhotoLoading => _isPhotoLoading;
 
+  bool get isVoiceRecording => _isVoiceRecording;
+
   // ===========================================================================
   // SECTION 3: STATE MUTATION METHODS (ACTIONS)
   // ===========================================================================
@@ -63,6 +66,11 @@ class InputProvider with ChangeNotifier {
   /// Clears the current mode (e.g., after sending).
   void clearFeatureMode() {
     _featureMode = ChatInputMode.none;
+    notifyListeners();
+  }
+
+  void setVoiceRecording(bool value) {
+    _isVoiceRecording = value;
     notifyListeners();
   }
 

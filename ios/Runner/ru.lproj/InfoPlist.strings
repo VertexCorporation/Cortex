@@ -2,3 +2,4 @@
 "NSPhotoLibraryUsageDescription" = "Cortex нужен доступ к вашей галерее для загрузки изображений.";
 "NSPhotoLibraryAddUsageDescription" = "Cortex нужно разрешение для сохранения изображений в галерею.";
 "NSMicrophoneUsageDescription" = "Cortex нужен доступ к микрофону для голосового чата.";
+"NSSpeechRecognitionUsageDescription" = "Cortex требуется доступ к распознаванию речи для преобразования вашего голоса в текст.";
