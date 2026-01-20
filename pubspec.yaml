@@ -130,20 +130,20 @@ flutter_launcher_icons:
 flutter_native_splash:
   # —─────────── Global light-mode splash (required) ───────────—
   color: "#FFFFFF"              # Light-mode background
-  image: assets/splash/white.png
+  image: assets/cortex/white.png
 
   # —────────────── Dark-mode splash overrides ───────────────—
   color_dark: "#000000"         # Dark-mode background
-  image_dark: assets/splash/black.png
+  image_dark: assets/cortex/black.png
 
   # —────────── Android 12+ specific settings ─────────—
   android_12:
     # Light-mode icon & window color
-    image: assets/splash/white.png
+    image: assets/cortex/white.png
     icon_background_color: "#FFFFFF"
 
     # Dark-mode overrides for Android 12+
-    image_dark: assets/splash/black.png
+    image_dark: assets/cortex/black.png
     icon_background_color_dark: "#000000"
 
 flutter:
