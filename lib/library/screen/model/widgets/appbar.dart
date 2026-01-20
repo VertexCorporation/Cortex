@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:cortex/appbar.dart';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -77,9 +78,6 @@ class _VariantOverlayPanelState extends State<_VariantOverlayPanel>
         .width;
     final bool isTablet = screenW >= 600;
 
-    // --- LEFT MARGIN CORRECTION ---
-    final marginPx = screenW * 0.02;
-
     // --- DYNAMIC TOP POSITIONING ---
     // Must match the logic in DetailAppBar to align perfectly.
     // Tablet: Dynamic (approx 14%). Phone: Standard 56.0.
@@ -101,24 +99,27 @@ class _VariantOverlayPanelState extends State<_VariantOverlayPanel>
           ),
           Positioned(
             top: topPx,
-            left: marginPx,
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                alignment: Alignment.topLeft,
-                child: GestureDetector(
-                  onTap: () {}, // Prevent clicks passing through the panel
-                  child: Variants.buildVariantPanelWidget(
-                    context: context,
-                    options: widget.options,
-                    selectedVariant: widget.selectedVariant,
-                    modelTitle: widget.modelTitle,
-                    onDismiss: startClosing,
-                    onSelect: (selectedMap) {
-                      widget.onSelect(selectedMap);
-                      startClosing();
-                    },
+            left: 0,
+            right: 0,
+            child: Center(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  alignment: Alignment.topCenter,
+                  child: GestureDetector(
+                    onTap: () {}, // Prevent clicks passing through the panel
+                    child: Variants.buildVariantPanelWidget(
+                      context: context,
+                      options: widget.options,
+                      selectedVariant: widget.selectedVariant,
+                      modelTitle: widget.modelTitle,
+                      onDismiss: startClosing,
+                      onSelect: (selectedMap) {
+                        widget.onSelect(selectedMap);
+                        startClosing();
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -133,6 +134,7 @@ class _VariantOverlayPanelState extends State<_VariantOverlayPanel>
 class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
   final ModelDetailProvider provider;
   final VoidCallback onBackPressed;
+  final ScrollController? scrollController;
 
   // Pre-calculated metrics for PreferredSize
   final double _toolbarHeight;
@@ -143,6 +145,7 @@ class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
     required BuildContext context, // Context required for sizing
     required this.provider,
     required this.onBackPressed,
+    this.scrollController,
   })
       :
         _isTablet = MediaQuery
@@ -170,7 +173,6 @@ class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
 class DetailAppBarState extends State<DetailAppBar>
     with TickerProviderStateMixin {
   OverlayEntry? _variantOverlayEntry;
-  BuildContext? _exitButtonContext;
 
   final GlobalKey<_VariantOverlayPanelState> _overlayKey = GlobalKey<
       _VariantOverlayPanelState>();
@@ -274,56 +276,24 @@ class DetailAppBarState extends State<DetailAppBar>
     return Future.value();
   }
 
-  bool _isTapInsideWidget(BuildContext context, Offset globalPosition) {
-    final RenderBox box = context.findRenderObject() as RenderBox;
-    final Offset localPosition = box.globalToLocal(globalPosition);
-    return box.paintBounds.contains(localPosition);
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery
         .of(context)
         .size
         .width;
-
-    // Use pre-calculated metrics from widget
     final bool isTablet = widget._isTablet;
-    final double toolbarHeight = widget._toolbarHeight;
 
-    // --- ELEMENT SCALING ---
-    final double backIconSize = isTablet ? 32.0 : screenWidth * 0.06; // Adjusted size
-
-    return Listener(
-      behavior: HitTestBehavior.translucent,
-      onPointerDown: (PointerDownEvent event) {
-        if (isPanelOpen &&
-            _exitButtonContext != null &&
-            !_isTapInsideWidget(_exitButtonContext!, event.position)) {
-          dismissVariantOverlay();
-        }
-      },
-      child: AppBar(
-        scrolledUnderElevation: 0,
-        toolbarHeight: toolbarHeight,
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        centerTitle: true,
-        leading: Builder(builder: (context) {
-          _exitButtonContext = context;
-          return IconButton(
-            icon: Icon(Icons.arrow_back,
-                color: AppColors.primaryColor.inverted,
-                size: backIconSize),
-            onPressed: _handleBackPressed,
-          );
-        }),
-        title: _buildTitleWidget(context, isTablet, screenWidth),
-        actions: [
-          _buildDownloadStatusIndicator(context, isTablet, screenWidth),
-          SizedBox(width: isTablet ? 16.0 : 16.0),
-        ],
-      ),
+    return CortexAppBar(
+      leadingMode: CortexLeadingMode.back,
+      showGradient: false,
+      scrollController: widget.scrollController,
+      onLeadingPressed: _handleBackPressed,
+      title: _buildTitleWidget(context, isTablet, screenWidth),
+      actions: [
+        _buildDownloadStatusIndicator(context, isTablet, screenWidth),
+        SizedBox(width: isTablet ? 16.0 : 16.0),
+      ],
     );
   }
 
@@ -381,7 +351,7 @@ class DetailAppBarState extends State<DetailAppBar>
       double screenWidth) {
     final provider = widget.provider;
     final localizations = AppLocalizations.of(context)!;
-    
+
     // Status should be smaller than title
     final double fontSize = isTablet ? 14.0 : screenWidth * 0.03;
 
@@ -401,14 +371,14 @@ class DetailAppBarState extends State<DetailAppBar>
           FadeTransition(opacity: animation, child: child),
       child: downloadStatus.isNotEmpty
           ? Center(
-            child: Text(
-              downloadStatus,
-              key: ValueKey<String>(downloadStatus),
-              style: TextStyle(
-                  color: AppColors.quinaryColor,
-                  fontSize: fontSize),
-            ),
-          )
+        child: Text(
+          downloadStatus,
+          key: ValueKey<String>(downloadStatus),
+          style: TextStyle(
+              color: AppColors.quinaryColor,
+              fontSize: fontSize),
+        ),
+      )
           : const SizedBox.shrink(key: ValueKey('empty')),
     );
   }

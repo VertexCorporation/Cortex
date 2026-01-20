@@ -30,7 +30,9 @@ class ModelDetailPage extends StatelessWidget {
     return ChangeNotifierProvider<ModelDetailProvider>(
       create: (context) {
         // Read the download manager for this specific model ID.
-        final downloadManager = context.read<ModelLocalStateProvider>().downloadManagers[id];
+        final downloadManager = context
+            .read<ModelLocalStateProvider>()
+            .downloadManagers[id];
 
         // Create the provider instance, passing all required dependencies
         // from the context via its constructor.
@@ -60,7 +62,8 @@ class _ModelDetailViewWithTicker extends StatefulWidget {
 
 class __ModelDetailViewWithTickerState extends State<_ModelDetailViewWithTicker>
     with TickerProviderStateMixin {
-  final GlobalKey<DetailAppBarState> _appBarKey = GlobalKey<DetailAppBarState>();
+  final GlobalKey<DetailAppBarState> _appBarKey = GlobalKey<
+      DetailAppBarState>();
 
   // A controller to manage the scroll position for the fog effect.
   late final ScrollController _scrollController;
@@ -100,10 +103,14 @@ class ModelDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ModelDetailProvider>();
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     void handlePop() {
-      Navigator.of(context).pop(provider.didBaseModelChange ? 'model_updated' : null);
+      Navigator.of(context).pop(
+          provider.didBaseModelChange ? 'model_updated' : null);
     }
 
     return PopScope(
@@ -122,40 +129,38 @@ class ModelDetailView extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: AppColors.background,
+        extendBodyBehindAppBar: true,
         appBar: DetailAppBar(
           context: context,
           key: appBarKey,
           provider: provider,
           onBackPressed: handlePop,
+          scrollController: scrollController,
         ),
         bottomNavigationBar: const BottomActionButtons(),
-        body: SafeArea(
-          bottom: false,
-          // Use a Stack to layer the scrollable content and the banners.
-          child: Stack(
-            children: [
-              ScrollFog(
+        body: Stack(
+          children: [
+            ScrollFog(
+              scrollController: scrollController,
+              fogColor: AppColors.background,
+              topFogHeight: screenHeight * 0.02,
+              showTop: true,
+              showBottom: false,
+              child: BodyContent(
+                key: const ValueKey('content'),
+                provider: provider,
                 scrollController: scrollController,
-                fogColor: AppColors.background,
-                topFogHeight: screenHeight * 0.02,
-                showTop: true,
-                showBottom: false,
-                child: BodyContent(
-                  key: const ValueKey('content'),
-                  provider: provider,
-                  scrollController: scrollController,
-                ),
               ),
-              // Position the banners at the bottom of the screen.
-              // They are now managed and dismissed from within the WarningOverlays widget.
-              Positioned(
-                bottom: screenHeight * 0.01,
-                left: 0,
-                right: 0,
-                child: WarningOverlays(provider: provider),
-              ),
-            ],
-          ),
+            ),
+            // Position the banners at the bottom of the screen.
+            // They are now managed and dismissed from within the WarningOverlays widget.
+            Positioned(
+              bottom: screenHeight * 0.01,
+              left: 0,
+              right: 0,
+              child: WarningOverlays(provider: provider),
+            ),
+          ],
         ),
       ),
     );

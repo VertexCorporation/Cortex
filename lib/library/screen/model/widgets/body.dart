@@ -28,10 +28,22 @@ class BodyContent extends StatelessWidget {
       controller: scrollController,
       physics: const ClampingScrollPhysics(),
       padding: EdgeInsets.fromLTRB(
-        MediaQuery.of(context).size.width * 0.04, // Horizontal padding
-        MediaQuery.of(context).size.width * 0.02, // Top padding
-        MediaQuery.of(context).size.width * 0.04, // Horizontal padding
-        MediaQuery.of(context).size.height * 0.02, // Bottom padding to clear buttons/banners
+        MediaQuery
+            .of(context)
+            .size
+            .width * 0.04, // Horizontal padding
+        MediaQuery
+            .of(context)
+            .padding
+            .top, // Correct top padding
+        MediaQuery
+            .of(context)
+            .size
+            .width * 0.04, // Horizontal padding
+        MediaQuery
+            .of(context)
+            .size
+            .height * 0.02, // Bottom padding to clear buttons/banners
       ),
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 450),
@@ -46,29 +58,36 @@ class BodyContent extends StatelessWidget {
         },
         transitionBuilder: (child, animation) {
           final expectedKey = ValueKey(
-            '${provider.selectedVariantName}_${provider.selectedBaseModelId ?? ''}',
+            '${provider.selectedVariantName}_${provider.selectedBaseModelId ??
+                ''}',
           );
           final isIncoming =
-              child.key is ValueKey && (child.key as ValueKey).value == expectedKey.value;
+              child.key is ValueKey &&
+                  (child.key as ValueKey).value == expectedKey.value;
 
           final slideAnimation = Tween<Offset>(
             begin: isIncoming ? const Offset(0.5, 0) : const Offset(-0.5, 0),
             end: Offset.zero,
-          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+          ).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
 
           return FadeTransition(
-            opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+            opacity: CurvedAnimation(
+                parent: animation, curve: Curves.easeInOut),
             child: SlideTransition(position: slideAnimation, child: child),
           );
         },
         child: Column(
           key: ValueKey(
-              '${provider.selectedVariantName}_${provider.selectedBaseModelId ?? ''}'),
+              '${provider.selectedVariantName}_${provider.selectedBaseModelId ??
+                  ''}'),
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ModelHeader(provider: provider),
             const _Spacing(),
-            if (provider.displaySummary.trim().isNotEmpty) ...[
+            if (provider.displaySummary
+                .trim()
+                .isNotEmpty) ...[
               SummarySection(provider: provider),
               const _Spacing(),
             ],
@@ -76,7 +95,9 @@ class BodyContent extends StatelessWidget {
               BaseModelSelectionSection(provider: provider),
               const _Spacing(),
             ],
-            if (provider.displayDescription.trim().isNotEmpty) ...[
+            if (provider.displayDescription
+                .trim()
+                .isNotEmpty) ...[
               DescriptionSection(provider: provider),
               const _Spacing(),
             ],
@@ -93,8 +114,12 @@ class BodyContent extends StatelessWidget {
 /// A simple, consistent spacing widget used between sections.
 class _Spacing extends StatelessWidget {
   const _Spacing();
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(height: MediaQuery.of(context).size.height * 0.02);
+    return SizedBox(height: MediaQuery
+        .of(context)
+        .size
+        .height * 0.02);
   }
 }

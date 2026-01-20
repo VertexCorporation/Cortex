@@ -340,41 +340,41 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
     final Color contentColor = AppColors.premium;
     final Color subtitleColor = AppColors.premium.withValues(alpha: 0.8);
 
-    return Material(
-      color: Colors.transparent,
-      elevation: 6,
-      shadowColor: Colors.black.withValues(alpha: 0.1),
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: Container(
-        width: widget.isEmbedded ? refWidth * 0.9 : null,
-        padding: EdgeInsets.symmetric(
-          horizontal: internalHorizontalPadding,
-          vertical: internalVerticalPadding,
-        ),
-        decoration: BoxDecoration(
-          color: solidBackgroundColor,
-          borderRadius: BorderRadius.circular(borderRadius),
-          border: Border.all(
-            color: borderColor,
-            width: refWidth * 0.003,
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOutCubic,
+      alignment: Alignment.topCenter,
+      child: Material(
+        color: Colors.transparent,
+        elevation: 6,
+        shadowColor: Colors.black.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Container(
+          width: widget.isEmbedded ? refWidth * 0.9 : null,
+          padding: EdgeInsets.symmetric(
+            horizontal: internalHorizontalPadding,
+            vertical: internalVerticalPadding,
           ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SvgPicture.asset(
-              iconPath,
-              colorFilter: ColorFilter.mode(contentColor, BlendMode.srcIn),
-              width: iconSize,
-              height: iconSize,
+          decoration: BoxDecoration(
+            color: solidBackgroundColor,
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(
+              color: borderColor,
+              width: refWidth * 0.003,
             ),
-            SizedBox(width: iconSpacing),
-            Expanded(
-              child: AnimatedSize(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOutCubic,
-                alignment: Alignment.centerLeft,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(
+                iconPath,
+                colorFilter: ColorFilter.mode(contentColor, BlendMode.srcIn),
+                width: iconSize,
+                height: iconSize,
+              ),
+              SizedBox(width: iconSpacing),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -413,8 +413,8 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -77,6 +77,7 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
     // --- PREPARE LEFT WIDGETS ---
     // Note: In RTL, these will visually appear on the Right side.
     final List<Widget> leftWidgets = [];
+    double calculatedLeadingWidth = 0;
 
     if (!hideLeading) {
       if (showBackButton) {
@@ -87,6 +88,7 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
             onPressed: onLeadingPressed ?? () => Navigator.of(context).pop(),
           ),
         );
+        calculatedLeadingWidth += buttonSize;
       } else {
         leftWidgets.add(
           _AxonToggleButton(
@@ -100,19 +102,31 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
                 },
           ),
         );
+        calculatedLeadingWidth += buttonSize;
       }
     }
 
     if (leadingActions != null && leadingActions!.isNotEmpty) {
       if (leftWidgets.isNotEmpty) {
         leftWidgets.add(SizedBox(width: gapSize));
+        calculatedLeadingWidth += gapSize;
       }
       for (int i = 0; i < leadingActions!.length; i++) {
+        // Assume leadingActions use standard buttonSize or wrap them
+        // For calculation safety, assume buttonSize, but user might pass anything.
+        // We blindly add buttonSize.
         leftWidgets.add(leadingActions![i]);
+        calculatedLeadingWidth += buttonSize;
         if (i < leadingActions!.length - 1) {
           leftWidgets.add(SizedBox(width: gapSize));
+          calculatedLeadingWidth += gapSize;
         }
       }
+    }
+
+    // Add padding to calculation
+    if (leftWidgets.isNotEmpty) {
+      calculatedLeadingWidth += horizontalPadding;
     }
 
     // --- PREPARE RIGHT WIDGETS ---
@@ -135,7 +149,11 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     if (rightWidgets.isEmpty) {
-      rightWidgets.add(SizedBox(width: buttonSize));
+      // If empty, standard AppBar handles well. We removed the "placeholder" logic
+      // because pure AppBar doesn't need balance if using CenterTitle.
+    } else {
+      // Add end padding
+      rightWidgets.add(SizedBox(width: horizontalPadding));
     }
 
     return AppBar(
@@ -143,8 +161,9 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       scrolledUnderElevation: 0,
       automaticallyImplyLeading: false,
-      titleSpacing: horizontalPadding,
       centerTitle: true,
+      toolbarHeight: kToolbarHeight,
+      // Or let it be?
       flexibleSpace: showGradient
           ? Container(
         decoration: BoxDecoration(
@@ -160,44 +179,32 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       )
           : null,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // "Leading" Section (Visually Right in RTL)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: leftWidgets,
-          ),
-          // Title Section
-          if (title != null)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: Center(child: title!),
+      leading: leftWidgets.isNotEmpty
+          ? Padding(
+        padding: EdgeInsets.only(left: horizontalPadding),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: leftWidgets,
+        ),
+      )
+          : null,
+      leadingWidth: leftWidgets.isNotEmpty ? calculatedLeadingWidth : null,
+      actions: rightWidgets,
+      title: _AnimatedTitleWrapper(
+        controller: scrollController,
+        child: title ??
+            (titleText != null
+                ? Text(
+              titleText!,
+              style: TextStyle(
+                fontFamily: 'Ubuntu',
+                fontWeight: FontWeight.w500,
+                fontSize: 18,
+                color: AppColors.primaryColor.inverted,
               ),
+              overflow: TextOverflow.ellipsis,
             )
-          else
-            if (titleText != null)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Center(
-                    child: _AnimatedTitle(
-                      text: titleText!,
-                      controller: scrollController,
-                    ),
-                  ),
-                ),
-              )
-            else
-              const Spacer(),
-          // "Actions" Section (Visually Left in RTL)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: rightWidgets,
-          ),
-        ],
+                : const SizedBox.shrink()),
       ),
     );
   }
@@ -335,30 +342,32 @@ class _AxonToggleButtonState extends State<_AxonToggleButton> {
 }
 
 // --- 4. ANIMATED TITLE WIDGET (FADE ONLY - No Slide) ---
-class _AnimatedTitle extends StatefulWidget {
-  final String text;
+class _AnimatedTitleWrapper extends StatefulWidget {
+  final Widget child;
   final ScrollController? controller;
 
-  const _AnimatedTitle({
-    required this.text,
+  const _AnimatedTitleWrapper({
+    required this.child,
     this.controller,
   });
 
   @override
-  State<_AnimatedTitle> createState() => _AnimatedTitleState();
+  State<_AnimatedTitleWrapper> createState() => _AnimatedTitleWrapperState();
 }
 
-class _AnimatedTitleState extends State<_AnimatedTitle> {
+class _AnimatedTitleWrapperState extends State<_AnimatedTitleWrapper> {
   bool _isVisible = true;
 
   @override
   void initState() {
     super.initState();
     widget.controller?.addListener(_onScroll);
+    // Initial check
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkVisibility());
   }
 
   @override
-  void didUpdateWidget(_AnimatedTitle oldWidget) {
+  void didUpdateWidget(_AnimatedTitleWrapper oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller?.removeListener(_onScroll);
@@ -385,10 +394,14 @@ class _AnimatedTitleState extends State<_AnimatedTitle> {
         .of(context)
         .size
         .height;
+    // Disappear immediately on scroll? Or after threshold?
+    // Threshold = 0.025 * H ~ 20px.
+    // So if offset > 20px, visible = false.
     final double dynamicThreshold = screenHeight * 0.025;
 
     final double offset = widget.controller!.offset;
 
+    // Logic: Visible ONLY when at top (offset <= threshold).
     final bool shouldBeVisible = offset <= dynamicThreshold;
 
     if (_isVisible != shouldBeVisible) {
@@ -400,24 +413,15 @@ class _AnimatedTitleState extends State<_AnimatedTitle> {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle textStyle = TextStyle(
-      fontFamily: 'Ubuntu',
-      fontWeight: FontWeight.w500,
-      fontSize: 18,
-      color: AppColors.primaryColor.inverted,
-    );
-
     if (widget.controller == null) {
-      return Text(widget.text,
-          style: textStyle, overflow: TextOverflow.ellipsis);
+      return widget.child;
     }
 
     return AnimatedOpacity(
       opacity: _isVisible ? 1.0 : 0.0,
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
-      child: Text(widget.text,
-          style: textStyle, overflow: TextOverflow.ellipsis),
+      child: widget.child,
     );
   }
 }

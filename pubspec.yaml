@@ -124,8 +124,8 @@ flutter_launcher_icons:
   ios: true
   remove_alpha_ios: true
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/cortex.png"
-  image_path: "assets/cortex.png"
+  adaptive_icon_foreground: "assets/cortex/white.png"
+  image_path: "assets/cortex/white.png"
 
 flutter_native_splash:
   # —─────────── Global light-mode splash (required) ───────────—
@@ -154,7 +154,7 @@ flutter:
     - assets/icons/on/
     - assets/icons/off/
     - assets/characters/
-    - assets/splash/
+    - assets/cortex/
     - assets/fonts/roboto/
     - assets/fonts/ubuntu/
     - assets/models/
