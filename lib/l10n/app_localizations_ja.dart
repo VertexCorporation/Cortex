@@ -1534,4 +1534,19 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get discountText => '全プラン80%割引！';
+
+  @override
+  String get attachmentSheetTitle => 'Attachments';
+
+  @override
+  String get actionCamera => 'Camera';
+
+  @override
+  String get actionGallery => 'Gallery';
+
+  @override
+  String get actionFile => 'File';
+
+  @override
+  String get listening => 'Listening';
 }

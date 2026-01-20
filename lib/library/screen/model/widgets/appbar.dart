@@ -292,7 +292,7 @@ class DetailAppBarState extends State<DetailAppBar>
     final double toolbarHeight = widget._toolbarHeight;
 
     // --- ELEMENT SCALING ---
-    final double backIconSize = isTablet ? 36.0 : screenWidth * 0.07;
+    final double backIconSize = isTablet ? 32.0 : screenWidth * 0.06; // Adjusted size
 
     return Listener(
       behavior: HitTestBehavior.translucent,
@@ -308,6 +308,7 @@ class DetailAppBarState extends State<DetailAppBar>
         toolbarHeight: toolbarHeight,
         backgroundColor: AppColors.background,
         elevation: 0,
+        centerTitle: true,
         leading: Builder(builder: (context) {
           _exitButtonContext = context;
           return IconButton(
@@ -317,17 +318,10 @@ class DetailAppBarState extends State<DetailAppBar>
             onPressed: _handleBackPressed,
           );
         }),
-        title: Row(
-          children: [
-            Expanded(
-              child: _buildTitleWidget(context, isTablet, screenWidth),
-            ),
-            SizedBox(width: isTablet ? 16.0 : screenWidth * 0.02),
-            _buildDownloadStatusIndicator(context, isTablet, screenWidth),
-          ],
-        ),
+        title: _buildTitleWidget(context, isTablet, screenWidth),
         actions: [
-          SizedBox(width: isTablet ? 32.0 : screenWidth * 0.04),
+          _buildDownloadStatusIndicator(context, isTablet, screenWidth),
+          SizedBox(width: isTablet ? 16.0 : 16.0),
         ],
       ),
     );
@@ -337,91 +331,45 @@ class DetailAppBarState extends State<DetailAppBar>
       double screenWidth) {
     final provider = widget.provider;
 
-    // Tablet: Large Fonts (32/20).
-    // Phone: Compact Fonts (20/14) to fit inside 56px height.
-    final double titleFontSize = isTablet ? 32.0 : screenWidth * 0.055;
-    final double subFontSize = isTablet ? 20.0 : screenWidth * 0.035;
-    final double iconSize = isTablet ? 24.0 : screenWidth * 0.035;
-    final double iconPadding = isTablet ? 10.0 : screenWidth * 0.015;
+    // Tablet: Large Fonts (24/20).
+    // Phone: Compact Fonts (20/14)
+    final double titleFontSize = isTablet ? 24.0 : screenWidth * 0.05;
+    final double iconSize = isTablet ? 20.0 : screenWidth * 0.04;
+    final double iconPadding = 8.0;
+
+    final titleText = Text(
+      provider.displayTitle,
+      style: TextStyle(
+          fontFamily: 'Roboto',
+          color: AppColors.primaryColor.inverted,
+          fontSize: titleFontSize,
+          fontWeight: FontWeight.bold),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
 
     if (!provider.isPluralModel) {
-      return FittedBox(
-        fit: BoxFit.scaleDown,
-        alignment: Alignment.centerLeft,
-        child: Text(
-          provider.displayTitle,
-          style: TextStyle(
-              fontFamily: 'Roboto',
-              color: AppColors.primaryColor.inverted,
-              fontSize: titleFontSize,
-              fontWeight: FontWeight.bold),
-          maxLines: 1,
-        ),
-      );
+      return titleText;
     }
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _showVariantOverlayPanel,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              provider.displayTitle,
-              style: TextStyle(
-                  fontFamily: 'Roboto',
-                  color: AppColors.primaryColor.inverted,
-                  fontSize: titleFontSize,
-                  fontWeight: FontWeight.bold),
-              maxLines: 1,
-            ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SizeTransition(
-                        sizeFactor: animation,
-                        axis: Axis.horizontal,
-                        axisAlignment: -1.0,
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: Text(
-                    _currentDisplayVariantName,
-                    key: ValueKey<String>(_currentDisplayVariantName),
-                    style: TextStyle(
-                        color: AppColors.quinaryColor,
-                        fontSize: subFontSize),
-                    maxLines: 1,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: iconPadding),
-                  child: Transform.rotate(
-                    angle: -1.57075,
-                    child: SvgPicture.asset(
-                      'assets/icons/arrov.svg',
-                      width: iconSize,
-                      height: iconSize,
-                      colorFilter: ColorFilter.mode(
-                          AppColors.quinaryColor, BlendMode.srcIn),
-                    ),
-                  ),
-                ),
-              ],
+          Flexible(child: titleText),
+          Padding(
+            padding: EdgeInsets.only(left: iconPadding),
+            child: Transform.rotate(
+              angle: -1.57075, // Keeps original rotation logic
+              child: SvgPicture.asset(
+                'assets/icons/arrov.svg',
+                width: iconSize,
+                height: iconSize,
+                colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted, BlendMode.srcIn),
+              ),
             ),
           ),
         ],
@@ -433,8 +381,9 @@ class DetailAppBarState extends State<DetailAppBar>
       double screenWidth) {
     final provider = widget.provider;
     final localizations = AppLocalizations.of(context)!;
-
-    final double fontSize = isTablet ? 18.0 : screenWidth * 0.035;
+    
+    // Status should be smaller than title
+    final double fontSize = isTablet ? 14.0 : screenWidth * 0.03;
 
     String downloadStatus = '';
     if (provider.isDownloading) {
@@ -451,22 +400,15 @@ class DetailAppBarState extends State<DetailAppBar>
       transitionBuilder: (child, animation) =>
           FadeTransition(opacity: animation, child: child),
       child: downloadStatus.isNotEmpty
-          ? Align(
-        alignment: Alignment.centerRight,
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerRight,
-          child: Text(
-            downloadStatus,
-            key: ValueKey<String>(downloadStatus),
-            textAlign: TextAlign.end,
-            style: TextStyle(
-                color: AppColors.quinaryColor,
-                fontSize: fontSize),
-            softWrap: false,
-          ),
-        ),
-      )
+          ? Center(
+            child: Text(
+              downloadStatus,
+              key: ValueKey<String>(downloadStatus),
+              style: TextStyle(
+                  color: AppColors.quinaryColor,
+                  fontSize: fontSize),
+            ),
+          )
           : const SizedBox.shrink(key: ValueKey('empty')),
     );
   }

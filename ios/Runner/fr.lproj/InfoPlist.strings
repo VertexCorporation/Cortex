@@ -2,3 +2,4 @@
 "NSPhotoLibraryUsageDescription" = "Cortex a besoin d'accéder à votre galerie pour télécharger des images.";
 "NSPhotoLibraryAddUsageDescription" = "Cortex a besoin de la permission pour enregistrer des images dans votre galerie.";
 "NSMicrophoneUsageDescription" = "Cortex a besoin d'accéder au microphone pour le chat vocal.";
+"NSSpeechRecognitionUsageDescription" = "Cortex a besoin d'accéder à la reconnaissance vocale pour convertir votre voix en texte.";

@@ -89,25 +89,30 @@ class AxonContent extends StatelessWidget {
         ),
 
         // --- 2. MENU ---
-        AnimatedSwitcher(
+        AnimatedSize(
           duration: const Duration(milliseconds: 300),
-          reverseDuration: const Duration(milliseconds: 250),
-          switchInCurve: Curves.easeOutBack,
-          switchOutCurve: Curves.easeIn,
-          // Optimization: Avoid complex transitions during drawer movement if possible
+          curve: Curves.easeInOutCubic,
+          alignment: Alignment.topCenter,
           child: isSearchActive
-              ? const SizedBox.shrink()
-              : AxonMenu(
-            referenceWidth: referenceWidth,
-            screenHeight: screenHeight,
-            activeTab: activeTab,
-            isNewChatActive: isNewChatActive,
-            onNewChatTap: onNewChatTap,
-            onLibraryTap: onLibraryTap,
-
-            // CRITICAL: We need to handle the tap carefully (Logic below)
-            onNewsTap: onNewsTap,
-          ),
+              ? const SizedBox(width: double.infinity, height: 0)
+              : AnimatedSlide(
+                  offset: isSearchActive ? const Offset(0, -0.2) : Offset.zero,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 300),
+                    opacity: isSearchActive ? 0.0 : 1.0,
+                    child: AxonMenu(
+                      referenceWidth: referenceWidth,
+                      screenHeight: screenHeight,
+                      activeTab: activeTab,
+                      isNewChatActive: isNewChatActive,
+                      onNewChatTap: onNewChatTap,
+                      onLibraryTap: onLibraryTap,
+                      onNewsTap: onNewsTap,
+                    ),
+                  ),
+                ),
         ),
 
         // --- 3. DIVIDER ---

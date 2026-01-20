@@ -2936,6 +2936,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'%80 Discount on all plans!'**
   String get discountText;
+
+  /// No description provided for @attachmentSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get attachmentSheetTitle;
+
+  /// No description provided for @actionCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get actionCamera;
+
+  /// No description provided for @actionGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get actionGallery;
+
+  /// No description provided for @actionFile.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get actionFile;
+
+  /// No description provided for @listening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening'**
+  String get listening;
 }
 
 class _AppLocalizationsDelegate

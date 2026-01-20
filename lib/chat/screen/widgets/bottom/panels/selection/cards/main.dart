@@ -104,22 +104,20 @@ class ModelCard extends StatelessWidget {
                           : Icon(Icons.token, color: AppColors.tertiaryColor),
                     ),
                     const SizedBox(width: 10),
-                    // Text
+                            // Text
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            title,
+                          _ScrollableText(
+                            text: title,
                             style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: textColor,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                           if (showExpansionArrow) ...[
                             const SizedBox(height: 1),
@@ -177,6 +175,55 @@ class ModelCard extends StatelessWidget {
           ]
         ],
       ),
+    );
+  }
+}
+
+class _ScrollableText extends StatelessWidget {
+  final String text;
+  final TextStyle style;
+
+  const _ScrollableText({required this.text, required this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final TextPainter textPainter = TextPainter(
+          text: TextSpan(text: text, style: style),
+          maxLines: 1,
+          textDirection: TextDirection.ltr,
+          textScaler: MediaQuery.textScalerOf(context),
+        )
+          ..layout(maxWidth: double.infinity);
+
+        final bool shouldScroll = textPainter.width > constraints.maxWidth;
+
+        if (!shouldScroll) {
+          return Text(
+            text,
+            style: style,
+            softWrap: false,
+            overflow: TextOverflow.visible,
+            maxLines: 1,
+          );
+        }
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+            child: Text(
+              text,
+              style: style,
+              softWrap: false,
+              overflow: TextOverflow.visible,
+              maxLines: 1,
+            ),
+          ),
+        );
+      },
     );
   }
 }

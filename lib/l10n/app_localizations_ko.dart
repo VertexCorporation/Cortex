@@ -1534,4 +1534,19 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get discountText => '모든 요금제 80% 할인!';
+
+  @override
+  String get attachmentSheetTitle => 'Attachments';
+
+  @override
+  String get actionCamera => 'Camera';
+
+  @override
+  String get actionGallery => 'Gallery';
+
+  @override
+  String get actionFile => 'File';
+
+  @override
+  String get listening => 'Listening';
 }

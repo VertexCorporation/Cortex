@@ -55,6 +55,10 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Cortex needs access to speech recognition to convert your voice into text for chatting.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Cortex needs access to the microphone to listen to your voice commands.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Cortex needs access to your camera to allow you to take photos for your profile or chat.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

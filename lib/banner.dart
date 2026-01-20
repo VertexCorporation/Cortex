@@ -56,6 +56,17 @@ class BannerService {
   void _displayBanner() {
     if (Platform.isIOS) return;
 
+    // Additional Random Chance: 50% chance even if cooldown met (User Experience)
+    // Unless Debug Mode
+    if (!kDebugMode) {
+      if (Random().nextBool()) {
+        debugPrint("[BannerService] Skipped by random chance.");
+        // Set a short cooldown so we don't spam check every second
+        startCooldown();
+        return;
+      }
+    }
+
     if (!showInviteBannerNotifier.value) {
       showInviteBannerNotifier.value = true;
     }

@@ -324,6 +324,12 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
         // Bu GestureDetector baloncuk üzerindeki tıklamayı yakalar
         child: GestureDetector(
           onTap: widget.onTap,
+          onHorizontalDragUpdate: (details) {
+            // Sensitivity check
+            if (details.primaryDelta!.abs() > 4) {
+               dismiss();
+            }
+          },
           child: Material(
             color: Colors.transparent,
             elevation: 4.0,

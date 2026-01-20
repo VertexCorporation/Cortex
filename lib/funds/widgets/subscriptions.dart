@@ -3,7 +3,6 @@
 // heavy PNG assets for a cleaner, faster UI.
 
 import 'dart:async';
-import 'dart:ui';
 import 'package:cortex/app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -176,14 +175,17 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
           child: Column(
             children: [
               // Header Title
-              Text(
-                purchaseKey,
-                style: TextStyle(
-                  fontSize: screenWidth * 0.1,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor.inverted,
+              FittedBox(
+                child: Text(
+                    purchaseKey,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.1,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor.inverted,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1
                 ),
-                textAlign: TextAlign.center,
               ),
               SizedBox(height: verticalSpacingSmall),
 
