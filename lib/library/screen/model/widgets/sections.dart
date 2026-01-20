@@ -493,41 +493,49 @@ class FeaturesSection extends StatelessWidget {
       ],
     };
 
+    final validFeatures = provider.parsedFeatures
+        .where((key) => featureDetails.containsKey(key))
+        .toList();
+
+    if (validFeatures.isEmpty) return const SizedBox.shrink();
+
     return SectionContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SectionTitle(title: localizations.capabilitiesSection),
           SizedBox(height: screenWidth * 0.02),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: provider.parsedFeatures.length,
-            separatorBuilder: (_, __) =>
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: screenWidth * 0.02),
-                  child: Divider(color: AppColors.border, thickness: 1),
-                ),
-            itemBuilder: (context, index) {
-              final featureKey = provider.parsedFeatures[index];
-              final details = featureDetails[featureKey];
-              if (details == null) return const SizedBox.shrink();
+          ...List.generate(validFeatures.length, (index) {
+            final key = validFeatures[index];
+            final details = featureDetails[key]!;
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(details[0], style: TextStyle(
-                      color: AppColors.primaryColor.inverted,
-                      fontSize: screenWidth * 0.04,
-                      fontWeight: FontWeight.w500)),
-                  SizedBox(height: screenWidth * 0.01),
-                  Text(details[1], style: TextStyle(
-                      color: AppColors.quinaryColor,
-                      fontSize: screenWidth * 0.035)),
-                ],
-              );
-            },
-          ),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (index > 0)
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: screenWidth * 0.02),
+                    child: Divider(color: AppColors.border, thickness: 1),
+                  ),
+                Text(
+                  details[0],
+                  style: TextStyle(
+                    color: AppColors.primaryColor.inverted,
+                    fontSize: screenWidth * 0.04,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: screenWidth * 0.01),
+                Text(
+                  details[1],
+                  style: TextStyle(
+                    color: AppColors.quinaryColor,
+                    fontSize: screenWidth * 0.035,
+                  ),
+                ),
+              ],
+            );
+          }),
         ],
       ),
     );
