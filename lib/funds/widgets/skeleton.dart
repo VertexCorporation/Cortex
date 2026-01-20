@@ -19,41 +19,40 @@ class FundsSkeletonLoader extends StatelessWidget {
         .size
         .height;
 
+    final double topPadding = MediaQuery.of(context).padding.top;
+
     return SizedBox(
       width: screenWidth,
       height: screenHeight,
       child: Shimmer.fromColors(
         baseColor: AppColors.shimmerBase,
         highlightColor: AppColors.shimmerHighlight,
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.04,
-              vertical: screenHeight * 0.03,
-            ),
-            child: Column(
-              children: [
-                SizedBox(height: screenHeight * 0.01),
-                Align(
-                  alignment: Alignment.center,
-                  child: Container(
-                    width: screenWidth * 0.06,
-                    height: screenWidth * 0.07,
-                    decoration: BoxDecoration(
-                      color: AppColors.shimmerBase,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: topPadding + 8.0,
+            left: screenWidth * 0.04,
+            right: screenWidth * 0.04,
+            bottom: screenHeight * 0.03,
+          ),
+          child: Column(
+            children: [
+              // Badge Skeleton (Pill)
+              Container(
+                width: screenWidth * 0.45,
+                height: 36.0 * (screenWidth / 375.0).clamp(0.85, 1.2),
+                decoration: BoxDecoration(
+                  color: AppColors.shimmerBase,
+                  borderRadius: BorderRadius.circular(36.0),
                 ),
-                SizedBox(height: screenHeight * 0.001),
-                Expanded(
-                  child: PageView(
-                    children: List.generate(
-                        4, (_) => _buildSkeletonPage(context)),
-                  ),
+              ),
+              Expanded(
+                child: PageView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: List.generate(
+                      1, (_) => _buildSkeletonPage(context)),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
