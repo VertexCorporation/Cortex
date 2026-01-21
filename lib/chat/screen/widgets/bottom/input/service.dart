@@ -11,20 +11,61 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../panels/selection/sheet.dart';
 
+/// Service responsible for handling input actions:
+/// - Media/File selection (Validation, Limits, Compression)
+/// - Model switching
+/// - Credit calculation logic (updated for multi-attachments)
 class InputService {
   final ImagePicker _imagePicker = ImagePicker();
 
-  // --- Image Handling (with Compression & Size Check) ---
+  // --- Constants ---
+  static const int _maxAttachmentCount = 4;
+  static const int _maxFileSizeInBytes = 10 * 1024 * 1024; // 10 MB strict limit
+
+  // Supported extensions for the file picker.
+  // We exclude executables (.exe, .apk, .bat) to prevent binary/malware uploads.
+  static const List<String> _allowedExtensions = [
+    // Documents
+    'pdf',
+    'doc',
+    'docx',
+    'ppt',
+    'pptx',
+    'xls',
+    'xlsx',
+    'csv',
+    'txt',
+    'rtf',
+    'md',
+    // Code / Data
+    'json',
+    'xml',
+    'html',
+    'css',
+    'js',
+    'ts',
+    'py',
+    'dart',
+    'c',
+    'cpp',
+    'java',
+    'sql'
+  ];
+
+  // --- Image Handling ---
 
   Future<void> pickPhoto(BuildContext context,
       {required ImageSource source,
-        required VoidCallback onPhotoSelected}) async {
+      required VoidCallback onSelectionComplete}) async {
+    // 1. Check Attachment Limit before opening camera/gallery
+    if (!_canAddMoreAttachments(context)) return;
+
     try {
-      // 1. Pick and compress the image
+      // 2. Pick and compress the image
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: source,
-        imageQuality: 80, // Compress to 80% quality
-        maxWidth: 1920, // Resize large images to FHD
+        imageQuality: 80, // Good balance for AI analysis
+        maxWidth: 1920, // Standard FHD limit
         maxHeight: 1920,
       );
 
@@ -32,67 +73,97 @@ class InputService {
 
       final File file = File(pickedFile.path);
 
-      // 2. Async operation: Get file size
-      final int sizeInBytes = await file.length();
-      const int maxPhotoSize = 10 * 1024 * 1024; // 10 MB
-
-      // 3. Safety Check: Ensure context is still valid after the 'await' above
+      // 3. Validate and Add
       if (!context.mounted) return;
+      await _validateAndAddAttachment(context, file, isImage: true);
 
-      // 4. Update State
-      if (sizeInBytes <= maxPhotoSize) {
-        context.read<InputProvider>().selectPhoto(file);
-        onPhotoSelected();
-      } else {
-        debugPrint("Photo ignored: Size > 10MB even after compression.");
-      }
+      onSelectionComplete();
     } catch (e) {
       debugPrint("Error picking photo: $e");
     }
   }
 
-  // --- File Selection (Check Only) ---
+  // --- File Selection ---
 
   Future<void> pickFile(BuildContext context) async {
-    try {
-      // 1. Define allowed extensions (No .exe, etc.)
-      const List<String> allowedExtensions = [
-        'pdf', 'doc', 'docx', 'txt', 'md', 'csv', 'xls', 'xlsx', 'json'
-      ];
+    // 1. Check Attachment Limit
+    if (!_canAddMoreAttachments(context)) return;
 
-      // 2. Pick the file
+    try {
+      // 2. Open Native File Picker
       final FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: allowedExtensions,
+        allowedExtensions: _allowedExtensions,
+        allowMultiple: true, // Allow selecting multiple files at once
       );
 
-      if (result == null || result.files.single.path == null) return;
+      if (result == null || result.files.isEmpty) return;
 
-      final File file = File(result.files.single.path!);
-
-      // 3. Async operation: Get file size
-      final int sizeInBytes = await file.length();
-      const int maxFileSize = 10 * 1024 * 1024; // 10 MB
-
-      // 4. Safety Check: Ensure context is still valid after the 'await' above
       if (!context.mounted) return;
 
-      // 5. Update State
-      if (sizeInBytes <= maxFileSize) {
-        context.read<InputProvider>().selectPhoto(file);
-      } else {
-        // Silently ignore or show a local notification if preferred
-        debugPrint("File ignored: Size > 10MB");
+      // 3. Process each selected file
+      // We loop through them to validate limits individually.
+      for (final platformFile in result.files) {
+        if (!context.mounted) return;
+        if (platformFile.path == null) continue;
+
+        // Stop if user tries to add more than the limit in a batch
+        if (!_canAddMoreAttachments(context)) break;
+
+        final File file = File(platformFile.path!);
+        await _validateAndAddAttachment(context, file, isImage: false);
       }
     } catch (e) {
       debugPrint("Error picking file: $e");
     }
   }
 
-  // --- Model Selection Logic ---
+  // --- Helper: Validation & State Update ---
 
-  void openModelSelectionSheet(BuildContext context,
-      AppLocalizations localizations) {
+  /// Checks if the user has reached the maximum number of attachments (4).
+  bool _canAddMoreAttachments(BuildContext context) {
+    final inputProvider = context.read<InputProvider>();
+    // Assuming InputProvider has an 'attachments' list getter
+    if (inputProvider.attachments.length >= _maxAttachmentCount) {
+      // Optional: Show a toast/snackbar here telling the user "Max 4 files".
+      debugPrint("Attachment limit reached ($_maxAttachmentCount).");
+      return false;
+    }
+    return true;
+  }
+
+  /// Validates file size and adds it to the provider if safe.
+  Future<void> _validateAndAddAttachment(BuildContext context, File file,
+      {required bool isImage}) async {
+    try {
+      // Async operation: Get file size
+      final int sizeInBytes = await file.length();
+
+      // Security Check:
+      // Even if a user renames 'game.exe' (500MB) to 'game.txt',
+      // this check prevents it from entering our system.
+      if (sizeInBytes > _maxFileSizeInBytes) {
+        debugPrint(
+            "File rejected: Size (${sizeInBytes / 1024 / 1024} MB) exceeds limit.");
+        // Optional: Trigger a UI notification via a helper service
+        return;
+      }
+
+      // Add to provider
+      if (context.mounted) {
+        // Assuming InputProvider has an 'addAttachment' method.
+        // We handle both images and docs as generic attachments now.
+        context.read<InputProvider>().addAttachment(file, isImage: isImage);
+      }
+    } catch (e) {
+      debugPrint("Error validating file: $e");
+    }
+  }
+
+  // --- Model Selection Logic (Existing) ---
+
+  void openModelSelectionSheet(
+      BuildContext context, AppLocalizations localizations) {
     final sessionProvider = context.read<ChatSessionProvider>();
     final String currentId = sessionProvider.modelId ?? '';
 
@@ -112,11 +183,9 @@ class InputService {
       final allModels = sessionProvider.allModels;
       ModelEntity? targetModel;
 
-      // 1. Try finding direct match
       try {
         targetModel = allModels.firstWhere((m) => m.id == newModelId);
       } catch (_) {
-        // 2. Try finding variant
         for (final parent in allModels) {
           if (parent.variants != null &&
               parent.variants!.containsKey(newModelId)) {
@@ -129,9 +198,7 @@ class InputService {
                 'title': variantMap['title'],
               };
               mergedMap.remove('variants');
-              final langCode = sessionProvider
-                  .getLocale()
-                  .languageCode;
+              final langCode = sessionProvider.getLocale().languageCode;
               targetModel = ModelEntity.fromMap(mergedMap, langCode);
             }
             break;
@@ -150,25 +217,30 @@ class InputService {
     }
   }
 
-  // --- Validation & Credit Logic ---
+  // --- Validation & Credit Logic (Updated for Multi-Attachments) ---
 
+  /// Calculates the total cost based on base model price + number of attachments.
   int calculateRequiredCredits({
     required bool isServerSide,
     required bool isDynamicChat,
     required bool isPremium,
-    required bool hasPhoto,
+    required int attachmentCount, // New Parameter: Number of files
   }) {
     if (!isServerSide) return 0;
 
-    if (isDynamicChat) {
-      const base = 20;
-      final photoCost = hasPhoto ? 30 : 0;
-      return base + photoCost;
+    // Define Costs
+    const int attachmentCostPerUnit = 30;
+
+    // Determine Base Cost
+    int baseCost = 5; // Standard
+    if (isDynamicChat || isPremium) {
+      baseCost = 20; // Premium / Auto
     }
 
-    final base = isPremium ? 20 : 5;
-    final photoCost = hasPhoto ? 30 : 0;
-    return base + photoCost;
+    // Formula: Base + (N * 30)
+    final int totalAttachmentCost = attachmentCount * attachmentCostPerUnit;
+
+    return baseCost + totalAttachmentCost;
   }
 
   bool isSendButtonEnabled({
@@ -185,35 +257,45 @@ class InputService {
     required int premiumTrialUses,
     required int totalCredits,
   }) {
+    // 1. Basic Blockers
     if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
       return false;
     }
 
+    // 2. Trial Limits
     if (isPremiumModel && !isSubscribed && premiumTrialUses >= 3) {
       return false;
     }
 
     final inputProvider = context.read<InputProvider>();
     final String currentText = controller.text.trim();
-    final bool hasPhoto = inputProvider.selectedPhoto != null;
 
+    // UPDATED: Check list length instead of single photo
+    final int attachmentCount = inputProvider.attachments.length;
+    final bool hasAttachments = attachmentCount > 0;
+
+    // 3. Credit Check
     final needed = calculateRequiredCredits(
       isServerSide: isServerSideModel,
       isDynamicChat: isDynamicChatMode,
       isPremium: isPremiumModel,
-      hasPhoto: hasPhoto,
+      attachmentCount: attachmentCount,
     );
 
     if ((isDynamicChatMode || isServerSideModel) && totalCredits < needed) {
       return false;
     }
 
+    // 4. Content Validation
     if (inputProvider.isEditingMode) {
       final String originalText = inputProvider.originalMessageText ?? '';
       final bool textChanged = currentText != originalText;
-      return (textChanged || hasPhoto) && (currentText.isNotEmpty || hasPhoto);
+      // Allow send if text changed OR if there are attachments (even if text is same/empty)
+      return (textChanged || hasAttachments) &&
+          (currentText.isNotEmpty || hasAttachments);
     }
 
-    return currentText.isNotEmpty || hasPhoto;
+    // Standard Mode: Must have text OR attachments
+    return currentText.isNotEmpty || hasAttachments;
   }
 }

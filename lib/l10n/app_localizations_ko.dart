@@ -662,6 +662,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get benefit9 => '새로운 테마';
 
   @override
+  String get benefit10 => '추가 첨부 파일';
+
+  @override
   String get oldBenefits => '하위 플랜의 모든 혜택';
 
   @override
@@ -1523,11 +1526,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+      '당신은 전문 강사입니다. 당신의 목표는 사용자가 원하는 주제를 완벽하게 설명하는 것입니다. 명확한 구성, 예시 및 비유를 활용하세요. 복잡한 개념을 이해하기 쉬운 부분으로 나누어 사용자가 효과적으로 학습할 수 있도록 하세요. 주제:';
 
   @override
   String get featureQuizMessage =>
-      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+      '당신은 퀴즈 진행자입니다. 사용자가 선택한 주제에 따라 특정한 객관식 문제를 생성하세요. 사용자의 답변을 기다린 후, 답변을 평가하고 다음 문제를 제시하세요. 모든 정답을 한 번에 공개하지 마세요. 상호작용적인 방식으로 진행하세요. 주제:';
 
   @override
   String get myPlan => '내 계획';
@@ -1536,17 +1539,17 @@ class AppLocalizationsKo extends AppLocalizations {
   String get discountText => '모든 요금제 80% 할인!';
 
   @override
-  String get attachmentSheetTitle => 'Attachments';
+  String get attachmentSheetTitle => '첨부파일';
 
   @override
-  String get actionCamera => 'Camera';
+  String get actionCamera => '카메라';
 
   @override
-  String get actionGallery => 'Gallery';
+  String get actionGallery => '갱도';
 
   @override
-  String get actionFile => 'File';
+  String get actionFile => '파일';
 
   @override
-  String get listening => 'Listening';
+  String get listening => '청취';
 }

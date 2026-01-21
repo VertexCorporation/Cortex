@@ -673,6 +673,9 @@ class AppLocalizationsKu extends AppLocalizations {
   String get benefit9 => 'Temayên nû';
 
   @override
+  String get benefit10 => 'Pêvekên Zêdetir';
+
+  @override
   String get oldBenefits => 'Hemî feydeyên ji planên jêrîn';
 
   @override
@@ -1569,11 +1572,11 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+      'Tu mamosteyekî pispor î. Armanca te ew e ku mijara bikarhêner bi awayekî berfireh rave bikî. Avahiyek zelal, mînak û analojiyan bi kar bîne. Ramanên tevlihev parçe bike nav beşên hêsan da ku bikarhêner bi bandor fêr bibe. Mijar:';
 
   @override
   String get featureQuizMessage =>
-      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+      'Tu pisporê quizê yî. Li gorî mijara bikarhêner pirsek pir-bijartî ya taybetî çêbike. Li benda bersiva wan be. Piştre, wê binirxîne û pirsa din bipirse. Hemû bersivên xwe di carekê de eşkere neke. Wê înteraktîf bihêle. Mijar:';
 
   @override
   String get myPlan => 'Plana Min';
@@ -1582,17 +1585,17 @@ class AppLocalizationsKu extends AppLocalizations {
   String get discountText => '%80 Daxistin li ser hemû planan!';
 
   @override
-  String get attachmentSheetTitle => 'Attachments';
+  String get attachmentSheetTitle => 'Pêvek';
 
   @override
-  String get actionCamera => 'Camera';
+  String get actionCamera => 'Kamîra';
 
   @override
-  String get actionGallery => 'Gallery';
+  String get actionGallery => 'Galerya';
 
   @override
-  String get actionFile => 'File';
+  String get actionFile => 'Dosî';
 
   @override
-  String get listening => 'Listening';
+  String get listening => 'Guhdarîkirin';
 }

@@ -675,6 +675,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get benefit9 => 'Новые темы';
 
   @override
+  String get benefit10 => 'Дополнительные вложения';
+
+  @override
   String get oldBenefits => 'Все преимущества предыдущих планов';
 
   @override
@@ -1576,11 +1579,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+      'Вы — опытный репетитор. Ваша цель — всесторонне объяснить тему, интересующую пользователя. Используйте четкую структуру, примеры и аналогии. Разбивайте сложные идеи на легко усваиваемые части, чтобы обеспечить эффективное усвоение материала. Тема:';
 
   @override
   String get featureQuizMessage =>
-      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+      'Вы — ведущий викторины. Сгенерируйте конкретный вопрос с несколькими вариантами ответа, основанный на теме, предложенной пользователем. Дождитесь его ответа. Затем оцените его и задайте следующий вопрос. Не раскрывайте все ответы сразу. Поддерживайте интерактивность. Тема:';
 
   @override
   String get myPlan => 'Мой план';
@@ -1589,17 +1592,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get discountText => 'Скидка 80% на все тарифные планы!';
 
   @override
-  String get attachmentSheetTitle => 'Attachments';
+  String get attachmentSheetTitle => 'Вложения';
 
   @override
-  String get actionCamera => 'Camera';
+  String get actionCamera => 'Камера';
 
   @override
-  String get actionGallery => 'Gallery';
+  String get actionGallery => 'Галерея';
 
   @override
-  String get actionFile => 'File';
+  String get actionFile => 'Файл';
 
   @override
-  String get listening => 'Listening';
+  String get listening => 'Слушание';
 }

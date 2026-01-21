@@ -46,12 +46,12 @@ class ChatViewState extends State<ChatView>
   late final OfflineService _offlineService;
 
   // --- UI Notifiers ---
-  final ValueNotifier<bool> showScrollDownButtonNotifier = ValueNotifier<bool>(
-      false);
-  final ValueNotifier<double> bottomPanelHeightNotifier = ValueNotifier<double>(
-      0.0);
-  final ValueNotifier<double> briefingVisibleHeightNotifier = ValueNotifier<
-      double>(0.0);
+  final ValueNotifier<bool> showScrollDownButtonNotifier =
+  ValueNotifier<bool>(false);
+  final ValueNotifier<double> bottomPanelHeightNotifier =
+  ValueNotifier<double>(0.0);
+  final ValueNotifier<double> briefingVisibleHeightNotifier =
+  ValueNotifier<double>(0.0);
 
   // Constants
   static const double _briefingBottomOffset = 8.0;
@@ -80,9 +80,11 @@ class ChatViewState extends State<ChatView>
         vsync: this, duration: const Duration(milliseconds: 300));
 
     slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-        .animate(
-        CurvedAnimation(parent: editPanelController, curve: Curves.easeOut));
+        .animate(CurvedAnimation(
+        parent: editPanelController, curve: Curves.easeOut));
 
+    // Initialize EditService. Note: The actual TextEditingController is provided
+    // by the ChatInputPanel later via updateControllers.
     editService = EditService(
       inputProvider: context.read<InputProvider>(),
       conversationProvider: context.read<ConversationProvider>(),
@@ -115,6 +117,7 @@ class ChatViewState extends State<ChatView>
 
     if (_lastActiveOfflineModelId == newModelId) return;
 
+    // Release old model if switching
     if (_lastActiveOfflineModelId != null &&
         _lastActiveOfflineModelId != newModelId) {
       _offlineService.releaseModel();
@@ -141,8 +144,8 @@ class ChatViewState extends State<ChatView>
   }
 
   void _updateBottomPanelHeight() {
-    final RenderBox? box = _bottomPanelKey.currentContext
-        ?.findRenderObject() as RenderBox?;
+    final RenderBox? box =
+    _bottomPanelKey.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       final newHeight = box.size.height;
       if (bottomPanelHeightNotifier.value != newHeight) {
@@ -170,8 +173,6 @@ class ChatViewState extends State<ChatView>
     super.dispose();
   }
 
-  void focusTextField() {}
-
   void cancelAnyActiveEdit() {
     if (mounted && context
         .read<InputProvider>()
@@ -191,6 +192,8 @@ class ChatViewState extends State<ChatView>
     final bottomSafe = mediaQuery.padding.bottom;
     final double keyboardHeight = mediaQuery.viewInsets.bottom;
     final bool isKeyboardOpen = keyboardHeight > 0.0;
+
+    // Watch ThemeProvider to rebuild on theme changes
     context.watch<ThemeProvider>();
 
     return Stack(
@@ -204,8 +207,7 @@ class ChatViewState extends State<ChatView>
                 duration: const Duration(milliseconds: 400),
                 switchInCurve: Curves.easeOut,
                 switchOutCurve: Curves.easeIn,
-                transitionBuilder: (Widget child,
-                    Animation<double> animation) {
+                transitionBuilder: (Widget child, Animation<double> animation) {
                   return FadeTransition(opacity: animation, child: child);
                 },
                 child: conversationProvider.isLoadingMessages
@@ -231,8 +233,8 @@ class ChatViewState extends State<ChatView>
               bottom: true,
               child: NotificationListener<SizeChangedLayoutNotification>(
                 onNotification: (notification) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) =>
-                      _updateBottomPanelHeight());
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _updateBottomPanelHeight());
                   return true;
                 },
                 child: Container(
@@ -249,7 +251,7 @@ class ChatViewState extends State<ChatView>
           ],
         ),
 
-        // LAYER 2: Briefing Overlay (Keep functionality)
+        // LAYER 2: Briefing Overlay
         AnimatedBuilder(
           animation: bottomPanelHeightNotifier,
           builder: (context, _) {
@@ -261,26 +263,36 @@ class ChatViewState extends State<ChatView>
               right: horizontalPadding,
               bottom: basePanelHeight + bottomSafe + _briefingBottomOffset,
               child: BriefingOverlay(
-                availableCredits: context
+                availableCredits:
+                context
                     .watch<CreditsManager>()
                     .totalCreditsNotifier
                     .value,
+
+                // LOGIC UPDATE: Universal Attachment Support
+                // We map 'hasAttachments' to 'photoSelected'.
+                // The BriefingOverlay will use this to show credit cost warnings for any file type.
                 photoSelected: context
                     .watch<InputProvider>()
-                    .selectedPhoto != null,
+                    .hasAttachments,
+
                 isOfflineModel: _isOfflineCurrentModel(context),
                 modelMissing: _isModelMissing(context),
                 limitReached: _isLimitExceeded(context),
-                isStorageSufficient: context
+                isStorageSufficient:
+                context
                     .watch<ChatSessionProvider>()
                     .isStorageSufficient,
-                isPremiumModel: context
+                isPremiumModel:
+                context
                     .watch<ChatSessionProvider>()
                     .isCurrentModelPremium,
-                isSubscribed: context
+                isSubscribed:
+                context
                     .watch<ChatSessionProvider>()
                     .isUserSubscribed,
-                premiumTrialUses: context
+                premiumTrialUses:
+                context
                     .watch<ChatSessionProvider>()
                     .premiumTrialUses,
                 inappropriate: _showInappropriateContentWarning,
@@ -306,8 +318,8 @@ class ChatViewState extends State<ChatView>
             final bool showButton = showScrollDownButtonNotifier.value;
             final double basePanel = bottomPanelHeightNotifier.value;
             final double briefingH = briefingVisibleHeightNotifier.value;
-            final double combinedPanelHeight = basePanel + briefingH +
-                _briefingBottomOffset;
+            final double combinedPanelHeight =
+                basePanel + briefingH + _briefingBottomOffset;
 
             return _scrollService.buildScrollDownButton(
               screenWidth: screenWidth,
@@ -324,7 +336,8 @@ class ChatViewState extends State<ChatView>
     );
   }
 
-  // Helpers
+  // --- Helpers ---
+
   bool _isLimitExceeded(BuildContext context) {
     return context
         .read<ChatSessionProvider>()
@@ -332,7 +345,8 @@ class ChatViewState extends State<ChatView>
         ?.isLimitExceeded(
         context
             .read<ConversationProvider>()
-            .messages) ?? false;
+            .messages) ??
+        false;
   }
 
   bool _isOfflineCurrentModel(BuildContext context) {
@@ -352,7 +366,8 @@ class ChatViewState extends State<ChatView>
     final isOffline = _isOfflineCurrentModel(context);
     final isDownloaded = context
         .read<ModelLocalStateProvider>()
-        .downloadCompleted[session.modelId] ?? false;
+        .downloadCompleted[session.modelId] ??
+        false;
     return !session.isDynamicChat && isOffline && !isDownloaded;
   }
 }

@@ -4,6 +4,13 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:cortex/chat/messages/messages.dart';
 
+// ignore: depend_on_referenced_packages
+import 'package:path/path.dart' as p; // Useful for extension checking
+
+// =================================================================************
+// SECTION 0: DEFINITIONS & MODELS
+// =================================================================************
+
 enum ChatInputMode {
   none,
   study,
@@ -11,27 +18,45 @@ enum ChatInputMode {
   offline,
 }
 
+enum AttachmentType {
+  image,
+  document,
+}
+
+/// A simple wrapper class to categorize attachments for the UI.
+class InputAttachment {
+  final File file;
+  final AttachmentType type;
+
+  const InputAttachment({
+    required this.file,
+    required this.type,
+  });
+
+  String get fileName => p.basename(file.path);
+
+  String get extension => p.extension(file.path).toLowerCase();
+}
+
 /// A dedicated provider responsible for managing the transient state of the user input area.
-///
-/// This provider's single responsibility is to manage the state directly related to
-/// what the user is currently doing in the input field. This includes:
-/// - Message editing mode (`isEditingMode`, `editingMessageIndex`).
-/// - Photo selection and loading status (`selectedPhoto`, `isPhotoLoading`).
-///
-/// By isolating this frequently changing state, we prevent unnecessary rebuilds of
-/// other parts of the UI, such as the main message list, leading to better performance.
 class InputProvider with ChangeNotifier {
+
   // ===========================================================================
   // SECTION 1: PRIVATE STATE VARIABLES
   // ===========================================================================
 
+  // --- Editing State ---
   bool _isEditingMode = false;
   int? _editingMessageIndex;
   String? _originalMessageText;
 
-  File? _selectedPhoto;
-  bool _isPhotoLoading = false;
+  // --- Attachment State (Universal System) ---
+  final List<InputAttachment> _attachments = [];
+  bool _isAttachmentLoading = false;
+
+  // --- Voice & Features ---
   bool _isVoiceRecording = false;
+  bool _isVoiceModeActive = false;
   ChatInputMode _featureMode = ChatInputMode.none;
 
   // ===========================================================================
@@ -40,30 +65,38 @@ class InputProvider with ChangeNotifier {
 
   ChatInputMode get featureMode => _featureMode;
 
+  // Editing
   bool get isEditingMode => _isEditingMode;
 
   int? get editingMessageIndex => _editingMessageIndex;
 
   String? get originalMessageText => _originalMessageText;
 
-  File? get selectedPhoto => _selectedPhoto;
+  // Attachments
+  List<InputAttachment> get attachments => List.unmodifiable(_attachments);
 
-  bool get isPhotoLoading => _isPhotoLoading;
+  bool get hasAttachments => _attachments.isNotEmpty;
 
+  bool get isAttachmentLoading => _isAttachmentLoading;
+
+  int get attachmentCount => _attachments.length;
+
+  // Voice
   bool get isVoiceRecording => _isVoiceRecording;
+
+  bool get isVoiceModeActive => _isVoiceModeActive;
 
   // ===========================================================================
   // SECTION 3: STATE MUTATION METHODS (ACTIONS)
   // ===========================================================================
 
-  /// Sets the current input mode (Study, Quiz, etc.) and notifies listeners
-  /// so the UI can update the button color to secondaryColor.
+  // -------------------- Feature & Voice Modes --------------------
+
   void setFeatureMode(ChatInputMode mode) {
     _featureMode = mode;
     notifyListeners();
   }
 
-  /// Clears the current mode (e.g., after sending).
   void clearFeatureMode() {
     _featureMode = ChatInputMode.none;
     notifyListeners();
@@ -74,77 +107,115 @@ class InputProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void setVoiceModeActive(bool isActive) {
+    if (_isVoiceModeActive == isActive) return;
+    _isVoiceModeActive = isActive;
+    notifyListeners();
+  }
+
+  // -------------------- Attachment Management --------------------
+
+  void addAttachment(File file, {required bool isImage}) {
+    if (_attachments.length >= 4) return; // Safety check
+
+    _attachments.add(InputAttachment(
+      file: file,
+      type: isImage ? AttachmentType.image : AttachmentType.document,
+    ));
+    notifyListeners();
+  }
+
+  void removeAttachmentAt(int index) {
+    if (index >= 0 && index < _attachments.length) {
+      _attachments.removeAt(index);
+      notifyListeners();
+    }
+  }
+
+  void clearAttachments() {
+    if (_attachments.isNotEmpty) {
+      _attachments.clear();
+      notifyListeners();
+    }
+  }
+
+  void setAttachmentLoading(bool isLoading) {
+    if (_isAttachmentLoading != isLoading) {
+      _isAttachmentLoading = isLoading;
+      notifyListeners();
+    }
+  }
+
   // -------------------- Editing Mode Actions --------------------
 
   /// Activates message editing mode.
-  /// This method only sets the state for the input UI. It does NOT manipulate
-  /// the main message list. An orchestrating service is responsible for telling
-  /// the ConversationProvider to update its message list for the UI.
+  /// Populates the input field and attachment list from the existing message.
   void startEditing(int index, Message messageToEdit) {
     _isEditingMode = true;
     _editingMessageIndex = index;
     _originalMessageText = messageToEdit.text;
 
-    // Load the existing photo from the message into the input field for editing.
-    final photoPath = messageToEdit.photoPath;
-    _selectedPhoto = photoPath != null ? File(photoPath) : null;
+    // Clear current attachments to avoid mixing new uploads with the edited message's old files
+    _attachments.clear();
+
+    // --- RECONSTRUCTION LOGIC ---
+    // The Message class handles migration internally.
+    // Even old messages with 'photoPath' in the DB will have that path inside
+    // 'attachmentPaths' when loaded into memory.
+    if (messageToEdit.attachmentPaths.isNotEmpty) {
+      for (final path in messageToEdit.attachmentPaths) {
+        final file = File(path);
+        // Only add if the file still exists on the device
+        if (file.existsSync()) {
+          final isImage = _isImageFile(path);
+          _attachments.add(InputAttachment(
+            file: file,
+            type: isImage ? AttachmentType.image : AttachmentType.document,
+          ));
+        }
+      }
+    }
 
     notifyListeners();
   }
 
-  /// Deactivates message editing mode without saving changes.
-  /// Resets all editing-related state.
+  /// Deactivates editing mode and discards changes.
   void cancelEditing() {
-    _isEditingMode = false;
-    _editingMessageIndex = null;
-    _originalMessageText = null;
-    _selectedPhoto = null; // Also clear any photo loaded for the edit
+    _resetEditState();
     notifyListeners();
   }
 
-  /// Clears the editing state after an edited message has been successfully applied.
-  /// This method should be called by an orchestrating service (`EditService`)
-  /// after it has updated the `ConversationProvider`.
+  /// Completes the editing process.
   void finishEditing() {
+    _resetEditState();
+    notifyListeners();
+  }
+
+  /// Helper to reset purely editing-related state variables.
+  void _resetEditState() {
     _isEditingMode = false;
     _editingMessageIndex = null;
     _originalMessageText = null;
-    _selectedPhoto = null;
-    notifyListeners();
+    _attachments.clear();
   }
 
-  // -------------------- Input Field Actions --------------------
+  // -------------------- Global Reset --------------------
 
-  /// Sets the photo selected by the user from the input field.
-  void selectPhoto(File? photo) {
-    _selectedPhoto = photo;
-    notifyListeners();
-  }
-
-  /// Clears the selected photo, typically after a message has been sent.
-  void clearSelectedPhoto() {
-    if (_selectedPhoto != null) {
-      _selectedPhoto = null;
-      notifyListeners();
-    }
-  }
-
-  /// Manages the loading indicator for photo selection/processing.
-  void setPhotoLoading(bool isLoading) {
-    if (_isPhotoLoading != isLoading) {
-      _isPhotoLoading = isLoading;
-      notifyListeners();
-    }
-  }
-
-  /// A comprehensive reset method to clear all input state.
-  /// Should be called when a chat session is completely reset.
   void resetInputState() {
     _isEditingMode = false;
     _editingMessageIndex = null;
     _originalMessageText = null;
-    _selectedPhoto = null;
-    _isPhotoLoading = false;
+    _attachments.clear();
+    _isAttachmentLoading = false;
+    _isVoiceRecording = false;
+    _featureMode = ChatInputMode.none;
     notifyListeners();
+  }
+
+  // -------------------- Helpers --------------------
+
+  bool _isImageFile(String path) {
+    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
   }
 }

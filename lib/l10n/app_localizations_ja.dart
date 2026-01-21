@@ -663,6 +663,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get benefit9 => '新しいテーマ';
 
   @override
+  String get benefit10 => 'その他の添付ファイル';
+
+  @override
   String get oldBenefits => '下位プランのすべての特典';
 
   @override
@@ -1523,11 +1526,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+      'あなたは熟練した講師です。目標は、ユーザーのトピックを包括的に説明することです。明確な構成、例、類推を用いて説明しましょう。複雑な概念を分かりやすい部分に分割し、ユーザーが効果的に学習できるようにします。トピック：';
 
   @override
   String get featureQuizMessage =>
-      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+      'あなたはクイズマスターです。ユーザーのトピックに基づいて、具体的な多肢選択式の質問を作成します。回答を待ちます。その後、回答を評価し、次の質問をします。一度にすべての回答を公開しないでください。インタラクティブな形式にしてください。トピック：';
 
   @override
   String get myPlan => '私の計画';
@@ -1536,17 +1539,17 @@ class AppLocalizationsJa extends AppLocalizations {
   String get discountText => '全プラン80%割引！';
 
   @override
-  String get attachmentSheetTitle => 'Attachments';
+  String get attachmentSheetTitle => '添付ファイル';
 
   @override
-  String get actionCamera => 'Camera';
+  String get actionCamera => 'カメラ';
 
   @override
-  String get actionGallery => 'Gallery';
+  String get actionGallery => 'ギャラリー';
 
   @override
-  String get actionFile => 'File';
+  String get actionFile => 'ファイル';
 
   @override
-  String get listening => 'Listening';
+  String get listening => 'リスニング';
 }

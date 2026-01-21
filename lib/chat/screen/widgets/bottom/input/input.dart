@@ -35,10 +35,9 @@ class InputField extends StatefulWidget {
   final String? role;
   final bool isServerSideModel;
   final VoidCallback onStop;
-  final ValueChanged<File?>? onPhotoSelected;
-  final bool canHandleImage;
+  final bool canHandleImage; // Maintained for legacy check logic
   final bool isEditingMode;
-  final File? preselectedPhoto;
+  final File? preselectedPhoto; // Deprecated but kept for signature compatibility
   final bool modelMissing;
   final VoidCallback onCancelEditing;
 
@@ -65,13 +64,16 @@ class InputField extends StatefulWidget {
     this.role,
     required this.isServerSideModel,
     required this.onStop,
-    this.onPhotoSelected,
+    this.onPhotoSelected, // Deprecated parameter, unused
     required this.canHandleImage,
     this.isEditingMode = false,
     this.preselectedPhoto,
     required this.modelMissing,
     required this.onCancelEditing,
   });
+
+  // Deprecated parameter kept for signature compatibility
+  final ValueChanged<File?>? onPhotoSelected;
 
   @override
   InputFieldState createState() => InputFieldState();
@@ -95,7 +97,8 @@ class InputFieldState extends State<InputField> {
   }
 
   void clearPhotoPanel() {
-    context.read<InputProvider>().selectPhoto(null);
+    // New logic: Clear all attachments via provider
+    context.read<InputProvider>().clearAttachments();
   }
 
   bool get isSendButtonEnabled {
@@ -150,10 +153,9 @@ class InputFieldState extends State<InputField> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Photo Preview (Always visible if photo exists)
-              if (widget.canHandleImage)
-                _PhotoPreviewSection(
-                    screenWidth: screenWidth, isTablet: isTablet),
+              // UPDATED: Universal Attachment Preview Section
+              _AttachmentPreviewSection(
+                  screenWidth: screenWidth, isTablet: isTablet),
 
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -169,17 +171,14 @@ class InputFieldState extends State<InputField> {
                           alignment: Alignment.bottomCenter,
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 300),
-                            transitionBuilder: (Widget child, Animation<
-                                double> animation) {
-                              // Smooth expansion
+                            transitionBuilder: (Widget child,
+                                Animation<double> animation) {
                               return FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              );
+                                  opacity: animation, child: child);
                             },
                             child: isRecording
-                                ? const _WaveformSection(key: ValueKey(
-                                'waveform'))
+                                ? const _WaveformSection(
+                                key: ValueKey('waveform'))
                                 : _TextFieldSection(
                               key: const ValueKey('textfield'),
                               controller: widget.controller,
@@ -194,7 +193,7 @@ class InputFieldState extends State<InputField> {
                           ),
                         ),
 
-                        // Tools Section (Sequenced Transition)
+                        // Tools Section
                         _SequencedToolsTransition(
                           isVisible: !isRecording,
                           child: _ToolsSection(
@@ -243,7 +242,6 @@ class _WaveformSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Pure Waveform with adjusted padding to sit lower
     return const Padding(
       padding: EdgeInsets.fromLTRB(12.0, 28.0, 0, 12.0),
       child: WaveformVisualizer(),
@@ -251,64 +249,50 @@ class _WaveformSection extends StatelessWidget {
   }
 }
 
-// ... [_PhotoPreviewSection, _TextFieldSection, _ToolsSection, _SendButtonSection] ...
-// (Keep these exactly as they were in the previous corrected version,
-// just ensure _SendButtonSection logic for 'isRecording' is present)
-
-class _PhotoPreviewSection extends StatelessWidget {
+// --- NEW COMPONENT: Multi-File Attachment Preview ---
+class _AttachmentPreviewSection extends StatelessWidget {
   final double screenWidth;
   final bool isTablet;
 
-  const _PhotoPreviewSection(
+  const _AttachmentPreviewSection(
       {required this.screenWidth, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     final inputProvider = context.watch<InputProvider>();
-    final File? photo = inputProvider.selectedPhoto;
-    final bool hasPhoto = photo != null;
+    final attachments = inputProvider.attachments;
+    final bool hasAttachments = attachments.isNotEmpty;
 
-    final double previewSize = isTablet ? screenWidth * 0.18 : screenWidth *
-        0.25;
+    final double itemSize = isTablet ? screenWidth * 0.15 : screenWidth * 0.20;
     final double padding = isTablet ? screenWidth * 0.02 : screenWidth * 0.03;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      height: hasPhoto ? previewSize + (padding * 2) : 0,
+      // If items exist, calculate height based on item size + padding. Else 0.
+      height: hasAttachments ? itemSize + (padding * 2) : 0,
       width: double.infinity,
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 200),
-        opacity: hasPhoto ? 1.0 : 0.0,
-        child: SingleChildScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.all(padding),
-            child: Stack(
+        opacity: hasAttachments ? 1.0 : 0.0,
+        child: hasAttachments
+            ? ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.all(padding),
+          itemCount: attachments.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 12),
+          itemBuilder: (context, index) {
+            final attachment = attachments[index];
+            return Stack(
               clipBehavior: Clip.none,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: SizedBox(
-                    width: previewSize,
-                    height: previewSize,
-                    child: hasPhoto
-                        ? Image.file(
-                      photo,
-                      fit: BoxFit.cover,
-                      errorBuilder: (ctx, err, stack) =>
-                          Icon(Icons.broken_image,
-                              color: AppColors.tertiaryColor),
-                    )
-                        : null,
-                  ),
-                ),
+                _buildPreviewItem(attachment, itemSize),
+                // Close Button (Top Right)
                 Positioned(
-                  top: -8,
-                  left: previewSize - 16,
+                  top: -6,
+                  right: -6,
                   child: GestureDetector(
-                    onTap: () =>
-                        context.read<InputProvider>().selectPhoto(null),
+                    onTap: () => inputProvider.removeAttachmentAt(index),
                     child: Container(
                       padding: const EdgeInsets.all(4.0),
                       decoration: const BoxDecoration(
@@ -322,19 +306,98 @@ class _PhotoPreviewSection extends StatelessWidget {
                       ),
                       child: Icon(
                         Icons.close_rounded,
-                        size: isTablet ? screenWidth * 0.025 : screenWidth *
-                            0.04,
+                        size: 14,
                         color: Colors.white,
                       ),
                     ),
                   ),
                 ),
               ],
-            ),
-          ),
-        ),
+            );
+          },
+        )
+            : null,
       ),
     );
+  }
+
+  Widget _buildPreviewItem(InputAttachment attachment, double size) {
+    // A. Image Preview
+    if (attachment.type == AttachmentType.image) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8.0),
+        child: Image.file(
+          attachment.file,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (ctx, err, stack) =>
+              Icon(Icons.broken_image, color: AppColors.tertiaryColor),
+        ),
+      );
+    }
+    // B. Document Preview
+    else {
+      return Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: AppColors.tertiaryColor.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _getFileIcon(attachment.extension),
+              size: size * 0.4,
+              color: AppColors.primaryColor.inverted,
+            ),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: Text(
+                attachment.extension.replaceAll('.', '').toUpperCase(),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryColor.inverted,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            )
+          ],
+        ),
+      );
+    }
+  }
+
+  IconData _getFileIcon(String ext) {
+    switch (ext) {
+      case '.pdf':
+        return Icons.picture_as_pdf_rounded;
+      case '.doc':
+      case '.docx':
+        return Icons.description_rounded;
+      case '.xls':
+      case '.xlsx':
+      case '.csv':
+        return Icons.table_chart_rounded;
+      case '.txt':
+      case '.md':
+        return Icons.text_snippet_rounded;
+      case '.json':
+      case '.xml':
+      case '.html':
+      case '.dart':
+      case '.js':
+      case '.py':
+        return Icons.code_rounded;
+      default:
+        return Icons.insert_drive_file_rounded;
+    }
   }
 }
 
@@ -424,15 +487,7 @@ class _SequencedToolsTransitionState extends State<_SequencedToolsTransition>
       duration: const Duration(milliseconds: 500),
     );
 
-    // HIDING SEQUENCE (Forward: Visible -> Hidden)
-    // 1. Fade Out: 0ms - 200ms (0.0 - 0.4)
-    // 2. Shrink: 200ms - 500ms (0.4 - 1.0)
-
-    // SHOWING SEQUENCE (Reverse: Hidden -> Visible)
-    // 1. Expand: 500ms - 200ms (1.0 - 0.4)
-    // 2. Fade In: 200ms - 0ms (0.4 - 0.0)
-
-    // Opacity: Visible (1.0) at start (0.0 progress). Invisible (0.0) at 0.4 progress.
+    // Fade Out: 0.0 - 0.4 progress
     _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -441,7 +496,7 @@ class _SequencedToolsTransitionState extends State<_SequencedToolsTransition>
       ),
     );
 
-    // Size: Full (1.0) at 0.4 progress. None (0.0) at 1.0 progress.
+    // Shrink: 0.4 - 1.0 progress
     _sizeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -450,7 +505,6 @@ class _SequencedToolsTransitionState extends State<_SequencedToolsTransition>
       ),
     );
 
-    // Initialize state
     if (!widget.isVisible) {
       _controller.value = 1.0;
     }
@@ -461,10 +515,8 @@ class _SequencedToolsTransitionState extends State<_SequencedToolsTransition>
     super.didUpdateWidget(oldWidget);
     if (widget.isVisible != oldWidget.isVisible) {
       if (widget.isVisible) {
-        // Hidden -> Visible (Reverse)
         _controller.reverse();
       } else {
-        // Visible -> Hidden (Forward)
         _controller.forward();
       }
     }
@@ -484,7 +536,7 @@ class _SequencedToolsTransitionState extends State<_SequencedToolsTransition>
         return SizeTransition(
           sizeFactor: _sizeAnimation,
           axis: Axis.vertical,
-          axisAlignment: -1.0, // Shrink upwards
+          axisAlignment: -1.0,
           child: FadeTransition(
             opacity: _opacityAnimation,
             child: widget.child,
@@ -515,6 +567,7 @@ class _ToolsSection extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Replaced AddPhotoButton with generic button
           AddPhotoButton(
             isLimitExceeded: widget.isLimitExceeded,
             isPhotoLoading: widget.isPhotoLoading,

@@ -1,6 +1,9 @@
 // lib/chat/screen/selected/tiles.dart
 
 import 'dart:io';
+
+// ignore: depend_on_referenced_packages
+import 'package:path/path.dart' as p; // Standard path manipulation
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/messages/messages.dart';
 import 'package:cortex/chat/messages/viewer.dart';
@@ -14,6 +17,9 @@ import '../../messages/tiles/user.dart';
 
 /// A utility class that acts as a factory for building different types of message widgets.
 class Tiles {
+
+  // --- USER MESSAGE TILES ---
+
   /// Builds a user's message tile, handling the switch between its normal and "editing" states.
   static Widget buildUserMessageTile({
     required BuildContext context,
@@ -31,7 +37,7 @@ class Tiles {
         (editingMessageIndex == index);
     final bool isTablet = screenWidth >= 600;
 
-    // --- DYNAMIC DIMENSIONS ---
+    // Dimensions
     final double padding = isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
     final double fontSize = isTablet ? screenWidth * 0.022 : 15.0;
     final double iconSize = isTablet ? screenWidth * 0.03 : 20.0;
@@ -44,14 +50,13 @@ class Tiles {
           : CrossFadeState.showSecond,
       sizeCurve: Curves.easeInOut,
       alignment: Alignment.centerRight,
+      // 1. Edit Indicator (When editing is active for this message)
       firstChild: Padding(
         key: ValueKey('editing_$index'),
         padding: EdgeInsets.all(padding),
         child: Container(
           padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.03,
-              vertical: screenWidth * 0.02
-          ),
+              horizontal: screenWidth * 0.03, vertical: screenWidth * 0.02),
           decoration: BoxDecoration(
             color: AppColors.background,
             borderRadius: BorderRadius.circular(borderRadius),
@@ -60,14 +65,15 @@ class Tiles {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.info_outline, color: AppColors.primaryColor.inverted,
-                  size: iconSize),
+              Icon(Icons.info_outline,
+                  color: AppColors.primaryColor.inverted, size: iconSize),
               SizedBox(width: screenWidth * 0.02),
               Expanded(
                 child: Text(
                   AppLocalizations.of(context)!.editingMessageInfo,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.primaryColor.inverted,
+                  style: TextStyle(
+                      color: AppColors.primaryColor.inverted,
                       fontSize: fontSize),
                 ),
               ),
@@ -75,6 +81,7 @@ class Tiles {
           ),
         ),
       ),
+      // 2. Normal Content
       secondChild: buildNormalUserContent(
         context: context,
         message: message,
@@ -88,7 +95,7 @@ class Tiles {
     );
   }
 
-  /// Builds the standard content for a user message, including the photo and text bubble.
+  /// Builds the standard content for a user message (Attachments + Text Bubble).
   static Widget buildNormalUserContent({
     required BuildContext context,
     required Message message,
@@ -100,61 +107,27 @@ class Tiles {
     VoidCallback? onFadeOutComplete,
   }) {
     final bool isTablet = screenWidth >= 600;
-    final bool hasPhoto = message.photoPath != null;
-    final bool isImage = hasPhoto && _isImageFile(message.photoPath!);
-
-    // --- DYNAMIC DIMENSIONS ---
-    // Image Width: Tablet 30% (prevents huge images), Phone 40%.
-    final double imageWidth = isTablet ? screenWidth * 0.3 : screenWidth * 0.4;
-    // Padding: Tablet 3%, Phone 4%.
     final double rightPadding = isTablet ? screenWidth * 0.03 : screenWidth *
         0.04;
-    final double borderRadius = isTablet ? screenWidth * 0.015 : 8.0;
 
     return Column(
       key: ValueKey('normal_user_$index'),
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        if (hasPhoto && isImage)
+        // --- ATTACHMENTS SECTION ---
+        if (message.hasAttachments)
           Padding(
             padding: EdgeInsets.only(
-                right: rightPadding,
-                bottom: screenHeight * 0.006
+                right: rightPadding, bottom: screenHeight * 0.006),
+            child: _buildAttachmentList(
+              context: context,
+              paths: message.attachmentPaths,
+              isUser: true,
+              screenWidth: screenWidth,
             ),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: () =>
-                    Navigator.push(
-                        context, PhotoViewer.route(File(message.photoPath!))),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(borderRadius),
-                  child: Image.file(
-                    File(message.photoPath!),
-                    width: imageWidth,
-                    height: imageWidth, // Square aspect ratio
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Icon(
-                            Icons.broken_image, color: AppColors.tertiaryColor),
-                  ),
-                ),
-              ),
-            ),
-          )
-        else
-          if (hasPhoto && !isImage)
-            Container(
-              margin: EdgeInsets.only(right: rightPadding, bottom: 8),
-              padding: EdgeInsets.all(screenWidth * 0.03),
-              decoration: BoxDecoration(
-                  color: AppColors.tertiaryColor,
-                  borderRadius: BorderRadius.circular(borderRadius)
-              ),
-              child: Icon(Icons.insert_drive_file, color: Colors.black54,
-                  size: screenWidth * 0.06),
-            ),
+          ),
 
+        // --- TEXT BUBBLE SECTION ---
         if (message.text
             .trim()
             .isNotEmpty)
@@ -168,7 +141,9 @@ class Tiles {
     );
   }
 
-  /// Builds an AI's message tile, which can include a photo and a text bubble.
+  // --- AI MESSAGE TILES ---
+
+  /// Builds an AI's message tile (Attachments/Generated Images + Text Bubble).
   static Widget buildAIMessageTile({
     required BuildContext context,
     required Message message,
@@ -190,118 +165,182 @@ class Tiles {
         preciseModelId, langCode: langCode);
     final correctImagePath = modelService.getModelImagePath(model);
 
-    final bool hasPhoto = message.photoPath != null &&
-        message.photoPath!.isNotEmpty;
-    final bool isImage = hasPhoto && _isImageFile(message.photoPath!);
-
     final bool hasText = message.text
         .trim()
         .isNotEmpty;
-    final bool isThinkingWithoutContent = message.isThinking && !hasPhoto &&
-        !hasText;
+    final bool isThinkingWithoutContent =
+        message.isThinking && !message.hasAttachments && !hasText;
 
-    // --- DYNAMIC DIMENSIONS ---
+    // Dimensions
     final double leftPadding = isTablet ? screenWidth * 0.03 : screenWidth *
         0.04;
-    // Image Width: Tablet 30%, Phone 40%.
-    final double imageWidth = isTablet ? screenWidth * 0.3 : screenWidth * 0.4;
-    final double borderRadius = isTablet ? screenWidth * 0.015 : 8.0;
 
+    // 1. Text Content Widget
     final aiMessageContentWidget = AIMessageTile(
       message: message,
       avatarPath: correctImagePath,
       onReport: onReport,
       onRegenerate: ({String? newModelId}) {
-        debugPrint(
-            "[Tiles.buildAIMessageTile] Callback forwarding: '$newModelId'");
+        debugPrint("[Tiles] Callback forwarding: '$newModelId'");
         onRegenerate(newModelId: newModelId);
       },
       onStop: onStop,
       parsedSpans: message.parsedSpans,
     );
 
-    Widget photoWidget;
+    // 2. Attachments Widget (e.g. Generated Images)
+    Widget attachmentWidget = const SizedBox.shrink();
 
-    if (hasPhoto && isImage) {
-      photoWidget = Padding(
+    if (message.hasAttachments) {
+      attachmentWidget = Padding(
         padding: EdgeInsets.only(
           left: leftPadding,
           bottom: (hasText || isThinkingWithoutContent)
               ? screenHeight * 0.006
               : 0,
         ),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: GestureDetector(
-            onTap: () =>
-                Navigator.push(
-                    context, PhotoViewer.route(File(message.photoPath!))),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(borderRadius),
-              child: Image.file(
-                File(message.photoPath!),
-                width: imageWidth,
-                height: imageWidth,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.broken_image, color: Colors.grey),
-              ),
-            ),
-          ),
+        child: _buildAttachmentList(
+          context: context,
+          paths: message.attachmentPaths,
+          isUser: false,
+          screenWidth: screenWidth,
         ),
       );
-    } else if (hasPhoto && !isImage) {
-      photoWidget = Padding(
-        padding: EdgeInsets.only(
-          left: leftPadding,
-          bottom: (hasText || isThinkingWithoutContent)
-              ? screenHeight * 0.006
-              : 0,
-        ),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Container(
-            width: imageWidth,
-            padding: EdgeInsets.all(screenWidth * 0.03),
-            decoration: BoxDecoration(
-                color: AppColors.tertiaryColor.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(borderRadius)
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.description, color: AppColors.primaryColor.inverted,
-                    size: screenWidth * 0.08),
-                const SizedBox(height: 4),
-                Text(
-                  message.photoPath!.split('/').last,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      color: AppColors.primaryColor.inverted,
-                      fontSize: isTablet ? screenWidth * 0.02 : 12
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    } else {
-      photoWidget = const SizedBox.shrink();
     }
 
     return Column(
       key: ValueKey('ai_message_${message.id}'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        photoWidget,
+        attachmentWidget,
         if (hasText || isThinkingWithoutContent) aiMessageContentWidget,
       ],
     );
   }
 
-  /// A top-level builder that determines whether to build a user or an AI message tile.
+  // --- UNIVERSAL ATTACHMENT BUILDER ---
+
+  /// Renders a list of attachments (Images/Docs) using a Wrap layout.
+  static Widget _buildAttachmentList({
+    required BuildContext context,
+    required List<String> paths,
+    required bool isUser,
+    required double screenWidth,
+  }) {
+    final bool isTablet = screenWidth >= 600;
+
+    // Dynamic sizing for items
+    final double imageSize = isTablet ? screenWidth * 0.3 : screenWidth * 0.4;
+    final double borderRadius = isTablet ? screenWidth * 0.015 : 12.0;
+
+    return Wrap(
+      alignment: isUser ? WrapAlignment.end : WrapAlignment.start,
+      runAlignment: WrapAlignment.start,
+      spacing: 8.0,
+      runSpacing: 8.0,
+      children: paths.map((path) {
+        final File file = File(path);
+        final bool isImage = _isImageFile(path);
+
+        // A. Image Attachment
+        if (isImage) {
+          return GestureDetector(
+            onTap: () =>
+                Navigator.push(
+                    context, PhotoViewer.route(file)),
+            child: Hero(
+              tag: path, // Basic hero tag
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(borderRadius),
+                child: Image.file(
+                  file,
+                  width: imageSize,
+                  height: imageSize,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image, color: Colors.grey),
+                ),
+              ),
+            ),
+          );
+        }
+
+        // B. Document/File Attachment
+        else {
+          return Container(
+            width: imageSize, // Keep same width as images for grid consistency
+            padding: EdgeInsets.all(screenWidth * 0.03),
+            decoration: BoxDecoration(
+              color: AppColors.tertiaryColor.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(borderRadius),
+              border: Border.all(
+                color: AppColors.border.withValues(alpha: 0.5),
+                width: 1,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  _getFileIcon(path),
+                  color: AppColors.primaryColor.inverted,
+                  size: screenWidth * 0.08,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  p.basename(path),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppColors.primaryColor.inverted,
+                    fontSize: isTablet ? screenWidth * 0.018 : 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      }).toList(),
+    );
+  }
+
+  // --- HELPERS ---
+
+  static bool _isImageFile(String path) {
+    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
+  }
+
+  static IconData _getFileIcon(String path) {
+    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
+    switch (ext) {
+      case 'pdf':
+        return Icons.picture_as_pdf_rounded;
+      case 'doc':
+      case 'docx':
+        return Icons.description_rounded;
+      case 'xls':
+      case 'xlsx':
+      case 'csv':
+        return Icons.table_chart_rounded;
+      case 'txt':
+      case 'md':
+        return Icons.text_snippet_rounded;
+      case 'json':
+      case 'xml':
+      case 'html':
+      case 'dart':
+      case 'js':
+      case 'py':
+        return Icons.code_rounded;
+      default:
+        return Icons.insert_drive_file_rounded;
+    }
+  }
+
+  // --- TOP LEVEL BUILDERS (Unchanged Logic, just wiring) ---
+
   static Widget buildMessageTile({
     required BuildContext context,
     required Message message,
@@ -347,7 +386,6 @@ class Tiles {
     }
   }
 
-  /// The main factory method that builds the entire scrollable list of messages.
   static Widget buildMessagesList({
     required BuildContext context,
     required List<Message> messages,
@@ -370,22 +408,16 @@ class Tiles {
         .size
         .height;
     final modelService = context.read<ModelService>();
-
     final double statusBarHeight = MediaQuery
         .of(context)
         .padding
         .top;
-
     final double totalTopPadding = statusBarHeight;
 
     return ListView.separated(
       controller: scrollController,
-
       padding: EdgeInsets.only(
-          top: totalTopPadding,
-          bottom: screenHeight * 0.01
-      ),
-
+          top: totalTopPadding, bottom: screenHeight * 0.01),
       cacheExtent: 500,
       itemCount: messages.length,
       separatorBuilder: (context, index) =>
@@ -393,7 +425,8 @@ class Tiles {
       itemBuilder: (context, index) {
         Message message = messages[index];
         final bool isMessageUnderEdit = isEditingMode &&
-            editingMessageIndex != null && index > editingMessageIndex;
+            editingMessageIndex != null &&
+            index > editingMessageIndex;
         if (isMessageUnderEdit) {
           message = message.copyWith(opacity: 0.0);
         }
@@ -406,8 +439,8 @@ class Tiles {
           isEditingMode: isEditingMode,
           editingMessageIndex: editingMessageIndex,
           onEdit: () => onEdit(index),
-          onFadeOutComplete: isMessageUnderEdit ? null : () =>
-              onFadeOutComplete?.call(index),
+          onFadeOutComplete:
+          isMessageUnderEdit ? null : () => onFadeOutComplete?.call(index),
           screenWidth: screenWidth,
           screenHeight: screenHeight,
           modelId: modelId,
@@ -420,13 +453,5 @@ class Tiles {
         );
       },
     );
-  }
-
-  static bool _isImageFile(String path) {
-    final ext = path
-        .split('.')
-        .last
-        .toLowerCase();
-    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'].contains(ext);
   }
 }

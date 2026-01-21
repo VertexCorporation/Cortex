@@ -1,3 +1,5 @@
+// lib/chat/screen/selected/widgets/input/bottom/actions.dart
+
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -74,7 +76,7 @@ class ActionButtonWidget extends StatelessWidget {
   final bool isEnabled;
   final bool isSending;
   final bool isTextEmpty;
-  final bool isRecording; // NEW: To toggle Stop button during voice
+  final bool isRecording; // To toggle Stop button during voice
   final VoidCallback onSend;
   final VoidCallback onStop;
   final TextEditingController controller;
@@ -109,21 +111,25 @@ class ActionButtonWidget extends StatelessWidget {
 
     // --- LOGIC MATRIX ---
     // 1. Sending OR Recording -> STOP
-    // 2. Text NOT empty -> SEND
-    // 3. Empty & Supported -> VOICE CHAT
+    // 2. Text NOT empty OR Has Attachments -> SEND
+    // 3. Empty & No Files & Supported -> VOICE CHAT
     // 4. Fallback -> DISABLED SEND
 
     Widget rightButton;
     Key rightButtonKey;
 
+    final bool hasContent = !isTextEmpty || inputProvider.hasAttachments;
+
     if (isSending || isRecording) {
       // STATE: STOP (Used for both AI gen and Voice Recording)
       rightButtonKey = const ValueKey('stop');
       rightButton = _buildStopButton(buttonSize);
-    } else if (!isTextEmpty) {
+    } else if (hasContent) {
+      // STATE: SEND (If user typed text OR attached a file)
       rightButtonKey = const ValueKey('send');
       rightButton = _buildSendButton(buttonSize, isEnabled, isConnected);
     } else {
+      // STATE: IDLE
       if (isDeviceSupported) {
         rightButtonKey = const ValueKey('voice_chat');
         rightButton = _buildVoiceChatButton(buttonSize);
@@ -133,8 +139,7 @@ class ActionButtonWidget extends StatelessWidget {
       }
     }
 
-    // Only show Mic if device supported AND we are not currently busy (sending/recording)
-    // When recording, we hide the Mic because the whole input is the visualizer
+    // Only show Mic if device supported AND we are not currently busy
     bool showMic = isDeviceSupported && !isSending && !isRecording;
 
     return Row(
@@ -287,7 +292,7 @@ class ActionButtonWidget extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 2. ADD PHOTO BUTTON (Unchanged but included for completeness)
+// 2. ADD ATTACHMENT BUTTON (Refactored for Multi-file Support)
 // -----------------------------------------------------------------------------
 class AddPhotoButton extends StatelessWidget {
   final bool isLimitExceeded;
@@ -296,7 +301,7 @@ class AddPhotoButton extends StatelessWidget {
 
   const AddPhotoButton({
     super.key,
-    required this.isLimitExceeded,
+    required this.isLimitExceeded, // Refers to Chat History Limit (e.g. Free Tier)
     required this.isPhotoLoading,
     required this.localizations,
   });
@@ -304,23 +309,37 @@ class AddPhotoButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inputProvider = context.watch<InputProvider>();
-    final bool hasPhoto = inputProvider.selectedPhoto != null;
-    final bool buttonDisabled = isLimitExceeded || hasPhoto;
+
+    // Check if we have reached the 4 file limit
+    final bool isMaxAttachments = inputProvider.attachments.length >= 4;
+
+    // Disable if loading or if main chat limit reached (but not just because we have 1 photo)
+    final bool buttonDisabled = isLimitExceeded;
 
     return _ToolCircleButton(
       disabled: isPhotoLoading && buttonDisabled,
       onTap: isPhotoLoading
           ? null
           : () {
-        if (hasPhoto) {
-          Provider.of<IntrovertNotificationService>(context, listen: false)
+        // Priority 1: Check Attachment Limit
+        if (isMaxAttachments) {
+          Provider
+              .of<IntrovertNotificationService>(context, listen: false)
               .showNotification(
             message: localizations.photoLimitReachedMessage,
+            // You might want to rename this key in l10n to 'attachmentLimitReached'
             type: NotificationType.error,
             bottomOffset: 0.22,
             fontSize: 0.032,
           );
-        } else {
+        }
+        // Priority 2: Check Chat History Limit
+        else if (isLimitExceeded) {
+          // The InputField usually handles this by disabling interaction,
+          // but if tapped, we can show a specific upgrade prompt here if needed.
+        }
+        // Priority 3: Open Sheet
+        else {
           showAttachmentSheet(context: context);
         }
       },
@@ -336,7 +355,7 @@ class AddPhotoButton extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 3. FEATURES BUTTON (Unchanged but included for completeness)
+// 3. FEATURES BUTTON (Unchanged)
 // -----------------------------------------------------------------------------
 class FeaturesButton extends StatelessWidget {
   final TextEditingController controller;
@@ -454,7 +473,7 @@ class FeaturesButton extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 4. MODEL SELECT BUTTON (Unchanged but included for completeness)
+// 4. MODEL SELECT BUTTON (Unchanged)
 // -----------------------------------------------------------------------------
 class ModelSelectButton extends StatelessWidget {
   final double screenWidth;

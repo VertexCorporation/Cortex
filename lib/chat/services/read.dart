@@ -30,14 +30,11 @@ class ReadService {
         _modelService = modelService;
 
   /// Loads a conversation using the provided manager.
-  /// This is the single entry point for loading ANY conversation type.
   Future<void> loadConversation(ConversationManager manager,
       {required String languageCode}) async {
     const String logPrefix = "[ReadService.loadConversation]";
 
     // 1. Resolve the Model ID
-    // If it's a legacy 'dynamic' chat, we map it to 'cortex/auto'.
-    // Otherwise, we use the model ID directly from the manager.
     String resolvedModelId = manager.modelId;
     if (resolvedModelId == 'dynamic') {
       resolvedModelId = 'cortex/auto';
@@ -47,13 +44,12 @@ class ReadService {
         "$logPrefix: Loading conversation for model '$resolvedModelId'.");
 
     // 2. Get Precise Model Data
-    // We fetch the fresh entity data using the resolved ID.
     final ModelEntity preciseModel = _modelService.getPreciseModelData(
       resolvedModelId,
       langCode: languageCode,
     );
 
-    // 3. Offline Path Check (Optional logging / setup)
+    // 3. Offline Path Check
     if (!preciseModel.isServerSide) {
       final downloadedPaths = await UserModels.loadDownloadedModelPaths();
       final baseId = _modelService.getBaseIdFromFullId(preciseModel.id);
@@ -62,8 +58,6 @@ class ReadService {
     }
 
     // 5. Configure Session
-    // We use selectModel directly.
-    // savePreference: false ensures opening an old chat doesn't change the default for NEW chats.
     _sessionProvider.selectModel(preciseModel, savePreference: false);
 
     // 6. Set Context
@@ -124,17 +118,21 @@ class ReadService {
       bool needsDbUpdate = false;
       final List<Message> loadedMessages = rows.map((r) {
         if (r['uuid'] == null) needsDbUpdate = true;
+        // Message.fromMap handles the migration from 'photoPath' to 'attachmentPaths'
         return Message.fromMap(r);
       }).toList();
 
       // Clean up empty trailing messages
-      if (loadedMessages.isNotEmpty &&
-          !loadedMessages.last.isUserMessage &&
-          loadedMessages.last.text
-              .trim()
-              .isEmpty &&
-          (loadedMessages.last.photoPath ?? '').isEmpty) {
-        loadedMessages.removeLast();
+      // Logic Update: Check hasAttachments instead of just photoPath
+      if (loadedMessages.isNotEmpty) {
+        final lastMsg = loadedMessages.last;
+        if (!lastMsg.isUserMessage &&
+            lastMsg.text
+                .trim()
+                .isEmpty &&
+            !lastMsg.hasAttachments) {
+          loadedMessages.removeLast();
+        }
       }
 
       _conversationProvider.loadMessages(loadedMessages);

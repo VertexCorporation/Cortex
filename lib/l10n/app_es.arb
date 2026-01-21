@@ -545,5 +545,13 @@
   "featureQuizPrefix": "Prueba:",
   "featureExploreDescription": "Descubre todos los modelos disponibles",
   "myPlan": "Mi plan",
-  "discountText": "¡80% de descuento en todos los planes!"
+  "discountText": "¡80% de descuento en todos los planes!",
+  "benefit10": "Más archivos adjuntos",
+  "featureStudyMessage": "Eres un tutor experto. Tu objetivo es explicar el tema del usuario de forma exhaustiva. Utiliza una estructura clara, ejemplos y analogías. Divide las ideas complejas en partes fáciles de digerir para asegurar que el usuario aprenda eficazmente. Tema:",
+  "featureQuizMessage": "Eres un experto en concursos. Genera una pregunta de opción múltiple específica basada en el tema del usuario. Espera su respuesta. Luego, evalúala y formula la siguiente pregunta. No reveles todas las respuestas a la vez. Mantén la interacción. Tema:",
+  "attachmentSheetTitle": "Archivos adjuntos",
+  "actionCamera": "Cámara",
+  "actionGallery": "Galería",
+  "actionFile": "Archivo",
+  "listening": "Escuchando"
 }

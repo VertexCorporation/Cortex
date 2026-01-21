@@ -535,5 +535,13 @@
   "featureQuizPrefix": "Quiz:",
   "featureExploreDescription": "Scopri tutti i modelli disponibili",
   "myPlan": "Il mio piano",
-  "discountText": "Sconto dell'80% su tutti i piani!"
+  "discountText": "Sconto dell'80% su tutti i piani!",
+  "benefit10": "Altri allegati",
+  "featureStudyMessage": "Sei un tutor esperto. Il tuo obiettivo è spiegare l'argomento dell'utente in modo completo. Utilizza una struttura chiara, esempi e analogie. Suddividi i concetti complessi in parti comprensibili per garantire che l'utente apprenda in modo efficace. Argomento:",
+  "featureQuizMessage": "Sei un maestro dei quiz. Genera una domanda a risposta multipla specifica basata sull'argomento dell'utente. Attendi la risposta. Quindi, valutala e poni la domanda successiva. Non rivelare tutte le risposte contemporaneamente. Mantieni l'interattività. Argomento:",
+  "attachmentSheetTitle": "Allegati",
+  "actionCamera": "Telecamera",
+  "actionGallery": "Galleria",
+  "actionFile": "File",
+  "listening": "In ascolto"
 }
