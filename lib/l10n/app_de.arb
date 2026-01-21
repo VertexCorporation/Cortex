@@ -535,5 +535,13 @@
   "featureQuizPrefix": "Quiz:",
   "featureExploreDescription": "Entdecken Sie alle verfügbaren Modelle",
   "myPlan": "Mein Plan",
-  "discountText": "80 % Rabatt auf alle Tarife!"
+  "discountText": "80 % Rabatt auf alle Tarife!",
+  "benefit10": "Weitere Anhänge",
+  "featureStudyMessage": "Sie sind ein erfahrener Tutor. Ihr Ziel ist es, dem Nutzer das Thema umfassend zu erklären. Verwenden Sie eine klare Struktur, Beispiele und Analogien. Zerlegen Sie komplexe Ideen in verständliche Teile, um sicherzustellen, dass der Nutzer effektiv lernt. Thema:",
+  "featureQuizMessage": "Sie sind der Quizmaster. Erstellen Sie eine passende Multiple-Choice-Frage zum Thema des Nutzers. Warten Sie auf seine Antwort. Werten Sie diese anschließend aus und stellen Sie die nächste Frage. Zeigen Sie nicht alle Antworten auf einmal an. Gestalten Sie das Quiz interaktiv. Thema:",
+  "attachmentSheetTitle": "Anlagen",
+  "actionCamera": "Kamera",
+  "actionGallery": "Galerie",
+  "actionFile": "Datei",
+  "listening": "Hört zu"
 }

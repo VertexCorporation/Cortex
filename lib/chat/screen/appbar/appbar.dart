@@ -1,5 +1,6 @@
 // lib/chat/screen/appbar/appbar.dart
 
+import 'package:path/path.dart' as p;
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -72,29 +73,49 @@ class AppbarState extends State<Appbar> {
       final String botName = session.isDynamicChat ? 'Cortex' : headerModelName;
       final StringBuffer buffer = StringBuffer();
 
-      // Build Transcript
+      // Build Transcript Header
       buffer.writeln('Cortex | $headerModelName');
       buffer.writeln();
 
+      // Iterate Messages
       for (final msg in conversation.messages) {
         if (msg.isThinking) continue;
+
+        // UPDATED: Skip only if text is empty AND no attachments exist
         if (msg.text
             .trim()
-            .isEmpty && msg.photoPath == null) {
+            .isEmpty && !msg.hasAttachments) {
           continue;
         }
 
         if (msg.isUserMessage) {
           buffer.writeln('👤 $userName: ${msg.text}');
-          if (msg.photoPath != null) buffer.writeln('📷 [Image]');
+
+          // UPDATED: List all attachments with their filenames
+          if (msg.hasAttachments) {
+            for (final path in msg.attachmentPaths) {
+              final filename = p.basename(path);
+              buffer.writeln('📎 [Attachment: $filename]');
+            }
+          }
         } else {
+          // Bot Message
           buffer.writeln('🤖 $botName: ${msg.text}');
+
+          // If bot generated images (rare but possible in future), list them too
+          if (msg.hasAttachments) {
+            for (final path in msg.attachmentPaths) {
+              final filename = p.basename(path);
+              buffer.writeln('🖼️ [Generated Image: $filename]');
+            }
+          }
         }
         buffer.writeln();
       }
 
       final String shareText = buffer.toString();
-      const String shareSubject = 'Cortex';
+      const String shareSubject = 'Cortex Chat Export';
+
       await SharePlus.instance.share(
           ShareParams(text: shareText, subject: shareSubject));
     } catch (e) {
@@ -156,9 +177,8 @@ class AppbarState extends State<Appbar> {
       ),
 
       // 3. Right Button: Action (Share / Flux)
-      // We wrap the content in the global CortexAppBarButton for consistent styling
       actionButton: AppBarButton(
-        size: isTablet ? 48.0 : 42.0, // Match global sizing logic
+        size: isTablet ? 48.0 : 42.0,
         onTap: () {
           if (isChatActive) {
             _handleShare(context);

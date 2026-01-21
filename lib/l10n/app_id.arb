@@ -535,5 +535,13 @@
   "featureQuizPrefix": "Kuis:",
   "featureExploreDescription": "Temukan semua model yang tersedia",
   "myPlan": "Rencana Saya",
-  "discountText": "Diskon 80% untuk semua paket!"
+  "discountText": "Diskon 80% untuk semua paket!",
+  "benefit10": "Lampiran Lainnya",
+  "featureStudyMessage": "Anda adalah seorang tutor ahli. Tujuan Anda adalah menjelaskan topik pengguna secara komprehensif. Gunakan struktur yang jelas, contoh, dan analogi. Uraikan ide-ide kompleks menjadi bagian-bagian yang mudah dipahami untuk memastikan pengguna belajar secara efektif. Topik:",
+  "featureQuizMessage": "Anda adalah seorang pengelola kuis. Buat pertanyaan pilihan ganda spesifik berdasarkan topik yang diberikan pengguna. Tunggu jawabannya. Kemudian, evaluasi jawaban tersebut dan ajukan pertanyaan berikutnya. Jangan ungkapkan semua jawaban sekaligus. Jaga agar tetap interaktif. Topik:",
+  "attachmentSheetTitle": "Lampiran",
+  "actionCamera": "Kamera",
+  "actionGallery": "Galeri",
+  "actionFile": "Berkas",
+  "listening": "Sedang Mendengarkan"
 }

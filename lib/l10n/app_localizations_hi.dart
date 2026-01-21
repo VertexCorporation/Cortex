@@ -671,6 +671,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get benefit9 => 'नई थीम';
 
   @override
+  String get benefit10 => 'अधिक अटैचमेंट';
+
+  @override
   String get oldBenefits => 'निचली योजनाओं से सभी लाभ';
 
   @override
@@ -1563,11 +1566,11 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+      'आप एक कुशल शिक्षक हैं। आपका लक्ष्य उपयोगकर्ता के विषय को व्यापक रूप से समझाना है। स्पष्ट संरचना, उदाहरणों और उपमाओं का प्रयोग करें। जटिल विचारों को सरल भागों में बाँटें ताकि उपयोगकर्ता प्रभावी ढंग से सीख सके। विषय:';
 
   @override
   String get featureQuizMessage =>
-      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+      'आप एक क्विज़ मास्टर हैं। उपयोगकर्ता के विषय के आधार पर एक विशिष्ट बहुविकल्पीय प्रश्न तैयार करें। उनके उत्तर की प्रतीक्षा करें। फिर, उसका मूल्यांकन करें और अगला प्रश्न पूछें। सभी उत्तर एक साथ प्रकट न करें। इसे इंटरैक्टिव बनाए रखें। विषय:';
 
   @override
   String get myPlan => 'मेरी योजना';
@@ -1576,17 +1579,17 @@ class AppLocalizationsHi extends AppLocalizations {
   String get discountText => 'सभी प्लानों पर 80% की छूट!';
 
   @override
-  String get attachmentSheetTitle => 'Attachments';
+  String get attachmentSheetTitle => 'संलग्नक';
 
   @override
-  String get actionCamera => 'Camera';
+  String get actionCamera => 'कैमरा';
 
   @override
-  String get actionGallery => 'Gallery';
+  String get actionGallery => 'गैलरी';
 
   @override
-  String get actionFile => 'File';
+  String get actionFile => 'फ़ाइल';
 
   @override
-  String get listening => 'Listening';
+  String get listening => 'सुनना';
 }

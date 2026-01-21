@@ -671,6 +671,9 @@ class AppLocalizationsAz extends AppLocalizations {
   String get benefit9 => 'Yeni mövzular';
 
   @override
+  String get benefit10 => 'Daha çox əlavə';
+
+  @override
   String get oldBenefits => 'Aşağı planların bütün üstünlükləri';
 
   @override
@@ -1566,11 +1569,11 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+      'Siz peşəkar repetitorsunuz. Məqsədiniz istifadəçinin mövzusunu hərtərəfli izah etməkdir. Aydın struktur, nümunələr və bənzətmələrdən istifadə edin. İstifadəçinin effektiv şəkildə öyrənməsini təmin etmək üçün mürəkkəb fikirləri asanlıqla başa düşülən hissələrə ayırın. Mövzu:';
 
   @override
   String get featureQuizMessage =>
-      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+      'Siz viktorina ustasısınız. İstifadəçinin mövzusuna əsasən müəyyən bir çoxseçimli sual yaradın. Cavabını gözləyin. Sonra onu qiymətləndirin və növbəti sualı verin. Bütün cavabları birdən açıqlamayın. İnteraktiv saxlayın. Mövzu:';
 
   @override
   String get myPlan => 'Planım';
@@ -1579,17 +1582,17 @@ class AppLocalizationsAz extends AppLocalizations {
   String get discountText => 'Bütün planlara 80% endirim!';
 
   @override
-  String get attachmentSheetTitle => 'Attachments';
+  String get attachmentSheetTitle => 'Əlavələr';
 
   @override
-  String get actionCamera => 'Camera';
+  String get actionCamera => 'Kamera';
 
   @override
-  String get actionGallery => 'Gallery';
+  String get actionGallery => 'Qalereya';
 
   @override
-  String get actionFile => 'File';
+  String get actionFile => 'Fayl';
 
   @override
-  String get listening => 'Listening';
+  String get listening => 'Dinləmə';
 }

@@ -10,7 +10,6 @@ import 'package:flutter/foundation.dart';
 import '../../library/backend/data/service.dart';
 
 /// Manages the logic for forcefully stopping a response generation from the AI.
-
 class StopService {
   final ConversationProvider _conversationProvider;
   final ChatSessionProvider _sessionProvider;
@@ -24,7 +23,8 @@ class StopService {
     required ApiService apiService,
     required OfflineService offlineService,
     required ModelService modelService,
-  })  : _conversationProvider = conversationProvider,
+  })
+      : _conversationProvider = conversationProvider,
         _sessionProvider = sessionProvider,
         _apiService = apiService,
         _offlineService = offlineService,
@@ -38,12 +38,14 @@ class StopService {
     }
     debugPrint("[StopService] Stop request initiated.");
 
-    // 1. Get the language code from the session provider.
-    final langCode = _sessionProvider.getLocale().languageCode;
+    final langCode = _sessionProvider
+        .getLocale()
+        .languageCode;
     final currentModelId = _sessionProvider.modelId;
 
-    // 2. Call the updated utility method with the required modelService.
-    if (currentModelId != null && Utils.isLocalModel(currentModelId, langCode: langCode, modelService: _modelService)) {
+    if (currentModelId != null &&
+        Utils.isLocalModel(
+            currentModelId, langCode: langCode, modelService: _modelService)) {
       _offlineService.stopGeneration();
       debugPrint("[StopService] Cancellation signal sent to OfflineService.");
     } else {
@@ -52,16 +54,22 @@ class StopService {
     }
 
     final messages = _conversationProvider.messages;
-    final int lastMessageIndex = messages.lastIndexWhere((m) => !m.isUserMessage && m.isThinking);
+    final int lastMessageIndex =
+    messages.lastIndexWhere((m) => !m.isUserMessage && m.isThinking);
 
     if (lastMessageIndex == -1) {
-      debugPrint("[StopService] No 'thinking' AI message found. Finalizing state just in case.");
+      debugPrint(
+          "[StopService] No 'thinking' AI message found. Finalizing state.");
       _conversationProvider.finishBotResponse(-1);
       return;
     }
 
     final aiMessage = messages[lastMessageIndex];
-    final bool wasJustThinking = aiMessage.text.trim().isEmpty && (aiMessage.photoPath ?? '').isEmpty;
+
+    // LOGIC UPDATE: Check hasAttachments instead of photoPath
+    final bool wasJustThinking = aiMessage.text
+        .trim()
+        .isEmpty && !aiMessage.hasAttachments;
 
     if (wasJustThinking) {
       debugPrint(
@@ -78,17 +86,16 @@ class StopService {
         ..removeWhere(
               (m) =>
           !m.isUserMessage &&
-              m.text.trim().isEmpty &&
-              ((m.photoPath ?? '').isEmpty),
+              m.text
+                  .trim()
+                  .isEmpty &&
+              !m.hasAttachments, // Updated check
         );
 
       _conversationProvider.loadMessages(prunedMessages);
 
       if (conversationID != null) {
-        debugPrint(
-          "[StopService] Persisting pruned messages list "
-              "(empty AI bubble removed after fade).",
-        );
+        debugPrint("[StopService] Persisting pruned messages list.");
         await ChatStorageService.saveCurrentMessages(
           conversationID,
           prunedMessages,
@@ -96,11 +103,9 @@ class StopService {
       }
 
       _conversationProvider.finishBotResponse(-1);
-      debugPrint("[StopService] Empty AI message faded out and removed.");
     } else {
       debugPrint(
-        "[StopService] Stopped in 'writing' state. Finalizing message at index $lastMessageIndex. "
-            "textLength=${aiMessage.text.length}, photoPath=${aiMessage.photoPath}",
+        "[StopService] Stopped in 'writing' state. Finalizing message at index $lastMessageIndex.",
       );
       _conversationProvider.finishBotResponse(lastMessageIndex);
       final conversationID = _conversationProvider.conversationID;

@@ -1,3 +1,5 @@
+// lib/chat/screen/widgets/bottom/panels/attachments/sheet.dart
+
 import 'package:cortex/app.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
@@ -9,26 +11,11 @@ import 'button.dart';
 void showAttachmentSheet({
   required BuildContext context,
 }) {
-  // Hide keyboard if open
+  // Hide keyboard if open to prevent UI glitching during bottom sheet animation
   FocusScope.of(context).unfocus();
 
-  final mediaQuery = MediaQuery.of(context);
-  final screenWidth = mediaQuery.size.width;
-  final screenHeight = mediaQuery.size.height;
   final l10n = AppLocalizations.of(context)!;
-
-  // Service Instance
   final inputService = InputService();
-
-  // DYNAMIC DIMENSIONS
-  final double topRadius = screenWidth * 0.07;
-  final double dragHandleWidth = screenWidth * 0.12;
-  final double dragHandleHeight = 4.0;
-  final double dragHandleVerticalPadding = screenHeight * 0.015;
-  final double titleFontSize = screenWidth * 0.05; // ~20px
-  final double titleBottomPadding = screenHeight * 0.03;
-  final double contentHorizontalPadding = screenWidth * 0.05; // ~20px
-  final double itemGap = screenWidth * 0.03; // Gap between buttons
 
   showModalBottomSheet<void>(
     context: context,
@@ -36,12 +23,24 @@ void showAttachmentSheet({
     isScrollControlled: true,
     useSafeArea: true,
     builder: (BuildContext modalContext) {
+      // Re-query media query inside builder for correct dimensions if orientation changes
+      final mediaQuery = MediaQuery.of(context);
+      final screenWidth = mediaQuery.size.width;
+      final screenHeight = mediaQuery.size.height;
+
+      // DYNAMIC DIMENSIONS
+      final double topRadius = screenWidth * 0.07;
+      final double dragHandleWidth = screenWidth * 0.12;
+      final double dragHandleHeight = 4.0;
+      final double dragHandleVerticalPadding = screenHeight * 0.015;
+      final double titleFontSize = screenWidth * 0.05;
+      final double titleBottomPadding = screenHeight * 0.03;
+      final double contentHorizontalPadding = screenWidth * 0.05;
+      final double itemGap = screenWidth * 0.03;
+
       return Container(
         padding: EdgeInsets.only(
-          bottom: MediaQuery
-              .of(context)
-              .padding
-              .bottom + 20,
+          bottom: mediaQuery.padding.bottom + 20,
         ),
         decoration: BoxDecoration(
           color: AppColors.background,
@@ -97,11 +96,13 @@ void showAttachmentSheet({
                       iconPath: 'assets/icons/camera.svg',
                       label: l10n.actionCamera,
                       onTap: () {
+                        // Close sheet first
                         Navigator.pop(context);
+                        // Trigger service (validation & logic inside)
                         inputService.pickPhoto(
                           context,
                           source: ImageSource.camera,
-                          onPhotoSelected: () {},
+                          onSelectionComplete: () {},
                         );
                       },
                     ),
@@ -118,14 +119,14 @@ void showAttachmentSheet({
                         inputService.pickPhoto(
                           context,
                           source: ImageSource.gallery,
-                          onPhotoSelected: () {},
+                          onSelectionComplete: () {},
                         );
                       },
                     ),
                   ),
                   SizedBox(width: itemGap),
 
-                  // 3. File
+                  // 3. File (Universal Document Picker)
                   Expanded(
                     child: AttachmentSheetButton(
                       iconPath: 'assets/icons/attachment.svg',

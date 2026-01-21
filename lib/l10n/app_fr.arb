@@ -486,5 +486,13 @@
   "featureQuizPrefix": "Questionnaire:",
   "featureExploreDescription": "Découvrez tous les modèles disponibles",
   "myPlan": "Mon plan",
-  "discountText": "80 % de réduction sur tous les forfaits !"
+  "discountText": "80 % de réduction sur tous les forfaits !",
+  "benefit10": "Pièces jointes supplémentaires",
+  "featureStudyMessage": "Vous êtes un tuteur expert. Votre objectif est d'expliquer le sujet à l'utilisateur de manière exhaustive. Utilisez une structure claire, des exemples et des analogies. Décomposez les idées complexes en parties faciles à assimiler pour garantir un apprentissage efficace. Sujet :",
+  "featureQuizMessage": "Vous êtes l'animateur du quiz. Créez une question à choix multiple spécifique en fonction du sujet choisi par l'utilisateur. Attendez sa réponse. Ensuite, évaluez-la et posez la question suivante. Ne révélez pas toutes les réponses d'un coup. Maintenez l'interactivité. Sujet :",
+  "attachmentSheetTitle": "Pièces jointes",
+  "actionCamera": "Caméra",
+  "actionGallery": "Galerie",
+  "actionFile": "Fichier",
+  "listening": "À l'écoute"
 }

@@ -483,7 +483,6 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         .width;
     final double horizontalPadding = screenWidth * 0.06;
 
-    String benefit7Text = localizations.benefit7;
     List<String> benefits = [];
     if (planType == 'plus') {
       benefits = [
@@ -491,8 +490,9 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         localizations.benefit3,
         localizations.benefit5,
         localizations.benefit4,
-        benefit7Text,
+        localizations.benefit7,
         localizations.benefit9,
+        localizations.benefit10,
         localizations.benefitPremiumModels,
       ];
     } else if (planType == 'pro') {
@@ -500,7 +500,8 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         localizations.oldBenefits,
         localizations.benefit5,
         localizations.benefit1,
-        benefit7Text
+        localizations.benefit10,
+        localizations.benefit7,
       ];
     } else if (planType == 'ultra') {
       benefits = [
@@ -508,7 +509,8 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         localizations.benefit8,
         localizations.benefit1,
         localizations.benefit5,
-        benefit7Text
+        localizations.benefit10,
+        localizations.benefit7,
       ];
     }
 

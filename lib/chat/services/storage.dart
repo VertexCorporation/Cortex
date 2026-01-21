@@ -1,6 +1,7 @@
 // lib/chat/services/storage.dart
 
 import 'dart:async';
+import 'dart:convert';
 import 'package:cortex/cache.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
@@ -185,6 +186,13 @@ class ChatStorageService {
     if (isFluxMode) return;
     try {
       final db = await DbHelper().db;
+
+      // LOGIC UPDATE: Serialize attachment paths
+      String? serializedAttachments;
+      if (m.attachmentPaths.isNotEmpty) {
+        serializedAttachments = jsonEncode(m.attachmentPaths);
+      }
+
       await db.update(
         'messages',
         {
@@ -192,7 +200,8 @@ class ChatStorageService {
           'text': m.text,
           'isUser': m.isUserMessage ? 1 : 0,
           'isReported': m.isReported ? 1 : 0,
-          'photoPath': m.photoPath,
+          // Store the JSON string in the existing column
+          'photoPath': serializedAttachments,
           'model': m.model,
           'includeInContext': m.includeInContext ? 1 : 0,
           'ts': DateTime
@@ -214,17 +223,25 @@ class ChatStorageService {
     try {
       final db = await DbHelper().db;
       final batch = db.batch();
-      batch.delete('messages',
-          where: 'conversationId = ?', whereArgs: [convId]);
+      batch.delete(
+          'messages', where: 'conversationId = ?', whereArgs: [convId]);
+
       for (int i = 0; i < msgs.length; i++) {
         final m = msgs[i];
+
+        // LOGIC UPDATE: Serialize attachment paths
+        String? serializedAttachments;
+        if (m.attachmentPaths.isNotEmpty) {
+          serializedAttachments = jsonEncode(m.attachmentPaths);
+        }
+
         batch.insert('messages', {
           'uuid': m.id,
           'conversationId': convId,
           'idx': i,
           'isUser': m.isUserMessage ? 1 : 0,
           'text': m.text,
-          'photoPath': m.photoPath,
+          'photoPath': serializedAttachments, // Store JSON here
           'isReported': m.isReported ? 1 : 0,
           'model': m.model,
           'includeInContext': m.includeInContext ? 1 : 0,
@@ -238,10 +255,17 @@ class ChatStorageService {
       if (msgs.isNotEmpty) {
         await _updateConversationTimestamp(convId, db);
         final lastMessage = msgs.last;
+
+        // Helper to get a displayable path for the stream (usually just the first one or null)
+        final displayPath = lastMessage.attachmentPaths.isNotEmpty
+            ? lastMessage.attachmentPaths.first
+            : null;
+
         _lastMsgController.add({
           'convId': convId,
           'text': lastMessage.text,
-          'photoPath': lastMessage.photoPath,
+          'photoPath': displayPath,
+          // Stream listeners might expect a single path or null
           'ts': DateTime
               .now()
               .millisecondsSinceEpoch,
@@ -280,12 +304,12 @@ class ChatStorageService {
       _handleDiskError(e, 'removeEmptyMessagesForConversation');
     }
 
+    // Logic Update: Check hasAttachments
     return inMemory
         .where((m) =>
     m.text
         .trim()
-        .isNotEmpty ||
-        (m.photoPath != null && m.photoPath!.trim().isNotEmpty))
+        .isNotEmpty || m.hasAttachments)
         .toList();
   }
 
@@ -305,13 +329,19 @@ class ChatStorageService {
     if (isFluxMode) return;
     try {
       final db = await DbHelper().db;
+
+      String? serializedAttachments;
+      if (m.attachmentPaths.isNotEmpty) {
+        serializedAttachments = jsonEncode(m.attachmentPaths);
+      }
+
       final messageData = {
         'uuid': m.id,
         'conversationId': convId,
         'idx': idx,
         'isUser': m.isUserMessage ? 1 : 0,
         'text': m.text,
-        'photoPath': m.photoPath,
+        'photoPath': serializedAttachments,
         'isReported': m.isReported ? 1 : 0,
         'model': m.model,
         'includeInContext': m.includeInContext ? 1 : 0,
@@ -331,10 +361,14 @@ class ChatStorageService {
           .now()
           .millisecondsSinceEpoch;
 
+      final displayPath = m.attachmentPaths.isNotEmpty
+          ? m.attachmentPaths.first
+          : null;
+
       _lastMsgController.add({
         'convId': convId,
         'text': m.text,
-        'photoPath': m.photoPath,
+        'photoPath': displayPath,
         'ts': now,
       });
     } catch (e) {

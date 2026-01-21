@@ -14,8 +14,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// fetching data from Firestore, caching it locally to allow offline usage,
 /// and providing reactive updates to the UI.
 class UserProvider with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth? _authOverride;
+  final FirebaseFirestore? _firestoreOverride;
+
+  FirebaseAuth get _auth => _authOverride ?? FirebaseAuth.instance;
+  FirebaseFirestore get _firestore =>
+      _firestoreOverride ?? FirebaseFirestore.instance;
+
+  UserProvider({FirebaseAuth? auth, FirebaseFirestore? firestore})
+      : _authOverride = auth,
+        _firestoreOverride = firestore;
 
   Map<String, dynamic>? _userData;
   StreamSubscription<DocumentSnapshot>? _userSubscription;
@@ -24,6 +32,12 @@ class UserProvider with ChangeNotifier {
 
   /// The current user's data as a map. Returns null if not logged in.
   Map<String, dynamic>? get userData => _userData;
+
+  @visibleForTesting
+  set userData(Map<String, dynamic>? data) {
+    _userData = data;
+    notifyListeners();
+  }
 
   /// Returns true if a user is authenticated and their data has been loaded.
   bool get isLoggedIn => _auth.currentUser != null && _userData != null;
@@ -89,9 +103,7 @@ class UserProvider with ChangeNotifier {
   /// The first initial of the user's name for use in avatars. Defaults to '?'.
   String get profileInitial {
     final name = username;
-    if (name
-        .trim()
-        .isEmpty || name == 'Guest') {
+    if (name.trim().isEmpty || name == 'Guest') {
       return '?';
     }
     return name.trim()[0].toUpperCase();
@@ -167,7 +179,6 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-
   /// Clears all user data and cancels the Firestore stream subscription.
   ///
   /// This should be called when the user signs out to clean up resources
@@ -191,7 +202,7 @@ class UserProvider with ChangeNotifier {
       final jsonString = jsonEncode(
         data,
         toEncodable: (object) =>
-        object is Timestamp ? object.toDate().toIso8601String() : object,
+            object is Timestamp ? object.toDate().toIso8601String() : object,
       );
       await prefs.setString('cached_user_data', jsonString);
     } catch (e) {

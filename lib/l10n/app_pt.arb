@@ -535,5 +535,13 @@
   "featureQuizPrefix": "Questionário:",
   "featureExploreDescription": "Descubra todos os modelos disponíveis",
   "myPlan": "Meu plano",
-  "discountText": "80% de desconto em todos os planos!"
+  "discountText": "80% de desconto em todos os planos!",
+  "benefit10": "Mais anexos",
+  "featureStudyMessage": "Você é um tutor experiente. Seu objetivo é explicar o tópico do usuário de forma abrangente. Utilize uma estrutura clara, exemplos e analogias. Divida ideias complexas em partes fáceis de assimilar para garantir que o usuário aprenda com eficácia. Tópico:",
+  "featureQuizMessage": "Você é o mestre do quiz. Crie uma pergunta de múltipla escolha específica com base no tópico escolhido pelo usuário. Aguarde a resposta. Em seguida, avalie-a e faça a próxima pergunta. Não revele todas as respostas de uma vez. Mantenha o quiz interativo. Tópico:",
+  "attachmentSheetTitle": "Anexos",
+  "actionCamera": "Câmera",
+  "actionGallery": "Galeria",
+  "actionFile": "Arquivo",
+  "listening": "Ouvindo"
 }

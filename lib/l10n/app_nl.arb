@@ -535,5 +535,13 @@
   "featureQuizPrefix": "Quiz:",
   "featureExploreDescription": "Ontdek alle beschikbare modellen",
   "myPlan": "Mijn plan",
-  "discountText": "80% korting op alle abonnementen!"
+  "discountText": "80% korting op alle abonnementen!",
+  "benefit10": "Meer bijlagen",
+  "featureStudyMessage": "U bent een ervaren docent. Uw doel is om het onderwerp van de gebruiker volledig uit te leggen. Gebruik een duidelijke structuur, voorbeelden en analogieën. Breek complexe ideeën op in behapbare delen om ervoor te zorgen dat de gebruiker effectief leert. Onderwerp:",
+  "featureQuizMessage": "Je bent de quizmaster. Genereer een specifieke meerkeuzevraag op basis van het onderwerp van de gebruiker. Wacht op het antwoord. Evalueer het vervolgens en stel de volgende vraag. Onthul niet alle antwoorden in één keer. Houd het interactief. Onderwerp:",
+  "attachmentSheetTitle": "Bijlagen",
+  "actionCamera": "Camera",
+  "actionGallery": "Galerij",
+  "actionFile": "Bestand",
+  "listening": "Luistert"
 }

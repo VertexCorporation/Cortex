@@ -666,6 +666,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get benefit9 => 'سمات جديدة';
 
   @override
+  String get benefit10 => 'المزيد من المرفقات';
+
+  @override
   String get oldBenefits => 'جميع مزايا الخطط الأقل';
 
   @override
@@ -1551,11 +1554,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+      'أنت مُدرّس خبير. هدفك هو شرح موضوع المستخدم شرحًا وافيًا. استخدم بنية واضحة، وأمثلة، وتشبيهات. قسّم الأفكار المعقدة إلى أجزاء يسهل فهمها لضمان تعلّم المستخدم بفعالية. الموضوع:';
 
   @override
   String get featureQuizMessage =>
-      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+      'أنت مُصمم أسئلة. أنشئ سؤالًا مُحددًا من نوع الاختيار من متعدد بناءً على موضوع المستخدم. انتظر إجابته. ثم قيّمها واطرح السؤال التالي. لا تكشف جميع الإجابات دفعة واحدة. اجعل الاختبار تفاعليًا. الموضوع:';
 
   @override
   String get myPlan => 'خطتي';
@@ -1564,17 +1567,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get discountText => 'خصم 80% على جميع الباقات!';
 
   @override
-  String get attachmentSheetTitle => 'Attachments';
+  String get attachmentSheetTitle => 'المرفقات';
 
   @override
-  String get actionCamera => 'Camera';
+  String get actionCamera => 'آلة تصوير';
 
   @override
-  String get actionGallery => 'Gallery';
+  String get actionGallery => 'معرض';
 
   @override
-  String get actionFile => 'File';
+  String get actionFile => 'ملف';
 
   @override
-  String get listening => 'Listening';
+  String get listening => 'الاستماع';
 }

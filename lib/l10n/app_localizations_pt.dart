@@ -677,6 +677,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get benefit9 => 'Novos temas';
 
   @override
+  String get benefit10 => 'Mais anexos';
+
+  @override
   String get oldBenefits => 'Todos os benefícios dos planos inferiores';
 
   @override
@@ -1575,11 +1578,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+      'Você é um tutor experiente. Seu objetivo é explicar o tópico do usuário de forma abrangente. Utilize uma estrutura clara, exemplos e analogias. Divida ideias complexas em partes fáceis de assimilar para garantir que o usuário aprenda com eficácia. Tópico:';
 
   @override
   String get featureQuizMessage =>
-      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+      'Você é o mestre do quiz. Crie uma pergunta de múltipla escolha específica com base no tópico escolhido pelo usuário. Aguarde a resposta. Em seguida, avalie-a e faça a próxima pergunta. Não revele todas as respostas de uma vez. Mantenha o quiz interativo. Tópico:';
 
   @override
   String get myPlan => 'Meu plano';
@@ -1588,17 +1591,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get discountText => '80% de desconto em todos os planos!';
 
   @override
-  String get attachmentSheetTitle => 'Attachments';
+  String get attachmentSheetTitle => 'Anexos';
 
   @override
-  String get actionCamera => 'Camera';
+  String get actionCamera => 'Câmera';
 
   @override
-  String get actionGallery => 'Gallery';
+  String get actionGallery => 'Galeria';
 
   @override
-  String get actionFile => 'File';
+  String get actionFile => 'Arquivo';
 
   @override
-  String get listening => 'Listening';
+  String get listening => 'Audição';
 }

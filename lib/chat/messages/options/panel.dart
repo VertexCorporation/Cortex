@@ -1,6 +1,6 @@
 // lib/chat/widgets/options/panel.dart
 
-import 'dart:ui' as ui; // For ImageFilter.blur
+import 'dart:ui' as ui;
 import 'package:cortex/chat/messages/messages.dart';
 import 'package:cortex/chat/messages/options/select.dart';
 import 'package:cortex/chat/providers/conversation.dart';
@@ -11,13 +11,16 @@ import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
+// ignore: depend_on_referenced_packages
+import 'package:path/path.dart' as p;
+
 import '../../../library/backend/data/service.dart';
 import '../../../library/utils.dart';
 import '../../../notifications/introvert.dart';
 import 'change.dart';
 import 'item.dart';
 
-// --- Enum and Constants ---
 enum MessageOption { copy, report, regenerate, select, stop, changeModel, edit }
 
 const Duration _kShortAnimationDuration = Duration(milliseconds: 100);
@@ -69,58 +72,80 @@ class OptionsPanelViewModel {
   }
 
   List<MessageOption> getVisibleOptions(BuildContext context) {
-
-    // 1. Get langCode from the provided context.
-    final langCode = Localizations.localeOf(context).languageCode;
-
+    final langCode = Localizations
+        .localeOf(context)
+        .languageCode;
     final currentModelId = message.model ?? '';
-    final conversationHasPhoto = conversation.messages.any((m) => m.photoPath != null);
 
-    // 2. Fetch entities, passing the required langCode.
-    final modelSeriesData = ModelDataUtils.findParentSeriesData(currentModelId, langCode: langCode, modelService: modelService);
-    final currentModel = modelService.getPreciseModelData(currentModelId, langCode: langCode);
+    // LOGIC UPDATE: Iterate attachments to find images.
+    final bool conversationHasImages = conversation.messages.any((m) {
+      return m.attachmentPaths.any((path) => _isImageFile(path));
+    });
 
-    // 3. Use entity properties directly and safely.
+    final modelSeriesData = ModelDataUtils.findParentSeriesData(
+        currentModelId, langCode: langCode, modelService: modelService);
+    final currentModel = modelService.getPreciseModelData(
+        currentModelId, langCode: langCode);
+
     final isDynamicContext = session.isDynamicChat;
     final isOfflineModel = modelSeriesData?.isServerSide == false;
-    final currentModelCanHandleImages = modelService.hasModality(currentModelId, langCode: langCode, modality: 'image');
-    final hasPremiumAccess = session.isUserSubscribed || session.premiumTrialUses < 3;
+
+    final currentModelCanHandleImages = modelService.hasModality(
+        currentModelId, langCode: langCode, modality: 'image');
+    final hasPremiumAccess = session.isUserSubscribed ||
+        session.premiumTrialUses < 3;
     final isCurrentModelPremium = currentModel.isPremium;
 
     return _baseOptions.where((option) {
-      if (conversation.isWaitingForResponse && (option == MessageOption.regenerate || option == MessageOption.changeModel || option == MessageOption.edit)) {
+      if (conversation.isWaitingForResponse &&
+          (option == MessageOption.regenerate ||
+              option == MessageOption.changeModel ||
+              option == MessageOption.edit)) {
         return false;
       }
       if (option == MessageOption.stop && !message.isThinking) {
         return false;
       }
+
       if (option == MessageOption.regenerate) {
         if (isCurrentModelPremium && !hasPremiumAccess) return false;
         if (!isOfflineModel && !internet.isConnected) return false;
       }
-      if (conversationHasPhoto && !currentModelCanHandleImages) {
-        if (option == MessageOption.regenerate || option == MessageOption.edit || option == MessageOption.changeModel) {
+
+      // LOGIC UPDATE: Only restrict model ops if chat has IMAGES and model CAN'T handle them.
+      // (Text files are safe for any model).
+      if (conversationHasImages && !currentModelCanHandleImages) {
+        if (option == MessageOption.regenerate ||
+            option == MessageOption.edit ||
+            option == MessageOption.changeModel) {
           return false;
         }
       }
+
       if (option == MessageOption.changeModel) {
         if (!isDynamicContext && modelSeriesData != null) {
-          final int validExtCount = ModelDataUtils.validVariantCountForChangingModel(
+          final int validExtCount = ModelDataUtils
+              .validVariantCountForChangingModel(
             parentSeries: modelSeriesData,
-            conversationHasPhoto: conversationHasPhoto,
+            conversationHasPhoto: conversationHasImages, // Renamed in utility call logic if needed, or pass boolean
           );
           if (validExtCount <= 1) return false;
-        } else if (modelSeriesData == null) { // If no series data, can't change model.
+        } else if (modelSeriesData == null) {
           return false;
         }
       }
       return true;
     }).toList();
   }
+
+  bool _isImageFile(String path) {
+    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
+  }
 }
 
 // ===========================================================================
-// SECTION: UI WIDGET
+// SECTION: UI WIDGET (Unchanged)
 // ===========================================================================
 
 class AnimatedMessageOptionsPanel extends StatefulWidget {
@@ -146,18 +171,24 @@ class AnimatedMessageOptionsPanel extends StatefulWidget {
   });
 
   @override
-  State<AnimatedMessageOptionsPanel> createState() => _AnimatedMessageOptionsPanelState();
+  State<AnimatedMessageOptionsPanel> createState() =>
+      _AnimatedMessageOptionsPanelState();
 }
 
-class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPanel> with SingleTickerProviderStateMixin {
+class _AnimatedMessageOptionsPanelState
+    extends State<AnimatedMessageOptionsPanel>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
   late final Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(duration: _kShortAnimationDuration, vsync: this);
-    _scaleAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic));
+    _animationController =
+        AnimationController(duration: _kShortAnimationDuration, vsync: this);
+    _scaleAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(
+        CurvedAnimation(
+            parent: _animationController, curve: Curves.easeOutCubic));
     _animationController.forward();
   }
 
@@ -169,7 +200,8 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
 
   void _dismissPanel() {
     if (!mounted) return;
-    if (_animationController.status == AnimationStatus.forward || _animationController.status == AnimationStatus.completed) {
+    if (_animationController.status == AnimationStatus.forward ||
+        _animationController.status == AnimationStatus.completed) {
       _animationController.reverse().then((_) {
         if (mounted) widget.onDismiss();
       });
@@ -180,7 +212,8 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
     Navigator.of(context).push(PageRouteBuilder(
       pageBuilder: (_, __, ___) => screen,
       transitionsBuilder: (_, animation, __, child) {
-        final tween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero).chain(CurveTween(curve: Curves.easeOut));
+        final tween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
+            .chain(CurveTween(curve: Curves.easeOut));
         return SlideTransition(position: animation.drive(tween), child: child);
       },
     ));
@@ -189,16 +222,20 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
   void _onCopyTapped() {
     final localizations = AppLocalizations.of(context)!;
     Clipboard.setData(ClipboardData(text: widget.message.text));
-    Provider.of<IntrovertNotificationService>(context, listen: false).showNotification(message: localizations.messageCopied, type: NotificationType.success, bottomOffset: 0.07);
+    Provider
+        .of<IntrovertNotificationService>(context, listen: false)
+        .showNotification(message: localizations.messageCopied,
+        type: NotificationType.success,
+        bottomOffset: 0.07);
     _dismissPanel();
   }
 
   void _onSelectTapped() {
     _dismissPanel();
-    _navigateToScreen(context, SelectTextScreen(messageNotifier: widget.messageNotifier));
+    _navigateToScreen(
+        context, SelectTextScreen(messageNotifier: widget.messageNotifier));
   }
 
-  /// Handles the tap event for the "Change Model" option.
   void _onChangeModelTapped() {
     _dismissPanel();
     showModelSelectionDialog(
@@ -224,16 +261,21 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
       modelService: modelService,
     );
 
-    final List<MessageOption> visibleOptions = viewModel.getVisibleOptions(context);
+    final List<MessageOption> visibleOptions = viewModel.getVisibleOptions(
+        context);
 
     if (visibleOptions.isEmpty) {
-      // Dismiss the panel if there are no options to show.
       WidgetsBinding.instance.addPostFrameCallback((_) => _dismissPanel());
       return const SizedBox.shrink();
     }
 
-    final screenSize = MediaQuery.of(context).size;
-    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final screenSize = MediaQuery
+        .of(context)
+        .size;
+    final keyboardHeight = MediaQuery
+        .of(context)
+        .viewInsets
+        .bottom;
     final panelWidth = screenSize.width * _UIFactors.panelWidthFactor;
     final optionHeight = screenSize.height * _UIFactors.optionHeightFactor;
     final borderRadius = screenSize.width * _UIFactors.borderRadiusFactor;
@@ -241,7 +283,9 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
 
     final double estimatedPanelHeight = visibleOptions.fold(0.0, (sum, opt) {
       if (opt == MessageOption.changeModel) {
-        return sum + (optionHeight + (screenSize.height * _UIFactors.changeModelVerticalPaddingFactor * 2));
+        return sum + (optionHeight +
+            (screenSize.height * _UIFactors.changeModelVerticalPaddingFactor *
+                2));
       }
       return sum + optionHeight;
     });
@@ -253,7 +297,8 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
       targetLeft = widget.position.dx - panelWidth;
       if (targetLeft < margin) targetLeft = margin;
     }
-    if (targetTop + estimatedPanelHeight > screenSize.height - margin - keyboardHeight) {
+    if (targetTop + estimatedPanelHeight >
+        screenSize.height - margin - keyboardHeight) {
       targetTop = widget.position.dy - estimatedPanelHeight;
       if (targetTop < margin) targetTop = margin;
     }
@@ -285,35 +330,73 @@ class _AnimatedMessageOptionsPanelState extends State<AnimatedMessageOptionsPane
                     decoration: BoxDecoration(
                       color: AppColors.secondaryColor,
                       borderRadius: BorderRadius.circular(borderRadius),
-                      boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2))],
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black26,
+                            blurRadius: 8,
+                            offset: Offset(0, 2))
+                      ],
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: visibleOptions.map((option) {
                         switch (option) {
                           case MessageOption.copy:
-                            return OptionPanelItem(label: localizations.copy, iconAsset: 'assets/icons/copy.svg', onTap: _onCopyTapped, borderRadius: borderRadius);
+                            return OptionPanelItem(label: localizations.copy,
+                                iconAsset: 'assets/icons/copy.svg',
+                                onTap: _onCopyTapped,
+                                borderRadius: borderRadius);
                           case MessageOption.report:
-                            return OptionPanelItem(label: localizations.report, iconAsset: 'assets/icons/warning.svg', onTap: () { _dismissPanel(); widget.onReport?.call(); }, borderRadius: borderRadius);
+                            return OptionPanelItem(label: localizations.report,
+                                iconAsset: 'assets/icons/warning.svg',
+                                onTap: () {
+                                  _dismissPanel();
+                                  widget.onReport?.call();
+                                },
+                                borderRadius: borderRadius);
                           case MessageOption.regenerate:
-                            return OptionPanelItem(label: localizations.regenerate, iconAsset: 'assets/icons/regenerate.svg', onTap: () { _dismissPanel(); widget.onRegenerate?.call(); }, borderRadius: borderRadius);
+                            return OptionPanelItem(
+                                label: localizations.regenerate,
+                                iconAsset: 'assets/icons/regenerate.svg',
+                                onTap: () {
+                                  _dismissPanel();
+                                  widget.onRegenerate?.call();
+                                },
+                                borderRadius: borderRadius);
                           case MessageOption.select:
-                            return OptionPanelItem(label: localizations.selectText, iconAsset: 'assets/icons/select.svg', onTap: _onSelectTapped, borderRadius: borderRadius);
+                            return OptionPanelItem(
+                                label: localizations.selectText,
+                                iconAsset: 'assets/icons/select.svg',
+                                onTap: _onSelectTapped,
+                                borderRadius: borderRadius);
                           case MessageOption.changeModel:
                             return OptionPanelItem(
                               label: localizations.changeModel,
                               iconAsset: 'assets/icons/variant.svg',
                               onTap: _onChangeModelTapped,
                               padding: EdgeInsets.symmetric(
-                                horizontal: screenSize.width * _UIFactors.horizontalPaddingFactor,
-                                vertical: screenSize.height * _UIFactors.changeModelVerticalPaddingFactor,
+                                horizontal: screenSize.width *
+                                    _UIFactors.horizontalPaddingFactor,
+                                vertical: screenSize.height *
+                                    _UIFactors.changeModelVerticalPaddingFactor,
                               ),
                               borderRadius: borderRadius,
                             );
                           case MessageOption.stop:
-                            return OptionPanelItem(label: localizations.stop, iconAsset: 'assets/icons/stop.svg', onTap: () { _dismissPanel(); widget.onStop?.call(); }, borderRadius: borderRadius);
+                            return OptionPanelItem(label: localizations.stop,
+                                iconAsset: 'assets/icons/stop.svg',
+                                onTap: () {
+                                  _dismissPanel();
+                                  widget.onStop?.call();
+                                },
+                                borderRadius: borderRadius);
                           case MessageOption.edit:
-                            return OptionPanelItem(label: localizations.edit, iconAsset: 'assets/icons/edit.svg', onTap: () { _dismissPanel(); widget.onEdit?.call(); }, borderRadius: borderRadius);
+                            return OptionPanelItem(label: localizations.edit,
+                                iconAsset: 'assets/icons/edit.svg',
+                                onTap: () {
+                                  _dismissPanel();
+                                  widget.onEdit?.call();
+                                },
+                                borderRadius: borderRadius);
                         }
                       }).toList(),
                     ),

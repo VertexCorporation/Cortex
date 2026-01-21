@@ -654,6 +654,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get benefit9 => '新主题';
 
   @override
+  String get benefit10 => '更多附件';
+
+  @override
   String get oldBenefits => '包含所有较低级别计划的权益';
 
   @override
@@ -1480,11 +1483,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+      '您是一位资深导师。您的目标是全面深入地讲解用户感兴趣的主题。请使用清晰的结构、丰富的示例和类比。将复杂的概念分解成易于理解的部分，以确保用户能够高效学习。主题：';
 
   @override
   String get featureQuizMessage =>
-      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+      '您是一位出题人。请根据用户选择的主题生成一道选择题。等待用户作答。然后，评估答案并提出下一题。不要一次性显示所有答案。保持互动性。主题：';
 
   @override
   String get myPlan => '我的计划';
@@ -1493,17 +1496,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get discountText => '所有套餐享2折特惠！';
 
   @override
-  String get attachmentSheetTitle => 'Attachments';
+  String get attachmentSheetTitle => '附件';
 
   @override
-  String get actionCamera => 'Camera';
+  String get actionCamera => '相机';
 
   @override
-  String get actionGallery => 'Gallery';
+  String get actionGallery => '画廊';
 
   @override
-  String get actionFile => 'File';
+  String get actionFile => '文件';
 
   @override
-  String get listening => 'Listening';
+  String get listening => '聆听';
 }

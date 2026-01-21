@@ -535,5 +535,13 @@
   "featureQuizPrefix": "Pirskirin:",
   "featureExploreDescription": "Hemû modelên berdest bibînin",
   "myPlan": "Plana Min",
-  "discountText": "%80 Daxistin li ser hemû planan!"
+  "discountText": "%80 Daxistin li ser hemû planan!",
+  "benefit10": "Pêvekên Zêdetir",
+  "featureStudyMessage": "Tu mamosteyekî pispor î. Armanca te ew e ku mijara bikarhêner bi awayekî berfireh rave bikî. Avahiyek zelal, mînak û analojiyan bi kar bîne. Ramanên tevlihev parçe bike nav beşên hêsan da ku bikarhêner bi bandor fêr bibe. Mijar:",
+  "featureQuizMessage": "Tu pisporê quizê yî. Li gorî mijara bikarhêner pirsek pir-bijartî ya taybetî çêbike. Li benda bersiva wan be. Piştre, wê binirxîne û pirsa din bipirse. Hemû bersivên xwe di carekê de eşkere neke. Wê înteraktîf bihêle. Mijar:",
+  "attachmentSheetTitle": "Pêvek",
+  "actionCamera": "Kamîra",
+  "actionGallery": "Galerya",
+  "actionFile": "Dosî",
+  "listening": "Guhdarî dike"
 }

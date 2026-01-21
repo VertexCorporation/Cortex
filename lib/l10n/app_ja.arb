@@ -535,5 +535,13 @@
   "featureQuizPrefix": "クイズ：",
   "featureExploreDescription": "利用可能なすべてのモデルを見る",
   "myPlan": "私の計画",
-  "discountText": "全プラン80%割引！"
+  "discountText": "全プラン80%割引！",
+  "benefit10": "その他の添付ファイル",
+  "featureStudyMessage": "あなたは熟練した講師です。目標は、ユーザーのトピックを包括的に説明することです。明確な構成、例、類推を用いて説明しましょう。複雑な概念を分かりやすい部分に分割し、ユーザーが効果的に学習できるようにします。トピック：",
+  "featureQuizMessage": "あなたはクイズマスターです。ユーザーのトピックに基づいて、具体的な多肢選択式の質問を作成します。回答を待ちます。その後、回答を評価し、次の質問をします。一度にすべての回答を公開しないでください。インタラクティブな形式にしてください。トピック：",
+  "attachmentSheetTitle": "添付ファイル",
+  "actionCamera": "カメラ",
+  "actionGallery": "ギャラリー",
+  "actionFile": "ファイル",
+  "listening": "聞き取り中"
 }

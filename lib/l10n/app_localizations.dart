@@ -1370,6 +1370,12 @@ abstract class AppLocalizations {
   /// **'New Themes'**
   String get benefit9;
 
+  /// No description provided for @benefit10.
+  ///
+  /// In en, this message translates to:
+  /// **'More Attachments'**
+  String get benefit10;
+
   /// No description provided for @oldBenefits.
   ///
   /// In en, this message translates to:

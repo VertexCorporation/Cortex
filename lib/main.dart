@@ -51,6 +51,7 @@ import 'chat/services/select.dart';
 import 'chat/services/send.dart';
 import 'chat/services/speech.dart';
 import 'chat/services/stop.dart';
+import 'chat/services/voice.dart';
 import 'funds/backend.dart';
 import 'initialization.dart';
 import 'internet.dart';
@@ -246,8 +247,7 @@ class AppGatekeeper extends StatelessWidget {
 
   /// Cached bootstrap future to avoid re-running initialization on hot reload
   /// or rebuilds of [FutureBuilder].
-  static final Future<BootstrapResult> _bootstrapFuture =
-  AppBootstrap.init();
+  static final Future<BootstrapResult> _bootstrapFuture = AppBootstrap.init();
 
   @override
   Widget build(BuildContext context) {
@@ -311,8 +311,7 @@ List<SingleChildWidget> _buildCoreProviders(AppStatus initialStatus,
         dio.interceptors.add(
           RetryInterceptor(
             dio: dio,
-            logPrint: (Object msg) =>
-                debugPrint('[DioRetry-Global] $msg'),
+            logPrint: (Object msg) => debugPrint('[DioRetry-Global] $msg'),
             retries: 5,
             retryDelays: const <Duration>[
               Duration(seconds: 1),
@@ -355,12 +354,10 @@ List<SingleChildWidget> _buildCoreProviders(AppStatus initialStatus,
       create: (_) => AuthService(),
     ),
     Provider<ExtrovertNotificationService>(
-      create: (_) =>
-          ExtrovertNotificationService(navigatorKey: navigatorKey),
+      create: (_) => ExtrovertNotificationService(navigatorKey: navigatorKey),
     ),
     Provider<IntrovertNotificationService>(
-      create: (_) =>
-          IntrovertNotificationService(navigatorKey: navigatorKey),
+      create: (_) => IntrovertNotificationService(navigatorKey: navigatorKey),
     ),
 
     // Model repository + service.
@@ -473,8 +470,7 @@ List<SingleChildWidget> _buildSettingsProviders() {
             SettingsGeneralProvider(
               authService: context.read<AuthService>(),
               profileService: context.read<ProfileService>(),
-              notificationService:
-              context.read<IntrovertNotificationService>(),
+              notificationService: context.read<IntrovertNotificationService>(),
             );
         provider.updateConnectivity(internetProvider);
         return provider;
@@ -508,11 +504,10 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
           notificationService: context.read<IntrovertNotificationService>(),
         );
 
-        final langCode =
-            context
-                .read<LocaleProvider>()
-                .locale
-                .languageCode;
+        final langCode = context
+            .read<LocaleProvider>()
+            .locale
+            .languageCode;
         scheduleMicrotask(() => vm.initialize(langCode));
 
         return vm;
@@ -632,6 +627,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
             scrollService: context.read<ScrollService>(),
             offlineService: context.read<OfflineService>(),
             modelService: context.read<ModelService>(),
+            voiceService: context.read<VoiceService>(), // [NEW]
           ),
     ),
     Provider<StopService>(
@@ -655,6 +651,12 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
     ),
     ChangeNotifierProvider<SpeechService>(
       create: (_) => SpeechService(),
+    ),
+    ChangeNotifierProxyProvider<SpeechService, VoiceService>(
+      create: (context) =>
+          VoiceService(speechService: context.read<SpeechService>()),
+      update: (context, speech, previous) =>
+      previous ?? VoiceService(speechService: speech),
     ),
   ];
 }

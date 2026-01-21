@@ -674,6 +674,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get benefit9 => 'Tema baru';
 
   @override
+  String get benefit10 => 'Lampiran Lainnya';
+
+  @override
   String get oldBenefits => 'Semua manfaat dari paket yang lebih rendah';
 
   @override
@@ -1576,11 +1579,11 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+      'Anda adalah seorang tutor ahli. Tujuan Anda adalah menjelaskan topik pengguna secara komprehensif. Gunakan struktur yang jelas, contoh, dan analogi. Uraikan ide-ide kompleks menjadi bagian-bagian yang mudah dipahami untuk memastikan pengguna belajar secara efektif. Topik:';
 
   @override
   String get featureQuizMessage =>
-      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+      'Anda adalah seorang pengelola kuis. Buat pertanyaan pilihan ganda spesifik berdasarkan topik yang diberikan pengguna. Tunggu jawabannya. Kemudian, evaluasi jawaban tersebut dan ajukan pertanyaan berikutnya. Jangan ungkapkan semua jawaban sekaligus. Jaga agar tetap interaktif. Topik:';
 
   @override
   String get myPlan => 'Rencana Saya';
@@ -1589,17 +1592,17 @@ class AppLocalizationsId extends AppLocalizations {
   String get discountText => 'Diskon 80% untuk semua paket!';
 
   @override
-  String get attachmentSheetTitle => 'Attachments';
+  String get attachmentSheetTitle => 'Lampiran';
 
   @override
-  String get actionCamera => 'Camera';
+  String get actionCamera => 'Kamera';
 
   @override
-  String get actionGallery => 'Gallery';
+  String get actionGallery => 'Galeri';
 
   @override
-  String get actionFile => 'File';
+  String get actionFile => 'Mengajukan';
 
   @override
-  String get listening => 'Listening';
+  String get listening => 'Mendengarkan';
 }

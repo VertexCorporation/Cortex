@@ -6,6 +6,9 @@ import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/chat/messages/messages.dart';
 import 'package:cortex/library/backend/data/service.dart';
 
+// ignore: depend_on_referenced_packages
+import 'package:path/path.dart' as p;
+
 /// Service responsible for building the list of messages in the format
 /// required by the backend API. It reads the current state from the relevant providers.
 class ContextService {
@@ -17,20 +20,12 @@ class ContextService {
     required ChatSessionProvider sessionProvider,
     required ConversationProvider conversationProvider,
     required ModelService modelService,
-  })  : _sessionProvider = sessionProvider,
+  })
+      : _sessionProvider = sessionProvider,
         _conversationProvider = conversationProvider,
         _modelService = modelService;
 
   /// Builds the list of messages for the API context.
-  ///
-  /// This method formats all relevant messages into the multimodal array format
-  /// that the API expects. It reads the system role from the `ChatSessionProvider`
-  /// and the message history from the `ConversationProvider`.
-  ///
-  /// [targetModelId]: The ID of the model the message will be sent to. This is used
-  ///                  to determine if image data should be included.
-  /// [includeLastUser]: If `false`, the very last user message in the history
-  ///                    will be excluded. This is used for regeneration scenarios.
   Future<List<Map<String, dynamic>>> buildContextMessages({
     bool includeLastUser = true,
     required String targetModelId,
@@ -46,7 +41,8 @@ class ContextService {
         .where((m) => m.includeInContext && !m.isThinking && !m.isError)
         .toList();
 
-    final bool targetModelSupportsImages = _modelService.hasModality(targetModelId, langCode: langCode, modality: 'image');
+    final bool targetModelSupportsImages = _modelService.hasModality(
+        targetModelId, langCode: langCode, modality: 'image');
 
     // Add the system prompt to the context, if it exists.
     if (systemRole != null && systemRole.isNotEmpty) {
@@ -56,7 +52,8 @@ class ContextService {
     // If we're regenerating a response, exclude the last user message
     // because it will be added again by the SendService.
     if (!includeLastUser && history.isNotEmpty) {
-      final int lastUserMessageIndex = history.lastIndexWhere((m) => m.isUserMessage);
+      final int lastUserMessageIndex =
+      history.lastIndexWhere((m) => m.isUserMessage);
       if (lastUserMessageIndex != -1) {
         history = history.sublist(0, lastUserMessageIndex);
       }
@@ -70,7 +67,7 @@ class ContextService {
       ));
     }
 
-    // As a final safety check, filter out any potential empty messages that might have been created.
+    // Safety check: Filter out empty messages
     return contextMessages.where((m) {
       final content = m['content'];
       if (content is String) return content.isNotEmpty;
@@ -80,34 +77,37 @@ class ContextService {
   }
 
   /// Helper function to convert a single `Message` object to the required
-  /// multimodal JSON format (`"content": [ ... ]`).
-  ///
-  /// This is a pure utility function that transforms data without side effects.
-  Future<Map<String, dynamic>> _formatMessageToJson(
-      Message message, {
-        required bool includeImage,
-      }) async {
+  /// multimodal JSON format.
+  Future<Map<String, dynamic>> _formatMessageToJson(Message message,
+      {required bool includeImage}) async {
     String role = message.isUserMessage ? "user" : "assistant";
     List<Map<String, dynamic>> contentParts = [];
 
-    // Add the text part of the message if it's not empty.
+    // 1. Text Content
     if (message.text.isNotEmpty) {
       contentParts.add({"type": "text", "text": message.text});
     }
 
-    // Conditionally add the image part.
-    // This is done only if the target model supports images AND the message has a photo.
-    if (includeImage && message.photoPath?.isNotEmpty == true) {
-      final String? base64Image = await Utils.formatBase64Image(message.photoPath!);
-      if (base64Image != null) {
-        contentParts.add({
-          "type": "image_url",
-          "image_url": {"url": base64Image}
-        });
+    // 2. Attachment Content (Images only for now)
+    if (includeImage && message.hasAttachments) {
+      for (final path in message.attachmentPaths) {
+        if (_isImageFile(path)) {
+          final String? base64Image = await Utils.formatBase64Image(path);
+          if (base64Image != null) {
+            contentParts.add({
+              "type": "image_url",
+              "image_url": {"url": base64Image}
+            });
+          }
+        }
       }
     }
 
-    // The API always expects the content to be a list, even for text-only messages.
     return {"role": role, "content": contentParts};
+  }
+
+  bool _isImageFile(String path) {
+    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
   }
 }

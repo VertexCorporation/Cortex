@@ -675,6 +675,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get benefit9 => 'Nuovi temi';
 
   @override
+  String get benefit10 => 'Altri allegati';
+
+  @override
   String get oldBenefits => 'Tutti i vantaggi dei piani inferiori';
 
   @override
@@ -1573,11 +1576,11 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'You are an expert tutor. Your goal is to explain the user\'s topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:';
+      'Sei un tutor esperto. Il tuo obiettivo è spiegare l\'argomento dell\'utente in modo completo. Utilizza una struttura chiara, esempi e analogie. Suddividi i concetti complessi in parti comprensibili per garantire che l\'utente apprenda in modo efficace. Argomento:';
 
   @override
   String get featureQuizMessage =>
-      'You are a quiz master. Generate a specific multiple-choice question based on the user\'s topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:';
+      'Sei un maestro dei quiz. Genera una domanda a risposta multipla specifica basata sull\'argomento dell\'utente. Attendi la risposta. Quindi, valutala e poni la domanda successiva. Non rivelare tutte le risposte contemporaneamente. Mantieni l\'interattività. Argomento:';
 
   @override
   String get myPlan => 'Il mio piano';
@@ -1586,17 +1589,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get discountText => 'Sconto dell\'80% su tutti i piani!';
 
   @override
-  String get attachmentSheetTitle => 'Attachments';
+  String get attachmentSheetTitle => 'Allegati';
 
   @override
-  String get actionCamera => 'Camera';
+  String get actionCamera => 'Telecamera';
 
   @override
-  String get actionGallery => 'Gallery';
+  String get actionGallery => 'Galleria';
 
   @override
   String get actionFile => 'File';
 
   @override
-  String get listening => 'Listening';
+  String get listening => 'Ascolto';
 }

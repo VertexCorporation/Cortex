@@ -670,6 +670,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get benefit9 => 'New Themes';
 
   @override
+  String get benefit10 => 'More Attachments';
+
+  @override
   String get oldBenefits => 'All Benefits From Lower Plans';
 
   @override

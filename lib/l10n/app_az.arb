@@ -471,5 +471,13 @@
   "featureQuizPrefix": "Viktorina:",
   "featureExploreDescription": "Bütün mövcud modelləri kəşf edin",
   "myPlan": "Planım",
-  "discountText": "Bütün planlara 80% endirim!"
+  "discountText": "Bütün planlara 80% endirim!",
+  "benefit10": "Daha çox əlavə",
+  "featureStudyMessage": "Siz peşəkar repetitorsunuz. Məqsədiniz istifadəçinin mövzusunu hərtərəfli izah etməkdir. Aydın struktur, nümunələr və bənzətmələrdən istifadə edin. İstifadəçinin effektiv şəkildə öyrənməsini təmin etmək üçün mürəkkəb fikirləri asanlıqla başa düşülən hissələrə ayırın. Mövzu:",
+  "featureQuizMessage": "Siz viktorina ustasısınız. İstifadəçinin mövzusuna əsasən müəyyən bir çoxseçimli sual yaradın. Cavabını gözləyin. Sonra onu qiymətləndirin və növbəti sualı verin. Bütün cavabları birdən açıqlamayın. İnteraktiv saxlayın. Mövzu:",
+  "attachmentSheetTitle": "Əlavələr",
+  "actionCamera": "Kamera",
+  "actionGallery": "Qalereya",
+  "actionFile": "Fayl",
+  "listening": "Dinləyir"
 }

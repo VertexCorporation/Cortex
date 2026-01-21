@@ -1,14 +1,11 @@
 // lib/chat/services/send.dart
 
-// This file defines the SendService, responsible for the business logic of
-// sending messages. It acts as an orchestrator, reading state from the dedicated
-// providers (Conversation, Session, Input) and coordinating actions between
-// other services (API, Offline, Context) to fulfill a send request.
-// It is completely decoupled from the UI.
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
+// ignore: depend_on_referenced_packages
+import 'package:path/path.dart' as p;
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -19,6 +16,7 @@ import 'package:cortex/chat/services/offline.dart';
 import 'package:cortex/chat/services/scroll.dart';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:cortex/chat/services/utils.dart';
+import 'package:cortex/chat/services/voice.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:flutter/widgets.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -32,11 +30,8 @@ import '../messages/messages.dart';
 
 /// Service responsible for sending messages. It orchestrates interactions between providers and other services.
 class SendService {
-  // Dependencies on the new, separated providers
   final ConversationProvider _conversationProvider;
   final InputProvider _inputProvider;
-
-  // Dependencies on other services
   final ApiService _apiService;
   final ContextService _contextService;
   final ScrollService _scrollService;
@@ -44,8 +39,8 @@ class SendService {
   final Uuid _uuid = const Uuid();
   bool _isSending = false;
   final ModelService _modelService;
+  final VoiceService _voiceService;
 
-  /// Constructs the SendService with all its required dependencies.
   SendService({
     required ConversationProvider conversationProvider,
     required ChatSessionProvider sessionProvider,
@@ -55,6 +50,7 @@ class SendService {
     required ScrollService scrollService,
     required OfflineService offlineService,
     required ModelService modelService,
+    required VoiceService voiceService,
   })
       : _conversationProvider = conversationProvider,
         _inputProvider = inputProvider,
@@ -62,16 +58,17 @@ class SendService {
         _contextService = contextService,
         _scrollService = scrollService,
         _offlineService = offlineService,
-        _modelService = modelService;
+        _modelService = modelService,
+        _voiceService = voiceService;
 
   Future<bool> sendMessage({
     required BuildContext context,
     required AppLocalizations localizations,
     required String messageText,
-    File? photo,
+    // REMOVED: File? photo (replaced by provider access)
     bool isRegenerate = false,
     int? regenerateAiIndex,
-    String? regeneratePhotoPath,
+    // REMOVED: String? regeneratePhotoPath (replaced by message lookup)
     String? overrideModelId,
   }) async {
     if (_isSending) return false;
@@ -79,8 +76,29 @@ class SendService {
     final inputProvider = context.read<InputProvider>();
     final sessionProvider = context.read<ChatSessionProvider>();
 
+    // -----------------------------------------------------------------------
+    // 1. PREPARE CONTENT (TEXT & ATTACHMENTS)
+    // -----------------------------------------------------------------------
+
     final String text = messageText.trim();
-    if (text.isEmpty && photo == null && regeneratePhotoPath == null) {
+    List<String> currentAttachmentPaths = [];
+
+    // Logic: If regenerating, get attachments from the last user message.
+    // If new message, get from InputProvider.
+    if (isRegenerate) {
+      final messages = _conversationProvider.messages;
+      final lastUserMessage = messages.reversed.firstWhere(
+            (m) => m.isUserMessage,
+        orElse: () => Message(text: '', isUserMessage: true),
+      );
+      currentAttachmentPaths = List.from(lastUserMessage.attachmentPaths);
+    } else {
+      currentAttachmentPaths =
+          inputProvider.attachments.map((a) => a.file.path).toList();
+    }
+
+    // Validation: Must have either text OR attachments
+    if (text.isEmpty && currentAttachmentPaths.isEmpty) {
       return false;
     }
 
@@ -88,11 +106,10 @@ class SendService {
 
     try {
       // -----------------------------------------------------------------------
-      // 0. HANDLE FEATURE MODES (Hidden System Prompts)
+      // 2. HANDLE FEATURE MODES (Hidden System Prompts)
       // -----------------------------------------------------------------------
 
       final activeMode = inputProvider.featureMode;
-
       String textForApi = text;
 
       if (activeMode == ChatInputMode.study) {
@@ -111,21 +128,19 @@ class SendService {
       final hasInternet = await InternetConnection().hasInternetAccess;
 
       // -----------------------------------------------------------------------
-      // 1. DETERMINE INITIAL TARGET ID
+      // 3. DETERMINE INITIAL TARGET ID
       // -----------------------------------------------------------------------
 
       if (overrideModelId != null && overrideModelId.isNotEmpty) {
         apiModelIdForSend = overrideModelId;
-      } else if (sessionProvider
-          .isDynamicChat) {
+      } else if (sessionProvider.isDynamicChat) {
         apiModelIdForSend = 'cortex/auto';
       } else {
-        apiModelIdForSend =
-            sessionProvider.modelId;
+        apiModelIdForSend = sessionProvider.modelId;
       }
 
       // -----------------------------------------------------------------------
-      // 2. SMART MODEL RESOLUTION
+      // 4. SMART MODEL RESOLUTION (Updated for List<File>)
       // -----------------------------------------------------------------------
 
       if (apiModelIdForSend != null && apiModelIdForSend != 'cortex/auto') {
@@ -134,7 +149,10 @@ class SendService {
 
         if (entity.variants != null && entity.variants!.isNotEmpty) {
           final List<dynamic> variants = entity.variants!.values.toList();
-          final bool hasPhoto = photo != null || regeneratePhotoPath != null;
+
+          // Logic Update: Check if ANY attachment is an image
+          final bool hasVisualContent = currentAttachmentPaths.any((path) =>
+              _isImageFile(path));
 
           List<dynamic> getPreferredCandidates(List<dynamic> sourceList) {
             final filtered = sourceList.where((v) {
@@ -161,10 +179,11 @@ class SendService {
               errorMessage = localizations.errorNoModelsAvailable;
               apiModelIdForSend = null;
             } else {
-              if (hasPhoto) {
+              if (hasVisualContent) {
+                // Prioritize vision-capable offline models if images exist
                 final visionModel = downloadedVariants.firstWhere(
-                        (v) => (v['modalities']?['image'] == true),
-                    orElse: () => null
+                      (v) => (v['modalities']?['image'] == true),
+                  orElse: () => null,
                 );
                 apiModelIdForSend = visionModel != null
                     ? visionModel['id']
@@ -175,10 +194,10 @@ class SendService {
               }
             }
           } else {
-            if (hasPhoto) {
+            if (hasVisualContent) {
               final visionModel = variants.firstWhere(
-                      (v) => (v['modalities']?['image'] == true),
-                  orElse: () => null
+                    (v) => (v['modalities']?['image'] == true),
+                orElse: () => null,
               );
               apiModelIdForSend = visionModel != null
                   ? visionModel['id']
@@ -192,7 +211,7 @@ class SendService {
       }
 
       // -----------------------------------------------------------------------
-      // 3. VALIDATION & PREPARATION
+      // 5. VALIDATION & PREPARATION
       // -----------------------------------------------------------------------
 
       final isAutoRouter = apiModelIdForSend == 'cortex/auto';
@@ -204,7 +223,7 @@ class SendService {
           regenerateAiIndex,
           localizations,
           failedUserText: text,
-          failedPhotoPath: photo?.path ?? inputProvider.selectedPhoto?.path,
+          failedAttachmentPaths: currentAttachmentPaths,
         );
         return false;
       }
@@ -215,31 +234,22 @@ class SendService {
           !hasInternet) {
         errorMessage = localizations.checkYourInternet;
         _handleSendError(
-            ApiException(errorMessage), isRegenerate, regenerateAiIndex,
+            ApiException(errorMessage),
+            isRegenerate,
+            regenerateAiIndex,
             localizations,
             failedUserText: text,
-            failedPhotoPath: photo?.path ?? inputProvider.selectedPhoto?.path);
+            failedAttachmentPaths: currentAttachmentPaths
+        );
         return false;
       }
 
-      String? effectivePhotoPath;
-      if (photo != null) {
-        effectivePhotoPath = photo.path;
-      } else if (isRegenerate) {
-        final messages = _conversationProvider.messages;
-        final lastUserMessage = messages.reversed.firstWhere((m) =>
-        m.isUserMessage, orElse: () => Message(text: '', isUserMessage: true));
-
-        if (regeneratePhotoPath != null) {
-          effectivePhotoPath = lastUserMessage.photoPath;
-        }
-      }
-
+      // Construct the User Message object
       final userMessage = Message(
         text: text,
         isUserMessage: true,
-        photoPath: effectivePhotoPath,
-        isPhotoUploading: photo != null,
+        attachmentPaths: currentAttachmentPaths,
+        isAttachmentUploading: currentAttachmentPaths.isNotEmpty,
         model: apiModelIdForSend,
       );
 
@@ -249,8 +259,9 @@ class SendService {
       } else {
         if (_conversationProvider.conversationID == null) {
           final newConvId = _uuid.v4();
-          final newConvTitle = (text.isEmpty && userMessage.photoPath != null)
-              ? "🖼️"
+          final newConvTitle = (text.isEmpty &&
+              currentAttachmentPaths.isNotEmpty)
+              ? "📁"
               : (text.length > 28 ? text.substring(0, 28) : text);
 
           final modelIdForStorage = (sessionProvider.isDynamicChat)
@@ -269,29 +280,35 @@ class SendService {
         aiMessageIndex = _conversationProvider.messages.length - 1;
       }
 
-      // Clear using the fresh provider
-      inputProvider.clearSelectedPhoto();
+      // Clear the input attachments from the provider
+      inputProvider.clearAttachments();
 
       // Routing
       if (!isAutoRouter && !Utils.isServerSideModel(
           apiModelIdForSend, langCode: langCode, modelService: _modelService)) {
+        // Offline Flow
         final offlineModerator = OfflineModeratorService();
         if (offlineModerator.isPromptAcceptable(textForApi)) {
           unawaited(_sendLocalMessage(
-              textForApi, userMessage.photoPath, apiModelIdForSend));
+              textForApi, currentAttachmentPaths, apiModelIdForSend));
         } else {
           throw ApiException(localizations.errorPromptFlagged);
         }
       } else {
+        // Server Flow
         await _sendServerSideMessage(
           textForApi,
           apiModelIdForSend,
-          userMessage.photoPath,
+          currentAttachmentPaths,
           localizations,
           aiMessageIndex,
           langCode,
         );
         _conversationProvider.finishBotResponse(aiMessageIndex);
+
+        if (inputProvider.isVoiceModeActive) {
+          _voiceService.onAiResponseFinished();
+        }
       }
 
       if (!isAutoRouter) {
@@ -316,12 +333,17 @@ class SendService {
   }
 
   /// Sends a message using a local (on-device) model via the OfflineService.
-  Future<void> _sendLocalMessage(String text, String? photoPath,
+  Future<void> _sendLocalMessage(String text, List<String> attachmentPaths,
       String modelId) async {
     try {
       debugPrint(
           "[SendService] Delegating local message to OfflineService for model '$modelId'.");
-      await _offlineService.sendMessage(text, photoPath);
+
+      // Note: OfflineService needs to be updated to accept List<String>.
+      // For now, passing the first path if available to maintain signature if not yet refactored.
+      // Ideally: await _offlineService.sendMessage(text, attachmentPaths);
+      await _offlineService.sendMessage(
+          text, attachmentPaths.isNotEmpty ? attachmentPaths.first : null);
     } catch (e) {
       rethrow;
     }
@@ -330,46 +352,43 @@ class SendService {
   /// Sends a message using a server-side model via the ApiService.
   Future<void> _sendServerSideMessage(String text,
       String modelIdForRequest,
-      String? photoPath,
+      List<String> attachmentPaths,
       AppLocalizations localizations,
       int aiMessageIndex,
       String langCode,) async {
     final bool isAutoRouter = modelIdForRequest == 'cortex/auto';
-
-    // If it's the Auto Router, we don't fetch local entity data because the ID doesn't exist there.
-    // We treat it as a generic premium, online model.
     final ModelEntity model = _modelService.getPreciseModelData(
         modelIdForRequest, langCode: langCode);
-
-    // Auto router generally routes to top-tier models (GPT-4, Claude 3.5), so we treat it as Premium
-    // to ensure correct credit deduction logic in Cloud Functions.
     final bool isPremium = model.isPremium;
-
-    final bool isCharacterModel =
-    isAutoRouter ? false : (model.category == 'roleplay' ||
-        model.category == 'self');
+    final bool isCharacterModel = isAutoRouter ? false : (model.category ==
+        'roleplay' || model.category == 'self');
 
     debugPrint(
       "[SendService] Sending server request for model '$modelIdForRequest'. "
           "Is Auto: $isAutoRouter, Is Premium: $isPremium",
     );
 
+    // Build context history
     final memory = await _contextService.buildContextMessages(
       includeLastUser: false,
       targetModelId: modelIdForRequest,
-      langCode: langCode, // Pass langCode down to the context service.
+      langCode: langCode,
     );
 
-    // This helper function is called for each piece of text streamed from the API.
+    // Stream Handlers
     void onTextChunk(String textChunk) {
       if (_conversationProvider.wasResponseStopped) return;
       _conversationProvider.appendToLastBotMessage(textChunk);
+
+      if (_inputProvider.isVoiceModeActive) {
+        _voiceService.onAiStreamCallback(textChunk);
+      }
+
       if (_scrollService.isUserAtBottom()) {
         _scrollService.scrollToBottom();
       }
     }
 
-    // This helper function is called when the API generates and returns an image.
     Future<void> onImageReceived(String imageUrl) async {
       if (_conversationProvider.wasResponseStopped) return;
       try {
@@ -380,6 +399,7 @@ class SendService {
         final filePath = '${tempDir.path}/${_uuid.v4()}.png';
         final file = File(filePath);
         await file.writeAsBytes(imageBytes);
+        // Note: Logic for generated images should eventually append to attachmentPaths of the bot message
       } catch (e) {
         debugPrint("[SendService] Error saving received image: $e");
         _conversationProvider.setErrorMessage(
@@ -387,8 +407,14 @@ class SendService {
       }
     }
 
+    // Call API (Passing lists will require ApiService refactor, adapting to legacy signature here for safety)
+    // Note: To fully support multi-file, ApiService must be updated to accept List<String>.
+    // Here we pass the first path if available to satisfy the likely signature of ApiService if not updated.
+    final String? legacyPhotoParam = attachmentPaths.isNotEmpty
+        ? attachmentPaths.first
+        : null;
+
     if (isCharacterModel) {
-      // Use the safe property from the entity.
       final baseModelId = model.baseModelId;
       if (baseModelId == null || baseModelId.isEmpty) {
         throw ApiException(
@@ -400,7 +426,8 @@ class SendService {
         characterId: modelIdForRequest,
         baseModelId: baseModelId,
         isPremium: isPremium,
-        photoPath: photoPath,
+        photoPath: legacyPhotoParam,
+        // Needs ApiService update for List support
         onTextChunk: onTextChunk,
         onImageReceived: onImageReceived,
         localizations: localizations,
@@ -411,7 +438,8 @@ class SendService {
         userInput: text,
         context: memory,
         isPremium: isPremium,
-        photoPath: photoPath,
+        photoPath: legacyPhotoParam,
+        // Needs ApiService update for List support
         onTextChunk: onTextChunk,
         onImageReceived: onImageReceived,
         localizations: localizations,
@@ -419,20 +447,18 @@ class SendService {
     }
   }
 
-  /// Handles send errors by updating the ConversationProvider with an error state.
   void _handleSendError(Object error,
       bool isRegenerate,
       int? regenerateAiIndex,
       AppLocalizations localizations, {
         String? failedUserText,
-        String? failedPhotoPath,
+        List<String>? failedAttachmentPaths,
       }) {
     final String errorMessage = error is ApiException
         ? error.message
         : localizations.anErrorOccurred;
-    final bool isContentFlagError =
-        error is ApiException &&
-            error.message == localizations.errorPromptFlagged;
+    final bool isContentFlagError = error is ApiException &&
+        error.message == localizations.errorPromptFlagged;
 
     if (isRegenerate && regenerateAiIndex != null) {
       _conversationProvider.setErrorMessage(
@@ -444,7 +470,8 @@ class SendService {
       final userMessagePlaceholder = Message(
         text: failedUserText ?? "",
         isUserMessage: true,
-        photoPath: failedPhotoPath ?? _inputProvider.selectedPhoto?.path,
+        attachmentPaths: failedAttachmentPaths ??
+            _inputProvider.attachments.map((a) => a.file.path).toList(),
         includeInContext: !isContentFlagError,
       );
 
@@ -454,5 +481,10 @@ class SendService {
         isContentFlagError,
       );
     }
+  }
+
+  bool _isImageFile(String path) {
+    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
   }
 }

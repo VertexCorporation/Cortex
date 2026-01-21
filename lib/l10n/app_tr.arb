@@ -535,5 +535,13 @@
   "featureQuizPrefix": "Sınav:",
   "featureExploreDescription": "Mevcut tüm modelleri keşfedin",
   "myPlan": "Planım",
-  "discountText": "Tüm planlarda %80 indirim!"
+  "discountText": "Tüm planlarda %80 indirim!",
+  "benefit10": "Daha Fazla Ek",
+  "featureStudyMessage": "Siz uzman bir eğitmensiniz. Amacınız, kullanıcının konusunu kapsamlı bir şekilde açıklamaktır. Açık bir yapı, örnekler ve benzetmeler kullanın. Kullanıcının etkili bir şekilde öğrenmesini sağlamak için karmaşık fikirleri anlaşılabilir parçalara ayırın. Konu:",
+  "featureQuizMessage": "Siz bir bilgi yarışması yöneticisisiniz. Kullanıcının konusuna göre belirli bir çoktan seçmeli soru oluşturun. Cevaplarını bekleyin. Ardından, cevapları değerlendirin ve bir sonraki soruyu sorun. Tüm cevapları aynı anda göstermeyin. Etkileşimli tutun. Konu:",
+  "attachmentSheetTitle": "Ekler",
+  "actionCamera": "Kamera",
+  "actionGallery": "Galeri",
+  "actionFile": "Dosya",
+  "listening": "Dinliyor"
 }
