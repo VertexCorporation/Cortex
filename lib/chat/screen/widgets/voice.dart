@@ -1,261 +1,260 @@
+import 'package:cortex/app.dart';
+import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/chat/services/voice.dart';
-import 'package:cortex/l10n/app_localizations.dart'; // [NEW]
+import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:math' as math;
 
-class VoiceOverlay extends StatelessWidget {
-  const VoiceOverlay({super.key});
+class VoiceSessionOverlay extends StatefulWidget {
+  const VoiceSessionOverlay({super.key});
+
+  @override
+  State<VoiceSessionOverlay> createState() => _VoiceSessionOverlayState();
+}
+
+class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
+    with TickerProviderStateMixin {
+  late AnimationController _pulseController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final voiceService = context.watch<VoiceService>();
     final speechService = context.watch<SpeechService>();
-    final theme = Theme.of(context);
-    final localizations = AppLocalizations.of(context)!; // [NEW]
-    // invertedColor removed.
+    final inputProvider = context.read<InputProvider>();
 
-    return Container(
-      height: 250, // Arbitrary height for the bottom sheet area
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Stack(
-        alignment: Alignment.center,
+    // Auto-Close Logic:
+    // If VoiceService becomes idle, close the overlay.
+    if (voiceService.state == VoiceState.idle) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (inputProvider.isVoiceModeActive) {
+          inputProvider.setVoiceModeActive(false);
+        }
+      });
+    }
+
+    // Determine visual state
+    bool isUserSpeaking = voiceService.state == VoiceState.listening;
+    bool isAiSpeaking = voiceService.state == VoiceState.speaking;
+    bool isProcessing = voiceService.state == VoiceState.processing;
+
+    // Sound Level (0.0 to 1.0)
+    double level = speechService.soundLevel;
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Stack(
         children: [
-          // Visualizer Area
+          // 1. Close Button (Top Right)
           Positioned(
-            top: 40,
-            child: _VoiceVisualizer(
-              state: voiceService.state,
-              soundLevel: speechService.soundLevel,
+            top: MediaQuery.of(context).padding.top + 16,
+            right: 16,
+            child: IconButton(
+              icon: Icon(Icons.close, color: AppColors.primaryColor.inverted),
+              onPressed: () {
+                voiceService.stopSession(); // Stops logic
+                inputProvider.setVoiceModeActive(false); // Closes UI
+              },
             ),
           ),
 
-          // Controls
-          Positioned(
-            bottom: 20,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+          // 2. Central Visualizer
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Microphone / Stop Button
-                FloatingActionButton(
-                  onPressed: () {
-                    if (voiceService.state == VoiceState.speaking) {
-                      // Interrupt
-                      voiceService.stopSpeaking();
-                    } else if (voiceService.state == VoiceState.listening) {
-                      // Manual submit? or Stop?
-                      // If already listening, maybe do nothing or stop?
-                      // Let's assume it forces a "I'm done" signal if pressed while listening?
-                      voiceService.manualSubmit();
-                    } else {
-                      // Idle? Start listening.
-                      // We need a way to restart session if idle.
-                      // voiceService.startListening(); // Assume existing session
-                    }
-                  },
-                  backgroundColor: theme.colorScheme.primary,
-                  child: Icon(
-                    voiceService.state == VoiceState.speaking
-                        ? Icons.stop
-                        : Icons.mic,
-                    color: theme.colorScheme.onPrimary,
+                // Status Text
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: Text(
+                    isUserSpeaking
+                        ? "Listening..."
+                        : isAiSpeaking
+                            ? "Speaking..."
+                            : isProcessing
+                                ? "Thinking..."
+                                : "Connecting...",
+                    key: ValueKey(voiceService.state),
+                    style: TextStyle(
+                      color: AppColors.primaryColor.inverted.withOpacity(0.7),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
+                ),
+                const SizedBox(height: 48),
+
+                // Converting Lines <-> Circle
+                SizedBox(
+                  height: 200,
+                  width: double.infinity,
+                  child: isAiSpeaking
+                      ? _AiSpeakingVisualizer() // Circle pulsing
+                      : _UserListeningVisualizer(level: level), // Waveform
                 ),
               ],
             ),
           ),
 
-          // Close Button (Bottom Right)
+          // 3. Bottom Controls (Stop Button)
           Positioned(
-            bottom: 20,
-            right: 20,
-            child: IconButton(
-              onPressed: () {
-                // Close overlay
-                // We need to access InputProvider to toggle state
-                // AND stop voice service.
-                context.read<VoiceService>().stopSession();
-                // The InputProvider toggle will be handled by the parent widget based on state,
-                // or we can call it here.
-                // Ideally parent listens to 'idle' state, but let's be explicit.
-                // context.read<InputProvider>().setVoiceModeActive(false);
-                // We'll let the parent handle the "Close" logic via a callback or provider.
-              },
-              icon: Transform.rotate(
-                angle: math.pi, // 180 degrees
-                child: SvgPicture.asset(
-                  'assets/icons/arrow.svg',
-                  // Assuming this asset exists as per user request
-                  colorFilter: ColorFilter.mode(
-                      theme.colorScheme.onSurface, BlendMode.srcIn),
-                  width: 24,
+            bottom: MediaQuery.of(context).padding.bottom + 48,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  // If listening, stop and process.
+                  if (isUserSpeaking) {
+                    voiceService.manualSubmit();
+                  } else if (isAiSpeaking) {
+                    voiceService.stopSpeaking(); // Interrupt
+                  }
+                },
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: AppColors.secondaryColor, // Redish usually
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isUserSpeaking ? Icons.check : Icons.stop,
+                    color: Colors.white,
+                    size: 32,
+                  ),
                 ),
               ),
             ),
-          ),
+          )
+        ],
+      ),
+    );
+  }
+}
 
-          // Status Text
-          Positioned(
-            top: 10,
-            child: Text(
-              _getStatusText(voiceService.state, localizations),
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+class _UserListeningVisualizer extends StatelessWidget {
+  final double level;
+  const _UserListeningVisualizer({required this.level});
+
+  @override
+  Widget build(BuildContext context) {
+    // "Famous Lines" - classic Siri-like waveform
+    return CustomPaint(
+      painter:
+          _WavePainter(level: level, color: AppColors.primaryColor.inverted),
+      child: Container(height: 100, width: double.infinity),
+    );
+  }
+}
+
+class _AiSpeakingVisualizer extends StatefulWidget {
+  @override
+  State<_AiSpeakingVisualizer> createState() => _AiSpeakingVisualizerState();
+}
+
+class _AiSpeakingVisualizerState extends State<_AiSpeakingVisualizer>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1))
+          ..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Pulsing Circle
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          width: 100 + (_controller.value * 20),
+          height: 100 + (_controller.value * 20),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color:
+                AppColors.primaryColor.inverted.withOpacity(0.2), // Outer glow
+          ),
+          child: Center(
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primaryColor.inverted,
               ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
+}
 
-  String _getStatusText(VoiceState state, AppLocalizations localizations) {
-    switch (state) {
-      case VoiceState.listening:
-        return localizations.listening;
-      case VoiceState.processing:
-        return "Thinking..."; // Consider generalizing this later
-      case VoiceState.speaking:
-        return "Speaking..."; // Consider generalizing this later
-      default:
-        return "Ready";
+// Simple wave painter
+class _WavePainter extends CustomPainter {
+  final double level;
+  final Color color;
+  _WavePainter({required this.level, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+
+    final width = size.width;
+    final height = size.height;
+    final midY = height / 2;
+
+    // Draw 5 lines representing the wave
+    for (int i = 0; i < 5; i++) {
+      double offset = (i - 2) * 20.0;
+      // Sensitivity adjustment for visuals
+      double sensitiveLevel = level;
+      if (sensitiveLevel < 0.05) sensitiveLevel = 0.02; // Noise floor
+
+      double amp = sensitiveLevel *
+          80 *
+          (1.0 - (i - 2).abs() * 0.2); // Center line tall, sides short
+      if (amp < 2) amp = 2; // Min height
+
+      canvas.drawLine(
+        Offset(width / 2 + offset, midY - amp),
+        Offset(width / 2 + offset, midY + amp),
+        paint,
+      );
     }
   }
-}
-
-class _VoiceVisualizer extends StatefulWidget {
-  final VoiceState state;
-  final double soundLevel; // 0.0 to 1.0
-
-  const _VoiceVisualizer({
-    required this.state,
-    required this.soundLevel,
-  });
 
   @override
-  State<_VoiceVisualizer> createState() => _VoiceVisualizerState();
-}
-
-class _VoiceVisualizerState extends State<_VoiceVisualizer>
-    with TickerProviderStateMixin {
-  // Dot animations will be complex.
-  // We can use AnimatedContainer for simplicity or CustomPainter for performance/smoothness.
-  // User wants:
-  // Listening: 4 dots merge to 1 big dot. Grows with volume.
-  // Speaking: 4 dots separate. Grow/shrink.
-
-  // Let's use AnimatedAlign + AnimatedContainer for the merge/split effect.
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isMerged = widget.state == VoiceState.listening ||
-        widget.state == VoiceState.processing; // Processing also merged?
-    // So Listening = Merged.
-
-    // Calculate size based on volume
-    // Base size + (volume * multiplier)
-    double vol = widget.soundLevel;
-
-    // Allow volume simulation if Speaking (since we don't always get mic audio when TTS talks)
-    // Actually, FlutterTts doesn't expose audio visualization data easily on all platforms.
-    // We might need to fake the visualizer for TTS Output or use a randomizer/sine wave if state is Speaking.
-    if (widget.state == VoiceState.speaking) {
-      // Simulate checks
-      vol = (math.Random().nextDouble() * 0.5) + 0.3; // Random flutter
-    }
-
-    return SizedBox(
-      width: 200,
-      height: 100,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Dot 1
-          _AnimatedDot(
-            isMerged: isMerged,
-            index: 0,
-            volume: vol,
-          ),
-          _AnimatedDot(
-            isMerged: isMerged,
-            index: 1,
-            volume: vol,
-          ),
-          _AnimatedDot(
-            isMerged: isMerged,
-            index: 2,
-            volume: vol,
-          ),
-          _AnimatedDot(
-            isMerged: isMerged,
-            index: 3,
-            volume: vol,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AnimatedDot extends StatelessWidget {
-  final bool isMerged;
-  final int index;
-  final double volume;
-
-  const _AnimatedDot({
-    required this.isMerged,
-    required this.index,
-    required this.volume,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Layout:
-    // 0 1 2 3 (Horizontal line)
-    // Merged: All at center.
-
-    // Positions (x from -3 to 3)
-    final double spreadPositions = (index - 1.5) * 30.0; // -45, -15, 15, 45
-
-    final double targetX = isMerged ? 0 : spreadPositions;
-
-    // Size logic
-    // Merged: Big base (20) + volume * 50
-    // Separate: Small base (10) + volume * 20
-    final double size = isMerged
-        ? (30.0 + (volume * 40.0))
-        : (12.0 + (volume * 20.0)); // Individual dots react nicely
-
-    // Color logic
-    final theme = Theme.of(context);
-    final color = isMerged
-        ? theme.primaryColor
-        : theme.primaryColor.withValues(alpha: 0.7); // Maybe vary opacity?
-
-    return AnimatedAlign(
-      duration: const Duration(milliseconds: 400),
-      curve: Curves.easeInOut,
-      alignment: Alignment(targetX / 100.0, 0), // Simple mapping
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100), // Fast response to volume
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          boxShadow: isMerged
-              ? [
-            BoxShadow(
-              color: color.withValues(alpha: 0.4),
-              blurRadius: 20 + (volume * 20),
-              spreadRadius: 5 + (volume * 10),
-            )
-          ]
-              : [],
-        ),
-      ),
-    );
-  }
+  bool shouldRepaint(_WavePainter old) => old.level != level;
 }

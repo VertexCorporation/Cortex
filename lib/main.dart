@@ -103,11 +103,13 @@ class BootstrapResult {
   final AppStatus initialStatus;
   final String initialTheme;
   final String? initialLanguageCode;
+  final String initialModelId; // [NEW]
 
   BootstrapResult({
     required this.initialStatus,
     required this.initialTheme,
     required this.initialLanguageCode,
+    required this.initialModelId,
   });
 }
 
@@ -203,6 +205,10 @@ class AppBootstrap {
 
     final String? savedLanguage = prefs.getString('language_code');
 
+    // 7. Determine Initial Model (Optimistic) [NEW]
+    // The key 'cortex' is defined in ChatSessionProvider as _prefDefaultModelKey
+    final String initialModelId = prefs.getString('cortex') ?? 'cortex/auto';
+
     debugPrint(
         "[AppBootstrap] Finished in ${stopwatch
             .elapsedMilliseconds}ms. Status: $initialStatus");
@@ -212,6 +218,7 @@ class AppBootstrap {
       initialStatus: initialStatus,
       initialTheme: initialTheme,
       initialLanguageCode: savedLanguage,
+      initialModelId: initialModelId,
     );
   }
 }
@@ -276,7 +283,10 @@ class AppGatekeeper extends StatelessWidget {
                 bootstrap.initialLanguageCode,
               ),
               ..._buildSettingsProviders(),
-              ..._buildChatAndLibraryProviders(),
+              ..._buildChatAndLibraryProviders(
+                bootstrap.initialModelId,
+                bootstrap.initialLanguageCode,
+              ),
             ],
             child: Cortex(
               navigatorKey: navigatorKey,
@@ -494,7 +504,8 @@ List<SingleChildWidget> _buildSettingsProviders() {
 /// - Chat session + conversation + input
 /// - Recent models, API, scroll, dynamic chat
 /// - Response, context, offline, selection, read, send, stop, regenerate
-List<SingleChildWidget> _buildChatAndLibraryProviders() {
+List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
+    String? initialLanguageCode) {
   return <SingleChildWidget>[
     // Inbox, Model catalog and local state.
     ChangeNotifierProvider<InboxViewModel>(
@@ -543,14 +554,25 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
       create: (BuildContext context) =>
           ChatSessionProvider(
             modelService: context.read<ModelService>(),
+            initialModelId: initialModelId,
+            initialLocale: initialLanguageCode != null
+                ? Locale(initialLanguageCode)
+                : const Locale('en'),
           ),
       update: (BuildContext _,
           UserProvider user,
           ModelService modelService,
           ModelLocalStateProvider local,
           ChatSessionProvider? previous,) {
-        final session =
-            previous ?? ChatSessionProvider(modelService: modelService);
+        // Note: We don't re-pass initialModelId on update because the session preserves state itself.
+        final session = previous ??
+            ChatSessionProvider(
+              modelService: modelService,
+              initialModelId: initialModelId,
+              initialLocale: initialLanguageCode != null
+                  ? Locale(initialLanguageCode)
+                  : const Locale('en'),
+            );
         session.setDependencies(local);
 
         if (user.userData != null) {
@@ -616,6 +638,17 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
             modelService: context.read<ModelService>(),
           ),
     ),
+    // Speech and Voice services (Must be before SendService)
+    ChangeNotifierProvider<SpeechService>(
+      create: (_) => SpeechService(),
+    ),
+    ChangeNotifierProxyProvider<SpeechService, VoiceService>(
+      create: (context) =>
+          VoiceService(speechService: context.read<SpeechService>()),
+      update: (context, speech, previous) =>
+      previous ?? VoiceService(speechService: speech),
+    ),
+
     Provider<SendService>(
       create: (BuildContext context) =>
           SendService(
@@ -627,7 +660,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
             scrollService: context.read<ScrollService>(),
             offlineService: context.read<OfflineService>(),
             modelService: context.read<ModelService>(),
-            voiceService: context.read<VoiceService>(), // [NEW]
+            voiceService: context.read<VoiceService>(),
           ),
     ),
     Provider<StopService>(
@@ -648,15 +681,6 @@ List<SingleChildWidget> _buildChatAndLibraryProviders() {
             sendService: context.read<SendService>(),
             scrollService: context.read<ScrollService>(),
           ),
-    ),
-    ChangeNotifierProvider<SpeechService>(
-      create: (_) => SpeechService(),
-    ),
-    ChangeNotifierProxyProvider<SpeechService, VoiceService>(
-      create: (context) =>
-          VoiceService(speechService: context.read<SpeechService>()),
-      update: (context, speech, previous) =>
-      previous ?? VoiceService(speechService: speech),
     ),
   ];
 }

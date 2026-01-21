@@ -1614,8 +1614,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionGallery => 'Galerie';
 
   @override
-  String get actionFile => 'Déposer';
+  String get actionFile => 'Fichier';
 
   @override
-  String get listening => 'Écoute';
+  String get listening => 'À l\'écoute';
 }

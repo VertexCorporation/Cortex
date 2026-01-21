@@ -135,8 +135,10 @@ class AppInitializer with ChangeNotifier {
       _status = newStatus;
       debugPrint("AppInitializer: Status changed to $_status");
 
-      if (_status == AppStatus.ready && !_coreServicesReadyCompleter.isCompleted) {
-        debugPrint("[AppInitializer] Status became READY via flow change. Triggering post-startup tasks.");
+      if (_status == AppStatus.ready &&
+          !_coreServicesReadyCompleter.isCompleted) {
+        debugPrint(
+            "[AppInitializer] Status became READY via flow change. Triggering post-startup tasks.");
         _runInBackground(_performPostStartupTasks);
       }
 
@@ -177,11 +179,11 @@ class AppInitializer with ChangeNotifier {
     }
 
     if (_status == AppStatus.ready) {
-      dev.log("[AppInitializer] User exists locally. UI will render. Scheduling background tasks.");
+      dev.log(
+          "[AppInitializer] User exists locally. UI will render. Scheduling background tasks.");
       _listenToAuthStateChanges();
       _runInBackground(_performPostStartupTasks);
-    }
-    else {
+    } else {
       _listenToAuthStateChanges();
       if (_status != AppStatus.initializing) {
         _runInBackground(_determineUserFlow);
@@ -191,7 +193,6 @@ class AppInitializer with ChangeNotifier {
 
   /// Checks for app updates using a hybrid approach.
   Future<bool> _checkForAppUpdate() async {
-
     // --- STRATEGY 1: STORE CHECK (UPGRADER) ---
     try {
       await upgrader.initialize();
@@ -201,7 +202,8 @@ class AppInitializer with ChangeNotifier {
         return true;
       }
     } catch (e) {
-      dev.log("[AppInitializer] Upgrader check failed: $e. Proceeding to Remote Config fallback.");
+      dev.log(
+          "[AppInitializer] Upgrader check failed: $e. Proceeding to Remote Config fallback.");
     }
 
     // --- STRATEGY 2: REMOTE CONFIG FALLBACK ---
@@ -215,16 +217,19 @@ class AppInitializer with ChangeNotifier {
 
       await remoteConfig.fetchAndActivate();
 
-      final String minRequiredVersion = remoteConfig.getString('min_required_version');
+      final String minRequiredVersion =
+          remoteConfig.getString('min_required_version');
 
       if (minRequiredVersion.isNotEmpty) {
         final packageInfo = await PackageInfo.fromPlatform();
         final String currentVersion = packageInfo.version;
 
-        dev.log("[AppInitializer] Remote Config Check: Current ($currentVersion) vs Required ($minRequiredVersion)");
+        dev.log(
+            "[AppInitializer] Remote Config Check: Current ($currentVersion) vs Required ($minRequiredVersion)");
 
         if (_isCurrentVersionLower(currentVersion, minRequiredVersion)) {
-          dev.log("[AppInitializer] Remote Config enforcement: Update required.");
+          dev.log(
+              "[AppInitializer] Remote Config enforcement: Update required.");
           _updateStatus(AppStatus.updateRequired);
           return true;
         }
@@ -244,7 +249,8 @@ class AppInitializer with ChangeNotifier {
       List<int> reqParts = required.split('.').map(int.parse).toList();
 
       // Normalize lengths (e.g. 2.9 vs 2.9.1)
-      final length = [currParts.length, reqParts.length].reduce((a, b) => a > b ? a : b);
+      final length =
+          [currParts.length, reqParts.length].reduce((a, b) => a > b ? a : b);
       for (int i = 0; i < length; i++) {
         final int c = i < currParts.length ? currParts[i] : 0;
         final int r = i < reqParts.length ? reqParts[i] : 0;
@@ -266,7 +272,8 @@ class AppInitializer with ChangeNotifier {
     }
     _isPostStartupTasksRunning = true;
     try {
-      dev.log("[AppInitializer] Phase 2: Starting Background Verification & Heavy Init...");
+      dev.log(
+          "[AppInitializer] Phase 2: Starting Background Verification & Heavy Init...");
 
       await Future.delayed(const Duration(seconds: 2));
 
@@ -342,7 +349,8 @@ class AppInitializer with ChangeNotifier {
       if (_currentUser!.emailVerified) {
         final docExists = await _waitForUserDocument(_currentUser!.uid);
         if (!docExists) {
-          dev.log("[AppInitializer] Critical: User verified but no doc. Logging out.");
+          dev.log(
+              "[AppInitializer] Critical: User verified but no doc. Logging out.");
           await signOut();
         }
       }
@@ -352,8 +360,11 @@ class AppInitializer with ChangeNotifier {
           (e.message?.contains('Json conversion failed') == true ||
               e.message?.contains('403') == true);
 
-      if (isCorruptSessionError || e.code == 'user-token-expired' || e.code == 'user-disabled') {
-        dev.log("[AppInitializer] Remote verification failed (${e.code}). Logging out.");
+      if (isCorruptSessionError ||
+          e.code == 'user-token-expired' ||
+          e.code == 'user-disabled') {
+        dev.log(
+            "[AppInitializer] Remote verification failed (${e.code}). Logging out.");
         await signOut();
       }
     } catch (e) {
@@ -368,7 +379,7 @@ class AppInitializer with ChangeNotifier {
   /// otherwise returns `false`.
   Future<bool> _checkServerStatus() async {
     final bool isMaintenance =
-    kDebugMode ? false : await checkMaintenanceMode();
+        kDebugMode ? false : await checkMaintenanceMode();
 
     if (isMaintenance) {
       _updateStatus(AppStatus.maintenance);
@@ -385,9 +396,7 @@ class AppInitializer with ChangeNotifier {
     }
 
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (_status == AppStatus.initializing && user != null) {
-
-      }
+      if (_status == AppStatus.initializing && user != null) {}
       if (_isRegistering) {
         dev.log(
           "Auth State Listener: Ignoring auth change because a registration is in progress.",
@@ -405,7 +414,7 @@ class AppInitializer with ChangeNotifier {
           user == null) {
         debugPrint(
           'Auth State Listener: Offline and in ready state. '
-              'Ignoring null user from auth stream to maintain session.',
+          'Ignoring null user from auth stream to maintain session.',
         );
         return;
       }
@@ -455,7 +464,6 @@ class AppInitializer with ChangeNotifier {
 
       // STEP 3: FORCE UI UPDATE
       _updateStatus(AppStatus.needsLogin);
-
     } catch (e) {
       debugPrint("AppInitializer: Error during sign out: $e");
       _updateStatus(AppStatus.needsLogin);
@@ -518,6 +526,17 @@ class AppInitializer with ChangeNotifier {
       return;
     }
 
+    // --- OPTIMISTIC INIT: Load from cache immediately ---
+    // This ensures the UI (Premium banner, avatar, username) is populated
+    // instantly, eliminating the "blank state" flash while waiting for the network.
+    await _userProvider.loadFromCache();
+    // Use notifyListeners inside the provider if needed, or if data is set,
+    // the provider getter will return it when the UI builds.
+
+    // If we have valid cached data, we can signal the UI to be ready,
+    // although we still perform the security checks below.
+    // For now, we populate the data so when 'ready' fires properly, it's populated.
+
     try {
       // 3. Attempt Server Sync (Reload)
       // This is where "end of stream" errors usually happen.
@@ -554,14 +573,15 @@ class AppInitializer with ChangeNotifier {
         } else {
           // Critical: User verified, internet works, but NO doc exists after retries.
           // This implies a deleted account or data corruption.
-          debugPrint("[_determineUserFlow] Critical: Verified user missing doc. Signing out.");
+          debugPrint(
+              "[_determineUserFlow] Critical: Verified user missing doc. Signing out.");
           await signOut();
         }
-
       } else {
         // 5. Handle Unverified User
         // We need to fetch data to show the email address on the Verify Screen.
-        debugPrint("[_determineUserFlow] User email not verified. Loading verification data.");
+        debugPrint(
+            "[_determineUserFlow] User email not verified. Loading verification data.");
 
         Map<String, dynamic>? data;
         try {
@@ -584,7 +604,6 @@ class AppInitializer with ChangeNotifier {
         };
         _updateStatus(AppStatus.needsVerification);
       }
-
     } catch (e, s) {
       // --- CRITICAL ERROR HANDLING SECTION ---
 
@@ -598,17 +617,17 @@ class AppInitializer with ChangeNotifier {
 
         // A. TRANSIENT NETWORK ERRORS (DO NOT LOG OUT)
         // Includes: "unexpected end of stream", "network-request-failed", timeouts.
-        final bool isNetworkGlitch =
-            code == 'network-request-failed' ||
-                isConnectionFailure ||
-                msg.contains('end of stream') ||
-                msg.contains('connection closed') ||
-                msg.contains('socket') ||
-                msg.contains('timeout') ||
-                msg.contains('unable to resolve host');
+        final bool isNetworkGlitch = code == 'network-request-failed' ||
+            isConnectionFailure ||
+            msg.contains('end of stream') ||
+            msg.contains('connection closed') ||
+            msg.contains('socket') ||
+            msg.contains('timeout') ||
+            msg.contains('unable to resolve host');
 
         if (isNetworkGlitch) {
-          debugPrint("[_determineUserFlow] Network error during reload ($code). Assuming Offline-Ready.");
+          debugPrint(
+              "[_determineUserFlow] Network error during reload ($code). Assuming Offline-Ready.");
           // Even though reload failed, the local session is likely valid.
           // Let the user in. The UserProvider will handle missing data.
           _updateStatus(AppStatus.ready);
@@ -624,7 +643,8 @@ class AppInitializer with ChangeNotifier {
                 msg.contains('html'));
 
         if (isCorruptSession) {
-          debugPrint("[_determineUserFlow] Corrupt session (HTML/403). Logging out safely.");
+          debugPrint(
+              "[_determineUserFlow] Corrupt session (HTML/403). Logging out safely.");
           await signOut();
           return;
         }
@@ -636,16 +656,19 @@ class AppInitializer with ChangeNotifier {
           case 'user-not-found':
           case 'invalid-credential':
           case 'session-cookie-expired':
-            debugPrint("[_determineUserFlow] Fatal auth error ($code). Signing out.");
+            debugPrint(
+                "[_determineUserFlow] Fatal auth error ($code). Signing out.");
             await signOut();
             break;
 
           default:
-          // D. UNKNOWN FIREBASE ERRORS
-          // If we don't know what it is, but it's NOT a network glitch,
-          // it's safer to log it and sign out to prevent stuck states.
-            debugPrint("[_determineUserFlow] Unhandled Firebase Error: $code. Signing out.");
-            FirebaseCrashlytics.instance.recordError(e, s, reason: "AuthFlow_UnhandledFirebase");
+            // D. UNKNOWN FIREBASE ERRORS
+            // If we don't know what it is, but it's NOT a network glitch,
+            // it's safer to log it and sign out to prevent stuck states.
+            debugPrint(
+                "[_determineUserFlow] Unhandled Firebase Error: $code. Signing out.");
+            FirebaseCrashlytics.instance
+                .recordError(e, s, reason: "AuthFlow_UnhandledFirebase");
             await signOut();
             break;
         }
@@ -654,14 +677,17 @@ class AppInitializer with ChangeNotifier {
         // If it's a generic SocketException (not wrapped in FirebaseAuthException), handle it as network.
         if (e.toString().toLowerCase().contains('socketexception') ||
             e.toString().toLowerCase().contains('handshake')) {
-          debugPrint("[_determineUserFlow] Socket/Handshake error. Assuming Offline-Ready.");
+          debugPrint(
+              "[_determineUserFlow] Socket/Handshake error. Assuming Offline-Ready.");
           _updateStatus(AppStatus.ready);
           return;
         }
 
         // Otherwise, it's a crash-worthy logic error.
-        debugPrint("[_determineUserFlow] Critical system error: $e. Signing out.");
-        FirebaseCrashlytics.instance.recordError(e, s, reason: "AuthFlow_SystemError");
+        debugPrint(
+            "[_determineUserFlow] Critical system error: $e. Signing out.");
+        FirebaseCrashlytics.instance
+            .recordError(e, s, reason: "AuthFlow_SystemError");
         await signOut();
       }
     }
@@ -696,7 +722,7 @@ class AppInitializer with ChangeNotifier {
     for (int i = 0; i < maxRetries; i++) {
       debugPrint(
         "[_waitForUserDocument] Attempt ${i + 1}/$maxRetries to find user "
-            "document for UID: $uid",
+        "document for UID: $uid",
       );
 
       try {
@@ -707,7 +733,8 @@ class AppInitializer with ChangeNotifier {
             .timeout(const Duration(seconds: 6));
 
         if (userDoc.exists) {
-          debugPrint("[_waitForUserDocument] Success (server). Document found.");
+          debugPrint(
+              "[_waitForUserDocument] Success (server). Document found.");
           return true;
         }
 
@@ -734,7 +761,7 @@ class AppInitializer with ChangeNotifier {
         if (_isRetryableFirestoreError(e)) {
           debugPrint(
             "[_waitForUserDocument] Retryable Firestore error ${e.code}; "
-                "backing off and retrying.",
+            "backing off and retrying.",
           );
           DocumentSnapshot<Map<String, dynamic>>? cached;
           try {
@@ -749,7 +776,7 @@ class AppInitializer with ChangeNotifier {
           if (cached?.exists == true) {
             debugPrint(
               "[_waitForUserDocument] Cache says exists (after error); "
-                  "treating as ready.",
+              "treating as ready.",
             );
             return true;
           }
@@ -777,7 +804,7 @@ class AppInitializer with ChangeNotifier {
         if (cached?.exists == true) {
           debugPrint(
             "[_waitForUserDocument] Cache says exists (after timeout); "
-                "treating as ready.",
+            "treating as ready.",
           );
           return true;
         }
@@ -789,7 +816,7 @@ class AppInitializer with ChangeNotifier {
 
     debugPrint(
       "[_waitForUserDocument] Failed to find user document after $maxRetries "
-          "attempts.",
+      "attempts.",
     );
     return false;
   }
@@ -819,7 +846,7 @@ class AppInitializer with ChangeNotifier {
     } catch (e) {
       debugPrint(
         'Startup: Auto-login failed (credentials might be outdated). '
-            'Clearing secure storage. Error: $e',
+        'Clearing secure storage. Error: $e',
       );
       await secureStorage.deleteAll();
     }

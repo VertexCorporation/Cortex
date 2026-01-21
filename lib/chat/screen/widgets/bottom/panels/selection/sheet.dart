@@ -149,9 +149,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
   Future<void> _fetchAsync() async {
     if (!mounted) return;
     final modelService = context.read<ModelService>();
-    final langCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final langCode = Localizations.localeOf(context).languageCode;
     final models = await modelService.getModels(langCode: langCode);
 
     if (mounted && models != null) {
@@ -234,98 +232,134 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
           clipBehavior: Clip.antiAlias,
           child: _isLoading
               ? Center(
-            child: CircularProgressIndicator(
-              color: AppColors.primaryColor.inverted,
-            ),
-          )
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryColor.inverted,
+                  ),
+                )
               : Column(
-            children: [
-              // 1. DRAG HANDLE AREA (Attached to Sheet Controller)
-              SingleChildScrollView(
-                controller: sheetScrollController,
-                physics: const ClampingScrollPhysics(),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {}, // Capture taps to prevent click-through
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(height: sw * 0.08),
-                      // Handle Bar
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        width: sw * 0.12,
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: AppColors.quaternaryColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      // Title
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: Center(
-                          child: Text(
-                            widget.localizations.allModels,
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: titleSize,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryColor.inverted,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // 2. SCROLLABLE CONTENT (Independent Controller)
-              Expanded(
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: ScrollFog(
-                    scrollController: _internalScrollController,
-                    fogColor: AppColors.background,
-                    topFogHeight: 20,
-                    bottomFogHeight: 50,
-                    child: CustomScrollView(
-                      controller: _internalScrollController,
+                  children: [
+                    // 1. DRAG HANDLE AREA (Attached to Sheet Controller)
+                    SingleChildScrollView(
+                      controller: sheetScrollController,
                       physics: const ClampingScrollPhysics(),
-                      slivers: [
-                        if (_selfModels.isNotEmpty) ...[
-                          _buildSliverHeader(widget.localizations.customModels),
-                          _buildSliverGrid(_selfModels),
-                        ],
-                        if (_offlineModels.isNotEmpty) ...[
-                          _buildSliverHeader(widget.localizations.offlineModels),
-                          _buildSliverGrid(_offlineModels),
-                        ],
-                        if (_onlineSeries.isNotEmpty) ...[
-                          _buildSliverHeader(widget.localizations.onlineModels),
-                          _buildSliverOnlineList(),
-                        ],
-                        if (_characterModels.isNotEmpty) ...[
-                          _buildSliverHeader(widget.localizations.characterModels),
-                          _buildSliverGrid(_characterModels),
-                        ],
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {}, // Capture taps to prevent click-through
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(height: sw * 0.08),
+                            // Handle Bar
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              width: sw * 0.12,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: AppColors.quaternaryColor,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            // Title
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16.0),
+                              child: Center(
+                                child: Text(
+                                  widget.localizations.allModels,
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    fontSize: titleSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryColor.inverted,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
 
-                        SliverPadding(
-                          padding: EdgeInsets.only(
-                            bottom: MediaQuery
-                                .of(context)
-                                .padding
-                                .bottom + 20,
+                    // 2. SCROLLABLE CONTENT (Independent Controller)
+                    Expanded(
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: ScrollFog(
+                          scrollController: _internalScrollController,
+                          fogColor: AppColors.background,
+                          topFogHeight: 20,
+                          bottomFogHeight: 50,
+                          child: CustomScrollView(
+                            controller: _internalScrollController,
+                            physics: const ClampingScrollPhysics(),
+                            slivers: [
+                              // --- DYNAMIC CHAT (CORTEX) ---
+                              _buildSliverHeader("Dynamic Chat"),
+                              SliverPadding(
+                                padding: EdgeInsets.symmetric(horizontal: sp16),
+                                sliver: SliverToBoxAdapter(
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: (sw - (2 * sp16) - sp12) / 2,
+                                      height: sh *
+                                          0.085, // Enforce height to match grid cards
+                                      child: ModelCard(
+                                        title: 'Cortex',
+                                        imagePath: 'assets/cortex.svg',
+                                        isSelected: widget.currentModelId ==
+                                            'cortex/auto',
+                                        onBodyTap: () =>
+                                            _handleSelection('cortex/auto'),
+                                        showExpansionArrow: false,
+                                        backgroundGradient: LinearGradient(
+                                          begin: Alignment.centerRight,
+                                          end: Alignment.centerLeft,
+                                          colors: [
+                                            const Color(0xFF3B82F6)
+                                                .withValues(alpha: 0.1),
+                                            Colors.transparent,
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              if (_selfModels.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.customModels),
+                                _buildSliverGrid(_selfModels),
+                              ],
+                              if (_offlineModels.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.offlineModels),
+                                _buildSliverGrid(_offlineModels),
+                              ],
+                              if (_onlineSeries.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.onlineModels),
+                                _buildSliverOnlineList(),
+                              ],
+                              if (_characterModels.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.characterModels),
+                                _buildSliverGrid(_characterModels),
+                              ],
+
+                              SliverPadding(
+                                padding: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).padding.bottom +
+                                          20,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         );
       },
     );
@@ -369,7 +403,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
           mainAxisSpacing: sp12,
         ),
         delegate: SliverChildBuilderDelegate(
-              (context, index) {
+          (context, index) {
             final model = models[index];
             return ModelCard(
               title: model.displayTitle,
@@ -392,7 +426,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
       padding: EdgeInsets.symmetric(horizontal: sp16),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-              (context, index) {
+          (context, index) {
             final int itemIndex = index * 2;
             final item1 = _onlineSeries[itemIndex];
             final item2 = (itemIndex + 1 < _onlineSeries.length)
@@ -431,22 +465,21 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                         Expanded(
                           child: item2 != null
                               ? ModelCard(
-                            title: item2.displayTitle,
-                            imagePath: item2.imagePath ?? '',
-                            isSelected: isItem2Active,
-                            isExpanded: isItem2Expanded,
-                            showExpansionArrow: true,
-                            onBodyTap: () => _handleSelection(item2.id),
-                            onArrowTap: () =>
-                                _handleSeriesExpansion(item2.id),
-                          )
+                                  title: item2.displayTitle,
+                                  imagePath: item2.imagePath ?? '',
+                                  isSelected: isItem2Active,
+                                  isExpanded: isItem2Expanded,
+                                  showExpansionArrow: true,
+                                  onBodyTap: () => _handleSelection(item2.id),
+                                  onArrowTap: () =>
+                                      _handleSeriesExpansion(item2.id),
+                                )
                               : const SizedBox.shrink(),
                         ),
                       ],
                     ),
                   ),
                 ),
-
                 _VariantsPanel(
                   seriesModel: item1,
                   isVisible: isItem1Expanded,
@@ -508,8 +541,8 @@ class _VariantsPanel extends StatelessWidget {
     return AnimatedCrossFade(
       firstChild: SizedBox(width: width, height: 0),
       secondChild: _buildContent(),
-      crossFadeState: isVisible ? CrossFadeState.showSecond : CrossFadeState
-          .showFirst,
+      crossFadeState:
+          isVisible ? CrossFadeState.showSecond : CrossFadeState.showFirst,
       duration: const Duration(milliseconds: 300),
       reverseDuration: const Duration(milliseconds: 250),
       sizeCurve: Curves.fastOutSlowIn,
@@ -555,8 +588,8 @@ class _VariantsPanel extends StatelessWidget {
                 'assets/icons/route.svg',
                 width: iconSize * 0.8,
                 height: iconSize * 0.8,
-                colorFilter: ColorFilter.mode(
-                    AppColors.tertiaryColor, BlendMode.srcIn),
+                colorFilter:
+                    ColorFilter.mode(AppColors.tertiaryColor, BlendMode.srcIn),
               ),
               SizedBox(width: sp8),
               Text(

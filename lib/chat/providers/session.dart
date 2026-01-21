@@ -65,16 +65,16 @@ class ChatSessionProvider with ChangeNotifier {
     }
 
     final langCode = _currentLocale.languageCode;
-    final baseId = _modelService.getBaseIdFromFullId(
-        currentModel.id, langCode: langCode);
+    final baseId =
+    _modelService.getBaseIdFromFullId(currentModel.id, langCode: langCode);
 
     if (baseId == currentModel.id) {
       return currentModel.displayTitle;
     }
 
     try {
-      final seriesModel = _modelService.getPreciseModelData(
-          baseId, langCode: langCode);
+      final seriesModel =
+      _modelService.getPreciseModelData(baseId, langCode: langCode);
       return seriesModel.displayTitle;
     } catch (e) {
       return currentModel.displayTitle;
@@ -126,8 +126,55 @@ class ChatSessionProvider with ChangeNotifier {
   // SECTION 3: CONSTRUCTOR
   // ===========================================================================
 
-  ChatSessionProvider({required ModelService modelService})
-      : _modelService = modelService;
+  ChatSessionProvider({
+    required ModelService modelService,
+    String initialModelId = 'cortex/auto',
+    Locale initialLocale = const Locale('en'),
+  }) : _modelService = modelService {
+    // Optimistic Initialization
+    _currentLocale = initialLocale;
+
+    // We try to load the model immediately.
+    // NOTE: ModelService might not have full catalog yet, but basic logic might work
+    // or we can fall back gracefully without setting it to null (which implies dynamic).
+
+    // If we can't find it immediately, we store it to resolve later?
+    // Actually, initializeDefaultSession() was doing async prefs read.
+    // Now we have the ID.
+
+    try {
+      // We try to get precise data. If ModelService has static definitions for this ID, it works.
+      final langCode = initialLocale.languageCode;
+      final entity =
+      _modelService.getPreciseModelData(initialModelId, langCode: langCode);
+      selectModel(entity, savePreference: false);
+    } catch (e) {
+      // FIX: Race Condition - ModelService cache empty (App startup)
+
+      if (initialModelId == 'cortex/auto' || initialModelId == 'dynamic') {
+        startDynamicConversation(savePreference: false);
+      } else {
+        debugPrint(
+            "[ChatSessionProvider] ModelService cache empty. Using STUB for: $initialModelId");
+
+        final stubEntity = ModelEntity(
+          id: initialModelId,
+          displayTitle: initialModelId,
+          // Temporary title will be updated later
+          producer: 'Vertex',
+          displaySummary: '',
+          displayDescription: '',
+          type: 'online',
+          category: 'general',
+          tier: 'free',
+          modalities: {'text': true},
+          outputs: {'text': true},
+          isFullyLocalized: true,
+        );
+        selectModel(stubEntity, savePreference: false);
+      }
+    }
+  }
 
   // ===========================================================================
   // SECTION 4: STATE MUTATION METHODS (ACTIONS)
@@ -169,8 +216,8 @@ class ChatSessionProvider with ChangeNotifier {
 
     final langCode = _currentLocale.languageCode;
     try {
-      final entity = _modelService.getPreciseModelData(
-          savedId, langCode: langCode);
+      final entity =
+      _modelService.getPreciseModelData(savedId, langCode: langCode);
       selectModel(entity, savePreference: false);
     } catch (e) {
       startDynamicConversation(savePreference: false);
@@ -273,7 +320,8 @@ class ChatSessionProvider with ChangeNotifier {
     if (lastResetTimestamp != null) {
       final lastResetDate = lastResetTimestamp.toDate();
       final now = DateTime.now();
-      if (lastResetDate.year != now.year || lastResetDate.month != now.month ||
+      if (lastResetDate.year != now.year ||
+          lastResetDate.month != now.month ||
           lastResetDate.day != now.day) {
         trialUses = 0;
       }

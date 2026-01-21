@@ -17,7 +17,6 @@ import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/server/credits.dart';
-import 'package:cortex/chat/screen/widgets/voice.dart';
 import 'input/input.dart';
 
 class ChatInputPanel extends StatefulWidget {
@@ -114,18 +113,11 @@ class _ChatInputPanelState extends State<ChatInputPanel>
       alignment: Alignment.bottomCenter,
       clipBehavior: Clip.none,
       children: [
-        // Voice Overlay (Slides Up)
-        AnimatedSlide(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          offset: isVoiceMode ? Offset.zero : const Offset(0, 1.2),
-          child: const VoiceOverlay(),
-        ),
-
         // Standard Input Panel (Slides Down)
         AnimatedSlide(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
+          // Slide down (hide) when voice mode is active
           offset: isVoiceMode ? const Offset(0, 1.2) : Offset.zero,
           child: SizeChangedLayoutNotifier(
             child: Column(
@@ -200,8 +192,9 @@ class _ChatInputPanelState extends State<ChatInputPanel>
                   // Logic Update: Null check before adding
                   onPhotoSelected: (photo) {
                     if (photo != null) {
-                      context.read<InputProvider>().addAttachment(
-                          photo, isImage: true);
+                      context
+                          .read<InputProvider>()
+                          .addAttachment(photo, isImage: true);
                     }
                   },
                   onCancelEditing: () {

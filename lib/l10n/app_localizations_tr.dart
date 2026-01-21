@@ -1591,5 +1591,5 @@ class AppLocalizationsTr extends AppLocalizations {
   String get actionFile => 'Dosya';
 
   @override
-  String get listening => 'Dinleme';
+  String get listening => 'Dinliyor';
 }

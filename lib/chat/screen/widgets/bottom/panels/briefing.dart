@@ -278,29 +278,33 @@ class _BriefingPanelContent extends StatelessWidget {
       color: AppColors.primaryColor.inverted,
     );
 
-    return Container(
-      padding: EdgeInsets.symmetric(
-          vertical: paddingVertical, horizontal: paddingHorizontal),
-      decoration: boxDecoration,
-      child: Row(
-        children: [
-          SvgPicture.asset(
-            'assets/icons/warning.svg',
-            colorFilter: ColorFilter.mode(
-              AppColors.primaryColor.inverted,
-              BlendMode.srcIn,
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+            vertical: paddingVertical, horizontal: paddingHorizontal),
+        decoration: boxDecoration,
+        child: Row(
+          children: [
+            SvgPicture.asset(
+              'assets/icons/warning.svg',
+              colorFilter: ColorFilter.mode(
+                AppColors.primaryColor.inverted,
+                BlendMode.srcIn,
+              ),
+              width: iconSize,
+              height: iconSize,
             ),
-            width: iconSize,
-            height: iconSize,
-          ),
-          SizedBox(width: isTablet ? screenWidth * 0.02 : 12.0),
-          Expanded(
-            child: Text(
-              message,
-              style: textStyle,
+            SizedBox(width: isTablet ? screenWidth * 0.02 : 12.0),
+            Expanded(
+              child: Text(
+                message,
+                style: textStyle,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

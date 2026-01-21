@@ -1551,5 +1551,5 @@ class AppLocalizationsJa extends AppLocalizations {
   String get actionFile => 'ファイル';
 
   @override
-  String get listening => 'リスニング';
+  String get listening => '聞き取り中';
 }
