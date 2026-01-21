@@ -1603,5 +1603,5 @@ class AppLocalizationsPt extends AppLocalizations {
   String get actionFile => 'Arquivo';
 
   @override
-  String get listening => 'Audição';
+  String get listening => 'Ouvindo';
 }

@@ -307,7 +307,7 @@ class ApiService {
     required String characterId,
     required bool isPremium,
     required String baseModelId,
-    String? photoPath,
+    List<String> attachmentPaths = const [],
     Function(String textChunk)? onTextChunk,
     Function(String imageUrl)? onImageReceived,
     required AppLocalizations localizations,
@@ -315,18 +315,21 @@ class ApiService {
     List<Map<String, dynamic>> messages = List.from(context);
     List<Map<String, dynamic>> userMessageContent = [];
 
+    // 1. Add User Text
     if (userInput.isNotEmpty) {
       userMessageContent.add({"type": "text", "text": userInput});
     }
-    if (photoPath != null) {
-      String? base64Image = await Utils.formatBase64Image(photoPath);
-      if (base64Image != null) {
-        userMessageContent.add({
-          "type": "image_url",
-          "image_url": {"url": base64Image}
-        });
+
+    // 2. Process Attachments (Parallel processing for speed)
+    if (attachmentPaths.isNotEmpty) {
+      for (final path in attachmentPaths) {
+        final contentBlock = await Utils.processAttachment(path);
+        if (contentBlock != null) {
+          userMessageContent.add(contentBlock);
+        }
       }
     }
+
     if (userMessageContent.isNotEmpty) {
       messages.add({"role": "user", "content": userMessageContent});
     }
@@ -347,7 +350,7 @@ class ApiService {
     required bool isPremium,
     required String userInput,
     required List<Map<String, dynamic>> context,
-    String? photoPath,
+    List<String> attachmentPaths = const [],
     Function(String textChunk)? onTextChunk,
     Function(String imageUrl)? onImageReceived,
     required AppLocalizations localizations,
@@ -355,18 +358,21 @@ class ApiService {
     List<Map<String, dynamic>> messages = List.from(context);
     List<Map<String, dynamic>> userMessageContent = [];
 
+    // 1. Add User Text
     if (userInput.isNotEmpty) {
       userMessageContent.add({"type": "text", "text": userInput});
     }
-    if (photoPath != null) {
-      String? base64Image = await Utils.formatBase64Image(photoPath);
-      if (base64Image != null) {
-        userMessageContent.add({
-          "type": "image_url",
-          "image_url": {"url": base64Image}
-        });
+
+    // 2. Process Attachments
+    if (attachmentPaths.isNotEmpty) {
+      for (final path in attachmentPaths) {
+        final contentBlock = await Utils.processAttachment(path);
+        if (contentBlock != null) {
+          userMessageContent.add(contentBlock);
+        }
       }
     }
+
     if (userMessageContent.isNotEmpty) {
       messages.add({"role": "user", "content": userMessageContent});
     }

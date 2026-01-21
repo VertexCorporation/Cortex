@@ -1545,11 +1545,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get actionCamera => '카메라';
 
   @override
-  String get actionGallery => '갱도';
+  String get actionGallery => '갤러리';
 
   @override
   String get actionFile => '파일';
 
   @override
-  String get listening => '청취';
+  String get listening => '듣는 중';
 }

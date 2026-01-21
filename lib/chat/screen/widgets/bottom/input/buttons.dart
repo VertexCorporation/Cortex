@@ -14,6 +14,8 @@ import '../../../../../library/backend/data/service.dart';
 import '../../../../../theme.dart';
 import '../../../../services/select.dart';
 import '../../../../services/speech.dart';
+import '../../../../services/send.dart';
+import '../../../../services/voice.dart';
 import '../panels/attachments/sheet.dart';
 import '../panels/features/sheet.dart';
 import '../panels/selection/sheet.dart';
@@ -54,9 +56,9 @@ class _ToolCircleButton extends StatelessWidget {
             onTap: disabled
                 ? null
                 : () {
-              HapticFeedback.lightImpact();
-              onTap?.call();
-            },
+                    HapticFeedback.lightImpact();
+                    onTap?.call();
+                  },
             child: SizedBox(
               width: size,
               height: size,
@@ -94,16 +96,11 @@ class ActionButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isConnected = context
-        .watch<InternetProvider>()
-        .isConnected;
+    final bool isConnected = context.watch<InternetProvider>().isConnected;
     final speechService = context.watch<SpeechService>();
     final inputProvider = context.watch<InputProvider>();
 
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
     final double buttonSize = isTablet ? 40.0 : 36.0;
 
@@ -132,7 +129,7 @@ class ActionButtonWidget extends StatelessWidget {
       // STATE: IDLE
       if (isDeviceSupported) {
         rightButtonKey = const ValueKey('voice_chat');
-        rightButton = _buildVoiceChatButton(buttonSize);
+        rightButton = _buildVoiceChatButton(context, buttonSize);
       } else {
         rightButtonKey = const ValueKey('send_disabled');
         rightButton = _buildSendButton(buttonSize, false, isConnected);
@@ -151,46 +148,49 @@ class ActionButtonWidget extends StatelessWidget {
           curve: Curves.easeOut,
           child: showMic
               ? Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: _ToolCircleButton(
-              size: buttonSize,
-              onTap: () async {
-                final localeCode = context
-                    .read<ChatSessionProvider>()
-                    .getLocale()
-                    .languageCode;
-                final currentText = controller.text;
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: _ToolCircleButton(
+                    size: buttonSize,
+                    onTap: () async {
+                      final localeCode = context
+                          .read<ChatSessionProvider>()
+                          .getLocale()
+                          .languageCode;
+                      final currentText = controller.text;
 
-                inputProvider.setVoiceRecording(true);
+                      inputProvider.setVoiceRecording(true);
 
-                await speechService.startListening(
-                  locale: localeCode,
-                  onResult: (String text) {
-                    String spacer = (currentText.isNotEmpty &&
-                        !currentText.endsWith(' ')) ? ' ' : '';
-                    if (currentText.isEmpty) spacer = '';
-                    controller.text = "$currentText$spacer$text";
-                    controller.selection = TextSelection.fromPosition(
-                        TextPosition(offset: controller.text.length));
-                  },
-                );
-              },
-              child: SvgPicture.asset(
-                'assets/icons/microphone.svg',
-                width: buttonSize * 0.55,
-                height: buttonSize * 0.55,
-                colorFilter: ColorFilter.mode(
-                    AppColors.primaryColor.inverted, BlendMode.srcIn),
-              ),
-            ),
-          )
+                      await speechService.startListening(
+                        locale: localeCode,
+                        onResult: (String text) {
+                          String spacer = (currentText.isNotEmpty &&
+                                  !currentText.endsWith(' '))
+                              ? ' '
+                              : '';
+                          if (currentText.isEmpty) spacer = '';
+                          controller.text = "$currentText$spacer$text";
+                          controller.selection = TextSelection.fromPosition(
+                              TextPosition(offset: controller.text.length));
+                        },
+                      );
+                    },
+                    child: SvgPicture.asset(
+                      'assets/icons/microphone.svg',
+                      width: buttonSize * 0.55,
+                      height: buttonSize * 0.55,
+                      colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted, BlendMode.srcIn),
+                    ),
+                  ),
+                )
               : const SizedBox.shrink(),
         ),
-
         AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 300),
+          switchInCurve: Curves.easeOutQuad,
+          switchOutCurve: Curves.easeInQuad,
           transitionBuilder: (child, animation) =>
-              ScaleTransition(scale: animation, child: child),
+              FadeTransition(opacity: animation, child: child),
           child: KeyedSubtree(
             key: rightButtonKey,
             child: rightButton,
@@ -219,8 +219,8 @@ class ActionButtonWidget extends StatelessWidget {
             'assets/icons/stop.svg',
             width: size * 0.4,
             height: size * 0.4,
-            colorFilter: ColorFilter.mode(
-                AppColors.primaryColor, BlendMode.srcIn),
+            colorFilter:
+                ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
           ),
         ),
       ),
@@ -244,9 +244,9 @@ class ActionButtonWidget extends StatelessWidget {
     return GestureDetector(
       onTap: enabled
           ? () {
-        HapticFeedback.lightImpact();
-        onSend();
-      }
+              HapticFeedback.lightImpact();
+              onSend();
+            }
           : null,
       child: Container(
         width: size,
@@ -264,11 +264,34 @@ class ActionButtonWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildVoiceChatButton(double size) {
+  Widget _buildVoiceChatButton(BuildContext context, double size) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         HapticFeedback.lightImpact();
-        debugPrint("Voice Chat Mode Clicked");
+
+        final voiceService = context.read<VoiceService>();
+        final session = context.read<ChatSessionProvider>();
+        final inputProvider = context.read<InputProvider>();
+        final sendService = context.read<SendService>();
+        final localizations = AppLocalizations.of(context)!;
+        final localeCode = session.getLocale().languageCode;
+
+        // Activate UI mode
+        inputProvider.setVoiceModeActive(true);
+
+        // Start Voice Session
+        await voiceService.startSession(
+          locale: localeCode,
+          onFinalSentence: (String text) {
+            if (text.trim().isNotEmpty) {
+              sendService.sendMessage(
+                context: context,
+                localizations: localizations,
+                messageText: text,
+              );
+            }
+          },
+        );
       },
       child: Container(
         width: size,
@@ -282,8 +305,8 @@ class ActionButtonWidget extends StatelessWidget {
             'assets/icons/voice.svg',
             width: size * 0.55,
             height: size * 0.55,
-            colorFilter: ColorFilter.mode(
-                AppColors.primaryColor, BlendMode.srcIn),
+            colorFilter:
+                ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
           ),
         ),
       ),
@@ -321,34 +344,34 @@ class AddPhotoButton extends StatelessWidget {
       onTap: isPhotoLoading
           ? null
           : () {
-        // Priority 1: Check Attachment Limit
-        if (isMaxAttachments) {
-          Provider
-              .of<IntrovertNotificationService>(context, listen: false)
-              .showNotification(
-            message: localizations.photoLimitReachedMessage,
-            // You might want to rename this key in l10n to 'attachmentLimitReached'
-            type: NotificationType.error,
-            bottomOffset: 0.22,
-            fontSize: 0.032,
-          );
-        }
-        // Priority 2: Check Chat History Limit
-        else if (isLimitExceeded) {
-          // The InputField usually handles this by disabling interaction,
-          // but if tapped, we can show a specific upgrade prompt here if needed.
-        }
-        // Priority 3: Open Sheet
-        else {
-          showAttachmentSheet(context: context);
-        }
-      },
+              // Priority 1: Check Attachment Limit
+              if (isMaxAttachments) {
+                Provider.of<IntrovertNotificationService>(context,
+                        listen: false)
+                    .showNotification(
+                  message: localizations.photoLimitReachedMessage,
+                  // You might want to rename this key in l10n to 'attachmentLimitReached'
+                  type: NotificationType.error,
+                  bottomOffset: 0.22,
+                  fontSize: 0.032,
+                );
+              }
+              // Priority 2: Check Chat History Limit
+              else if (isLimitExceeded) {
+                // The InputField usually handles this by disabling interaction,
+                // but if tapped, we can show a specific upgrade prompt here if needed.
+              }
+              // Priority 3: Open Sheet
+              else {
+                showAttachmentSheet(context: context);
+              }
+            },
       child: SvgPicture.asset(
         'assets/icons/add.svg',
         width: 24.0,
         height: 24.0,
-        colorFilter: ColorFilter.mode(
-            AppColors.primaryColor.inverted, BlendMode.srcIn),
+        colorFilter:
+            ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
       ),
     );
   }
@@ -367,10 +390,7 @@ class FeaturesButton extends StatelessWidget {
     final inputProvider = context.watch<InputProvider>();
     final featureMode = inputProvider.featureMode;
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final maxAllowedWidth = screenWidth * 0.35;
     final bool isActive = featureMode != ChatInputMode.none;
 
@@ -461,8 +481,8 @@ class FeaturesButton extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 4),
-                Icon(Icons.close_rounded, size: 14,
-                    color: contentColor.withValues(alpha: 0.7)),
+                Icon(Icons.close_rounded,
+                    size: 14, color: contentColor.withValues(alpha: 0.7)),
               ],
             ],
           ),
@@ -520,11 +540,10 @@ class ModelSelectButton extends StatelessWidget {
                     currentModelId: sessionProvider.modelId ?? '',
                     onModelSelected: (String id) {
                       final modelService = context.read<ModelService>();
-                      final langCode = Localizations
-                          .localeOf(context)
-                          .languageCode;
-                      final model = modelService.getPreciseModelData(
-                          id, langCode: langCode);
+                      final langCode =
+                          Localizations.localeOf(context).languageCode;
+                      final model = modelService.getPreciseModelData(id,
+                          langCode: langCode);
                       context.read<SelectionService>().selectModel(model);
                     },
                   );
@@ -539,10 +558,12 @@ class ModelSelectButton extends StatelessWidget {
                       Flexible(
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 250),
-                          transitionBuilder: (Widget child, Animation<
-                              double> animation) {
-                            return FadeTransition(opacity: animation,
-                                child: SizeTransition(sizeFactor: animation,
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                            return FadeTransition(
+                                opacity: animation,
+                                child: SizeTransition(
+                                    sizeFactor: animation,
                                     axis: Axis.horizontal,
                                     axisAlignment: -1.0,
                                     child: child));
@@ -560,7 +581,8 @@ class ModelSelectButton extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      Transform.rotate(angle: -1.5708,
+                      Transform.rotate(
+                          angle: -1.5708,
                           child: Icon(Icons.keyboard_arrow_down_rounded,
                               color: AppColors.primaryColor.inverted,
                               size: fontSize * 1.2)),

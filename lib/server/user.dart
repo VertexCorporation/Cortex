@@ -156,7 +156,7 @@ class UserProvider with ChangeNotifier {
   Future<void> fetchInitialData(User user) async {
     try {
       // 1. Load from cache so the UI isn't blocked/blank.
-      await _loadCachedUserData();
+      await loadFromCache();
       // If we found cached data, notify immediately to show the UI.
       if (_userData != null) notifyListeners();
 
@@ -211,12 +211,19 @@ class UserProvider with ChangeNotifier {
   }
 
   /// Loads user data from the SharedPreferences cache, if it exists.
-  Future<void> _loadCachedUserData() async {
+  Future<void> loadFromCache() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString('cached_user_data');
     if (jsonString != null) {
       try {
         _userData = jsonDecode(jsonString);
+        debugPrint("[UserProvider] Cached data loaded successfully.");
+        // We do NOT notify listeners here if this is called before the provider is attached,
+        // but if called from AppInitializer, we might want to?
+        // Actually, if we set _userData, we normally notify.
+        // Let's rely on the caller to handle timing, or notify safely.
+
+        // IMPORTANT: Checking if anyone is listening is hard, but notifyListeners safe usually.
       } catch (e) {
         debugPrint("[UserProvider] Failed to parse cached user data: $e");
       }

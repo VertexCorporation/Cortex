@@ -1594,5 +1594,5 @@ class AppLocalizationsAz extends AppLocalizations {
   String get actionFile => 'Fayl';
 
   @override
-  String get listening => 'Dinləmə';
+  String get listening => 'Dinləyir';
 }

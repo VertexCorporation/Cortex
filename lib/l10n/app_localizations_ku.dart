@@ -1597,5 +1597,5 @@ class AppLocalizationsKu extends AppLocalizations {
   String get actionFile => 'Dosî';
 
   @override
-  String get listening => 'Guhdarîkirin';
+  String get listening => 'Guhdarî dike';
 }

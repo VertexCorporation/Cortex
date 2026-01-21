@@ -1604,5 +1604,5 @@ class AppLocalizationsRu extends AppLocalizations {
   String get actionFile => 'Файл';
 
   @override
-  String get listening => 'Слушание';
+  String get listening => 'Слушает';
 }

@@ -23,7 +23,6 @@ class ChatEmptyState extends StatefulWidget {
 
 class _ChatEmptyStateState extends State<ChatEmptyState>
     with TickerProviderStateMixin {
-
   // 1. Breathing Animation (Continuous)
   late AnimationController _breathingController;
   late Animation<double> _breathingScaleAnimation;
@@ -46,8 +45,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     _breathingController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
-    )
-      ..repeat(reverse: true);
+    )..repeat(reverse: true);
 
     _breathingScaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(
@@ -79,9 +77,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final isFlux = context
-        .read<ChatSessionProvider>()
-        .isFluxMode;
+    final isFlux = context.read<ChatSessionProvider>().isFluxMode;
 
     // Initialize state on first run
     if (_wasFluxMode == null) {
@@ -158,251 +154,276 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     // Dimensions
     final double logoSize = isTablet ? screenWidth * 0.15 : screenWidth * 0.22;
     final double verticalSpacing = screenHeight * 0.025;
-    final double cardHeight = isTablet ? screenHeight * 0.08 : screenWidth *
-        0.14;
+    final double cardHeight =
+        isTablet ? screenHeight * 0.08 : screenWidth * 0.14;
     final double titleSize = isTablet ? screenWidth * 0.04 : screenWidth * 0.06;
-    final double bodyFontSize = isTablet ? screenWidth * 0.025 : screenWidth *
-        0.04;
+    final double bodyFontSize =
+        isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
     final double iconSize = isTablet ? screenWidth * 0.04 : screenWidth * 0.065;
     final double contentMaxWidth = isTablet ? screenWidth * 0.6 : screenWidth;
     final double horizontalPadding = isTablet ? 0 : screenWidth * 0.12;
     final double gapSize = screenHeight * 0.015;
 
-    return Center(
-      child: SingleChildScrollView(
-        child: Container(
-          width: contentMaxWidth,
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          // We use AnimatedBuilder to drive the layout changes frame-by-frame
-          child: AnimatedBuilder(
-            animation: _modeAnimation,
-            builder: (context, child) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return AnimatedBuilder(
+          animation: _modeAnimation,
+          builder: (context, child) {
+            // "Smart Algorithm" for dynamic spacing
+            // Normal Mode (0.0): Top 2x, Bottom 1x
+            // Flux Mode (1.0): Top 3x, Bottom 1x
+            // We interpolate the top weight smoothly
+            final double topWeight = 2.0 + _modeAnimation.value;
+            final int topFlex = (topWeight * 1000).round();
+            final int bottomFlex = 1000;
 
-                  // --- 1. LOGO AREA (Swapping) ---
-                  SizedBox(
-                    height: logoSize,
-                    width: logoSize,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // CORTEX Logo (Fades OUT, Scales DOWN slightly)
-                        Opacity(
-                          opacity: (1.0 - _modeAnimation.value).clamp(0.0, 1.0),
-                          child: Transform.scale(
-                            scale: 1.0 - (_modeAnimation.value * 0.2),
-                            // Shrink slightly
-                            child: ScaleTransition(
-                              scale: _breathingScaleAnimation,
-                              child: SvgPicture.asset(
-                                'assets/cortex.svg',
-                                width: logoSize,
-                                height: logoSize,
-                                fit: BoxFit.contain,
-                                colorFilter: ColorFilter.mode(
-                                  AppColors.primaryColor.inverted,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        // FLUX (GHOST) Logo (Fades IN, Scales UP slightly from small)
-                        Opacity(
-                          opacity: _modeAnimation.value.clamp(0.0, 1.0),
-                          child: Transform.scale(
-                            scale: 0.8 + (_modeAnimation.value * 0.2),
-                            // Grow to 1.0
-                            child: ScaleTransition(
-                              scale: _breathingScaleAnimation,
-                              child: SvgPicture.asset(
-                                'assets/icons/on/ghost.svg',
-                                width: logoSize,
-                                height: logoSize,
-                                fit: BoxFit.contain,
-                                // Enforced color consistency
-                                colorFilter: ColorFilter.mode(
-                                    contentColor, BlendMode.srcIn),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Fixed gap
-                  SizedBox(height: verticalSpacing - gapSize),
-
-                  // --- 2. CONTENT AREA (Sliding & Fading) ---
-                  Stack(
+            return CustomScrollView(
+              physics: const ClampingScrollPhysics(),
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Column(
                     children: [
-                      // STANDARD CONTENT (Exit: Slide UP & Fade OUT)
-                      // We ignore hits when mode > 0.5 so hidden buttons aren't clickable
-                      IgnorePointer(
-                        ignoring: _modeAnimation.value > 0.1,
-                        child: Opacity(
-                          opacity: (1.0 - _modeAnimation.value * 2).clamp(
-                              0.0, 1.0), // Fast fade out
-                          child: Transform.translate(
-                            // Move UP towards logo
-                            offset: Offset(0, -50.0 * _modeAnimation.value),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // Greeting
-                                _buildEntranceItem(
-                                  startTime: 0.0,
-                                  endTime: 0.5,
-                                  child: Text(
-                                    l10n.howCanIHelpWith,
-                                    style: TextStyle(
-                                      fontSize: titleSize,
-                                      letterSpacing: 0.5,
-                                      color: contentColor,
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.2,
+                      Spacer(flex: topFlex),
+                      Container(
+                        width: contentMaxWidth,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // --- 1. LOGO AREA (Swapping) ---
+                            SizedBox(
+                              height: logoSize,
+                              width: logoSize,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  // CORTEX Logo
+                                  Opacity(
+                                    opacity: (1.0 - _modeAnimation.value)
+                                        .clamp(0.0, 1.0),
+                                    child: Transform.scale(
+                                      scale: 1.0 - (_modeAnimation.value * 0.2),
+                                      child: ScaleTransition(
+                                        scale: _breathingScaleAnimation,
+                                        child: SvgPicture.asset(
+                                          'assets/cortex.svg',
+                                          width: logoSize,
+                                          height: logoSize,
+                                          fit: BoxFit.contain,
+                                          colorFilter: ColorFilter.mode(
+                                            AppColors.primaryColor.inverted,
+                                            BlendMode.srcIn,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                                SizedBox(height: verticalSpacing),
 
-                                // Buttons
-                                _buildEntranceItem(
-                                  startTime: 0.2,
-                                  endTime: 0.7,
-                                  child: DefaultCard(
-                                    text: l10n.explore,
-                                    height: cardHeight,
-                                    iconWidget: Icon(
-                                      Icons.visibility_outlined,
-                                      color: contentColor,
-                                      size: iconSize,
+                                  // FLUX (GHOST) Logo
+                                  Opacity(
+                                    opacity:
+                                        _modeAnimation.value.clamp(0.0, 1.0),
+                                    child: Transform.scale(
+                                      scale: 0.8 + (_modeAnimation.value * 0.2),
+                                      child: ScaleTransition(
+                                        scale: _breathingScaleAnimation,
+                                        child: SvgPicture.asset(
+                                          'assets/icons/on/ghost.svg',
+                                          width: logoSize,
+                                          height: logoSize,
+                                          fit: BoxFit.contain,
+                                          colorFilter: ColorFilter.mode(
+                                              contentColor, BlendMode.srcIn),
+                                        ),
+                                      ),
                                     ),
-                                    onTap: () {
-                                      showModelSelectionSheet(
-                                        context: context,
-                                        localizations: l10n,
-                                        currentModelId: context
-                                            .read<ChatSessionProvider>()
-                                            .modelId ?? '',
-                                        onModelSelected: (String id) {
-                                          final catalog = context.read<
-                                              ModelCatalogProvider>();
-                                          final model = catalog.allModels
-                                              .firstWhere((m) => m.id == id);
-                                          context
-                                              .read<SelectionService>()
-                                              .selectModel(model);
-                                        },
-                                      );
-                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Fixed gap
+                            SizedBox(height: verticalSpacing - gapSize),
+
+                            // --- 2. CONTENT AREA (Sliding & Fading) ---
+                            Stack(
+                              children: [
+                                // STANDARD CONTENT
+                                IgnorePointer(
+                                  ignoring: _modeAnimation.value > 0.1,
+                                  child: Opacity(
+                                    opacity: (1.0 - _modeAnimation.value * 2)
+                                        .clamp(0.0, 1.0),
+                                    child: Transform.translate(
+                                      offset: Offset(
+                                          0, -50.0 * _modeAnimation.value),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          // Greeting
+                                          _buildEntranceItem(
+                                            startTime: 0.0,
+                                            endTime: 0.5,
+                                            child: Text(
+                                              l10n.howCanIHelpWith,
+                                              style: TextStyle(
+                                                fontSize: titleSize,
+                                                letterSpacing: 0.5,
+                                                color: contentColor,
+                                                fontWeight: FontWeight.w600,
+                                                height: 1.2,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                          SizedBox(height: verticalSpacing),
+
+                                          // Buttons
+                                          _buildEntranceItem(
+                                            startTime: 0.2,
+                                            endTime: 0.7,
+                                            child: DefaultCard(
+                                              text: l10n.explore,
+                                              height: cardHeight,
+                                              iconWidget: Icon(
+                                                Icons.visibility_outlined,
+                                                color: contentColor,
+                                                size: iconSize,
+                                              ),
+                                              onTap: () {
+                                                showModelSelectionSheet(
+                                                  context: context,
+                                                  localizations: l10n,
+                                                  currentModelId: context
+                                                          .read<
+                                                              ChatSessionProvider>()
+                                                          .modelId ??
+                                                      '',
+                                                  onModelSelected: (String id) {
+                                                    final catalog = context.read<
+                                                        ModelCatalogProvider>();
+                                                    final model = catalog
+                                                        .allModels
+                                                        .firstWhere(
+                                                            (m) => m.id == id);
+                                                    context
+                                                        .read<
+                                                            SelectionService>()
+                                                        .selectModel(model);
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          SizedBox(height: gapSize),
+                                          _buildEntranceItem(
+                                            startTime: 0.4,
+                                            endTime: 0.9,
+                                            child: DefaultCard(
+                                              text: l10n.useOffline,
+                                              height: cardHeight,
+                                              iconWidget: SvgPicture.asset(
+                                                'assets/icons/context.svg',
+                                                width: iconSize,
+                                                height: iconSize,
+                                                colorFilter: ColorFilter.mode(
+                                                    contentColor,
+                                                    BlendMode.srcIn),
+                                              ),
+                                              onTap: () =>
+                                                  _handleOfflineTap(context),
+                                            ),
+                                          ),
+                                          SizedBox(height: gapSize),
+                                          _buildEntranceItem(
+                                            startTime: 0.6,
+                                            endTime: 1.0,
+                                            child: DefaultCard(
+                                              text: l10n.news,
+                                              height: cardHeight,
+                                              iconWidget: SvgPicture.asset(
+                                                'assets/icons/news.svg',
+                                                width: iconSize,
+                                                height: iconSize,
+                                                colorFilter: ColorFilter.mode(
+                                                    contentColor,
+                                                    BlendMode.srcIn),
+                                              ),
+                                              onTap: () {
+                                                mainScreenKey.currentState
+                                                    ?.openNewsScreen();
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                SizedBox(height: gapSize),
-                                _buildEntranceItem(
-                                  startTime: 0.4,
-                                  endTime: 0.9,
-                                  child: DefaultCard(
-                                    text: l10n.useOffline,
-                                    height: cardHeight,
-                                    iconWidget: SvgPicture.asset(
-                                      'assets/icons/context.svg',
-                                      width: iconSize,
-                                      height: iconSize,
-                                      colorFilter: ColorFilter.mode(
-                                          contentColor, BlendMode.srcIn),
+
+                                // FLUX CONTENT
+                                IgnorePointer(
+                                  ignoring: _modeAnimation.value < 0.9,
+                                  child: Opacity(
+                                    opacity: ((_modeAnimation.value - 0.5) * 2)
+                                        .clamp(0.0, 1.0),
+                                    child: Transform.translate(
+                                      offset: Offset(0,
+                                          50.0 * (1.0 - _modeAnimation.value)),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          SizedBox(height: verticalSpacing),
+                                          Text(
+                                            l10n.fluxChatTitle,
+                                            style: TextStyle(
+                                              fontSize: titleSize,
+                                              letterSpacing: 0.5,
+                                              color: contentColor,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          SizedBox(
+                                              height: verticalSpacing * 0.6),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: logoSize * 0.2),
+                                            child: Text(
+                                              l10n.fluxChatDescription,
+                                              style: TextStyle(
+                                                fontSize: bodyFontSize,
+                                                color: contentColor.withValues(
+                                                    alpha: 0.8),
+                                                height: 1.5,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    onTap: () => _handleOfflineTap(context),
-                                  ),
-                                ),
-                                SizedBox(height: gapSize),
-                                _buildEntranceItem(
-                                  startTime: 0.6,
-                                  endTime: 1.0,
-                                  child: DefaultCard(
-                                    text: l10n.news,
-                                    height: cardHeight,
-                                    iconWidget: SvgPicture.asset(
-                                      'assets/icons/news.svg',
-                                      width: iconSize,
-                                      height: iconSize,
-                                      colorFilter: ColorFilter.mode(
-                                          contentColor, BlendMode.srcIn),
-                                    ),
-                                    onTap: () {
-                                      mainScreenKey.currentState
-                                          ?.openNewsScreen();
-                                    },
                                   ),
                                 ),
                               ],
                             ),
-                          ),
+                          ],
                         ),
                       ),
-
-                      // FLUX CONTENT (Enter: Slide UP from bottom & Fade IN)
-                      IgnorePointer(
-                        ignoring: _modeAnimation.value < 0.9,
-                        child: Opacity(
-                          // Starts appearing after 50%
-                          opacity: ((_modeAnimation.value - 0.5) * 2).clamp(
-                              0.0, 1.0),
-                          child: Transform.translate(
-                            // Slide UP into position from below
-                            offset: Offset(
-                                0, 50.0 * (1.0 - _modeAnimation.value)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // Spacer to align text roughly where Standard text was
-                                SizedBox(height: verticalSpacing),
-
-                                Text(
-                                  l10n.fluxChatTitle,
-                                  style: TextStyle(
-                                    fontSize: titleSize,
-                                    letterSpacing: 0.5,
-                                    color: contentColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                SizedBox(height: verticalSpacing * 0.6),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: logoSize * 0.2),
-                                  child: Text(
-                                    l10n.fluxChatDescription,
-                                    style: TextStyle(
-                                      fontSize: bodyFontSize,
-                                      color: contentColor.withValues(
-                                          alpha: 0.8),
-                                      height: 1.5,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                      Spacer(flex: bottomFlex),
                     ],
                   ),
-                  SizedBox(height: verticalSpacing),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

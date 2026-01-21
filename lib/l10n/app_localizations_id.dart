@@ -1601,8 +1601,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get actionGallery => 'Galeri';
 
   @override
-  String get actionFile => 'Mengajukan';
+  String get actionFile => 'Berkas';
 
   @override
-  String get listening => 'Mendengarkan';
+  String get listening => 'Sedang Mendengarkan';
 }

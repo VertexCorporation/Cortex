@@ -1606,5 +1606,5 @@ class AppLocalizationsNl extends AppLocalizations {
   String get actionFile => 'Bestand';
 
   @override
-  String get listening => 'Luisteren';
+  String get listening => 'Luistert';
 }

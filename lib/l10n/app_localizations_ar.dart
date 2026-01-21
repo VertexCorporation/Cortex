@@ -1579,5 +1579,5 @@ class AppLocalizationsAr extends AppLocalizations {
   String get actionFile => 'ملف';
 
   @override
-  String get listening => 'الاستماع';
+  String get listening => 'جاري الاستماع';
 }

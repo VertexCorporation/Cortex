@@ -1591,5 +1591,5 @@ class AppLocalizationsHi extends AppLocalizations {
   String get actionFile => 'फ़ाइल';
 
   @override
-  String get listening => 'सुनना';
+  String get listening => 'सुन रहा है';
 }

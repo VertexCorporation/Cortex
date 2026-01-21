@@ -1502,11 +1502,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get actionCamera => '相机';
 
   @override
-  String get actionGallery => '画廊';
+  String get actionGallery => '相册';
 
   @override
   String get actionFile => '文件';
 
   @override
-  String get listening => '聆听';
+  String get listening => '正在听';
 }

@@ -5,8 +5,6 @@ import 'package:cortex/chat/screen/widgets/bottom/panels/briefing.dart';
 import 'package:cortex/chat/screen/widgets/list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-// --- Internal Imports ---
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -21,6 +19,7 @@ import 'package:cortex/server/credits.dart';
 import '../../theme.dart';
 import '../messages/skeleton.dart';
 import 'default/view.dart';
+import 'widgets/voice.dart';
 
 class ChatView extends StatefulWidget {
   const ChatView({super.key});
@@ -31,7 +30,6 @@ class ChatView extends StatefulWidget {
 
 class ChatViewState extends State<ChatView>
     with TickerProviderStateMixin, WidgetsBindingObserver {
-
   // --- Core Controllers ---
   final ScrollController scrollController = ScrollController();
   final GlobalKey _bottomPanelKey = GlobalKey();
@@ -47,11 +45,11 @@ class ChatViewState extends State<ChatView>
 
   // --- UI Notifiers ---
   final ValueNotifier<bool> showScrollDownButtonNotifier =
-  ValueNotifier<bool>(false);
+      ValueNotifier<bool>(false);
   final ValueNotifier<double> bottomPanelHeightNotifier =
-  ValueNotifier<double>(0.0);
+      ValueNotifier<double>(0.0);
   final ValueNotifier<double> briefingVisibleHeightNotifier =
-  ValueNotifier<double>(0.0);
+      ValueNotifier<double>(0.0);
 
   // Constants
   static const double _briefingBottomOffset = 8.0;
@@ -81,7 +79,7 @@ class ChatViewState extends State<ChatView>
 
     slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
         .animate(CurvedAnimation(
-        parent: editPanelController, curve: Curves.easeOut));
+            parent: editPanelController, curve: Curves.easeOut));
 
     // Initialize EditService. Note: The actual TextEditingController is provided
     // by the ChatInputPanel later via updateControllers.
@@ -109,9 +107,7 @@ class ChatViewState extends State<ChatView>
     final modelService = context.read<ModelService>();
     final inputProvider = context.read<InputProvider>();
 
-    final langCode = session
-        .getLocale()
-        .languageCode;
+    final langCode = session.getLocale().languageCode;
     final newModelId = session.modelId;
     final newModelPath = session.modelPath;
 
@@ -124,8 +120,8 @@ class ChatViewState extends State<ChatView>
     }
 
     final isNewModelOffline = newModelId != null &&
-        !Utils.isServerSideModel(
-            newModelId, langCode: langCode, modelService: modelService);
+        !Utils.isServerSideModel(newModelId,
+            langCode: langCode, modelService: modelService);
 
     if (isNewModelOffline) {
       inputProvider.setFeatureMode(ChatInputMode.offline);
@@ -145,7 +141,7 @@ class ChatViewState extends State<ChatView>
 
   void _updateBottomPanelHeight() {
     final RenderBox? box =
-    _bottomPanelKey.currentContext?.findRenderObject() as RenderBox?;
+        _bottomPanelKey.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       final newHeight = box.size.height;
       if (bottomPanelHeightNotifier.value != newHeight) {
@@ -174,9 +170,7 @@ class ChatViewState extends State<ChatView>
   }
 
   void cancelAnyActiveEdit() {
-    if (mounted && context
-        .read<InputProvider>()
-        .isEditingMode) {
+    if (mounted && context.read<InputProvider>().isEditingMode) {
       editService.cancelEditingMode();
     }
   }
@@ -213,17 +207,16 @@ class ChatViewState extends State<ChatView>
                 child: conversationProvider.isLoadingMessages
                     ? const MessageListSkeleton(key: ValueKey('skeleton'))
                     : conversationProvider.messages.isEmpty
-                    ? Container(
-                  key: const ValueKey('empty'),
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.only(top: screenHeight * 0.1),
-                  child: const ChatEmptyState(),
-                )
-                    : ChatMessageList(
-                  key: const ValueKey('list'),
-                  scrollController: scrollController,
-                  editService: editService,
-                ),
+                        ? Container(
+                            key: const ValueKey('empty'),
+                            // Removed hardcoded alignment to allow dynamic spacing in child
+                            child: const ChatEmptyState(),
+                          )
+                        : ChatMessageList(
+                            key: const ValueKey('list'),
+                            scrollController: scrollController,
+                            editService: editService,
+                          ),
               ),
             ),
 
@@ -264,37 +257,24 @@ class ChatViewState extends State<ChatView>
               bottom: basePanelHeight + bottomSafe + _briefingBottomOffset,
               child: BriefingOverlay(
                 availableCredits:
-                context
-                    .watch<CreditsManager>()
-                    .totalCreditsNotifier
-                    .value,
+                    context.watch<CreditsManager>().totalCreditsNotifier.value,
 
                 // LOGIC UPDATE: Universal Attachment Support
                 // We map 'hasAttachments' to 'photoSelected'.
                 // The BriefingOverlay will use this to show credit cost warnings for any file type.
-                photoSelected: context
-                    .watch<InputProvider>()
-                    .hasAttachments,
+                photoSelected: context.watch<InputProvider>().hasAttachments,
 
                 isOfflineModel: _isOfflineCurrentModel(context),
                 modelMissing: _isModelMissing(context),
                 limitReached: _isLimitExceeded(context),
                 isStorageSufficient:
-                context
-                    .watch<ChatSessionProvider>()
-                    .isStorageSufficient,
+                    context.watch<ChatSessionProvider>().isStorageSufficient,
                 isPremiumModel:
-                context
-                    .watch<ChatSessionProvider>()
-                    .isCurrentModelPremium,
+                    context.watch<ChatSessionProvider>().isCurrentModelPremium,
                 isSubscribed:
-                context
-                    .watch<ChatSessionProvider>()
-                    .isUserSubscribed,
+                    context.watch<ChatSessionProvider>().isUserSubscribed,
                 premiumTrialUses:
-                context
-                    .watch<ChatSessionProvider>()
-                    .premiumTrialUses,
+                    context.watch<ChatSessionProvider>().premiumTrialUses,
                 inappropriate: _showInappropriateContentWarning,
                 onVisibleHeightChanged: (h) {
                   if (briefingVisibleHeightNotifier.value != h) {
@@ -332,6 +312,10 @@ class ChatViewState extends State<ChatView>
             );
           },
         ),
+
+        // LAYER 4: Voice Overlay (Topmost)
+        if (context.watch<InputProvider>().isVoiceModeActive)
+          const VoiceSessionOverlay(), // Covers everything
       ],
     );
   }
@@ -340,20 +324,15 @@ class ChatViewState extends State<ChatView>
 
   bool _isLimitExceeded(BuildContext context) {
     return context
-        .read<ChatSessionProvider>()
-        .chatLimitManager
-        ?.isLimitExceeded(
-        context
-            .read<ConversationProvider>()
-            .messages) ??
+            .read<ChatSessionProvider>()
+            .chatLimitManager
+            ?.isLimitExceeded(context.read<ConversationProvider>().messages) ??
         false;
   }
 
   bool _isOfflineCurrentModel(BuildContext context) {
     final session = context.read<ChatSessionProvider>();
-    final langCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final langCode = Localizations.localeOf(context).languageCode;
     return !Utils.isServerSideModel(
       session.modelId,
       langCode: langCode,
@@ -365,8 +344,8 @@ class ChatViewState extends State<ChatView>
     final session = context.read<ChatSessionProvider>();
     final isOffline = _isOfflineCurrentModel(context);
     final isDownloaded = context
-        .read<ModelLocalStateProvider>()
-        .downloadCompleted[session.modelId] ??
+            .read<ModelLocalStateProvider>()
+            .downloadCompleted[session.modelId] ??
         false;
     return !session.isDynamicChat && isOffline && !isDownloaded;
   }

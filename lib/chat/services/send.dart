@@ -51,8 +51,7 @@ class SendService {
     required OfflineService offlineService,
     required ModelService modelService,
     required VoiceService voiceService,
-  })
-      : _conversationProvider = conversationProvider,
+  })  : _conversationProvider = conversationProvider,
         _inputProvider = inputProvider,
         _apiService = apiService,
         _contextService = contextService,
@@ -88,7 +87,7 @@ class SendService {
     if (isRegenerate) {
       final messages = _conversationProvider.messages;
       final lastUserMessage = messages.reversed.firstWhere(
-            (m) => m.isUserMessage,
+        (m) => m.isUserMessage,
         orElse: () => Message(text: '', isUserMessage: true),
       );
       currentAttachmentPaths = List.from(lastUserMessage.attachmentPaths);
@@ -122,9 +121,7 @@ class SendService {
       String errorMessage = localizations.errorNoModelsAvailable;
 
       final localState = context.read<ModelLocalStateProvider>();
-      final langCode = Localizations
-          .localeOf(context)
-          .languageCode;
+      final langCode = Localizations.localeOf(context).languageCode;
       final hasInternet = await InternetConnection().hasInternetAccess;
 
       // -----------------------------------------------------------------------
@@ -144,21 +141,21 @@ class SendService {
       // -----------------------------------------------------------------------
 
       if (apiModelIdForSend != null && apiModelIdForSend != 'cortex/auto') {
-        final ModelEntity entity = _modelService.getPreciseModelData(
-            apiModelIdForSend, langCode: langCode);
+        final ModelEntity entity = _modelService
+            .getPreciseModelData(apiModelIdForSend, langCode: langCode);
 
         if (entity.variants != null && entity.variants!.isNotEmpty) {
           final List<dynamic> variants = entity.variants!.values.toList();
 
           // Logic Update: Check if ANY attachment is an image
-          final bool hasVisualContent = currentAttachmentPaths.any((path) =>
-              _isImageFile(path));
+          final bool hasVisualContent =
+              currentAttachmentPaths.any((path) => _isImageFile(path));
 
           List<dynamic> getPreferredCandidates(List<dynamic> sourceList) {
             final filtered = sourceList.where((v) {
               final String vid = v['id'].toString().toLowerCase();
-              final String vTier = v['tier']?.toString().toLowerCase() ??
-                  'free';
+              final String vTier =
+                  v['tier']?.toString().toLowerCase() ?? 'free';
               final bool isGuard = vid.contains('guard');
               final bool isPremium = vTier == 'premium';
               return !isGuard && !isPremium;
@@ -182,7 +179,7 @@ class SendService {
               if (hasVisualContent) {
                 // Prioritize vision-capable offline models if images exist
                 final visionModel = downloadedVariants.firstWhere(
-                      (v) => (v['modalities']?['image'] == true),
+                  (v) => (v['modalities']?['image'] == true),
                   orElse: () => null,
                 );
                 apiModelIdForSend = visionModel != null
@@ -196,7 +193,7 @@ class SendService {
           } else {
             if (hasVisualContent) {
               final visionModel = variants.firstWhere(
-                    (v) => (v['modalities']?['image'] == true),
+                (v) => (v['modalities']?['image'] == true),
                 orElse: () => null,
               );
               apiModelIdForSend = visionModel != null
@@ -229,18 +226,14 @@ class SendService {
       }
 
       if (!isAutoRouter &&
-          Utils.isServerSideModel(apiModelIdForSend, langCode: langCode,
-              modelService: _modelService) &&
+          Utils.isServerSideModel(apiModelIdForSend,
+              langCode: langCode, modelService: _modelService) &&
           !hasInternet) {
         errorMessage = localizations.checkYourInternet;
-        _handleSendError(
-            ApiException(errorMessage),
-            isRegenerate,
-            regenerateAiIndex,
-            localizations,
+        _handleSendError(ApiException(errorMessage), isRegenerate,
+            regenerateAiIndex, localizations,
             failedUserText: text,
-            failedAttachmentPaths: currentAttachmentPaths
-        );
+            failedAttachmentPaths: currentAttachmentPaths);
         return false;
       }
 
@@ -259,10 +252,10 @@ class SendService {
       } else {
         if (_conversationProvider.conversationID == null) {
           final newConvId = _uuid.v4();
-          final newConvTitle = (text.isEmpty &&
-              currentAttachmentPaths.isNotEmpty)
-              ? "📁"
-              : (text.length > 28 ? text.substring(0, 28) : text);
+          final newConvTitle =
+              (text.isEmpty && currentAttachmentPaths.isNotEmpty)
+                  ? "📁"
+                  : (text.length > 28 ? text.substring(0, 28) : text);
 
           final modelIdForStorage = (sessionProvider.isDynamicChat)
               ? (sessionProvider.modelId ?? 'dynamic')
@@ -284,8 +277,9 @@ class SendService {
       inputProvider.clearAttachments();
 
       // Routing
-      if (!isAutoRouter && !Utils.isServerSideModel(
-          apiModelIdForSend, langCode: langCode, modelService: _modelService)) {
+      if (!isAutoRouter &&
+          !Utils.isServerSideModel(apiModelIdForSend,
+              langCode: langCode, modelService: _modelService)) {
         // Offline Flow
         final offlineModerator = OfflineModeratorService();
         if (offlineModerator.isPromptAcceptable(textForApi)) {
@@ -333,8 +327,8 @@ class SendService {
   }
 
   /// Sends a message using a local (on-device) model via the OfflineService.
-  Future<void> _sendLocalMessage(String text, List<String> attachmentPaths,
-      String modelId) async {
+  Future<void> _sendLocalMessage(
+      String text, List<String> attachmentPaths, String modelId) async {
     try {
       debugPrint(
           "[SendService] Delegating local message to OfflineService for model '$modelId'.");
@@ -350,22 +344,25 @@ class SendService {
   }
 
   /// Sends a message using a server-side model via the ApiService.
-  Future<void> _sendServerSideMessage(String text,
-      String modelIdForRequest,
-      List<String> attachmentPaths,
-      AppLocalizations localizations,
-      int aiMessageIndex,
-      String langCode,) async {
+  Future<void> _sendServerSideMessage(
+    String text,
+    String modelIdForRequest,
+    List<String> attachmentPaths,
+    AppLocalizations localizations,
+    int aiMessageIndex,
+    String langCode,
+  ) async {
     final bool isAutoRouter = modelIdForRequest == 'cortex/auto';
-    final ModelEntity model = _modelService.getPreciseModelData(
-        modelIdForRequest, langCode: langCode);
+    final ModelEntity model = _modelService
+        .getPreciseModelData(modelIdForRequest, langCode: langCode);
     final bool isPremium = model.isPremium;
-    final bool isCharacterModel = isAutoRouter ? false : (model.category ==
-        'roleplay' || model.category == 'self');
+    final bool isCharacterModel = isAutoRouter
+        ? false
+        : (model.category == 'roleplay' || model.category == 'self');
 
     debugPrint(
       "[SendService] Sending server request for model '$modelIdForRequest'. "
-          "Is Auto: $isAutoRouter, Is Premium: $isPremium",
+      "Is Auto: $isAutoRouter, Is Premium: $isPremium",
     );
 
     // Build context history
@@ -392,9 +389,7 @@ class SendService {
     Future<void> onImageReceived(String imageUrl) async {
       if (_conversationProvider.wasResponseStopped) return;
       try {
-        final imageBytes = base64Decode(imageUrl
-            .split(',')
-            .last);
+        final imageBytes = base64Decode(imageUrl.split(',').last);
         final tempDir = await getTemporaryDirectory();
         final filePath = '${tempDir.path}/${_uuid.v4()}.png';
         final file = File(filePath);
@@ -407,13 +402,7 @@ class SendService {
       }
     }
 
-    // Call API (Passing lists will require ApiService refactor, adapting to legacy signature here for safety)
-    // Note: To fully support multi-file, ApiService must be updated to accept List<String>.
-    // Here we pass the first path if available to satisfy the likely signature of ApiService if not updated.
-    final String? legacyPhotoParam = attachmentPaths.isNotEmpty
-        ? attachmentPaths.first
-        : null;
-
+    // Call API
     if (isCharacterModel) {
       final baseModelId = model.baseModelId;
       if (baseModelId == null || baseModelId.isEmpty) {
@@ -426,8 +415,7 @@ class SendService {
         characterId: modelIdForRequest,
         baseModelId: baseModelId,
         isPremium: isPremium,
-        photoPath: legacyPhotoParam,
-        // Needs ApiService update for List support
+        attachmentPaths: attachmentPaths,
         onTextChunk: onTextChunk,
         onImageReceived: onImageReceived,
         localizations: localizations,
@@ -438,8 +426,7 @@ class SendService {
         userInput: text,
         context: memory,
         isPremium: isPremium,
-        photoPath: legacyPhotoParam,
-        // Needs ApiService update for List support
+        attachmentPaths: attachmentPaths,
         onTextChunk: onTextChunk,
         onImageReceived: onImageReceived,
         localizations: localizations,
@@ -447,16 +434,16 @@ class SendService {
     }
   }
 
-  void _handleSendError(Object error,
-      bool isRegenerate,
-      int? regenerateAiIndex,
-      AppLocalizations localizations, {
-        String? failedUserText,
-        List<String>? failedAttachmentPaths,
-      }) {
-    final String errorMessage = error is ApiException
-        ? error.message
-        : localizations.anErrorOccurred;
+  void _handleSendError(
+    Object error,
+    bool isRegenerate,
+    int? regenerateAiIndex,
+    AppLocalizations localizations, {
+    String? failedUserText,
+    List<String>? failedAttachmentPaths,
+  }) {
+    final String errorMessage =
+        error is ApiException ? error.message : localizations.anErrorOccurred;
     final bool isContentFlagError = error is ApiException &&
         error.message == localizations.errorPromptFlagged;
 
