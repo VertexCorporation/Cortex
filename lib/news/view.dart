@@ -147,7 +147,6 @@ class _NewsScreenState extends State<NewsScreen>
           // 2. Scrollable Content
           ScrollFog(
             scrollController: _scrollController,
-            fogColor: AppColors.background,
             topFogHeight: 0,
             bottomFogHeight: screenHeight * 0.05,
             child: CustomScrollView(

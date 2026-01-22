@@ -494,5 +494,7 @@
   "actionCamera": "Caméra",
   "actionGallery": "Galerie",
   "actionFile": "Fichier",
-  "listening": "À l'écoute"
+  "listening": "À l'écoute",
+  "defaultViewTitle": "Quoi de neuf?",
+  "defaultViewDescription": "Cortex est toujours à vos côtés grâce à des centaines de modèles d'IA, des fonctionnalités hors ligne, un chat dynamique et bien plus encore."
 }

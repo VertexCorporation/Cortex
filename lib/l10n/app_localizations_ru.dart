@@ -1607,9 +1607,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get listening => 'Слушает';
 
   @override
-  String get defaultViewTitle => 'What\'s Up?';
+  String get defaultViewTitle => 'Как дела?';
 
   @override
   String get defaultViewDescription =>
-      'Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.';
+      'Cortex всегда рядом с вами, предлагая сотни моделей искусственного интеллекта, возможности работы в автономном режиме, динамический чат и многое другое.';
 }

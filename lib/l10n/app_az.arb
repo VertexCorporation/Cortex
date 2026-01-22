@@ -479,5 +479,7 @@
   "actionCamera": "Kamera",
   "actionGallery": "Qalereya",
   "actionFile": "Fayl",
-  "listening": "Dinləyir"
+  "listening": "Dinləyir",
+  "defaultViewTitle": "Necəsən?",
+  "defaultViewDescription": "Cortex yüzlərlə süni intellekt modeli, oflayn imkanlar, dinamik söhbət və daha çox şey ilə həmişə yanınızdadır."
 }

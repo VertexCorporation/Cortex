@@ -1582,9 +1582,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get listening => 'جاري الاستماع';
 
   @override
-  String get defaultViewTitle => 'What\'s Up?';
+  String get defaultViewTitle => 'ما أخبارك؟';
 
   @override
   String get defaultViewDescription =>
-      'Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.';
+      'كورتكس دائمًا بجانبك مع مئات من نماذج الذكاء الاصطناعي، وإمكانيات العمل دون اتصال بالإنترنت، والدردشة الديناميكية، وغير ذلك الكثير.';
 }

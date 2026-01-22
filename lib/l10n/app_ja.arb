@@ -543,5 +543,7 @@
   "actionCamera": "カメラ",
   "actionGallery": "ギャラリー",
   "actionFile": "ファイル",
-  "listening": "聞き取り中"
+  "listening": "聞き取り中",
+  "defaultViewTitle": "元気？",
+  "defaultViewDescription": "Cortex は、何百もの AI モデル、オフライン機能、ダイナミック チャットなどを備え、常にあなたのそばにいます。"
 }

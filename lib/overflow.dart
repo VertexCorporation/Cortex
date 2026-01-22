@@ -4,38 +4,29 @@ import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
 
-/// A private utility function to sanitize a string by removing the Unicode
-/// replacement character (U+FFFD), which often appears in malformed or
-/// incomplete UTF-16 strings. This prevents crashes in the text rendering engine.
-///
-/// This function is used centrally within this widget to ensure all text processing
-/// is safe.
+/// A private utility function to sanitize a string.
 String _sanitizeText(String text) {
   return text.replaceAll('\uFFFD', '');
 }
 
-/// A text widget that gracefully handles overflow by truncating the text and
-/// applying a fade-out effect to the last few characters.
-///
-/// It is designed to be robust against rendering errors by internally sanitizing
-/// input strings and correctly handling Unicode characters (runes), including emojis.
-class OverflowText extends StatelessWidget {
-  /// The text to display.
+/// A versatile text widget that can either:
+/// 1. Gracefully truncate text with a fade-out effect (default).
+/// 2. Provide a scrollable text area with fog effects on edges (scrollable: true).
+class OverflowText extends StatefulWidget {
   final String text;
-
-  /// The style to use for the text. If null, the default style from the
-  /// context will be used.
   final TextStyle? style;
+  final int maxLines; // Only applies if scrollable is false
 
-  /// The maximum number of lines for the text to span.
-  final int maxLines;
-
-  /// The number of characters at the end of the text to apply the fade-out effect to.
+  // --- Fade Mode Params ---
   final int fadeLength;
-
-  /// An optional animation to control the opacity of the fading part, useful for
-  /// entrance/exit animations.
   final Animation<double>? animation;
+
+  // --- Scroll Mode Params ---
+  /// If true, the text will scroll horizontally instead of truncating.
+  final bool scrollable;
+
+  /// The width of the fog effect in scrollable mode.
+  final double fogWidth;
 
   const OverflowText({
     super.key,
@@ -44,16 +35,82 @@ class OverflowText extends StatelessWidget {
     this.maxLines = 1,
     this.fadeLength = 6,
     this.animation,
+    this.scrollable = false, // Default to old behavior
+    this.fogWidth = 20.0,
   });
 
-  /// Calculates the number of characters (runes) that can fit within the given
-  /// constraints without overflowing.
-  ///
-  /// This method uses a binary search algorithm for efficient calculation and
-  /// operates on runes to correctly handle multi-byte characters like emojis.
+  @override
+  State<OverflowText> createState() => _OverflowTextState();
+}
+
+class _OverflowTextState extends State<OverflowText> {
+  // Scroll Controller & Fog State
+  late ScrollController _scrollController;
+  bool _showStartFog = false;
+  bool _showEndFog = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    // Only add listener if we are in scrollable mode
+    if (widget.scrollable) {
+      _scrollController.addListener(_updateFogVisibility);
+      WidgetsBinding.instance.addPostFrameCallback((_) =>
+          _updateFogVisibility());
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant OverflowText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.scrollable) {
+      if (!oldWidget.scrollable) {
+        // Switched to scrollable
+        _scrollController.addListener(_updateFogVisibility);
+        WidgetsBinding.instance.addPostFrameCallback((_) =>
+            _updateFogVisibility());
+      }
+      _updateFogVisibility();
+    } else {
+      if (oldWidget.scrollable) {
+        // Switched off scrollable
+        _scrollController.removeListener(_updateFogVisibility);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _updateFogVisibility() {
+    if (!mounted || !widget.scrollable) return;
+    if (!_scrollController.hasClients) return;
+
+    // Prevent errors during layout/animation changes
+    if (_scrollController.positions.length > 1) return;
+
+    final position = _scrollController.position;
+    final double threshold = 5.0;
+
+    final bool shouldShowStart = position.pixels > threshold;
+    final bool shouldShowEnd = position.maxScrollExtent > 0 &&
+        position.pixels < position.maxScrollExtent - threshold;
+
+    if (shouldShowStart != _showStartFog || shouldShowEnd != _showEndFog) {
+      setState(() {
+        _showStartFog = shouldShowStart;
+        _showEndFog = shouldShowEnd;
+      });
+    }
+  }
+
+  // --- Helper: Calculate Fitting Length (Original Logic) ---
   int _findFittingTextLength(String textToMeasure, TextStyle? style,
       BoxConstraints constraints, BuildContext context) {
-    // Sanitize the text before any measurement to prevent crashes from malformed strings.
     final sanitizedText = _sanitizeText(textToMeasure);
     if (sanitizedText.isEmpty) return 0;
 
@@ -62,7 +119,7 @@ class OverflowText extends StatelessWidget {
         .style;
     final TextPainter textPainter = TextPainter(
       text: TextSpan(text: sanitizedText, style: effectiveStyle),
-      maxLines: maxLines,
+      maxLines: widget.maxLines,
       textDirection: ui.TextDirection.ltr,
     );
 
@@ -71,12 +128,10 @@ class OverflowText extends StatelessWidget {
         : double.infinity;
     textPainter.layout(maxWidth: maxWidth);
 
-    // If the entire text fits, return its full length in runes.
     if (!textPainter.didExceedMaxLines && textPainter.width <= maxWidth) {
       return sanitizedText.runes.length;
     }
 
-    // If the text overflows, perform a binary search to find the fitting character count.
     final runes = sanitizedText.runes.toList();
     int low = 0;
     int high = runes.length;
@@ -88,13 +143,10 @@ class OverflowText extends StatelessWidget {
         low = mid + 1;
         continue;
       }
-
-      // Create a test string from a subset of runes to ensure it's always valid.
       final testText = String.fromCharCodes(runes.sublist(0, mid));
-
       final testPainter = TextPainter(
         text: TextSpan(text: testText, style: effectiveStyle),
-        maxLines: maxLines,
+        maxLines: widget.maxLines,
         textDirection: ui.TextDirection.ltr,
       );
       testPainter.layout(maxWidth: maxWidth);
@@ -102,7 +154,7 @@ class OverflowText extends StatelessWidget {
       if (testPainter.didExceedMaxLines || testPainter.width > maxWidth) {
         high = mid - 1;
       } else {
-        fittingRuneCount = mid; // This `mid` value fits, try for more.
+        fittingRuneCount = mid;
         low = mid + 1;
       }
     }
@@ -111,49 +163,125 @@ class OverflowText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sanitizedText = _sanitizeText(widget.text);
+    final TextStyle effectiveStyle = widget.style ?? DefaultTextStyle
+        .of(context)
+        .style;
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        // First, calculate how many characters of the original text will fit.
+        // ----------------------------------------------------------
+        // MODE 1: SCROLLABLE TEXT (New Logic)
+        // ----------------------------------------------------------
+        if (widget.scrollable) {
+          // Measure text to see if it even needs scrolling
+          final TextPainter textPainter = TextPainter(
+            text: TextSpan(text: sanitizedText, style: effectiveStyle),
+            maxLines: 1,
+            textDirection: ui.TextDirection.ltr,
+            textScaler: MediaQuery.textScalerOf(context),
+          )
+            ..layout(maxWidth: double.infinity);
+
+          final bool needsScrolling = textPainter.width > constraints.maxWidth;
+
+          // If text fits, just return simple text
+          if (!needsScrolling) {
+            return Text(
+              sanitizedText,
+              style: effectiveStyle,
+              softWrap: false,
+              overflow: TextOverflow.visible,
+              maxLines: 1,
+            );
+          }
+
+          // If text overflows, return the Scrollable + Fog + ShaderMask logic
+          // Use SizedBox with calculated height to prevent jumping alignment issues
+          return SizedBox(
+            height: textPainter.height,
+            width: constraints.maxWidth,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  final double startStop = _showStartFog
+                      ? (widget.fogWidth / bounds.width).clamp(0.0, 0.5)
+                      : 0.0;
+                  final double endStop = _showEndFog
+                      ? (1.0 - (widget.fogWidth / bounds.width)).clamp(0.5, 1.0)
+                      : 1.0;
+
+                  return LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: const [
+                      Colors.transparent,
+                      Colors.black,
+                      Colors.black,
+                      Colors.transparent,
+                    ],
+                    stops: [0.0, startStop, endStop, 1.0],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.dstIn,
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                    child: Text(
+                      sanitizedText,
+                      style: effectiveStyle,
+                      softWrap: false,
+                      overflow: TextOverflow.visible,
+                      maxLines: 1,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        // ----------------------------------------------------------
+        // MODE 2: TRUNCATE & FADE (Old Logic)
+        // ----------------------------------------------------------
         final fittingRuneLength = _findFittingTextLength(
-            text, style, constraints, context);
+            sanitizedText, widget.style, constraints, context);
 
         if (fittingRuneLength == 0) {
           return const SizedBox.shrink();
         }
 
-        // Sanitize the text that will actually be rendered.
-        final sanitizedText = _sanitizeText(text);
         final totalRunes = sanitizedText.runes.length;
 
-        // If the sanitized text fits completely, render a simple Text widget.
         if (fittingRuneLength >= totalRunes) {
           return Text(
             sanitizedText,
-            style: style,
-            maxLines: maxLines,
+            style: widget.style,
+            maxLines: widget.maxLines,
             overflow: TextOverflow.clip,
           );
         }
 
-        // --- Build the faded text using RichText for character-by-character styling ---
-
-        // Truncate the text based on the calculated number of fitting runes.
+        // Construct Faded RichText
         final String displayText = String.fromCharCodes(
             sanitizedText.runes.take(fittingRuneLength));
         final int displayRunesLength = displayText.runes.length;
-        final int actualCharsToFade = math.min(displayRunesLength, fadeLength);
+        final int actualCharsToFade = math.min(
+            displayRunesLength, widget.fadeLength);
 
-        // If no fading is needed, render the truncated text.
         if (actualCharsToFade <= 0) {
           return Text(
             displayText,
-            style: style,
-            maxLines: maxLines,
+            style: widget.style,
+            maxLines: widget.maxLines,
             overflow: TextOverflow.clip,
           );
         }
 
-        // Split the display text into the solid part and the part to be faded.
         final int solidPartRuneLength = displayRunesLength - actualCharsToFade;
         final String solidText = String.fromCharCodes(
             displayText.runes.take(solidPartRuneLength));
@@ -162,24 +290,17 @@ class OverflowText extends StatelessWidget {
 
         final List<InlineSpan> spans = [];
         if (solidText.isNotEmpty) {
-          spans.add(TextSpan(text: solidText, style: style));
+          spans.add(TextSpan(text: solidText, style: widget.style));
         }
 
-        // Prepare colors for the fade effect.
         final Color defaultColor = DefaultTextStyle
             .of(context)
             .style
             .color ?? Colors.black;
-        final Color effectiveColor = style?.color ?? defaultColor;
-        final Color baseColorForFade = effectiveColor.withAlpha(
-            255); // A fully opaque version of the color.
-        // This comment will tell the faulty linter to ignore this specific line,
-        // permanently removing the warning from your IDE.
+        final Color effectiveColor = widget.style?.color ?? defaultColor;
+        final Color baseColorForFade = effectiveColor.withAlpha(255);
         // ignore: deprecated_member_use
         final double originalStyleAlpha = effectiveColor.alpha / 255.0;
-        // The line above is correct. `Color.alpha` is NOT deprecated in standard Flutter.
-        // This is the standard way to convert the 0-255 integer alpha to a 0.0-1.0 double opacity.
-
         const double fadeTargetMinRelativeOpacity = 0.2;
 
         final fadingRunes = fadingText.runes.toList();
@@ -190,13 +311,12 @@ class OverflowText extends StatelessWidget {
 
           final double charOpacity = originalStyleAlpha * (1.0 -
               relativeFadeProgress * (1.0 - fadeTargetMinRelativeOpacity));
-          final double animatedOpacity = (animation?.value ?? 1.0) *
+          final double animatedOpacity = (widget.animation?.value ?? 1.0) *
               charOpacity;
 
-          // Correctly convert the 0.0-1.0 opacity double into a 0-255 integer for the alpha channel.
           final int newAlpha = (animatedOpacity * 255).round().clamp(0, 255);
 
-          final TextStyle? charStyle = style?.copyWith(
+          final TextStyle? charStyle = widget.style?.copyWith(
             color: baseColorForFade.withAlpha(newAlpha),
           );
 
@@ -208,7 +328,7 @@ class OverflowText extends StatelessWidget {
 
         return RichText(
           text: TextSpan(children: spans),
-          maxLines: maxLines,
+          maxLines: widget.maxLines,
           overflow: TextOverflow.clip,
         );
       },

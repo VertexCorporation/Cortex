@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../../../../../app.dart';
+import '../../../../../../../overflow.dart';
 import '../../../../../../../theme.dart';
 import 'package:cortex/fog.dart';
 
@@ -22,7 +23,10 @@ class ModelVariantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final bool isTablet = screenWidth >= 600;
 
     // Constants
@@ -31,11 +35,11 @@ class ModelVariantCard extends StatelessWidget {
 
     // Colors
     final Color bgColor =
-        isSelected ? AppColors.primaryColor.inverted : AppColors.background;
+    isSelected ? AppColors.primaryColor.inverted : AppColors.background;
     final Color textColor =
-        isSelected ? AppColors.primaryColor : AppColors.primaryColor.inverted;
+    isSelected ? AppColors.primaryColor : AppColors.primaryColor.inverted;
     final Color borderColor =
-        isSelected ? Colors.transparent : AppColors.border;
+    isSelected ? Colors.transparent : AppColors.border;
 
     return Material(
       color: bgColor,
@@ -59,13 +63,13 @@ class ModelVariantCard extends StatelessWidget {
               Expanded(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: _ScrollableText(
+                  child: OverflowText(
                     text: title,
-                    fogColor: bgColor,
+                    scrollable: true,
                     style: TextStyle(
                       fontSize: fontSize,
                       fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      isSelected ? FontWeight.bold : FontWeight.normal,
                       color: textColor,
                     ),
                   ),
@@ -128,7 +132,8 @@ class _ScrollableTextState extends State<_ScrollableText> {
           maxLines: 1,
           textDirection: TextDirection.ltr,
           textScaler: MediaQuery.textScalerOf(context),
-        )..layout(maxWidth: double.infinity);
+        )
+          ..layout(maxWidth: double.infinity);
 
         final bool shouldScroll = textPainter.width > constraints.maxWidth;
 
@@ -142,21 +147,27 @@ class _ScrollableTextState extends State<_ScrollableText> {
           );
         }
 
-        return ScrollFogHorizontal(
-          scrollController: _scrollController,
-          fogColor: widget.fogColor,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minWidth: constraints.maxWidth),
-              child: Text(
-                widget.text,
-                style: widget.style,
-                softWrap: false,
-                overflow: TextOverflow.visible,
-                maxLines: 1,
+        return SizedBox(
+          height: textPainter.height,
+          width: constraints.maxWidth,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: ScrollFogHorizontal(
+              scrollController: _scrollController,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                  child: Text(
+                    widget.text,
+                    style: widget.style,
+                    softWrap: false,
+                    overflow: TextOverflow.visible,
+                    maxLines: 1,
+                  ),
+                ),
               ),
             ),
           ),

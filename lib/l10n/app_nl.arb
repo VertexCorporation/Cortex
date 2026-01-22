@@ -543,5 +543,7 @@
   "actionCamera": "Camera",
   "actionGallery": "Galerij",
   "actionFile": "Bestand",
-  "listening": "Luistert"
+  "listening": "Luistert",
+  "defaultViewTitle": "Alles goed?",
+  "defaultViewDescription": "Cortex staat altijd voor je klaar met honderden AI-modellen, offline mogelijkheden, dynamische chat en nog veel meer."
 }

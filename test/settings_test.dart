@@ -7,7 +7,6 @@ import 'package:cortex/settings/providers/general.dart';
 import 'package:cortex/settings/services/auth.dart';
 import 'package:cortex/settings/services/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mockito/mockito.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -189,7 +188,7 @@ void main() {
       profile.fakeData = {
         'hasCortexSubscription': 1,
         'subscriptionExpiresAt':
-            Timestamp.fromDate(DateTime.now().add(const Duration(days: 30))),
+        Timestamp.fromDate(DateTime.now().add(const Duration(days: 30))),
       };
       await provider.refreshData();
       expect(provider.activeSubscriptionLevel, 1);

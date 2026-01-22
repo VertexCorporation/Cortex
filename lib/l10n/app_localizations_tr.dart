@@ -1594,7 +1594,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get listening => 'Dinliyor';
 
   @override
-  String get defaultViewTitle => 'Naber?';
+  String get defaultViewTitle => 'Ne haber?';
 
   @override
   String get defaultViewDescription =>

@@ -1600,9 +1600,9 @@ class AppLocalizationsKu extends AppLocalizations {
   String get listening => 'Guhdarî dike';
 
   @override
-  String get defaultViewTitle => 'What\'s Up?';
+  String get defaultViewTitle => 'Çi heye?';
 
   @override
   String get defaultViewDescription =>
-      'Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.';
+      'Cortex bi sedan modelên AI, kapasîteyên negirêdayî, sohbeta dînamîk û gelek tiştên din her gav li kêleka we ye.';
 }

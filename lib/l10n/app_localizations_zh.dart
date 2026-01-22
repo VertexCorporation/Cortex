@@ -1511,9 +1511,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get listening => '正在听';
 
   @override
-  String get defaultViewTitle => 'What\'s Up?';
+  String get defaultViewTitle => '最近怎么样？';
 
   @override
   String get defaultViewDescription =>
-      'Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.';
+      'Cortex 始终伴您左右，拥有数百个 AI 模型、离线功能、动态聊天等诸多特性。';
 }
