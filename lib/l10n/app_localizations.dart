@@ -2972,6 +2972,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Listening'**
   String get listening;
+
+  /// No description provided for @defaultViewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s Up?'**
+  String get defaultViewTitle;
+
+  /// No description provided for @defaultViewDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.'**
+  String get defaultViewDescription;
 }
 
 class _AppLocalizationsDelegate

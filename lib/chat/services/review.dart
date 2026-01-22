@@ -37,7 +37,8 @@ class ReviewService {
   Future<void> _launchStoreReview(BuildContext context) async {
     if (!context.mounted) return;
 
-    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+    final notificationService =
+        Provider.of<IntrovertNotificationService>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
     final platform = Theme.of(context).platform;
 
@@ -48,7 +49,8 @@ class ReviewService {
     const String iosAppId = "6755621587";
 
     try {
-      debugPrint("[ReviewService] Attempting to open store listing via in_app_review.");
+      debugPrint(
+          "[ReviewService] Attempting to open store listing via in_app_review.");
 
       // Platform-aware native call
       if (platform == TargetPlatform.iOS) {
@@ -59,18 +61,19 @@ class ReviewService {
 
       debugPrint("[ReviewService] openStoreListing succeeded.");
       return;
-
     } catch (e) {
-      debugPrint("[ReviewService] openStoreListing failed: $e. Falling back to direct URL.");
+      debugPrint(
+          "[ReviewService] openStoreListing failed: $e. Falling back to direct URL.");
     }
 
     // --- FALLBACK URL based on platform ---
     late final Uri url;
 
-    if (platform== TargetPlatform.iOS) {
+    if (platform == TargetPlatform.iOS) {
       url = Uri.parse("https://apps.apple.com/app/id$iosAppId");
     } else {
-      url = Uri.parse("https://play.google.com/store/apps/details?id=$androidPackageName");
+      url = Uri.parse(
+          "https://play.google.com/store/apps/details?id=$androidPackageName");
     }
 
     if (await canLaunchUrl(url)) {
@@ -106,12 +109,16 @@ class ReviewService {
           return;
         }
         final int? lastTs = prefs.getInt(_lastPromptedKey);
-        if (lastTs != null && DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(lastTs)) < _promptCooldown) {
+        if (lastTs != null &&
+            DateTime.now()
+                    .difference(DateTime.fromMillisecondsSinceEpoch(lastTs)) <
+                _promptCooldown) {
           debugPrint("[ReviewService] Production: In cooldown. Skipping.");
           return;
         }
 
-        debugPrint("[ReviewService] Production: Conditions met. Showing prompt.");
+        debugPrint(
+            "[ReviewService] Production: Conditions met. Showing prompt.");
 
         // This is the guard that the linter requires. It ensures that even after
         // waiting for SharedPreferences, the widget is still in the tree.
@@ -119,9 +126,9 @@ class ReviewService {
 
         // Now, this call is guaranteed to be safe.
         await _showReviewPrePrompt(context: context, isProduction: true);
-
       } catch (e) {
-        debugPrint("[ReviewService] Production: SharedPreferences check failed: $e");
+        debugPrint(
+            "[ReviewService] Production: SharedPreferences check failed: $e");
       }
     }
   }
@@ -139,10 +146,12 @@ class ReviewService {
       try {
         // --- The First Async Gap ---
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setInt(_lastPromptedKey, DateTime.now().millisecondsSinceEpoch);
+        await prefs.setInt(
+            _lastPromptedKey, DateTime.now().millisecondsSinceEpoch);
         debugPrint("[ReviewService] Production: Cooldown timestamp updated.");
       } catch (e) {
-        debugPrint("[ReviewService] Production: Failed to update timestamp: $e");
+        debugPrint(
+            "[ReviewService] Production: Failed to update timestamp: $e");
       }
     }
 
@@ -152,10 +161,12 @@ class ReviewService {
     // --- DYNAMIC STYLES ---
     final dialogBackgroundColor = AppColors.secondaryColor;
     final primaryTextColor = AppColors.primaryColor.inverted;
-    final secondaryTextColor = AppColors.primaryColor.inverted.withValues(alpha:0.8);
+    final secondaryTextColor =
+        AppColors.primaryColor.inverted.withValues(alpha: 0.8);
     final borderColor = AppColors.border;
     final noThanksButtonColor = AppColors.septenaryColor;
-    final laterButtonColor = AppColors.primaryColor.inverted.withValues(alpha:0.7);
+    final laterButtonColor =
+        AppColors.primaryColor.inverted.withValues(alpha: 0.7);
     final rateButtonColor = AppColors.senaryColor;
     const double dialogMaxWidth = 340.0;
 
@@ -184,12 +195,23 @@ class ReviewService {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 16),
+                        padding:
+                            const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 16),
                         child: Column(
                           children: [
-                            Text(localizations.reviewEnjoyingAppTitle, style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: primaryTextColor), textAlign: TextAlign.center),
+                            Text(localizations.reviewEnjoyingAppTitle,
+                                style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: primaryTextColor),
+                                textAlign: TextAlign.center),
                             const SizedBox(height: 12),
-                            Text(localizations.reviewHelpUsGrow, style: TextStyle(fontSize: 14.0, color: secondaryTextColor, height: 1.4), textAlign: TextAlign.center),
+                            Text(localizations.reviewHelpUsGrow,
+                                style: TextStyle(
+                                    fontSize: 14.0,
+                                    color: secondaryTextColor,
+                                    height: 1.4),
+                                textAlign: TextAlign.center),
                           ],
                         ),
                       ),
@@ -202,10 +224,13 @@ class ReviewService {
                               text: localizations.noThanks,
                               textColor: noThanksButtonColor,
                               onTap: () async {
-                                debugPrint("[ReviewService] User selected 'No, Thanks'.");
+                                debugPrint(
+                                    "[ReviewService] User selected 'No, Thanks'.");
                                 if (isProduction) {
-                                  final prefs = await SharedPreferences.getInstance();
-                                  await prefs.setBool(_reviewCompletedKey, true);
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  await prefs.setBool(
+                                      _reviewCompletedKey, true);
                                 }
                                 // Guard usage of the dialog's context.
                                 if (dialogCtx.mounted) {
@@ -213,31 +238,37 @@ class ReviewService {
                                 }
                               },
                             ),
-                            VerticalDivider(color: borderColor, thickness: 0.5, width: 0.5),
+                            VerticalDivider(
+                                color: borderColor, thickness: 0.5, width: 0.5),
                             // 2. "Maybe Later" Button
                             _buildDialogButton(
                               text: localizations.reviewMaybeLater,
                               textColor: laterButtonColor,
                               onTap: () {
-                                debugPrint("[ReviewService] User selected 'Maybe Later'.");
+                                debugPrint(
+                                    "[ReviewService] User selected 'Maybe Later'.");
                                 Navigator.of(dialogCtx).pop();
                               },
                             ),
-                            VerticalDivider(color: borderColor, thickness: 0.5, width: 0.5),
+                            VerticalDivider(
+                                color: borderColor, thickness: 0.5, width: 0.5),
                             // 3. "Rate Now" Button
                             _buildDialogButton(
                               text: localizations.reviewRateNow,
                               textColor: rateButtonColor,
                               isBold: true,
                               onTap: () async {
-                                debugPrint("[ReviewService] User selected 'Rate Now'.");
+                                debugPrint(
+                                    "[ReviewService] User selected 'Rate Now'.");
 
                                 // First, close the custom dialog (safe to do without a check first).
                                 Navigator.of(dialogCtx).pop();
 
                                 if (isProduction) {
-                                  final prefs = await SharedPreferences.getInstance();
-                                  await prefs.setBool(_reviewCompletedKey, true);
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  await prefs.setBool(
+                                      _reviewCompletedKey, true);
                                 }
 
                                 // Guard usage of the original context.
@@ -277,7 +308,8 @@ class ReviewService {
           highlightColor: textColor.withValues(alpha: 0.1),
           child: Container(
             alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 maxHeight: 16.0 * 3 * 1.2,

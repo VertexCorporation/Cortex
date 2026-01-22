@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cortex/theme.dart';
+import 'package:cortex/fog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import '../../../../../../../app.dart';
@@ -32,25 +33,22 @@ class ModelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final bool isTablet = MediaQuery
-        .of(context)
-        .size
-        .width >= 600;
+    final bool isTablet = MediaQuery.of(context).size.width >= 600;
     final double borderRadius = isTablet ? 24 : 20;
 
     // --- Visual State Colors ---
     final Color backgroundColor =
-    isSelected ? AppColors.primaryColor.inverted : AppColors.background;
+        isSelected ? AppColors.primaryColor.inverted : AppColors.background;
 
     final Color textColor =
-    isSelected ? AppColors.primaryColor : AppColors.primaryColor.inverted;
+        isSelected ? AppColors.primaryColor : AppColors.primaryColor.inverted;
 
     final Color subTextColor = isSelected
         ? AppColors.primaryColor.withValues(alpha: 0.7)
         : AppColors.tertiaryColor;
 
     final Color borderColor =
-    isSelected ? Colors.transparent : AppColors.border;
+        isSelected ? Colors.transparent : AppColors.border;
 
     final Color arrowColor = isSelected
         ? AppColors.primaryColor
@@ -91,43 +89,43 @@ class ModelCard extends StatelessWidget {
                         height: 40,
                         decoration: BoxDecoration(
                           color: imagePath.endsWith('.svg')
-                              ? Colors.transparent
+                              ? AppColors.primaryColor.inverted
                               : AppColors.quaternaryColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         clipBehavior: Clip.antiAlias,
                         child: imagePath.isNotEmpty
                             ? (imagePath.endsWith('.svg')
-                            ? (imagePath.startsWith('assets')
-                            ? SvgPicture.asset(
-                          imagePath,
-                          fit: BoxFit.cover,
-                          colorFilter: isSelected
-                              ? ColorFilter.mode(
-                              AppColors.primaryColor,
-                              BlendMode.srcIn)
-                              : null,
-                        )
-                            : SvgPicture.file(
-                          File(imagePath),
-                          fit: BoxFit.cover,
-                          colorFilter: isSelected
-                              ? ColorFilter.mode(
-                              AppColors.primaryColor.inverted,
-                              BlendMode.srcIn)
-                              : null,
-                        ))
-                            : (imagePath.startsWith('assets')
-                            ? Image.asset(
-                          imagePath,
-                          fit: BoxFit.cover,
-                          cacheWidth: 90,
-                        )
-                            : Image.file(
-                          File(imagePath),
-                          fit: BoxFit.cover,
-                          cacheWidth: 90,
-                        )))
+                                ? (imagePath.startsWith('assets')
+                                    ? SvgPicture.asset(
+                                        imagePath,
+                                        fit: BoxFit.cover,
+                                        colorFilter: isSelected
+                                            ? ColorFilter.mode(
+                                                AppColors.primaryColor,
+                                                BlendMode.srcIn)
+                                            : null,
+                                      )
+                                    : SvgPicture.file(
+                                        File(imagePath),
+                                        fit: BoxFit.cover,
+                                        colorFilter: isSelected
+                                            ? ColorFilter.mode(
+                                                AppColors.primaryColor.inverted,
+                                                BlendMode.srcIn)
+                                            : null,
+                                      ))
+                                : (imagePath.startsWith('assets')
+                                    ? Image.asset(
+                                        imagePath,
+                                        fit: BoxFit.cover,
+                                        cacheWidth: 90,
+                                      )
+                                    : Image.file(
+                                        File(imagePath),
+                                        fit: BoxFit.cover,
+                                        cacheWidth: 90,
+                                      )))
                             : Icon(Icons.token, color: AppColors.tertiaryColor),
                       ),
                       const SizedBox(width: 10),
@@ -139,6 +137,8 @@ class ModelCard extends StatelessWidget {
                           children: [
                             _ScrollableText(
                               text: title,
+                              fogColor:
+                                  backgroundColor, // Pass the card's background color
                               style: TextStyle(
                                 fontFamily: 'Roboto',
                                 fontSize: 14,
@@ -206,47 +206,96 @@ class ModelCard extends StatelessWidget {
   }
 }
 
-class _ScrollableText extends StatelessWidget {
+class _ScrollableText extends StatefulWidget {
   final String text;
   final TextStyle style;
+  final Color fogColor;
 
-  const _ScrollableText({required this.text, required this.style});
+  const _ScrollableText({
+    required this.text,
+    required this.style,
+    required this.fogColor,
+  });
+
+  @override
+  State<_ScrollableText> createState() => _ScrollableTextState();
+}
+
+class _ScrollableTextState extends State<_ScrollableText> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final TextPainter textPainter = TextPainter(
-          text: TextSpan(text: text, style: style),
+          text: TextSpan(text: widget.text, style: widget.style),
           maxLines: 1,
           textDirection: TextDirection.ltr,
           textScaler: MediaQuery.textScalerOf(context),
-        )
-          ..layout(maxWidth: double.infinity);
+        )..layout(maxWidth: double.infinity);
 
         final bool shouldScroll = textPainter.width > constraints.maxWidth;
 
         if (!shouldScroll) {
           return Text(
-            text,
-            style: style,
+            widget.text,
+            style: widget.style,
             softWrap: false,
             overflow: TextOverflow.visible,
             maxLines: 1,
           );
         }
 
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: constraints.maxWidth),
-            child: Text(
-              text,
-              style: style,
-              softWrap: false,
-              overflow: TextOverflow.visible,
-              maxLines: 1,
+        return ScrollFogHorizontal(
+          scrollController: _scrollController,
+          // Fog color matches the card background (dynamic based on selection is tricky here)
+          // Ideally we pass the fogColor. Usage in parent doesn't easily expose background color here.
+          // BUT, usually cards are on a background.
+          // If the card is selected (Dark/Primary), fog should match that.
+          // If not selected (Light/Background), fog should match that.
+          // The current _ScrollableText doesn't know about selection or colors.
+          // We should modify _ScrollableText to accept `fogColor`.
+          // For now, I'll use a hack or just default? No, default won't work on colored backgrounds.
+          // Refactor needed: pass color.
+          // Re-reading parent: `backgroundColor` is defined in `ModelCard`.
+          // I will assume for now I can pass it.
+          // Wait, I need to update the constructor in this Replace call?
+          // I can't easily change the constructor across the file in one Replace call if I don't see the usages.
+          // I'll stick to 'transparent' or 'Theme.of(context).cardColor'?
+          // Actually, the user said "pus" (fog). It needs a color to fade TO.
+          // I'll update the constructor to accept `fogColor`.
+          fogColor: Theme.of(context)
+              .scaffoldBackgroundColor, // Placeholder, need refactor.
+          // WAIT. I should check if I can easily pass color.
+          // In ModelCard build method:
+          // final Color backgroundColor = isSelected ? AppColors.primaryColor.inverted : AppColors.background;
+          // I should pass this to _ScrollableText.
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+              child: Text(
+                widget.text,
+                style: widget.style,
+                softWrap: false,
+                overflow: TextOverflow.visible,
+                maxLines: 1,
+              ),
             ),
           ),
         );

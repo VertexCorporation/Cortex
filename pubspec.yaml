@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 5.3.0+530
+version: 5.4.0+530
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -95,6 +95,7 @@ dependencies:
   # --- TIMEZONE ---
   timezone: ^0.10.1
   flutter_tts: ^4.2.5
+  camera: ^0.11.3
 
 dev_dependencies:
   flutter_test:

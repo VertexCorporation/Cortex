@@ -2,6 +2,7 @@
 
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../app.dart';
@@ -66,17 +67,20 @@ class AxonItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius),
           clipBehavior: Clip.antiAlias, // Ensures splash doesn't bleed
           child: InkWell(
-            onTap: onTap,
+            onTap: onTap != null
+                ? () {
+                    HapticFeedback.lightImpact();
+                    onTap!();
+                  }
+                : null,
             splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
-            highlightColor: AppColors.primaryColor.inverted.withValues(
-                alpha: 0.05),
+            highlightColor:
+                AppColors.primaryColor.inverted.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(borderRadius),
             child: Container(
               width: referenceWidth * 0.85,
               padding: EdgeInsets.symmetric(
-                  vertical: itemPaddingV,
-                  horizontal: itemPaddingH
-              ),
+                  vertical: itemPaddingV, horizontal: itemPaddingH),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -90,8 +94,8 @@ class AxonItem extends StatelessWidget {
                         width: iconSize,
                         height: iconSize,
                         // Optimization: BlendMode.srcIn is faster than masking
-                        colorFilter: ColorFilter.mode(
-                            iconColor, BlendMode.srcIn),
+                        colorFilter:
+                            ColorFilter.mode(iconColor, BlendMode.srcIn),
                       ),
                     ),
                   ),

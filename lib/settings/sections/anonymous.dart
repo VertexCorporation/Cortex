@@ -2,6 +2,7 @@
 
 import 'package:cortex/navigation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../app.dart';
 import '../../login/upgrade.dart';
@@ -30,7 +31,7 @@ class AnonymousUpgradePanel extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppColors.primaryColor.withValues(alpha:0.15),
+                AppColors.primaryColor.withValues(alpha: 0.15),
                 AppColors.secondaryColor,
               ],
               begin: Alignment.topLeft,
@@ -38,7 +39,7 @@ class AnonymousUpgradePanel extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: AppColors.primaryColor.inverted.withValues(alpha:0.3),
+              color: AppColors.primaryColor.inverted.withValues(alpha: 0.3),
               width: 1.5,
             ),
           ),
@@ -48,7 +49,9 @@ class AnonymousUpgradePanel extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.verified, color: AppColors.primaryColor.inverted, size: screenWidth * 0.07),
+                  Icon(Icons.verified,
+                      color: AppColors.primaryColor.inverted,
+                      size: screenWidth * 0.07),
                   SizedBox(width: screenWidth * 0.02),
                   Text(
                     l10n.upgradeAccountTitle,
@@ -78,11 +81,15 @@ class AnonymousUpgradePanel extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => _openUpgradeScreen(context),
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    _openUpgradeScreen(context);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor.inverted,
                     foregroundColor: AppColors.primaryColor,
-                    padding: EdgeInsets.symmetric(vertical: screenWidth * 0.035),
+                    padding:
+                        EdgeInsets.symmetric(vertical: screenWidth * 0.035),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

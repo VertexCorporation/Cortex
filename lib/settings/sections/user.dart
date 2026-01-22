@@ -4,6 +4,7 @@ import 'package:cortex/funds/backend.dart';
 import 'package:cortex/funds/funds.dart';
 import 'package:cortex/navigation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../app.dart';
 import '../../darkener.dart';
@@ -40,8 +41,9 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
         vsync: this, duration: const Duration(milliseconds: 500));
     // Initialize the controller here, using context.read for one-time access.
     final initialUsername = context
-        .read<SettingsGeneralProvider>()
-        .userData?['username'] as String? ?? '';
+            .read<SettingsGeneralProvider>()
+            .userData?['username'] as String? ??
+        '';
     _nameController = TextEditingController(text: initialUsername);
   }
 
@@ -91,10 +93,7 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
     context.watch<ThemeProvider>();
 
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Center(
       child: SingleChildScrollView(
@@ -102,7 +101,8 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
           color: Colors.transparent,
           child: Container(
             width: screenWidth * 0.8,
-            decoration: BoxDecoration(color: AppColors.secondaryColor,
+            decoration: BoxDecoration(
+                color: AppColors.secondaryColor,
                 borderRadius: BorderRadius.circular(10)),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -116,10 +116,11 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
                         padding: EdgeInsets.all(screenWidth * 0.05),
                         child: Column(
                           children: [
-                            Text(appLocalizations.editProfile, style: TextStyle(
-                                fontSize: screenWidth * 0.045,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryColor.inverted),
+                            Text(appLocalizations.editProfile,
+                                style: TextStyle(
+                                    fontSize: screenWidth * 0.045,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryColor.inverted),
                                 textAlign: TextAlign.center),
                             SizedBox(height: screenWidth * 0.05),
                             ShakeWidget(
@@ -137,79 +138,104 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
                                     enabledBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
                                             color: AppColors.quinaryColor),
-                                        borderRadius: BorderRadius.circular(
-                                            10.0)),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0)),
                                     focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
-                                            color: AppColors.primaryColor
-                                                .inverted),
-                                        borderRadius: BorderRadius.circular(
-                                            10.0)),
+                                            color: AppColors
+                                                .primaryColor.inverted),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0)),
                                     counterText: ''),
                               ),
                             ),
                             AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 300),
                                 child: _errorText != null
-                                    ? Padding(padding: EdgeInsets.only(
-                                    top: screenWidth * 0.02),
-                                    child: Text(_errorText!, style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: screenWidth * 0.03),
-                                        key: ValueKey(_errorText)))
+                                    ? Padding(
+                                        padding: EdgeInsets.only(
+                                            top: screenWidth * 0.02),
+                                        child: Text(_errorText!,
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: screenWidth * 0.03),
+                                            key: ValueKey(_errorText)))
                                     : const SizedBox.shrink(
-                                    key: ValueKey("emptyError"))),
+                                        key: ValueKey("emptyError"))),
                           ],
                         ),
                       ),
-                      Divider(color: AppColors.quinaryColor,
+                      Divider(
+                          color: AppColors.quinaryColor,
                           thickness: 0.5,
                           height: 1),
                       IntrinsicHeight(
                         child: Row(
                           children: [
-                            Expanded(child: Material(color: Colors.transparent,
-                                child: InkWell(onTap: isUpdating ? null : () =>
-                                    Navigator.of(context).pop(),
-                                    splashColor: AppColors.senaryColor
-                                        .withValues(alpha: 0.1),
-                                    highlightColor: AppColors.senaryColor
-                                        .withValues(alpha: 0.1),
-                                    child: Container(
-                                        alignment: Alignment.center,
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: screenWidth * 0.04),
-                                        child: Text(appLocalizations.cancel,
-                                            style: TextStyle(
-                                                color: AppColors.senaryColor,
-                                                fontSize: screenWidth *
-                                                    0.04)))))),
-                            VerticalDivider(width: 1,
+                            Expanded(
+                                child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                        onTap: isUpdating
+                                            ? null
+                                            : () {
+                                                HapticFeedback.lightImpact();
+                                                Navigator.of(context).pop();
+                                              },
+                                        splashColor: AppColors.senaryColor
+                                            .withValues(alpha: 0.1),
+                                        highlightColor: AppColors.senaryColor
+                                            .withValues(alpha: 0.1),
+                                        child: Container(
+                                            alignment: Alignment.center,
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: screenWidth * 0.04),
+                                            child: Text(appLocalizations.cancel,
+                                                style: TextStyle(
+                                                    color:
+                                                        AppColors.senaryColor,
+                                                    fontSize: screenWidth *
+                                                        0.04)))))),
+                            VerticalDivider(
+                                width: 1,
                                 thickness: 0.5,
                                 color: AppColors.quinaryColor),
                             Expanded(
                               child: Material(
-                                  color: Colors.transparent, child: InkWell(
-                                splashColor: AppColors.septenaryColor
-                                    .withValues(alpha: 0.1),
-                                highlightColor: AppColors.septenaryColor
-                                    .withValues(alpha: 0.1),
-                                onTap: isUpdating ? null : _handleUpdate,
-                                child: Container(alignment: Alignment.center,
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: screenWidth * 0.04),
-                                    child: isUpdating
-                                        ? SizedBox(width: screenWidth * 0.05,
-                                        height: screenWidth * 0.05,
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 2.0,
-                                            color: AppColors.septenaryColor))
-                                        : Text(appLocalizations.save,
-                                        style: TextStyle(
-                                            color: AppColors.septenaryColor,
-                                            fontSize: screenWidth * 0.04,
-                                            fontWeight: FontWeight.bold))),
-                              )),
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    splashColor: AppColors.septenaryColor
+                                        .withValues(alpha: 0.1),
+                                    highlightColor: AppColors.septenaryColor
+                                        .withValues(alpha: 0.1),
+                                    onTap: isUpdating
+                                        ? null
+                                        : () {
+                                            HapticFeedback.lightImpact();
+                                            _handleUpdate();
+                                          },
+                                    child: Container(
+                                        alignment: Alignment.center,
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: screenWidth * 0.04),
+                                        child: isUpdating
+                                            ? SizedBox(
+                                                width: screenWidth * 0.05,
+                                                height: screenWidth * 0.05,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                        strokeWidth: 2.0,
+                                                        color: AppColors
+                                                            .septenaryColor))
+                                            : Text(appLocalizations.save,
+                                                style: TextStyle(
+                                                    color: AppColors
+                                                        .septenaryColor,
+                                                    fontSize:
+                                                        screenWidth * 0.04,
+                                                    fontWeight:
+                                                        FontWeight.bold))),
+                                  )),
                             ),
                           ],
                         ),
@@ -236,9 +262,11 @@ class _ChangePasswordDialog extends StatefulWidget {
 
 class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
     with TickerProviderStateMixin {
-  late final AnimationController _oldPassShake, _newPassShake,
+  late final AnimationController _oldPassShake,
+      _newPassShake,
       _confirmPassShake;
-  late final TextEditingController _oldPassController, _newPassController,
+  late final TextEditingController _oldPassController,
+      _newPassController,
       _confirmPassController;
 
   // *** FIX: Use separate error variables for each field. ***
@@ -304,8 +332,8 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
     }
 
     try {
-      await actionProvider.changePassword(
-          context, oldPassword: oldPass, newPassword: newPass);
+      await actionProvider.changePassword(context,
+          oldPassword: oldPass, newPassword: newPass);
       if (mounted) {
         navigator.pop(); // Pop the dialog
         navigator.pop(); // Pop the SettingsScreen
@@ -324,10 +352,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
     context.watch<ThemeProvider>();
 
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     // This is the build method for the dialog.
     return Center(
@@ -336,7 +361,8 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
           color: Colors.transparent,
           child: Container(
             width: screenWidth * 0.8,
-            decoration: BoxDecoration(color: AppColors.secondaryColor,
+            decoration: BoxDecoration(
+                color: AppColors.secondaryColor,
                 borderRadius: BorderRadius.circular(10)),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -351,168 +377,201 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
                         child: Column(
                           children: [
                             Text(appLocalizations.changePassword,
-                                style: TextStyle(fontSize: screenWidth * 0.045,
+                                style: TextStyle(
+                                    fontSize: screenWidth * 0.045,
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.primaryColor.inverted),
                                 textAlign: TextAlign.center),
                             SizedBox(height: screenWidth * 0.05),
                             // Old Password Field
-                            ShakeWidget(controller: _oldPassShake,
-                                child: TextField(controller: _oldPassController,
+                            ShakeWidget(
+                                controller: _oldPassShake,
+                                child: TextField(
+                                    controller: _oldPassController,
                                     obscureText: true,
                                     style: TextStyle(
                                         color: AppColors.primaryColor.inverted),
                                     decoration: InputDecoration(
                                         labelText: appLocalizations.oldPassword,
                                         labelStyle: TextStyle(
-                                            color: AppColors.primaryColor
-                                                .inverted),
+                                            color: AppColors
+                                                .primaryColor.inverted),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: AppColors.quinaryColor),
-                                            borderRadius: BorderRadius.circular(
-                                                10)),
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
                                         focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
-                                                color: AppColors.primaryColor
-                                                    .inverted),
-                                            borderRadius: BorderRadius.circular(
-                                                10))))),
+                                                color: AppColors
+                                                    .primaryColor.inverted),
+                                            borderRadius:
+                                                BorderRadius.circular(10))))),
                             AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 300),
                                 child: _oldPassError != null
-                                    ? Padding(padding: EdgeInsets.only(
-                                    top: screenWidth * 0.02),
-                                    child: Text(_oldPassError!,
-                                        style: TextStyle(color: Colors.red,
-                                            fontSize: screenWidth * 0.03),
-                                        key: ValueKey(_oldPassError)))
+                                    ? Padding(
+                                        padding: EdgeInsets.only(
+                                            top: screenWidth * 0.02),
+                                        child: Text(_oldPassError!,
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: screenWidth * 0.03),
+                                            key: ValueKey(_oldPassError)))
                                     : const SizedBox.shrink()),
 
                             SizedBox(height: screenWidth * 0.03),
 
                             // New Password Field
-                            ShakeWidget(controller: _newPassShake,
-                                child: TextField(controller: _newPassController,
+                            ShakeWidget(
+                                controller: _newPassShake,
+                                child: TextField(
+                                    controller: _newPassController,
                                     obscureText: true,
                                     style: TextStyle(
                                         color: AppColors.primaryColor.inverted),
                                     decoration: InputDecoration(
                                         labelText: appLocalizations.newPassword,
                                         labelStyle: TextStyle(
-                                            color: AppColors.primaryColor
-                                                .inverted),
+                                            color: AppColors
+                                                .primaryColor.inverted),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: AppColors.quinaryColor),
-                                            borderRadius: BorderRadius.circular(
-                                                10)),
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
                                         focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
-                                                color: AppColors.primaryColor
-                                                    .inverted),
-                                            borderRadius: BorderRadius.circular(
-                                                10))))),
+                                                color: AppColors
+                                                    .primaryColor.inverted),
+                                            borderRadius:
+                                                BorderRadius.circular(10))))),
                             AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 300),
                                 child: _newPassError != null
-                                    ? Padding(padding: EdgeInsets.only(
-                                    top: screenWidth * 0.02),
-                                    child: Text(_newPassError!,
-                                        style: TextStyle(color: Colors.red,
-                                            fontSize: screenWidth * 0.03),
-                                        key: ValueKey(_newPassError)))
+                                    ? Padding(
+                                        padding: EdgeInsets.only(
+                                            top: screenWidth * 0.02),
+                                        child: Text(_newPassError!,
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: screenWidth * 0.03),
+                                            key: ValueKey(_newPassError)))
                                     : const SizedBox.shrink()),
 
                             SizedBox(height: screenWidth * 0.03),
 
                             // Confirm Password Field
-                            ShakeWidget(controller: _confirmPassShake,
+                            ShakeWidget(
+                                controller: _confirmPassShake,
                                 child: TextField(
                                     controller: _confirmPassController,
                                     obscureText: true,
                                     style: TextStyle(
                                         color: AppColors.primaryColor.inverted),
                                     decoration: InputDecoration(
-                                        labelText: appLocalizations
-                                            .confirmPassword,
+                                        labelText:
+                                            appLocalizations.confirmPassword,
                                         labelStyle: TextStyle(
-                                            color: AppColors.primaryColor
-                                                .inverted),
+                                            color: AppColors
+                                                .primaryColor.inverted),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: AppColors.quinaryColor),
-                                            borderRadius: BorderRadius.circular(
-                                                10)),
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
                                         focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
-                                                color: AppColors.primaryColor
-                                                    .inverted),
-                                            borderRadius: BorderRadius.circular(
-                                                10))))),
+                                                color: AppColors
+                                                    .primaryColor.inverted),
+                                            borderRadius:
+                                                BorderRadius.circular(10))))),
                             AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 300),
                                 child: _confirmPassError != null
-                                    ? Padding(padding: EdgeInsets.only(
-                                    top: screenWidth * 0.02),
-                                    child: Text(_confirmPassError!,
-                                        style: TextStyle(color: Colors.red,
-                                            fontSize: screenWidth * 0.03),
-                                        key: ValueKey(_confirmPassError)))
+                                    ? Padding(
+                                        padding: EdgeInsets.only(
+                                            top: screenWidth * 0.02),
+                                        child: Text(_confirmPassError!,
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: screenWidth * 0.03),
+                                            key: ValueKey(_confirmPassError)))
                                     : const SizedBox.shrink()),
                           ],
                         ),
                       ),
-                      Divider(color: AppColors.quinaryColor,
+                      Divider(
+                          color: AppColors.quinaryColor,
                           thickness: 0.5,
                           height: 1),
                       IntrinsicHeight(
                         child: Row(
                           children: [
-                            Expanded(child: Material(color: Colors.transparent,
-                                child: InkWell(onTap: isChanging ? null : () =>
-                                    Navigator.of(context).pop(),
-                                    splashColor: AppColors.senaryColor
-                                        .withValues(alpha: 0.1),
-                                    highlightColor: AppColors.senaryColor
-                                        .withValues(alpha: 0.1),
-                                    child: Container(
-                                        alignment: Alignment.center,
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: screenWidth * 0.04),
-                                        child: Text(appLocalizations.cancel,
-                                            style: TextStyle(
-                                                color: AppColors.senaryColor,
-                                                fontSize: screenWidth *
-                                                    0.04)))))),
-                            VerticalDivider(width: 1,
+                            Expanded(
+                                child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                        onTap: isChanging
+                                            ? null
+                                            : () {
+                                                HapticFeedback.lightImpact();
+                                                Navigator.of(context).pop();
+                                              },
+                                        splashColor: AppColors.senaryColor
+                                            .withValues(alpha: 0.1),
+                                        highlightColor: AppColors.senaryColor
+                                            .withValues(alpha: 0.1),
+                                        child: Container(
+                                            alignment: Alignment.center,
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: screenWidth * 0.04),
+                                            child: Text(appLocalizations.cancel,
+                                                style: TextStyle(
+                                                    color:
+                                                        AppColors.senaryColor,
+                                                    fontSize: screenWidth *
+                                                        0.04)))))),
+                            VerticalDivider(
+                                width: 1,
                                 thickness: 0.5,
                                 color: AppColors.quinaryColor),
                             Expanded(
                               child: Material(
-                                  color: Colors.transparent, child: InkWell(
-                                splashColor: AppColors.septenaryColor
-                                    .withValues(alpha: 0.1),
-                                highlightColor: AppColors.septenaryColor
-                                    .withValues(alpha: 0.1),
-                                onTap: isChanging
-                                    ? null
-                                    : _handleChangePassword,
-                                child: Container(alignment: Alignment.center,
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: screenWidth * 0.04),
-                                    child: isChanging
-                                        ? SizedBox(width: screenWidth * 0.05,
-                                        height: screenWidth * 0.05,
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 2.0,
-                                            color: AppColors.septenaryColor))
-                                        : Text(appLocalizations.save,
-                                        style: TextStyle(
-                                            color: AppColors.septenaryColor,
-                                            fontSize: screenWidth * 0.04,
-                                            fontWeight: FontWeight.bold))),
-                              )),
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    splashColor: AppColors.septenaryColor
+                                        .withValues(alpha: 0.1),
+                                    highlightColor: AppColors.septenaryColor
+                                        .withValues(alpha: 0.1),
+                                    onTap: isChanging
+                                        ? null
+                                        : () {
+                                            HapticFeedback.lightImpact();
+                                            _handleChangePassword();
+                                          },
+                                    child: Container(
+                                        alignment: Alignment.center,
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: screenWidth * 0.04),
+                                        child: isChanging
+                                            ? SizedBox(
+                                                width: screenWidth * 0.05,
+                                                height: screenWidth * 0.05,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                        strokeWidth: 2.0,
+                                                        color: AppColors
+                                                            .septenaryColor))
+                                            : Text(appLocalizations.save,
+                                                style: TextStyle(
+                                                    color: AppColors
+                                                        .septenaryColor,
+                                                    fontSize:
+                                                        screenWidth * 0.04,
+                                                    fontWeight:
+                                                        FontWeight.bold))),
+                                  )),
                             ),
                           ],
                         ),
@@ -538,17 +597,15 @@ class _LogoutDialog extends StatelessWidget {
     context.watch<ThemeProvider>();
 
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Center(
       child: Material(
         color: Colors.transparent,
         child: Container(
           width: screenWidth * 0.8,
-          decoration: BoxDecoration(color: AppColors.secondaryColor,
+          decoration: BoxDecoration(
+              color: AppColors.secondaryColor,
               borderRadius: BorderRadius.circular(10)),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
@@ -562,41 +619,53 @@ class _LogoutDialog extends StatelessWidget {
                       padding: EdgeInsets.all(screenWidth * 0.05),
                       child: Column(
                         children: [
-                          Text(appLocalizations.logout, style: TextStyle(
-                              fontSize: screenWidth * 0.045,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryColor.inverted),
+                          Text(appLocalizations.logout,
+                              style: TextStyle(
+                                  fontSize: screenWidth * 0.045,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryColor.inverted),
                               textAlign: TextAlign.center),
                           SizedBox(height: screenWidth * 0.03),
                           Text(appLocalizations.logoutConfirmationTitle,
-                              style: TextStyle(color: AppColors.quinaryColor,
+                              style: TextStyle(
+                                  color: AppColors.quinaryColor,
                                   fontSize: screenWidth * 0.035),
                               textAlign: TextAlign.center),
                         ],
                       ),
                     ),
-                    Divider(color: AppColors.quinaryColor,
+                    Divider(
+                        color: AppColors.quinaryColor,
                         thickness: 0.5,
                         height: 1),
                     IntrinsicHeight(
                       child: Row(
                         children: [
-                          Expanded(child: Material(color: Colors.transparent,
-                              child: InkWell(onTap: isLoggingOut ? null : () =>
-                                  Navigator.of(context).pop(),
-                                  splashColor: AppColors.senaryColor.withValues(
-                                      alpha: 0.1),
-                                  highlightColor: AppColors.senaryColor
-                                      .withValues(alpha: 0.1),
-                                  child: Container(alignment: Alignment.center,
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: screenWidth * 0.04),
-                                      child: Text(appLocalizations.no,
-                                          style: TextStyle(
-                                              color: AppColors.senaryColor,
-                                              fontSize: screenWidth *
-                                                  0.04)))))),
-                          VerticalDivider(width: 1,
+                          Expanded(
+                              child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                      onTap: isLoggingOut
+                                          ? null
+                                          : () {
+                                              HapticFeedback.lightImpact();
+                                              Navigator.of(context).pop();
+                                            },
+                                      splashColor: AppColors.senaryColor
+                                          .withValues(alpha: 0.1),
+                                      highlightColor: AppColors.senaryColor
+                                          .withValues(alpha: 0.1),
+                                      child: Container(
+                                          alignment: Alignment.center,
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: screenWidth * 0.04),
+                                          child: Text(appLocalizations.no,
+                                              style: TextStyle(
+                                                  color: AppColors.senaryColor,
+                                                  fontSize:
+                                                      screenWidth * 0.04)))))),
+                          VerticalDivider(
+                              width: 1,
                               thickness: 0.5,
                               color: AppColors.quinaryColor),
                           Expanded(
@@ -607,24 +676,29 @@ class _LogoutDialog extends StatelessWidget {
                                     .withValues(alpha: 0.1),
                                 highlightColor: AppColors.septenaryColor
                                     .withValues(alpha: 0.1),
-                                onTap: isLoggingOut ? null : () =>
-                                    context
-                                        .read<SettingsActionProvider>()
-                                        .performLogout(context),
+                                onTap: isLoggingOut
+                                    ? null
+                                    : () {
+                                        HapticFeedback.lightImpact();
+                                        context
+                                            .read<SettingsActionProvider>()
+                                            .performLogout(context);
+                                      },
                                 child: Container(
                                   alignment: Alignment.center,
                                   padding: EdgeInsets.symmetric(
                                       vertical: screenWidth * 0.04),
                                   child: isLoggingOut
-                                      ? SizedBox(width: screenWidth * 0.05,
-                                      height: screenWidth * 0.05,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2.0,
-                                          color: AppColors.septenaryColor))
+                                      ? SizedBox(
+                                          width: screenWidth * 0.05,
+                                          height: screenWidth * 0.05,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                              color: AppColors.septenaryColor))
                                       : Text(appLocalizations.yes,
-                                      style: TextStyle(
-                                          color: AppColors.septenaryColor,
-                                          fontSize: screenWidth * 0.04)),
+                                          style: TextStyle(
+                                              color: AppColors.septenaryColor,
+                                              fontSize: screenWidth * 0.04)),
                                 ),
                               ),
                             ),
@@ -698,10 +772,7 @@ class _MyPlanButtonState extends State<_MyPlanButton>
   @override
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final appLocalizations = AppLocalizations.of(context)!;
 
     return Consumer<FundsBackend>(
@@ -725,8 +796,9 @@ class _MyPlanButtonState extends State<_MyPlanButton>
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              navigateToScreen(
-                  const FundsScreen(), direction: const Offset(1.0, 0.0));
+              HapticFeedback.lightImpact();
+              navigateToScreen(const FundsScreen(),
+                  direction: const Offset(1.0, 0.0));
             },
             borderRadius: BorderRadius.circular(10.0),
             child: Stack(
@@ -820,10 +892,7 @@ class UserSection extends StatelessWidget {
       barrierDismissible: true,
       barrierLabel: 'UserActionDialog',
       pageBuilder: (ctx, _, __) {
-        final keyboardPadding = MediaQuery
-            .of(ctx)
-            .viewInsets
-            .bottom;
+        final keyboardPadding = MediaQuery.of(ctx).viewInsets.bottom;
         return AnimatedPadding(
           padding: EdgeInsets.only(bottom: keyboardPadding),
           duration: const Duration(milliseconds: 50),
@@ -835,11 +904,10 @@ class UserSection extends StatelessWidget {
   }
 
   Widget _buildCenteredButton(BuildContext context,
-      {required String text, required VoidCallback onPressed, bool enabled = true}) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+      {required String text,
+      required VoidCallback onPressed,
+      bool enabled = true}) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Opacity(
       opacity: enabled ? 1.0 : 0.5,
       child: Material(
@@ -856,10 +924,11 @@ class UserSection extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(text, style: TextStyle(
-                    color: AppColors.primaryColor.inverted,
-                    fontSize: screenWidth * 0.041,
-                    fontWeight: FontWeight.w500)),
+                Text(text,
+                    style: TextStyle(
+                        color: AppColors.primaryColor.inverted,
+                        fontSize: screenWidth * 0.041,
+                        fontWeight: FontWeight.w500)),
                 Icon(Icons.arrow_forward_ios,
                     color: AppColors.primaryColor.inverted,
                     size: screenWidth * 0.04),
@@ -876,31 +945,25 @@ class UserSection extends StatelessWidget {
     context.watch<ThemeProvider>();
 
     final appLocalizations = AppLocalizations.of(context)!;
-    final hasInternet = context
-        .watch<SettingsGeneralProvider>()
-        .hasInternet;
-    final isPasswordUser = context.select((AuthService auth) =>
-        auth.hasPasswordProvider());
+    final hasInternet = context.watch<SettingsGeneralProvider>().hasInternet;
+    final isPasswordUser =
+        context.select((AuthService auth) => auth.hasPasswordProvider());
 
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(appLocalizations.user, style: TextStyle(
-            color: AppColors.primaryColor.inverted,
-            fontSize: screenWidth * 0.05,
-            fontWeight: FontWeight.w600)),
+        Text(appLocalizations.user,
+            style: TextStyle(
+                color: AppColors.primaryColor.inverted,
+                fontSize: screenWidth * 0.05,
+                fontWeight: FontWeight.w600)),
         SizedBox(height: screenHeight * 0.01),
-        Text(appLocalizations.manageProfileDescription, style: TextStyle(
-            color: AppColors.quinaryColor, fontSize: screenWidth * 0.035)),
+        Text(appLocalizations.manageProfileDescription,
+            style: TextStyle(
+                color: AppColors.quinaryColor, fontSize: screenWidth * 0.035)),
         SizedBox(height: screenHeight * 0.02),
         // Premium / My Plan Button
         const _MyPlanButton(),

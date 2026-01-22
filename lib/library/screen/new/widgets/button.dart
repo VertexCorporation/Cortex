@@ -1,6 +1,7 @@
 // lib/screens/models/screen/new/widgets/button.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../theme.dart';
@@ -60,19 +61,24 @@ class CreationSaveButton extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: isEnabled ? onPressed : null,
+              onPressed: isEnabled
+                  ? () {
+                      HapticFeedback.lightImpact();
+                      onPressed();
+                    }
+                  : null,
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                      (Set<WidgetState> states) {
+                  (Set<WidgetState> states) {
                     if (states.contains(WidgetState.disabled)) {
-                      return AppColors.senaryColor.withValues(alpha:0.5);
+                      return AppColors.senaryColor.withValues(alpha: 0.5);
                     }
                     return AppColors.senaryColor;
                   },
                 ),
                 foregroundColor: WidgetStateProperty.all(Colors.white),
-                padding: WidgetStateProperty.all(
-                    EdgeInsets.symmetric(vertical: isTablet ? 20 : screenHeight * 0.018)),
+                padding: WidgetStateProperty.all(EdgeInsets.symmetric(
+                    vertical: isTablet ? 20 : screenHeight * 0.018)),
                 shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(borderRadius),
@@ -81,20 +87,20 @@ class CreationSaveButton extends StatelessWidget {
               ),
               child: isSaving
                   ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.white,
-                ),
-              )
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.white,
+                      ),
+                    )
                   : Text(
-                localizations.save,
-                style: TextStyle(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+                      localizations.save,
+                      style: TextStyle(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ),
           ),
         ),

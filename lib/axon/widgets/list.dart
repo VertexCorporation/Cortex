@@ -64,6 +64,12 @@ class _AxonConversationListState extends State<AxonConversationList> {
     _checkForUpdates();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _checkForUpdates();
+  }
+
   void _checkForUpdates() {
     final vm = context.read<InboxViewModel>();
     final newIds = vm.conversations;
@@ -153,33 +159,29 @@ class _AxonConversationListState extends State<AxonConversationList> {
           final existingIndex = _displayedIds.indexOf(newId, index);
 
           if (existingIndex != -1) {
-             // It exists later. This implies `oldId` (and others) have shifted down,
-             // or `newId` moved up.
-             // We remove it from the old position and insert it here.
-             final idToMove = _displayedIds.removeAt(existingIndex);
-             _listKey.currentState?.removeItem(
+            // It exists later. This implies `oldId` (and others) have shifted down,
+            // or `newId` moved up.
+            // We remove it from the old position and insert it here.
+            final idToMove = _displayedIds.removeAt(existingIndex);
+            _listKey.currentState?.removeItem(
                 existingIndex,
-                 (context, _) => SizedBox.shrink(), // Instant remove (visual hack)
-                duration: Duration.zero
-             );
-             _displayedIds.insert(index, idToMove);
-             _listKey.currentState?.insertItem(index);
+                (context, _) =>
+                    SizedBox.shrink(), // Instant remove (visual hack)
+                duration: Duration.zero);
+            _displayedIds.insert(index, idToMove);
+            _listKey.currentState?.insertItem(index);
           } else {
             // It doesn't exist. It's a new item. Match!
-             _displayedIds.insert(index, newId);
-             _listKey.currentState?.insertItem(
-               index,
-               duration: const Duration(milliseconds: 300)
-             );
+            _displayedIds.insert(index, newId);
+            _listKey.currentState?.insertItem(index,
+                duration: const Duration(milliseconds: 300));
           }
         }
       } else {
         // Appending new item
         _displayedIds.add(newId);
-        _listKey.currentState?.insertItem(
-            index,
-            duration: const Duration(milliseconds: 300)
-        );
+        _listKey.currentState
+            ?.insertItem(index, duration: const Duration(milliseconds: 300));
       }
     }
   }
@@ -244,13 +246,16 @@ class _AxonConversationListState extends State<AxonConversationList> {
     // --- Logic for Empty States ---
     final List<String> currentIds = inboxViewModel.conversations;
     // Initial sync if we missed it (Edge case)
-    if (_displayedIds.isEmpty && currentIds.isNotEmpty && _listKey.currentState == null) {
-       _displayedIds = List.from(currentIds);
+    if (_displayedIds.isEmpty &&
+        currentIds.isNotEmpty &&
+        _listKey.currentState == null) {
+      _displayedIds = List.from(currentIds);
     }
 
     final bool isEmpty = currentIds.isEmpty && _displayedIds.isEmpty;
     final bool hasSearchText = widget.searchController.text.trim().isNotEmpty;
-    final bool showNoResults = widget.isSearchActive && hasSearchText && isEmpty;
+    final bool showNoResults =
+        widget.isSearchActive && hasSearchText && isEmpty;
 
     // --- 2. Empty / No Results State ---
     if (isEmpty) {
@@ -295,7 +300,9 @@ class _AxonConversationListState extends State<AxonConversationList> {
 
           // Wrap tile in transition for Insert animations
           return SlideTransition(
-            position: animation.drive(Tween(begin: const Offset(0, 0.5), end: Offset.zero).chain(CurveTween(curve: Curves.easeOutCubic))),
+            position: animation.drive(
+                Tween(begin: const Offset(0, 0.5), end: Offset.zero)
+                    .chain(CurveTween(curve: Curves.easeOutCubic))),
             child: FadeTransition(
               opacity: animation,
               child: AxonConversationTile(
@@ -303,7 +310,8 @@ class _AxonConversationListState extends State<AxonConversationList> {
                 manager: manager,
                 onDelete: () {
                   inboxViewModel.deleteConversation(id);
-                  Provider.of<IntrovertNotificationService>(context, listen: false)
+                  Provider.of<IntrovertNotificationService>(context,
+                          listen: false)
                       .showNotification(
                     message: localizations.conversationDeleted,
                     type: NotificationType.success,
@@ -311,7 +319,8 @@ class _AxonConversationListState extends State<AxonConversationList> {
                     axonWidth: widget.referenceWidth,
                   );
                 },
-                onEdit: (newTitle) => inboxViewModel.editConversation(id, newTitle),
+                onEdit: (newTitle) =>
+                    inboxViewModel.editConversation(id, newTitle),
                 onTogglePin: () => inboxViewModel.togglePinStatus(id),
               ),
             ),
@@ -321,9 +330,9 @@ class _AxonConversationListState extends State<AxonConversationList> {
     );
   }
 
-  Widget _buildNoResultsFound(BuildContext context,
-      AppLocalizations localizations) {
-      // (Keep existing implementation)
+  Widget _buildNoResultsFound(
+      BuildContext context, AppLocalizations localizations) {
+    // (Keep existing implementation)
     return Padding(
       key: const ValueKey('no_results'),
       padding: EdgeInsets.only(top: widget.screenHeight * 0.05),
@@ -362,6 +371,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
     );
   }
 }
+
 class _SkeletonTile extends StatelessWidget {
   const _SkeletonTile();
 

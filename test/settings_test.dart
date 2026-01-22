@@ -2,19 +2,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/internet.dart';
 import 'package:cortex/notifications/introvert.dart';
+import 'package:cortex/server/user.dart';
 import 'package:cortex/settings/providers/general.dart';
 import 'package:cortex/settings/services/auth.dart';
 import 'package:cortex/settings/services/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mockito/mockito.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // --- FAKES ---
 
+class FakeUser extends Fake implements User {
+  @override
+  String get uid => 'test_uid';
+}
+
 class FakeAuthService implements AuthService {
   bool verified = true;
   int reloadCalledCount = 0;
   int sendEmailCalledCount = 0;
+  final FakeUser _fakeUser = FakeUser();
 
   @override
   bool isCurrentUserVerified() => verified;
@@ -35,7 +43,7 @@ class FakeAuthService implements AuthService {
       {required String oldPassword, required String newPassword}) async {}
 
   @override
-  User? get currentUser => null;
+  User? get currentUser => _fakeUser; // Returns non-null user
 
   @override
   bool hasPasswordProvider() => true;
@@ -93,6 +101,7 @@ class FakeNotificationService implements IntrovertNotificationService {
     VoidCallback? onTap,
     bool isAxonMode = false,
     double axonWidth = 0.0,
+    bool isChatMode = false,
   }) {
     lastMessage = message;
     lastType = type;
@@ -119,22 +128,37 @@ class FakeInternetProvider extends InternetProvider {
   }
 }
 
+class FakeUserProvider extends UserProvider {
+  final FakeProfileService profileService;
+
+  FakeUserProvider(this.profileService);
+
+  @override
+  Future<void> fetchInitialData(User user) async {
+    final data = await profileService.fetchUserData();
+    userData = data;
+  }
+}
+
 void main() {
   group('SettingsGeneralProvider Tests', () {
     late SettingsGeneralProvider provider;
     late FakeAuthService auth;
     late FakeProfileService profile;
     late FakeNotificationService notifications;
+    late FakeUserProvider userProvider;
 
     setUp(() {
       auth = FakeAuthService();
       profile = FakeProfileService();
       notifications = FakeNotificationService();
+      userProvider = FakeUserProvider(profile);
 
       provider = SettingsGeneralProvider(
         authService: auth,
         profileService: profile,
         notificationService: notifications,
+        userProvider: userProvider,
       );
     });
 
@@ -148,7 +172,8 @@ void main() {
     });
 
     test('isAnonymous check', () async {
-      await provider.refreshData();
+      await provider
+          .refreshData(); // This loads data from profile into userProvider
       expect(provider.isAnonymous, false);
 
       profile.fakeData = {'accountType': 'anonymous'};

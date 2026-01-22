@@ -55,22 +55,7 @@ class TileAvatar extends StatelessWidget {
 
     ColorFilter? colorFilter;
 
-    if (isSelfIcon) {
-      colorFilter = ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn);
-    } else if (isCortexIcon) {
-      final bool isDarkContainer = AppColors.secondaryColor.computeLuminance() < 0.5;
-
-      if (isDarkContainer) {
-        colorFilter = const ColorFilter.matrix([
-          -1,  0,  0, 0, 255,
-          0, -1,  0, 0, 255,
-          0,  0, -1, 0, 255,
-          0,  0,  0, 1,   0,
-        ]);
-      } else {
-        colorFilter = null;
-      }
-    }
+    colorFilter = ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn);
 
     if (isAsset) {
       return SvgPicture.asset(

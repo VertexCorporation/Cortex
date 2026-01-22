@@ -1,6 +1,7 @@
 // lib/axon/inbox/widgets/tiles/actions/edit.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import '../../../../app.dart';
 import '../../../../darkener.dart';
@@ -14,13 +15,10 @@ Future<String?> showEditTitleDialog({
   // 1. Darken background and keep a restore callback.
   final RestoreCallback restoreNavBar = Darkener.darken(factor: 0.5);
 
-  final TextEditingController controller = TextEditingController(
-      text: initialTitle);
+  final TextEditingController controller =
+      TextEditingController(text: initialTitle);
   final localizations = AppLocalizations.of(context)!;
-  final screenWidth = MediaQuery
-      .of(context)
-      .size
-      .width;
+  final screenWidth = MediaQuery.of(context).size.width;
 
   // Determine tablet status to cap width
   final bool isTablet = screenWidth > 600;
@@ -40,14 +38,11 @@ Future<String?> showEditTitleDialog({
       return StatefulBuilder(
         builder: (dialogContext, setStateDialog) {
           final currentText = controller.text.trim();
-          final bool isChanged = currentText.isNotEmpty &&
-              currentText != initialTitle;
+          final bool isChanged =
+              currentText.isNotEmpty && currentText != initialTitle;
 
           // --- KEYBOARD LOGIC ---
-          final double keyboardHeight = MediaQuery
-              .of(ctx)
-              .viewInsets
-              .bottom;
+          final double keyboardHeight = MediaQuery.of(ctx).viewInsets.bottom;
 
           final double verticalOffset = keyboardHeight * 0.25;
 
@@ -108,8 +103,8 @@ Future<String?> showEditTitleDialog({
                                     horizontal: 12,
                                   ),
                                   enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: AppColors.border),
+                                    borderSide:
+                                        BorderSide(color: AppColors.border),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   focusedBorder: OutlineInputBorder(
@@ -131,7 +126,8 @@ Future<String?> showEditTitleDialog({
                         ),
 
                         // --- Divider ---
-                        Divider(color: AppColors.quinaryColor,
+                        Divider(
+                            color: AppColors.quinaryColor,
                             thickness: 0.5,
                             height: 1),
 
@@ -143,7 +139,10 @@ Future<String?> showEditTitleDialog({
                               // Cancel
                               Expanded(
                                 child: InkWell(
-                                  onTap: () => Navigator.of(ctx).pop(),
+                                  onTap: () {
+                                    HapticFeedback.lightImpact();
+                                    Navigator.of(ctx).pop();
+                                  },
                                   // Splash color visible now thanks to Material parent
                                   splashColor: AppColors.septenaryColor
                                       .withValues(alpha: 0.1),
@@ -153,8 +152,8 @@ Future<String?> showEditTitleDialog({
                                     child: Text(
                                       localizations.cancel,
                                       style: TextStyle(
-                                        fontSize: isTablet ? 15 : screenWidth *
-                                            0.038,
+                                        fontSize:
+                                            isTablet ? 15 : screenWidth * 0.038,
                                         color: AppColors.septenaryColor,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -162,7 +161,8 @@ Future<String?> showEditTitleDialog({
                                   ),
                                 ),
                               ),
-                              VerticalDivider(color: AppColors.quinaryColor,
+                              VerticalDivider(
+                                  color: AppColors.quinaryColor,
                                   thickness: 0.5,
                                   width: 1),
                               // Save
@@ -170,22 +170,23 @@ Future<String?> showEditTitleDialog({
                                 child: InkWell(
                                   onTap: isChanged
                                       ? () {
-                                    final text = controller.text.trim();
-                                    if (text.isNotEmpty &&
-                                        text != initialTitle) {
-                                      newTitle = text;
-                                    }
-                                    Navigator.of(ctx).pop();
-                                  }
+                                          HapticFeedback.lightImpact();
+                                          final text = controller.text.trim();
+                                          if (text.isNotEmpty &&
+                                              text != initialTitle) {
+                                            newTitle = text;
+                                          }
+                                          Navigator.of(ctx).pop();
+                                        }
                                       : null,
-                                  splashColor: AppColors.senaryColor.withValues(
-                                      alpha: 0.1),
+                                  splashColor: AppColors.senaryColor
+                                      .withValues(alpha: 0.1),
                                   highlightColor: AppColors.senaryColor
                                       .withValues(alpha: 0.05),
                                   child: Center(
                                     child: AnimatedOpacity(
-                                      duration: const Duration(
-                                          milliseconds: 250),
+                                      duration:
+                                          const Duration(milliseconds: 250),
                                       opacity: isChanged ? 1.0 : 0.5,
                                       child: Text(
                                         localizations.save,

@@ -63,6 +63,7 @@ class IntrovertNotificationService {
     VoidCallback? onTap,
     bool isAxonMode = false,
     double axonWidth = 0.0,
+    bool isChatMode = false, // [NEW] Add chat mode flag
   }) {
     dismissCurrentNotification();
 
@@ -71,8 +72,8 @@ class IntrovertNotificationService {
 
     if (context != null) {
       try {
-        final bannerService = Provider.of<BannerService>(
-            context, listen: false);
+        final bannerService =
+            Provider.of<BannerService>(context, listen: false);
         isBannerVisible = bannerService.showInviteBannerNotifier.value;
       } catch (e) {
         // CATCH
@@ -90,6 +91,7 @@ class IntrovertNotificationService {
       isAxonMode: isAxonMode,
       axonWidth: axonWidth,
       isBannerVisible: isBannerVisible,
+      isChatMode: isChatMode,
     );
   }
 
@@ -104,6 +106,7 @@ class IntrovertNotificationService {
     required bool isAxonMode,
     required double axonWidth,
     required bool isBannerVisible,
+    required bool isChatMode,
   }) {
     final overlay = navigatorKey.currentState?.overlay;
     if (overlay == null) return;
@@ -122,8 +125,9 @@ class IntrovertNotificationService {
         double bottomPosition;
         double widthConstraint;
 
-        final double bannerHeightPadding = isBannerVisible ? (media.size
-            .height * 0.16) : 0.0;
+        // Dynamic Banner Height (Use 16% of height as a safe estimate for the banner)
+        final double bannerHeightPadding =
+            isBannerVisible ? (media.size.height * 0.16) : 0.0;
 
         if (isAxonMode && axonWidth > 0) {
           // SIDEBAR (AXON) MODE
@@ -131,21 +135,34 @@ class IntrovertNotificationService {
           rightPos = null;
           explicitWidth = axonWidth;
 
+          // If banner is visible, stack above it. Default is 80.0
           bottomPosition = 80.0 + bannerHeightPadding;
           widthConstraint = axonWidth - 32.0;
         } else {
-          // DEFAULT MODE
+          // DEFAULT / CHAT MODE
           leftPos = 0;
           rightPos = 0;
           explicitWidth = null;
 
           final keyboardInset = media.viewInsets.bottom;
-          final baseOffset = bottomOffset * media.size.height;
+          double baseOffset;
 
-          // Klavye varsa banner zaten görünmez/altta kalır, o yüzden max() kullanıyoruz
-          // Klavye yoksa banner payını ekliyoruz.
-          bottomPosition = keyboardInset + baseOffset +
-              (keyboardInset > 0 ? 0 : bannerHeightPadding);
+          if (isChatMode) {
+            // In Chat Mode, we want to be above the input field.
+            // Input field is roughly 80-90px.
+            // If keyboard is open, keyboardInset covers it.
+            // If keyboard is closed, we need safe area + input height.
+            // Let's assume standard input height + a bit of padding.
+            // Mobile input usually ~60-80px.
+            const double chatInputHeight = 90.0;
+            baseOffset = chatInputHeight + 20.0;
+          } else {
+            // Standard proportional offset (0.1 screen height)
+            baseOffset = bottomOffset * media.size.height;
+          }
+
+          // Combined calculations
+          bottomPosition = keyboardInset + baseOffset;
 
           widthConstraint = media.size.width * 0.95;
         }
@@ -327,7 +344,7 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
           onHorizontalDragUpdate: (details) {
             // Sensitivity check
             if (details.primaryDelta!.abs() > 4) {
-               dismiss();
+              dismiss();
             }
           },
           child: Material(
@@ -336,8 +353,8 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
             shadowColor: Colors.black.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(12.0),
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  vertical: 12.0, horizontal: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
               decoration: BoxDecoration(
                 color: widget.backgroundColor,
                 borderRadius: BorderRadius.circular(12.0),

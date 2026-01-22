@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:cortex/settings/providers/general.dart';
 import 'package:cortex/settings/sections/anonymous.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../app.dart';
 import '../appbar.dart';
@@ -67,30 +68,23 @@ class _SettingsScreenState extends State<SettingsScreen>
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
 
     context.watch<ThemeProvider>();
 
     return Scaffold(
       backgroundColor: AppColors.background,
-
       extendBodyBehindAppBar: true,
-
       appBar: CortexAppBar(
         titleText: appLocalizations.settings,
         scrollController: _scrollController,
         leadingMode: CortexLeadingMode.back,
       ),
-
       body: Consumer<SettingsGeneralProvider>(
         builder: (context, generalProvider, child) {
           final bool showSkeleton = generalProvider.isLoading ||
-              (generalProvider.hasInternet &&
-                  generalProvider.userData == null);
+              (generalProvider.hasInternet && generalProvider.userData == null);
 
           return AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
@@ -98,8 +92,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                 FadeTransition(opacity: animation, child: child),
             child: showSkeleton
                 ? const SkeletonLoader(key: ValueKey('skeleton'))
-                : _buildContent(
-                context, widget.isFromActiveChat, isTablet, appLocalizations),
+                : _buildContent(context, widget.isFromActiveChat, isTablet,
+                    appLocalizations),
           );
         },
       ),
@@ -108,48 +102,30 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   Widget _buildContent(BuildContext context, bool isFromActiveChat,
       bool isTablet, AppLocalizations l10n) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final generalProvider = context.watch<SettingsGeneralProvider>();
     final bool isAnonymous = generalProvider.isAnonymous;
 
-    final double topPadding = MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final double topPadding = MediaQuery.of(context).padding.top;
 
     final List<Widget> settingsItems = [
-      if (generalProvider.userData != null)
-        const ProfileHeaderSection(),
-
+      if (generalProvider.userData != null) const ProfileHeaderSection(),
       SizedBox(height: isTablet ? 40.0 : screenWidth * 0.06),
-
-      if (isAnonymous)
-        const AnonymousUpgradePanel(),
-
-      if (!isAnonymous && !generalProvider.isVerified &&
+      if (isAnonymous) const AnonymousUpgradePanel(),
+      if (!isAnonymous &&
+          !generalProvider.isVerified &&
           generalProvider.hasInternet)
         const _UnverifiedAccountPanel(),
-
-      if (!isAnonymous && generalProvider.hasInternet)
-        const UserSection(),
-
+      if (!isAnonymous && generalProvider.hasInternet) const UserSection(),
       if (!isAnonymous && generalProvider.hasInternet)
         SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
-
       const AppLanguageSection(),
       SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
-
       const AppThemeSection(),
       SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
-
       const SettingsSection(),
       SizedBox(height: isTablet ? 24.0 : screenWidth * 0.04),
-
       DeleteSection(isFromActiveChat: isFromActiveChat),
-
       SizedBox(height: isTablet ? 60.0 : screenWidth * 0.08),
     ];
 
@@ -161,8 +137,8 @@ class _SettingsScreenState extends State<SettingsScreen>
       showBottom: true,
       child: Center(
         child: Container(
-          constraints: BoxConstraints(
-              maxWidth: isTablet ? 800 : double.infinity),
+          constraints:
+              BoxConstraints(maxWidth: isTablet ? 800 : double.infinity),
           child: ListView.builder(
             controller: _scrollController,
             key: const ValueKey('settingsContent'),
@@ -214,8 +190,8 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
     final verifyAttempts = generalProvider.verificationAttempts;
 
     if (createdAt != null) {
-      final deadline = createdAt.toDate().add(
-          Duration(hours: 24 * (verifyAttempts + 1)));
+      final deadline =
+          createdAt.toDate().add(Duration(hours: 24 * (verifyAttempts + 1)));
       final difference = deadline.difference(DateTime.now());
 
       setState(() {
@@ -256,8 +232,7 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
     final hours = totalSeconds ~/ 3600;
     final minutes = (totalSeconds % 3600) ~/ 60;
     final seconds = totalSeconds % 60;
-    return "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(
-        2, '0')}:${seconds.toString().padLeft(2, '0')}";
+    return "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
   }
 
   @override
@@ -266,14 +241,8 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
 
     final appLocalizations = AppLocalizations.of(context)!;
     final generalProvider = context.watch<SettingsGeneralProvider>();
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final bool isTablet = screenWidth >= 600;
 
     final timeStr = _formatRemainingTime(_remainingSeconds);
@@ -296,7 +265,8 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
             children: [
               Text(
                 appLocalizations.unverifiedAccountHeader,
-                style: TextStyle(fontSize: headerSize,
+                style: TextStyle(
+                    fontSize: headerSize,
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryColor.inverted),
                 textAlign: TextAlign.center,
@@ -311,7 +281,8 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
               SizedBox(height: screenHeight * 0.015),
               Text(
                 timeStr,
-                style: TextStyle(fontSize: bodySize,
+                style: TextStyle(
+                    fontSize: bodySize,
                     fontWeight: FontWeight.bold,
                     color: AppColors.septenaryColor),
               ),
@@ -323,13 +294,15 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
                       minimumSize: Size.fromHeight(buttonHeight),
                       backgroundColor: AppColors.senaryColor,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10))
-                  ),
-                  onPressed: () =>
-                      context.read<SettingsGeneralProvider>().refreshData(),
-                  child: Text(appLocalizations.verifyNow, style: TextStyle(
-                      color: AppColors.primaryColor,
-                      fontSize: isTablet ? 18 : screenWidth * 0.04)),
+                          borderRadius: BorderRadius.circular(10))),
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    context.read<SettingsGeneralProvider>().refreshData();
+                  },
+                  child: Text(appLocalizations.verifyNow,
+                      style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontSize: isTablet ? 18 : screenWidth * 0.04)),
                 ),
               ),
               SizedBox(height: screenHeight * 0.015),
@@ -340,28 +313,31 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
                       minimumSize: Size.fromHeight(buttonHeight),
                       backgroundColor: AppColors.senaryColor,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10))
-                  ),
+                          borderRadius: BorderRadius.circular(10))),
                   onPressed: (generalProvider.isResendingEmail ||
-                      generalProvider.verificationAttempts >= 2) ? null : () {
-                    context
-                        .read<SettingsGeneralProvider>()
-                        .resendVerificationEmail();
-                  },
+                          generalProvider.verificationAttempts >= 2)
+                      ? null
+                      : () {
+                          HapticFeedback.lightImpact();
+                          context
+                              .read<SettingsGeneralProvider>()
+                              .resendVerificationEmail();
+                        },
                   child: generalProvider.isResendingEmail
-                      ? SizedBox(height: 24,
-                      width: 24,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2.5, color: AppColors.primaryColor))
+                      ? SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2.5, color: AppColors.primaryColor))
                       : Text(
-                    appLocalizations.resendCode,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: (generalProvider.verificationAttempts >= 2)
-                            ? AppColors.quinaryColor
-                            : AppColors.primaryColor,
-                        fontSize: isTablet ? 18 : screenWidth * 0.04),
-                  ),
+                          appLocalizations.resendCode,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: (generalProvider.verificationAttempts >= 2)
+                                  ? AppColors.quinaryColor
+                                  : AppColors.primaryColor,
+                              fontSize: isTablet ? 18 : screenWidth * 0.04),
+                        ),
                 ),
               ),
               if (generalProvider.verificationAttempts >= 2)
@@ -371,7 +347,8 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
                     child: Text(
                       appLocalizations.maxResendLimitReached,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.septenaryColor,
+                      style: TextStyle(
+                          color: AppColors.septenaryColor,
                           fontSize: bodySize,
                           fontWeight: FontWeight.bold),
                     ),

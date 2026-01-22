@@ -627,5 +627,8 @@
   "actionCamera": "Camera",
   "actionGallery": "Gallery",
   "actionFile": "File",
-  "listening": "Listening"
+  "listening": "Listening",
+  "defaultViewTitle": "What's Up?",
+  "defaultViewDescription": "Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more."
+
 }

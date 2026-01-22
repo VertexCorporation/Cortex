@@ -2,6 +2,7 @@
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -81,7 +82,12 @@ class AxonHeader extends StatelessWidget {
                     ),
                     // --- Animated Icon (Search Glass <-> Arrow) ---
                     prefixIcon: GestureDetector(
-                      onTap: isSearchActive ? onExitSearchTap : null,
+                      onTap: isSearchActive
+                          ? () {
+                              HapticFeedback.lightImpact();
+                              onExitSearchTap();
+                            }
+                          : null,
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
                         switchInCurve: Curves.easeOutBack,
@@ -91,27 +97,27 @@ class AxonHeader extends StatelessWidget {
                         },
                         child: isSearchActive
                             ? Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Transform.rotate(
-                            angle: math.pi / 2,
-                            child: SvgPicture.asset(
-                              'assets/icons/arrov.svg',
-                              key: const ValueKey('arrow'),
-                              width: searchIconSize,
-                              height: searchIconSize,
-                              colorFilter: ColorFilter.mode(
-                                AppColors.primaryColor.inverted,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                        )
+                                padding: const EdgeInsets.all(10.0),
+                                child: Transform.rotate(
+                                  angle: math.pi / 2,
+                                  child: SvgPicture.asset(
+                                    'assets/icons/arrov.svg',
+                                    key: const ValueKey('arrow'),
+                                    width: searchIconSize,
+                                    height: searchIconSize,
+                                    colorFilter: ColorFilter.mode(
+                                      AppColors.primaryColor.inverted,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                ),
+                              )
                             : Icon(
-                          Icons.search,
-                          key: const ValueKey('search'),
-                          size: searchIconSize,
-                          color: AppColors.tertiaryColor,
-                        ),
+                                Icons.search,
+                                key: const ValueKey('search'),
+                                size: searchIconSize,
+                                color: AppColors.tertiaryColor,
+                              ),
                       ),
                     ),
                     border: InputBorder.none,
@@ -134,27 +140,37 @@ class AxonHeader extends StatelessWidget {
               curve: Curves.easeInOutCubic,
               alignment: Alignment.centerRight, // Shrink from Left
               child: SizedBox(
+                // Collapse width to 0 when searching, but keep child alive
                 width: isSearchActive ? 0 : null,
-                child: AnimatedSlide(
-                  offset: isSearchActive ? const Offset(-0.5, 0) : Offset.zero,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOutCubic,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 400),
-                    curve: isSearchActive ? Curves.easeInQuint : Curves.easeOut,
-                    opacity: isSearchActive ? 0.0 : 1.0,
-                    child: Row(
-                      children: [
-                        SizedBox(width: referenceWidth * 0.03),
-                        SvgPicture.asset(
-                          'assets/cortex.svg',
-                          height: brandIconHeight,
-                          colorFilter: ColorFilter.mode(
-                            AppColors.primaryColor.inverted,
-                            BlendMode.srcIn,
+                child: OverflowBox(
+                  // Allow content to maintain its intrinsic width even when parent is 0
+                  minWidth: 0,
+                  maxWidth: double.infinity,
+                  alignment: Alignment.centerLeft,
+                  child: AnimatedSlide(
+                    // Slide LEFT (-0.5) into the search bar
+                    offset:
+                        isSearchActive ? const Offset(-0.5, 0) : Offset.zero,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      curve:
+                          isSearchActive ? Curves.easeInQuint : Curves.easeOut,
+                      opacity: isSearchActive ? 0.0 : 1.0,
+                      child: Row(
+                        children: [
+                          SizedBox(width: referenceWidth * 0.03),
+                          SvgPicture.asset(
+                            'assets/cortex.svg',
+                            height: brandIconHeight,
+                            colorFilter: ColorFilter.mode(
+                              AppColors.primaryColor.inverted,
+                              BlendMode.srcIn,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

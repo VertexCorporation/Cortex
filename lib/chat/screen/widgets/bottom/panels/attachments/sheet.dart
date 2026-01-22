@@ -8,6 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../input/service.dart';
 import 'button.dart';
 
+import 'package:camera/camera.dart';
+
 void showAttachmentSheet({
   required BuildContext context,
 }) {
@@ -56,8 +58,8 @@ void showAttachmentSheet({
           children: [
             // Dynamic Drag Handle
             Padding(
-              padding: EdgeInsets.symmetric(
-                  vertical: dragHandleVerticalPadding),
+              padding:
+                  EdgeInsets.symmetric(vertical: dragHandleVerticalPadding),
               child: Container(
                 width: dragHandleWidth,
                 height: dragHandleHeight,
@@ -83,62 +85,90 @@ void showAttachmentSheet({
             ),
 
             // Dynamic Action Buttons Row
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: contentHorizontalPadding),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 1. Camera
-                  Expanded(
-                    child: AttachmentSheetButton(
-                      iconPath: 'assets/icons/camera.svg',
-                      label: l10n.actionCamera,
-                      onTap: () {
-                        // Close sheet first
-                        Navigator.pop(context);
-                        // Trigger service (validation & logic inside)
-                        inputService.pickPhoto(
-                          context,
-                          source: ImageSource.camera,
-                          onSelectionComplete: () {},
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(width: itemGap),
+            FutureBuilder<List<CameraDescription>>(
+              future: availableCameras(),
+              builder: (context, snapshot) {
+                // Default to showing camera if waiting or if we can't determine (fail safe)
+                // BUT user specific request: "if camera not supported... camera icon should not prevent"
+                // Actually safer to assume NO camera if error/empty for this specific requirement.
+                final bool hasCamera =
+                    snapshot.hasData && snapshot.data!.isNotEmpty;
 
-                  // 2. Gallery
-                  Expanded(
-                    child: AttachmentSheetButton(
-                      iconPath: 'assets/icons/gallery.svg',
-                      label: l10n.actionGallery,
-                      onTap: () {
-                        Navigator.pop(context);
-                        inputService.pickPhoto(
-                          context,
-                          source: ImageSource.gallery,
-                          onSelectionComplete: () {},
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(width: itemGap),
+                // While loading, we can just show nothing or a loader.
+                // But for a bottom sheet, snappy is better.
+                // Let's assume false until loaded? Or true?
+                // Given "required=false" in manifest, we should rely on the check.
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SizedBox(
+                    height: 100,
+                    child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2)),
+                  );
+                }
 
-                  // 3. File (Universal Document Picker)
-                  Expanded(
-                    child: AttachmentSheetButton(
-                      iconPath: 'assets/icons/attachment.svg',
-                      label: l10n.actionFile,
-                      onTap: () {
-                        Navigator.pop(context);
-                        inputService.pickFile(context);
-                      },
-                    ),
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: contentHorizontalPadding),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 1. Camera (Conditional)
+                      if (hasCamera) ...[
+                        Expanded(
+                          child: AttachmentSheetButton(
+                            iconPath: 'assets/icons/camera.svg',
+                            label: l10n.actionCamera,
+                            onTap: () {
+                              Navigator.pop(context);
+                              inputService.pickPhoto(
+                                context,
+                                source: ImageSource.camera,
+                                onSelectionComplete: () {},
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(width: itemGap),
+                      ],
+
+                      // 2. Gallery
+                      Expanded(
+                        child: AttachmentSheetButton(
+                          iconPath: 'assets/icons/gallery.svg',
+                          label: l10n.actionGallery,
+                          onTap: () {
+                            Navigator.pop(context);
+                            inputService.pickPhoto(
+                              context,
+                              source: ImageSource.gallery,
+                              onSelectionComplete: () {},
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(width: itemGap),
+
+                      // 3. File
+                      Expanded(
+                        child: AttachmentSheetButton(
+                          iconPath: 'assets/icons/attachment.svg',
+                          label: l10n.actionFile,
+                          onTap: () {
+                            Navigator.pop(context);
+                            inputService.pickFile(context);
+                          },
+                        ),
+                      ),
+
+                      // Spacer if camera is missing to keep things nice?
+                      // Row spaceEvenly handles it well, but "Expanded" will fill space.
+                      // If 2 items, they take 50% each. If 3, 33% each.
+                      // This meets the "centered" requirement naturally with Expanded.
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ],
         ),

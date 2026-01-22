@@ -1,6 +1,7 @@
 // lib/settings/sections/language.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../../app.dart';
@@ -19,8 +20,8 @@ class AppLanguageSection extends StatelessWidget {
   const AppLanguageSection({super.key});
 
   /// Returns the localized language name corresponding to the given language code.
-  String _getLocalizedLanguageName(AppLocalizations localizations,
-      String code) {
+  String _getLocalizedLanguageName(
+      AppLocalizations localizations, String code) {
     switch (code) {
       case 'en':
         return localizations.english;
@@ -66,14 +67,8 @@ class AppLanguageSection extends StatelessWidget {
   Future<void> _showLanguageSelectionDialog(BuildContext context) async {
     final localeProvider = context.read<LocaleProvider>();
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final modelCatalogProvider = context.read<ModelCatalogProvider>();
 
     final languages = [
@@ -143,15 +138,16 @@ class AppLanguageSection extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: screenHeight * 0.008),
-                        Divider(height: 1,
+                        Divider(
+                            height: 1,
                             thickness: 0.5,
-                            color: AppColors.quinaryColor.withValues(
-                                alpha: 0.7)),
+                            color:
+                                AppColors.quinaryColor.withValues(alpha: 0.7)),
 
                         // --- Language List ---
                         ConstrainedBox(
-                          constraints: BoxConstraints(
-                              maxHeight: screenHeight * 0.4),
+                          constraints:
+                              BoxConstraints(maxHeight: screenHeight * 0.4),
                           child: ListView.builder(
                             shrinkWrap: true,
                             padding: EdgeInsets.symmetric(
@@ -161,16 +157,17 @@ class AppLanguageSection extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final lang = languages[index];
                               final String langCode = lang['code']!;
-                              final bool isSelected = (tempSelectedLanguageCode ==
-                                  langCode);
+                              final bool isSelected =
+                                  (tempSelectedLanguageCode == langCode);
 
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 curve: Curves.easeInOut,
                                 decoration: BoxDecoration(
-                                  color: isSelected ? AppColors.primaryColor
-                                      .inverted.withValues(alpha: 0.02) : Colors
-                                      .transparent,
+                                  color: isSelected
+                                      ? AppColors.primaryColor.inverted
+                                          .withValues(alpha: 0.02)
+                                      : Colors.transparent,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: ListTile(
@@ -197,8 +194,9 @@ class AppLanguageSection extends StatelessWidget {
                                   ),
                                   onTap: () {
                                     if (!isSelected) {
+                                      HapticFeedback.lightImpact();
                                       setStateDialog(() =>
-                                      tempSelectedLanguageCode = langCode);
+                                          tempSelectedLanguageCode = langCode);
                                     }
                                   },
                                   shape: RoundedRectangleBorder(
@@ -213,19 +211,22 @@ class AppLanguageSection extends StatelessWidget {
                         ),
 
                         // --- Dialog Footer with "Done" Button ---
-                        Divider(height: 1,
+                        Divider(
+                            height: 1,
                             thickness: 0.5,
-                            color: AppColors.quinaryColor.withValues(
-                                alpha: 0.7)),
+                            color:
+                                AppColors.quinaryColor.withValues(alpha: 0.7)),
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            splashColor: AppColors.senaryColor.withValues(
-                                alpha: 0.1),
-                            highlightColor: AppColors.senaryColor.withValues(
-                                alpha: 0.1),
-                            onTap: () =>
-                                Navigator.of(ctx).pop(tempSelectedLanguageCode),
+                            splashColor:
+                                AppColors.senaryColor.withValues(alpha: 0.1),
+                            highlightColor:
+                                AppColors.senaryColor.withValues(alpha: 0.1),
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              Navigator.of(ctx).pop(tempSelectedLanguageCode);
+                            },
                             child: Container(
                               height: screenHeight * 0.065,
                               alignment: Alignment.center,
@@ -279,17 +280,11 @@ class AppLanguageSection extends StatelessWidget {
     final appLocalizations = AppLocalizations.of(context)!;
 
     final currentLanguageCode = localeProvider.locale.languageCode;
-    final currentLanguageName = _getLocalizedLanguageName(
-        appLocalizations, currentLanguageCode);
+    final currentLanguageName =
+        _getLocalizedLanguageName(appLocalizations, currentLanguageCode);
 
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,11 +314,15 @@ class AppLanguageSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
-            onTap: () => _showLanguageSelectionDialog(context),
+            onTap: () {
+              HapticFeedback.lightImpact();
+              _showLanguageSelectionDialog(context);
+            },
             borderRadius: BorderRadius.circular(10.0),
             splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02,
+              padding: EdgeInsets.symmetric(
+                  vertical: screenHeight * 0.02,
                   horizontal: screenWidth * 0.04),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

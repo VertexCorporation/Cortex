@@ -4,6 +4,7 @@ import 'package:cortex/app.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'controller.dart';
@@ -67,9 +68,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
           constraints: BoxConstraints(maxWidth: containerMaxWidth),
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(
-                horizontal: 30 * fontScale,
-                vertical: 16 * fontScale
-            ),
+                horizontal: 30 * fontScale, vertical: 16 * fontScale),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -83,20 +82,21 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                   crossFadeState: _controller.authMode == AuthMode.login
                       ? CrossFadeState.showFirst
                       : CrossFadeState.showSecond,
-
                   firstChild: LoginForm(
                     key: const ValueKey('login_form'),
                     isLoading: _controller.isLoading,
                     emailError: _controller.loginEmailError,
                     passwordError: _controller.loginPasswordError,
                     emailShakeController: _controller.loginEmailShakeController,
-                    passwordShakeController: _controller.loginPasswordShakeController,
+                    passwordShakeController:
+                        _controller.loginPasswordShakeController,
                     fontScale: fontScale,
-                    onSubmit: (email, password, rememberMe) => _controller.submitLogin(context, email, password, rememberMe),
-                    onForgotPassword: () => _controller.launchResetPasswordURL(context),
+                    onSubmit: (email, password, rememberMe) => _controller
+                        .submitLogin(context, email, password, rememberMe),
+                    onForgotPassword: () =>
+                        _controller.launchResetPasswordURL(context),
                     onInputChanged: _controller.clearErrorsOnInput,
                   ),
-
                   secondChild: RegisterForm(
                     key: const ValueKey('register_form'),
                     isLoading: _controller.isLoading,
@@ -104,11 +104,15 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                     usernameError: _controller.registerUsernameError,
                     emailError: _controller.registerEmailError,
                     passwordError: _controller.registerPasswordError,
-                    usernameShakeController: _controller.registerUsernameShakeController,
-                    emailShakeController: _controller.registerEmailShakeController,
-                    passwordShakeController: _controller.registerPasswordShakeController,
+                    usernameShakeController:
+                        _controller.registerUsernameShakeController,
+                    emailShakeController:
+                        _controller.registerEmailShakeController,
+                    passwordShakeController:
+                        _controller.registerPasswordShakeController,
                     fontScale: fontScale,
-                    onSubmit: (username, email, password) => _controller.submitRegister(context, username, email, password),
+                    onSubmit: (username, email, password) => _controller
+                        .submitRegister(context, username, email, password),
                     onInputChanged: _controller.clearErrorsOnInput,
                   ),
                 ),
@@ -130,11 +134,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                   alignment: Alignment.topCenter,
                   child: _controller.authMode == AuthMode.register
                       ? Column(
-                    children: [
-                      SizedBox(height: 12 * fontScale),
-                      _buildTermsAndConditions(l10n, fontScale, screenHeight),
-                    ],
-                  )
+                          children: [
+                            SizedBox(height: 12 * fontScale),
+                            _buildTermsAndConditions(
+                                l10n, fontScale, screenHeight),
+                          ],
+                        )
                       : const SizedBox.shrink(),
                 ),
 
@@ -155,19 +160,26 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
 
   // --- Common UI Widgets ---
 
-  Widget _buildGuestLoginButton(AppLocalizations l10n, double fontScale, double screenHeight) {
+  Widget _buildGuestLoginButton(
+      AppLocalizations l10n, double fontScale, double screenHeight) {
     // No "isRegisterMode" check. It is now always visible.
     // No "checkbox" requirement. It is frictionless.
 
     return Column(
       children: [
-        SizedBox(height: 16 * fontScale), // Spacing from the "Sign Up" button above
+        SizedBox(
+            height: 16 * fontScale), // Spacing from the "Sign Up" button above
 
         AnimatedOpacity(
           opacity: _controller.isLoading ? 0.6 : 1.0,
           duration: const Duration(milliseconds: 300),
           child: TextButton(
-            onPressed: _controller.isLoading ? null : () => _controller.submitAnonymousLogin(context),
+            onPressed: _controller.isLoading
+                ? null
+                : () {
+                    HapticFeedback.lightImpact();
+                    _controller.submitAnonymousLogin(context);
+                  },
             style: TextButton.styleFrom(
               // Simple text style, no background
               foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
@@ -210,26 +222,37 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   Widget _buildOrDivider(AppLocalizations l10n, double fontScale) {
     return Row(
       children: [
-        Expanded(child: Divider(color: Theme.of(context).dividerColor, thickness: 1 * fontScale)),
+        Expanded(
+            child: Divider(
+                color: Theme.of(context).dividerColor,
+                thickness: 1 * fontScale)),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8 * fontScale),
           child: Text(
             l10n.or,
-            style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontSize: 16 * fontScale),
+            style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color,
+                fontSize: 16 * fontScale),
           ),
         ),
-        Expanded(child: Divider(color: Theme.of(context).dividerColor, thickness: 1 * fontScale)),
+        Expanded(
+            child: Divider(
+                color: Theme.of(context).dividerColor,
+                thickness: 1 * fontScale)),
       ],
     );
   }
 
-  Widget _buildSocialButtons(AppLocalizations l10n, double screenHeight, double fontScale) {
+  Widget _buildSocialButtons(
+      AppLocalizations l10n, double screenHeight, double fontScale) {
     final isRegisterMode = _controller.authMode == AuthMode.register;
-    final isDisabled = _controller.isLoading || (isRegisterMode && !_controller.agreeToTerms);
+    final isDisabled =
+        _controller.isLoading || (isRegisterMode && !_controller.agreeToTerms);
 
     // Using fontScale for padding ensures icons don't get too big on iPad
     final buttonPadding = EdgeInsets.symmetric(vertical: 14 * fontScale);
-    final buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(10 * fontScale));
+    final buttonShape = RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10 * fontScale));
 
     final ButtonStyle elegantButtonStyle = ElevatedButton.styleFrom(
       backgroundColor: AppColors.background,
@@ -254,11 +277,15 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: elegantButtonStyle,
-                onPressed: () => _controller.signInWithApple(context),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  _controller.signInWithApple(context);
+                },
                 icon: Icon(Icons.apple, size: 24 * fontScale),
                 label: Text(
                   l10n.continueWithApple,
-                  style: TextStyle(fontSize: 16 * fontScale, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      fontSize: 16 * fontScale, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -270,26 +297,27 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
               width: double.infinity,
               child: ElevatedButton(
                 style: elegantButtonStyle,
-                onPressed: () => _controller.signInWithGoogle(context),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  _controller.signInWithGoogle(context);
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SvgPicture.asset(
                       'assets/icons/google.svg',
-                      colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                      colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted, BlendMode.srcIn),
                       width: 16 * fontScale,
                       height: 16 * fontScale,
                     ),
-
                     SizedBox(width: 12 * fontScale),
-
                     Text(
                       l10n.continueWithGoogle,
                       style: TextStyle(
                           fontSize: 16 * fontScale,
-                          fontWeight: FontWeight.w600
-                      ),
+                          fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -301,7 +329,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildTermsAndConditions(AppLocalizations l10n, double fontScale, double screenHeight) {
+  Widget _buildTermsAndConditions(
+      AppLocalizations l10n, double fontScale, double screenHeight) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10.0 * fontScale),
       child: Row(
@@ -309,13 +338,18 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
         children: [
           Expanded(
             child: GestureDetector(
-              onTap: () => _controller.showTermsAndPolicy(context),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                _controller.showTermsAndPolicy(context);
+              },
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Text(
                   l10n.iHaveReadAndAgree,
-                  style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontSize: 12.6 * fontScale),
+                  style: TextStyle(
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                      fontSize: 12.6 * fontScale),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -343,14 +377,24 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          _controller.authMode == AuthMode.login ? l10n.dontHaveAccount : l10n.alreadyHaveAccount,
-          style: TextStyle(fontSize: 16 * fontScale, color: Theme.of(context).textTheme.bodyLarge?.color),
+          _controller.authMode == AuthMode.login
+              ? l10n.dontHaveAccount
+              : l10n.alreadyHaveAccount,
+          style: TextStyle(
+              fontSize: 16 * fontScale,
+              color: Theme.of(context).textTheme.bodyLarge?.color),
         ),
         TextButton(
-          onPressed: _controller.switchAuthMode,
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            _controller.switchAuthMode();
+          },
           child: Text(
             _controller.authMode == AuthMode.login ? l10n.signUp : l10n.logIn,
-            style: TextStyle(fontSize: 16 * fontScale, color: Colors.blue, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                fontSize: 16 * fontScale,
+                color: Colors.blue,
+                fontWeight: FontWeight.bold),
           ),
         ),
       ],

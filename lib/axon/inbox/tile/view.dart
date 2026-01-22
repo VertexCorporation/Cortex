@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:cortex/axon/inbox/panel/view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -158,6 +159,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     _holdTimer?.cancel();
     // 350ms threshold for "Long Press"
     _holdTimer = Timer(const Duration(milliseconds: 350), () {
+      HapticFeedback.lightImpact();
       _showActionPanel();
     });
   }
@@ -165,6 +167,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
   void _onTapUp(TapUpDetails details) {
     if (_holdTimer?.isActive ?? false) {
       _holdTimer?.cancel();
+      HapticFeedback.lightImpact();
       _openChat();
     }
   }
@@ -175,6 +178,10 @@ class _AxonConversationTileState extends State<AxonConversationTile>
 
   void _openChat() {
     if (_panelController != null) {
+      // Panel was open, we already hapticed on opening.
+      // Closing it might deserve a light impact?
+      // "click anywhere to close" logic in panel/view.dart has it.
+      // _panelController.close() is just a manual call.
       _panelController!.close();
       return;
     }
@@ -212,34 +219,32 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     final double outerPaddingH = screenWidth * 0.01;
 
     // Padding inside the tile
-    final double innerPaddingV = isTablet
-        ? screenHeight * 0.012
-        : screenHeight * 0.012;
-    final double innerPaddingH = isTablet ? screenWidth * 0.02 : screenWidth *
-        0.03;
+    final double innerPaddingV =
+        isTablet ? screenHeight * 0.012 : screenHeight * 0.012;
+    final double innerPaddingH =
+        isTablet ? screenWidth * 0.02 : screenWidth * 0.03;
 
-    final double borderRadius = isTablet ? screenWidth * 0.015 : screenWidth *
-        0.03;
+    final double borderRadius =
+        isTablet ? screenWidth * 0.015 : screenWidth * 0.03;
 
     // Avatar Size: Larger on tablet but scaled appropriately
-    final double avatarSize = isTablet ? screenWidth * 0.045 : screenWidth *
-        0.072;
+    final double avatarSize =
+        isTablet ? screenWidth * 0.045 : screenWidth * 0.072;
 
     // Font Size
     final double fontSize = isTablet ? screenWidth * 0.02 : screenWidth * 0.038;
 
     // Icon Size (Star)
-    final double starIconSize = isTablet ? screenWidth * 0.025 : screenWidth *
-        0.042;
+    final double starIconSize =
+        isTablet ? screenWidth * 0.025 : screenWidth * 0.042;
 
     // Spacing between elements
     final double gapAvatarText = screenWidth * 0.03;
     final double gapTextIcon = screenWidth * 0.015;
 
     // --- 2. State & Colors ---
-    final currentConversationId = context
-        .watch<ConversationProvider>()
-        .conversationID;
+    final currentConversationId =
+        context.watch<ConversationProvider>().conversationID;
     final isActive = currentConversationId == widget.manager.conversationID;
     final Color textColor = AppColors.primaryColor.inverted;
 
@@ -250,9 +255,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
 
     return Padding(
       padding: EdgeInsets.symmetric(
-          vertical: outerPaddingV,
-          horizontal: outerPaddingH
-      ),
+          vertical: outerPaddingV, horizontal: outerPaddingH),
       // --- 3. Animated Background Container ---
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
@@ -272,13 +275,11 @@ class _AxonConversationTileState extends State<AxonConversationTile>
             onTapUp: _onTapUp,
             onTapCancel: _onTapCancel,
             splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
-            highlightColor: AppColors.primaryColor.inverted.withValues(
-                alpha: 0.1),
+            highlightColor:
+                AppColors.primaryColor.inverted.withValues(alpha: 0.1),
             child: Container(
               padding: EdgeInsets.symmetric(
-                  horizontal: innerPaddingH,
-                  vertical: innerPaddingV
-              ),
+                  horizontal: innerPaddingH, vertical: innerPaddingV),
               child: Row(
                 children: [
                   // Dynamic Avatar
@@ -305,8 +306,8 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                           ],
                         );
                       },
-                      transitionBuilder: (Widget child,
-                          Animation<double> animation) {
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
                         return FadeTransition(opacity: animation, child: child);
                       },
                       child: OverflowText(
@@ -319,8 +320,8 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                               ? textColor
                               : textColor.withValues(alpha: 0.85),
                           fontSize: fontSize,
-                          fontWeight: isActive ? FontWeight.w600 : FontWeight
-                              .w500,
+                          fontWeight:
+                              isActive ? FontWeight.w600 : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -331,17 +332,17 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                   // Dynamic Star Icon
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
-                    transitionBuilder: (Widget child,
-                        Animation<double> animation) {
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
                       return ScaleTransition(scale: animation, child: child);
                     },
                     child: widget.manager.isStarred
                         ? Icon(
-                      Icons.star_rounded,
-                      key: const ValueKey('star'),
-                      size: starIconSize,
-                      color: Colors.amber,
-                    )
+                            Icons.star_rounded,
+                            key: const ValueKey('star'),
+                            size: starIconSize,
+                            color: Colors.amber,
+                          )
                         : SizedBox.shrink(key: const ValueKey('empty')),
                   ),
                 ],

@@ -37,7 +37,8 @@ class InputField extends StatefulWidget {
   final VoidCallback onStop;
   final bool canHandleImage; // Maintained for legacy check logic
   final bool isEditingMode;
-  final File? preselectedPhoto; // Deprecated but kept for signature compatibility
+  final File?
+      preselectedPhoto; // Deprecated but kept for signature compatibility
   final bool modelMissing;
   final VoidCallback onCancelEditing;
 
@@ -90,10 +91,6 @@ class InputFieldState extends State<InputField> {
     widget.controller.addListener(() {
       if (mounted) setState(() {});
     });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SpeechService>().checkAvailability();
-    });
   }
 
   void clearPhotoPanel() {
@@ -120,10 +117,7 @@ class InputFieldState extends State<InputField> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
 
     final inputProvider = context.watch<InputProvider>();
@@ -147,8 +141,8 @@ class InputFieldState extends State<InputField> {
               topLeft: Radius.circular(radius),
               topRight: Radius.circular(radius),
             ),
-            border: Border(
-                top: BorderSide(color: AppColors.border, width: 1.0)),
+            border:
+                Border(top: BorderSide(color: AppColors.border, width: 1.0)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -171,25 +165,25 @@ class InputFieldState extends State<InputField> {
                           alignment: Alignment.bottomCenter,
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 300),
-                            transitionBuilder: (Widget child,
-                                Animation<double> animation) {
+                            transitionBuilder:
+                                (Widget child, Animation<double> animation) {
                               return FadeTransition(
                                   opacity: animation, child: child);
                             },
                             child: isRecording
                                 ? const _WaveformSection(
-                                key: ValueKey('waveform'))
+                                    key: ValueKey('waveform'))
                                 : _TextFieldSection(
-                              key: const ValueKey('textfield'),
-                              controller: widget.controller,
-                              focusNode: widget.textFieldFocusNode,
-                              localizations: widget.localizations,
-                              screenWidth: screenWidth,
-                              isTablet: isTablet,
-                              onEnterPressed: () {
-                                if (isSendButtonEnabled) widget.onSend();
-                              },
-                            ),
+                                    key: const ValueKey('textfield'),
+                                    controller: widget.controller,
+                                    focusNode: widget.textFieldFocusNode,
+                                    localizations: widget.localizations,
+                                    screenWidth: screenWidth,
+                                    isTablet: isTablet,
+                                    onEnterPressed: () {
+                                      if (isSendButtonEnabled) widget.onSend();
+                                    },
+                                  ),
                           ),
                         ),
 
@@ -225,7 +219,7 @@ class InputFieldState extends State<InputField> {
 
   void _updateHeight() {
     final RenderBox? renderBox =
-    _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
+        _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       final newHeight = renderBox.size.height;
       if (newHeight != _inputFieldHeight) {
@@ -277,45 +271,46 @@ class _AttachmentPreviewSection extends StatelessWidget {
         opacity: hasAttachments ? 1.0 : 0.0,
         child: hasAttachments
             ? ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.all(padding),
-          itemCount: attachments.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 12),
-          itemBuilder: (context, index) {
-            final attachment = attachments[index];
-            return Stack(
-              clipBehavior: Clip.none,
-              children: [
-                _buildPreviewItem(attachment, itemSize),
-                // Close Button (Top Right)
-                Positioned(
-                  top: -6,
-                  right: -6,
-                  child: GestureDetector(
-                    onTap: () => inputProvider.removeAttachmentAt(index),
-                    child: Container(
-                      padding: const EdgeInsets.all(4.0),
-                      decoration: const BoxDecoration(
-                        color: Colors.black87,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(color: Colors.black38,
-                              blurRadius: 4,
-                              offset: Offset(0, 1))
-                        ],
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.all(padding),
+                itemCount: attachments.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  final attachment = attachments[index];
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      _buildPreviewItem(attachment, itemSize),
+                      // Close Button (Top Right)
+                      Positioned(
+                        top: -6,
+                        right: -6,
+                        child: GestureDetector(
+                          onTap: () => inputProvider.removeAttachmentAt(index),
+                          child: Container(
+                            padding: const EdgeInsets.all(4.0),
+                            decoration: const BoxDecoration(
+                              color: Colors.black87,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.black38,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 1))
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.close_rounded,
+                              size: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
-                      child: Icon(
-                        Icons.close_rounded,
-                        size: 14,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        )
+                    ],
+                  );
+                },
+              )
             : null,
       ),
     );
@@ -553,7 +548,9 @@ class _ToolsSection extends StatelessWidget {
   final InputField widget;
 
   const _ToolsSection(
-      {required this.screenWidth, required this.isTablet, required this.widget});
+      {required this.screenWidth,
+      required this.isTablet,
+      required this.widget});
 
   @override
   Widget build(BuildContext context) {
@@ -604,9 +601,7 @@ class _SendButtonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isConnected = context
-        .watch<InternetProvider>()
-        .isConnected;
+    final bool isConnected = context.watch<InternetProvider>().isConnected;
     final inputProvider = context.watch<InputProvider>();
     final speechService = context.watch<SpeechService>();
 
@@ -635,9 +630,7 @@ class _SendButtonSection extends StatelessWidget {
         isEnabled: effectiveEnabled,
         isSending: widget.isSending,
         isRecording: inputProvider.isVoiceRecording,
-        isTextEmpty: controller.text
-            .trim()
-            .isEmpty,
+        isTextEmpty: controller.text.trim().isEmpty,
         onSend: widget.onSend,
         onStop: effectiveOnStop,
         controller: controller,

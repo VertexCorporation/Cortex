@@ -21,9 +21,13 @@ class UserProvider with ChangeNotifier {
   FirebaseFirestore get _firestore =>
       _firestoreOverride ?? FirebaseFirestore.instance;
 
-  UserProvider({FirebaseAuth? auth, FirebaseFirestore? firestore})
-      : _authOverride = auth,
-        _firestoreOverride = firestore;
+  UserProvider({
+    FirebaseAuth? auth,
+    FirebaseFirestore? firestore,
+    Map<String, dynamic>? initialData,
+  })  : _authOverride = auth,
+        _firestoreOverride = firestore,
+        _userData = initialData;
 
   Map<String, dynamic>? _userData;
   StreamSubscription<DocumentSnapshot>? _userSubscription;

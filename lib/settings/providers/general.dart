@@ -1,12 +1,10 @@
-// lib/settings/providers/general.dart
-
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 // Provider & Service Imports
 import '../../internet.dart';
-import '../../cache.dart';
+import '../../server/user.dart';
 import '../../notifications/introvert.dart';
 import '../services/auth.dart';
 import '../services/profile.dart';
@@ -16,27 +14,22 @@ import '../services/profile.dart';
 /// This provider acts as the primary ViewModel for the settings UI. Its main
 /// responsibilities are scoped to the lifecycle of the settings screen:
 ///
-/// 1.  **Data Loading & Caching:** It fetches a snapshot of the user's data
-///     from services upon initialization. It leverages `CacheService` to
-///     provide instant data loading on subsequent visits and to reduce
-///     unnecessary network requests.
-/// 2.  **State Management:** It tracks UI-specific states like the overall
-///     loading status (`isLoading`), internet connectivity (`hasInternet`),
-///     and the state of actions like resending a verification email (`isResendingEmail`).
-/// 3.  **Data Source for UI Components:** It acts as the single source of truth
-///     for all data displayed on the settings screen, such as username,
-///     email, subscription level, etc.
+/// 1.  **Data Source (Single Source of Truth):** It delegates all user data access
+///     to the [UserProvider]. This ensures that when the global user state changes
+///     (e.g., logout), the settings screen updates immediately without stale data.
+/// 2.  **State Management:** It tracks UI-specific states like
+///     internet connectivity (`hasInternet`) and action states (`isResendingEmail`).
 class SettingsGeneralProvider with ChangeNotifier {
   // --- Service Dependencies ---
   final AuthService _authService;
   final ProfileService _profileService;
   final IntrovertNotificationService _notificationService;
+  final UserProvider _userProvider;
 
   // --- Private State Variables ---
-  bool _isLoading = true;
+  bool _isLoading = false;
   bool _hasInternet = true;
   bool _isResendingEmail = false;
-  Map<String, dynamic>? _userData;
 
   // --- Public Getters for UI State ---
 
@@ -46,23 +39,22 @@ class SettingsGeneralProvider with ChangeNotifier {
 
   bool get isResendingEmail => _isResendingEmail;
 
-  Map<String, dynamic>? get userData => _userData;
+  /// Returns the global user data directly from UserProvider.
+  Map<String, dynamic>? get userData => _userProvider.userData;
 
   bool get isVerified => _authService.isCurrentUserVerified();
 
-  bool get isAnonymous {
-    if (_userData == null) return false;
-    return _userData!['accountType'] == 'anonymous';
-  }
+  /// Checks if the current user is in 'Guest/Anonymous' mode via UserProvider.
+  bool get isAnonymous => _userProvider.isAnonymous;
 
-  // --- Computed Properties from UserData (Safe Getters) ---
+  // --- Computed Properties from UserProvider (Safe Getters) ---
 
   /// The expiration date of the user's subscription, if any.
-  ///
-  /// This robust getter correctly handles both `Timestamp` objects from a live
-  /// Firestore fetch and `String` representations from a JSON cache.
   Timestamp? get subscriptionExpiresAt {
-    final expires = _userData?['subscriptionExpiresAt'];
+    // We can rely on UserProvider's logic or parse here if needed.
+    // Since UserProvider doesn't expose raw valid dates as Timestamps for UI,
+    // we access the map directly to keep consistent usage.
+    final expires = userData?['subscriptionExpiresAt'];
     if (expires is Timestamp) return expires; // Live data
     if (expires is String) {
       final parsedDate = DateTime.tryParse(expires); // Cached data
@@ -73,39 +65,18 @@ class SettingsGeneralProvider with ChangeNotifier {
 
   /// The user's **active** subscription level (e.g., 0 for Free, 1 for Plus).
   ///
-  /// This getter serves as the single source of truth for the active subscription status.
-  /// It combines the raw subscription level with its expiration date, returning 0
-  /// if the subscription is expired. This makes it safe to use throughout the UI
-  /// for feature locking and display logic.
-  int get activeSubscriptionLevel {
-    final level = _userData?['hasCortexSubscription'] as int? ?? 0;
-
-    // Legacy subscriptions (levels 4, 5, 6) are considered lifetime and always active.
-    if (level >= 4) {
-      return level;
-    }
-
-    // If the user is on the free tier, no further checks are needed.
-    if (level == 0) {
-      return 0;
-    }
-
-    // For standard subscriptions, check if the expiration date is valid and in the future.
-    final expires = subscriptionExpiresAt;
-    if (expires == null || expires.toDate().isBefore(DateTime.now())) {
-      return 0; // Subscription is expired or has no expiration date.
-    }
-
-    // If all checks pass, the subscription is active.
-    return level;
-  }
+  /// Delegates to UserProvider's robust logic if possible, or implements
+  /// view-specific logic here.
+  int get activeSubscriptionLevel => _userProvider.isSubscriptionActive
+      ? (userData?['hasCortexSubscription'] as int? ?? 0)
+      : 0;
 
   /// The number of times a verification email has been resent.
-  int get verificationAttempts => _userData?['verifyAttempts'] as int? ?? 0;
+  int get verificationAttempts => userData?['verifyAttempts'] as int? ?? 0;
 
   /// The timestamp of when the user account was created.
   Timestamp? get createdAt {
-    final created = _userData?['createdAt'];
+    final created = userData?['createdAt'];
     if (created is Timestamp) return created;
     if (created is String) {
       final parsedDate = DateTime.tryParse(created);
@@ -119,12 +90,11 @@ class SettingsGeneralProvider with ChangeNotifier {
     required AuthService authService,
     required ProfileService profileService,
     required IntrovertNotificationService notificationService,
-  })
-      : _authService = authService,
+    required UserProvider userProvider,
+  })  : _authService = authService,
         _profileService = profileService,
-        _notificationService = notificationService {
-    loadInitialData();
-  }
+        _notificationService = notificationService,
+        _userProvider = userProvider;
 
   void updateConnectivity(InternetProvider internetProvider) {
     final bool wasConnected = _hasInternet;
@@ -135,44 +105,29 @@ class SettingsGeneralProvider with ChangeNotifier {
     }
   }
 
-  Future<void> loadInitialData() async {
-    _isLoading = true;
-
-    final cachedData = CacheService.get<Map<String, dynamic>>(
-        CacheKey.settingsUserData);
-    if (cachedData != null) {
-      _userData = cachedData;
-    }
-
-    _isLoading = false;
-    notifyListeners();
-
-    if (_hasInternet) {
-      await refreshData(isInitialLoad: true);
-    }
-  }
-
-  Future<void> refreshData({bool isInitialLoad = false}) async {
+  /// Refreshes the user data by reloading the auth user and fetching the latest profile.
+  /// The [UserProvider] will be updated via the fetch, keeping everything in sync.
+  Future<void> refreshData() async {
     if (!_hasInternet) return;
+
+    _isLoading = true;
+    notifyListeners();
 
     try {
       await _authService.reloadCurrentUser();
-
-      final freshData = await _profileService.fetchUserData();
-
-      _userData = freshData;
-      CacheService.set(CacheKey.settingsUserData, freshData);
-
-      notifyListeners();
-      debugPrint("[GeneralProvider] Data refreshed. AccountType: ${_userData?['accountType']}");
-
+      // fetchInitialData updates the UserProvider's internal state (and cache).
+      if (_authService.currentUser != null) {
+        await _userProvider.fetchInitialData(_authService.currentUser!);
+      }
+      debugPrint("[GeneralProvider] Data refreshed via UserProvider.");
     } catch (e) {
       debugPrint("[GeneralProvider] Error refreshing user data: $e");
-      if (!isInitialLoad && _userData == null) {
-        _notificationService.showNotification(
-            message: "Could not load your profile data.",
-            type: NotificationType.error);
-      }
+      _notificationService.showNotification(
+          message: "Could not refresh profile data.",
+          type: NotificationType.error);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -195,5 +150,11 @@ class SettingsGeneralProvider with ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  /// Called when UserProvider updates (e.g. logout or new data fetched).
+  /// We notify our listeners so the UI rebuilds with the new UserProvider data.
+  void onUserProviderUpdate() {
+    notifyListeners();
   }
 }

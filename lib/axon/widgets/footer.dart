@@ -1,6 +1,7 @@
 // lib/axon/widgets/footer.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 // Logic & Theme
@@ -67,6 +68,7 @@ class AxonFooter extends StatelessWidget {
           ),
           child: InkWell(
             onTap: () {
+              HapticFeedback.lightImpact();
               // Navigate to Settings from Right to Left
               // Keeping Axon open to avoid UI stutter/lag
               navigateToScreen(
@@ -77,8 +79,8 @@ class AxonFooter extends StatelessWidget {
             },
             borderRadius: BorderRadius.circular(12),
             splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
-            highlightColor: AppColors.primaryColor.inverted.withValues(
-                alpha: 0.05),
+            highlightColor:
+                AppColors.primaryColor.inverted.withValues(alpha: 0.05),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(

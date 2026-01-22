@@ -543,5 +543,8 @@
   "actionCamera": "Kamera",
   "actionGallery": "Galeri",
   "actionFile": "Dosya",
-  "listening": "Dinliyor"
+  "listening": "Dinliyor",
+  "defaultViewTitle": "Naber?",
+  "defaultViewDescription": "Cortex içerisindeki yüzlerce yapay zekayla, internetsiz çalışma özelliğiyle, dinamik sohbetiyle ve çok daha fazlasıyla her zaman yanında."
+
 }

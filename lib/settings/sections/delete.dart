@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../app.dart';
@@ -22,10 +23,13 @@ class _DeleteAllConversationsDialog extends StatefulWidget {
   const _DeleteAllConversationsDialog();
 
   @override
-  State<_DeleteAllConversationsDialog> createState() => _DeleteAllConversationsDialogState();
+  State<_DeleteAllConversationsDialog> createState() =>
+      _DeleteAllConversationsDialogState();
 }
 
-class _DeleteAllConversationsDialogState extends State<_DeleteAllConversationsDialog> with SingleTickerProviderStateMixin {
+class _DeleteAllConversationsDialogState
+    extends State<_DeleteAllConversationsDialog>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _shakeController;
   late final TextEditingController _confirmController;
   String? _confirmError;
@@ -33,7 +37,8 @@ class _DeleteAllConversationsDialogState extends State<_DeleteAllConversationsDi
   @override
   void initState() {
     super.initState();
-    _shakeController = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _shakeController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
     _confirmController = TextEditingController();
   }
 
@@ -57,7 +62,9 @@ class _DeleteAllConversationsDialogState extends State<_DeleteAllConversationsDi
     }
     if (!await ChatStorageService.hasAnyConversations()) {
       navigator.pop();
-      notificationService.showNotification(message: appLocalizations.noConversationsToDelete, type: NotificationType.error);
+      notificationService.showNotification(
+          message: appLocalizations.noConversationsToDelete,
+          type: NotificationType.error);
       return;
     }
 
@@ -66,7 +73,9 @@ class _DeleteAllConversationsDialogState extends State<_DeleteAllConversationsDi
 
     if (mounted) {
       navigator.pop();
-      notificationService.showNotification(message: appLocalizations.allConversationsDeleted, type: NotificationType.success);
+      notificationService.showNotification(
+          message: appLocalizations.allConversationsDeleted,
+          type: NotificationType.success);
     }
   }
 
@@ -83,7 +92,9 @@ class _DeleteAllConversationsDialogState extends State<_DeleteAllConversationsDi
           color: Colors.transparent,
           child: Container(
             width: screenWidth * 0.8,
-            decoration: BoxDecoration(color: AppColors.secondaryColor, borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(
+                color: AppColors.secondaryColor,
+                borderRadius: BorderRadius.circular(10)),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Column(
@@ -93,37 +104,112 @@ class _DeleteAllConversationsDialogState extends State<_DeleteAllConversationsDi
                     padding: EdgeInsets.all(screenWidth * 0.05),
                     child: Column(
                       children: [
-                        Text(appLocalizations.deleteAllConversationsConfirmTitle, style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
+                        Text(
+                            appLocalizations.deleteAllConversationsConfirmTitle,
+                            style: TextStyle(
+                                fontSize: screenWidth * 0.045,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryColor.inverted),
+                            textAlign: TextAlign.center),
                         SizedBox(height: screenWidth * 0.03),
-                        Text(appLocalizations.deleteAllConversationsConfirmMessage, style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035), textAlign: TextAlign.center),
+                        Text(
+                            appLocalizations
+                                .deleteAllConversationsConfirmMessage,
+                            style: TextStyle(
+                                color: AppColors.quinaryColor,
+                                fontSize: screenWidth * 0.035),
+                            textAlign: TextAlign.center),
                         SizedBox(height: screenWidth * 0.05),
                         ShakeWidget(
                           controller: _shakeController,
                           child: TextField(
                             controller: _confirmController,
-                            style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.04),
+                            style: TextStyle(
+                                color: AppColors.primaryColor.inverted,
+                                fontSize: screenWidth * 0.04),
                             decoration: InputDecoration(
                               labelText: appLocalizations.confirmWord,
-                              labelStyle: TextStyle(color: AppColors.primaryColor.inverted),
-                              enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.quinaryColor), borderRadius: BorderRadius.circular(10.0)),
-                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor.inverted), borderRadius: BorderRadius.circular(10.0)),
+                              labelStyle: TextStyle(
+                                  color: AppColors.primaryColor.inverted),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: AppColors.quinaryColor),
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: AppColors.primaryColor.inverted),
+                                  borderRadius: BorderRadius.circular(10.0)),
                             ),
                           ),
                         ),
                         AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
-                          child: _confirmError != null ? Padding(padding: EdgeInsets.only(top: screenWidth * 0.02), child: Text(_confirmError!, style: TextStyle(color: Colors.red, fontSize: screenWidth * 0.03), key: ValueKey(_confirmError))) : const SizedBox.shrink(key: ValueKey("emptyConfirmError")),
+                          child: _confirmError != null
+                              ? Padding(
+                                  padding:
+                                      EdgeInsets.only(top: screenWidth * 0.02),
+                                  child: Text(_confirmError!,
+                                      style: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: screenWidth * 0.03),
+                                      key: ValueKey(_confirmError)))
+                              : const SizedBox.shrink(
+                                  key: ValueKey("emptyConfirmError")),
                         ),
                       ],
                     ),
                   ),
-                  Divider(color: AppColors.quinaryColor, thickness: 0.5, height: 1),
+                  Divider(
+                      color: AppColors.quinaryColor, thickness: 0.5, height: 1),
                   IntrinsicHeight(
                     child: Row(
                       children: [
-                        Expanded(child: Material(color: Colors.transparent, child: InkWell(onTap: () => Navigator.of(context).pop(), splashColor: AppColors.senaryColor.withValues(alpha: 0.1), highlightColor: AppColors.senaryColor.withValues(alpha: 0.1), child: Container(alignment: Alignment.center, padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04), child: Text(appLocalizations.cancel, style: TextStyle(color: AppColors.senaryColor, fontSize: screenWidth * 0.04)))))),
-                        VerticalDivider(width: 1, thickness: 0.5, color: AppColors.quinaryColor),
-                        Expanded(child: Material(color: Colors.transparent, child: InkWell(splashColor: Colors.red.withValues(alpha:0.3), highlightColor: Colors.red.withValues(alpha:0.1), onTap: _handleDelete, child: Container(alignment: Alignment.center, padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04), child: Text(appLocalizations.deleteAll, style: TextStyle(color: Colors.red, fontSize: screenWidth * 0.04)))))),
+                        Expanded(
+                            child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                    onTap: () {
+                                      HapticFeedback.lightImpact();
+                                      Navigator.of(context).pop();
+                                    },
+                                    splashColor: AppColors.senaryColor
+                                        .withValues(alpha: 0.1),
+                                    highlightColor: AppColors.senaryColor
+                                        .withValues(alpha: 0.1),
+                                    child: Container(
+                                        alignment: Alignment.center,
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: screenWidth * 0.04),
+                                        child: Text(appLocalizations.cancel,
+                                            style: TextStyle(
+                                                color: AppColors.senaryColor,
+                                                fontSize:
+                                                    screenWidth * 0.04)))))),
+                        VerticalDivider(
+                            width: 1,
+                            thickness: 0.5,
+                            color: AppColors.quinaryColor),
+                        Expanded(
+                            child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                    splashColor:
+                                        Colors.red.withValues(alpha: 0.3),
+                                    highlightColor:
+                                        Colors.red.withValues(alpha: 0.1),
+                                    onTap: () {
+                                      HapticFeedback.lightImpact();
+                                      _handleDelete();
+                                    },
+                                    child: Container(
+                                        alignment: Alignment.center,
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: screenWidth * 0.04),
+                                        child: Text(appLocalizations.deleteAll,
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize:
+                                                    screenWidth * 0.04)))))),
                       ],
                     ),
                   ),
@@ -145,7 +231,8 @@ class _DeleteAccountDialog extends StatefulWidget {
   State<_DeleteAccountDialog> createState() => _DeleteAccountDialogState();
 }
 
-class _DeleteAccountDialogState extends State<_DeleteAccountDialog> with SingleTickerProviderStateMixin {
+class _DeleteAccountDialogState extends State<_DeleteAccountDialog>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _shakeController;
   late final TextEditingController _confirmController;
   String? _confirmError;
@@ -153,7 +240,8 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> with SingleT
   @override
   void initState() {
     super.initState();
-    _shakeController = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _shakeController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
     _confirmController = TextEditingController();
   }
 
@@ -195,7 +283,9 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> with SingleT
           color: Colors.transparent,
           child: Container(
             width: screenWidth * 0.8,
-            decoration: BoxDecoration(color: AppColors.secondaryColor, borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(
+                color: AppColors.secondaryColor,
+                borderRadius: BorderRadius.circular(10)),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Consumer<SettingsActionProvider>(
@@ -208,49 +298,126 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> with SingleT
                         padding: EdgeInsets.all(screenWidth * 0.05),
                         child: Column(
                           children: [
-                            Text(appLocalizations.deleteAccount, style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted), textAlign: TextAlign.center),
+                            Text(appLocalizations.deleteAccount,
+                                style: TextStyle(
+                                    fontSize: screenWidth * 0.045,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryColor.inverted),
+                                textAlign: TextAlign.center),
                             SizedBox(height: screenWidth * 0.03),
-                            Text(appLocalizations.confirmDeleteAccount, style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035), textAlign: TextAlign.center),
+                            Text(appLocalizations.confirmDeleteAccount,
+                                style: TextStyle(
+                                    color: AppColors.quinaryColor,
+                                    fontSize: screenWidth * 0.035),
+                                textAlign: TextAlign.center),
                             SizedBox(height: screenWidth * 0.05),
                             ShakeWidget(
                               controller: _shakeController,
                               child: TextField(
                                 controller: _confirmController,
-                                style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.04),
+                                style: TextStyle(
+                                    color: AppColors.primaryColor.inverted,
+                                    fontSize: screenWidth * 0.04),
                                 decoration: InputDecoration(
                                   labelText: appLocalizations.confirmWord,
-                                  labelStyle: TextStyle(color: AppColors.primaryColor.inverted),
-                                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.quinaryColor), borderRadius: BorderRadius.circular(10.0)),
-                                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.primaryColor.inverted), borderRadius: BorderRadius.circular(10.0)),
+                                  labelStyle: TextStyle(
+                                      color: AppColors.primaryColor.inverted),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: AppColors.quinaryColor),
+                                      borderRadius:
+                                          BorderRadius.circular(10.0)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color:
+                                              AppColors.primaryColor.inverted),
+                                      borderRadius:
+                                          BorderRadius.circular(10.0)),
                                 ),
                               ),
                             ),
                             AnimatedSwitcher(
                               duration: const Duration(milliseconds: 300),
-                              child: _confirmError != null ? Padding(padding: EdgeInsets.only(top: screenWidth * 0.02), child: Text(_confirmError!, style: TextStyle(color: Colors.red, fontSize: screenWidth * 0.03), key: ValueKey(_confirmError))) : const SizedBox.shrink(key: ValueKey("emptyConfirmError")),
+                              child: _confirmError != null
+                                  ? Padding(
+                                      padding: EdgeInsets.only(
+                                          top: screenWidth * 0.02),
+                                      child: Text(_confirmError!,
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: screenWidth * 0.03),
+                                          key: ValueKey(_confirmError)))
+                                  : const SizedBox.shrink(
+                                      key: ValueKey("emptyConfirmError")),
                             ),
                           ],
                         ),
                       ),
-                      Divider(color: AppColors.quinaryColor, thickness: 0.5, height: 1),
+                      Divider(
+                          color: AppColors.quinaryColor,
+                          thickness: 0.5,
+                          height: 1),
                       IntrinsicHeight(
                         child: Row(
                           children: [
-                            Expanded(child: Material(color: Colors.transparent, child: InkWell(onTap: isDeleting ? null : () => Navigator.of(context).pop(), splashColor: AppColors.senaryColor.withValues(alpha: 0.1), highlightColor: AppColors.senaryColor.withValues(alpha: 0.1), child: Container(alignment: Alignment.center, padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04), child: Text(appLocalizations.cancel, style: TextStyle(color: AppColors.senaryColor, fontSize: screenWidth * 0.04)))))),
-                            VerticalDivider(width: 1, thickness: 0.5, color: AppColors.quinaryColor),
+                            Expanded(
+                                child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                        onTap: isDeleting
+                                            ? null
+                                            : () {
+                                                HapticFeedback.lightImpact();
+                                                Navigator.of(context).pop();
+                                              },
+                                        splashColor: AppColors.senaryColor
+                                            .withValues(alpha: 0.1),
+                                        highlightColor: AppColors.senaryColor
+                                            .withValues(alpha: 0.1),
+                                        child: Container(
+                                            alignment: Alignment.center,
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: screenWidth * 0.04),
+                                            child: Text(appLocalizations.cancel,
+                                                style: TextStyle(
+                                                    color:
+                                                        AppColors.senaryColor,
+                                                    fontSize: screenWidth *
+                                                        0.04)))))),
+                            VerticalDivider(
+                                width: 1,
+                                thickness: 0.5,
+                                color: AppColors.quinaryColor),
                             Expanded(
                               child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
-                                  splashColor: Colors.red.withValues(alpha:0.3),
-                                  highlightColor: Colors.red.withValues(alpha:0.1),
-                                  onTap: isDeleting ? null : _handleDelete,
+                                  splashColor:
+                                      Colors.red.withValues(alpha: 0.3),
+                                  highlightColor:
+                                      Colors.red.withValues(alpha: 0.1),
+                                  onTap: isDeleting
+                                      ? null
+                                      : () {
+                                          HapticFeedback.lightImpact();
+                                          _handleDelete();
+                                        },
                                   child: Container(
                                     alignment: Alignment.center,
-                                    padding: EdgeInsets.symmetric(vertical: screenWidth * 0.04),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: screenWidth * 0.04),
                                     child: isDeleting
-                                        ? SizedBox(width: screenWidth * 0.05, height: screenWidth * 0.05, child: CircularProgressIndicator(strokeWidth: 2.0, color: AppColors.primaryColor.inverted))
-                                        : Text(appLocalizations.delete, style: TextStyle(color: Colors.red, fontSize: screenWidth * 0.04)),
+                                        ? SizedBox(
+                                            width: screenWidth * 0.05,
+                                            height: screenWidth * 0.05,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2.0,
+                                                color: AppColors
+                                                    .primaryColor.inverted))
+                                        : Text(appLocalizations.delete,
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontSize: screenWidth * 0.04)),
                                   ),
                                 ),
                               ),
@@ -269,7 +436,6 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> with SingleT
     );
   }
 }
-
 
 /// A stateless widget that displays the delete actions and launches the corresponding dialogs.
 class DeleteSection extends StatelessWidget {
@@ -307,19 +473,27 @@ class DeleteSection extends StatelessWidget {
       borderRadius: BorderRadius.circular(10.0),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => _showDialog(context, child: const _DeleteAllConversationsDialog()),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          _showDialog(context, child: const _DeleteAllConversationsDialog());
+        },
         borderRadius: BorderRadius.circular(10.0),
-        splashColor: AppColors.quaternaryColor.withValues(alpha:0.3),
+        splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
+          padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 appLocalizations.deleteAllConversationsButton,
-                style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth * 0.04,
+                    fontWeight: FontWeight.w500),
               ),
-              Icon(Icons.arrow_forward_ios, color: Colors.white, size: screenWidth * 0.04),
+              Icon(Icons.arrow_forward_ios,
+                  color: Colors.white, size: screenWidth * 0.04),
             ],
           ),
         ),
@@ -336,19 +510,27 @@ class DeleteSection extends StatelessWidget {
       borderRadius: BorderRadius.circular(10.0),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => _showDialog(context, child: const _DeleteAccountDialog()),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          _showDialog(context, child: const _DeleteAccountDialog());
+        },
         borderRadius: BorderRadius.circular(10.0),
-        splashColor: AppColors.quaternaryColor.withValues(alpha:0.3),
+        splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
+          padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 appLocalizations.deleteAccountButton,
-                style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth * 0.04,
+                    fontWeight: FontWeight.w500),
               ),
-              Icon(Icons.arrow_forward_ios, color: Colors.white, size: screenWidth * 0.04),
+              Icon(Icons.arrow_forward_ios,
+                  color: Colors.white, size: screenWidth * 0.04),
             ],
           ),
         ),
@@ -360,18 +542,21 @@ class DeleteSection extends StatelessWidget {
     final appLocalizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03, vertical: screenWidth * 0.03),
+      padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.03, vertical: screenWidth * 0.03),
       decoration: BoxDecoration(
-        color: AppColors.septenaryColor.withValues(alpha:0.1),
+        color: AppColors.septenaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(color: AppColors.septenaryColor.withValues(alpha:0.5), width: 1),
+        border: Border.all(
+            color: AppColors.septenaryColor.withValues(alpha: 0.5), width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SvgPicture.asset(
             'assets/icons/warning.svg',
-            colorFilter: ColorFilter.mode(AppColors.quinaryColor, BlendMode.srcIn),
+            colorFilter:
+                ColorFilter.mode(AppColors.quinaryColor, BlendMode.srcIn),
             width: screenWidth * 0.05,
             height: screenWidth * 0.05,
           ),
@@ -379,7 +564,8 @@ class DeleteSection extends StatelessWidget {
           Expanded(
             child: Text(
               appLocalizations.deleteAllConversationsDisabledInfo,
-              style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
+              style: TextStyle(
+                  color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
               textAlign: TextAlign.start,
             ),
           ),
@@ -405,19 +591,22 @@ class DeleteSection extends StatelessWidget {
       children: [
         Text(
           appLocalizations.delete,
-          style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: screenWidth * 0.05, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              color: AppColors.primaryColor.inverted,
+              fontSize: screenWidth * 0.05,
+              fontWeight: FontWeight.w600),
         ),
         SizedBox(height: screenHeight * 0.01),
         Text(
           appLocalizations.deleteDescription,
-          style: TextStyle(color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
+          style: TextStyle(
+              color: AppColors.quinaryColor, fontSize: screenWidth * 0.035),
         ),
         SizedBox(height: screenHeight * 0.02),
         if (isFromActiveChat)
           _buildDisabledInfoText(context)
         else
           _buildDeleteAllConversationsButton(context),
-
         if (hasInternet && !isAnonymous) ...[
           SizedBox(height: screenHeight * 0.015),
           _buildDeleteAccountButton(context),

@@ -72,9 +72,7 @@ class OptionsPanelViewModel {
   }
 
   List<MessageOption> getVisibleOptions(BuildContext context) {
-    final langCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final langCode = Localizations.localeOf(context).languageCode;
     final currentModelId = message.model ?? '';
 
     // LOGIC UPDATE: Iterate attachments to find images.
@@ -82,18 +80,18 @@ class OptionsPanelViewModel {
       return m.attachmentPaths.any((path) => _isImageFile(path));
     });
 
-    final modelSeriesData = ModelDataUtils.findParentSeriesData(
-        currentModelId, langCode: langCode, modelService: modelService);
-    final currentModel = modelService.getPreciseModelData(
-        currentModelId, langCode: langCode);
+    final modelSeriesData = ModelDataUtils.findParentSeriesData(currentModelId,
+        langCode: langCode, modelService: modelService);
+    final currentModel =
+        modelService.getPreciseModelData(currentModelId, langCode: langCode);
 
     final isDynamicContext = session.isDynamicChat;
     final isOfflineModel = modelSeriesData?.isServerSide == false;
 
-    final currentModelCanHandleImages = modelService.hasModality(
-        currentModelId, langCode: langCode, modality: 'image');
-    final hasPremiumAccess = session.isUserSubscribed ||
-        session.premiumTrialUses < 3;
+    final currentModelCanHandleImages = modelService.hasModality(currentModelId,
+        langCode: langCode, modality: 'image');
+    final hasPremiumAccess =
+        session.isUserSubscribed || session.premiumTrialUses < 3;
     final isCurrentModelPremium = currentModel.isPremium;
 
     return _baseOptions.where((option) {
@@ -124,10 +122,11 @@ class OptionsPanelViewModel {
 
       if (option == MessageOption.changeModel) {
         if (!isDynamicContext && modelSeriesData != null) {
-          final int validExtCount = ModelDataUtils
-              .validVariantCountForChangingModel(
+          final int validExtCount =
+              ModelDataUtils.validVariantCountForChangingModel(
             parentSeries: modelSeriesData,
-            conversationHasPhoto: conversationHasImages, // Renamed in utility call logic if needed, or pass boolean
+            conversationHasPhoto:
+                conversationHasImages, // Renamed in utility call logic if needed, or pass boolean
           );
           if (validExtCount <= 1) return false;
         } else if (modelSeriesData == null) {
@@ -222,11 +221,12 @@ class _AnimatedMessageOptionsPanelState
   void _onCopyTapped() {
     final localizations = AppLocalizations.of(context)!;
     Clipboard.setData(ClipboardData(text: widget.message.text));
-    Provider
-        .of<IntrovertNotificationService>(context, listen: false)
-        .showNotification(message: localizations.messageCopied,
-        type: NotificationType.success,
-        bottomOffset: 0.07);
+    Provider.of<IntrovertNotificationService>(context, listen: false)
+        .showNotification(
+            message: localizations.messageCopied,
+            type: NotificationType.success,
+            bottomOffset: 0.07,
+            isChatMode: true);
     _dismissPanel();
   }
 
@@ -261,21 +261,16 @@ class _AnimatedMessageOptionsPanelState
       modelService: modelService,
     );
 
-    final List<MessageOption> visibleOptions = viewModel.getVisibleOptions(
-        context);
+    final List<MessageOption> visibleOptions =
+        viewModel.getVisibleOptions(context);
 
     if (visibleOptions.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _dismissPanel());
       return const SizedBox.shrink();
     }
 
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
-    final keyboardHeight = MediaQuery
-        .of(context)
-        .viewInsets
-        .bottom;
+    final screenSize = MediaQuery.of(context).size;
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final panelWidth = screenSize.width * _UIFactors.panelWidthFactor;
     final optionHeight = screenSize.height * _UIFactors.optionHeightFactor;
     final borderRadius = screenSize.width * _UIFactors.borderRadiusFactor;
@@ -283,9 +278,11 @@ class _AnimatedMessageOptionsPanelState
 
     final double estimatedPanelHeight = visibleOptions.fold(0.0, (sum, opt) {
       if (opt == MessageOption.changeModel) {
-        return sum + (optionHeight +
-            (screenSize.height * _UIFactors.changeModelVerticalPaddingFactor *
-                2));
+        return sum +
+            (optionHeight +
+                (screenSize.height *
+                    _UIFactors.changeModelVerticalPaddingFactor *
+                    2));
       }
       return sum + optionHeight;
     });
@@ -331,7 +328,8 @@ class _AnimatedMessageOptionsPanelState
                       color: AppColors.secondaryColor,
                       borderRadius: BorderRadius.circular(borderRadius),
                       boxShadow: const [
-                        BoxShadow(color: Colors.black26,
+                        BoxShadow(
+                            color: Colors.black26,
                             blurRadius: 8,
                             offset: Offset(0, 2))
                       ],
@@ -341,12 +339,14 @@ class _AnimatedMessageOptionsPanelState
                       children: visibleOptions.map((option) {
                         switch (option) {
                           case MessageOption.copy:
-                            return OptionPanelItem(label: localizations.copy,
+                            return OptionPanelItem(
+                                label: localizations.copy,
                                 iconAsset: 'assets/icons/copy.svg',
                                 onTap: _onCopyTapped,
                                 borderRadius: borderRadius);
                           case MessageOption.report:
-                            return OptionPanelItem(label: localizations.report,
+                            return OptionPanelItem(
+                                label: localizations.report,
                                 iconAsset: 'assets/icons/warning.svg',
                                 onTap: () {
                                   _dismissPanel();
@@ -382,7 +382,8 @@ class _AnimatedMessageOptionsPanelState
                               borderRadius: borderRadius,
                             );
                           case MessageOption.stop:
-                            return OptionPanelItem(label: localizations.stop,
+                            return OptionPanelItem(
+                                label: localizations.stop,
                                 iconAsset: 'assets/icons/stop.svg',
                                 onTap: () {
                                   _dismissPanel();
@@ -390,7 +391,8 @@ class _AnimatedMessageOptionsPanelState
                                 },
                                 borderRadius: borderRadius);
                           case MessageOption.edit:
-                            return OptionPanelItem(label: localizations.edit,
+                            return OptionPanelItem(
+                                label: localizations.edit,
                                 iconAsset: 'assets/icons/edit.svg',
                                 onTap: () {
                                   _dismissPanel();

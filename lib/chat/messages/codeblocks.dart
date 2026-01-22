@@ -13,37 +13,38 @@ import '../../notifications/introvert.dart';
 import '../../theme.dart';
 
 const Map<String, TextStyle> oneDarkProTheme = {
-  'root'             : TextStyle(backgroundColor: Color(0xFF141414), color: Color(0xffabb2bf)),
-  'comment'          : TextStyle(color: Color(0xff5c6370), fontStyle: FontStyle.italic),
-  'quote'            : TextStyle(color: Color(0xff5c6370), fontStyle: FontStyle.italic),
-  'variable'         : TextStyle(color: Color(0xffe06c75)),
+  'root':
+      TextStyle(backgroundColor: Color(0xFF141414), color: Color(0xffabb2bf)),
+  'comment': TextStyle(color: Color(0xff5c6370), fontStyle: FontStyle.italic),
+  'quote': TextStyle(color: Color(0xff5c6370), fontStyle: FontStyle.italic),
+  'variable': TextStyle(color: Color(0xffe06c75)),
   'template-variable': TextStyle(color: Color(0xffe06c75)),
-  'tag'              : TextStyle(color: Color(0xffe06c75)),
-  'name'             : TextStyle(color: Color(0xff61afef)),
-  'selector-id'      : TextStyle(color: Color(0xffe06c75)),
-  'selector-class'   : TextStyle(color: Color(0xffe06c75)),
-  'regexp'           : TextStyle(color: Color(0xff98c379)),
-  'deletion'         : TextStyle(color: Color(0xffe06c75)),
-  'number'           : TextStyle(color: Color(0xffd19a66)),
-  'built_in'         : TextStyle(color: Color(0xffe5c07b)),
-  'builtin-name'     : TextStyle(color: Color(0xffe5c07b)),
-  'literal'          : TextStyle(color: Color(0xff56b6c2)),
-  'type'             : TextStyle(color: Color(0xffe5c07b)),
-  'params'           : TextStyle(color: Color(0xffabb2bf)),
-  'meta'             : TextStyle(color: Color(0xffc678dd)),
-  'meta-keyword'     : TextStyle(color: Color(0xffc678dd)),
-  'meta-string'      : TextStyle(color: Color(0xff98c379)),
-  'string'           : TextStyle(color: Color(0xff98c379)),
-  'symbol'           : TextStyle(color: Color(0xff56b6c2)),
-  'bullet'           : TextStyle(color: Color(0xff56b6c2)),
-  'addition'         : TextStyle(color: Color(0xff98c379)),
-  'title'            : TextStyle(color: Color(0xff61afef)),
-  'section'          : TextStyle(color: Color(0xff61afef)),
-  'keyword'          : TextStyle(color: Color(0xffc678dd)),
-  'selector-tag'     : TextStyle(color: Color(0xffc678dd)),
-  'attribute'        : TextStyle(color: Color(0xffd19a66)),
-  'emphasis'         : TextStyle(fontStyle: FontStyle.italic),
-  'strong'           : TextStyle(fontWeight: FontWeight.bold),
+  'tag': TextStyle(color: Color(0xffe06c75)),
+  'name': TextStyle(color: Color(0xff61afef)),
+  'selector-id': TextStyle(color: Color(0xffe06c75)),
+  'selector-class': TextStyle(color: Color(0xffe06c75)),
+  'regexp': TextStyle(color: Color(0xff98c379)),
+  'deletion': TextStyle(color: Color(0xffe06c75)),
+  'number': TextStyle(color: Color(0xffd19a66)),
+  'built_in': TextStyle(color: Color(0xffe5c07b)),
+  'builtin-name': TextStyle(color: Color(0xffe5c07b)),
+  'literal': TextStyle(color: Color(0xff56b6c2)),
+  'type': TextStyle(color: Color(0xffe5c07b)),
+  'params': TextStyle(color: Color(0xffabb2bf)),
+  'meta': TextStyle(color: Color(0xffc678dd)),
+  'meta-keyword': TextStyle(color: Color(0xffc678dd)),
+  'meta-string': TextStyle(color: Color(0xff98c379)),
+  'string': TextStyle(color: Color(0xff98c379)),
+  'symbol': TextStyle(color: Color(0xff56b6c2)),
+  'bullet': TextStyle(color: Color(0xff56b6c2)),
+  'addition': TextStyle(color: Color(0xff98c379)),
+  'title': TextStyle(color: Color(0xff61afef)),
+  'section': TextStyle(color: Color(0xff61afef)),
+  'keyword': TextStyle(color: Color(0xffc678dd)),
+  'selector-tag': TextStyle(color: Color(0xffc678dd)),
+  'attribute': TextStyle(color: Color(0xffd19a66)),
+  'emphasis': TextStyle(fontStyle: FontStyle.italic),
+  'strong': TextStyle(fontWeight: FontWeight.bold),
 };
 
 /// A widget that displays a block of code with syntax highlighting, a copy button,
@@ -75,7 +76,8 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
   @override
   void didUpdateWidget(covariant CodeBlockWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.language != oldWidget.language || widget.code != oldWidget.code) {
+    if (widget.language != oldWidget.language ||
+        widget.code != oldWidget.code) {
       _resolveLanguage();
     }
   }
@@ -91,17 +93,21 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
     if (providedLang != null && providedLang.isNotEmpty) {
       if (allLanguages.containsKey(providedLang)) {
         finalLang = providedLang;
-        debugPrint("[CodeBlock] Using provided and supported language hint: '$finalLang'");
+        debugPrint(
+            "[CodeBlock] Using provided and supported language hint: '$finalLang'");
       } else {
-        debugPrint("[CodeBlock] Provided language hint '${widget.language}' is not in `allLanguages`. Falling back to auto-detection.");
+        debugPrint(
+            "[CodeBlock] Provided language hint '${widget.language}' is not in `allLanguages`. Falling back to auto-detection.");
       }
     }
 
     // If no valid hint was found or provided, and the code is not empty, fall back to auto-detection.
     if (finalLang == null && widget.code.isNotEmpty) {
-      final result = highlight.highlight.parse(widget.code, autoDetection: true);
+      final result =
+          highlight.highlight.parse(widget.code, autoDetection: true);
       finalLang = result.language; // This can still be null if detection fails.
-      debugPrint("[CodeBlock] No valid hint. Auto-detected language: '$finalLang'");
+      debugPrint(
+          "[CodeBlock] No valid hint. Auto-detected language: '$finalLang'");
     }
 
     if (mounted) {
@@ -116,10 +122,12 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
     if (mounted) setState(() => _copying = true);
     await Clipboard.setData(ClipboardData(text: widget.code));
     if (mounted) {
-      Provider.of<IntrovertNotificationService>(context, listen: false).showNotification(
+      Provider.of<IntrovertNotificationService>(context, listen: false)
+          .showNotification(
         message: AppLocalizations.of(context)!.messageCopied,
         type: NotificationType.success,
         bottomOffset: 0.02,
+        isChatMode: true,
       );
     }
     await Future.delayed(const Duration(milliseconds: 1200));
@@ -130,9 +138,11 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final languageNameForDisplay = _resolvedLanguage != null && _resolvedLanguage!.isNotEmpty
-        ? (_resolvedLanguage![0].toUpperCase() + _resolvedLanguage!.substring(1))
-        : AppLocalizations.of(context)!.text;
+    final languageNameForDisplay =
+        _resolvedLanguage != null && _resolvedLanguage!.isNotEmpty
+            ? (_resolvedLanguage![0].toUpperCase() +
+                _resolvedLanguage!.substring(1))
+            : AppLocalizations.of(context)!.text;
 
     final languageForHighlighter = _resolvedLanguage ?? 'plaintext';
 
@@ -140,7 +150,8 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: oneDarkProTheme['root']?.backgroundColor ?? const Color(0xFF141414),
+            color: oneDarkProTheme['root']?.backgroundColor ??
+                const Color(0xFF141414),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: AppColors.border, width: 0.5),
           ),
@@ -150,7 +161,8 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
               builder: (context, constraints) {
                 return SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  key: ValueKey('${widget.code.hashCode}_${languageForHighlighter.hashCode}'),
+                  key: ValueKey(
+                      '${widget.code.hashCode}_${languageForHighlighter.hashCode}'),
                   child: Container(
                     constraints: BoxConstraints(minWidth: constraints.maxWidth),
                     child: HighlightView(
@@ -158,7 +170,8 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
                       language: languageForHighlighter,
                       theme: oneDarkProTheme,
                       padding: const EdgeInsets.fromLTRB(12, 42, 12, 12),
-                      textStyle: const TextStyle(fontFamily: 'monospace', fontSize: 14),
+                      textStyle: const TextStyle(
+                          fontFamily: 'monospace', fontSize: 14),
                     ),
                   ),
                 );
@@ -174,7 +187,8 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: AppColors.primaryColor.inverted,
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8), topRight: Radius.circular(8)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -182,7 +196,10 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
                 Expanded(
                   child: Text(
                     languageNameForDisplay,
-                    style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
@@ -194,10 +211,19 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
                     padding: const EdgeInsets.all(4.0),
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
-                      transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: ScaleTransition(scale: animation, child: child)),
+                      transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: animation,
+                          child:
+                              ScaleTransition(scale: animation, child: child)),
                       child: _copying
-                          ? const Icon(Icons.check, size: 18, color: Colors.greenAccent, key: ValueKey('check'))
-                          : const Icon(Icons.copy_all_outlined, size: 18, color: Colors.white70, key: ValueKey('copy')),
+                          ? const Icon(Icons.check,
+                              size: 18,
+                              color: Colors.greenAccent,
+                              key: ValueKey('check'))
+                          : const Icon(Icons.copy_all_outlined,
+                              size: 18,
+                              color: Colors.white70,
+                              key: ValueKey('copy')),
                     ),
                   ),
                 ),

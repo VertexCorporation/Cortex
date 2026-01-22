@@ -5,10 +5,12 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../shake.dart';
 
 class LoginForm extends StatefulWidget {
-  final Future<void> Function(String email, String password, bool rememberMe) onSubmit;
+  final Future<void> Function(String email, String password, bool rememberMe)
+      onSubmit;
   final VoidCallback onForgotPassword;
   final VoidCallback onInputChanged;
   final bool isLoading;
@@ -53,10 +55,12 @@ class _LoginFormState extends State<LoginForm> {
   @override
   void didUpdateWidget(LoginForm oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.emailError != null && widget.emailError != oldWidget.emailError) {
+    if (widget.emailError != null &&
+        widget.emailError != oldWidget.emailError) {
       _formKey.currentState?.validate();
     }
-    if (widget.passwordError != null && widget.passwordError != oldWidget.passwordError) {
+    if (widget.passwordError != null &&
+        widget.passwordError != oldWidget.passwordError) {
       _formKey.currentState?.validate();
     }
   }
@@ -125,28 +129,34 @@ class _LoginFormState extends State<LoginForm> {
               cursorColor: AppColors.primaryColor.inverted,
               style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color,
-                  fontSize: 14 * widget.fontScale
-              ),
+                  fontSize: 14 * widget.fontScale),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: AppColors.secondaryColor,
                 labelText: l10n.email,
                 labelStyle: TextStyle(
                     color: Theme.of(context).textTheme.bodySmall?.color,
-                    fontSize: 14 * widget.fontScale
-                ),
-                prefixIcon: Icon(Icons.email, color: Theme.of(context).iconTheme.color, size: 24 * widget.fontScale),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10 * widget.fontScale), borderSide: BorderSide.none),
+                    fontSize: 14 * widget.fontScale),
+                prefixIcon: Icon(Icons.email,
+                    color: Theme.of(context).iconTheme.color,
+                    size: 24 * widget.fontScale),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10 * widget.fontScale),
+                    borderSide: BorderSide.none),
                 counterText: '',
                 errorMaxLines: 3,
                 errorStyle: TextStyle(fontSize: 12 * widget.fontScale),
-                contentPadding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale, horizontal: 12 * widget.fontScale),
+                contentPadding: EdgeInsets.symmetric(
+                    vertical: 14 * widget.fontScale,
+                    horizontal: 12 * widget.fontScale),
               ),
               keyboardType: TextInputType.emailAddress,
               maxLength: 42,
               validator: (value) {
                 if (widget.emailError != null) return widget.emailError;
-                if (value == null || !EmailValidator.validate(value.trim())) return l10n.invalidEmail;
+                if (value == null || !EmailValidator.validate(value.trim())) {
+                  return l10n.invalidEmail;
+                }
                 return null;
               },
               onSaved: (value) => _email = value!.trim(),
@@ -164,43 +174,51 @@ class _LoginFormState extends State<LoginForm> {
               cursorColor: AppColors.primaryColor.inverted,
               style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color,
-                  fontSize: 14 * widget.fontScale
-              ),
+                  fontSize: 14 * widget.fontScale),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: AppColors.secondaryColor,
                 labelText: l10n.password,
                 labelStyle: TextStyle(
                     color: Theme.of(context).textTheme.bodySmall?.color,
-                    fontSize: 14 * widget.fontScale
-                ),
-                prefixIcon: Icon(Icons.lock_outline, color: Theme.of(context).iconTheme.color, size: 24 * widget.fontScale),
-
+                    fontSize: 14 * widget.fontScale),
+                prefixIcon: Icon(Icons.lock_outline,
+                    color: Theme.of(context).iconTheme.color,
+                    size: 24 * widget.fontScale),
                 suffixIcon: IconButton(
                   icon: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                    transitionBuilder: (child, animation) =>
+                        FadeTransition(opacity: animation, child: child),
                     child: Icon(
-                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                       key: ValueKey(_isPasswordVisible ? 'icon1' : 'icon2'),
                       color: Theme.of(context).iconTheme.color,
                       size: 24 * widget.fontScale,
                     ),
                   ),
-                  onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                  onPressed: () =>
+                      setState(() => _isPasswordVisible = !_isPasswordVisible),
                 ),
-
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10 * widget.fontScale), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10 * widget.fontScale),
+                    borderSide: BorderSide.none),
                 counterText: '',
                 errorMaxLines: 3,
                 errorStyle: TextStyle(fontSize: 12 * widget.fontScale),
-                contentPadding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale, horizontal: 12 * widget.fontScale),
+                contentPadding: EdgeInsets.symmetric(
+                    vertical: 14 * widget.fontScale,
+                    horizontal: 12 * widget.fontScale),
               ),
               obscureText: !_isPasswordVisible,
               maxLength: 64,
               validator: (value) {
                 if (widget.passwordError != null) return widget.passwordError;
-                if (value == null || value.length < 6) return l10n.invalidPassword;
+                if (value == null || value.length < 6) {
+                  return l10n.invalidPassword;
+                }
                 return null;
               },
               onSaved: (value) => _password = value!.trim(),
@@ -222,20 +240,18 @@ class _LoginFormState extends State<LoginForm> {
                       width: 24 * widget.fontScale,
                       child: Checkbox(
                         value: _rememberMe,
-                        onChanged: (value) => setState(() => _rememberMe = value ?? false),
+                        onChanged: (value) =>
+                            setState(() => _rememberMe = value ?? false),
                         checkColor: AppColors.primaryColor,
                         activeColor: AppColors.primaryColor.inverted,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ),
                     SizedBox(width: 8 * widget.fontScale),
-                    Text(
-                        l10n.rememberMe,
+                    Text(l10n.rememberMe,
                         style: TextStyle(
                             color: Theme.of(context).textTheme.bodyLarge?.color,
-                            fontSize: 14 * widget.fontScale
-                        )
-                    ),
+                            fontSize: 14 * widget.fontScale)),
                   ],
                 ),
                 TextButton(
@@ -245,14 +261,12 @@ class _LoginFormState extends State<LoginForm> {
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: Text(
-                      l10n.forgotPassword,
+                  child: Text(l10n.forgotPassword,
                       style: TextStyle(
                         color: Colors.blue,
                         fontWeight: FontWeight.w600,
                         fontSize: 14 * widget.fontScale,
-                      )
-                  ),
+                      )),
                 ),
               ],
             ),
@@ -270,20 +284,26 @@ class _LoginFormState extends State<LoginForm> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.background,
                   foregroundColor: AppColors.primaryColor.inverted,
-                  padding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 14 * widget.fontScale),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10 * widget.fontScale),
                   ),
                   elevation: 0,
-                  side: BorderSide(color: AppColors.quinaryColor.withValues(alpha:0.3)),
+                  side: BorderSide(
+                      color: AppColors.quinaryColor.withValues(alpha: 0.3)),
                 ),
-                onPressed: widget.isLoading ? null : _submitForm,
+                onPressed: widget.isLoading
+                    ? null
+                    : () {
+                        HapticFeedback.lightImpact();
+                        _submitForm();
+                      },
                 child: Text(
                   l10n.logIn,
                   style: TextStyle(
                       fontSize: 16 * widget.fontScale,
-                      fontWeight: FontWeight.bold
-                  ),
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ),
