@@ -1614,4 +1614,7 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'Cortex staat altijd voor je klaar met honderden AI-modellen, offline mogelijkheden, dynamische chat en nog veel meer.';
+
+  @override
+  String get comingSoon => 'Binnenkort beschikbaar';
 }

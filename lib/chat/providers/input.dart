@@ -40,7 +40,6 @@ class InputAttachment {
 
 /// A dedicated provider responsible for managing the transient state of the user input area.
 class InputProvider with ChangeNotifier {
-
   // ===========================================================================
   // SECTION 1: PRIVATE STATE VARIABLES
   // ===========================================================================
@@ -116,7 +115,7 @@ class InputProvider with ChangeNotifier {
   // -------------------- Attachment Management --------------------
 
   void addAttachment(File file, {required bool isImage}) {
-    if (_attachments.length >= 4) return; // Safety check
+    if (_attachments.length >= 9) return; // Safety check
 
     _attachments.add(InputAttachment(
       file: file,

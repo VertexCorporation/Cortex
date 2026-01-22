@@ -1611,4 +1611,7 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'O Cortex está sempre ao seu lado com centenas de modelos de IA, funcionalidades offline, chat dinâmico e muito mais.';
+
+  @override
+  String get comingSoon => 'Em breve';
 }

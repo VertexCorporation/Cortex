@@ -545,5 +545,6 @@
   "actionFile": "Arquivo",
   "listening": "Ouvindo",
   "defaultViewTitle": "E aí?",
-  "defaultViewDescription": "O Cortex está sempre ao seu lado com centenas de modelos de IA, funcionalidades offline, chat dinâmico e muito mais."
+  "defaultViewDescription": "O Cortex está sempre ao seu lado com centenas de modelos de IA, funcionalidades offline, chat dinâmico e muito mais.",
+  "comingSoon": "Em breve"
 }

@@ -60,12 +60,17 @@ class ChatLimitManager {
     return 50000; // Fallback for any unknown cases.
   }
 
+  /// Approximate character count equivalent for an image attachment.
+  static const int imageCharacterEquivalent = 1000;
+
   /// Calculates the total number of characters in a list of messages.
   int calculateTotalCharacters(List<Message> messages) {
     int total = 0;
     for (var message in messages) {
       // It's safer to check for null text, just in case.
       total += message.text.length;
+      // Add equivalent characters for each attachment
+      total += message.attachmentPaths.length * imageCharacterEquivalent;
     }
     return total;
   }

@@ -87,11 +87,11 @@ void main() {
     });
 
     test('Max attachment limit logic', () {
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 15; i++) {
         inputProvider.addAttachment(File('file$i.jpg'), isImage: true);
       }
-      expect(inputProvider.attachments.length, 4,
-          reason: 'Should cap at 4 attachments');
+      expect(inputProvider.attachments.length, 9,
+          reason: 'Should cap at 9 attachments');
     });
 
     test('Editing mode flow logic', () {

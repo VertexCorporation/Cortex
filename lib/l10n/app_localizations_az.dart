@@ -1602,4 +1602,7 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'Cortex yüzlərlə süni intellekt modeli, oflayn imkanlar, dinamik söhbət və daha çox şey ilə həmişə yanınızdadır.';
+
+  @override
+  String get comingSoon => 'Tezliklə';
 }

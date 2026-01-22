@@ -1,10 +1,9 @@
-// lib/chat/screen/selected/widgets/input/bottom/actions.dart
-
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/notifications/introvert.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,8 +13,7 @@ import '../../../../../library/backend/data/service.dart';
 import '../../../../../theme.dart';
 import '../../../../services/select.dart';
 import '../../../../services/speech.dart';
-import '../../../../services/send.dart';
-import '../../../../services/voice.dart';
+
 import '../panels/attachments/sheet.dart';
 import '../panels/features/sheet.dart';
 import '../panels/selection/sheet.dart';
@@ -56,9 +54,9 @@ class _ToolCircleButton extends StatelessWidget {
             onTap: disabled
                 ? null
                 : () {
-                    HapticFeedback.lightImpact();
-                    onTap?.call();
-                  },
+              HapticFeedback.lightImpact();
+              onTap?.call();
+            },
             child: SizedBox(
               width: size,
               height: size,
@@ -96,11 +94,16 @@ class ActionButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isConnected = context.watch<InternetProvider>().isConnected;
+    final bool isConnected = context
+        .watch<InternetProvider>()
+        .isConnected;
     final speechService = context.watch<SpeechService>();
     final inputProvider = context.watch<InputProvider>();
 
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final bool isTablet = screenWidth >= 600;
     final double buttonSize = isTablet ? 40.0 : 36.0;
 
@@ -148,41 +151,41 @@ class ActionButtonWidget extends StatelessWidget {
           curve: Curves.easeOut,
           child: showMic
               ? Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: _ToolCircleButton(
-                    size: buttonSize,
-                    onTap: () async {
-                      final localeCode = context
-                          .read<ChatSessionProvider>()
-                          .getLocale()
-                          .languageCode;
-                      final currentText = controller.text;
+            padding: const EdgeInsets.only(right: 8.0),
+            child: _ToolCircleButton(
+              size: buttonSize,
+              onTap: () async {
+                final localeCode = context
+                    .read<ChatSessionProvider>()
+                    .getLocale()
+                    .languageCode;
+                final currentText = controller.text;
 
-                      inputProvider.setVoiceRecording(true);
+                inputProvider.setVoiceRecording(true);
 
-                      await speechService.startListening(
-                        locale: localeCode,
-                        onResult: (String text) {
-                          String spacer = (currentText.isNotEmpty &&
-                                  !currentText.endsWith(' '))
-                              ? ' '
-                              : '';
-                          if (currentText.isEmpty) spacer = '';
-                          controller.text = "$currentText$spacer$text";
-                          controller.selection = TextSelection.fromPosition(
-                              TextPosition(offset: controller.text.length));
-                        },
-                      );
-                    },
-                    child: SvgPicture.asset(
-                      'assets/icons/microphone.svg',
-                      width: buttonSize * 0.55,
-                      height: buttonSize * 0.55,
-                      colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.inverted, BlendMode.srcIn),
-                    ),
-                  ),
-                )
+                await speechService.startListening(
+                  locale: localeCode,
+                  onResult: (String text) {
+                    String spacer = (currentText.isNotEmpty &&
+                        !currentText.endsWith(' '))
+                        ? ' '
+                        : '';
+                    if (currentText.isEmpty) spacer = '';
+                    controller.text = "$currentText$spacer$text";
+                    controller.selection = TextSelection.fromPosition(
+                        TextPosition(offset: controller.text.length));
+                  },
+                );
+              },
+              child: SvgPicture.asset(
+                'assets/icons/microphone.svg',
+                width: buttonSize * 0.55,
+                height: buttonSize * 0.55,
+                colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted, BlendMode.srcIn),
+              ),
+            ),
+          )
               : const SizedBox.shrink(),
         ),
         AnimatedSwitcher(
@@ -220,7 +223,7 @@ class ActionButtonWidget extends StatelessWidget {
             width: size * 0.4,
             height: size * 0.4,
             colorFilter:
-                ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+            ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
           ),
         ),
       ),
@@ -244,9 +247,9 @@ class ActionButtonWidget extends StatelessWidget {
     return GestureDetector(
       onTap: enabled
           ? () {
-              HapticFeedback.lightImpact();
-              onSend();
-            }
+        HapticFeedback.lightImpact();
+        onSend();
+      }
           : null,
       child: Container(
         width: size,
@@ -266,14 +269,27 @@ class ActionButtonWidget extends StatelessWidget {
 
   Widget _buildVoiceChatButton(BuildContext context, double size) {
     return GestureDetector(
-      onTap: () async {
+      onTap: () {
         HapticFeedback.lightImpact();
 
+        // Disable Voice Chat and show Coming Soon
+        final localizations = AppLocalizations.of(context)!;
+        Provider.of<IntrovertNotificationService>(context, listen: false)
+            .showNotification(
+          message: localizations.comingSoon,
+          type: NotificationType.neutral,
+          // Neutral notification
+          bottomOffset: 0.22,
+          fontSize: 0.032,
+          isChatMode: true,
+        );
+
+        /* 
+        // Original Voice Logic (Commented Out)
         final voiceService = context.read<VoiceService>();
         final session = context.read<ChatSessionProvider>();
         final inputProvider = context.read<InputProvider>();
         final sendService = context.read<SendService>();
-        final localizations = AppLocalizations.of(context)!;
         final localeCode = session.getLocale().languageCode;
 
         // Activate UI mode
@@ -292,6 +308,7 @@ class ActionButtonWidget extends StatelessWidget {
             }
           },
         );
+        */
       },
       child: Container(
         width: size,
@@ -306,7 +323,7 @@ class ActionButtonWidget extends StatelessWidget {
             width: size * 0.55,
             height: size * 0.55,
             colorFilter:
-                ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+            ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
           ),
         ),
       ),
@@ -333,46 +350,33 @@ class AddPhotoButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final inputProvider = context.watch<InputProvider>();
 
-    // Check if we have reached the 4 file limit
-    final bool isMaxAttachments = inputProvider.attachments.length >= 4;
+    // Check if we have reached the 9 file limit
+    final bool isMaxAttachments = inputProvider.attachments.length >= 9;
 
     // Disable if loading or if main chat limit reached (but not just because we have 1 photo)
     final bool buttonDisabled = isLimitExceeded;
 
     return _ToolCircleButton(
-      disabled: isPhotoLoading && buttonDisabled,
+      disabled: (isPhotoLoading && buttonDisabled) || isMaxAttachments,
       onTap: isPhotoLoading
           ? null
           : () {
-              // Priority 1: Check Attachment Limit
-              if (isMaxAttachments) {
-                Provider.of<IntrovertNotificationService>(context,
-                        listen: false)
-                    .showNotification(
-                  message: localizations.photoLimitReachedMessage,
-                  // You might want to rename this key in l10n to 'attachmentLimitReached'
-                  type: NotificationType.error,
-                  bottomOffset: 0.22,
-                  fontSize: 0.032,
-                  isChatMode: true,
-                );
-              }
-              // Priority 2: Check Chat History Limit
-              else if (isLimitExceeded) {
-                // The InputField usually handles this by disabling interaction,
-                // but if tapped, we can show a specific upgrade prompt here if needed.
-              }
-              // Priority 3: Open Sheet
-              else {
-                showAttachmentSheet(context: context);
-              }
-            },
+        // Priority 1: Check Chat History Limit
+        if (isLimitExceeded) {
+          // The InputField usually handles this by disabling interaction,
+          // but if tapped, we can show a specific upgrade prompt here if needed.
+        }
+        // Priority 2: Open Sheet
+        else {
+          showAttachmentSheet(context: context);
+        }
+      },
       child: SvgPicture.asset(
         'assets/icons/add.svg',
         width: 24.0,
         height: 24.0,
         colorFilter:
-            ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+        ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
       ),
     );
   }
@@ -391,7 +395,10 @@ class FeaturesButton extends StatelessWidget {
     final inputProvider = context.watch<InputProvider>();
     final featureMode = inputProvider.featureMode;
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final maxAllowedWidth = screenWidth * 0.35;
     final bool isActive = featureMode != ChatInputMode.none;
 
@@ -542,7 +549,9 @@ class ModelSelectButton extends StatelessWidget {
                     onModelSelected: (String id) {
                       final modelService = context.read<ModelService>();
                       final langCode =
-                          Localizations.localeOf(context).languageCode;
+                          Localizations
+                              .localeOf(context)
+                              .languageCode;
                       final model = modelService.getPreciseModelData(id,
                           langCode: langCode);
                       context.read<SelectionService>().selectModel(model);

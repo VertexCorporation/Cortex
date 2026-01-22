@@ -545,5 +545,6 @@
   "actionFile": "Datei",
   "listening": "Hört zu",
   "defaultViewTitle": "Alles klar?",
-  "defaultViewDescription": "Cortex steht Ihnen stets zur Seite mit Hunderten von KI-Modellen, Offline-Funktionen, dynamischem Chat und vielem mehr."
+  "defaultViewDescription": "Cortex steht Ihnen stets zur Seite mit Hunderten von KI-Modellen, Offline-Funktionen, dynamischem Chat und vielem mehr.",
+  "comingSoon": "Demnächst verfügbar"
 }

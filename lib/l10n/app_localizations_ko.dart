@@ -1559,4 +1559,7 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'Cortex는 수백 가지의 AI 모델, 오프라인 기능, 동적 채팅 등 다양한 기능을 통해 항상 여러분 곁에 있습니다.';
+
+  @override
+  String get comingSoon => '곧 출시 예정';
 }

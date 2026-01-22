@@ -629,6 +629,6 @@
   "actionFile": "File",
   "listening": "Listening",
   "defaultViewTitle": "What's Up?",
-  "defaultViewDescription": "Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more."
-
+  "defaultViewDescription": "Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.",
+  "comingSoon": "Coming Soon"
 }

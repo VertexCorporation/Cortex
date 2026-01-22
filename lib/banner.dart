@@ -14,7 +14,7 @@ import 'invite.dart';
 
 class BannerService {
   final ValueNotifier<bool> showInviteBannerNotifier =
-  ValueNotifier<bool>(false);
+      ValueNotifier<bool>(false);
   final InviteService _inviteService = InviteService();
 
   bool _isSharingLink = false;
@@ -36,20 +36,17 @@ class BannerService {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final int? nextShowTimestamp = prefs.getInt(_nextShowTimestampKey);
-      final int now = DateTime
-          .now()
-          .millisecondsSinceEpoch;
+      final int now = DateTime.now().millisecondsSinceEpoch;
 
       // Logic: If no timestamp exists (first run) OR current time >= next allowed time
       if (nextShowTimestamp == null || now >= nextShowTimestamp) {
         debugPrint(
-            "[BannerService] Time condition met. Displaying Axon banner.");
+            "[BannerService] Time condition met. Attempting to display Axon banner.");
         _displayBanner();
       } else {
         final double remainingHours = (nextShowTimestamp - now) / 1000 / 3600;
         debugPrint(
-            "[BannerService] Cooldown active. Remaining: ${remainingHours
-                .toStringAsFixed(1)} hours.");
+            "[BannerService] Cooldown active. Remaining: ${remainingHours.toStringAsFixed(1)} hours.");
       }
     } catch (e) {
       debugPrint("[BannerService] SharedPreferences error: $e");
@@ -63,20 +60,26 @@ class BannerService {
     // Unless Debug Mode
     if (!kDebugMode) {
       if (Random().nextBool()) {
-        debugPrint("[BannerService] Skipped by random chance.");
-        // Set a short cooldown so we don't spam check every second
-        startCooldown();
+        debugPrint("[BannerService] Skipped by random chance (50%).");
+        // FIX: Don't set a full cooldown. Just return.
+        // The next session/check will try again.
+        // OR optionally set a tiny cooldown (e.g. 1 hour) to avoid spamming logs if checked frequently.
+        _scheduleNextAppearance(shortDelay: true);
         return;
       }
     }
 
     if (!showInviteBannerNotifier.value) {
       showInviteBannerNotifier.value = true;
+      // FIX: Set the next cooldown immediately when we DECIDE to show it.
+      // This ensures we don't show it again for 1-3 days even if the user crashes/restarts
+      // without dismissing it manually.
+      _scheduleNextAppearance();
     }
   }
 
   /// Called when the banner is swiped away.
-  /// Sets a random cooldown between 3 days (72h) and 7 days (168h).
+  /// Sets a random cooldown between 1 day (24h) and 3 days (72h).
   Future<void> startCooldown() async {
     // Hide from UI immediately
     if (showInviteBannerNotifier.value) {
@@ -85,25 +88,37 @@ class BannerService {
 
     if (Platform.isIOS) return;
 
-    // Even in Debug mode, we might want to test setting the pref,
-    // but the checkAndTriggerBanner will ignore it next time.
+    // Re-schedule just in case, ensuring the "dismissed" action pushes it out.
+    await _scheduleNextAppearance();
+  }
+
+  /// Calculates and saves the next allowed show time.
+  /// [shortDelay] : If true, sets a small delay (e.g. 4 hours) instead of full 1-3 days.
+  ///                Used when skipping by random chance.
+  Future<void> _scheduleNextAppearance({bool shortDelay = false}) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
+      int randomHours;
 
-      // 3 Days = 72 Hours
-      // 7 Days = 168 Hours
-      // Range = 168 - 72 = 96 Hours variance
-      final int randomHours = 72 + Random().nextInt(96 + 1);
+      if (shortDelay) {
+        // Retry in 4 hours
+        randomHours = 4;
+      } else {
+        // 1 Day = 24 Hours
+        // 3 Days = 72 Hours
+        // Range = 72 - 24 = 48 Hours variance
+        randomHours = 24 + Random().nextInt(48 + 1);
+      }
 
       // Calculate the next allowed show time
       final DateTime nextShowTime =
-      DateTime.now().add(Duration(hours: randomHours));
+          DateTime.now().add(Duration(hours: randomHours));
 
       await prefs.setInt(
           _nextShowTimestampKey, nextShowTime.millisecondsSinceEpoch);
 
       debugPrint(
-          "[BannerService] Banner dismissed. Cooldown set for $randomHours hours.");
+          "[BannerService] Scheduled next appearance in $randomHours hours.");
     } catch (e) {
       debugPrint("[BannerService] Failed to set cooldown timestamp: $e");
     }
@@ -273,9 +288,7 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
     if (Platform.isIOS) return const SizedBox.shrink();
 
     final localizations = AppLocalizations.of(context)!;
-    final Size screenSize = MediaQuery
-        .of(context)
-        .size;
+    final Size screenSize = MediaQuery.of(context).size;
     final double refWidth = widget.referenceWidth ?? screenSize.width;
 
     // --- Embedded Mode (Inside Axon List) ---
@@ -286,37 +299,37 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
         alignment: Alignment.topCenter,
         child: _isVisible
             ? SlideTransition(
-          // 1. Entry Animation Layer (Slight Slide Up)
-          position: _slideAnimation,
-          child: FadeTransition(
-            opacity: _fadeAnimation, // Entry Fade
-            child: SlideTransition(
-              // 2. Exit Animation Layer (Directional Slide Out)
-              position: _exitSlideAnimation,
-              child: FadeTransition(
-                opacity: _exitFadeAnimation, // Exit Fade
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      bottom: refWidth * 0.04, top: refWidth * 0.02),
-                  child: GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      widget.onTap?.call();
-                    },
-                    // Listen to ALL swipes (Pan)
-                    onPanUpdate: (details) {
-                      if (details.delta.distance > 1.5) {
-                        dismiss(details.delta);
-                      }
-                    },
-                    child: _buildBannerContent(
-                        context, localizations, refWidth),
+                // 1. Entry Animation Layer (Slight Slide Up)
+                position: _slideAnimation,
+                child: FadeTransition(
+                  opacity: _fadeAnimation, // Entry Fade
+                  child: SlideTransition(
+                    // 2. Exit Animation Layer (Directional Slide Out)
+                    position: _exitSlideAnimation,
+                    child: FadeTransition(
+                      opacity: _exitFadeAnimation, // Exit Fade
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                            bottom: refWidth * 0.04, top: refWidth * 0.02),
+                        child: GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            widget.onTap?.call();
+                          },
+                          // Listen to ALL swipes (Pan)
+                          onPanUpdate: (details) {
+                            if (details.delta.distance > 1.5) {
+                              dismiss(details.delta);
+                            }
+                          },
+                          child: _buildBannerContent(
+                              context, localizations, refWidth),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
-        )
+              )
             : const SizedBox(width: double.infinity, height: 0),
       );
     }
@@ -324,8 +337,8 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
     return const SizedBox.shrink();
   }
 
-  Widget _buildBannerContent(BuildContext context,
-      AppLocalizations localizations, double refWidth) {
+  Widget _buildBannerContent(
+      BuildContext context, AppLocalizations localizations, double refWidth) {
     final double internalHorizontalPadding = refWidth * 0.04;
     final double internalVerticalPadding = refWidth * 0.035;
     final double iconSpacing = refWidth * 0.03;
@@ -342,7 +355,7 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
     // --- COLOR MAGIC: Solid "Faux-Transparent" ---
     final Color tintColor = AppColors.premium.withValues(alpha: 0.15);
     final Color solidBackgroundColor =
-    Color.alphaBlend(tintColor, AppColors.background);
+        Color.alphaBlend(tintColor, AppColors.background);
     final Color borderColor = AppColors.premium;
     final Color contentColor = AppColors.premium;
     final Color subtitleColor = AppColors.premium.withValues(alpha: 0.8);

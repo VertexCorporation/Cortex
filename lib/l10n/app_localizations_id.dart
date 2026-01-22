@@ -1612,4 +1612,7 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'Cortex selalu berada di sisi Anda dengan ratusan model AI, kemampuan offline, obrolan dinamis, dan masih banyak lagi.';
+
+  @override
+  String get comingSoon => 'Segera hadir';
 }

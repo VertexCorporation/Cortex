@@ -46,7 +46,7 @@ class _PremiumButtonState extends State<PremiumButton>
     });
 
     // Schedule periodic animation every 30 seconds
-    _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       if (mounted) {
         _shineController.forward(from: 0.0);
       }
@@ -68,7 +68,10 @@ class _PremiumButtonState extends State<PremiumButton>
   @override
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     final double scale = (screenWidth / 375.0).clamp(0.85, 1.2);
 
@@ -82,7 +85,7 @@ class _PremiumButtonState extends State<PremiumButton>
 
     final Color baseColor = AppColors.premium.withValues(alpha: 0.15);
     final Color backgroundColor =
-        Color.alphaBlend(baseColor, AppColors.background);
+    Color.alphaBlend(baseColor, AppColors.background);
     final Color contentColor = AppColors.premium;
     final Color borderColor = baseColor.withValues(alpha: 0.8);
 

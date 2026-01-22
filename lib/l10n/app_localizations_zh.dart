@@ -1516,4 +1516,7 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'Cortex 始终伴您左右，拥有数百个 AI 模型、离线功能、动态聊天等诸多特性。';
+
+  @override
+  String get comingSoon => '即将推出';
 }

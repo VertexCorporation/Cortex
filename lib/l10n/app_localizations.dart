@@ -2984,6 +2984,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.'**
   String get defaultViewDescription;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get comingSoon;
 }
 
 class _AppLocalizationsDelegate

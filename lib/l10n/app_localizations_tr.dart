@@ -1599,4 +1599,7 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'Cortex içerisindeki yüzlerce yapay zekayla, internetsiz çalışma özelliğiyle, dinamik sohbetiyle ve çok daha fazlasıyla her zaman yanında.';
+
+  @override
+  String get comingSoon => 'Çok Yakında';
 }

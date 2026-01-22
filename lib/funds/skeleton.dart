@@ -9,36 +9,25 @@ class FundsSkeletonLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
-    // KESİN ÇÖZÜM: funds.dart ile aynı padding mantığı.
-    // Scaffold olmadığı için context.padding.top burada DOĞRU (örn: 47.0) gelecek.
-    final double topPadding = MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final double topPadding = MediaQuery.of(context).padding.top;
 
-    // funds.dart'taki formül: topPadding + screenHeight * 0.01
-    final double contentTopPadding = topPadding + (screenHeight * 0.01);
+    final double contentTopPadding = topPadding + screenHeight * 0.01;
 
     final double contentBottomPadding = screenHeight * 0.015;
-    final double bottomPadding = screenHeight * 0.02 + MediaQuery
-        .of(context)
-        .padding
-        .bottom;
+    final double bottomPadding =
+        screenHeight * 0.02 + MediaQuery.of(context).padding.bottom;
 
-    // Badge ölçeklemesi (funds.dart ile birebir aynı)
     final scale = (screenWidth / 375.0).clamp(0.85, 1.2);
     final badgeHeight = 36.0 * scale;
 
-    return Container( // <--- Scaffold YERİNE Container
+    return Container(
       width: screenWidth,
       height: screenHeight,
-      color: AppColors.background, // Arkaplan rengi
+      color: AppColors.background,
       child: Shimmer.fromColors(
         baseColor: AppColors.shimmerBase,
         highlightColor: AppColors.shimmerHighlight,
@@ -47,14 +36,11 @@ class FundsSkeletonLoader extends StatelessWidget {
             // --- 1. HEADER (DISCOUNT BANNER SKELETON) ---
             Padding(
               padding: EdgeInsets.only(
-                  top: contentTopPadding,
-                  // Artık 0 gelmeyecek, gerçek değer gelecek
-                  bottom: contentBottomPadding
-              ),
+                  top: contentTopPadding, bottom: contentBottomPadding),
               child: Center(
                 child: Container(
-                  width: screenWidth * 0.45, // Banner genişliği
-                  height: badgeHeight, // Banner yüksekliği
+                  width: screenWidth * 0.45,
+                  height: badgeHeight,
                   decoration: BoxDecoration(
                     color: AppColors.shimmerBase,
                     borderRadius: BorderRadius.circular(36.0 * scale),
@@ -63,49 +49,43 @@ class FundsSkeletonLoader extends StatelessWidget {
               ),
             ),
 
-            // --- Geri Kalan İçerik (Değişmedi) ---
             Expanded(
               child: PageView(
                 physics: const NeverScrollableScrollPhysics(),
-                children: List.generate(
-                    1, (_) => _buildSkeletonPage(context)),
+                children: List.generate(1, (_) => _buildSkeletonPage(context)),
               ),
             ),
 
             Padding(
-              padding: EdgeInsets.fromLTRB(
-                  screenWidth * 0.06,
-                  screenHeight * 0.01,
-                  screenWidth * 0.06,
-                  bottomPadding
-              ),
+              padding: EdgeInsets.fromLTRB(screenWidth * 0.06,
+                  screenHeight * 0.01, screenWidth * 0.06, bottomPadding),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Page Indicator
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(3, (index) =>
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.01),
-                          width: index == 1
-                              ? screenWidth * 0.06
-                              : screenWidth * 0.022,
-                          height: screenWidth * 0.022,
-                          decoration: BoxDecoration(
-                            color: AppColors.shimmerBase,
-                            borderRadius: BorderRadius.circular(
-                                screenWidth * 0.022),
-                          ),
-                        )),
+                    children: List.generate(
+                        3,
+                        (index) => Container(
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.01),
+                              width: index == 1
+                                  ? screenWidth * 0.06
+                                  : screenWidth * 0.022,
+                              height: screenWidth * 0.022,
+                              decoration: BoxDecoration(
+                                color: AppColors.shimmerBase,
+                                borderRadius:
+                                    BorderRadius.circular(screenWidth * 0.022),
+                              ),
+                            )),
                   ),
                   SizedBox(height: screenHeight * 0.02),
                   // Main Button
                   Container(
                     width: double.infinity,
                     height: screenHeight * 0.06,
-                    // funds.dart'taki buton minSize ile eşleşmeli
                     decoration: BoxDecoration(
                       color: AppColors.shimmerBase,
                       borderRadius: BorderRadius.circular(30),
@@ -144,9 +124,7 @@ class FundsSkeletonLoader extends StatelessWidget {
   }
 
   Widget _buildSkeletonPage(BuildContext context) {
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
@@ -204,18 +182,13 @@ class FundsSkeletonLoader extends StatelessWidget {
   }
 
   Widget _skeletonOptionBox(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-    // funds.dart -> Subscriptions widget'ındaki yükseklik hesabına yakın bir değer
-    final estimatedHeight = (screenHeight * 0.03) + (screenWidth * 0.085) +
-        (screenHeight * 0.006) + 30; // +30 padding/margin payı
+    final estimatedHeight = (screenHeight * 0.03) +
+        (screenWidth * 0.085) +
+        (screenHeight * 0.006) +
+        30;
 
     return Container(
       width: double.infinity,
@@ -229,10 +202,7 @@ class FundsSkeletonLoader extends StatelessWidget {
   }
 
   Widget _skeletonBenefitsGrid(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Wrap(
       alignment: WrapAlignment.center,
       runAlignment: WrapAlignment.center,
@@ -240,17 +210,16 @@ class FundsSkeletonLoader extends StatelessWidget {
       runSpacing: screenWidth * 0.057,
       children: List.generate(6, (index) {
         return SizedBox(
-          width: (screenWidth - (screenWidth * 0.06 * 2) -
-              (screenWidth * 0.02)) / 2,
+          width:
+              (screenWidth - (screenWidth * 0.06 * 2) - (screenWidth * 0.02)) /
+                  2,
           child: Row(
             children: [
               Container(
                 width: screenWidth * 0.057,
                 height: screenWidth * 0.057,
                 decoration: BoxDecoration(
-                    color: AppColors.shimmerBase,
-                    shape: BoxShape.circle
-                ),
+                    color: AppColors.shimmerBase, shape: BoxShape.circle),
               ),
               SizedBox(width: screenWidth * 0.03),
               Expanded(
@@ -258,8 +227,7 @@ class FundsSkeletonLoader extends StatelessWidget {
                   height: screenWidth * 0.034,
                   decoration: BoxDecoration(
                       color: AppColors.shimmerBase,
-                      borderRadius: BorderRadius.circular(4)
-                  ),
+                      borderRadius: BorderRadius.circular(4)),
                 ),
               )
             ],

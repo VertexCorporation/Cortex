@@ -555,5 +555,6 @@
   "actionFile": "Archivo",
   "listening": "Escuchando",
   "defaultViewTitle": "¿Qué pasa?",
-  "defaultViewDescription": "Cortex siempre está a tu lado con cientos de modelos de IA, capacidades sin conexión, chat dinámico y mucho más."
+  "defaultViewDescription": "Cortex siempre está a tu lado con cientos de modelos de IA, capacidades sin conexión, chat dinámico y mucho más.",
+  "comingSoon": "Muy pronto"
 }
