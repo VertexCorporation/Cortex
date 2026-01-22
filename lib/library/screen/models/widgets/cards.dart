@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cortex/app.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:path/path.dart' as path;
 import 'package:cortex/l10n/app_localizations.dart';
@@ -111,10 +112,7 @@ class _ModelTileState extends State<ModelTile> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final double w = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double w = MediaQuery.of(context).size.width;
 
     // Logic now uses the entity's properties for clarity.
     final bool canLongPress = widget.model.isCustomModel || widget.isDownloaded;
@@ -124,12 +122,15 @@ class _ModelTileState extends State<ModelTile> {
       behavior: HitTestBehavior.opaque,
       gestures: {
         LongPressGestureRecognizer:
-        GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
-              () =>
-              LongPressGestureRecognizer(
-                  duration: const Duration(milliseconds: 100)),
-              (instance) =>
-          instance.onLongPress = canLongPress ? widget.onRemoveRequested : null,
+            GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
+          () => LongPressGestureRecognizer(
+              duration: const Duration(milliseconds: 100)),
+          (instance) => instance.onLongPress = canLongPress
+              ? () {
+                  HapticFeedback.lightImpact();
+                  widget.onRemoveRequested();
+                }
+              : null,
         ),
       },
       child: _content(context, w, loc, finalImageWidget),
@@ -169,35 +170,44 @@ class _ModelTileState extends State<ModelTile> {
     if (manager?.isPaused ?? false) {
       return SizedBox(
         key: ValueKey('resume-${widget.model.id}'),
-        width: btnW, height: h,
+        width: btnW,
+        height: h,
         child: ElevatedButton(
-          onPressed: widget.onResumeDownload,
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            widget.onResumeDownload();
+          },
           style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.senaryColor,
               shape: RoundedRectangleBorder(borderRadius: br),
               padding: EdgeInsets.zero),
-          child: FittedBox(
-              child: Text(loc.resume, style: _boldWhite(context, w))),
+          child:
+              FittedBox(child: Text(loc.resume, style: _boldWhite(context, w))),
         ),
       );
     }
 
     // Logic uses the entity's properties for clarity.
-    final bool showChatButton = (widget.isDownloaded ||
-        (manager?.isDownloaded ?? false)) || widget.model.isCustomModel ||
-        widget.model.isServerSide;
+    final bool showChatButton =
+        (widget.isDownloaded || (manager?.isDownloaded ?? false)) ||
+            widget.model.isCustomModel ||
+            widget.model.isServerSide;
     if (showChatButton) {
       return SizedBox(
         key: ValueKey('chat-${widget.model.id}'),
-        width: btnW, height: h,
+        width: btnW,
+        height: h,
         child: ElevatedButton(
-          onPressed: widget.onChatPressed,
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            widget.onChatPressed();
+          },
           style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.senaryColor,
               shape: RoundedRectangleBorder(borderRadius: br),
               padding: EdgeInsets.zero),
-          child: FittedBox(
-              child: Text(loc.chat, style: _boldWhite(context, w))),
+          child:
+              FittedBox(child: Text(loc.chat, style: _boldWhite(context, w))),
         ),
       );
     }
@@ -208,8 +218,8 @@ class _ModelTileState extends State<ModelTile> {
       initialData: InternetService().currentStatus,
       builder: (context, snapshot) {
         final bool hasInternet = snapshot.data ?? false;
-        final bool isCompatible = widget.compatibilityStatus ==
-            CompatibilityStatus.compatible;
+        final bool isCompatible =
+            widget.compatibilityStatus == CompatibilityStatus.compatible;
         bool isButtonEnabled;
         String buttonText;
         double fontSize = w * .035;
@@ -224,32 +234,40 @@ class _ModelTileState extends State<ModelTile> {
           isButtonEnabled = true;
         } else {
           buttonText =
-          (widget.compatibilityStatus == CompatibilityStatus.insufficientRAM
-              ? loc.insufficientRAM
-              : loc.insufficientStorage);
+              (widget.compatibilityStatus == CompatibilityStatus.insufficientRAM
+                  ? loc.insufficientRAM
+                  : loc.insufficientStorage);
           isButtonEnabled = false;
           fontSize = w * .025;
         }
 
         return SizedBox(
-          width: btnW, height: h,
+          width: btnW,
+          height: h,
           child: ElevatedButton(
-            onPressed: isButtonEnabled ? widget.onDownloadPressed : null,
+            onPressed: isButtonEnabled
+                ? () {
+                    HapticFeedback.lightImpact();
+                    widget.onDownloadPressed();
+                  }
+                : null,
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.resolveWith<Color>((s) =>
-              s.contains(WidgetState.disabled)
-                  ? AppColors.quaternaryColor
-                  : AppColors.primaryColor.inverted),
+                  s.contains(WidgetState.disabled)
+                      ? AppColors.quaternaryColor
+                      : AppColors.primaryColor.inverted),
               foregroundColor: WidgetStateProperty.resolveWith<Color>((s) =>
-              s.contains(WidgetState.disabled)
-                  ? AppColors.tertiaryColor
-                  : AppColors.primaryColor),
+                  s.contains(WidgetState.disabled)
+                      ? AppColors.tertiaryColor
+                      : AppColors.primaryColor),
               shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(borderRadius: br)),
               padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero),
             ),
-            child: FittedBox(child: Text(buttonText, style: TextStyle(
-                fontSize: fontSize, fontWeight: FontWeight.bold))),
+            child: FittedBox(
+                child: Text(buttonText,
+                    style: TextStyle(
+                        fontSize: fontSize, fontWeight: FontWeight.bold))),
           ),
         );
       },
@@ -262,8 +280,8 @@ class _ModelTileState extends State<ModelTile> {
   Widget _buildImage(double w) {
     // Use the pre-resolved path directly from the entity.
     // Provide a fallback just in case, for ultimate safety.
-    final String resolvedImagePath = widget.model.imagePath ??
-        'assets/icons/self.svg';
+    final String resolvedImagePath =
+        widget.model.imagePath ?? 'assets/icons/self.svg';
 
     final String variant = path.extension(resolvedImagePath).toLowerCase();
     final bool isFramedType = (variant == '.svg' || variant == '.png');
@@ -276,49 +294,57 @@ class _ModelTileState extends State<ModelTile> {
       imageContent = fallbackImage;
     } else {
       if (variant == '.svg') {
-        imageContent = SvgPicture.asset(resolvedImagePath, fit: BoxFit.contain,
-            placeholderBuilder: (_) => fallbackImage);
+        imageContent = SvgPicture.asset(resolvedImagePath,
+            fit: BoxFit.contain, placeholderBuilder: (_) => fallbackImage);
       } else {
         ImageProvider provider = resolvedImagePath.startsWith('assets/')
             ? AssetImage(resolvedImagePath)
             : FileImage(File(resolvedImagePath));
-        imageContent = Image(image: provider,
+        imageContent = Image(
+            image: provider,
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) => fallbackImage);
       }
     }
 
     if (isFramedType) {
-      return Container(width: imgW,
+      return Container(
+          width: imgW,
           height: imgH,
           padding: const EdgeInsets.all(6.0),
-          decoration: BoxDecoration(color: AppColors.secondaryColor,
+          decoration: BoxDecoration(
+              color: AppColors.secondaryColor,
               borderRadius: BorderRadius.circular(w * .03)),
           child: imageContent);
     } else {
-      return Container(width: imgW,
+      return Container(
+          width: imgW,
           height: imgH,
           clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(w * .03)),
+          decoration:
+              BoxDecoration(borderRadius: BorderRadius.circular(w * .03)),
           child: imageContent);
     }
   }
 
-  Widget _fallback(double w, double h) =>
-      Container(width: w,
-          height: h,
-          color: AppColors.secondaryColor,
-          child: Padding(padding: const EdgeInsets.all(8.0),
-              child: SvgPicture.asset('assets/icons/self.svg',
-                  colorFilter: ColorFilter.mode(
-                      AppColors.primaryColor.inverted, BlendMode.srcIn))));
+  Widget _fallback(double w, double h) => Container(
+      width: w,
+      height: h,
+      color: AppColors.secondaryColor,
+      child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SvgPicture.asset('assets/icons/self.svg',
+              colorFilter: ColorFilter.mode(
+                  AppColors.primaryColor.inverted, BlendMode.srcIn))));
 
-  Widget _content(BuildContext context, double w, AppLocalizations loc,
-      Widget img) {
+  Widget _content(
+      BuildContext context, double w, AppLocalizations loc, Widget img) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: widget.onTileTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        widget.onTileTap();
+      },
       child: AnimatedContainer(
         padding: EdgeInsets.all(widget.isSeeAll ? w * .01 : w * .005),
         duration: const Duration(seconds: 1),
@@ -334,7 +360,8 @@ class _ModelTileState extends State<ModelTile> {
                   OverflowText(
                     // Use pre-localized 'displayTitle' from the entity.
                     text: widget.model.displayTitle,
-                    style: TextStyle(color: AppColors.primaryColor.inverted,
+                    style: TextStyle(
+                        color: AppColors.primaryColor.inverted,
                         fontSize: w * .04,
                         fontWeight: FontWeight.bold),
                   ),
@@ -345,8 +372,9 @@ class _ModelTileState extends State<ModelTile> {
                     maxLines: 2,
                     fadeLength: 6,
                     style: TextStyle(
-                        color: AppColors.primaryColor.inverted.withValues(
-                            alpha: .5), fontSize: w * .029),
+                        color: AppColors.primaryColor.inverted
+                            .withValues(alpha: .5),
+                        fontSize: w * .029),
                   ),
                 ],
               ),
@@ -360,14 +388,17 @@ class _ModelTileState extends State<ModelTile> {
   }
 
   Widget _rightColumn(BuildContext context, double w, AppLocalizations loc) {
-    return Column(mainAxisSize: MainAxisSize.min,
+    return Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(width: w * .2,
+          SizedBox(
+              width: w * .2,
               height: w * .04,
               child: Center(child: _buildDownloadStatusText(loc, w))),
           SizedBox(height: w * .005),
-          SizedBox(width: w * .2,
+          SizedBox(
+              width: w * .2,
               height: w * .09,
               child: _fade(_buildButton(context, w, loc))),
         ]);
@@ -377,25 +408,26 @@ class _ModelTileState extends State<ModelTile> {
     final manager = widget.manager;
     if (manager == null) return const SizedBox.shrink();
     if (manager.isDownloading) {
-      final String text = manager.progress >= 95 ? loc.finalPreparation : loc
-          .downloaded(manager.progress.toStringAsFixed(0));
-      return _fade(Text(text, textAlign: TextAlign.center,
+      final String text = manager.progress >= 95
+          ? loc.finalPreparation
+          : loc.downloaded(manager.progress.toStringAsFixed(0));
+      return _fade(Text(text,
+          textAlign: TextAlign.center,
           style: TextStyle(
               color: AppColors.primaryColor.inverted, fontSize: w * .03)));
     } else if (manager.isPaused) {
-      return _fade(Text(loc.downloadPaused, style: TextStyle(
-          color: AppColors.primaryColor.inverted, fontSize: w * .03)));
+      return _fade(Text(loc.downloadPaused,
+          style: TextStyle(
+              color: AppColors.primaryColor.inverted, fontSize: w * .03)));
     }
     return const SizedBox.shrink();
   }
 
-  Widget _fade(Widget child) =>
-      AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
-          child: child);
+  Widget _fade(Widget child) => AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
+      child: child);
 
-  TextStyle _boldWhite(BuildContext ctx, double w) =>
-      TextStyle(
-          color: Colors.white, fontSize: w * .035, fontWeight: FontWeight.bold);
+  TextStyle _boldWhite(BuildContext ctx, double w) => TextStyle(
+      color: Colors.white, fontSize: w * .035, fontWeight: FontWeight.bold);
 }

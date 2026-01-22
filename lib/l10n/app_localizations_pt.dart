@@ -1604,4 +1604,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get listening => 'Ouvindo';
+
+  @override
+  String get defaultViewTitle => 'What\'s Up?';
+
+  @override
+  String get defaultViewDescription =>
+      'Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.';
 }

@@ -1,6 +1,7 @@
 // lib/settings/sections/theme.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../../app.dart';
@@ -18,7 +19,8 @@ class AppThemeSection extends StatelessWidget {
   const AppThemeSection({super.key});
 
   /// Returns the localized name for a given theme code.
-  String _getLocalizedThemeName(AppLocalizations localizations, String themeCode) {
+  String _getLocalizedThemeName(
+      AppLocalizations localizations, String themeCode) {
     final Map<String, String> mapping = {
       'light': localizations.light,
       'dark': localizations.dark,
@@ -72,19 +74,25 @@ class AppThemeSection extends StatelessWidget {
       final int aBaseIndex = baseThemeOrder.indexOf(aCode);
       final int bBaseIndex = baseThemeOrder.indexOf(bCode);
 
-      if (aBaseIndex != -1 && bBaseIndex != -1) return aBaseIndex.compareTo(bBaseIndex);
+      if (aBaseIndex != -1 && bBaseIndex != -1) {
+        return aBaseIndex.compareTo(bBaseIndex);
+      }
       if (aBaseIndex != -1) return -1;
       if (bBaseIndex != -1) return 1;
 
       if (aEnabled && !bEnabled) return -1;
       if (!aEnabled && bEnabled) return 1;
 
-      if (aEnabled && bEnabled) return aName.toLowerCase().compareTo(bName.toLowerCase());
+      if (aEnabled && bEnabled) {
+        return aName.toLowerCase().compareTo(bName.toLowerCase());
+      }
 
       if (!aEnabled && !bEnabled) {
         final int aRequiredLevel = _getRequiredSubscriptionLevelForTheme(aCode);
         final int bRequiredLevel = _getRequiredSubscriptionLevelForTheme(bCode);
-        if (aRequiredLevel != bRequiredLevel) return aRequiredLevel.compareTo(bRequiredLevel);
+        if (aRequiredLevel != bRequiredLevel) {
+          return aRequiredLevel.compareTo(bRequiredLevel);
+        }
         return aName.toLowerCase().compareTo(bName.toLowerCase());
       }
       return 0;
@@ -104,7 +112,8 @@ class AppThemeSection extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final double scale = screenWidth / 400.0;
 
-    final List<String> availableThemeCodes = AppColors.overlayStyles.keys.toList();
+    final List<String> availableThemeCodes =
+        AppColors.overlayStyles.keys.toList();
     List<Map<String, dynamic>> themesList = availableThemeCodes.map((code) {
       return {
         'code': code,
@@ -131,8 +140,7 @@ class AppThemeSection extends StatelessWidget {
               width: (screenWidth * 0.8).clamp(0, 500 * scale),
               decoration: BoxDecoration(
                   color: AppColors.secondaryColor,
-                  borderRadius: BorderRadius.circular(16 * scale)
-              ),
+                  borderRadius: BorderRadius.circular(16 * scale)),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16 * scale),
                 child: StatefulBuilder(
@@ -147,7 +155,8 @@ class AppThemeSection extends StatelessWidget {
                           'assets/icons/theme.svg',
                           width: 30 * scale,
                           height: 30 * scale,
-                          colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                          colorFilter: ColorFilter.mode(
+                              AppColors.primaryColor.inverted, BlendMode.srcIn),
                         ),
                         SizedBox(height: 10 * scale),
                         Text(
@@ -155,83 +164,109 @@ class AppThemeSection extends StatelessWidget {
                           style: TextStyle(
                               fontSize: 18 * scale,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.primaryColor.inverted
-                          ),
+                              color: AppColors.primaryColor.inverted),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 10 * scale),
-                        Divider(height: 1, thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha:0.7)),
+                        Divider(
+                            height: 1,
+                            thickness: 0.5,
+                            color:
+                                AppColors.quinaryColor.withValues(alpha: 0.7)),
 
                         // --- Themes List with Animations ---
                         ConstrainedBox(
-                          constraints: BoxConstraints(maxHeight: screenHeight * 0.4),
+                          constraints:
+                              BoxConstraints(maxHeight: screenHeight * 0.4),
                           child: ListView.builder(
                             shrinkWrap: true,
                             padding: EdgeInsets.symmetric(
-                                vertical: 10 * scale,
-                                horizontal: 10 * scale
-                            ),
+                                vertical: 10 * scale, horizontal: 10 * scale),
                             itemCount: themesList.length,
                             itemBuilder: (context, index) {
                               final theme = themesList[index];
                               final bool isEnabled = theme['enabled'] as bool;
                               final String themeCode = theme['code'] as String;
-                              final bool isSelected = (tempSelectedTheme == themeCode);
+                              final bool isSelected =
+                                  (tempSelectedTheme == themeCode);
 
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 curve: Curves.easeInOut,
                                 decoration: BoxDecoration(
-                                  color: isSelected ? AppColors.primaryColor.inverted.withValues(alpha: 0.02) : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8 * scale),
+                                  color: isSelected
+                                      ? AppColors.primaryColor.inverted
+                                          .withValues(alpha: 0.02)
+                                      : Colors.transparent,
+                                  borderRadius:
+                                      BorderRadius.circular(8 * scale),
                                 ),
                                 child: ListTile(
                                   leading: isEnabled
                                       ? AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 200),
-                                    transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-                                    child: Icon(
-                                      isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                                      key: ValueKey<bool>(isSelected),
-                                      color: AppColors.primaryColor.inverted,
-                                      size: 24 * scale,
-                                    ),
-                                  )
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          transitionBuilder:
+                                              (child, animation) =>
+                                                  FadeTransition(
+                                                      opacity: animation,
+                                                      child: child),
+                                          child: Icon(
+                                            isSelected
+                                                ? Icons.radio_button_checked
+                                                : Icons.radio_button_unchecked,
+                                            key: ValueKey<bool>(isSelected),
+                                            color:
+                                                AppColors.primaryColor.inverted,
+                                            size: 24 * scale,
+                                          ),
+                                        )
                                       : SizedBox(
-                                    width: 24 * scale,
-                                    height: 24 * scale,
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        'assets/icons/lock.svg',
-                                        width: 20 * scale,
-                                        height: 20 * scale,
-                                        colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted.withValues(alpha:0.5), BlendMode.srcIn),
-                                      ),
-                                    ),
-                                  ),
+                                          width: 24 * scale,
+                                          height: 24 * scale,
+                                          child: Center(
+                                            child: SvgPicture.asset(
+                                              'assets/icons/lock.svg',
+                                              width: 20 * scale,
+                                              height: 20 * scale,
+                                              colorFilter: ColorFilter.mode(
+                                                  AppColors
+                                                      .primaryColor.inverted
+                                                      .withValues(alpha: 0.5),
+                                                  BlendMode.srcIn),
+                                            ),
+                                          ),
+                                        ),
                                   title: Text(
                                     theme['name'] as String,
                                     style: TextStyle(
                                       fontSize: 15 * scale,
-                                      color: isEnabled ? AppColors.primaryColor.inverted : AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                                      color: isEnabled
+                                          ? AppColors.primaryColor.inverted
+                                          : AppColors.primaryColor.inverted
+                                              .withValues(alpha: 0.5),
                                     ),
                                   ),
                                   onTap: () {
                                     if (isEnabled) {
                                       if (!isSelected) {
-                                        setStateDialog(() => tempSelectedTheme = themeCode);
+                                        HapticFeedback.lightImpact();
+                                        setStateDialog(() =>
+                                            tempSelectedTheme = themeCode);
                                       }
                                     } else {
+                                      HapticFeedback.lightImpact();
                                       notificationService.showNotification(
                                           message: appLocalizations.themeLocked,
-                                          type: NotificationType.error
-                                      );
+                                          type: NotificationType.error);
                                     }
                                   },
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8 * scale),
+                                    borderRadius:
+                                        BorderRadius.circular(8 * scale),
                                   ),
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 10 * scale),
+                                  contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 10 * scale),
                                 ),
                               );
                             },
@@ -239,13 +274,22 @@ class AppThemeSection extends StatelessWidget {
                         ),
 
                         // --- Dialog Footer with "Done" Button ---
-                        Divider(height: 1, thickness: 0.5, color: AppColors.quinaryColor.withValues(alpha:0.7)),
+                        Divider(
+                            height: 1,
+                            thickness: 0.5,
+                            color:
+                                AppColors.quinaryColor.withValues(alpha: 0.7)),
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            splashColor: AppColors.senaryColor.withValues(alpha:0.1),
-                            highlightColor: AppColors.senaryColor.withValues(alpha:0.1),
-                            onTap: () => Navigator.of(ctx).pop(tempSelectedTheme),
+                            splashColor:
+                                AppColors.senaryColor.withValues(alpha: 0.1),
+                            highlightColor:
+                                AppColors.senaryColor.withValues(alpha: 0.1),
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              Navigator.of(ctx).pop(tempSelectedTheme);
+                            },
                             child: Container(
                               height: 50 * scale,
                               alignment: Alignment.center,
@@ -254,8 +298,7 @@ class AppThemeSection extends StatelessWidget {
                                 style: TextStyle(
                                     fontSize: 16 * scale,
                                     color: AppColors.senaryColor,
-                                    fontWeight: FontWeight.w500
-                                ),
+                                    fontWeight: FontWeight.w500),
                               ),
                             ),
                           ),
@@ -273,7 +316,10 @@ class AppThemeSection extends StatelessWidget {
 
     restoreNavBar();
 
-    if (selectedThemeCode == null || selectedThemeCode == themeProvider.currentTheme) return;
+    if (selectedThemeCode == null ||
+        selectedThemeCode == themeProvider.currentTheme) {
+      return;
+    }
 
     themeProvider.changeTheme(selectedThemeCode);
   }
@@ -282,7 +328,8 @@ class AppThemeSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
     final themeProvider = context.watch<ThemeProvider>();
-    final currentThemeName = _getLocalizedThemeName(appLocalizations, themeProvider.currentTheme);
+    final currentThemeName =
+        _getLocalizedThemeName(appLocalizations, themeProvider.currentTheme);
 
     final screenWidth = MediaQuery.of(context).size.width;
     final double scale = screenWidth / 400.0;
@@ -292,7 +339,10 @@ class AppThemeSection extends StatelessWidget {
       children: [
         Text(
           appLocalizations.theme,
-          style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: 18 * scale, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              color: AppColors.primaryColor.inverted,
+              fontSize: 18 * scale,
+              fontWeight: FontWeight.w600),
         ),
         SizedBox(height: 8 * scale),
         Text(
@@ -305,19 +355,27 @@ class AppThemeSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0 * scale),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
-            onTap: () => _showThemeSelectionDialog(context),
+            onTap: () {
+              HapticFeedback.lightImpact();
+              _showThemeSelectionDialog(context);
+            },
             borderRadius: BorderRadius.circular(10.0 * scale),
-            splashColor: AppColors.quaternaryColor.withValues(alpha:0.3),
+            splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 16 * scale, horizontal: 16 * scale),
+              padding: EdgeInsets.symmetric(
+                  vertical: 16 * scale, horizontal: 16 * scale),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     currentThemeName,
-                    style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: 16 * scale, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                        color: AppColors.primaryColor.inverted,
+                        fontSize: 16 * scale,
+                        fontWeight: FontWeight.w500),
                   ),
-                  Icon(Icons.arrow_forward_ios, color: AppColors.primaryColor.inverted, size: 16 * scale),
+                  Icon(Icons.arrow_forward_ios,
+                      color: AppColors.primaryColor.inverted, size: 16 * scale),
                 ],
               ),
             ),

@@ -10,16 +10,8 @@ class FundsSkeletonLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
-
-    final double topPadding = MediaQuery.of(context).padding.top;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return SizedBox(
       width: screenWidth,
@@ -29,7 +21,7 @@ class FundsSkeletonLoader extends StatelessWidget {
         highlightColor: AppColors.shimmerHighlight,
         child: Padding(
           padding: EdgeInsets.only(
-            top: topPadding + 8.0,
+            top: screenHeight * 0.01,
             left: screenWidth * 0.04,
             right: screenWidth * 0.04,
             bottom: screenHeight * 0.03,
@@ -48,8 +40,8 @@ class FundsSkeletonLoader extends StatelessWidget {
               Expanded(
                 child: PageView(
                   physics: const NeverScrollableScrollPhysics(),
-                  children: List.generate(
-                      1, (_) => _buildSkeletonPage(context)),
+                  children:
+                      List.generate(1, (_) => _buildSkeletonPage(context)),
                 ),
               ),
             ],
@@ -60,14 +52,8 @@ class FundsSkeletonLoader extends StatelessWidget {
   }
 
   Widget _buildSkeletonPage(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return SingleChildScrollView(
       child: Column(
@@ -107,27 +93,29 @@ class FundsSkeletonLoader extends StatelessWidget {
           ),
           SizedBox(height: screenHeight * 0.015),
           Column(
-            children: List.generate(5, (index) =>
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: screenHeight * 0.0012),
-                  child: Container(
-                    width: index == 4 ? screenWidth * 0.6 : screenWidth * 0.9,
-                    height: screenHeight * 0.014,
-                    decoration: BoxDecoration(
-                      color: AppColors.shimmerBase,
-                      borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                    ),
-                  ),
-                )),
+            children: List.generate(
+                5,
+                (index) => Padding(
+                      padding:
+                          EdgeInsets.symmetric(vertical: screenHeight * 0.0012),
+                      child: Container(
+                        width:
+                            index == 4 ? screenWidth * 0.6 : screenWidth * 0.9,
+                        height: screenHeight * 0.014,
+                        decoration: BoxDecoration(
+                          color: AppColors.shimmerBase,
+                          borderRadius:
+                              BorderRadius.circular(screenWidth * 0.02),
+                        ),
+                      ),
+                    )),
           ),
         ],
       ),
     );
   }
 
-  Widget _line(double width, double height, double screenWidth) =>
-      Container(
+  Widget _line(double width, double height, double screenWidth) => Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
@@ -146,49 +134,51 @@ class FundsSkeletonLoader extends StatelessWidget {
         ),
       );
 
-  Widget _wrapChecks(double screenWidth) =>
-      Wrap(
+  Widget _wrapChecks(double screenWidth) => Wrap(
         spacing: screenWidth * 0.012,
         runSpacing: screenWidth * 0.012,
-        children: List.generate(6, (index) =>
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: screenWidth * 0.05,
-                  height: screenWidth * 0.05,
+        children: List.generate(
+            6,
+            (index) => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: screenWidth * 0.05,
+                      height: screenWidth * 0.05,
+                      decoration: BoxDecoration(
+                        color: AppColors.shimmerBase,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    SizedBox(width: screenWidth * 0.01),
+                    Container(
+                      width: ((screenWidth -
+                                  2 * screenWidth * 0.04 -
+                                  screenWidth * 0.024) /
+                              2) -
+                          (screenWidth * 0.05 + screenWidth * 0.01),
+                      height: screenWidth * 0.03,
+                      decoration: BoxDecoration(
+                        color: AppColors.shimmerBase,
+                        borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                      ),
+                    ),
+                  ],
+                )),
+      );
+
+  Widget _dots(double screenWidth) => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(
+            4,
+            (index) => Container(
+                  margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.004),
+                  width: screenWidth * 0.032,
+                  height: screenWidth * 0.032,
                   decoration: BoxDecoration(
                     color: AppColors.shimmerBase,
                     shape: BoxShape.circle,
                   ),
-                ),
-                SizedBox(width: screenWidth * 0.01),
-                Container(
-                  width: ((screenWidth - 2 * screenWidth * 0.04 -
-                      screenWidth * 0.024) / 2) -
-                      (screenWidth * 0.05 + screenWidth * 0.01),
-                  height: screenWidth * 0.03,
-                  decoration: BoxDecoration(
-                    color: AppColors.shimmerBase,
-                    borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                  ),
-                ),
-              ],
-            )),
-      );
-
-  Widget _dots(double screenWidth) =>
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(4, (index) =>
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.004),
-              width: screenWidth * 0.032,
-              height: screenWidth * 0.032,
-              decoration: BoxDecoration(
-                color: AppColors.shimmerBase,
-                shape: BoxShape.circle,
-              ),
-            )),
+                )),
       );
 }

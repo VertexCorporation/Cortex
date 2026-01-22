@@ -1,6 +1,5 @@
 // funds.dart
 
-
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
@@ -10,6 +9,7 @@ import 'package:cortex/funds/widgets/skeleton.dart';
 import 'package:cortex/funds/widgets/subscriptions.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -110,11 +110,11 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
       _purchaseCompletedSubscription =
           _backend.onPurchaseCompleted.listen((String purchasedProductId) {
-            if (mounted) {
-              _confettiController.play();
-              _updateUiAfterPurchase(purchasedProductId);
-            }
-          });
+        if (mounted) {
+          _confettiController.play();
+          _updateUiAfterPurchase(purchasedProductId);
+        }
+      });
     });
   }
 
@@ -160,8 +160,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final bool hasDataChanged = newLevel != _uiActiveSubscriptionLevel ||
         newOption != _uiActiveSubscriptionOption;
     if (hasDataChanged) {
-      log(
-          "Real backend data change detected. Syncing UI Brain. New state: L$newLevel '$newOption'.",
+      log("Real backend data change detected. Syncing UI Brain. New state: L$newLevel '$newOption'.",
           name: "FundsScreenView");
       setState(() {
         _uiActiveSubscriptionLevel = newLevel;
@@ -216,8 +215,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     }
 
     if (planType != null && billingOption != null && planLevel != null) {
-      log(
-          "Proactive UI Update: Purchase of '$purchasedProductId' detected. Updating UI Brain.",
+      log("Proactive UI Update: Purchase of '$purchasedProductId' detected. Updating UI Brain.",
           name: "FundsScreenView");
       setState(() {
         // 1. Update the selection map (for the blue border)
@@ -232,13 +230,11 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   void _onPrimaryButtonPressed() {
     final backend = Provider.of<FundsBackend>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
-    final isAnonymous = context
-        .read<UserProvider>()
-        .isAnonymous;
+    final isAnonymous = context.read<UserProvider>().isAnonymous;
 
     if (isAnonymous) {
-      navigateToScreen(
-          const UpgradeAccountScreen(), direction: const Offset(0.0, 1.0));
+      navigateToScreen(const UpgradeAccountScreen(),
+          direction: const Offset(0.0, 1.0));
       FocusScope.of(context).unfocus();
       return;
     }
@@ -288,7 +284,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     if (productIdToPurchase != null) {
       try {
         final productDetails =
-        backend.allProducts.firstWhere((p) => p.id == productIdToPurchase);
+            backend.allProducts.firstWhere((p) => p.id == productIdToPurchase);
         backend.purchase(productDetails);
       } catch (e) {
         log('Attempted to purchase a product not found: $productIdToPurchase',
@@ -320,11 +316,11 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     if (mounted) {
       Provider.of<IntrovertNotificationService>(context, listen: false)
           .showNotification(
-          message: message,
-          type: isSuccess,
-          oneLine: false,
-          fontSize: 0.025,
-          bottomOffset: 0.01);
+              message: message,
+              type: isSuccess,
+              oneLine: false,
+              fontSize: 0.025,
+              bottomOffset: 0.01);
     }
   }
 
@@ -346,8 +342,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                 child: backend.hasError
                     ? _buildErrorScreen(context, backend.errorMessage!)
                     : backend.isLoading
-                    ? const FundsSkeletonLoader(key: ValueKey('skeleton'))
-                    : _buildMainContent(context, backend),
+                        ? const FundsSkeletonLoader(key: ValueKey('skeleton'))
+                        : _buildMainContent(context, backend),
               ),
             ),
             Align(
@@ -379,9 +375,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   Widget _buildErrorScreen(BuildContext context, String message) {
     final localizations = AppLocalizations.of(context)!;
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    final screenSize = MediaQuery.of(context).size;
     return SafeArea(
       key: const ValueKey('error_screen'),
       child: Padding(
@@ -403,8 +397,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   ),
                   SizedBox(height: screenSize.height * 0.04),
                   Padding(
-                    padding:
-                    EdgeInsets.symmetric(horizontal: screenSize.width * 0.05),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: screenSize.width * 0.05),
                     child: Text(
                       message,
                       style: TextStyle(
@@ -417,8 +411,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   SizedBox(height: screenSize.height * 0.05),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                      AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+                      backgroundColor: AppColors.primaryColor.inverted
+                          .withValues(alpha: 0.1),
                       foregroundColor: AppColors.primaryColor.inverted,
                       padding: EdgeInsets.symmetric(
                           horizontal: screenSize.width * 0.1,
@@ -427,11 +421,12 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                           borderRadius: BorderRadius.circular(12.0)),
                     ),
                     onPressed: () {
+                      HapticFeedback.lightImpact();
                       final backend =
-                      Provider.of<FundsBackend>(context, listen: false);
+                          Provider.of<FundsBackend>(context, listen: false);
                       final notificationService =
-                      Provider.of<IntrovertNotificationService>(context,
-                          listen: false);
+                          Provider.of<IntrovertNotificationService>(context,
+                              listen: false);
                       backend.initialize(
                           notificationService: notificationService,
                           localizations: localizations);
@@ -452,18 +447,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   Widget _buildMainContent(BuildContext context, FundsBackend backend) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
-    final double topPadding = MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final double topPadding = MediaQuery.of(context).padding.top;
 
     if (!backend.isLoading && !_isContentLoaded) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -490,14 +476,13 @@ class _FundsScreenViewState extends State<FundsScreenView> {
               children: [
                 Padding(
                   padding: EdgeInsets.only(
-                    top: topPadding + 8.0,
+                    top: topPadding + screenHeight * 0.01,
                     bottom: screenHeight * 0.015,
                   ),
                   child: Center(
                     child: _buildFixedDiscountBadge(context, screenWidth),
                   ),
                 ),
-
                 Expanded(
                   child: PageView(
                     controller: _pageController,
@@ -508,7 +493,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                           planType: _planTypes[i],
                           availableProducts: backend.subscriptionProducts,
                           selectedBillingOption:
-                          _selectedBillingOptions[_planTypes[i]]!,
+                              _selectedBillingOptions[_planTypes[i]]!,
                           activeSubscriptionLevel: _uiActiveSubscriptionLevel,
                           activeSubscriptionOption: _uiActiveSubscriptionOption,
                           onBillingOptionChanged: (newOption) {
@@ -530,22 +515,18 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                     ],
                   ),
                 ),
-
                 Padding(
                   padding: EdgeInsets.fromLTRB(
                       screenWidth * 0.06,
                       screenHeight * 0.01,
                       screenWidth * 0.06,
-                      screenHeight * 0.02 + MediaQuery
-                          .of(context)
-                          .padding
-                          .bottom),
+                      screenHeight * 0.02 +
+                          MediaQuery.of(context).padding.bottom),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildPageIndicator(screenWidth),
                       SizedBox(height: screenHeight * 0.02),
-
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 250),
                         curve: Curves.easeInOut,
@@ -558,24 +539,26 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                             backend.isPurchasePending ? 0.98 : 1.0,
                           ),
                         child: ElevatedButton(
-                          onPressed:
-                          (backend.isPurchasePending || _isEmulator)
+                          onPressed: (backend.isPurchasePending || _isEmulator)
                               ? null
-                              : _onPrimaryButtonPressed,
+                              : () {
+                                  HapticFeedback.lightImpact();
+                                  _onPrimaryButtonPressed();
+                                },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: AppColors.primaryColor,
                             backgroundColor: AppColors.primaryColor.inverted,
-                            disabledBackgroundColor: AppColors.primaryColor
-                                .inverted
+                            disabledBackgroundColor: AppColors
+                                .primaryColor.inverted
                                 .withValues(alpha: 0.6),
-                            disabledForegroundColor: AppColors.primaryColor
-                                .withValues(alpha: 0.6),
+                            disabledForegroundColor:
+                                AppColors.primaryColor.withValues(alpha: 0.6),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30)),
                             padding: EdgeInsets.symmetric(
                                 vertical: screenHeight * 0.02),
                             minimumSize:
-                            Size(double.infinity, screenHeight * 0.06),
+                                Size(double.infinity, screenHeight * 0.06),
                             splashFactory: backend.isPurchasePending
                                 ? NoSplash.splashFactory
                                 : InkSplash.splashFactory,
@@ -593,47 +576,46 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                                     color: AppColors.primaryColor,
                                   ),
                                 )
-                              else
-                                ...[
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 250),
-                                    child: _buildButtonText(
-                                        context, backend, screenWidth),
-                                  ),
-                                  if (_isEmulator) ...[
-                                    SizedBox(height: screenHeight * 0.002),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: screenWidth * 0.04),
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          localizations.emulatorModeWarning,
-                                          textAlign: TextAlign.center,
-                                          maxLines: 3,
-                                          style: TextStyle(
-                                            fontSize: screenWidth * 0.025,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.primaryColor
-                                                .withValues(alpha: 0.8),
-                                          ),
+                              else ...[
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 250),
+                                  child: _buildButtonText(
+                                      context, backend, screenWidth),
+                                ),
+                                if (_isEmulator) ...[
+                                  SizedBox(height: screenHeight * 0.002),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.04),
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        localizations.emulatorModeWarning,
+                                        textAlign: TextAlign.center,
+                                        maxLines: 3,
+                                        style: TextStyle(
+                                          fontSize: screenWidth * 0.025,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.primaryColor
+                                              .withValues(alpha: 0.8),
                                         ),
                                       ),
                                     ),
-                                  ]
+                                  ),
                                 ]
+                              ]
                             ],
                           ),
                         ),
                       ),
-
                       SizedBox(height: screenHeight * 0.002),
                       TextButton(
                         onPressed: backend.isPurchasePending
                             ? null
                             : () async {
-                          await backend.restorePurchases();
-                        },
+                                HapticFeedback.lightImpact();
+                                await backend.restorePurchases();
+                              },
                         child: Text(
                           localizations.restorePurchases,
                           style: TextStyle(
@@ -645,7 +627,10 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       ),
                       SizedBox(height: screenHeight * 0.002),
                       TextButton(
-                        onPressed: _showTermsAndConditions,
+                        onPressed: () {
+                          HapticFeedback.lightImpact();
+                          _showTermsAndConditions();
+                        },
                         style: TextButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6.0),
@@ -761,8 +746,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     );
   }
 
-  Widget _buildButtonText(BuildContext context, FundsBackend backend,
-      double screenWidth) {
+  Widget _buildButtonText(
+      BuildContext context, FundsBackend backend, double screenWidth) {
     final localizations = AppLocalizations.of(context)!;
     final textStyle = TextStyle(
         fontSize: screenWidth * 0.042,

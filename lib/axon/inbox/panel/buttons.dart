@@ -1,6 +1,7 @@
 // lib/inbox/widgets/tiles/actions/buttons.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 /// A styled button for use inside the [ActionPanel].
@@ -39,10 +40,13 @@ class ActionPanelButton extends StatelessWidget {
     final double iconContainerSize = screenWidth * 0.05;
 
     return TextButton(
-      onPressed: onPressed,
+      onPressed: () {
+        HapticFeedback.lightImpact();
+        onPressed();
+      },
       style: TextButton.styleFrom(
         // Use the button's foregroundColor property for the ripple effect.
-        foregroundColor: textColor.withValues(alpha:0.1),
+        foregroundColor: textColor.withValues(alpha: 0.1),
         padding: EdgeInsets.symmetric(
           vertical: screenWidth * 0.03,
           horizontal: screenWidth * 0.03,
@@ -53,11 +57,13 @@ class ActionPanelButton extends StatelessWidget {
         // Align content to the start (left).
         alignment: Alignment.centerLeft,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0), // Subtle rounded corners for the ripple
+          borderRadius: BorderRadius.circular(
+              8.0), // Subtle rounded corners for the ripple
         ),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min, // The row should only be as wide as its content.
+        mainAxisSize:
+            MainAxisSize.min, // The row should only be as wide as its content.
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Only build the icon container if an icon asset is provided.

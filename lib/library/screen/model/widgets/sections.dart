@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cortex/app.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,10 +28,7 @@ class SectionContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -51,10 +49,7 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Text(
       title,
       style: TextStyle(
@@ -75,10 +70,7 @@ class SummarySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return SectionContainer(
       child: Column(
@@ -109,10 +101,7 @@ class DescriptionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final fullDescription = provider.displayDescription;
 
     const collapsedHeight = 100.0;
@@ -125,8 +114,7 @@ class DescriptionSection extends StatelessWidget {
       text: TextSpan(text: fullDescription, style: textStyle),
       maxLines: null,
       textDirection: TextDirection.ltr,
-    )
-      ..layout(maxWidth: screenWidth - (screenWidth * 0.16));
+    )..layout(maxWidth: screenWidth - (screenWidth * 0.16));
 
     final bool isOverflowing = textPainter.size.height > collapsedHeight;
     final isExpanded = provider.isDescriptionExpanded;
@@ -141,7 +129,10 @@ class DescriptionSection extends StatelessWidget {
               _SectionTitle(title: localizations.descriptionSection),
               if (isOverflowing)
                 InkWell(
-                  onTap: provider.toggleDescriptionExpanded,
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    provider.toggleDescriptionExpanded();
+                  },
                   borderRadius: BorderRadius.circular(100),
                   child: Padding(
                     padding: const EdgeInsets.all(4.0),
@@ -216,8 +207,8 @@ class _ParsedText extends StatelessWidget {
     // 1. **Bold** -> (\*\*(.*?)\*\*)
     // 2. [Label](url) -> (\[([^\]]+)\]\(([^)]+)\))
     // 3. Raw URL -> (https?://\S+)
-    final combinedRegExp = RegExp(
-        r'(\*\*(.*?)\*\*)|(\[([^\]]+)\]\(([^)]+)\))|(https?://\S+)');
+    final combinedRegExp =
+        RegExp(r'(\*\*(.*?)\*\*)|(\[([^\]]+)\]\(([^)]+)\))|(https?://\S+)');
 
     final spans = <TextSpan>[];
     int lastEnd = 0;
@@ -246,8 +237,7 @@ class _ParsedText extends StatelessWidget {
             text: label,
             style: linkStyle,
             recognizer: TapGestureRecognizer()
-              ..onTap = () async => _launchUrl(href)
-        ));
+              ..onTap = () async => _launchUrl(href)));
       } else {
         // --- RAW URL HANDLING ---
         // Group 6 is the raw URL
@@ -256,8 +246,7 @@ class _ParsedText extends StatelessWidget {
             text: url,
             style: linkStyle,
             recognizer: TapGestureRecognizer()
-              ..onTap = () async => _launchUrl(url)
-        ));
+              ..onTap = () async => _launchUrl(url)));
       }
 
       lastEnd = match.end;
@@ -300,20 +289,15 @@ class BaseModelSelectionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     if (provider.availableBaseModels.isEmpty) return const SizedBox.shrink();
 
     final rawSelectedTitle = provider.selectedBaseModel?.displayTitle;
     final selectedModelTitle =
-    (rawSelectedTitle == null || rawSelectedTitle
-        .trim()
-        .isEmpty)
-        ? localizations.selectBaseModel
-        : ModelDataUtils.cleanTitle(rawSelectedTitle);
+        (rawSelectedTitle == null || rawSelectedTitle.trim().isEmpty)
+            ? localizations.selectBaseModel
+            : ModelDataUtils.cleanTitle(rawSelectedTitle);
     final isPremium = provider.selectedBaseModel?.isPremium ?? false;
 
     return SectionContainer(
@@ -332,23 +316,29 @@ class BaseModelSelectionSection extends StatelessWidget {
             color: AppColors.background,
             borderRadius: BorderRadius.circular(screenWidth * 0.02),
             child: InkWell(
-              onTap: provider.toggleBaseModelPanelExpanded,
+              onTap: () {
+                HapticFeedback.lightImpact();
+                provider.toggleBaseModelPanelExpanded();
+              },
               borderRadius: BorderRadius.circular(screenWidth * 0.02),
               child: Padding(
                 padding: EdgeInsets.all(screenWidth * 0.03),
                 child: Row(
                   children: [
-                    Expanded(child: Text(selectedModelTitle, style: TextStyle(
-                        color: AppColors.primaryColor.inverted,
-                        fontSize: screenWidth * 0.04),
-                        overflow: TextOverflow.ellipsis)),
+                    Expanded(
+                        child: Text(selectedModelTitle,
+                            style: TextStyle(
+                                color: AppColors.primaryColor.inverted,
+                                fontSize: screenWidth * 0.04),
+                            overflow: TextOverflow.ellipsis)),
                     if (isPremium)
                       Padding(
                         padding: EdgeInsets.only(right: screenWidth * 0.02),
                         child: SvgPicture.asset('assets/icons/sparkle.svg',
                             width: screenWidth * 0.05,
-                            colorFilter: ColorFilter.mode(AppColors.primaryColor
-                                .inverted.withValues(alpha: 0.8),
+                            colorFilter: ColorFilter.mode(
+                                AppColors.primaryColor.inverted
+                                    .withValues(alpha: 0.8),
                                 BlendMode.srcIn)),
                       ),
                     AnimatedRotation(
@@ -376,13 +366,8 @@ class BaseModelSelectionSection extends StatelessWidget {
 
   /// Builds the list of selectable base models.
   Widget _buildBaseModelList(BuildContext context, ModelService modelService) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final langCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final langCode = Localizations.localeOf(context).languageCode;
 
     final List<Widget> variantListTiles = [];
 
@@ -417,13 +402,17 @@ class BaseModelSelectionSection extends StatelessWidget {
                 style: TextStyle(color: AppColors.primaryColor.inverted),
               ),
               trailing: variantEntity.isPremium
-                  ? SvgPicture.asset(
-                  'assets/icons/sparkle.svg', width: screenWidth * 0.05,
-                  colorFilter: ColorFilter.mode(
-                      AppColors.primaryColor.inverted.withValues(alpha: 0.8),
-                      BlendMode.srcIn))
+                  ? SvgPicture.asset('assets/icons/sparkle.svg',
+                      width: screenWidth * 0.05,
+                      colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted
+                              .withValues(alpha: 0.8),
+                          BlendMode.srcIn))
                   : null,
-              onTap: () => provider.selectBaseModel(context, variantId),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                provider.selectBaseModel(context, variantId);
+              },
             ),
           );
         }
@@ -432,10 +421,7 @@ class BaseModelSelectionSection extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.only(top: screenWidth * 0.02),
-      height: MediaQuery
-          .of(context)
-          .size
-          .height * 0.25,
+      height: MediaQuery.of(context).size.height * 0.25,
       decoration: BoxDecoration(
         color: AppColors.background.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(screenWidth * 0.02),
@@ -457,10 +443,7 @@ class FeaturesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     final featureDetails = {
       'photo': [

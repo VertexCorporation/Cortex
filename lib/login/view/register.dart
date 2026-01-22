@@ -5,10 +5,12 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../shake.dart';
 
 class RegisterForm extends StatefulWidget {
-  final Future<void> Function(String username, String email, String password) onSubmit;
+  final Future<void> Function(String username, String email, String password)
+      onSubmit;
   final VoidCallback onInputChanged;
   final bool isLoading;
   final bool agreeToTerms;
@@ -48,7 +50,8 @@ class _RegisterFormState extends State<RegisterForm> {
   String _username = '';
   String _email = '';
   String _password = '';
-  final RegExp _usernameRegExp = RegExp(r'^[a-z0-9çğıöşü._-]{3,20}$', caseSensitive: false);
+  final RegExp _usernameRegExp =
+      RegExp(r'^[a-z0-9çğıöşü._-]{3,20}$', caseSensitive: false);
 
   @override
   void initState() {
@@ -61,13 +64,16 @@ class _RegisterFormState extends State<RegisterForm> {
   @override
   void didUpdateWidget(RegisterForm oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.usernameError != null && widget.usernameError != oldWidget.usernameError) {
+    if (widget.usernameError != null &&
+        widget.usernameError != oldWidget.usernameError) {
       _formKey.currentState?.validate();
     }
-    if (widget.emailError != null && widget.emailError != oldWidget.emailError) {
+    if (widget.emailError != null &&
+        widget.emailError != oldWidget.emailError) {
       _formKey.currentState?.validate();
     }
-    if (widget.passwordError != null && widget.passwordError != oldWidget.passwordError) {
+    if (widget.passwordError != null &&
+        widget.passwordError != oldWidget.passwordError) {
       _formKey.currentState?.validate();
     }
   }
@@ -138,29 +144,37 @@ class _RegisterFormState extends State<RegisterForm> {
               cursorColor: AppColors.primaryColor.inverted,
               style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color,
-                  fontSize: 14 * widget.fontScale
-              ),
+                  fontSize: 14 * widget.fontScale),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: AppColors.secondaryColor,
                 labelText: l10n.username,
                 labelStyle: TextStyle(
                     color: Theme.of(context).textTheme.bodySmall?.color,
-                    fontSize: 14 * widget.fontScale
-                ),
-                prefixIcon: Icon(Icons.person, color: Theme.of(context).iconTheme.color, size: 24 * widget.fontScale),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10 * widget.fontScale), borderSide: BorderSide.none),
+                    fontSize: 14 * widget.fontScale),
+                prefixIcon: Icon(Icons.person,
+                    color: Theme.of(context).iconTheme.color,
+                    size: 24 * widget.fontScale),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10 * widget.fontScale),
+                    borderSide: BorderSide.none),
                 counterText: '',
                 errorMaxLines: 3,
                 errorStyle: TextStyle(fontSize: 12 * widget.fontScale),
-                contentPadding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale, horizontal: 12 * widget.fontScale),
+                contentPadding: EdgeInsets.symmetric(
+                    vertical: 14 * widget.fontScale,
+                    horizontal: 12 * widget.fontScale),
               ),
               maxLength: 20,
               validator: (value) {
                 if (widget.usernameError != null) return widget.usernameError;
-                if (value == null || value.trim().length < 3) return l10n.usernameTooShort;
+                if (value == null || value.trim().length < 3) {
+                  return l10n.usernameTooShort;
+                }
                 if (value.trim().length > 20) return l10n.usernameTooLong;
-                if (!_usernameRegExp.hasMatch(value.trim())) return l10n.invalidUsernameCharacters;
+                if (!_usernameRegExp.hasMatch(value.trim())) {
+                  return l10n.invalidUsernameCharacters;
+                }
                 return null;
               },
               onSaved: (value) => _username = value!.trim().toLowerCase(),
@@ -178,27 +192,33 @@ class _RegisterFormState extends State<RegisterForm> {
               cursorColor: AppColors.primaryColor.inverted,
               style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color,
-                  fontSize: 14 * widget.fontScale
-              ),
+                  fontSize: 14 * widget.fontScale),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: AppColors.secondaryColor,
                 labelText: l10n.email,
                 labelStyle: TextStyle(
                     color: Theme.of(context).textTheme.bodySmall?.color,
-                    fontSize: 14 * widget.fontScale
-                ),
-                prefixIcon: Icon(Icons.email, color: Theme.of(context).iconTheme.color, size: 24 * widget.fontScale),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10 * widget.fontScale), borderSide: BorderSide.none),
+                    fontSize: 14 * widget.fontScale),
+                prefixIcon: Icon(Icons.email,
+                    color: Theme.of(context).iconTheme.color,
+                    size: 24 * widget.fontScale),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10 * widget.fontScale),
+                    borderSide: BorderSide.none),
                 counterText: '',
                 errorMaxLines: 3,
                 errorStyle: TextStyle(fontSize: 12 * widget.fontScale),
-                contentPadding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale, horizontal: 12 * widget.fontScale),
+                contentPadding: EdgeInsets.symmetric(
+                    vertical: 14 * widget.fontScale,
+                    horizontal: 12 * widget.fontScale),
               ),
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
                 if (widget.emailError != null) return widget.emailError;
-                if (value == null || !EmailValidator.validate(value.trim())) return l10n.invalidEmail;
+                if (value == null || !EmailValidator.validate(value.trim())) {
+                  return l10n.invalidEmail;
+                }
                 return null;
               },
               onSaved: (value) => _email = value!.trim(),
@@ -216,41 +236,51 @@ class _RegisterFormState extends State<RegisterForm> {
               cursorColor: AppColors.primaryColor.inverted,
               style: TextStyle(
                   color: Theme.of(context).textTheme.bodyLarge?.color,
-                  fontSize: 14 * widget.fontScale
-              ),
+                  fontSize: 14 * widget.fontScale),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: AppColors.secondaryColor,
                 labelText: l10n.password,
                 labelStyle: TextStyle(
                     color: Theme.of(context).textTheme.bodySmall?.color,
-                    fontSize: 14 * widget.fontScale
-                ),
-                prefixIcon: Icon(Icons.lock_outline, color: Theme.of(context).iconTheme.color, size: 24 * widget.fontScale),
+                    fontSize: 14 * widget.fontScale),
+                prefixIcon: Icon(Icons.lock_outline,
+                    color: Theme.of(context).iconTheme.color,
+                    size: 24 * widget.fontScale),
                 suffixIcon: IconButton(
                   icon: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+                    transitionBuilder: (child, animation) =>
+                        FadeTransition(opacity: animation, child: child),
                     child: Icon(
-                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                       key: ValueKey(_isPasswordVisible ? 'icon1' : 'icon2'),
                       color: Theme.of(context).iconTheme.color,
                       size: 24 * widget.fontScale,
                     ),
                   ),
-                  onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                  onPressed: () =>
+                      setState(() => _isPasswordVisible = !_isPasswordVisible),
                 ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10 * widget.fontScale), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10 * widget.fontScale),
+                    borderSide: BorderSide.none),
                 counterText: '',
                 errorMaxLines: 3,
                 errorStyle: TextStyle(fontSize: 12 * widget.fontScale),
-                contentPadding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale, horizontal: 12 * widget.fontScale),
+                contentPadding: EdgeInsets.symmetric(
+                    vertical: 14 * widget.fontScale,
+                    horizontal: 12 * widget.fontScale),
               ),
               obscureText: !_isPasswordVisible,
               maxLength: 64,
               validator: (value) {
                 if (widget.passwordError != null) return widget.passwordError;
-                if (value == null || value.length < 6) return l10n.invalidPassword;
+                if (value == null || value.length < 6) {
+                  return l10n.invalidPassword;
+                }
                 return null;
               },
               onSaved: (value) => _password = value!.trim(),
@@ -273,21 +303,24 @@ class _RegisterFormState extends State<RegisterForm> {
                     foregroundColor: AppColors.primaryColor.inverted,
                     disabledBackgroundColor: AppColors.background,
                     disabledForegroundColor: AppColors.primaryColor.inverted,
-                    padding: EdgeInsets.symmetric(vertical: 14 * widget.fontScale),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 14 * widget.fontScale),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10 * widget.fontScale),
+                      borderRadius:
+                          BorderRadius.circular(10 * widget.fontScale),
                     ),
                     elevation: 0,
-                    side: BorderSide(color: AppColors.quinaryColor.withValues(alpha:0.3)),
+                    side: BorderSide(
+                        color: AppColors.quinaryColor.withValues(alpha: 0.3)),
                   ),
-                  onPressed: _submitForm,
-                  child: Text(
-                      l10n.signUp,
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    _submitForm();
+                  },
+                  child: Text(l10n.signUp,
                       style: TextStyle(
                           fontSize: 16 * widget.fontScale,
-                          fontWeight: FontWeight.bold
-                      )
-                  ),
+                          fontWeight: FontWeight.bold)),
                 ),
               ),
             ),

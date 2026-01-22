@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../../theme.dart';
 import 'buttons.dart';
 
@@ -37,7 +38,9 @@ ActionPanelController showActionPanel({
   double left = touchPosition.dx - (panelWidth / 2);
 
   if (left < 10) left = 10;
-  if (left + panelWidth > screenWidth - 10) left = screenWidth - panelWidth - 10;
+  if (left + panelWidth > screenWidth - 10) {
+    left = screenWidth - panelWidth - 10;
+  }
 
   double top;
   if (openUpwards) {
@@ -62,7 +65,10 @@ ActionPanelController showActionPanel({
     builder: (overlayContext) {
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
-        onTap: () => controller.close(),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          controller.close();
+        },
         onVerticalDragEnd: (_) => controller.close(),
         child: Stack(
           children: [
@@ -155,9 +161,8 @@ class _AnimatedPanelContainerState extends State<_AnimatedPanelContainer>
 
   @override
   Widget build(BuildContext context) {
-    final Alignment origin = widget.openUpwards
-        ? Alignment.bottomCenter
-        : Alignment.topCenter;
+    final Alignment origin =
+        widget.openUpwards ? Alignment.bottomCenter : Alignment.topCenter;
 
     return FadeTransition(
       opacity: _animationController,
@@ -193,8 +198,7 @@ class _AnimatedPanelContainerState extends State<_AnimatedPanelContainer>
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 for (int i = 0; i < widget.buttons.length; i++) ...[
-                  if (i > 0)
-                    const SizedBox(height: 6),
+                  if (i > 0) const SizedBox(height: 6),
                   widget.buttons[i],
                 ],
               ],

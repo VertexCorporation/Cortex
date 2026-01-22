@@ -89,30 +89,42 @@ class AxonContent extends StatelessWidget {
         ),
 
         // --- 2. MENU ---
+        // OPTIMIZATION: We keep the menu in the tree but collapse it.
+        // This allows the "Slide Up" animation to play out visually
+        // instead of instantly disappearing.
         AnimatedSize(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOutCubic,
           alignment: Alignment.topCenter,
-          child: isSearchActive
-              ? const SizedBox(width: double.infinity, height: 0)
-              : AnimatedSlide(
-                  offset: isSearchActive ? const Offset(0, -0.2) : Offset.zero,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOut,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 300),
-                    opacity: isSearchActive ? 0.0 : 1.0,
-                    child: AxonMenu(
-                      referenceWidth: referenceWidth,
-                      screenHeight: screenHeight,
-                      activeTab: activeTab,
-                      isNewChatActive: isNewChatActive,
-                      onNewChatTap: onNewChatTap,
-                      onLibraryTap: onLibraryTap,
-                      onNewsTap: onNewsTap,
-                    ),
+          child: SizedBox(
+            // When search is active, we collapse the height to 0.
+            // But the child remains "alive" to animate its slide/opacity.
+            width: double.infinity,
+            height: isSearchActive ? 0.0 : null,
+            child: AnimatedSlide(
+              // Slide slightly UP when disappearing (-0.2)
+              offset: isSearchActive ? const Offset(0, -0.2) : Offset.zero,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+              child: AnimatedOpacity(
+                // Fade out
+                opacity: isSearchActive ? 0.0 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                child: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: AxonMenu(
+                    referenceWidth: referenceWidth,
+                    screenHeight: screenHeight,
+                    activeTab: activeTab,
+                    isNewChatActive: isNewChatActive,
+                    onNewChatTap: onNewChatTap,
+                    onLibraryTap: onLibraryTap,
+                    onNewsTap: onNewsTap,
                   ),
                 ),
+              ),
+            ),
+          ),
         ),
 
         // --- 3. DIVIDER ---

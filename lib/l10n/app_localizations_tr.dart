@@ -1592,4 +1592,11 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get listening => 'Dinliyor';
+
+  @override
+  String get defaultViewTitle => 'Naber?';
+
+  @override
+  String get defaultViewDescription =>
+      'Cortex içerisindeki yüzlerce yapay zekayla, internetsiz çalışma özelliğiyle, dinamik sohbetiyle ve çok daha fazlasıyla her zaman yanında.';
 }

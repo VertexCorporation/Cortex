@@ -1,6 +1,7 @@
 // cancel.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AnimatedCancelButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -28,7 +29,8 @@ class AnimatedCancelButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final effectiveWidth = width == double.infinity ? constraints.maxWidth : width;
+        final effectiveWidth =
+            width == double.infinity ? constraints.maxWidth : width;
         final dynamicStrokeWidth = effectiveWidth * strokeFactor;
         return SizedBox(
           width: width,
@@ -38,7 +40,10 @@ class AnimatedCancelButton extends StatelessWidget {
             strokeWidth: dynamicStrokeWidth,
             borderRadius: borderRadius,
             child: ElevatedButton(
-              onPressed: onPressed,
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                onPressed();
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
                 shape: RoundedRectangleBorder(
@@ -85,7 +90,8 @@ class AnimatedBorder extends StatefulWidget {
   AnimatedBorderState createState() => AnimatedBorderState();
 }
 
-class AnimatedBorderState extends State<AnimatedBorder> with SingleTickerProviderStateMixin {
+class AnimatedBorderState extends State<AnimatedBorder>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -133,13 +139,15 @@ class RotatingBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
-    final RRect rrect = RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
+    final RRect rrect =
+        RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
     final path = Path()..addRRect(rrect);
 
     // Calculate total border length and dash segment length (40% of total)
     final metrics = path.computeMetrics().toList();
     if (metrics.isEmpty) return;
-    final totalLength = metrics.fold<double>(0, (prev, metric) => prev + metric.length);
+    final totalLength =
+        metrics.fold<double>(0, (prev, metric) => prev + metric.length);
     final dashLength = totalLength * 0.4;
     final offset = animation.value * totalLength;
 
@@ -156,7 +164,9 @@ class RotatingBorderPainter extends CustomPainter {
       final double extractLength = (currentOffset + remaining <= metric.length)
           ? remaining
           : metric.length - currentOffset;
-      dashedPath.addPath(metric.extractPath(currentOffset, currentOffset + extractLength), Offset.zero);
+      dashedPath.addPath(
+          metric.extractPath(currentOffset, currentOffset + extractLength),
+          Offset.zero);
       remaining -= extractLength;
       if (remaining <= 0) break;
       currentOffset = 0;
@@ -164,8 +174,10 @@ class RotatingBorderPainter extends CustomPainter {
     // Wrap-around: if part of the dash spills over, extract from the start.
     if (remaining > 0 && metrics.isNotEmpty) {
       final firstMetric = metrics.first;
-      final double extractLength = remaining.clamp(0, firstMetric.length).toDouble();
-      dashedPath.addPath(firstMetric.extractPath(0.0, extractLength), Offset.zero);
+      final double extractLength =
+          remaining.clamp(0, firstMetric.length).toDouble();
+      dashedPath.addPath(
+          firstMetric.extractPath(0.0, extractLength), Offset.zero);
     }
 
     final paint = Paint()

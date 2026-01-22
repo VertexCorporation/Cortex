@@ -2,6 +2,7 @@
 
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../../../funds/funds.dart';
 import '../../../../../l10n/app_localizations.dart';
@@ -87,20 +88,20 @@ class _WarningOverlaysState extends State<WarningOverlays>
       child: warningWidgets.isEmpty
           ? const SizedBox.shrink(key: ValueKey('empty'))
           : Padding(
-        padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * 0.04),
-        child: Column(
-          key: const ValueKey('warnings'),
-          mainAxisSize: MainAxisSize.min,
-          children: List.generate(
-            warningWidgets.length,
-                (index) => Padding(
-              padding: EdgeInsets.only(top: index > 0 ? 8.0 : 0.0),
-              child: warningWidgets[index],
+              padding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.04),
+              child: Column(
+                key: const ValueKey('warnings'),
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(
+                  warningWidgets.length,
+                  (index) => Padding(
+                    padding: EdgeInsets.only(top: index > 0 ? 8.0 : 0.0),
+                    child: warningWidgets[index],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -127,9 +128,14 @@ class _WarningOverlaysState extends State<WarningOverlays>
               center: Alignment.center,
               transform: GradientRotation(_rgbController.value * 2 * 3.14159),
               colors: const [
-                Color(0xFFFF0000), Color(0xFFFF7F00), Color(0xFFFFFF00),
-                Color(0xFF00FF00), Color(0xFF0000FF), Color(0xFF4B0082),
-                Color(0xFF9400D3), Color(0xFFFF0000),
+                Color(0xFFFF0000),
+                Color(0xFFFF7F00),
+                Color(0xFFFFFF00),
+                Color(0xFF00FF00),
+                Color(0xFF0000FF),
+                Color(0xFF4B0082),
+                Color(0xFF9400D3),
+                Color(0xFFFF0000),
               ],
             ),
           ),
@@ -140,7 +146,11 @@ class _WarningOverlaysState extends State<WarningOverlays>
         color: AppColors.secondaryColor,
         borderRadius: BorderRadius.circular(borderRadius - borderThickness),
         child: InkWell(
-          onTap: () => navigateToScreen(const FundsScreen(), direction: const Offset(0.0, 1.0)),
+          onTap: () {
+            HapticFeedback.lightImpact();
+            navigateToScreen(const FundsScreen(),
+                direction: const Offset(0.0, 1.0));
+          },
           borderRadius: BorderRadius.circular(borderRadius - borderThickness),
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -151,7 +161,8 @@ class _WarningOverlaysState extends State<WarningOverlays>
               children: [
                 SvgPicture.asset(
                   'assets/icons/sparkle.svg',
-                  colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                      AppColors.primaryColor.inverted, BlendMode.srcIn),
                   width: iconSize,
                 ),
                 SizedBox(width: internalPaddingHorizontal),
@@ -161,12 +172,18 @@ class _WarningOverlaysState extends State<WarningOverlays>
                     children: [
                       Text(
                         localizations.premiumModelNoticeTitle,
-                        style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, color: AppColors.primaryColor.inverted),
+                        style: TextStyle(
+                            fontSize: titleFontSize,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryColor.inverted),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         localizations.premiumModelNoticeDescription,
-                        style: TextStyle(fontSize: descriptionFontSize, color: AppColors.primaryColor.inverted.withValues(alpha:0.8)),
+                        style: TextStyle(
+                            fontSize: descriptionFontSize,
+                            color: AppColors.primaryColor.inverted
+                                .withValues(alpha: 0.8)),
                       ),
                     ],
                   ),
@@ -211,7 +228,8 @@ class _WarningOverlaysState extends State<WarningOverlays>
             children: [
               SvgPicture.asset(
                 'assets/icons/warning.svg',
-                colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted, BlendMode.srcIn),
                 width: iconSize,
               ),
               SizedBox(width: internalPaddingHorizontal),
@@ -220,7 +238,8 @@ class _WarningOverlaysState extends State<WarningOverlays>
                   text,
                   style: TextStyle(
                     fontSize: textFontSize,
-                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.9),
+                    color:
+                        AppColors.primaryColor.inverted.withValues(alpha: 0.9),
                   ),
                 ),
               ),
@@ -233,7 +252,8 @@ class _WarningOverlaysState extends State<WarningOverlays>
 
   /// Builds the specific banner for localization warnings.
   Widget _buildLocalizationWarningBanner(AppLocalizations localizations) {
-    return _buildWarningBanner(localizations, localizations.localizationWarning);
+    return _buildWarningBanner(
+        localizations, localizations.localizationWarning);
   }
 
   /// Builds the specific banner for experimental offline models, wrapped in a Dismissible and GestureDetector.
@@ -250,13 +270,15 @@ class _WarningOverlaysState extends State<WarningOverlays>
       },
       child: GestureDetector(
         onTap: () {
+          HapticFeedback.lightImpact();
           if (mounted) {
             setState(() {
               _experimentalBannerDismissed = true;
             });
           }
         },
-        child: _buildWarningBanner(localizations, localizations.experimentalOfflineWarning),
+        child: _buildWarningBanner(
+            localizations, localizations.experimentalOfflineWarning),
       ),
     );
   }

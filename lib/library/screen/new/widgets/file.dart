@@ -3,7 +3,8 @@
 import 'dart:io';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path/path.dart' as path;
 
 import '../../../../../l10n/app_localizations.dart';
@@ -58,7 +59,10 @@ class GgufFilePicker extends StatelessWidget {
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: onPickFile,
+            onTap: () {
+              HapticFeedback.lightImpact();
+              onPickFile();
+            },
             borderRadius: BorderRadius.circular(borderRadius),
             child: Container(
               width: double.infinity,
@@ -70,8 +74,10 @@ class GgufFilePicker extends StatelessWidget {
               ),
               child: Center(
                 child: ggufFile != null
-                    ? _buildFileSelectedView(context, isTablet, screenWidth, screenHeight)
-                    : _buildFilePickerPrompt(context, isTablet, screenWidth, screenHeight, localizations),
+                    ? _buildFileSelectedView(
+                        context, isTablet, screenWidth, screenHeight)
+                    : _buildFilePickerPrompt(context, isTablet, screenWidth,
+                        screenHeight, localizations),
               ),
             ),
           ),
@@ -80,11 +86,13 @@ class GgufFilePicker extends StatelessWidget {
     );
   }
 
-  Widget _buildFileSelectedView(BuildContext context, bool isTablet, double w, double h) {
+  Widget _buildFileSelectedView(
+      BuildContext context, bool isTablet, double w, double h) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.check_circle_outline, color: AppColors.senaryColor, size: isTablet ? 80.0 : w * 0.1),
+        Icon(Icons.check_circle_outline,
+            color: AppColors.senaryColor, size: isTablet ? 80.0 : w * 0.1),
         SizedBox(height: h * 0.01),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -103,14 +111,17 @@ class GgufFilePicker extends StatelessWidget {
     );
   }
 
-  Widget _buildFilePickerPrompt(BuildContext context, bool isTablet, double w, double h, AppLocalizations loc) {
+  Widget _buildFilePickerPrompt(BuildContext context, bool isTablet, double w,
+      double h, AppLocalizations loc) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SvgPicture.asset(
           'assets/icons/upload.svg',
           width: isTablet ? 80.0 : w * 0.1,
-          colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted.withValues(alpha:0.8), BlendMode.srcIn),
+          colorFilter: ColorFilter.mode(
+              AppColors.primaryColor.inverted.withValues(alpha: 0.8),
+              BlendMode.srcIn),
         ),
         SizedBox(height: h * 0.01),
         Text(
@@ -134,6 +145,3 @@ class GgufFilePicker extends StatelessWidget {
     );
   }
 }
-
-
-

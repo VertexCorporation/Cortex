@@ -7,12 +7,6 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/chat/providers/session.dart';
 import '../../../../app.dart';
-import '../../../../library/providers/catalog.dart';
-import '../../../../library/providers/local.dart';
-import '../../../../main.dart';
-import '../../services/select.dart';
-import '../widgets/bottom/panels/selection/sheet.dart';
-import 'cards.dart';
 
 class ChatEmptyState extends StatefulWidget {
   const ChatEmptyState({super.key});
@@ -154,15 +148,13 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     // Dimensions
     final double logoSize = isTablet ? screenWidth * 0.15 : screenWidth * 0.22;
     final double verticalSpacing = screenHeight * 0.025;
-    final double cardHeight =
-        isTablet ? screenHeight * 0.08 : screenWidth * 0.14;
+
     final double titleSize = isTablet ? screenWidth * 0.04 : screenWidth * 0.06;
     final double bodyFontSize =
         isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
-    final double iconSize = isTablet ? screenWidth * 0.04 : screenWidth * 0.065;
+
     final double contentMaxWidth = isTablet ? screenWidth * 0.6 : screenWidth;
     final double horizontalPadding = isTablet ? 0 : screenWidth * 0.12;
-    final double gapSize = screenHeight * 0.015;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -246,7 +238,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                             ),
 
                             // Fixed gap
-                            SizedBox(height: verticalSpacing - gapSize),
+                            SizedBox(height: verticalSpacing * 0.4),
 
                             // --- 2. CONTENT AREA (Sliding & Fading) ---
                             Stack(
@@ -264,99 +256,41 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
                                         children: [
-                                          // Greeting
+                                          // Title (Standard)
                                           _buildEntranceItem(
                                             startTime: 0.0,
                                             endTime: 0.5,
                                             child: Text(
-                                              l10n.howCanIHelpWith,
+                                              l10n.defaultViewTitle,
                                               style: TextStyle(
                                                 fontSize: titleSize,
                                                 letterSpacing: 0.5,
                                                 color: contentColor,
-                                                fontWeight: FontWeight.w600,
-                                                height: 1.2,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                               textAlign: TextAlign.center,
                                             ),
                                           ),
-                                          SizedBox(height: verticalSpacing),
+                                          SizedBox(
+                                              height: verticalSpacing * 0.6),
 
-                                          // Buttons
+                                          // Description (Standard)
                                           _buildEntranceItem(
                                             startTime: 0.2,
                                             endTime: 0.7,
-                                            child: DefaultCard(
-                                              text: l10n.explore,
-                                              height: cardHeight,
-                                              iconWidget: Icon(
-                                                Icons.visibility_outlined,
-                                                color: contentColor,
-                                                size: iconSize,
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: logoSize * 0.2),
+                                              child: Text(
+                                                l10n.defaultViewDescription,
+                                                style: TextStyle(
+                                                  fontSize: bodyFontSize,
+                                                  color: contentColor
+                                                      .withValues(alpha: 0.8),
+                                                  height: 1.5,
+                                                ),
+                                                textAlign: TextAlign.center,
                                               ),
-                                              onTap: () {
-                                                showModelSelectionSheet(
-                                                  context: context,
-                                                  localizations: l10n,
-                                                  currentModelId: context
-                                                          .read<
-                                                              ChatSessionProvider>()
-                                                          .modelId ??
-                                                      '',
-                                                  onModelSelected: (String id) {
-                                                    final catalog = context.read<
-                                                        ModelCatalogProvider>();
-                                                    final model = catalog
-                                                        .allModels
-                                                        .firstWhere(
-                                                            (m) => m.id == id);
-                                                    context
-                                                        .read<
-                                                            SelectionService>()
-                                                        .selectModel(model);
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          SizedBox(height: gapSize),
-                                          _buildEntranceItem(
-                                            startTime: 0.4,
-                                            endTime: 0.9,
-                                            child: DefaultCard(
-                                              text: l10n.useOffline,
-                                              height: cardHeight,
-                                              iconWidget: SvgPicture.asset(
-                                                'assets/icons/context.svg',
-                                                width: iconSize,
-                                                height: iconSize,
-                                                colorFilter: ColorFilter.mode(
-                                                    contentColor,
-                                                    BlendMode.srcIn),
-                                              ),
-                                              onTap: () =>
-                                                  _handleOfflineTap(context),
-                                            ),
-                                          ),
-                                          SizedBox(height: gapSize),
-                                          _buildEntranceItem(
-                                            startTime: 0.6,
-                                            endTime: 1.0,
-                                            child: DefaultCard(
-                                              text: l10n.news,
-                                              height: cardHeight,
-                                              iconWidget: SvgPicture.asset(
-                                                'assets/icons/news.svg',
-                                                width: iconSize,
-                                                height: iconSize,
-                                                colorFilter: ColorFilter.mode(
-                                                    contentColor,
-                                                    BlendMode.srcIn),
-                                              ),
-                                              onTap: () {
-                                                mainScreenKey.currentState
-                                                    ?.openNewsScreen();
-                                              },
                                             ),
                                           ),
                                         ],
@@ -425,35 +359,5 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         );
       },
     );
-  }
-
-  // --- Helper: Logic for Offline Button ---
-  void _handleOfflineTap(BuildContext context) {
-    final catalog = context.read<ModelCatalogProvider>();
-    final local = context.read<ModelLocalStateProvider>();
-    final session = context.read<ChatSessionProvider>();
-    final selectionService = context.read<SelectionService>();
-    final l10n = AppLocalizations.of(context)!;
-
-    // 1. Check if we have any offline model downloaded on disk
-    final offlineModels = catalog.allModels.where((m) => m.type == 'offline');
-    final hasDownloadedModel = offlineModels.any((m) {
-      final path = local.getFilePathById(m.id);
-      return local.isModelOnDisk(path);
-    });
-
-    if (hasDownloadedModel) {
-      showModelSelectionSheet(
-        context: context,
-        localizations: l10n,
-        currentModelId: session.modelId ?? '',
-        onModelSelected: (String id) {
-          final model = catalog.allModels.firstWhere((m) => m.id == id);
-          selectionService.selectModel(model);
-        },
-      );
-    } else {
-      mainScreenKey.currentState?.switchToLibrary(pulse: true);
-    }
   }
 }

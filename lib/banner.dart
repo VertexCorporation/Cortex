@@ -4,7 +4,9 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:cortex/theme.dart';
+import 'package:cortex/fog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -148,6 +150,7 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
     with TickerProviderStateMixin {
   // Controls the collapsing height (AnimatedSize)
   bool _isVisible = false;
+  late ScrollController _subtitleScrollController;
 
   late AnimationController _controller;
   late Animation<Offset> _slideAnimation; // Shared for Entry
@@ -166,6 +169,7 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
     if (Platform.isIOS) return;
 
     // --- 1. Entry Animation Setup ---
+    _subtitleScrollController = ScrollController();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800), // Smooth entry duration
@@ -211,6 +215,7 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
 
   @override
   void dispose() {
+    _subtitleScrollController.dispose();
     _controller.dispose();
     _exitController.dispose();
     super.dispose();
@@ -289,7 +294,10 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
                         padding: EdgeInsets.only(
                             bottom: refWidth * 0.04, top: refWidth * 0.02),
                         child: GestureDetector(
-                          onTap: widget.onTap,
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            widget.onTap?.call();
+                          },
                           // Listen to ALL swipes (Pan)
                           onPanUpdate: (details) {
                             if (details.delta.distance > 1.5) {
@@ -383,19 +391,31 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: gapBetweenText),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: subtitleFontSize * 1.2 * 4.5,
-                    ),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      physics: const ClampingScrollPhysics(),
-                      child: Text(
-                        subtitle,
-                        style: TextStyle(
-                          color: subtitleColor,
-                          fontSize: subtitleFontSize,
-                          height: 1.2,
+                  Container(
+                    // FIX: Enforce a fixed height for 2 lines of text to prevent
+                    // layout jumps at different widths.
+                    // Height = fontSize * lineHeight (1.2) * 2 lines
+                    height: subtitleFontSize * 1.2 * 2,
+                    alignment: Alignment.centerLeft,
+                    child: ScrollFog(
+                      // Since FloatingInfoBanner is Stateful, I can add a controller there.
+                      // But `_buildBannerContent` is just a method.
+                      // I'll add `_subtitleScrollController` to the State class.
+                      scrollController: _subtitleScrollController,
+                      fogColor:
+                          solidBackgroundColor, // Match the card background
+                      topFogHeight: 4,
+                      bottomFogHeight: 12,
+                      child: SingleChildScrollView(
+                        controller: _subtitleScrollController,
+                        physics: const BouncingScrollPhysics(),
+                        child: Text(
+                          subtitle,
+                          style: TextStyle(
+                            color: subtitleColor,
+                            fontSize: subtitleFontSize,
+                            height: 1.2,
+                          ),
                         ),
                       ),
                     ),

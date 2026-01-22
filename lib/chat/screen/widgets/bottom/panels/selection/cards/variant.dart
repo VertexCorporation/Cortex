@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../../../../../app.dart';
 import '../../../../../../../theme.dart';
+import 'package:cortex/fog.dart';
 
 class ModelVariantCard extends StatelessWidget {
   final String title;
@@ -21,10 +22,7 @@ class ModelVariantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
 
     // Constants
@@ -32,15 +30,12 @@ class ModelVariantCard extends StatelessWidget {
     final double borderRadius = isTablet ? 18 : 16;
 
     // Colors
-    final Color bgColor = isSelected
-        ? AppColors.primaryColor.inverted
-        : AppColors.background;
-    final Color textColor = isSelected
-        ? AppColors.primaryColor
-        : AppColors.primaryColor.inverted;
-    final Color borderColor = isSelected
-        ? Colors.transparent
-        : AppColors.border;
+    final Color bgColor =
+        isSelected ? AppColors.primaryColor.inverted : AppColors.background;
+    final Color textColor =
+        isSelected ? AppColors.primaryColor : AppColors.primaryColor.inverted;
+    final Color borderColor =
+        isSelected ? Colors.transparent : AppColors.border;
 
     return Material(
       color: bgColor,
@@ -66,10 +61,11 @@ class ModelVariantCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: _ScrollableText(
                     text: title,
+                    fogColor: bgColor,
                     style: TextStyle(
                       fontSize: fontSize,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight
-                          .normal,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                       color: textColor,
                     ),
                   ),
@@ -82,10 +78,7 @@ class ModelVariantCard extends StatelessWidget {
                     'assets/icons/sparkle.svg',
                     width: 12,
                     height: 12,
-                    colorFilter: ColorFilter.mode(
-                        textColor,
-                        BlendMode.srcIn
-                    ),
+                    colorFilter: ColorFilter.mode(textColor, BlendMode.srcIn),
                   ),
                 ),
             ],
@@ -96,47 +89,75 @@ class ModelVariantCard extends StatelessWidget {
   }
 }
 
-class _ScrollableText extends StatelessWidget {
+class _ScrollableText extends StatefulWidget {
   final String text;
   final TextStyle style;
+  final Color fogColor;
 
-  const _ScrollableText({required this.text, required this.style});
+  const _ScrollableText({
+    required this.text,
+    required this.style,
+    required this.fogColor,
+  });
+
+  @override
+  State<_ScrollableText> createState() => _ScrollableTextState();
+}
+
+class _ScrollableTextState extends State<_ScrollableText> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final TextPainter textPainter = TextPainter(
-          text: TextSpan(text: text, style: style),
+          text: TextSpan(text: widget.text, style: widget.style),
           maxLines: 1,
           textDirection: TextDirection.ltr,
           textScaler: MediaQuery.textScalerOf(context),
-        )
-          ..layout(maxWidth: double.infinity);
+        )..layout(maxWidth: double.infinity);
 
         final bool shouldScroll = textPainter.width > constraints.maxWidth;
 
         if (!shouldScroll) {
           return Text(
-            text,
-            style: style,
+            widget.text,
+            style: widget.style,
             softWrap: false,
             overflow: TextOverflow.visible,
             maxLines: 1,
           );
         }
 
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: constraints.maxWidth),
-            child: Text(
-              text,
-              style: style,
-              softWrap: false,
-              overflow: TextOverflow.visible,
-              maxLines: 1,
+        return ScrollFogHorizontal(
+          scrollController: _scrollController,
+          fogColor: widget.fogColor,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+              child: Text(
+                widget.text,
+                style: widget.style,
+                softWrap: false,
+                overflow: TextOverflow.visible,
+                maxLines: 1,
+              ),
             ),
           ),
         );

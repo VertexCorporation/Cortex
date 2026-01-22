@@ -354,6 +354,7 @@ class AddPhotoButton extends StatelessWidget {
                   type: NotificationType.error,
                   bottomOffset: 0.22,
                   fontSize: 0.032,
+                  isChatMode: true,
                 );
               }
               // Priority 2: Check Chat History Limit

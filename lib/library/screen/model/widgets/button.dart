@@ -2,6 +2,7 @@
 
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../../../internet.dart';
 import '../../../../../l10n/app_localizations.dart';
@@ -23,7 +24,9 @@ class BottomActionButtons extends StatelessWidget {
   void _startChat(BuildContext context, ModelDetailProvider provider) {
     // filePath is only relevant for downloaded offline models.
     final filePath = !provider.mainModel!.isServerSide && provider.isDownloaded
-        ? context.read<ModelLocalStateProvider>().getFilePathById(provider.mainModel!.id)
+        ? context
+            .read<ModelLocalStateProvider>()
+            .getFilePathById(provider.mainModel!.id)
         : null;
 
     // Pop the screen and return a map containing the action and the necessary data.
@@ -31,7 +34,8 @@ class BottomActionButtons extends StatelessWidget {
       'action': 'start_chat',
       'modelId': provider.mainModel!.id,
       'filePath': filePath,
-      'model_updated': provider.didBaseModelChange, // Pass along the update status
+      'model_updated':
+          provider.didBaseModelChange, // Pass along the update status
     });
   }
 
@@ -62,7 +66,8 @@ class BottomActionButtons extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.background,
             boxShadow: const [
-              BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, -2))
+              BoxShadow(
+                  color: Colors.black12, blurRadius: 6, offset: Offset(0, -2))
             ],
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(screenWidth * 0.05),
@@ -88,11 +93,13 @@ class BottomActionButtons extends StatelessWidget {
       return buildContainer(
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
-          transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+          transitionBuilder: (child, animation) =>
+              FadeTransition(opacity: animation, child: child),
           child: provider.isDownloaded
               ? _buildRemoveOrChatButtons(context, provider, localizations)
-          // Pass the buttonHeight to ensure consistent sizing.
-              : _buildDownloadOrCancelButtons(context, provider, localizations, buttonHeight),
+              // Pass the buttonHeight to ensure consistent sizing.
+              : _buildDownloadOrCancelButtons(
+                  context, provider, localizations, buttonHeight),
         ),
       );
     }
@@ -106,10 +113,10 @@ class BottomActionButtons extends StatelessWidget {
 
   /// Builds the "Remove / Chat" button row for downloaded or user-created models.
   Widget _buildRemoveOrChatButtons(
-      BuildContext context,
-      ModelDetailProvider provider,
-      AppLocalizations localizations,
-      ) {
+    BuildContext context,
+    ModelDetailProvider provider,
+    AppLocalizations localizations,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
@@ -124,11 +131,14 @@ class BottomActionButtons extends StatelessWidget {
               onTap: provider.isDeleting
                   ? null
                   : () async {
-                final success = await provider.removeModel(context);
-                if (success && provider.isUserCreatedModel && context.mounted) {
-                  Navigator.of(context).pop();
-                }
-              },
+                      HapticFeedback.lightImpact(); // Add haptic context
+                      final success = await provider.removeModel(context);
+                      if (success &&
+                          provider.isUserCreatedModel &&
+                          context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    },
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(screenWidth * 0.03),
                 bottomLeft: Radius.circular(screenWidth * 0.03),
@@ -156,7 +166,12 @@ class BottomActionButtons extends StatelessWidget {
           Container(width: 1.0, color: AppColors.border),
           Expanded(
             child: InkWell(
-              onTap: provider.isDeleting ? null : () => _startChat(context, provider),
+              onTap: provider.isDeleting
+                  ? null
+                  : () {
+                      HapticFeedback.lightImpact();
+                      _startChat(context, provider);
+                    },
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(screenWidth * 0.03),
                 bottomRight: Radius.circular(screenWidth * 0.03),
@@ -188,12 +203,12 @@ class BottomActionButtons extends StatelessWidget {
 
   /// Builds the "Download" or "Cancel" button for models that are not yet downloaded.
   Widget _buildDownloadOrCancelButtons(
-      BuildContext context,
-      ModelDetailProvider provider,
-      AppLocalizations localizations,
-      // Accept buttonHeight as a parameter for consistent sizing.
-      double buttonHeight,
-      ) {
+    BuildContext context,
+    ModelDetailProvider provider,
+    AppLocalizations localizations,
+    // Accept buttonHeight as a parameter for consistent sizing.
+    double buttonHeight,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final localProvider = context.read<ModelLocalStateProvider>();
 
@@ -216,7 +231,8 @@ class BottomActionButtons extends StatelessWidget {
       initialData: InternetService().currentStatus,
       builder: (context, snapshot) {
         final hasInternet = snapshot.data ?? false;
-        final compatibility = localProvider.getCompatibilityStatus(provider.mainModel!.size);
+        final compatibility =
+            localProvider.getCompatibilityStatus(provider.mainModel!.size);
         final isCompatible = compatibility == CompatibilityStatus.compatible;
 
         String buttonText;
@@ -237,24 +253,32 @@ class BottomActionButtons extends StatelessWidget {
           height: buttonHeight,
           child: ElevatedButton(
             onPressed: isButtonEnabled && !provider.isButtonLocked
-                ? () => localProvider.requestPermissionAndStartDownload(
-              context: context,
-              id: provider.mainModel!.id,
-              url: provider.mainModel!.url,
-            )
+                ? () {
+                    HapticFeedback.lightImpact();
+                    localProvider.requestPermissionAndStartDownload(
+                      context: context,
+                      id: provider.mainModel!.id,
+                      url: provider.mainModel!.url,
+                    );
+                  }
                 : null,
             style: ElevatedButton.styleFrom(
               // Changed button color to primaryColor.inverted.
               backgroundColor: AppColors.primaryColor.inverted,
               foregroundColor: Colors.white,
               // Updated disabled color to match the new background color.
-              disabledBackgroundColor: AppColors.primaryColor.inverted.withValues(alpha:0.5),
-              disabledForegroundColor: Colors.white.withValues(alpha:0.7),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+              disabledBackgroundColor:
+                  AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+              disabledForegroundColor: Colors.white.withValues(alpha: 0.7),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(screenWidth * 0.03)),
             ),
             child: Text(
               buttonText,
-              style: TextStyle(fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+              style: TextStyle(
+                  fontSize: screenWidth * 0.04,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryColor),
             ),
           ),
         );
@@ -264,17 +288,23 @@ class BottomActionButtons extends StatelessWidget {
 
   /// Builds a simple, full-width "Chat" button.
   Widget _buildChatOnlyButton(
-      BuildContext context,
-      ModelDetailProvider provider,
-      AppLocalizations localizations,
-      ) {
+    BuildContext context,
+    ModelDetailProvider provider,
+    AppLocalizations localizations,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
       key: const ValueKey('chatOnly'),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(screenWidth * 0.03)),
       child: InkWell(
-        onTap: provider.isDeleting ? null : () => _startChat(context, provider),
+        onTap: provider.isDeleting
+            ? null
+            : () {
+                HapticFeedback.lightImpact();
+                _startChat(context, provider);
+              },
         borderRadius: BorderRadius.circular(screenWidth * 0.03),
         child: Container(
           alignment: Alignment.center,
@@ -284,7 +314,10 @@ class BottomActionButtons extends StatelessWidget {
           ),
           child: Text(
             localizations.chat,
-            style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: screenWidth * 0.04,
+                fontWeight: FontWeight.bold),
           ),
         ),
       ),
