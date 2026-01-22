@@ -1605,4 +1605,7 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'Cortex bi sedan modelên AI, kapasîteyên negirêdayî, sohbeta dînamîk û gelek tiştên din her gav li kêleka we ye.';
+
+  @override
+  String get comingSoon => 'Hema têm';
 }

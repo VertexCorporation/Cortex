@@ -545,5 +545,6 @@
   "actionFile": "Berkas",
   "listening": "Sedang Mendengarkan",
   "defaultViewTitle": "Apa kabar?",
-  "defaultViewDescription": "Cortex selalu berada di sisi Anda dengan ratusan model AI, kemampuan offline, obrolan dinamis, dan masih banyak lagi."
+  "defaultViewDescription": "Cortex selalu berada di sisi Anda dengan ratusan model AI, kemampuan offline, obrolan dinamis, dan masih banyak lagi.",
+  "comingSoon": "Segera hadir"
 }

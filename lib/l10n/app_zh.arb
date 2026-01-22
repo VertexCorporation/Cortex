@@ -545,5 +545,6 @@
   "actionFile": "文件",
   "listening": "正在听",
   "defaultViewTitle": "最近怎么样？",
-  "defaultViewDescription": "Cortex 始终伴您左右，拥有数百个 AI 模型、离线功能、动态聊天等诸多特性。"
+  "defaultViewDescription": "Cortex 始终伴您左右，拥有数百个 AI 模型、离线功能、动态聊天等诸多特性。",
+  "comingSoon": "即将推出"
 }

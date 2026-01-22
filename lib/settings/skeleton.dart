@@ -231,6 +231,7 @@ class SkeletonLoader extends StatelessWidget {
         _buildSkeletonButton(context, buttonHeight),
         _buildSkeletonButton(context, buttonHeight),
         _buildSkeletonButton(context, buttonHeight),
+        _buildSkeletonButton(context, buttonHeight),
         SizedBox(height: largeSpacing * 0.6),
 
         // Language Section Skeleton

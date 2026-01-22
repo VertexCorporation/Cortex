@@ -54,6 +54,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _shineController;
   late Animation<double> _shineAnimation;
+  ScrollPhysics _scrollPhysics = const ClampingScrollPhysics();
 
   @override
   void initState() {
@@ -84,7 +85,9 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
 
   String _getPriceForId(String id) {
     try {
-      return widget.availableProducts.firstWhere((p) => p.id == id).price;
+      return widget.availableProducts
+          .firstWhere((p) => p.id == id)
+          .price;
     } catch (e) {
       return '';
     }
@@ -93,7 +96,9 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery
+        .of(context)
+        .size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
@@ -140,9 +145,9 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     final String formattedMonthlyEquivalentPrice;
     if (annualProductDetails != null && annualProductDetails.rawPrice > 0) {
       final currencySymbol =
-          annualProductDetails.price.replaceAll(RegExp(r'[\d.,\s]'), '');
+      annualProductDetails.price.replaceAll(RegExp(r'[\d.,\s]'), '');
       final monthlyPrice =
-          (annualProductDetails.rawPrice / 12).toStringAsFixed(2);
+      (annualProductDetails.rawPrice / 12).toStringAsFixed(2);
       formattedMonthlyEquivalentPrice = "$currencySymbol$monthlyPrice";
     } else {
       formattedMonthlyEquivalentPrice = '...';
@@ -152,11 +157,11 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     final String annualTotalPrice =
         annualProductDetails?.price ?? _getPriceForId(annualId);
     final String annualPrimaryDesc =
-        localizations.annualTotalDescription(annualTotalPrice);
+    localizations.annualTotalDescription(annualTotalPrice);
     final String? annualSecondaryDesc = isIOS
         ? null
         : localizations
-            .equivalentMonthlyDescription(formattedMonthlyEquivalentPrice);
+        .equivalentMonthlyDescription(formattedMonthlyEquivalentPrice);
     final bool isActivePlan =
         widget.activeSubscriptionLevel == currentPlanLevel;
 
@@ -164,77 +169,106 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
       scrollController: widget.scrollController!,
       topFogHeight: screenHeight * 0.04,
       bottomFogHeight: screenHeight * 0.07,
-      child: SingleChildScrollView(
-        controller: widget.scrollController,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Column(
-            children: [
-              // Header Title
-              FittedBox(
-                child: Text(purchaseKey,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.1,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryColor.inverted,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1),
-              ),
-              SizedBox(height: verticalSpacingSmall),
+      child: NotificationListener<ScrollMetricsNotification>(
+        onNotification: (notification) {
+          if (notification.metrics.maxScrollExtent < 5.0) {
+            if (_scrollPhysics is! NeverScrollableScrollPhysics) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  setState(() {
+                    _scrollPhysics = const NeverScrollableScrollPhysics();
+                  });
+                }
+              });
+            }
+          } else {
+            if (_scrollPhysics is NeverScrollableScrollPhysics) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  setState(() {
+                    _scrollPhysics = const ClampingScrollPhysics();
+                  });
+                }
+              });
+            }
+          }
+          return false;
+        },
+        child: SingleChildScrollView(
+          controller: widget.scrollController,
+          physics: _scrollPhysics,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: Column(
+              children: [
+                // Header Title
+                FittedBox(
+                  child: Text(purchaseKey,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.1,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryColor.inverted,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1),
+                ),
+                SizedBox(height: verticalSpacingSmall),
 
-              // Description Text
-              FittedBox(
-                child: Text(
-                  descriptionKey,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.032,
-                    color: AppColors.tertiaryColor,
+                // Description Text
+                FittedBox(
+                  child: Text(
+                    descriptionKey,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.032,
+                      color: AppColors.tertiaryColor,
+                    ),
                   ),
                 ),
-              ),
 
-              // Spacing (Replaces old logo area)
-              SizedBox(height: verticalSpacingLarge),
+                // Spacing (Replaces old logo area)
+                SizedBox(height: verticalSpacingLarge),
 
-              // --- Annual option ---
-              _buildSubscriptionOption(
-                context: context,
-                localizations: localizations,
-                option: 'annual',
-                title:
-                    "${localizations.annual} ${widget.planType.capitalize()}",
-                primaryDescription: annualPrimaryDesc,
-                secondaryDescription: annualSecondaryDesc,
-                isBestValue: true,
-                isSelected: widget.selectedBillingOption == 'annual',
-                isSubscribedPlan: isActivePlan,
-                activeSubscriptionOption: widget.activeSubscriptionOption ?? '',
-              ),
+                // --- Annual option ---
+                _buildSubscriptionOption(
+                  context: context,
+                  localizations: localizations,
+                  option: 'annual',
+                  title:
+                  "${localizations.annual} ${widget.planType.capitalize()}",
+                  primaryDescription: annualPrimaryDesc,
+                  secondaryDescription: annualSecondaryDesc,
+                  isBestValue: true,
+                  isSelected: widget.selectedBillingOption == 'annual',
+                  isSubscribedPlan: isActivePlan,
+                  activeSubscriptionOption:
+                  widget.activeSubscriptionOption ?? '',
+                ),
 
-              SizedBox(height: verticalSpacingMedium),
+                SizedBox(height: verticalSpacingMedium),
 
-              // --- Monthly option ---
-              _buildSubscriptionOption(
-                context: context,
-                localizations: localizations,
-                option: 'monthly',
-                title:
-                    "${localizations.monthly} ${widget.planType.capitalize()}",
-                primaryDescription: localizations
-                    .monthlyPlanDescription(_getPriceForId(monthlyId)),
-                secondaryDescription: null,
-                isBestValue: false,
-                isSelected: widget.selectedBillingOption == 'monthly',
-                isSubscribedPlan: isActivePlan,
-                activeSubscriptionOption: widget.activeSubscriptionOption ?? '',
-              ),
+                // --- Monthly option ---
+                _buildSubscriptionOption(
+                  context: context,
+                  localizations: localizations,
+                  option: 'monthly',
+                  title:
+                  "${localizations.monthly} ${widget.planType.capitalize()}",
+                  primaryDescription: localizations
+                      .monthlyPlanDescription(_getPriceForId(monthlyId)),
+                  secondaryDescription: null,
+                  isBestValue: false,
+                  isSelected: widget.selectedBillingOption == 'monthly',
+                  isSubscribedPlan: isActivePlan,
+                  activeSubscriptionOption:
+                  widget.activeSubscriptionOption ?? '',
+                ),
 
-              SizedBox(height: verticalSpacingLarge),
-              _buildBenefitsList(context, localizations, widget.planType),
-              SizedBox(height: verticalSpacingLarge),
-            ],
+                SizedBox(height: verticalSpacingLarge),
+                _buildBenefitsList(context, localizations, widget.planType),
+                SizedBox(height: verticalSpacingLarge),
+              ],
+            ),
           ),
         ),
       ),
@@ -253,7 +287,9 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     required bool isSubscribedPlan,
     required String activeSubscriptionOption,
   }) {
-    final screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery
+        .of(context)
+        .size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
@@ -301,7 +337,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color:
-              isSelected ? AppColors.primaryColor.inverted : AppColors.border,
+          isSelected ? AppColors.primaryColor.inverted : AppColors.border,
           width: isSelected ? 2.0 : 1.0,
         ),
       ),
@@ -355,7 +391,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                         style: TextStyle(
                           fontSize: screenWidth * 0.025,
                           color:
-                              AppColors.tertiaryColor.withValues(alpha: 0.85),
+                          AppColors.tertiaryColor.withValues(alpha: 0.85),
                         ),
                         maxLines: 1,
                         softWrap: false,
@@ -373,46 +409,46 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                   FadeTransition(opacity: animation, child: child),
               child: showCheckmark
                   ? Container(
-                      key: const ValueKey('checkmark'),
-                      alignment: Alignment.center,
-                      width: screenWidth * 0.17,
-                      child: SvgPicture.asset(
-                        'assets/icons/checkmark.svg',
-                        colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.inverted,
-                          BlendMode.srcIn,
-                        ),
-                        width: screenWidth * 0.09,
-                        height: screenWidth * 0.09,
-                      ),
-                    )
+                key: const ValueKey('checkmark'),
+                alignment: Alignment.center,
+                width: screenWidth * 0.17,
+                child: SvgPicture.asset(
+                  'assets/icons/checkmark.svg',
+                  colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted,
+                    BlendMode.srcIn,
+                  ),
+                  width: screenWidth * 0.09,
+                  height: screenWidth * 0.09,
+                ),
+              )
                   : SizedBox(
-                      key: const ValueKey('badges'),
-                      width: screenWidth * 0.17,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Visibility(
-                            visible: isBestValue,
-                            maintainSize: true,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            child: buildBadge(
-                              backgroundColor: AppColors.primaryColor.inverted,
-                              textColor: AppColors.primaryColor,
-                              text: localizations.bestValue,
-                            ),
-                          ),
-                          buildBadge(
-                            backgroundColor:
-                                AppColors.premium.withValues(alpha: 0.15),
-                            textColor: AppColors.premium,
-                            text: localizations.discountOffer(80),
-                          ),
-                        ],
+                key: const ValueKey('badges'),
+                width: screenWidth * 0.17,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Visibility(
+                      visible: isBestValue,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: buildBadge(
+                        backgroundColor: AppColors.primaryColor.inverted,
+                        textColor: AppColors.primaryColor,
+                        text: localizations.bestValue,
                       ),
                     ),
+                    buildBadge(
+                      backgroundColor:
+                      AppColors.premium.withValues(alpha: 0.15),
+                      textColor: AppColors.premium,
+                      text: localizations.discountOffer(80),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -426,9 +462,9 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         onTap: isEffectivelyDisabled
             ? null
             : () {
-                HapticFeedback.lightImpact();
-                widget.onBillingOptionChanged(option);
-              },
+          HapticFeedback.lightImpact();
+          widget.onBillingOptionChanged(option);
+        },
         child: Stack(
           children: [
             content,
@@ -437,13 +473,17 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                 borderRadius: BorderRadius.circular(20.0),
                 child: AnimatedBuilder(
                   animation: _shineAnimation,
-                  builder: (context, child) => Transform.translate(
-                    offset: Offset(
-                        MediaQuery.of(context).size.width *
-                            _shineAnimation.value,
-                        0),
-                    child: child,
-                  ),
+                  builder: (context, child) =>
+                      Transform.translate(
+                        offset: Offset(
+                            MediaQuery
+                                .of(context)
+                                .size
+                                .width *
+                                _shineAnimation.value,
+                            0),
+                        child: child,
+                      ),
                   child: Container(
                     width: screenWidth * 0.25,
                     decoration: BoxDecoration(
@@ -468,9 +508,12 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     );
   }
 
-  Widget _buildBenefitsList(
-      BuildContext context, AppLocalizations localizations, String planType) {
-    final screenWidth = MediaQuery.of(context).size.width;
+  Widget _buildBenefitsList(BuildContext context,
+      AppLocalizations localizations, String planType) {
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final double horizontalPadding = screenWidth * 0.06;
 
     List<String> benefits = [];
@@ -517,15 +560,18 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
       runAlignment: WrapAlignment.center,
       spacing: screenWidth * 0.012,
       runSpacing: screenWidth * 0.057,
-      children: benefits.asMap().entries.map((entry) {
+      children: benefits
+          .asMap()
+          .entries
+          .map((entry) {
         final int index = entry.key;
         final String benefit = entry.value;
         final double iconSize = screenWidth * 0.057;
 
         final benefitContent = SizedBox(
           width:
-              (screenWidth - (horizontalPadding * 2) - (screenWidth * 0.02)) /
-                  2,
+          (screenWidth - (horizontalPadding * 2) - (screenWidth * 0.02)) /
+              2,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

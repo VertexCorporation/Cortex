@@ -317,17 +317,22 @@ class _FundsScreenViewState extends State<FundsScreenView> {
               ),
               body: Stack(
                 children: [
-                  const FundsSkeletonLoader(key: ValueKey('skeleton')),
-
-                  if (!backend.hasError)
-                    _buildMainContent(context, backend),
-
+                  if (!backend.hasError) _buildMainContent(context, backend),
+                  IgnorePointer(
+                    ignoring: _isContentLoaded,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 500),
+                      opacity: _isContentLoaded ? 0.0 : 1.0,
+                      curve: Curves.easeOutCubic,
+                      child:
+                      const FundsSkeletonLoader(key: ValueKey('skeleton')),
+                    ),
+                  ),
                   if (backend.hasError)
                     _buildErrorScreen(context, backend.errorMessage!),
                 ],
               ),
             ),
-
             Align(
               alignment: Alignment.topCenter,
               child: ConfettiWidget(
@@ -491,8 +496,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       activeSubscriptionOption: _uiActiveSubscriptionOption,
                       onBillingOptionChanged: (newOption) {
                         setState(() {
-                          _selectedBillingOptions[_planTypes[i]] =
-                              newOption;
+                          _selectedBillingOptions[_planTypes[i]] = newOption;
                         });
                       },
                       scrollController: _scrollControllers[i],
@@ -543,17 +547,15 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                       style: ElevatedButton.styleFrom(
                         foregroundColor: AppColors.primaryColor,
                         backgroundColor: AppColors.primaryColor.inverted,
-                        disabledBackgroundColor: AppColors
-                            .primaryColor.inverted
+                        disabledBackgroundColor: AppColors.primaryColor.inverted
                             .withValues(alpha: 0.6),
                         disabledForegroundColor:
                         AppColors.primaryColor.withValues(alpha: 0.6),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30)),
-                        padding: EdgeInsets.symmetric(
-                            vertical: screenHeight * 0.02),
-                        minimumSize:
-                        Size(double.infinity, screenHeight * 0.06),
+                        padding:
+                        EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                        minimumSize: Size(double.infinity, screenHeight * 0.06),
                         splashFactory: backend.isPurchasePending
                             ? NoSplash.splashFactory
                             : InkSplash.splashFactory,

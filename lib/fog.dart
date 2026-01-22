@@ -27,13 +27,32 @@ class ScrollFog extends StatefulWidget {
   State<ScrollFog> createState() => _ScrollFogState();
 }
 
-class _ScrollFogState extends State<ScrollFog> {
-  bool _showTopFog = false;
-  bool _showBottomFog = false;
+class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
+  late AnimationController _topController;
+  late AnimationController _bottomController;
+  late Animation<double> _topOpacity;
+  late Animation<double> _bottomOpacity;
+
+  bool _isTopVisible = false;
+  bool _isBottomVisible = false;
 
   @override
   void initState() {
     super.initState();
+
+    _topController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _bottomController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    _topOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(_topController);
+    _bottomOpacity =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_bottomController);
+
     widget.scrollController.addListener(_updateFogVisibility);
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateFogVisibility());
   }
@@ -55,6 +74,8 @@ class _ScrollFogState extends State<ScrollFog> {
   @override
   void dispose() {
     widget.scrollController.removeListener(_updateFogVisibility);
+    _topController.dispose();
+    _bottomController.dispose();
     super.dispose();
   }
 
@@ -63,11 +84,11 @@ class _ScrollFogState extends State<ScrollFog> {
     final controller = widget.scrollController;
 
     if (!controller.hasClients) {
-      if (_showBottomFog || _showTopFog) {
-        setState(() {
-          _showBottomFog = false;
-          _showTopFog = false;
-        });
+      if (_isTopVisible || _isBottomVisible) {
+        _topController.reverse();
+        _bottomController.reverse();
+        _isTopVisible = false;
+        _isBottomVisible = false;
       }
       return;
     }
@@ -86,46 +107,84 @@ class _ScrollFogState extends State<ScrollFog> {
         position.maxScrollExtent > 0 &&
         position.pixels < position.maxScrollExtent - widget.scrollThreshold;
 
-    if (shouldShowTop != _showTopFog || shouldShowBottom != _showBottomFog) {
-      setState(() {
-        _showTopFog = shouldShowTop;
-        _showBottomFog = shouldShowBottom;
-      });
+    if (shouldShowTop != _isTopVisible) {
+      _isTopVisible = shouldShowTop;
+      if (shouldShowTop) {
+        _topController.forward(from: 0.1);
+      } else {
+        _topController.reverse();
+      }
+    }
+
+    if (shouldShowBottom != _isBottomVisible) {
+      _isBottomVisible = shouldShowBottom;
+      if (shouldShowBottom) {
+        _bottomController.forward(from: 0.1);
+      } else {
+        _bottomController.reverse();
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_showTopFog && !_showBottomFog) {
-      return widget.child;
-    }
+    return AnimatedBuilder(
+      animation: Listenable.merge([_topController, _bottomController]),
+      builder: (context, child) {
+        final double topVal = _topOpacity.value;
+        final double bottomVal = _bottomOpacity.value;
 
-    return ShaderMask(
-      shaderCallback: (Rect bounds) {
-        final double topStop = _showTopFog ? (widget.topFogHeight /
-            bounds.height).clamp(0.0, 0.5) : 0.0;
-        final double bottomStop = _showBottomFog ? (1.0 -
-            (widget.bottomFogHeight / bounds.height)).clamp(0.5, 1.0) : 1.0;
+        if (topVal == 0.0 && bottomVal == 0.0) {
+          return widget.child;
+        }
 
-        return LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: const [
-            Colors.transparent,
-            Colors.black,
-            Colors.black,
-            Colors.transparent,
-          ],
-          stops: [
-            0.0,
-            topStop,
-            bottomStop,
-            1.0,
-          ],
-        ).createShader(bounds);
+        return ShaderMask(
+          shaderCallback: (Rect bounds) {
+            // We keep the stops consistent but change the "black" color opacity effectively by using transparency in gradient?
+            // Actually, ShaderMask with dstIn uses alpha channel.
+            // So if we want to fade IN the masking effect (which creates transparency), it's tricky.
+            // Wait, dstIn means the source (gradient) alpha defines the destination (child) alpha.
+            // Transparent in gradient = Transparent in child. Black (solid) in gradient = Opaque in child.
+            // To "disable" fog (child visible), we need Solid everywhere.
+            // To "enable" fog (top transparent), top part of gradient is Transparent.
+
+            // So if opacity is 0 (no fog), top should be Solid (Black).
+            // If opacity is 1 (full fog), top should be Transparent.
+
+            // Let's interpolate the "Transparent" color towards "Black" based on (1 - opacity).
+
+            final double topStop =
+                (widget.topFogHeight / bounds.height).clamp(0.0, 0.5);
+            final double bottomStop =
+                (1.0 - (widget.bottomFogHeight / bounds.height))
+                    .clamp(0.5, 1.0);
+
+            final Color topColor =
+                Color.lerp(Colors.black, Colors.transparent, topVal)!;
+            final Color bottomColor =
+                Color.lerp(Colors.black, Colors.transparent, bottomVal)!;
+
+            return LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                topColor,
+                Colors.black,
+                Colors.black,
+                bottomColor,
+              ],
+              stops: [
+                0.0,
+                topStop,
+                bottomStop,
+                1.0,
+              ],
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.dstIn,
+          child: widget.child,
+        );
       },
-      blendMode: BlendMode.dstIn,
-      child: widget.child,
     );
   }
 }

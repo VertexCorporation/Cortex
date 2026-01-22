@@ -1612,4 +1612,7 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'Cortex всегда рядом с вами, предлагая сотни моделей искусственного интеллекта, возможности работы в автономном режиме, динамический чат и многое другое.';
+
+  @override
+  String get comingSoon => 'Вскоре';
 }

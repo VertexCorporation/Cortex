@@ -1559,4 +1559,7 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'Cortex は、何百もの AI モデル、オフライン機能、ダイナミック チャットなどを備え、常にあなたのそばにいます。';
+
+  @override
+  String get comingSoon => '近日公開';
 }

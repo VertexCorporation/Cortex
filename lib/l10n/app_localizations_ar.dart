@@ -1587,4 +1587,7 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'كورتكس دائمًا بجانبك مع مئات من نماذج الذكاء الاصطناعي، وإمكانيات العمل دون اتصال بالإنترنت، والدردشة الديناميكية، وغير ذلك الكثير.';
+
+  @override
+  String get comingSoon => 'قريباً';
 }

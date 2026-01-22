@@ -1625,4 +1625,7 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'Cortex est toujours à vos côtés grâce à des centaines de modèles d\'IA, des fonctionnalités hors ligne, un chat dynamique et bien plus encore.';
+
+  @override
+  String get comingSoon => 'À venir';
 }

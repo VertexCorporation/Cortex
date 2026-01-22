@@ -545,5 +545,6 @@
   "actionFile": "Bestand",
   "listening": "Luistert",
   "defaultViewTitle": "Alles goed?",
-  "defaultViewDescription": "Cortex staat altijd voor je klaar met honderden AI-modellen, offline mogelijkheden, dynamische chat en nog veel meer."
+  "defaultViewDescription": "Cortex staat altijd voor je klaar met honderden AI-modellen, offline mogelijkheden, dynamische chat en nog veel meer.",
+  "comingSoon": "Binnenkort beschikbaar"
 }

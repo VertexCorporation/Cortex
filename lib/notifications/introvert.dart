@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../banner.dart'; // BannerService'e erişim için
+import '../../banner.dart';
 
 enum NotificationType { success, error, neutral }
 
@@ -73,7 +73,7 @@ class IntrovertNotificationService {
     if (context != null) {
       try {
         final bannerService =
-            Provider.of<BannerService>(context, listen: false);
+        Provider.of<BannerService>(context, listen: false);
         isBannerVisible = bannerService.showInviteBannerNotifier.value;
       } catch (e) {
         // CATCH
@@ -127,7 +127,7 @@ class IntrovertNotificationService {
 
         // Dynamic Banner Height (Use 16% of height as a safe estimate for the banner)
         final double bannerHeightPadding =
-            isBannerVisible ? (media.size.height * 0.16) : 0.0;
+        isBannerVisible ? (media.size.height * 0.16) : 0.0;
 
         if (isAxonMode && axonWidth > 0) {
           // SIDEBAR (AXON) MODE
@@ -171,7 +171,6 @@ class IntrovertNotificationService {
 
         return Stack(
           children: [
-            // Layer 1: Şeffaf Dedektör (Ekrana dokunmayı yakalar)
             Positioned.fill(
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
@@ -182,7 +181,6 @@ class IntrovertNotificationService {
               ),
             ),
 
-            // Layer 2: Bildirim Baloncuğu
             Positioned(
               bottom: bottomPosition,
               left: leftPos,
@@ -209,9 +207,7 @@ class IntrovertNotificationService {
                     onRemove: () {
                       try {
                         entry.remove();
-                      } catch (_) {
-                        // Zaten silinmişse hata vermesin
-                      }
+                      } catch (_) {}
                       if (_activeNotification?.entry == entry) {
                         _activeNotification = null;
                       }
@@ -289,7 +285,6 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
       vsync: this,
     );
 
-    // Giriş: Hafif aşağıdan yukarı
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.5),
       end: Offset.zero,
@@ -298,12 +293,10 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
     _fadeAnimation =
         CurvedAnimation(parent: _controller, curve: Curves.easeOut);
 
-    // Servis'e "beni kapatmak istersen bu fonksiyonu çağır" diyoruz
     widget.registerDismiss(dismiss);
 
     _controller.forward();
 
-    // Otomatik kapanma zamanlayıcısı
     _dismissTimer = Timer(widget.duration, dismiss);
   }
 
@@ -313,13 +306,10 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
 
     _dismissTimer?.cancel();
 
-    // Çıkış: Yukarıdan aşağı düşerek (Drop) kaybol
-    // Reverse animasyonunu başlat, bitince overlay'den sil
     _controller.reverse().then((_) {
       if (mounted) {
         widget.onRemove();
       } else {
-        // Widget dispose olduysa bile remove çağrılmalı ki Overlay temizlensin
         widget.onRemove();
       }
     });
@@ -338,7 +328,6 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
       position: _slideAnimation,
       child: FadeTransition(
         opacity: _fadeAnimation,
-        // Bu GestureDetector baloncuk üzerindeki tıklamayı yakalar
         child: GestureDetector(
           onTap: widget.onTap,
           onHorizontalDragUpdate: (details) {
@@ -354,7 +343,7 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
             borderRadius: BorderRadius.circular(12.0),
             child: Container(
               padding:
-                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+              const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
               decoration: BoxDecoration(
                 color: widget.backgroundColor,
                 borderRadius: BorderRadius.circular(12.0),

@@ -1599,4 +1599,7 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get defaultViewDescription =>
       'कॉर्टेक्स सैकड़ों एआई मॉडल, ऑफलाइन क्षमताओं, डायनामिक चैट और बहुत कुछ के साथ हमेशा आपके साथ है।';
+
+  @override
+  String get comingSoon => 'जल्द आ रहा है';
 }
