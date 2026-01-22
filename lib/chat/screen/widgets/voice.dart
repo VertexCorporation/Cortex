@@ -92,7 +92,8 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                                 : "Connecting...",
                     key: ValueKey(voiceService.state),
                     style: TextStyle(
-                      color: AppColors.primaryColor.inverted.withOpacity(0.7),
+                      color: AppColors.primaryColor.inverted
+                          .withValues(alpha: 0.7),
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),
@@ -160,7 +161,7 @@ class _UserListeningVisualizer extends StatelessWidget {
     return CustomPaint(
       painter:
           _WavePainter(level: level, color: AppColors.primaryColor.inverted),
-      child: Container(height: 100, width: double.infinity),
+      child: SizedBox(height: 100, width: double.infinity),
     );
   }
 }
@@ -199,8 +200,8 @@ class _AiSpeakingVisualizerState extends State<_AiSpeakingVisualizer>
           height: 100 + (_controller.value * 20),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color:
-                AppColors.primaryColor.inverted.withOpacity(0.2), // Outer glow
+            color: AppColors.primaryColor.inverted
+                .withValues(alpha: 0.2), // Outer glow
           ),
           child: Center(
             child: Container(
