@@ -1554,9 +1554,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get listening => '듣는 중';
 
   @override
-  String get defaultViewTitle => 'What\'s Up?';
+  String get defaultViewTitle => '요즘 어때요?';
 
   @override
   String get defaultViewDescription =>
-      'Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.';
+      'Cortex는 수백 가지의 AI 모델, 오프라인 기능, 동적 채팅 등 다양한 기능을 통해 항상 여러분 곁에 있습니다.';
 }

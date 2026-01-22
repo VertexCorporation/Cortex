@@ -543,5 +543,7 @@
   "actionCamera": "Kamîra",
   "actionGallery": "Galerya",
   "actionFile": "Dosî",
-  "listening": "Guhdarî dike"
+  "listening": "Guhdarî dike",
+  "defaultViewTitle": "Çi heye?",
+  "defaultViewDescription": "Cortex bi sedan modelên AI, kapasîteyên negirêdayî, sohbeta dînamîk û gelek tiştên din her gav li kêleka we ye."
 }

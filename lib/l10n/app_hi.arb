@@ -543,5 +543,7 @@
   "actionCamera": "कैमरा",
   "actionGallery": "गैलरी",
   "actionFile": "फ़ाइल",
-  "listening": "सुन रहा है"
+  "listening": "सुन रहा है",
+  "defaultViewTitle": "क्या चल रहा है?",
+  "defaultViewDescription": "कॉर्टेक्स सैकड़ों एआई मॉडल, ऑफलाइन क्षमताओं, डायनामिक चैट और बहुत कुछ के साथ हमेशा आपके साथ है।"
 }

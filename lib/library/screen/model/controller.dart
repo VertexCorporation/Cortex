@@ -142,7 +142,6 @@ class ModelDetailView extends StatelessWidget {
           children: [
             ScrollFog(
               scrollController: scrollController,
-              fogColor: AppColors.background,
               topFogHeight: screenHeight * 0.02,
               showTop: true,
               showBottom: false,

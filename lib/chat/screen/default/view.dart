@@ -39,7 +39,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     _breathingController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
-    )..repeat(reverse: true);
+    )
+      ..repeat(reverse: true);
 
     _breathingScaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(
@@ -71,7 +72,9 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final isFlux = context.read<ChatSessionProvider>().isFluxMode;
+    final isFlux = context
+        .read<ChatSessionProvider>()
+        .isFluxMode;
 
     // Initialize state on first run
     if (_wasFluxMode == null) {
@@ -145,30 +148,23 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     // Colors
     final Color contentColor = AppColors.primaryColor.inverted;
 
-    // Dimensions
-    final double logoSize = isTablet ? screenWidth * 0.15 : screenWidth * 0.22;
+    final double logoSize = isTablet ? screenWidth * 0.16 : screenWidth * 0.22;
+
     final double verticalSpacing = screenHeight * 0.025;
 
     final double titleSize = isTablet ? screenWidth * 0.04 : screenWidth * 0.06;
     final double bodyFontSize =
-        isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
+    isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
 
     final double contentMaxWidth = isTablet ? screenWidth * 0.6 : screenWidth;
     final double horizontalPadding = isTablet ? 0 : screenWidth * 0.12;
+    final double topPadding = mediaQuery.padding.top;
 
     return LayoutBuilder(
       builder: (context, constraints) {
         return AnimatedBuilder(
           animation: _modeAnimation,
           builder: (context, child) {
-            // "Smart Algorithm" for dynamic spacing
-            // Normal Mode (0.0): Top 2x, Bottom 1x
-            // Flux Mode (1.0): Top 3x, Bottom 1x
-            // We interpolate the top weight smoothly
-            final double topWeight = 2.0 + _modeAnimation.value;
-            final int topFlex = (topWeight * 1000).round();
-            final int bottomFlex = 1000;
-
             return CustomScrollView(
               physics: const ClampingScrollPhysics(),
               slivers: [
@@ -176,69 +172,74 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   hasScrollBody: false,
                   child: Column(
                     children: [
-                      Spacer(flex: topFlex),
+                      const Spacer(),
+
                       Container(
                         width: contentMaxWidth,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        padding: EdgeInsets.only(top: topPadding,
+                            right: horizontalPadding, left: horizontalPadding),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // --- 1. LOGO AREA (Swapping) ---
-                            SizedBox(
-                              height: logoSize,
-                              width: logoSize,
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  // CORTEX Logo
-                                  Opacity(
-                                    opacity: (1.0 - _modeAnimation.value)
-                                        .clamp(0.0, 1.0),
-                                    child: Transform.scale(
-                                      scale: 1.0 - (_modeAnimation.value * 0.2),
-                                      child: ScaleTransition(
-                                        scale: _breathingScaleAnimation,
-                                        child: SvgPicture.asset(
-                                          'assets/cortex.svg',
-                                          width: logoSize,
-                                          height: logoSize,
-                                          fit: BoxFit.contain,
-                                          colorFilter: ColorFilter.mode(
-                                            AppColors.primaryColor.inverted,
-                                            BlendMode.srcIn,
+                            Center(
+                              child: SizedBox(
+                                height: logoSize,
+                                width: logoSize,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    // CORTEX Logo
+                                    Opacity(
+                                      opacity: (1.0 - _modeAnimation.value)
+                                          .clamp(0.0, 1.0),
+                                      child: Transform.scale(
+                                        scale: 1.0 -
+                                            (_modeAnimation.value * 0.2),
+                                        child: ScaleTransition(
+                                          scale: _breathingScaleAnimation,
+                                          child: SvgPicture.asset(
+                                            'assets/cortex.svg',
+                                            width: logoSize,
+                                            height: logoSize,
+                                            fit: BoxFit.contain,
+                                            colorFilter: ColorFilter.mode(
+                                              AppColors.primaryColor.inverted,
+                                              BlendMode.srcIn,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
 
-                                  // FLUX (GHOST) Logo
-                                  Opacity(
-                                    opacity:
-                                        _modeAnimation.value.clamp(0.0, 1.0),
-                                    child: Transform.scale(
-                                      scale: 0.8 + (_modeAnimation.value * 0.2),
-                                      child: ScaleTransition(
-                                        scale: _breathingScaleAnimation,
-                                        child: SvgPicture.asset(
-                                          'assets/icons/on/ghost.svg',
-                                          width: logoSize,
-                                          height: logoSize,
-                                          fit: BoxFit.contain,
-                                          colorFilter: ColorFilter.mode(
-                                              contentColor, BlendMode.srcIn),
+                                    // FLUX (GHOST) Logo
+                                    Opacity(
+                                      opacity:
+                                      _modeAnimation.value.clamp(0.0, 1.0),
+                                      child: Transform.scale(
+                                        scale: 0.8 +
+                                            (_modeAnimation.value * 0.2),
+                                        child: ScaleTransition(
+                                          scale: _breathingScaleAnimation,
+                                          child: SvgPicture.asset(
+                                            'assets/icons/on/ghost.svg',
+                                            width: logoSize,
+                                            height: logoSize,
+                                            fit: BoxFit.contain,
+                                            colorFilter: ColorFilter.mode(
+                                                contentColor, BlendMode.srcIn),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
 
                             // Fixed gap
-                            SizedBox(height: verticalSpacing * 0.4),
+                            SizedBox(height: verticalSpacing * 0.8),
 
                             // --- 2. CONTENT AREA (Sliding & Fading) ---
                             Stack(
@@ -251,10 +252,10 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                         .clamp(0.0, 1.0),
                                     child: Transform.translate(
                                       offset: Offset(
-                                          0, -50.0 * _modeAnimation.value),
+                                          0, -30.0 * _modeAnimation.value),
                                       child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
+                                        CrossAxisAlignment.stretch,
                                         children: [
                                           // Title (Standard)
                                           _buildEntranceItem(
@@ -280,7 +281,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                             endTime: 0.7,
                                             child: Padding(
                                               padding: EdgeInsets.symmetric(
-                                                  horizontal: logoSize * 0.2),
+                                                  horizontal: logoSize * 0.1),
                                               child: Text(
                                                 l10n.defaultViewDescription,
                                                 style: TextStyle(
@@ -307,12 +308,13 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                         .clamp(0.0, 1.0),
                                     child: Transform.translate(
                                       offset: Offset(0,
-                                          50.0 * (1.0 - _modeAnimation.value)),
+                                          30.0 * (1.0 - _modeAnimation.value)),
                                       child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
+                                        CrossAxisAlignment.stretch,
                                         children: [
-                                          SizedBox(height: verticalSpacing),
+                                          SizedBox(
+                                              height: verticalSpacing * 0.2),
                                           Text(
                                             l10n.fluxChatTitle,
                                             style: TextStyle(
@@ -327,7 +329,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                               height: verticalSpacing * 0.6),
                                           Padding(
                                             padding: EdgeInsets.symmetric(
-                                                horizontal: logoSize * 0.2),
+                                                horizontal: logoSize * 0.1),
                                             child: Text(
                                               l10n.fluxChatDescription,
                                               style: TextStyle(
@@ -349,7 +351,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                           ],
                         ),
                       ),
-                      Spacer(flex: bottomFlex),
+
+                      const Spacer(),
                     ],
                   ),
                 ),

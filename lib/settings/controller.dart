@@ -131,7 +131,6 @@ class _SettingsScreenState extends State<SettingsScreen>
 
     return ScrollFog(
       scrollController: _scrollController,
-      fogColor: AppColors.background,
       showTop: false,
       bottomFogHeight: 20,
       showBottom: true,

@@ -543,5 +543,7 @@
   "actionCamera": "Kamera",
   "actionGallery": "Galeri",
   "actionFile": "Berkas",
-  "listening": "Sedang Mendengarkan"
+  "listening": "Sedang Mendengarkan",
+  "defaultViewTitle": "Apa kabar?",
+  "defaultViewDescription": "Cortex selalu berada di sisi Anda dengan ratusan model AI, kemampuan offline, obrolan dinamis, dan masih banyak lagi."
 }

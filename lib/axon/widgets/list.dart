@@ -276,7 +276,6 @@ class _AxonConversationListState extends State<AxonConversationList> {
     return ScrollFog(
       key: const ValueKey('list'),
       scrollController: widget.scrollController,
-      fogColor: AppColors.background,
       topFogHeight: 15,
       bottomFogHeight: 30,
       showTop: true,

@@ -1,5 +1,6 @@
 // lib/chat/screen/widgets/bottom/selection/sheet.dart
 
+import 'package:cortex/chat/screen/widgets/bottom/panels/selection/skeleton.dart';
 import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ void showModelSelectionSheet({
   final modelService = context.read<ModelService>();
   final localStateProvider = context.read<ModelLocalStateProvider>();
 
-  // Sync access for instant load
+  // Sync access for instant load check
   final cachedModels = modelService.getCachedModelsSync();
   final downloadMap = localStateProvider.downloadCompleted;
 
@@ -69,10 +70,8 @@ class _ModelSheetContent extends StatefulWidget {
 
 class _ModelSheetContentState extends State<_ModelSheetContent>
     with TickerProviderStateMixin {
-  late AnimationController _entryController;
-  late Animation<double> _fadeAnimation;
 
-  // Optimized Data Lists
+  // Data Lists
   List<ModelEntity> _selfModels = [];
   List<ModelEntity> _offlineModels = [];
   List<ModelEntity> _onlineSeries = [];
@@ -101,20 +100,6 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
       _isLoading = false;
     } else {
       _fetchAsync();
-    }
-
-    _entryController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-
-    _fadeAnimation = CurvedAnimation(
-      parent: _entryController,
-      curve: Curves.easeOut,
-    );
-
-    if (!_isLoading) {
-      _entryController.forward();
     }
   }
 
@@ -149,15 +134,19 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
   Future<void> _fetchAsync() async {
     if (!mounted) return;
     final modelService = context.read<ModelService>();
-    final langCode = Localizations.localeOf(context).languageCode;
+    final langCode = Localizations
+        .localeOf(context)
+        .languageCode;
     final models = await modelService.getModels(langCode: langCode);
 
     if (mounted && models != null) {
+      // Simulate a small delay if needed for smoother transition, or remove.
+      // await Future.delayed(const Duration(milliseconds: 100));
+
       setState(() {
         _processData(models);
         _isLoading = false;
       });
-      _entryController.forward();
     }
   }
 
@@ -180,12 +169,6 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     final itemWidth = (gridWidth - sp12) / 2;
     final desiredHeight = sh * 0.085;
     mainCardAspectRatio = itemWidth / desiredHeight;
-  }
-
-  @override
-  void dispose() {
-    _entryController.dispose();
-    super.dispose();
   }
 
   void _handleSeriesExpansion(String seriesId) {
@@ -230,136 +213,141 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
           color: AppColors.background,
           borderRadius: BorderRadius.vertical(top: Radius.circular(topRadius)),
           clipBehavior: Clip.antiAlias,
-          child: _isLoading
-              ? Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primaryColor.inverted,
-                  ),
-                )
-              : Column(
-                  children: [
-                    // 1. DRAG HANDLE AREA (Attached to Sheet Controller)
-                    SingleChildScrollView(
-                      controller: sheetScrollController,
-                      physics: const ClampingScrollPhysics(),
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () {}, // Capture taps to prevent click-through
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(height: sw * 0.08),
-                            // Handle Bar
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              width: sw * 0.12,
-                              height: 5,
-                              decoration: BoxDecoration(
-                                color: AppColors.quaternaryColor,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            // Title
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: Center(
-                                child: Text(
-                                  widget.localizations.allModels,
-                                  style: TextStyle(
-                                    fontFamily: 'Roboto',
-                                    fontSize: titleSize,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primaryColor.inverted,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+          child: Column(
+            children: [
+              // 1. HEADER AREA (Always visible, handled by Sheet Controller)
+              SingleChildScrollView(
+                controller: sheetScrollController,
+                physics: const ClampingScrollPhysics(),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {}, // Capture taps
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(height: sw * 0.08),
+                      // Handle Bar
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        width: sw * 0.12,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: AppColors.quaternaryColor,
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                    ),
-
-                    // 2. SCROLLABLE CONTENT (Independent Controller)
-                    Expanded(
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: ScrollFog(
-                          scrollController: _internalScrollController,
-                          fogColor: AppColors.background,
-                          topFogHeight: 20,
-                          bottomFogHeight: 50,
-                          child: CustomScrollView(
-                            controller: _internalScrollController,
-                            physics: const ClampingScrollPhysics(),
-                            slivers: [
-                              // --- DYNAMIC CHAT (CORTEX) ---
-                              _buildSliverHeader("Dynamic Chat"),
-                              SliverPadding(
-                                padding: EdgeInsets.symmetric(horizontal: sp16),
-                                sliver: SliverToBoxAdapter(
-                                  child: Center(
-                                    child: SizedBox(
-                                      width: (sw - (2 * sp16) - sp12) / 2,
-                                      height: sh *
-                                          0.085, // Enforce height to match grid cards
-                                      child: ModelCard(
-                                        title: 'Cortex',
-                                        imagePath: 'assets/cortex.svg',
-                                        isSelected: widget.currentModelId ==
-                                            'cortex/auto',
-                                        onBodyTap: () =>
-                                            _handleSelection('cortex/auto'),
-                                        showExpansionArrow: false,
-                                        backgroundGradient: LinearGradient(
-                                          begin: Alignment.centerRight,
-                                          end: Alignment.centerLeft,
-                                          colors: [
-                                            const Color(0xFF3B82F6)
-                                                .withValues(alpha: 0.1),
-                                            Colors.transparent,
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              if (_selfModels.isNotEmpty) ...[
-                                _buildSliverHeader(
-                                    widget.localizations.customModels),
-                                _buildSliverGrid(_selfModels),
-                              ],
-                              if (_offlineModels.isNotEmpty) ...[
-                                _buildSliverHeader(
-                                    widget.localizations.offlineModels),
-                                _buildSliverGrid(_offlineModels),
-                              ],
-                              if (_onlineSeries.isNotEmpty) ...[
-                                _buildSliverHeader(
-                                    widget.localizations.onlineModels),
-                                _buildSliverOnlineList(),
-                              ],
-                              if (_characterModels.isNotEmpty) ...[
-                                _buildSliverHeader(
-                                    widget.localizations.characterModels),
-                                _buildSliverGrid(_characterModels),
-                              ],
-
-                              SliverPadding(
-                                padding: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).padding.bottom +
-                                          20,
-                                ),
-                              ),
-                            ],
+                      // Title
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Center(
+                          child: Text(
+                            widget.localizations.allModels,
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                              fontSize: titleSize,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryColor.inverted,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+              ),
+
+              // 2. CONTENT AREA (Switches between Skeleton and Real Data)
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  switchInCurve: Curves.easeOutQuart,
+                  switchOutCurve: Curves.easeInQuart,
+                  transitionBuilder: (Widget child,
+                      Animation<double> animation) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                  child: _isLoading
+                      ? const ModelSelectionSkeleton(key: ValueKey('skeleton'))
+                      : ScrollFog(
+                    key: const ValueKey('content'),
+                    scrollController: _internalScrollController,
+                    topFogHeight: 20,
+                    bottomFogHeight: 50,
+                    child: CustomScrollView(
+                      controller: _internalScrollController,
+                      physics: const ClampingScrollPhysics(),
+                      slivers: [
+                        // --- DYNAMIC CHAT (CORTEX) ---
+                        _buildSliverHeader("Dynamic Chat"),
+                        SliverPadding(
+                          padding: EdgeInsets.symmetric(horizontal: sp16),
+                          sliver: SliverToBoxAdapter(
+                            child: Center(
+                              child: SizedBox(
+                                width: (sw - (2 * sp16) - sp12) / 2,
+                                height: sh * 0.085,
+                                child: ModelCard(
+                                  title: 'Cortex',
+                                  imagePath: 'assets/cortex.svg',
+                                  isSelected: widget.currentModelId ==
+                                      'cortex/auto',
+                                  onBodyTap: () =>
+                                      _handleSelection('cortex/auto'),
+                                  showExpansionArrow: false,
+                                  backgroundGradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    stops: const [0.1, 1],
+                                    colors: [
+                                      Colors.blueAccent.withValues(
+                                          alpha: 0.0),
+                                      Colors.blueAccent.withValues(
+                                          alpha: 0.2),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        if (_selfModels.isNotEmpty) ...[
+                          _buildSliverHeader(
+                              widget.localizations.customModels),
+                          _buildSliverGrid(_selfModels),
+                        ],
+                        if (_offlineModels.isNotEmpty) ...[
+                          _buildSliverHeader(
+                              widget.localizations.offlineModels),
+                          _buildSliverGrid(_offlineModels),
+                        ],
+                        if (_onlineSeries.isNotEmpty) ...[
+                          _buildSliverHeader(
+                              widget.localizations.onlineModels),
+                          _buildSliverOnlineList(),
+                        ],
+                        if (_characterModels.isNotEmpty) ...[
+                          _buildSliverHeader(
+                              widget.localizations.characterModels),
+                          _buildSliverGrid(_characterModels),
+                        ],
+
+                        SliverPadding(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery
+                                .of(context)
+                                .padding
+                                .bottom +
+                                20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -403,7 +391,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
           mainAxisSpacing: sp12,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+              (context, index) {
             final model = models[index];
             return ModelCard(
               title: model.displayTitle,
@@ -426,7 +414,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
       padding: EdgeInsets.symmetric(horizontal: sp16),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) {
+              (context, index) {
             final int itemIndex = index * 2;
             final item1 = _onlineSeries[itemIndex];
             final item2 = (itemIndex + 1 < _onlineSeries.length)
@@ -465,15 +453,15 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                         Expanded(
                           child: item2 != null
                               ? ModelCard(
-                                  title: item2.displayTitle,
-                                  imagePath: item2.imagePath ?? '',
-                                  isSelected: isItem2Active,
-                                  isExpanded: isItem2Expanded,
-                                  showExpansionArrow: true,
-                                  onBodyTap: () => _handleSelection(item2.id),
-                                  onArrowTap: () =>
-                                      _handleSeriesExpansion(item2.id),
-                                )
+                            title: item2.displayTitle,
+                            imagePath: item2.imagePath ?? '',
+                            isSelected: isItem2Active,
+                            isExpanded: isItem2Expanded,
+                            showExpansionArrow: true,
+                            onBodyTap: () => _handleSelection(item2.id),
+                            onArrowTap: () =>
+                                _handleSeriesExpansion(item2.id),
+                          )
                               : const SizedBox.shrink(),
                         ),
                       ],
@@ -542,7 +530,7 @@ class _VariantsPanel extends StatelessWidget {
       firstChild: SizedBox(width: width, height: 0),
       secondChild: _buildContent(),
       crossFadeState:
-          isVisible ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+      isVisible ? CrossFadeState.showSecond : CrossFadeState.showFirst,
       duration: const Duration(milliseconds: 300),
       reverseDuration: const Duration(milliseconds: 250),
       sizeCurve: Curves.fastOutSlowIn,
@@ -589,7 +577,7 @@ class _VariantsPanel extends StatelessWidget {
                 width: iconSize * 0.8,
                 height: iconSize * 0.8,
                 colorFilter:
-                    ColorFilter.mode(AppColors.tertiaryColor, BlendMode.srcIn),
+                ColorFilter.mode(AppColors.tertiaryColor, BlendMode.srcIn),
               ),
               SizedBox(width: sp8),
               Text(

@@ -543,5 +543,7 @@
   "actionCamera": "카메라",
   "actionGallery": "갤러리",
   "actionFile": "파일",
-  "listening": "듣는 중"
+  "listening": "듣는 중",
+  "defaultViewTitle": "요즘 어때요?",
+  "defaultViewDescription": "Cortex는 수백 가지의 AI 모델, 오프라인 기능, 동적 채팅 등 다양한 기능을 통해 항상 여러분 곁에 있습니다."
 }

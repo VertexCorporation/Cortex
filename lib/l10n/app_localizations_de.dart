@@ -1616,9 +1616,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get listening => 'Hört zu';
 
   @override
-  String get defaultViewTitle => 'What\'s Up?';
+  String get defaultViewTitle => 'Alles klar?';
 
   @override
   String get defaultViewDescription =>
-      'Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.';
+      'Cortex steht Ihnen stets zur Seite mit Hunderten von KI-Modellen, Offline-Funktionen, dynamischem Chat und vielem mehr.';
 }

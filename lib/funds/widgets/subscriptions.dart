@@ -162,7 +162,6 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
 
     return ScrollFog(
       scrollController: widget.scrollController!,
-      fogColor: AppColors.background,
       topFogHeight: screenHeight * 0.04,
       bottomFogHeight: screenHeight * 0.07,
       child: SingleChildScrollView(
