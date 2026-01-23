@@ -11,7 +11,7 @@ class DbHelper {
   DbHelper._internal();
 
   Database? _db;
-  static const int _latestVersion = 5; // Define the latest version here
+  static const int _latestVersion = 6; // Define the latest version here
 
   Future<Database> get db async {
     if (_db != null) return _db!;
@@ -36,6 +36,7 @@ class DbHelper {
         title           TEXT,
         modelId         TEXT,
         isStarred       INTEGER DEFAULT 0,
+        starredDate     INTEGER DEFAULT 0,
         lastMessageDate INTEGER DEFAULT 0
       );
     ''');
@@ -76,14 +77,16 @@ class DbHelper {
       debugPrint("[Database] Applying migration for version ${i + 1}");
       switch (i + 1) {
         case 2:
-          batch.execute('ALTER TABLE conversations ADD COLUMN isStarred INTEGER DEFAULT 0;');
+          batch.execute(
+              'ALTER TABLE conversations ADD COLUMN isStarred INTEGER DEFAULT 0;');
           batch.execute('''
             CREATE UNIQUE INDEX IF NOT EXISTS messages_conv_idx
             ON messages(conversationId, idx);
           ''');
           break;
         case 3:
-          batch.execute('ALTER TABLE conversations ADD COLUMN lastMessageDate INTEGER DEFAULT 0;');
+          batch.execute(
+              'ALTER TABLE conversations ADD COLUMN lastMessageDate INTEGER DEFAULT 0;');
           break;
         case 4:
           batch.execute('ALTER TABLE messages ADD COLUMN uuid TEXT;');
@@ -95,6 +98,10 @@ class DbHelper {
               last_used   INTEGER
             );
           ''');
+          break;
+        case 6:
+          batch.execute(
+              'ALTER TABLE conversations ADD COLUMN starredDate INTEGER DEFAULT 0;');
           break;
       }
     }
@@ -110,9 +117,11 @@ class DbHelper {
       if (_db == null) await db;
 
       await _db!.execute('VACUUM');
-      debugPrint("[DatabaseHelper] Database vacuumed and optimized (Disk Space Reclaimed).");
+      debugPrint(
+          "[DatabaseHelper] Database vacuumed and optimized (Disk Space Reclaimed).");
     } catch (e) {
-      debugPrint("[DatabaseHelper] Optimization failed (likely disk full or locked): $e");
+      debugPrint(
+          "[DatabaseHelper] Optimization failed (likely disk full or locked): $e");
     }
   }
 }

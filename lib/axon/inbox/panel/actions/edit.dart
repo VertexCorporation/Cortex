@@ -91,6 +91,7 @@ Future<String?> showEditTitleDialog({
                               TextField(
                                 controller: controller,
                                 autofocus: true,
+                                maxLength: 32, // Enforce limit
                                 decoration: InputDecoration(
                                   labelText: localizations.newTitle,
                                   labelStyle: TextStyle(
@@ -98,6 +99,7 @@ Future<String?> showEditTitleDialog({
                                     fontSize: 14,
                                   ),
                                   isDense: true,
+                                  counterText: "", // Hide character counter
                                   contentPadding: const EdgeInsets.symmetric(
                                     vertical: 12,
                                     horizontal: 12,

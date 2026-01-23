@@ -38,7 +38,7 @@ class Cortex extends StatelessWidget {
         secondary: AppColors.border,
         onSecondary: AppColors.quaternaryColor,
         surface: AppColors.background,
-        onSurface: AppColors.border,
+        onSurface: AppColors.primaryColor.inverted,
         error: AppColors.septenaryColor,
       ),
       textSelectionTheme: TextSelectionThemeData(

@@ -1,12 +1,14 @@
 // lib/chat/screen/default/view.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/chat/providers/session.dart';
 import '../../../../app.dart';
+import '../../../../webview.dart';
 
 class ChatEmptyState extends StatefulWidget {
   const ChatEmptyState({super.key});
@@ -39,8 +41,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     _breathingController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
-    )
-      ..repeat(reverse: true);
+    )..repeat(reverse: true);
 
     _breathingScaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(
@@ -72,9 +73,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final isFlux = context
-        .read<ChatSessionProvider>()
-        .isFluxMode;
+    final isFlux = context.read<ChatSessionProvider>().isFluxMode;
 
     // Initialize state on first run
     if (_wasFluxMode == null) {
@@ -154,7 +153,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
 
     final double titleSize = isTablet ? screenWidth * 0.04 : screenWidth * 0.06;
     final double bodyFontSize =
-    isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
+        isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
 
     final double contentMaxWidth = isTablet ? screenWidth * 0.6 : screenWidth;
     final double horizontalPadding = isTablet ? 0 : screenWidth * 0.12;
@@ -173,11 +172,12 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   child: Column(
                     children: [
                       const Spacer(),
-
                       Container(
                         width: contentMaxWidth,
-                        padding: EdgeInsets.only(top: topPadding,
-                            right: horizontalPadding, left: horizontalPadding),
+                        padding: EdgeInsets.only(
+                            top: topPadding,
+                            right: horizontalPadding,
+                            left: horizontalPadding),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -195,18 +195,31 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                       opacity: (1.0 - _modeAnimation.value)
                                           .clamp(0.0, 1.0),
                                       child: Transform.scale(
-                                        scale: 1.0 -
-                                            (_modeAnimation.value * 0.2),
+                                        scale:
+                                            1.0 - (_modeAnimation.value * 0.2),
                                         child: ScaleTransition(
                                           scale: _breathingScaleAnimation,
-                                          child: SvgPicture.asset(
-                                            'assets/cortex.svg',
-                                            width: logoSize,
-                                            height: logoSize,
-                                            fit: BoxFit.contain,
-                                            colorFilter: ColorFilter.mode(
-                                              AppColors.primaryColor.inverted,
-                                              BlendMode.srcIn,
+                                          child: IconButton(
+                                            onPressed: () {
+                                              if (_modeAnimation.value < 0.5) {
+                                                HapticFeedback.lightImpact();
+                                                showAppWebViewModal(
+                                                    context,
+                                                    "Vertex",
+                                                    "https://vertexishere.com");
+                                              }
+                                            },
+                                            iconSize: logoSize,
+                                            padding: EdgeInsets.zero,
+                                            icon: SvgPicture.asset(
+                                              'assets/cortex.svg',
+                                              width: logoSize,
+                                              height: logoSize,
+                                              fit: BoxFit.contain,
+                                              colorFilter: ColorFilter.mode(
+                                                AppColors.primaryColor.inverted,
+                                                BlendMode.srcIn,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -214,21 +227,24 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                     ),
 
                                     // FLUX (GHOST) Logo
-                                    Opacity(
-                                      opacity:
-                                      _modeAnimation.value.clamp(0.0, 1.0),
-                                      child: Transform.scale(
-                                        scale: 0.8 +
-                                            (_modeAnimation.value * 0.2),
-                                        child: ScaleTransition(
-                                          scale: _breathingScaleAnimation,
-                                          child: SvgPicture.asset(
-                                            'assets/icons/on/ghost.svg',
-                                            width: logoSize,
-                                            height: logoSize,
-                                            fit: BoxFit.contain,
-                                            colorFilter: ColorFilter.mode(
-                                                contentColor, BlendMode.srcIn),
+                                    IgnorePointer(
+                                      child: Opacity(
+                                        opacity: _modeAnimation.value
+                                            .clamp(0.0, 1.0),
+                                        child: Transform.scale(
+                                          scale: 0.8 +
+                                              (_modeAnimation.value * 0.2),
+                                          child: ScaleTransition(
+                                            scale: _breathingScaleAnimation,
+                                            child: SvgPicture.asset(
+                                              'assets/icons/on/ghost.svg',
+                                              width: logoSize,
+                                              height: logoSize,
+                                              fit: BoxFit.contain,
+                                              colorFilter: ColorFilter.mode(
+                                                  contentColor,
+                                                  BlendMode.srcIn),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -255,7 +271,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                           0, -30.0 * _modeAnimation.value),
                                       child: Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
+                                            CrossAxisAlignment.stretch,
                                         children: [
                                           // Title (Standard)
                                           _buildEntranceItem(
@@ -311,7 +327,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                           30.0 * (1.0 - _modeAnimation.value)),
                                       child: Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
+                                            CrossAxisAlignment.stretch,
                                         children: [
                                           SizedBox(
                                               height: verticalSpacing * 0.2),
@@ -351,7 +367,6 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                           ],
                         ),
                       ),
-
                       const Spacer(),
                     ],
                   ),

@@ -278,7 +278,8 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                       physics: const ClampingScrollPhysics(),
                       slivers: [
                         // --- DYNAMIC CHAT (CORTEX) ---
-                        _buildSliverHeader("Dynamic Chat"),
+                        _buildSliverHeader(
+                            widget.localizations.dynamicChatTitle),
                         SliverPadding(
                           padding: EdgeInsets.symmetric(horizontal: sp16),
                           sliver: SliverToBoxAdapter(

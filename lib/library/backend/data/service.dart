@@ -328,32 +328,39 @@ class ModelService with ChangeNotifier {
 
   /// Retrieves a precise [ModelEntity] for a given ID, which can be a base ID or a variant ID.
   /// It intelligently merges series data with variant data if necessary.
+  /// Retrieves a precise [ModelEntity] for a given ID, which can be a base ID or a variant ID.
   ModelEntity getPreciseModelData(String modelId, {required String langCode}) {
+    if (modelId == 'cortex/auto' || modelId == 'dynamic') {
+      var entity = ModelEntity.fromMap(
+          ModelDefaults.cortexDynamicChatData, langCode);
+      return entity.copyWith(imagePath: getModelImagePath(entity));
+    }
+
     final allModels = getCachedModelsSync();
     if (allModels.isEmpty) {
       debugPrint(
           "[ModelService] CRITICAL WARNING: getPreciseModelData called when entity cache is empty.");
+      if (modelId == 'cortex/auto' || modelId == 'dynamic') {
+        var entity = ModelEntity.fromMap(
+            ModelDefaults.cortexDynamicChatData, langCode);
+        return entity.copyWith(imagePath: getModelImagePath(entity));
+      }
       return _createFallbackEntity(modelId, langCode: langCode);
     }
 
-    if (modelId == 'cortex/auto') {
-      return ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
-    }
-
-    // Search 1: Exact match in top-level models.
+    // Search 1: Exact match
     try {
       return allModels.firstWhere((model) => model.id == modelId);
     } catch (_) {
-      // Not found, proceed to search in variants.
+      // Not found, proceed.
     }
 
-    // Search 2: Match within a series' variants.
+    // Search 2: Match within variants
     for (final modelSeries in allModels) {
       if (modelSeries.variants?.containsKey(modelId) ?? false) {
         final variantData = modelSeries.variants![modelId] as Map<
             String,
             dynamic>;
-        // Merge series data with variant-specific data.
         final mergedMap = {
           ...modelSeries.toMap(),
           ...variantData,
@@ -381,6 +388,7 @@ class ModelService with ChangeNotifier {
   ///    c. A match for the model's producer name (e.g., 'xai' for a Grok model).
   /// 3. If no cached image exists, it checks for a direct 'assets/...' path provided in the model's server data (a rare case).
   /// 4. As a final fallback, it returns a default icon.
+  /// Determines the definitive image path for a model.
   String getModelImagePath(ModelEntity model) {
     _cachedImagePaths ??= ModelImageCache.getPathsSync();
 
@@ -391,12 +399,15 @@ class ModelService with ChangeNotifier {
       }
     }
 
+    if (model.id == 'cortex/auto' || model.id == 'dynamic') {
+      return 'assets/cortex.svg';
+    }
+
     final baseId = getBaseIdFromFullId(model.id);
     final modelIdLower = model.id.toLowerCase();
     final baseIdLower = baseId.toLowerCase();
     final producerLower = model.producer.toLowerCase();
 
-    // 2a. Exact ID or Base ID match
     if (ModelDefaults.localAssetImageMap.containsKey(modelIdLower)) {
       return ModelDefaults.localAssetImageMap[modelIdLower]!;
     }
@@ -404,17 +415,11 @@ class ModelService with ChangeNotifier {
       return ModelDefaults.localAssetImageMap[baseIdLower]!;
     }
 
-    // 2b. Best "series" or "family" match
     final seriesMatch = _findBestAssetMatch(model.id);
-    if (seriesMatch != null) {
-      return seriesMatch;
-    }
+    if (seriesMatch != null) return seriesMatch;
 
-    // 2c. Producer name match
     final producerMatch = _findBestAssetMatch(producerLower);
-    if (producerMatch != null) {
-      return producerMatch;
-    }
+    if (producerMatch != null) return producerMatch;
 
     if (model.imagePath != null && model.imagePath!.startsWith('assets/')) {
       return model.imagePath!;

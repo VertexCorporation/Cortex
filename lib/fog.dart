@@ -1,5 +1,6 @@
 // lib/fog.dart
 
+import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 
 // --- VERTICAL FOG ---
@@ -28,10 +29,10 @@ class ScrollFog extends StatefulWidget {
 }
 
 class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
-  late AnimationController _topController;
-  late AnimationController _bottomController;
-  late Animation<double> _topOpacity;
-  late Animation<double> _bottomOpacity;
+  late final AnimationController _topController;
+  late final AnimationController _bottomController;
+  late final Animation<double> _topOpacity;
+  late final Animation<double> _bottomOpacity;
 
   bool _isTopVisible = false;
   bool _isBottomVisible = false;
@@ -49,9 +50,10 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 300),
     );
 
-    _topOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(_topController);
+    _topOpacity =
+        CurvedAnimation(parent: _topController, curve: Curves.easeOut);
     _bottomOpacity =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_bottomController);
+        CurvedAnimation(parent: _bottomController, curve: Curves.easeOut);
 
     widget.scrollController.addListener(_updateFogVisibility);
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateFogVisibility());
@@ -84,11 +86,13 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
     final controller = widget.scrollController;
 
     if (!controller.hasClients) {
-      if (_isTopVisible || _isBottomVisible) {
-        _topController.reverse();
-        _bottomController.reverse();
+      if (_isTopVisible) {
         _isTopVisible = false;
+        _topController.reverse();
+      }
+      if (_isBottomVisible) {
         _isBottomVisible = false;
+        _bottomController.reverse();
       }
       return;
     }
@@ -107,16 +111,17 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
         position.maxScrollExtent > 0 &&
         position.pixels < position.maxScrollExtent - widget.scrollThreshold;
 
-    if (shouldShowTop != _isTopVisible) {
+    if (_isTopVisible != shouldShowTop) {
       _isTopVisible = shouldShowTop;
       if (shouldShowTop) {
+        // Start from 0.1 to give immediate feedback, then fade to 1.0
         _topController.forward(from: 0.1);
       } else {
         _topController.reverse();
       }
     }
 
-    if (shouldShowBottom != _isBottomVisible) {
+    if (_isBottomVisible != shouldShowBottom) {
       _isBottomVisible = shouldShowBottom;
       if (shouldShowBottom) {
         _bottomController.forward(from: 0.1);
@@ -128,63 +133,81 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([_topController, _bottomController]),
-      builder: (context, child) {
-        final double topVal = _topOpacity.value;
-        final double bottomVal = _bottomOpacity.value;
+    return Stack(
+      children: [
+        // 1. Content stays at the bottom, untouched
+        Positioned.fill(child: widget.child),
 
-        if (topVal == 0.0 && bottomVal == 0.0) {
-          return widget.child;
-        }
+        // 2. Top Fog Overlay
+        if (widget.showTop)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: widget.topFogHeight,
+            child: AnimatedBuilder(
+              animation: _topOpacity,
+              builder: (context, child) {
+                // If opacity is effectively zero, don't paint
+                if (_topOpacity.value <= 0.01) return const SizedBox.shrink();
+                return Opacity(
+                  opacity: _topOpacity.value,
+                  child: child,
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    // Non-linear gradient for smoother "fog" feel
+                    stops: const [0.0, 0.4, 1.0],
+                    colors: [
+                      AppColors.background,
+                      AppColors.background.withValues(alpha: 0.8),
+                      AppColors.background.withValues(alpha: 0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
 
-        return ShaderMask(
-          shaderCallback: (Rect bounds) {
-            // We keep the stops consistent but change the "black" color opacity effectively by using transparency in gradient?
-            // Actually, ShaderMask with dstIn uses alpha channel.
-            // So if we want to fade IN the masking effect (which creates transparency), it's tricky.
-            // Wait, dstIn means the source (gradient) alpha defines the destination (child) alpha.
-            // Transparent in gradient = Transparent in child. Black (solid) in gradient = Opaque in child.
-            // To "disable" fog (child visible), we need Solid everywhere.
-            // To "enable" fog (top transparent), top part of gradient is Transparent.
-
-            // So if opacity is 0 (no fog), top should be Solid (Black).
-            // If opacity is 1 (full fog), top should be Transparent.
-
-            // Let's interpolate the "Transparent" color towards "Black" based on (1 - opacity).
-
-            final double topStop =
-                (widget.topFogHeight / bounds.height).clamp(0.0, 0.5);
-            final double bottomStop =
-                (1.0 - (widget.bottomFogHeight / bounds.height))
-                    .clamp(0.5, 1.0);
-
-            final Color topColor =
-                Color.lerp(Colors.black, Colors.transparent, topVal)!;
-            final Color bottomColor =
-                Color.lerp(Colors.black, Colors.transparent, bottomVal)!;
-
-            return LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                topColor,
-                Colors.black,
-                Colors.black,
-                bottomColor,
-              ],
-              stops: [
-                0.0,
-                topStop,
-                bottomStop,
-                1.0,
-              ],
-            ).createShader(bounds);
-          },
-          blendMode: BlendMode.dstIn,
-          child: widget.child,
-        );
-      },
+        // 3. Bottom Fog Overlay
+        if (widget.showBottom)
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: widget.bottomFogHeight,
+            child: AnimatedBuilder(
+              animation: _bottomOpacity,
+              builder: (context, child) {
+                if (_bottomOpacity.value <= 0.01) {
+                  return const SizedBox.shrink();
+                }
+                return Opacity(
+                  opacity: _bottomOpacity.value,
+                  child: child,
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    stops: const [0.0, 0.4, 1.0],
+                    colors: [
+                      AppColors.background,
+                      AppColors.background.withValues(alpha: 0.8),
+                      AppColors.background.withValues(alpha: 0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -215,13 +238,29 @@ class ScrollFogHorizontal extends StatefulWidget {
   State<ScrollFogHorizontal> createState() => _ScrollFogHorizontalState();
 }
 
-class _ScrollFogHorizontalState extends State<ScrollFogHorizontal> {
-  bool _showStartFog = false;
-  bool _showEndFog = false;
+class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
+    with TickerProviderStateMixin {
+  late final AnimationController _startController;
+  late final AnimationController _endController;
+  late final Animation<double> _startOpacity;
+  late final Animation<double> _endOpacity;
+
+  bool _isStartVisible = false;
+  bool _isEndVisible = false;
 
   @override
   void initState() {
     super.initState();
+    _startController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 300));
+    _endController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 300));
+
+    _startOpacity =
+        CurvedAnimation(parent: _startController, curve: Curves.easeOut);
+    _endOpacity =
+        CurvedAnimation(parent: _endController, curve: Curves.easeOut);
+
     widget.scrollController.addListener(_updateFogVisibility);
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateFogVisibility());
   }
@@ -243,6 +282,8 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal> {
   @override
   void dispose() {
     widget.scrollController.removeListener(_updateFogVisibility);
+    _startController.dispose();
+    _endController.dispose();
     super.dispose();
   }
 
@@ -251,17 +292,18 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal> {
     final controller = widget.scrollController;
 
     if (!controller.hasClients) {
-      if (_showStartFog || _showEndFog) {
-        setState(() {
-          _showStartFog = false;
-          _showEndFog = false;
-        });
+      if (_isStartVisible) {
+        _isStartVisible = false;
+        _startController.reverse();
+      }
+      if (_isEndVisible) {
+        _isEndVisible = false;
+        _endController.reverse();
       }
       return;
     }
 
     if (controller.positions.length > 1) return;
-
     final position = controller.position;
 
     final bool shouldShowStart =
@@ -271,49 +313,94 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal> {
         position.maxScrollExtent > 0 &&
         position.pixels < position.maxScrollExtent - widget.scrollThreshold;
 
-    if (shouldShowStart != _showStartFog || shouldShowEnd != _showEndFog) {
-      setState(() {
-        _showStartFog = shouldShowStart;
-        _showEndFog = shouldShowEnd;
-      });
+    if (_isStartVisible != shouldShowStart) {
+      _isStartVisible = shouldShowStart;
+      if (shouldShowStart) {
+        _startController.forward(from: 0.1);
+      } else {
+        _startController.reverse();
+      }
+    }
+
+    if (_isEndVisible != shouldShowEnd) {
+      _isEndVisible = shouldShowEnd;
+      if (shouldShowEnd) {
+        _endController.forward(from: 0.1);
+      } else {
+        _endController.reverse();
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_showStartFog && !_showEndFog) {
-      return widget.child;
-    }
-
-    return ShaderMask(
-      shaderCallback: (Rect bounds) {
-        final double startStop = _showStartFog
-            ? (widget.startFogWidth / bounds.width).clamp(0.0, 0.5)
-            : 0.0;
-
-        final double endStop = _showEndFog
-            ? (1.0 - (widget.endFogWidth / bounds.width)).clamp(0.5, 1.0)
-            : 1.0;
-
-        return LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: const [
-            Colors.transparent,
-            Colors.black,
-            Colors.black,
-            Colors.transparent,
-          ],
-          stops: [
-            0.0,
-            startStop,
-            endStop,
-            1.0,
-          ],
-        ).createShader(bounds);
-      },
-      blendMode: BlendMode.dstIn,
-      child: widget.child,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned.fill(child: widget.child),
+        if (widget.showStart)
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: widget.startFogWidth,
+            child: AnimatedBuilder(
+              animation: _startOpacity,
+              builder: (context, child) {
+                if (_startOpacity.value <= 0.01) return const SizedBox.shrink();
+                return Opacity(
+                  opacity: _startOpacity.value,
+                  child: child,
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    stops: const [0.0, 0.4, 1.0],
+                    colors: [
+                      AppColors.background,
+                      AppColors.background.withValues(alpha: 0.8),
+                      AppColors.background.withValues(alpha: 0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        if (widget.showEnd)
+          Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: widget.endFogWidth,
+            child: AnimatedBuilder(
+              animation: _endOpacity,
+              builder: (context, child) {
+                if (_endOpacity.value <= 0.01) return const SizedBox.shrink();
+                return Opacity(
+                  opacity: _endOpacity.value,
+                  child: child,
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft,
+                    stops: const [0.0, 0.4, 1.0],
+                    colors: [
+                      AppColors.background,
+                      AppColors.background.withValues(alpha: 0.8),
+                      AppColors.background.withValues(alpha: 0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

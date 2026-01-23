@@ -11,6 +11,7 @@ class ConversationManager extends ChangeNotifier {
   final String conversationID;
   String conversationTitle;
   bool isStarred;
+  DateTime? starredDate;
   bool isDeleted = false;
   late ModelEntity _model;
   final ModelService _modelService;
@@ -54,13 +55,13 @@ class ConversationManager extends ChangeNotifier {
     required this.conversationTitle,
     required String initialModelId,
     required this.isStarred,
+    this.starredDate, // Add param
     required DateTime lastMessageDate,
     required String langCode,
     String lastMessageText = '',
     String lastMessagePhotoPath = '',
     required ModelService modelService,
-  })
-      : _lastMessageText = lastMessageText,
+  })  : _lastMessageText = lastMessageText,
         _lastMessageDate = lastMessageDate,
         _lastMessagePhotoPath = lastMessagePhotoPath,
         _modelService = modelService {
@@ -85,7 +86,8 @@ class ConversationManager extends ChangeNotifier {
     try {
       final db = await DbHelper().db;
       final List<Map<String, dynamic>> convData = await db.query(
-          'conversations', where: 'id = ?',
+          'conversations',
+          where: 'id = ?',
           whereArgs: [conversationId],
           limit: 1);
 
@@ -99,10 +101,15 @@ class ConversationManager extends ChangeNotifier {
         conversationTitle: convRow['title'] as String? ?? 'Untitled',
         initialModelId: convRow['modelId'] as String? ?? '',
         isStarred: (convRow['isStarred'] as int? ?? 0) == 1,
+        // Load starredDate
+        starredDate: convRow['starredDate'] != null &&
+                (convRow['starredDate'] as int) > 0
+            ? DateTime.fromMillisecondsSinceEpoch(convRow['starredDate'] as int)
+            : null,
         lastMessageDate: lastMsg?['ts'] != null
             ? DateTime.fromMillisecondsSinceEpoch(lastMsg!['ts'] as int)
             : DateTime.fromMillisecondsSinceEpoch(
-            convRow['lastMessageDate'] as int? ?? 0),
+                convRow['lastMessageDate'] as int? ?? 0),
         lastMessageText: lastMsg?['text'] as String? ?? '',
         lastMessagePhotoPath: lastMsg?['photoPath'] as String? ?? '',
         langCode: langCode,
@@ -118,8 +125,8 @@ class ConversationManager extends ChangeNotifier {
   Future<bool> checkForModelUpdate({required String langCode}) async {
     try {
       final db = await DbHelper().db;
-      final List<Map<String, dynamic>> result = await db.query(
-          'conversations', columns: ['modelId'],
+      final List<Map<String, dynamic>> result = await db.query('conversations',
+          columns: ['modelId'],
           where: 'id = ?',
           whereArgs: [conversationID],
           limit: 1);
@@ -127,8 +134,8 @@ class ConversationManager extends ChangeNotifier {
       if (result.isNotEmpty) {
         final latestModelId = result.first['modelId'] as String?;
         if (latestModelId != null && latestModelId != modelId) {
-          _model = _modelService.getPreciseModelData(
-              latestModelId, langCode: langCode);
+          _model = _modelService.getPreciseModelData(latestModelId,
+              langCode: langCode);
           notifyListeners();
           return true;
         }
@@ -139,8 +146,8 @@ class ConversationManager extends ChangeNotifier {
     return false;
   }
 
-  void updateLastMessage(String newText, String newPhotoPath,
-      DateTime newDate) {
+  void updateLastMessage(
+      String newText, String newPhotoPath, DateTime newDate) {
     bool needsNotify = false;
     if (_lastMessageText != newText) {
       _lastMessageText = newText;
@@ -170,6 +177,11 @@ class ConversationManager extends ChangeNotifier {
   void setStarred(bool val) {
     if (isStarred != val) {
       isStarred = val;
+      if (val) {
+        starredDate = DateTime.now();
+      } else {
+        starredDate = null;
+      }
       notifyListeners();
     }
   }

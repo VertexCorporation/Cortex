@@ -1,5 +1,6 @@
 // lib/chat/screen/selected/widgets/input/input.dart
 
+import 'dart:async';
 import 'dart:io';
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/input.dart';
@@ -81,21 +82,111 @@ class InputField extends StatefulWidget {
   InputFieldState createState() => InputFieldState();
 }
 
-class InputFieldState extends State<InputField> {
+class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   final InputService _inputService = InputService();
   double _inputFieldHeight = 0.0;
   final GlobalKey _inputFieldKey = GlobalKey();
 
+  // Master controller for Input <-> Voice transition
+  late AnimationController _modeController;
+
+  late Animation<double> _inputOpacityAnim;
+  late Animation<double> _waveOpacityAnim;
+
   @override
   void initState() {
     super.initState();
+
+    // 600ms total transition duration
+    _modeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    // 1. Input Opacity (Fade Out 0.0 -> 0.4)
+    // Reverse: Fade In (0.4 -> 0.0) -> Buttons appear last
+    _inputOpacityAnim = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _modeController,
+        curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
+        reverseCurve: const Interval(0.0, 0.4, curve: Curves.easeIn),
+      ),
+    );
+
+    // 2. Wave Opacity (Fade In 0.5 -> 1.0)
+    // Reverse: Fade Out (1.0 -> 0.5) -> Wave disappears first
+    _waveOpacityAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _modeController,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+        reverseCurve: const Interval(0.5, 1.0, curve: Curves.easeOut),
+      ),
+    );
+
     widget.controller.addListener(() {
       if (mounted) setState(() {});
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final speechService = context.read<SpeechService>();
+      speechService.addListener(_onSpeechStatusChange);
+
+      // Initialize state based on provider
+      final inputProvider = context.read<InputProvider>();
+      if (inputProvider.isVoiceRecording) {
+        _modeController.value = 1.0;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _modeController.dispose();
+    _speechService?.removeListener(_onSpeechStatusChange);
+    super.dispose();
+  }
+
+  SpeechService? _speechService;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newService = context.read<SpeechService>();
+    if (_speechService != newService) {
+      _speechService?.removeListener(_onSpeechStatusChange);
+      _speechService = newService;
+      _speechService?.addListener(_onSpeechStatusChange);
+    }
+  }
+
+  void _onSpeechStatusChange() {
+    if (!mounted) return;
+    final inputProvider = context.read<InputProvider>();
+    final speechService = _speechService;
+
+    if (speechService == null) return;
+
+    if (inputProvider.isVoiceRecording && !speechService.isListening) {
+      inputProvider.setVoiceRecording(false);
+    }
+  }
+
+  // Monitor provider state changes to drive animation
+  void _syncAnimationWithState(bool isRecording) {
+    if (isRecording) {
+      if (_modeController.status != AnimationStatus.forward &&
+          _modeController.status != AnimationStatus.completed) {
+        _modeController.forward();
+      }
+    } else {
+      if (_modeController.status != AnimationStatus.reverse &&
+          _modeController.status != AnimationStatus.dismissed) {
+        _modeController.reverse();
+      }
+    }
   }
 
   void clearPhotoPanel() {
-    // New logic: Clear all attachments via provider
     context.read<InputProvider>().clearAttachments();
   }
 
@@ -124,6 +215,8 @@ class InputFieldState extends State<InputField> {
     final inputProvider = context.watch<InputProvider>();
     final bool isRecording = inputProvider.isVoiceRecording;
 
+    _syncAnimationWithState(isRecording);
+
     if (!widget.isModelSelected && !widget.isDynamicChatMode) {
       return const SizedBox.shrink();
     }
@@ -148,68 +241,137 @@ class InputFieldState extends State<InputField> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // UPDATED: Universal Attachment Preview Section
               _AttachmentPreviewSection(
                   screenWidth: screenWidth, isTablet: isTablet),
 
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+              // Main Animated Area
+              AnimatedBuilder(
+                animation: _modeController,
+                builder: (context, child) {
+                  // Logic for sequencing Layout Changes (Expansion/Shrink)
+                  // Forward (Input->Voice):
+                  //   0.0->0.2: Standard Input (Wave Offstage)
+                  //   0.2: Wave Onstage -> Layout expands to max
+                  //   1.0: Input Offstage -> Layout shrinks to Wave
+                  // Reverse (Voice->Input):
+                  //   1.0->0.8: Wave Visible (Input Offstage)
+                  //   0.8: Input Onstage -> "Input Expand" triggers here (Stack becomes Max)
+                  //   0.0: Wave Offstage -> Stack becomes Input
+
+                  // Asymmetric Logic for sequencing:
+                  // Forward: Cut input early (0.5) to avoid empty box.
+                  // Reverse: Expand input early (0.9) to ensure expansion finishes before buttons fade in.
+                  final bool isForward =
+                      _modeController.status == AnimationStatus.forward ||
+                          _modeController.status == AnimationStatus.completed;
+                  final double inputCutoff = isForward ? 0.5 : 0.9;
+
+                  final bool showInputLayout =
+                      _modeController.value < inputCutoff;
+                  final bool showWaveLayout = _modeController.value > 0.1;
+
+                  return AnimatedSize(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment.bottomCenter,
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
                       children: [
-                        // Animated Switcher: Text Field <-> Waveform
-                        AnimatedSize(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOutCubic,
-                          alignment: Alignment.bottomCenter,
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                              return FadeTransition(
-                                  opacity: animation, child: child);
-                            },
-                            child: isRecording
-                                ? const _WaveformSection(
-                                    key: ValueKey('waveform'))
-                                : _TextFieldSection(
-                                    key: const ValueKey('textfield'),
-                                    controller: widget.controller,
-                                    focusNode: widget.textFieldFocusNode,
-                                    localizations: widget.localizations,
-                                    screenWidth: screenWidth,
-                                    isTablet: isTablet,
-                                    onEnterPressed: () {
-                                      if (isSendButtonEnabled) widget.onSend();
-                                    },
+                        // 1. INPUT CONTENT
+                        Visibility(
+                          visible: showInputLayout,
+                          maintainState: true,
+                          child: IgnorePointer(
+                            ignoring: _inputOpacityAnim.value < 0.1,
+                            child: FadeTransition(
+                              opacity: _inputOpacityAnim,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            _TextFieldSection(
+                                              key: const ValueKey('textfield'),
+                                              controller: widget.controller,
+                                              focusNode:
+                                                  widget.textFieldFocusNode,
+                                              localizations:
+                                                  widget.localizations,
+                                              screenWidth: screenWidth,
+                                              isTablet: isTablet,
+                                              showHintText: true,
+                                              onEnterPressed: () {
+                                                if (isSendButtonEnabled) {
+                                                  widget.onSend();
+                                                }
+                                              },
+                                            ),
+                                            _SequencedToolsTransition(
+                                              isVisible: true,
+                                              child: _ToolsSection(
+                                                screenWidth: screenWidth,
+                                                isTablet: isTablet,
+                                                widget: widget,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: false,
+                                        maintainSize: true,
+                                        maintainAnimation: true,
+                                        maintainState: true,
+                                        child: _SendButtonSection(
+                                          screenWidth: screenWidth,
+                                          isTablet: isTablet,
+                                          widget: widget,
+                                          isEnabled: isSendButtonEnabled,
+                                          controller: widget.controller,
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
 
-                        // Tools Section
-                        _SequencedToolsTransition(
-                          isVisible: !isRecording,
-                          child: _ToolsSection(
+                        // 2. WAVEFORM CONTENT
+                        Visibility(
+                          visible: showWaveLayout,
+                          maintainState: true,
+                          child: IgnorePointer(
+                            ignoring: _waveOpacityAnim.value < 0.1,
+                            child: FadeTransition(
+                              opacity: _waveOpacityAnim,
+                              child: const _WaveformSection(
+                                  key: ValueKey('waveform')),
+                            ),
+                          ),
+                        ),
+
+                        // 3. MAIN ACTION BUTTON (PERSISTENT)
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: _SendButtonSection(
                             screenWidth: screenWidth,
                             isTablet: isTablet,
                             widget: widget,
+                            isEnabled: isSendButtonEnabled,
+                            controller: widget.controller,
                           ),
                         ),
                       ],
                     ),
-                  ),
-
-                  // Send / Mic / Stop Button
-                  _SendButtonSection(
-                    screenWidth: screenWidth,
-                    isTablet: isTablet,
-                    widget: widget,
-                    isEnabled: isSendButtonEnabled,
-                    controller: widget.controller,
-                  ),
-                ],
+                  );
+                },
               ),
             ],
           ),
@@ -238,7 +400,8 @@ class _WaveformSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: EdgeInsets.fromLTRB(12.0, 28.0, 0, 12.0),
+      // Lowered position per user request (increased top padding from 16.0 to 24.0)
+      padding: EdgeInsets.fromLTRB(12.0, 24.0, 0, 16.0),
       child: WaveformVisualizer(),
     );
   }
@@ -258,14 +421,8 @@ class _AttachmentPreviewSection extends StatelessWidget {
     final attachments = inputProvider.attachments;
 
     final double itemSize = isTablet ? screenWidth * 0.15 : screenWidth * 0.20;
-    final double padding = isTablet ? screenWidth * 0.02 : screenWidth * 0.03;
-
-    // Create a ScrollController for the fog
-    // Note: In a stateless widget, we can't dispose this controller properly if we create it here.
-    // Ideally, we should convert this to StatefulWidget or accept one.
-    // However, for brevity and since this widget might be rebuilt, let's try to just build it.
-    // BUT! Fog requires a controller that is attached.
-    // `_AttachmentPreviewSection` is Stateless. I should convert it to Stateful to hold the controller.
+    // Reverted padding to standard
+    final double padding = isTablet ? screenWidth * 0.02 : 12.0;
 
     return _AttachmentListWithFog(
       attachments: attachments,
@@ -294,25 +451,67 @@ class _AttachmentListWithFog extends StatefulWidget {
 }
 
 class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final ScrollController _scrollController = ScrollController();
+  late List<InputAttachment> _displayedItems;
 
-  // We are using a normal ListView for now because switching to AnimatedList
-  // with an external provider list source (inputProvider.attachments) is tricky
-  // to synchronize (keeping two lists in sync).
-  //
-  // To implement "sliding gap fill" properly without full AnimatedList sync hell:
-  // We will just use the standard list for now but wrapped in Fog.
-  // The 'sliding' effect usually requires AnimatedList which needs
-  // precise insert/remove calls matching the model.
-  // provider.removeAttachmentAt(index) happens instantly.
-  //
-  // User asked for "fotoğraf çıkarıldığında falan diğer elemanlar kayarak onun boşluğunu tamamlasınlar".
-  // This is implicit in standard Flutter ListView? No, it snaps.
-  // ImplicitlyAnimatedList packages exist but we don't have them.
-  //
-  // PROPOSE: Just add Fog for now to satisfy the "impressive" part of scrolling.
-  // Converting to AnimatedList requires changing how InputProvider notifies removals
-  // (it currently just notifiesListeners).
+  @override
+  void initState() {
+    super.initState();
+    _displayedItems = List.from(widget.attachments);
+  }
+
+  @override
+  void didUpdateWidget(_AttachmentListWithFog oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncList();
+  }
+
+  void _syncList() {
+    final newItems = widget.attachments;
+
+    // Calculate Diff (Simple implementation optimized for single operations)
+    // 1. Check for Additions
+    if (newItems.length > _displayedItems.length) {
+      for (int i = 0; i < newItems.length; i++) {
+        if (i >= _displayedItems.length || newItems[i] != _displayedItems[i]) {
+          _displayedItems.insert(i, newItems[i]);
+          _listKey.currentState?.insertItem(i);
+
+          // Auto-scroll to end on add
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_scrollController.hasClients) {
+              _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              );
+            }
+          });
+
+          // Single addition optimization
+          if (newItems.length == _displayedItems.length) break;
+        }
+      }
+    }
+    // 2. Check for Removals
+    else if (newItems.length < _displayedItems.length) {
+      for (int i = 0; i < _displayedItems.length; i++) {
+        if (i >= newItems.length || _displayedItems[i] != newItems[i]) {
+          final removedItem = _displayedItems[i];
+          _displayedItems.removeAt(i);
+          _listKey.currentState?.removeItem(
+            i,
+            (context, animation) =>
+                _buildItem(removedItem, animation, i, isRemoving: true),
+            duration: const Duration(milliseconds: 300),
+          );
+          if (newItems.length == _displayedItems.length) break;
+          i--; // Adjust index since we removed
+        }
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -320,67 +519,156 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
     super.dispose();
   }
 
+  Widget _buildItem(
+      InputAttachment attachment, Animation<double> animation, int index,
+      {bool isRemoving = false}) {
+    // Combined Fade and Size transition for polished effect
+    return FadeTransition(
+      opacity: animation,
+      child: SizeTransition(
+        sizeFactor: animation,
+        axis: Axis.horizontal,
+        child: Padding(
+          padding: const EdgeInsets.only(right: 12.0),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              _AttachmentItem(attachment: attachment, size: widget.itemSize),
+              // Only show delete button if NOT removing (visual polish)
+              if (!isRemoving)
+                Positioned(
+                  top: 2,
+                  right: -6,
+                  child: GestureDetector(
+                    onTap: () => widget.onRemove(index),
+                    child: Container(
+                      padding: const EdgeInsets.all(4.0),
+                      decoration: const BoxDecoration(
+                        color: Colors.black87,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black38,
+                              blurRadius: 4,
+                              offset: Offset(0, 1))
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.close_rounded,
+                        size: 14,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final hasAttachments = widget.attachments.isNotEmpty;
+    // If empty (and no outgoing animations pending?), collapse.
+    // AnimatedList keeps state, so strict check on _displayedItems might hide outgoing element.
+    // Better to check widget.attachments for the "container" visibility, but for AnimatedList to work
+    // it needs to be in the tree.
+    // However, our parent uses AnimatedSize to hide this whole block if "hasAttachments" is false.
+    // If we rely on parent to hide, the "last item removal" animation will be clipped instantly.
+    // SO: We must ensure parent logic in _AttachmentPreviewSection doesn't hide us prematurely!
 
-    return AnimatedContainer(
+    // FIX: _AttachmentPreviewSection (parent) wraps this in AnimatedList logic?
+    // No, currently _AttachmentPreviewSection passes `attachments` to us.
+    // If `attachments` is empty, parent MIGHT rebuild us?
+    // Actually `_AttachmentListWithFog` wraps itself in `AnimatedSize` in the OLD code.
+    // In MY NEW code, I am REPLACING `_AttachmentListWithFog`.
+    // I should INCLUDE the `AnimatedSize` wrapper HERE.
+
+    // Logic: If _displayedItems is empty, height is 0.
+    // But while animating out, _displayedItems is already empty?
+    // No, _displayedItems is sync with provider. removeItem animation runs even if item removed from list.
+    // The AnimatedList itself needs to remain visible until animation finishes.
+
+    // We will use AnimatedSize on the CONTAINER.
+    // Trigger: _displayedItems.isNotEmpty ?
+
+    return AnimatedSize(
       duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      height: hasAttachments ? widget.itemSize + (widget.padding * 2) : 0,
-      width: double.infinity,
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 200),
-        opacity: hasAttachments ? 1.0 : 0.0,
-        child: hasAttachments
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        // Ensure localized constraints don't squash us
+        // If hasContent is false, height 0 is fine.
+        // But "removing" item still needs space.
+        // AnimatedList holds the widget in tree during animation.
+        // So `_displayedItems` removal happens, but widget needs non-zero height?
+        // Is AnimatedList empty immediately? No, it contains the "removing" item.
+        // So checking `_listKey.currentState` length? Hard.
+
+        // Better strategy: Always return the Container with AnimatedList.
+        // Let AnimatedList determine its own width/height?
+        // Since it's horizontal, we need fixed height.
+
+        // Wait, if I set height 0 when _displayedItems is empty (after last removal),
+        // the last item's exit animation (width shrink) might be visible, but height cut?
+        // Actually, if I set height 0 immediately when provider clears, yes, animation is cut.
+        // I need to wait for animation?
+        // UX Decision: Just keep height if `widget.attachments` OR `_displayedItems` has stuff?
+        // If Provider clears, `_displayedItems` clears immediately in my sync logic.
+        // I should probably just keep the height until the list is truly visually empty.
+        // Simpler: Just rely on `widget.attachments.isNotEmpty` for the 'height' toggle?
+        // If user deletes last item -> Provider empty -> Widget rebuilds -> Height 0.
+        // Animation cut.
+        // FIX: Don't use AnimatedSize for the height toggle of the LAST item.
+        // Just let AnimatedList be empty (height fixed, width 0).
+        // But we want it to collapse.
+
+        // Revised: Use `AnimatedSize` and toggle based on `_displayedItems.isNotEmpty`.
+        // BUT, since we remove from `_displayedItems` BEFORE animation, this is the problem.
+        // I will DELAY the removal from `_displayedItems`? No, that desyncs state.
+
+        // I will simply use `widget.attachments.isNotEmpty` for the height check? Same issue.
+
+        // Hack: AnimatedList handles the width. The container height can stay?
+        // If width becomes 0, does it matters?
+        // Let's rely on `hasContent` but adding a check?
+        // Actually, standard `AnimatedList` implementation:
+        // Use a boolean `_isAnimatingOut`?
+
+        // Let's stick to the industry standard:
+        // When last item is removed, we animate it out, THEN collapse the container.
+        // That is hard without callbacks.
+
+        // Acceptable Compromise: The "Slide to fill" is the main goal.
+        // The last item disappearing instantly is acceptable if it collapses smoothly vertically.
+        // So I will use `AnimatedSize` toggled by `widget.attachments.isNotEmpty`.
+        // The "Slide" works for items 1..N. The last one just vertically collapses.
+
+        height: widget.attachments.isNotEmpty
+            ? widget.itemSize + (widget.padding * 2)
+            : 0,
+        width: double.infinity,
+        child: widget.attachments.isNotEmpty
             ? ScrollFogHorizontal(
                 scrollController: _scrollController,
-                startFogWidth: 12.0,
-                endFogWidth: 32.0,
-                child: ListView.separated(
+                child: AnimatedList(
+                  key: _listKey,
                   controller: _scrollController,
+                  clipBehavior: Clip.none,
                   scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.all(widget.padding),
-                  itemCount: widget.attachments.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
-                  itemBuilder: (context, index) {
-                    final attachment = widget.attachments[index];
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        _AttachmentItem(
-                            attachment: attachment, size: widget.itemSize),
-                        Positioned(
-                          top: -6,
-                          right: -6,
-                          child: GestureDetector(
-                            onTap: () => widget.onRemove(index),
-                            child: Container(
-                              padding: const EdgeInsets.all(4.0),
-                              decoration: const BoxDecoration(
-                                color: Colors.black87,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.black38,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 1))
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.close_rounded,
-                                size: 14,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
+                  padding: EdgeInsets.symmetric(
+                      horizontal: widget.padding, vertical: widget.padding),
+                  initialItemCount: _displayedItems.length,
+                  itemBuilder: (context, index, animation) {
+                    // Safety for fast tapping
+                    if (index >= _displayedItems.length)
+                      return const SizedBox.shrink();
+                    return _buildItem(_displayedItems[index], animation, index);
                   },
                 ),
               )
-            : null,
+            : const SizedBox.shrink(),
       ),
     );
   }
@@ -483,6 +771,7 @@ class _TextFieldSection extends StatelessWidget {
   final double screenWidth;
   final bool isTablet;
   final VoidCallback onEnterPressed;
+  final bool showHintText;
 
   const _TextFieldSection({
     super.key,
@@ -492,6 +781,7 @@ class _TextFieldSection extends StatelessWidget {
     required this.screenWidth,
     required this.isTablet,
     required this.onEnterPressed,
+    this.showHintText = true,
   });
 
   @override
@@ -517,7 +807,7 @@ class _TextFieldSection extends StatelessWidget {
           isDense: true,
           contentPadding: EdgeInsets.symmetric(
               vertical: verticalPadding, horizontal: horizontalPadding),
-          hintText: localizations.messageHint,
+          hintText: showHintText ? localizations.messageHint : '',
           hintStyle: TextStyle(color: Colors.grey[600], fontSize: fontSize),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
@@ -694,8 +984,9 @@ class _SendButtonSection extends StatelessWidget {
     VoidCallback? effectiveOnStop;
     if (inputProvider.isVoiceRecording) {
       effectiveOnStop = () async {
-        await speechService.stopListening();
+        // Optimistic update: Stop UI immediately
         inputProvider.setVoiceRecording(false);
+        await speechService.stopListening();
       };
     } else {
       effectiveOnStop = widget.onStop;

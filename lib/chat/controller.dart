@@ -29,7 +29,6 @@ class ChatController extends StatefulWidget {
 
 class ChatControllerState extends State<ChatController>
     with TickerProviderStateMixin, WidgetsBindingObserver {
-
   // --- Keys ---
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<AppbarState> appbarKey = GlobalKey<AppbarState>();
@@ -76,8 +75,9 @@ class ChatControllerState extends State<ChatController>
       _currentLocale = newLocale;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          context.read<NewsService>().loadNewsForLanguage(
-              newLocale.languageCode);
+          context
+              .read<NewsService>()
+              .loadNewsForLanguage(newLocale.languageCode);
         }
       });
     }
@@ -90,14 +90,12 @@ class ChatControllerState extends State<ChatController>
     // --- FIX: Removed isChatActive check ---
     // We assume if modelId is not null, we might need to release resources.
     // Or we check if model is local directly.
-    final langCode = _sessionProvider
-        .getLocale()
-        .languageCode;
+    final langCode = _sessionProvider.getLocale().languageCode;
     final currentModelId = _sessionProvider.modelId;
 
     if (currentModelId != null &&
-        Utils.isLocalModel(
-            currentModelId, langCode: langCode, modelService: _modelService)) {
+        Utils.isLocalModel(currentModelId,
+            langCode: langCode, modelService: _modelService)) {
       _offlineService.releaseModel();
     }
 
@@ -107,9 +105,7 @@ class ChatControllerState extends State<ChatController>
   /// Handles system back press events (called by MainScreen).
   bool handleSystemBackPress() {
     // 1. Cancel Message Editing Mode if active
-    if (context
-        .read<InputProvider>()
-        .isEditingMode) {
+    if (context.read<InputProvider>().isEditingMode) {
       chatViewKey.currentState?.cancelAnyActiveEdit();
       return false; // Handled
     }
@@ -118,23 +114,27 @@ class ChatControllerState extends State<ChatController>
   }
 
   Future<void> _performInitialAsyncSetup(String langCode) async {
-    await context
-        .read<AppInitializer>()
-        .onCoreServicesReady;
+    await context.read<AppInitializer>().onCoreServicesReady;
     if (!mounted) return;
 
-    final newsFuture = context.read<NewsService>().loadNewsForLanguage(
-        langCode);
+    final newsFuture =
+        context.read<NewsService>().loadNewsForLanguage(langCode);
     await newsFuture;
 
     if (!mounted) return;
 
     if (widget.conversationID != null) {
+      // Ensure input state (editing mode etc.) is reset when loading a chat
+      // This keeps the Global Draft intact.
+      context.read<InputProvider>().resetInputState();
+
       await context.read<ReadService>().loadConversationById(
-        widget.conversationID!,
-        languageCode: langCode,
-      );
+            widget.conversationID!,
+            languageCode: langCode,
+          );
     } else {
+      // Logic for new chat
+      context.read<InputProvider>().resetInputState();
       await _sessionProvider.initializeDefaultSession();
     }
   }

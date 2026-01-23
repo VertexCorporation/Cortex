@@ -88,9 +88,18 @@ class SpeechService with ChangeNotifier {
       localeId: _localeId,
       onResult: (result) {
         // Send partial or final results immediately to the text field
-        onResult(result.recognizedWords);
+        String text = result.recognizedWords;
+        // Strict Capitalization: First letter of FIRST word upper, rest lower.
+        if (text.isNotEmpty) {
+          text = text.trim();
+          if (text.isNotEmpty) {
+            text = text[0].toUpperCase() + text.substring(1).toLowerCase();
+          }
+        }
+        onResult(text);
       },
       onSoundLevelChange: (level) {
+        if (!_isListening) return; // Guard against updates after stop
         // Normalize (-10 to 10) -> (0.0 to 1.0)
         _soundLevel = (level + 10) / 20;
         if (_soundLevel < 0) _soundLevel = 0;
@@ -106,9 +115,9 @@ class SpeechService with ChangeNotifier {
   }
 
   Future<void> stopListening() async {
-    await _speech.stop();
     _isListening = false;
     _soundLevel = 0.0;
     notifyListeners();
+    await _speech.stop();
   }
 }

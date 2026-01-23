@@ -36,8 +36,7 @@ class InboxViewModel extends ChangeNotifier {
   InboxViewModel({
     required ModelService modelService,
     required IntrovertNotificationService notificationService,
-  })
-      : _modelService = modelService,
+  })  : _modelService = modelService,
         _notificationService = notificationService;
 
   Future<void> initialize(String langCode) async {
@@ -74,15 +73,17 @@ class InboxViewModel extends ChangeNotifier {
     } else {
       // 1. First, get IDs of conversations where messages match (Deep Search)
       final List<String> deepSearchResults =
-      await ChatStorageService.searchConversations(query: _currentSearchQuery);
+          await ChatStorageService.searchConversations(
+              query: _currentSearchQuery);
 
       // 2. Filter in memory (Title matches or ID is in deep search results)
       _filteredConversationIDs = _allConversationIDs.where((id) {
         final manager = _conversationManagers[id];
         if (manager == null) return false;
 
-        final matchesTitle = manager.conversationTitle.toLowerCase().contains(
-            _currentSearchQuery);
+        final matchesTitle = manager.conversationTitle
+            .toLowerCase()
+            .contains(_currentSearchQuery);
         final isDeepMatch = deepSearchResults.contains(id);
 
         return matchesTitle || isDeepMatch;
@@ -101,6 +102,15 @@ class InboxViewModel extends ChangeNotifier {
       // 1. Pinned items go to top
       if (managerA.isStarred != managerB.isStarred) {
         return managerA.isStarred ? -1 : 1;
+      }
+
+      // 1.1 If both are starred, sort by 'Recently Starred' (Newest Starred First)
+      if (managerA.isStarred && managerB.isStarred) {
+        final dateA = managerA.starredDate ?? DateTime(0);
+        final dateB = managerB.starredDate ?? DateTime(0);
+        // Compare dateB to dateA for descending (newest first)
+        final comparison = dateB.compareTo(dateA);
+        if (comparison != 0) return comparison;
       }
 
       // 2. Then sort by Date (Newest first)
@@ -122,8 +132,8 @@ class InboxViewModel extends ChangeNotifier {
   void _loadFromCache() {
     final cachedManagers = CacheService.get<Map<String, ConversationManager>>(
         CacheKey.conversationManagers);
-    final cachedOrder = CacheService.get<List<String>>(
-        CacheKey.conversationOrder);
+    final cachedOrder =
+        CacheService.get<List<String>>(CacheKey.conversationOrder);
 
     if (cachedManagers != null && cachedOrder != null) {
       _conversationManagers.addAll(cachedManagers);
@@ -143,22 +153,22 @@ class InboxViewModel extends ChangeNotifier {
     _lastMessageSubscription?.cancel();
     _lastMessageSubscription =
         ChatStorageService.lastMsgStream.listen((update) async {
-          final String convId = update['convId'] as String;
-          final manager = _conversationManagers[convId];
+      final String convId = update['convId'] as String;
+      final manager = _conversationManagers[convId];
 
-          if (manager == null) {
-            await loadConversations(langCode: _currentLangCode, isReload: true);
-            return;
-          }
+      if (manager == null) {
+        await loadConversations(langCode: _currentLangCode, isReload: true);
+        return;
+      }
 
-          manager.updateLastMessage(
-            update['text'] as String? ?? '',
-            update['photoPath'] as String? ?? '',
-            DateTime.fromMillisecondsSinceEpoch(update['ts'] as int),
-          );
+      manager.updateLastMessage(
+        update['text'] as String? ?? '',
+        update['photoPath'] as String? ?? '',
+        DateTime.fromMillisecondsSinceEpoch(update['ts'] as int),
+      );
 
-          _sortConversations();
-        });
+      _sortConversations();
+    });
   }
 
   Future<void> loadConversations(
@@ -186,10 +196,14 @@ class InboxViewModel extends ChangeNotifier {
           conversationTitle: row['title'] as String? ?? 'Untitled',
           initialModelId: modelId,
           isStarred: (row['isStarred'] as int? ?? 0) == 1,
+          starredDate: row['starredDate'] != null &&
+                  (row['starredDate'] as int) > 0
+              ? DateTime.fromMillisecondsSinceEpoch(row['starredDate'] as int)
+              : null,
           lastMessageDate: lastMsg?['ts'] != null
               ? DateTime.fromMillisecondsSinceEpoch(lastMsg!['ts'] as int)
               : DateTime.fromMillisecondsSinceEpoch(
-              row['lastMessageDate'] as int? ?? 0),
+                  row['lastMessageDate'] as int? ?? 0),
           langCode: langCode,
           modelService: _modelService,
         );
@@ -215,16 +229,13 @@ class InboxViewModel extends ChangeNotifier {
     // 1. PROTECTION CHECK: Active conversation check
     final BuildContext? context = mainScreenKey.currentContext;
     if (context != null) {
-      final activeId = Provider
-          .of<ConversationProvider>(context, listen: false)
+      final activeId = Provider.of<ConversationProvider>(context, listen: false)
           .conversationID;
 
       if (activeId == conversationID) {
         debugPrint(
             "[InboxViewModel] Active conversation deleted. Triggering reset.");
-        mainScreenKey.currentState?.startNewConversation(
-            closeSidebar: false
-        );
+        mainScreenKey.currentState?.startNewConversation(closeSidebar: false);
       }
     }
 

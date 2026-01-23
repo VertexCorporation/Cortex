@@ -70,7 +70,10 @@ class SendService {
     // REMOVED: String? regeneratePhotoPath (replaced by message lookup)
     String? overrideModelId,
   }) async {
-    if (_isSending) return false;
+    if (_isSending) {
+      debugPrint("SendService: Already sending. Ignored.");
+      return false;
+    }
 
     final inputProvider = context.read<InputProvider>();
     final sessionProvider = context.read<ChatSessionProvider>();
@@ -96,8 +99,12 @@ class SendService {
           inputProvider.attachments.map((a) => a.file.path).toList();
     }
 
+    debugPrint(
+        "SendService: Preparing to send. Text: '$text', Attachments: ${currentAttachmentPaths.length}");
+
     // Validation: Must have either text OR attachments
     if (text.isEmpty && currentAttachmentPaths.isEmpty) {
+      debugPrint("SendService: Aborting. No text and no attachments.");
       return false;
     }
 
@@ -255,7 +262,7 @@ class SendService {
           final newConvTitle =
               (text.isEmpty && currentAttachmentPaths.isNotEmpty)
                   ? "📁"
-                  : (text.length > 28 ? text.substring(0, 28) : text);
+                  : (text.length > 32 ? text.substring(0, 32) : text);
 
           final modelIdForStorage = (sessionProvider.isDynamicChat)
               ? (sessionProvider.modelId ?? 'dynamic')
@@ -394,7 +401,6 @@ class SendService {
         final filePath = '${tempDir.path}/${_uuid.v4()}.png';
         final file = File(filePath);
         await file.writeAsBytes(imageBytes);
-        // Note: Logic for generated images should eventually append to attachmentPaths of the bot message
       } catch (e) {
         debugPrint("[SendService] Error saving received image: $e");
         _conversationProvider.setErrorMessage(
@@ -404,11 +410,17 @@ class SendService {
 
     // Call API
     if (isCharacterModel) {
-      final baseModelId = model.baseModelId;
+      var baseModelId = model.baseModelId;
+
+      if (baseModelId == 'dynamic') {
+        baseModelId = 'cortex/auto';
+      }
+
       if (baseModelId == null || baseModelId.isEmpty) {
         throw ApiException(
             "Character '$modelIdForRequest' has no valid base model configured.");
       }
+
       await _apiService.getCharacterResponse(
         userInput: text,
         context: memory,

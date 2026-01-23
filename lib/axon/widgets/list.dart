@@ -46,7 +46,6 @@ class _AxonConversationListState extends State<AxonConversationList> {
   @override
   void initState() {
     super.initState();
-    // Initial Population
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final vm = context.read<InboxViewModel>();
@@ -74,9 +73,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
     final vm = context.read<InboxViewModel>();
     final newIds = vm.conversations;
 
-    // Fast path: if identical, do nothing
     if (_areListsEqual(_displayedIds, newIds)) return;
-
     _calculateDiffs(List.from(_displayedIds), newIds);
   }
 
@@ -89,129 +86,79 @@ class _AxonConversationListState extends State<AxonConversationList> {
   }
 
   void _calculateDiffs(List<String> oldList, List<String> newList) {
-    // We will perform a sequence of removals and insertions to transform oldList -> newList.
-    // 1. Remove items that are no longer in newList (from highest index to lowest)
-    // 2. Insert items that are new in newList (from lowest to highest)
-    // 3. Handle moves as Remove + Insert
-
-    // A simple diff algorithm for Flutter AnimatedList:
-    // It is often safer to reconcile manually or use a diff package.
-    // Given we don't have a diff package, we'll use a pragmatic approach:
-    // "Remove all items that moved or deleted" vs "Insert all items that moved or added".
-
-    int i = 0;
-    while (i < _displayedIds.length) {
-      if (!newList.contains(_displayedIds[i])) {
-        // DELETE
-        final removedId = _displayedIds.removeAt(i);
+    // 1. Deletions
+    for (int i = oldList.length - 1; i >= 0; i--) {
+      final item = oldList[i];
+      if (!newList.contains(item)) {
+        _displayedIds.removeAt(i);
         _listKey.currentState?.removeItem(
           i,
-          (context, animation) => _buildRemovedItem(removedId, animation),
+              (context, animation) => _buildRemovedItem(item, animation),
           duration: const Duration(milliseconds: 300),
         );
+      }
+    }
+
+    // 2. Additions
+    int index = 0;
+    while (index < newList.length) {
+      final newItem = newList[index];
+      if (index >= _displayedIds.length) {
+        _displayedIds.insert(index, newItem);
+        _listKey.currentState
+            ?.insertItem(index, duration: const Duration(milliseconds: 300));
       } else {
-        i++;
-      }
-    }
-
-    // Now _displayedIds contains only items that exist in both (in old order).
-    // We need to reorder them or insert new ones.
-    // This part is tricky with just insertions.
-    // Strategy: To animate REORDERING, we must also remove them if their index changed significantly?
-    // Actually, AnimatedList doesn't support "Move".
-    // The visual trick is: Remove from old, Insert at new.
-
-    // Let's do a more robust standard diff:
-    // We will walk through the new list and ensure _displayedIds matches it.
-
-    // Reset loop
-    _displayedIds = List.from(oldList); // Reset to verify logic cleanly
-
-    // 1. Identification phase
-    // Find items that need to be removed (not in new list)
-    for (int index = _displayedIds.length - 1; index >= 0; index--) {
-      final id = _displayedIds[index];
-      if (!newList.contains(id)) {
-        _listKey.currentState?.removeItem(
-          index,
-          (context, animation) => _buildRemovedItem(id, animation),
-          duration: const Duration(milliseconds: 300),
-        );
-        _displayedIds.removeAt(index);
-      }
-    }
-
-    // 2. Alignment phase
-    // Now displayedIds contains only items that ARE in the new list, but maybe in wrong order.
-    // And it doesn't have the new items.
-    // We iterate through NEW list.
-    for (int index = 0; index < newList.length; index++) {
-      final newId = newList[index];
-
-      if (index < _displayedIds.length) {
-        final oldId = _displayedIds[index];
-        if (oldId == newId) {
-          // Sync, continue
-          continue;
-        } else {
-          // IDs mismatch at this index.
-          // Is the `newId` somewhere later in our displayed list?
-          final existingIndex = _displayedIds.indexOf(newId, index);
-
+        final currentDisplayedItem = _displayedIds[index];
+        if (currentDisplayedItem != newItem) {
+          final int existingIndex = _displayedIds.indexOf(newItem, index);
           if (existingIndex != -1) {
-            // It exists later. This implies `oldId` (and others) have shifted down,
-            // or `newId` moved up.
-            // We remove it from the old position and insert it here.
-            final idToMove = _displayedIds.removeAt(existingIndex);
+            final movedItem = _displayedIds.removeAt(existingIndex);
             _listKey.currentState?.removeItem(
                 existingIndex,
-                (context, _) =>
-                    SizedBox.shrink(), // Instant remove (visual hack)
+                    (context, animation) => const SizedBox.shrink(),
                 duration: Duration.zero);
-            _displayedIds.insert(index, idToMove);
-            _listKey.currentState?.insertItem(index);
+            _displayedIds.insert(index, movedItem);
+            _listKey.currentState?.insertItem(index,
+                duration: const Duration(milliseconds: 300));
           } else {
-            // It doesn't exist. It's a new item. Match!
-            _displayedIds.insert(index, newId);
+            _displayedIds.insert(index, newItem);
             _listKey.currentState?.insertItem(index,
                 duration: const Duration(milliseconds: 300));
           }
         }
-      } else {
-        // Appending new item
-        _displayedIds.add(newId);
-        _listKey.currentState
-            ?.insertItem(index, duration: const Duration(milliseconds: 300));
       }
+      index++;
+    }
+
+    while (_displayedIds.length > newList.length) {
+      final lastIndex = _displayedIds.length - 1;
+      _displayedIds.removeAt(lastIndex);
+      _listKey.currentState?.removeItem(
+        lastIndex,
+            (context, animation) => const SizedBox.shrink(),
+        duration: Duration.zero,
+      );
     }
   }
 
   Widget _buildRemovedItem(String id, Animation<double> animation) {
-    // We need to fetch data from provider momentarily, or fallback if deleted.
-    // Ideally we'd have the data snapshot.
-    // For deleted items, we just slide them out.
-    // Since manager might be gone from VM, `AxonConversationTile` handles null gracefully?
-    // The `AxonConversationList` builder checks `manager == null`.
-    // If manager is gone, we can't show the tile.
-    // So we assume for "moves" manager exists. For "deletes" it might be gone.
-
     final inboxViewModel = context.read<InboxViewModel>();
     final manager = inboxViewModel.conversationManagers[id];
 
     return SizeTransition(
       sizeFactor: animation,
-      axisAlignment: -1.0, // Collapse upwards
+      axisAlignment: -1.0,
       child: FadeTransition(
         opacity: animation,
         child: manager != null
             ? AxonConversationTile(
-                manager: manager,
-                onDelete: () {}, // No op during animation
-                onEdit: (_) {},
-                onTogglePin: () {},
-                key: ValueKey(id),
-              )
-            : const SizedBox.shrink(), // Item data gone, shrink away
+          manager: manager,
+          onDelete: () {},
+          onEdit: (_) {},
+          onTogglePin: () {},
+          key: ValueKey(id),
+        )
+            : const SizedBox.shrink(),
       ),
     );
   }
@@ -221,12 +168,42 @@ class _AxonConversationListState extends State<AxonConversationList> {
     final localizations = AppLocalizations.of(context)!;
     final inboxViewModel = context.watch<InboxViewModel>();
 
-    // Layout Constants
     final double horizontalPadding = widget.referenceWidth * 0.05;
+    final bool isLoading = inboxViewModel.isLoading && _displayedIds.isEmpty;
 
-    // --- 1. Loading State ---
-    if (inboxViewModel.isLoading && _displayedIds.isEmpty) {
-      return ListView.separated(
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 600),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+
+      // --- CRITICAL UPDATE: Custom Transition ---
+      // Scale + Fade effect to mask any layout shift
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            // Starts slightly smaller (0.98) and grows to natural size (1.0)
+            // A subtle pop effect is better than a large zoom.
+            scale: Tween<double>(begin: 0.98, end: 1.0).animate(animation),
+            // Pin to top-center so the list doesn't jump up/down relative to header
+            alignment: Alignment.topCenter,
+            child: child,
+          ),
+        );
+      },
+
+      // Overlap (Stack) Layout
+      layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+        return Stack(
+          alignment: Alignment.topCenter,
+          children: <Widget>[
+            ...previousChildren,
+            if (currentChild != null) currentChild,
+          ],
+        );
+      },
+      child: isLoading
+          ? ListView.separated(
         key: const ValueKey('loading_skeletons'),
         padding: EdgeInsets.fromLTRB(
           horizontalPadding * 0.5,
@@ -235,17 +212,22 @@ class _AxonConversationListState extends State<AxonConversationList> {
           widget.screenHeight * 0.1,
         ),
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: 7,
-        separatorBuilder: (context, index) => const SizedBox(height: 8),
+        itemCount: 14,
+        separatorBuilder: (context, index) => const SizedBox(height: 0),
         itemBuilder: (context, index) {
-          return const _SkeletonTile();
+          return _SkeletonTile(
+            referenceWidth: widget.referenceWidth,
+            screenHeight: widget.screenHeight,
+          );
         },
-      );
-    }
+      )
+          : _buildListContent(localizations, inboxViewModel, horizontalPadding),
+    );
+  }
 
-    // --- Logic for Empty States ---
+  Widget _buildListContent(AppLocalizations localizations,
+      InboxViewModel inboxViewModel, double horizontalPadding) {
     final List<String> currentIds = inboxViewModel.conversations;
-    // Initial sync if we missed it (Edge case)
     if (_displayedIds.isEmpty &&
         currentIds.isNotEmpty &&
         _listKey.currentState == null) {
@@ -253,85 +235,87 @@ class _AxonConversationListState extends State<AxonConversationList> {
     }
 
     final bool isEmpty = currentIds.isEmpty && _displayedIds.isEmpty;
-    final bool hasSearchText = widget.searchController.text.trim().isNotEmpty;
+    final bool hasSearchText = widget.searchController.text
+        .trim()
+        .isNotEmpty;
     final bool showNoResults =
         widget.isSearchActive && hasSearchText && isEmpty;
 
-    // --- 2. Empty / No Results State ---
-    if (isEmpty) {
-      if (showNoResults) {
-        return _buildNoResultsFound(context, localizations);
-      } else {
-        return const Center(
-          key: ValueKey('empty_state'),
-          child: EmptyStateView(isForStarred: false),
-        );
-      }
-    }
+    return Stack(
+      key: const ValueKey('loaded_content'),
+      children: [
+        if (isEmpty)
+          Positioned.fill(
+              child: Center(
+                key: const ValueKey('empty_state'),
+                child: showNoResults
+                    ? _buildNoResultsFound(context, localizations)
+                    : const EmptyStateView(isForStarred: false),
+              )),
+        if (!showNoResults)
+          Positioned.fill(
+            child: ScrollFog(
+              key: const ValueKey('list'),
+              scrollController: widget.scrollController,
+              topFogHeight: 15,
+              bottomFogHeight: 30,
+              showTop: true,
+              showBottom: true,
+              child: AnimatedList(
+                key: _listKey,
+                controller: widget.scrollController,
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding * 0.5,
+                  widget.screenHeight * 0.005,
+                  horizontalPadding * 0.5,
+                  widget.screenHeight * 0.1,
+                ),
+                initialItemCount: _displayedIds.length,
+                itemBuilder: (context, index, animation) {
+                  if (index >= _displayedIds.length) {
+                    return const SizedBox.shrink();
+                  }
+                  final id = _displayedIds[index];
+                  final manager = inboxViewModel.conversationManagers[id];
 
-    // --- 3. Active List with Fog Effect ---
-    // If the View Model reset (e.g. search changed drastically), re-sync immediately?
-    // We rely on `didUpdateWidget` diffing.
+                  if (manager == null) return const SizedBox.shrink();
 
-    return ScrollFog(
-      key: const ValueKey('list'),
-      scrollController: widget.scrollController,
-      topFogHeight: 15,
-      bottomFogHeight: 30,
-      showTop: true,
-      showBottom: true,
-      child: AnimatedList(
-        key: _listKey,
-        controller: widget.scrollController,
-        padding: EdgeInsets.fromLTRB(
-          horizontalPadding * 0.5,
-          widget.screenHeight * 0.005,
-          horizontalPadding * 0.5,
-          widget.screenHeight * 0.1,
-        ),
-        initialItemCount: _displayedIds.length,
-        itemBuilder: (context, index, animation) {
-          if (index >= _displayedIds.length) return const SizedBox.shrink();
-          final id = _displayedIds[index];
-          final manager = inboxViewModel.conversationManagers[id];
-
-          if (manager == null) return const SizedBox.shrink();
-
-          // Wrap tile in transition for Insert animations
-          return SlideTransition(
-            position: animation.drive(
-                Tween(begin: const Offset(0, 0.5), end: Offset.zero)
-                    .chain(CurveTween(curve: Curves.easeOutCubic))),
-            child: FadeTransition(
-              opacity: animation,
-              child: AxonConversationTile(
-                key: ValueKey(id),
-                manager: manager,
-                onDelete: () {
-                  inboxViewModel.deleteConversation(id);
-                  Provider.of<IntrovertNotificationService>(context,
-                          listen: false)
-                      .showNotification(
-                    message: localizations.conversationDeleted,
-                    type: NotificationType.success,
-                    isAxonMode: true,
-                    axonWidth: widget.referenceWidth,
+                  return SlideTransition(
+                    position: animation.drive(
+                        Tween(begin: const Offset(0, 0.5), end: Offset.zero)
+                            .chain(CurveTween(curve: Curves.easeOutCubic))),
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: AxonConversationTile(
+                        key: ValueKey(id),
+                        manager: manager,
+                        onDelete: () {
+                          inboxViewModel.deleteConversation(id);
+                          Provider.of<IntrovertNotificationService>(context,
+                              listen: false)
+                              .showNotification(
+                            message: localizations.conversationDeleted,
+                            type: NotificationType.success,
+                            isAxonMode: true,
+                            axonWidth: widget.referenceWidth,
+                          );
+                        },
+                        onEdit: (newTitle) =>
+                            inboxViewModel.editConversation(id, newTitle),
+                        onTogglePin: () => inboxViewModel.togglePinStatus(id),
+                      ),
+                    ),
                   );
                 },
-                onEdit: (newTitle) =>
-                    inboxViewModel.editConversation(id, newTitle),
-                onTogglePin: () => inboxViewModel.togglePinStatus(id),
               ),
             ),
-          );
-        },
-      ),
+          ),
+      ],
     );
   }
 
-  Widget _buildNoResultsFound(
-      BuildContext context, AppLocalizations localizations) {
-    // (Keep existing implementation)
+  Widget _buildNoResultsFound(BuildContext context,
+      AppLocalizations localizations) {
     return Padding(
       key: const ValueKey('no_results'),
       padding: EdgeInsets.only(top: widget.screenHeight * 0.05),
@@ -372,33 +356,57 @@ class _AxonConversationListState extends State<AxonConversationList> {
 }
 
 class _SkeletonTile extends StatelessWidget {
-  const _SkeletonTile();
+  final double referenceWidth;
+  final double screenHeight;
+
+  const _SkeletonTile({
+    required this.referenceWidth,
+    required this.screenHeight,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // --- EXACT DIMENSION REPLICATION ---
+
+    // 1. Margins
+    final double marginV = screenHeight * 0.003;
+    final double marginH = referenceWidth * 0.01;
+
+    // 2. Padding (Inner)
+    final double innerPaddingV = screenHeight * 0.012;
+
+    // 3. Avatar Size
+    final double avatarSize = referenceWidth * 0.072;
+
+    // 4. Border Radius
+    final double borderRadius = referenceWidth * 0.03;
+
+    // 5. Total Height = Avatar + (InnerPadding * 2)
+    final double contentHeight = avatarSize + (innerPaddingV * 2);
+
     return Shimmer.fromColors(
       baseColor: AppColors.secondaryColor,
       highlightColor: AppColors.tertiaryColor.withValues(alpha: 0.1),
       child: Container(
-        height: 80, // Approximate tile height
-        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        height: contentHeight,
+        margin: EdgeInsets.symmetric(horizontal: marginH, vertical: marginV),
         decoration: BoxDecoration(
           color: AppColors.secondaryColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(borderRadius),
         ),
         child: Row(
           children: [
-            const SizedBox(width: 16),
+            SizedBox(width: referenceWidth * 0.03), // Left Inner Padding
             // Avatar Circle
             Container(
-              width: 48,
-              height: 48,
+              width: avatarSize,
+              height: avatarSize,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: referenceWidth * 0.03), // Gap
             // Text Lines
             Expanded(
               child: Column(
@@ -407,21 +415,14 @@ class _SkeletonTile extends StatelessWidget {
                 children: [
                   Container(
                     width: double.infinity,
-                    height: 14,
+                    height: referenceWidth * 0.035,
                     color: Colors.white,
-                    margin: const EdgeInsets.only(right: 60),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    height: 12,
-                    color: Colors.white,
-                    margin: const EdgeInsets.only(right: 20),
+                    margin: EdgeInsets.only(right: referenceWidth * 0.15),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: referenceWidth * 0.03), // Right Inner Padding
           ],
         ),
       ),

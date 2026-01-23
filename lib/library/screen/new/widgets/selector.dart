@@ -33,23 +33,26 @@ class BaseModelSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final localizations = AppLocalizations.of(context)!;
     final modelService = context.read<ModelService>();
     final bool isTablet = screenWidth >= 600;
 
-    // --- TABLET OPTIMIZATIONS ---
+    // --- DYNAMIC DIMENSIONS ---
     final double titleSize = isTablet ? 26.0 : screenWidth * 0.05;
     final double descSize = isTablet ? 18.0 : screenWidth * 0.035;
     final double textSize = isTablet ? 20.0 : screenWidth * 0.04;
-    final double borderRadius = isTablet ? 16.0 : screenWidth * 0.025;
+    final double borderRadius = isTablet ? 16.0 : screenWidth * 0.03;
     final double iconSize = isTablet ? 28.0 : screenWidth * 0.05;
-    final double paddingV = isTablet ? 20.0 : 15.0;
+    final double paddingV = isTablet ? 20.0 : screenWidth * 0.035;
     final double paddingH = isTablet ? 24.0 : screenWidth * 0.04;
 
     if (availableBaseModels.isEmpty) {
       return Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(paddingH),
         decoration: BoxDecoration(
           color: AppColors.secondaryColor,
           borderRadius: BorderRadius.circular(borderRadius),
@@ -84,11 +87,11 @@ class BaseModelSelector extends StatelessWidget {
                 color: AppColors.primaryColor.inverted,
                 fontSize: titleSize,
                 fontWeight: FontWeight.w600)),
-        const SizedBox(height: 5),
+        SizedBox(height: screenWidth * 0.015),
         Text(localizations.baseModelDescription,
             style:
-                TextStyle(color: AppColors.quinaryColor, fontSize: descSize)),
-        const SizedBox(height: 15),
+            TextStyle(color: AppColors.quinaryColor, fontSize: descSize)),
+        SizedBox(height: screenWidth * 0.04),
 
         // --- Selection Button ---
         Material(
@@ -138,7 +141,7 @@ class BaseModelSelector extends StatelessWidget {
                     duration: const Duration(milliseconds: 200),
                     child: Icon(Icons.keyboard_arrow_down,
                         color: AppColors.primaryColor.inverted,
-                        size: isTablet ? 32 : 24),
+                        size: isTablet ? 32 : screenWidth * 0.06),
                   ),
                 ],
               ),
@@ -152,7 +155,7 @@ class BaseModelSelector extends StatelessWidget {
           curve: Curves.easeInOut,
           child: isPanelExpanded
               ? _buildBaseModelList(context, modelService, borderRadius,
-                  iconSize, textSize, isTablet)
+              textSize, isTablet)
               : const SizedBox.shrink(),
         ),
       ],
@@ -161,99 +164,142 @@ class BaseModelSelector extends StatelessWidget {
 
   /// Builds the list of selectable base models.
   Widget _buildBaseModelList(BuildContext context, ModelService modelService,
-      double radius, double iconSize, double textSize, bool isTablet) {
+      double radius, double textSize, bool isTablet) {
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+
     // List Layout Constants
-    final double listHeight = isTablet ? 350.0 : 250.0;
-    final double avatarRadius = isTablet ? 28.0 : 20.0;
-    final double itemVerticalPadding = isTablet ? 16.0 : 12.0;
-    final double itemHorizontalPadding = isTablet ? 24.0 : 16.0;
+    final double listHeight = isTablet ? 350.0 : screenWidth * 0.65;
+    // Avatar size relative to screen width (approx 40px-50px)
+    final double avatarSize = isTablet ? 56.0 : screenWidth * 0.11;
+
+    final double itemVerticalPadding = isTablet ? 16.0 : screenWidth * 0.03;
+    final double itemHorizontalPadding = isTablet ? 24.0 : screenWidth * 0.04;
 
     return Container(
-      margin: const EdgeInsets.only(top: 8),
+      margin: EdgeInsets.only(top: screenWidth * 0.02),
       height: listHeight,
       decoration: BoxDecoration(
         color: AppColors.secondaryColor,
         borderRadius: BorderRadius.circular(radius),
       ),
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: availableBaseModels.expand<Widget>((series) {
-          final Map<String, dynamic> variants = series.variants ?? const {};
-          if (variants.isEmpty) return [];
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: availableBaseModels.expand<Widget>((series) {
+            final Map<String, dynamic> variants = series.variants ?? const {};
+            if (variants.isEmpty) return [];
 
-          return variants.entries.map((ext) {
-            final modelId = ext.key;
-            final variantData = ext.value as Map<String, dynamic>? ?? {};
-            var modelTitle = variantData['title'] as String? ?? modelId;
-            modelTitle = ModelDataUtils.cleanTitle(modelTitle);
+            return variants.entries.map((ext) {
+              final modelId = ext.key;
+              final variantData = ext.value as Map<String, dynamic>? ?? {};
+              var modelTitle = variantData['title'] as String? ?? modelId;
+              modelTitle = ModelDataUtils.cleanTitle(modelTitle);
 
-            final imagePath = modelService.getModelImagePath(series);
-            final imageProvider = imagePath.startsWith('assets/')
-                ? AssetImage(imagePath) as ImageProvider
-                : FileImage(File(imagePath));
+              final imagePath = modelService.getModelImagePath(series);
 
-            final isVariantPremium =
-                (variantData['tier'] as String? ?? 'free') == 'premium';
+              // --- SVG CHECK LOGIC (Prevents Crashes) ---
+              final bool isSvg = imagePath.endsWith('.svg');
+              final bool isAsset = imagePath.startsWith('assets/');
 
-            // REPLACED ListTile WITH CUSTOM INKWELL TO KILL THE WHITE HIGHLIGHT
-            return Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  onSelectBaseModel(modelId, modelTitle);
-                },
-                // CRITICAL: All splash and highlight colors set to transparent
-                splashFactory: NoSplash.splashFactory,
-                splashColor: Colors.transparent,
-                highlightColor:
-                    Colors.transparent, // This kills the white light
-                hoverColor: Colors.transparent,
-                focusColor: Colors.transparent,
+              Widget imageWidget;
+              if (isSvg) {
+                // Safe rendering for SVGs (like cortex.svg)
+                imageWidget = Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: SvgPicture.asset(
+                    imagePath,
+                    fit: BoxFit.contain,
+                    colorFilter: ColorFilter.mode(
+                        AppColors.primaryColor.inverted, BlendMode.srcIn),
+                  ),
+                );
+              } else {
+                // Bitmap rendering
+                ImageProvider? provider;
+                if (isAsset) {
+                  provider = AssetImage(imagePath);
+                } else {
+                  provider = FileImage(File(imagePath));
+                }
+                imageWidget = CircleAvatar(
+                  backgroundImage: provider,
+                  backgroundColor: Colors.transparent,
+                  radius: avatarSize / 2,
+                );
+              }
+              // ------------------------------------------
 
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: itemHorizontalPadding,
-                      vertical: itemVerticalPadding),
-                  child: Row(
-                    children: [
-                      // Leading: Avatar
-                      CircleAvatar(
-                        backgroundImage: imageProvider,
-                        backgroundColor: Colors.transparent,
-                        radius: avatarRadius,
-                      ),
+              final isVariantPremium =
+                  (variantData['tier'] as String? ?? 'free') == 'premium';
 
-                      SizedBox(width: isTablet ? 24.0 : 16.0), // Gap
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    onSelectBaseModel(modelId, modelTitle);
+                  },
+                  // Clean look: No splash/highlight
+                  splashFactory: NoSplash.splashFactory,
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  hoverColor: Colors.transparent,
+                  focusColor: Colors.transparent,
 
-                      // Title
-                      Expanded(
-                        child: Text(
-                          modelTitle,
-                          style: TextStyle(
-                              color: AppColors.primaryColor.inverted,
-                              fontSize: textSize),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: itemHorizontalPadding,
+                        vertical: itemVerticalPadding),
+                    child: Row(
+                      children: [
+                        // Leading: Avatar / Icon
+                        Container(
+                          width: avatarSize,
+                          height: avatarSize,
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle),
+                          child: imageWidget,
                         ),
-                      ),
 
-                      // Trailing: Sparkle Icon (if premium)
-                      if (isVariantPremium)
-                        SvgPicture.asset(
-                          'assets/icons/sparkle.svg',
-                          width: iconSize,
-                          colorFilter: ColorFilter.mode(
-                            AppColors.primaryColor.inverted
-                                .withValues(alpha: 0.8),
-                            BlendMode.srcIn,
+                        SizedBox(width: screenWidth * 0.04), // Gap
+
+                        // Title
+                        Expanded(
+                          child: Text(
+                            modelTitle,
+                            style: TextStyle(
+                                color: AppColors.primaryColor.inverted,
+                                fontSize: textSize,
+                                fontWeight: FontWeight.w500),
                           ),
                         ),
-                    ],
+
+                        // Trailing: Sparkle Icon (if premium)
+                        if (isVariantPremium)
+                          Padding(
+                            padding: EdgeInsets.only(left: screenWidth * 0.02),
+                            child: SvgPicture.asset(
+                              'assets/icons/sparkle.svg',
+                              width: screenWidth * 0.05,
+                              colorFilter: ColorFilter.mode(
+                                AppColors.primaryColor.inverted
+                                    .withValues(alpha: 0.8),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }).toList();
-        }).toList(),
+              );
+            }).toList();
+          }).toList(),
+        ),
       ),
     );
   }

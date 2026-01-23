@@ -54,9 +54,9 @@ class _ToolCircleButton extends StatelessWidget {
             onTap: disabled
                 ? null
                 : () {
-              HapticFeedback.lightImpact();
-              onTap?.call();
-            },
+                    HapticFeedback.lightImpact();
+                    onTap?.call();
+                  },
             child: SizedBox(
               width: size,
               height: size,
@@ -94,16 +94,11 @@ class ActionButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isConnected = context
-        .watch<InternetProvider>()
-        .isConnected;
+    final bool isConnected = context.watch<InternetProvider>().isConnected;
     final speechService = context.watch<SpeechService>();
     final inputProvider = context.watch<InputProvider>();
 
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
     final double buttonSize = isTablet ? 40.0 : 36.0;
 
@@ -151,41 +146,41 @@ class ActionButtonWidget extends StatelessWidget {
           curve: Curves.easeOut,
           child: showMic
               ? Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: _ToolCircleButton(
-              size: buttonSize,
-              onTap: () async {
-                final localeCode = context
-                    .read<ChatSessionProvider>()
-                    .getLocale()
-                    .languageCode;
-                final currentText = controller.text;
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: _ToolCircleButton(
+                    size: buttonSize,
+                    onTap: () async {
+                      final localeCode = context
+                          .read<ChatSessionProvider>()
+                          .getLocale()
+                          .languageCode;
+                      final currentText = controller.text;
 
-                inputProvider.setVoiceRecording(true);
+                      inputProvider.setVoiceRecording(true);
 
-                await speechService.startListening(
-                  locale: localeCode,
-                  onResult: (String text) {
-                    String spacer = (currentText.isNotEmpty &&
-                        !currentText.endsWith(' '))
-                        ? ' '
-                        : '';
-                    if (currentText.isEmpty) spacer = '';
-                    controller.text = "$currentText$spacer$text";
-                    controller.selection = TextSelection.fromPosition(
-                        TextPosition(offset: controller.text.length));
-                  },
-                );
-              },
-              child: SvgPicture.asset(
-                'assets/icons/microphone.svg',
-                width: buttonSize * 0.55,
-                height: buttonSize * 0.55,
-                colorFilter: ColorFilter.mode(
-                    AppColors.primaryColor.inverted, BlendMode.srcIn),
-              ),
-            ),
-          )
+                      await speechService.startListening(
+                        locale: localeCode,
+                        onResult: (String text) {
+                          String spacer = (currentText.isNotEmpty &&
+                                  !currentText.endsWith(' '))
+                              ? ' '
+                              : '';
+                          if (currentText.isEmpty) spacer = '';
+                          controller.text = "$currentText$spacer$text";
+                          controller.selection = TextSelection.fromPosition(
+                              TextPosition(offset: controller.text.length));
+                        },
+                      );
+                    },
+                    child: SvgPicture.asset(
+                      'assets/icons/microphone.svg',
+                      width: buttonSize * 0.55,
+                      height: buttonSize * 0.55,
+                      colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted, BlendMode.srcIn),
+                    ),
+                  ),
+                )
               : const SizedBox.shrink(),
         ),
         AnimatedSwitcher(
@@ -223,7 +218,7 @@ class ActionButtonWidget extends StatelessWidget {
             width: size * 0.4,
             height: size * 0.4,
             colorFilter:
-            ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
           ),
         ),
       ),
@@ -247,9 +242,9 @@ class ActionButtonWidget extends StatelessWidget {
     return GestureDetector(
       onTap: enabled
           ? () {
-        HapticFeedback.lightImpact();
-        onSend();
-      }
+              HapticFeedback.lightImpact();
+              onSend();
+            }
           : null,
       child: Container(
         width: size,
@@ -323,7 +318,7 @@ class ActionButtonWidget extends StatelessWidget {
             width: size * 0.55,
             height: size * 0.55,
             colorFilter:
-            ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
           ),
         ),
       ),
@@ -361,22 +356,28 @@ class AddPhotoButton extends StatelessWidget {
       onTap: isPhotoLoading
           ? null
           : () {
-        // Priority 1: Check Chat History Limit
-        if (isLimitExceeded) {
-          // The InputField usually handles this by disabling interaction,
-          // but if tapped, we can show a specific upgrade prompt here if needed.
-        }
-        // Priority 2: Open Sheet
-        else {
-          showAttachmentSheet(context: context);
-        }
-      },
+              // Priority 1: Check Chat History Limit
+              if (isLimitExceeded) {
+                // The InputField usually handles this by disabling interaction,
+                // but if tapped, we can show a specific upgrade prompt here if needed.
+              }
+              // Priority 2: Open Sheet
+              // Priority 2: Open Sheet
+              else {
+                final session = context.read<ChatSessionProvider>();
+                showAttachmentSheet(
+                  context: context,
+                  canHandleImages:
+                      session.isDynamicChat ? true : session.canHandleImage,
+                );
+              }
+            },
       child: SvgPicture.asset(
         'assets/icons/add.svg',
         width: 24.0,
         height: 24.0,
         colorFilter:
-        ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+            ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
       ),
     );
   }
@@ -395,10 +396,7 @@ class FeaturesButton extends StatelessWidget {
     final inputProvider = context.watch<InputProvider>();
     final featureMode = inputProvider.featureMode;
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final maxAllowedWidth = screenWidth * 0.35;
     final bool isActive = featureMode != ChatInputMode.none;
 
@@ -549,12 +547,10 @@ class ModelSelectButton extends StatelessWidget {
                     onModelSelected: (String id) {
                       final modelService = context.read<ModelService>();
                       final langCode =
-                          Localizations
-                              .localeOf(context)
-                              .languageCode;
+                          Localizations.localeOf(context).languageCode;
                       final model = modelService.getPreciseModelData(id,
                           langCode: langCode);
-                      context.read<SelectionService>().selectModel(model);
+                      context.read<SelectionService>().switchActiveModel(model);
                     },
                   );
                 },

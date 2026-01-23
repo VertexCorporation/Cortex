@@ -58,9 +58,14 @@ class InputProvider with ChangeNotifier {
   bool _isVoiceModeActive = false;
   ChatInputMode _featureMode = ChatInputMode.none;
 
+  // --- Global Draft (Persist across chats) ---
+  String _globalDraft = '';
+
   // ===========================================================================
   // SECTION 2: PUBLIC GETTERS
   // ===========================================================================
+
+  String get globalDraft => _globalDraft;
 
   ChatInputMode get featureMode => _featureMode;
 
@@ -115,12 +120,19 @@ class InputProvider with ChangeNotifier {
   // -------------------- Attachment Management --------------------
 
   void addAttachment(File file, {required bool isImage}) {
-    if (_attachments.length >= 9) return; // Safety check
+    debugPrint(
+        "InputProvider: addAttachment called. Current count: ${_attachments.length}. New file: ${file.path}");
+    if (_attachments.length >= 9) {
+      debugPrint("InputProvider: Attachment limit reached. Ignoring.");
+      return;
+    }
 
     _attachments.add(InputAttachment(
       file: file,
       type: isImage ? AttachmentType.image : AttachmentType.document,
     ));
+    debugPrint(
+        "InputProvider: Attachment added. New count: ${_attachments.length}. Notifying listeners.");
     notifyListeners();
   }
 
@@ -198,6 +210,14 @@ class InputProvider with ChangeNotifier {
     _attachments.clear();
   }
 
+  // -------------------- Global Draft Management --------------------
+
+  void updateGlobalDraft(String text) {
+    if (_globalDraft != text) {
+      _globalDraft = text;
+    }
+  }
+
   // -------------------- Global Reset --------------------
 
   void resetInputState() {
@@ -205,10 +225,18 @@ class InputProvider with ChangeNotifier {
     _editingMessageIndex = null;
     _originalMessageText = null;
     _attachments.clear();
-    _isAttachmentLoading = false;
     _isVoiceRecording = false;
+    _isAttachmentLoading = false;
     _featureMode = ChatInputMode.none;
+    // NOTE: We do NOT clear _globalDraft here.
+    // This allows maintaining text when switching chats.
     notifyListeners();
+  }
+
+  /// Clears everything including the draft. Called after successful send.
+  void clearAllInput() {
+    _globalDraft = '';
+    resetInputState();
   }
 
   // -------------------- Helpers --------------------

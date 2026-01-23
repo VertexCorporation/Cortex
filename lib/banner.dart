@@ -4,121 +4,68 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:cortex/theme.dart';
-import 'package:cortex/fog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'invite.dart';
 
 class BannerService {
-  final ValueNotifier<bool> showInviteBannerNotifier =
-      ValueNotifier<bool>(false);
+  final ValueNotifier<bool> showInviteBannerNotifier = ValueNotifier<bool>(
+      false);
+
+  final ValueNotifier<double> bannerHeightNotifier = ValueNotifier<double>(0.0);
+
   final InviteService _inviteService = InviteService();
-
   bool _isSharingLink = false;
-
-  // Key to track the NEXT allowed appearance time
   static const String _nextShowTimestampKey = 'inviteBannerNextShowTimestamp';
 
   Future<void> checkAndTriggerBanner() async {
-    // 1. SECURITY: iOS detected → Auto-banner logic completely disabled.
     if (Platform.isIOS) return;
 
-    // 2. DEBUG MODE: Bypass timer logic completely
     if (kDebugMode) {
-      debugPrint("[BannerService] Debug Mode detected. Bypassing cooldown.");
-      _displayBanner();
+      debugPrint(
+          "[BannerService] Debug Mode detected. Showing banner immediately.");
+      if (!showInviteBannerNotifier.value) {
+        showInviteBannerNotifier.value = true;
+      }
       return;
     }
 
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final int? nextShowTimestamp = prefs.getInt(_nextShowTimestampKey);
-      final int now = DateTime.now().millisecondsSinceEpoch;
+      final int now = DateTime
+          .now()
+          .millisecondsSinceEpoch;
 
-      // Logic: If no timestamp exists (first run) OR current time >= next allowed time
       if (nextShowTimestamp == null || now >= nextShowTimestamp) {
-        debugPrint(
-            "[BannerService] Time condition met. Attempting to display Axon banner.");
-        _displayBanner();
-      } else {
-        final double remainingHours = (nextShowTimestamp - now) / 1000 / 3600;
-        debugPrint(
-            "[BannerService] Cooldown active. Remaining: ${remainingHours.toStringAsFixed(1)} hours.");
+        if (!showInviteBannerNotifier.value) {
+          showInviteBannerNotifier.value = true;
+        }
       }
     } catch (e) {
       debugPrint("[BannerService] SharedPreferences error: $e");
     }
   }
 
-  void _displayBanner() {
-    if (Platform.isIOS) return;
-
-    // Additional Random Chance: 50% chance even if cooldown met (User Experience)
-    // Unless Debug Mode
-    if (!kDebugMode) {
-      if (Random().nextBool()) {
-        debugPrint("[BannerService] Skipped by random chance (50%).");
-        // FIX: Don't set a full cooldown. Just return.
-        // The next session/check will try again.
-        // OR optionally set a tiny cooldown (e.g. 1 hour) to avoid spamming logs if checked frequently.
-        _scheduleNextAppearance(shortDelay: true);
-        return;
-      }
-    }
-
-    if (!showInviteBannerNotifier.value) {
-      showInviteBannerNotifier.value = true;
-      // FIX: Set the next cooldown immediately when we DECIDE to show it.
-      // This ensures we don't show it again for 1-3 days even if the user crashes/restarts
-      // without dismissing it manually.
-      _scheduleNextAppearance();
-    }
-  }
-
-  /// Called when the banner is swiped away.
-  /// Sets a random cooldown between 1 day (24h) and 3 days (72h).
   Future<void> startCooldown() async {
-    // Hide from UI immediately
     if (showInviteBannerNotifier.value) {
       showInviteBannerNotifier.value = false;
+      bannerHeightNotifier.value = 0.0;
     }
 
     if (Platform.isIOS) return;
 
-    // Re-schedule just in case, ensuring the "dismissed" action pushes it out.
-    await _scheduleNextAppearance();
-  }
-
-  /// Calculates and saves the next allowed show time.
-  /// [shortDelay] : If true, sets a small delay (e.g. 4 hours) instead of full 1-3 days.
-  ///                Used when skipping by random chance.
-  Future<void> _scheduleNextAppearance({bool shortDelay = false}) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      int randomHours;
-
-      if (shortDelay) {
-        // Retry in 4 hours
-        randomHours = 4;
-      } else {
-        // 1 Day = 24 Hours
-        // 3 Days = 72 Hours
-        // Range = 72 - 24 = 48 Hours variance
-        randomHours = 24 + Random().nextInt(48 + 1);
-      }
-
-      // Calculate the next allowed show time
-      final DateTime nextShowTime =
-          DateTime.now().add(Duration(hours: randomHours));
-
+      final int randomHours = 24 + Random().nextInt(48 + 1);
+      final DateTime nextShowTime = DateTime.now().add(
+          Duration(hours: randomHours));
       await prefs.setInt(
           _nextShowTimestampKey, nextShowTime.millisecondsSinceEpoch);
-
-      debugPrint(
-          "[BannerService] Scheduled next appearance in $randomHours hours.");
     } catch (e) {
       debugPrint("[BannerService] Failed to set cooldown timestamp: $e");
     }
@@ -126,11 +73,11 @@ class BannerService {
 
   Future<void> generateAndShareInviteLink(BuildContext context) async {
     if (Platform.isIOS) return;
-
     if (_isSharingLink) return;
     _isSharingLink = true;
 
     try {
+      HapticFeedback.lightImpact();
       await _inviteService.createAndShareReferralLink(context);
     } catch (e) {
       debugPrint('[BannerService] Error for invite system: $e');
@@ -141,13 +88,13 @@ class BannerService {
 
   void dispose() {
     showInviteBannerNotifier.dispose();
+    bannerHeightNotifier.dispose();
   }
 }
 
 class FloatingInfoBanner extends StatefulWidget {
   final VoidCallback? onDismissed;
   final VoidCallback? onTap;
-  final GlobalKey? anchorKey;
   final bool isEmbedded;
   final double? referenceWidth;
 
@@ -155,7 +102,6 @@ class FloatingInfoBanner extends StatefulWidget {
     super.key,
     this.onDismissed,
     this.onTap,
-    this.anchorKey,
     this.isEmbedded = false,
     this.referenceWidth,
   });
@@ -166,15 +112,11 @@ class FloatingInfoBanner extends StatefulWidget {
 
 class FloatingInfoBannerState extends State<FloatingInfoBanner>
     with TickerProviderStateMixin {
-  // Controls the collapsing height (AnimatedSize)
   bool _isVisible = false;
-  late ScrollController _subtitleScrollController;
-
   late AnimationController _controller;
-  late Animation<Offset> _slideAnimation; // Shared for Entry
-  late Animation<double> _fadeAnimation; // Shared for Entry
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _fadeAnimation;
 
-  // Exit Specifics
   late AnimationController _exitController;
   late Animation<Offset> _exitSlideAnimation;
   late Animation<double> _exitFadeAnimation;
@@ -183,18 +125,13 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
   @override
   void initState() {
     super.initState();
-
     if (Platform.isIOS) return;
 
-    // --- 1. Entry Animation Setup ---
-    _subtitleScrollController = ScrollController();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800), // Smooth entry duration
+      duration: const Duration(milliseconds: 800),
     );
 
-    // CHANGED: Slide from slightly below (0.3), not far below.
-    // CHANGED: Curve is EaseOutCubic (Smooth), not Elastic (Bouncy).
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
@@ -203,13 +140,9 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
       curve: Curves.easeOutCubic,
     ));
 
-    // Fade matches the slide
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    );
+    _fadeAnimation =
+        CurvedAnimation(parent: _controller, curve: Curves.easeOut);
 
-    // --- 2. Exit Animation Setup ---
     _exitController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -222,7 +155,6 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
     _exitSlideAnimation = Tween<Offset>(begin: Offset.zero, end: Offset.zero)
         .animate(_exitController);
 
-    // Trigger Entry Animation
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() => _isVisible = true);
@@ -233,54 +165,116 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
 
   @override
   void dispose() {
-    _subtitleScrollController.dispose();
     _controller.dispose();
     _exitController.dispose();
     super.dispose();
   }
 
-  /// Handles the complex dismiss logic:
-  /// Calculate Direction -> Animate Out -> Shrink Space -> Callback
   void dismiss(Offset swipeDelta) async {
-    if (!mounted ||
-        _exitController.isAnimating ||
+    if (!mounted || _exitController.isAnimating ||
         _exitController.isCompleted) {
       return;
     }
 
-    // Determine exit direction based on swipe
     double dx = 0;
     double dy = 0;
-
     if (swipeDelta.dx.abs() > swipeDelta.dy.abs()) {
-      dx = swipeDelta.dx > 0 ? 0.5 : -0.5; // Horizontal
+      dx = swipeDelta.dx > 0 ? 0.5 : -0.5;
     } else {
-      dy = swipeDelta.dy > 0 ? 0.5 : -0.5; // Vertical
+      dy = swipeDelta.dy > 0 ? 0.5 : -0.5;
     }
 
     setState(() {
       _exitOffset = Offset(dx, dy);
       _exitSlideAnimation = Tween<Offset>(begin: Offset.zero, end: _exitOffset)
-          .animate(CurvedAnimation(
-        parent: _exitController,
-        curve: Curves.easeOutQuad,
-      ));
+          .animate(
+          CurvedAnimation(parent: _exitController, curve: Curves.easeOutQuad));
     });
 
-    // 1. Play Exit Animation (Fade out + Slide slightly)
     await _exitController.forward();
 
     if (!mounted) return;
-
-    // 2. Collapse the layout (AnimatedSize shrinks)
     setState(() => _isVisible = false);
 
-    // 3. Wait for collapse to finish, then callback
     await Future.delayed(const Duration(milliseconds: 300));
+    if (mounted) widget.onDismissed?.call();
+  }
 
-    if (mounted) {
-      widget.onDismissed?.call();
-    }
+  /// Calculates the exact height the banner needs to be for a given width.
+  double _calculateDesiredHeight(BuildContext context, double refWidth,
+      AppLocalizations localizations) {
+    if (!_isVisible) return 0.0;
+
+    final double internalHorizontalPadding = refWidth * 0.04;
+    final double internalVerticalPadding = refWidth * 0.035;
+    final double iconSpacing = refWidth * 0.03;
+    final double iconSize = refWidth * 0.08;
+    final double gapBetweenText = refWidth * 0.01;
+    final double borderThickness = refWidth * 0.003;
+
+    // Available width for text
+    final double textAvailableWidth = refWidth -
+        (internalHorizontalPadding * 2) -
+        iconSize -
+        iconSpacing -
+        (borderThickness * 2);
+
+    if (textAvailableWidth <= 0) return 0.0;
+
+    final String title = localizations.plusBannerTitle;
+    final String subtitle = localizations.plusBannerSubtitle;
+
+    final double titleFontSize = refWidth * 0.04;
+    final double subtitleFontSize = titleFontSize * 0.80;
+
+    final TextScaler textScaler = MediaQuery.textScalerOf(context);
+
+    // Measure Title
+    final TextPainter titlePainter = TextPainter(
+      text: TextSpan(
+        text: title,
+        style: TextStyle(
+          fontSize: titleFontSize,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+          height: 1.1,
+        ),
+      ),
+      maxLines: 2,
+      textDirection: TextDirection.ltr,
+      textScaler: textScaler,
+    )
+      ..layout(maxWidth: textAvailableWidth);
+
+    // Measure Subtitle
+    final TextPainter subtitlePainter = TextPainter(
+      text: TextSpan(
+        text: subtitle,
+        style: TextStyle(
+          fontSize: subtitleFontSize,
+          height: 1.2,
+        ),
+      ),
+      maxLines: 4,
+      textDirection: TextDirection.ltr,
+      textScaler: textScaler,
+    )
+      ..layout(maxWidth: textAvailableWidth);
+
+    // Calculate total height of the content column
+    final double textColumnHeight =
+        titlePainter.height + gapBetweenText + subtitlePainter.height;
+
+    // The container height is max(Icon, Text) + Vertical Padding
+    final double contentHeight = max(iconSize, textColumnHeight);
+    final double totalHeight =
+        contentHeight + (internalVerticalPadding * 2) + (borderThickness * 2);
+
+    // Add extra padding for the outer wrapper (bottom: 0.04, top: 0.02)
+    final double wrapperPadding = (refWidth * 0.04) + (refWidth * 0.02);
+
+    // +1 Buffer to avoid rounding jitter causing overflow
+    return totalHeight + wrapperPadding + 1.0;
   }
 
   @override
@@ -288,57 +282,70 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
     if (Platform.isIOS) return const SizedBox.shrink();
 
     final localizations = AppLocalizations.of(context)!;
-    final Size screenSize = MediaQuery.of(context).size;
+    final Size screenSize = MediaQuery
+        .of(context)
+        .size;
     final double refWidth = widget.referenceWidth ?? screenSize.width;
 
-    // --- Embedded Mode (Inside Axon List) ---
     if (widget.isEmbedded) {
-      return AnimatedSize(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOutCubic,
-        alignment: Alignment.topCenter,
+      final double targetHeight =
+      _calculateDesiredHeight(context, refWidth, localizations);
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final service = Provider.of<BannerService>(context, listen: false);
+        if ((service.bannerHeightNotifier.value - targetHeight).abs() > 0.5) {
+          service.bannerHeightNotifier.value = targetHeight;
+        }
+      });
+
+      // --- FIXED ALIGNMENT LOGIC ---
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        height: targetHeight,
+        alignment: Alignment.bottomCenter,
+        // Ensure child sticks to bottom
         child: _isVisible
-            ? SlideTransition(
-                // 1. Entry Animation Layer (Slight Slide Up)
-                position: _slideAnimation,
+            ? OverflowBox(
+          // Allow content to be its natural height (even if larger than container during animation)
+          minHeight: 0,
+          maxHeight: double.infinity,
+          alignment: Alignment.bottomCenter, // Glue content to bottom
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _exitSlideAnimation,
                 child: FadeTransition(
-                  opacity: _fadeAnimation, // Entry Fade
-                  child: SlideTransition(
-                    // 2. Exit Animation Layer (Directional Slide Out)
-                    position: _exitSlideAnimation,
-                    child: FadeTransition(
-                      opacity: _exitFadeAnimation, // Exit Fade
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                            bottom: refWidth * 0.04, top: refWidth * 0.02),
-                        child: GestureDetector(
-                          onTap: () {
-                            HapticFeedback.lightImpact();
-                            widget.onTap?.call();
-                          },
-                          // Listen to ALL swipes (Pan)
-                          onPanUpdate: (details) {
-                            if (details.delta.distance > 1.5) {
-                              dismiss(details.delta);
-                            }
-                          },
-                          child: _buildBannerContent(
-                              context, localizations, refWidth),
-                        ),
-                      ),
+                  opacity: _exitFadeAnimation,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        bottom: refWidth * 0.04, top: refWidth * 0.02),
+                    child: GestureDetector(
+                      onPanUpdate: (details) {
+                        if (details.delta.distance > 1.5) {
+                          dismiss(details.delta);
+                        }
+                      },
+                      child: _buildBannerContent(
+                          context, localizations, refWidth),
                     ),
                   ),
                 ),
-              )
-            : const SizedBox(width: double.infinity, height: 0),
+              ),
+            ),
+          ),
+        )
+            : const SizedBox.shrink(),
       );
     }
-
     return const SizedBox.shrink();
   }
 
-  Widget _buildBannerContent(
-      BuildContext context, AppLocalizations localizations, double refWidth) {
+  Widget _buildBannerContent(BuildContext context,
+      AppLocalizations localizations, double refWidth) {
     final double internalHorizontalPadding = refWidth * 0.04;
     final double internalVerticalPadding = refWidth * 0.035;
     final double iconSpacing = refWidth * 0.03;
@@ -352,94 +359,81 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
     final String subtitle = localizations.plusBannerSubtitle;
     final String iconPath = 'assets/icons/sparkle.svg';
 
-    // --- COLOR MAGIC: Solid "Faux-Transparent" ---
     final Color tintColor = AppColors.premium.withValues(alpha: 0.15);
-    final Color solidBackgroundColor =
-        Color.alphaBlend(tintColor, AppColors.background);
+    final Color solidBackgroundColor = Color.alphaBlend(
+        tintColor, AppColors.background);
     final Color borderColor = AppColors.premium;
     final Color contentColor = AppColors.premium;
     final Color subtitleColor = AppColors.premium.withValues(alpha: 0.8);
 
     return Material(
-      color: Colors.transparent,
+      color: solidBackgroundColor,
       elevation: 6,
       shadowColor: Colors.black.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(borderRadius),
-      child: Container(
-        width: widget.isEmbedded ? refWidth * 0.9 : null,
-        padding: EdgeInsets.symmetric(
-          horizontal: internalHorizontalPadding,
-          vertical: internalVerticalPadding,
-        ),
-        decoration: BoxDecoration(
-          color: solidBackgroundColor,
-          borderRadius: BorderRadius.circular(borderRadius),
-          border: Border.all(
-            color: borderColor,
-            width: refWidth * 0.003,
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          widget.onTap?.call();
+        },
+        borderRadius: BorderRadius.circular(borderRadius),
+        splashColor: AppColors.primaryColor.withValues(alpha: 0.1),
+        highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),
+        child: Container(
+          width: widget.isEmbedded ? refWidth * 0.9 : null,
+          padding: EdgeInsets.symmetric(
+            horizontal: internalHorizontalPadding,
+            vertical: internalVerticalPadding,
           ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SvgPicture.asset(
-              iconPath,
-              colorFilter: ColorFilter.mode(contentColor, BlendMode.srcIn),
-              width: iconSize,
-              height: iconSize,
-            ),
-            SizedBox(width: iconSpacing),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: contentColor,
-                      fontSize: titleFontSize,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                      height: 1.1,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: gapBetweenText),
-                  Container(
-                    // FIX: Enforce a fixed height for 2 lines of text to prevent
-                    // layout jumps at different widths.
-                    // Height = fontSize * lineHeight (1.2) * 2 lines
-                    height: subtitleFontSize * 1.2 * 2,
-                    alignment: Alignment.centerLeft,
-                    child: ScrollFog(
-                      // Since FloatingInfoBanner is Stateful, I can add a controller there.
-                      // But `_buildBannerContent` is just a method.
-                      // I'll add `_subtitleScrollController` to the State class.
-                      scrollController: _subtitleScrollController,
-                      topFogHeight: 4,
-                      bottomFogHeight: 12,
-                      child: SingleChildScrollView(
-                        controller: _subtitleScrollController,
-                        physics: const BouncingScrollPhysics(),
-                        child: Text(
-                          subtitle,
-                          style: TextStyle(
-                            color: subtitleColor,
-                            fontSize: subtitleFontSize,
-                            height: 1.2,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(color: borderColor, width: refWidth * 0.003),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(
+                iconPath,
+                colorFilter: ColorFilter.mode(contentColor, BlendMode.srcIn),
+                width: iconSize,
+                height: iconSize,
               ),
-            ),
-          ],
+              SizedBox(width: iconSpacing),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: contentColor,
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                        height: 1.1,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: gapBetweenText),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: subtitleColor,
+                        fontSize: subtitleFontSize,
+                        height: 1.2,
+                      ),
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -11,21 +11,13 @@ import 'package:provider/provider.dart';
 
 /// Defines the behavior of the leading (left) button.
 enum CortexLeadingMode {
-  /// Automatically decides: Shows 'Back' if the THIS ROUTE can pop.
-  /// Ignores overlays/sheets/dialogs open on top of it.
   auto,
-
-  /// Forces the Axon (Sidebar) toggle button.
   axon,
-
-  /// Forces the Back (Exit) button.
   back,
-
-  /// Hides the main leading button entirely (useful if you only want custom leadingActions).
   none,
 }
 
-// --- 1. THE UNIVERSAL APP BAR (Zero-Lag, Haptic & Animated & RTL-Ready) ---
+// --- 1. THE UNIVERSAL APP BAR ---
 class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onLeadingPressed;
   final Widget? actionButton;
@@ -66,7 +58,7 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
     final double horizontalPadding = screenWidth * 0.04;
     final double gapSize = 12.0;
 
-    // --- SMART LEADING LOGIC ---
+    // --- LEADING LOGIC ---
     final ModalRoute<dynamic>? parentRoute = ModalRoute.of(context);
     final bool canPopThisRoute = parentRoute?.canPop ?? false;
 
@@ -74,8 +66,6 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
         (leadingMode == CortexLeadingMode.auto && canPopThisRoute);
     final bool hideLeading = leadingMode == CortexLeadingMode.none;
 
-    // --- PREPARE LEFT WIDGETS ---
-    // Note: In RTL, these will visually appear on the Right side.
     final List<Widget> leftWidgets = [];
     double calculatedLeadingWidth = 0;
 
@@ -112,9 +102,6 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
         calculatedLeadingWidth += gapSize;
       }
       for (int i = 0; i < leadingActions!.length; i++) {
-        // Assume leadingActions use standard buttonSize or wrap them
-        // For calculation safety, assume buttonSize, but user might pass anything.
-        // We blindly add buttonSize.
         leftWidgets.add(leadingActions![i]);
         calculatedLeadingWidth += buttonSize;
         if (i < leadingActions!.length - 1) {
@@ -124,93 +111,258 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
       }
     }
 
-    // Add padding to calculation
     if (leftWidgets.isNotEmpty) {
       calculatedLeadingWidth += horizontalPadding;
     }
 
-    // --- PREPARE RIGHT WIDGETS ---
-    // Note: In RTL, these will visually appear on the Left side.
+    // --- RIGHT WIDGETS LOGIC (UPDATED FOR DYNAMIC WIDTH) ---
     final List<Widget> rightWidgets = [];
+    double calculatedActionsWidth = 0;
     final List<Widget> sourceActions =
         actions ?? (actionButton != null ? [actionButton!] : []);
 
     for (int i = 0; i < sourceActions.length; i++) {
+      // [FIX] Removed fixed SizedBox constraint to allow pills to expand
       rightWidgets.add(
-        SizedBox(
-          width: buttonSize,
+        Container(
           height: buttonSize,
-          child: Center(child: sourceActions[i]),
+          constraints: BoxConstraints(minWidth: buttonSize),
+          alignment: Alignment.center,
+          child: sourceActions[i],
         ),
       );
+
+      // Estimate width for centering logic (Assuming standard size if not dual)
+      // This is an approximation for the center title calculation.
+      calculatedActionsWidth += buttonSize;
+
       if (i < sourceActions.length - 1) {
         rightWidgets.add(SizedBox(width: gapSize));
+        calculatedActionsWidth += gapSize;
       }
     }
 
-    if (rightWidgets.isEmpty) {
-      // If empty, standard AppBar handles well. We removed the "placeholder" logic
-      // because pure AppBar doesn't need balance if using CenterTitle.
-    } else {
-      // Add end padding
+    if (rightWidgets.isNotEmpty) {
       rightWidgets.add(SizedBox(width: horizontalPadding));
+      calculatedActionsWidth += horizontalPadding;
     }
 
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      automaticallyImplyLeading: false,
-      centerTitle: true,
-      toolbarHeight: kToolbarHeight,
-      // Or let it be?
-      flexibleSpace: showGradient
-          ? Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.background.withValues(alpha: 1),
-              AppColors.background.withValues(alpha: 0),
-            ],
-            stops: const [0.0, 0.7],
+    // --- CENTER CALCULATION ---
+    final double maxSideWidth =
+    math.max(calculatedLeadingWidth, calculatedActionsWidth);
+    final double availableCenteredSpace = screenWidth - (maxSideWidth * 2);
+    final double targetWidth = screenWidth * 0.70;
+    final double finalTitleMaxWidth =
+    math.min(targetWidth, availableCenteredSpace);
+
+    return Stack(
+      children: [
+        AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          toolbarHeight: kToolbarHeight,
+          flexibleSpace: showGradient
+              ? Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.background.withValues(alpha: 1),
+                  AppColors.background.withValues(alpha: 0),
+                ],
+                stops: const [0.0, 0.7],
+              ),
+            ),
+          )
+              : null,
+          leading: leftWidgets.isNotEmpty
+              ? Padding(
+            padding: EdgeInsets.only(left: horizontalPadding),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: leftWidgets,
+            ),
+          )
+              : null,
+          leadingWidth: leftWidgets.isNotEmpty ? calculatedLeadingWidth : null,
+          actions: rightWidgets,
+          title: null,
+        ),
+        Positioned(
+          top: MediaQuery
+              .of(context)
+              .padding
+              .top,
+          left: 0,
+          right: 0,
+          height: kToolbarHeight,
+          child: Center(
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: finalTitleMaxWidth > 0 ? finalTitleMaxWidth : 0,
+              ),
+              child: _AnimatedTitleWrapper(
+                controller: scrollController,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.center,
+                  child: title ??
+                      (titleText != null
+                          ? Text(
+                        titleText!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Ubuntu',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 18,
+                          color: AppColors.primaryColor.inverted,
+                        ),
+                        maxLines: 1,
+                      )
+                          : const SizedBox.shrink()),
+                ),
+              ),
+            ),
           ),
         ),
-      )
-          : null,
-      leading: leftWidgets.isNotEmpty
-          ? Padding(
-        padding: EdgeInsets.only(left: horizontalPadding),
+      ],
+    );
+  }
+}
+
+// --- 2. DUAL ACTION PILL (The Morphing Button) ---
+class DualActionPill extends StatelessWidget {
+  final bool isDual;
+  final Widget mainIcon; // Right side (New Chat / Flux)
+  final Widget? secondaryIcon; // Left side (Share)
+  final VoidCallback onMainTap;
+  final VoidCallback? onSecondaryTap;
+  final double size;
+
+  const DualActionPill({
+    super.key,
+    required this.isDual,
+    required this.mainIcon,
+    this.secondaryIcon,
+    required this.onMainTap,
+    this.onSecondaryTap,
+    this.size = 42.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    context.watch<ThemeProvider>();
+    final invertedColor = AppColors.primaryColor.inverted;
+    final Color backgroundColor = AppColors.background;
+    final Color borderColor = invertedColor.withValues(alpha: 0.12);
+    final Color splashColor = invertedColor.withValues(alpha: 0.1);
+
+    // Using 16.0 to match AppBarButton's radius
+    const double radius = 16.0;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutBack,
+      // Bouncy expansion
+      height: size,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: borderColor, width: 0.8),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(radius),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: leftWidgets,
-        ),
-      )
-          : null,
-      leadingWidth: leftWidgets.isNotEmpty ? calculatedLeadingWidth : null,
-      actions: rightWidgets,
-      title: _AnimatedTitleWrapper(
-        controller: scrollController,
-        child: title ??
-            (titleText != null
-                ? Text(
-              titleText!,
-              style: TextStyle(
-                fontFamily: 'Ubuntu',
-                fontWeight: FontWeight.w500,
-                fontSize: 18,
-                color: AppColors.primaryColor.inverted,
+          children: [
+            // --- LEFT BUTTON (Secondary / Share) ---
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.centerRight,
+              child: isDual
+                  ? Row(
+                children: [
+                  SizedBox(
+                    width: size,
+                    height: size,
+                    child: InkWell(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        onSecondaryTap?.call();
+                      },
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(radius),
+                        bottomLeft: Radius.circular(radius),
+                      ),
+                      splashColor: splashColor,
+                      highlightColor: splashColor.withValues(alpha: 0.05),
+                      child: Center(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: secondaryIcon ?? const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // --- DIVIDER ---
+                  Container(
+                    width: 1,
+                    height: size * 0.6, // Slightly shorter for elegance
+                    color: borderColor,
+                  ),
+                ],
+              )
+                  : const SizedBox.shrink(),
+            ),
+
+            // --- RIGHT BUTTON (Main / New Chat / Flux) ---
+            SizedBox(
+              width: size,
+              height: size,
+              child: InkWell(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  onMainTap();
+                },
+                borderRadius: isDual
+                    ? const BorderRadius.only(
+                  topRight: Radius.circular(radius),
+                  bottomRight: Radius.circular(radius),
+                )
+                    : BorderRadius.circular(radius),
+                splashColor: splashColor,
+                highlightColor: splashColor.withValues(alpha: 0.05),
+                child: Center(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    transitionBuilder: (child, animation) {
+                      return ScaleTransition(
+                        scale: animation,
+                        child: FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: mainIcon,
+                  ),
+                ),
               ),
-              overflow: TextOverflow.ellipsis,
-            )
-                : const SizedBox.shrink()),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-// --- 2. BACK BUTTON (Direction-Aware Rotation) ---
+// --- 3. BACK BUTTON ---
 class _BackButton extends StatelessWidget {
   final double buttonSize;
   final double iconSize;
@@ -224,11 +376,7 @@ class _BackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Detect RTL
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
-
-    // LTR Logic: Rotate 90deg (pi/2) to point Left (assuming SVG points Down).
-    // RTL Logic: Rotate -90deg (-pi/2) to point Right.
     final double rotationAngle = isRtl ? -math.pi / 2 : math.pi / 2;
 
     return AppBarButton(
@@ -250,7 +398,7 @@ class _BackButton extends StatelessWidget {
   }
 }
 
-// --- 3. AXON TOGGLE BUTTON (Synced & Elastic Animation) ---
+// --- 4. AXON TOGGLE BUTTON ---
 class _AxonToggleButton extends StatefulWidget {
   final double buttonSize;
   final double iconSize;
@@ -292,7 +440,6 @@ class _AxonToggleButtonState extends State<_AxonToggleButton> {
   void _onAxonStateChanged() {
     if (_axonAnimation == null) return;
     final bool isOpen = _axonAnimation!.value > 0.01;
-
     if (_isActivated != isOpen) {
       setState(() {
         _isActivated = isOpen;
@@ -341,7 +488,7 @@ class _AxonToggleButtonState extends State<_AxonToggleButton> {
   }
 }
 
-// --- 4. ANIMATED TITLE WIDGET (FADE ONLY - No Slide) ---
+// --- 5. ANIMATED TITLE WIDGET ---
 class _AnimatedTitleWrapper extends StatefulWidget {
   final Widget child;
   final ScrollController? controller;
@@ -362,7 +509,6 @@ class _AnimatedTitleWrapperState extends State<_AnimatedTitleWrapper> {
   void initState() {
     super.initState();
     widget.controller?.addListener(_onScroll);
-    // Initial check
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkVisibility());
   }
 
@@ -394,14 +540,8 @@ class _AnimatedTitleWrapperState extends State<_AnimatedTitleWrapper> {
         .of(context)
         .size
         .height;
-    // Disappear immediately on scroll? Or after threshold?
-    // Threshold = 0.025 * H ~ 20px.
-    // So if offset > 20px, visible = false.
     final double dynamicThreshold = screenHeight * 0.025;
-
     final double offset = widget.controller!.offset;
-
-    // Logic: Visible ONLY when at top (offset <= threshold).
     final bool shouldBeVisible = offset <= dynamicThreshold;
 
     if (_isVisible != shouldBeVisible) {
@@ -416,7 +556,6 @@ class _AnimatedTitleWrapperState extends State<_AnimatedTitleWrapper> {
     if (widget.controller == null) {
       return widget.child;
     }
-
     return AnimatedOpacity(
       opacity: _isVisible ? 1.0 : 0.0,
       duration: const Duration(milliseconds: 200),
@@ -426,7 +565,7 @@ class _AnimatedTitleWrapperState extends State<_AnimatedTitleWrapper> {
   }
 }
 
-// --- 5. HIGH-PERFORMANCE PILL BUTTON (Faux-Glass & Auto Haptics) ---
+// --- 6. STANDARD PILL BUTTON ---
 class AppBarButton extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
@@ -447,7 +586,6 @@ class AppBarButton extends StatelessWidget {
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
     final invertedColor = AppColors.primaryColor.inverted;
-
     final Color backgroundColor = AppColors.background;
     final Color borderColor = invertedColor.withValues(alpha: 0.12);
     final Color splashColor = invertedColor.withValues(alpha: 0.1);

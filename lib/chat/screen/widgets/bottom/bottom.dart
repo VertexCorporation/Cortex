@@ -45,7 +45,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
 
   // We use a GlobalKey to access InputField state (specifically for button enabling logic)
   final GlobalKey<InputFieldState> _inputFieldKey =
-  GlobalKey<InputFieldState>();
+      GlobalKey<InputFieldState>();
 
   // Animation for warning fade inside InputField
   late AnimationController _warningController;
@@ -64,6 +64,17 @@ class _ChatInputPanelState extends State<ChatInputPanel>
       controller: _textController,
       focusNode: _focusNode,
     );
+
+    // Initialize from Global Draft
+    final draft = context.read<InputProvider>().globalDraft;
+    if (draft.isNotEmpty) {
+      _textController.text = draft;
+    }
+
+    // Keep Global Draft synced
+    _textController.addListener(() {
+      context.read<InputProvider>().updateGlobalDraft(_textController.text);
+    });
   }
 
   @override
@@ -85,9 +96,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
     final localizations = AppLocalizations.of(context)!;
 
     // --- Model Status Checks ---
-    final langCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final langCode = Localizations.localeOf(context).languageCode;
     final isOffline = !Utils.isServerSideModel(
       sessionProvider.modelId,
       langCode: langCode,
@@ -102,7 +111,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
         !sessionProvider.isDynamicChat && isOffline && !isDownloaded;
 
     final bool isLimitExceeded = sessionProvider.chatLimitManager
-        ?.isLimitExceeded(conversationProvider.messages) ??
+            ?.isLimitExceeded(conversationProvider.messages) ??
         false;
 
     // We wrap the column in SizeChangedLayoutNotifier so the parent (View)
@@ -155,7 +164,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
                   originalMessageText: inputProvider.originalMessageText,
                   // Legacy photo support for UI (optional, can be null if InputField uses provider directly)
                   preselectedPhoto: inputProvider.attachments.isNotEmpty &&
-                      inputProvider.attachments.first.file.path.isNotEmpty
+                          inputProvider.attachments.first.file.path.isNotEmpty
                       ? inputProvider.attachments.first.file
                       : null,
                   isStorageSufficient: sessionProvider.isStorageSufficient,
@@ -176,19 +185,16 @@ class _ChatInputPanelState extends State<ChatInputPanel>
                   fadeAnimation: _warningFadeAnimation,
 
                   // --- Actions ---
-                  onSend: () async =>
-                      _handleSend(
-                          localizations,
-                          isLimitExceeded,
-                          langCode,
-                          modelService,
-                          inputProvider,
-                          conversationProvider),
+                  onSend: () async => _handleSend(
+                      localizations,
+                      isLimitExceeded,
+                      langCode,
+                      modelService,
+                      inputProvider,
+                      conversationProvider),
                   onApplyEditedMessage: () async =>
-                  await widget.editService.applyEditedMessage(context),
-                  onStop: context
-                      .read<StopService>()
-                      .stopResponse,
+                      await widget.editService.applyEditedMessage(context),
+                  onStop: context.read<StopService>().stopResponse,
                   // Logic Update: Null check before adding
                   onPhotoSelected: (photo) {
                     if (photo != null) {
@@ -212,12 +218,14 @@ class _ChatInputPanelState extends State<ChatInputPanel>
 
   // --- Logic Helpers ---
 
-  Future<void> _handleSend(AppLocalizations localizations,
-      bool isLimitExceeded,
-      String langCode,
-      ModelService modelService,
-      InputProvider inputProvider,
-      ConversationProvider conversationProvider,) async {
+  Future<void> _handleSend(
+    AppLocalizations localizations,
+    bool isLimitExceeded,
+    String langCode,
+    ModelService modelService,
+    InputProvider inputProvider,
+    ConversationProvider conversationProvider,
+  ) async {
     // Basic validation
     final isEnabled = _inputFieldKey.currentState?.isSendButtonEnabled ?? false;
     if (!isEnabled || conversationProvider.isWaitingForResponse) return;
@@ -232,11 +240,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
     // B. Send New Message
     final String messageText = _textController.text;
 
-    // UI Cleanup
-    _textController.clear();
-    // InputProvider clears attachments inside SendService, but we unfocus here
-    FocusScope.of(context).unfocus();
-
+    // Define sessionProvider first
     final sessionProvider = context.read<ChatSessionProvider>();
     final isServerSide = Utils.isServerSideModel(
       sessionProvider.modelId,
@@ -244,14 +248,22 @@ class _ChatInputPanelState extends State<ChatInputPanel>
       modelService: modelService,
     );
 
+    // InputProvider clears attachments inside SendService, but we unfocus here
+    FocusScope.of(context).unfocus();
     // Send Logic
     // FIX: Removed the 'photo' parameter to match the new SendService signature.
     // The service will read attachments directly from the InputProvider.
+    debugPrint(
+        "ChatInputPanel: Sending message. Text length: ${messageText.length}. Attachments: ${inputProvider.attachments.length}");
     final sendFuture = context.read<SendService>().sendMessage(
-      context: context,
-      localizations: localizations,
-      messageText: messageText,
-    );
+          context: context,
+          localizations: localizations,
+          messageText: messageText,
+        );
+
+    // UI Cleanup AFTER initiating send
+    _textController.clear();
+    inputProvider.clearAllInput(); // Clears draft and attachments
 
     // Post-Send Review Triggers
     if (isServerSide) {

@@ -25,8 +25,8 @@ class BottomActionButtons extends StatelessWidget {
     // filePath is only relevant for downloaded offline models.
     final filePath = !provider.mainModel!.isServerSide && provider.isDownloaded
         ? context
-            .read<ModelLocalStateProvider>()
-            .getFilePathById(provider.mainModel!.id)
+        .read<ModelLocalStateProvider>()
+        .getFilePathById(provider.mainModel!.id)
         : null;
 
     // Pop the screen and return a map containing the action and the necessary data.
@@ -35,14 +35,20 @@ class BottomActionButtons extends StatelessWidget {
       'modelId': provider.mainModel!.id,
       'filePath': filePath,
       'model_updated':
-          provider.didBaseModelChange, // Pass along the update status
+      provider.didBaseModelChange, // Pass along the update status
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final localizations = AppLocalizations.of(context)!;
     final provider = context.watch<ModelDetailProvider>();
     final mainModel = provider.mainModel;
@@ -97,9 +103,9 @@ class BottomActionButtons extends StatelessWidget {
               FadeTransition(opacity: animation, child: child),
           child: provider.isDownloaded
               ? _buildRemoveOrChatButtons(context, provider, localizations)
-              // Pass the buttonHeight to ensure consistent sizing.
+          // Pass the buttonHeight to ensure consistent sizing.
               : _buildDownloadOrCancelButtons(
-                  context, provider, localizations, buttonHeight),
+              context, provider, localizations, buttonHeight),
         ),
       );
     }
@@ -112,12 +118,13 @@ class BottomActionButtons extends StatelessWidget {
   }
 
   /// Builds the "Remove / Chat" button row for downloaded or user-created models.
-  Widget _buildRemoveOrChatButtons(
-    BuildContext context,
-    ModelDetailProvider provider,
-    AppLocalizations localizations,
-  ) {
-    final screenWidth = MediaQuery.of(context).size.width;
+  Widget _buildRemoveOrChatButtons(BuildContext context,
+      ModelDetailProvider provider,
+      AppLocalizations localizations,) {
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Container(
       key: const ValueKey('removeAndChat'),
@@ -131,14 +138,14 @@ class BottomActionButtons extends StatelessWidget {
               onTap: provider.isDeleting
                   ? null
                   : () async {
-                      HapticFeedback.lightImpact(); // Add haptic context
-                      final success = await provider.removeModel(context);
-                      if (success &&
-                          provider.isUserCreatedModel &&
-                          context.mounted) {
-                        Navigator.of(context).pop();
-                      }
-                    },
+                HapticFeedback.lightImpact(); // Add haptic context
+                final success = await provider.removeModel(context);
+                if (success &&
+                    provider.isUserCreatedModel &&
+                    context.mounted) {
+                  Navigator.of(context).pop();
+                }
+              },
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(screenWidth * 0.03),
                 bottomLeft: Radius.circular(screenWidth * 0.03),
@@ -169,9 +176,9 @@ class BottomActionButtons extends StatelessWidget {
               onTap: provider.isDeleting
                   ? null
                   : () {
-                      HapticFeedback.lightImpact();
-                      _startChat(context, provider);
-                    },
+                HapticFeedback.lightImpact();
+                _startChat(context, provider);
+              },
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(screenWidth * 0.03),
                 bottomRight: Radius.circular(screenWidth * 0.03),
@@ -202,14 +209,15 @@ class BottomActionButtons extends StatelessWidget {
   }
 
   /// Builds the "Download" or "Cancel" button for models that are not yet downloaded.
-  Widget _buildDownloadOrCancelButtons(
-    BuildContext context,
-    ModelDetailProvider provider,
-    AppLocalizations localizations,
-    // Accept buttonHeight as a parameter for consistent sizing.
-    double buttonHeight,
-  ) {
-    final screenWidth = MediaQuery.of(context).size.width;
+  Widget _buildDownloadOrCancelButtons(BuildContext context,
+      ModelDetailProvider provider,
+      AppLocalizations localizations,
+      // Accept buttonHeight as a parameter for consistent sizing.
+      double buttonHeight,) {
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final localProvider = context.read<ModelLocalStateProvider>();
 
     if (provider.isDownloading || provider.isPaused) {
@@ -232,7 +240,7 @@ class BottomActionButtons extends StatelessWidget {
       builder: (context, snapshot) {
         final hasInternet = snapshot.data ?? false;
         final compatibility =
-            localProvider.getCompatibilityStatus(provider.mainModel!.size);
+        localProvider.getCompatibilityStatus(provider.mainModel!.size);
         final isCompatible = compatibility == CompatibilityStatus.compatible;
 
         String buttonText;
@@ -254,13 +262,13 @@ class BottomActionButtons extends StatelessWidget {
           child: ElevatedButton(
             onPressed: isButtonEnabled && !provider.isButtonLocked
                 ? () {
-                    HapticFeedback.lightImpact();
-                    localProvider.requestPermissionAndStartDownload(
-                      context: context,
-                      id: provider.mainModel!.id,
-                      url: provider.mainModel!.url,
-                    );
-                  }
+              HapticFeedback.lightImpact();
+              localProvider.requestPermissionAndStartDownload(
+                context: context,
+                id: provider.mainModel!.id,
+                url: provider.mainModel!.url,
+              );
+            }
                 : null,
             style: ElevatedButton.styleFrom(
               // Changed button color to primaryColor.inverted.
@@ -268,7 +276,7 @@ class BottomActionButtons extends StatelessWidget {
               foregroundColor: Colors.white,
               // Updated disabled color to match the new background color.
               disabledBackgroundColor:
-                  AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+              AppColors.primaryColor.inverted.withValues(alpha: 0.5),
               disabledForegroundColor: Colors.white.withValues(alpha: 0.7),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(screenWidth * 0.03)),
@@ -287,12 +295,13 @@ class BottomActionButtons extends StatelessWidget {
   }
 
   /// Builds a simple, full-width "Chat" button.
-  Widget _buildChatOnlyButton(
-    BuildContext context,
-    ModelDetailProvider provider,
-    AppLocalizations localizations,
-  ) {
-    final screenWidth = MediaQuery.of(context).size.width;
+  Widget _buildChatOnlyButton(BuildContext context,
+      ModelDetailProvider provider,
+      AppLocalizations localizations,) {
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Container(
       key: const ValueKey('chatOnly'),
@@ -302,9 +311,9 @@ class BottomActionButtons extends StatelessWidget {
         onTap: provider.isDeleting
             ? null
             : () {
-                HapticFeedback.lightImpact();
-                _startChat(context, provider);
-              },
+          HapticFeedback.lightImpact();
+          _startChat(context, provider);
+        },
         borderRadius: BorderRadius.circular(screenWidth * 0.03),
         child: Container(
           alignment: Alignment.center,

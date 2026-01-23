@@ -83,8 +83,8 @@ class _SettingsScreenState extends State<SettingsScreen>
       ),
       body: Consumer<SettingsGeneralProvider>(
         builder: (context, generalProvider, child) {
-          final bool showSkeleton = generalProvider.isLoading ||
-              (generalProvider.hasInternet && generalProvider.userData == null);
+          final bool showSkeleton =
+              generalProvider.isLoading && (generalProvider.userData == null);
 
           return AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
@@ -134,23 +134,29 @@ class _SettingsScreenState extends State<SettingsScreen>
       showTop: false,
       bottomFogHeight: 20,
       showBottom: true,
-      child: Center(
+      child: Container(
+        alignment: Alignment.topCenter,
         child: Container(
           constraints:
               BoxConstraints(maxWidth: isTablet ? 800 : double.infinity),
-          child: ListView.builder(
-            controller: _scrollController,
-            key: const ValueKey('settingsContent'),
-            padding: EdgeInsets.only(
-              top: topPadding,
-              bottom: 20,
-              left: isTablet ? 32.0 : screenWidth * 0.04,
-              right: isTablet ? 32.0 : screenWidth * 0.04,
+          child: ScrollConfiguration(
+            behavior:
+                ScrollConfiguration.of(context).copyWith(overscroll: false),
+            child: ListView.builder(
+              controller: _scrollController,
+              key: const PageStorageKey('settingsContent'),
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.only(
+                top: topPadding,
+                bottom: 20,
+                left: isTablet ? 32.0 : screenWidth * 0.04,
+                right: isTablet ? 32.0 : screenWidth * 0.04,
+              ),
+              itemCount: settingsItems.length,
+              itemBuilder: (context, index) {
+                return settingsItems[index];
+              },
             ),
-            itemCount: settingsItems.length,
-            itemBuilder: (context, index) {
-              return settingsItems[index];
-            },
           ),
         ),
       ),

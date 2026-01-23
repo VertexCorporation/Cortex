@@ -1,6 +1,8 @@
-// library/screen/models/widgets/category.dart
+// lib/library/screen/models/widgets/category.dart
 
+import 'dart:async';
 import 'package:cortex/app.dart';
+import 'package:cortex/fog.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,9 +11,7 @@ import '../../../backend/download/download.dart';
 import '../../../backend/utils.dart';
 import 'cards.dart';
 
-/// A widget that displays a self-contained, pageable section of models for a specific category.
-/// This widget now operates on a type-safe list of [ModelEntity].
-class ModelCategorySection extends StatelessWidget {
+class ModelCategorySection extends StatefulWidget {
   final String title;
   final List<ModelEntity> models;
   final Animation<double>? pulseAnimation;
@@ -19,13 +19,21 @@ class ModelCategorySection extends StatelessWidget {
   final Map<String, DownloadManager> downloadManagers;
   final CompatibilityStatus Function(int? modelSizeInMB) getCompatibilityStatus;
 
-  // Callbacks
+  // Actions
   final void Function(ModelEntity model) onModelTapped;
   final Future<void> Function(String id, String title) onRemovePressed;
-  final Future<void> Function(String id, bool isServerSide, {bool isCustomModel, String? modelPath}) onChatPressed;
-  final Future<void> Function({required String id, required String? url, required String title}) onDownloadPressed;
+  final Future<void> Function(String id, bool isServerSide,
+      {bool isCustomModel, String? modelPath}) onChatPressed;
+  final Future<void> Function(
+      {required String id,
+      required String? url,
+      required String title}) onDownloadPressed;
   final void Function(String id) onCancelDownload;
   final void Function(String id) onResumeDownload;
+
+  // Edge Gestures
+  final VoidCallback? onOverscrollStart;
+  final VoidCallback? onOverscrollEnd;
 
   const ModelCategorySection({
     super.key,
@@ -41,20 +49,58 @@ class ModelCategorySection extends StatelessWidget {
     required this.onDownloadPressed,
     required this.onCancelDownload,
     required this.onResumeDownload,
+    this.onOverscrollStart,
+    this.onOverscrollEnd,
   });
 
+  @override
+  State<ModelCategorySection> createState() => _ModelCategorySectionState();
+}
+
+class _ModelCategorySectionState extends State<ModelCategorySection> {
+  late final PageController _pageController;
+
+  // Debounce
+  bool _canTriggerEdgeAction = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: 0.98);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _triggerEdgeAction(VoidCallback action) {
+    if (_canTriggerEdgeAction) {
+      HapticFeedback.lightImpact();
+
+      // Navigasyon hatasını önlemek için post frame callback
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        action();
+      });
+
+      setState(() => _canTriggerEdgeAction = false);
+
+      Timer(const Duration(seconds: 1), () {
+        if (mounted) setState(() => _canTriggerEdgeAction = true);
+      });
+    }
+  }
+
   double _calculateHeight(double screenWidth) {
-    final modelMaps = models.map((e) => e.toMap()).toList();
+    final modelMaps = widget.models.map((e) => e.toMap()).toList();
     return ModelsBackendUtils.calculateCategoryHeight(modelMaps, screenWidth);
   }
 
-  List<Widget> _buildModelColumns(
-      BuildContext context,
-      double screenWidth,
-      ) {
+  List<Widget> _buildModelColumns(BuildContext context, double screenWidth) {
     final List<Widget> columns = [];
     const int modelsPerColumn = 3;
-    final int totalModels = models.length;
+    final int totalModels = widget.models.length;
     final int totalColumns = (totalModels / modelsPerColumn).ceil();
 
     for (int i = 0; i < totalColumns; i++) {
@@ -64,7 +110,7 @@ class ModelCategorySection extends StatelessWidget {
           : startIndex + modelsPerColumn;
 
       final List<ModelEntity> columnModels =
-      models.sublist(startIndex, endIndex);
+      widget.models.sublist(startIndex, endIndex);
 
       columns.add(
         Padding(
@@ -73,12 +119,12 @@ class ModelCategorySection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: columnModels.map((model) {
-              final isDownloaded = downloadedStates[model.id] ?? false;
+              final isDownloaded = widget.downloadedStates[model.id] ?? false;
               final manager =
-              model.isServerSide ? null : downloadManagers[model.id];
+              model.isServerSide ? null : widget.downloadManagers[model.id];
               final compatibilityStatus = isDownloaded
                   ? CompatibilityStatus.compatible
-                  : getCompatibilityStatus(model.size);
+                  : widget.getCompatibilityStatus(model.size);
 
               return ModelTile(
                 model: model,
@@ -87,24 +133,26 @@ class ModelCategorySection extends StatelessWidget {
                 manager: manager,
                 isDownloaded: isDownloaded,
                 compatibilityStatus: compatibilityStatus,
-                onTileTap: () => onModelTapped(model),
+                onTileTap: () => widget.onModelTapped(model),
                 onRemoveRequested: () async {
                   HapticFeedback.mediumImpact();
-                  await onRemovePressed(model.id, model.displayTitle);
+                  await widget.onRemovePressed(model.id, model.displayTitle);
                 },
-                onChatPressed: () => onChatPressed(
-                  model.id,
-                  model.isServerSide,
-                  isCustomModel: model.isCustomModel,
-                  modelPath: null,
-                ),
-                onDownloadPressed: () => onDownloadPressed(
-                  id: model.id,
-                  url: model.url,
-                  title: model.displayTitle,
-                ),
-                onCancelDownload: () => onCancelDownload(model.id),
-                onResumeDownload: () => onResumeDownload(model.id),
+                onChatPressed: () =>
+                    widget.onChatPressed(
+                      model.id,
+                      model.isServerSide,
+                      isCustomModel: model.isCustomModel,
+                      modelPath: null,
+                    ),
+                onDownloadPressed: () =>
+                    widget.onDownloadPressed(
+                      id: model.id,
+                      url: model.url,
+                      title: model.displayTitle,
+                    ),
+                onCancelDownload: () => widget.onCancelDownload(model.id),
+                onResumeDownload: () => widget.onResumeDownload(model.id),
               );
             }).toList(),
           ),
@@ -114,46 +162,25 @@ class ModelCategorySection extends StatelessWidget {
     return columns;
   }
 
-  Widget _buildHeader(double screenWidth) {
-    return Padding(
-      padding: EdgeInsets.only(top: screenWidth * 0.02, bottom: screenWidth * 0.01),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              color: AppColors.primaryColor.inverted,
-              fontSize: screenWidth * 0.05,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (models.isEmpty) {
+    if (widget.models.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     const double horizontalPaddingRatio = 0.04;
     final double sectionHPad = screenWidth * horizontalPaddingRatio;
-    const double pageFraction = 0.98;
-    final double viewportFraction = pageFraction;
 
     final double availableWidth = screenWidth - 2 * sectionHPad;
-
-    final double pageWidth = availableWidth * viewportFraction;
-
+    final double pageWidth = availableWidth * 0.98;
     final double sideInset = (availableWidth - pageWidth) / 2;
-
     final double trackShift = sideInset * 2;
 
-    final Widget content = Column(
+    Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -163,20 +190,41 @@ class ModelCategorySection extends StatelessWidget {
         ),
         SizedBox(
           height: _calculateHeight(screenWidth),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: sectionHPad),
-            child: Transform.translate(
-              offset: Offset(-trackShift, 0),
-              child: PageView(
-                clipBehavior: Clip.none,
-                controller: PageController(
-                  viewportFraction: viewportFraction,
-                ),
-                padEnds: true,
-                physics: const PageScrollPhysics(),
-                children: _buildModelColumns(
-                  context,
-                  screenWidth,
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              if (notification is OverscrollNotification) {
+                if (notification.overscroll < 0 &&
+                    widget.onOverscrollStart != null) {
+                  _triggerEdgeAction(widget.onOverscrollStart!);
+                }
+                else if (notification.overscroll > 0 &&
+                    widget.onOverscrollEnd != null) {
+                  _triggerEdgeAction(widget.onOverscrollEnd!);
+                }
+              }
+              return false;
+            },
+            // --- HİYERARŞİ DEĞİŞİKLİĞİ BURADA ---
+            // ScrollFogHorizontal artık en dışta.
+            // Bu sayede sis efekti Padding'in (boşluğun) üstüne biner ve ekranın tam kenarından başlar.
+            child: ScrollFogHorizontal(
+              scrollController: _pageController,
+              // Sis genişliğini (Padding + biraz içerik) kadar yapıyoruz ki yumuşak geçiş olsun.
+              startFogWidth: sectionHPad + 24.0,
+              endFogWidth: sectionHPad + 24.0,
+
+              // Padding şimdi Fog'un çocuğu oldu.
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: sectionHPad),
+                child: Transform.translate(
+                  offset: Offset(-trackShift, 0),
+                  child: PageView(
+                    clipBehavior: Clip.none,
+                    controller: _pageController,
+                    padEnds: true,
+                    physics: const ClampingScrollPhysics(),
+                    children: _buildModelColumns(context, screenWidth),
+                  ),
                 ),
               ),
             ),
@@ -185,22 +233,23 @@ class ModelCategorySection extends StatelessWidget {
       ],
     );
 
-    if (pulseAnimation != null) {
+    if (widget.pulseAnimation != null) {
       return AnimatedBuilder(
-        animation: pulseAnimation!,
+        animation: widget.pulseAnimation!,
         builder: (context, child) {
           const double maxExpansionInPixels = 7.0;
           final double originalContentWidth =
               screenWidth - 2 * (screenWidth * 0.04);
           final double maxDesiredWidth =
               originalContentWidth + maxExpansionInPixels;
-          final double targetWidth =
-          (maxDesiredWidth < screenWidth) ? maxDesiredWidth : screenWidth;
+          final double targetWidth = (maxDesiredWidth < screenWidth)
+              ? maxDesiredWidth
+              : screenWidth;
           final double maxTargetScale = (originalContentWidth > 0)
               ? targetWidth / originalContentWidth
               : 1.0;
           final double animationProgress =
-              (pulseAnimation!.value - 1.0) / 0.10;
+              (widget.pulseAnimation!.value - 1.0) / 0.10;
           final double finalAppliedScale =
               1.0 + (animationProgress * (maxTargetScale - 1.0));
           final double headerApproxHeight = screenWidth * 0.08;
@@ -210,6 +259,7 @@ class ModelCategorySection extends StatelessWidget {
               (contentOriginalHeight * finalAppliedScale) -
                   contentOriginalHeight;
           final double bottomSpacerHeight = extraHeight / 2.0;
+
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -225,5 +275,25 @@ class ModelCategorySection extends StatelessWidget {
       );
     }
     return content;
+  }
+
+  Widget _buildHeader(double screenWidth) {
+    return Padding(
+      padding: EdgeInsets.only(
+          top: screenWidth * 0.02, bottom: screenWidth * 0.01),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            widget.title,
+            style: TextStyle(
+              color: AppColors.primaryColor.inverted,
+              fontSize: screenWidth * 0.05,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -50,6 +50,12 @@ class AppbarState extends State<Appbar> {
     conversation.clearConversation();
   }
 
+  // --- LOGIC: Start New Chat ---
+  void _handleNewChat(BuildContext context) {
+    // Calls the global key method to reset everything properly
+    mainScreenKey.currentState?.startNewConversation(closeSidebar: false);
+  }
+
   // --- LOGIC: Share Chat ---
   Future<void> _handleShare(BuildContext context) async {
     if (_isSharing) return;
@@ -81,7 +87,7 @@ class AppbarState extends State<Appbar> {
       for (final msg in conversation.messages) {
         if (msg.isThinking) continue;
 
-        // UPDATED: Skip only if text is empty AND no attachments exist
+        // Skip only if text is empty AND no attachments exist
         if (msg.text
             .trim()
             .isEmpty && !msg.hasAttachments) {
@@ -90,8 +96,6 @@ class AppbarState extends State<Appbar> {
 
         if (msg.isUserMessage) {
           buffer.writeln('👤 $userName: ${msg.text}');
-
-          // UPDATED: List all attachments with their filenames
           if (msg.hasAttachments) {
             for (final path in msg.attachmentPaths) {
               final filename = p.basename(path);
@@ -99,10 +103,7 @@ class AppbarState extends State<Appbar> {
             }
           }
         } else {
-          // Bot Message
           buffer.writeln('🤖 $botName: ${msg.text}');
-
-          // If bot generated images (rare but possible in future), list them too
           if (msg.hasAttachments) {
             for (final path in msg.attachmentPaths) {
               final filename = p.basename(path);
@@ -138,6 +139,7 @@ class AppbarState extends State<Appbar> {
         .of(context)
         .size;
     final bool isTablet = size.shortestSide > 600;
+    final double buttonSize = isTablet ? 48.0 : 42.0;
     final double iconSize = isTablet ? 26.0 : 22.0;
 
     // State Checks
@@ -176,50 +178,60 @@ class AppbarState extends State<Appbar> {
             : const SizedBox.shrink(),
       ),
 
-      // 3. Right Button: Action (Share / Flux)
-      actionButton: AppBarButton(
-        size: isTablet ? 48.0 : 42.0,
-        onTap: () {
+      // 3. Right Action: The Dual-Action Pill
+      actionButton: DualActionPill(
+        size: buttonSize,
+        // If chat is active, we go DUAL mode.
+        // If chat is empty, we go SINGLE mode (Flux Toggle).
+        isDual: isChatActive,
+
+        // --- MAIN ICON (Right Side) ---
+        // If chat active -> New Chat Icon
+        // If chat empty -> Flux Icon (On/Off)
+        mainIcon: isChatActive
+            ? SvgPicture.asset(
+          'assets/icons/new.svg',
+          key: const ValueKey('new_chat_icon'),
+          width: iconSize,
+          height: iconSize,
+          colorFilter: ColorFilter.mode(
+            AppColors.primaryColor.inverted,
+            BlendMode.srcIn,
+          ),
+        )
+            : SvgPicture.asset(
+          session.isFluxMode
+              ? 'assets/icons/on/ghost.svg'
+              : 'assets/icons/off/ghost.svg',
+          key: ValueKey('ghost_${session.isFluxMode}'),
+          width: iconSize,
+          height: iconSize,
+          colorFilter: ColorFilter.mode(
+            AppColors.primaryColor.inverted,
+            BlendMode.srcIn,
+          ),
+        ),
+        onMainTap: () {
           if (isChatActive) {
-            _handleShare(context);
+            _handleNewChat(context);
           } else {
             _handleFluxModeToggle(context);
           }
         },
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 180),
-          switchInCurve: Curves.easeInOutBack,
-          switchOutCurve: Curves.easeIn,
-          transitionBuilder: (child, animation) {
-            return ScaleTransition(
-              scale: animation,
-              child: FadeTransition(opacity: animation, child: child),
-            );
-          },
-          child: isChatActive
-              ? SvgPicture.asset(
-            'assets/icons/world.svg',
-            key: const ValueKey('share'),
-            width: iconSize - 2,
-            height: iconSize - 2,
-            colorFilter: ColorFilter.mode(
-              AppColors.primaryColor.inverted,
-              BlendMode.srcIn,
-            ),
-          )
-              : SvgPicture.asset(
-            session.isFluxMode
-                ? 'assets/icons/on/ghost.svg'
-                : 'assets/icons/off/ghost.svg',
-            key: ValueKey('ghost_${session.isFluxMode}'),
-            width: iconSize,
-            height: iconSize,
-            colorFilter: ColorFilter.mode(
-              AppColors.primaryColor.inverted,
-              BlendMode.srcIn,
-            ),
+
+        // --- SECONDARY ICON (Left Side) ---
+        // Only visible when isDual is true (Chat Active).
+        // This is the Share button.
+        secondaryIcon: SvgPicture.asset(
+          'assets/icons/world.svg',
+          width: iconSize - 2,
+          height: iconSize - 2,
+          colorFilter: ColorFilter.mode(
+            AppColors.primaryColor.inverted,
+            BlendMode.srcIn,
           ),
         ),
+        onSecondaryTap: () => _handleShare(context),
       ),
     );
   }

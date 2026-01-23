@@ -28,7 +28,10 @@ class SectionContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -49,7 +52,10 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     return Text(
       title,
       style: TextStyle(
@@ -70,7 +76,10 @@ class SummarySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return SectionContainer(
       child: Column(
@@ -101,7 +110,10 @@ class DescriptionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final fullDescription = provider.displayDescription;
 
     const collapsedHeight = 100.0;
@@ -114,7 +126,8 @@ class DescriptionSection extends StatelessWidget {
       text: TextSpan(text: fullDescription, style: textStyle),
       maxLines: null,
       textDirection: TextDirection.ltr,
-    )..layout(maxWidth: screenWidth - (screenWidth * 0.16));
+    )
+      ..layout(maxWidth: screenWidth - (screenWidth * 0.16));
 
     final bool isOverflowing = textPainter.size.height > collapsedHeight;
     final isExpanded = provider.isDescriptionExpanded;
@@ -208,7 +221,7 @@ class _ParsedText extends StatelessWidget {
     // 2. [Label](url) -> (\[([^\]]+)\]\(([^)]+)\))
     // 3. Raw URL -> (https?://\S+)
     final combinedRegExp =
-        RegExp(r'(\*\*(.*?)\*\*)|(\[([^\]]+)\]\(([^)]+)\))|(https?://\S+)');
+    RegExp(r'(\*\*(.*?)\*\*)|(\[([^\]]+)\]\(([^)]+)\))|(https?://\S+)');
 
     final spans = <TextSpan>[];
     int lastEnd = 0;
@@ -289,15 +302,20 @@ class BaseModelSelectionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     if (provider.availableBaseModels.isEmpty) return const SizedBox.shrink();
 
     final rawSelectedTitle = provider.selectedBaseModel?.displayTitle;
     final selectedModelTitle =
-        (rawSelectedTitle == null || rawSelectedTitle.trim().isEmpty)
-            ? localizations.selectBaseModel
-            : ModelDataUtils.cleanTitle(rawSelectedTitle);
+    (rawSelectedTitle == null || rawSelectedTitle
+        .trim()
+        .isEmpty)
+        ? localizations.selectBaseModel
+        : ModelDataUtils.cleanTitle(rawSelectedTitle);
     final isPremium = provider.selectedBaseModel?.isPremium ?? false;
 
     return SectionContainer(
@@ -314,38 +332,52 @@ class BaseModelSelectionSection extends StatelessWidget {
           SizedBox(height: screenWidth * 0.02),
           Material(
             color: AppColors.background,
-            borderRadius: BorderRadius.circular(screenWidth * 0.02),
+            borderRadius: BorderRadius.circular(screenWidth * 0.03),
             child: InkWell(
               onTap: () {
                 HapticFeedback.lightImpact();
                 provider.toggleBaseModelPanelExpanded();
               },
-              borderRadius: BorderRadius.circular(screenWidth * 0.02),
+              borderRadius: BorderRadius.circular(screenWidth * 0.03),
               child: Padding(
-                padding: EdgeInsets.all(screenWidth * 0.03),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04,
+                  vertical: screenWidth * 0.035,
+                ),
                 child: Row(
                   children: [
                     Expanded(
-                        child: Text(selectedModelTitle,
-                            style: TextStyle(
-                                color: AppColors.primaryColor.inverted,
-                                fontSize: screenWidth * 0.04),
-                            overflow: TextOverflow.ellipsis)),
+                      child: Text(
+                        selectedModelTitle,
+                        style: TextStyle(
+                          color: AppColors.primaryColor.inverted,
+                          fontSize: screenWidth * 0.042,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     if (isPremium)
                       Padding(
                         padding: EdgeInsets.only(right: screenWidth * 0.02),
-                        child: SvgPicture.asset('assets/icons/sparkle.svg',
-                            width: screenWidth * 0.05,
-                            colorFilter: ColorFilter.mode(
-                                AppColors.primaryColor.inverted
-                                    .withValues(alpha: 0.8),
-                                BlendMode.srcIn)),
+                        child: SvgPicture.asset(
+                          'assets/icons/sparkle.svg',
+                          width: screenWidth * 0.05,
+                          colorFilter: ColorFilter.mode(
+                            AppColors.primaryColor.inverted.withValues(
+                                alpha: 0.8),
+                            BlendMode.srcIn,
+                          ),
+                        ),
                       ),
                     AnimatedRotation(
                       turns: provider.isBaseModelPanelExpanded ? 0.5 : 0,
                       duration: const Duration(milliseconds: 200),
-                      child: Icon(Icons.keyboard_arrow_down,
-                          color: AppColors.primaryColor.inverted),
+                      child: Icon(
+                        Icons.keyboard_arrow_down,
+                        color: AppColors.primaryColor.inverted,
+                        size: screenWidth * 0.06,
+                      ),
                     ),
                   ],
                 ),
@@ -356,7 +388,10 @@ class BaseModelSelectionSection extends StatelessWidget {
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
             child: provider.isBaseModelPanelExpanded
-                ? _buildBaseModelList(context, context.read<ModelService>())
+                ? Padding(
+              padding: EdgeInsets.only(top: screenWidth * 0.02),
+              child: _buildBaseModelList(context, context.read<ModelService>()),
+            )
                 : const SizedBox.shrink(),
           ),
         ],
@@ -366,10 +401,20 @@ class BaseModelSelectionSection extends StatelessWidget {
 
   /// Builds the list of selectable base models.
   Widget _buildBaseModelList(BuildContext context, ModelService modelService) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final langCode = Localizations.localeOf(context).languageCode;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
+    final langCode = Localizations
+        .localeOf(context)
+        .languageCode;
 
     final List<Widget> variantListTiles = [];
+    final double iconSize = screenWidth * 0.11;
 
     for (final series in provider.availableBaseModels) {
       final variants = series.variants;
@@ -387,32 +432,92 @@ class BaseModelSelectionSection extends StatelessWidget {
           final cleanedTitle = ModelDataUtils.cleanTitle(rawTitle);
 
           final imagePath = modelService.getModelImagePath(series);
-          final imageProvider = imagePath.startsWith('assets/')
-              ? AssetImage(imagePath) as ImageProvider
-              : FileImage(File(imagePath));
+
+          final bool isSvg = imagePath.endsWith('.svg');
+          final bool isAsset = imagePath.startsWith('assets/');
+
+          Widget imageWidget;
+          if (isSvg) {
+            imageWidget = Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: SvgPicture.asset(
+                imagePath,
+                fit: BoxFit.contain,
+                colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted, BlendMode.srcIn),
+              ),
+            );
+          } else {
+            ImageProvider? provider;
+            if (isAsset) {
+              provider = AssetImage(imagePath);
+            } else {
+              provider = FileImage(File(imagePath));
+            }
+            imageWidget = CircleAvatar(
+              radius: iconSize / 2,
+              backgroundImage: provider,
+              backgroundColor: Colors.transparent,
+            );
+          }
+          // ----------------------------------------
 
           variantListTiles.add(
-            ListTile(
-              leading: CircleAvatar(
-                backgroundImage: imageProvider,
-                backgroundColor: Colors.transparent,
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  provider.selectBaseModel(context, variantId);
+                },
+                borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.03,
+                    vertical: screenWidth * 0.025,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: iconSize,
+                        height: iconSize,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        child: imageWidget,
+                      ),
+
+                      SizedBox(width: screenWidth * 0.04),
+
+                      Expanded(
+                        child: Text(
+                          cleanedTitle,
+                          style: TextStyle(
+                            color: AppColors.primaryColor.inverted,
+                            fontSize: screenWidth * 0.04,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+
+                      if (variantEntity.isPremium)
+                        Padding(
+                          padding: EdgeInsets.only(left: screenWidth * 0.02),
+                          child: SvgPicture.asset(
+                            'assets/icons/sparkle.svg',
+                            width: screenWidth * 0.05,
+                            colorFilter: ColorFilter.mode(
+                                AppColors.primaryColor.inverted.withValues(
+                                    alpha: 0.8),
+                                BlendMode.srcIn),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
-              title: Text(
-                cleanedTitle,
-                style: TextStyle(color: AppColors.primaryColor.inverted),
-              ),
-              trailing: variantEntity.isPremium
-                  ? SvgPicture.asset('assets/icons/sparkle.svg',
-                      width: screenWidth * 0.05,
-                      colorFilter: ColorFilter.mode(
-                          AppColors.primaryColor.inverted
-                              .withValues(alpha: 0.8),
-                          BlendMode.srcIn))
-                  : null,
-              onTap: () {
-                HapticFeedback.lightImpact();
-                provider.selectBaseModel(context, variantId);
-              },
             ),
           );
         }
@@ -420,15 +525,20 @@ class BaseModelSelectionSection extends StatelessWidget {
     }
 
     return Container(
-      margin: EdgeInsets.only(top: screenWidth * 0.02),
-      height: MediaQuery.of(context).size.height * 0.25,
       decoration: BoxDecoration(
         color: AppColors.background.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(screenWidth * 0.02),
+        borderRadius: BorderRadius.circular(screenWidth * 0.03),
       ),
-      child: ListView(
-        shrinkWrap: true,
-        children: variantListTiles,
+      constraints: BoxConstraints(
+        maxHeight: screenHeight * 0.35,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(screenWidth * 0.03),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          children: variantListTiles,
+        ),
       ),
     );
   }
@@ -443,7 +553,10 @@ class FeaturesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     final featureDetails = {
       'photo': [

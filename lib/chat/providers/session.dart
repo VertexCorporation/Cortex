@@ -149,8 +149,6 @@ class ChatSessionProvider with ChangeNotifier {
       _modelService.getPreciseModelData(initialModelId, langCode: langCode);
       selectModel(entity, savePreference: false);
     } catch (e) {
-      // FIX: Race Condition - ModelService cache empty (App startup)
-
       if (initialModelId == 'cortex/auto' || initialModelId == 'dynamic') {
         startDynamicConversation(savePreference: false);
       } else {
