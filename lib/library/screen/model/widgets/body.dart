@@ -23,27 +23,26 @@ class BodyContent extends StatelessWidget {
           child: Text("Error: Model data could not be loaded."));
     }
 
+    final double horizontalPadding = MediaQuery
+        .of(context)
+        .size
+        .width * 0.04;
+
     return SingleChildScrollView(
       key: const ValueKey('model_detail_scroll_view'),
       controller: scrollController,
-      physics: const ClampingScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.fromLTRB(
-        MediaQuery
-            .of(context)
-            .size
-            .width * 0.04, // Horizontal padding
+        horizontalPadding, // Left
         MediaQuery
             .of(context)
             .padding
-            .top, // Correct top padding
+            .top, // Top
+        horizontalPadding, // Right
         MediaQuery
             .of(context)
             .size
-            .width * 0.04, // Horizontal padding
-        MediaQuery
-            .of(context)
-            .size
-            .height * 0.02, // Bottom padding to clear buttons/banners
+            .height * 0.02,
       ),
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 450),
@@ -61,9 +60,8 @@ class BodyContent extends StatelessWidget {
             '${provider.selectedVariantName}_${provider.selectedBaseModelId ??
                 ''}',
           );
-          final isIncoming =
-              child.key is ValueKey &&
-                  (child.key as ValueKey).value == expectedKey.value;
+          final isIncoming = child.key is ValueKey &&
+              (child.key as ValueKey).value == expectedKey.value;
 
           final slideAnimation = Tween<Offset>(
             begin: isIncoming ? const Offset(0.5, 0) : const Offset(-0.5, 0),
@@ -72,8 +70,8 @@ class BodyContent extends StatelessWidget {
               CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
 
           return FadeTransition(
-            opacity: CurvedAnimation(
-                parent: animation, curve: Curves.easeInOut),
+            opacity:
+            CurvedAnimation(parent: animation, curve: Curves.easeInOut),
             child: SlideTransition(position: slideAnimation, child: child),
           );
         },
@@ -120,6 +118,6 @@ class _Spacing extends StatelessWidget {
     return SizedBox(height: MediaQuery
         .of(context)
         .size
-        .height * 0.02);
+        .height * 0.015);
   }
 }

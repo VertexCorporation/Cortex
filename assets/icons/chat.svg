@@ -24,7 +24,7 @@
     v 0
     a 4,4 0 0,1 4,-4
     z
-  " fill="black" fill-rule="evenodd"/>
+  " fill="black" fill-rule="evenodd" />
 
-    <polygon points="14,18 15,60 0,50" fill="black"/>
+    <polygon points="14,18 15,60 0,50" fill="black" />
 </svg>

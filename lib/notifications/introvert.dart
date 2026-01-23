@@ -63,21 +63,18 @@ class IntrovertNotificationService {
     VoidCallback? onTap,
     bool isAxonMode = false,
     double axonWidth = 0.0,
-    bool isChatMode = false, // [NEW] Add chat mode flag
+    bool isChatMode = false,
   }) {
     dismissCurrentNotification();
 
     final context = navigatorKey.currentContext;
-    bool isBannerVisible = false;
 
+    // Retrieve BannerService safely
+    BannerService? bannerService;
     if (context != null) {
       try {
-        final bannerService =
-        Provider.of<BannerService>(context, listen: false);
-        isBannerVisible = bannerService.showInviteBannerNotifier.value;
-      } catch (e) {
-        // CATCH
-      }
+        bannerService = Provider.of<BannerService>(context, listen: false);
+      } catch (_) {}
     }
 
     _showOverlayNotification(
@@ -90,7 +87,7 @@ class IntrovertNotificationService {
       onTap: onTap,
       isAxonMode: isAxonMode,
       axonWidth: axonWidth,
-      isBannerVisible: isBannerVisible,
+      bannerService: bannerService,
       isChatMode: isChatMode,
     );
   }
@@ -105,7 +102,7 @@ class IntrovertNotificationService {
     VoidCallback? onTap,
     required bool isAxonMode,
     required double axonWidth,
-    required bool isBannerVisible,
+    required BannerService? bannerService,
     required bool isChatMode,
   }) {
     final overlay = navigatorKey.currentState?.overlay;
@@ -117,110 +114,117 @@ class IntrovertNotificationService {
     entry = OverlayEntry(
       builder: (context) {
         final media = MediaQuery.of(context);
+        final double screenH = media.size.height;
+        final double screenW = media.size.width;
 
-        // --- POSITIONING LOGIC ---
-        double? leftPos;
-        double? rightPos;
-        double? explicitWidth;
-        double bottomPosition;
-        double widthConstraint;
+        // Listen to dynamic banner height
+        return ValueListenableBuilder<double>(
+          valueListenable: bannerService?.bannerHeightNotifier ??
+              ValueNotifier(0.0),
+          builder: (context, bannerHeight, child) {
+            // --- POSITIONING LOGIC (Restored from your working code) ---
+            double? leftPos;
+            double? rightPos;
+            double? explicitWidth;
+            double bottomPosition;
+            double maxWidthConstraint;
 
-        // Dynamic Banner Height (Use 16% of height as a safe estimate for the banner)
-        final double bannerHeightPadding =
-        isBannerVisible ? (media.size.height * 0.16) : 0.0;
+            if (isAxonMode && axonWidth > 0) {
+              // --- AXON MODE ---
+              // Left = 0, Width = AxonWidth, Right = NULL
+              leftPos = 0;
+              rightPos = null;
+              explicitWidth = axonWidth;
 
-        if (isAxonMode && axonWidth > 0) {
-          // SIDEBAR (AXON) MODE
-          leftPos = 0;
-          rightPos = null;
-          explicitWidth = axonWidth;
+              // Footer Height (~10.5%) + Banner Height
+              final double footerHeight = screenH * 0.105;
+              bottomPosition = footerHeight + bannerHeight;
 
-          // If banner is visible, stack above it. Default is 80.0
-          bottomPosition = 80.0 + bannerHeightPadding;
-          widthConstraint = axonWidth - 32.0;
-        } else {
-          // DEFAULT / CHAT MODE
-          leftPos = 0;
-          rightPos = 0;
-          explicitWidth = null;
+              if (bannerHeight > 0) {
+                bottomPosition += (screenH * 0.02);
+              }
 
-          final keyboardInset = media.viewInsets.bottom;
-          double baseOffset;
+              maxWidthConstraint = axonWidth * 0.90;
+            } else {
+              // --- DEFAULT / CHAT MODE ---
+              // Left = 0 AND Right = 0. This forces the container to span the full screen.
+              leftPos = 0;
+              rightPos = 0;
+              explicitWidth = null;
 
-          if (isChatMode) {
-            // In Chat Mode, we want to be above the input field.
-            // Input field is roughly 80-90px.
-            // If keyboard is open, keyboardInset covers it.
-            // If keyboard is closed, we need safe area + input height.
-            // Let's assume standard input height + a bit of padding.
-            // Mobile input usually ~60-80px.
-            const double chatInputHeight = 90.0;
-            baseOffset = chatInputHeight + 20.0;
-          } else {
-            // Standard proportional offset (0.1 screen height)
-            baseOffset = bottomOffset * media.size.height;
-          }
+              final keyboardInset = media.viewInsets.bottom;
+              double baseOffset;
 
-          // Combined calculations
-          bottomPosition = keyboardInset + baseOffset;
+              if (isChatMode) {
+                final double chatInputHeight = screenH * 0.11;
+                final double padding = screenH * 0.025;
+                baseOffset = chatInputHeight + padding;
+              } else {
+                baseOffset = bottomOffset * screenH;
+              }
 
-          widthConstraint = media.size.width * 0.95;
-        }
+              bottomPosition = keyboardInset + baseOffset;
+              maxWidthConstraint = screenW * 0.95;
+            }
 
-        final actualFontSize = fontSizeProportion * media.size.width;
-
-        return Stack(
-          children: [
-            Positioned.fill(
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () {
-                  dismissCurrentNotification();
-                },
-                child: const SizedBox.expand(),
-              ),
-            ),
-
-            Positioned(
-              bottom: bottomPosition,
-              left: leftPos,
-              right: rightPos,
-              width: explicitWidth,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: widthConstraint),
-                  child: _AnimatedNotification(
-                    message: message,
-                    backgroundColor: style.backgroundColor,
-                    icon: style.icon,
-                    textColor: Colors.white,
-                    duration: duration,
-                    fontSize: actualFontSize,
-                    oneLine: oneLine,
-                    registerDismiss: (dismissFn) {
-                      _activeNotification = _ActiveNotificationHandle(
-                        entry: entry,
-                        dismiss: dismissFn,
-                        isAxonMode: isAxonMode,
-                      );
-                    },
-                    onRemove: () {
-                      try {
-                        entry.remove();
-                      } catch (_) {}
-                      if (_activeNotification?.entry == entry) {
-                        _activeNotification = null;
-                      }
-                    },
-                    onTap: () {
-                      dismissCurrentNotification();
-                      onTap?.call();
-                    },
+            return Stack(
+              children: [
+                // Background Tap Handler
+                Positioned.fill(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () => dismissCurrentNotification(),
+                    child: const SizedBox.expand(),
                   ),
                 ),
-              ),
-            ),
-          ],
+
+                // [FIXED POSITIONING - USING STANDARD POSITIONED]
+                // We replaced AnimatedPositioned with Positioned because the animation
+                // is handled inside the child (_AnimatedNotification).
+                // Using 'left: 0' and 'right: 0' ensures perfect centering.
+                Positioned(
+                  bottom: bottomPosition,
+                  left: leftPos,
+                  right: rightPos,
+                  width: explicitWidth,
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: maxWidthConstraint),
+                      child: _AnimatedNotification(
+                        message: message,
+                        backgroundColor: style.backgroundColor,
+                        icon: style.icon,
+                        textColor: Colors.white,
+                        duration: duration,
+                        fontSize: 13.5,
+                        // Fixed Style
+                        oneLine: oneLine,
+                        registerDismiss: (dismissFn) {
+                          _activeNotification = _ActiveNotificationHandle(
+                            entry: entry,
+                            dismiss: dismissFn,
+                            isAxonMode: isAxonMode,
+                          );
+                        },
+                        onRemove: () {
+                          try {
+                            entry.remove();
+                          } catch (_) {}
+                          if (_activeNotification?.entry == entry) {
+                            _activeNotification = null;
+                          }
+                        },
+                        onTap: () {
+                          dismissCurrentNotification();
+                          onTap?.call();
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -285,6 +289,7 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
       vsync: this,
     );
 
+    // Slide up animation (Same as Code 3)
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.5),
       end: Offset.zero,
@@ -294,16 +299,13 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
         CurvedAnimation(parent: _controller, curve: Curves.easeOut);
 
     widget.registerDismiss(dismiss);
-
     _controller.forward();
-
     _dismissTimer = Timer(widget.duration, dismiss);
   }
 
   void dismiss() {
     if (!mounted || _isDismissing) return;
     _isDismissing = true;
-
     _dismissTimer?.cancel();
 
     _controller.reverse().then((_) {
@@ -324,15 +326,19 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
 
   @override
   Widget build(BuildContext context) {
+    // --- STYLING CONSTANTS (From Code 2) ---
+    const double borderRadius = 12.0;
+    const double iconSize = 20.0;
+    const double gapSize = 10.0;
+
     return SlideTransition(
       position: _slideAnimation,
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: GestureDetector(
           onTap: widget.onTap,
-          onHorizontalDragUpdate: (details) {
-            // Sensitivity check
-            if (details.primaryDelta!.abs() > 4) {
+          onPanUpdate: (details) {
+            if (details.delta.distance > 10) {
               dismiss();
             }
           },
@@ -340,30 +346,39 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
             color: Colors.transparent,
             elevation: 4.0,
             shadowColor: Colors.black.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(borderRadius),
             child: Container(
-              padding:
-              const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+              margin: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.symmetric(
+                vertical: 12.0,
+                horizontal: 16.0,
+              ),
               decoration: BoxDecoration(
                 color: widget.backgroundColor,
-                borderRadius: BorderRadius.circular(12.0),
+                borderRadius: BorderRadius.circular(borderRadius),
                 border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1), width: 0.5),
+                  color: Colors.white.withValues(alpha: 0.1),
+                  width: 0.5,
+                ),
               ),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisSize: MainAxisSize.min, // Wrap content width
                 children: [
                   if (widget.icon != null) ...[
-                    Icon(widget.icon, color: widget.textColor, size: 20),
-                    const SizedBox(width: 10.0),
+                    Icon(
+                      widget.icon,
+                      color: widget.textColor,
+                      size: iconSize,
+                    ),
+                    const SizedBox(width: gapSize),
                   ],
                   Flexible(
                     child: Text(
                       widget.message,
                       style: TextStyle(
                         color: widget.textColor,
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 13.5, // Fixed Style
+                        fontWeight: FontWeight.w500, // Fixed Style
                         height: 1.2,
                       ),
                       maxLines: widget.oneLine ? 1 : null,

@@ -19,7 +19,7 @@ class InputService {
   final ImagePicker _imagePicker = ImagePicker();
 
   // --- Constants ---
-  static const int _maxAttachmentCount = 4;
+  static const int _maxAttachmentCount = 9;
   static const int _maxFileSizeInBytes = 10 * 1024 * 1024; // 10 MB strict limit
 
   // Supported extensions for the file picker.
@@ -151,9 +151,14 @@ class InputService {
 
       // Add to provider
       if (context.mounted) {
+        debugPrint(
+            "InputService: File validated. Adding to provider: ${file.path}");
         // Assuming InputProvider has an 'addAttachment' method.
         // We handle both images and docs as generic attachments now.
         context.read<InputProvider>().addAttachment(file, isImage: isImage);
+      } else {
+        debugPrint(
+            "InputService: Context not mounted after validation. Skipped.");
       }
     } catch (e) {
       debugPrint("Error validating file: $e");

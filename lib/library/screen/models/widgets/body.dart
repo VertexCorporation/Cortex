@@ -25,9 +25,9 @@ const _kWarningPanelVisibleBottom = 16.0;
 const _kWarningPanelHiddenBottom = -150.0;
 
 typedef DownloadCallback = Future<bool> Function({
-  required String id,
-  required String? url,
-  required String title,
+required String id,
+required String? url,
+required String title,
 });
 
 class ModelsBody extends StatelessWidget {
@@ -54,6 +54,8 @@ class ModelsBody extends StatelessWidget {
   final void Function(String) onResumeDownload;
   final void Function(String id) openModelDetail;
   final ScrollController scrollController;
+  final VoidCallback onTriggerAxon;
+  final VoidCallback onTriggerCreateScreen;
 
   const ModelsBody({
     super.key,
@@ -76,6 +78,8 @@ class ModelsBody extends StatelessWidget {
     required this.onResumeDownload,
     required this.openModelDetail,
     required this.scrollController,
+    required this.onTriggerAxon,
+    required this.onTriggerCreateScreen,
   });
 
   @override
@@ -109,18 +113,21 @@ class ModelsBody extends StatelessWidget {
     );
   }
 
-  Widget _buildLocalizationWarningPanel(
-      BuildContext context, AppLocalizations localizations) {
+  Widget _buildLocalizationWarningPanel(BuildContext context,
+      AppLocalizations localizations) {
     final double bottomPosition = showLocalizationWarning
         ? _kWarningPanelVisibleBottom
         : _kWarningPanelHiddenBottom;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final bool isTablet = screenWidth >= 600;
 
     // --- DYNAMIC WIDTH FOR TABLET ---
     // Tablet: 5% margin (90% width). Phone: 4% margin (92% width).
     final double horizontalMargin =
-        isTablet ? screenWidth * 0.05 : screenWidth * 0.04;
+    isTablet ? screenWidth * 0.05 : screenWidth * 0.04;
 
     return AnimatedPositioned(
       duration: _kWarningPanelAnimDuration,
@@ -143,7 +150,7 @@ class ModelsBody extends StatelessWidget {
               color: AppColors.secondaryColor,
               borderRadius: BorderRadius.circular(12),
               border:
-                  Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+              Border.all(color: AppColors.border.withValues(alpha: 0.5)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.15),
@@ -197,9 +204,18 @@ class ModelsBody extends StatelessWidget {
   }
 
   Widget _buildContentView(BuildContext context, bool isSearching) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final topPadding = MediaQuery.of(context).padding.top;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
+    final topPadding = MediaQuery
+        .of(context)
+        .padding
+        .top;
     final double safeTopPadding = topPadding;
 
     return ScrollFog(
@@ -231,14 +247,14 @@ class ModelsBody extends StatelessWidget {
                     FadeTransition(opacity: animation, child: child),
                 child: isSearching
                     ? Container(
-                        key: const ValueKey('search-view'),
-                        // Search Body also handles its own internal responsiveness
-                        child: searchController.buildSearchBody(screenWidth),
-                      )
+                  key: const ValueKey('search-view'),
+                  // Search Body also handles its own internal responsiveness
+                  child: searchController.buildSearchBody(screenWidth),
+                )
                     : Container(
-                        key: const ValueKey('default-view'),
-                        child: _buildDefaultModelList(context),
-                      ),
+                  key: const ValueKey('default-view'),
+                  child: _buildDefaultModelList(context),
+                ),
               ),
             ),
           ],
@@ -249,22 +265,28 @@ class ModelsBody extends StatelessWidget {
 
   Widget _buildDefaultModelList(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final bool isTablet = screenWidth >= 600;
 
     final self = allModels.where((model) => model.category == 'self').toList();
     final serverSide = allModels
         .where((model) =>
-            model.isServerSide &&
-            model.category != 'self' &&
-            model.category != 'roleplay')
+    model.isServerSide &&
+        model.category != 'self' &&
+        model.category != 'roleplay')
         .toList();
     final local = allModels
         .where((model) => !model.isServerSide && model.category != 'self')
         .toList();
     final role =
-        allModels.where((model) => model.category == 'roleplay').toList();
+    allModels.where((model) => model.category == 'roleplay').toList();
 
     void openModelDetailCallback(ModelEntity model) {
       openModelDetail(model.id);
@@ -290,6 +312,8 @@ class ModelsBody extends StatelessWidget {
               onDownloadPressed: onDownloadPressed,
               onCancelDownload: onCancelDownload,
               onResumeDownload: onResumeDownload,
+              onOverscrollStart: onTriggerAxon,
+              onOverscrollEnd: onTriggerCreateScreen,
             ),
             ModelCategorySection(
               title: loc.serverSideModels,
@@ -303,6 +327,8 @@ class ModelsBody extends StatelessWidget {
               onDownloadPressed: onDownloadPressed,
               onCancelDownload: onCancelDownload,
               onResumeDownload: onResumeDownload,
+              onOverscrollStart: onTriggerAxon,
+              onOverscrollEnd: onTriggerCreateScreen,
             ),
             ModelCategorySection(
               title: loc.roleModels,
@@ -316,6 +342,8 @@ class ModelsBody extends StatelessWidget {
               onDownloadPressed: onDownloadPressed,
               onCancelDownload: onCancelDownload,
               onResumeDownload: onResumeDownload,
+              onOverscrollStart: onTriggerAxon,
+              onOverscrollEnd: onTriggerCreateScreen,
             ),
             ModelCategorySection(
               title: loc.myModels,
@@ -329,16 +357,18 @@ class ModelsBody extends StatelessWidget {
               onDownloadPressed: onDownloadPressed,
               onCancelDownload: onCancelDownload,
               onResumeDownload: onResumeDownload,
+              onOverscrollStart: onTriggerAxon,
+              onOverscrollEnd: onTriggerCreateScreen,
             ),
             if (systemInfo != null) ...[
               // --- SYSTEM INFO HEADER ---
               Padding(
                 padding: EdgeInsets.symmetric(
-                        horizontal:
-                            isTablet ? screenWidth * 0.02 : screenWidth * 0.04)
+                    horizontal:
+                    isTablet ? screenWidth * 0.02 : screenWidth * 0.04)
                     .copyWith(
-                        top: isTablet ? 24.0 : screenWidth * 0.02,
-                        bottom: isTablet ? 16.0 : screenWidth * 0.01),
+                    top: isTablet ? 24.0 : screenWidth * 0.02,
+                    bottom: isTablet ? 16.0 : screenWidth * 0.01),
                 child: Text(
                   loc.systemInfo,
                   style: TextStyle(
@@ -357,7 +387,7 @@ class ModelsBody extends StatelessWidget {
                 child: SystemInfoChart(
                     totalStorage: systemInfo!.totalStorage,
                     usedStorage:
-                        systemInfo!.totalStorage - systemInfo!.freeStorage,
+                    systemInfo!.totalStorage - systemInfo!.freeStorage,
                     totalMemory: systemInfo!.deviceMemory,
                     usedMemory: systemInfo!.usedMemory),
               ),

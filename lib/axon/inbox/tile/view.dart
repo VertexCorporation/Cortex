@@ -220,23 +220,23 @@ class _AxonConversationTileState extends State<AxonConversationTile>
 
     // Padding inside the tile
     final double innerPaddingV =
-        isTablet ? screenHeight * 0.012 : screenHeight * 0.012;
+    isTablet ? screenHeight * 0.012 : screenHeight * 0.012;
     final double innerPaddingH =
-        isTablet ? screenWidth * 0.02 : screenWidth * 0.03;
+    isTablet ? screenWidth * 0.02 : screenWidth * 0.03;
 
     final double borderRadius =
-        isTablet ? screenWidth * 0.015 : screenWidth * 0.03;
+    isTablet ? screenWidth * 0.015 : screenWidth * 0.03;
 
     // Avatar Size: Larger on tablet but scaled appropriately
     final double avatarSize =
-        isTablet ? screenWidth * 0.045 : screenWidth * 0.072;
+    isTablet ? screenWidth * 0.045 : screenWidth * 0.072;
 
     // Font Size
     final double fontSize = isTablet ? screenWidth * 0.02 : screenWidth * 0.038;
 
     // Icon Size (Star)
     final double starIconSize =
-        isTablet ? screenWidth * 0.025 : screenWidth * 0.042;
+    isTablet ? screenWidth * 0.025 : screenWidth * 0.042;
 
     // Spacing between elements
     final double gapAvatarText = screenWidth * 0.03;
@@ -244,7 +244,9 @@ class _AxonConversationTileState extends State<AxonConversationTile>
 
     // --- 2. State & Colors ---
     final currentConversationId =
-        context.watch<ConversationProvider>().conversationID;
+        context
+            .watch<ConversationProvider>()
+            .conversationID;
     final isActive = currentConversationId == widget.manager.conversationID;
     final Color textColor = AppColors.primaryColor.inverted;
 
@@ -276,7 +278,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
             onTapCancel: _onTapCancel,
             splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
             highlightColor:
-                AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+            AppColors.primaryColor.inverted.withValues(alpha: 0.1),
             child: Container(
               padding: EdgeInsets.symmetric(
                   horizontal: innerPaddingH, vertical: innerPaddingV),
@@ -321,7 +323,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                               : textColor.withValues(alpha: 0.85),
                           fontSize: fontSize,
                           fontWeight:
-                              isActive ? FontWeight.w600 : FontWeight.w500,
+                          isActive ? FontWeight.w600 : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -338,11 +340,11 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                     },
                     child: widget.manager.isStarred
                         ? Icon(
-                            Icons.star_rounded,
-                            key: const ValueKey('star'),
-                            size: starIconSize,
-                            color: Colors.amber,
-                          )
+                      Icons.star_rounded,
+                      key: const ValueKey('star'),
+                      size: starIconSize,
+                      color: Colors.amber,
+                    )
                         : SizedBox.shrink(key: const ValueKey('empty')),
                   ),
                 ],

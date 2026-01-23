@@ -127,5 +127,27 @@ void main() {
       expect(inputProvider.isAttachmentLoading, false);
       expect(inputProvider.isEditingMode, false);
     });
+    test('Global Draft logic', () {
+      // 1. Initial State
+      expect(inputProvider.globalDraft, isEmpty);
+
+      // 2. Update Draft
+      inputProvider.updateGlobalDraft('Draft Text');
+      expect(inputProvider.globalDraft, 'Draft Text');
+
+      // 3. Reset Input State (Should NOT clear draft)
+      inputProvider.setVoiceRecording(true);
+      inputProvider.resetInputState();
+      expect(inputProvider.isVoiceRecording, false);
+      expect(inputProvider.globalDraft, 'Draft Text');
+
+      // 4. Update Draft again
+      inputProvider.updateGlobalDraft('New Draft');
+      expect(inputProvider.globalDraft, 'New Draft');
+
+      // 5. Clear All Input (Should clear draft)
+      inputProvider.clearAllInput();
+      expect(inputProvider.globalDraft, isEmpty);
+    });
   });
 }

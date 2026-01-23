@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../screen.dart';
 import 'widgets/search.dart';
 import '../../providers/catalog.dart';
 import '../../providers/local.dart';
@@ -171,6 +172,20 @@ class LibraryScreenState extends State<LibraryScreen>
     }
   }
 
+  void _handleOverscrollStart() {
+    final mainScreen = context.findAncestorStateOfType<MainScreenState>();
+    if (mainScreen != null) {
+      mainScreen.toggleAxon();
+    }
+  }
+
+  void _handleOverscrollEnd() {
+    if (_catalogProvider != null) {
+      _navigateAndHandleFocus(() =>
+          _catalogProvider!.openCreateScreen(context));
+    }
+  }
+
   @override
   void dispose() {
     _searchCtrl?.dispose();
@@ -256,6 +271,8 @@ class LibraryScreenState extends State<LibraryScreen>
             openModelDetail: (id) =>
                 _navigateAndHandleFocus(() =>
                     catalog.openModelDetail(context, id)),
+            onTriggerAxon: _handleOverscrollStart,
+            onTriggerCreateScreen: _handleOverscrollEnd,
           ),
         );
       },

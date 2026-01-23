@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart'; // Import for Ticker
 import 'package:provider/provider.dart';
 
 import '../../../app.dart';
@@ -15,57 +16,68 @@ class WaveformVisualizer extends StatefulWidget {
 
 class _WaveformVisualizerState extends State<WaveformVisualizer>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late Ticker _ticker;
   final List<double> _history = [];
   static const int _historySize = 60;
+
+  // Animation state for the continuous flow
+  double _animationValue = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )
-      ..repeat();
+    // Use Ticker to drive the animation loop ~60fps
+    _ticker = createTicker(_onTick)..start();
+
+    // Pre-fill history with zeros
+    for (int i = 0; i < _historySize; i++) {
+      _history.add(0.0);
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ticker.dispose();
     super.dispose();
+  }
+
+  void _onTick(Duration elapsed) {
+    if (!mounted) return;
+
+    // Update animation value for phase shifting
+    // 2PI every 2 seconds roughly
+    _animationValue = (elapsed.inMilliseconds % 2000) / 2000.0;
+
+    // Update history
+    _updateHistory();
+
+    // Trigger repaint
+    setState(() {});
+  }
+
+  void _updateHistory() {
+    // Get current sound level from provider
+    final speechService = context.read<SpeechService>();
+    final double rawLevel = speechService.soundLevel.clamp(0.0, 1.0);
+
+    // Shift history
+    if (_history.length >= _historySize) {
+      _history.removeAt(0); // Remove oldest (Left)
+    }
+    _history.add(rawLevel); // Add newest (Right)
   }
 
   @override
   Widget build(BuildContext context) {
-    // Listen to speech service for sound level updates
-    final speechService = context.watch<SpeechService>();
-    final double level = speechService.soundLevel.clamp(0.0, 1.0);
-
-    // Maintain a history for the traveling wave effect
-    if (_history.length >= _historySize) {
-      _history.removeAt(0);
-    }
-    _history.add(level);
-
-    // If history isn't full yet (start), pad it
-    while (_history.length < _historySize) {
-      _history.insert(0, 0.0);
-    }
-
     return SizedBox(
       height: 50,
       width: double.infinity,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return CustomPaint(
-            painter: _ModernWavePainter(
-              history: _history,
-              animationValue: _controller.value,
-              color: AppColors.primaryColor.inverted,
-            ),
-          );
-        },
+      child: CustomPaint(
+        painter: _ModernWavePainter(
+          history: _history,
+          animationValue: _animationValue,
+          color: AppColors.primaryColor.inverted,
+        ),
       ),
     );
   }
@@ -100,11 +112,6 @@ class _ModernWavePainter extends CustomPainter {
     final height = size.height;
     final midY = height / 2;
 
-    // We want the wave to flow from Right to Left.
-    // The history contains the *newest* samples at the END.
-    // So the last element of history is "now" -> should be at the Right edge (width).
-    // The first element of history is "oldest" -> should be at the Left edge (0).
-
     final stepX = width / (history.length - 1);
 
     path1.moveTo(0, midY);
@@ -112,51 +119,62 @@ class _ModernWavePainter extends CustomPainter {
     path3.moveTo(0, midY);
 
     for (int i = 0; i < history.length; i++) {
-        final double x = i * stepX;
-        final double amplitude = history[i];
+      final double x = i * stepX;
+      final double amplitude = history[i];
 
-        // Silence check: explicit 0.0 means straight line
-        // But we want a tiny organic movement even in silence to show it's "alive"
-        // User requested: "dümdüz çizgi olacak... hiç ses algılanmıyorsa"
-        // Let's implement strict straight line if amplitude is near zero
-        
-        bool isSilent = amplitude < 0.05; // Threshold
+      bool isSilent = amplitude < 0.05;
 
-        double y1 = midY;
-        double y2 = midY;
-        double y3 = midY;
-        
-        if (!isSilent) {
-           // Standard wave logic
-           // Smooth the amplitude
-           double smoothAmp = 0.1 + (amplitude * 0.9);
-           double maxDy = (height / 2) * 0.8;
+      double y1 = midY;
+      double y2 = midY;
+      double y3 = midY;
 
-           // Calculate phases (adjusted for right-to-left visual flow preference if needed, 
-           // but mapped X is time, so moving left means history shifts left?
-           // Actually, history shifts: we add new item to end, remove from start.
-           // So index 0 (left) was index 1 previously. So visual data moves LEFT.
-           // That matches "Right-to-Left" flow.
-           
-           double angle1 = (i * 0.2) - (animationValue * 2 * math.pi); // (-) for flow direction
-           y1 = midY + math.sin(angle1) * maxDy * smoothAmp;
+      if (!isSilent) {
+        double smoothAmp = 0.1 + (amplitude * 0.9);
+        double maxDy = (height / 2) * 0.8;
 
-           double angle2 = (i * 0.4) - (animationValue * 4 * math.pi) + 1.0;
-           y2 = midY + math.sin(angle2) * (maxDy * 0.7) * smoothAmp;
+        // Apply dampening to the right side (where index is near length)
+        // normalizedPos = i / (length - 1). 0(Left)..1(Right).
+        double normalizedPos = i / (history.length - 1);
+        double rightDamp = 1.0;
 
-           double angle3 = (i * 0.1) + (animationValue * 2 * math.pi) + 2.0;
-           y3 = midY + math.sin(angle3) * (maxDy * 0.5) * smoothAmp;
+        // Linear fade out for the last 20% of points to ensure perfect connection
+        // at the right edge
+        if (normalizedPos > 0.8) {
+          rightDamp = (1.0 - normalizedPos) / 0.2;
         }
 
-       if (i == 0) {
-          path1.moveTo(x, y1);
-          path2.moveTo(x, y2);
-          path3.moveTo(x, y3);
-        } else {
-          path1.lineTo(x, y1);
-          path2.lineTo(x, y2);
-          path3.lineTo(x, y3);
-        }
+        // Force the very last point to be exactly 0 (or close enough)
+        if (i == history.length - 1) rightDamp = 0.0;
+
+        smoothAmp *= rightDamp;
+
+        // Moving Left <- Right
+        // i=0 is Left (Oldest), i=Max is Right (Newest)
+        // We add new data to the right.
+        // Phase shift: We want the wave shape to "travel" left?
+        // Actually, the data itself shifts left every frame (removeAt(0)).
+        // So visually the "bump" travels left naturally.
+        // The sinusoidal phase shift is just for the "wobble".
+
+        double angle1 = (i * 0.2) - (animationValue * 2 * math.pi);
+        y1 = midY + math.sin(angle1) * maxDy * smoothAmp;
+
+        double angle2 = (i * 0.4) - (animationValue * 4 * math.pi) + 1.0;
+        y2 = midY + math.sin(angle2) * (maxDy * 0.7) * smoothAmp;
+
+        double angle3 = (i * 0.1) + (animationValue * 2 * math.pi) + 2.0;
+        y3 = midY + math.sin(angle3) * (maxDy * 0.5) * smoothAmp;
+      }
+
+      if (i == 0) {
+        path1.moveTo(x, y1);
+        path2.moveTo(x, y2);
+        path3.moveTo(x, y3);
+      } else {
+        path1.lineTo(x, y1);
+        path2.lineTo(x, y2);
+        path3.lineTo(x, y3);
+      }
     }
 
     paint.color = color.withValues(alpha: 0.8);

@@ -80,7 +80,7 @@ class AxonFooter extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
             highlightColor:
-                AppColors.primaryColor.inverted.withValues(alpha: 0.05),
+            AppColors.primaryColor.inverted.withValues(alpha: 0.05),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(

@@ -24,30 +24,22 @@ import 'data.dart';
 
 extension NewsArticleLocalization on NewsArticle {
   String titleFor(BuildContext context) {
-    final languageCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final languageCode = Localizations.localeOf(context).languageCode;
     return title[languageCode] ?? title['en'] ?? '';
   }
 
   String summaryFor(BuildContext context) {
-    final languageCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final languageCode = Localizations.localeOf(context).languageCode;
     return summary[languageCode] ?? summary['en'] ?? '';
   }
 
   String contentFor(BuildContext context) {
-    final languageCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final languageCode = Localizations.localeOf(context).languageCode;
     return content[languageCode] ?? content['en'] ?? '';
   }
 
   String coverPathFor(BuildContext context) {
-    final languageCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final languageCode = Localizations.localeOf(context).languageCode;
     final paths = coverImagePaths ?? {};
     return paths[languageCode] ?? paths['en'] ?? '';
   }
@@ -90,9 +82,7 @@ class _NewsScreenState extends State<NewsScreen>
     final newsService = Provider.of<NewsService>(context);
     final l10n = AppLocalizations.of(context);
 
-    final Size screenSize = MediaQuery
-        .of(context)
-        .size;
+    final Size screenSize = MediaQuery.of(context).size;
     final double screenHeight = screenSize.height;
     final double screenWidth = screenSize.width;
 
@@ -106,10 +96,7 @@ class _NewsScreenState extends State<NewsScreen>
     final double horizontalPadding = screenWidth * 0.041;
     final double searchGap = screenHeight * 0.02;
 
-    final double topSafeArea = MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final double topSafeArea = MediaQuery.of(context).padding.top;
     final double appBarHeight = kToolbarHeight;
 
     return Scaffold(
@@ -153,7 +140,6 @@ class _NewsScreenState extends State<NewsScreen>
               controller: _scrollController,
               cacheExtent: screenHeight * 0.8,
               slivers: [
-
                 // --- TOP SPACER ---
                 SliverToBoxAdapter(
                   child: SizedBox(height: topSafeArea + appBarHeight + 10),
@@ -183,8 +169,7 @@ class _NewsScreenState extends State<NewsScreen>
                   horizontalPadding,
                 ),
 
-                SliverToBoxAdapter(
-                    child: SizedBox(height: screenHeight * 0.1)),
+                SliverToBoxAdapter(child: SizedBox(height: screenHeight * 0.1)),
               ],
             ),
           ),
@@ -193,11 +178,13 @@ class _NewsScreenState extends State<NewsScreen>
     );
   }
 
-  Widget _buildContent(NewsService newsService,
-      AppLocalizations l10n,
-      double screenWidth,
-      double screenHeight,
-      double horizontalPadding,) {
+  Widget _buildContent(
+    NewsService newsService,
+    AppLocalizations l10n,
+    double screenWidth,
+    double screenHeight,
+    double horizontalPadding,
+  ) {
     final double itemSpacing = screenHeight * 0.01;
 
     if (newsService.state == NewsState.initial ||
@@ -221,14 +208,25 @@ class _NewsScreenState extends State<NewsScreen>
     if (articles.isEmpty) {
       return SliverToBoxAdapter(
         key: const ValueKey('empty'),
-        child: Column(
-          children: [
-            SizedBox(height: screenHeight * 0.1),
-            ErrorView(
-              title: l10n.noFoundTitle,
-              message: l10n.noFoundMessage,
-            ),
-          ],
+        child: TweenAnimationBuilder<double>(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+          tween: Tween(begin: 0.0, end: 1.0),
+          builder: (context, opacity, child) {
+            return Opacity(
+              opacity: opacity,
+              child: child,
+            );
+          },
+          child: Column(
+            children: [
+              SizedBox(height: screenHeight * 0.1),
+              ErrorView(
+                title: l10n.noFoundTitle,
+                message: l10n.noFoundMessage,
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -237,7 +235,7 @@ class _NewsScreenState extends State<NewsScreen>
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-              (context, index) {
+          (context, index) {
             final isLast = index == articles.length - 1;
             return Padding(
               padding: EdgeInsets.only(bottom: isLast ? 0 : itemSpacing),
@@ -295,7 +293,7 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
     try {
       return await Future.sync(() async {
         final inMemoryUrls =
-        CacheService.get<Map<String, String>>(CacheKey.newsImageUrls);
+            CacheService.get<Map<String, String>>(CacheKey.newsImageUrls);
         if (inMemoryUrls?[widget.imagePath] != null) {
           return inMemoryUrls![widget.imagePath];
         }
@@ -306,15 +304,12 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
         if (cachedDataJson != null) {
           try {
             final Map<String, dynamic> cachedData = jsonDecode(cachedDataJson);
-            if (DateTime
-                .now()
-                .millisecondsSinceEpoch <
+            if (DateTime.now().millisecondsSinceEpoch <
                 (cachedData['expires'] as int)) {
               final String persistentUrl = cachedData['url'] as String;
-              final currentInMemoryUrls =
-                  CacheService.get<Map<String, String>>(
+              final currentInMemoryUrls = CacheService.get<Map<String, String>>(
                       CacheKey.newsImageUrls) ??
-                      {};
+                  {};
               currentInMemoryUrls[widget.imagePath] = persistentUrl;
               CacheService.set(CacheKey.newsImageUrls, currentInMemoryUrls);
               return persistentUrl;
@@ -324,15 +319,13 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
 
         if (!mounted) return null;
         final appInitializer =
-        Provider.of<AppInitializer>(context, listen: false);
+            Provider.of<AppInitializer>(context, listen: false);
         final dio = Provider.of<Dio>(context, listen: false);
 
         await appInitializer.onCoreServicesReady;
         if (!mounted) return null;
 
-        final user = await FirebaseAuth.instance
-            .authStateChanges()
-            .first;
+        final user = await FirebaseAuth.instance.authStateChanges().first;
         if (user == null) return null;
         final idToken = await user.getIdToken();
         if (!mounted) return null;
@@ -359,8 +352,7 @@ class _FirebaseStorageImageState extends State<FirebaseStorageImage> {
             currentUrls[widget.imagePath] = newUrl;
             CacheService.set(CacheKey.newsImageUrls, currentUrls);
 
-            final expiryTime = DateTime
-                .now()
+            final expiryTime = DateTime.now()
                 .add(const Duration(minutes: 8))
                 .millisecondsSinceEpoch;
             await prefs.setString(
@@ -415,10 +407,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final iconSize = screenWidth * 0.08;
     return Material(
       color: AppColors.border.withValues(alpha: 0.5),

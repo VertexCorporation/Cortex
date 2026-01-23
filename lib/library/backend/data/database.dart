@@ -58,13 +58,17 @@ class DatabaseHelper {
 
       // --- ENCRYPTION LOGIC ---
       // If it's a user-created model and we have a user ID, encrypt the data.
-      if (userId != null && rawJson != null && (modelId?.startsWith('self_') == true || modelId?.startsWith('local_') == true)) {
+      if (userId != null && rawJson != null &&
+          (modelId?.startsWith('self_') == true ||
+              modelId?.startsWith('local_') == true)) {
         final encryptedJson = CryptoHelper.encrypt(rawJson, userId);
         if (encryptedJson != null) {
-          values['raw_json'] = encryptedJson; // Replace raw JSON with encrypted data
+          values['raw_json'] =
+              encryptedJson; // Replace raw JSON with encrypted data
           debugPrint("[DatabaseHelper] Encrypted data for model '$modelId'");
         } else {
-          debugPrint("[DatabaseHelper] CRITICAL: Failed to encrypt data for model '$modelId'");
+          debugPrint(
+              "[DatabaseHelper] CRITICAL: Failed to encrypt data for model '$modelId'");
           // We might choose to throw here, or proceed unencrypted (risky). Throwing is safer.
           throw Exception("Encryption failed for model $modelId");
         }
@@ -76,8 +80,10 @@ class DatabaseHelper {
         conflictAlgorithm: conflictAlgorithm ?? ConflictAlgorithm.replace,
       );
     } catch (e) {
-      if (e.toString().contains("SQLITE_FULL") || e.toString().contains("database or disk is full")) {
-        debugPrint("[DatabaseHelper] CRITICAL: Disk full during insert. Data NOT saved.");
+      if (e.toString().contains("SQLITE_FULL") ||
+          e.toString().contains("database or disk is full")) {
+        debugPrint(
+            "[DatabaseHelper] CRITICAL: Disk full during insert. Data NOT saved.");
         return -1; // Return -1 to indicate failure
       }
       rethrow;
@@ -85,13 +91,16 @@ class DatabaseHelper {
   }
 
   /// Updates rows in the database.
-  Future<int> update(String table, Map<String, dynamic> values, {String? where, List<Object?>? whereArgs}) async {
+  Future<int> update(String table, Map<String, dynamic> values,
+      {String? where, List<Object?>? whereArgs}) async {
     try {
       final db = await instance.database;
       return await db.update(table, values, where: where, whereArgs: whereArgs);
     } catch (e) {
-      if (e.toString().contains("SQLITE_FULL") || e.toString().contains("database or disk is full")) {
-        debugPrint("[DatabaseHelper] CRITICAL: Disk full during update. Data NOT saved.");
+      if (e.toString().contains("SQLITE_FULL") ||
+          e.toString().contains("database or disk is full")) {
+        debugPrint(
+            "[DatabaseHelper] CRITICAL: Disk full during update. Data NOT saved.");
         return -1;
       }
       rethrow;
@@ -138,7 +147,8 @@ class DatabaseHelper {
         whereArgs: validIds.toList(),
       );
     } catch (e) {
-      if (e.toString().contains("SQLITE_FULL")) return; // Ignore disk full on delete
+      if (e.toString().contains("SQLITE_FULL"))
+        return; // Ignore disk full on delete
       rethrow;
     }
   }
@@ -151,7 +161,8 @@ class DatabaseHelper {
         'models',
         where: "id LIKE 'self_%' OR id LIKE 'local_%'",
       );
-      debugPrint("[DatabaseHelper] Logout cleanup: Deleted $count user-created models to protect privacy.");
+      debugPrint(
+          "[DatabaseHelper] Logout cleanup: Deleted $count user-created models to protect privacy.");
     } catch (e) {
       if (e.toString().contains("SQLITE_FULL")) return;
       rethrow;
@@ -170,11 +181,14 @@ class DatabaseHelper {
         where: where,
         whereArgs: whereArgs,
       );
-      debugPrint("[DatabaseHelper] Deleted $count rows from '$table' where: $where");
+      debugPrint(
+          "[DatabaseHelper] Deleted $count rows from '$table' where: $where");
       return count;
     } catch (e) {
-      if (e.toString().contains("SQLITE_FULL") || e.toString().contains("database or disk is full")) {
-        debugPrint("[DatabaseHelper] Disk full error during delete (journal write failed). Ignoring.");
+      if (e.toString().contains("SQLITE_FULL") ||
+          e.toString().contains("database or disk is full")) {
+        debugPrint(
+            "[DatabaseHelper] Disk full error during delete (journal write failed). Ignoring.");
         return 0;
       }
       rethrow;
@@ -196,7 +210,8 @@ class DatabaseHelper {
       final rawJsonString = map['raw_json'] as String;
 
       // --- DECRYPTION LOGIC ---
-      if (userId != null && (modelId.startsWith('self_') || modelId.startsWith('local_'))) {
+      if (userId != null &&
+          (modelId.startsWith('self_') || modelId.startsWith('local_'))) {
         // This is a user-created model. Attempt to decrypt it.
         final decryptedJson = CryptoHelper.decrypt(rawJsonString, userId);
         if (decryptedJson != null) {
@@ -204,7 +219,8 @@ class DatabaseHelper {
           decodedModels.add(json.decode(decryptedJson) as Map<String, dynamic>);
         } else {
           // Decryption failed. This model belongs to another user. Skip it.
-          debugPrint("[DatabaseHelper] Skipped model '$modelId' as it belongs to another user.");
+          debugPrint(
+              "[DatabaseHelper] Skipped model '$modelId' as it belongs to another user.");
         }
       } else {
         // This is a public model. Decode it directly.
@@ -220,9 +236,11 @@ class DatabaseHelper {
     try {
       final db = await database;
       await db.execute('VACUUM');
-      debugPrint("[DatabaseHelper] Database vacuumed and optimized (Disk Space Reclaimed).");
+      debugPrint(
+          "[DatabaseHelper] Database vacuumed and optimized (Disk Space Reclaimed).");
     } catch (e) {
-      debugPrint("[DatabaseHelper] Optimization failed (likely disk full or locked): $e");
+      debugPrint(
+          "[DatabaseHelper] Optimization failed (likely disk full or locked): $e");
     }
   }
 }

@@ -51,6 +51,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   bool _ignoreDrag = false;
   bool _isSearchFocused = false;
 
+  double _accumulatedDrag = 0.0;
+  bool _hasTriggeredNavigation = false;
+
   @override
   void initState() {
     super.initState();
@@ -129,17 +132,16 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   // --- DRAWER & GESTURE LOGIC (RTL ADAPTED) ---
-
   void _onDragStart(DragStartDetails details) {
+    _accumulatedDrag = 0.0;
+    _hasTriggeredNavigation = false;
+
     final double screenW = MediaQuery
         .of(context)
         .size
         .width;
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
 
-    // In LTR: we ignore drags starting from the far right edge (ScreenW - 25).
-    // In RTL: we ignore drags starting from the far left edge (25).
-    // Because the drawer is always at the "Start" edge.
     if (isRtl) {
       if (details.globalPosition.dx < 25.0) {
         _ignoreDrag = true;
@@ -170,11 +172,24 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     final double searchGapW = screenW - standardAxonW;
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
 
-    // In RTL, dragging LEFT (negative delta) means "Opening/Pulling from Right".
-    // In LTR, dragging RIGHT (positive delta) means "Opening/Pulling from Left".
-    // We normalize delta so positive always means "Opening".
     final double rawDelta = details.primaryDelta!;
     final double delta = isRtl ? -rawDelta : rawDelta;
+
+    if (_currentView == MainScreenView.library &&
+        _axonController.value == 0 &&
+        !_hasTriggeredNavigation) {
+      if (delta < 0) {
+        _accumulatedDrag += delta;
+        if (_accumulatedDrag.abs() > 60) {
+          _hasTriggeredNavigation = true;
+          HapticFeedback.lightImpact();
+          context.read<ModelCatalogProvider>().openCreateScreen(context);
+          _accumulatedDrag = 0.0;
+          return;
+        }
+      }
+    }
+    // -------------------------------------------------------------
 
     if (_isSearchFocused) {
       if (delta > 0) {
@@ -214,6 +229,11 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   void _onDragEnd(DragEndDetails details) {
+    if (_hasTriggeredNavigation) {
+      _hasTriggeredNavigation = false;
+      return;
+    }
+
     if (_ignoreDrag) {
       _ignoreDrag = false;
       return;
@@ -221,7 +241,6 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
     final double rawVelocity = details.primaryVelocity!;
-    // Normalize velocity: Positive = Opening direction, Negative = Closing direction
     final double velocity = isRtl ? -rawVelocity : rawVelocity;
 
     if (_isSearchFocused) {
@@ -419,9 +438,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         .width;
     final double standardAxonWidth = screenWidth * 0.85;
 
-    // Detect layout direction
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
-    // Multiplier to flip X-axis translations: 1 for LTR, -1 for RTL
     final double directionMultiplier = isRtl ? -1.0 : 1.0;
 
     return Title(
@@ -471,199 +488,203 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         child: Scaffold(
           backgroundColor: AppColors.background,
           resizeToAvoidBottomInset: false,
-          body: GestureDetector(
-            onHorizontalDragStart: _onDragStart,
-            onHorizontalDragUpdate: _onDragUpdate,
-            onHorizontalDragEnd: _onDragEnd,
-            child: AnimatedBuilder(
-              animation: Listenable.merge(
-                  [_axonController, _elasticController, _searchModeController]),
-              builder: (context, child) {
-                final double rawValue = _axonController.value;
-                final double searchValue = Curves.easeInOutCubic
-                    .transform(_searchModeController.value);
+          body: Listener(
+            onPointerDown: (_) {
+              context
+                  .read<IntrovertNotificationService>()
+                  .dismissCurrentNotification();
+            },
+            child: GestureDetector(
+              onHorizontalDragStart: _onDragStart,
+              onHorizontalDragUpdate: _onDragUpdate,
+              onHorizontalDragEnd: _onDragEnd,
+              child: AnimatedBuilder(
+                animation: Listenable.merge([
+                  _axonController,
+                  _elasticController,
+                  _searchModeController
+                ]),
+                builder: (context, child) {
+                  final double rawValue = _axonController.value;
+                  final double searchValue = Curves.easeInOutCubic
+                      .transform(_searchModeController.value);
 
-                final double visibleAxonWidth =
-                    standardAxonWidth + _elasticWidth;
-                final double currentAxonWidth = visibleAxonWidth +
-                    ((screenWidth - visibleAxonWidth) * searchValue);
+                  final double visibleAxonWidth =
+                      standardAxonWidth + _elasticWidth;
+                  final double currentAxonWidth = visibleAxonWidth +
+                      ((screenWidth - visibleAxonWidth) * searchValue);
 
-                final double axonOpenOffset =
-                    (standardAxonWidth * rawValue) + _elasticWidth;
-                final double searchOffset =
-                    (screenWidth - axonOpenOffset) * searchValue;
+                  final double axonOpenOffset =
+                      (standardAxonWidth * rawValue) + _elasticWidth;
+                  final double searchOffset =
+                      (screenWidth - axonOpenOffset) * searchValue;
 
-                // Determine final X translation based on direction
-                final double mainScreenX =
-                    (axonOpenOffset + searchOffset) * directionMultiplier;
+                  final double mainScreenX =
+                      (axonOpenOffset + searchOffset) * directionMultiplier;
 
-                double axonParallaxX =
-                    -(standardAxonWidth * 0.25) * (1.0 - rawValue);
-                if (searchValue > 0) {
-                  axonParallaxX = axonParallaxX * (1.0 - searchValue);
-                }
-                // Flip parallax for RTL
-                axonParallaxX *= directionMultiplier;
+                  double axonParallaxX =
+                      -(standardAxonWidth * 0.25) * (1.0 - rawValue);
+                  if (searchValue > 0) {
+                    axonParallaxX = axonParallaxX * (1.0 - searchValue);
+                  }
+                  axonParallaxX *= directionMultiplier;
 
-                final double overlayOpacity = (0.3 * rawValue).clamp(0.0, 1.0);
+                  final double overlayOpacity =
+                  (0.3 * rawValue).clamp(0.0, 1.0);
 
-                return Stack(
-                  children: [
-                    // --- LAYER 1: Axon (Sidebar) ---
-                    // Back layer remains physically same Z-index,
-                    // but visual position flips via Transform.
-                    Transform.translate(
-                      offset: Offset(axonParallaxX, 0),
-                      child: SizedBox(
-                        width: currentAxonWidth,
-                        height: MediaQuery
-                            .of(context)
-                            .size
-                            .height,
-                        // Ensure Sidebar aligns to the correct start edge
-                        child: Align(
-                          alignment: AlignmentDirectional.centerStart,
-                          child: Axon(
-                            onNewChatTap: () => startNewConversation(),
-                            onLibraryTap: switchToLibrary,
-                            onNewsTap: openNewsScreen,
-                            onCloseAxon: closeAxon,
-                            onOpenAxon: () => _animateAxonTo(1.0),
-                            onSearchFocusChanged: _handleSearchFocusChanged,
-                            referenceWidth: standardAxonWidth,
-                            activeTab: _getCurrentViewIndex(),
+                  return Stack(
+                    children: [
+                      // --- LAYER 1: Axon (Sidebar) ---
+                      Transform.translate(
+                        offset: Offset(axonParallaxX, 0),
+                        child: SizedBox(
+                          width: currentAxonWidth,
+                          height: MediaQuery
+                              .of(context)
+                              .size
+                              .height,
+                          child: Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Axon(
+                              onNewChatTap: () => startNewConversation(),
+                              onLibraryTap: switchToLibrary,
+                              onNewsTap: openNewsScreen,
+                              onCloseAxon: closeAxon,
+                              onOpenAxon: () => _animateAxonTo(1.0),
+                              onSearchFocusChanged: _handleSearchFocusChanged,
+                              referenceWidth: standardAxonWidth,
+                              activeTab: _getCurrentViewIndex(),
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    // --- LAYER 2: MAIN SCREEN (Front) ---
-                    Transform.translate(
-                      offset: Offset(mainScreenX, 0),
-                      child: Transform.scale(
-                        scale: 1.0 - (0.08 * rawValue),
-                        // Scale anchor flips based on direction
-                        alignment: isRtl
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.background,
-                            boxShadow: [
-                              if (rawValue > 0)
-                                BoxShadow(
-                                  color:
-                                  Colors.black.withValues(
-                                      alpha: 0.2 * rawValue),
-                                  blurRadius: 30,
-                                  spreadRadius: -5,
-                                  // Shadow flips to the other side in RTL
-                                  offset: Offset(-15 * directionMultiplier, 0),
-                                )
-                            ],
-                            borderRadius:
-                            BorderRadius.circular(30.0 * rawValue),
-                          ),
-                          child: ClipRRect(
-                            borderRadius:
-                            BorderRadius.circular(30.0 * rawValue),
-                            child: MediaQuery(
-                              data: MediaQuery.of(context).copyWith(
-                                viewInsets: (rawValue > 0 || searchValue > 0)
-                                    ? EdgeInsets.zero
-                                    : MediaQuery
-                                    .of(context)
-                                    .viewInsets,
-                              ),
-                              child: Stack(
-                                children: [
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 250),
-                                    switchInCurve: Curves.easeOutQuad,
-                                    switchOutCurve: Curves.easeInQuad,
-                                    transitionBuilder: (Widget child,
-                                        Animation<double> animation) {
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      );
-                                    },
-                                    child: KeyedSubtree(
-                                      key: ValueKey<MainScreenView>(
-                                          _currentView),
-                                      child: _buildCurrentScreenWidget(),
-                                    ),
-                                  ),
-
-                                  if (rawValue > 0)
-                                    IgnorePointer(
-                                      child: Container(
-                                        color: Colors.black
-                                            .withValues(alpha: overlayOpacity),
+                      // --- LAYER 2: MAIN SCREEN (Front) ---
+                      Transform.translate(
+                        offset: Offset(mainScreenX, 0),
+                        child: Transform.scale(
+                          scale: 1.0 - (0.08 * rawValue),
+                          alignment: isRtl
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.background,
+                              boxShadow: [
+                                if (rawValue > 0)
+                                  BoxShadow(
+                                    color: Colors.black
+                                        .withValues(alpha: 0.2 * rawValue),
+                                    blurRadius: 30,
+                                    spreadRadius: -5,
+                                    offset:
+                                    Offset(-15 * directionMultiplier, 0),
+                                  )
+                              ],
+                              borderRadius:
+                              BorderRadius.circular(30.0 * rawValue),
+                            ),
+                            child: ClipRRect(
+                              borderRadius:
+                              BorderRadius.circular(30.0 * rawValue),
+                              child: MediaQuery(
+                                data: MediaQuery.of(context).copyWith(
+                                  viewInsets: (rawValue > 0 || searchValue > 0)
+                                      ? EdgeInsets.zero
+                                      : MediaQuery
+                                      .of(context)
+                                      .viewInsets,
+                                ),
+                                child: Stack(
+                                  children: [
+                                    AnimatedSwitcher(
+                                      duration:
+                                      const Duration(milliseconds: 250),
+                                      switchInCurve: Curves.easeOutQuad,
+                                      switchOutCurve: Curves.easeInQuad,
+                                      transitionBuilder: (Widget child,
+                                          Animation<double> animation) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+                                      },
+                                      child: KeyedSubtree(
+                                        key: ValueKey<MainScreenView>(
+                                            _currentView),
+                                        child: _buildCurrentScreenWidget(),
                                       ),
                                     ),
 
-                                  // Vertical separator line on the "hinge"
-                                  Align(
-                                    alignment: isRtl
-                                        ? Alignment.centerRight
-                                        : Alignment.centerLeft,
-                                    child: Container(
-                                      width: 1.0,
-                                      height: (MediaQuery
-                                          .of(context)
-                                          .size
-                                          .height *
-                                          0.6) *
-                                          rawValue,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Theme
-                                                .of(context)
-                                                .dividerColor
-                                                .withValues(alpha: 0.0),
-                                            Theme
-                                                .of(context)
-                                                .dividerColor
-                                                .withValues(alpha: 0.3),
-                                            Theme
-                                                .of(context)
-                                                .dividerColor
-                                                .withValues(alpha: 0.3),
-                                            Theme
-                                                .of(context)
-                                                .dividerColor
-                                                .withValues(alpha: 0.0),
-                                          ],
-                                          stops: const [0.0, 0.3, 0.7, 1.0],
+                                    if (rawValue > 0)
+                                      IgnorePointer(
+                                        child: Container(
+                                          color: Colors.black.withValues(
+                                              alpha: overlayOpacity),
+                                        ),
+                                      ),
+
+                                    Align(
+                                      alignment: isRtl
+                                          ? Alignment.centerRight
+                                          : Alignment.centerLeft,
+                                      child: Container(
+                                        width: 1.0,
+                                        height: (MediaQuery
+                                            .of(context)
+                                            .size
+                                            .height *
+                                            0.6) *
+                                            rawValue,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              Theme
+                                                  .of(context)
+                                                  .dividerColor
+                                                  .withValues(alpha: 0.0),
+                                              Theme
+                                                  .of(context)
+                                                  .dividerColor
+                                                  .withValues(alpha: 0.3),
+                                              Theme
+                                                  .of(context)
+                                                  .dividerColor
+                                                  .withValues(alpha: 0.3),
+                                              Theme
+                                                  .of(context)
+                                                  .dividerColor
+                                                  .withValues(alpha: 0.0),
+                                            ],
+                                            stops: const [0.0, 0.3, 0.7, 1.0],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
 
-                                  if (rawValue > 0 && searchValue == 0)
-                                    GestureDetector(
-                                      onTap: closeAxon,
-                                      behavior: HitTestBehavior.translucent,
-                                      child: Container(
-                                        color: Colors.transparent,
-                                        width: double.infinity,
-                                        height: double.infinity,
+                                    if (rawValue > 0 && searchValue == 0)
+                                      GestureDetector(
+                                        onTap: closeAxon,
+                                        behavior: HitTestBehavior.translucent,
+                                        child: Container(
+                                          color: Colors.transparent,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                        ),
                                       ),
-                                    ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),

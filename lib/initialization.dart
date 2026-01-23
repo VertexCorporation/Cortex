@@ -47,6 +47,7 @@ enum AppStatus {
 /// A custom messages class for Upgrader to use the app's localization.
 class AppUpgraderMessages extends UpgraderMessages {
   final AppLocalizations appLocalizations;
+
   AppUpgraderMessages({required this.appLocalizations});
 
   @override
@@ -67,15 +68,19 @@ class AppUpgraderMessages extends UpgraderMessages {
 /// The core service for managing the application's lifecycle and state.
 class AppInitializer with ChangeNotifier {
   AppStatus _status = AppStatus.initializing;
+
   AppStatus get status => _status;
   User? _currentUser;
+
   User? get currentUser => _currentUser;
   Map<String, dynamic>? _verificationScreenData;
+
   Map<String, dynamic>? get verificationScreenData => _verificationScreenData;
 
   /// Completer that is completed once essential core services are ready.
   /// UI components can await this future before touching those services.
   final Completer<void> _coreServicesReadyCompleter = Completer<void>();
+
   Future<void> get onCoreServicesReady => _coreServicesReadyCompleter.future;
 
   Upgrader? _upgrader;
@@ -97,6 +102,7 @@ class AppInitializer with ChangeNotifier {
   /// Flag used to prevent authStateChanges from running user flow checks
   /// during an active registration flow.
   bool _isRegistering = false;
+
   void setRegistrationStatus(bool isRegistering) {
     _isRegistering = isRegistering;
   }
@@ -113,6 +119,7 @@ class AppInitializer with ChangeNotifier {
   final ExtrovertNotificationService _extrovertNotificationService;
   final InternetProvider _internetProvider;
   final UserProvider _userProvider;
+
   AppInitializer({
     required AppStatus initialStatus,
     required AuthService authService,
@@ -168,14 +175,29 @@ class AppInitializer with ChangeNotifier {
     // 1. Check Connectivity IMMEDIATELY.
     await _internetProvider.checkInternetConnection();
 
-    if (await _checkForAppUpdate()) {
-      dev.log("[AppInitializer] Update required. Flow halted.");
-      return;
-    }
+    if (_internetProvider.isConnected) {
+      // 2. Parallelize Remote Checks (Update & Maintenance)
+      // This saves time by not waiting for one to finish before starting the other.
+      final results = await Future.wait([
+        _checkForAppUpdate(),
+        _checkServerStatus(),
+      ]);
 
-    if (await _checkServerStatus()) {
-      dev.log("[AppInitializer] Maintenance mode. Flow halted.");
-      return;
+      final bool updateRequired = results[0];
+      final bool maintenanceActive = results[1];
+
+      if (updateRequired) {
+        dev.log("[AppInitializer] Update required. Flow halted.");
+        return;
+      }
+
+      if (maintenanceActive) {
+        dev.log("[AppInitializer] Maintenance mode. Flow halted.");
+        return;
+      }
+    } else {
+      // Offline fallback: skip remote checks
+      dev.log("[AppInitializer] Offline. Skipping remote checks.");
     }
 
     if (_status == AppStatus.ready) {
@@ -316,11 +338,12 @@ class AppInitializer with ChangeNotifier {
       // Timezones
       tz.initializeTimeZones();
 
-      // Moderator
-      await OfflineModeratorService().initialize();
+      // Parallelize Moderator and Notification service initialization
+      await Future.wait([
+        OfflineModeratorService().initialize(),
+        _extrovertNotificationService.initialize(),
+      ]);
 
-      // Notification
-      await _extrovertNotificationService.initialize();
       _extrovertNotificationService.recordAppOpen();
 
       dev.log("[AppInitializer] Heavy libraries initialized.");

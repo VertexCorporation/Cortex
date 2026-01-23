@@ -2,11 +2,13 @@
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 
 import '../../app.dart';
+import '../../../webview.dart';
 
 class AxonHeader extends StatelessWidget {
   final double referenceWidth;
@@ -82,35 +84,40 @@ class AxonHeader extends StatelessWidget {
                     // --- Animated Icon (Search Glass <-> Arrow) ---
                     prefixIcon: GestureDetector(
                       onTap: isSearchActive ? onExitSearchTap : null,
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        switchInCurve: Curves.easeOutBack,
-                        switchOutCurve: Curves.easeIn,
-                        transitionBuilder: (child, anim) {
-                          return ScaleTransition(scale: anim, child: child);
-                        },
-                        child: isSearchActive
-                            ? Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Transform.rotate(
-                            angle: math.pi / 2,
-                            child: SvgPicture.asset(
-                              'assets/icons/arrov.svg',
-                              key: const ValueKey('arrow'),
-                              width: searchIconSize,
-                              height: searchIconSize,
-                              colorFilter: ColorFilter.mode(
-                                AppColors.primaryColor.inverted,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                        )
-                            : Icon(
-                          Icons.search,
-                          key: const ValueKey('search'),
-                          size: searchIconSize,
-                          color: AppColors.tertiaryColor,
+                      behavior: HitTestBehavior
+                          .translucent, // Ensure touches are caught
+                      child: Container(
+                        // Expand touch target
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        color:
+                            Colors.transparent, // Visual debug or transparent
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          switchInCurve: Curves.easeOutBack,
+                          switchOutCurve: Curves.easeIn,
+                          transitionBuilder: (child, anim) {
+                            return ScaleTransition(scale: anim, child: child);
+                          },
+                          child: isSearchActive
+                              ? Transform.rotate(
+                                  angle: math.pi / 2,
+                                  child: SvgPicture.asset(
+                                    'assets/icons/arrov.svg',
+                                    key: const ValueKey('arrow'),
+                                    width: searchIconSize,
+                                    height: searchIconSize,
+                                    colorFilter: ColorFilter.mode(
+                                      AppColors.primaryColor.inverted,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.search,
+                                  key: const ValueKey('search'),
+                                  size: searchIconSize,
+                                  color: AppColors.tertiaryColor,
+                                ),
                         ),
                       ),
                     ),
@@ -146,12 +153,22 @@ class AxonHeader extends StatelessWidget {
                     child: Row(
                       children: [
                         SizedBox(width: referenceWidth * 0.03),
-                        SvgPicture.asset(
-                          'assets/cortex.svg',
-                          height: brandIconHeight,
-                          colorFilter: ColorFilter.mode(
-                            AppColors.primaryColor.inverted,
-                            BlendMode.srcIn,
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            showAppWebViewModal(
+                              context,
+                              "Vertex",
+                              "https://vertexishere.com",
+                            );
+                          },
+                          child: SvgPicture.asset(
+                            'assets/cortex.svg',
+                            height: brandIconHeight,
+                            colorFilter: ColorFilter.mode(
+                              AppColors.primaryColor.inverted,
+                              BlendMode.srcIn,
+                            ),
                           ),
                         ),
                       ],

@@ -415,7 +415,12 @@ class ChatStorageService {
       final db = await DbHelper().db;
       await db.update(
         'conversations',
-        {'isStarred': starred ? 1 : 0},
+        {
+          'isStarred': starred ? 1 : 0,
+          'starredDate': starred
+              ? DateTime.now().millisecondsSinceEpoch
+              : 0 // Save date or 0
+        },
         where: 'id = ?',
         whereArgs: [id],
       );

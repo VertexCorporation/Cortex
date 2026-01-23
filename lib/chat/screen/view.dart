@@ -232,6 +232,7 @@ class ChatViewState extends State<ChatView>
                 },
                 child: Container(
                   key: _bottomPanelKey,
+                  width: double.infinity,
                   child: ChatInputPanel(
                     editService: editService,
                     scrollService: _scrollService,

@@ -43,7 +43,6 @@ class BriefingOverlay extends StatefulWidget {
 
 class _BriefingOverlayState extends State<BriefingOverlay>
     with TickerProviderStateMixin {
-
   late final AnimationController _slideController;
   late final Animation<Offset> _slideAnimation;
   late final Animation<double> _fadeAnimation;
@@ -63,11 +62,10 @@ class _BriefingOverlayState extends State<BriefingOverlay>
         AnimationController(vsync: this, duration: _animationDuration);
 
     final curvedAnimation =
-    CurvedAnimation(parent: _slideController, curve: Curves.easeOut);
+        CurvedAnimation(parent: _slideController, curve: Curves.easeOut);
 
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-            .animate(curvedAnimation);
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+        .animate(curvedAnimation);
 
     _fadeAnimation =
         Tween<double>(begin: 0.0, end: 1.0).animate(curvedAnimation);
@@ -177,7 +175,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
   void _measurePanelHeightAndReport() {
     final RenderBox? box =
-    _panelKey.currentContext?.findRenderObject() as RenderBox?;
+        _panelKey.currentContext?.findRenderObject() as RenderBox?;
     final newHeight = box?.size.height ?? 0.0;
     if (newHeight != _measuredPanelHeight) {
       _measuredPanelHeight = newHeight;
@@ -248,10 +246,7 @@ class _BriefingPanelContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
 
     final double fontSize = isTablet ? screenWidth * 0.022 : 14.0;

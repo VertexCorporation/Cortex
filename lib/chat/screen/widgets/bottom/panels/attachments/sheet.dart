@@ -12,6 +12,7 @@ import 'package:camera/camera.dart';
 
 void showAttachmentSheet({
   required BuildContext context,
+  required bool canHandleImages,
 }) {
   // Hide keyboard if open to prevent UI glitching during bottom sheet animation
   FocusScope.of(context).unfocus();
@@ -47,11 +48,6 @@ void showAttachmentSheet({
         decoration: BoxDecoration(
           color: AppColors.background,
           borderRadius: BorderRadius.vertical(top: Radius.circular(topRadius)),
-          border: Border(
-            top: BorderSide(color: AppColors.border, width: 1.0),
-            left: BorderSide(color: AppColors.border, width: 1.0),
-            right: BorderSide(color: AppColors.border, width: 1.0),
-          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -87,7 +83,7 @@ void showAttachmentSheet({
             // Dynamic Action Buttons Row
             FutureBuilder<List<CameraDescription>>(
               future: availableCameras(),
-              builder: (context, snapshot) {
+              builder: (futureContext, snapshot) {
                 // Default to showing camera if waiting or if we can't determine (fail safe)
                 // BUT user specific request: "if camera not supported... camera icon should not prevent"
                 // Actually safer to assume NO camera if error/empty for this specific requirement.
@@ -114,13 +110,13 @@ void showAttachmentSheet({
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // 1. Camera (Conditional)
-                      if (hasCamera) ...[
+                      if (hasCamera && canHandleImages) ...[
                         Expanded(
                           child: AttachmentSheetButton(
                             iconPath: 'assets/icons/camera.svg',
                             label: l10n.actionCamera,
                             onTap: () {
-                              Navigator.pop(context);
+                              Navigator.pop(futureContext);
                               inputService.pickPhoto(
                                 context,
                                 source: ImageSource.camera,
@@ -133,21 +129,23 @@ void showAttachmentSheet({
                       ],
 
                       // 2. Gallery
-                      Expanded(
-                        child: AttachmentSheetButton(
-                          iconPath: 'assets/icons/gallery.svg',
-                          label: l10n.actionGallery,
-                          onTap: () {
-                            Navigator.pop(context);
-                            inputService.pickPhoto(
-                              context,
-                              source: ImageSource.gallery,
-                              onSelectionComplete: () {},
-                            );
-                          },
+                      if (canHandleImages) ...[
+                        Expanded(
+                          child: AttachmentSheetButton(
+                            iconPath: 'assets/icons/gallery.svg',
+                            label: l10n.actionGallery,
+                            onTap: () {
+                              Navigator.pop(futureContext);
+                              inputService.pickPhoto(
+                                context,
+                                source: ImageSource.gallery,
+                                onSelectionComplete: () {},
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      SizedBox(width: itemGap),
+                        SizedBox(width: itemGap),
+                      ],
 
                       // 3. File
                       Expanded(
@@ -155,7 +153,7 @@ void showAttachmentSheet({
                           iconPath: 'assets/icons/attachment.svg',
                           label: l10n.actionFile,
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.pop(futureContext);
                             inputService.pickFile(context);
                           },
                         ),

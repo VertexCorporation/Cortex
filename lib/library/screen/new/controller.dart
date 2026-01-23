@@ -1,4 +1,4 @@
-// lib/screens/models/screen/new/controller.dart
+// lib/library/screen/new/controller.dart
 
 import 'package:cortex/app.dart';
 import 'package:cortex/appbar.dart';
@@ -53,6 +53,8 @@ class _ModelCreationHostState extends State<ModelCreationHost>
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final localeName = localizations.localeName;
+
     final screenWidth = MediaQuery
         .of(context)
         .size
@@ -73,13 +75,15 @@ class _ModelCreationHostState extends State<ModelCreationHost>
     _showCreateScreen ? localizations.create : localizations.add;
 
     return ChangeNotifierProvider(
-      create: (ctx) =>
-          ModelCreationProvider(
-            this,
-            ctx,
-            widget.availableBaseModels,
-            modelService: context.read<ModelService>(),
-          ),
+      create: (ctx) {
+        return ModelCreationProvider(
+          this,
+          widget.availableBaseModels,
+          modelService: context.read<ModelService>(),
+          localeName: localeName,
+          localizations: localizations,
+        );
+      },
       child: Consumer<ModelCreationProvider>(
         builder: (context, provider, child) {
           return PopScope(
@@ -89,14 +93,12 @@ class _ModelCreationHostState extends State<ModelCreationHost>
               child: Scaffold(
                 backgroundColor: AppColors.background,
                 extendBodyBehindAppBar: true,
-
                 appBar: CortexAppBar(
                   leadingMode: CortexLeadingMode.back,
                   showGradient: true,
                   onLeadingPressed: provider.isSaving
                       ? () {}
                       : () => Navigator.of(context).pop(),
-
                   title: AnimatedBuilder(
                     animation: _scrollController,
                     builder: (context, child) {
@@ -133,7 +135,6 @@ class _ModelCreationHostState extends State<ModelCreationHost>
                       ),
                     ),
                   ),
-
                   actionButton: AppBarButton(
                     onTap: provider.isSaving ? () {} : _switchScreen,
                     child: Opacity(
@@ -150,7 +151,6 @@ class _ModelCreationHostState extends State<ModelCreationHost>
                     ),
                   ),
                 ),
-
                 body: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   transitionBuilder:
@@ -167,7 +167,6 @@ class _ModelCreationHostState extends State<ModelCreationHost>
                     scrollController: _scrollController,
                   ),
                 ),
-
                 bottomNavigationBar: IntrinsicHeight(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
