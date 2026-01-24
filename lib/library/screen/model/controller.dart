@@ -1,5 +1,6 @@
 // lib/library/screen/model/controller.dart
 
+import 'package:cortex/analytics/service.dart';
 import 'package:cortex/library/screen/model/widgets/appbar.dart';
 import 'package:cortex/library/screen/model/widgets/banner.dart';
 import 'package:cortex/library/screen/model/widgets/body.dart';
@@ -26,13 +27,15 @@ class ModelDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Log screen view
+    AnalyticsService().logModelDetailScreen(id);
+
     // We create the provider here, directly in a standard ChangeNotifierProvider.
     return ChangeNotifierProvider<ModelDetailProvider>(
       create: (context) {
         // Read the download manager for this specific model ID.
-        final downloadManager = context
-            .read<ModelLocalStateProvider>()
-            .downloadManagers[id];
+        final downloadManager =
+            context.read<ModelLocalStateProvider>().downloadManagers[id];
 
         // Create the provider instance, passing all required dependencies
         // from the context via its constructor.
@@ -62,8 +65,8 @@ class _ModelDetailViewWithTicker extends StatefulWidget {
 
 class __ModelDetailViewWithTickerState extends State<_ModelDetailViewWithTicker>
     with TickerProviderStateMixin {
-  final GlobalKey<DetailAppBarState> _appBarKey = GlobalKey<
-      DetailAppBarState>();
+  final GlobalKey<DetailAppBarState> _appBarKey =
+      GlobalKey<DetailAppBarState>();
 
   // A controller to manage the scroll position for the fog effect.
   late final ScrollController _scrollController;
@@ -103,14 +106,11 @@ class ModelDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ModelDetailProvider>();
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     void handlePop() {
-      Navigator.of(context).pop(
-          provider.didBaseModelChange ? 'model_updated' : null);
+      Navigator.of(context)
+          .pop(provider.didBaseModelChange ? 'model_updated' : null);
     }
 
     return PopScope(

@@ -371,11 +371,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return '$percent% DE RÉDUCTION';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/mois, facturé mensuellement';
   }
@@ -502,12 +497,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get selectText => 'Sélectionner le texte';
-
-  @override
-  String get showLatex => 'Afficher les symboles spéciaux';
-
-  @override
-  String get hideLatex => 'Masquer les symboles spéciaux';
 
   @override
   String get thinking => 'Réflexion en cours';
@@ -819,9 +808,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       'Cette discussion a dépassé la limite de caractères. Veuillez démarrer une nouvelle discussion ou acheter un abonnement.';
-
-  @override
-  String get photoLimitReachedMessage => 'Une seule photo peut être ajoutée';
 
   @override
   String get inappropriateContentDetected => 'Contenu inapproprié détecté !';
@@ -1540,9 +1526,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get newChat => 'Nouvelle conversation';
 
   @override
-  String get howCanIHelpWith => 'Comment puis-je vous aider ?';
-
-  @override
   String get variants => 'Variantes';
 
   @override
@@ -1602,7 +1585,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get myPlan => 'Mon plan';
 
   @override
-  String get discountText => '80 % de réduction sur tous les forfaits !';
+  String specialOfferBadge(String time) {
+    return 'Offre spéciale pour les nouveaux utilisateurs • $time';
+  }
 
   @override
   String get attachmentSheetTitle => 'Pièces jointes';
@@ -1627,5 +1612,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cortex est toujours à vos côtés grâce à des centaines de modèles d\'IA, des fonctionnalités hors ligne, un chat dynamique et bien plus encore.';
 
   @override
-  String get comingSoon => 'À venir';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat =>
+      'Format de nom d\'utilisateur invalide. Veuillez utiliser entre 3 et 20 caractères, chiffres ou points. - _';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

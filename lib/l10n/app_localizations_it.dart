@@ -369,11 +369,6 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return '$percent% DI SCONTO';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/mese, fatturato mensilmente';
   }
@@ -498,12 +493,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get selectText => 'Seleziona Testo';
-
-  @override
-  String get showLatex => 'Mostra Simboli Speciali';
-
-  @override
-  String get hideLatex => 'Nascondi Simboli Speciali';
 
   @override
   String get thinking => 'Sto pensando';
@@ -810,9 +799,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       'Questa chat ha superato il limite di caratteri. Inizia una nuova chat o acquista un abbonamento.';
-
-  @override
-  String get photoLimitReachedMessage => 'È possibile aggiungere solo una foto';
 
   @override
   String get inappropriateContentDetected =>
@@ -1527,9 +1513,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get newChat => 'Nuova chat';
 
   @override
-  String get howCanIHelpWith => 'Come posso aiutarti?';
-
-  @override
   String get variants => 'Varianti';
 
   @override
@@ -1586,7 +1569,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get myPlan => 'Il mio piano';
 
   @override
-  String get discountText => 'Sconto dell\'80% su tutti i piani!';
+  String specialOfferBadge(String time) {
+    return 'Offerta speciale per nuovi utenti • $time';
+  }
 
   @override
   String get attachmentSheetTitle => 'Allegati';
@@ -1611,5 +1596,12 @@ class AppLocalizationsIt extends AppLocalizations {
       'Cortex è sempre al tuo fianco con centinaia di modelli di intelligenza artificiale, funzionalità offline, chat dinamica e molto altro ancora.';
 
   @override
-  String get comingSoon => 'Prossimamente';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat =>
+      'Formato nome utente non valido. Utilizzare 3-20 caratteri, cifre o . - _';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

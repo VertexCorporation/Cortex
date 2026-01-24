@@ -2,8 +2,8 @@
 
 import 'dart:io';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:cortex/theme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,8 +13,8 @@ import 'package:provider/provider.dart';
 import 'invite.dart';
 
 class BannerService {
-  final ValueNotifier<bool> showInviteBannerNotifier = ValueNotifier<bool>(
-      false);
+  final ValueNotifier<bool> showInviteBannerNotifier =
+  ValueNotifier<bool>(false);
 
   final ValueNotifier<double> bannerHeightNotifier = ValueNotifier<double>(0.0);
 
@@ -22,8 +22,19 @@ class BannerService {
   bool _isSharingLink = false;
   static const String _nextShowTimestampKey = 'inviteBannerNextShowTimestamp';
 
+  /// Session-level flag: Once the banner is dismissed, it won't reappear
+  /// during the current app session, regardless of the timestamp check.
+  bool _hasDismissedThisSession = false;
+
   Future<void> checkAndTriggerBanner() async {
     if (Platform.isIOS) return;
+
+    // If the banner was already dismissed this session, don't show it again.
+    if (_hasDismissedThisSession) {
+      debugPrint(
+          "[BannerService] Banner already dismissed this session. Skipping.");
+      return;
+    }
 
     if (kDebugMode) {
       debugPrint(
@@ -52,6 +63,9 @@ class BannerService {
   }
 
   Future<void> startCooldown() async {
+    // Mark as dismissed for this session to prevent re-triggering.
+    _hasDismissedThisSession = true;
+
     if (showInviteBannerNotifier.value) {
       showInviteBannerNotifier.value = false;
       bannerHeightNotifier.value = 0.0;
@@ -62,8 +76,8 @@ class BannerService {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final int randomHours = 24 + Random().nextInt(48 + 1);
-      final DateTime nextShowTime = DateTime.now().add(
-          Duration(hours: randomHours));
+      final DateTime nextShowTime =
+      DateTime.now().add(Duration(hours: randomHours));
       await prefs.setInt(
           _nextShowTimestampKey, nextShowTime.millisecondsSinceEpoch);
     } catch (e) {
@@ -171,7 +185,8 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
   }
 
   void dismiss(Offset swipeDelta) async {
-    if (!mounted || _exitController.isAnimating ||
+    if (!mounted ||
+        _exitController.isAnimating ||
         _exitController.isCompleted) {
       return;
     }
@@ -187,8 +202,8 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
     setState(() {
       _exitOffset = Offset(dx, dy);
       _exitSlideAnimation = Tween<Offset>(begin: Offset.zero, end: _exitOffset)
-          .animate(
-          CurvedAnimation(parent: _exitController, curve: Curves.easeOutQuad));
+          .animate(CurvedAnimation(
+          parent: _exitController, curve: Curves.easeOutQuad));
     });
 
     await _exitController.forward();
@@ -360,8 +375,8 @@ class FloatingInfoBannerState extends State<FloatingInfoBanner>
     final String iconPath = 'assets/icons/sparkle.svg';
 
     final Color tintColor = AppColors.premium.withValues(alpha: 0.15);
-    final Color solidBackgroundColor = Color.alphaBlend(
-        tintColor, AppColors.background);
+    final Color solidBackgroundColor =
+    Color.alphaBlend(tintColor, AppColors.background);
     final Color borderColor = AppColors.premium;
     final Color contentColor = AppColors.premium;
     final Color subtitleColor = AppColors.premium.withValues(alpha: 0.8);

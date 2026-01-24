@@ -31,6 +31,7 @@ class SubscriptionContentWidget extends StatefulWidget {
   final ScrollController? scrollController;
   final bool animateBenefits;
   final VoidCallback onBenefitsAnimated;
+  final bool isSpecialOfferActive;
 
   const SubscriptionContentWidget({
     super.key,
@@ -43,6 +44,7 @@ class SubscriptionContentWidget extends StatefulWidget {
     this.scrollController,
     required this.animateBenefits,
     required this.onBenefitsAnimated,
+    this.isSpecialOfferActive = false,
   });
 
   @override
@@ -424,7 +426,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
               )
                   : SizedBox(
                 key: const ValueKey('badges'),
-                width: screenWidth * 0.17,
+                width: screenWidth * 0.2,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -444,7 +446,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                       backgroundColor:
                       AppColors.premium.withValues(alpha: 0.15),
                       textColor: AppColors.premium,
-                      text: localizations.discountOffer(80),
+                      text: localizations.exclusiveOffer,
                     ),
                   ],
                 ),
@@ -516,6 +518,12 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         .width;
     final double horizontalPadding = screenWidth * 0.06;
 
+    // Benefits that should be highlighted when special offer is active
+    final highlightedBenefits = {
+      localizations.benefit7, // More Usage Limits
+      localizations.benefit10, // More Attachments
+    };
+
     List<String> benefits = [];
     if (planType == 'plus') {
       benefits = [
@@ -568,6 +576,12 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         final String benefit = entry.value;
         final double iconSize = screenWidth * 0.057;
 
+        // Check if this benefit should be highlighted
+        final bool isHighlighted = widget.isSpecialOfferActive &&
+            highlightedBenefits.contains(benefit);
+        final Color benefitColor =
+        isHighlighted ? AppColors.premium : AppColors.primaryColor.inverted;
+
         final benefitContent = SizedBox(
           width:
           (screenWidth - (horizontalPadding * 2) - (screenWidth * 0.02)) /
@@ -578,14 +592,16 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
               SvgPicture.asset('assets/icons/checkmark.svg',
                   width: iconSize,
                   height: iconSize,
-                  colorFilter: ColorFilter.mode(
-                      AppColors.primaryColor.inverted, BlendMode.srcIn)),
+                  colorFilter: ColorFilter.mode(benefitColor, BlendMode.srcIn)),
               SizedBox(width: screenWidth * 0.03),
               Expanded(
                   child: Text(benefit,
                       style: TextStyle(
                           fontSize: screenWidth * 0.034,
-                          color: AppColors.primaryColor.inverted))),
+                          fontWeight: isHighlighted
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                          color: benefitColor))),
             ],
           ),
         );

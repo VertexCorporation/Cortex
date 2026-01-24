@@ -125,14 +125,6 @@
       }
     }
   },
-  "discountOffer": "{percent}% KORTING",
-  "@discountOffer": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
   "monthlyPlanDescription": "{price}/maand, maandelijks gefactureerd",
   "@monthlyPlanDescription": {
     "description": "The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly",
@@ -189,8 +181,6 @@
   "shareMessage": "Bekijk de Cortex-app, hij is geweldig! Download hem hier: {cortexLink}",
   "shareFailed": "Het delen van de app is mislukt. Probeer het later opnieuw.",
   "selectText": "Selecteer Tekst",
-  "showLatex": "Toon Speciale Symbolen",
-  "hideLatex": "Verberg Speciale Symbolen",
   "thinking": "Aan het denken",
   "user": "Gebruiker",
   "help": "Hulp",
@@ -283,7 +273,6 @@
   "removePhotoTitle": "Foto Verwijderen",
   "confirmRemovePhoto": "Weet je zeker dat je de foto wilt verwijderen?",
   "chatLengthLimitExceeded": "Deze chat heeft de tekenlimiet overschreden. Start een nieuwe chat of koop een abonnement.",
-  "photoLimitReachedMessage": "Er kan slechts één foto worden toegevoegd",
   "inappropriateContentDetected": "Ongepaste inhoud gedetecteerd!",
   "offlineModelNotInstalled": "Dit offline model is niet op je apparaat geïnstalleerd.",
   "reachedLimit": "Je hebt je gebruikslimiet bereikt; om meer limieten te krijgen, kun je je abonnement upgraden. (We snappen natuurlijk helemaal dat het balen is als je limiet op is. Maar serieus, die geweldige reacties krijgen is niet gratis, dus deze limieten helpen ons juist om de leuke momenten te blijven voortzetten.)",
@@ -515,7 +504,6 @@
   "emulatorModeWarning": "Deze functie is uitgeschakeld in de emulatormodus.",
   "unstarConversation": "Unstar",
   "newChat": "Nieuwe chat",
-  "howCanIHelpWith": "Hoe kan ik helpen?",
   "conversationDeleted": "Gesprek verwijderd!",
   "variants": "Varianten",
   "variantsDescription": "Varianten zijn verschillende versies van dezelfde AI-familie. We selecteren automatisch de beste wanneer je op de hoofdkaart tikt, maar je kunt hier handmatig een specifieke variant kiezen als je dat wilt!",
@@ -535,7 +523,6 @@
   "featureQuizPrefix": "Quiz:",
   "featureExploreDescription": "Ontdek alle beschikbare modellen",
   "myPlan": "Mijn plan",
-  "discountText": "80% korting op alle abonnementen!",
   "benefit10": "Meer bijlagen",
   "featureStudyMessage": "U bent een ervaren docent. Uw doel is om het onderwerp van de gebruiker volledig uit te leggen. Gebruik een duidelijke structuur, voorbeelden en analogieën. Breek complexe ideeën op in behapbare delen om ervoor te zorgen dat de gebruiker effectief leert. Onderwerp:",
   "featureQuizMessage": "Je bent de quizmaster. Genereer een specifieke meerkeuzevraag op basis van het onderwerp van de gebruiker. Wacht op het antwoord. Evalueer het vervolgens en stel de volgende vraag. Onthul niet alle antwoorden in één keer. Houd het interactief. Onderwerp:",
@@ -546,5 +533,7 @@
   "listening": "Luistert",
   "defaultViewTitle": "Alles goed?",
   "defaultViewDescription": "Cortex staat altijd voor je klaar met honderden AI-modellen, offline mogelijkheden, dynamische chat en nog veel meer.",
-  "comingSoon": "Binnenkort beschikbaar"
+  "speakTheMessage": "Speak The Message",
+  "invalidUsernameFormat": "Ongeldig gebruikersnaamformaat. Gebruik 3-20 tekens, cijfers of een punt (.) of een underscore (_).",
+  "specialOfferBadge": "Speciale aanbieding voor nieuwe gebruikers • {time}"
 }

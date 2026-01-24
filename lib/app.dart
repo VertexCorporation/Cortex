@@ -6,6 +6,7 @@
 // - InvertedColor: small color utility variant used across the app.
 // - kUnsupportedMaterialLocales: locales with incomplete Material translations.
 
+import 'package:cortex/analytics/service.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/language.dart';
 import 'package:cortex/theme.dart';
@@ -62,6 +63,9 @@ class Cortex extends StatelessWidget {
 
     return MaterialApp(
       navigatorKey: navigatorKey,
+      navigatorObservers: <NavigatorObserver>[
+        AnalyticsService().observer,
+      ],
       theme: _buildTheme(themeProvider.currentTheme),
       builder: (BuildContext context, Widget? child) {
         try {

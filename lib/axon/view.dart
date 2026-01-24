@@ -39,7 +39,6 @@ class _AxonState extends State<Axon> {
   late final ScrollController _scrollController;
   late final TextEditingController _searchController;
   late final FocusNode _searchFocusNode;
-  late final BannerService _bannerService;
 
   bool _isSearchActive = false;
 
@@ -49,13 +48,16 @@ class _AxonState extends State<Axon> {
     _scrollController = ScrollController();
     _searchController = TextEditingController();
     _searchFocusNode = FocusNode();
-    _bannerService = BannerService();
 
     _searchFocusNode.addListener(_onSearchFocusChange);
-    _bannerService.checkAndTriggerBanner();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusManager.instance.primaryFocus?.unfocus();
+      // Trigger banner check using the Provider's BannerService.
+      if (mounted) {
+        Provider.of<BannerService>(context, listen: false)
+            .checkAndTriggerBanner();
+      }
     });
   }
 
@@ -65,8 +67,7 @@ class _AxonState extends State<Axon> {
     _searchController.dispose();
     _searchFocusNode.removeListener(_onSearchFocusChange);
     _searchFocusNode.dispose();
-    _bannerService.dispose();
-
+    // Note: BannerService is managed by Provider, not disposed here.
     super.dispose();
   }
 
@@ -103,6 +104,9 @@ class _AxonState extends State<Axon> {
 
   @override
   Widget build(BuildContext context) {
+    // Access the shared BannerService from Provider.
+    final bannerService = Provider.of<BannerService>(context, listen: false);
+
     return Material(
       color: AppColors.background,
       child: SafeArea(
@@ -119,7 +123,7 @@ class _AxonState extends State<Axon> {
           onSearchChanged: _handleSearchQueryChanged,
           onExitSearchTap: _handleExitSearchMode,
           activeTab: widget.activeTab,
-          bannerService: _bannerService,
+          bannerService: bannerService,
         ),
       ),
     );

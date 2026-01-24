@@ -96,23 +96,23 @@ class AxonContent extends StatelessWidget {
           child: isSearchActive
               ? const SizedBox(width: double.infinity, height: 0)
               : AnimatedSlide(
-            offset: isSearchActive ? const Offset(0, -0.2) : Offset.zero,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 300),
-              opacity: isSearchActive ? 0.0 : 1.0,
-              child: AxonMenu(
-                referenceWidth: referenceWidth,
-                screenHeight: screenHeight,
-                activeTab: activeTab,
-                isNewChatActive: isNewChatActive,
-                onNewChatTap: onNewChatTap,
-                onLibraryTap: onLibraryTap,
-                onNewsTap: onNewsTap,
-              ),
-            ),
-          ),
+                  offset: isSearchActive ? const Offset(0, -0.2) : Offset.zero,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 300),
+                    opacity: isSearchActive ? 0.0 : 1.0,
+                    child: AxonMenu(
+                      referenceWidth: referenceWidth,
+                      screenHeight: screenHeight,
+                      activeTab: activeTab,
+                      isNewChatActive: isNewChatActive,
+                      onNewChatTap: onNewChatTap,
+                      onLibraryTap: onLibraryTap,
+                      onNewsTap: onNewsTap,
+                    ),
+                  ),
+                ),
         ),
 
         // --- 3. DIVIDER ---
@@ -193,6 +193,10 @@ class AxonContent extends StatelessWidget {
                 child: ValueListenableBuilder<bool>(
                   valueListenable: bannerService.showInviteBannerNotifier,
                   builder: (context, showBanner, child) {
+                    // Only render the banner widget when it should be visible.
+                    if (!showBanner) {
+                      return const SizedBox.shrink();
+                    }
                     return FloatingInfoBanner(
                       isEmbedded: true,
                       referenceWidth: referenceWidth,

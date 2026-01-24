@@ -125,14 +125,6 @@
       }
     }
   },
-  "discountOffer": "{percent}% DE DESCUENTO",
-  "@discountOffer": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
   "annualPlanDescription": "{price}/mes, facturado anualmente",
   "@annualPlanDescription": {
     "description": "La descripción para el plan anual, mostrando el precio mensual equivalente para que parezca más asequible. Ejemplo: 4,17 $/mes, facturado anualmente",
@@ -199,8 +191,6 @@
   "shareMessage": "¡Echa un vistazo a la app Cortex, es increíble! Descárgala aquí: {cortexLink}",
   "shareFailed": "Error al compartir la app. Por favor, inténtalo de nuevo más tarde",
   "selectText": "Seleccionar Texto",
-  "showLatex": "Mostrar Símbolos Especiales",
-  "hideLatex": "Ocultar Símbolos Especiales",
   "thinking": "Pensando",
   "user": "Usuario",
   "help": "Ayuda",
@@ -293,7 +283,6 @@
   "removePhotoTitle": "Eliminar Foto",
   "confirmRemovePhoto": "¿Estás seguro de que quieres eliminar la foto?",
   "chatLengthLimitExceeded": "Este chat ha excedido el límite de caracteres. Por favor, inicia un nuevo chat o compra una suscripción.",
-  "photoLimitReachedMessage": "Solo se puede añadir una foto",
   "inappropriateContentDetected": "¡Contenido inapropiado detectado!",
   "offlineModelNotInstalled": "Este modelo sin conexión no está instalado en tu dispositivo.",
   "reachedLimit": "Has alcanzado tu límite; mejora tu plan para más. (hey, entendemos que es un fastidio. pero en serio, esas respuestas increíbles cuestan dinero, así que estos límites nos ayudan a que la magia siga fluuyyeeeenndao.)",
@@ -525,7 +514,6 @@
   "emulatorModeWarning": "Esta función está deshabilitada en el modo emulador.",
   "unstarConversation": "Desmarcar",
   "newChat": "Nuevo chat",
-  "howCanIHelpWith": "¿Cómo puedo ayudar?",
   "conversationDeleted": "¡Conversación eliminada!",
   "variants": "Variantes",
   "variantsDescription": "Las variantes son versiones diferentes de la misma familia de IA. Seleccionamos automáticamente la mejor al tocar la tarjeta principal, pero puedes elegir una específica manualmente aquí si lo prefieres.",
@@ -545,7 +533,6 @@
   "featureQuizPrefix": "Prueba:",
   "featureExploreDescription": "Descubre todos los modelos disponibles",
   "myPlan": "Mi plan",
-  "discountText": "¡80% de descuento en todos los planes!",
   "benefit10": "Más archivos adjuntos",
   "featureStudyMessage": "Eres un tutor experto. Tu objetivo es explicar el tema del usuario de forma exhaustiva. Utiliza una estructura clara, ejemplos y analogías. Divide las ideas complejas en partes fáciles de digerir para asegurar que el usuario aprenda eficazmente. Tema:",
   "featureQuizMessage": "Eres un experto en concursos. Genera una pregunta de opción múltiple específica basada en el tema del usuario. Espera su respuesta. Luego, evalúala y formula la siguiente pregunta. No reveles todas las respuestas a la vez. Mantén la interacción. Tema:",
@@ -556,5 +543,7 @@
   "listening": "Escuchando",
   "defaultViewTitle": "¿Qué pasa?",
   "defaultViewDescription": "Cortex siempre está a tu lado con cientos de modelos de IA, capacidades sin conexión, chat dinámico y mucho más.",
-  "comingSoon": "Muy pronto"
+  "speakTheMessage": "Speak The Message",
+  "invalidUsernameFormat": "Formato de nombre de usuario no válido. Use de 3 a 20 caracteres, dígitos o . - _",
+  "specialOfferBadge": "Oferta especial para nuevos usuarios • {time}"
 }

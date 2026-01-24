@@ -125,14 +125,6 @@
       }
     }
   },
-  "discountOffer": "{percent}% DI SCONTO",
-  "@discountOffer": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
   "monthlyPlanDescription": "{price}/mese, fatturato mensilmente",
   "@monthlyPlanDescription": {
     "description": "La descrizione del piano mensile, che mostra il prezzo al mese. Esempio: 4,99€/mese, fatturato mensilmente",
@@ -189,8 +181,6 @@
   "shareMessage": "Dai un'occhiata all'app Cortex, è fantastica! Scaricala qui: {cortexLink}",
   "shareFailed": "Impossibile condividere l'app. Riprova più tardi",
   "selectText": "Seleziona Testo",
-  "showLatex": "Mostra Simboli Speciali",
-  "hideLatex": "Nascondi Simboli Speciali",
   "thinking": "Sto pensando",
   "user": "Utente",
   "help": "Aiuto",
@@ -283,7 +273,6 @@
   "removePhotoTitle": "Rimuovi Foto",
   "confirmRemovePhoto": "Sei sicuro di voler rimuovere la foto?",
   "chatLengthLimitExceeded": "Questa chat ha superato il limite di caratteri. Inizia una nuova chat o acquista un abbonamento.",
-  "photoLimitReachedMessage": "È possibile aggiungere solo una foto",
   "inappropriateContentDetected": "Contenuto inappropriato rilevato!",
   "offlineModelNotInstalled": "Questo modello offline non è installato sul tuo dispositivo.",
   "reachedLimit": "Hai raggiunto il limite di utilizzo; per ottenere altri limiti, puoi aggiornare il tuo piano. (Ehi, capiamo perfettamente che esaurire i limiti sia una seccatura. Ma seriamente, ricevere quelle fantastiche risposte non è gratis, quindi questi limiti ci aiutano a far sì che i bei momenti continuino a scorrere.)",
@@ -515,7 +504,6 @@
   "emulatorModeWarning": "Questa funzione è disabilitata in modalità emulatore",
   "unstarConversation": "Rimuovi stella",
   "newChat": "Nuova chat",
-  "howCanIHelpWith": "Come posso aiutarti?",
   "conversationDeleted": "Conversazione eliminata!",
   "variants": "Varianti",
   "variantsDescription": "Le varianti sono versioni diverse della stessa famiglia di IA. Selezioniamo automaticamente la migliore quando tocchi la scheda principale, ma puoi sceglierne manualmente una specifica qui se preferisci!",
@@ -535,7 +523,6 @@
   "featureQuizPrefix": "Quiz:",
   "featureExploreDescription": "Scopri tutti i modelli disponibili",
   "myPlan": "Il mio piano",
-  "discountText": "Sconto dell'80% su tutti i piani!",
   "benefit10": "Altri allegati",
   "featureStudyMessage": "Sei un tutor esperto. Il tuo obiettivo è spiegare l'argomento dell'utente in modo completo. Utilizza una struttura chiara, esempi e analogie. Suddividi i concetti complessi in parti comprensibili per garantire che l'utente apprenda in modo efficace. Argomento:",
   "featureQuizMessage": "Sei un maestro dei quiz. Genera una domanda a risposta multipla specifica basata sull'argomento dell'utente. Attendi la risposta. Quindi, valutala e poni la domanda successiva. Non rivelare tutte le risposte contemporaneamente. Mantieni l'interattività. Argomento:",
@@ -546,5 +533,7 @@
   "listening": "In ascolto",
   "defaultViewTitle": "Che cosa succede?",
   "defaultViewDescription": "Cortex è sempre al tuo fianco con centinaia di modelli di intelligenza artificiale, funzionalità offline, chat dinamica e molto altro ancora.",
-  "comingSoon": "Prossimamente"
+  "speakTheMessage": "Speak The Message",
+  "invalidUsernameFormat": "Formato nome utente non valido. Utilizzare 3-20 caratteri, cifre o . - _",
+  "specialOfferBadge": "Offerta speciale per nuovi utenti • {time}"
 }

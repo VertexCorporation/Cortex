@@ -356,11 +356,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return '优惠 $percent%';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/月，按月计费';
   }
@@ -481,12 +476,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get selectText => '选择文本';
-
-  @override
-  String get showLatex => '显示特殊符号';
-
-  @override
-  String get hideLatex => '隐藏特殊符号';
 
   @override
   String get thinking => '思考中';
@@ -785,9 +774,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatLengthLimitExceeded => '此聊天已超出字符限制。请开始新的聊天或购买订阅。';
-
-  @override
-  String get photoLimitReachedMessage => '只能添加一张照片';
 
   @override
   String get inappropriateContentDetected => '检测到不当内容！';
@@ -1436,9 +1422,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get newChat => '新聊天';
 
   @override
-  String get howCanIHelpWith => '我能帮上什么忙？';
-
-  @override
   String get variants => '变体';
 
   @override
@@ -1493,7 +1476,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get myPlan => '我的计划';
 
   @override
-  String get discountText => '所有套餐享2折特惠！';
+  String specialOfferBadge(String time) {
+    return '新用户特惠 • $time';
+  }
 
   @override
   String get attachmentSheetTitle => '附件';
@@ -1518,5 +1503,11 @@ class AppLocalizationsZh extends AppLocalizations {
       'Cortex 始终伴您左右，拥有数百个 AI 模型、离线功能、动态聊天等诸多特性。';
 
   @override
-  String get comingSoon => '即将推出';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat => '用户名格式无效。请使用 3-20 个字符、数字或句点（. - _）。';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

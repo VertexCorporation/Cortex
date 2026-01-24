@@ -6,7 +6,6 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 
-
 /// Checks whether the server is currently in maintenance mode.
 ///
 /// Returns `true` if maintenance is active, otherwise `false`.
@@ -130,7 +129,7 @@ class _MaintenanceScreenState extends State<MaintenanceScreen>
         height: imageHeight,
         width: double.infinity,
         child: Image.asset(
-          'assets/neuro/unamused.png',
+          'assets/neuro/unamused.webp',
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
           color: AppColors.background,
@@ -143,9 +142,7 @@ class _MaintenanceScreenState extends State<MaintenanceScreen>
   /// Builds the main content column that sits on top of the background image.
   Widget _buildContentColumn(BuildContext context, BoxConstraints constraints) {
     final l10n = AppLocalizations.of(context)!;
-    final safeArea = MediaQuery
-        .of(context)
-        .padding;
+    final safeArea = MediaQuery.of(context).padding;
     final screenHeight = constraints.maxHeight;
 
     return Padding(
@@ -172,8 +169,8 @@ class _MaintenanceScreenState extends State<MaintenanceScreen>
   }
 
   /// Builds the "Under Maintenance" title and descriptive message.
-  Widget _buildHeader(BuildContext context, AppLocalizations l10n,
-      BoxConstraints constraints) {
+  Widget _buildHeader(
+      BuildContext context, AppLocalizations l10n, BoxConstraints constraints) {
     final screenWidth = constraints.maxWidth;
     final screenHeight = constraints.maxHeight;
 

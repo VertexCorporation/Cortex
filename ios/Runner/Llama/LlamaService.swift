@@ -21,6 +21,10 @@ class LlamaService: NSObject, FlutterPlugin {
                 result(FlutterError(code: "INVALID_ARGS", message: "Path is required", details: nil))
                 return
             }
+            
+            // Extract dynamic parameters from Dart
+            let nCtx = args["nCtx"] as? Int32 ?? 2048
+            let nThreads = args["nThreads"] as? Int32 ?? 4
 
             Task {
                 do {
@@ -29,7 +33,8 @@ class LlamaService: NSObject, FlutterPlugin {
                         self.llamaContext = nil
                     }
 
-                    self.llamaContext = try LlamaContext.create_context(path: path)
+                    // Pass dynamic parameters to context creation
+                    self.llamaContext = try LlamaContext.create_context(path: path, nCtx: nCtx, nThreads: nThreads)
 
                     DispatchQueue.main.async {
                         self.resultChannel?.invokeMethod("onModelLoaded", arguments: nil)
@@ -51,6 +56,11 @@ class LlamaService: NSObject, FlutterPlugin {
             }
 
             let photoPath = args["photoPath"] as? String
+            
+            // Extract sampler parameters from Dart (use defaults if not provided)
+            let temp = args["temp"] as? Float ?? 0.7
+            let topP = args["topP"] as? Float ?? 0.9
+            let topK = args["topK"] as? Int32 ?? 40
 
             guard let context = self.llamaContext else {
                 result(FlutterError(code: "NO_MODEL", message: "Model not loaded", details: nil))
@@ -61,6 +71,9 @@ class LlamaService: NSObject, FlutterPlugin {
 
             Task {
                 await context.clear()
+                
+                // Update sampler with Dart-provided parameters
+                await context.updateSampler(temp: temp, topP: topP, topK: topK)
 
                 if let photo = photoPath, !photo.isEmpty {
                      print("[LlamaService] Warning: Photo provided but iOS Vision support is currently implementation-pending.")

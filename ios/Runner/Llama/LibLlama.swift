@@ -94,32 +94,8 @@ actor LlamaContext {
         print("[LlamaContext] Memory released.")
     }
 
-    /// Determines generation parameters based on model file size (Heuristic).
-    private static func calculateParams(path: String) -> SamplerParams {
-        do {
-            let attr = try FileManager.default.attributesOfItem(atPath: path)
-            let fileSize = attr[FileAttributeKey.size] as? UInt64 ?? 0
-            let sizeMB = fileSize / (1024 * 1024)
-
-            print("[LlamaContext] Model size: \(sizeMB) MB")
-
-            switch sizeMB {
-            case 0...300:    return SamplerParams(temp: 0.1, topP: 1.0, topK: 1)     // Micro
-            case 301...700:  return SamplerParams(temp: 0.25, topP: 0.98, topK: 5)   // Mini
-            case 701...1400: return SamplerParams(temp: 0.40, topP: 0.92, topK: 20)  // Small
-            case 1401...3000:return SamplerParams(temp: 0.55, topP: 0.90, topK: 40)  // Medium
-            case 3001...5000:return SamplerParams(temp: 0.70, topP: 0.92, topK: 60)  // Large
-            case 5001...8000:return SamplerParams(temp: 0.80, topP: 0.94, topK: 80)  // XL
-            default:         return SamplerParams(temp: 0.90, topP: 0.95, topK: 100) // XXL+
-            }
-        } catch {
-            print("[LlamaContext] Warning: Could not check file size. Defaulting.")
-            return SamplerParams(temp: 0.7, topP: 0.9, topK: 40)
-        }
-    }
-
     /// Static Factory to create and return an actor instance
-    static func create_context(path: String) throws -> LlamaContext {
+    static func create_context(path: String, nCtx: Int32 = 2048, nThreads: Int32 = 4) throws -> LlamaContext {
         llama_backend_init()
 
         var model_params = llama_model_default_params()
@@ -137,20 +113,24 @@ actor LlamaContext {
             throw LlamaError.modelNotFound(path)
         }
 
-        // Determine optimal thread count (Performance cores usually)
-        let n_threads = max(1, min(8, ProcessInfo.processInfo.processorCount - 2))
+        // Use provided thread count or auto-detect
+        let threads = nThreads > 0 ? Int(nThreads) : max(1, min(8, ProcessInfo.processInfo.processorCount - 2))
 
         var ctx_params = llama_context_default_params()
-        ctx_params.n_ctx = 2048
-        ctx_params.n_threads = Int32(n_threads)
-        ctx_params.n_threads_batch = Int32(n_threads)
+        // DYNAMIC CONTEXT SIZE from Dart!
+        ctx_params.n_ctx = UInt32(nCtx)
+        ctx_params.n_threads = Int32(threads)
+        ctx_params.n_threads_batch = Int32(threads)
+        
+        print("[LlamaContext] Creating context with n_ctx=\(nCtx), n_threads=\(threads)")
 
         guard let context = llama_init_from_model(model, ctx_params) else {
             llama_model_free(model)
             throw LlamaError.couldNotInitializeContext
         }
 
-        let params = calculateParams(path: path)
+        // Use default params initially, will be updated per-message
+        let params = SamplerParams(temp: 0.7, topP: 0.9, topK: 40)
         return LlamaContext(model: model, context: context, params: params)
     }
 
@@ -159,13 +139,30 @@ actor LlamaContext {
     func stop() {
         self.is_interrupted = true
     }
+    
+    /// Updates the sampler with new parameters from Dart (per-message)
+    func updateSampler(temp: Float, topP: Float, topK: Int32) {
+        // Free old sampler
+        llama_sampler_free(sampling)
+        
+        // Create new sampler chain with Dart-provided params
+        let sparams = llama_sampler_chain_default_params()
+        sampling = llama_sampler_chain_init(sparams)
+        
+        // Add samplers in correct order: TopK -> TopP -> Temp -> Dist
+        llama_sampler_chain_add(sampling, llama_sampler_init_top_k(topK))
+        llama_sampler_chain_add(sampling, llama_sampler_init_top_p(topP, 1))
+        llama_sampler_chain_add(sampling, llama_sampler_init_temp(temp))
+        llama_sampler_chain_add(sampling, llama_sampler_init_dist(1234))
+        
+        print("[LlamaContext] Sampler updated: temp=\(temp), topP=\(topP), topK=\(topK)")
+    }
 
     func clear() {
-
         temporary_invalid_cchars.removeAll()
         n_cur = 0
         n_decode = 0
-        print("[LlamaContext] Context variables reset (Android Style Overwrite).")
+        print("[LlamaContext] Context variables reset.")
     }
 
     // MARK: - Generation Logic

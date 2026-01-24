@@ -1,6 +1,7 @@
 // lib/settings/controller.dart
 
 import 'dart:async';
+import 'package:cortex/analytics/service.dart';
 import 'package:cortex/settings/providers/general.dart';
 import 'package:cortex/settings/sections/anonymous.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     super.initState();
     _scrollController = ScrollController();
     WidgetsBinding.instance.addObserver(this);
+    AnalyticsService().logSettingsScreen();
     debugPrint("[SettingsScreen] Initialized and observing app lifecycle.");
   }
 

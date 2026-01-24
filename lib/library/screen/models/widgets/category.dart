@@ -110,18 +110,18 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
           : startIndex + modelsPerColumn;
 
       final List<ModelEntity> columnModels =
-      widget.models.sublist(startIndex, endIndex);
+          widget.models.sublist(startIndex, endIndex);
 
       columns.add(
         Padding(
-          padding: EdgeInsets.only(right: screenWidth * 0.001),
+          padding: EdgeInsetsDirectional.only(end: screenWidth * 0.001),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: columnModels.map((model) {
               final isDownloaded = widget.downloadedStates[model.id] ?? false;
               final manager =
-              model.isServerSide ? null : widget.downloadManagers[model.id];
+                  model.isServerSide ? null : widget.downloadManagers[model.id];
               final compatibilityStatus = isDownloaded
                   ? CompatibilityStatus.compatible
                   : widget.getCompatibilityStatus(model.size);
@@ -138,19 +138,17 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
                   HapticFeedback.mediumImpact();
                   await widget.onRemovePressed(model.id, model.displayTitle);
                 },
-                onChatPressed: () =>
-                    widget.onChatPressed(
-                      model.id,
-                      model.isServerSide,
-                      isCustomModel: model.isCustomModel,
-                      modelPath: null,
-                    ),
-                onDownloadPressed: () =>
-                    widget.onDownloadPressed(
-                      id: model.id,
-                      url: model.url,
-                      title: model.displayTitle,
-                    ),
+                onChatPressed: () => widget.onChatPressed(
+                  model.id,
+                  model.isServerSide,
+                  isCustomModel: model.isCustomModel,
+                  modelPath: null,
+                ),
+                onDownloadPressed: () => widget.onDownloadPressed(
+                  id: model.id,
+                  url: model.url,
+                  title: model.displayTitle,
+                ),
                 onCancelDownload: () => widget.onCancelDownload(model.id),
                 onResumeDownload: () => widget.onResumeDownload(model.id),
               );
@@ -168,10 +166,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
       return const SizedBox.shrink();
     }
 
-    final double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double screenWidth = MediaQuery.of(context).size.width;
     const double horizontalPaddingRatio = 0.04;
     final double sectionHPad = screenWidth * horizontalPaddingRatio;
 
@@ -196,8 +191,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
                 if (notification.overscroll < 0 &&
                     widget.onOverscrollStart != null) {
                   _triggerEdgeAction(widget.onOverscrollStart!);
-                }
-                else if (notification.overscroll > 0 &&
+                } else if (notification.overscroll > 0 &&
                     widget.onOverscrollEnd != null) {
                   _triggerEdgeAction(widget.onOverscrollEnd!);
                 }
@@ -216,14 +210,17 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
               // Padding şimdi Fog'un çocuğu oldu.
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: sectionHPad),
-                child: Transform.translate(
-                  offset: Offset(-trackShift, 0),
-                  child: PageView(
-                    clipBehavior: Clip.none,
-                    controller: _pageController,
-                    padEnds: true,
-                    physics: const ClampingScrollPhysics(),
-                    children: _buildModelColumns(context, screenWidth),
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Transform.translate(
+                    offset: Offset(-trackShift, 0),
+                    child: PageView(
+                      clipBehavior: Clip.none,
+                      controller: _pageController,
+                      padEnds: true,
+                      physics: const ClampingScrollPhysics(),
+                      children: _buildModelColumns(context, screenWidth),
+                    ),
                   ),
                 ),
               ),
@@ -242,9 +239,8 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
               screenWidth - 2 * (screenWidth * 0.04);
           final double maxDesiredWidth =
               originalContentWidth + maxExpansionInPixels;
-          final double targetWidth = (maxDesiredWidth < screenWidth)
-              ? maxDesiredWidth
-              : screenWidth;
+          final double targetWidth =
+              (maxDesiredWidth < screenWidth) ? maxDesiredWidth : screenWidth;
           final double maxTargetScale = (originalContentWidth > 0)
               ? targetWidth / originalContentWidth
               : 1.0;
@@ -279,8 +275,8 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
 
   Widget _buildHeader(double screenWidth) {
     return Padding(
-      padding: EdgeInsets.only(
-          top: screenWidth * 0.02, bottom: screenWidth * 0.01),
+      padding:
+          EdgeInsets.only(top: screenWidth * 0.02, bottom: screenWidth * 0.01),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

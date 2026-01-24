@@ -6,6 +6,7 @@ import 'dart:io';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
+import 'package:cortex/analytics/service.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -323,6 +324,16 @@ class SendService {
           debugPrint("[SendService] Failed to update recent models: $e");
         }
       }
+
+      // Log message sent event
+      final isLocalModel = !isAutoRouter &&
+          !Utils.isServerSideModel(apiModelIdForSend,
+              langCode: langCode, modelService: _modelService);
+      AnalyticsService().logMessageSent(
+        modelType: isLocalModel ? 'offline' : 'online',
+        hasAttachments: currentAttachmentPaths.isNotEmpty,
+      );
+
       return true;
     } catch (e) {
       if (e is UserCancelledException) return false;

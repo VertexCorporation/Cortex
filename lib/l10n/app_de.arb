@@ -125,14 +125,6 @@
       }
     }
   },
-  "discountOffer": "{percent}% RABATT",
-  "@discountOffer": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
   "monthlyPlanDescription": "{price}/Monat, monatliche Abrechnung",
   "@monthlyPlanDescription": {
     "description": "The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly",
@@ -189,8 +181,6 @@
   "shareMessage": "Schau dir die Cortex-App an, sie ist der Hammer! Lade sie hier herunter: {cortexLink}",
   "shareFailed": "Teilen der App fehlgeschlagen. Bitte versuche es später erneut.",
   "selectText": "Text auswählen",
-  "showLatex": "Sonderzeichen anzeigen",
-  "hideLatex": "Sonderzeichen ausblenden",
   "thinking": "Denke nach",
   "user": "Benutzer",
   "help": "Hilfe",
@@ -283,7 +273,6 @@
   "removePhotoTitle": "Foto entfernen",
   "confirmRemovePhoto": "Bist du sicher, dass du das Foto entfernen möchtest?",
   "chatLengthLimitExceeded": "Dieser Chat hat das Zeichenlimit überschritten. Bitte starte einen neuen Chat oder kaufe ein Abonnement.",
-  "photoLimitReachedMessage": "Es kann nur ein Foto hinzugefügt werden",
   "inappropriateContentDetected": "Unangemessener Inhalt erkannt!",
   "offlineModelNotInstalled": "Dieses Offline-Modell ist nicht auf deinem Gerät installiert.",
   "reachedLimit": "Du hast dein Limit erreicht; für mehr kannst du upgraden. (hey, wir verstehen, dass das nervt. aber im ernst: diese coolen antworten sind nicht umsonst, also helfen uns diese limits, den laden am laufeeeen zu haaaallten.)",
@@ -515,7 +504,6 @@
   "emulatorModeWarning": "Diese Funktion ist im Emulatormodus deaktiviert.",
   "unstarConversation": "Unstar",
   "newChat": "Neuer Chat",
-  "howCanIHelpWith": "Womit kann ich Ihnen helfen?",
   "conversationDeleted": "Konversation gelöscht!",
   "variants": "Varianten",
   "variantsDescription": "Varianten sind unterschiedliche Versionen derselben KI-Familie. Wir wählen automatisch die beste aus, wenn Sie auf die Hauptkarte tippen. Sie können hier aber auch manuell eine bestimmte Variante auswählen!",
@@ -535,7 +523,6 @@
   "featureQuizPrefix": "Quiz:",
   "featureExploreDescription": "Entdecken Sie alle verfügbaren Modelle",
   "myPlan": "Mein Plan",
-  "discountText": "80 % Rabatt auf alle Tarife!",
   "benefit10": "Weitere Anhänge",
   "featureStudyMessage": "Sie sind ein erfahrener Tutor. Ihr Ziel ist es, dem Nutzer das Thema umfassend zu erklären. Verwenden Sie eine klare Struktur, Beispiele und Analogien. Zerlegen Sie komplexe Ideen in verständliche Teile, um sicherzustellen, dass der Nutzer effektiv lernt. Thema:",
   "featureQuizMessage": "Sie sind der Quizmaster. Erstellen Sie eine passende Multiple-Choice-Frage zum Thema des Nutzers. Warten Sie auf seine Antwort. Werten Sie diese anschließend aus und stellen Sie die nächste Frage. Zeigen Sie nicht alle Antworten auf einmal an. Gestalten Sie das Quiz interaktiv. Thema:",
@@ -546,5 +533,7 @@
   "listening": "Hört zu",
   "defaultViewTitle": "Alles klar?",
   "defaultViewDescription": "Cortex steht Ihnen stets zur Seite mit Hunderten von KI-Modellen, Offline-Funktionen, dynamischem Chat und vielem mehr.",
-  "comingSoon": "Demnächst verfügbar"
+  "speakTheMessage": "Speak The Message",
+  "invalidUsernameFormat": "Ungültiges Benutzernamenformat. Verwenden Sie 3–20 Zeichen, Ziffern oder einen Punkt (. - _).",
+  "specialOfferBadge": "Sonderangebot für Neukunden • {time}"
 }

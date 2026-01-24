@@ -361,11 +361,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return '$percent% OFF';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/月、月払い';
   }
@@ -488,12 +483,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get selectText => 'テキストを選択';
-
-  @override
-  String get showLatex => '特殊記号を表示';
-
-  @override
-  String get hideLatex => '特殊記号を非表示';
 
   @override
   String get thinking => '考え中';
@@ -796,9 +785,6 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       'このチャットは文字数制限を超えました。新しいチャットを開始するか、サブスクリプションを購入してください。';
-
-  @override
-  String get photoLimitReachedMessage => '追加できる写真は1枚だけです';
 
   @override
   String get inappropriateContentDetected => '不適切なコンテンツが検出されました！';
@@ -1479,9 +1465,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get newChat => '新しいチャット';
 
   @override
-  String get howCanIHelpWith => 'どのようにお手伝いすればいいでしょうか?';
-
-  @override
   String get variants => 'バリエーション';
 
   @override
@@ -1536,7 +1519,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get myPlan => '私の計画';
 
   @override
-  String get discountText => '全プラン80%割引！';
+  String specialOfferBadge(String time) {
+    return '新規ユーザー向け特別オファー • $time';
+  }
 
   @override
   String get attachmentSheetTitle => '添付ファイル';
@@ -1561,5 +1546,12 @@ class AppLocalizationsJa extends AppLocalizations {
       'Cortex は、何百もの AI モデル、オフライン機能、ダイナミック チャットなどを備え、常にあなたのそばにいます。';
 
   @override
-  String get comingSoon => '近日公開';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat =>
+      'ユーザー名の形式が無効です。3～20文字の文字、数字、または. - _ を使用してください。';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

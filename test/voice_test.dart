@@ -37,9 +37,9 @@ class MockFlutterTts extends FlutterTts {
 
   @override
   Future<dynamic> setIosAudioCategory(IosTextToSpeechAudioCategory category,
-          List<IosTextToSpeechAudioCategoryOptions> options,
-          [IosTextToSpeechAudioMode mode =
-              IosTextToSpeechAudioMode.defaultMode]) async =>
+      List<IosTextToSpeechAudioCategoryOptions> options,
+      [IosTextToSpeechAudioMode mode =
+          IosTextToSpeechAudioMode.defaultMode]) async =>
       1;
 
   @override

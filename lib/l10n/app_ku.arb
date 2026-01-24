@@ -125,14 +125,6 @@
       }
     }
   },
-  "discountOffer": "%{percent} ERZANÎ",
-  "@discountOffer": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
   "monthlyPlanDescription": "{price}/meh, mehane tê fatûrekirin",
   "@monthlyPlanDescription": {
     "description": "Danasîna plana mehane, ku bihayê mehê nîşan dide. Mînak: 4.99$/mehê, mehane tê fatûrekirin",
@@ -189,8 +181,6 @@
   "shareMessage": "Li sepana Cortex binêre, ew pir ecêb e! Ji vir daxe: {cortexLink}",
   "shareFailed": "Parvekirina sepanê bi ser neket. Ji kerema xwe paşê dîsa biceribîne",
   "selectText": "Nivîsê Hilbijêre",
-  "showLatex": "Sembolên Taybet Nîşan bide",
-  "hideLatex": "Sembolên Taybet Veşêre",
   "thinking": "Difikire",
   "user": "Bikarhêner",
   "help": "Alîkarî",
@@ -283,7 +273,6 @@
   "removePhotoTitle": "Wêneyê Rake",
   "confirmRemovePhoto": "Tu bi rastî dixwazî wêneyê rakî?",
   "chatLengthLimitExceeded": "Vê sohbetê sînorê karakteran derbas kiriye. Ji kerema xwe sohbetek nû dest pê bike an abonetiyek bikire.",
-  "photoLimitReachedMessage": "Tenê yek wêne dikare were zêdekirin",
   "inappropriateContentDetected": "Naveroka neguncaw hat tespîtkirin!",
   "offlineModelNotInstalled": "Ev modela negirêdayî li ser amûra te nehatiye saz kirin.",
   "reachedLimit": "Te sînorê bikaranîna xwe gihandiye; ji bo ku tu sînorên zêdetir bi dest bixî, tu dikarî plana xwe nûve bikî. (hey, em bi tevahî fêm dikin ku derbasbûna ji sînoran xemgîn e. lê bi rastî, wergirtina wan bersivên ecêb ne belaş e, ji ber vê yekê ev sînor bi rastî alîkariya me dikin ku demên xweş berdewam bikin.)",
@@ -515,7 +504,6 @@
   "emulatorModeWarning": "Ev taybetmendî di moda emulatorê de neçalak e",
   "unstarConversation": "Rakirina stêrkê",
   "newChat": "Sohbeta Nû",
-  "howCanIHelpWith": "Ez çawa dikarim alîkariyê bikim?",
   "conversationDeleted": "Axaftin hat jêbirin!",
   "variants": "Guhertoyên",
   "variantsDescription": "Guherto guhertoyên cuda yên heman malbata AI ne. Dema ku hûn li ser karta sereke bitikînin, em bixweber ya çêtirîn hildibijêrin, lê heke hûn tercîh bikin, hûn dikarin li vir yeka taybetî bi destan hilbijêrin!",
@@ -535,7 +523,6 @@
   "featureQuizPrefix": "Pirskirin:",
   "featureExploreDescription": "Hemû modelên berdest bibînin",
   "myPlan": "Plana Min",
-  "discountText": "%80 Daxistin li ser hemû planan!",
   "benefit10": "Pêvekên Zêdetir",
   "featureStudyMessage": "Tu mamosteyekî pispor î. Armanca te ew e ku mijara bikarhêner bi awayekî berfireh rave bikî. Avahiyek zelal, mînak û analojiyan bi kar bîne. Ramanên tevlihev parçe bike nav beşên hêsan da ku bikarhêner bi bandor fêr bibe. Mijar:",
   "featureQuizMessage": "Tu pisporê quizê yî. Li gorî mijara bikarhêner pirsek pir-bijartî ya taybetî çêbike. Li benda bersiva wan be. Piştre, wê binirxîne û pirsa din bipirse. Hemû bersivên xwe di carekê de eşkere neke. Wê înteraktîf bihêle. Mijar:",
@@ -546,5 +533,7 @@
   "listening": "Guhdarî dike",
   "defaultViewTitle": "Çi heye?",
   "defaultViewDescription": "Cortex bi sedan modelên AI, kapasîteyên negirêdayî, sohbeta dînamîk û gelek tiştên din her gav li kêleka we ye.",
-  "comingSoon": "Hema têm"
+  "speakTheMessage": "Speak The Message",
+  "invalidUsernameFormat": "Formata navê bikarhêner nederbasdar e. 3-20 tîp, reqem, an jî . bikar bîne. - _",
+  "specialOfferBadge": "Pêşniyara Taybet a Bikarhênerê Nû • {time}"
 }

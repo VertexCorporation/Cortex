@@ -2,7 +2,6 @@ import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:cortex/notifications/introvert.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,8 +10,11 @@ import 'package:provider/provider.dart';
 import '../../../../../internet.dart';
 import '../../../../../library/backend/data/service.dart';
 import '../../../../../theme.dart';
+
 import '../../../../services/select.dart';
 import '../../../../services/speech.dart';
+import '../../../../services/voice.dart'; // [NEW]
+import '../../../../services/send.dart'; // [NEW]
 
 import '../panels/attachments/sheet.dart';
 import '../panels/features/sheet.dart';
@@ -146,7 +148,7 @@ class ActionButtonWidget extends StatelessWidget {
           curve: Curves.easeOut,
           child: showMic
               ? Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
+                  padding: const EdgeInsetsDirectional.only(end: 8.0),
                   child: _ToolCircleButton(
                     size: buttonSize,
                     onTap: () async {
@@ -264,30 +266,17 @@ class ActionButtonWidget extends StatelessWidget {
 
   Widget _buildVoiceChatButton(BuildContext context, double size) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         HapticFeedback.lightImpact();
 
-        // Disable Voice Chat and show Coming Soon
-        final localizations = AppLocalizations.of(context)!;
-        Provider.of<IntrovertNotificationService>(context, listen: false)
-            .showNotification(
-          message: localizations.comingSoon,
-          type: NotificationType.neutral,
-          // Neutral notification
-          bottomOffset: 0.22,
-          fontSize: 0.032,
-          isChatMode: true,
-        );
-
-        /* 
-        // Original Voice Logic (Commented Out)
         final voiceService = context.read<VoiceService>();
         final session = context.read<ChatSessionProvider>();
         final inputProvider = context.read<InputProvider>();
         final sendService = context.read<SendService>();
+        final localizations = AppLocalizations.of(context)!;
         final localeCode = session.getLocale().languageCode;
 
-        // Activate UI mode
+        // Activate UI mode (triggers Overlay)
         inputProvider.setVoiceModeActive(true);
 
         // Start Voice Session
@@ -303,7 +292,6 @@ class ActionButtonWidget extends StatelessWidget {
             }
           },
         );
-        */
       },
       child: Container(
         width: size,

@@ -794,12 +794,6 @@ abstract class AppLocalizations {
   /// **'Purchase {planName}'**
   String purchasePlan(String planName);
 
-  /// No description provided for @discountOffer.
-  ///
-  /// In en, this message translates to:
-  /// **'{percent}% OFF'**
-  String discountOffer(int percent);
-
   /// The description for the monthly plan, showing the price per month. Example: $4.99/mo, billed monthly
   ///
   /// In en, this message translates to:
@@ -1033,18 +1027,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Text'**
   String get selectText;
-
-  /// No description provided for @showLatex.
-  ///
-  /// In en, this message translates to:
-  /// **'Show Special Symbols'**
-  String get showLatex;
-
-  /// No description provided for @hideLatex.
-  ///
-  /// In en, this message translates to:
-  /// **'Hide Special Symbols'**
-  String get hideLatex;
 
   /// No description provided for @thinking.
   ///
@@ -1627,12 +1609,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This chat has exceeded the character limit. Please start a new chat or purchase a subscription.'**
   String get chatLengthLimitExceeded;
-
-  /// No description provided for @photoLimitReachedMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Only one photo can be added'**
-  String get photoLimitReachedMessage;
 
   /// No description provided for @inappropriateContentDetected.
   ///
@@ -2829,12 +2805,6 @@ abstract class AppLocalizations {
   /// **'New Chat'**
   String get newChat;
 
-  /// No description provided for @howCanIHelpWith.
-  ///
-  /// In en, this message translates to:
-  /// **'How can I help with?'**
-  String get howCanIHelpWith;
-
   /// No description provided for @variants.
   ///
   /// In en, this message translates to:
@@ -2937,11 +2907,11 @@ abstract class AppLocalizations {
   /// **'My Plan'**
   String get myPlan;
 
-  /// No description provided for @discountText.
+  /// No description provided for @specialOfferBadge.
   ///
   /// In en, this message translates to:
-  /// **'%80 Discount on all plans!'**
-  String get discountText;
+  /// **'Welcome Special Offer • {time}'**
+  String specialOfferBadge(String time);
 
   /// No description provided for @attachmentSheetTitle.
   ///
@@ -2985,11 +2955,23 @@ abstract class AppLocalizations {
   /// **'Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.'**
   String get defaultViewDescription;
 
-  /// No description provided for @comingSoon.
+  /// No description provided for @speakTheMessage.
   ///
   /// In en, this message translates to:
-  /// **'Coming Soon'**
-  String get comingSoon;
+  /// **'Speak The Message'**
+  String get speakTheMessage;
+
+  /// No description provided for @invalidUsernameFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid username format. Use 3-20 chars, digits, or . - _'**
+  String get invalidUsernameFormat;
+
+  /// No description provided for @exclusiveOffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Exclusive Offer'**
+  String get exclusiveOffer;
 }
 
 class _AppLocalizationsDelegate

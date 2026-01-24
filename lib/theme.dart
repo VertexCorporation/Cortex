@@ -29,10 +29,12 @@ class ThemeProvider extends ChangeNotifier {
 
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-        systemNavigationBarColor: themeColors.navigationBarColor,
-        statusBarColor: themeColors.statusBarColor,
-        systemNavigationBarIconBrightness: themeColors
-            .navigationBarIconBrightness,
+        systemNavigationBarColor:
+            Colors.transparent, // Enforce transparent for Edge-to-Edge
+        systemNavigationBarDividerColor: Colors.transparent,
+        statusBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness:
+            themeColors.navigationBarIconBrightness,
         statusBarIconBrightness: themeColors.statusBarIconBrightness,
       ),
     );
@@ -248,8 +250,7 @@ class AppColors {
   static Color get premium => getThemeColors(currentTheme).premium;
 
   static Map<String, Map<String, dynamic>> get overlayStyles {
-    return themeDefinitions.map((key, value) =>
-        MapEntry(
+    return themeDefinitions.map((key, value) => MapEntry(
           key,
           {
             'navigationBarColor': value.navigationBarColor,
@@ -260,8 +261,7 @@ class AppColors {
         ));
   }
 
-  static List<Color> get animatedBorderGradientColors =>
-      [
+  static List<Color> get animatedBorderGradientColors => [
         Colors.red,
         Colors.orange,
         Colors.yellow,

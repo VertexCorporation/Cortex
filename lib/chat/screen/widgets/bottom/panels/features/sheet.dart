@@ -60,11 +60,7 @@ void showFeaturesSheet({
         decoration: BoxDecoration(
           color: AppColors.background,
           borderRadius: BorderRadius.vertical(top: Radius.circular(topRadius)),
-          border: Border(
-            top: BorderSide(color: AppColors.border, width: 1.0),
-            left: BorderSide(color: AppColors.border, width: 1.0),
-            right: BorderSide(color: AppColors.border, width: 1.0),
-          ),
+          // Border removed - now on individual buttons
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -101,13 +97,9 @@ void showFeaturesSheet({
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 padding: EdgeInsets.only(
-                    bottom: MediaQuery
-                        .of(context)
-                        .padding
-                        .bottom + 20),
+                    bottom: MediaQuery.of(context).padding.bottom + 20),
                 child: Column(
                   children: [
-
                     // 1. USE OFFLINE
                     FeaturesSheetButton(
                       iconPath: 'assets/icons/context.svg',
@@ -118,7 +110,6 @@ void showFeaturesSheet({
                         _handleOfflineAction(context, l10n);
                       },
                     ),
-                    _buildDivider(),
 
                     // 2. CREATE IMAGE (Make)
                     FeaturesSheetButton(
@@ -129,13 +120,9 @@ void showFeaturesSheet({
                       onTap: () {
                         Navigator.pop(context);
                         _handleCreateImageAction(
-                            context,
-                            imageGenModels,
-                            controller
-                        );
+                            context, imageGenModels, controller);
                       },
                     ),
-                    _buildDivider(),
 
                     // 3. STUDY & LEARN
                     FeaturesSheetButton(
@@ -147,7 +134,6 @@ void showFeaturesSheet({
                         _handleFeatureSelection(context, ChatInputMode.study);
                       },
                     ),
-                    _buildDivider(),
 
                     // 4. QUIZZES
                     FeaturesSheetButton(
@@ -159,7 +145,6 @@ void showFeaturesSheet({
                         _handleFeatureSelection(context, ChatInputMode.quiz);
                       },
                     ),
-                    _buildDivider(),
 
                     // 5. EXPLORE (Google Fonts Eye Icon)
                     FeaturesSheetButton(
@@ -173,14 +158,13 @@ void showFeaturesSheet({
                         showModelSelectionSheet(
                           context: context,
                           localizations: l10n,
-                          currentModelId: context
-                              .read<ChatSessionProvider>()
-                              .modelId ?? '',
+                          currentModelId:
+                              context.read<ChatSessionProvider>().modelId ?? '',
                           onModelSelected: (String id) {
-                            final catalog = context.read<
-                                ModelCatalogProvider>();
-                            final model = catalog.allModels.firstWhere((m) =>
-                            m.id == id);
+                            final catalog =
+                                context.read<ModelCatalogProvider>();
+                            final model =
+                                catalog.allModels.firstWhere((m) => m.id == id);
                             context.read<SelectionService>().selectModel(model);
                           },
                         );
@@ -198,17 +182,6 @@ void showFeaturesSheet({
 }
 
 // --- LOGIC HELPERS ---
-
-Widget _buildDivider() {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-    child: Divider(
-      height: 1,
-      thickness: 1,
-      color: AppColors.border.withValues(alpha: 0.5),
-    ),
-  );
-}
 
 /// Logic for "Use Offline": Checks downloaded models, opens selector or library.
 void _handleOfflineAction(BuildContext context, AppLocalizations l10n) {
@@ -239,14 +212,16 @@ void _handleOfflineAction(BuildContext context, AppLocalizations l10n) {
 }
 
 /// Logic for "Create Image": Selects best model, sends prompt if available.
-void _handleCreateImageAction(BuildContext context,
-    List<ModelEntity> candidates,
-    TextEditingController controller,) {
+void _handleCreateImageAction(
+  BuildContext context,
+  List<ModelEntity> candidates,
+  TextEditingController controller,
+) {
   if (candidates.isEmpty) return;
 
   // Priority: Non-Premium (Free) first, otherwise Premium.
   final ModelEntity targetModel = candidates.firstWhere(
-        (m) => !m.isPremium,
+    (m) => !m.isPremium,
     orElse: () => candidates.first,
   );
 
@@ -257,10 +232,10 @@ void _handleCreateImageAction(BuildContext context,
   final String currentText = controller.text.trim();
   if (currentText.isNotEmpty) {
     context.read<SendService>().sendMessage(
-      context: context,
-      localizations: AppLocalizations.of(context)!,
-      messageText: currentText,
-    );
+          context: context,
+          localizations: AppLocalizations.of(context)!,
+          messageText: currentText,
+        );
     // Clear controller handled by SendService usually, but safe to clear here if needed logic differs
   }
 }

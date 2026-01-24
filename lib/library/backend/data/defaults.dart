@@ -4,7 +4,6 @@
 // Separating this data from the service layer keeps the logic clean and readable.
 
 class ModelDefaults {
-
   /// A map of predefined local asset paths for common models, structured by matching priority.
   /// The matching logic will check these in order:
   /// 1. Exact ID matches for specific models.
@@ -14,36 +13,36 @@ class ModelDefaults {
   static final Map<String, String> localAssetImageMap = {
     // --- PRIORITY 1: EXACT MODEL IDS ---
     // Use this for specific models that need a unique image, overriding any family/producer rule.
-    'neuro': 'assets/characters/neuro.jpg',
+    'neuro': 'assets/characters/neuro.webp',
     'jannano128k': 'assets/models/jannano128k.jpg',
     'gptneox': 'assets/models/gptneox.jpg',
     'supernova-medius': 'assets/producers/arceeai.jpg',
     'hermes-2-pro-mistral-7b': 'assets/models/hermes.jpg',
 
     // All roleplay characters are treated as exact IDs.
-    'teacher': 'assets/characters/teacher.jpg',
-    'doctor': 'assets/characters/doctor.jpg',
-    'animegirl': 'assets/characters/animegirl.jpg',
-    'astronaut': 'assets/characters/astronaut.jpg',
-    'psychologist': 'assets/characters/psychologist.jpg',
-    'gamer': 'assets/characters/gamer.jpg',
-    'hacker': 'assets/characters/hacker.jpg',
-    'athlete': 'assets/characters/athlete.jpg',
-    'trash': 'assets/characters/trash.jpg',
-    'tree': 'assets/characters/tree.jpg',
-    'chef': 'assets/characters/chef.jpg',
-    'lawyer': 'assets/characters/lawyer.jpg',
-    'engineer': 'assets/characters/engineer.jpg',
-    'crazy': 'assets/characters/crazy.jpg',
-    'baby': 'assets/characters/baby.jpg',
-    'police': 'assets/characters/police.jpg',
-    'scientist': 'assets/characters/scientist.jpg',
-    'dj': 'assets/characters/dj.jpg',
-    'lover': 'assets/characters/lover.jpg',
-    'shaver': 'assets/characters/shaver.jpg',
-    'detective': 'assets/characters/detective.jpg',
-    'grandmother': 'assets/characters/grandmother.jpg',
-    'miner': 'assets/characters/miner.jpg',
+    'teacher': 'assets/characters/teacher.webp',
+    'doctor': 'assets/characters/doctor.webp',
+    'animegirl': 'assets/characters/animegirl.webp',
+    'astronaut': 'assets/characters/astronaut.webp',
+    'psychologist': 'assets/characters/psychologist.webp',
+    'gamer': 'assets/characters/gamer.webp',
+    'hacker': 'assets/characters/hacker.webp',
+    'athlete': 'assets/characters/athlete.webp',
+    'trash': 'assets/characters/trash.webp',
+    'tree': 'assets/characters/tree.webp',
+    'chef': 'assets/characters/chef.webp',
+    'lawyer': 'assets/characters/lawyer.webp',
+    'engineer': 'assets/characters/engineer.webp',
+    'crazy': 'assets/characters/crazy.webp',
+    'baby': 'assets/characters/baby.webp',
+    'police': 'assets/characters/police.webp',
+    'scientist': 'assets/characters/scientist.webp',
+    'dj': 'assets/characters/dj.webp',
+    'lover': 'assets/characters/lover.webp',
+    'shaver': 'assets/characters/shaver.webp',
+    'detective': 'assets/characters/detective.webp',
+    'grandmother': 'assets/characters/grandmother.webp',
+    'miner': 'assets/characters/miner.webp',
 
     // --- PRIORITY 2: MODEL FAMILIES / SERIES ---
     // These keys will match if a model's ID *contains* them. Longer keys are prioritized.
@@ -150,23 +149,109 @@ class ModelDefaults {
 
     // Localized Descriptions
     'description': {
-      'en': 'Cortex intelligently analyzes your request and activates the most capable AI model available to provide the best possible answer.',
-      'tr': 'Cortex, isteğinizi analiz eder ve en iyi cevabı sunmak için mevcut en yetenekli yapay zeka modelini devreye sokar.',
-      'ku': 'Cortex daxwaza we bi awayekî aqilmend analîz dike û modela AI ya herî jêhatî çalak dike da ku bersiva herî baş bide.',
-      'es': 'Cortex analiza inteligentemente tu solicitud y activa el modelo de IA más capaz disponible para dar la mejor respuesta.',
-      'fr': 'Cortex analyse intelligemment votre demande et active le modèle d\'IA le plus performant pour fournir la meilleure réponse.',
-      'de': 'Cortex analysiert Ihre Anfrage intelligent und aktiviert das fähigste verfügbare KI-Modell, um die bestmögliche Antwort zu geben.',
-      'it': 'Cortex analizza intelligentemente la tua richiesta e attiva il modello AI più capace disponibile per fornire la migliore risposta.',
-      'pt': 'O Cortex analisa inteligentemente seu pedido e ativa o modelo de IA mais capaz disponível para fornecer a melhor resposta.',
-      'ru': 'Cortex анализирует ваш запрос и активирует самую мощную доступную модель ИИ для предоставления наилучшего ответа.',
+      'en':
+          'Cortex intelligently analyzes your request and activates the most capable AI model available to provide the best possible answer.',
+      'tr':
+          'Cortex, isteğinizi analiz eder ve en iyi cevabı sunmak için mevcut en yetenekli yapay zeka modelini devreye sokar.',
+      'ku':
+          'Cortex daxwaza we bi awayekî aqilmend analîz dike û modela AI ya herî jêhatî çalak dike da ku bersiva herî baş bide.',
+      'es':
+          'Cortex analiza inteligentemente tu solicitud y activa el modelo de IA más capaz disponible para dar la mejor respuesta.',
+      'fr':
+          'Cortex analyse intelligemment votre demande et active le modèle d\'IA le plus performant pour fournir la meilleure réponse.',
+      'de':
+          'Cortex analysiert Ihre Anfrage intelligent und aktiviert das fähigste verfügbare KI-Modell, um die bestmögliche Antwort zu geben.',
+      'it':
+          'Cortex analizza intelligentemente la tua richiesta e attiva il modello AI più capace disponibile per fornire la migliore risposta.',
+      'pt':
+          'O Cortex analisa inteligentemente seu pedido e ativa o modelo de IA mais capaz disponível para fornecer a melhor resposta.',
+      'ru':
+          'Cortex анализирует ваш запрос и активирует самую мощную доступную модель ИИ для предоставления наилучшего ответа.',
       'zh': 'Cortex 智能分析您的请求，并激活现有的最强 AI 模型以提供最佳答案。',
       'ja': 'Cortexはリクエストをインテリジェントに分析し、利用可能な最も高性能なAIモデルを起動して最適な回答を提供します。',
       'ko': 'Cortex는 귀하의 요청을 지능적으로 분석하고 가장 뛰어난 AI 모델을 활성화하여 최상의 답변을 제공합니다.',
-      'ar': 'يقوم Cortex بتحليل طلبك بذكاء وتنشيط نموذج الذكاء الاصطناعي الأكثر قدرة لتقديم أفضل إجابة ممكنة.',
-      'hi': 'Cortex आपके अनुरोध का बुद्धिमानी से विश्लेषण करता है और सर्वोत्तम संभव उत्तर प्रदान करने के लिए सबसे सक्षम AI मॉडल को सक्रिय करता है।',
-      'id': 'Cortex menganalisis permintaan Anda dengan cerdas dan mengaktifkan model AI paling mumpuni yang tersedia untuk memberikan jawaban terbaik.',
-      'nl': 'Cortex analyseert uw verzoek intelligent en activeert het meest capabele AI-model dat beschikbaar is om het best mogelijke antwoord te geven.',
-      'pl': 'Cortex inteligentnie analizuje Twoje żądanie i aktywuje najlepszy dostępny model AI, aby zapewnić najlepszą możliwą odpowiedź.',
-    },
+      'ar':
+          'يقوم Cortex بتحليل طلبك بذكاء وتنشيط نموذج الذكاء الاصطناعي الأكثر قدرة لتقديم أفضل إجابة ممكنة.',
+      'hi':
+          'Cortex आपके अनुरोध का बुद्धिमानी से विश्लेषण करता है और सर्वोत्तम संभव उत्तर प्रदान करने के लिए सबसे सक्षम AI मॉडल को सक्रिय करता है।',
+      'id':
+          'Cortex menganalisis permintaan Anda dengan cerdas dan mengaktifkan model AI paling mumpuni yang tersedia untuk memberikan jawaban terbaik.',
+    }
   };
+
+  // --- CHAT FORMAT TEMPLATES ---
+
+  static const Map<String, dynamic> _chatmlFormat = {
+    'template': 'chatml',
+    'tokens': {
+      'system_start': '<|im_start|>system\n',
+      'system_end': '<|im_end|>\n',
+      'user_start': '<|im_start|>user\n',
+      'user_end': '<|im_end|>\n',
+      'assistant_start': '<|im_start|>assistant\n',
+      'assistant_end': '<|im_end|>\n',
+      'stop_generation': ['<|im_end|>', '<|endoftext|>'],
+    }
+  };
+
+  static const Map<String, dynamic> _llama3Format = {
+    'template': 'llama3',
+    'tokens': {
+      'system_start':
+          '<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n',
+      'system_end': '<|eot_id|>',
+      'user_start': '<|start_header_id|>user<|end_header_id|>\n\n',
+      'user_end': '<|eot_id|>',
+      'assistant_start': '<|start_header_id|>assistant<|end_header_id|>\n\n',
+      'assistant_end': '<|eot_id|>',
+      'stop_generation': ['<|eot_id|>', '<|end_of_text|>'],
+    }
+  };
+
+  static const Map<String, dynamic> _gemmaFormat = {
+    'template': 'gemma',
+    'tokens': {
+      'user_start': '<start_of_turn>user\n',
+      'user_end': '<end_of_turn>\n',
+      'assistant_start': '<start_of_turn>model\n',
+      'assistant_end': '<end_of_turn>\n',
+      'stop_generation': ['<end_of_turn>', '<eos>'],
+    }
+  };
+
+  static const Map<String, dynamic> _phi3Format = {
+    'template': 'phi3',
+    'tokens': {
+      'system_start': '<|system|>\n',
+      'system_end': '<|end|>\n',
+      'user_start': '<|user|>\n',
+      'user_end': '<|end|>\n',
+      'assistant_start': '<|assistant|>\n',
+      'assistant_end': '<|end|>\n',
+      'stop_generation': ['<|end|>', '<|endoftext|>'],
+    }
+  };
+
+  /// Returns a smart fallback format based on the model ID.
+  /// If the ID matches a known family (Llama 3, Gemma, etc.), returns that specific format.
+  /// Otherwise, returns ChatML as the safest general default.
+  static Map<String, dynamic> getFallbackFormat(String modelId) {
+    final id = modelId.toLowerCase();
+
+    if (id.contains('llama-3') || id.contains('llama3')) {
+      return _llama3Format;
+    }
+    if (id.contains('gemma')) {
+      return _gemmaFormat;
+    }
+    if (id.contains('phi-3') || id.contains('phi3')) {
+      return _phi3Format;
+    }
+
+    // Default to ChatML for Qwen, Mistral, and others as they often support it or are fine-tuned on it.
+    return _chatmlFormat;
+  }
+
+  /// Expose generic ChatML for backward compatibility/direct usage
+  static const Map<String, dynamic> defaultChatFormat = _chatmlFormat;
 }

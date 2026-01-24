@@ -21,7 +21,16 @@ import '../../../notifications/introvert.dart';
 import 'change.dart';
 import 'item.dart';
 
-enum MessageOption { copy, report, regenerate, select, stop, changeModel, edit }
+enum MessageOption {
+  copy,
+  report,
+  regenerate,
+  select,
+  stop,
+  changeModel,
+  edit,
+  speak
+}
 
 const Duration _kShortAnimationDuration = Duration(milliseconds: 100);
 const Duration _kLongAnimationDuration = Duration(milliseconds: 200);
@@ -56,9 +65,18 @@ class OptionsPanelViewModel {
 
   List<MessageOption> get _baseOptions {
     if (message.isUserMessage) {
-      return [MessageOption.copy, MessageOption.edit, MessageOption.select];
+      return [
+        MessageOption.copy,
+        MessageOption.edit,
+        MessageOption.select,
+        MessageOption.speak
+      ];
     } else {
-      final options = [MessageOption.copy, MessageOption.select];
+      final options = [
+        MessageOption.copy,
+        MessageOption.select,
+        MessageOption.speak
+      ];
       if (!message.isError) {
         options.addAll([MessageOption.regenerate, MessageOption.changeModel]);
         if (!message.isReported) {
@@ -156,6 +174,7 @@ class AnimatedMessageOptionsPanel extends StatefulWidget {
   final void Function({String? newModelId})? onRegenerate;
   final VoidCallback? onStop;
   final VoidCallback? onEdit;
+  final VoidCallback? onSpeak;
 
   const AnimatedMessageOptionsPanel({
     super.key,
@@ -167,6 +186,7 @@ class AnimatedMessageOptionsPanel extends StatefulWidget {
     this.onRegenerate,
     this.onStop,
     this.onEdit,
+    this.onSpeak,
   });
 
   @override
@@ -397,6 +417,15 @@ class _AnimatedMessageOptionsPanelState
                                 onTap: () {
                                   _dismissPanel();
                                   widget.onEdit?.call();
+                                },
+                                borderRadius: borderRadius);
+                          case MessageOption.speak:
+                            return OptionPanelItem(
+                                label: localizations.speakTheMessage,
+                                iconAsset: 'assets/icons/voice.svg',
+                                onTap: () {
+                                  _dismissPanel();
+                                  widget.onSpeak?.call();
                                 },
                                 borderRadius: borderRadius);
                         }

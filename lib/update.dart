@@ -115,7 +115,7 @@ class _UpdateRequiredScreenState extends State<UpdateRequiredScreen>
         height: imageHeight,
         width: double.infinity,
         child: Image.asset(
-          'assets/neuro/yum.png',
+          'assets/neuro/yum.webp',
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
           color: AppColors.background,
@@ -133,9 +133,7 @@ class _UpdateRequiredScreenState extends State<UpdateRequiredScreen>
     appInitializer.configureUpgrader(l10n);
     final upgrader = appInitializer.upgrader;
 
-    final safeArea = MediaQuery
-        .of(context)
-        .padding;
+    final safeArea = MediaQuery.of(context).padding;
     final screenHeight = constraints.maxHeight;
 
     return Padding(
@@ -170,8 +168,8 @@ class _UpdateRequiredScreenState extends State<UpdateRequiredScreen>
   }
 
   /// Builds the "Update Required" title and descriptive message.
-  Widget _buildHeader(BuildContext context, AppLocalizations l10n,
-      BoxConstraints constraints) {
+  Widget _buildHeader(
+      BuildContext context, AppLocalizations l10n, BoxConstraints constraints) {
     final screenWidth = constraints.maxWidth;
     final screenHeight = constraints.maxHeight;
     final titleFontSize = (screenWidth * 0.07).clamp(26.0, 42.0);

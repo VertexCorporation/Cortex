@@ -125,14 +125,6 @@
       }
     }
   },
-  "discountOffer": "优惠 {percent}%",
-  "@discountOffer": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
   "monthlyPlanDescription": "{price}/月，按月计费",
   "@monthlyPlanDescription": {
     "description": "月度计划的描述，显示每月价格。例如：$4.99/月，按月计费",
@@ -189,8 +181,6 @@
   "shareMessage": "快来看看 Cortex 应用，它太棒了！在这里下载：{cortexLink}",
   "shareFailed": "分享应用失败。请稍后再试",
   "selectText": "选择文本",
-  "showLatex": "显示特殊符号",
-  "hideLatex": "隐藏特殊符号",
   "thinking": "思考中",
   "user": "用户",
   "help": "帮助",
@@ -283,7 +273,6 @@
   "removePhotoTitle": "移除照片",
   "confirmRemovePhoto": "您确定要移除照片吗？",
   "chatLengthLimitExceeded": "此聊天已超出字符限制。请开始新的聊天或购买订阅。",
-  "photoLimitReachedMessage": "只能添加一张照片",
   "inappropriateContentDetected": "检测到不当内容！",
   "offlineModelNotInstalled": "此离线模型未安装在您的设备上。",
   "reachedLimit": "您的使用量已达上限；如需获得更多限额，您可以升级套餐。（嘿，我们完全理解限额用完很扫兴。但说真的，获得那些精彩的回复可不是免费的，所以这些限额实际上有助于我们继续提供优质服务。）",
@@ -515,7 +504,6 @@
   "emulatorModeWarning": "此功能在模拟器模式下禁用。",
   "unstarConversation": "不星",
   "newChat": "新聊天",
-  "howCanIHelpWith": "我能帮上什么忙？",
   "conversationDeleted": "对话已删除！",
   "variants": "变体",
   "variantsDescription": "变体是同一人工智能家族的不同版本。当您点击主卡片时，我们会自动选择最佳版本，但如果您愿意，也可以在此处手动选择特定版本！",
@@ -535,7 +523,6 @@
   "featureQuizPrefix": "测验：",
   "featureExploreDescription": "探索所有可用型号",
   "myPlan": "我的计划",
-  "discountText": "所有套餐享2折特惠！",
   "benefit10": "更多附件",
   "featureStudyMessage": "您是一位资深导师。您的目标是全面深入地讲解用户感兴趣的主题。请使用清晰的结构、丰富的示例和类比。将复杂的概念分解成易于理解的部分，以确保用户能够高效学习。主题：",
   "featureQuizMessage": "您是一位出题人。请根据用户选择的主题生成一道选择题。等待用户作答。然后，评估答案并提出下一题。不要一次性显示所有答案。保持互动性。主题：",
@@ -546,5 +533,7 @@
   "listening": "正在听",
   "defaultViewTitle": "最近怎么样？",
   "defaultViewDescription": "Cortex 始终伴您左右，拥有数百个 AI 模型、离线功能、动态聊天等诸多特性。",
-  "comingSoon": "即将推出"
+  "speakTheMessage": "Speak The Message",
+  "invalidUsernameFormat": "用户名格式无效。请使用 3-20 个字符、数字或句点（. - _）。",
+  "specialOfferBadge": "新用户特惠 • {time}"
 }

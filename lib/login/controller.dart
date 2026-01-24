@@ -1,5 +1,6 @@
 // lib/login/controller.dart
 
+import 'package:cortex/analytics/service.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/webview.dart';
 import 'package:flutter/material.dart';
@@ -66,17 +67,24 @@ class LoginController extends ChangeNotifier {
   /// The `context` is used only for the initial setup and is not stored.
   void initialize(TickerProvider vsync, BuildContext context) {
     _backendService = LoginBackendService();
-    _notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+    _notificationService =
+        Provider.of<IntrovertNotificationService>(context, listen: false);
 
     const duration300 = Duration(milliseconds: 300);
     const shakeDuration = Duration(milliseconds: 500);
 
-    mainAnimationController = AnimationController(vsync: vsync, duration: duration300);
-    loginEmailShakeController = AnimationController(vsync: vsync, duration: shakeDuration);
-    loginPasswordShakeController = AnimationController(vsync: vsync, duration: shakeDuration);
-    registerUsernameShakeController = AnimationController(vsync: vsync, duration: shakeDuration);
-    registerEmailShakeController = AnimationController(vsync: vsync, duration: shakeDuration);
-    registerPasswordShakeController = AnimationController(vsync: vsync, duration: shakeDuration);
+    mainAnimationController =
+        AnimationController(vsync: vsync, duration: duration300);
+    loginEmailShakeController =
+        AnimationController(vsync: vsync, duration: shakeDuration);
+    loginPasswordShakeController =
+        AnimationController(vsync: vsync, duration: shakeDuration);
+    registerUsernameShakeController =
+        AnimationController(vsync: vsync, duration: shakeDuration);
+    registerEmailShakeController =
+        AnimationController(vsync: vsync, duration: shakeDuration);
+    registerPasswordShakeController =
+        AnimationController(vsync: vsync, duration: shakeDuration);
   }
 
   @override
@@ -112,7 +120,10 @@ class LoginController extends ChangeNotifier {
   /// Clears any displayed server-side errors. Typically called when the user
   /// starts typing in a field again after a failed submission.
   void clearErrorsOnInput() {
-    if (_loginEmailError != null || _registerUsernameError != null || _registerEmailError != null || _registerPasswordError != null) {
+    if (_loginEmailError != null ||
+        _registerUsernameError != null ||
+        _registerEmailError != null ||
+        _registerPasswordError != null) {
       _clearServerErrors();
       notifyListeners();
     }
@@ -136,7 +147,8 @@ class LoginController extends ChangeNotifier {
   }
 
   /// Handles the login submission logic. Requires a fresh `BuildContext` from the UI.
-  Future<void> submitLogin(BuildContext context, String email, String password, bool rememberMe) async {
+  Future<void> submitLogin(BuildContext context, String email, String password,
+      bool rememberMe) async {
     _clearServerErrors();
     _setLoading(true);
 
@@ -153,27 +165,34 @@ class LoginController extends ChangeNotifier {
 
     switch (result) {
       case LoginSuccess():
+        AnalyticsService().logLoginSuccess('email');
         break;
       case LoginInvalidCredentials():
         _loginEmailError = l10n.invalidCredentials;
-        _loginPasswordError = ' '; // Prevents default validator but shows field as invalid.
+        _loginPasswordError =
+            ' '; // Prevents default validator but shows field as invalid.
         loginEmailShakeController.forward(from: 0);
         loginPasswordShakeController.forward(from: 0);
+        AnalyticsService().logLoginFailure('email', 'invalid_credentials');
         break;
       case LoginUserDisabled():
         _loginEmailError = l10n.userDisabled;
         loginEmailShakeController.forward(from: 0);
+        AnalyticsService().logLoginFailure('email', 'user_disabled');
         break;
       case LoginNetworkError():
+        AnalyticsService().logLoginFailure('email', 'network_error');
+        break;
       case LoginUnknownError():
-      // Do nothing, the service has already shown a notification.
+        AnalyticsService().logLoginFailure('email', 'unknown_error');
         break;
     }
     _setLoading(false);
   }
 
   /// Handles the registration submission logic. Requires a fresh `BuildContext` from the UI.
-  Future<void> submitRegister(BuildContext context, String username, String email, String password) async {
+  Future<void> submitRegister(BuildContext context, String username,
+      String email, String password) async {
     if (_isLoading) return;
 
     _clearServerErrors();
@@ -192,22 +211,33 @@ class LoginController extends ChangeNotifier {
 
     switch (result) {
       case RegistrationSuccess():
+        AnalyticsService().logRegisterSuccess('email');
         break;
       case RegistrationUsernameTaken():
         _registerUsernameError = l10n.usernameTaken;
         registerUsernameShakeController.forward(from: 0);
+        AnalyticsService().logRegisterFailure('email', 'username_taken');
+        break;
+      case RegistrationInvalidUsername():
+        _registerUsernameError = l10n.invalidUsernameFormat;
+        registerUsernameShakeController.forward(from: 0);
+        AnalyticsService().logRegisterFailure('email', 'invalid_username');
         break;
       case RegistrationEmailInUse():
         _registerEmailError = l10n.emailAlreadyInUse;
         registerEmailShakeController.forward(from: 0);
+        AnalyticsService().logRegisterFailure('email', 'email_in_use');
         break;
       case RegistrationWeakPassword():
         _registerPasswordError = l10n.weakPassword;
         registerPasswordShakeController.forward(from: 0);
+        AnalyticsService().logRegisterFailure('email', 'weak_password');
         break;
       case RegistrationNetworkError():
+        AnalyticsService().logRegisterFailure('email', 'network_error');
+        break;
       case RegistrationUnknownError():
-      // The service has already shown a notification.
+        AnalyticsService().logRegisterFailure('email', 'unknown_error');
         break;
     }
     _setLoading(false);
@@ -225,10 +255,12 @@ class LoginController extends ChangeNotifier {
 
     if (!(context.mounted)) return;
 
-    switch(result) {
+    switch (result) {
       case GoogleSignInSuccess():
+        AnalyticsService().logLoginSuccess('google');
         break;
       case GoogleSignInFailure():
+        AnalyticsService().logLoginFailure('google', 'sign_in_failed');
         break;
     }
     _setLoading(false);
@@ -251,9 +283,14 @@ class LoginController extends ChangeNotifier {
 
     switch (result) {
       case AnonymousSignInSuccess():
+        AnalyticsService().logLoginSuccess('anonymous');
         break;
       case AnonymousSignInNetworkError():
+        AnalyticsService().logLoginFailure('anonymous', 'network_error');
+        _setLoading(false);
+        break;
       case AnonymousSignInFailure():
+        AnalyticsService().logLoginFailure('anonymous', 'sign_in_failed');
         _setLoading(false);
         break;
     }
@@ -271,19 +308,20 @@ class LoginController extends ChangeNotifier {
 
     if (!(context.mounted)) return;
 
-    switch(result) {
+    switch (result) {
       case AppleSignInSuccess():
-      // Logic handled in backend (sync token, etc.), UI will react to auth state change.
+        AnalyticsService().logLoginSuccess('apple');
         break;
       case AppleSignInFailure():
-      // Error notification handled in backend.
+        AnalyticsService().logLoginFailure('apple', 'sign_in_failed');
         break;
     }
     _setLoading(false);
   }
 
   /// Handles the upgrade (linking) submission logic.
-  Future<void> submitUpgrade(BuildContext context, String username, String email, String password) async {
+  Future<void> submitUpgrade(BuildContext context, String username,
+      String email, String password) async {
     if (_isLoading) return;
 
     _clearServerErrors();
@@ -312,12 +350,15 @@ class LoginController extends ChangeNotifier {
           Navigator.of(context).pop();
           _notificationService.showNotification(
               message: l10n.accountLinkedSuccess,
-              type: NotificationType.success
-          );
+              type: NotificationType.success);
         }
         break;
       case RegistrationUsernameTaken():
         _registerUsernameError = l10n.usernameTaken;
+        registerUsernameShakeController.forward(from: 0);
+        break;
+      case RegistrationInvalidUsername():
+        _registerUsernameError = l10n.invalidUsernameFormat;
         registerUsernameShakeController.forward(from: 0);
         break;
       case RegistrationEmailInUse():
