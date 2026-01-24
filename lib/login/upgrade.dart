@@ -16,7 +16,8 @@ class UpgradeAccountScreen extends StatefulWidget {
   State<UpgradeAccountScreen> createState() => _UpgradeAccountScreenState();
 }
 
-class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with TickerProviderStateMixin {
+class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
+    with TickerProviderStateMixin {
   late final LoginController _controller;
 
   @override
@@ -59,30 +60,40 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
       padding: EdgeInsets.symmetric(vertical: 10 * fontScale),
       child: Row(
         children: [
-          Expanded(child: Divider(color: Theme.of(context).dividerColor, thickness: 1)),
+          Expanded(child: Divider(color: Theme
+              .of(context)
+              .dividerColor, thickness: 1)),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12 * fontScale),
             child: Text(
               l10n.or,
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyLarge?.color,
+                color: Theme
+                    .of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.color,
                 fontSize: 14 * fontScale,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          Expanded(child: Divider(color: Theme.of(context).dividerColor, thickness: 1)),
+          Expanded(child: Divider(color: Theme
+              .of(context)
+              .dividerColor, thickness: 1)),
         ],
       ),
     );
   }
 
-  Widget _buildSocialButtons(AppLocalizations l10n, double screenHeight, double fontScale) {
+  Widget _buildSocialButtons(AppLocalizations l10n, double screenHeight,
+      double fontScale) {
     final bool isTermsAccepted = _controller.agreeToTerms;
     final bool isDisabled = _controller.isLoading || !isTermsAccepted;
 
     final buttonPadding = EdgeInsets.symmetric(vertical: 14 * fontScale);
-    final buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(10 * fontScale));
+    final buttonShape = RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10 * fontScale));
 
     final ButtonStyle elegantButtonStyle = ElevatedButton.styleFrom(
       backgroundColor: AppColors.background,
@@ -94,7 +105,7 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
       padding: buttonPadding,
       shape: buttonShape,
       elevation: 0,
-      side: BorderSide(color: AppColors.quinaryColor.withValues(alpha:0.3)),
+      side: BorderSide(color: AppColors.quinaryColor.withValues(alpha: 0.3)),
     );
 
     return AnimatedOpacity(
@@ -113,7 +124,8 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                 icon: Icon(Icons.apple, size: 24 * fontScale),
                 label: Text(
                   l10n.continueWithApple,
-                  style: TextStyle(fontSize: 16 * fontScale, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      fontSize: 16 * fontScale, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -132,7 +144,8 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                   children: [
                     SvgPicture.asset(
                       'assets/icons/google.svg',
-                      colorFilter: ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+                      colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted, BlendMode.srcIn),
                       width: 16 * fontScale,
                       height: 16 * fontScale,
                     ),
@@ -159,8 +172,14 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     // --- SCALING LOGIC ---
     double fontScale = screenWidth / 375.0;
@@ -194,13 +213,17 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                         usernameError: _controller.registerUsernameError,
                         emailError: _controller.registerEmailError,
                         passwordError: _controller.registerPasswordError,
-                        usernameShakeController: _controller.registerUsernameShakeController,
-                        emailShakeController: _controller.registerEmailShakeController,
-                        passwordShakeController: _controller.registerPasswordShakeController,
+                        usernameShakeController: _controller
+                            .registerUsernameShakeController,
+                        emailShakeController: _controller
+                            .registerEmailShakeController,
+                        passwordShakeController: _controller
+                            .registerPasswordShakeController,
                         fontScale: fontScale,
                         onInputChanged: _controller.clearErrorsOnInput,
                         onSubmit: (username, email, password) =>
-                            _controller.submitUpgrade(context, username, email, password),
+                            _controller.submitUpgrade(
+                                context, username, email, password),
                       ),
 
                       // B) Divider
@@ -212,7 +235,8 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                       // D) Terms Checkbox
                       SizedBox(height: 16 * fontScale),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4.0 * fontScale),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 4.0 * fontScale),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -225,7 +249,11 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                                   child: Text(
                                     l10n.iHaveReadAndAgree,
                                     style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                                      color: Theme
+                                          .of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.color,
                                       fontSize: 13.0 * fontScale,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -241,11 +269,14 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen> with Ticker
                               width: 24 * fontScale,
                               child: Checkbox(
                                 value: _controller.agreeToTerms,
-                                onChanged: (bool? value) => _controller.toggleAgreeToTerms(),
+                                onChanged: (bool? value) =>
+                                    _controller.toggleAgreeToTerms(),
                                 checkColor: AppColors.primaryColor,
                                 activeColor: AppColors.primaryColor.inverted,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4)),
+                                materialTapTargetSize: MaterialTapTargetSize
+                                    .shrinkWrap,
                               ),
                             ),
                           ],

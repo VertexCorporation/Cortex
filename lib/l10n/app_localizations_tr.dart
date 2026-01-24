@@ -630,7 +630,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String confirmRemoveModel(Object model) {
-    return '$model modelini cihazınızdan kaldırmak istediğinizden emin misiniz? Bu işlem, o modelle olan önceki tüm sohbetleri de silecektir.';
+    return 'Cihazınızdan $model modelini kaldırmak istediğinizden emin misiniz? Bunu yaptığınızda, o modelle yapılan önceki tüm konuşmalar da silinecektir.';
   }
 
   @override
@@ -1598,4 +1598,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get exclusiveOffer => 'Özel Teklif';
+
+  @override
+  String get continueInOfflineMode => 'Çevrimdışı Modda Devam Et';
 }

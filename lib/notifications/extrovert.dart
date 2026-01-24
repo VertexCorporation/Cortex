@@ -803,7 +803,7 @@ class ExtrovertNotificationService {
         DateTime.fromMillisecondsSinceEpoch(firstOpenTime);
         if (now
             .difference(firstOpenDate)
-            .inHours < 48) {
+            .inHours < 47) {
           final scheduledDateTime = now.add(const Duration(hours: 1));
           await _scheduleWelcomeNotification(scheduledDateTime);
           return;

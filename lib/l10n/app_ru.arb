@@ -537,5 +537,6 @@
   "exclusiveOfferBadge": "Эксклюзивное предложение • {time}",
   "exclusiveOffer": "Эксклюзивное предложение",
   "notificationWelcomeOfferTitle": "Приветственный подарок 🎁",
-  "notificationWelcomeOfferBody": "Вас ждёт специальное приветственное предложение! Не упустите эту эксклюзивную возможность."
+  "notificationWelcomeOfferBody": "Вас ждёт специальное приветственное предложение! Не упустите эту эксклюзивную возможность.",
+  "continueInOfflineMode": "Продолжить в автономном режиме"
 }

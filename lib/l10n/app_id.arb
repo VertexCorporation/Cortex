@@ -537,5 +537,6 @@
   "exclusiveOfferBadge": "Penawaran Eksklusif • {time}",
   "exclusiveOffer": "Penawaran Eksklusif",
   "notificationWelcomeOfferTitle": "Hadiah Selamat Datang 🎁",
-  "notificationWelcomeOfferBody": "Penawaran sambutan spesial menanti Anda! Jangan lewatkan penawaran eksklusif ini."
+  "notificationWelcomeOfferBody": "Penawaran sambutan spesial menanti Anda! Jangan lewatkan penawaran eksklusif ini.",
+  "continueInOfflineMode": "Lanjutkan dalam Mode Offline"
 }

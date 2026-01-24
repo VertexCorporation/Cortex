@@ -636,7 +636,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'Weet je zeker dat je het $model model van je apparaat wilt verwijderen? Hiermee worden ook alle eerdere gesprekken met dat model verwijderd.';
+    return 'Weet je zeker dat je het model $model van je apparaat wilt verwijderen? Als je dit doet, worden ook alle eerdere gesprekken met dat model verwijderd.';
   }
 
   @override
@@ -1612,4 +1612,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get exclusiveOffer => 'Exclusieve aanbieding';
+
+  @override
+  String get continueInOfflineMode => 'Continue in Offline Mode';
 }

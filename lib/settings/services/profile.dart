@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 class ProfileException implements Exception {
   /// A machine-readable error code (e.g., 'already-exists', 'not-found').
   final String code;
+
   ProfileException(this.code);
 
   @override
@@ -45,8 +46,10 @@ class ProfileService {
     FirebaseFirestore? firestore,
     FirebaseFunctions? functions,
     FirebaseAuth? auth,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'europe-west1'),
+  })
+      : _firestore = firestore ?? FirebaseFirestore.instance,
+        _functions = functions ??
+            FirebaseFunctions.instanceFor(region: 'europe-west1'),
         _auth = auth ?? FirebaseAuth.instance;
 
   String _getCurrentUserId() {
@@ -79,7 +82,8 @@ class ProfileService {
       final callable = _functions.httpsCallable('updateUsername');
       await callable.call({'newUsername': newUsername});
     } on FirebaseFunctionsException catch (e) {
-      debugPrint("ProfileService: Cloud Function error updating username: ${e.code} - ${e.message}");
+      debugPrint("ProfileService: Cloud Function error updating username: ${e
+          .code} - ${e.message}");
       // Propagate the specific error code for the ViewModel to handle localization.
       throw ProfileException(e.code);
     }
@@ -88,9 +92,11 @@ class ProfileService {
   Future<void> incrementVerificationAttempts() async {
     final uid = _getCurrentUserId();
     try {
-      await _firestore.collection('users').doc(uid).update({'verifyAttempts': FieldValue.increment(1)});
+      await _firestore.collection('users').doc(uid).update(
+          {'verifyAttempts': FieldValue.increment(1)});
     } catch (e) {
-      debugPrint("ProfileService: Error incrementing verification attempts: $e");
+      debugPrint(
+          "ProfileService: Error incrementing verification attempts: $e");
       // This is a non-critical error, so we don't throw to the UI.
     }
   }
@@ -102,7 +108,9 @@ class ProfileService {
       final callable = _functions.httpsCallable('redeemCreatorCode');
       await callable.call({'code': code});
     } on FirebaseFunctionsException catch (e) {
-      debugPrint("ProfileService: Cloud Function error redeeming code: ${e.code} - ${e.message}");
+      debugPrint(
+          "ProfileService: Cloud Function error redeeming code: ${e.code} - ${e
+              .message}");
       // Propagate the specific error code for the ViewModel to handle localization.
       throw ProfileException(e.code);
     }
@@ -115,7 +123,9 @@ class ProfileService {
       final callable = _functions.httpsCallable('requestAccountDeletion');
       await callable.call();
     } on FirebaseFunctionsException catch (e) {
-      debugPrint("ProfileService: Cloud Function error requesting account deletion: ${e.code} - ${e.message}");
+      debugPrint(
+          "ProfileService: Cloud Function error requesting account deletion: ${e
+              .code} - ${e.message}");
       throw ProfileUnknownException();
     }
   }

@@ -615,7 +615,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String confirmRemoveModel(Object model) {
-    return '您确定要从您的设备中移除 $model 模型吗？这样做也将删除与该模型的任何先前对话。';
+    return '您确定要从设备中移除 $model 型号吗？这样做也会删除之前与该型号的所有对话记录。';
   }
 
   @override
@@ -1513,4 +1513,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exclusiveOffer => '独家优惠';
+
+  @override
+  String get continueInOfflineMode => 'Continue in Offline Mode';
 }

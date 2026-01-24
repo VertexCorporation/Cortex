@@ -632,7 +632,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String confirmRemoveModel(Object model) {
-    return '$model modelini cihazınızdan silmək istədiyinizə əminsinizmi? Bu əməliyyat həmin model ilə olan bütün əvvəlki söhbətləri də siləcək.';
+    return 'Cihazınızdan $model modelini silmək istədiyinizə əminsiniz? Bunu etmək həmin modellə əvvəlki söhbətləri də siləcək.';
   }
 
   @override
@@ -1601,4 +1601,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get exclusiveOffer => 'Eksklüziv Təklif';
+
+  @override
+  String get continueInOfflineMode => 'Continue in Offline Mode';
 }

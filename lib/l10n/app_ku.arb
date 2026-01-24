@@ -537,5 +537,6 @@
   "exclusiveOfferBadge": "Pêşniyara Taybet • {time}",
   "exclusiveOffer": "Pêşniyara Taybet",
   "notificationWelcomeOfferTitle": "Diyariya Bi Xêrhatinê 🎁",
-  "notificationWelcomeOfferBody": "Pêşniyareke taybet a pêşwaziyê li benda we ye! Vê peymana taybet ji dest xwe bernedin."
+  "notificationWelcomeOfferBody": "Pêşniyareke taybet a pêşwaziyê li benda we ye! Vê peymana taybet ji dest xwe bernedin.",
+  "continueInOfflineMode": "Bi Moda Offline Berdewam Bike"
 }

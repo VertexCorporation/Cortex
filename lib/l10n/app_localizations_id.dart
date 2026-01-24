@@ -635,7 +635,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'Apakah Anda yakin ingin menghapus model $model dari perangkat Anda? Melakukannya juga akan menghapus percakapan sebelumnya dengan model tersebut.';
+    return 'Apakah Anda yakin ingin menghapus model $model dari perangkat Anda? Dengan melakukan itu, semua percakapan sebelumnya dengan model tersebut juga akan terhapus.';
   }
 
   @override
@@ -1609,4 +1609,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get exclusiveOffer => 'Penawaran Eksklusif';
+
+  @override
+  String get continueInOfflineMode => 'Continue in Offline Mode';
 }

@@ -7,9 +7,19 @@ import 'dart:async';
 /// A dedicated ChangeNotifier to manage and provide internet connectivity state.
 class InternetProvider with ChangeNotifier {
   late final StreamSubscription<bool> _subscription;
+  bool _forceOffline = false;
   bool _isConnected = true; // Assume connected initially (Optimistic UI).
 
-  bool get isConnected => _isConnected;
+  bool get isConnected => _forceOffline ? false : _isConnected;
+
+  /// Forces the app to behave as if it's offline.
+  /// Used for maintenance mode bypass.
+  void setForceOffline(bool value) {
+    if (_forceOffline != value) {
+      _forceOffline = value;
+      notifyListeners();
+    }
+  }
 
   InternetProvider() {
     _initialize();
@@ -24,10 +34,19 @@ class InternetProvider with ChangeNotifier {
     _subscription = InternetService().onConnectivityChanged.listen((status) {
       if (_isConnected != status) {
         _isConnected = status;
+        // Only notify if we are NOT in forced offline mode.
+        // If forced offline, isConnected remains false regardless of real status.
+        // But we should still notify if the *real* status changes?
+        // Actually, if we are forced offline, isConnected is always false.
+        // So a change in _isConnected implementation detail shouldn't fire a notification
+        // if the public getter result doesn't change?
+        // But ChangeNotifier usually just notifies. Consumers check the value.
+        // If _forceOffline is true, isConnected returns false.
+        // If _isConnected flips true->false, isConnected is still false.
+        // So technically no change.
         notifyListeners();
       }
     });
-
   }
 
   /// --- NEW METHOD ---
@@ -71,7 +90,8 @@ class InternetService {
 
         // Only log significant changes to keep logs clean
         if (kDebugMode) {
-          debugPrint("[Connectivity] Status changed to: ${connected ? 'ONLINE' : 'OFFLINE'}");
+          debugPrint(
+              "[Connectivity] Status changed to: ${connected ? 'ONLINE' : 'OFFLINE'}");
         }
       }
     });

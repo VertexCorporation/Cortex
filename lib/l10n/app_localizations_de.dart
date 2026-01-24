@@ -637,7 +637,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'Bist du sicher, dass du das Modell $model von deinem Gerät entfernen möchtest? Dadurch werden auch alle früheren Unterhaltungen mit diesem Modell gelöscht.';
+    return 'Möchten Sie das Modell $model wirklich von Ihrem Gerät entfernen? Dadurch werden auch alle vorherigen Konversationen mit diesem Modell gelöscht.';
   }
 
   @override
@@ -1619,4 +1619,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get exclusiveOffer => 'Exklusives Angebot';
+
+  @override
+  String get continueInOfflineMode => 'Continue in Offline Mode';
 }

@@ -39,8 +39,14 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     // --- FINAL SCALING LOGIC ---
     // 1. Phones (width < 450): Scale is close to 1.0. Keeps the compact look.
@@ -89,10 +95,11 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                     passwordError: _controller.loginPasswordError,
                     emailShakeController: _controller.loginEmailShakeController,
                     passwordShakeController:
-                        _controller.loginPasswordShakeController,
+                    _controller.loginPasswordShakeController,
                     fontScale: fontScale,
-                    onSubmit: (email, password, rememberMe) => _controller
-                        .submitLogin(context, email, password, rememberMe),
+                    onSubmit: (email, password, rememberMe) =>
+                        _controller
+                            .submitLogin(context, email, password, rememberMe),
                     onForgotPassword: () =>
                         _controller.launchResetPasswordURL(context),
                     onInputChanged: _controller.clearErrorsOnInput,
@@ -105,14 +112,15 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                     emailError: _controller.registerEmailError,
                     passwordError: _controller.registerPasswordError,
                     usernameShakeController:
-                        _controller.registerUsernameShakeController,
+                    _controller.registerUsernameShakeController,
                     emailShakeController:
-                        _controller.registerEmailShakeController,
+                    _controller.registerEmailShakeController,
                     passwordShakeController:
-                        _controller.registerPasswordShakeController,
+                    _controller.registerPasswordShakeController,
                     fontScale: fontScale,
-                    onSubmit: (username, email, password) => _controller
-                        .submitRegister(context, username, email, password),
+                    onSubmit: (username, email, password) =>
+                        _controller
+                            .submitRegister(context, username, email, password),
                     onInputChanged: _controller.clearErrorsOnInput,
                   ),
                 ),
@@ -134,12 +142,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                   alignment: Alignment.topCenter,
                   child: _controller.authMode == AuthMode.register
                       ? Column(
-                          children: [
-                            SizedBox(height: 12 * fontScale),
-                            _buildTermsAndConditions(
-                                l10n, fontScale, screenHeight),
-                          ],
-                        )
+                    children: [
+                      SizedBox(height: 12 * fontScale),
+                      _buildTermsAndConditions(
+                          l10n, fontScale, screenHeight),
+                    ],
+                  )
                       : const SizedBox.shrink(),
                 ),
 
@@ -160,8 +168,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
 
   // --- Common UI Widgets ---
 
-  Widget _buildGuestLoginButton(
-      AppLocalizations l10n, double fontScale, double screenHeight) {
+  Widget _buildGuestLoginButton(AppLocalizations l10n, double fontScale,
+      double screenHeight) {
     // No "isRegisterMode" check. It is now always visible.
     // No "checkbox" requirement. It is frictionless.
 
@@ -177,12 +185,16 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
             onPressed: _controller.isLoading
                 ? null
                 : () {
-                    HapticFeedback.lightImpact();
-                    _controller.submitAnonymousLogin(context);
-                  },
+              HapticFeedback.lightImpact();
+              _controller.submitAnonymousLogin(context);
+            },
             style: TextButton.styleFrom(
               // Simple text style, no background
-              foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
+              foregroundColor: Theme
+                  .of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.color,
               padding: EdgeInsets.zero,
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -224,27 +236,35 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       children: [
         Expanded(
             child: Divider(
-                color: Theme.of(context).dividerColor,
+                color: Theme
+                    .of(context)
+                    .dividerColor,
                 thickness: 1 * fontScale)),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8 * fontScale),
           child: Text(
             l10n.or,
             style: TextStyle(
-                color: Theme.of(context).textTheme.bodyLarge?.color,
+                color: Theme
+                    .of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.color,
                 fontSize: 16 * fontScale),
           ),
         ),
         Expanded(
             child: Divider(
-                color: Theme.of(context).dividerColor,
+                color: Theme
+                    .of(context)
+                    .dividerColor,
                 thickness: 1 * fontScale)),
       ],
     );
   }
 
-  Widget _buildSocialButtons(
-      AppLocalizations l10n, double screenHeight, double fontScale) {
+  Widget _buildSocialButtons(AppLocalizations l10n, double screenHeight,
+      double fontScale) {
     final isRegisterMode = _controller.authMode == AuthMode.register;
     final isDisabled =
         _controller.isLoading || (isRegisterMode && !_controller.agreeToTerms);
@@ -329,8 +349,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildTermsAndConditions(
-      AppLocalizations l10n, double fontScale, double screenHeight) {
+  Widget _buildTermsAndConditions(AppLocalizations l10n, double fontScale,
+      double screenHeight) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10.0 * fontScale),
       child: Row(
@@ -348,7 +368,11 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 child: Text(
                   l10n.iHaveReadAndAgree,
                   style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                      color: Theme
+                          .of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.color,
                       fontSize: 12.6 * fontScale),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -382,7 +406,11 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
               : l10n.alreadyHaveAccount,
           style: TextStyle(
               fontSize: 16 * fontScale,
-              color: Theme.of(context).textTheme.bodyLarge?.color),
+              color: Theme
+                  .of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.color),
         ),
         TextButton(
           onPressed: () {

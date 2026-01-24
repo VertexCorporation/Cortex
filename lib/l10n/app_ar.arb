@@ -537,5 +537,6 @@
   "exclusiveOfferBadge": "عرض حصري • {time}",
   "exclusiveOffer": "عرض حصري",
   "notificationWelcomeOfferTitle": "هدية ترحيبية 🎁",
-  "notificationWelcomeOfferBody": "عرض ترحيبي مميز بانتظارك! لا تفوت هذه الصفقة الحصرية."
+  "notificationWelcomeOfferBody": "عرض ترحيبي مميز بانتظارك! لا تفوت هذه الصفقة الحصرية.",
+  "continueInOfflineMode": "متابعة في وضع عدم الاتصال"
 }

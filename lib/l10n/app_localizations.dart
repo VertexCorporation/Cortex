@@ -2978,6 +2978,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exclusive Offer'**
   String get exclusiveOffer;
+
+  /// No description provided for @continueInOfflineMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue in Offline Mode'**
+  String get continueInOfflineMode;
 }
 
 class _AppLocalizationsDelegate

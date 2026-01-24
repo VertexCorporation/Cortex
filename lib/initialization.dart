@@ -153,6 +153,18 @@ class AppInitializer with ChangeNotifier {
     }
   }
 
+  /// Forces the app into offline mode and re-evaluates the user flow.
+  /// This allows users to bypass the maintenance screen.
+  Future<void> bypassMaintenanceMode() async {
+    debugPrint(
+        "[AppInitializer] Bypassing maintenance mode (forcing offline)...");
+    _internetProvider.setForceOffline(true);
+    // Give a small delay to ensure the provider notifies listeners (though likely synchronous)
+    // and for the UI to potentially react if needed, but mainly to ensure state consistency.
+    await Future.delayed(const Duration(milliseconds: 100));
+    await _determineUserFlow();
+  }
+
   void requestEmailVerification({
     required String email,
     required String userId,

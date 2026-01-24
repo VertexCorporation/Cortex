@@ -537,5 +537,6 @@
   "exclusiveOfferBadge": "특별 할인 • {time}",
   "exclusiveOffer": "특별 혜택",
   "notificationWelcomeOfferTitle": "환영 선물 🎁",
-  "notificationWelcomeOfferBody": "특별한 환영 혜택이 기다리고 있습니다! 이 특별한 기회를 놓치지 마세요."
+  "notificationWelcomeOfferBody": "특별한 환영 혜택이 기다리고 있습니다! 이 특별한 기회를 놓치지 마세요.",
+  "continueInOfflineMode": "오프라인 모드에서 계속하기"
 }
