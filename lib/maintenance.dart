@@ -142,7 +142,9 @@ class _MaintenanceScreenState extends State<MaintenanceScreen>
   /// Builds the main content column that sits on top of the background image.
   Widget _buildContentColumn(BuildContext context, BoxConstraints constraints) {
     final l10n = AppLocalizations.of(context)!;
-    final safeArea = MediaQuery.of(context).padding;
+    final safeArea = MediaQuery
+        .of(context)
+        .padding;
     final screenHeight = constraints.maxHeight;
 
     return Padding(
@@ -157,24 +159,24 @@ class _MaintenanceScreenState extends State<MaintenanceScreen>
         children: [
           // This Spacer pushes the content down, helping to center it vertically
           // in the space *above* the background image.
-          const Spacer(flex: 3),
+          const Spacer(flex: 2),
 
           _buildHeader(context, l10n, constraints),
 
-          SizedBox(height: screenHeight * 0.05),
+          SizedBox(height: screenHeight * 0.04),
 
           _buildContinueButton(context, l10n, constraints),
 
           // This Spacer takes up the remaining space, completing the centering effect.
-          const Spacer(flex: 4),
+          const Spacer(flex: 6),
         ],
       ),
     );
   }
 
   /// Builds the "Under Maintenance" title and descriptive message.
-  Widget _buildHeader(
-      BuildContext context, AppLocalizations l10n, BoxConstraints constraints) {
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n,
+      BoxConstraints constraints) {
     final screenWidth = constraints.maxWidth;
     final screenHeight = constraints.maxHeight;
 
@@ -208,8 +210,8 @@ class _MaintenanceScreenState extends State<MaintenanceScreen>
     );
   }
 
-  Widget _buildContinueButton(
-      BuildContext context, AppLocalizations l10n, BoxConstraints constraints) {
+  Widget _buildContinueButton(BuildContext context, AppLocalizations l10n,
+      BoxConstraints constraints) {
     return TextButton(
       onPressed: () {
         context.read<AppInitializer>().bypassMaintenanceMode();

@@ -1588,5 +1588,5 @@ class AppLocalizationsAr extends AppLocalizations {
   String get exclusiveOffer => 'عرض حصري';
 
   @override
-  String get continueInOfflineMode => 'Continue in Offline Mode';
+  String get continueInOfflineMode => 'متابعة في وضع عدم الاتصال';
 }

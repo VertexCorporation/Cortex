@@ -1612,5 +1612,5 @@ class AppLocalizationsRu extends AppLocalizations {
   String get exclusiveOffer => 'Эксклюзивное предложение';
 
   @override
-  String get continueInOfflineMode => 'Continue in Offline Mode';
+  String get continueInOfflineMode => 'Продолжить в автономном режиме';
 }

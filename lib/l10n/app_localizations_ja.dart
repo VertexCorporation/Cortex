@@ -1560,5 +1560,5 @@ class AppLocalizationsJa extends AppLocalizations {
   String get exclusiveOffer => '限定オファー';
 
   @override
-  String get continueInOfflineMode => 'Continue in Offline Mode';
+  String get continueInOfflineMode => 'オフラインモードで続行';
 }

@@ -1603,5 +1603,5 @@ class AppLocalizationsAz extends AppLocalizations {
   String get exclusiveOffer => 'Eksklüziv Təklif';
 
   @override
-  String get continueInOfflineMode => 'Continue in Offline Mode';
+  String get continueInOfflineMode => 'Oflayn Rejimdə Davam Edin';
 }

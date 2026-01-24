@@ -128,7 +128,8 @@ class AppInitializer with ChangeNotifier {
     required IntrovertNotificationService introvertNotificationService,
     required InternetProvider internetProvider,
     required UserProvider userProvider,
-  })  : _status = initialStatus,
+  })
+      : _status = initialStatus,
         _authService = authService,
         _modelService = modelService,
         _extrovertNotificationService = extrovertNotificationService,
@@ -252,7 +253,7 @@ class AppInitializer with ChangeNotifier {
       await remoteConfig.fetchAndActivate();
 
       final String minRequiredVersion =
-          remoteConfig.getString('min_required_version');
+      remoteConfig.getString('min_required_version');
 
       if (minRequiredVersion.isNotEmpty) {
         final packageInfo = await PackageInfo.fromPlatform();
@@ -284,7 +285,7 @@ class AppInitializer with ChangeNotifier {
 
       // Normalize lengths (e.g. 2.9 vs 2.9.1)
       final length =
-          [currParts.length, reqParts.length].reduce((a, b) => a > b ? a : b);
+      [currParts.length, reqParts.length].reduce((a, b) => a > b ? a : b);
       for (int i = 0; i < length; i++) {
         final int c = i < currParts.length ? currParts[i] : 0;
         final int r = i < reqParts.length ? reqParts[i] : 0;
@@ -399,7 +400,8 @@ class AppInitializer with ChangeNotifier {
           e.code == 'user-token-expired' ||
           e.code == 'user-disabled') {
         dev.log(
-            "[AppInitializer] Remote verification failed (${e.code}). Logging out.");
+            "[AppInitializer] Remote verification failed (${e
+                .code}). Logging out.");
         await signOut();
       }
     } catch (e) {
@@ -413,8 +415,12 @@ class AppInitializer with ChangeNotifier {
   /// Returns `true` and updates the app status if maintenance is active,
   /// otherwise returns `false`.
   Future<bool> _checkServerStatus() async {
-    final bool isMaintenance =
-        kDebugMode ? false : await checkMaintenanceMode();
+    // If we are offline (or forced offline), we shouldn't be blocked by server maintenance.
+    if (!_internetProvider.isConnected) {
+      return false;
+    }
+
+    final bool isMaintenance = kDebugMode ? true : await checkMaintenanceMode();
 
     if (isMaintenance) {
       _updateStatus(AppStatus.maintenance);
@@ -449,7 +455,7 @@ class AppInitializer with ChangeNotifier {
           user == null) {
         debugPrint(
           'Auth State Listener: Offline and in ready state. '
-          'Ignoring null user from auth stream to maintain session.',
+              'Ignoring null user from auth stream to maintain session.',
         );
         return;
       }
@@ -697,9 +703,9 @@ class AppInitializer with ChangeNotifier {
             break;
 
           default:
-            // D. UNKNOWN FIREBASE ERRORS
-            // If we don't know what it is, but it's NOT a network glitch,
-            // it's safer to log it and sign out to prevent stuck states.
+          // D. UNKNOWN FIREBASE ERRORS
+          // If we don't know what it is, but it's NOT a network glitch,
+          // it's safer to log it and sign out to prevent stuck states.
             debugPrint(
                 "[_determineUserFlow] Unhandled Firebase Error: $code. Signing out.");
             FirebaseCrashlytics.instance
@@ -732,7 +738,9 @@ class AppInitializer with ChangeNotifier {
     final pow = 1 << attempt; // 1,2,4,8...
     final ms = (baseMs * pow).clamp(baseMs, maxMs);
     final jitter = (ms * 0.2).toInt();
-    final actual = ms + (DateTime.now().microsecond % (jitter * 2)) - jitter;
+    final actual = ms + (DateTime
+        .now()
+        .microsecond % (jitter * 2)) - jitter;
     return Duration(milliseconds: actual);
   }
 
@@ -757,7 +765,7 @@ class AppInitializer with ChangeNotifier {
     for (int i = 0; i < maxRetries; i++) {
       debugPrint(
         "[_waitForUserDocument] Attempt ${i + 1}/$maxRetries to find user "
-        "document for UID: $uid",
+            "document for UID: $uid",
       );
 
       try {
@@ -796,7 +804,7 @@ class AppInitializer with ChangeNotifier {
         if (_isRetryableFirestoreError(e)) {
           debugPrint(
             "[_waitForUserDocument] Retryable Firestore error ${e.code}; "
-            "backing off and retrying.",
+                "backing off and retrying.",
           );
           DocumentSnapshot<Map<String, dynamic>>? cached;
           try {
@@ -811,7 +819,7 @@ class AppInitializer with ChangeNotifier {
           if (cached?.exists == true) {
             debugPrint(
               "[_waitForUserDocument] Cache says exists (after error); "
-              "treating as ready.",
+                  "treating as ready.",
             );
             return true;
           }
@@ -839,7 +847,7 @@ class AppInitializer with ChangeNotifier {
         if (cached?.exists == true) {
           debugPrint(
             "[_waitForUserDocument] Cache says exists (after timeout); "
-            "treating as ready.",
+                "treating as ready.",
           );
           return true;
         }
@@ -851,7 +859,7 @@ class AppInitializer with ChangeNotifier {
 
     debugPrint(
       "[_waitForUserDocument] Failed to find user document after $maxRetries "
-      "attempts.",
+          "attempts.",
     );
     return false;
   }
@@ -881,7 +889,7 @@ class AppInitializer with ChangeNotifier {
     } catch (e) {
       debugPrint(
         'Startup: Auto-login failed (credentials might be outdated). '
-        'Clearing secure storage. Error: $e',
+            'Clearing secure storage. Error: $e',
       );
       await secureStorage.deleteAll();
     }
