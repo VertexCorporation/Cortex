@@ -1597,4 +1597,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exclusiveOffer => 'Exclusive Offer';
+
+  @override
+  String get continueInOfflineMode => 'Continue in Offline Mode';
 }

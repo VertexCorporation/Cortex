@@ -634,7 +634,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'Tu bi rastî dixwazî modela $model ji amûra xwe rakî? Vê yekê dê hemî sohbetên berê yên bi wê modelê re jî jê bibe.';
+    return 'Ma tu piştrast î ku dixwazî modela $model ji cîhaza xwe rakî? Bi vê yekê re, hemû axaftinên berê yên bi wê modelê re jî dê jê bibî.';
   }
 
   @override
@@ -1604,4 +1604,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get exclusiveOffer => 'Pêşniyara Taybet';
+
+  @override
+  String get continueInOfflineMode => 'Continue in Offline Mode';
 }

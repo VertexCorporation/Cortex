@@ -10,6 +10,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 /// It carries a machine-readable error code.
 class AuthException implements Exception {
   final String code;
+
   AuthException(this.code);
 
   @override
@@ -36,6 +37,7 @@ class AuthService {
         _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
 
   User? get currentUser => _firebaseAuth.currentUser;
+
   bool get isLoggedIn => currentUser != null;
 
   bool isCurrentUserVerified() {
@@ -44,7 +46,8 @@ class AuthService {
 
   bool hasPasswordProvider() {
     if (!isLoggedIn) return false;
-    return currentUser!.providerData.any((provider) => provider.providerId == 'password');
+    return currentUser!.providerData.any((provider) =>
+    provider.providerId == 'password');
   }
 
   Future<void> reloadCurrentUser() async {

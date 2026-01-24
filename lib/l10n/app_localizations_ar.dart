@@ -627,7 +627,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'هل أنت متأكد أنك تريد إزالة نموذج $model من جهازك؟ سيؤدي ذلك أيضًا إلى حذف أي محادثات سابقة مع هذا النموذج.';
+    return 'هل أنت متأكد من رغبتك في إزالة جهاز $model من جهازك؟ سيؤدي ذلك أيضاً إلى حذف جميع المحادثات السابقة مع هذا الجهاز.';
   }
 
   @override
@@ -1586,4 +1586,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get exclusiveOffer => 'عرض حصري';
+
+  @override
+  String get continueInOfflineMode => 'Continue in Offline Mode';
 }

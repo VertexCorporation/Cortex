@@ -480,5 +480,6 @@
   "exclusiveOfferBadge": "Eksklüziv Təklif • {time}",
   "exclusiveOffer": "Eksklüziv Təklif",
   "notificationWelcomeOfferTitle": "Xoş Gəlmisiniz Hədiyyəsi 🎁",
-  "notificationWelcomeOfferBody": "Xüsusi xoş gəlmisiniz təklifi sizi gözləyir! Bu eksklüziv təklifi qaçırmayın."
+  "notificationWelcomeOfferBody": "Xüsusi xoş gəlmisiniz təklifi sizi gözləyir! Bu eksklüziv təklifi qaçırmayın.",
+  "continueInOfflineMode": "Oflayn Rejimdə Davam Edin"
 }

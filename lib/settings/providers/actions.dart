@@ -1,12 +1,14 @@
 // lib/settings/providers/actions.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Required for accessing GeneralProvider
 import '../../initialization.dart';
 import '../../internet.dart';
 import '../../l10n/app_localizations.dart';
 import '../../notifications/introvert.dart';
 import '../services/auth.dart';
 import '../services/profile.dart';
+import 'general.dart'; // Import to access freezeForLogout
 
 /// Manages user-initiated actions and their corresponding UI states.
 class SettingsActionProvider with ChangeNotifier {
@@ -22,7 +24,8 @@ class SettingsActionProvider with ChangeNotifier {
     required IntrovertNotificationService notificationService,
     required InternetProvider internetProvider,
     required AppInitializer appInitializer,
-  })  : _authService = authService,
+  })
+      : _authService = authService,
         _profileService = profileService,
         _notificationService = notificationService,
         _internetProvider = internetProvider,
@@ -30,18 +33,23 @@ class SettingsActionProvider with ChangeNotifier {
 
   // --- UI State Variables ---
   bool _isUpdatingUsername = false;
+
   bool get isUpdatingUsername => _isUpdatingUsername;
 
   bool _isChangingPassword = false;
+
   bool get isChangingPassword => _isChangingPassword;
 
   bool _isLoggingOut = false;
+
   bool get isLoggingOut => _isLoggingOut;
 
   bool _isDeletingAccount = false;
+
   bool get isDeletingAccount => _isDeletingAccount;
 
   bool _isRedeemingCode = false;
+
   bool get isRedeemingCode => _isRedeemingCode;
 
   // --- Private Helpers ---
@@ -57,7 +65,8 @@ class SettingsActionProvider with ChangeNotifier {
     return true;
   }
 
-  String _getLocalizedProfileError(AppLocalizations localizations, String code) {
+  String _getLocalizedProfileError(AppLocalizations localizations,
+      String code) {
     switch (code) {
       case 'already-exists':
         return localizations.usernameTaken;
@@ -124,7 +133,8 @@ class SettingsActionProvider with ChangeNotifier {
       await _authService.changePassword(
           oldPassword: oldPassword, newPassword: newPassword);
       _notificationService.showNotification(
-          message: localizations.passwordUpdated, type: NotificationType.success);
+          message: localizations.passwordUpdated,
+          type: NotificationType.success);
     } on AuthException catch (e) {
       throw Exception(_getLocalizedAuthError(localizations, e.code));
     } catch (_) {
@@ -145,7 +155,8 @@ class SettingsActionProvider with ChangeNotifier {
     try {
       await _profileService.redeemCreatorCode(code);
       _notificationService.showNotification(
-          message: localizations.creatorSupportedSuccess, type: NotificationType.success);
+          message: localizations.creatorSupportedSuccess,
+          type: NotificationType.success);
     } on ProfileException catch (e) {
       throw Exception(_getLocalizedProfileError(localizations, e.code));
     } catch (_) {
@@ -157,6 +168,7 @@ class SettingsActionProvider with ChangeNotifier {
   }
 
   /// Performs the logout process and handles UI navigation upon success.
+  /// Freezes the GeneralProvider state before signing out to prevent UI flicker.
   Future<void> performLogout(BuildContext context) async {
     final localizations = AppLocalizations.of(context)!;
     if (_isLoggingOut) return;
@@ -164,27 +176,32 @@ class SettingsActionProvider with ChangeNotifier {
     _isLoggingOut = true;
     notifyListeners();
 
+    // 1. FREEZE UI STATE
+    // We snapshot the current settings data immediately.
+    // This ensures the UI doesn't "panic" or flicker when user data is cleared
+    // from the underlying providers during the signOut process.
+    if (context.mounted) {
+      context.read<SettingsGeneralProvider>().freezeForLogout();
+    }
+
     try {
+      // 2. PERFORM LOGOUT
       await _appInitializer.signOut();
 
-      // After signing out, we must dismiss the dialog so the user feels the action.
-      // The AppLifecycleManager will detect the 'needsLogin' state and swap
-      // the entire MaterialApp to the AuthScreen, but popping here prevents glitches.
+      // 3. NAVIGATION
       if (context.mounted) {
-        // 1. Pop the Logout Confirmation Dialog
+        // Pop the Logout Confirmation Dialog
         if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         }
 
-        // 2. (Optional) Pop the Settings Screen to reveal MainScreen underneath
-        // This makes the transition to the AuthScreen feel smoother.
+        // Pop the Settings Screen to reveal MainScreen/AuthScreen underneath
         if (context.mounted && Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         }
       }
-
     } catch (e) {
-      debugPrint("SettingsActionProvider: An error occurred during the orchestrated logout: $e");
+      debugPrint("SettingsActionProvider: An error occurred during logout: $e");
       _notificationService.showNotification(
           message: localizations.anErrorOccurred,
           type: NotificationType.error);
@@ -206,6 +223,11 @@ class SettingsActionProvider with ChangeNotifier {
     _isDeletingAccount = true;
     notifyListeners();
 
+    // Freeze UI state for account deletion as well to prevent layout shifts.
+    if (context.mounted) {
+      context.read<SettingsGeneralProvider>().freezeForLogout();
+    }
+
     try {
       await _profileService.requestAccountDeletion();
       _notificationService.showNotification(
@@ -214,15 +236,18 @@ class SettingsActionProvider with ChangeNotifier {
 
       await _appInitializer.signOut();
 
-      // Also pop dialogs here for account deletion flow
+      // Pop dialogs
       if (context.mounted) {
         if (Navigator.of(context).canPop()) Navigator.of(context).pop();
-        if (context.mounted && Navigator.of(context).canPop()) Navigator.of(context).pop();
+        if (context.mounted && Navigator.of(context).canPop()) {
+          Navigator.of(
+              context).pop();
+        }
       }
-
     } on ProfileException catch (e) {
       final message = _getLocalizedProfileError(localizations, e.code);
-      _notificationService.showNotification(message: message, type: NotificationType.error);
+      _notificationService.showNotification(
+          message: message, type: NotificationType.error);
       rethrow;
     } catch (e) {
       _notificationService.showNotification(

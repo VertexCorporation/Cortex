@@ -548,5 +548,6 @@
   "invalidUsernameFormat": "Geçersiz format. 3-20 karakter, rakam veya . - _ kullanın",
   "welcomeOfferBadge": "Hoş Geldiniz Teklifi • {time}",
   "exclusiveOfferBadge": "Özel Teklif • {time}",
-  "exclusiveOffer": "Özel Teklif"
+  "exclusiveOffer": "Özel Teklif",
+  "continueInOfflineMode": "Çevrimdışı Modda Devam Et"
 }

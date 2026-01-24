@@ -537,5 +537,6 @@
   "exclusiveOfferBadge": "Exclusieve aanbieding • {time}",
   "exclusiveOffer": "Exclusieve aanbieding",
   "notificationWelcomeOfferTitle": "Welkomstcadeau 🎁",
-  "notificationWelcomeOfferBody": "Een speciale welkomstaanbieding wacht op u! Mis deze exclusieve deal niet."
+  "notificationWelcomeOfferBody": "Een speciale welkomstaanbieding wacht op u! Mis deze exclusieve deal niet.",
+  "continueInOfflineMode": "Doorgaan in offline modus"
 }

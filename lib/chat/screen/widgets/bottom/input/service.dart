@@ -56,7 +56,7 @@ class InputService {
 
   Future<void> pickPhoto(BuildContext context,
       {required ImageSource source,
-      required VoidCallback onSelectionComplete}) async {
+        required VoidCallback onSelectionComplete}) async {
     // 1. Check Attachment Limit before opening camera/gallery
     if (!_canAddMoreAttachments(context)) return;
 
@@ -144,7 +144,8 @@ class InputService {
       // this check prevents it from entering our system.
       if (sizeInBytes > _maxFileSizeInBytes) {
         debugPrint(
-            "File rejected: Size (${sizeInBytes / 1024 / 1024} MB) exceeds limit.");
+            "File rejected: Size (${sizeInBytes / 1024 /
+                1024} MB) exceeds limit.");
         // Optional: Trigger a UI notification via a helper service
         return;
       }
@@ -167,8 +168,8 @@ class InputService {
 
   // --- Model Selection Logic (Existing) ---
 
-  void openModelSelectionSheet(
-      BuildContext context, AppLocalizations localizations) {
+  void openModelSelectionSheet(BuildContext context,
+      AppLocalizations localizations) {
     final sessionProvider = context.read<ChatSessionProvider>();
     final String currentId = sessionProvider.modelId ?? '';
 
@@ -203,7 +204,9 @@ class InputService {
                 'title': variantMap['title'],
               };
               mergedMap.remove('variants');
-              final langCode = sessionProvider.getLocale().languageCode;
+              final langCode = sessionProvider
+                  .getLocale()
+                  .languageCode;
               targetModel = ModelEntity.fromMap(mergedMap, langCode);
             }
             break;

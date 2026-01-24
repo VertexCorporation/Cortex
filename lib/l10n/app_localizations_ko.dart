@@ -623,7 +623,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String confirmRemoveModel(Object model) {
-    return '정말로 $model 모델을 기기에서 제거하시겠습니까? 이 작업을 수행하면 해당 모델과의 이전 대화도 모두 삭제됩니다.';
+    return '기기에서 $model 모델을 삭제하시겠습니까? 삭제하면 해당 모델과의 이전 대화 내용도 모두 삭제됩니다.';
   }
 
   @override
@@ -1558,4 +1558,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get exclusiveOffer => '특별 혜택';
+
+  @override
+  String get continueInOfflineMode => 'Continue in Offline Mode';
 }

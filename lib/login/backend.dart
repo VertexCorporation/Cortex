@@ -104,7 +104,7 @@ class LoginBackendService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   final FirebaseFunctions _functions =
-  FirebaseFunctions.instanceFor(region: 'europe-west1');
+      FirebaseFunctions.instanceFor(region: 'europe-west1');
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   /// Handles the entire email and password login flow.
@@ -117,7 +117,7 @@ class LoginBackendService {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final extrovertNotificationService =
-    context.read<ExtrovertNotificationService>();
+        context.read<ExtrovertNotificationService>();
 
     if (!await InternetConnection().hasInternetAccess) {
       notificationService.showNotification(
@@ -134,40 +134,35 @@ class LoginBackendService {
       }
 
       await _handleSessionPersistence(email, password, rememberMe);
-      await user.reload();
-      final freshUser = _auth.currentUser;
-      if (freshUser == null) {
-        throw FirebaseAuthException(code: 'user-disappeared-after-reload');
-      }
+      // Removed redundant user.reload() for optimization.
+      // The user object from signInWithEmailAndPassword is fresh enough for our needs.
 
-      if (!freshUser.emailVerified) {
+      if (!user.emailVerified) {
         dev.log(
-            '[Auth.Login] User email not verified. UID: ${freshUser
-                .uid}. Triggering verification flow.',
+            '[Auth.Login] User email not verified. UID: ${user.uid}. Triggering verification flow.',
             name: 'LoginBackend');
 
         final initializer = Provider.of<AppInitializer>(
             navigatorKey.currentContext!,
             listen: false);
         initializer.requestEmailVerification(
-          email: freshUser.email!,
-          userId: freshUser.uid,
+          email: user.email!,
+          userId: user.uid,
           password: password,
         );
 
         _safeTokenSync(extrovertNotificationService);
 
-        return LoginSuccess(freshUser);
+        return LoginSuccess(user);
       }
 
       dev.log(
-          '[Auth.Login] User verified. UID: ${freshUser
-              .uid}. Running post-login tasks.',
+          '[Auth.Login] User verified. UID: ${user.uid}. Running post-login tasks.',
           name: 'LoginBackend');
 
       _safeTokenSync(extrovertNotificationService);
 
-      return LoginSuccess(freshUser);
+      return LoginSuccess(user);
     } on FirebaseAuthException catch (e) {
       dev.log('[Auth.Login] FirebaseAuthException: ${e.code}',
           name: 'LoginBackend', error: e.message);
@@ -202,7 +197,7 @@ class LoginBackendService {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final extrovertNotificationService =
-    context.read<ExtrovertNotificationService>();
+        context.read<ExtrovertNotificationService>();
     final userProvider = context.read<UserProvider>();
     final initializer = Provider.of<AppInitializer>(
         navigatorKey.currentContext!,
@@ -220,7 +215,7 @@ class LoginBackendService {
       // --- ASYNC GAP 1 ---
       // --- ASYNC GAP 1 ---
       final availability =
-      await _checkUsernameAvailability(username, notificationService, l10n);
+          await _checkUsernameAvailability(username, notificationService, l10n);
 
       if (availability == UsernameStatus.invalid) {
         initializer.setRegistrationStatus(false);
@@ -243,17 +238,20 @@ class LoginBackendService {
       userProvider.listenToUserData(user);
       CreditsManager.instance.listenToCredits();
       dev.log(
-        '[Auth.Register] Manually attached UserProvider & CreditsManager listeners for new user (UID: ${user
-            .uid}).',
+        '[Auth.Register] Manually attached UserProvider & CreditsManager listeners for new user (UID: ${user.uid}).',
         name: 'LoginBackend',
       );
 
       _safeTokenSync(extrovertNotificationService);
 
-      await _postUsernameSuggestion(uid: user.uid, username: username);
+      // Parallelize these independent network tasks to reduce waiting time.
+      await Future.wait([
+        _postUsernameSuggestion(uid: user.uid, username: username),
+        user.sendEmailVerification(),
+      ]);
 
-      await user.sendEmailVerification();
-      dev.log('[Auth.Register] Verification email sent for UID: ${user.uid}.',
+      dev.log(
+          '[Auth.Register] Verification email sent & suggestion posted for UID: ${user.uid}.',
           name: 'LoginBackend');
 
       initializer.requestEmailVerification(
@@ -300,14 +298,14 @@ class LoginBackendService {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final extrovertNotificationService =
-    context.read<ExtrovertNotificationService>();
+        context.read<ExtrovertNotificationService>();
 
     try {
       // Step 0: Initialize GoogleSignIn with the required serverClientId.
       // This is the new, correct way to configure the sign-in process before starting.
       await _googleSignIn.initialize(
         serverClientId:
-        '561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com',
+            '561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com',
       );
 
       // Step 1: Initiate the user-interactive sign-in process using authenticate().
@@ -324,7 +322,7 @@ class LoginBackendService {
 
       // Step 4: Sign in to Firebase.
       final UserCredential userCredential =
-      await _auth.signInWithCredential(credential);
+          await _auth.signInWithCredential(credential);
       final User? user = userCredential.user;
       if (user == null) {
         throw Exception("Firebase sign in with Google returned a null user.");
@@ -379,7 +377,7 @@ class LoginBackendService {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final extrovertNotificationService =
-    context.read<ExtrovertNotificationService>();
+        context.read<ExtrovertNotificationService>();
 
     if (!await InternetConnection().hasInternetAccess) {
       notificationService.showNotification(
@@ -421,15 +419,16 @@ class LoginBackendService {
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final extrovertNotificationService =
-    context.read<ExtrovertNotificationService>();
+        context.read<ExtrovertNotificationService>();
 
     try {
       // 1) Use Firebase's native provider flow
       final appleProvider = AppleAuthProvider()
-        ..addScope('email')..addScope('name');
+        ..addScope('email')
+        ..addScope('name');
 
       final UserCredential userCredential =
-      await FirebaseAuth.instance.signInWithProvider(appleProvider);
+          await FirebaseAuth.instance.signInWithProvider(appleProvider);
 
       final User? user = userCredential.user;
       if (user == null) {
@@ -442,9 +441,7 @@ class LoginBackendService {
 
       if (isNewUser) {
         // Apple provider may set displayName (not guaranteed). Prefer Firebase user fields when available.
-        final String? displayName = user.displayName
-            ?.trim()
-            .isEmpty ?? true
+        final String? displayName = user.displayName?.trim().isEmpty ?? true
             ? null
             : user.displayName?.trim();
 
@@ -498,7 +495,7 @@ class LoginBackendService {
     final l10n = AppLocalizations.of(context)!;
     final user = _auth.currentUser;
     final extrovertNotificationService =
-    context.read<ExtrovertNotificationService>();
+        context.read<ExtrovertNotificationService>();
 
     if (user == null || !user.isAnonymous) return RegistrationUnknownError();
 
@@ -510,7 +507,7 @@ class LoginBackendService {
 
     try {
       final availability =
-      await _checkUsernameAvailability(username, notificationService, l10n);
+          await _checkUsernameAvailability(username, notificationService, l10n);
       if (availability == UsernameStatus.invalid) {
         return RegistrationInvalidUsername();
       }
@@ -519,11 +516,11 @@ class LoginBackendService {
       }
 
       final credential =
-      EmailAuthProvider.credential(email: email, password: password);
+          EmailAuthProvider.credential(email: email, password: password);
       await user.linkWithCredential(credential);
 
       final callable =
-      _functions.httpsCallable('completeAnonymousRegistration');
+          _functions.httpsCallable('completeAnonymousRegistration');
       await callable.call();
 
       _safeTokenSync(extrovertNotificationService);
@@ -582,7 +579,7 @@ class LoginBackendService {
     try {
       final callable = _functions.httpsCallable('isUsernameAvailable');
       final result =
-      await callable.call<Map<String, dynamic>>({'username': username});
+          await callable.call<Map<String, dynamic>>({'username': username});
       final available = result.data['available'] as bool? ?? false;
       return available ? UsernameStatus.available : UsernameStatus.taken;
     } on FirebaseFunctionsException catch (e) {
@@ -604,8 +601,8 @@ class LoginBackendService {
     }
   }
 
-  Future<void> _handleSessionPersistence(String email, String password,
-      bool rememberMe) async {
+  Future<void> _handleSessionPersistence(
+      String email, String password, bool rememberMe) async {
     if (rememberMe) {
       await _secureStorage.write(key: 'email', value: email);
       await _secureStorage.write(key: 'password', value: password);

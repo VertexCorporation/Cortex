@@ -537,5 +537,6 @@
   "exclusiveOfferBadge": "限定オファー • {time}",
   "exclusiveOffer": "限定オファー",
   "notificationWelcomeOfferTitle": "ウェルカムギフト🎁",
-  "notificationWelcomeOfferBody": "特別なウェルカムオファーをご用意しております！この限定オファーをお見逃しなく。"
+  "notificationWelcomeOfferBody": "特別なウェルカムオファーをご用意しております！この限定オファーをお見逃しなく。",
+  "continueInOfflineMode": "オフラインモードで続行"
 }

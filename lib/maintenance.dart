@@ -1,10 +1,10 @@
-// lib/maintenance.dart
-
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:cortex/app.dart';
+import 'package:cortex/initialization.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 /// Checks whether the server is currently in maintenance mode.
 ///
@@ -161,6 +161,10 @@ class _MaintenanceScreenState extends State<MaintenanceScreen>
 
           _buildHeader(context, l10n, constraints),
 
+          SizedBox(height: screenHeight * 0.05),
+
+          _buildContinueButton(context, l10n, constraints),
+
           // This Spacer takes up the remaining space, completing the centering effect.
           const Spacer(flex: 4),
         ],
@@ -201,6 +205,23 @@ class _MaintenanceScreenState extends State<MaintenanceScreen>
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildContinueButton(
+      BuildContext context, AppLocalizations l10n, BoxConstraints constraints) {
+    return TextButton(
+      onPressed: () {
+        context.read<AppInitializer>().bypassMaintenanceMode();
+      },
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.tertiaryColor,
+        textStyle: TextStyle(
+          fontSize: (constraints.maxWidth * 0.04).clamp(14.0, 18.0),
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      child: Text(l10n.continueInOfflineMode),
     );
   }
 }

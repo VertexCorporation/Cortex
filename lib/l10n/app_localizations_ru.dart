@@ -636,7 +636,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'Вы уверены, что хотите удалить модель $model с вашего устройства? Это также удалит все предыдущие чаты с этой моделью.';
+    return 'Вы уверены, что хотите удалить модель $model со своего устройства? Это также приведет к удалению всех предыдущих разговоров, связанных с этой моделью.';
   }
 
   @override
@@ -1610,4 +1610,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get exclusiveOffer => 'Эксклюзивное предложение';
+
+  @override
+  String get continueInOfflineMode => 'Continue in Offline Mode';
 }

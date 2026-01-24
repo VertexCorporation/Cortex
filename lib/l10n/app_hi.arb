@@ -537,5 +537,6 @@
   "exclusiveOfferBadge": "विशेष ऑफर • {time}",
   "exclusiveOffer": "विशेष ऑफर",
   "notificationWelcomeOfferTitle": "स्वागत उपहार 🎁",
-  "notificationWelcomeOfferBody": "आपके लिए एक विशेष स्वागत ऑफर इंतजार कर रहा है! इस खास ऑफर को हाथ से जाने न दें।"
+  "notificationWelcomeOfferBody": "आपके लिए एक विशेष स्वागत ऑफर इंतजार कर रहा है! इस खास ऑफर को हाथ से जाने न दें।",
+  "continueInOfflineMode": "ऑफ़लाइन मोड में जारी रखें"
 }

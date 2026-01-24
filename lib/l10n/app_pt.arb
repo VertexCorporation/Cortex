@@ -537,5 +537,6 @@
   "exclusiveOfferBadge": "Oferta exclusiva • {time}",
   "exclusiveOffer": "Oferta exclusiva",
   "notificationWelcomeOfferTitle": "Presente de boas-vindas 🎁",
-  "notificationWelcomeOfferBody": "Uma oferta especial de boas-vindas espera por você! Não perca esta oportunidade exclusiva."
+  "notificationWelcomeOfferBody": "Uma oferta especial de boas-vindas espera por você! Não perca esta oportunidade exclusiva.",
+  "continueInOfflineMode": "Continuar no modo offline"
 }

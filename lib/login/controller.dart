@@ -52,12 +52,19 @@ class LoginController extends ChangeNotifier {
 
   // --- Public Getters for UI ---
   AuthMode get authMode => _authMode;
+
   bool get isLoading => _isLoading;
+
   bool get agreeToTerms => _agreeToTerms;
+
   String? get loginEmailError => _loginEmailError;
+
   String? get loginPasswordError => _loginPasswordError;
+
   String? get registerUsernameError => _registerUsernameError;
+
   String? get registerEmailError => _registerEmailError;
+
   String? get registerPasswordError => _registerPasswordError;
 
   // --- Initialization and Disposal ---
@@ -166,6 +173,7 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case LoginSuccess():
         AnalyticsService().logLoginSuccess('email');
+        // Do NOT stop loading here. Wait for navigation.
         break;
       case LoginInvalidCredentials():
         _loginEmailError = l10n.invalidCredentials;
@@ -174,20 +182,25 @@ class LoginController extends ChangeNotifier {
         loginEmailShakeController.forward(from: 0);
         loginPasswordShakeController.forward(from: 0);
         AnalyticsService().logLoginFailure('email', 'invalid_credentials');
+        _setLoading(false);
         break;
       case LoginUserDisabled():
         _loginEmailError = l10n.userDisabled;
         loginEmailShakeController.forward(from: 0);
         AnalyticsService().logLoginFailure('email', 'user_disabled');
+        _setLoading(false);
         break;
       case LoginNetworkError():
         AnalyticsService().logLoginFailure('email', 'network_error');
+        _setLoading(false);
         break;
       case LoginUnknownError():
         AnalyticsService().logLoginFailure('email', 'unknown_error');
+        _setLoading(false);
         break;
     }
-    _setLoading(false);
+    // _setLoading(false) is intentionally omitted for LoginSuccess
+    // to keep the UI locked while navigation happens.
   }
 
   /// Handles the registration submission logic. Requires a fresh `BuildContext` from the UI.
@@ -212,35 +225,41 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case RegistrationSuccess():
         AnalyticsService().logRegisterSuccess('email');
+        // Do NOT stop loading here. Wait for navigation.
         break;
       case RegistrationUsernameTaken():
         _registerUsernameError = l10n.usernameTaken;
         registerUsernameShakeController.forward(from: 0);
         AnalyticsService().logRegisterFailure('email', 'username_taken');
+        _setLoading(false);
         break;
       case RegistrationInvalidUsername():
         _registerUsernameError = l10n.invalidUsernameFormat;
         registerUsernameShakeController.forward(from: 0);
         AnalyticsService().logRegisterFailure('email', 'invalid_username');
+        _setLoading(false);
         break;
       case RegistrationEmailInUse():
         _registerEmailError = l10n.emailAlreadyInUse;
         registerEmailShakeController.forward(from: 0);
         AnalyticsService().logRegisterFailure('email', 'email_in_use');
+        _setLoading(false);
         break;
       case RegistrationWeakPassword():
         _registerPasswordError = l10n.weakPassword;
         registerPasswordShakeController.forward(from: 0);
         AnalyticsService().logRegisterFailure('email', 'weak_password');
+        _setLoading(false);
         break;
       case RegistrationNetworkError():
         AnalyticsService().logRegisterFailure('email', 'network_error');
+        _setLoading(false);
         break;
       case RegistrationUnknownError():
         AnalyticsService().logRegisterFailure('email', 'unknown_error');
+        _setLoading(false);
         break;
     }
-    _setLoading(false);
   }
 
   /// Handles Google Sign-In. Requires a fresh `BuildContext` from the UI.
@@ -258,12 +277,13 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case GoogleSignInSuccess():
         AnalyticsService().logLoginSuccess('google');
+        // Do NOT stop loading here. Wait for navigation.
         break;
       case GoogleSignInFailure():
         AnalyticsService().logLoginFailure('google', 'sign_in_failed');
+        _setLoading(false);
         break;
     }
-    _setLoading(false);
   }
 
   /// Handles the anonymous login submission.
@@ -284,6 +304,7 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case AnonymousSignInSuccess():
         AnalyticsService().logLoginSuccess('anonymous');
+        // Do NOT stop loading here. Wait for navigation.
         break;
       case AnonymousSignInNetworkError():
         AnalyticsService().logLoginFailure('anonymous', 'network_error');
@@ -311,12 +332,13 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case AppleSignInSuccess():
         AnalyticsService().logLoginSuccess('apple');
+        // Do NOT stop loading here. Wait for navigation.
         break;
       case AppleSignInFailure():
         AnalyticsService().logLoginFailure('apple', 'sign_in_failed');
+        _setLoading(false);
         break;
     }
-    _setLoading(false);
   }
 
   /// Handles the upgrade (linking) submission logic.
@@ -352,28 +374,34 @@ class LoginController extends ChangeNotifier {
               message: l10n.accountLinkedSuccess,
               type: NotificationType.success);
         }
+        _setLoading(
+            false); // Here we DO unblock because we popped the dialog, we didn't navigate to a new screen.
         break;
       case RegistrationUsernameTaken():
         _registerUsernameError = l10n.usernameTaken;
         registerUsernameShakeController.forward(from: 0);
+        _setLoading(false);
         break;
       case RegistrationInvalidUsername():
         _registerUsernameError = l10n.invalidUsernameFormat;
         registerUsernameShakeController.forward(from: 0);
+        _setLoading(false);
         break;
       case RegistrationEmailInUse():
         _registerEmailError = l10n.emailAlreadyInUse;
         registerEmailShakeController.forward(from: 0);
+        _setLoading(false);
         break;
       case RegistrationWeakPassword():
         _registerPasswordError = l10n.weakPassword;
         registerPasswordShakeController.forward(from: 0);
+        _setLoading(false);
         break;
       case RegistrationNetworkError():
       case RegistrationUnknownError():
+        _setLoading(false);
         break;
     }
-    _setLoading(false);
   }
 
   // --- UI Helper Methods ---

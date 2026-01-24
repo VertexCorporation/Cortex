@@ -1,3 +1,5 @@
+// lib/settings/providers/general.dart
+
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -11,14 +13,8 @@ import '../services/profile.dart';
 
 /// Manages the general state and data specifically for the settings screen.
 ///
-/// This provider acts as the primary ViewModel for the settings UI. Its main
-/// responsibilities are scoped to the lifecycle of the settings screen:
-///
-/// 1.  **Data Source (Single Source of Truth):** It delegates all user data access
-///     to the [UserProvider]. This ensures that when the global user state changes
-///     (e.g., logout), the settings screen updates immediately without stale data.
-/// 2.  **State Management:** It tracks UI-specific states like
-///     internet connectivity (`hasInternet`) and action states (`isResendingEmail`).
+/// This provider acts as the primary ViewModel for the settings UI.
+/// Includes a "Freeze" mechanism to prevent UI flickering during logout.
 class SettingsGeneralProvider with ChangeNotifier {
   // --- Service Dependencies ---
   final AuthService _authService;
@@ -31,6 +27,26 @@ class SettingsGeneralProvider with ChangeNotifier {
   bool _hasInternet = true;
   bool _isResendingEmail = false;
 
+  // --- Freeze Mechanism State ---
+  // These variables hold a snapshot of the user data during the logout process.
+  bool _isFrozen = false;
+  Map<String, dynamic>? _frozenUserData;
+  bool _frozenIsAnonymous = false;
+  bool _frozenIsVerified = true;
+  int _frozenSubscriptionLevel = 0;
+
+  /// Constructor: Injects services and starts the initialization process.
+  SettingsGeneralProvider({
+    required AuthService authService,
+    required ProfileService profileService,
+    required IntrovertNotificationService notificationService,
+    required UserProvider userProvider,
+  })
+      : _authService = authService,
+        _profileService = profileService,
+        _notificationService = notificationService,
+        _userProvider = userProvider;
+
   // --- Public Getters for UI State ---
 
   bool get isLoading => _isLoading;
@@ -39,22 +55,44 @@ class SettingsGeneralProvider with ChangeNotifier {
 
   bool get isResendingEmail => _isResendingEmail;
 
-  /// Returns the global user data directly from UserProvider.
-  Map<String, dynamic>? get userData => _userProvider.userData;
+  /// Snapshots the current user state and locks the UI to these values.
+  /// Call this immediately before signing out to prevent UI flickering.
+  void freezeForLogout() {
+    _frozenUserData = _userProvider.userData;
+    _frozenIsAnonymous = _userProvider.isAnonymous;
+    _frozenIsVerified = _authService.isCurrentUserVerified();
 
-  bool get isVerified => _authService.isCurrentUserVerified();
+    // Snapshot subscription level logic
+    _frozenSubscriptionLevel = _userProvider.isSubscriptionActive
+        ? (_userProvider.userData?['hasCortexSubscription'] as int? ?? 0)
+        : 0;
 
-  /// Checks if the current user is in 'Guest/Anonymous' mode via UserProvider.
-  bool get isAnonymous => _userProvider.isAnonymous;
+    _isFrozen = true;
+    notifyListeners();
+  }
 
-  // --- Computed Properties from UserProvider (Safe Getters) ---
+  /// Returns the user data.
+  /// If frozen (logging out), returns the snapshot.
+  /// Otherwise, returns live data from UserProvider.
+  Map<String, dynamic>? get userData =>
+      _isFrozen ? _frozenUserData : _userProvider.userData;
+
+  bool get isVerified =>
+      _isFrozen ? _frozenIsVerified : _authService.isCurrentUserVerified();
+
+  /// Checks if the current user is in 'Guest/Anonymous' mode.
+  bool get isAnonymous =>
+      _isFrozen ? _frozenIsAnonymous : _userProvider.isAnonymous;
+
+  // --- Computed Properties ---
 
   /// The expiration date of the user's subscription, if any.
+  /// Accesses `userData` via the getter, so it respects the frozen state.
   Timestamp? get subscriptionExpiresAt {
-    // We can rely on UserProvider's logic or parse here if needed.
-    // Since UserProvider doesn't expose raw valid dates as Timestamps for UI,
-    // we access the map directly to keep consistent usage.
-    final expires = userData?['subscriptionExpiresAt'];
+    final data = userData;
+    if (data == null) return null;
+
+    final expires = data['subscriptionExpiresAt'];
     if (expires is Timestamp) return expires; // Live data
     if (expires is String) {
       final parsedDate = DateTime.tryParse(expires); // Cached data
@@ -64,12 +102,13 @@ class SettingsGeneralProvider with ChangeNotifier {
   }
 
   /// The user's **active** subscription level (e.g., 0 for Free, 1 for Plus).
-  ///
-  /// Delegates to UserProvider's robust logic if possible, or implements
-  /// view-specific logic here.
-  int get activeSubscriptionLevel => _userProvider.isSubscriptionActive
-      ? (userData?['hasCortexSubscription'] as int? ?? 0)
-      : 0;
+  int get activeSubscriptionLevel {
+    if (_isFrozen) return _frozenSubscriptionLevel;
+
+    return _userProvider.isSubscriptionActive
+        ? (userData?['hasCortexSubscription'] as int? ?? 0)
+        : 0;
+  }
 
   /// The number of times a verification email has been resent.
   int get verificationAttempts => userData?['verifyAttempts'] as int? ?? 0;
@@ -85,18 +124,12 @@ class SettingsGeneralProvider with ChangeNotifier {
     return null;
   }
 
-  /// Constructor: Injects services and starts the initialization process.
-  SettingsGeneralProvider({
-    required AuthService authService,
-    required ProfileService profileService,
-    required IntrovertNotificationService notificationService,
-    required UserProvider userProvider,
-  })  : _authService = authService,
-        _profileService = profileService,
-        _notificationService = notificationService,
-        _userProvider = userProvider;
+  // --- Methods ---
 
   void updateConnectivity(InternetProvider internetProvider) {
+    // If we are logging out (frozen), ignore connectivity updates to keep UI stable.
+    if (_isFrozen) return;
+
     final bool wasConnected = _hasInternet;
     _hasInternet = internetProvider.isConnected;
     if (_hasInternet && !wasConnected) {
@@ -106,9 +139,9 @@ class SettingsGeneralProvider with ChangeNotifier {
   }
 
   /// Refreshes the user data by reloading the auth user and fetching the latest profile.
-  /// The [UserProvider] will be updated via the fetch, keeping everything in sync.
   Future<void> refreshData() async {
-    if (!_hasInternet) return;
+    // Prevent refreshing if no internet or if UI is frozen for logout.
+    if (!_hasInternet || _isFrozen) return;
 
     _isLoading = true;
     notifyListeners();
@@ -132,7 +165,10 @@ class SettingsGeneralProvider with ChangeNotifier {
   }
 
   Future<void> resendVerificationEmail() async {
-    if (isResendingEmail || verificationAttempts >= 2 || !_hasInternet) return;
+    if (isResendingEmail || verificationAttempts >= 2 || !_hasInternet ||
+        _isFrozen) {
+      return;
+    }
     _isResendingEmail = true;
     notifyListeners();
     try {
@@ -153,8 +189,10 @@ class SettingsGeneralProvider with ChangeNotifier {
   }
 
   /// Called when UserProvider updates (e.g. logout or new data fetched).
-  /// We notify our listeners so the UI rebuilds with the new UserProvider data.
   void onUserProviderUpdate() {
-    notifyListeners();
+    // If frozen, ignore updates from the underlying UserProvider to keep the UI static.
+    if (!_isFrozen) {
+      notifyListeners();
+    }
   }
 }
