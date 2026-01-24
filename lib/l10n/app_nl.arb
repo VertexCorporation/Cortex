@@ -221,7 +221,7 @@
   "removeModel": "Model Verwijderen",
   "insufficientRAM": "Onvoldoende Geheugen",
   "insufficientStorage": "Onvoldoende Opslag",
-  "confirmRemoveModel": "Weet je zeker dat je het {model} model van je apparaat wilt verwijderen? Hiermee worden ook alle eerdere gesprekken met dat model verwijderd.",
+  "confirmRemoveModel": "Weet je zeker dat je het model {model} van je apparaat wilt verwijderen? Als je dit doet, worden ook alle eerdere gesprekken met dat model verwijderd.",
   "noMatchingModels": "Geen overeenkomende modellen gevonden.",
   "creditPackage": "Koop {amount} Credits",
   "benefit1": "Verhoogde gesprekslimieten",
@@ -412,8 +412,6 @@
   "notificationAppUpdateBody": "Vergeet niet de app te updaten voor gloednieuwe functies en verbeteringen!",
   "notificationNewFeatureTitle": "Wauw!",
   "notificationNewFeatureBody": "Ontdek de nieuwe functie {featureName}. Cortex is nu krachtiger dan ooit.",
-  "notificationSubscriptionOfferTitle": "GOEDKOPER DAN KAUWGOM",
-  "notificationSubscriptionOfferBody": "VOLLEDIGE KORTING van {discountRate}% op al onze abonnementen. Mis dit niet!",
   "notificationSocialMediaTitle": "Doe mee!",
   "notificationSocialMediaBody": "Volg ons op Instagram (vertex.23) voor het laatste nieuws!",
   "notificationRandomFactTitle": "Willekeurig feit",
@@ -535,5 +533,9 @@
   "defaultViewDescription": "Cortex staat altijd voor je klaar met honderden AI-modellen, offline mogelijkheden, dynamische chat en nog veel meer.",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "Ongeldig gebruikersnaamformaat. Gebruik 3-20 tekens, cijfers of een punt (.) of een underscore (_).",
-  "specialOfferBadge": "Speciale aanbieding voor nieuwe gebruikers • {time}"
+  "welcomeOfferBadge": "Welkomstaanbieding • {time}",
+  "exclusiveOfferBadge": "Exclusieve aanbieding • {time}",
+  "exclusiveOffer": "Exclusieve aanbieding",
+  "notificationWelcomeOfferTitle": "Welkomstcadeau 🎁",
+  "notificationWelcomeOfferBody": "Een speciale welkomstaanbieding wacht op u! Mis deze exclusieve deal niet."
 }

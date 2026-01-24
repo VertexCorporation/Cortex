@@ -41,8 +41,8 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
         vsync: this, duration: const Duration(milliseconds: 500));
     // Initialize the controller here, using context.read for one-time access.
     final initialUsername = context
-            .read<SettingsGeneralProvider>()
-            .userData?['username'] as String? ??
+        .read<SettingsGeneralProvider>()
+        .userData?['username'] as String? ??
         '';
     _nameController = TextEditingController(text: initialUsername);
   }
@@ -93,7 +93,10 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
     context.watch<ThemeProvider>();
 
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Center(
       child: SingleChildScrollView(
@@ -139,13 +142,13 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
                                         borderSide: BorderSide(
                                             color: AppColors.quinaryColor),
                                         borderRadius:
-                                            BorderRadius.circular(10.0)),
+                                        BorderRadius.circular(10.0)),
                                     focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
                                             color: AppColors
                                                 .primaryColor.inverted),
                                         borderRadius:
-                                            BorderRadius.circular(10.0)),
+                                        BorderRadius.circular(10.0)),
                                     counterText: ''),
                               ),
                             ),
@@ -153,15 +156,15 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
                                 duration: const Duration(milliseconds: 300),
                                 child: _errorText != null
                                     ? Padding(
-                                        padding: EdgeInsets.only(
-                                            top: screenWidth * 0.02),
-                                        child: Text(_errorText!,
-                                            style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: screenWidth * 0.03),
-                                            key: ValueKey(_errorText)))
+                                    padding: EdgeInsets.only(
+                                        top: screenWidth * 0.02),
+                                    child: Text(_errorText!,
+                                        style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: screenWidth * 0.03),
+                                        key: ValueKey(_errorText)))
                                     : const SizedBox.shrink(
-                                        key: ValueKey("emptyError"))),
+                                    key: ValueKey("emptyError"))),
                           ],
                         ),
                       ),
@@ -179,9 +182,9 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
                                         onTap: isUpdating
                                             ? null
                                             : () {
-                                                HapticFeedback.lightImpact();
-                                                Navigator.of(context).pop();
-                                              },
+                                          HapticFeedback.lightImpact();
+                                          Navigator.of(context).pop();
+                                        },
                                         splashColor: AppColors.senaryColor
                                             .withValues(alpha: 0.1),
                                         highlightColor: AppColors.senaryColor
@@ -193,7 +196,7 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
                                             child: Text(appLocalizations.cancel,
                                                 style: TextStyle(
                                                     color:
-                                                        AppColors.senaryColor,
+                                                    AppColors.senaryColor,
                                                     fontSize: screenWidth *
                                                         0.04)))))),
                             VerticalDivider(
@@ -211,30 +214,30 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
                                     onTap: isUpdating
                                         ? null
                                         : () {
-                                            HapticFeedback.lightImpact();
-                                            _handleUpdate();
-                                          },
+                                      HapticFeedback.lightImpact();
+                                      _handleUpdate();
+                                    },
                                     child: Container(
                                         alignment: Alignment.center,
                                         padding: EdgeInsets.symmetric(
                                             vertical: screenWidth * 0.04),
                                         child: isUpdating
                                             ? SizedBox(
-                                                width: screenWidth * 0.05,
-                                                height: screenWidth * 0.05,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                        strokeWidth: 2.0,
-                                                        color: AppColors
-                                                            .septenaryColor))
+                                            width: screenWidth * 0.05,
+                                            height: screenWidth * 0.05,
+                                            child:
+                                            CircularProgressIndicator(
+                                                strokeWidth: 2.0,
+                                                color: AppColors
+                                                    .septenaryColor))
                                             : Text(appLocalizations.save,
-                                                style: TextStyle(
-                                                    color: AppColors
-                                                        .septenaryColor,
-                                                    fontSize:
-                                                        screenWidth * 0.04,
-                                                    fontWeight:
-                                                        FontWeight.bold))),
+                                            style: TextStyle(
+                                                color: AppColors
+                                                    .septenaryColor,
+                                                fontSize:
+                                                screenWidth * 0.04,
+                                                fontWeight:
+                                                FontWeight.bold))),
                                   )),
                             ),
                           ],
@@ -352,7 +355,10 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
     context.watch<ThemeProvider>();
 
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     // This is the build method for the dialog.
     return Center(
@@ -400,24 +406,24 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
                                             borderSide: BorderSide(
                                                 color: AppColors.quinaryColor),
                                             borderRadius:
-                                                BorderRadius.circular(10)),
+                                            BorderRadius.circular(10)),
                                         focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: AppColors
                                                     .primaryColor.inverted),
                                             borderRadius:
-                                                BorderRadius.circular(10))))),
+                                            BorderRadius.circular(10))))),
                             AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 300),
                                 child: _oldPassError != null
                                     ? Padding(
-                                        padding: EdgeInsets.only(
-                                            top: screenWidth * 0.02),
-                                        child: Text(_oldPassError!,
-                                            style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: screenWidth * 0.03),
-                                            key: ValueKey(_oldPassError)))
+                                    padding: EdgeInsets.only(
+                                        top: screenWidth * 0.02),
+                                    child: Text(_oldPassError!,
+                                        style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: screenWidth * 0.03),
+                                        key: ValueKey(_oldPassError)))
                                     : const SizedBox.shrink()),
 
                             SizedBox(height: screenWidth * 0.03),
@@ -439,24 +445,24 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
                                             borderSide: BorderSide(
                                                 color: AppColors.quinaryColor),
                                             borderRadius:
-                                                BorderRadius.circular(10)),
+                                            BorderRadius.circular(10)),
                                         focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: AppColors
                                                     .primaryColor.inverted),
                                             borderRadius:
-                                                BorderRadius.circular(10))))),
+                                            BorderRadius.circular(10))))),
                             AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 300),
                                 child: _newPassError != null
                                     ? Padding(
-                                        padding: EdgeInsets.only(
-                                            top: screenWidth * 0.02),
-                                        child: Text(_newPassError!,
-                                            style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: screenWidth * 0.03),
-                                            key: ValueKey(_newPassError)))
+                                    padding: EdgeInsets.only(
+                                        top: screenWidth * 0.02),
+                                    child: Text(_newPassError!,
+                                        style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: screenWidth * 0.03),
+                                        key: ValueKey(_newPassError)))
                                     : const SizedBox.shrink()),
 
                             SizedBox(height: screenWidth * 0.03),
@@ -471,7 +477,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
                                         color: AppColors.primaryColor.inverted),
                                     decoration: InputDecoration(
                                         labelText:
-                                            appLocalizations.confirmPassword,
+                                        appLocalizations.confirmPassword,
                                         labelStyle: TextStyle(
                                             color: AppColors
                                                 .primaryColor.inverted),
@@ -479,24 +485,24 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
                                             borderSide: BorderSide(
                                                 color: AppColors.quinaryColor),
                                             borderRadius:
-                                                BorderRadius.circular(10)),
+                                            BorderRadius.circular(10)),
                                         focusedBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: AppColors
                                                     .primaryColor.inverted),
                                             borderRadius:
-                                                BorderRadius.circular(10))))),
+                                            BorderRadius.circular(10))))),
                             AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 300),
                                 child: _confirmPassError != null
                                     ? Padding(
-                                        padding: EdgeInsets.only(
-                                            top: screenWidth * 0.02),
-                                        child: Text(_confirmPassError!,
-                                            style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: screenWidth * 0.03),
-                                            key: ValueKey(_confirmPassError)))
+                                    padding: EdgeInsets.only(
+                                        top: screenWidth * 0.02),
+                                    child: Text(_confirmPassError!,
+                                        style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: screenWidth * 0.03),
+                                        key: ValueKey(_confirmPassError)))
                                     : const SizedBox.shrink()),
                           ],
                         ),
@@ -515,9 +521,9 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
                                         onTap: isChanging
                                             ? null
                                             : () {
-                                                HapticFeedback.lightImpact();
-                                                Navigator.of(context).pop();
-                                              },
+                                          HapticFeedback.lightImpact();
+                                          Navigator.of(context).pop();
+                                        },
                                         splashColor: AppColors.senaryColor
                                             .withValues(alpha: 0.1),
                                         highlightColor: AppColors.senaryColor
@@ -529,7 +535,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
                                             child: Text(appLocalizations.cancel,
                                                 style: TextStyle(
                                                     color:
-                                                        AppColors.senaryColor,
+                                                    AppColors.senaryColor,
                                                     fontSize: screenWidth *
                                                         0.04)))))),
                             VerticalDivider(
@@ -547,30 +553,30 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog>
                                     onTap: isChanging
                                         ? null
                                         : () {
-                                            HapticFeedback.lightImpact();
-                                            _handleChangePassword();
-                                          },
+                                      HapticFeedback.lightImpact();
+                                      _handleChangePassword();
+                                    },
                                     child: Container(
                                         alignment: Alignment.center,
                                         padding: EdgeInsets.symmetric(
                                             vertical: screenWidth * 0.04),
                                         child: isChanging
                                             ? SizedBox(
-                                                width: screenWidth * 0.05,
-                                                height: screenWidth * 0.05,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                        strokeWidth: 2.0,
-                                                        color: AppColors
-                                                            .septenaryColor))
+                                            width: screenWidth * 0.05,
+                                            height: screenWidth * 0.05,
+                                            child:
+                                            CircularProgressIndicator(
+                                                strokeWidth: 2.0,
+                                                color: AppColors
+                                                    .septenaryColor))
                                             : Text(appLocalizations.save,
-                                                style: TextStyle(
-                                                    color: AppColors
-                                                        .septenaryColor,
-                                                    fontSize:
-                                                        screenWidth * 0.04,
-                                                    fontWeight:
-                                                        FontWeight.bold))),
+                                            style: TextStyle(
+                                                color: AppColors
+                                                    .septenaryColor,
+                                                fontSize:
+                                                screenWidth * 0.04,
+                                                fontWeight:
+                                                FontWeight.bold))),
                                   )),
                             ),
                           ],
@@ -597,7 +603,10 @@ class _LogoutDialog extends StatelessWidget {
     context.watch<ThemeProvider>();
 
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Center(
       child: Material(
@@ -648,9 +657,9 @@ class _LogoutDialog extends StatelessWidget {
                                       onTap: isLoggingOut
                                           ? null
                                           : () {
-                                              HapticFeedback.lightImpact();
-                                              Navigator.of(context).pop();
-                                            },
+                                        HapticFeedback.lightImpact();
+                                        Navigator.of(context).pop();
+                                      },
                                       splashColor: AppColors.senaryColor
                                           .withValues(alpha: 0.1),
                                       highlightColor: AppColors.senaryColor
@@ -663,7 +672,7 @@ class _LogoutDialog extends StatelessWidget {
                                               style: TextStyle(
                                                   color: AppColors.senaryColor,
                                                   fontSize:
-                                                      screenWidth * 0.04)))))),
+                                                  screenWidth * 0.04)))))),
                           VerticalDivider(
                               width: 1,
                               thickness: 0.5,
@@ -679,26 +688,26 @@ class _LogoutDialog extends StatelessWidget {
                                 onTap: isLoggingOut
                                     ? null
                                     : () {
-                                        HapticFeedback.lightImpact();
-                                        context
-                                            .read<SettingsActionProvider>()
-                                            .performLogout(context);
-                                      },
+                                  HapticFeedback.lightImpact();
+                                  context
+                                      .read<SettingsActionProvider>()
+                                      .performLogout(context);
+                                },
                                 child: Container(
                                   alignment: Alignment.center,
                                   padding: EdgeInsets.symmetric(
                                       vertical: screenWidth * 0.04),
                                   child: isLoggingOut
                                       ? SizedBox(
-                                          width: screenWidth * 0.05,
-                                          height: screenWidth * 0.05,
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 2.0,
-                                              color: AppColors.septenaryColor))
+                                      width: screenWidth * 0.05,
+                                      height: screenWidth * 0.05,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2.0,
+                                          color: AppColors.septenaryColor))
                                       : Text(appLocalizations.yes,
-                                          style: TextStyle(
-                                              color: AppColors.septenaryColor,
-                                              fontSize: screenWidth * 0.04)),
+                                      style: TextStyle(
+                                          color: AppColors.septenaryColor,
+                                          fontSize: screenWidth * 0.04)),
                                 ),
                               ),
                             ),
@@ -772,7 +781,10 @@ class _MyPlanButtonState extends State<_MyPlanButton>
   @override
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final appLocalizations = AppLocalizations.of(context)!;
 
     return Consumer<FundsBackend>(
@@ -892,7 +904,10 @@ class UserSection extends StatelessWidget {
       barrierDismissible: true,
       barrierLabel: 'UserActionDialog',
       pageBuilder: (ctx, _, __) {
-        final keyboardPadding = MediaQuery.of(ctx).viewInsets.bottom;
+        final keyboardPadding = MediaQuery
+            .of(ctx)
+            .viewInsets
+            .bottom;
         return AnimatedPadding(
           padding: EdgeInsets.only(bottom: keyboardPadding),
           duration: const Duration(milliseconds: 50),
@@ -905,9 +920,12 @@ class UserSection extends StatelessWidget {
 
   Widget _buildCenteredButton(BuildContext context,
       {required String text,
-      required VoidCallback onPressed,
-      bool enabled = true}) {
-    final screenWidth = MediaQuery.of(context).size.width;
+        required VoidCallback onPressed,
+        bool enabled = true}) {
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     return Opacity(
       opacity: enabled ? 1.0 : 0.5,
       child: Material(
@@ -945,12 +963,20 @@ class UserSection extends StatelessWidget {
     context.watch<ThemeProvider>();
 
     final appLocalizations = AppLocalizations.of(context)!;
-    final hasInternet = context.watch<SettingsGeneralProvider>().hasInternet;
+    final hasInternet = context
+        .watch<SettingsGeneralProvider>()
+        .hasInternet;
     final isPasswordUser =
-        context.select((AuthService auth) => auth.hasPasswordProvider());
+    context.select((AuthService auth) => auth.hasPasswordProvider());
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

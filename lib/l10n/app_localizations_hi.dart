@@ -1181,12 +1181,11 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle => 'गम से सस्ता';
+  String get notificationWelcomeOfferTitle => 'स्वागत उपहार 🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return 'हमारी सभी सदस्यता योजनाओं पर पूरी $discountRate% की छूट। इसे हाथ से न जाने दें!';
-  }
+  String get notificationWelcomeOfferBody =>
+      'आपके लिए एक विशेष स्वागत ऑफर इंतजार कर रहा है! इस खास ऑफर को हाथ से जाने न दें।';
 
   @override
   String get notificationSocialMediaTitle => 'हमसे जुड़ें!';
@@ -1559,8 +1558,13 @@ class AppLocalizationsHi extends AppLocalizations {
   String get myPlan => 'मेरी योजना';
 
   @override
-  String specialOfferBadge(String time) {
-    return 'नए उपयोगकर्ताओं के लिए विशेष ऑफर • $time';
+  String welcomeOfferBadge(String time) {
+    return 'स्वागत प्रस्ताव • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return 'विशेष ऑफर • $time';
   }
 
   @override
@@ -1593,5 +1597,5 @@ class AppLocalizationsHi extends AppLocalizations {
       'उपयोगकर्ता नाम का प्रारूप अमान्य है। 3-20 अक्षर, अंक या . - _ का उपयोग करें।';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => 'विशेष ऑफर';
 }

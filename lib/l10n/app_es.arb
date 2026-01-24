@@ -231,7 +231,7 @@
   "removeModel": "Eliminar Modelo",
   "insufficientRAM": "Memoria Insuficiente",
   "insufficientStorage": "Almacenamiento Insuficiente",
-  "confirmRemoveModel": "¿Estás seguro de que quieres eliminar el modelo {model} de tu dispositivo? Hacerlo también eliminará cualquier conversación anterior con ese modelo.",
+  "confirmRemoveModel": "¿Seguro que quieres eliminar el modelo {model} de tu dispositivo? Al hacerlo, también se eliminarán todas las conversaciones previas con él.",
   "noMatchingModels": "No se encontraron modelos coincidentes.",
   "creditPackage": "Comprar {amount} Créditos",
   "benefit1": "Límites de conversación aumentados",
@@ -422,8 +422,6 @@
   "notificationAppUpdateBody": "¡No olvides actualizar la aplicación para obtener nuevas funciones y mejoras!",
   "notificationNewFeatureTitle": "¡Guau!",
   "notificationNewFeatureBody": "Descubre la nueva función {featureName}. Cortex ahora es más potente que nunca.",
-  "notificationSubscriptionOfferTitle": "MÁS BARATO QUE EL CHICLE",
-  "notificationSubscriptionOfferBody": "¡Un {discountRate}% de DESCUENTO en todos nuestros planes de suscripción! ¡No te lo pierdas!",
   "notificationSocialMediaTitle": "¡Únete a nosotros!",
   "notificationSocialMediaBody": "¡Síguenos en Instagram (vertex.23) para las últimas novedades!",
   "notificationRandomFactTitle": "Dato curioso",
@@ -545,5 +543,9 @@
   "defaultViewDescription": "Cortex siempre está a tu lado con cientos de modelos de IA, capacidades sin conexión, chat dinámico y mucho más.",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "Formato de nombre de usuario no válido. Use de 3 a 20 caracteres, dígitos o . - _",
-  "specialOfferBadge": "Oferta especial para nuevos usuarios • {time}"
+  "welcomeOfferBadge": "Oferta de bienvenida • {time}",
+  "exclusiveOfferBadge": "Oferta exclusiva • {time}",
+  "exclusiveOffer": "Oferta exclusiva",
+  "notificationWelcomeOfferTitle": "Regalo de bienvenida 🎁",
+  "notificationWelcomeOfferBody": "¡Te espera una oferta especial de bienvenida! ¡No te la pierdas!"
 }

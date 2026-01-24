@@ -20,14 +20,22 @@ class SkeletonScreen extends StatelessWidget {
 
     // Total list items: one search bar placeholder + 4 items per category
     final int totalItems = 1 + shimmerCategories.length * 4;
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+
+    final double topPadding = MediaQuery
+        .of(context)
+        .padding
+        .top;
 
     return Shimmer.fromColors(
       key: key ?? const ValueKey('skeleton'),
       baseColor: AppColors.shimmerBase,
       highlightColor: AppColors.shimmerHighlight,
       child: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.fromLTRB(16.0, topPadding + 16.0, 16.0, 16.0),
         itemCount: totalItems,
         itemBuilder: (context, index) {
           if (index == 0) {

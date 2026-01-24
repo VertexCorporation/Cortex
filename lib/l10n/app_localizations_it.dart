@@ -1187,13 +1187,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle =>
-      'PIÙ ECONOMICO DELLA GOMMA DA GOMMA';
+  String get notificationWelcomeOfferTitle => 'Regalo di benvenuto 🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return 'Uno SCONTO COMPLETO del $discountRate% su tutti i nostri piani di abbonamento. Non lasciartelo sfuggire!';
-  }
+  String get notificationWelcomeOfferBody =>
+      'Ti aspetta un\'offerta speciale di benvenuto! Non perdere questa offerta esclusiva.';
 
   @override
   String get notificationSocialMediaTitle => 'Unisciti a noi!';
@@ -1569,8 +1567,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get myPlan => 'Il mio piano';
 
   @override
-  String specialOfferBadge(String time) {
-    return 'Offerta speciale per nuovi utenti • $time';
+  String welcomeOfferBadge(String time) {
+    return 'Offerta di benvenuto • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return 'Offerta esclusiva • $time';
   }
 
   @override
@@ -1603,5 +1606,5 @@ class AppLocalizationsIt extends AppLocalizations {
       'Formato nome utente non valido. Utilizzare 3-20 caratteri, cifre o . - _';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => 'Offerta esclusiva';
 }

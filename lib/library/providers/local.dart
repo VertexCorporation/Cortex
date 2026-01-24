@@ -44,11 +44,13 @@ Future<_ProcessedStateData> _processModelStatesInBackground(
       model['id'] as String: false
   };
 
-  final newPathStates = await ModelsBackendUtils.collectFileStates(offlineModels, filesDirectoryPath);
+  final newPathStates = await ModelsBackendUtils.collectFileStates(
+      offlineModels, filesDirectoryPath);
 
   Map<String, bool> oldPathStates = {};
   if (filesDirectoryPath != oldFilesDirectoryPath) {
-    oldPathStates = await ModelsBackendUtils.collectFileStates(offlineModels, oldFilesDirectoryPath);
+    oldPathStates = await ModelsBackendUtils.collectFileStates(
+        offlineModels, oldFilesDirectoryPath);
   }
 
   final Map<String, bool> combinedStates = {};
@@ -65,7 +67,8 @@ Future<_ProcessedStateData> _processModelStatesInBackground(
 }
 
 /// Manages the local state of models on the device, such as download status and system compatibility.
-class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver {
+class ModelLocalStateProvider extends ChangeNotifier
+    with WidgetsBindingObserver {
   //================================================================================
   // Private State Properties
   //================================================================================
@@ -75,7 +78,8 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   String _filesDirectoryPath = '';
   String _oldFilesDirectoryPath = '';
   final Map<String, DownloadManager> _downloadManagers = {};
-  final DownloadedModelsManager _downloadedModelsManager = DownloadedModelsManager();
+  final DownloadedModelsManager _downloadedModelsManager =
+      DownloadedModelsManager();
   late final ModelDownloadController _dl;
   late final VoidCallback _downloadedModelsManagerListener;
   List<ModelEntity> _currentModels = [];
@@ -87,8 +91,10 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   //================================================================================
 
   SystemInfoData? get systemInfo => _systemInfo;
-  Map<String, bool> get downloadCompleted => Map.unmodifiable(_downloadCompleted);
-  Map<String, DownloadManager> get downloadManagers => Map.unmodifiable(_downloadManagers);
+  Map<String, bool> get downloadCompleted =>
+      Map.unmodifiable(_downloadCompleted);
+  Map<String, DownloadManager> get downloadManagers =>
+      Map.unmodifiable(_downloadManagers);
 
   //================================================================================
   // Initialization & Lifecycle
@@ -123,7 +129,8 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   void update(List<ModelEntity> modelsFromCatalog) {
     if (listEquals(_currentModels, modelsFromCatalog)) return;
 
-    debugPrint("[ModelLocalStateProvider] Received updated model list from catalog. Checking file states.");
+    debugPrint(
+        "[ModelLocalStateProvider] Received updated model list from catalog. Checking file states.");
     _currentModels = modelsFromCatalog;
 
     if (_filesDirectoryPath.isEmpty) {
@@ -138,11 +145,14 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      debugPrint("[ModelLocalStateProvider] App resumed from background. Forcing download state sync.");
+      debugPrint(
+          "[ModelLocalStateProvider] App resumed from background. Forcing download state sync.");
 
       _dl.checkDownloadingStates(
         models: _currentModels,
         groundTruthDownloadStates: _downloadCompleted,
+        isFreshStart:
+            false, // On resume, we want to KEEP failed tasks so user can retry
       );
 
       if (_filesDirectoryPath.isNotEmpty && _currentModels.isNotEmpty) {
@@ -166,12 +176,14 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
   /// Checks if a model's file exists on disk using its path.
   bool isModelOnDisk(String? path) {
     if (path == null || path.isEmpty) {
-      debugPrint("[ModelLocalStateProvider] isModelOnDisk check failed: Path is null or empty.");
+      debugPrint(
+          "[ModelLocalStateProvider] isModelOnDisk check failed: Path is null or empty.");
       return false;
     }
     final file = File(path);
     final exists = file.existsSync();
-    debugPrint("[ModelLocalStateProvider] Checking isModelOnDisk for path: '$path'. Exists: $exists");
+    debugPrint(
+        "[ModelLocalStateProvider] Checking isModelOnDisk for path: '$path'. Exists: $exists");
     return exists;
   }
 
@@ -182,17 +194,23 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
     required String? url,
   }) async {
     if (_isRequestingPermission) {
-      debugPrint("[ModelLocalStateProvider] Permission request already in progress. Ignoring tap.");
+      debugPrint(
+          "[ModelLocalStateProvider] Permission request already in progress. Ignoring tap.");
       return false;
     }
-    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+    final notificationService =
+        Provider.of<IntrovertNotificationService>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
 
     final manager = _downloadManagers[id];
     final isAlreadyCompleted = _downloadCompleted[id] ?? false;
     final modelTitle = _getTitleById(id) ?? id;
 
-    if (url == null || (manager != null && (manager.isDownloading || manager.isPaused || isAlreadyCompleted))) {
+    if (url == null ||
+        (manager != null &&
+            (manager.isDownloading ||
+                manager.isPaused ||
+                isAlreadyCompleted))) {
       return false;
     }
 
@@ -200,10 +218,12 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
 
     try {
       if (Platform.isIOS) {
-        final model = _currentModels.firstWhere((m) => m.id == id, orElse: () => _currentModels.first);
+        final model = _currentModels.firstWhere((m) => m.id == id,
+            orElse: () => _currentModels.first);
         final double sizeInGB = (model.size ?? 0) / 1024.0;
 
-        final bool confirmed = await _showDownloadConfirmationDialog(context, modelTitle, sizeInGB);
+        final bool confirmed = await _showDownloadConfirmationDialog(
+            context, modelTitle, sizeInGB);
 
         if (!confirmed) {
           _isRequestingPermission = false;
@@ -220,19 +240,32 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
           final storageStatus = await Permission.storage.request();
           if (!storageStatus.isGranted) {
             notificationService.showNotification(
-                message: localizations.storagePermissionRequired, type: NotificationType.error);
+                message: localizations.storagePermissionRequired,
+                type: NotificationType.error);
             return false;
           }
         }
 
         final manufacturer = androidInfo.manufacturer.toLowerCase();
-        final problematicVendors = ['xiaomi', 'redmi', 'poco', 'huawei', 'honor', 'oppo', 'vivo', 'meizu', 'oneplus'];
+        final problematicVendors = [
+          'xiaomi',
+          'redmi',
+          'poco',
+          'huawei',
+          'honor',
+          'oppo',
+          'vivo',
+          'meizu',
+          'oneplus'
+        ];
 
         if (problematicVendors.any((vendor) => manufacturer.contains(vendor))) {
-          final batteryStatus = await Permission.ignoreBatteryOptimizations.status;
+          final batteryStatus =
+              await Permission.ignoreBatteryOptimizations.status;
 
           if (!batteryStatus.isGranted) {
-            debugPrint("[ModelLocalStateProvider] $manufacturer device found, requesting the battery optimization permission.");
+            debugPrint(
+                "[ModelLocalStateProvider] $manufacturer device found, requesting the battery optimization permission.");
             await Permission.ignoreBatteryOptimizations.request();
           }
         }
@@ -240,20 +273,27 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
 
       final canShowSystemNotifications = notificationStatus.isGranted;
 
+      final model = _currentModels.firstWhere((m) => m.id == id,
+          orElse: () => _currentModels.first);
+      final double? sizeVal = model.size?.toDouble();
+
       _dl.startDownload(
           id: id,
           url: url,
           title: modelTitle,
-          showSystemNotification: canShowSystemNotifications);
+          showSystemNotification: canShowSystemNotifications,
+          sizeInMB: sizeVal);
 
       if (!canShowSystemNotifications) {
         notificationService.showNotification(
-            message: localizations.downloadStarted, type: NotificationType.success, oneLine: true);
+            message: localizations.downloadStarted,
+            type: NotificationType.success,
+            oneLine: true);
       }
       return true;
-
     } catch (e) {
-      debugPrint("[ModelLocalStateProvider] Error during permission/download sequence: $e");
+      debugPrint(
+          "[ModelLocalStateProvider] Error during permission/download sequence: $e");
       return false;
     } finally {
       _isRequestingPermission = false;
@@ -296,10 +336,7 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
 
     if (_oldFilesDirectoryPath.isNotEmpty) {
       final oldPath = ModelsBackendUtils.getFilePathById(
-          filesDir: _oldFilesDirectoryPath,
-          modelId: id,
-          modelTitle: title
-      );
+          filesDir: _oldFilesDirectoryPath, modelId: id, modelTitle: title);
       if (File(oldPath).existsSync()) {
         return oldPath;
       }
@@ -342,11 +379,13 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
 
     final modelsList = _currentModels.map((e) => e.toMap()).toList();
 
-    final newDownloadStates = await ModelsBackendUtils.collectFileStates(modelsList, _filesDirectoryPath);
+    final newDownloadStates = await ModelsBackendUtils.collectFileStates(
+        modelsList, _filesDirectoryPath);
 
     Map<String, bool> oldDownloadStates = {};
     if (_filesDirectoryPath != _oldFilesDirectoryPath) {
-      oldDownloadStates = await ModelsBackendUtils.collectFileStates(modelsList, _oldFilesDirectoryPath);
+      oldDownloadStates = await ModelsBackendUtils.collectFileStates(
+          modelsList, _oldFilesDirectoryPath);
     }
 
     final Map<String, bool> combinedStates = {};
@@ -371,14 +410,16 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
 
     if (hasChanged) {
       CacheService.invalidate(CacheKey.filteredModels);
-      debugPrint("[ModelLocalStateProvider] Download state changed. Invalidated filtered models cache.");
+      debugPrint(
+          "[ModelLocalStateProvider] Download state changed. Invalidated filtered models cache.");
       notifyListeners();
     }
   }
 
   Future<void> _updateFileStatesInBackground(List<ModelEntity> models) async {
     if (_filesDirectoryPath.isEmpty) {
-      debugPrint("[ModelLocalStateProvider] Files directory path not initialized. Aborting state update.");
+      debugPrint(
+          "[ModelLocalStateProvider] Files directory path not initialized. Aborting state update.");
       return;
     }
 
@@ -402,13 +443,16 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
     await _dl.checkDownloadingStates(
       models: models,
       groundTruthDownloadStates: _downloadCompleted,
+      isFreshStart:
+          true, // We assume a full re-init implies a fresh perspective or app start
     );
 
     notifyListeners();
   }
 
   void _onDownloadedModelsChanged() {
-    debugPrint("[ModelLocalStateProvider] Downloaded models changed. Refreshing state.");
+    debugPrint(
+        "[ModelLocalStateProvider] Downloaded models changed. Refreshing state.");
     _refreshStateAfterFileChange();
   }
 
@@ -467,20 +511,23 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Padding(
-                      padding: EdgeInsets.all(screenWidth * 0.05), // Dynamic padding
+                      padding:
+                          EdgeInsets.all(screenWidth * 0.05), // Dynamic padding
                       child: Column(
                         children: [
                           // 1. Title: Are you sure?
                           Text(
                             localizations.confirmDownloadTitle,
                             style: TextStyle(
-                              fontSize: screenWidth * 0.045, // Dynamic font size
+                              fontSize:
+                                  screenWidth * 0.045, // Dynamic font size
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryColor.inverted,
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(height: screenHeight * 0.015), // Dynamic spacing
+                          SizedBox(
+                              height: screenHeight * 0.015), // Dynamic spacing
 
                           // REMOVED: Huge Model Title (as requested)
 
@@ -488,7 +535,8 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
                           Text(
                             localizations.downloadSizeDisclosure(sizeString),
                             style: TextStyle(
-                              color: AppColors.primaryColor.inverted.withValues(alpha: 0.6),
+                              color: AppColors.primaryColor.inverted
+                                  .withValues(alpha: 0.6),
                               fontSize: screenWidth * 0.035,
                             ),
                             textAlign: TextAlign.center,
@@ -506,8 +554,10 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
                               color: Colors.transparent,
                               child: InkWell(
                                 // Ripple Effect: Senary color with low opacity
-                                splashColor: AppColors.senaryColor.withValues(alpha: 0.1),
-                                highlightColor: AppColors.senaryColor.withValues(alpha: 0.05),
+                                splashColor: AppColors.senaryColor
+                                    .withValues(alpha: 0.1),
+                                highlightColor: AppColors.senaryColor
+                                    .withValues(alpha: 0.05),
                                 onTap: () => Navigator.of(ctx).pop(false),
                                 child: Container(
                                   alignment: Alignment.center,
@@ -515,7 +565,8 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
                                       vertical: screenHeight * 0.02),
                                   child: Text(localizations.cancel,
                                       style: TextStyle(
-                                        color: AppColors.senaryColor, // Senary Color
+                                        color: AppColors
+                                            .senaryColor, // Senary Color
                                         fontSize: screenWidth * 0.04,
                                       )),
                                 ),
@@ -523,15 +574,19 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
                             ),
                           ),
                           VerticalDivider(
-                              width: 1, thickness: 0.5, color: AppColors.border),
+                              width: 1,
+                              thickness: 0.5,
+                              color: AppColors.border),
                           // Download Button
                           Expanded(
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
                                 // Ripple Effect: Senary color with low opacity
-                                splashColor: AppColors.senaryColor.withValues(alpha: 0.1),
-                                highlightColor: AppColors.senaryColor.withValues(alpha: 0.05),
+                                splashColor: AppColors.senaryColor
+                                    .withValues(alpha: 0.1),
+                                highlightColor: AppColors.senaryColor
+                                    .withValues(alpha: 0.05),
                                 onTap: () => Navigator.of(ctx).pop(true),
                                 child: Container(
                                   alignment: Alignment.center,
@@ -539,7 +594,8 @@ class ModelLocalStateProvider extends ChangeNotifier with WidgetsBindingObserver
                                       vertical: screenHeight * 0.02),
                                   child: Text(localizations.download,
                                       style: TextStyle(
-                                        color: AppColors.senaryColor, // Senary Color
+                                        color: AppColors
+                                            .senaryColor, // Senary Color
                                         fontSize: screenWidth * 0.04,
                                         fontWeight: FontWeight.bold,
                                       )),

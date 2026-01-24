@@ -11,6 +11,7 @@
 // - Tuned Sampler Settings (Temp 0.7 default).
 //
 
+import 'dart:io'; // Required for File checks
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/processor.dart';
 import 'package:cortex/chat/services/response.dart';
@@ -140,6 +141,15 @@ class OfflineService {
       return;
     }
 
+    if (!await File(path).exists()) {
+      debugPrint(
+          "[OfflineService] Critical Error: Model file not found at $path");
+      _responseService.onMessageResponse(
+          "[Error: Model file not found on device. Please re-download.]");
+      _responseService.finalizeResponse();
+      return;
+    }
+
     // DYNAMIC CONTEXT SIZE based on device RAM
     final int nCtx = await _computeOptimalContextSize();
 
@@ -173,6 +183,8 @@ class OfflineService {
 
   Future<void> releaseModel() async {
     debugPrint("[OfflineService] Invoking 'releaseModel'.");
+    // Fix: Ensure any active generation is stopped before releasing memory/file handle.
+    await stopGeneration();
     await _llamaChannel.invokeMethod('releaseModel');
     _sessionProvider.setLocalModelLoaded(false);
   }

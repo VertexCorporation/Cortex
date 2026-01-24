@@ -1188,13 +1188,11 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle =>
-      'ДЕШЕВЛЕ, ЧЕМ ЖЕВАТЕЛЬНАЯ РЕЗИНКА';
+  String get notificationWelcomeOfferTitle => 'Приветственный подарок 🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return 'ПОЛНАЯ СКИДКА $discountRate% на все наши тарифные планы. Не упустите!';
-  }
+  String get notificationWelcomeOfferBody =>
+      'Вас ждёт специальное приветственное предложение! Не упустите эту эксклюзивную возможность.';
 
   @override
   String get notificationSocialMediaTitle => 'Присоединяйтесь к нам!';
@@ -1572,8 +1570,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get myPlan => 'Мой план';
 
   @override
-  String specialOfferBadge(String time) {
-    return 'Специальное предложение для новых пользователей • $time';
+  String welcomeOfferBadge(String time) {
+    return 'Приветственное предложение • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return 'Эксклюзивное предложение • $time';
   }
 
   @override
@@ -1606,5 +1609,5 @@ class AppLocalizationsRu extends AppLocalizations {
       'Неверный формат имени пользователя. Используйте 3-20 символов, цифр или . - _';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => 'Эксклюзивное предложение';
 }

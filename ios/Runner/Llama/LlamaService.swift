@@ -24,6 +24,7 @@ class LlamaService: NSObject, FlutterPlugin {
             
             // Extract dynamic parameters from Dart
             let nCtx = args["nCtx"] as? Int32 ?? 2048
+            let nGpu = args["nGpu"] as? Int32 ?? 99       // Default to 99 (Max GPU) if not provided
             let nThreads = args["nThreads"] as? Int32 ?? 4
 
             Task {
@@ -34,7 +35,7 @@ class LlamaService: NSObject, FlutterPlugin {
                     }
 
                     // Pass dynamic parameters to context creation
-                    self.llamaContext = try LlamaContext.create_context(path: path, nCtx: nCtx, nThreads: nThreads)
+                    self.llamaContext = try LlamaContext.create_context(path: path, nCtx: nCtx, nGpu: nGpu, nThreads: nThreads)
 
                     DispatchQueue.main.async {
                         self.resultChannel?.invokeMethod("onModelLoaded", arguments: nil)
@@ -56,6 +57,17 @@ class LlamaService: NSObject, FlutterPlugin {
             }
 
             let photoPath = args["photoPath"] as? String
+            var photoData: Data? = nil
+            
+            if let path = photoPath, !path.isEmpty {
+                let fileURL = URL(fileURLWithPath: path)
+                do {
+                    photoData = try Data(contentsOf: fileURL)
+                    print("[LlamaService] Photo loaded: \(path) (\(photoData!.count) bytes)")
+                } catch {
+                     print("[LlamaService] Error reading photo: \(error)")
+                }
+            }
             
             // Extract sampler parameters from Dart (use defaults if not provided)
             let temp = args["temp"] as? Float ?? 0.7
@@ -75,13 +87,10 @@ class LlamaService: NSObject, FlutterPlugin {
                 // Update sampler with Dart-provided parameters
                 await context.updateSampler(temp: temp, topP: topP, topK: topK)
 
-                if let photo = photoPath, !photo.isEmpty {
-                     print("[LlamaService] Warning: Photo provided but iOS Vision support is currently implementation-pending.")
-                }
-
-                await context.completion_init(text: message)
+                await context.completion_init(text: message, imageData: photoData)
 
                 while await !context.is_done {
+                    // completion_loop logic ...
                     if let token = await context.completion_loop() {
                         if !token.isEmpty {
                             DispatchQueue.main.async {
@@ -108,6 +117,7 @@ class LlamaService: NSObject, FlutterPlugin {
 
         case "releaseModel":
             Task {
+                await self.llamaContext?.stop()
                 self.llamaContext = nil
                 result(nil)
             }

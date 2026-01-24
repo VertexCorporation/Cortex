@@ -222,12 +222,8 @@ class UserProvider with ChangeNotifier {
       try {
         _userData = jsonDecode(jsonString);
         debugPrint("[UserProvider] Cached data loaded successfully.");
-        // We do NOT notify listeners here if this is called before the provider is attached,
-        // but if called from AppInitializer, we might want to?
-        // Actually, if we set _userData, we normally notify.
-        // Let's rely on the caller to handle timing, or notify safely.
-
-        // IMPORTANT: Checking if anyone is listening is hard, but notifyListeners safe usually.
+        // Notify listeners so the UI (AppBar, etc.) picks up the cached data immediately.
+        notifyListeners();
       } catch (e) {
         debugPrint("[UserProvider] Failed to parse cached user data: $e");
       }

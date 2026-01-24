@@ -62,39 +62,71 @@ class MainActivity : FlutterActivity() {
                 when (call.method) {
                     "cacheModel"    -> {
                         val path = call.argument<String>("path")
+                        val nCtx = call.argument<Int>("nCtx") ?: 2048
+                        val nGpu = call.argument<Int>("nGpu") ?: 0
+                        val nThreads = call.argument<Int>("nThreads") ?: 4
+
                         if (path.isNullOrBlank()) {
                             result.error("INVALID_PATH", "Model path is null or empty", null)
                             return@setMethodCallHandler
                         }
-                        startLlamaService("cacheModel", "modelPath" to path)
+                        
+                        val intent = Intent(this, LlamaService::class.java).apply {
+                            putExtra("action", "cacheModel")
+                            putExtra("modelPath", path)
+                            putExtra("nCtx", nCtx)
+                            putExtra("nGpu", nGpu)
+                            putExtra("nThreads", nThreads)
+                        }
+                        startServiceSafe(intent)
+                        
                         result.success("Model loading started: $path")
                     }
 
                     "sendMessage"  -> {
                         val msg = call.argument<String>("message")
                         val photoPath = call.argument<String>("photoPath")
+                        // Flutter passes doubles for floats
+                        val temp = call.argument<Double>("temp")?.toFloat() ?: 0.7f
+                        val topP = call.argument<Double>("topP")?.toFloat() ?: 0.95f
+                        val topK = call.argument<Int>("topK") ?: 40
 
                         if (msg.isNullOrBlank()) {
                             result.error("INVALID_MSG", "Message is null or empty", null)
                             return@setMethodCallHandler
                         }
 
-                        startLlamaService("sendMessage", "message" to msg, "photoPath" to (photoPath ?: ""))
+                        val intent = Intent(this, LlamaService::class.java).apply {
+                            putExtra("action", "sendMessage")
+                            putExtra("message", msg)
+                            putExtra("photoPath", photoPath ?: "")
+                            putExtra("temp", temp)
+                            putExtra("topP", topP)
+                            putExtra("topK", topK)
+                        }
+                        startServiceSafe(intent)
+                        
                         result.success("Message sent: $msg")
                     }
 
                     "stopGeneration" -> {
-                        startLlamaService("stopGeneration")
+                        startServiceSafe(Intent(this, LlamaService::class.java).apply {
+                            putExtra("action", "stopGeneration")
+                        })
                         result.success("Stop generation request sent.")
                     }
 
                     "releaseModel" -> {
-                        startLlamaService("releaseModel")
+                        startServiceSafe(Intent(this, LlamaService::class.java).apply {
+                            putExtra("action", "releaseModel")
+                        })
                         result.success("Unload model request sent.")
                     }
 
                     "resetKv" -> {
-                        startLlamaService("resetKv")
+                         startServiceSafe(Intent(this, LlamaService::class.java).apply {
+                            putExtra("action", "resetKv")
+                        })
                         result.success("KV reset request sent.")
                     }
 
@@ -142,17 +174,12 @@ class MainActivity : FlutterActivity() {
         return stat.blockSizeLong * stat.blockCountLong / (1024L * 1024L)
     }
 
-    /** Helper to start / communicate with the background service. */
-    private fun startLlamaService(action: String, vararg extras: Pair<String, String>) {
-        val intent = Intent(this, LlamaService::class.java).apply {
-            putExtra("action", action)
-            extras.forEach { (k, v) -> putExtra(k, v) }
-        }
-
+    /** Helper to start the background service safely. */
+    private fun startServiceSafe(intent: Intent) {
         try {
             startService(intent)
         } catch (e: IllegalStateException) {
-            Log.w(TAG, "⚠️ App is in background, service start ignored: $action")
+            Log.w(TAG, "⚠️ App is in background, service start ignored.")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start LlamaService: ${e.message}")
         }

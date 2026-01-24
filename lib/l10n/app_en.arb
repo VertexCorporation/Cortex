@@ -467,8 +467,8 @@
   "notificationAppUpdateBody": "Don't forget to update the app for brand new features and improvements!",
   "notificationNewFeatureTitle": "whoa!",
   "notificationNewFeatureBody": "Discover the new {featureName} feature. Cortex is now more powerful than ever.",
-  "notificationSubscriptionOfferTitle": "CHEAPER THAN GUM",
-  "notificationSubscriptionOfferBody": "A FULL {discountRate}% DISCOUNT on all our subscription plans. Don't miss this!",
+  "notificationWelcomeOfferTitle": "Welcome Gift 🎁",
+  "notificationWelcomeOfferBody": "A special welcome offer is waiting for you! Don't miss out on this exclusive deal.",
   "notificationSocialMediaTitle": "Join Us!",
   "notificationSocialMediaBody": "Follow us on Instagram (vertex.23) for the latest news!",
   "notificationRandomFactTitle": "Random Fact",
@@ -610,8 +610,9 @@
   "featureStudyMessage": "You are an expert tutor. Your goal is to explain the user's topic comprehensively. Use clear structure, examples, and analogies. Break complex ideas into digestible parts to ensure the user learns effectively. Topic:",
   "featureQuizMessage": "You are a quiz master. Generate a specific multiple-choice question based on the user's topic. Wait for their answer. Then, evaluate it and ask the next question. Do not reveal all answers at once. Keep it interactive. Topic:",
   "myPlan": "My Plan",
-  "specialOfferBadge": "Welcome Special Offer • {time}",
-  "@specialOfferBadge": {
+  "welcomeOfferBadge": "Welcome Offer • {time}",
+  "exclusiveOfferBadge": "Exclusive Offer • {time}",
+  "@welcomeOfferBadge": {
     "placeholders": {
       "time": {
         "type": "String",

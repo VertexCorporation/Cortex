@@ -221,7 +221,7 @@
   "removeModel": "Hapus Model",
   "insufficientRAM": "Memori Rendah",
   "insufficientStorage": "Penyimpanan Rendah",
-  "confirmRemoveModel": "Apakah Anda yakin ingin menghapus model {model} dari perangkat Anda? Melakukannya juga akan menghapus percakapan sebelumnya dengan model tersebut.",
+  "confirmRemoveModel": "Apakah Anda yakin ingin menghapus model {model} dari perangkat Anda? Dengan melakukan itu, semua percakapan sebelumnya dengan model tersebut juga akan terhapus.",
   "noMatchingModels": "Tidak ada model yang cocok ditemukan.",
   "creditPackage": "Beli {amount} Kredit",
   "benefit1": "Batasan percakapan yang ditingkatkan",
@@ -412,8 +412,6 @@
   "notificationAppUpdateBody": "Jangan lupa memperbarui aplikasi untuk mendapatkan fitur dan peningkatan baru!",
   "notificationNewFeatureTitle": "wah!",
   "notificationNewFeatureBody": "Temukan fitur baru {featureName}. Cortex kini lebih canggih dari sebelumnya.",
-  "notificationSubscriptionOfferTitle": "LEBIH MURAH DARI PERMEN KARET",
-  "notificationSubscriptionOfferBody": "DISKON PENUH {discountRate}% untuk semua paket langganan kami. Jangan lewatkan!",
   "notificationSocialMediaTitle": "Bergabunglah dengan Kami!",
   "notificationSocialMediaBody": "Ikuti kami di Instagram (vertex.23) untuk berita terbaru!",
   "notificationRandomFactTitle": "Fakta Acak",
@@ -535,5 +533,9 @@
   "defaultViewDescription": "Cortex selalu berada di sisi Anda dengan ratusan model AI, kemampuan offline, obrolan dinamis, dan masih banyak lagi.",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "Format nama pengguna tidak valid. Gunakan 3-20 karakter, angka, atau . - _",
-  "specialOfferBadge": "Penawaran Khusus Pengguna Baru • {time}"
+  "welcomeOfferBadge": "Penawaran Selamat Datang • {time}",
+  "exclusiveOfferBadge": "Penawaran Eksklusif • {time}",
+  "exclusiveOffer": "Penawaran Eksklusif",
+  "notificationWelcomeOfferTitle": "Hadiah Selamat Datang 🎁",
+  "notificationWelcomeOfferBody": "Penawaran sambutan spesial menanti Anda! Jangan lewatkan penawaran eksklusif ini."
 }

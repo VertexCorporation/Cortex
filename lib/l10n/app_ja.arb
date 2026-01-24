@@ -221,7 +221,7 @@
   "removeModel": "モデルを削除",
   "insufficientRAM": "メモリ不足",
   "insufficientStorage": "ストレージ不足",
-  "confirmRemoveModel": "本当に{model}モデルをデバイスから削除しますか？そうすると、そのモデルとの以前の会話もすべて削除されます。",
+  "confirmRemoveModel": "デバイスから {model} モデルを削除してもよろしいですか？削除すると、そのモデルとの以前の会話もすべて削除されます。",
   "noMatchingModels": "一致するモデルが見つかりませんでした。",
   "creditPackage": "{amount}クレジットを購入",
   "benefit1": "会話制限の拡大",
@@ -412,8 +412,6 @@
   "notificationAppUpdateBody": "新しい機能や改善点を見逃さないように、アプリをアップデートしてください。",
   "notificationNewFeatureTitle": "うわあ！",
   "notificationNewFeatureBody": "新しい {featureName} 機能をご覧ください。Cortex はこれまで以上に強力になりました。",
-  "notificationSubscriptionOfferTitle": "ガムより安い",
-  "notificationSubscriptionOfferBody": "すべてのサブスクリプションプランが{discountRate}%オフ！この機会をお見逃しなく！",
   "notificationSocialMediaTitle": "参加しませんか！",
   "notificationSocialMediaBody": "最新ニュースはInstagram（vertex.23）でフォローしてください！",
   "notificationRandomFactTitle": "ランダムな事実",
@@ -535,5 +533,9 @@
   "defaultViewDescription": "Cortex は、何百もの AI モデル、オフライン機能、ダイナミック チャットなどを備え、常にあなたのそばにいます。",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "ユーザー名の形式が無効です。3～20文字の文字、数字、または. - _ を使用してください。",
-  "specialOfferBadge": "新規ユーザー向け特別オファー • {time}"
+  "welcomeOfferBadge": "ウェルカムオファー • {time}",
+  "exclusiveOfferBadge": "限定オファー • {time}",
+  "exclusiveOffer": "限定オファー",
+  "notificationWelcomeOfferTitle": "ウェルカムギフト🎁",
+  "notificationWelcomeOfferBody": "特別なウェルカムオファーをご用意しております！この限定オファーをお見逃しなく。"
 }

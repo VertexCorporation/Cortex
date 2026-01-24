@@ -1151,12 +1151,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle => 'ガムより安い';
+  String get notificationWelcomeOfferTitle => 'ウェルカムギフト🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return 'すべてのサブスクリプションプランが$discountRate%オフ！この機会をお見逃しなく！';
-  }
+  String get notificationWelcomeOfferBody =>
+      '特別なウェルカムオファーをご用意しております！この限定オファーをお見逃しなく。';
 
   @override
   String get notificationSocialMediaTitle => '参加しませんか！';
@@ -1519,8 +1518,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get myPlan => '私の計画';
 
   @override
-  String specialOfferBadge(String time) {
-    return '新規ユーザー向け特別オファー • $time';
+  String welcomeOfferBadge(String time) {
+    return 'ウェルカムオファー • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return '限定オファー • $time';
   }
 
   @override
@@ -1553,5 +1557,5 @@ class AppLocalizationsJa extends AppLocalizations {
       'ユーザー名の形式が無効です。3～20文字の文字、数字、または. - _ を使用してください。';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => '限定オファー';
 }

@@ -221,7 +221,7 @@
   "removeModel": "Удалить модель",
   "insufficientRAM": "Недостаточно памяти",
   "insufficientStorage": "Недостаточно места",
-  "confirmRemoveModel": "Вы уверены, что хотите удалить модель {model} с вашего устройства? Это также удалит все предыдущие чаты с этой моделью.",
+  "confirmRemoveModel": "Вы уверены, что хотите удалить модель {model} со своего устройства? Это также приведет к удалению всех предыдущих разговоров, связанных с этой моделью.",
   "noMatchingModels": "Подходящих моделей не найдено.",
   "creditPackage": "Купить {amount} кредитов",
   "benefit1": "Увеличены лимиты на количество разговоров",
@@ -412,8 +412,6 @@
   "notificationAppUpdateBody": "Не забудьте обновить приложение для получения новых функций и улучшений!",
   "notificationNewFeatureTitle": "ух ты!",
   "notificationNewFeatureBody": "Откройте для себя новую функцию {featureName}. Cortex теперь мощнее, чем когда-либо.",
-  "notificationSubscriptionOfferTitle": "ДЕШЕВЛЕ, ЧЕМ ЖЕВАТЕЛЬНАЯ РЕЗИНКА",
-  "notificationSubscriptionOfferBody": "ПОЛНАЯ СКИДКА {discountRate}% на все наши тарифные планы. Не упустите!",
   "notificationSocialMediaTitle": "Присоединяйтесь к нам!",
   "notificationSocialMediaBody": "Подпишитесь на нас в Instagram (vertex.23) и будьте в курсе последних новостей!",
   "notificationRandomFactTitle": "Случайный факт",
@@ -535,5 +533,9 @@
   "defaultViewDescription": "Cortex всегда рядом с вами, предлагая сотни моделей искусственного интеллекта, возможности работы в автономном режиме, динамический чат и многое другое.",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "Неверный формат имени пользователя. Используйте 3-20 символов, цифр или . - _",
-  "specialOfferBadge": "Специальное предложение для новых пользователей • {time}"
+  "welcomeOfferBadge": "Приветственное предложение • {time}",
+  "exclusiveOfferBadge": "Эксклюзивное предложение • {time}",
+  "exclusiveOffer": "Эксклюзивное предложение",
+  "notificationWelcomeOfferTitle": "Приветственный подарок 🎁",
+  "notificationWelcomeOfferBody": "Вас ждёт специальное приветственное предложение! Не упустите эту эксклюзивную возможность."
 }

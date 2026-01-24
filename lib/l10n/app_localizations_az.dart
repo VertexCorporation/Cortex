@@ -1182,12 +1182,11 @@ class AppLocalizationsAz extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle => 'SAKIZDAN UCUZ';
+  String get notificationWelcomeOfferTitle => 'Xoş Gəlmisiniz Hədiyyəsi 🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return 'Bütün abunə planlarımızda TAM $discountRate% ENDİRİM. Bunu qaçırmayın!';
-  }
+  String get notificationWelcomeOfferBody =>
+      'Xüsusi xoş gəlmisiniz təklifi sizi gözləyir! Bu eksklüziv təklifi qaçırmayın.';
 
   @override
   String get notificationSocialMediaTitle => 'Bizə Qoşulun!';
@@ -1562,8 +1561,13 @@ class AppLocalizationsAz extends AppLocalizations {
   String get myPlan => 'Planım';
 
   @override
-  String specialOfferBadge(String time) {
-    return 'Yeni İstifadəçi Xüsusi Təklifi • $time';
+  String welcomeOfferBadge(String time) {
+    return 'Xoş Gəlmisiniz Təklifi • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return 'Eksklüziv Təklif • $time';
   }
 
   @override
@@ -1596,5 +1600,5 @@ class AppLocalizationsAz extends AppLocalizations {
       'Yanlış istifadəçi adı formatı. 3-20 simvol, rəqəm və ya . - _ istifadə edin.';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => 'Eksklüziv Təklif';
 }

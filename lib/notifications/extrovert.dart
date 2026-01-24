@@ -22,6 +22,7 @@ import 'package:timezone/timezone.dart' as timezone;
 import 'package:timezone/data/latest.dart' as data;
 import '../l10n/app_localizations.dart';
 import '../maintenance.dart';
+import '../funds/funds.dart';
 
 //======================================================================
 // Top-Level Functions (Required for Background Isolate)
@@ -68,8 +69,9 @@ Future<Map<String, String>> _buildLocalizedContent(
       .split('_')
       .first);
 
-  debugPrint("[Content Builder] Using '${locale
-      .languageCode}' for notification language.");
+  debugPrint(
+      "[Content Builder] Using '${locale
+          .languageCode}' for notification language.");
 
   final l10n = await AppLocalizations.delegate.load(locale);
 
@@ -79,23 +81,21 @@ Future<Map<String, String>> _buildLocalizedContent(
     switch (key) {
     // --- PARAMETERIZED STRINGS ---
       case 'notificationNewModelAddedBody':
-        return l10n.notificationNewModelAddedBody(
-            data['modelName'] ?? '[Model]');
+        return l10n
+            .notificationNewModelAddedBody(data['modelName'] ?? '[Model]');
       case 'notificationNewFeatureBody':
-        return l10n.notificationNewFeatureBody(
-            data['featureName'] ?? '[Feature]');
-      case 'notificationSubscriptionOfferBody':
-        return l10n.notificationSubscriptionOfferBody(
-            data['discountRate'] ?? '0');
+        return l10n
+            .notificationNewFeatureBody(data['featureName'] ?? '[Feature]');
+      case 'notificationWelcomeOfferBody':
+        return l10n.notificationWelcomeOfferBody;
       case 'notificationUpsellFeatureTitle':
-        return l10n.notificationUpsellFeatureTitle(
-            data['targetTier'] ?? '[Plan]');
+        return l10n
+            .notificationUpsellFeatureTitle(data['targetTier'] ?? '[Plan]');
       case 'notificationUpsellFeatureBody':
         return l10n.notificationUpsellFeatureBody(
             data['currentTier'] ?? '[Current Plan]',
             data['targetTier'] ?? '[New Plan]',
-            data['featureName'] ?? '[Feature]'
-        );
+            data['featureName'] ?? '[Feature]');
 
     // --- NON-PARAMETERIZED STRINGS (unchanged from your original code) ---
       case 'notificationComebackTitle':
@@ -150,8 +150,8 @@ Future<Map<String, String>> _buildLocalizedContent(
         return l10n.notificationAppUpdateBody;
       case 'notificationNewFeatureTitle':
         return l10n.notificationNewFeatureTitle;
-      case 'notificationSubscriptionOfferTitle':
-        return l10n.notificationSubscriptionOfferTitle;
+      case 'notificationWelcomeOfferTitle':
+        return l10n.notificationWelcomeOfferTitle;
       case 'notificationSocialMediaTitle':
         return l10n.notificationSocialMediaTitle;
       case 'notificationSocialMediaBody':
@@ -274,8 +274,8 @@ Future<void> _showLocalizedNotification(Map<String, dynamic> data) async {
   final String channelDescription = data['channel_desc'] ??
       'Notifications about news and updates from Cortex.';
 
-
-  final BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
+  final BigTextStyleInformation bigTextStyleInformation =
+  BigTextStyleInformation(
     body,
     htmlFormatBigText: false,
     contentTitle: title,
@@ -297,8 +297,7 @@ Future<void> _showLocalizedNotification(Map<String, dynamic> data) async {
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
-      )
-  );
+      ));
 
   await FlutterLocalNotificationsPlugin().show(
     DateTime
@@ -321,7 +320,8 @@ class ExtrovertNotificationService {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _localNotifications =
+  FlutterLocalNotificationsPlugin();
 
   // Define Android Notification Channels
   late final AndroidNotificationChannel _fcmChannel;
@@ -356,10 +356,11 @@ class ExtrovertNotificationService {
     // Load localization data safely.
     final prefs = await SharedPreferences.getInstance();
     final savedLocaleCode = prefs.getString('language_code');
-    final locale = savedLocaleCode != null ? Locale(savedLocaleCode) : Locale(
-        Platform.localeName
-            .split('_')
-            .first);
+    final locale = savedLocaleCode != null
+        ? Locale(savedLocaleCode)
+        : Locale(Platform.localeName
+        .split('_')
+        .first);
     final l10n = await AppLocalizations.delegate.load(locale);
 
     // Initialize channels with localized names.
@@ -392,19 +393,23 @@ class ExtrovertNotificationService {
   /// Sets up Flutter Local Notifications, including channels and tap handlers.
   Future<void> _initializeLocalNotifications() async {
     // Create Android notification channels upfront.
-    await _localNotifications.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(
-        _fcmChannel);
-    await _localNotifications.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(
-        _engagementChannel);
-    await _localNotifications.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(
-        _greetingsChannel);
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_fcmChannel);
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_engagementChannel);
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_greetingsChannel);
 
-    const AndroidInitializationSettings initSettingsAndroid = AndroidInitializationSettings(
-        'ic_notification');
-    const DarwinInitializationSettings initSettingsIOS = DarwinInitializationSettings(
+    const AndroidInitializationSettings initSettingsAndroid =
+    AndroidInitializationSettings('ic_notification');
+    const DarwinInitializationSettings initSettingsIOS =
+    DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
@@ -461,11 +466,11 @@ class ExtrovertNotificationService {
           final String errorStr = e.toString();
 
           // Check for specific recoverable errors
-          final bool isServiceNotAvailable = errorStr.contains(
-              "SERVICE_NOT_AVAILABLE") ||
-              errorStr.contains("java.io.IOException");
-          final bool isTooManyRegistrations = errorStr.contains(
-              "TOO_MANY_REGISTRATIONS");
+          final bool isServiceNotAvailable =
+              errorStr.contains("SERVICE_NOT_AVAILABLE") ||
+                  errorStr.contains("java.io.IOException");
+          final bool isTooManyRegistrations =
+          errorStr.contains("TOO_MANY_REGISTRATIONS");
 
           if (isServiceNotAvailable || isTooManyRegistrations) {
             retryCount++;
@@ -543,8 +548,8 @@ class ExtrovertNotificationService {
             "[Extrovert] FCM Service Not Available (Ignored in Crashlytics): $e");
       } else {
         debugPrint("[Extrovert] UNEXPECTED ERROR during FCM init: $e");
-        FirebaseCrashlytics.instance.recordError(
-            e, s, reason: "FCM Initialization Failed (Fatal)");
+        FirebaseCrashlytics.instance
+            .recordError(e, s, reason: "FCM Initialization Failed (Fatal)");
       }
     }
   }
@@ -581,8 +586,8 @@ class ExtrovertNotificationService {
       if (e is! FirebaseException || e.code != 'failed-precondition') {
         debugPrint(
             "[ExtrovertNotificationService] Error requesting notification permission: $e");
-        FirebaseCrashlytics.instance.recordError(
-            e, s, reason: "FCM Permission Request Failed");
+        FirebaseCrashlytics.instance
+            .recordError(e, s, reason: "FCM Permission Request Failed");
       } else {
         debugPrint(
             "[ExtrovertNotificationService] Handled a known 'failed-precondition' error during permission request.");
@@ -608,10 +613,11 @@ class ExtrovertNotificationService {
           "[ExtrovertNotificationService] App resumed. Canceled any pending low-battery notification (ID: $lowBatteryNotificationId).");
 
       if (_auth.currentUser != null) {
-        final pendingRequests = await _localNotifications
-            .pendingNotificationRequests();
-        final engagementRequests = pendingRequests.where((p) =>
-        p.id != lowBatteryNotificationId).toList();
+        final pendingRequests =
+        await _localNotifications.pendingNotificationRequests();
+        final engagementRequests = pendingRequests
+            .where((p) => p.id != lowBatteryNotificationId)
+            .toList();
         if (engagementRequests.isEmpty) {
           debugPrint(
               "[ExtrovertNotificationService] No pending engagement notifications. Scheduling a recovery notification.");
@@ -627,8 +633,8 @@ class ExtrovertNotificationService {
           final batteryLevel = await Battery().batteryLevel;
           if (batteryLevel < 20) {
             final prefs = await SharedPreferences.getInstance();
-            final lastSentTime = prefs.getInt(
-                'lowBatteryNotificationSentTime') ?? 0;
+            final lastSentTime =
+                prefs.getInt('lowBatteryNotificationSentTime') ?? 0;
             final now = DateTime
                 .now()
                 .millisecondsSinceEpoch;
@@ -731,8 +737,9 @@ class ExtrovertNotificationService {
 
       if (tokenToRemove != null) {
         final userRef = _db.collection('users').doc(user.uid);
-        await userRef.update(
-            {'fcmTokens': FieldValue.arrayRemove([tokenToRemove])});
+        await userRef.update({
+          'fcmTokens': FieldValue.arrayRemove([tokenToRemove])
+        });
         debugPrint(
             "[ExtrovertNotificationService] FCM token removed from Firestore for user ${user
                 .uid}.");
@@ -740,8 +747,8 @@ class ExtrovertNotificationService {
     } catch (e, s) {
       debugPrint(
           "[ExtrovertNotificationService] Error removing FCM token on sign-out: $e");
-      FirebaseCrashlytics.instance.recordError(
-          e, s, reason: "FCM Token Cleanup Failed");
+      FirebaseCrashlytics.instance
+          .recordError(e, s, reason: "FCM Token Cleanup Failed");
     }
   }
 
@@ -755,8 +762,9 @@ class ExtrovertNotificationService {
       await prefs.setInt('firstAppOpenTime', now);
     }
     await prefs.setInt('lastAppOpenTime', now);
-    debugPrint("[ExtrovertNotificationService] App open recorded at ${DateTime
-        .now()}.");
+    debugPrint(
+        "[ExtrovertNotificationService] App open recorded at ${DateTime
+            .now()}.");
   }
 
   /// The main scheduler for engagement notifications with richer content pools.
@@ -765,8 +773,8 @@ class ExtrovertNotificationService {
     if (await checkMaintenanceMode()) {
       debugPrint(
           "[ExtrovertNotificationService] Maintenance mode active. Deferring notification scheduling.");
-      await SharedPreferences.getInstance().then((p) =>
-          p.setBool('pendingNotificationDueToMaintenance', true));
+      await SharedPreferences.getInstance()
+          .then((p) => p.setBool('pendingNotificationDueToMaintenance', true));
       return;
     }
     try {
@@ -777,8 +785,8 @@ class ExtrovertNotificationService {
       final now = DateTime.now(); // DateTime
 
       final firstOpenTime = prefs.getInt('firstAppOpenTime');
-      final lastOpenTime = prefs.getInt('lastAppOpenTime') ??
-          now.millisecondsSinceEpoch;
+      final lastOpenTime =
+          prefs.getInt('lastAppOpenTime') ?? now.millisecondsSinceEpoch;
       final lastScheduledTime = prefs.getInt('lastSmartScheduleTime') ?? 0;
 
       if (now.millisecondsSinceEpoch - lastScheduledTime <
@@ -788,14 +796,14 @@ class ExtrovertNotificationService {
         return;
       }
 
-      final welcomeNotificationSent = prefs.getBool(
-          'welcomeNotificationSent') ?? false;
+      final welcomeNotificationSent =
+          prefs.getBool('welcomeNotificationSent') ?? false;
       if (firstOpenTime != null && !welcomeNotificationSent) {
-        final firstOpenDate = DateTime.fromMillisecondsSinceEpoch(
-            firstOpenTime);
+        final firstOpenDate =
+        DateTime.fromMillisecondsSinceEpoch(firstOpenTime);
         if (now
             .difference(firstOpenDate)
-            .inHours < 24) {
+            .inHours < 48) {
           final scheduledDateTime = now.add(const Duration(hours: 1));
           await _scheduleWelcomeNotification(scheduledDateTime);
           return;
@@ -825,20 +833,18 @@ class ExtrovertNotificationService {
           'body': 'notificationGoodMorningBody'
         };
         final tomorrow = now.add(const Duration(days: 1));
-        final finalScheduleTime = DateTime(
-            tomorrow.year, tomorrow.month, tomorrow.day, 9);
-        await _scheduleFinalNotification(
-            engagementNotificationId, selectedNotification, finalScheduleTime,
-            _greetingsChannel);
+        final finalScheduleTime =
+        DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9);
+        await _scheduleFinalNotification(engagementNotificationId,
+            selectedNotification, finalScheduleTime, _greetingsChannel);
       } else if (now.hour < 18) {
         selectedNotification = {
           'title': 'notificationGoodNightTitle',
           'body': 'notificationGoodNightBody'
         };
         final finalScheduleTime = DateTime(now.year, now.month, now.day, 22);
-        await _scheduleFinalNotification(
-            engagementNotificationId, selectedNotification, finalScheduleTime,
-            _greetingsChannel);
+        await _scheduleFinalNotification(engagementNotificationId,
+            selectedNotification, finalScheduleTime, _greetingsChannel);
       } else {
         if (daysSinceLastOpen > 14) {
           const comebackPool = [
@@ -883,15 +889,14 @@ class ExtrovertNotificationService {
           selectedNotification =
           generalPool[Random().nextInt(generalPool.length)];
         }
-        await _scheduleFinalNotification(
-            engagementNotificationId, selectedNotification, scheduledDateTime,
-            _engagementChannel);
+        await _scheduleFinalNotification(engagementNotificationId,
+            selectedNotification, scheduledDateTime, _engagementChannel);
       }
     } catch (e, s) {
       debugPrint(
           "[ExtrovertNotificationService] Error during smart scheduling: $e");
-      FirebaseCrashlytics.instance.recordError(
-          e, s, reason: "SmartSchedulingFailed");
+      FirebaseCrashlytics.instance
+          .recordError(e, s, reason: "SmartSchedulingFailed");
     }
   }
 
@@ -907,8 +912,8 @@ class ExtrovertNotificationService {
     debugPrint(
         "[ExtrovertNotificationService] Maintenance is over. Intelligently scheduling deferred notification.");
 
-    final welcomeNotificationSent = prefs.getBool('welcomeNotificationSent') ??
-        false;
+    final welcomeNotificationSent =
+        prefs.getBool('welcomeNotificationSent') ?? false;
 
     if (!welcomeNotificationSent) {
       debugPrint(
@@ -928,8 +933,8 @@ class ExtrovertNotificationService {
           'body': 'notificationLongTimeNoSeeBody'
         },
       ];
-      final selectedNotification = generalPool[Random().nextInt(
-          generalPool.length)];
+      final selectedNotification =
+      generalPool[Random().nextInt(generalPool.length)];
       final scheduledTime = DateTime.now().add(const Duration(minutes: 5));
       await _scheduleFinalNotification(
           2, selectedNotification, scheduledTime, _engagementChannel);
@@ -938,60 +943,32 @@ class ExtrovertNotificationService {
     await prefs.setBool('pendingNotificationDueToMaintenance', false);
   }
 
-  /// Schedules a special, randomized welcome notification with a larger variety pool.
+  /// Schedules the special welcome discount notification.
   Future<void> _scheduleWelcomeNotification(DateTime scheduledTime) async {
     const int welcomeNotificationId = 1;
-    const welcomePool = [
-      {
-        'title': 'notificationDynamicChatTitle',
-        'body': 'notificationDynamicChatBody'
-      },
-      {'title': 'notificationPirateTitle', 'body': 'notificationPirateBody'},
-      {
-        'title': 'notificationFortuneCookieTitle',
-        'body': 'notificationFortuneCookieBody'
-      },
-      {
-        'title': 'notificationSingularityTitle',
-        'body': 'notificationSingularityBody'
-      },
-      {
-        'title': 'notificationHackerJokeTitle',
-        'body': 'notificationHackerJokeBody'
-      },
-      {
-        'title': 'notificationDetectiveCaseTitle',
-        'body': 'notificationDetectiveCaseBody'
-      },
-      {
-        'title': 'notificationOriginStoryTitle',
-        'body': 'notificationOriginStoryBody'
-      },
-      {
-        'title': 'notificationOpenSourceTitle',
-        'body': 'notificationOpenSourceBody'
-      },
-      {
-        'title': 'notificationHomeworkHelperTitle',
-        'body': 'notificationHomeworkHelperBody'
-      },
-    ];
-    final selectedNotification = welcomePool[Random().nextInt(
-        welcomePool.length)];
+    final welcomeNotification = {
+      'title': 'notificationWelcomeOfferTitle',
+      'body': 'notificationWelcomeOfferBody',
+      'screen': 'funds'
+    };
 
     await _scheduleFinalNotification(
-        welcomeNotificationId, selectedNotification, scheduledTime,
-        _engagementChannel);
+      welcomeNotificationId,
+      welcomeNotification,
+      scheduledTime,
+      _engagementChannel,
+    );
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('welcomeNotificationSent', true);
     debugPrint(
-        "[ExtrovertNotificationService] Welcome notification scheduled with ID 1 for $scheduledTime.");
+        "[ExtrovertNotificationService] Welcome discount notification scheduled with ID 1 for $scheduledTime.");
   }
 
   /// Helper to build and schedule a notification, centralizing the logic.
   Future<void> _scheduleFinalNotification(int id,
-      Map<String, String> notificationKeys, DateTime scheduledTime,
+      Map<String, String> notificationKeys,
+      DateTime scheduledTime,
       AndroidNotificationChannel channel) async {
     final dataPayload = {
       'notification_title_key': notificationKeys['title']!,
@@ -1065,7 +1042,8 @@ class ExtrovertNotificationService {
     );
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('lastSmartScheduleTime', DateTime
+    await prefs.setInt(
+        'lastSmartScheduleTime', DateTime
         .now()
         .millisecondsSinceEpoch);
     debugPrint(
@@ -1127,8 +1105,14 @@ class ExtrovertNotificationService {
       final slug = finalData['slug'];
       debugPrint("TODO: Navigate to news article with slug: $slug");
       // Example: navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => NewsDetailScreen(slug: slug)));
-    } else
-    if (finalData['notification_title_key'] == 'notificationRateAppTitle') {
+    } else if (screen == 'funds' ||
+        finalData['notification_title_key'] ==
+            'notificationWelcomeOfferTitle') {
+      debugPrint("[Extrovert] Navigating to FundsScreen (Special Offer)");
+      navigatorKey.currentState
+          ?.push(MaterialPageRoute(builder: (_) => const FundsScreen()));
+    } else if (finalData['notification_title_key'] ==
+        'notificationRateAppTitle') {
       debugPrint("TODO: Open the app store for rating.");
       // Example: InAppReview.instance.openStoreListing();
     } else {

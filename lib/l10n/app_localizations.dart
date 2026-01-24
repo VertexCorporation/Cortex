@@ -2264,17 +2264,17 @@ abstract class AppLocalizations {
   /// **'Discover the new {featureName} feature. Cortex is now more powerful than ever.'**
   String notificationNewFeatureBody(Object featureName);
 
-  /// No description provided for @notificationSubscriptionOfferTitle.
+  /// No description provided for @notificationWelcomeOfferTitle.
   ///
   /// In en, this message translates to:
-  /// **'CHEAPER THAN GUM'**
-  String get notificationSubscriptionOfferTitle;
+  /// **'Welcome Gift 🎁'**
+  String get notificationWelcomeOfferTitle;
 
-  /// No description provided for @notificationSubscriptionOfferBody.
+  /// No description provided for @notificationWelcomeOfferBody.
   ///
   /// In en, this message translates to:
-  /// **'A FULL {discountRate}% DISCOUNT on all our subscription plans. Don\'t miss this!'**
-  String notificationSubscriptionOfferBody(Object discountRate);
+  /// **'A special welcome offer is waiting for you! Don\'t miss out on this exclusive deal.'**
+  String get notificationWelcomeOfferBody;
 
   /// No description provided for @notificationSocialMediaTitle.
   ///
@@ -2907,11 +2907,17 @@ abstract class AppLocalizations {
   /// **'My Plan'**
   String get myPlan;
 
-  /// No description provided for @specialOfferBadge.
+  /// No description provided for @welcomeOfferBadge.
   ///
   /// In en, this message translates to:
-  /// **'Welcome Special Offer • {time}'**
-  String specialOfferBadge(String time);
+  /// **'Welcome Offer • {time}'**
+  String welcomeOfferBadge(String time);
+
+  /// No description provided for @exclusiveOfferBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Exclusive Offer • {time}'**
+  String exclusiveOfferBadge(Object time);
 
   /// No description provided for @attachmentSheetTitle.
   ///

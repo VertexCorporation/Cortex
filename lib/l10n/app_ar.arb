@@ -221,7 +221,7 @@
   "removeModel": "إزالة النموذج",
   "insufficientRAM": "ذاكرة منخفضة",
   "insufficientStorage": "مساحة تخزين منخفضة",
-  "confirmRemoveModel": "هل أنت متأكد أنك تريد إزالة نموذج {model} من جهازك؟ سيؤدي ذلك أيضًا إلى حذف أي محادثات سابقة مع هذا النموذج.",
+  "confirmRemoveModel": "هل أنت متأكد من رغبتك في إزالة جهاز {model} من جهازك؟ سيؤدي ذلك أيضاً إلى حذف جميع المحادثات السابقة مع هذا الجهاز.",
   "noMatchingModels": "لم يتم العثور على نماذج مطابقة.",
   "creditPackage": "شراء {amount} رصيد",
   "benefit1": "زيادة حدود المحادثة",
@@ -412,8 +412,6 @@
   "notificationAppUpdateBody": "لا تنسى تحديث التطبيق للحصول على ميزات وتحسينات جديدة!",
   "notificationNewFeatureTitle": "واو!",
   "notificationNewFeatureBody": "اكتشف ميزة {featureName} الجديدة. أصبح Cortex الآن أقوى من أي وقت مضى.",
-  "notificationSubscriptionOfferTitle": "أرخص من العلكة",
-  "notificationSubscriptionOfferBody": "خصم كامل بنسبة {discountRate}% على جميع باقات اشتراكنا. لا تفوت هذه الفرصة!",
   "notificationSocialMediaTitle": "انضم إلينا!",
   "notificationSocialMediaBody": "تابعونا على الانستجرام (vertex.23) للحصول على آخر الأخبار!",
   "notificationRandomFactTitle": "حقيقة عشوائية",
@@ -535,5 +533,9 @@
   "defaultViewDescription": "كورتكس دائمًا بجانبك مع مئات من نماذج الذكاء الاصطناعي، وإمكانيات العمل دون اتصال بالإنترنت، والدردشة الديناميكية، وغير ذلك الكثير.",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "تنسيق اسم المستخدم غير صالح. استخدم من 3 إلى 20 حرفًا أو رقمًا أو . - _",
-  "specialOfferBadge": "عرض خاص للمستخدمين الجدد • {time}"
+  "welcomeOfferBadge": "عرض ترحيبي • {time}",
+  "exclusiveOfferBadge": "عرض حصري • {time}",
+  "exclusiveOffer": "عرض حصري",
+  "notificationWelcomeOfferTitle": "هدية ترحيبية 🎁",
+  "notificationWelcomeOfferBody": "عرض ترحيبي مميز بانتظارك! لا تفوت هذه الصفقة الحصرية."
 }
