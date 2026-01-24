@@ -1196,13 +1196,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle =>
-      'MOINS CHER QUE DU CHEWING-GUM';
+  String get notificationWelcomeOfferTitle => 'Cadeau de bienvenue 🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return 'Bénéficiez d\'une réduction de $discountRate % sur tous nos abonnements. À ne pas manquer !';
-  }
+  String get notificationWelcomeOfferBody =>
+      'Une offre de bienvenue exceptionnelle vous attend ! Ne ratez pas cette offre exclusive.';
 
   @override
   String get notificationSocialMediaTitle => 'Rejoignez-nous !';
@@ -1585,8 +1583,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get myPlan => 'Mon plan';
 
   @override
-  String specialOfferBadge(String time) {
-    return 'Offre spéciale pour les nouveaux utilisateurs • $time';
+  String welcomeOfferBadge(String time) {
+    return 'Offre de bienvenue • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return 'Offre exclusive • $time';
   }
 
   @override
@@ -1619,5 +1622,5 @@ class AppLocalizationsFr extends AppLocalizations {
       'Format de nom d\'utilisateur invalide. Veuillez utiliser entre 3 et 20 caractères, chiffres ou points. - _';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => 'Offre exclusive';
 }

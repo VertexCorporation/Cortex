@@ -95,7 +95,7 @@ actor LlamaContext {
     }
 
     /// Static Factory to create and return an actor instance
-    static func create_context(path: String, nCtx: Int32 = 2048, nThreads: Int32 = 4) throws -> LlamaContext {
+    static func create_context(path: String, nCtx: Int32 = 2048, nGpu: Int32 = 99, nThreads: Int32 = 4) throws -> LlamaContext {
         llama_backend_init()
 
         var model_params = llama_model_default_params()
@@ -104,9 +104,9 @@ actor LlamaContext {
         model_params.n_gpu_layers = 0
         print("[LlamaContext] Simulator detected: GPU disabled.")
         #else
-        // IMPORTANT: 99 forces all layers to Metal (GPU)
-        model_params.n_gpu_layers = 99
-        print("[LlamaContext] Device detected: GPU (Metal) enabled.")
+        // Use provided nGpu
+        model_params.n_gpu_layers = nGpu
+        print("[LlamaContext] Device detected: GPU (Metal) enabled with \(nGpu) layers.")
         #endif
 
         guard let model = llama_model_load_from_file(path, model_params) else {
@@ -167,7 +167,12 @@ actor LlamaContext {
 
     // MARK: - Generation Logic
 
-    func completion_init(text: String) {
+    func completion_init(text: String, imageData: Data?) {
+        if let data = imageData {
+             print("[LlamaContext] Image data received (\(data.count) bytes). Vision processing not yet fully bridged.")
+             // TODO: implement llava_eval_image_embed if bindings available
+        }
+
         print("[LlamaContext] Processing prompt: \(text.prefix(50))...")
 
         // Reset state

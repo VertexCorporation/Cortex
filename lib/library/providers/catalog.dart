@@ -19,6 +19,8 @@ import '../backend/data/service.dart';
 import '../backend/remove.dart';
 import '../screen/model/controller.dart';
 import '../screen/new/controller.dart';
+import '../../chat/providers/session.dart';
+import '../../chat/services/offline.dart';
 import 'local.dart';
 
 /// Manages the state of the model catalog for the entire library feature.
@@ -122,6 +124,23 @@ class ModelCatalogProvider extends ChangeNotifier {
     final notificationService = context.read<IntrovertNotificationService>();
     final localStateProvider = context.read<ModelLocalStateProvider>();
 
+    // FIX: Ensure we unload the model from memory if it's currently loaded.
+    // This releases the file handle, allowing the OS to reclaim storage immediately.
+    try {
+      final chatSession = context.read<ChatSessionProvider>();
+      if (chatSession.modelId == model.id) {
+        debugPrint(
+            "[ModelCatalogProvider] Deleting currently active model ('${model.id}'). checking load state...");
+        // Even if not "loaded" flag is true, we should try to release to be safe if it's the selected one.
+        final offlineService = context.read<OfflineService>();
+        await offlineService.releaseModel();
+        debugPrint("[ModelCatalogProvider] Model released from memory.");
+      }
+    } catch (e) {
+      debugPrint(
+          "[ModelCatalogProvider] Warning: Could not release model from memory: $e");
+    }
+
     final confirmed = await showRemoveConfirmationDialog(
         context, model.displayTitle, localizations);
     if (confirmed != true) return false;
@@ -144,7 +163,7 @@ class ModelCatalogProvider extends ChangeNotifier {
         );
       } else {
         final String? uninstalledModelTitle =
-        await localStateProvider.uninstallDownloadedModel(model.id);
+            await localStateProvider.uninstallDownloadedModel(model.id);
         success = uninstalledModelTitle != null;
 
         if (success) {
@@ -162,8 +181,7 @@ class ModelCatalogProvider extends ChangeNotifier {
 
       if (success) {
         debugPrint(
-          "[ModelCatalogProvider] Model removed (${model
-              .id}). Syncing catalog with ModelService cache.",
+          "[ModelCatalogProvider] Model removed (${model.id}). Syncing catalog with ModelService cache.",
         );
         _onDataSourceChanged();
       }
@@ -197,7 +215,7 @@ class ModelCatalogProvider extends ChangeNotifier {
     final localStateProvider = context.read<ModelLocalStateProvider>();
 
     final modelEntity = _allModels.firstWhere(
-          (m) => m.id == id,
+      (m) => m.id == id,
       orElse: () => _modelService.getPreciseModelData(id, langCode: langCode),
     );
 
@@ -305,14 +323,8 @@ class ModelCatalogProvider extends ChangeNotifier {
       AppLocalizations localizations) async {
     final restoreNavBar = Darkener.darken();
     // Get screen dimensions once for responsive sizing.
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     final result = await showGeneralDialog<bool>(
       context: context,
@@ -354,10 +366,10 @@ class ModelCatalogProvider extends ChangeNotifier {
                           Text(
                             localizations.confirmRemoveModel(title),
                             style: TextStyle(
-                              color: AppColors.primaryColor.inverted.withValues(
-                                  alpha: 0.6),
-                              fontSize: screenWidth *
-                                  0.035, // Dynamic font size
+                              color: AppColors.primaryColor.inverted
+                                  .withValues(alpha: 0.6),
+                              fontSize:
+                                  screenWidth * 0.035, // Dynamic font size
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -388,7 +400,8 @@ class ModelCatalogProvider extends ChangeNotifier {
                               ),
                             ),
                           ),
-                          VerticalDivider(width: 1,
+                          VerticalDivider(
+                              width: 1,
                               thickness: 0.5,
                               color: AppColors.border),
                           Expanded(

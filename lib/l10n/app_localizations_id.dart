@@ -1186,13 +1186,11 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle =>
-      'LEBIH MURAH DARI PERMEN KARET';
+  String get notificationWelcomeOfferTitle => 'Hadiah Selamat Datang 🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return 'DISKON PENUH $discountRate% untuk semua paket langganan kami. Jangan lewatkan!';
-  }
+  String get notificationWelcomeOfferBody =>
+      'Penawaran sambutan spesial menanti Anda! Jangan lewatkan penawaran eksklusif ini.';
 
   @override
   String get notificationSocialMediaTitle => 'Bergabunglah dengan Kami!';
@@ -1571,8 +1569,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get myPlan => 'Rencana Saya';
 
   @override
-  String specialOfferBadge(String time) {
-    return 'Penawaran Khusus Pengguna Baru • $time';
+  String welcomeOfferBadge(String time) {
+    return 'Penawaran Selamat Datang • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return 'Penawaran Eksklusif • $time';
   }
 
   @override
@@ -1605,5 +1608,5 @@ class AppLocalizationsId extends AppLocalizations {
       'Format nama pengguna tidak valid. Gunakan 3-20 karakter, angka, atau . - _';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => 'Penawaran Eksklusif';
 }

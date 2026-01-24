@@ -221,7 +221,7 @@
   "removeModel": "Remover Modelo",
   "insufficientRAM": "Memória Insuficiente",
   "insufficientStorage": "Armazenamento Insuficiente",
-  "confirmRemoveModel": "Tem a certeza de que quer remover o modelo {model} do seu dispositivo? Ao fazê-lo, também eliminará quaisquer conversas anteriores com esse modelo.",
+  "confirmRemoveModel": "Tem certeza de que deseja remover o modelo {model} do seu dispositivo? Ao fazer isso, todas as conversas anteriores com esse modelo também serão excluídas.",
   "noMatchingModels": "Nenhum modelo correspondente encontrado.",
   "creditPackage": "Comprar {amount} Créditos",
   "benefit1": "Aumento dos limites de conversa",
@@ -412,8 +412,6 @@
   "notificationAppUpdateBody": "Não se esqueça de atualizar o aplicativo para novos recursos e melhorias!",
   "notificationNewFeatureTitle": "Uau!",
   "notificationNewFeatureBody": "Descubra o novo recurso {featureName}. O Cortex agora está mais poderoso do que nunca.",
-  "notificationSubscriptionOfferTitle": "MAIS BARATO QUE CHICLETE",
-  "notificationSubscriptionOfferBody": "DESCONTO TOTAL de {discountRate}% em todos os nossos planos de assinatura. Não perca!",
   "notificationSocialMediaTitle": "Junte-se a nós!",
   "notificationSocialMediaBody": "Siga-nos no Instagram (vertex.23) para as últimas notícias!",
   "notificationRandomFactTitle": "Fato aleatório",
@@ -535,5 +533,9 @@
   "defaultViewDescription": "O Cortex está sempre ao seu lado com centenas de modelos de IA, funcionalidades offline, chat dinâmico e muito mais.",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "Formato de nome de usuário inválido. Use 3-20 caracteres, dígitos ou . - _",
-  "specialOfferBadge": "Oferta especial para novos usuários • {time}"
+  "welcomeOfferBadge": "Oferta de boas-vindas • {time}",
+  "exclusiveOfferBadge": "Oferta exclusiva • {time}",
+  "exclusiveOffer": "Oferta exclusiva",
+  "notificationWelcomeOfferTitle": "Presente de boas-vindas 🎁",
+  "notificationWelcomeOfferBody": "Uma oferta especial de boas-vindas espera por você! Não perca esta oportunidade exclusiva."
 }

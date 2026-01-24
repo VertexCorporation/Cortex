@@ -191,7 +191,7 @@
   "removeModel": "Modeli Sil",
   "insufficientRAM": "Aşağı Yaddaş",
   "insufficientStorage": "Aşağı Depolama",
-  "confirmRemoveModel": "{model} modelini cihazınızdan silmək istədiyinizə əminsinizmi? Bu əməliyyat həmin model ilə olan bütün əvvəlki söhbətləri də siləcək.",
+  "confirmRemoveModel": "Cihazınızdan {model} modelini silmək istədiyinizə əminsiniz? Bunu etmək həmin modellə əvvəlki söhbətləri də siləcək.",
   "noMatchingModels": "Uyğun model tapılmadı.",
   "creditPackage": "{amount} Kredit Al",
   "benefit1": "Artan söhbət limitləri",
@@ -355,8 +355,6 @@
   "notificationAppUpdateBody": "Yeni funksiyalar və təkmilləşdirmələr üçün proqramı yeniləməyi unutmayın!",
   "notificationNewFeatureTitle": "vay!",
   "notificationNewFeatureBody": "Yeni {featureName} funksiyasını kəşf edin. Korteks indi həmişəkindən daha güclüdür.",
-  "notificationSubscriptionOfferTitle": "SAKIZDAN UCUZ",
-  "notificationSubscriptionOfferBody": "Bütün abunə planlarımızda TAM {discountRate}% ENDİRİM. Bunu qaçırmayın!",
   "notificationSocialMediaTitle": "Bizə Qoşulun!",
   "notificationSocialMediaBody": "Ən son xəbərlər üçün bizi Instagram-da (vertex.23) izləyin!",
   "notificationRandomFactTitle": "Təsadüfi Fakt",
@@ -478,5 +476,9 @@
   "defaultViewDescription": "Cortex yüzlərlə süni intellekt modeli, oflayn imkanlar, dinamik söhbət və daha çox şey ilə həmişə yanınızdadır.",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "Yanlış istifadəçi adı formatı. 3-20 simvol, rəqəm və ya . - _ istifadə edin.",
-  "specialOfferBadge": "Yeni İstifadəçi Xüsusi Təklifi • {time}"
+  "welcomeOfferBadge": "Xoş Gəlmisiniz Təklifi • {time}",
+  "exclusiveOfferBadge": "Eksklüziv Təklif • {time}",
+  "exclusiveOffer": "Eksklüziv Təklif",
+  "notificationWelcomeOfferTitle": "Xoş Gəlmisiniz Hədiyyəsi 🎁",
+  "notificationWelcomeOfferBody": "Xüsusi xoş gəlmisiniz təklifi sizi gözləyir! Bu eksklüziv təklifi qaçırmayın."
 }

@@ -1185,12 +1185,11 @@ class AppLocalizationsKu extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle => 'JI ÇÎMÎKÊ ERZANTIR';
+  String get notificationWelcomeOfferTitle => 'Diyariya Bi Xêrhatinê 🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return 'DAXISTINEKE TEMAM A $discountRate% li ser hemî planên abonetiya me. Vê ji dest xwe bernedin!';
-  }
+  String get notificationWelcomeOfferBody =>
+      'Pêşniyareke taybet a pêşwaziyê li benda we ye! Vê peymana taybet ji dest xwe bernedin.';
 
   @override
   String get notificationSocialMediaTitle => 'Tevlî me bibin!';
@@ -1565,8 +1564,13 @@ class AppLocalizationsKu extends AppLocalizations {
   String get myPlan => 'Plana Min';
 
   @override
-  String specialOfferBadge(String time) {
-    return 'Pêşniyara Taybet a Bikarhênerê Nû • $time';
+  String welcomeOfferBadge(String time) {
+    return 'Pêşniyara Pêşwazîkirinê • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return 'Pêşniyara Taybet • $time';
   }
 
   @override
@@ -1599,5 +1603,5 @@ class AppLocalizationsKu extends AppLocalizations {
       'Formata navê bikarhêner nederbasdar e. 3-20 tîp, reqem, an jî . bikar bîne. - _';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => 'Pêşniyara Taybet';
 }

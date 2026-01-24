@@ -191,7 +191,7 @@
   "removeModel": "Supprimer le Modèle",
   "insufficientRAM": "Mémoire insuffisante",
   "insufficientStorage": "Stockage insuffisant",
-  "confirmRemoveModel": "Êtes-vous sûr de vouloir supprimer le modèle {model} de votre appareil ? Cela supprimera également toutes les conversations précédentes avec ce modèle.",
+  "confirmRemoveModel": "Êtes-vous sûr de vouloir supprimer le modèle {model} de votre appareil ? Cette action supprimera également toutes les conversations précédentes avec ce modèle.",
   "noMatchingModels": "Aucun modèle correspondant trouvé.",
   "creditPackage": "Acheter {amount} Crédits",
   "benefit1": "Limites de Conversation Augmentées",
@@ -370,8 +370,6 @@
   "notificationAppUpdateBody": "N'oubliez pas de mettre à jour l'application pour de toutes nouvelles fonctionnalités et améliorations !",
   "notificationNewFeatureTitle": "ouah!",
   "notificationNewFeatureBody": "Découvrez la nouvelle fonctionnalité {featureName}. Cortex est désormais plus puissant que jamais.",
-  "notificationSubscriptionOfferTitle": "MOINS CHER QUE DU CHEWING-GUM",
-  "notificationSubscriptionOfferBody": "Bénéficiez d'une réduction de {discountRate} % sur tous nos abonnements. À ne pas manquer !",
   "notificationSocialMediaTitle": "Rejoignez-nous !",
   "notificationSocialMediaBody": "Suivez-nous sur Instagram (vertex.23) pour les dernières nouvelles !",
   "notificationRandomFactTitle": "Fait aléatoire",
@@ -493,5 +491,9 @@
   "defaultViewDescription": "Cortex est toujours à vos côtés grâce à des centaines de modèles d'IA, des fonctionnalités hors ligne, un chat dynamique et bien plus encore.",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "Format de nom d'utilisateur invalide. Veuillez utiliser entre 3 et 20 caractères, chiffres ou points. - _",
-  "specialOfferBadge": "Offre spéciale pour les nouveaux utilisateurs • {time}"
+  "welcomeOfferBadge": "Offre de bienvenue • {time}",
+  "exclusiveOfferBadge": "Offre exclusive • {time}",
+  "exclusiveOffer": "Offre exclusive",
+  "notificationWelcomeOfferTitle": "Cadeau de bienvenue 🎁",
+  "notificationWelcomeOfferBody": "Une offre de bienvenue exceptionnelle vous attend ! Ne ratez pas cette offre exclusive."
 }

@@ -221,7 +221,7 @@
   "removeModel": "मॉडल हटाएं",
   "insufficientRAM": "कम मेमोरी",
   "insufficientStorage": "कम स्टोरेज",
-  "confirmRemoveModel": "क्या आप वाकई अपने डिवाइस से {model} मॉडल हटाना चाहते हैं? ऐसा करने से उस मॉडल के साथ कोई भी पिछली बातचीत भी हट जाएगी।",
+  "confirmRemoveModel": "क्या आप वाकई {model} मॉडल को अपने डिवाइस से हटाना चाहते हैं? ऐसा करने से उस मॉडल के साथ हुई सभी पिछली बातचीत भी डिलीट हो जाएगी।",
   "noMatchingModels": "कोई मेल खाने वाला मॉडल नहीं मिला।",
   "creditPackage": "{amount} क्रेडिट खरीदें",
   "benefit1": "बातचीत की सीमाएँ बढ़ाई गईं",
@@ -412,8 +412,6 @@
   "notificationAppUpdateBody": "नए फीचर्स और सुधारों के लिए ऐप को अपडेट करना न भूलें!",
   "notificationNewFeatureTitle": "वाह!",
   "notificationNewFeatureBody": "नए {featureName} फ़ीचर के बारे में जानें। कॉर्टेक्स अब पहले से कहीं ज़्यादा शक्तिशाली है।",
-  "notificationSubscriptionOfferTitle": "गम से सस्ता",
-  "notificationSubscriptionOfferBody": "हमारी सभी सदस्यता योजनाओं पर पूरी {discountRate}% की छूट। इसे हाथ से न जाने दें!",
   "notificationSocialMediaTitle": "हमसे जुड़ें!",
   "notificationSocialMediaBody": "नवीनतम समाचारों के लिए हमें इंस्टाग्राम (vertex.23) पर फॉलो करें!",
   "notificationRandomFactTitle": "यादृच्छिक तथ्य",
@@ -535,5 +533,9 @@
   "defaultViewDescription": "कॉर्टेक्स सैकड़ों एआई मॉडल, ऑफलाइन क्षमताओं, डायनामिक चैट और बहुत कुछ के साथ हमेशा आपके साथ है।",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "उपयोगकर्ता नाम का प्रारूप अमान्य है। 3-20 अक्षर, अंक या . - _ का उपयोग करें।",
-  "specialOfferBadge": "नए उपयोगकर्ताओं के लिए विशेष ऑफर • {time}"
+  "welcomeOfferBadge": "स्वागत प्रस्ताव • {time}",
+  "exclusiveOfferBadge": "विशेष ऑफर • {time}",
+  "exclusiveOffer": "विशेष ऑफर",
+  "notificationWelcomeOfferTitle": "स्वागत उपहार 🎁",
+  "notificationWelcomeOfferBody": "आपके लिए एक विशेष स्वागत ऑफर इंतजार कर रहा है! इस खास ऑफर को हाथ से जाने न दें।"
 }

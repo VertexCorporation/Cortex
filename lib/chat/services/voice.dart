@@ -35,6 +35,26 @@ class VoiceService with ChangeNotifier {
   })  : _speechService = speechService,
         _flutterTts = flutterTts ?? FlutterTts() {
     _initTts();
+    _speechService.addListener(_onSpeechStatusChange);
+  }
+
+  @override
+  void dispose() {
+    _speechService.removeListener(_onSpeechStatusChange);
+    _silenceTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onSpeechStatusChange() {
+    // If native speech service stops listening (timeout/silence)
+    // We must update our internal state to IDLE so the UI shows the Mic button.
+    // We DO NOT auto-restart here (to avoid tight loops).
+    // User must tap Mic button to restart.
+    if (!_speechService.isListening && _state == VoiceState.listening) {
+      debugPrint(
+          "[VoiceService] Native listener stopped. Setting state to IDLE.");
+      _updateState(VoiceState.idle);
+    }
   }
 
   Future<void> _initTts() async {
@@ -104,9 +124,10 @@ class VoiceService with ChangeNotifier {
 
   Future<void> stopSession() async {
     _silenceTimer?.cancel();
+    _updateState(
+        VoiceState.idle); // Set idle FIRST to prevent auto-restart loop
     await _speechService.stopListening();
     await _flutterTts.stop();
-    _updateState(VoiceState.idle);
   }
 
   // --- STT Logic ---

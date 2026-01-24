@@ -47,7 +47,7 @@ class DownloadManager extends ChangeNotifier {
 
 class DownloadedModelsManager extends ChangeNotifier {
   static final DownloadedModelsManager _instance =
-  DownloadedModelsManager._internal();
+      DownloadedModelsManager._internal();
   factory DownloadedModelsManager() => _instance;
   DownloadedModelsManager._internal();
 
@@ -58,19 +58,21 @@ class DownloadedModelsManager extends ChangeNotifier {
     notifyListeners();
   }
 
-
   /// Call this whenever a model is downloaded OR uninstalled.
   /// It simply notifies all listeners (like ModelsScreen and ChatScreen)
   /// that they need to reload their data to get the latest download states.
   void notifyListenersOfChange() {
-    debugPrint("[DownloadedModelsManager] A downloaded model's state has changed. Notifying all listeners to perform a data refresh.");
+    debugPrint(
+        "[DownloadedModelsManager] A downloaded model's state has changed. Notifying all listeners to perform a data refresh.");
     notifyListeners();
   }
 
   void updateSingleDownloadedModel(String modelTitle, String imagePath) {
-    int index = downloadedModels.indexWhere((model) => model.name == modelTitle);
+    int index =
+        downloadedModels.indexWhere((model) => model.name == modelTitle);
     if (index >= 0) {
-      downloadedModels[index] = DownloadedModel(name: modelTitle, image: imagePath);
+      downloadedModels[index] =
+          DownloadedModel(name: modelTitle, image: imagePath);
     } else {
       downloadedModels.add(DownloadedModel(name: modelTitle, image: imagePath));
     }
@@ -108,7 +110,8 @@ class FileDownloadHelper extends ChangeNotifier {
     if (IsolateNameServer.lookupPortByName('downloader_send_port') != null) {
       IsolateNameServer.removePortNameMapping('downloader_send_port');
     }
-    IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
+    IsolateNameServer.registerPortWithName(
+        _port.sendPort, 'downloader_send_port');
 
     _port.listen((dynamic data) async {
       try {
@@ -126,7 +129,8 @@ class FileDownloadHelper extends ChangeNotifier {
           } else if (status == DownloadTaskStatus.complete) {
             taskInfo.onDownloadCompleted(taskId);
             _tasks.remove(taskId);
-            debugPrint("[FileDownloadHelper] Download complete for task '$taskId'. Broadcasting global state change.");
+            debugPrint(
+                "[FileDownloadHelper] Download complete for task '$taskId'. Broadcasting global state change.");
             DownloadedModelsManager().notifyListenersOfChange();
           } else if (status == DownloadTaskStatus.paused) {
             taskInfo.onDownloadPaused();
@@ -134,7 +138,8 @@ class FileDownloadHelper extends ChangeNotifier {
             taskInfo.onDownloadError('Download failed');
             _tasks.remove(taskId);
           } else if (status == DownloadTaskStatus.canceled) {
-            debugPrint("[FileDownloadHelper] Task '$taskId' was confirmed as canceled by the backend.");
+            debugPrint(
+                "[FileDownloadHelper] Task '$taskId' was confirmed as canceled by the backend.");
             _tasks.remove(taskId);
           }
         }
@@ -179,7 +184,8 @@ class FileDownloadHelper extends ChangeNotifier {
         savedDir: savedDir,
         fileName: fileName,
         showNotification: showNotification,
-        openFileFromNotification: showNotification,
+        // Fix: Re-enabled. Now intercepted by AndroidManifest to open App instead of crashing.
+        openFileFromNotification: true,
       );
 
       if (taskId != null) {
@@ -209,25 +215,28 @@ class FileDownloadHelper extends ChangeNotifier {
   /// flutter_downloader plugin to cancel a task. It does not rely on the
   /// in-memory `_tasks` map, so it works perfectly even after an app restart.
   Future<void> cancelDownload(String taskId) async {
-    debugPrint('[FileDownloadHelper] Received request to cancel taskId: $taskId');
+    debugPrint(
+        '[FileDownloadHelper] Received request to cancel taskId: $taskId');
     try {
       // Unconditionally call the plugin to cancel the task. This is the fix.
       await FlutterDownloader.cancel(taskId: taskId);
-      debugPrint('[FileDownloadHelper] Command to cancel taskId: $taskId sent to the OS successfully.');
+      debugPrint(
+          '[FileDownloadHelper] Command to cancel taskId: $taskId sent to the OS successfully.');
 
       // Also remove the task from our in-memory map if it happens to exist
       // (for the non-restart scenario).
       _tasks.remove(taskId);
     } catch (e) {
       // This might happen if the task ID is invalid or already completed. It's safe to ignore.
-      debugPrint("[FileDownloadHelper] Error while cancelling download task '$taskId': $e");
+      debugPrint(
+          "[FileDownloadHelper] Error while cancelling download task '$taskId': $e");
     }
   }
 
-
   Future<void> removeDownload(String taskId) async {
     try {
-      await FlutterDownloader.remove(taskId: taskId, shouldDeleteContent: false);
+      await FlutterDownloader.remove(
+          taskId: taskId, shouldDeleteContent: false);
     } catch (e) {
       debugPrint("Error removing task: $e");
     }
@@ -273,8 +282,9 @@ class FileDownloadHelper extends ChangeNotifier {
         }
       }
 
-      final prefs       = await SharedPreferences.getInstance();
-      final keysToWipe  = prefs.getKeys().where((k) => k.startsWith('download_task_id_'));
+      final prefs = await SharedPreferences.getInstance();
+      final keysToWipe =
+          prefs.getKeys().where((k) => k.startsWith('download_task_id_'));
       for (final k in keysToWipe) {
         await prefs.remove(k);
       }

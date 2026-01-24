@@ -221,7 +221,7 @@
   "removeModel": "Modelê Rake",
   "insufficientRAM": "Bîra Kêm",
   "insufficientStorage": "Depoya Kêm",
-  "confirmRemoveModel": "Tu bi rastî dixwazî modela {model} ji amûra xwe rakî? Vê yekê dê hemî sohbetên berê yên bi wê modelê re jî jê bibe.",
+  "confirmRemoveModel": "Ma tu piştrast î ku dixwazî modela {model} ji cîhaza xwe rakî? Bi vê yekê re, hemû axaftinên berê yên bi wê modelê re jî dê jê bibî.",
   "noMatchingModels": "Tu modelên lihevhatî nehatin dîtin.",
   "creditPackage": "{amount} Kredî Bikire",
   "benefit1": "Sînorên danûstendinê yên zêdekirî",
@@ -412,8 +412,6 @@
   "notificationAppUpdateBody": "Ji bo taybetmendî û başkirinên nû, ji bîr nekin ku sepanê nûve bikin!",
   "notificationNewFeatureTitle": "waa!",
   "notificationNewFeatureBody": "Taybetiya nû ya {featureName} kifş bikin. Cortex niha ji her demê bihêztir e.",
-  "notificationSubscriptionOfferTitle": "JI ÇÎMÎKÊ ERZANTIR",
-  "notificationSubscriptionOfferBody": "DAXISTINEKE TEMAM A {discountRate}% li ser hemî planên abonetiya me. Vê ji dest xwe bernedin!",
   "notificationSocialMediaTitle": "Tevlî me bibin!",
   "notificationSocialMediaBody": "Ji bo nûçeyên dawî li ser Instagramê (vertex.23) me bişopînin!",
   "notificationRandomFactTitle": "Rastiyek Rasthatî",
@@ -535,5 +533,9 @@
   "defaultViewDescription": "Cortex bi sedan modelên AI, kapasîteyên negirêdayî, sohbeta dînamîk û gelek tiştên din her gav li kêleka we ye.",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "Formata navê bikarhêner nederbasdar e. 3-20 tîp, reqem, an jî . bikar bîne. - _",
-  "specialOfferBadge": "Pêşniyara Taybet a Bikarhênerê Nû • {time}"
+  "welcomeOfferBadge": "Pêşniyara Pêşwazîkirinê • {time}",
+  "exclusiveOfferBadge": "Pêşniyara Taybet • {time}",
+  "exclusiveOffer": "Pêşniyara Taybet",
+  "notificationWelcomeOfferTitle": "Diyariya Bi Xêrhatinê 🎁",
+  "notificationWelcomeOfferBody": "Pêşniyareke taybet a pêşwaziyê li benda we ye! Vê peymana taybet ji dest xwe bernedin."
 }

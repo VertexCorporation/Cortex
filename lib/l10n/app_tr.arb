@@ -221,7 +221,7 @@
   "removeModel": "Modeli Kaldır",
   "insufficientRAM": "Yetersiz Bellek",
   "insufficientStorage": "Yetersiz Depolama",
-  "confirmRemoveModel": "{model} modelini cihazınızdan kaldırmak istediğinizden emin misiniz? Bu işlem, o modelle olan önceki tüm sohbetleri de silecektir.",
+  "confirmRemoveModel": "Cihazınızdan {model} modelini kaldırmak istediğinizden emin misiniz? Bunu yaptığınızda, o modelle yapılan önceki tüm konuşmalar da silinecektir.",
   "noMatchingModels": "Eşleşen model bulunamadı.",
   "creditPackage": "{amount} Kredi Satın Al",
   "benefit1": "Daha Yüksek Sohbet Limitleri",
@@ -412,8 +412,8 @@
   "notificationAppUpdateBody": "Yepyeni özellikler ve geliştirmeler için uygulamayı güncellemeyi unutma!",
   "notificationNewFeatureTitle": "oha!",
   "notificationNewFeatureBody": "Yeni {featureName} özelliğini keşfet, artık Cortex çok daha güçlü.",
-  "notificationSubscriptionOfferTitle": "SAKIZ KADAR UCUZ",
-  "notificationSubscriptionOfferBody": "Tüm abonelik planlarımızda TAM %{discountRate} İNDİRİM, bu fırsatı kaçırma!",
+  "notificationWelcomeOfferTitle": "Hoş Geldin Hediyesi 🎁",
+  "notificationWelcomeOfferBody": "Sana özel bir hoş geldin teklifimiz var! Bu özel fırsatı kaçırma.",
   "notificationSocialMediaTitle": "Bize Katıl!",
   "notificationSocialMediaBody": "En son haberler için bizi (vertex.23) Instagram'da takip et!",
   "notificationRandomFactTitle": "Rastgele Bilgi",
@@ -546,5 +546,7 @@
   "defaultViewDescription": "Cortex içerisindeki yüzlerce yapay zekayla, internetsiz çalışma özelliğiyle, dinamik sohbetiyle ve çok daha fazlasıyla her zaman yanında.",
   "speakTheMessage": "Mesajı Seslendir",
   "invalidUsernameFormat": "Geçersiz format. 3-20 karakter, rakam veya . - _ kullanın",
-  "specialOfferBadge": "Yeni Kullanıcılara Özel Teklif • {time}"
+  "welcomeOfferBadge": "Hoş Geldiniz Teklifi • {time}",
+  "exclusiveOfferBadge": "Özel Teklif • {time}",
+  "exclusiveOffer": "Özel Teklif"
 }

@@ -16,9 +16,16 @@ class AnalyticsService {
 
   final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
 
-  /// Get the navigator observer for automatic route tracking
-  FirebaseAnalyticsObserver get observer =>
-      FirebaseAnalyticsObserver(analytics: _analytics);
+  /// Get the navigator observer for automatic route tracking.
+  /// Filters out the root '/' route since it's always shown and not useful for analysis.
+  FirebaseAnalyticsObserver get observer => FirebaseAnalyticsObserver(
+        analytics: _analytics,
+        nameExtractor: (settings) {
+          // Filter out root route - it's always shown on app start
+          if (settings.name == '/') return null;
+          return settings.name;
+        },
+      );
 
   // ============================================================
   // SCREEN TRACKING (Views by Page title and screen class)

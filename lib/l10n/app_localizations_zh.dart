@@ -1120,12 +1120,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle => '比口香糖便宜';
+  String get notificationWelcomeOfferTitle => '欢迎礼品🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return '所有订阅计划均可享受 $discountRate% 的全额折扣。不容错过！';
-  }
+  String get notificationWelcomeOfferBody => '一份特别的迎新优惠等着您！千万不要错过这项独家优惠。';
 
   @override
   String get notificationSocialMediaTitle => '加入我们！';
@@ -1476,8 +1474,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get myPlan => '我的计划';
 
   @override
-  String specialOfferBadge(String time) {
-    return '新用户特惠 • $time';
+  String welcomeOfferBadge(String time) {
+    return '欢迎优惠 • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return '独家优惠 • $time';
   }
 
   @override
@@ -1509,5 +1512,5 @@ class AppLocalizationsZh extends AppLocalizations {
   String get invalidUsernameFormat => '用户名格式无效。请使用 3-20 个字符、数字或句点（. - _）。';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => '独家优惠';
 }

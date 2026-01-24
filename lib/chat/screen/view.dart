@@ -216,6 +216,7 @@ class ChatViewState extends State<ChatView>
   Widget build(BuildContext context) {
     final sessionProvider = context.watch<ChatSessionProvider>();
     final conversationProvider = context.watch<ConversationProvider>();
+    final inputProvider = context.watch<InputProvider>();
 
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -232,49 +233,68 @@ class ChatViewState extends State<ChatView>
         // LAYER 1: Main Content
         Column(
           children: [
-            // Chat Body
+            // Chat Body (Morphs into Dot)
             Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                switchInCurve: Curves.easeOut,
-                switchOutCurve: Curves.easeIn,
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-                child: conversationProvider.isLoadingMessages
-                    ? const MessageListSkeleton(key: ValueKey('skeleton'))
-                    : conversationProvider.messages.isEmpty
-                        ? Container(
-                            key: const ValueKey('empty'),
-                            // Removed hardcoded alignment to allow dynamic spacing in child
-                            child: const ChatEmptyState(),
-                          )
-                        : ChatMessageList(
-                            key: const ValueKey('list'),
-                            scrollController: scrollController,
-                            editService: editService,
-                          ),
+              child: AnimatedScale(
+                scale: inputProvider.isVoiceModeActive ? 0.5 : 1.0,
+                duration: const Duration(milliseconds: 300),
+                curve: inputProvider.isVoiceModeActive
+                    ? Curves.easeInBack
+                    : Curves.easeOutCubic,
+                child: AnimatedOpacity(
+                  opacity: inputProvider.isVoiceModeActive ? 0.0 : 1.0,
+                  duration: const Duration(milliseconds: 300),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 400),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                    child: conversationProvider.isLoadingMessages
+                        ? const MessageListSkeleton(key: ValueKey('skeleton'))
+                        : conversationProvider.messages.isEmpty
+                            ? Container(
+                                key: const ValueKey('empty'),
+                                // Removed hardcoded alignment to allow dynamic spacing in child
+                                child: const ChatEmptyState(),
+                              )
+                            : ChatMessageList(
+                                key: const ValueKey('list'),
+                                scrollController: scrollController,
+                                editService: editService,
+                              ),
+                  ),
+                ),
               ),
             ),
 
-            // Bottom Panel
-            SafeArea(
-              top: false,
-              bottom: true,
-              child: NotificationListener<SizeChangedLayoutNotification>(
-                onNotification: (notification) {
-                  WidgetsBinding.instance
-                      .addPostFrameCallback((_) => _updateBottomPanelHeight());
-                  return true;
-                },
-                child: SizedBox(
-                  key: _bottomPanelKey,
-                  width: double.infinity,
-                  child: ChatInputPanel(
-                    editService: editService,
-                    scrollService: _scrollService,
-                    editPanelController: editPanelController,
-                    slideAnimation: slideAnimation,
+            // Bottom Panel (Slides Down)
+            AnimatedSlide(
+              offset: inputProvider.isVoiceModeActive
+                  ? const Offset(0, 1)
+                  : Offset.zero,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: SafeArea(
+                top: false,
+                bottom: true,
+                child: NotificationListener<SizeChangedLayoutNotification>(
+                  onNotification: (notification) {
+                    WidgetsBinding.instance.addPostFrameCallback(
+                        (_) => _updateBottomPanelHeight());
+                    return true;
+                  },
+                  child: SizedBox(
+                    key: _bottomPanelKey,
+                    width: double.infinity,
+                    child: ChatInputPanel(
+                      editService: editService,
+                      scrollService: _scrollService,
+                      editPanelController: editPanelController,
+                      slideAnimation: slideAnimation,
+                    ),
                   ),
                 ),
               ),
@@ -293,33 +313,39 @@ class ChatViewState extends State<ChatView>
               left: horizontalPadding,
               right: horizontalPadding,
               bottom: basePanelHeight + bottomSafe + _briefingBottomOffset,
-              child: BriefingOverlay(
-                availableCredits:
-                    context.watch<CreditsManager>().totalCreditsNotifier.value,
-
-                // LOGIC UPDATE: Universal Attachment Support
-                // We map 'hasAttachments' to 'photoSelected'.
-                // The BriefingOverlay will use this to show credit cost warnings for any file type.
-                photoSelected: context.watch<InputProvider>().hasAttachments,
-
-                isOfflineModel: _isOfflineCurrentModel(context),
-                modelMissing: _isModelMissing(context),
-                limitReached: _isLimitExceeded(context),
-                isStorageSufficient:
-                    context.watch<ChatSessionProvider>().isStorageSufficient,
-                isPremiumModel:
-                    context.watch<ChatSessionProvider>().isCurrentModelPremium,
-                isSubscribed:
-                    context.watch<ChatSessionProvider>().isUserSubscribed,
-                premiumTrialUses:
-                    context.watch<ChatSessionProvider>().premiumTrialUses,
-                inappropriate: _showInappropriateContentWarning,
-                onVisibleHeightChanged: (h) {
-                  if (briefingVisibleHeightNotifier.value != h) {
-                    briefingVisibleHeightNotifier.value = h;
-                  }
-                },
-                isDynamicChat: sessionProvider.isDynamicChat,
+              child: AnimatedSlide(
+                offset: inputProvider.isVoiceModeActive
+                    ? const Offset(0, 1.5) // Slide deeper
+                    : Offset.zero,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: BriefingOverlay(
+                  availableCredits: context
+                      .watch<CreditsManager>()
+                      .totalCreditsNotifier
+                      .value,
+                  // LOGIC UPDATE: Universal Attachment Support
+                  photoSelected: context.watch<InputProvider>().hasAttachments,
+                  isOfflineModel: _isOfflineCurrentModel(context),
+                  modelMissing: _isModelMissing(context),
+                  limitReached: _isLimitExceeded(context),
+                  isStorageSufficient:
+                      context.watch<ChatSessionProvider>().isStorageSufficient,
+                  isPremiumModel: context
+                      .watch<ChatSessionProvider>()
+                      .isCurrentModelPremium,
+                  isSubscribed:
+                      context.watch<ChatSessionProvider>().isUserSubscribed,
+                  premiumTrialUses:
+                      context.watch<ChatSessionProvider>().premiumTrialUses,
+                  inappropriate: _showInappropriateContentWarning,
+                  onVisibleHeightChanged: (h) {
+                    if (briefingVisibleHeightNotifier.value != h) {
+                      briefingVisibleHeightNotifier.value = h;
+                    }
+                  },
+                  isDynamicChat: sessionProvider.isDynamicChat,
+                ),
               ),
             );
           },
@@ -339,6 +365,7 @@ class ChatViewState extends State<ChatView>
             final double combinedPanelHeight =
                 basePanel + briefingH + _briefingBottomOffset;
 
+            // Pass slide offset directly to prevent Positioned nesting crash
             return _scrollService.buildScrollDownButton(
               screenWidth: screenWidth,
               screenHeight: screenHeight,
@@ -347,6 +374,9 @@ class ChatViewState extends State<ChatView>
               safeAreaBottomPadding: bottomSafe,
               isKeyboardOpen: isKeyboardOpen,
               keyboardHeight: keyboardHeight,
+              slideOffset: inputProvider.isVoiceModeActive
+                  ? const Offset(0, 2)
+                  : Offset.zero,
             );
           },
         ),

@@ -221,7 +221,7 @@
   "removeModel": "모델 제거",
   "insufficientRAM": "메모리 부족",
   "insufficientStorage": "저장 공간 부족",
-  "confirmRemoveModel": "정말로 {model} 모델을 기기에서 제거하시겠습니까? 이 작업을 수행하면 해당 모델과의 이전 대화도 모두 삭제됩니다.",
+  "confirmRemoveModel": "기기에서 {model} 모델을 삭제하시겠습니까? 삭제하면 해당 모델과의 이전 대화 내용도 모두 삭제됩니다.",
   "noMatchingModels": "일치하는 모델을 찾을 수 없습니다.",
   "creditPackage": "{amount} 크레딧 구매",
   "benefit1": "대화 제한 증가",
@@ -412,8 +412,6 @@
   "notificationAppUpdateBody": "새로운 기능과 개선 사항을 적용하려면 앱을 업데이트하는 것을 잊지 마세요!",
   "notificationNewFeatureTitle": "와!",
   "notificationNewFeatureBody": "새로운 {featureName} 기능을 확인해 보세요. Cortex가 그 어느 때보다 강력해졌습니다.",
-  "notificationSubscriptionOfferTitle": "껌보다 저렴하다",
-  "notificationSubscriptionOfferBody": "모든 구독 플랜에 {discountRate}% 할인 혜택이 제공됩니다. 놓치지 마세요!",
   "notificationSocialMediaTitle": "우리와 함께하세요!",
   "notificationSocialMediaBody": "최신 소식을 받아보려면 Instagram(vertex.23)에서 저희를 팔로우하세요!",
   "notificationRandomFactTitle": "무작위 사실",
@@ -535,5 +533,9 @@
   "defaultViewDescription": "Cortex는 수백 가지의 AI 모델, 오프라인 기능, 동적 채팅 등 다양한 기능을 통해 항상 여러분 곁에 있습니다.",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "잘못된 사용자 이름 형식입니다. 3~20자, 숫자 또는 . - _ 를 사용하세요.",
-  "specialOfferBadge": "신규 사용자 특별 혜택 • {time}"
+  "welcomeOfferBadge": "환영 혜택 • {time}",
+  "exclusiveOfferBadge": "특별 할인 • {time}",
+  "exclusiveOffer": "특별 혜택",
+  "notificationWelcomeOfferTitle": "환영 선물 🎁",
+  "notificationWelcomeOfferBody": "특별한 환영 혜택이 기다리고 있습니다! 이 특별한 기회를 놓치지 마세요."
 }

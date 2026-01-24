@@ -1151,12 +1151,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle => '껌보다 저렴하다';
+  String get notificationWelcomeOfferTitle => '환영 선물 🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return '모든 구독 플랜에 $discountRate% 할인 혜택이 제공됩니다. 놓치지 마세요!';
-  }
+  String get notificationWelcomeOfferBody =>
+      '특별한 환영 혜택이 기다리고 있습니다! 이 특별한 기회를 놓치지 마세요.';
 
   @override
   String get notificationSocialMediaTitle => '우리와 함께하세요!';
@@ -1519,8 +1518,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get myPlan => '내 계획';
 
   @override
-  String specialOfferBadge(String time) {
-    return '신규 사용자 특별 혜택 • $time';
+  String welcomeOfferBadge(String time) {
+    return '환영 혜택 • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return '특별 할인 • $time';
   }
 
   @override
@@ -1553,5 +1557,5 @@ class AppLocalizationsKo extends AppLocalizations {
       '잘못된 사용자 이름 형식입니다. 3~20자, 숫자 또는 . - _ 를 사용하세요.';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => '특별 혜택';
 }

@@ -72,6 +72,14 @@ class FundsBackend with ChangeNotifier {
   bool get isSpecialOfferActive => _isSpecialOfferActive;
   int? get specialOfferExpiresAt => _specialOfferExpiresAt;
 
+  bool get isWelcomeOffer {
+    final user = _auth.currentUser;
+    if (user?.metadata.creationTime == null) return true;
+    final daysSinceCreation =
+        DateTime.now().difference(user!.metadata.creationTime!).inDays;
+    return daysSinceCreation < 7;
+  }
+
   // --- Product Identifiers & Mocks ---
   static const String _logName = 'FundsBackend';
   static const String monthlySubscriptionPlus = 'vertex_ai_monthly_sub';
@@ -718,7 +726,39 @@ class FundsBackend with ChangeNotifier {
       );
 
       AppDataState().markUserDataAsChanged();
-      safeAddEvent();
+
+      // Fix: Check if the transaction is recent (e.g., within 2 minutes).
+      // If it's an old transaction (restored or replayed), we do NOT trigger the confetti or analytics event.
+      bool isRecentPurchase = true;
+      if (purchaseDetails.transactionDate != null) {
+        try {
+          final rawDate = purchaseDetails.transactionDate!;
+          DateTime? transactionTime;
+
+          // Try parse as milliseconds (common for Android/Google Play)
+          final dtInt = int.tryParse(rawDate);
+          if (dtInt != null && dtInt > 0) {
+            transactionTime = DateTime.fromMillisecondsSinceEpoch(dtInt);
+          } else {
+            // Try parse as ISO String (common for generic formatting)
+            transactionTime = DateTime.tryParse(rawDate);
+          }
+
+          if (transactionTime != null) {
+            final diff = DateTime.now().difference(transactionTime);
+            // 5 minutes buffer to be safe against clock skew/network delay
+            if (diff.inMinutes.abs() > 5) {
+              isRecentPurchase = false;
+              log('Purchase is old (${diff.inMinutes} mins). Skipping confetti/event.',
+                  name: _logName);
+            }
+          }
+        } catch (_) {}
+      }
+
+      if (isRecentPurchase) {
+        safeAddEvent();
+      }
     } on FirebaseFunctionsException catch (e, stack) {
       log('Purchase verification failed with FirebaseFunctionsException: ${e.message} (Code: ${e.code})',
           name: _logName);

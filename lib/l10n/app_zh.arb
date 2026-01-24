@@ -221,7 +221,7 @@
   "removeModel": "移除模型",
   "insufficientRAM": "内存不足",
   "insufficientStorage": "存储空间不足",
-  "confirmRemoveModel": "您确定要从您的设备中移除 {model} 模型吗？这样做也将删除与该模型的任何先前对话。",
+  "confirmRemoveModel": "您确定要从设备中移除 {model} 型号吗？这样做也会删除之前与该型号的所有对话记录。",
   "noMatchingModels": "未找到匹配的模型。",
   "creditPackage": "购买 {amount} 积分",
   "benefit1": "提高对话上限",
@@ -412,8 +412,6 @@
   "notificationAppUpdateBody": "不要忘记更新应用程序以获得全新的功能和改进！",
   "notificationNewFeatureTitle": "哇哦！",
   "notificationNewFeatureBody": "探索新的 {featureName} 功能。Cortex 现在比以往更加强大。",
-  "notificationSubscriptionOfferTitle": "比口香糖便宜",
-  "notificationSubscriptionOfferBody": "所有订阅计划均可享受 {discountRate}% 的全额折扣。不容错过！",
   "notificationSocialMediaTitle": "加入我们！",
   "notificationSocialMediaBody": "在 Instagram (vertex.23) 上关注我们，获取最新消息！",
   "notificationRandomFactTitle": "随机事实",
@@ -535,5 +533,9 @@
   "defaultViewDescription": "Cortex 始终伴您左右，拥有数百个 AI 模型、离线功能、动态聊天等诸多特性。",
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "用户名格式无效。请使用 3-20 个字符、数字或句点（. - _）。",
-  "specialOfferBadge": "新用户特惠 • {time}"
+  "welcomeOfferBadge": "欢迎优惠 • {time}",
+  "exclusiveOfferBadge": "独家优惠 • {time}",
+  "exclusiveOffer": "独家优惠",
+  "notificationWelcomeOfferTitle": "欢迎礼品🎁",
+  "notificationWelcomeOfferBody": "一份特别的迎新优惠等着您！千万不要错过这项独家优惠。"
 }

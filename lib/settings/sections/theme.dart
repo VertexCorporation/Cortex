@@ -19,8 +19,8 @@ class AppThemeSection extends StatelessWidget {
   const AppThemeSection({super.key});
 
   /// Returns the localized name for a given theme code.
-  String _getLocalizedThemeName(
-      AppLocalizations localizations, String themeCode) {
+  String _getLocalizedThemeName(AppLocalizations localizations,
+      String themeCode) {
     final Map<String, String> mapping = {
       'light': localizations.light,
       'dark': localizations.dark,
@@ -108,12 +108,18 @@ class AppThemeSection extends StatelessWidget {
     final appLocalizations = AppLocalizations.of(context)!;
 
     // --- DYNAMIC SCALING ---
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final double scale = screenWidth / 400.0;
 
     final List<String> availableThemeCodes =
-        AppColors.overlayStyles.keys.toList();
+    AppColors.overlayStyles.keys.toList();
     List<Map<String, dynamic>> themesList = availableThemeCodes.map((code) {
       return {
         'code': code,
@@ -172,12 +178,12 @@ class AppThemeSection extends StatelessWidget {
                             height: 1,
                             thickness: 0.5,
                             color:
-                                AppColors.quinaryColor.withValues(alpha: 0.7)),
+                            AppColors.quinaryColor.withValues(alpha: 0.7)),
 
                         // --- Themes List with Animations ---
                         ConstrainedBox(
                           constraints:
-                              BoxConstraints(maxHeight: screenHeight * 0.4),
+                          BoxConstraints(maxHeight: screenHeight * 0.4),
                           child: ListView.builder(
                             shrinkWrap: true,
                             padding: EdgeInsets.symmetric(
@@ -188,7 +194,7 @@ class AppThemeSection extends StatelessWidget {
                               final bool isEnabled = theme['enabled'] as bool;
                               final String themeCode = theme['code'] as String;
                               final bool isSelected =
-                                  (tempSelectedTheme == themeCode);
+                              (tempSelectedTheme == themeCode);
 
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
@@ -196,47 +202,47 @@ class AppThemeSection extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? AppColors.primaryColor.inverted
-                                          .withValues(alpha: 0.02)
+                                      .withValues(alpha: 0.02)
                                       : Colors.transparent,
                                   borderRadius:
-                                      BorderRadius.circular(8 * scale),
+                                  BorderRadius.circular(8 * scale),
                                 ),
                                 child: ListTile(
                                   leading: isEnabled
                                       ? AnimatedSwitcher(
-                                          duration:
-                                              const Duration(milliseconds: 200),
-                                          transitionBuilder:
-                                              (child, animation) =>
-                                                  FadeTransition(
-                                                      opacity: animation,
-                                                      child: child),
-                                          child: Icon(
-                                            isSelected
-                                                ? Icons.radio_button_checked
-                                                : Icons.radio_button_unchecked,
-                                            key: ValueKey<bool>(isSelected),
-                                            color:
-                                                AppColors.primaryColor.inverted,
-                                            size: 24 * scale,
-                                          ),
-                                        )
+                                    duration:
+                                    const Duration(milliseconds: 200),
+                                    transitionBuilder:
+                                        (child, animation) =>
+                                        FadeTransition(
+                                            opacity: animation,
+                                            child: child),
+                                    child: Icon(
+                                      isSelected
+                                          ? Icons.radio_button_checked
+                                          : Icons.radio_button_unchecked,
+                                      key: ValueKey<bool>(isSelected),
+                                      color:
+                                      AppColors.primaryColor.inverted,
+                                      size: 24 * scale,
+                                    ),
+                                  )
                                       : SizedBox(
-                                          width: 24 * scale,
-                                          height: 24 * scale,
-                                          child: Center(
-                                            child: SvgPicture.asset(
-                                              'assets/icons/lock.svg',
-                                              width: 20 * scale,
-                                              height: 20 * scale,
-                                              colorFilter: ColorFilter.mode(
-                                                  AppColors
-                                                      .primaryColor.inverted
-                                                      .withValues(alpha: 0.5),
-                                                  BlendMode.srcIn),
-                                            ),
-                                          ),
-                                        ),
+                                    width: 24 * scale,
+                                    height: 24 * scale,
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                        'assets/icons/lock.svg',
+                                        width: 20 * scale,
+                                        height: 20 * scale,
+                                        colorFilter: ColorFilter.mode(
+                                            AppColors
+                                                .primaryColor.inverted
+                                                .withValues(alpha: 0.5),
+                                            BlendMode.srcIn),
+                                      ),
+                                    ),
+                                  ),
                                   title: Text(
                                     theme['name'] as String,
                                     style: TextStyle(
@@ -244,7 +250,7 @@ class AppThemeSection extends StatelessWidget {
                                       color: isEnabled
                                           ? AppColors.primaryColor.inverted
                                           : AppColors.primaryColor.inverted
-                                              .withValues(alpha: 0.5),
+                                          .withValues(alpha: 0.5),
                                     ),
                                   ),
                                   onTap: () {
@@ -252,7 +258,7 @@ class AppThemeSection extends StatelessWidget {
                                       if (!isSelected) {
                                         HapticFeedback.lightImpact();
                                         setStateDialog(() =>
-                                            tempSelectedTheme = themeCode);
+                                        tempSelectedTheme = themeCode);
                                       }
                                     } else {
                                       HapticFeedback.lightImpact();
@@ -263,7 +269,7 @@ class AppThemeSection extends StatelessWidget {
                                   },
                                   shape: RoundedRectangleBorder(
                                     borderRadius:
-                                        BorderRadius.circular(8 * scale),
+                                    BorderRadius.circular(8 * scale),
                                   ),
                                   contentPadding: EdgeInsets.symmetric(
                                       horizontal: 10 * scale),
@@ -278,14 +284,14 @@ class AppThemeSection extends StatelessWidget {
                             height: 1,
                             thickness: 0.5,
                             color:
-                                AppColors.quinaryColor.withValues(alpha: 0.7)),
+                            AppColors.quinaryColor.withValues(alpha: 0.7)),
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
                             splashColor:
-                                AppColors.senaryColor.withValues(alpha: 0.1),
+                            AppColors.senaryColor.withValues(alpha: 0.1),
                             highlightColor:
-                                AppColors.senaryColor.withValues(alpha: 0.1),
+                            AppColors.senaryColor.withValues(alpha: 0.1),
                             onTap: () {
                               HapticFeedback.lightImpact();
                               Navigator.of(ctx).pop(tempSelectedTheme);
@@ -329,9 +335,12 @@ class AppThemeSection extends StatelessWidget {
     final appLocalizations = AppLocalizations.of(context)!;
     final themeProvider = context.watch<ThemeProvider>();
     final currentThemeName =
-        _getLocalizedThemeName(appLocalizations, themeProvider.currentTheme);
+    _getLocalizedThemeName(appLocalizations, themeProvider.currentTheme);
 
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final double scale = screenWidth / 400.0;
 
     return Column(

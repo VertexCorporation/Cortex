@@ -79,7 +79,8 @@ class ScrollService {
     _showScrollDownButtonNotifier = notifier;
 
     _listener = () {
-      if (_scrollController == null || !_scrollController!.hasClients ||
+      if (_scrollController == null ||
+          !_scrollController!.hasClients ||
           _showScrollDownButtonNotifier == null) {
         return;
       }
@@ -185,12 +186,13 @@ class ScrollService {
     required double safeAreaBottomPadding,
     required bool isKeyboardOpen,
     required double keyboardHeight,
+    Offset slideOffset = Offset.zero,
   }) {
     final themeColors = AppColors.getThemeColors(AppColors.currentTheme);
     final Color iconColor =
-    themeColors.statusBarIconBrightness == Brightness.light
-        ? Colors.white.withValues(alpha: 0.9)
-        : Colors.black.withValues(alpha: 0.8);
+        themeColors.statusBarIconBrightness == Brightness.light
+            ? Colors.white.withValues(alpha: 0.9)
+            : Colors.black.withValues(alpha: 0.8);
 
     final double panelTopMargin = screenHeight * 0.02;
 
@@ -208,40 +210,45 @@ class ScrollService {
     return Positioned(
       right: screenWidth * 0.02,
       bottom: bottomOffset,
-      child: AnimatedOpacity(
-        opacity: showScrollDownButton ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        child: AnimatedScale(
-          scale: showScrollDownButton ? 1.0 : 0.5,
+      child: AnimatedSlide(
+        offset: slideOffset,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        child: AnimatedOpacity(
+          opacity: showScrollDownButton ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutBack,
-          child: IgnorePointer(
-            ignoring: !showScrollDownButton,
-            child: GestureDetector(
-              onTap: scrollToBottom,
-              child: Container(
-                padding: EdgeInsets.all(screenWidth * 0.02),
-                decoration: BoxDecoration(
-                  color: AppColors.background.withValues(alpha: 0.9),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.border.withValues(alpha: 0.5),
-                    width: 1,
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black38,
-                      blurRadius: 8,
-                      offset: Offset(0, 4),
+          curve: Curves.easeOut,
+          child: AnimatedScale(
+            scale: showScrollDownButton ? 1.0 : 0.5,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutBack,
+            child: IgnorePointer(
+              ignoring: !showScrollDownButton,
+              child: GestureDetector(
+                onTap: scrollToBottom,
+                child: Container(
+                  padding: EdgeInsets.all(screenWidth * 0.02),
+                  decoration: BoxDecoration(
+                    color: AppColors.background.withValues(alpha: 0.9),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.border.withValues(alpha: 0.5),
+                      width: 1,
                     ),
-                  ],
-                ),
-                child: SvgPicture.asset(
-                  'assets/icons/arrov.svg',
-                  width: screenWidth * 0.04,
-                  height: screenWidth * 0.04,
-                  colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: SvgPicture.asset(
+                    'assets/icons/arrov.svg',
+                    width: screenWidth * 0.04,
+                    height: screenWidth * 0.04,
+                    colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                  ),
                 ),
               ),
             ),

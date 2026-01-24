@@ -1172,12 +1172,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle => 'أرخص من العلكة';
+  String get notificationWelcomeOfferTitle => 'هدية ترحيبية 🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return 'خصم كامل بنسبة $discountRate% على جميع باقات اشتراكنا. لا تفوت هذه الفرصة!';
-  }
+  String get notificationWelcomeOfferBody =>
+      'عرض ترحيبي مميز بانتظارك! لا تفوت هذه الصفقة الحصرية.';
 
   @override
   String get notificationSocialMediaTitle => 'انضم إلينا!';
@@ -1547,8 +1546,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get myPlan => 'خطتي';
 
   @override
-  String specialOfferBadge(String time) {
-    return 'عرض خاص للمستخدمين الجدد • $time';
+  String welcomeOfferBadge(String time) {
+    return 'عرض ترحيبي • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return 'عرض حصري • $time';
   }
 
   @override
@@ -1581,5 +1585,5 @@ class AppLocalizationsAr extends AppLocalizations {
       'تنسيق اسم المستخدم غير صالح. استخدم من 3 إلى 20 حرفًا أو رقمًا أو . - _';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => 'عرض حصري';
 }

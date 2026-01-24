@@ -42,31 +42,39 @@ class AxonConversationList extends StatefulWidget {
 class _AxonConversationListState extends State<AxonConversationList> {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   List<String> _displayedIds = [];
+  InboxViewModel? _viewModel;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final vm = context.read<InboxViewModel>();
-      if (vm.conversations.isNotEmpty) {
+      _viewModel = context.read<InboxViewModel>();
+      _viewModel!.addListener(_onViewModelUpdate);
+
+      if (_viewModel!.conversations.isNotEmpty) {
         setState(() {
-          _displayedIds = List.from(vm.conversations);
+          _displayedIds = List.from(_viewModel!.conversations);
         });
       }
     });
   }
 
   @override
-  void didUpdateWidget(AxonConversationList oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void dispose() {
+    _viewModel?.removeListener(_onViewModelUpdate);
+    super.dispose();
+  }
+
+  void _onViewModelUpdate() {
+    if (!mounted) return;
     _checkForUpdates();
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _checkForUpdates();
+  void didUpdateWidget(AxonConversationList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // No longer need to check here, listener handles it.
   }
 
   void _checkForUpdates() {
@@ -93,7 +101,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
         _displayedIds.removeAt(i);
         _listKey.currentState?.removeItem(
           i,
-              (context, animation) => _buildRemovedItem(item, animation),
+          (context, animation) => _buildRemovedItem(item, animation),
           duration: const Duration(milliseconds: 300),
         );
       }
@@ -114,8 +122,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
           if (existingIndex != -1) {
             final movedItem = _displayedIds.removeAt(existingIndex);
             _listKey.currentState?.removeItem(
-                existingIndex,
-                    (context, animation) => const SizedBox.shrink(),
+                existingIndex, (context, animation) => const SizedBox.shrink(),
                 duration: Duration.zero);
             _displayedIds.insert(index, movedItem);
             _listKey.currentState?.insertItem(index,
@@ -135,7 +142,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
       _displayedIds.removeAt(lastIndex);
       _listKey.currentState?.removeItem(
         lastIndex,
-            (context, animation) => const SizedBox.shrink(),
+        (context, animation) => const SizedBox.shrink(),
         duration: Duration.zero,
       );
     }
@@ -152,12 +159,12 @@ class _AxonConversationListState extends State<AxonConversationList> {
         opacity: animation,
         child: manager != null
             ? AxonConversationTile(
-          manager: manager,
-          onDelete: () {},
-          onEdit: (_) {},
-          onTogglePin: () {},
-          key: ValueKey(id),
-        )
+                manager: manager,
+                onDelete: () {},
+                onEdit: (_) {},
+                onTogglePin: () {},
+                key: ValueKey(id),
+              )
             : const SizedBox.shrink(),
       ),
     );
@@ -166,10 +173,14 @@ class _AxonConversationListState extends State<AxonConversationList> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final inboxViewModel = context.watch<InboxViewModel>();
+    // Use context.select to only rebuild when isLoading changes.
+    // The conversation list updates are handled by the dedicated listener.
+    final bool isLoading = context.select<InboxViewModel, bool>(
+      (vm) => vm.isLoading,
+    );
 
     final double horizontalPadding = widget.referenceWidth * 0.05;
-    final bool isLoading = inboxViewModel.isLoading && _displayedIds.isEmpty;
+    final bool showSkeletons = isLoading && _displayedIds.isEmpty;
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 600),
@@ -202,26 +213,30 @@ class _AxonConversationListState extends State<AxonConversationList> {
           ],
         );
       },
-      child: isLoading
+      child: showSkeletons
           ? ListView.separated(
-        key: const ValueKey('loading_skeletons'),
-        padding: EdgeInsets.fromLTRB(
-          horizontalPadding * 0.5,
-          widget.screenHeight * 0.005,
-          horizontalPadding * 0.5,
-          widget.screenHeight * 0.1,
-        ),
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: 14,
-        separatorBuilder: (context, index) => const SizedBox(height: 0),
-        itemBuilder: (context, index) {
-          return _SkeletonTile(
-            referenceWidth: widget.referenceWidth,
-            screenHeight: widget.screenHeight,
-          );
-        },
-      )
-          : _buildListContent(localizations, inboxViewModel, horizontalPadding),
+              key: const ValueKey('loading_skeletons'),
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding * 0.5,
+                widget.screenHeight * 0.005,
+                horizontalPadding * 0.5,
+                widget.screenHeight * 0.1,
+              ),
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 14,
+              separatorBuilder: (context, index) => const SizedBox(height: 0),
+              itemBuilder: (context, index) {
+                return _SkeletonTile(
+                  referenceWidth: widget.referenceWidth,
+                  screenHeight: widget.screenHeight,
+                );
+              },
+            )
+          : _buildListContent(
+              localizations,
+              context.read<InboxViewModel>(),
+              horizontalPadding,
+            ),
     );
   }
 
@@ -235,9 +250,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
     }
 
     final bool isEmpty = currentIds.isEmpty && _displayedIds.isEmpty;
-    final bool hasSearchText = widget.searchController.text
-        .trim()
-        .isNotEmpty;
+    final bool hasSearchText = widget.searchController.text.trim().isNotEmpty;
     final bool showNoResults =
         widget.isSearchActive && hasSearchText && isEmpty;
 
@@ -247,11 +260,11 @@ class _AxonConversationListState extends State<AxonConversationList> {
         if (isEmpty)
           Positioned.fill(
               child: Center(
-                key: const ValueKey('empty_state'),
-                child: showNoResults
-                    ? _buildNoResultsFound(context, localizations)
-                    : const EmptyStateView(isForStarred: false),
-              )),
+            key: const ValueKey('empty_state'),
+            child: showNoResults
+                ? _buildNoResultsFound(context, localizations)
+                : const EmptyStateView(isForStarred: false),
+          )),
         if (!showNoResults)
           Positioned.fill(
             child: ScrollFog(
@@ -292,7 +305,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
                         onDelete: () {
                           inboxViewModel.deleteConversation(id);
                           Provider.of<IntrovertNotificationService>(context,
-                              listen: false)
+                                  listen: false)
                               .showNotification(
                             message: localizations.conversationDeleted,
                             type: NotificationType.success,
@@ -314,8 +327,8 @@ class _AxonConversationListState extends State<AxonConversationList> {
     );
   }
 
-  Widget _buildNoResultsFound(BuildContext context,
-      AppLocalizations localizations) {
+  Widget _buildNoResultsFound(
+      BuildContext context, AppLocalizations localizations) {
     return Padding(
       key: const ValueKey('no_results'),
       padding: EdgeInsets.only(top: widget.screenHeight * 0.05),

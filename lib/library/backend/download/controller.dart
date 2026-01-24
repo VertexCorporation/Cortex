@@ -10,6 +10,7 @@ import 'package:mutex/mutex.dart';
 import '../data/entity.dart';
 import 'download.dart';
 import '../data/user.dart';
+import '../system.dart';
 
 class ModelDownloadController {
   ModelDownloadController({
@@ -27,6 +28,7 @@ class ModelDownloadController {
   final Map<String, DownloadManager> managers;
   final Map<String, bool> downloadCompleted;
   final String Function(String id) getFilePathById;
+
   /// A callback function that the controller will invoke to signal a UI refresh.
   final VoidCallback onStateChange;
 
@@ -47,15 +49,37 @@ class ModelDownloadController {
     required String url,
     required String title,
     required bool showSystemNotification,
+    double? sizeInMB,
   }) async {
     if (url.isEmpty) {
-      debugPrint("[DownloadController] Download for '$id' aborted: URL is empty.");
+      debugPrint(
+          "[DownloadController] Download for '$id' aborted: URL is empty.");
       return;
+    }
+
+    // Storage Check
+    if (sizeInMB != null) {
+      final sysInfo = await SystemInfoProvider.fetchSystemInfo();
+      final freeStorage = sysInfo.freeStorage; // MB
+      // 10% safety buffer or 500MB, whichever is smaller, but at least 100MB
+      final buffer = (sizeInMB * 0.1).clamp(100.0, 500.0);
+
+      if (freeStorage < (sizeInMB + buffer)) {
+        debugPrint(
+            "[DownloadController] Not enough storage. Free: ${freeStorage}MB, Required: ${sizeInMB + buffer}MB");
+        // We can't easily show a Toast here without a scaffold key or overlay,
+        // but we can abort and let the UI stay in "Download" state (not loading).
+        // Or we can throw to trigger the error state.
+        // Better: throw a specific exception message.
+        throw Exception(
+            "Insufficient storage space via SystemInfoProvider check.");
+      }
     }
 
     final mutex = _modelMutexes.putIfAbsent(id, () => Mutex());
     if (mutex.isLocked) {
-      debugPrint("[DownloadController] Download for '$id' is already being initiated. Ignoring duplicate request.");
+      debugPrint(
+          "[DownloadController] Download for '$id' is already being initiated. Ignoring duplicate request.");
       return;
     }
 
@@ -63,7 +87,8 @@ class ModelDownloadController {
     try {
       final manager = managers.putIfAbsent(id, () => DownloadManager());
       if (manager.isDownloaded || manager.isDownloading || manager.isPaused) {
-        debugPrint("[DownloadController] Pre-flight check failed for '$id'. Aborting.");
+        debugPrint(
+            "[DownloadController] Pre-flight check failed for '$id'. Aborting.");
         return;
       }
 
@@ -82,8 +107,12 @@ class ModelDownloadController {
         showSystemNotification: showSystemNotification,
       );
     } catch (e) {
-      debugPrint("[DownloadController] CRITICAL ERROR during download initiation for '$id': $e");
-      managers[id]?..setDownloading(false)..setPaused(false)..setProgress(0);
+      debugPrint(
+          "[DownloadController] CRITICAL ERROR during download initiation for '$id': $e");
+      managers[id]
+        ?..setDownloading(false)
+        ..setPaused(false)
+        ..setProgress(0);
       onStateChange(); // Also notify on error
     } finally {
       if (mutex.isLocked) {
@@ -96,7 +125,8 @@ class ModelDownloadController {
   Future<void> cancelDownload(String id) async {
     final manager = managers[id];
     if (manager == null) {
-      debugPrint("[DownloadController] Cancel request for '$id' ignored: No manager found.");
+      debugPrint(
+          "[DownloadController] Cancel request for '$id' ignored: No manager found.");
       return;
     }
 
@@ -110,29 +140,35 @@ class ModelDownloadController {
     onStateChange();
 
     final prefs = await SharedPreferences.getInstance();
-    final taskId = _downloadTaskIds[id] ?? prefs.getString('download_task_id_$id');
+    final taskId =
+        _downloadTaskIds[id] ?? prefs.getString('download_task_id_$id');
 
     if (taskId == null) {
-      debugPrint("[DownloadController] Cancel cleanup for '$id': No task ID found, only UI state was reset.");
+      debugPrint(
+          "[DownloadController] Cancel cleanup for '$id': No task ID found, only UI state was reset.");
       return;
     }
 
     try {
       await FileDownloadHelper().cancelDownload(taskId);
-      debugPrint("[DownloadController] Cancellation command sent for task '$taskId'.");
+      debugPrint(
+          "[DownloadController] Cancellation command sent for task '$taskId'.");
 
       final filePath = getFilePathById(id);
       final partialFile = File(filePath);
       if (await partialFile.exists()) {
         try {
           await partialFile.delete();
-          debugPrint("[DownloadController] Deleted partial download file for '$id'.");
+          debugPrint(
+              "[DownloadController] Deleted partial download file for '$id'.");
         } catch (e) {
-          debugPrint("[DownloadController] Error deleting partial file for '$id': $e");
+          debugPrint(
+              "[DownloadController] Error deleting partial file for '$id': $e");
         }
       }
     } catch (e, s) {
-      debugPrint("[DownloadController] An error occurred during cancellation for '$id': $e\n$s");
+      debugPrint(
+          "[DownloadController] An error occurred during cancellation for '$id': $e\n$s");
     } finally {
       _downloadTaskIds.remove(id);
       await prefs.remove('download_task_id_$id');
@@ -177,8 +213,8 @@ class ModelDownloadController {
   Future<void> checkDownloadingStates({
     required List<ModelEntity> models,
     required Map<String, bool> groundTruthDownloadStates,
+    bool isFreshStart = false,
   }) async {
-
     final tasks = await FlutterDownloader.loadTasks();
     final safeTasks = tasks ?? [];
 
@@ -189,16 +225,21 @@ class ModelDownloadController {
       if (model.isServerSide) continue;
       final id = model.id;
       final manager = managers[id];
-      final effectiveManager = manager ?? managers.putIfAbsent(id, () => DownloadManager());
+      final effectiveManager =
+          manager ?? managers.putIfAbsent(id, () => DownloadManager());
 
       final taskId = prefs.getString('download_task_id_$id');
-      final task = taskId == null ? null : safeTasks.firstWhereOrNull((t) => t.taskId == taskId);
+      final task = taskId == null
+          ? null
+          : safeTasks.firstWhereOrNull((t) => t.taskId == taskId);
 
       bool isTaskRunning = task != null &&
-          (task.status == DownloadTaskStatus.running || task.status == DownloadTaskStatus.enqueued);
+          (task.status == DownloadTaskStatus.running ||
+              task.status == DownloadTaskStatus.enqueued);
 
       if (!isTaskRunning && _activeDownloadCompleters.containsKey(id)) {
-        debugPrint("[DownloadController] ZOMBIE LOCK DETECTED for '$id'. Forcing completer termination.");
+        debugPrint(
+            "[DownloadController] ZOMBIE LOCK DETECTED for '$id'. Forcing completer termination.");
         final completer = _activeDownloadCompleters[id];
         if (completer != null && !completer.isCompleted) {
           completer.completeError("System process kill detected on resume");
@@ -206,11 +247,14 @@ class ModelDownloadController {
         _activeDownloadCompleters.remove(id);
       }
 
-
       if (task == null) {
         if (effectiveManager.isDownloading || effectiveManager.isPaused) {
-          debugPrint("[DownloadController] Sync: Task for '$id' disappeared. Resetting UI.");
-          effectiveManager..setDownloading(false)..setPaused(false)..setProgress(0);
+          debugPrint(
+              "[DownloadController] Sync: Task for '$id' disappeared. Resetting UI.");
+          effectiveManager
+            ..setDownloading(false)
+            ..setPaused(false)
+            ..setProgress(0);
           needsUIRefresh = true;
         }
 
@@ -218,58 +262,129 @@ class ModelDownloadController {
           await prefs.remove('download_task_id_$id');
           _downloadTaskIds.remove(id);
         }
+
+        // Fix: Orphaned File Cleanup
+        // If the task is gone from the DB, and we don't think it's downloaded,
+        // and we are starting fresh... the file is likely a zombie partial.
+        if (isFreshStart) {
+          final isDownloaded = groundTruthDownloadStates[id] ?? false;
+          if (!isDownloaded) {
+            final path = getFilePathById(id);
+            final file = File(path);
+            if (await file.exists()) {
+              debugPrint(
+                  "[DownloadController] Fresh Start Cleanup: Deleting ORPHANED file for '$id' (No task found).");
+              try {
+                await file.delete();
+              } catch (e) {
+                debugPrint("Error deleting orphan: $e");
+              }
+            }
+          }
+        }
+
         continue;
       }
 
       _downloadTaskIds[id] = task.taskId;
       effectiveManager.setCancelled(false);
 
-      debugPrint("[DownloadController] Syncing '$id': Status ${task.status}, Progress ${task.progress}");
+      debugPrint(
+          "[DownloadController] Syncing '$id': Status ${task.status}, Progress ${task.progress}");
 
       switch (task.status) {
         case DownloadTaskStatus.running:
-          effectiveManager..setDownloading(true)..setPaused(false)..setProgress(task.progress.toDouble());
+          effectiveManager
+            ..setDownloading(true)
+            ..setPaused(false)
+            ..setProgress(task.progress.toDouble());
           needsUIRefresh = true;
           break;
 
         case DownloadTaskStatus.enqueued:
-          effectiveManager..setDownloading(true)..setPaused(false)..setProgress(task.progress.toDouble());
+          effectiveManager
+            ..setDownloading(true)
+            ..setPaused(false)
+            ..setProgress(task.progress.toDouble());
           needsUIRefresh = true;
           break;
 
         case DownloadTaskStatus.paused:
-          effectiveManager..setDownloading(false)..setPaused(true)..setProgress(task.progress.toDouble());
+          effectiveManager
+            ..setDownloading(false)
+            ..setPaused(true)
+            ..setProgress(task.progress.toDouble());
           needsUIRefresh = true;
           break;
 
         case DownloadTaskStatus.complete:
-          final bool fileActuallyExists = groundTruthDownloadStates[id] ?? false;
+          final bool fileActuallyExists =
+              groundTruthDownloadStates[id] ?? false;
 
           if (fileActuallyExists) {
-            effectiveManager..setDownloading(false)..setPaused(false)..setDownloaded(true)..setProgress(100);
+            effectiveManager
+              ..setDownloading(false)
+              ..setPaused(false)
+              ..setDownloaded(true)
+              ..setProgress(100);
             await prefs.remove('download_task_id_$id');
             needsUIRefresh = true;
           } else {
-            debugPrint("[DownloadController] Conflict found for '$id'. Task complete but file missing.");
-            await FlutterDownloader.remove(taskId: task.taskId, shouldDeleteContent: false);
+            debugPrint(
+                "[DownloadController] Conflict found for '$id'. Task complete but file missing. Cleaning up.");
+            // FIX: Ensure we clean up the zombie task from the downloader DB
+            await FlutterDownloader.remove(
+                taskId: task.taskId, shouldDeleteContent: false);
             await prefs.remove('download_task_id_$id');
-            effectiveManager..setDownloading(false)..setDownloaded(false)..setProgress(0);
+
+            // FIX: Ensure we remove the 'downloaded' mark from user models if file is gone
+            await UserModels.removeDownloadedModel(id);
+
+            effectiveManager
+              ..setDownloading(false)
+              ..setDownloaded(false)
+              ..setProgress(0);
             needsUIRefresh = true;
           }
           break;
 
         case DownloadTaskStatus.failed:
-          debugPrint("[DownloadController] Sync: Task '$id' failed while backgrounded.");
-          effectiveManager..setDownloading(false)..setPaused(false)..setProgress(0);
+          debugPrint(
+              "[DownloadController] Sync: Task '$id' failed while backgrounded.");
+          effectiveManager
+            ..setDownloading(false)
+            ..setPaused(false)
+            ..setProgress(0);
 
-          await FlutterDownloader.remove(taskId: task.taskId, shouldDeleteContent: false);
-          await prefs.remove('download_task_id_$id');
-          needsUIRefresh = true;
+          if (isFreshStart) {
+            debugPrint(
+                "[DownloadController] Fresh Start Cleanup: Deleting stale failed task '$id'.");
+            await FlutterDownloader.remove(
+                taskId: task.taskId, shouldDeleteContent: true);
+            await prefs.remove('download_task_id_$id');
+            await UserModels.removeDownloadedModel(id);
+          } else {
+            // Keep for resume if simple lifecycle resume
+            needsUIRefresh = true;
+          }
           break;
 
         case DownloadTaskStatus.canceled:
-          effectiveManager..setDownloading(false)..setPaused(false)..setProgress(0);
-          await prefs.remove('download_task_id_$id');
+          effectiveManager
+            ..setDownloading(false)
+            ..setPaused(false)
+            ..setProgress(0);
+
+          if (isFreshStart) {
+            debugPrint(
+                "[DownloadController] Fresh Start Cleanup: Deleting stale canceled task '$id'.");
+            await FlutterDownloader.remove(
+                taskId: task.taskId, shouldDeleteContent: true);
+            await prefs.remove('download_task_id_$id');
+            await UserModels.removeDownloadedModel(id);
+          } else {
+            await prefs.remove('download_task_id_$id');
+          }
           needsUIRefresh = true;
           break;
 
@@ -339,21 +454,23 @@ class ModelDownloadController {
               ..setPaused(false)
               ..setProgress(0);
             await prefs.remove('download_task_id_$id');
-            final partialFile = File(filePath);
-            if (await partialFile.exists()) {
-              await partialFile.delete();
-            }
-            await UserModels.removeDownloadedModel(id);
+            // Fix: Do NOT delete partial file or model record. Allow resume.
+            // final partialFile = File(filePath);
+            // if (await partialFile.exists()) { await partialFile.delete(); }
+            // await UserModels.removeDownloadedModel(id);
             if (!completer.isCompleted) completer.completeError(e);
           } catch (deleteError) {
-            debugPrint("Could not delete partial file during error handling: $deleteError");
+            debugPrint(
+                "Could not delete partial file during error handling: $deleteError");
           } finally {
             onStateChange();
           }
         },
         onDownloadPaused: () {
           if (manager.isCancelled) return;
-          manager..setDownloading(false)..setPaused(true);
+          manager
+            ..setDownloading(false)
+            ..setPaused(true);
           onStateChange();
         },
       );
@@ -367,7 +484,10 @@ class ModelDownloadController {
 
       await completer.future;
     } catch (e) {
-      manager..setDownloading(false)..setPaused(false)..setProgress(0);
+      manager
+        ..setDownloading(false)
+        ..setPaused(false)
+        ..setProgress(0);
       onStateChange();
       if (!completer.isCompleted) completer.completeError(e);
       rethrow;

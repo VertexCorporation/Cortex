@@ -70,7 +70,10 @@ class _SettingsScreenState extends State<SettingsScreen>
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final bool isTablet = screenWidth >= 600;
 
     context.watch<ThemeProvider>();
@@ -95,7 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen>
             child: showSkeleton
                 ? const SkeletonLoader(key: ValueKey('skeleton'))
                 : _buildContent(context, widget.isFromActiveChat, isTablet,
-                    appLocalizations),
+                appLocalizations),
           );
         },
       ),
@@ -104,11 +107,17 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   Widget _buildContent(BuildContext context, bool isFromActiveChat,
       bool isTablet, AppLocalizations l10n) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final generalProvider = context.watch<SettingsGeneralProvider>();
     final bool isAnonymous = generalProvider.isAnonymous;
 
-    final double topPadding = MediaQuery.of(context).padding.top;
+    final double topPadding = MediaQuery
+        .of(context)
+        .padding
+        .top;
 
     final List<Widget> settingsItems = [
       if (generalProvider.userData != null) const ProfileHeaderSection(),
@@ -140,10 +149,10 @@ class _SettingsScreenState extends State<SettingsScreen>
         alignment: Alignment.topCenter,
         child: Container(
           constraints:
-              BoxConstraints(maxWidth: isTablet ? 800 : double.infinity),
+          BoxConstraints(maxWidth: isTablet ? 800 : double.infinity),
           child: ScrollConfiguration(
             behavior:
-                ScrollConfiguration.of(context).copyWith(overscroll: false),
+            ScrollConfiguration.of(context).copyWith(overscroll: false),
             child: ListView.builder(
               controller: _scrollController,
               key: const PageStorageKey('settingsContent'),
@@ -198,7 +207,7 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
 
     if (createdAt != null) {
       final deadline =
-          createdAt.toDate().add(Duration(hours: 24 * (verifyAttempts + 1)));
+      createdAt.toDate().add(Duration(hours: 24 * (verifyAttempts + 1)));
       final difference = deadline.difference(DateTime.now());
 
       setState(() {
@@ -239,7 +248,8 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
     final hours = totalSeconds ~/ 3600;
     final minutes = (totalSeconds % 3600) ~/ 60;
     final seconds = totalSeconds % 60;
-    return "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
+    return "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(
+        2, '0')}:${seconds.toString().padLeft(2, '0')}";
   }
 
   @override
@@ -248,8 +258,14 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
 
     final appLocalizations = AppLocalizations.of(context)!;
     final generalProvider = context.watch<SettingsGeneralProvider>();
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final bool isTablet = screenWidth >= 600;
 
     final timeStr = _formatRemainingTime(_remainingSeconds);
@@ -322,29 +338,29 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10))),
                   onPressed: (generalProvider.isResendingEmail ||
-                          generalProvider.verificationAttempts >= 2)
+                      generalProvider.verificationAttempts >= 2)
                       ? null
                       : () {
-                          HapticFeedback.lightImpact();
-                          context
-                              .read<SettingsGeneralProvider>()
-                              .resendVerificationEmail();
-                        },
+                    HapticFeedback.lightImpact();
+                    context
+                        .read<SettingsGeneralProvider>()
+                        .resendVerificationEmail();
+                  },
                   child: generalProvider.isResendingEmail
                       ? SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2.5, color: AppColors.primaryColor))
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2.5, color: AppColors.primaryColor))
                       : Text(
-                          appLocalizations.resendCode,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: (generalProvider.verificationAttempts >= 2)
-                                  ? AppColors.quinaryColor
-                                  : AppColors.primaryColor,
-                              fontSize: isTablet ? 18 : screenWidth * 0.04),
-                        ),
+                    appLocalizations.resendCode,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: (generalProvider.verificationAttempts >= 2)
+                            ? AppColors.quinaryColor
+                            : AppColors.primaryColor,
+                        fontSize: isTablet ? 18 : screenWidth * 0.04),
+                  ),
                 ),
               ),
               if (generalProvider.verificationAttempts >= 2)

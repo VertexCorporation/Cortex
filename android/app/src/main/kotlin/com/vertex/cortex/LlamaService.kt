@@ -115,10 +115,15 @@ class LlamaService : Service() {
 
     private fun cacheModel(path: String, nCtx: Int, nGpu: Int, nThreads: Int) {
         serviceScope.launch {
-            withContext(Dispatchers.IO) {
-                viewModel.load(path, nCtx, nGpu, nThreads)
+            try {
+                withContext(Dispatchers.IO) {
+                    viewModel.load(path, nCtx, nGpu, nThreads)
+                }
+                sendModelLoadedToFlutter(path)
+            } catch (e: Exception) {
+                Log.e("LlamaService", "Model load failed", e)
+                sendModelLoadFailedToFlutter(e.message ?: "Unknown error")
             }
-            sendModelLoadedToFlutter(path)
         }
     }
 

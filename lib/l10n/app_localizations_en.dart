@@ -1180,12 +1180,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle => 'CHEAPER THAN GUM';
+  String get notificationWelcomeOfferTitle => 'Welcome Gift 🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return 'A FULL $discountRate% DISCOUNT on all our subscription plans. Don\'t miss this!';
-  }
+  String get notificationWelcomeOfferBody =>
+      'A special welcome offer is waiting for you! Don\'t miss out on this exclusive deal.';
 
   @override
   String get notificationSocialMediaTitle => 'Join Us!';
@@ -1558,8 +1557,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get myPlan => 'My Plan';
 
   @override
-  String specialOfferBadge(String time) {
-    return 'Welcome Special Offer • $time';
+  String welcomeOfferBadge(String time) {
+    return 'Welcome Offer • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return 'Exclusive Offer • $time';
   }
 
   @override

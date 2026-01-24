@@ -1192,12 +1192,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get notificationSubscriptionOfferTitle => 'GOEDKOPER DAN KAUWGOM';
+  String get notificationWelcomeOfferTitle => 'Welkomstcadeau 🎁';
 
   @override
-  String notificationSubscriptionOfferBody(Object discountRate) {
-    return 'VOLLEDIGE KORTING van $discountRate% op al onze abonnementen. Mis dit niet!';
-  }
+  String get notificationWelcomeOfferBody =>
+      'Een speciale welkomstaanbieding wacht op u! Mis deze exclusieve deal niet.';
 
   @override
   String get notificationSocialMediaTitle => 'Doe mee!';
@@ -1573,8 +1572,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get myPlan => 'Mijn plan';
 
   @override
-  String specialOfferBadge(String time) {
-    return 'Speciale aanbieding voor nieuwe gebruikers • $time';
+  String welcomeOfferBadge(String time) {
+    return 'Welkomstaanbieding • $time';
+  }
+
+  @override
+  String exclusiveOfferBadge(Object time) {
+    return 'Exclusieve aanbieding • $time';
   }
 
   @override
@@ -1607,5 +1611,5 @@ class AppLocalizationsNl extends AppLocalizations {
       'Ongeldig gebruikersnaamformaat. Gebruik 3-20 tekens, cijfers of een punt (.) of een underscore (_).';
 
   @override
-  String get exclusiveOffer => 'Exclusive Offer';
+  String get exclusiveOffer => 'Exclusieve aanbieding';
 }
