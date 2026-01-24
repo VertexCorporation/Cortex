@@ -41,8 +41,7 @@ class SettingsGeneralProvider with ChangeNotifier {
     required ProfileService profileService,
     required IntrovertNotificationService notificationService,
     required UserProvider userProvider,
-  })
-      : _authService = authService,
+  })  : _authService = authService,
         _profileService = profileService,
         _notificationService = notificationService,
         _userProvider = userProvider;
@@ -165,7 +164,9 @@ class SettingsGeneralProvider with ChangeNotifier {
   }
 
   Future<void> resendVerificationEmail() async {
-    if (isResendingEmail || verificationAttempts >= 2 || !_hasInternet ||
+    if (isResendingEmail ||
+        verificationAttempts >= 2 ||
+        !_hasInternet ||
         _isFrozen) {
       return;
     }
@@ -190,9 +191,37 @@ class SettingsGeneralProvider with ChangeNotifier {
 
   /// Called when UserProvider updates (e.g. logout or new data fetched).
   void onUserProviderUpdate() {
-    // If frozen, ignore updates from the underlying UserProvider to keep the UI static.
+    final currentUser = _authService.currentUser;
+    debugPrint(
+        "[GeneralProvider] onUserProviderUpdate called. Frozen: $_isFrozen, UserData: ${_userProvider.userData != null}, AuthUser: ${currentUser?.uid}");
+
+    // Auto-Unfreeze: If we were frozen (logging out) but now have a valid authenticated user,
+    // we must unfreeze specificially because a new session has started.
+    // relying on _userProvider.userData is risky for Anonymous users or slow network.
+    // _authService.currentUser is the source of truth for "Am I logged in?".
+    if (_isFrozen && currentUser != null) {
+      debugPrint(
+          "[GeneralProvider] Authenticated user detected (${currentUser.uid}). Unfreezing state.");
+      resetState();
+      return;
+    }
+
+    // If frozen, ignore updates from the underlying UserProvider to keep the UI static
+    // (prevents flickering during the logout process).
     if (!_isFrozen) {
       notifyListeners();
     }
+  }
+
+  /// Resets the provider to its initial, unfrozen state.
+  /// This must be called when a new session starts to discard the old user's snapshot.
+  void resetState() {
+    debugPrint("[GeneralProvider] resetState() called.");
+    _isFrozen = false;
+    _frozenUserData = null;
+    _frozenIsAnonymous = false;
+    _frozenIsVerified = true;
+    _frozenSubscriptionLevel = 0;
+    notifyListeners();
   }
 }

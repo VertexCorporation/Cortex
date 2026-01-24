@@ -1611,5 +1611,5 @@ class AppLocalizationsId extends AppLocalizations {
   String get exclusiveOffer => 'Penawaran Eksklusif';
 
   @override
-  String get continueInOfflineMode => 'Continue in Offline Mode';
+  String get continueInOfflineMode => 'Lanjutkan dalam Mode Offline';
 }

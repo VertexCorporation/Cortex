@@ -1606,5 +1606,5 @@ class AppLocalizationsKu extends AppLocalizations {
   String get exclusiveOffer => 'Pêşniyara Taybet';
 
   @override
-  String get continueInOfflineMode => 'Continue in Offline Mode';
+  String get continueInOfflineMode => 'Bi Moda Offline Berdewam Bike';
 }

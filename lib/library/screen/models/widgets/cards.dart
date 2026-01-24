@@ -6,6 +6,7 @@ import 'package:cortex/app.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart'; // Added import
 import 'package:flutter_svg/svg.dart';
 import 'package:path/path.dart' as path;
 import 'package:cortex/l10n/app_localizations.dart';
@@ -212,65 +213,61 @@ class _ModelTileState extends State<ModelTile> {
       );
     }
 
-    return StreamBuilder<bool>(
-      key: ValueKey('download-stream-${widget.model.id}'),
-      stream: InternetService().onConnectivityChanged,
-      initialData: InternetService().currentStatus,
-      builder: (context, snapshot) {
-        final bool hasInternet = snapshot.data ?? false;
-        final bool isCompatible =
-            widget.compatibilityStatus == CompatibilityStatus.compatible;
-        bool isButtonEnabled;
-        String buttonText;
-        double fontSize = w * .035;
+    // Use Provider to listen to the centralized InternetProvider, which supports forceOffline.
+    final internetProvider = Provider.of<InternetProvider>(context);
+    final bool hasInternet = internetProvider.isConnected;
 
-        // Use entity property 'isServerSide'.
-        if (!widget.model.isServerSide && !hasInternet) {
-          buttonText = loc.noInternetConnection;
-          isButtonEnabled = false;
-          fontSize = w * .028;
-        } else if (isCompatible) {
-          buttonText = loc.download;
-          isButtonEnabled = true;
-        } else {
-          buttonText =
-              (widget.compatibilityStatus == CompatibilityStatus.insufficientRAM
-                  ? loc.insufficientRAM
-                  : loc.insufficientStorage);
-          isButtonEnabled = false;
-          fontSize = w * .025;
-        }
+    final bool isCompatible =
+        widget.compatibilityStatus == CompatibilityStatus.compatible;
+    bool isButtonEnabled;
+    String buttonText;
+    double fontSize = w * .035;
 
-        return SizedBox(
-          width: btnW,
-          height: h,
-          child: ElevatedButton(
-            onPressed: isButtonEnabled
-                ? () {
-                    HapticFeedback.lightImpact();
-                    widget.onDownloadPressed();
-                  }
-                : null,
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.resolveWith<Color>((s) =>
-                  s.contains(WidgetState.disabled)
-                      ? AppColors.quaternaryColor
-                      : AppColors.primaryColor.inverted),
-              foregroundColor: WidgetStateProperty.resolveWith<Color>((s) =>
-                  s.contains(WidgetState.disabled)
-                      ? AppColors.tertiaryColor
-                      : AppColors.primaryColor),
-              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(borderRadius: br)),
-              padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero),
-            ),
-            child: FittedBox(
-                child: Text(buttonText,
-                    style: TextStyle(
-                        fontSize: fontSize, fontWeight: FontWeight.bold))),
-          ),
-        );
-      },
+    // Use entity property 'isServerSide'.
+    if (!widget.model.isServerSide && !hasInternet) {
+      buttonText = loc.noInternetConnection;
+      isButtonEnabled = false;
+      fontSize = w * .028;
+    } else if (isCompatible) {
+      buttonText = loc.download;
+      isButtonEnabled = true;
+    } else {
+      buttonText =
+          (widget.compatibilityStatus == CompatibilityStatus.insufficientRAM
+              ? loc.insufficientRAM
+              : loc.insufficientStorage);
+      isButtonEnabled = false;
+      fontSize = w * .025;
+    }
+
+    return SizedBox(
+      width: btnW,
+      height: h,
+      child: ElevatedButton(
+        onPressed: isButtonEnabled
+            ? () {
+                HapticFeedback.lightImpact();
+                widget.onDownloadPressed();
+              }
+            : null,
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith<Color>((s) =>
+              s.contains(WidgetState.disabled)
+                  ? AppColors.quaternaryColor
+                  : AppColors.primaryColor.inverted),
+          foregroundColor: WidgetStateProperty.resolveWith<Color>((s) =>
+              s.contains(WidgetState.disabled)
+                  ? AppColors.tertiaryColor
+                  : AppColors.primaryColor),
+          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(borderRadius: br)),
+          padding: WidgetStateProperty.all<EdgeInsets>(EdgeInsets.zero),
+        ),
+        child: FittedBox(
+            child: Text(buttonText,
+                style: TextStyle(
+                    fontSize: fontSize, fontWeight: FontWeight.bold))),
+      ),
     );
   }
 

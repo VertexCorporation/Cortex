@@ -1560,5 +1560,5 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exclusiveOffer => '특별 혜택';
 
   @override
-  String get continueInOfflineMode => 'Continue in Offline Mode';
+  String get continueInOfflineMode => '오프라인 모드에서 계속하기';
 }

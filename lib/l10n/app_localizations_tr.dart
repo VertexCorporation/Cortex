@@ -441,7 +441,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu model, kamera veya resim dosyaları aracılığıyla fotoğraf tarama yeteneğine sahiptir.';
 
   @override
-  String get featureOfflineTitle => 'Çevrimdışı Çalışma';
+  String get featureOfflineTitle => 'lokal Çalışma';
 
   @override
   String get featureOfflineDescription =>
@@ -776,7 +776,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get modelUploadDescription =>
-      'Yerel GGUF dosyalarınızı doğrudan cihazınızdan seçip yükleyin. Bu, modelinizi internet bağlantısı gerektirmeden çevrimdışı çalıştırmanızı sağlar. Dosyanın geçerli GGUF formatında ve düzgün yapılandırılmış olduğundan emin olun. Dosya yanlış veya bozuksa, Cortex beklendiği gibi çalışmayabilir ve hatalarla karşılaşabilirsiniz.';
+      'Yerel GGUF dosyalarınızı doğrudan cihazınızdan seçip yükleyin. Bu, modelinizi internet bağlantısı gerektirmeden lokal çalıştırmanızı sağlar. Dosyanın geçerli GGUF formatında ve düzgün yapılandırılmış olduğundan emin olun. Dosya yanlış veya bozuksa, Cortex beklendiği gibi çalışmayabilir ve hatalarla karşılaşabilirsiniz.';
 
   @override
   String get modelUploadShortDescription =>
@@ -801,7 +801,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get offlineModelNotInstalled =>
-      'Bu çevrimdışı model cihazınızda yüklü değil.';
+      'Bu lokal model cihazınızda yüklü değil.';
 
   @override
   String get reachedLimit =>
@@ -907,7 +907,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get experimentalOfflineWarning =>
-      'Çevrimdışı mod hâlâ deneyseldir ve indirdiğiniz model optimum verimlilikle çalışmayabilir.';
+      'lokal mod hâlâ deneyseldir ve indirdiğiniz model optimum verimlilikle çalışmayabilir.';
 
   @override
   String get noConversationsToDelete => 'You have no conversations to delete.';
@@ -927,7 +927,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get maintenanceMessage =>
-      'Önemli güncellemeler yaparken Cortex geçici olarak çevrimdışı. Uygulamaya erişim kısa süre içinde yeniden sağlanacaktır.\n\nDeneyiminizi iyileştirirken gösterdiğiniz sabır için teşekkür ederiz.';
+      'Önemli güncellemeler yaparken Cortex geçici olarak lokal. Uygulamaya erişim kısa süre içinde yeniden sağlanacaktır.\n\nDeneyiminizi iyileştirirken gösterdiğiniz sabır için teşekkür ederiz.';
 
   @override
   String get errorPromptFlagged =>
@@ -1066,7 +1066,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onlineModels => 'Çevrimiçi Modeller';
 
   @override
-  String get offlineModels => 'Çevrimdışı Modeller';
+  String get offlineModels => 'lokal Modeller';
 
   @override
   String get characterModels => 'Karakterler';
@@ -1216,7 +1216,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Cortex uyurken de yanında, korkma dokunmaz.';
 
   @override
-  String get notificationOfflineReadyTitle => 'Çevrimdışı Mod Hazır';
+  String get notificationOfflineReadyTitle => 'lokal Mod Hazır';
 
   @override
   String get notificationOfflineReadyBody =>
@@ -1408,7 +1408,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboardingDesc3 =>
-      'Bu eşiği aşmak için güçlü, estetik, özelleştirilebilir, kullanımı kolay, tamamen şeffaf, hem çevrimiçi hem de çevrimdışı çalışan ve verilerinizi yalnızca cihazınızda tutan bir platform yaptık. Gücü, ait olduğu yere, yani size geri verdik.';
+      'Bu eşiği aşmak için güçlü, estetik, özelleştirilebilir, kullanımı kolay, tamamen şeffaf, hem çevrimiçi hem de lokal çalışan ve verilerinizi yalnızca cihazınızda tutan bir platform yaptık. Gücü, ait olduğu yere, yani size geri verdik.';
 
   @override
   String get onboardingTitle4 => 'Bu İş Hiç Kolay Değildi.';
@@ -1600,5 +1600,5 @@ class AppLocalizationsTr extends AppLocalizations {
   String get exclusiveOffer => 'Özel Teklif';
 
   @override
-  String get continueInOfflineMode => 'Çevrimdışı Modda Devam Et';
+  String get continueInOfflineMode => 'lokal Modda Devam Et';
 }

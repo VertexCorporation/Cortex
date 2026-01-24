@@ -1515,5 +1515,5 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exclusiveOffer => '独家优惠';
 
   @override
-  String get continueInOfflineMode => 'Continue in Offline Mode';
+  String get continueInOfflineMode => '以离线模式继续';
 }

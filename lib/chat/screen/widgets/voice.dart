@@ -99,14 +99,14 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // LEFT BUTTON: Flow (Placeholder)
-                  _buildCircleButton(
+                 /* _buildCircleButton(
                     iconPath: 'assets/icons/flow.svg',
                     onTap: () {
                       HapticFeedback.selectionClick();
                       // Currently no function
                     },
                     isSecondary: true,
-                  ),
+                  ),*/
 
                   // CENTER BUTTON: Mic / Stop
                   // If AI speaking -> Stop icon (interrupt)

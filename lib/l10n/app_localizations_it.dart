@@ -1609,5 +1609,5 @@ class AppLocalizationsIt extends AppLocalizations {
   String get exclusiveOffer => 'Offerta esclusiva';
 
   @override
-  String get continueInOfflineMode => 'Continue in Offline Mode';
+  String get continueInOfflineMode => 'Continua in modalità offline';
 }
