@@ -125,14 +125,6 @@
       }
     }
   },
-  "discountOffer": "{percent}% 할인",
-  "@discountOffer": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
   "monthlyPlanDescription": "{price}/월, 월별 청구",
   "@monthlyPlanDescription": {
     "description": "월별 가격을 보여주는 월간 플랜 설명. 예: 월 $4.99, 월간 청구",
@@ -189,8 +181,6 @@
   "shareMessage": "Cortex 앱을 확인해보세요, 정말 놀랍습니다! 여기서 다운로드하세요: {cortexLink}",
   "shareFailed": "앱 공유에 실패했습니다. 나중에 다시 시도해주세요.",
   "selectText": "텍스트 선택",
-  "showLatex": "특수 기호 표시",
-  "hideLatex": "특수 기호 숨기기",
   "thinking": "생각 중",
   "user": "사용자",
   "help": "도움말",
@@ -283,7 +273,6 @@
   "removePhotoTitle": "사진 제거",
   "confirmRemovePhoto": "사진을 제거하시겠습니까?",
   "chatLengthLimitExceeded": "이 채팅이 글자 수 제한을 초과했습니다. 새 채팅을 시작하거나 구독을 구매해주세요.",
-  "photoLimitReachedMessage": "사진은 한 장만 추가할 수 있습니다.",
   "inappropriateContentDetected": "부적절한 콘텐츠가 감지되었습니다!",
   "offlineModelNotInstalled": "이 오프라인 모델은 기기에 설치되어 있지 않습니다.",
   "reachedLimit": "사용량 한도에 도달하셨습니다. 사용량을 늘리려면 요금제를 업그레이드하세요. (물론 사용량 한도가 소진되면 아쉽겠지만, 멋진 답변들을 얻는 데는 돈이 들기 때문에 이러한 사용량 제한은 저희가 계속해서 좋은 서비스를 제공할 수 있도록 도와주는 중요한 요소입니다.)",
@@ -515,7 +504,6 @@
   "emulatorModeWarning": "이 기능은 에뮬레이터 모드에서 비활성화됩니다.",
   "unstarConversation": "언스타",
   "newChat": "새 채팅",
-  "howCanIHelpWith": "어떻게 도와드릴까요?",
   "conversationDeleted": "대화 내용이 삭제되었습니다!",
   "variants": "버전",
   "variantsDescription": "변형은 동일한 AI 계열의 여러 버전입니다. 메인 카드를 탭하면 자동으로 최적의 버전이 선택되지만, 원하시면 여기에서 특정 버전을 직접 선택할 수도 있습니다!",
@@ -535,7 +523,6 @@
   "featureQuizPrefix": "놀리다:",
   "featureExploreDescription": "모든 모델을 확인해 보세요",
   "myPlan": "내 계획",
-  "discountText": "모든 요금제 80% 할인!",
   "benefit10": "추가 첨부 파일",
   "featureStudyMessage": "당신은 전문 강사입니다. 당신의 목표는 사용자가 원하는 주제를 완벽하게 설명하는 것입니다. 명확한 구성, 예시 및 비유를 활용하세요. 복잡한 개념을 이해하기 쉬운 부분으로 나누어 사용자가 효과적으로 학습할 수 있도록 하세요. 주제:",
   "featureQuizMessage": "당신은 퀴즈 진행자입니다. 사용자가 선택한 주제에 따라 특정한 객관식 문제를 생성하세요. 사용자의 답변을 기다린 후, 답변을 평가하고 다음 문제를 제시하세요. 모든 정답을 한 번에 공개하지 마세요. 상호작용적인 방식으로 진행하세요. 주제:",
@@ -546,5 +533,7 @@
   "listening": "듣는 중",
   "defaultViewTitle": "요즘 어때요?",
   "defaultViewDescription": "Cortex는 수백 가지의 AI 모델, 오프라인 기능, 동적 채팅 등 다양한 기능을 통해 항상 여러분 곁에 있습니다.",
-  "comingSoon": "곧 출시 예정"
+  "speakTheMessage": "Speak The Message",
+  "invalidUsernameFormat": "잘못된 사용자 이름 형식입니다. 3~20자, 숫자 또는 . - _ 를 사용하세요.",
+  "specialOfferBadge": "신규 사용자 특별 혜택 • {time}"
 }

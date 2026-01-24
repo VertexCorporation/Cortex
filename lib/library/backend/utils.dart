@@ -57,10 +57,9 @@ class ModelsBackendUtils {
   ///
   /// The formula mirrors sizes in `ModelTile`, so update both in lock-step.
   static double calculateCategoryHeight(
-      List<Map<String, dynamic>> models,
-      double screenWidth,
-      ) {
-
+    List<Map<String, dynamic>> models,
+    double screenWidth,
+  ) {
     const modelsPerColumn = 3;
     const verticalSpacingFactor = 0.01;
     final cardHeight = screenWidth * 0.17;
@@ -74,7 +73,8 @@ class ModelsBackendUtils {
       final end = (start + modelsPerColumn).clamp(0, models.length);
       final entries = end - start;
       final columnHeight = entries * cardHeight + (entries - 1) * spacing;
-      maxColumnHeight = columnHeight > maxColumnHeight ? columnHeight : maxColumnHeight;
+      maxColumnHeight =
+          columnHeight > maxColumnHeight ? columnHeight : maxColumnHeight;
     }
 
     // Add a little breathing room (20 % of one card).
@@ -123,7 +123,9 @@ class ModelsBackendUtils {
   /// `.gguf` size.*  (Guards against partially-downloaded artefacts).
   static Future<Map<String, bool>> collectFileStates(
       List<Map<String, dynamic>> models, String filesDir) async {
-    dev.log("[Utils] Collecting file states based on the SINGLE SOURCE OF TRUTH: UserModels (SharedPreferences).", name: 'Utils.FileState');
+    dev.log(
+        "[Utils] Collecting file states based on the SINGLE SOURCE OF TRUTH: UserModels (SharedPreferences).",
+        name: 'Utils.FileState');
 
     // 1. Get the definitive list of downloaded models from SharedPreferences.
     // This map contains { "modelId": "/path/to/file.gguf" }.
@@ -140,7 +142,8 @@ class ModelsBackendUtils {
       fileStates[id] = downloadedPaths.containsKey(id);
     }
 
-    dev.log("[Utils] Final collected states: $fileStates", name: 'Utils.FileState');
+    dev.log("[Utils] Final collected states: $fileStates",
+        name: 'Utils.FileState');
     return fileStates;
   }
 
@@ -153,7 +156,8 @@ class ModelsBackendUtils {
       dev.log('System info loaded: $info', name: 'Utils');
       return info;
     } catch (e, st) {
-      dev.log('Failed to load system info', name: 'Utils', error: e, stackTrace: st);
+      dev.log('Failed to load system info',
+          name: 'Utils', error: e, stackTrace: st);
       return null;
     }
   }
@@ -250,10 +254,9 @@ class ModelsBackendUtils {
     return bytes;
   }
 
-  static Future<String> getExpectedFilePathById(String modelId, String modelTitle) async {
-    final Directory appSupportDir = await getApplicationSupportDirectory();
-    final String filesDirectoryPath = appSupportDir.path;
-    final String sanitizedTitle = modelTitle.replaceAll(RegExp(r'[/\\]'), '_'); // Sanitize
-    return p.join(filesDirectoryPath, '$sanitizedTitle.gguf');
-  }
+  // NOTE: The deprecated `getExpectedFilePathById` function was REMOVED.
+  // It used `modelTitle` for the filename, which was inconsistent with
+  // `getFilePathById` (the canonical source of truth) that uses `modelId`.
+  // This inconsistency caused model deletion to fail to find files.
+  // ALL file path operations should now use `getFilePathById` exclusively.
 }

@@ -47,10 +47,7 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
 
     final double buttonSize = isTablet ? 48.0 : 42.0;
@@ -85,7 +82,7 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
             buttonSize: buttonSize,
             iconSize: iconSize,
             onPressed: onLeadingPressed ??
-                    () {
+                () {
                   context
                       .findAncestorStateOfType<MainScreenState>()
                       ?.toggleAxon();
@@ -149,11 +146,11 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     // --- CENTER CALCULATION ---
     final double maxSideWidth =
-    math.max(calculatedLeadingWidth, calculatedActionsWidth);
+        math.max(calculatedLeadingWidth, calculatedActionsWidth);
     final double availableCenteredSpace = screenWidth - (maxSideWidth * 2);
     final double targetWidth = screenWidth * 0.70;
     final double finalTitleMaxWidth =
-    math.min(targetWidth, availableCenteredSpace);
+        math.min(targetWidth, availableCenteredSpace);
 
     return Stack(
       children: [
@@ -166,37 +163,34 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
           toolbarHeight: kToolbarHeight,
           flexibleSpace: showGradient
               ? Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.background.withValues(alpha: 1),
-                  AppColors.background.withValues(alpha: 0),
-                ],
-                stops: const [0.0, 0.7],
-              ),
-            ),
-          )
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        AppColors.background.withValues(alpha: 1),
+                        AppColors.background.withValues(alpha: 0),
+                      ],
+                      stops: const [0.0, 0.7],
+                    ),
+                  ),
+                )
               : null,
           leading: leftWidgets.isNotEmpty
               ? Padding(
-            padding: EdgeInsets.only(left: horizontalPadding),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: leftWidgets,
-            ),
-          )
+                  padding: EdgeInsetsDirectional.only(start: horizontalPadding),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: leftWidgets,
+                  ),
+                )
               : null,
           leadingWidth: leftWidgets.isNotEmpty ? calculatedLeadingWidth : null,
           actions: rightWidgets,
           title: null,
         ),
         Positioned(
-          top: MediaQuery
-              .of(context)
-              .padding
-              .top,
+          top: MediaQuery.of(context).padding.top,
           left: 0,
           right: 0,
           height: kToolbarHeight,
@@ -213,16 +207,16 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: title ??
                       (titleText != null
                           ? Text(
-                        titleText!,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Ubuntu',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18,
-                          color: AppColors.primaryColor.inverted,
-                        ),
-                        maxLines: 1,
-                      )
+                              titleText!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'Ubuntu',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
+                                color: AppColors.primaryColor.inverted,
+                              ),
+                              maxLines: 1,
+                            )
                           : const SizedBox.shrink()),
                 ),
               ),
@@ -287,37 +281,37 @@ class DualActionPill extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: isDual
                   ? Row(
-                children: [
-                  SizedBox(
-                    width: size,
-                    height: size,
-                    child: InkWell(
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        onSecondaryTap?.call();
-                      },
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(radius),
-                        bottomLeft: Radius.circular(radius),
-                      ),
-                      splashColor: splashColor,
-                      highlightColor: splashColor.withValues(alpha: 0.05),
-                      child: Center(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 200),
-                          child: secondaryIcon ?? const SizedBox.shrink(),
+                      children: [
+                        SizedBox(
+                          width: size,
+                          height: size,
+                          child: InkWell(
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              onSecondaryTap?.call();
+                            },
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(radius),
+                              bottomLeft: Radius.circular(radius),
+                            ),
+                            splashColor: splashColor,
+                            highlightColor: splashColor.withValues(alpha: 0.05),
+                            child: Center(
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 200),
+                                child: secondaryIcon ?? const SizedBox.shrink(),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                  // --- DIVIDER ---
-                  Container(
-                    width: 1,
-                    height: size * 0.6, // Slightly shorter for elegance
-                    color: borderColor,
-                  ),
-                ],
-              )
+                        // --- DIVIDER ---
+                        Container(
+                          width: 1,
+                          height: size * 0.6, // Slightly shorter for elegance
+                          color: borderColor,
+                        ),
+                      ],
+                    )
                   : const SizedBox.shrink(),
             ),
 
@@ -332,9 +326,9 @@ class DualActionPill extends StatelessWidget {
                 },
                 borderRadius: isDual
                     ? const BorderRadius.only(
-                  topRight: Radius.circular(radius),
-                  bottomRight: Radius.circular(radius),
-                )
+                        topRight: Radius.circular(radius),
+                        bottomRight: Radius.circular(radius),
+                      )
                     : BorderRadius.circular(radius),
                 splashColor: splashColor,
                 highlightColor: splashColor.withValues(alpha: 0.05),
@@ -536,10 +530,7 @@ class _AnimatedTitleWrapperState extends State<_AnimatedTitleWrapper> {
     if (widget.controller == null || !widget.controller!.hasClients) return;
     if (!mounted) return;
 
-    final double screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final double screenHeight = MediaQuery.of(context).size.height;
     final double dynamicThreshold = screenHeight * 0.025;
     final double offset = widget.controller!.offset;
     final bool shouldBeVisible = offset <= dynamicThreshold;

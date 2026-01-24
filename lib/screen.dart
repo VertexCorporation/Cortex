@@ -1,5 +1,6 @@
 // lib/screen.dart
 
+import 'package:cortex/analytics/service.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,7 @@ import 'chat/providers/input.dart';
 import 'chat/providers/session.dart';
 import 'chat/services/read.dart';
 import 'chat/services/select.dart';
+import 'chat/services/stop.dart';
 import 'axon/inbox/logic/manager.dart';
 import 'initialization.dart';
 import 'language.dart';
@@ -36,9 +38,9 @@ class MainScreen extends StatefulWidget {
 
 class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final GlobalKey<ChatControllerState> chatScreenKey =
-  GlobalKey<ChatControllerState>();
+      GlobalKey<ChatControllerState>();
   final GlobalKey<LibraryScreenState> libraryScreenKey =
-  GlobalKey<LibraryScreenState>();
+      GlobalKey<LibraryScreenState>();
 
   MainScreenView _currentView = MainScreenView.chat;
 
@@ -69,6 +71,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       value: 0.0,
     );
 
+    // Log initial chat screen view
+    AnalyticsService().logChatScreen();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<ModelCatalogProvider>().initialize(context: context);
@@ -89,6 +94,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   void toggleAxon() {
     if (_axonController.value < 0.5) {
       FocusManager.instance.primaryFocus?.unfocus();
+      AnalyticsService().logSidebarOpened();
       _animateAxonTo(1.0);
     } else {
       _closeAxonWithAnimation();
@@ -105,6 +111,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     if (mounted) {
       context.read<IntrovertNotificationService>().dismissAxonNotification();
     }
+
+    AnalyticsService().logSidebarClosed();
 
     if (_isSearchFocused) {
       FocusManager.instance.primaryFocus?.unfocus();
@@ -136,10 +144,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     _accumulatedDrag = 0.0;
     _hasTriggeredNavigation = false;
 
-    final double screenW = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double screenW = MediaQuery.of(context).size.width;
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
 
     if (isRtl) {
@@ -164,10 +169,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   void _onDragUpdate(DragUpdateDetails details) {
     if (_ignoreDrag) return;
 
-    final double screenW = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double screenW = MediaQuery.of(context).size.width;
     final double standardAxonW = screenW * 0.85;
     final double searchGapW = screenW - standardAxonW;
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
@@ -325,6 +327,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     }
 
     setState(() => _currentView = MainScreenView.library);
+    AnalyticsService().logLibraryScreen();
+    AnalyticsService().logTabSwitched('library');
     closeAxon();
 
     if (pulse) {
@@ -339,22 +343,29 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   void openNewsScreen() {
     _forceCloseKeyboard();
     setState(() => _currentView = MainScreenView.news);
+    AnalyticsService().logNewsScreen();
+    AnalyticsService().logTabSwitched('news');
     closeAxon();
   }
 
   void openConversation(ConversationManager manager) async {
     _forceCloseKeyboard();
-    await context
-        .read<AppInitializer>()
-        .onCoreServicesReady;
+    await context.read<AppInitializer>().onCoreServicesReady;
     if (!mounted) return;
 
     setState(() => _currentView = MainScreenView.chat);
+    AnalyticsService().logChatScreen();
+    AnalyticsService().logTabSwitched('chat');
+
+    // CRITICAL: Clear editing mode when switching to a different conversation
+    // This preserves the global draft but clears editing-specific state
+    context.read<InputProvider>().resetInputState();
 
     final ReadService readService = context.read<ReadService>();
     final LocaleProvider localeProvider = context.read<LocaleProvider>();
     await readService.loadConversation(manager,
         languageCode: localeProvider.locale.languageCode);
+    AnalyticsService().logConversationStarted(isNew: false);
     closeAxon();
   }
 
@@ -363,15 +374,25 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       setState(() => _currentView = MainScreenView.chat);
+      AnalyticsService().logChatScreen();
+      AnalyticsService().logTabSwitched('chat');
 
       final session = context.read<ChatSessionProvider>();
       final conv = context.read<ConversationProvider>();
       final input = context.read<InputProvider>();
+      final stopService = context.read<StopService>();
+
+      // CRITICAL: Stop any active response stream BEFORE clearing
+      // This prevents response chunks from appearing in the new empty chat
+      if (conv.isWaitingForResponse) {
+        await stopService.stopResponse();
+      }
 
       await session.initializeDefaultSession();
 
       conv.clearConversation();
       input.resetInputState();
+      AnalyticsService().logConversationStarted(isNew: true);
 
       if (closeSidebar) {
         closeAxon();
@@ -432,10 +453,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final double standardAxonWidth = screenWidth * 0.85;
 
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
@@ -470,10 +488,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             return;
           }
 
-          if (MediaQuery
-              .of(context)
-              .viewInsets
-              .bottom > 0) {
+          if (MediaQuery.of(context).viewInsets.bottom > 0) {
             _forceCloseKeyboard();
             return;
           }
@@ -530,7 +545,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   axonParallaxX *= directionMultiplier;
 
                   final double overlayOpacity =
-                  (0.3 * rawValue).clamp(0.0, 1.0);
+                      (0.3 * rawValue).clamp(0.0, 1.0);
 
                   return Stack(
                     children: [
@@ -539,10 +554,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         offset: Offset(axonParallaxX, 0),
                         child: SizedBox(
                           width: currentAxonWidth,
-                          height: MediaQuery
-                              .of(context)
-                              .size
-                              .height,
+                          height: MediaQuery.of(context).size.height,
                           child: Align(
                             alignment: AlignmentDirectional.centerStart,
                             child: Axon(
@@ -578,28 +590,26 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                     blurRadius: 30,
                                     spreadRadius: -5,
                                     offset:
-                                    Offset(-15 * directionMultiplier, 0),
+                                        Offset(-15 * directionMultiplier, 0),
                                   )
                               ],
                               borderRadius:
-                              BorderRadius.circular(30.0 * rawValue),
+                                  BorderRadius.circular(30.0 * rawValue),
                             ),
                             child: ClipRRect(
                               borderRadius:
-                              BorderRadius.circular(30.0 * rawValue),
+                                  BorderRadius.circular(30.0 * rawValue),
                               child: MediaQuery(
                                 data: MediaQuery.of(context).copyWith(
                                   viewInsets: (rawValue > 0 || searchValue > 0)
                                       ? EdgeInsets.zero
-                                      : MediaQuery
-                                      .of(context)
-                                      .viewInsets,
+                                      : MediaQuery.of(context).viewInsets,
                                 ),
                                 child: Stack(
                                   children: [
                                     AnimatedSwitcher(
                                       duration:
-                                      const Duration(milliseconds: 250),
+                                          const Duration(milliseconds: 250),
                                       switchInCurve: Curves.easeOutQuad,
                                       switchOutCurve: Curves.easeInQuad,
                                       transitionBuilder: (Widget child,
@@ -615,7 +625,6 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                         child: _buildCurrentScreenWidget(),
                                       ),
                                     ),
-
                                     if (rawValue > 0)
                                       IgnorePointer(
                                         child: Container(
@@ -623,38 +632,32 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                               alpha: overlayOpacity),
                                         ),
                                       ),
-
                                     Align(
                                       alignment: isRtl
                                           ? Alignment.centerRight
                                           : Alignment.centerLeft,
                                       child: Container(
                                         width: 1.0,
-                                        height: (MediaQuery
-                                            .of(context)
-                                            .size
-                                            .height *
-                                            0.6) *
+                                        height: (MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.6) *
                                             rawValue,
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             begin: Alignment.topCenter,
                                             end: Alignment.bottomCenter,
                                             colors: [
-                                              Theme
-                                                  .of(context)
+                                              Theme.of(context)
                                                   .dividerColor
                                                   .withValues(alpha: 0.0),
-                                              Theme
-                                                  .of(context)
+                                              Theme.of(context)
                                                   .dividerColor
                                                   .withValues(alpha: 0.3),
-                                              Theme
-                                                  .of(context)
+                                              Theme.of(context)
                                                   .dividerColor
                                                   .withValues(alpha: 0.3),
-                                              Theme
-                                                  .of(context)
+                                              Theme.of(context)
                                                   .dividerColor
                                                   .withValues(alpha: 0.0),
                                             ],
@@ -663,7 +666,6 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                         ),
                                       ),
                                     ),
-
                                     if (rawValue > 0 && searchValue == 0)
                                       GestureDetector(
                                         onTap: closeAxon,

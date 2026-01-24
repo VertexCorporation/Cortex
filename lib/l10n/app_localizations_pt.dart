@@ -369,11 +369,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return '$percent% DE DESCONTO';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/mês, cobrado mensalmente';
   }
@@ -500,12 +495,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get selectText => 'Selecionar Texto';
-
-  @override
-  String get showLatex => 'Mostrar Símbolos Especiais';
-
-  @override
-  String get hideLatex => 'Ocultar Símbolos Especiais';
 
   @override
   String get thinking => 'A pensar';
@@ -813,9 +802,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       'Este chat excedeu o limite de caracteres. Por favor, inicie um novo chat ou compre uma subscrição.';
-
-  @override
-  String get photoLimitReachedMessage => 'Só pode ser adicionada uma foto';
 
   @override
   String get inappropriateContentDetected => 'Conteúdo inadequado detetado!';
@@ -1527,9 +1513,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get newChat => 'Novo bate-papo';
 
   @override
-  String get howCanIHelpWith => 'Como posso ajudar?';
-
-  @override
   String get variants => 'Variantes';
 
   @override
@@ -1588,7 +1571,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get myPlan => 'Meu plano';
 
   @override
-  String get discountText => '80% de desconto em todos os planos!';
+  String specialOfferBadge(String time) {
+    return 'Oferta especial para novos usuários • $time';
+  }
 
   @override
   String get attachmentSheetTitle => 'Anexos';
@@ -1613,5 +1598,12 @@ class AppLocalizationsPt extends AppLocalizations {
       'O Cortex está sempre ao seu lado com centenas de modelos de IA, funcionalidades offline, chat dinâmico e muito mais.';
 
   @override
-  String get comingSoon => 'Em breve';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat =>
+      'Formato de nome de usuário inválido. Use 3-20 caracteres, dígitos ou . - _';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

@@ -2,36 +2,14 @@ import 'package:cortex/app.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/chat/services/voice.dart';
+import 'package:cortex/chat/screen/widgets/wave.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-class VoiceSessionOverlay extends StatefulWidget {
+class VoiceSessionOverlay extends StatelessWidget {
   const VoiceSessionOverlay({super.key});
-
-  @override
-  State<VoiceSessionOverlay> createState() => _VoiceSessionOverlayState();
-}
-
-class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
-    with TickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +32,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
     bool isAiSpeaking = voiceService.state == VoiceState.speaking;
     bool isProcessing = voiceService.state == VoiceState.processing;
 
-    // Sound Level (0.0 to 1.0)
+    // Sound Level (0.0 to 1.0) for Dot Animation
     double level = speechService.soundLevel;
 
     return Scaffold(
@@ -74,7 +52,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
             ),
           ),
 
-          // 2. Central Visualizer
+          // 2. Central Visualizer (The Core Experience)
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -99,21 +77,24 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                     ),
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 64),
 
-                // Converting Lines <-> Circle
+                // MORPHING VISUALIZER
+                // Wave (AI) <-> Dot (User)
                 SizedBox(
-                  height: 200,
+                  height: 120, // Check wave height compatibility
                   width: double.infinity,
-                  child: isAiSpeaking
-                      ? _AiSpeakingVisualizer() // Circle pulsing
-                      : _UserListeningVisualizer(level: level), // Waveform
+                  child: _MorphingVisualizer(
+                    isUserSpeaking: isUserSpeaking,
+                    isAiSpeaking: isAiSpeaking,
+                    level: level,
+                  ),
                 ),
               ],
             ),
           ),
 
-          // 3. Bottom Controls (Stop Button)
+          // 3. Bottom Controls (Stop/Submit Button)
           Positioned(
             bottom: MediaQuery.of(context).padding.bottom + 48,
             left: 0,
@@ -122,23 +103,27 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
               child: GestureDetector(
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  // If listening, stop and process.
+                  // Manual interactions
                   if (isUserSpeaking) {
                     voiceService.manualSubmit();
                   } else if (isAiSpeaking) {
                     voiceService.stopSpeaking(); // Interrupt
                   }
                 },
-                child: Container(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
                   width: 72,
                   height: 72,
                   decoration: BoxDecoration(
-                    color: AppColors.secondaryColor, // Redish usually
+                    color: isUserSpeaking
+                        ? AppColors.primaryColor.inverted
+                        : AppColors.secondaryColor,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    isUserSpeaking ? Icons.check : Icons.stop,
-                    color: Colors.white,
+                    isUserSpeaking ? Icons.arrow_upward : Icons.stop,
+                    color:
+                        isUserSpeaking ? AppColors.primaryColor : Colors.white,
                     size: 32,
                   ),
                 ),
@@ -151,111 +136,72 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
   }
 }
 
-class _UserListeningVisualizer extends StatelessWidget {
+class _MorphingVisualizer extends StatelessWidget {
+  final bool isUserSpeaking;
+  final bool isAiSpeaking;
   final double level;
-  const _UserListeningVisualizer({required this.level});
+
+  const _MorphingVisualizer({
+    required this.isUserSpeaking,
+    required this.isAiSpeaking,
+    required this.level,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // "Famous Lines" - classic Siri-like waveform
-    return CustomPaint(
-      painter:
-          _WavePainter(level: level, color: AppColors.primaryColor.inverted),
-      child: SizedBox(height: 100, width: double.infinity),
+    // LAYOUT LOGIC:
+    // AI Speaking -> Full Width Wave
+    // User Speaking -> Small Center Dot
+    // We animate the Container's width constraint to achieve the "merge" effect.
+
+    // If User Speaking, width is small (Dot size + padding).
+    // If AI Speaking (or others), width is max.
+    final double targetWidth =
+        isUserSpeaking ? 80.0 : MediaQuery.of(context).size.width;
+
+    return Center(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutCubic, // Smooth merge
+        width: targetWidth,
+        height: 100,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          // We cross-fade between the Dot and the Wave
+          child: isUserSpeaking
+              ? _ListeningDotVisualizer(level: level)
+              : const WaveformVisualizer(),
+        ),
+      ),
     );
   }
 }
 
-class _AiSpeakingVisualizer extends StatefulWidget {
-  @override
-  State<_AiSpeakingVisualizer> createState() => _AiSpeakingVisualizerState();
-}
+class _ListeningDotVisualizer extends StatelessWidget {
+  final double level; // 0.0 to 1.0
 
-class _AiSpeakingVisualizerState extends State<_AiSpeakingVisualizer>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1))
-          ..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  const _ListeningDotVisualizer({required this.level});
 
   @override
   Widget build(BuildContext context) {
-    // Pulsing Circle
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Container(
-          width: 100 + (_controller.value * 20),
-          height: 100 + (_controller.value * 20),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.primaryColor.inverted
-                .withValues(alpha: 0.2), // Outer glow
-          ),
-          child: Center(
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primaryColor.inverted,
-              ),
-            ),
-          ),
-        );
-      },
+    // Base size 24, max size 72.
+    // Level is usually low, so we pump it up a bit if above noise floor.
+    double effectiveLevel = level;
+    if (effectiveLevel < 0.02) effectiveLevel = 0.02; // Min pulse
+
+    double size = 24.0 + (effectiveLevel * 100);
+    if (size > 80) size = 80; // Cap max size
+
+    return Center(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100), // Fast reaction to voice
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: AppColors.primaryColor.inverted,
+          shape: BoxShape.circle,
+        ),
+      ),
     );
   }
-}
-
-// Simple wave painter
-class _WavePainter extends CustomPainter {
-  final double level;
-  final Color color;
-  _WavePainter({required this.level, required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
-
-    final width = size.width;
-    final height = size.height;
-    final midY = height / 2;
-
-    // Draw 5 lines representing the wave
-    for (int i = 0; i < 5; i++) {
-      double offset = (i - 2) * 20.0;
-      // Sensitivity adjustment for visuals
-      double sensitiveLevel = level;
-      if (sensitiveLevel < 0.05) sensitiveLevel = 0.02; // Noise floor
-
-      double amp = sensitiveLevel *
-          80 *
-          (1.0 - (i - 2).abs() * 0.2); // Center line tall, sides short
-      if (amp < 2) amp = 2; // Min height
-
-      canvas.drawLine(
-        Offset(width / 2 + offset, midY - amp),
-        Offset(width / 2 + offset, midY + amp),
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(_WavePainter old) => old.level != level;
 }

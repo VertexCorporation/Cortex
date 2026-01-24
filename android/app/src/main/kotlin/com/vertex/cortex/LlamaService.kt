@@ -20,11 +20,8 @@ class LlamaService : Service() {
         lateinit var resultChannel: MethodChannel
         var isChannelInitialized = false
 
-        // OPTIMIZATION: Created a single Handler instance.
-        // Previously, a new Handler was created for every single token, causing GC Trashing.
         private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
 
-        // Static function to be called by ViewModel
         @JvmStatic
         fun sendTokenToFlutter(token: String) {
             if (isChannelInitialized) {
@@ -60,6 +57,15 @@ class LlamaService : Service() {
             }
         }
 
+        @JvmStatic
+        fun sendModelLoadFailedToFlutter(error: String) {
+            if (isChannelInitialized) {
+                mainHandler.post {
+                    resultChannel.invokeMethod("onModelLoadFailed", error)
+                }
+            }
+        }
+
         fun setMethodChannel(channel: MethodChannel) {
             resultChannel = channel
             isChannelInitialized = true
@@ -82,12 +88,21 @@ class LlamaService : Service() {
             when (action) {
                 "cacheModel" -> {
                     val path = it.getStringExtra("modelPath")
-                    path?.let { p -> cacheModel(p) }
+                    val nCtx = it.getIntExtra("nCtx", 2048)
+                    val nGpu = it.getIntExtra("nGpu", 0)
+                    val nThreads = it.getIntExtra("nThreads", 4)
+                    
+                    path?.let { p -> cacheModel(p, nCtx, nGpu, nThreads) }
                 }
                 "sendMessage" -> {
                     val message = it.getStringExtra("message") ?: ""
                     val photoPath = it.getStringExtra("photoPath")
-                    sendMessage(message, photoPath)
+                    
+                    val temp = it.getFloatExtra("temp", 0.7f)
+                    val topP = it.getFloatExtra("topP", 0.95f)
+                    val topK = it.getIntExtra("topK", 40)
+                    
+                    sendMessage(message, photoPath, temp, topP, topK)
                 }
                 "stopGeneration" -> stopGeneration()
                 "releaseModel" -> releaseModel()
@@ -98,10 +113,10 @@ class LlamaService : Service() {
         return START_STICKY
     }
 
-    private fun cacheModel(path: String) {
+    private fun cacheModel(path: String, nCtx: Int, nGpu: Int, nThreads: Int) {
         serviceScope.launch {
             withContext(Dispatchers.IO) {
-                viewModel.load(path)
+                viewModel.load(path, nCtx, nGpu, nThreads)
             }
             sendModelLoadedToFlutter(path)
         }
@@ -127,7 +142,13 @@ class LlamaService : Service() {
         }
     }
 
-    private fun sendMessage(message: String?, photoPath: String?) {
+    private fun sendMessage(
+        message: String?, 
+        photoPath: String?,
+        temp: Float,
+        topP: Float,
+        topK: Int
+    ) {
         val safeMessage = message ?: ""
         serviceScope.launch {
             viewModel.updateMessage(safeMessage)
@@ -151,7 +172,7 @@ class LlamaService : Service() {
                 }
             }
             // Trigger the generation
-            viewModel.send(photoBase64)
+            viewModel.send(photoBase64, temp, topP, topK)
         }
     }
 

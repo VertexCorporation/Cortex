@@ -359,7 +359,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
                         // 3. MAIN ACTION BUTTON (PERSISTENT)
                         Align(
-                          alignment: Alignment.bottomRight,
+                          alignment: AlignmentDirectional.bottomEnd,
                           child: _SendButtonSection(
                             screenWidth: screenWidth,
                             isTablet: isTablet,
@@ -399,10 +399,25 @@ class _WaveformSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      // Lowered position per user request (increased top padding from 16.0 to 24.0)
-      padding: EdgeInsets.fromLTRB(12.0, 24.0, 0, 16.0),
-      child: WaveformVisualizer(),
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth >= 600;
+
+    // Calculate right padding to stop exactly at the center of main action button
+    // _SendButtonSection uses: right padding = 16px (phone) or 2% (tablet)
+    // ActionButtonWidget uses: buttonSize = 36px (phone) or 40px (tablet)
+    // Wave should end at the center of the button (half width + padding)
+    final double buttonSize = isTablet ? 40.0 : 36.0;
+    final double buttonPadding = isTablet ? screenWidth * 0.02 : 16.0;
+
+    // Position wave to end exactly at the button's center
+    // (button right edge is at screen edge - buttonPadding)
+    // Button center is at: buttonPadding + (buttonSize / 2)
+    final double rightPadding = buttonPadding + (buttonSize / 2);
+
+    return Padding(
+      // Wave line now originates from exactly under the main action button center
+      padding: EdgeInsetsDirectional.fromSTEB(12.0, 24.0, rightPadding, 16.0),
+      child: const WaveformVisualizer(),
     );
   }
 }
@@ -597,7 +612,7 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOutCubic,
       alignment: Alignment.bottomCenter,
-      child: Container(
+      child: SizedBox(
         // Ensure localized constraints don't squash us
         // If hasContent is false, height 0 is fine.
         // But "removing" item still needs space.
@@ -662,8 +677,9 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
                   initialItemCount: _displayedItems.length,
                   itemBuilder: (context, index, animation) {
                     // Safety for fast tapping
-                    if (index >= _displayedItems.length)
+                    if (index >= _displayedItems.length) {
                       return const SizedBox.shrink();
+                    }
                     return _buildItem(_displayedItems[index], animation, index);
                   },
                 ),
@@ -925,9 +941,9 @@ class _ToolsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
-        left: isTablet ? screenWidth * 0.02 : 12.0,
-        right: 8.0,
+      padding: EdgeInsetsDirectional.only(
+        start: isTablet ? screenWidth * 0.02 : 12.0,
+        end: 8.0,
         top: 2.0,
         bottom: isTablet ? screenWidth * 0.015 : 12.0,
       ),
@@ -993,8 +1009,8 @@ class _SendButtonSection extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.only(
-        right: isTablet ? screenWidth * 0.02 : 16.0,
+      padding: EdgeInsetsDirectional.only(
+        end: isTablet ? screenWidth * 0.02 : 16.0,
         bottom: isTablet ? screenWidth * 0.015 : 12.0,
       ),
       child: ActionButtonWidget(

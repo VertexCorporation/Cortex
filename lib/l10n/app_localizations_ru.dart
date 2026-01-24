@@ -368,11 +368,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return 'СКИДКА $percent%';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/месяц, оплата ежемесячно';
   }
@@ -499,12 +494,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get selectText => 'Выбрать текст';
-
-  @override
-  String get showLatex => 'Показать спецсимволы';
-
-  @override
-  String get hideLatex => 'Скрыть спецсимволы';
 
   @override
   String get thinking => 'Думает';
@@ -810,9 +799,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       'Этот чат превысил лимит символов. Пожалуйста, начните новый чат или приобретите подписку.';
-
-  @override
-  String get photoLimitReachedMessage => 'Можно добавить только одно фото';
 
   @override
   String get inappropriateContentDetected => 'Обнаружен неприемлемый контент!';
@@ -1528,9 +1514,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get newChat => 'Новый чат';
 
   @override
-  String get howCanIHelpWith => 'Чем я могу помочь?';
-
-  @override
   String get variants => 'Варианты';
 
   @override
@@ -1589,7 +1572,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get myPlan => 'Мой план';
 
   @override
-  String get discountText => 'Скидка 80% на все тарифные планы!';
+  String specialOfferBadge(String time) {
+    return 'Специальное предложение для новых пользователей • $time';
+  }
 
   @override
   String get attachmentSheetTitle => 'Вложения';
@@ -1614,5 +1599,12 @@ class AppLocalizationsRu extends AppLocalizations {
       'Cortex всегда рядом с вами, предлагая сотни моделей искусственного интеллекта, возможности работы в автономном режиме, динамический чат и многое другое.';
 
   @override
-  String get comingSoon => 'Вскоре';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat =>
+      'Неверный формат имени пользователя. Используйте 3-20 символов, цифр или . - _';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

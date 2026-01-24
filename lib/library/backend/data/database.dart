@@ -147,8 +147,9 @@ class DatabaseHelper {
         whereArgs: validIds.toList(),
       );
     } catch (e) {
-      if (e.toString().contains("SQLITE_FULL"))
+      if (e.toString().contains("SQLITE_FULL")) {
         return; // Ignore disk full on delete
+      }
       rethrow;
     }
   }

@@ -125,14 +125,6 @@
       }
     }
   },
-  "discountOffer": "%{percent} UCUZ",
-  "@discountOffer": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
   "monthlyPlanDescription": "{price}/ay, aylık faturalandırılır",
   "@monthlyPlanDescription": {
     "description": "Aylık planın açıklaması, aylık fiyatı gösterir. Örnek: $4.99/ay, aylık faturalandırılır",
@@ -189,8 +181,6 @@
   "shareMessage": "Cortex uygulamasına bir göz at, harika! Buradan indir: {cortexLink}",
   "shareFailed": "Uygulama paylaşılamadı. Lütfen daha sonra tekrar deneyin",
   "selectText": "Metin Seç",
-  "showLatex": "Özel Sembolleri Göster",
-  "hideLatex": "Özel Sembolleri Gizle",
   "thinking": "Düşünüyor",
   "user": "Kullanıcı",
   "help": "Yardım",
@@ -283,7 +273,6 @@
   "removePhotoTitle": "Fotoğrafı Kaldır",
   "confirmRemovePhoto": "Fotoğrafı kaldırmak istediğinizden emin misiniz?",
   "chatLengthLimitExceeded": "Bu sohbet karakter sınırını aştı. Lütfen yeni bir sohbet başlatın veya bir abonelik satın alın.",
-  "photoLimitReachedMessage": "Sadece bir fotoğraf eklenebilir",
   "inappropriateContentDetected": "Uygunsuz içerik tespit edildi!",
   "offlineModelNotInstalled": "Bu çevrimdışı model cihazınızda yüklü değil.",
   "reachedLimit": "Kullanım limitinize ulaştınız; daha fazla limit kazanmak için planınızı yükseltebilirsiniz. (kanka, biliyoruz limitlerin bitmesi can sıkıcı. ama o harika cevapları almanın bize maliyeti çok fazla, bu yüzden bu limitler aslında güzel zamanların devam etmesine yardımcı olluuuuyor.)",
@@ -515,7 +504,6 @@
   "emulatorModeWarning": "Bu özellik emülatör modunda devre dışıdır.",
   "unstarConversation": "Unstar",
   "newChat": "Yeni Sohbet",
-  "howCanIHelpWith": "Nasıl yardımcı olabilirim?",
   "conversationDeleted": "Konuşma silindi!",
   "variants": "Varyantlar",
   "variantsDescription": "Varyantlar, aynı yapay zeka ailesinin farklı sürümleridir. Ana karta dokunduğunuzda otomatik olarak en iyisini seçiyoruz, ancak isterseniz buradan belirli birini manuel olarak seçebilirsiniz!",
@@ -535,7 +523,17 @@
   "featureQuizPrefix": "Sınav:",
   "featureExploreDescription": "Mevcut tüm modelleri keşfedin",
   "myPlan": "Planım",
-  "discountText": "Tüm planlarda %80 indirim!",
+  "specialOfferTitle": "Özel Teklif!",
+  "specialOfferCountdown": "+100 Kredi • {time} kaldı",
+  "@specialOfferCountdown": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "23:59:59"
+      }
+    }
+  },
+  "specialOfferBonus": "+100 Bonus Kredi",
   "benefit10": "Daha Fazla Ek",
   "featureStudyMessage": "Siz uzman bir eğitmensiniz. Amacınız, kullanıcının konusunu kapsamlı bir şekilde açıklamaktır. Açık bir yapı, örnekler ve benzetmeler kullanın. Kullanıcının etkili bir şekilde öğrenmesini sağlamak için karmaşık fikirleri anlaşılabilir parçalara ayırın. Konu:",
   "featureQuizMessage": "Siz bir bilgi yarışması yöneticisisiniz. Kullanıcının konusuna göre belirli bir çoktan seçmeli soru oluşturun. Cevaplarını bekleyin. Ardından, cevapları değerlendirin ve bir sonraki soruyu sorun. Tüm cevapları aynı anda göstermeyin. Etkileşimli tutun. Konu:",
@@ -546,5 +544,7 @@
   "listening": "Dinliyor",
   "defaultViewTitle": "Ne haber?",
   "defaultViewDescription": "Cortex içerisindeki yüzlerce yapay zekayla, internetsiz çalışma özelliğiyle, dinamik sohbetiyle ve çok daha fazlasıyla her zaman yanında.",
-  "comingSoon": "Çok Yakında"
+  "speakTheMessage": "Mesajı Seslendir",
+  "invalidUsernameFormat": "Geçersiz format. 3-20 karakter, rakam veya . - _ kullanın",
+  "specialOfferBadge": "Yeni Kullanıcılara Özel Teklif • {time}"
 }

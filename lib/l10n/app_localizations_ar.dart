@@ -363,11 +363,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return 'خصم $percent%';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/شهريًا، يتم دفع الفاتورة شهريًا';
   }
@@ -491,12 +486,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get selectText => 'تحديد نص';
-
-  @override
-  String get showLatex => 'إظهار الرموز الخاصة';
-
-  @override
-  String get hideLatex => 'إخفاء الرموز الخاصة';
 
   @override
   String get thinking => 'يفكر';
@@ -801,9 +790,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       'لقد تجاوزت هذه المحادثة الحد الأقصى للحروف. يرجى بدء محادثة جديدة أو شراء اشتراك.';
-
-  @override
-  String get photoLimitReachedMessage => 'يمكن إضافة صورة واحدة فقط';
 
   @override
   String get inappropriateContentDetected => 'تم اكتشاف محتوى غير لائق!';
@@ -1505,9 +1491,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get newChat => 'دردشة جديدة';
 
   @override
-  String get howCanIHelpWith => 'كيف يمكنني المساعدة؟';
-
-  @override
   String get variants => 'الإصدارات';
 
   @override
@@ -1564,7 +1547,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get myPlan => 'خطتي';
 
   @override
-  String get discountText => 'خصم 80% على جميع الباقات!';
+  String specialOfferBadge(String time) {
+    return 'عرض خاص للمستخدمين الجدد • $time';
+  }
 
   @override
   String get attachmentSheetTitle => 'المرفقات';
@@ -1589,5 +1574,12 @@ class AppLocalizationsAr extends AppLocalizations {
       'كورتكس دائمًا بجانبك مع مئات من نماذج الذكاء الاصطناعي، وإمكانيات العمل دون اتصال بالإنترنت، والدردشة الديناميكية، وغير ذلك الكثير.';
 
   @override
-  String get comingSoon => 'قريباً';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat =>
+      'تنسيق اسم المستخدم غير صالح. استخدم من 3 إلى 20 حرفًا أو رقمًا أو . - _';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

@@ -1,5 +1,6 @@
 // lib/chat/messages/messages.dart
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -110,9 +111,8 @@ class Message {
     List<InlineSpan>? parsedSpans,
   }) {
     // Reuse existing notifier if text hasn't changed to save resources.
-    final newNotifier = (text != null && text != this.text)
-        ? ValueNotifier(text)
-        : notifier;
+    final newNotifier =
+        (text != null && text != this.text) ? ValueNotifier(text) : notifier;
 
     if (text != null) {
       newNotifier.value = text;
@@ -135,7 +135,7 @@ class Message {
       isError: isError ?? this.isError,
       opacity: opacity ?? this.opacity,
       isAttachmentUploading:
-      isAttachmentUploading ?? this.isAttachmentUploading,
+          isAttachmentUploading ?? this.isAttachmentUploading,
       parsedSpans: parsedSpans ?? this.parsedSpans,
       notifier: newNotifier,
     );
@@ -148,18 +148,33 @@ class Message {
     // the new 'attachmentPaths' (list/json) structures.
     final List<String> paths = [];
 
-    // 1. Check for new list format
+    // 1. Check for new list format (in-memory usage)
     if (map['attachmentPaths'] != null) {
       if (map['attachmentPaths'] is List) {
         paths.addAll((map['attachmentPaths'] as List).cast<String>());
       }
     }
-    // 2. Fallback: Check for legacy single photo column
-    // This ensures old messages still show their photos.
+    // 2. Parse the 'photoPath' column from database
+    // It can be: (a) JSON array string like '["path1", "path2"]'
+    //            (b) Legacy single path string
     else if (map['photoPath'] != null &&
         map['photoPath'] is String &&
         (map['photoPath'] as String).isNotEmpty) {
-      paths.add(map['photoPath'] as String);
+      final photoPathValue = map['photoPath'] as String;
+
+      // Check if it's a JSON array
+      if (photoPathValue.trim().startsWith('[')) {
+        try {
+          final List<dynamic> decoded = jsonDecode(photoPathValue);
+          paths.addAll(decoded.cast<String>());
+        } catch (e) {
+          // Fallback: treat as legacy single path if JSON decode fails
+          paths.add(photoPathValue);
+        }
+      } else {
+        // Legacy single path
+        paths.add(photoPathValue);
+      }
     }
 
     return Message._private(

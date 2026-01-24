@@ -71,24 +71,47 @@ class AppLanguageSection extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final modelCatalogProvider = context.read<ModelCatalogProvider>();
 
+    // Define base languages with native names for sorting
+    final allLanguages = [
+      {'code': 'en', 'name': appLocalizations.english, 'native': 'English'},
+      {'code': 'tr', 'name': appLocalizations.turkish, 'native': 'Türkçe'},
+      {'code': 'zh', 'name': appLocalizations.chinese, 'native': '中文'},
+      {'code': 'fr', 'name': appLocalizations.french, 'native': 'Français'},
+      {'code': 'hi', 'name': appLocalizations.hindi, 'native': 'हिन्दी'},
+      {
+        'code': 'pt',
+        'name': appLocalizations.portuguese,
+        'native': 'Português'
+      },
+      {
+        'code': 'id',
+        'name': appLocalizations.indonesian,
+        'native': 'Bahasa Indonesia'
+      },
+      {
+        'code': 'az',
+        'name': appLocalizations.azerbaijani,
+        'native': 'Azərbaycan'
+      },
+      {'code': 'de', 'name': appLocalizations.german, 'native': 'Deutsch'},
+      {'code': 'es', 'name': appLocalizations.spanish, 'native': 'Español'},
+      {'code': 'it', 'name': appLocalizations.italian, 'native': 'Italiano'},
+      {'code': 'ja', 'name': appLocalizations.japanese, 'native': '日本語'},
+      {'code': 'ku', 'name': appLocalizations.kurdish, 'native': 'Kurdî'},
+      {'code': 'nl', 'name': appLocalizations.dutch, 'native': 'Nederlands'},
+      {'code': 'ru', 'name': appLocalizations.russian, 'native': 'Русский'},
+      {'code': 'ko', 'name': appLocalizations.korean, 'native': '한국어'},
+      {'code': 'ar', 'name': appLocalizations.arabic, 'native': 'العربية'},
+    ];
+
+    // Sort: TR first, EN second, rest alphabetically by native name
     final languages = [
-      {'code': 'en', 'name': appLocalizations.english},
-      {'code': 'tr', 'name': appLocalizations.turkish},
-      {'code': 'zh', 'name': appLocalizations.chinese},
-      {'code': 'fr', 'name': appLocalizations.french},
-      {'code': 'hi', 'name': appLocalizations.hindi},
-      {'code': 'pt', 'name': appLocalizations.portuguese},
-      {'code': 'id', 'name': appLocalizations.indonesian},
-      {'code': 'az', 'name': appLocalizations.azerbaijani},
-      {'code': 'de', 'name': appLocalizations.german},
-      {'code': 'es', 'name': appLocalizations.spanish},
-      {'code': 'it', 'name': appLocalizations.italian},
-      {'code': 'ja', 'name': appLocalizations.japanese},
-      {'code': 'ku', 'name': appLocalizations.kurdish},
-      {'code': 'nl', 'name': appLocalizations.dutch},
-      {'code': 'ru', 'name': appLocalizations.russian},
-      {'code': 'ko', 'name': appLocalizations.korean},
-      {'code': 'ar', 'name': appLocalizations.arabic},
+      allLanguages.firstWhere((l) => l['code'] == 'tr'),
+      allLanguages.firstWhere((l) => l['code'] == 'en'),
+      ...allLanguages
+          .where((l) => l['code'] != 'tr' && l['code'] != 'en')
+          .toList()
+        ..sort((a, b) => a['native']!.compareTo(b['native']!)),
     ];
 
     // Temporarily holds the selected language within the dialog.

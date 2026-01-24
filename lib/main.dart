@@ -105,6 +105,7 @@ class BootstrapResult {
   final String initialTheme;
   final String? initialLanguageCode;
   final String initialModelId; // [NEW]
+  final String initialModelTitle; // [NEW] Cached title
   final String? initialUserDataJson;
 
   BootstrapResult({
@@ -112,6 +113,7 @@ class BootstrapResult {
     required this.initialTheme,
     required this.initialLanguageCode,
     required this.initialModelId,
+    required this.initialModelTitle,
     this.initialUserDataJson,
   });
 }
@@ -221,6 +223,7 @@ class AppBootstrap {
     // 7. Determine Initial Model (Optimistic) [NEW]
     // The key 'cortex' is defined in ChatSessionProvider as _prefDefaultModelKey
     final String initialModelId = prefs.getString('cortex') ?? 'cortex/auto';
+    final String initialModelTitle = prefs.getString('cortex_title') ?? '';
 
     // 8. Preload User Data for synchronous startup (Fixes Guest flash)
     final String? initialUserDataJson = prefs.getString('cached_user_data');
@@ -235,6 +238,7 @@ class AppBootstrap {
       initialTheme: initialTheme,
       initialLanguageCode: savedLanguage,
       initialModelId: initialModelId,
+      initialModelTitle: initialModelTitle,
       initialUserDataJson: initialUserDataJson,
     );
   }
@@ -298,6 +302,7 @@ class AppGatekeeper extends StatelessWidget {
               ..._buildSettingsProviders(),
               ..._buildChatAndLibraryProviders(
                 bootstrap.initialModelId,
+                bootstrap.initialModelTitle,
                 bootstrap.initialLanguageCode,
               ),
             ],
@@ -535,7 +540,7 @@ List<SingleChildWidget> _buildSettingsProviders() {
 /// - Recent models, API, scroll, dynamic chat
 /// - Response, context, offline, selection, read, send, stop, regenerate
 List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
-    String? initialLanguageCode) {
+    String initialModelTitle, String? initialLanguageCode) {
   return <SingleChildWidget>[
     // Inbox, Model catalog and local state.
     ChangeNotifierProvider<InboxViewModel>(
@@ -585,6 +590,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
           ChatSessionProvider(
             modelService: context.read<ModelService>(),
             initialModelId: initialModelId,
+            initialModelTitle: initialModelTitle,
             initialLocale: initialLanguageCode != null
                 ? Locale(initialLanguageCode)
                 : const Locale('en'),
@@ -599,6 +605,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
             ChatSessionProvider(
               modelService: modelService,
               initialModelId: initialModelId,
+              initialModelTitle: initialModelTitle,
               initialLocale: initialLanguageCode != null
                   ? Locale(initialLanguageCode)
                   : const Locale('en'),

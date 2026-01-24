@@ -366,11 +366,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return '$percent% OFF';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/month, billed monthly';
   }
@@ -494,12 +489,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectText => 'Select Text';
-
-  @override
-  String get showLatex => 'Show Special Symbols';
-
-  @override
-  String get hideLatex => 'Hide Special Symbols';
 
   @override
   String get thinking => 'Thinking';
@@ -805,9 +794,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       'This chat has exceeded the character limit. Please start a new chat or purchase a subscription.';
-
-  @override
-  String get photoLimitReachedMessage => 'Only one photo can be added';
 
   @override
   String get inappropriateContentDetected => 'Inappropriate content detected!';
@@ -1516,9 +1502,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newChat => 'New Chat';
 
   @override
-  String get howCanIHelpWith => 'How can I help with?';
-
-  @override
   String get variants => 'Variants';
 
   @override
@@ -1575,7 +1558,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get myPlan => 'My Plan';
 
   @override
-  String get discountText => '%80 Discount on all plans!';
+  String specialOfferBadge(String time) {
+    return 'Welcome Special Offer • $time';
+  }
 
   @override
   String get attachmentSheetTitle => 'Attachments';
@@ -1600,5 +1585,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Cortex is always by your side with hundreds of AI models, offline capabilities, dynamic chat, and much more.';
 
   @override
-  String get comingSoon => 'Coming Soon';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat =>
+      'Invalid username format. Use 3-20 chars, digits, or . - _';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

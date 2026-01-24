@@ -98,12 +98,10 @@ class ModelService with ChangeNotifier {
         return tempEntity.copyWith(imagePath: resolvedPath);
       }).toList();
 
-      final offlineModels = finalEntities
-          .where((m) => m.type == 'offline')
-          .toList();
-      final otherModels = finalEntities
-          .where((m) => m.type != 'offline')
-          .toList();
+      final offlineModels =
+          finalEntities.where((m) => m.type == 'offline').toList();
+      final otherModels =
+          finalEntities.where((m) => m.type != 'offline').toList();
       otherModels.sort((a, b) =>
           a.displayTitle.toLowerCase().compareTo(b.displayTitle.toLowerCase()));
       offlineModels.sort((a, b) {
@@ -116,8 +114,8 @@ class ModelService with ChangeNotifier {
         return sizeA.compareTo(sizeB);
       });
       finalEntities = [...otherModels, ...offlineModels];
-      final neuroIndex = finalEntities.indexWhere((model) =>
-      model.id == 'neuro');
+      final neuroIndex =
+          finalEntities.indexWhere((model) => model.id == 'neuro');
       if (neuroIndex != -1) {
         final neuroModel = finalEntities.removeAt(neuroIndex);
         finalEntities.insert(0, neuroModel);
@@ -130,8 +128,8 @@ class ModelService with ChangeNotifier {
       }
 
       _cachedEntities = finalEntities;
-      debugPrint("$logPrefix: Caching ${finalEntities
-          .length} ENRICHED model entities.");
+      debugPrint(
+          "$logPrefix: Caching ${finalEntities.length} ENRICHED model entities.");
       unawaited(_validateAndAssignDefaultBaseModels());
 
       return _cachedEntities;
@@ -171,12 +169,13 @@ class ModelService with ChangeNotifier {
     for (final model in allModels) {
       if (model.category == 'roleplay' || model.category == 'self') {
         String? currentBaseId = model.baseModelId;
-        bool requiresRepair = (currentBaseId == null || currentBaseId.isEmpty ||
+        bool requiresRepair = (currentBaseId == null ||
+            currentBaseId.isEmpty ||
             !allOnlineVariantIds.contains(currentBaseId));
 
         if (requiresRepair) {
-          debugPrint("[ModelService] Repairing base model for '${model
-              .id}' to '$defaultBaseModelId'.");
+          debugPrint(
+              "[ModelService] Repairing base model for '${model.id}' to '$defaultBaseModelId'.");
           await updateBaseModel(model.id, defaultBaseModelId);
         }
       }
@@ -210,8 +209,8 @@ class ModelService with ChangeNotifier {
       if (textOnlyVariants.isNotEmpty) {
         // Prefer a non-"pro" model if available, otherwise take the first text-only one.
         final nonProEntry = textOnlyVariants.entries.firstWhere(
-              (e) =>
-          e.value['title'] is String &&
+          (e) =>
+              e.value['title'] is String &&
               !(e.value['title'] as String).toLowerCase().contains('pro'),
           orElse: () => textOnlyVariants.entries.first,
         );
@@ -224,21 +223,21 @@ class ModelService with ChangeNotifier {
 
     // --- STEP 1: Prioritize Gemini ---
     // Try to find the Gemini model series first.
-    final geminiModel = modelsAsMaps.firstWhere((m) => m['id'] == 'gemini',
-        orElse: () => {});
+    final geminiModel =
+        modelsAsMaps.firstWhere((m) => m['id'] == 'gemini', orElse: () => {});
     if (geminiModel.isNotEmpty) {
       debugPrint(
           "[ModelRepository] Attempt 1: Searching for a safe variant within the Gemini series.");
-      defaultBaseModelId = findBestSafeVariant(
-          geminiModel['variants'] as Map<String, dynamic>?);
+      defaultBaseModelId =
+          findBestSafeVariant(geminiModel['variants'] as Map<String, dynamic>?);
     }
 
     // --- STEP 2: Fallback to other online models if Gemini is not found or has no suitable variant ---
     if (defaultBaseModelId == null) {
       debugPrint(
           "[ModelRepository] Attempt 1 Failed. Attempt 2: Searching other online series.");
-      final otherOnlineSeries = modelsAsMaps.where((m) =>
-      m['type'] == 'online' && m['id'] != 'gemini');
+      final otherOnlineSeries = modelsAsMaps
+          .where((m) => m['type'] == 'online' && m['id'] != 'gemini');
 
       for (final model in otherOnlineSeries) {
         defaultBaseModelId =
@@ -313,9 +312,7 @@ class ModelService with ChangeNotifier {
 
     final allModels = getCachedModelsSync();
     if (allModels.isEmpty) {
-      return fullId.contains('/') ? fullId
-          .split('/')
-          .first : fullId;
+      return fullId.contains('/') ? fullId.split('/').first : fullId;
     }
     if (allModels.any((model) => model.id == fullId)) return fullId;
     for (final modelSeries in allModels) {
@@ -331,8 +328,8 @@ class ModelService with ChangeNotifier {
   /// Retrieves a precise [ModelEntity] for a given ID, which can be a base ID or a variant ID.
   ModelEntity getPreciseModelData(String modelId, {required String langCode}) {
     if (modelId == 'cortex/auto' || modelId == 'dynamic') {
-      var entity = ModelEntity.fromMap(
-          ModelDefaults.cortexDynamicChatData, langCode);
+      var entity =
+          ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
       return entity.copyWith(imagePath: getModelImagePath(entity));
     }
 
@@ -341,8 +338,8 @@ class ModelService with ChangeNotifier {
       debugPrint(
           "[ModelService] CRITICAL WARNING: getPreciseModelData called when entity cache is empty.");
       if (modelId == 'cortex/auto' || modelId == 'dynamic') {
-        var entity = ModelEntity.fromMap(
-            ModelDefaults.cortexDynamicChatData, langCode);
+        var entity =
+            ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
         return entity.copyWith(imagePath: getModelImagePath(entity));
       }
       return _createFallbackEntity(modelId, langCode: langCode);
@@ -358,9 +355,8 @@ class ModelService with ChangeNotifier {
     // Search 2: Match within variants
     for (final modelSeries in allModels) {
       if (modelSeries.variants?.containsKey(modelId) ?? false) {
-        final variantData = modelSeries.variants![modelId] as Map<
-            String,
-            dynamic>;
+        final variantData =
+            modelSeries.variants![modelId] as Map<String, dynamic>;
         final mergedMap = {
           ...modelSeries.toMap(),
           ...variantData,
@@ -465,10 +461,11 @@ class ModelService with ChangeNotifier {
           ? modalitiesMap.isNotEmpty
           : modalitiesMap[modality] == true;
     }
+
     if (check(model.modalities)) return true;
 
-    final isCharacter = model.category == 'roleplay' ||
-        model.category == 'self';
+    final isCharacter =
+        model.category == 'roleplay' || model.category == 'self';
     final baseModelId = model.baseModelId;
     if (isCharacter && baseModelId != null && baseModelId.isNotEmpty) {
       final baseModel = getPreciseModelData(baseModelId, langCode: langCode);
@@ -483,8 +480,8 @@ class ModelService with ChangeNotifier {
     if (success) {
       // If the DB was updated, we need to reflect this in our entity cache.
       // A simple way is to find and update the entity.
-      final entity = getPreciseModelData(
-          modelId, langCode: 'en'); // langCode might need to be dynamic
+      final entity = getPreciseModelData(modelId,
+          langCode: 'en'); // langCode might need to be dynamic
       final updatedEntity = entity.copyWith(baseModelId: newBaseModelId);
       updateCachedEntity(updatedEntity);
       notifyListeners();
@@ -504,6 +501,7 @@ class ModelService with ChangeNotifier {
       'tier': 'free',
       'modalities': <String, dynamic>{},
       'outputs': <String, dynamic>{},
+      'chatFormat': ModelDefaults.getFallbackFormat(modelId),
     }, langCode);
   }
 }

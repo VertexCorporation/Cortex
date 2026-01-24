@@ -367,11 +367,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return '$percent% KORTING';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/maand, maandelijks gefactureerd';
   }
@@ -498,12 +493,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get selectText => 'Selecteer Tekst';
-
-  @override
-  String get showLatex => 'Toon Speciale Symbolen';
-
-  @override
-  String get hideLatex => 'Verberg Speciale Symbolen';
 
   @override
   String get thinking => 'Aan het denken';
@@ -812,10 +801,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       'Deze chat heeft de tekenlimiet overschreden. Start een nieuwe chat of koop een abonnement.';
-
-  @override
-  String get photoLimitReachedMessage =>
-      'Er kan slechts één foto worden toegevoegd';
 
   @override
   String get inappropriateContentDetected => 'Ongepaste inhoud gedetecteerd!';
@@ -1532,9 +1517,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get newChat => 'Nieuwe chat';
 
   @override
-  String get howCanIHelpWith => 'Hoe kan ik helpen?';
-
-  @override
   String get variants => 'Varianten';
 
   @override
@@ -1591,7 +1573,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get myPlan => 'Mijn plan';
 
   @override
-  String get discountText => '80% korting op alle abonnementen!';
+  String specialOfferBadge(String time) {
+    return 'Speciale aanbieding voor nieuwe gebruikers • $time';
+  }
 
   @override
   String get attachmentSheetTitle => 'Bijlagen';
@@ -1616,5 +1600,12 @@ class AppLocalizationsNl extends AppLocalizations {
       'Cortex staat altijd voor je klaar met honderden AI-modellen, offline mogelijkheden, dynamische chat en nog veel meer.';
 
   @override
-  String get comingSoon => 'Binnenkort beschikbaar';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat =>
+      'Ongeldig gebruikersnaamformaat. Gebruik 3-20 tekens, cijfers of een punt (.) of een underscore (_).';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

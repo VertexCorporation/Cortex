@@ -41,11 +41,10 @@ class ModelRemoveService {
         name: 'ModelRemove');
     try {
       // Step 1: De-register the model from the backend server.
-      final callable = FirebaseFunctions
-          .instanceFor(region: 'europe-west1')
+      final callable = FirebaseFunctions.instanceFor(region: 'europe-west1')
           .httpsCallable('deleteCustomModel');
-      await callable.call(
-          {'modelType': id.startsWith('self_') ? 'roleplay' : 'offline'});
+      await callable
+          .call({'modelType': id.startsWith('self_') ? 'roleplay' : 'offline'});
       dev.log(
           '[ModelRemoveService.deleteCustom] Step 1: De-registered from server.',
           name: 'ModelRemove');
@@ -93,7 +92,8 @@ class ModelRemoveService {
     } catch (e, st) {
       dev.log(
           '--- [ModelRemoveService.deleteCustom] FAILED for ID: $id. Error: $e ---',
-          name: 'ModelRemove', stackTrace: st);
+          name: 'ModelRemove',
+          stackTrace: st);
       notificationService.showNotification(
         message: localizations.errorDeletingModel,
         type: NotificationType.error,
@@ -139,7 +139,8 @@ class ModelRemoveService {
     } catch (e, st) {
       dev.log(
           '--- [ModelRemoveService.uninstall] FAILED for ID: $id. Error: $e ---',
-          name: logName, stackTrace: st);
+          name: logName,
+          stackTrace: st);
       // ERROR NOTIFICATION LOGIC REMOVED FROM HERE
       return false;
     }
@@ -148,10 +149,17 @@ class ModelRemoveService {
   /// A private helper to robustly clean up all artifacts of a download.
   /// It finds the task ID from SharedPreferences, removes the task from the
   /// downloader's database, and then manually deletes the file as a guarantee.
+  ///
+  /// This method now includes:
+  /// 1. Primary deletion using the canonical ID-based path
+  /// 2. Fallback deletion using legacy title-based path
+  /// 3. Verification logging to confirm deletion success
   static Future<void> _cleanupDownloadTaskAndFile(String modelId,
       {String? title}) async {
     final logName = 'DownloadCleanup';
-    dev.log('[Cleanup] Starting cleanup for model ID: $modelId', name: logName);
+    dev.log('[Cleanup] Starting cleanup for model ID: $modelId, title: $title',
+        name: logName);
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final taskId = prefs.getString('download_task_id_$modelId');
@@ -160,8 +168,14 @@ class ModelRemoveService {
         dev.log(
             '[Cleanup] Found associated task ID: $taskId. Removing from FlutterDownloader.',
             name: logName);
-        await FlutterDownloader.remove(
-            taskId: taskId, shouldDeleteContent: true);
+        try {
+          await FlutterDownloader.remove(
+              taskId: taskId, shouldDeleteContent: true);
+        } catch (e) {
+          dev.log(
+              '[Cleanup] FlutterDownloader.remove failed (may be already removed): $e',
+              name: logName);
+        }
         await prefs.remove('download_task_id_$modelId');
       } else {
         dev.log(
@@ -170,18 +184,51 @@ class ModelRemoveService {
       }
 
       final filesDir = await ModelsBackendUtils.initializeDirectory();
-      final ggufFilePath = ModelsBackendUtils.getFilePathById(
-          filesDir: filesDir, modelId: modelId, modelTitle: title ?? modelId);
-      final file = File(ggufFilePath);
 
-      if (await file.exists()) {
-        await file.delete();
-        dev.log('[Cleanup] Successfully deleted file at: $ggufFilePath',
+      // PRIMARY PATH: Use the canonical ID-based path (current standard)
+      final canonicalPath = ModelsBackendUtils.getFilePathById(
+          filesDir: filesDir, modelId: modelId, modelTitle: title ?? modelId);
+      final canonicalFile = File(canonicalPath);
+
+      bool deletedCanonical = false;
+      if (await canonicalFile.exists()) {
+        final fileSize = await canonicalFile.length();
+        await canonicalFile.delete();
+        deletedCanonical = true;
+        dev.log(
+            '[Cleanup] Deleted canonical file at: $canonicalPath (freed ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB)',
             name: logName);
       } else {
-        dev.log(
-            '[Cleanup] File at $ggufFilePath did not exist. No manual deletion needed.',
+        dev.log('[Cleanup] Canonical file at $canonicalPath does not exist.',
             name: logName);
+      }
+
+      // FALLBACK PATH: Try legacy title-based path (for older downloads)
+      if (!deletedCanonical && title != null && title != modelId) {
+        final sanitizedTitle = title.replaceAll(RegExp(r'[/\\]'), '_');
+        final legacyPath = '$filesDir/$sanitizedTitle.gguf';
+        final legacyFile = File(legacyPath);
+
+        if (await legacyFile.exists()) {
+          final fileSize = await legacyFile.length();
+          await legacyFile.delete();
+          dev.log(
+              '[Cleanup] Deleted LEGACY file at: $legacyPath (freed ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB)',
+              name: logName);
+        } else {
+          dev.log('[Cleanup] Legacy file at $legacyPath also does not exist.',
+              name: logName);
+        }
+      }
+
+      // FINAL VERIFICATION: Ensure both paths no longer exist
+      final canonicalStillExists = await canonicalFile.exists();
+      if (canonicalStillExists) {
+        dev.log(
+            '[Cleanup] WARNING: Canonical file still exists after deletion attempt!',
+            name: logName);
+      } else {
+        dev.log('[Cleanup] Verified: Canonical path is clear.', name: logName);
       }
     } catch (e) {
       dev.log(

@@ -52,9 +52,9 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
         currentMessage = newMessage
     }
 
-    fun send(photoBase64: String?) {
+    fun send(photoBase64: String?, temp: Float, topP: Float, topK: Int) {
         val text = currentMessage
-        currentMessage = "" // Tamponu temizle
+        currentMessage = "" // Clear buffer
 
         viewModelScope.launch {
             if (photoBase64 != null && photoBase64.isNotEmpty()) {
@@ -62,7 +62,13 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
             }
 
             try {
-                llamaAndroid.send(message = text)
+                
+                llamaAndroid.send(
+                    message = text,
+                    temp = temp,
+                    topP = topP,
+                    topK = topK
+                )
                     .catch { exception ->
                         Log.e(tag, "send() failed via Flow", exception)
                         LlamaService.sendCompletionToFlutter()
@@ -80,13 +86,14 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
         }
     }
 
-    fun load(pathToModel: String) {
+    fun load(pathToModel: String, nCtx: Int, nGpuLayers: Int, nThreads: Int) {
         viewModelScope.launch {
             try {
-                llamaAndroid.load(pathToModel)
-                Log.d(tag, "Loaded $pathToModel")
+                llamaAndroid.load(pathToModel, nCtx, nGpuLayers, nThreads)
+                Log.d(tag, "Loaded $pathToModel with nCtx=$nCtx")
             } catch (exc: IllegalStateException) {
                 Log.e(tag, "load() failed", exc)
+                LlamaService.sendModelLoadFailedToFlutter(exc.message ?: "Unknown error")
             }
         }
     }

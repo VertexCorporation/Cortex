@@ -360,11 +360,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return '$percent% 할인';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/월, 월별 청구';
   }
@@ -487,12 +482,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get selectText => '텍스트 선택';
-
-  @override
-  String get showLatex => '특수 기호 표시';
-
-  @override
-  String get hideLatex => '특수 기호 숨기기';
 
   @override
   String get thinking => '생각 중';
@@ -795,9 +784,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       '이 채팅이 글자 수 제한을 초과했습니다. 새 채팅을 시작하거나 구독을 구매해주세요.';
-
-  @override
-  String get photoLimitReachedMessage => '사진은 한 장만 추가할 수 있습니다.';
 
   @override
   String get inappropriateContentDetected => '부적절한 콘텐츠가 감지되었습니다!';
@@ -1479,9 +1465,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get newChat => '새 채팅';
 
   @override
-  String get howCanIHelpWith => '어떻게 도와드릴까요?';
-
-  @override
   String get variants => '버전';
 
   @override
@@ -1536,7 +1519,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get myPlan => '내 계획';
 
   @override
-  String get discountText => '모든 요금제 80% 할인!';
+  String specialOfferBadge(String time) {
+    return '신규 사용자 특별 혜택 • $time';
+  }
 
   @override
   String get attachmentSheetTitle => '첨부파일';
@@ -1561,5 +1546,12 @@ class AppLocalizationsKo extends AppLocalizations {
       'Cortex는 수백 가지의 AI 모델, 오프라인 기능, 동적 채팅 등 다양한 기능을 통해 항상 여러분 곁에 있습니다.';
 
   @override
-  String get comingSoon => '곧 출시 예정';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat =>
+      '잘못된 사용자 이름 형식입니다. 3~20자, 숫자 또는 . - _ 를 사용하세요.';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

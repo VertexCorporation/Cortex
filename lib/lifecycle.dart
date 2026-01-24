@@ -8,6 +8,7 @@
 // - BottomNavigationButton: animated icon+label button used in the nav bar.
 // - showExitConfirmationDialog: centralized confirmation dialog on app exit.
 
+import 'package:cortex/analytics/service.dart';
 import 'package:cortex/initialization.dart';
 import 'package:cortex/login/screen.dart';
 import 'package:cortex/login/verify.dart';
@@ -111,7 +112,7 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
         // If the user is logged out from a ready/initializing state, pop back
         // to the first route (e.g. login).
         if ((_previousStatus == AppStatus.ready ||
-            _previousStatus == AppStatus.initializing) &&
+                _previousStatus == AppStatus.initializing) &&
             currentStatus == AppStatus.needsLogin) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (navigatorKey.currentState != null &&
@@ -120,7 +121,7 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
                 'AppLifecycleManager: Logout detected. Resetting navigation stack.',
               );
               navigatorKey.currentState!.popUntil(
-                    (Route<dynamic> route) => route.isFirst,
+                (Route<dynamic> route) => route.isFirst,
               );
             }
           });
@@ -156,15 +157,19 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
   /// Maps each [AppStatus] to the appropriate root screen.
   Widget _buildScreenForStatus(AppInitializer initializer) {
     final AppStatus status = initializer.status;
+    final analytics = AnalyticsService();
 
     switch (status) {
       case AppStatus.needsOnboarding:
+        analytics.logOnboardingScreen();
         return const OnboardingScreen(key: ValueKey('OnboardingScreen'));
 
       case AppStatus.needsLogin:
+        analytics.logLoginScreen();
         return const AuthScreen(key: ValueKey('AuthScreen'));
 
       case AppStatus.needsVerification:
+        analytics.logVerificationScreen();
         final verificationData = initializer.verificationScreenData;
         if (verificationData != null) {
           return EmailVerificationScreen(
@@ -179,16 +184,19 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
         return const AuthScreen(key: ValueKey('AuthScreen_Fallback'));
 
       case AppStatus.maintenance:
+        analytics.logMaintenanceScreen();
         return const MaintenanceScreen(key: ValueKey('MaintenanceScreen'));
 
       case AppStatus.updateRequired:
+        analytics.logUpdateScreen();
         return const UpdateRequiredScreen(key: ValueKey('UpdateScreen'));
 
       case AppStatus.initializing:
-      // While initializing, let the native splash stay visible.
+        // While initializing, let the native splash stay visible.
         return const SizedBox.shrink(key: ValueKey('Initializing'));
 
       case AppStatus.ready:
+        // Chat screen is logged inside MainScreen based on view
         return MainScreen(key: mainScreenKey);
     }
   }

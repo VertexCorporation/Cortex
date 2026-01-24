@@ -93,8 +93,8 @@ class ConversationProvider with ChangeNotifier {
   /// Starts a new conversation session with the first user message.
   /// This atomic operation sets the conversation ID, title, and adds the
   /// initial user message and a "thinking" bubble.
-  void startNewConversationSession(String id, String title,
-      String modelIdForStorage, Message userMessage) {
+  void startNewConversationSession(
+      String id, String title, String modelIdForStorage, Message userMessage) {
     _conversationID = id;
     _conversationTitle = title;
 
@@ -110,8 +110,9 @@ class ConversationProvider with ChangeNotifier {
     _responseStopped = false;
 
     // Persist the new conversation structure asynchronously.
-    ChatStorageService.saveConversation(
-        id, title, [], modelId: modelIdForStorage).then((_) {
+    ChatStorageService.saveConversation(id, title, [],
+            modelId: modelIdForStorage)
+        .then((_) {
       ChatStorageService.upsertMessage(id, 0, userMessage);
     });
     CacheService.invalidateConversationCache();
@@ -167,8 +168,7 @@ class ConversationProvider with ChangeNotifier {
       _messages = _messages.sublist(0, aiMessageIndex);
     } else {
       debugPrint(
-          "[ConversationProvider] Invalid index $aiMessageIndex for list of length ${_messages
-              .length}. Aborting regeneration prep.");
+          "[ConversationProvider] Invalid index $aiMessageIndex for list of length ${_messages.length}. Aborting regeneration prep.");
       return;
     }
 
@@ -202,8 +202,8 @@ class ConversationProvider with ChangeNotifier {
       );
     } else {
       // This case handles a stream starting before the thinking bubble is in place.
-      _messages.add(
-          Message(text: chunk, isUserMessage: false, isThinking: true));
+      _messages
+          .add(Message(text: chunk, isUserMessage: false, isThinking: true));
     }
     notifyListeners();
   }
@@ -252,18 +252,28 @@ class ConversationProvider with ChangeNotifier {
   // -------------------- Error Handling Actions --------------------
 
   /// Updates an existing AI message with an error state.
-  void setErrorMessage(int index, String errorMessage,
-      bool isContentFlagError) {
+  void setErrorMessage(
+      int index, String errorMessage, bool isContentFlagError) {
     if (index < 0 || index >= _messages.length) return;
 
     final aiMessage = _messages[index];
 
     if (aiMessage.isThinking && aiMessage.text.isEmpty) {
       debugPrint(
-          "[ConversationProvider] Error occurred during thinking phase. Removing empty bubble to prevent whitespace.");
-      _messages.removeAt(index);
+          "[ConversationProvider] Error occurred during thinking phase. Fading out empty bubble.");
+      // Instead of instant removal, fade out the message for smooth animation
+      // The UI (AIMessageTile) will handle the fade animation via opacity
+      _messages[index] = aiMessage.copyWith(opacity: 0.0);
       _isWaitingForResponse = false;
       notifyListeners();
+
+      // Remove the message after a short delay to allow fade animation to complete
+      Future.delayed(const Duration(milliseconds: 250), () {
+        if (index < _messages.length && _messages[index].opacity == 0.0) {
+          _messages.removeAt(index);
+          notifyListeners();
+        }
+      });
       return;
     }
 
@@ -292,16 +302,17 @@ class ConversationProvider with ChangeNotifier {
   }
 
   /// Adds a new user message and a corresponding error message to the list.
-  void showSendError(Message userMessage, String errorMessage,
-      bool isContentFlagError) {
+  void showSendError(
+      Message userMessage, String errorMessage, bool isContentFlagError) {
     if (_messages.isNotEmpty && _messages.last.isThinking) {
       setErrorMessage(_messages.length - 1, errorMessage, isContentFlagError);
       return;
     }
 
-    final finalUserMessage = userMessage.copyWith(
-        includeInContext: !isContentFlagError);
-    final errorAIMessage = Message(text: errorMessage,
+    final finalUserMessage =
+        userMessage.copyWith(includeInContext: !isContentFlagError);
+    final errorAIMessage = Message(
+        text: errorMessage,
         isUserMessage: false,
         isError: true,
         includeInContext: false);

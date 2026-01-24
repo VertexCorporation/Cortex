@@ -1,6 +1,7 @@
 // lib/messages/options/select.dart
 
 import 'package:cortex/app.dart';
+import 'package:cortex/appbar.dart';
 import 'package:cortex/chat/messages/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,7 +47,8 @@ class SelectTextScreenState extends State<SelectTextScreen> {
     Clipboard.setData(ClipboardData(text: textToCopy));
 
     // Show a confirmation notification using the app's internal notification service.
-    Provider.of<IntrovertNotificationService>(ctx, listen: false).showNotification(
+    Provider.of<IntrovertNotificationService>(ctx, listen: false)
+        .showNotification(
       message: AppLocalizations.of(ctx)!.messageCopied,
       type: NotificationType.success,
       bottomOffset: 0.01,
@@ -67,7 +69,6 @@ class SelectTextScreenState extends State<SelectTextScreen> {
 
     // Define dynamic dimensions
     final double bodyFontSize = 16.0 * scale;
-    final double titleFontSize = 20.0 * scale;
     final double iconSize = 24.0 * scale;
     final EdgeInsets contentPadding = EdgeInsets.fromLTRB(
       16.0 * scale,
@@ -85,63 +86,52 @@ class SelectTextScreenState extends State<SelectTextScreen> {
 
     return Scaffold(
       backgroundColor: bg,
-      appBar: AppBar(
-        backgroundColor: bg,
-        scrolledUnderElevation: 0,
-        iconTheme: IconThemeData(color: fg, size: iconSize),
-        titleSpacing: 0,
-        centerTitle: false,
-        leadingWidth: 56.0 * scale, // Scale back button area
-        toolbarHeight: 56.0 * scale, // Scale toolbar height
-        title: Text(
-          loc.selectText,
-          style: TextStyle(
-            color: fg,
-            fontSize: titleFontSize,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      extendBodyBehindAppBar: true,
+      appBar: CortexAppBar(
+        leadingMode: CortexLeadingMode.back,
+        titleText: loc.selectText,
+        showGradient: false,
         actions: [
           // Toggle Formatting Button
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (child, animation) =>
-                ScaleTransition(scale: animation, child: child),
-            child: IconButton(
-              key: ValueKey(_hideSpecialFormatting),
-              iconSize: iconSize,
-              icon: Icon(
+          AppBarButton(
+            size: 42.0,
+            onTap: _toggleFormattingVisibility,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) =>
+                  ScaleTransition(scale: animation, child: child),
+              child: Icon(
                 _hideSpecialFormatting
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
+                key: ValueKey(_hideSpecialFormatting),
                 color: fg,
+                size: iconSize,
               ),
-              tooltip: _hideSpecialFormatting ? loc.showLatex : loc.hideLatex,
-              onPressed: _toggleFormattingVisibility,
             ),
           ),
           // Copy Button
-          IconButton(
-            iconSize: iconSize,
-            icon: SvgPicture.asset(
+          AppBarButton(
+            size: 42.0,
+            onTap: () => _copyText(context),
+            child: SvgPicture.asset(
               'assets/icons/copy.svg',
               colorFilter: ColorFilter.mode(fg, BlendMode.srcIn),
               width: iconSize,
               height: iconSize,
             ),
-            tooltip: loc.copy,
-            onPressed: () => _copyText(context),
           ),
-          SizedBox(width: 8.0 * scale), // Dynamic end padding
         ],
       ),
-      body: Padding(
-        padding: contentPadding,
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: _hideSpecialFormatting
-              ? _buildStrippedTextView(rawText, baseTextStyle)
-              : _buildRichTextView(rawText, baseTextStyle),
+      body: SafeArea(
+        child: Padding(
+          padding: contentPadding,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: _hideSpecialFormatting
+                ? _buildStrippedTextView(rawText, baseTextStyle)
+                : _buildRichTextView(rawText, baseTextStyle),
+          ),
         ),
       ),
     );

@@ -369,11 +369,6 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return 'DISKON $percent%';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/bulan, ditagih setiap bulan';
   }
@@ -498,12 +493,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get selectText => 'Pilih Teks';
-
-  @override
-  String get showLatex => 'Tampilkan Simbol Khusus';
-
-  @override
-  String get hideLatex => 'Sembunyikan Simbol Khusus';
 
   @override
   String get thinking => 'Berpikir';
@@ -809,10 +798,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       'Obrolan ini telah melebihi batas karakter. Silakan mulai obrolan baru atau beli langganan.';
-
-  @override
-  String get photoLimitReachedMessage =>
-      'Hanya satu foto yang bisa ditambahkan';
 
   @override
   String get inappropriateContentDetected => 'Konten tidak pantas terdeteksi!';
@@ -1529,9 +1514,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get newChat => 'Obrolan Baru';
 
   @override
-  String get howCanIHelpWith => 'Bagaimana saya bisa membantu?';
-
-  @override
   String get variants => 'Varian';
 
   @override
@@ -1589,7 +1571,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get myPlan => 'Rencana Saya';
 
   @override
-  String get discountText => 'Diskon 80% untuk semua paket!';
+  String specialOfferBadge(String time) {
+    return 'Penawaran Khusus Pengguna Baru • $time';
+  }
 
   @override
   String get attachmentSheetTitle => 'Lampiran';
@@ -1614,5 +1598,12 @@ class AppLocalizationsId extends AppLocalizations {
       'Cortex selalu berada di sisi Anda dengan ratusan model AI, kemampuan offline, obrolan dinamis, dan masih banyak lagi.';
 
   @override
-  String get comingSoon => 'Segera hadir';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat =>
+      'Format nama pengguna tidak valid. Gunakan 3-20 karakter, angka, atau . - _';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

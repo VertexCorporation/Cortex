@@ -125,14 +125,6 @@
       }
     }
   },
-  "discountOffer": "DISKON {percent}%",
-  "@discountOffer": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
   "monthlyPlanDescription": "{price}/bulan, ditagih setiap bulan",
   "@monthlyPlanDescription": {
     "description": "Deskripsi untuk paket bulanan, menunjukkan harga per bulan. Contoh: $4.99/bln, ditagih bulanan",
@@ -189,8 +181,6 @@
   "shareMessage": "Cek aplikasi Cortex, keren banget! Unduh di sini: {cortexLink}",
   "shareFailed": "Gagal membagikan aplikasi. Silakan coba lagi nanti",
   "selectText": "Pilih Teks",
-  "showLatex": "Tampilkan Simbol Khusus",
-  "hideLatex": "Sembunyikan Simbol Khusus",
   "thinking": "Berpikir",
   "user": "Pengguna",
   "help": "Bantuan",
@@ -283,7 +273,6 @@
   "removePhotoTitle": "Hapus Foto",
   "confirmRemovePhoto": "Apakah Anda yakin ingin menghapus foto?",
   "chatLengthLimitExceeded": "Obrolan ini telah melebihi batas karakter. Silakan mulai obrolan baru atau beli langganan.",
-  "photoLimitReachedMessage": "Hanya satu foto yang bisa ditambahkan",
   "inappropriateContentDetected": "Konten tidak pantas terdeteksi!",
   "offlineModelNotInstalled": "Model offline ini tidak terpasang di perangkat Anda.",
   "reachedLimit": "Kamu sudah mencapai batas; upgrade untuk dapat lebih banyak. (hei, kami tahu ini menyebalkan. tapi serius, jawaban keren itu nggak gratis, jadi batas ini bantu kami biar semuanya tetap lancaaaaaarrjaya.)",
@@ -515,7 +504,6 @@
   "emulatorModeWarning": "Fitur ini dinonaktifkan dalam mode emulator.",
   "unstarConversation": "Unstar",
   "newChat": "Obrolan Baru",
-  "howCanIHelpWith": "Bagaimana saya bisa membantu?",
   "conversationDeleted": "Percakapan dihapus!",
   "variants": "Varian",
   "variantsDescription": "Varian adalah versi berbeda dari keluarga AI yang sama. Kami secara otomatis memilih yang terbaik saat Anda mengetuk kartu utama, tetapi Anda dapat memilih yang spesifik secara manual di sini jika Anda mau!",
@@ -535,7 +523,6 @@
   "featureQuizPrefix": "Kuis:",
   "featureExploreDescription": "Temukan semua model yang tersedia",
   "myPlan": "Rencana Saya",
-  "discountText": "Diskon 80% untuk semua paket!",
   "benefit10": "Lampiran Lainnya",
   "featureStudyMessage": "Anda adalah seorang tutor ahli. Tujuan Anda adalah menjelaskan topik pengguna secara komprehensif. Gunakan struktur yang jelas, contoh, dan analogi. Uraikan ide-ide kompleks menjadi bagian-bagian yang mudah dipahami untuk memastikan pengguna belajar secara efektif. Topik:",
   "featureQuizMessage": "Anda adalah seorang pengelola kuis. Buat pertanyaan pilihan ganda spesifik berdasarkan topik yang diberikan pengguna. Tunggu jawabannya. Kemudian, evaluasi jawaban tersebut dan ajukan pertanyaan berikutnya. Jangan ungkapkan semua jawaban sekaligus. Jaga agar tetap interaktif. Topik:",
@@ -546,5 +533,7 @@
   "listening": "Sedang Mendengarkan",
   "defaultViewTitle": "Apa kabar?",
   "defaultViewDescription": "Cortex selalu berada di sisi Anda dengan ratusan model AI, kemampuan offline, obrolan dinamis, dan masih banyak lagi.",
-  "comingSoon": "Segera hadir"
+  "speakTheMessage": "Speak The Message",
+  "invalidUsernameFormat": "Format nama pengguna tidak valid. Gunakan 3-20 karakter, angka, atau . - _",
+  "specialOfferBadge": "Penawaran Khusus Pengguna Baru • {time}"
 }

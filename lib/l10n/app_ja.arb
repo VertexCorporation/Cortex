@@ -125,14 +125,6 @@
       }
     }
   },
-  "discountOffer": "{percent}% OFF",
-  "@discountOffer": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
   "monthlyPlanDescription": "{price}/月、月払い",
   "@monthlyPlanDescription": {
     "description": "月間プランの説明。月額価格を表示。例：$4.99/月、月間請求",
@@ -189,8 +181,6 @@
   "shareMessage": "Cortexアプリをチェックしてみてください、とても素晴らしいです！ここからダウンロードしてください: {cortexLink}",
   "shareFailed": "アプリの共有に失敗しました。後でもう一度お試しください",
   "selectText": "テキストを選択",
-  "showLatex": "特殊記号を表示",
-  "hideLatex": "特殊記号を非表示",
   "thinking": "考え中",
   "user": "ユーザー",
   "help": "ヘルプ",
@@ -283,7 +273,6 @@
   "removePhotoTitle": "写真を削除",
   "confirmRemovePhoto": "本当に写真を削除しますか？",
   "chatLengthLimitExceeded": "このチャットは文字数制限を超えました。新しいチャットを開始するか、サブスクリプションを購入してください。",
-  "photoLimitReachedMessage": "追加できる写真は1枚だけです",
   "inappropriateContentDetected": "不適切なコンテンツが検出されました！",
   "offlineModelNotInstalled": "このオフラインモデルはデバイスにインストールされていません。",
   "reachedLimit": "使用制限に達しました。制限を増やすには、プランをアップグレードしてください。(制限がなくなるのは残念なことですよね。でも、素晴らしい返信を受け取るのは無料ではないので、この制限は私たちが楽しい時間を過ごし続けるために役立っているんです。)",
@@ -515,7 +504,6 @@
   "emulatorModeWarning": "この機能はエミュレータモードでは無効になっています",
   "unstarConversation": "スターを外す",
   "newChat": "新しいチャット",
-  "howCanIHelpWith": "どのようにお手伝いすればいいでしょうか?",
   "conversationDeleted": "会話が削除されました!",
   "variants": "バリエーション",
   "variantsDescription": "バリアントは同じAIファミリーの異なるバージョンです。メインカードをタップすると最適なものが自動的に選択されますが、ご希望の場合はここで手動で特定のものを選択することもできます。",
@@ -535,7 +523,6 @@
   "featureQuizPrefix": "クイズ：",
   "featureExploreDescription": "利用可能なすべてのモデルを見る",
   "myPlan": "私の計画",
-  "discountText": "全プラン80%割引！",
   "benefit10": "その他の添付ファイル",
   "featureStudyMessage": "あなたは熟練した講師です。目標は、ユーザーのトピックを包括的に説明することです。明確な構成、例、類推を用いて説明しましょう。複雑な概念を分かりやすい部分に分割し、ユーザーが効果的に学習できるようにします。トピック：",
   "featureQuizMessage": "あなたはクイズマスターです。ユーザーのトピックに基づいて、具体的な多肢選択式の質問を作成します。回答を待ちます。その後、回答を評価し、次の質問をします。一度にすべての回答を公開しないでください。インタラクティブな形式にしてください。トピック：",
@@ -546,5 +533,7 @@
   "listening": "聞き取り中",
   "defaultViewTitle": "元気？",
   "defaultViewDescription": "Cortex は、何百もの AI モデル、オフライン機能、ダイナミック チャットなどを備え、常にあなたのそばにいます。",
-  "comingSoon": "近日公開"
+  "speakTheMessage": "Speak The Message",
+  "invalidUsernameFormat": "ユーザー名の形式が無効です。3～20文字の文字、数字、または. - _ を使用してください。",
+  "specialOfferBadge": "新規ユーザー向け特別オファー • {time}"
 }

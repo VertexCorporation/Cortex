@@ -29,7 +29,7 @@ class ModelCreationProvider extends ChangeNotifier {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFunctions _functions =
-  FirebaseFunctions.instanceFor(region: 'europe-west1');
+      FirebaseFunctions.instanceFor(region: 'europe-west1');
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
   final ModelService _modelService;
 
@@ -40,7 +40,7 @@ class ModelCreationProvider extends ChangeNotifier {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController summaryController = TextEditingController();
   final TextEditingController modelExplanationController =
-  TextEditingController();
+      TextEditingController();
   File? _pickedImage;
   List<ModelEntity> _availableBaseModels = [];
 
@@ -80,16 +80,12 @@ class ModelCreationProvider extends ChangeNotifier {
   List<ModelEntity> get availableBaseModels => _availableBaseModels;
 
   bool get isCreateSaveEnabled =>
-      nameController.text
-          .trim()
-          .isNotEmpty &&
-          _selectedBaseModelId != null &&
-          !_isSaving;
+      nameController.text.trim().isNotEmpty &&
+      _selectedBaseModelId != null &&
+      !_isSaving;
 
   bool get isAddSaveEnabled =>
-      nameController.text
-          .trim()
-          .isNotEmpty && _ggufFile != null && !_isSaving;
+      nameController.text.trim().isNotEmpty && _ggufFile != null && !_isSaving;
 
   bool get isPickerActive => _isPickerActive;
 
@@ -97,12 +93,13 @@ class ModelCreationProvider extends ChangeNotifier {
   // Initialization & Lifecycle
   //================================================================================
 
-  ModelCreationProvider(TickerProvider vsync,
-      List<ModelEntity> baseModels, {
-        required ModelService modelService,
-        required String localeName,
-        required AppLocalizations localizations,
-      }) : _modelService = modelService {
+  ModelCreationProvider(
+    TickerProvider vsync,
+    List<ModelEntity> baseModels, {
+    required ModelService modelService,
+    required String localeName,
+    required AppLocalizations localizations,
+  }) : _modelService = modelService {
     // Initialize Animation Controllers
     nameShakeController = AnimationController(
         vsync: vsync, duration: const Duration(milliseconds: 500));
@@ -116,8 +113,8 @@ class ModelCreationProvider extends ChangeNotifier {
 
     // 1. Prepare Dynamic Chat Model
     final dynamicModel =
-    ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, localeName)
-        .copyWith(
+        ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, localeName)
+            .copyWith(
       displayTitle: localizations.alwaysBest,
       variants: {
         'dynamic': {
@@ -170,7 +167,13 @@ class ModelCreationProvider extends ChangeNotifier {
 
   void selectBaseModel(String modelId, String displayTitle) {
     _selectedBaseModelId = modelId;
-    _selectedBaseModelDisplayTitle = ModelDataUtils.cleanTitle(displayTitle);
+    // Find the parent series to get the series title (not variant title)
+    final parentSeries = _availableBaseModels.firstWhere(
+      (series) => series.variants?.containsKey(modelId) ?? false,
+      orElse: () => _availableBaseModels.first,
+    );
+    _selectedBaseModelDisplayTitle =
+        ModelDataUtils.cleanTitle(parentSeries.displayTitle);
     _isBaseModelPanelExpanded = false;
     notifyListeners();
   }
@@ -220,7 +223,7 @@ class ModelCreationProvider extends ChangeNotifier {
     if (_isPickerActive) return;
 
     final notificationService =
-    Provider.of<IntrovertNotificationService>(context, listen: false);
+        Provider.of<IntrovertNotificationService>(context, listen: false);
     final localizations = AppLocalizations.of(context)!;
 
     try {
@@ -259,7 +262,7 @@ class ModelCreationProvider extends ChangeNotifier {
 
     final localizations = AppLocalizations.of(context)!;
     final notificationService =
-    Provider.of<IntrovertNotificationService>(context, listen: false);
+        Provider.of<IntrovertNotificationService>(context, listen: false);
     final internetService = InternetService();
     final user = _auth.currentUser;
 
@@ -272,9 +275,7 @@ class ModelCreationProvider extends ChangeNotifier {
       return false;
     }
 
-    final modelId = 'self_${user.uid}_${DateTime
-        .now()
-        .millisecondsSinceEpoch}';
+    final modelId = 'self_${user.uid}_${DateTime.now().millisecondsSinceEpoch}';
 
     try {
       final String? base64Image = await _imageFileToBase64(_pickedImage);
@@ -299,14 +300,14 @@ class ModelCreationProvider extends ChangeNotifier {
         try {
           final appDocsDir = await getApplicationDocumentsDirectory();
           final userModelsDir =
-          Directory(p.join(appDocsDir.path, 'user_models', modelId));
+              Directory(p.join(appDocsDir.path, 'user_models', modelId));
 
           if (!await userModelsDir.exists()) {
             await userModelsDir.create(recursive: true);
           }
           final fileName = p.basename(_pickedImage!.path);
           final permanentFile =
-          await _pickedImage!.copy(p.join(userModelsDir.path, fileName));
+              await _pickedImage!.copy(p.join(userModelsDir.path, fileName));
           permanentImagePath = permanentFile.path;
         } catch (e) {
           permanentImagePath = _pickedImage?.path;
@@ -378,7 +379,7 @@ class ModelCreationProvider extends ChangeNotifier {
 
     final localizations = AppLocalizations.of(context)!;
     final notificationService =
-    Provider.of<IntrovertNotificationService>(context, listen: false);
+        Provider.of<IntrovertNotificationService>(context, listen: false);
     final user = _auth.currentUser;
 
     if (user == null) return false;
@@ -395,24 +396,22 @@ class ModelCreationProvider extends ChangeNotifier {
 
     try {
       final modelId =
-          'local_${user.uid}_${DateTime
-          .now()
-          .millisecondsSinceEpoch}';
+          'local_${user.uid}_${DateTime.now().millisecondsSinceEpoch}';
 
       final appDocsDir = await getApplicationDocumentsDirectory();
       final userModelsDir =
-      Directory(p.join(appDocsDir.path, 'user_models', modelId));
+          Directory(p.join(appDocsDir.path, 'user_models', modelId));
       await userModelsDir.create(recursive: true);
 
       final ggufFileName = p.basename(_ggufFile!.path);
       final permanentGgufFile =
-      await _ggufFile!.copy(p.join(userModelsDir.path, ggufFileName));
+          await _ggufFile!.copy(p.join(userModelsDir.path, ggufFileName));
 
       String? permanentImagePath;
       if (_pickedImage != null) {
         final imageFileName = p.basename(_pickedImage!.path);
         final permanentImageFile =
-        await _pickedImage!.copy(p.join(userModelsDir.path, imageFileName));
+            await _pickedImage!.copy(p.join(userModelsDir.path, imageFileName));
         permanentImagePath = permanentImageFile.path;
       }
 
@@ -466,16 +465,15 @@ class ModelCreationProvider extends ChangeNotifier {
   //================================================================================
 
   void _initializeDefaultBaseModelSync(String langCode) {
-    final modelMaps = _availableBaseModels.map((e) => e.toMap()).toList();
-    final defaultId = _modelService.findDefaultBaseModel(modelMaps);
-
-    if (defaultId != null) {
-      final modelEntity =
-      _modelService.getPreciseModelData(defaultId, langCode: langCode);
-
-      _selectedBaseModelId = defaultId;
-      String displayTitle = modelEntity.displayTitle;
-      _selectedBaseModelDisplayTitle = ModelDataUtils.cleanTitle(displayTitle);
+    // Default to 'dynamic' (cortex/auto) which is the Dynamic Chat / AlwaysBest option
+    if (_availableBaseModels.isNotEmpty) {
+      final dynamicModel = _availableBaseModels.firstWhere(
+        (m) => m.variants?.containsKey('dynamic') ?? false,
+        orElse: () => _availableBaseModels.first,
+      );
+      _selectedBaseModelId = 'dynamic';
+      _selectedBaseModelDisplayTitle =
+          ModelDataUtils.cleanTitle(dynamicModel.displayTitle);
     }
   }
 

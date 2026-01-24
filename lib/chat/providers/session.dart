@@ -64,9 +64,14 @@ class ChatSessionProvider with ChangeNotifier {
       return null;
     }
 
+    // If using a stub entity with empty title, return null to trigger fallback display
+    if (currentModel.displayTitle.isEmpty) {
+      return null;
+    }
+
     final langCode = _currentLocale.languageCode;
     final baseId =
-    _modelService.getBaseIdFromFullId(currentModel.id, langCode: langCode);
+        _modelService.getBaseIdFromFullId(currentModel.id, langCode: langCode);
 
     if (baseId == currentModel.id) {
       return currentModel.displayTitle;
@@ -74,10 +79,12 @@ class ChatSessionProvider with ChangeNotifier {
 
     try {
       final seriesModel =
-      _modelService.getPreciseModelData(baseId, langCode: langCode);
+          _modelService.getPreciseModelData(baseId, langCode: langCode);
       return seriesModel.displayTitle;
     } catch (e) {
-      return currentModel.displayTitle;
+      return currentModel.displayTitle.isNotEmpty
+          ? currentModel.displayTitle
+          : null;
     }
   }
 
@@ -126,9 +133,13 @@ class ChatSessionProvider with ChangeNotifier {
   // SECTION 3: CONSTRUCTOR
   // ===========================================================================
 
+  // Track pending model ID that needs resolution when catalog loads
+  String? _pendingModelId;
+
   ChatSessionProvider({
     required ModelService modelService,
     String initialModelId = 'cortex/auto',
+    String initialModelTitle = '', // [NEW] Cached title
     Locale initialLocale = const Locale('en'),
   }) : _modelService = modelService {
     // Optimistic Initialization
@@ -142,35 +153,114 @@ class ChatSessionProvider with ChangeNotifier {
     // Actually, initializeDefaultSession() was doing async prefs read.
     // Now we have the ID.
 
-    try {
-      // We try to get precise data. If ModelService has static definitions for this ID, it works.
-      final langCode = initialLocale.languageCode;
-      final entity =
-      _modelService.getPreciseModelData(initialModelId, langCode: langCode);
-      selectModel(entity, savePreference: false);
-    } catch (e) {
-      if (initialModelId == 'cortex/auto' || initialModelId == 'dynamic') {
-        startDynamicConversation(savePreference: false);
-      } else {
-        debugPrint(
-            "[ChatSessionProvider] ModelService cache empty. Using STUB for: $initialModelId");
+    // Listen to ModelService updates to resolve pending model when catalog loads
+    _modelService.addListener(_onModelServiceUpdate);
 
-        final stubEntity = ModelEntity(
-          id: initialModelId,
-          displayTitle: initialModelId,
-          // Temporary title will be updated later
-          producer: 'Vertex',
-          displaySummary: '',
-          displayDescription: '',
-          type: 'online',
-          category: 'general',
-          tier: 'free',
-          modalities: {'text': true},
-          outputs: {'text': true},
-          isFullyLocalized: true,
-        );
-        selectModel(stubEntity, savePreference: false);
+    // IMMEDIATE CHECK: In case it's already loaded or loading finished before listener attach
+    debugPrint(
+        "[ChatSessionProvider] Constructor: Attaching listener. Initial isLoading: ${_modelService.isLoading}");
+    if (!_modelService.isLoading) {
+      _onModelServiceUpdate();
+    }
+
+    // CRITICAL FIX: Check if cache is empty FIRST.
+    // If we call getPreciseModelData while cache is empty, ModelService returns a generic "Unknown Model" entity
+    // instead of throwing. This bypasses our catch block where we would use the cached title.
+    // So we must manually check cache state.
+    final bool isCacheEmpty = _modelService.getCachedModelsSync().isEmpty;
+
+    if (isCacheEmpty) {
+      debugPrint(
+          "[ChatSessionProvider] Cache is empty. Using cached title: '$initialModelTitle' for ID: $initialModelId");
+      _initializeWithStub(initialModelId, initialModelTitle);
+    } else {
+      try {
+        final langCode = initialLocale.languageCode;
+        final entity = _modelService.getPreciseModelData(initialModelId,
+            langCode: langCode);
+        selectModel(entity, savePreference: false);
+      } catch (e) {
+        // Fallback to stub if exact lookup fails even with cache present
+        _initializeWithStub(initialModelId, initialModelTitle);
       }
+    }
+  }
+
+  void _initializeWithStub(String modelId, String title) {
+    if (modelId == 'cortex/auto' || modelId == 'dynamic') {
+      startDynamicConversation(savePreference: false);
+    } else {
+      debugPrint(
+          "[ChatSessionProvider] Initialization fallback. Storing pending ID: $modelId");
+
+      // Store for later resolution when catalog loads
+      _pendingModelId = modelId;
+
+      // Create stub with valid title if cached, otherwise empty
+      final stubEntity = ModelEntity(
+        id: modelId,
+        displayTitle: title,
+        producer: 'Vertex',
+        displaySummary: '',
+        displayDescription: '',
+        type: 'online',
+        category: 'general',
+        tier: 'free',
+        modalities: {'text': true},
+        outputs: {'text': true},
+        isFullyLocalized: true,
+      );
+      selectModel(stubEntity, savePreference: false);
+    }
+  }
+
+  void _onModelServiceUpdate() {
+    // Debug log to trace service updates
+    // debugPrint("[ChatSessionProvider] _onModelServiceUpdate. isLoading: ${_modelService.isLoading}, pendingId: $_pendingModelId");
+
+    // If models are loaded and we have a pending ID, try to resolve it
+    if (!_modelService.isLoading && _pendingModelId != null) {
+      refreshModelAfterCatalogLoad();
+    }
+  }
+
+  @override
+  void dispose() {
+    _modelService.removeListener(_onModelServiceUpdate);
+    super.dispose();
+  }
+
+  /// Called when model catalog finishes loading to resolve pending model
+  void refreshModelAfterCatalogLoad() {
+    if (_pendingModelId == null) return;
+
+    final pendingId = _pendingModelId!;
+    debugPrint(
+        "[ChatSessionProvider] refreshModelAfterCatalogLoad: Attempting to resolve pending ID: $pendingId");
+
+    final langCode = _currentLocale.languageCode;
+    try {
+      // Check if service actually has data now
+      if (_modelService.getCachedModelsSync().isEmpty) {
+        debugPrint(
+            "[ChatSessionProvider] refreshModelAfterCatalogLoad: Service cache still empty. Aborting.");
+        return;
+      }
+
+      final entity =
+          _modelService.getPreciseModelData(pendingId, langCode: langCode);
+
+      // Clear pending ID first so selectModel doesn't get confused or we don't retry unnecessarily
+      _pendingModelId = null;
+
+      selectModel(entity, savePreference: false);
+      debugPrint(
+          "[ChatSessionProvider] Successfully resolved pending model: ${entity.displayTitle}");
+    } catch (e) {
+      debugPrint(
+          "[ChatSessionProvider] Failed to resolve pending model: $pendingId. Error: $e");
+      // Keep pending ID to try again next update? Or give up?
+      // If it failed despite cache being present, it might be an invalid ID.
     }
   }
 
@@ -198,7 +288,7 @@ class ChatSessionProvider with ChangeNotifier {
     }
 
     if (savePreference) {
-      _savePreference(entity.id);
+      _savePreference(entity.id, entity.displayTitle);
     }
 
     notifyListeners();
@@ -215,7 +305,7 @@ class ChatSessionProvider with ChangeNotifier {
     final langCode = _currentLocale.languageCode;
     try {
       final entity =
-      _modelService.getPreciseModelData(savedId, langCode: langCode);
+          _modelService.getPreciseModelData(savedId, langCode: langCode);
       selectModel(entity, savePreference: false);
     } catch (e) {
       startDynamicConversation(savePreference: false);
@@ -230,7 +320,7 @@ class ChatSessionProvider with ChangeNotifier {
     _isLocalModelLoaded = false;
 
     if (savePreference) {
-      _savePreference('cortex/auto');
+      _savePreference('cortex/auto', '');
     }
 
     notifyListeners();
@@ -244,16 +334,19 @@ class ChatSessionProvider with ChangeNotifier {
         _modelService.getPreciseModelData(newModelId, langCode: langCode);
 
     if (savePreference) {
-      _savePreference(newModelId);
+      _selectedModel =
+          _modelService.getPreciseModelData(newModelId, langCode: langCode);
+      _savePreference(newModelId, _selectedModel!.displayTitle);
     }
 
     notifyListeners();
   }
 
-  Future<void> _savePreference(String value) async {
+  Future<void> _savePreference(String id, String title) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_prefDefaultModelKey, value);
+      await prefs.setString(_prefDefaultModelKey, id);
+      await prefs.setString('${_prefDefaultModelKey}_title', title);
     } catch (e) {
       debugPrint("Failed to save model preference: $e");
     }

@@ -365,11 +365,6 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return '%$percent UCUZ';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/ay, aylık faturalandırılır';
   }
@@ -494,12 +489,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get selectText => 'Metin Seç';
-
-  @override
-  String get showLatex => 'Özel Sembolleri Göster';
-
-  @override
-  String get hideLatex => 'Özel Sembolleri Gizle';
 
   @override
   String get thinking => 'Düşünüyor';
@@ -806,9 +795,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       'Bu sohbet karakter sınırını aştı. Lütfen yeni bir sohbet başlatın veya bir abonelik satın alın.';
-
-  @override
-  String get photoLimitReachedMessage => 'Sadece bir fotoğraf eklenebilir';
 
   @override
   String get inappropriateContentDetected => 'Uygunsuz içerik tespit edildi!';
@@ -1516,9 +1502,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get newChat => 'Yeni Sohbet';
 
   @override
-  String get howCanIHelpWith => 'Nasıl yardımcı olabilirim?';
-
-  @override
   String get variants => 'Varyantlar';
 
   @override
@@ -1576,7 +1559,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get myPlan => 'Planım';
 
   @override
-  String get discountText => 'Tüm planlarda %80 indirim!';
+  String specialOfferBadge(String time) {
+    return 'Yeni Kullanıcılara Özel Teklif • $time';
+  }
 
   @override
   String get attachmentSheetTitle => 'Ekler';
@@ -1601,5 +1586,12 @@ class AppLocalizationsTr extends AppLocalizations {
       'Cortex içerisindeki yüzlerce yapay zekayla, internetsiz çalışma özelliğiyle, dinamik sohbetiyle ve çok daha fazlasıyla her zaman yanında.';
 
   @override
-  String get comingSoon => 'Çok Yakında';
+  String get speakTheMessage => 'Mesajı Seslendir';
+
+  @override
+  String get invalidUsernameFormat =>
+      'Geçersiz format. 3-20 karakter, rakam veya . - _ kullanın';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

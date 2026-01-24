@@ -11,7 +11,15 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
+import android.os.Bundle
+import androidx.core.view.WindowCompat
+
 class MainActivity : FlutterActivity() {
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        super.onCreate(savedInstanceState)
+    }
 
     /* ────────────────  CONSTANTS  ──────────────── */
     private val STORAGE_CH = "com.vertex.cortex/storage"

@@ -366,11 +366,6 @@ class AppLocalizationsKu extends AppLocalizations {
   }
 
   @override
-  String discountOffer(int percent) {
-    return '%$percent ERZANÎ';
-  }
-
-  @override
   String monthlyPlanDescription(String price) {
     return '$price/meh, mehane tê fatûrekirin';
   }
@@ -496,12 +491,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get selectText => 'Nivîsê Hilbijêre';
-
-  @override
-  String get showLatex => 'Sembolên Taybet Nîşan bide';
-
-  @override
-  String get hideLatex => 'Sembolên Taybet Veşêre';
 
   @override
   String get thinking => 'Difikire';
@@ -808,9 +797,6 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get chatLengthLimitExceeded =>
       'Vê sohbetê sînorê karakteran derbas kiriye. Ji kerema xwe sohbetek nû dest pê bike an abonetiyek bikire.';
-
-  @override
-  String get photoLimitReachedMessage => 'Tenê yek wêne dikare were zêdekirin';
 
   @override
   String get inappropriateContentDetected =>
@@ -1523,9 +1509,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get newChat => 'Sohbeta Nû';
 
   @override
-  String get howCanIHelpWith => 'Ez çawa dikarim alîkariyê bikim?';
-
-  @override
   String get variants => 'Guhertoyên';
 
   @override
@@ -1582,7 +1565,9 @@ class AppLocalizationsKu extends AppLocalizations {
   String get myPlan => 'Plana Min';
 
   @override
-  String get discountText => '%80 Daxistin li ser hemû planan!';
+  String specialOfferBadge(String time) {
+    return 'Pêşniyara Taybet a Bikarhênerê Nû • $time';
+  }
 
   @override
   String get attachmentSheetTitle => 'Pêvek';
@@ -1607,5 +1592,12 @@ class AppLocalizationsKu extends AppLocalizations {
       'Cortex bi sedan modelên AI, kapasîteyên negirêdayî, sohbeta dînamîk û gelek tiştên din her gav li kêleka we ye.';
 
   @override
-  String get comingSoon => 'Hema têm';
+  String get speakTheMessage => 'Speak The Message';
+
+  @override
+  String get invalidUsernameFormat =>
+      'Formata navê bikarhêner nederbasdar e. 3-20 tîp, reqem, an jî . bikar bîne. - _';
+
+  @override
+  String get exclusiveOffer => 'Exclusive Offer';
 }

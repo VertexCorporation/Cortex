@@ -3,6 +3,7 @@
 import 'package:cortex/chat/screen/widgets/bottom/bottom.dart';
 import 'package:cortex/chat/screen/widgets/bottom/panels/briefing.dart';
 import 'package:cortex/chat/screen/widgets/list.dart';
+import 'package:cortex/chat/screen/widgets/tts_player.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/chat/providers/conversation.dart';
@@ -58,6 +59,10 @@ class ChatViewState extends State<ChatView>
   final bool _showInappropriateContentWarning = false;
   String? _lastActiveOfflineModelId;
 
+  // Cached references for dispose cleanup (avoid context.read in dispose)
+  late final InputProvider _inputProvider;
+  late final ChatSessionProvider _sessionProvider;
+
   @override
   void initState() {
     super.initState();
@@ -93,7 +98,16 @@ class ChatViewState extends State<ChatView>
       panelController: editPanelController,
     );
 
+    // Cache session provider and add listener for model changes
+    _sessionProvider = sessionProvider;
+    _sessionProvider.addListener(_onSessionModelChange);
     _handleModelChange(sessionProvider);
+
+    // CRITICAL: Sync editPanelController with InputProvider's isEditingMode
+    // This ensures the edit panel hides when resetInputState() is called
+    // Cache reference for safe disposal (can't use context.read in dispose)
+    _inputProvider = context.read<InputProvider>();
+    _inputProvider.addListener(_syncEditPanelWithProvider);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -101,6 +115,25 @@ class ChatViewState extends State<ChatView>
         _scrollService.jumpToBottom();
       }
     });
+  }
+
+  /// Syncs the edit panel animation controller with InputProvider state.
+  /// When isEditingMode becomes false externally (e.g., via resetInputState),
+  /// the edit panel animation is reversed to hide it.
+  void _syncEditPanelWithProvider() {
+    if (!mounted) return;
+
+    if (!_inputProvider.isEditingMode &&
+        editPanelController.status != AnimationStatus.dismissed &&
+        editPanelController.status != AnimationStatus.reverse) {
+      editPanelController.reverse();
+    }
+  }
+
+  /// Called when ChatSessionProvider notifies listeners (model may have changed).
+  void _onSessionModelChange() {
+    if (!mounted) return;
+    _handleModelChange(_sessionProvider);
   }
 
   void _handleModelChange(ChatSessionProvider session) {
@@ -162,6 +195,10 @@ class ChatViewState extends State<ChatView>
 
   @override
   void dispose() {
+    // Remove listeners to prevent memory leaks
+    _inputProvider.removeListener(_syncEditPanelWithProvider);
+    _sessionProvider.removeListener(_onSessionModelChange);
+
     WidgetsBinding.instance.removeObserver(this);
     scrollController.dispose();
     editPanelController.dispose();
@@ -230,7 +267,7 @@ class ChatViewState extends State<ChatView>
                       .addPostFrameCallback((_) => _updateBottomPanelHeight());
                   return true;
                 },
-                child: Container(
+                child: SizedBox(
                   key: _bottomPanelKey,
                   width: double.infinity,
                   child: ChatInputPanel(
@@ -314,7 +351,15 @@ class ChatViewState extends State<ChatView>
           },
         ),
 
-        // LAYER 4: Voice Overlay (Topmost)
+        // LAYER 4: TTS Player Overlay (Below AppBar)
+        const Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: TtsPlayerOverlay(),
+        ),
+
+        // LAYER 5: Voice Overlay (Topmost)
         if (context.watch<InputProvider>().isVoiceModeActive)
           const VoiceSessionOverlay(), // Covers everything
       ],

@@ -1,5 +1,6 @@
 // lib/chat/services/select.dart
 
+import 'package:cortex/analytics/service.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:flutter/material.dart';
@@ -75,6 +76,12 @@ class SelectionService {
     // IMPORTANT: savePreference is true by default, so this choice becomes the default for new chats.
     _sessionProvider.selectModel(finalModelEntity);
 
+    // Log model selected event
+    AnalyticsService().logModelSelected(
+      modelId: finalModelEntity.id,
+      modelType: finalModelEntity.type,
+    );
+
     debugPrint(
         "$logPrefix: Session updated and preference saved for new chat session.");
   }
@@ -92,6 +99,12 @@ class SelectionService {
 
     // Select model without clearing conversation
     _sessionProvider.selectModel(newModel);
+
+    // Log model selected event
+    AnalyticsService().logModelSelected(
+      modelId: newModel.id,
+      modelType: newModel.type,
+    );
   }
 
   /// Changes the active model to a different variant within the same series.

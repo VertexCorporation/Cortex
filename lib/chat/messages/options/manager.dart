@@ -1,6 +1,7 @@
 // lib/chat/widgets/options/manager.dart
 
 import 'package:cortex/chat/messages/messages.dart';
+import 'package:cortex/chat/services/tts.dart';
 import 'package:flutter/material.dart';
 import 'panel.dart';
 
@@ -80,6 +81,11 @@ Future<void> showMessageOptions({
         onRegenerate: onRegenerate, // Pass the powerful, unified callback.
         onStop: onStop,
         onEdit: onEdit,
+        onSpeak: () {
+          // Trigger TTS to speak the message
+          final ttsService = TtsService();
+          ttsService.speak(message.text);
+        },
       );
     },
   );

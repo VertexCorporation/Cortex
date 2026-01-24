@@ -32,7 +32,6 @@ class NoGoBackScrollPhysics extends BouncingScrollPhysics {
   }
 }
 
-
 /// A data class to hold the content for a single onboarding page.
 class _OnboardingPageData {
   final String imageAsset;
@@ -76,14 +75,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   /// If the user swipes more than 15% towards the next page,
   /// the animation completes automatically, preventing them from swiping back.
   void _scrollListener() {
-    if (_isPageReady && !_isAnimatingAutomatically &&
+    if (_isPageReady &&
+        !_isAnimatingAutomatically &&
         _pageController.page! > _currentPage + 0.15) {
       _isAnimatingAutomatically = true;
-      _pageController.animateToPage(
+      _pageController
+          .animateToPage(
         _currentPage + 1,
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeOutCubic,
-      ).whenComplete(() {
+      )
+          .whenComplete(() {
         if (mounted) {
           _isAnimatingAutomatically = false;
         }
@@ -123,22 +125,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     final List<_OnboardingPageData> pages = [
       _OnboardingPageData(
-        imageAsset: 'assets/neuro/greeting.png',
+        imageAsset: 'assets/neuro/greeting.webp',
         title: l10n.onboardingTitle1,
         description: formattedDesc1,
       ),
       _OnboardingPageData(
-        imageAsset: 'assets/neuro/angry.png',
+        imageAsset: 'assets/neuro/angry.webp',
         title: l10n.onboardingTitle2,
         description: l10n.onboardingDesc2,
       ),
       _OnboardingPageData(
-        imageAsset: 'assets/neuro/smiley.png',
+        imageAsset: 'assets/neuro/smiley.webp',
         title: l10n.onboardingTitle3,
         description: l10n.onboardingDesc3,
       ),
       _OnboardingPageData(
-        imageAsset: 'assets/neuro/powerful.png',
+        imageAsset: 'assets/neuro/powerful.webp',
         title: l10n.onboardingTitle4,
         description: l10n.onboardingDesc4,
       ),
@@ -231,22 +233,22 @@ class _OnboardingContentPageState extends State<_OnboardingContentPage>
           parent: _mainController,
           curve: const Interval(0.2, 0.7, curve: Curves.easeOutCubic),
         ));
-    _textFadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
-        .animate(CurvedAnimation(
-      parent: _mainController,
-      curve: const Interval(0.2, 0.7, curve: Curves.easeOut),
-    ));
+    _textFadeAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+          parent: _mainController,
+          curve: const Interval(0.2, 0.7, curve: Curves.easeOut),
+        ));
     _imageSlideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero)
             .animate(CurvedAnimation(
           parent: _mainController,
           curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
         ));
-    _imageFadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
-        .animate(CurvedAnimation(
-      parent: _mainController,
-      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-    ));
+    _imageFadeAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+          parent: _mainController,
+          curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+        ));
 
     _mainController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -299,12 +301,9 @@ class _OnboardingContentPageState extends State<_OnboardingContentPage>
         final double imageOverflow = imageHeight - imageVisibleHeight;
 
         // Base font sizes derived from text container height, then clamped.
-        double titleFontSize =
-        (textContainerHeight * 0.12).clamp(22.0, 38.0);
-        double descFontSize =
-        (textContainerHeight * 0.055).clamp(14.0, 19.0);
-        final double promptIconSize =
-        (descFontSize * 1.1).clamp(16.0, 20.0);
+        double titleFontSize = (textContainerHeight * 0.12).clamp(22.0, 38.0);
+        double descFontSize = (textContainerHeight * 0.055).clamp(14.0, 19.0);
+        final double promptIconSize = (descFontSize * 1.1).clamp(16.0, 20.0);
         final double swipeFontSize =
         (textContainerHeight * 0.035).clamp(12.0, 16.0);
 
@@ -385,8 +384,7 @@ class _OnboardingContentPageState extends State<_OnboardingContentPage>
                                 // Swipe hint
                                 AnimatedOpacity(
                                   opacity: _showSwipePrompt ? 1.0 : 0.0,
-                                  duration:
-                                  const Duration(milliseconds: 500),
+                                  duration: const Duration(milliseconds: 500),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -400,8 +398,7 @@ class _OnboardingContentPageState extends State<_OnboardingContentPage>
                                         ),
                                       ),
                                       SizedBox(
-                                        height:
-                                        textContainerHeight * 0.015,
+                                        height: textContainerHeight * 0.015,
                                       ),
                                       _buildFlowingArrows(promptIconSize),
                                     ],
@@ -439,15 +436,16 @@ class _OnboardingContentPageState extends State<_OnboardingContentPage>
           builder: (context, child) {
             return Stack(
               children: List.generate(arrowCount, (i) {
-                final double offsetValue = (_slideController.value +
-                    (i / arrowCount)) % 1.0;
-                final double leftPosition = (offsetValue *
-                    totalTravelDistance) - iconSize;
+                final double offsetValue =
+                    (_slideController.value + (i / arrowCount)) % 1.0;
+                final double leftPosition =
+                    (offsetValue * totalTravelDistance) - iconSize;
 
                 double opacity = 1.0;
                 if (leftPosition + (iconSize / 2) > fadeStartPoint) {
-                  final double fadeProgress = (leftPosition + (iconSize / 2) -
-                      fadeStartPoint) / (fadeEndPoint - fadeStartPoint);
+                  final double fadeProgress =
+                      (leftPosition + (iconSize / 2) - fadeStartPoint) /
+                          (fadeEndPoint - fadeStartPoint);
                   opacity = (1.0 - fadeProgress).clamp(0.0, 1.0);
                 }
 
@@ -502,23 +500,23 @@ class _FinalOnboardingPageState extends State<_FinalOnboardingPage>
         duration: const Duration(milliseconds: 1500), vsync: this);
 
     _buttonPulseController = AnimationController(
-        duration: const Duration(milliseconds: 800),
-        vsync: this
-    )
+        duration: const Duration(milliseconds: 800), vsync: this)
       ..repeat(reverse: true);
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _controller,
+        CurvedAnimation(
+            parent: _controller,
             curve: const Interval(0.0, 0.6, curve: Curves.easeOut)));
 
     _contentSlideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
-            CurvedAnimation(parent: _controller,
+            CurvedAnimation(
+                parent: _controller,
                 curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic)));
 
     _buttonPulseAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
-        CurvedAnimation(parent: _buttonPulseController, curve: Curves.easeInOut)
-    );
+        CurvedAnimation(
+            parent: _buttonPulseController, curve: Curves.easeInOut));
 
     _controller.forward();
   }
@@ -569,7 +567,7 @@ class _FinalOnboardingPageState extends State<_FinalOnboardingPage>
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: Image.asset(
-                  'assets/neuro/call.png',
+                  'assets/neuro/call.webp',
                   height: imageHeight,
                   fit: BoxFit.contain,
                 ),
@@ -652,8 +650,7 @@ class _FinalOnboardingPageState extends State<_FinalOnboardingPage>
                                   opacity: _buttonPulseAnimation,
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(
-                                      vertical:
-                                      textContainerHeight * 0.02,
+                                      vertical: textContainerHeight * 0.02,
                                     ),
                                     child: Text(
                                       l10n.onboardingFinalButton,

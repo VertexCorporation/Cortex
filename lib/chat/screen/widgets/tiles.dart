@@ -17,7 +17,6 @@ import '../../messages/tiles/user.dart';
 
 /// A utility class that acts as a factory for building different types of message widgets.
 class Tiles {
-
   // --- USER MESSAGE TILES ---
 
   /// Builds a user's message tile, handling the switch between its normal and "editing" states.
@@ -33,8 +32,8 @@ class Tiles {
     required double screenWidth,
     required double screenHeight,
   }) {
-    final isEditingThisMessage = isEditingMode &&
-        (editingMessageIndex == index);
+    final isEditingThisMessage =
+        isEditingMode && (editingMessageIndex == index);
     final bool isTablet = screenWidth >= 600;
 
     // Dimensions
@@ -107,8 +106,8 @@ class Tiles {
     VoidCallback? onFadeOutComplete,
   }) {
     final bool isTablet = screenWidth >= 600;
-    final double rightPadding = isTablet ? screenWidth * 0.03 : screenWidth *
-        0.04;
+    final double rightPadding =
+        isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
 
     return Column(
       key: ValueKey('normal_user_$index'),
@@ -116,21 +115,22 @@ class Tiles {
       children: [
         // --- ATTACHMENTS SECTION ---
         if (message.hasAttachments)
-          Padding(
-            padding: EdgeInsets.only(
-                right: rightPadding, bottom: screenHeight * 0.006),
-            child: _buildAttachmentList(
-              context: context,
-              paths: message.attachmentPaths,
-              isUser: true,
-              screenWidth: screenWidth,
+          Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: EdgeInsets.only(
+                  right: rightPadding, bottom: screenHeight * 0.006),
+              child: _buildAttachmentList(
+                context: context,
+                paths: message.attachmentPaths,
+                isUser: true,
+                screenWidth: screenWidth,
+              ),
             ),
           ),
 
         // --- TEXT BUBBLE SECTION ---
-        if (message.text
-            .trim()
-            .isNotEmpty)
+        if (message.text.trim().isNotEmpty)
           UserMessageTile(
             message: message,
             key: key,
@@ -156,24 +156,20 @@ class Tiles {
     required ModelService modelService,
   }) {
     final bool isTablet = screenWidth >= 600;
-    final langCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final langCode = Localizations.localeOf(context).languageCode;
     final preciseModelId = message.model ?? modelId;
 
-    final model = modelService.getPreciseModelData(
-        preciseModelId, langCode: langCode);
+    final model =
+        modelService.getPreciseModelData(preciseModelId, langCode: langCode);
     final correctImagePath = modelService.getModelImagePath(model);
 
-    final bool hasText = message.text
-        .trim()
-        .isNotEmpty;
+    final bool hasText = message.text.trim().isNotEmpty;
     final bool isThinkingWithoutContent =
         message.isThinking && !message.hasAttachments && !hasText;
 
     // Dimensions
-    final double leftPadding = isTablet ? screenWidth * 0.03 : screenWidth *
-        0.04;
+    final double leftPadding =
+        isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
 
     // 1. Text Content Widget
     final aiMessageContentWidget = AIMessageTile(
@@ -195,9 +191,8 @@ class Tiles {
       attachmentWidget = Padding(
         padding: EdgeInsets.only(
           left: leftPadding,
-          bottom: (hasText || isThinkingWithoutContent)
-              ? screenHeight * 0.006
-              : 0,
+          bottom:
+              (hasText || isThinkingWithoutContent) ? screenHeight * 0.006 : 0,
         ),
         child: _buildAttachmentList(
           context: context,
@@ -245,9 +240,7 @@ class Tiles {
         // A. Image Attachment
         if (isImage) {
           return GestureDetector(
-            onTap: () =>
-                Navigator.push(
-                    context, PhotoViewer.route(file)),
+            onTap: () => Navigator.push(context, PhotoViewer.route(file)),
             child: Hero(
               tag: path, // Basic hero tag
               child: ClipRRect(
@@ -258,7 +251,7 @@ class Tiles {
                   height: imageSize,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image, color: Colors.grey),
+                      const Icon(Icons.broken_image, color: Colors.grey),
                 ),
               ),
             ),
@@ -399,25 +392,16 @@ class Tiles {
     required void Function(int index, {String? newModelId}) onRegenerate,
     required ValueChanged<int> onReport,
   }) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final modelService = context.read<ModelService>();
-    final double statusBarHeight = MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
     final double totalTopPadding = statusBarHeight;
 
     return ListView.separated(
       controller: scrollController,
-      padding: EdgeInsets.only(
-          top: totalTopPadding, bottom: screenHeight * 0.01),
+      padding:
+          EdgeInsets.only(top: totalTopPadding, bottom: screenHeight * 0.01),
       cacheExtent: 500,
       itemCount: messages.length,
       separatorBuilder: (context, index) =>
@@ -440,7 +424,7 @@ class Tiles {
           editingMessageIndex: editingMessageIndex,
           onEdit: () => onEdit(index),
           onFadeOutComplete:
-          isMessageUnderEdit ? null : () => onFadeOutComplete?.call(index),
+              isMessageUnderEdit ? null : () => onFadeOutComplete?.call(index),
           screenWidth: screenWidth,
           screenHeight: screenHeight,
           modelId: modelId,

@@ -5,6 +5,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../input/service.dart';
 import 'button.dart';
 
@@ -95,10 +96,31 @@ void showAttachmentSheet({
                 // Let's assume false until loaded? Or true?
                 // Given "required=false" in manifest, we should rely on the check.
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SizedBox(
-                    height: 100,
-                    child: Center(
-                        child: CircularProgressIndicator(strokeWidth: 2)),
+                  // Shimmer skeleton that matches the button layout
+                  final double itemWidth = (screenWidth * 0.85) / 3;
+                  final double borderRadius = screenWidth * 0.04;
+
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: contentHorizontalPadding),
+                    child: Shimmer.fromColors(
+                      baseColor: AppColors.shimmerBase,
+                      highlightColor: AppColors.shimmerHighlight,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(3, (index) {
+                          return Container(
+                            width: itemWidth,
+                            height:
+                                itemWidth, // Square boxes like actual buttons
+                            decoration: BoxDecoration(
+                              color: AppColors.shimmerBase,
+                              borderRadius: BorderRadius.circular(borderRadius),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
                   );
                 }
 
