@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/app_localizations.dart';
-import '../../chat/services/storage.dart';
+// import '../../chat/services/storage.dart';
 import '../../notifications/introvert.dart';
 import 'data/database.dart';
 import 'data/image.dart';
@@ -57,9 +57,9 @@ class ModelRemoveService {
           name: 'ModelRemove');
 
       // Step 3 & 4: Clean up application-level data (conversations and recents).
-      await ChatStorageService.deleteConversationsForModel(id);
+      // await ChatStorageService.deleteConversationsForModel(id);
       dev.log(
-          '[ModelRemoveService.deleteCustom] Step 3: Deleted associated conversations.',
+          '[ModelRemoveService.deleteCustom] Step 3: Skipped deletion of associated conversations (Preserved per user request).',
           name: 'ModelRemove');
 
       // Step 5: If it was an offline model, clean up its GGUF file and download task.
@@ -130,9 +130,9 @@ class ModelRemoveService {
 
       // Step 3 & 4: Clean up application-level data (conversations and recents).
       dev.log(
-          '[ModelRemoveService.uninstall] Step 3: Deleting all associated conversations.',
+          '[ModelRemoveService.uninstall] Step 3: Skipped deletion of associated conversations.',
           name: logName);
-      await ChatStorageService.deleteConversationsForModel(id);
+      // await ChatStorageService.deleteConversationsForModel(id);
       dev.log('--- [ModelRemoveService.uninstall] SUCCESS for ID: $id ---',
           name: logName);
       return true;

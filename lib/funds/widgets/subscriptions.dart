@@ -433,7 +433,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                   children: [
                     Visibility(
                       visible: isBestValue,
-                      maintainSize: true,
+                      maintainSize: false,
                       maintainAnimation: true,
                       maintainState: true,
                       child: buildBadge(
@@ -442,12 +442,13 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                         text: localizations.bestValue,
                       ),
                     ),
-                    buildBadge(
-                      backgroundColor:
-                      AppColors.premium.withValues(alpha: 0.15),
-                      textColor: AppColors.premium,
-                      text: localizations.exclusiveOffer,
-                    ),
+                    if (widget.isSpecialOfferActive)
+                      buildBadge(
+                        backgroundColor:
+                        AppColors.premium.withValues(alpha: 0.15),
+                        textColor: AppColors.premium,
+                        text: localizations.exclusiveOffer,
+                      ),
                   ],
                 ),
               ),

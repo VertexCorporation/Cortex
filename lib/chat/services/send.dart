@@ -28,6 +28,7 @@ import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/providers/local.dart';
 import '../messages/messages.dart';
+import 'tools.dart';
 
 /// Service responsible for sending messages. It orchestrates interactions between providers and other services.
 class SendService {
@@ -61,14 +62,13 @@ class SendService {
         _modelService = modelService,
         _voiceService = voiceService;
 
+  /// Main entry point to send a message.
   Future<bool> sendMessage({
     required BuildContext context,
     required AppLocalizations localizations,
     required String messageText,
-    // REMOVED: File? photo (replaced by provider access)
     bool isRegenerate = false,
     int? regenerateAiIndex,
-    // REMOVED: String? regeneratePhotoPath (replaced by message lookup)
     String? overrideModelId,
   }) async {
     if (_isSending) {
@@ -76,18 +76,15 @@ class SendService {
       return false;
     }
 
-    final inputProvider = context.read<InputProvider>();
     final sessionProvider = context.read<ChatSessionProvider>();
 
     // -----------------------------------------------------------------------
-    // 1. PREPARE CONTENT (TEXT & ATTACHMENTS)
+    // 1. PREPARE CONTENT
     // -----------------------------------------------------------------------
 
     final String text = messageText.trim();
     List<String> currentAttachmentPaths = [];
 
-    // Logic: If regenerating, get attachments from the last user message.
-    // If new message, get from InputProvider.
     if (isRegenerate) {
       final messages = _conversationProvider.messages;
       final lastUserMessage = messages.reversed.firstWhere(
@@ -96,16 +93,13 @@ class SendService {
       );
       currentAttachmentPaths = List.from(lastUserMessage.attachmentPaths);
     } else {
+      // Use the class member _inputProvider or the local one.
+      // Since we injected it, _inputProvider is safe.
       currentAttachmentPaths =
-          inputProvider.attachments.map((a) => a.file.path).toList();
+          _inputProvider.attachments.map((a) => a.file.path).toList();
     }
 
-    debugPrint(
-        "SendService: Preparing to send. Text: '$text', Attachments: ${currentAttachmentPaths.length}");
-
-    // Validation: Must have either text OR attachments
     if (text.isEmpty && currentAttachmentPaths.isEmpty) {
-      debugPrint("SendService: Aborting. No text and no attachments.");
       return false;
     }
 
@@ -113,10 +107,9 @@ class SendService {
 
     try {
       // -----------------------------------------------------------------------
-      // 2. HANDLE FEATURE MODES (Hidden System Prompts)
+      // 2. FEATURE MODES (Study, Quiz, etc.)
       // -----------------------------------------------------------------------
-
-      final activeMode = inputProvider.featureMode;
+      final activeMode = _inputProvider.featureMode;
       String textForApi = text;
 
       if (activeMode == ChatInputMode.study) {
@@ -125,16 +118,15 @@ class SendService {
         textForApi = "${localizations.featureQuizMessage}\n\n$text";
       }
 
+      // -----------------------------------------------------------------------
+      // 3. MODEL RESOLUTION
+      // -----------------------------------------------------------------------
       String? apiModelIdForSend;
       String errorMessage = localizations.errorNoModelsAvailable;
 
       final localState = context.read<ModelLocalStateProvider>();
       final langCode = Localizations.localeOf(context).languageCode;
       final hasInternet = await InternetConnection().hasInternetAccess;
-
-      // -----------------------------------------------------------------------
-      // 3. DETERMINE INITIAL TARGET ID
-      // -----------------------------------------------------------------------
 
       if (overrideModelId != null && overrideModelId.isNotEmpty) {
         apiModelIdForSend = overrideModelId;
@@ -144,18 +136,13 @@ class SendService {
         apiModelIdForSend = sessionProvider.modelId;
       }
 
-      // -----------------------------------------------------------------------
-      // 4. SMART MODEL RESOLUTION (Updated for List<File>)
-      // -----------------------------------------------------------------------
-
+      // Smart Selection Logic
       if (apiModelIdForSend != null && apiModelIdForSend != 'cortex/auto') {
         final ModelEntity entity = _modelService
             .getPreciseModelData(apiModelIdForSend, langCode: langCode);
 
         if (entity.variants != null && entity.variants!.isNotEmpty) {
           final List<dynamic> variants = entity.variants!.values.toList();
-
-          // Logic Update: Check if ANY attachment is an image
           final bool hasVisualContent =
               currentAttachmentPaths.any((path) => _isImageFile(path));
 
@@ -164,9 +151,7 @@ class SendService {
               final String vid = v['id'].toString().toLowerCase();
               final String vTier =
                   v['tier']?.toString().toLowerCase() ?? 'free';
-              final bool isGuard = vid.contains('guard');
-              final bool isPremium = vTier == 'premium';
-              return !isGuard && !isPremium;
+              return !vid.contains('guard') && vTier != 'premium';
             }).toList();
             return filtered.isNotEmpty ? filtered : sourceList;
           }
@@ -175,17 +160,15 @@ class SendService {
               (!hasInternet && !entity.isServerSide);
 
           if (mustRunOffline) {
-            final downloadedVariants = variants.where((v) {
-              final String vId = v['id'];
-              return localState.downloadCompleted[vId] == true;
-            }).toList();
+            final downloadedVariants = variants
+                .where((v) => localState.downloadCompleted[v['id']] == true)
+                .toList();
 
             if (downloadedVariants.isEmpty) {
               errorMessage = localizations.errorNoModelsAvailable;
               apiModelIdForSend = null;
             } else {
               if (hasVisualContent) {
-                // Prioritize vision-capable offline models if images exist
                 final visionModel = downloadedVariants.firstWhere(
                   (v) => (v['modalities']?['image'] == true),
                   orElse: () => null,
@@ -194,11 +177,12 @@ class SendService {
                     ? visionModel['id']
                     : getPreferredCandidates(downloadedVariants).first['id'];
               } else {
-                final candidates = getPreferredCandidates(downloadedVariants);
-                apiModelIdForSend = candidates.first['id'];
+                apiModelIdForSend =
+                    getPreferredCandidates(downloadedVariants).first['id'];
               }
             }
           } else {
+            // Online Variants
             if (hasVisualContent) {
               final visionModel = variants.firstWhere(
                 (v) => (v['modalities']?['image'] == true),
@@ -208,44 +192,30 @@ class SendService {
                   ? visionModel['id']
                   : getPreferredCandidates(variants).first['id'];
             } else {
-              final candidates = getPreferredCandidates(variants);
-              apiModelIdForSend = candidates.first['id'];
+              apiModelIdForSend = getPreferredCandidates(variants).first['id'];
             }
           }
         }
       }
 
       // -----------------------------------------------------------------------
-      // 5. VALIDATION & PREPARATION
+      // 4. CHECKS & UI UPDATES
       // -----------------------------------------------------------------------
 
+      if (apiModelIdForSend == null) {
+        throw ApiException(errorMessage);
+      }
+
       final isAutoRouter = apiModelIdForSend == 'cortex/auto';
-
-      if (apiModelIdForSend == null || apiModelIdForSend.isEmpty) {
-        _handleSendError(
-          ApiException(errorMessage),
-          isRegenerate,
-          regenerateAiIndex,
-          localizations,
-          failedUserText: text,
-          failedAttachmentPaths: currentAttachmentPaths,
-        );
-        return false;
-      }
-
-      if (!isAutoRouter &&
+      final isServerSide = isAutoRouter ||
           Utils.isServerSideModel(apiModelIdForSend,
-              langCode: langCode, modelService: _modelService) &&
-          !hasInternet) {
-        errorMessage = localizations.checkYourInternet;
-        _handleSendError(ApiException(errorMessage), isRegenerate,
-            regenerateAiIndex, localizations,
-            failedUserText: text,
-            failedAttachmentPaths: currentAttachmentPaths);
-        return false;
+              langCode: langCode, modelService: _modelService);
+
+      if (isServerSide && !hasInternet) {
+        throw ApiException(localizations.checkYourInternet);
       }
 
-      // Construct the User Message object
+      // Optimistic UI Message
       final userMessage = Message(
         text: text,
         isUserMessage: true,
@@ -260,77 +230,66 @@ class SendService {
       } else {
         if (_conversationProvider.conversationID == null) {
           final newConvId = _uuid.v4();
-          final newConvTitle =
-              (text.isEmpty && currentAttachmentPaths.isNotEmpty)
-                  ? "📁"
-                  : (text.length > 32 ? text.substring(0, 32) : text);
+          final title = (text.isEmpty && currentAttachmentPaths.isNotEmpty)
+              ? "📁"
+              : (text.length > 32 ? text.substring(0, 32) : text);
 
-          final modelIdForStorage = (sessionProvider.isDynamicChat)
+          final modelForStorage = sessionProvider.isDynamicChat
               ? (sessionProvider.modelId ?? 'dynamic')
               : apiModelIdForSend;
 
           _conversationProvider.startNewConversationSession(
-            newConvId,
-            newConvTitle,
-            modelIdForStorage,
-            userMessage,
-          );
+              newConvId, title, modelForStorage, userMessage);
         } else {
           _conversationProvider.appendMessageToConversation(userMessage);
         }
         aiMessageIndex = _conversationProvider.messages.length - 1;
       }
 
-      // Clear the input attachments from the provider
-      inputProvider.clearAttachments();
+      _inputProvider.clearAttachments();
 
-      // Routing
-      if (!isAutoRouter &&
-          !Utils.isServerSideModel(apiModelIdForSend,
-              langCode: langCode, modelService: _modelService)) {
+      // -----------------------------------------------------------------------
+      // 5. EXECUTION ROUTING
+      // -----------------------------------------------------------------------
+
+      if (!isServerSide) {
         // Offline Flow
         final offlineModerator = OfflineModeratorService();
         if (offlineModerator.isPromptAcceptable(textForApi)) {
-          unawaited(_sendLocalMessage(
-              textForApi, currentAttachmentPaths, apiModelIdForSend));
+          await _offlineService.sendMessage(
+              textForApi, currentAttachmentPaths.firstOrNull);
         } else {
           throw ApiException(localizations.errorPromptFlagged);
         }
       } else {
-        // Server Flow
-        await _sendServerSideMessage(
-          textForApi,
-          apiModelIdForSend,
-          currentAttachmentPaths,
-          localizations,
-          aiMessageIndex,
-          langCode,
+        // Server Flow (with Tool Loop & Reasoning)
+        await _sendServerSideMessageWithLoop(
+          initialText: textForApi,
+          modelId: apiModelIdForSend,
+          attachments: currentAttachmentPaths,
+          localizations: localizations,
+          aiMessageIndex: aiMessageIndex,
+          langCode: langCode,
         );
+
         _conversationProvider.finishBotResponse(aiMessageIndex);
 
-        if (inputProvider.isVoiceModeActive) {
+        if (_inputProvider.isVoiceModeActive) {
           _voiceService.onAiResponseFinished();
         }
       }
 
+      // -----------------------------------------------------------------------
+      // 6. ANALYTICS & HISTORY
+      // -----------------------------------------------------------------------
       if (!isAutoRouter) {
-        try {
-          await ChatStorageService.addRecentModel(
-            apiModelIdForSend,
-            langCode: langCode,
-            modelService: _modelService,
-          );
-        } catch (e) {
-          debugPrint("[SendService] Failed to update recent models: $e");
-        }
+        ChatStorageService.addRecentModel(apiModelIdForSend,
+                langCode: langCode, modelService: _modelService)
+            .ignore();
       }
 
-      // Log message sent event
-      final isLocalModel = !isAutoRouter &&
-          !Utils.isServerSideModel(apiModelIdForSend,
-              langCode: langCode, modelService: _modelService);
       AnalyticsService().logMessageSent(
-        modelType: isLocalModel ? 'offline' : 'online',
+        modelType: !isServerSide ? 'offline' : 'online',
         hasAttachments: currentAttachmentPaths.isNotEmpty,
       );
 
@@ -344,116 +303,216 @@ class SendService {
     }
   }
 
-  /// Sends a message using a local (on-device) model via the OfflineService.
-  Future<void> _sendLocalMessage(
-      String text, List<String> attachmentPaths, String modelId) async {
-    try {
-      debugPrint(
-          "[SendService] Delegating local message to OfflineService for model '$modelId'.");
+  /// Manages the full conversation loop:
+  /// 1. Sends Request
+  /// 2. Streams Text/Reasoning
+  /// 3. Captures Tool Calls
+  /// 4. Executes Tools
+  /// 5. Loops back to step 1 if tools were used.
+  Future<void> _sendServerSideMessageWithLoop({
+    required String initialText,
+    required String modelId,
+    required List<String> attachments,
+    required AppLocalizations localizations,
+    required int aiMessageIndex,
+    required String langCode,
+  }) async {
+    final ModelEntity modelData =
+        _modelService.getPreciseModelData(modelId, langCode: langCode);
+    final bool isPremium = modelData.isPremium;
 
-      // Note: OfflineService needs to be updated to accept List<String>.
-      // For now, passing the first path if available to maintain signature if not yet refactored.
-      // Ideally: await _offlineService.sendMessage(text, attachmentPaths);
-      await _offlineService.sendMessage(
-          text, attachmentPaths.isNotEmpty ? attachmentPaths.first : null);
-    } catch (e) {
-      rethrow;
-    }
-  }
+    final bool isCharacterModel =
+        (modelData.category == 'roleplay' || modelData.category == 'self') &&
+            modelId != 'cortex/auto';
 
-  /// Sends a message using a server-side model via the ApiService.
-  Future<void> _sendServerSideMessage(
-    String text,
-    String modelIdForRequest,
-    List<String> attachmentPaths,
-    AppLocalizations localizations,
-    int aiMessageIndex,
-    String langCode,
-  ) async {
-    final bool isAutoRouter = modelIdForRequest == 'cortex/auto';
-    final ModelEntity model = _modelService
-        .getPreciseModelData(modelIdForRequest, langCode: langCode);
-    final bool isPremium = model.isPremium;
-    final bool isCharacterModel = isAutoRouter
-        ? false
-        : (model.category == 'roleplay' || model.category == 'self');
-
-    debugPrint(
-      "[SendService] Sending server request for model '$modelIdForRequest'. "
-      "Is Auto: $isAutoRouter, Is Premium: $isPremium",
-    );
-
-    // Build context history
-    final memory = await _contextService.buildContextMessages(
+    // 1. Build Base Context (History)
+    List<Map<String, dynamic>> contextMessages =
+        await _contextService.buildContextMessages(
       includeLastUser: false,
-      targetModelId: modelIdForRequest,
+      targetModelId: modelId,
       langCode: langCode,
     );
 
-    // Stream Handlers
-    void onTextChunk(String textChunk) {
-      if (_conversationProvider.wasResponseStopped) return;
-      _conversationProvider.appendToLastBotMessage(textChunk);
-
-      if (_inputProvider.isVoiceModeActive) {
-        _voiceService.onAiStreamCallback(textChunk);
-      }
-
-      if (_scrollService.isUserAtBottom()) {
-        _scrollService.scrollToBottom();
-      }
+    // 2. Add Current User Message to Context (Manual Construction)
+    // We do this manually because attachments need to be processed into base64 blocks
+    final List<Map<String, dynamic>> userContent = [];
+    if (initialText.isNotEmpty) {
+      userContent.add({"type": "text", "text": initialText});
+    }
+    for (var path in attachments) {
+      final block = await Utils.processAttachment(path);
+      if (block != null) userContent.add(block);
     }
 
-    Future<void> onImageReceived(String imageUrl) async {
-      if (_conversationProvider.wasResponseStopped) return;
-      try {
-        final imageBytes = base64Decode(imageUrl.split(',').last);
-        final tempDir = await getTemporaryDirectory();
-        final filePath = '${tempDir.path}/${_uuid.v4()}.png';
-        final file = File(filePath);
-        await file.writeAsBytes(imageBytes);
-      } catch (e) {
-        debugPrint("[SendService] Error saving received image: $e");
-        _conversationProvider.setErrorMessage(
-            aiMessageIndex, localizations.errorImageLoad, false);
-      }
+    if (userContent.isNotEmpty) {
+      contextMessages.add({"role": "user", "content": userContent});
     }
 
-    // Call API
-    if (isCharacterModel) {
-      var baseModelId = model.baseModelId;
+    // Loop Variables
+    bool shouldContinue = true;
+    int loopCount = 0;
+    const int maxLoops = 5; // Safety break
 
-      if (baseModelId == 'dynamic') {
-        baseModelId = 'cortex/auto';
+    // --- THE LOOP ---
+    while (shouldContinue && loopCount < maxLoops) {
+      shouldContinue = false; // Stop unless tools are called
+      loopCount++;
+
+      List<dynamic> turnToolCalls = [];
+
+      // Handler Functions (defined here to capture scope)
+      void onTextChunk(String text) {
+        if (_conversationProvider.wasResponseStopped) return;
+        _conversationProvider.appendToLastBotMessage(text);
+        if (_inputProvider.isVoiceModeActive) {
+          _voiceService.onAiStreamCallback(text);
+        }
+        if (_scrollService.isUserAtBottom()) {
+          _scrollService.scrollToBottom(
+              duration: const Duration(milliseconds: 50));
+        }
       }
 
-      if (baseModelId == null || baseModelId.isEmpty) {
-        throw ApiException(
-            "Character '$modelIdForRequest' has no valid base model configured.");
+      void onReasoning(String reasoningText) {
+        // Format reasoning (thinking) process nicely in the UI
+        if (_conversationProvider.wasResponseStopped) return;
+        _conversationProvider.appendToLastBotMessage(
+            "\n> *${localizations.thinking}...*\n> $reasoningText\n\n");
+        if (_scrollService.isUserAtBottom()) {
+          _scrollService.scrollToBottom(
+              duration: const Duration(milliseconds: 50));
+        }
       }
 
-      await _apiService.getCharacterResponse(
-        userInput: text,
-        context: memory,
-        characterId: modelIdForRequest,
-        baseModelId: baseModelId,
-        isPremium: isPremium,
-        attachmentPaths: attachmentPaths,
-        onTextChunk: onTextChunk,
-        onImageReceived: onImageReceived,
-        localizations: localizations,
-      );
-    } else {
-      await _apiService.getOnlineModelResponse(
-        modelId: modelIdForRequest,
-        userInput: text,
-        context: memory,
-        isPremium: isPremium,
-        attachmentPaths: attachmentPaths,
-        onTextChunk: onTextChunk,
-        onImageReceived: onImageReceived,
-        localizations: localizations,
-      );
+      Future<void> onImageReceived(String url) async {
+        if (_conversationProvider.wasResponseStopped) return;
+        try {
+          final bytes = base64Decode(url.split(',').last);
+          final path =
+              '${(await getTemporaryDirectory()).path}/${_uuid.v4()}.png';
+          await File(path).writeAsBytes(bytes);
+          // UI update logic implies message provider listens to changes or reloads
+        } catch (e) {
+          debugPrint("Image save error: $e");
+        }
+      }
+
+      // Execute Request
+      if (isCharacterModel) {
+        // Characters typically don't use tools in this architecture yet
+        var baseModelId = modelData.baseModelId;
+        if (baseModelId == 'dynamic') baseModelId = 'cortex/auto';
+
+        await _apiService.getCharacterResponse(
+          userInput: "",
+          // Already in context
+          context: contextMessages,
+          characterId: modelId,
+          baseModelId: baseModelId ?? 'cortex/auto',
+          isPremium: isPremium,
+          localizations: localizations,
+          onTextChunk: onTextChunk,
+          onReasoning: onReasoning,
+          onImageReceived: onImageReceived,
+        );
+        // Characters exit loop immediately
+        shouldContinue = false;
+      } else {
+        // Standard Models (Support Tools)
+        await _apiService.getOnlineModelResponse(
+          modelId: modelId,
+          isPremium: isPremium,
+          userInput: "",
+          // Already in context
+          context: contextMessages,
+          localizations: localizations,
+          langCode: langCode,
+          onTextChunk: onTextChunk,
+          onReasoning: onReasoning,
+          onImageReceived: onImageReceived,
+          // Capture Tools
+          onToolCall: (tools) {
+            turnToolCalls = tools;
+          },
+        );
+      }
+
+      // Post-Response: Check for Tools
+      if (turnToolCalls.isNotEmpty) {
+        shouldContinue = true; // We need to loop again to send results
+
+        // 1. Add Assistant Request to History
+        contextMessages.add({
+          "role": "assistant",
+          "content": "", // Usually empty when calling tools
+          "tool_calls": turnToolCalls
+        });
+
+        // 2. Execute Tools & Add Results
+        for (var call in turnToolCalls) {
+          final String callId = call['id'];
+          final String name = call['function']['name'];
+          final String argsStr = call['function']['arguments'];
+
+          String result;
+          final tool = ToolRegistry.getTool(name);
+
+          // Variables for structured output
+          String? widgetType;
+          Map<String, dynamic>? widgetData;
+          String summaryForContext = "";
+
+          if (tool != null) {
+            try {
+              final args = jsonDecode(argsStr);
+              // Notify UI gently
+              _conversationProvider
+                  .appendToLastBotMessage("\n*Using $name...*");
+              // Execute
+              result = await tool.function(args);
+
+              // CHECK FOR STRUCTURED WIDGET RESPONSE
+              try {
+                if (result.trim().startsWith('{')) {
+                  final jsonResult = jsonDecode(result);
+                  if (jsonResult is Map && jsonResult.containsKey('widget')) {
+                    widgetType = jsonResult['widget'];
+                    widgetData = jsonResult['data'];
+                    summaryForContext = jsonResult['summary'].toString();
+                  }
+                }
+              } catch (_) {
+                // Not a widget json, proceed as normal
+              }
+
+              if (widgetType != null) {
+                // Inject Widget Marker
+                // The UI (parser) will detect this pattern and render the card
+                _conversationProvider.appendToLastBotMessage(
+                    "\n<<<WIDGET:$widgetType>>>${jsonEncode(widgetData)}<<<END>>>\n");
+
+                // Use the summary for the LLM context so it doesn't get confused by raw JSON
+                result = summaryForContext;
+              } else {
+                _conversationProvider.appendToLastBotMessage(" ✅\n");
+              }
+            } catch (e) {
+              result = "Error executing tool '$name': $e";
+              _conversationProvider.appendToLastBotMessage(" ❌\n");
+            }
+          } else {
+            result = "Tool not found.";
+          }
+
+          // Add Tool Result to History
+          contextMessages.add({
+            "role": "tool",
+            "tool_call_id": callId,
+            "name": name,
+            "content": result
+          });
+        }
+      }
     }
   }
 

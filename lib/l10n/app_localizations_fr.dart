@@ -673,6 +673,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get benefit10 => 'Pièces jointes supplémentaires';
 
   @override
+  String get benefit11 => 'Mode flux illimité';
+
+  @override
+  String get benefit12 => '';
+
+  @override
   String get oldBenefits => 'Tous les Avantages des Plans Inférieurs';
 
   @override
@@ -1626,4 +1632,75 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get continueInOfflineMode => 'Continuer en mode hors ligne';
+
+  @override
+  String get voiceModeInformation =>
+      'Cortex protège vos données en fonctionnant entièrement sur l\'appareil, même en mode de chat vocal ; profitez de conversations fluides !';
+
+  @override
+  String get workInProgress => 'Travaux en cours';
+
+  @override
+  String get toolGetStockPriceDescription =>
+      'Obtenez le cours actuel et l\'historique des actions (par exemple AAPL, THYAO.IS) et des cryptomonnaies (par exemple BTC-USD, ETH-USD).';
+
+  @override
+  String get toolGetStockPriceParamSymbol =>
+      'Le symbole boursier (par exemple AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolGetWeatherDescription =>
+      'Obtenez la météo actuelle d\'une ville spécifique. Demandez la ville à l\'utilisateur si elle n\'est pas connue.';
+
+  @override
+  String get toolGetWeatherParamCity =>
+      'Le nom de la ville (par exemple, Londres, Istanbul).';
+
+  @override
+  String get toolRunPythonCodeDescription =>
+      'Exécutez du code Python dans un environnement isolé et sécurisé. Utilisez cette fonctionnalité pour des calculs complexes, le traitement de données ou des tâches algorithmiques.';
+
+  @override
+  String get toolRunPythonCodeParamCode => 'Le code Python à exécuter.';
+
+  @override
+  String get toolCalculateDescription => 'Évaluer une expression mathématique.';
+
+  @override
+  String get toolCalculateParamExpression =>
+      'L\'expression mathématique (par exemple, « 3 + 4 * 2 », « sin(45) »).';
+
+  @override
+  String get toolRenderChartDescription =>
+      'Générez un graphique. Utilisez-le pour visualiser les données fournies par l\'utilisateur ou calculées.';
+
+  @override
+  String get toolRenderChartParamType =>
+      'Type de graphique : barres, lignes, secteurs.';
+
+  @override
+  String get toolRenderChartParamLabels =>
+      'Étiquettes de l\'axe des abscisses ou catégories.';
+
+  @override
+  String get toolRenderChartParamData => 'Points de données numériques.';
+
+  @override
+  String get toolRenderChartParamLabel =>
+      'Étiquette de l\'ensemble de données.';
+
+  @override
+  String get toolRenderChartParamTitle => 'Titre du graphique.';
+
+  @override
+  String get flowModeDescription =>
+      'En mode Flow, les intelligences débattent entre elles ; vous pouvez soit vous asseoir et écouter, soit intervenir et participer à la discussion !';
+
+  @override
+  String get flowModeQuestion =>
+      'Bonjour ! Vous êtes maintenant en mode Flow sur l\'application Cortex. Trois autres agents IA sont présents. Votre mission est de lancer un sujet de discussion en posant une question provocatrice ou amusante. N\'hésitez pas à utiliser l\'humour, l\'ironie et quelques piques amicales dans vos réponses. Tous les sujets sont permis. À vous de jouer !';
+
+  @override
+  String get voicePrompt =>
+      'Vous fournissez actuellement un service vocal sur la plateforme Cortex. Veuillez ne pas utiliser Markdown, de blocs de code ni de LaTeX. Répondez uniquement par du texte adapté à la synthèse vocale.';
 }

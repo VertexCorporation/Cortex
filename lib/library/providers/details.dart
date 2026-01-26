@@ -97,7 +97,7 @@ class ModelDetailProvider extends ChangeNotifier {
 
   bool get isPluralModel =>
       _mainModel?.isServerSide == true &&
-          (_mainModel?.variants?.isNotEmpty ?? false);
+      (_mainModel?.variants?.isNotEmpty ?? false);
 
   //================================================================================
   // Initialization & Lifecycle
@@ -107,8 +107,7 @@ class ModelDetailProvider extends ChangeNotifier {
     required String modelId,
     required BuildContext context,
     required DownloadManager? downloadManager,
-  })
-      : _modelId = modelId,
+  })  : _modelId = modelId,
         _downloadManager = downloadManager,
         _modelService = context.read<ModelService>(),
         _localStateProvider = context.read<ModelLocalStateProvider>(),
@@ -164,13 +163,14 @@ class ModelDetailProvider extends ChangeNotifier {
     final localizations = await AppLocalizations.delegate.load(locale);
 
     // Add Dynamic Chat as a base model option
+    // Add Dynamic Chat as a base model option
     final dynamicModel =
-    ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode)
-        .copyWith(
+        ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode)
+            .copyWith(
       displayTitle: localizations.alwaysBest,
       variants: {
-        'dynamic': {
-          'id': 'dynamic',
+        'cortex/auto': {
+          'id': 'cortex/auto',
           'title': localizations.alwaysBest,
           'tier': 'free',
         }
@@ -180,9 +180,9 @@ class ModelDetailProvider extends ChangeNotifier {
     availableBaseModels.insert(0, dynamicModel);
 
     // --- DEFAULT SELECTION LOGIC ---
-    // If no base model is selected (or it is null), default to 'dynamic' (Always Best).
+    // If no base model is selected (or it is null), default to 'cortex/auto' (Always Best).
     if (selectedBaseModelId == null || selectedBaseModelId!.isEmpty) {
-      selectedBaseModelId = 'dynamic';
+      selectedBaseModelId = 'cortex/auto';
     }
 
     _processData(localizations);
@@ -212,8 +212,8 @@ class ModelDetailProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> selectBaseModel(BuildContext context,
-      String newBaseModelId) async {
+  Future<void> selectBaseModel(
+      BuildContext context, String newBaseModelId) async {
     if (isButtonLocked) return;
     isButtonLocked = true;
     notifyListeners();
@@ -228,7 +228,7 @@ class ModelDetailProvider extends ChangeNotifier {
       }
 
       final success =
-      await _modelService.updateBaseModel(_modelId, newBaseModelId);
+          await _modelService.updateBaseModel(_modelId, newBaseModelId);
       if (!success) {
         _notificationService.showNotification(
             message: localizations.anErrorOccurred,
@@ -341,7 +341,7 @@ class ModelDetailProvider extends ChangeNotifier {
         // 1. Try to find the model in the local available list (Includes 'dynamic')
         try {
           selectedBaseModel = availableBaseModels.firstWhere(
-                (m) => m.variants?.containsKey(selectedBaseModelId) ?? false,
+            (m) => m.variants?.containsKey(selectedBaseModelId) ?? false,
           );
         } catch (_) {
           // 2. If not found locally, try fetching from the service (Server-side models)
@@ -357,10 +357,10 @@ class ModelDetailProvider extends ChangeNotifier {
       _currentCapabilitiesSource = selectedBaseModel ?? _mainModel;
     } else if (isPluralModel) {
       selectedVariant =
-      (selectedVariantName != null && selectedVariantName!.isNotEmpty)
-          ? _modelService.getPreciseModelData(selectedVariantName!,
-          langCode: langCode)
-          : null;
+          (selectedVariantName != null && selectedVariantName!.isNotEmpty)
+              ? _modelService.getPreciseModelData(selectedVariantName!,
+                  langCode: langCode)
+              : null;
       _currentCapabilitiesSource = selectedVariant ?? _mainModel;
     } else {
       _currentCapabilitiesSource = _mainModel;
@@ -378,14 +378,10 @@ class ModelDetailProvider extends ChangeNotifier {
     } else if (isCharacterModel) {
       displaySummary = _mainModel!.displaySummary;
       displayDescription = _mainModel!.displayDescription;
-      if (displaySummary
-          .trim()
-          .isEmpty) {
+      if (displaySummary.trim().isEmpty) {
         displaySummary = selectedBaseModel?.displaySummary ?? '';
       }
-      if (displayDescription
-          .trim()
-          .isEmpty) {
+      if (displayDescription.trim().isEmpty) {
         displayDescription = selectedBaseModel?.displayDescription ?? '';
       }
     } else {

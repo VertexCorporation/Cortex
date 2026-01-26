@@ -661,6 +661,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get benefit10 => 'Daha Fazla Ek';
 
   @override
+  String get benefit11 => 'Sınırsız Akış Modu';
+
+  @override
+  String get benefit12 => '';
+
+  @override
   String get oldBenefits => 'Alt planlardaki tüm avantajlar';
 
   @override
@@ -1601,4 +1607,74 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get continueInOfflineMode => 'lokal Modda Devam Et';
+
+  @override
+  String get voiceModeInformation =>
+      'Cortex, sesli sohbet modunda bile tamamen cihaz üzerinde çalışarak verilerinizi güvende tutar; sorunsuz konuşmaların tadını çıkarın!';
+
+  @override
+  String get workInProgress => 'Çalışmalar Devam Ediyor';
+
+  @override
+  String get toolGetStockPriceDescription =>
+      'Hisse senetleri (örneğin AAPL, THYAO.IS) ve kripto paralar (örneğin BTC-USD, ETH-USD) için güncel fiyat ve geçmiş verilerini alın.';
+
+  @override
+  String get toolGetStockPriceParamSymbol =>
+      'Hisse senedinin sembolü (ör. AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolGetWeatherDescription =>
+      'Belirtilen şehir için güncel hava durumunu öğrenin. Şehir bilinmiyorsa kullanıcıdan şehir bilgisini isteyin.';
+
+  @override
+  String get toolGetWeatherParamCity =>
+      'Şehrin adı (örneğin, Londra, İstanbul).';
+
+  @override
+  String get toolRunPythonCodeDescription =>
+      'Python kodunu güvenli bir sanal ortamda çalıştırın. Bunu karmaşık hesaplamalar, veri işleme veya algoritmik görevler için kullanın.';
+
+  @override
+  String get toolRunPythonCodeParamCode => 'Çalıştırılacak Python kodu.';
+
+  @override
+  String get toolCalculateDescription =>
+      'Bir matematiksel ifadeyi değerlendirin.';
+
+  @override
+  String get toolCalculateParamExpression =>
+      'Matematiksel ifade (örneğin, \"3 + 4 * 2\", \"sin(45)\").';
+
+  @override
+  String get toolRenderChartDescription =>
+      'Bir grafik oluşturun. Bunu, kullanıcı tarafından sağlanan veya hesaplanan verileri görselleştirmek için kullanın.';
+
+  @override
+  String get toolRenderChartParamType => 'Grafik türü: çubuk, çizgi, pasta.';
+
+  @override
+  String get toolRenderChartParamLabels =>
+      'X ekseni veya kategoriler için etiketler.';
+
+  @override
+  String get toolRenderChartParamData => 'Sayısal veri noktaları.';
+
+  @override
+  String get toolRenderChartParamLabel => 'Veri kümesi için etiket.';
+
+  @override
+  String get toolRenderChartParamTitle => 'Grafiğin başlığı.';
+
+  @override
+  String get flowModeDescription =>
+      'Akış modunda, zekâlar kendi aralarında tartışır; isterseniz arkanıza yaslanıp dinleyebilir, isterseniz de tartışmaya katılabilirsiniz!';
+
+  @override
+  String get flowModeQuestion =>
+      'Merhaba! Şu anda Cortex uygulamasında Akış Modundasınız. Burada sizinle birlikte üç yapay zeka ajanı daha var. Göreviniz, bir konu ortaya atmak ve diğerlerine kışkırtıcı veya eğlenceli bir soru sorarak bir tartışma başlatmak. Yanıtlarınızda mizah, ironi ve hafif alaycı ifadeler kullanmaktan çekinmeyin. Herhangi bir konu kabul edilebilir. Hadi, sohbeti başlatın.';
+
+  @override
+  String get voicePrompt =>
+      'Şu anda Cortex platformunda ses hizmeti veriyorsunuz. Markdown, kod blokları veya LaTeX kullanmayın. Yalnızca konuşma sentezine uygun metin biçiminde yanıt verin.';
 }

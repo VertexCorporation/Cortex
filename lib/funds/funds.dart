@@ -151,6 +151,14 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   void _updateCountdown() {
     if (!mounted) return;
+
+    if (_uiActiveSubscriptionLevel > 0) {
+      if (_countdownText.isNotEmpty) {
+        setState(() => _countdownText = '');
+      }
+      return;
+    }
+
     final expiresAt = _backend.specialOfferExpiresAt;
 
     // If logic says offer is inactive (null expiry or inactive flag)
@@ -553,7 +561,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     // Determine visual active state locally to ensure instant UI update when timer hits 0
     // even if backend state lags slightly.
     final bool isOfferVisuallyActive =
-        backend.isSpecialOfferActive && _countdownText.isNotEmpty;
+        backend.currentUserSubscriptionLevel == 0 &&
+            backend.isSpecialOfferActive &&
+            _countdownText.isNotEmpty;
 
     return AnimatedSlide(
       key: const ValueKey('main_content'),
@@ -748,7 +758,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final backend = Provider.of<FundsBackend>(context, listen: false);
     // Rely on countdown text being present to show badge
     final bool showSpecialOffer =
-        backend.isSpecialOfferActive && _countdownText.isNotEmpty;
+        backend.currentUserSubscriptionLevel == 0 &&
+            backend.isSpecialOfferActive &&
+            _countdownText.isNotEmpty;
 
     final scale = (screenWidth / 375.0).clamp(0.85, 1.2);
     final badgeHeight = 36.0 * scale;

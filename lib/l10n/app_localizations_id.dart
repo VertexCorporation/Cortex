@@ -666,6 +666,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get benefit10 => 'Lampiran Lainnya';
 
   @override
+  String get benefit11 => 'Mode Aliran Tanpa Batas';
+
+  @override
+  String get benefit12 => '';
+
+  @override
   String get oldBenefits => 'Semua manfaat dari paket yang lebih rendah';
 
   @override
@@ -1612,4 +1618,73 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get continueInOfflineMode => 'Lanjutkan dalam Mode Offline';
+
+  @override
+  String get voiceModeInformation =>
+      'Cortex menjaga keamanan data Anda dengan berjalan sepenuhnya di perangkat, bahkan dalam mode obrolan suara; nikmati percakapan tanpa hambatan!';
+
+  @override
+  String get workInProgress => 'Sedang dalam pengerjaan';
+
+  @override
+  String get toolGetStockPriceDescription =>
+      'Dapatkan harga terkini dan riwayat untuk saham (misalnya AAPL, THYAO.IS) dan kripto (misalnya BTC-USD, ETH-USD).';
+
+  @override
+  String get toolGetStockPriceParamSymbol =>
+      'Simbol saham (misalnya AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolGetWeatherDescription =>
+      'Dapatkan informasi cuaca terkini untuk kota tertentu. Tanyakan kepada pengguna untuk memasukkan kota jika tidak diketahui.';
+
+  @override
+  String get toolGetWeatherParamCity =>
+      'Nama kota (misalnya, London, Istanbul).';
+
+  @override
+  String get toolRunPythonCodeDescription =>
+      'Jalankan kode Python di lingkungan terisolasi (sandbox) yang aman. Gunakan ini untuk perhitungan kompleks, pemrosesan data, atau tugas-tugas algoritmik.';
+
+  @override
+  String get toolRunPythonCodeParamCode => 'Kode Python yang akan dieksekusi.';
+
+  @override
+  String get toolCalculateDescription => 'Evaluasi suatu ekspresi matematika.';
+
+  @override
+  String get toolCalculateParamExpression =>
+      'Ekspresi matematika (misalnya, \"3 + 4 * 2\", \"sin(45)\").';
+
+  @override
+  String get toolRenderChartDescription =>
+      'Buat bagan/grafik. Gunakan ini untuk memvisualisasikan data yang diberikan oleh pengguna atau yang telah dihitung.';
+
+  @override
+  String get toolRenderChartParamType =>
+      'Jenis grafik: batang, garis, lingkaran.';
+
+  @override
+  String get toolRenderChartParamLabels => 'Label untuk sumbu x atau kategori.';
+
+  @override
+  String get toolRenderChartParamData => 'Titik data numerik.';
+
+  @override
+  String get toolRenderChartParamLabel => 'Label untuk dataset.';
+
+  @override
+  String get toolRenderChartParamTitle => 'Judul grafik.';
+
+  @override
+  String get flowModeDescription =>
+      'Dalam mode Flow, kecerdasan-kecerdasan berdebat di antara mereka sendiri; Anda dapat duduk santai dan mendengarkan atau ikut serta dan bergabung dalam diskusi!';
+
+  @override
+  String get flowModeQuestion =>
+      'Halo! Anda sekarang berada di Mode Alur pada aplikasi Cortex. Ada tiga agen AI lain di sini bersama Anda. Tugas Anda adalah mengajukan topik ke dalam ruangan dan memulai diskusi dengan mengajukan pertanyaan yang provokatif atau menghibur kepada yang lain. Dalam tanggapan Anda, jangan ragu untuk menggunakan humor, ironi, dan sedikit ejekan. Topik apa pun boleh dibahas. Silakan, mulai percakapannya.';
+
+  @override
+  String get voicePrompt =>
+      'Saat ini Anda menyediakan layanan suara di platform Cortex. Jangan gunakan markdown, blok kode, atau LaTeX. Tanggapi murni dalam teks yang sesuai untuk sintesis suara.';
 }

@@ -665,6 +665,12 @@ class AppLocalizationsKu extends AppLocalizations {
   String get benefit10 => 'Pêvekên Zêdetir';
 
   @override
+  String get benefit11 => 'Moda Herikîna Bêsînor';
+
+  @override
+  String get benefit12 => '';
+
+  @override
   String get oldBenefits => 'Hemî feydeyên ji planên jêrîn';
 
   @override
@@ -1607,4 +1613,72 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get continueInOfflineMode => 'Bi Moda Offline Berdewam Bike';
+
+  @override
+  String get voiceModeInformation =>
+      'Cortex bi xebitandina bi tevahî li ser cîhazê, tewra di moda sohbeta dengî de jî, daneyên we ewle dihêle; ji sohbetên bênavber kêfê bistînin!';
+
+  @override
+  String get workInProgress => 'Kar berdewam e';
+
+  @override
+  String get toolGetStockPriceDescription =>
+      'Buhayê niha û dîroka stokan (mînak AAPL, THYAO.IS) û krîptoyê (mînak BTC-USD, ETH-USD) bistînin.';
+
+  @override
+  String get toolGetStockPriceParamSymbol =>
+      'Sembola tîkerê (mînak AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolGetWeatherDescription =>
+      'Rewşa hewayê ya niha ji bo bajarekî diyarkirî bistînin. Ger bajar neyê zanîn, ji bikarhêner bipirsin.';
+
+  @override
+  String get toolGetWeatherParamCity => 'Navê bajarî (mînak, London, Stenbol).';
+
+  @override
+  String get toolRunPythonCodeDescription =>
+      'Koda Pythonê di sandboxek ewle de bicîh bînin. Vê ji bo hesabên tevlihev, pêvajoya daneyan, an karên algorîtmîk bikar bînin.';
+
+  @override
+  String get toolRunPythonCodeParamCode => 'Koda Pythonê ya ku were bicîhanîn.';
+
+  @override
+  String get toolCalculateDescription => 'Nirxandina îfadeyeke matematîkî.';
+
+  @override
+  String get toolCalculateParamExpression =>
+      'Îfadeya matematîkî (mînak, \"3 + 4 * 2\", \"sin(45)\").';
+
+  @override
+  String get toolRenderChartDescription =>
+      'Nexşeyek/grafek çêbikin. Vê bikar bînin da ku daneyên ku ji hêla bikarhêner ve hatine peyda kirin an jî hatine hesabkirin dîtbar bikin.';
+
+  @override
+  String get toolRenderChartParamType => 'Cureyê nexşeyê: bar, xêz, pî.';
+
+  @override
+  String get toolRenderChartParamLabels =>
+      'Etîket ji bo eksena-x an kategoriyan.';
+
+  @override
+  String get toolRenderChartParamData => 'Xalên daneyên hejmarî.';
+
+  @override
+  String get toolRenderChartParamLabel => 'Etîket ji bo daneyê.';
+
+  @override
+  String get toolRenderChartParamTitle => 'Sernavê nexşeyê.';
+
+  @override
+  String get flowModeDescription =>
+      'Di moda Flow de, aqilmend di navbera xwe de nîqaş dikin; hûn dikarin an rûnin û guhdarî bikin an jî xwe bavêjin û beşdarî nîqaşê bibin!';
+
+  @override
+  String get flowModeQuestion =>
+      'Silav! Tu niha di Moda Herikînê de li ser sepana Cortex î. Sê ajanên din ên AI li vir bi te re ne. Erka te ew e ku mijarekê bavêjî odeyê û bi pirsîna pirsek provokatîf an kêfxweş ji yên din re nîqaşekê dest pê bikî. Di bersivên xwe de, xwe azad hîs bike ku mîzah, îronî û gotinên sivik ên bêwate bi kar bînî. Her mijarek mafdar e. Berdewam bike, axaftinê dest pê bike.';
+
+  @override
+  String get voicePrompt =>
+      'Niha tu li ser platforma Cortex xizmeta deng peyda dikî. Markdown, blokên kodê, an LaTeX bikar neynin. Bi tenê bi nivîsa guncaw ji bo senteza axaftinê bersiv bide.';
 }

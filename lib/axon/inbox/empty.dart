@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 import '../../../app.dart';
 import '../../../theme.dart';
 
@@ -20,12 +21,13 @@ class EmptyStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild when theme changes
+    context.watch<ThemeProvider>();
     final localizations = AppLocalizations.of(context)!;
 
     // Logic for text content
-    final String title = isForStarred
-        ? localizations.noStarredChats
-        : localizations.noChats;
+    final String title =
+        isForStarred ? localizations.noStarredChats : localizations.noChats;
 
     final String message = isForStarred
         ? localizations.noStarredChatsMessage
@@ -51,19 +53,19 @@ class EmptyStateView extends StatelessWidget {
               // 1. Icon (SVG for Inbox, Icon for Starred)
               isForStarred
                   ? Icon(
-                Icons.star_border_rounded,
-                size: 48,
-                color: AppColors.tertiaryColor.withValues(alpha: 0.4),
-              )
+                      Icons.star_border_rounded,
+                      size: 48,
+                      color: AppColors.tertiaryColor.withValues(alpha: 0.4),
+                    )
                   : SvgPicture.asset(
-                'assets/icons/inbox.svg',
-                width: 48,
-                height: 48,
-                colorFilter: ColorFilter.mode(
-                  AppColors.tertiaryColor.withValues(alpha: 0.4),
-                  BlendMode.srcIn,
-                ),
-              ),
+                      'assets/icons/inbox.svg',
+                      width: 48,
+                      height: 48,
+                      colorFilter: ColorFilter.mode(
+                        AppColors.tertiaryColor.withValues(alpha: 0.4),
+                        BlendMode.srcIn,
+                      ),
+                    ),
               const SizedBox(height: 18),
 
               // 2. Title (Increased size: 16 -> 18)

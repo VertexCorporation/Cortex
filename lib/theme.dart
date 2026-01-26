@@ -30,11 +30,12 @@ class ThemeProvider extends ChangeNotifier {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         systemNavigationBarColor:
-            Colors.transparent, // Enforce transparent for Edge-to-Edge
+        Colors.transparent,
+        // Enforce transparent for Edge-to-Edge
         systemNavigationBarDividerColor: Colors.transparent,
         statusBarColor: Colors.transparent,
         systemNavigationBarIconBrightness:
-            themeColors.navigationBarIconBrightness,
+        themeColors.navigationBarIconBrightness,
         statusBarIconBrightness: themeColors.statusBarIconBrightness,
       ),
     );
@@ -87,7 +88,8 @@ class AppColors {
         quaternaryColor: const Color(0xFFEBEBEB),
         quinaryColor: const Color(0xA8000000),
         senaryColor: const Color(0xFF0D62FE),
-        septenaryColor: const Color(0xFFFA2626),
+        septenaryColor: const Color(0xFFEF5350),
+        // Soft Red (was 0xFFFA2626)
         background: const Color(0xFFFFFFFF),
         border: const Color(0xFFBFBFBF),
         premium: const Color(0xFF9900FF),
@@ -103,7 +105,8 @@ class AppColors {
         quaternaryColor: const Color(0xFF141414),
         quinaryColor: Colors.white70,
         senaryColor: const Color(0xFF0D31FE),
-        septenaryColor: const Color(0xFFD32F2F),
+        septenaryColor: const Color(0xFFE57373),
+        // Soft Red (was 0xFFD32F2F)
         background: const Color(0xFF090909),
         border: const Color(0xFF303030),
         premium: const Color(0xFFBB86FC),
@@ -250,7 +253,8 @@ class AppColors {
   static Color get premium => getThemeColors(currentTheme).premium;
 
   static Map<String, Map<String, dynamic>> get overlayStyles {
-    return themeDefinitions.map((key, value) => MapEntry(
+    return themeDefinitions.map((key, value) =>
+        MapEntry(
           key,
           {
             'navigationBarColor': value.navigationBarColor,
@@ -261,7 +265,8 @@ class AppColors {
         ));
   }
 
-  static List<Color> get animatedBorderGradientColors => [
+  static List<Color> get animatedBorderGradientColors =>
+      [
         Colors.red,
         Colors.orange,
         Colors.yellow,

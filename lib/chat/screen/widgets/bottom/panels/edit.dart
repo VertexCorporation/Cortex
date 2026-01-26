@@ -46,6 +46,12 @@ class EditPanelWidget extends StatelessWidget {
         height: height,
         decoration: BoxDecoration(
           color: AppColors.background,
+          border: Border(
+            top: BorderSide(
+              color: AppColors.border.withValues(alpha: 0.3),
+              width: 1.0,
+            ),
+          ),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(radius),
             topRight: Radius.circular(radius),

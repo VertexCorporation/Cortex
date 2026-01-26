@@ -8,7 +8,8 @@ import 'package:provider/provider.dart';
 import '../../../app.dart';
 
 class WaveformVisualizer extends StatefulWidget {
-  const WaveformVisualizer({super.key});
+  final Color? color;
+  const WaveformVisualizer({super.key, this.color});
 
   @override
   State<WaveformVisualizer> createState() => _WaveformVisualizerState();
@@ -76,7 +77,7 @@ class _WaveformVisualizerState extends State<WaveformVisualizer>
         painter: _ModernWavePainter(
           history: _history,
           animationValue: _animationValue,
-          color: AppColors.primaryColor.inverted,
+          color: widget.color ?? AppColors.primaryColor.inverted,
         ),
       ),
     );
@@ -122,49 +123,42 @@ class _ModernWavePainter extends CustomPainter {
       final double x = i * stepX;
       final double amplitude = history[i];
 
-      bool isSilent = amplitude < 0.05;
+      // Always animate, even if silent (Idle state)
+      // Base amplitude for "breathing" effect
+      double minAmplitude = 0.05;
+      double effectiveAmplitude = math.max(amplitude, minAmplitude);
 
       double y1 = midY;
       double y2 = midY;
       double y3 = midY;
 
-      if (!isSilent) {
-        double smoothAmp = 0.1 + (amplitude * 0.9);
-        double maxDy = (height / 2) * 0.8;
+      double smoothAmp = 0.1 + (effectiveAmplitude * 0.9);
+      double maxDy = (height / 2) * 0.8;
 
-        // Apply dampening to the right side (where index is near length)
-        // normalizedPos = i / (length - 1). 0(Left)..1(Right).
-        double normalizedPos = i / (history.length - 1);
-        double rightDamp = 1.0;
+      // Apply dampening to the right side (where index is near length)
+      // normalizedPos = i / (length - 1). 0(Left)..1(Right).
+      double normalizedPos = i / (history.length - 1);
+      double rightDamp = 1.0;
 
-        // Linear fade out for the last 20% of points to ensure perfect connection
-        // at the right edge
-        if (normalizedPos > 0.8) {
-          rightDamp = (1.0 - normalizedPos) / 0.2;
-        }
-
-        // Force the very last point to be exactly 0 (or close enough)
-        if (i == history.length - 1) rightDamp = 0.0;
-
-        smoothAmp *= rightDamp;
-
-        // Moving Left <- Right
-        // i=0 is Left (Oldest), i=Max is Right (Newest)
-        // We add new data to the right.
-        // Phase shift: We want the wave shape to "travel" left?
-        // Actually, the data itself shifts left every frame (removeAt(0)).
-        // So visually the "bump" travels left naturally.
-        // The sinusoidal phase shift is just for the "wobble".
-
-        double angle1 = (i * 0.2) - (animationValue * 2 * math.pi);
-        y1 = midY + math.sin(angle1) * maxDy * smoothAmp;
-
-        double angle2 = (i * 0.4) - (animationValue * 4 * math.pi) + 1.0;
-        y2 = midY + math.sin(angle2) * (maxDy * 0.7) * smoothAmp;
-
-        double angle3 = (i * 0.1) + (animationValue * 2 * math.pi) + 2.0;
-        y3 = midY + math.sin(angle3) * (maxDy * 0.5) * smoothAmp;
+      // Linear fade out for the last 20% of points to ensure perfect connection
+      // at the right edge
+      if (normalizedPos > 0.8) {
+        rightDamp = (1.0 - normalizedPos) / 0.2;
       }
+
+      // Force the very last point to be exactly 0 (or close enough)
+      if (i == history.length - 1) rightDamp = 0.0;
+
+      smoothAmp *= rightDamp;
+
+      double angle1 = (i * 0.2) - (animationValue * 2 * math.pi);
+      y1 = midY + math.sin(angle1) * maxDy * smoothAmp;
+
+      double angle2 = (i * 0.4) - (animationValue * 4 * math.pi) + 1.0;
+      y2 = midY + math.sin(angle2) * (maxDy * 0.7) * smoothAmp;
+
+      double angle3 = (i * 0.1) + (animationValue * 2 * math.pi) + 2.0;
+      y3 = midY + math.sin(angle3) * (maxDy * 0.5) * smoothAmp;
 
       if (i == 0) {
         path1.moveTo(x, y1);

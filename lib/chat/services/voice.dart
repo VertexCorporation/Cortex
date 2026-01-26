@@ -17,9 +17,17 @@ class VoiceService with ChangeNotifier {
   VoiceState _state = VoiceState.idle;
   VoiceState get state => _state;
 
+  // TEST MODE: Simulate flow without hardware mic
+  bool get isTestMode => kDebugMode;
+  Timer? _testModeTimer;
+
   String _currentLocale = "en-US";
   Timer? _silenceTimer;
   Function(String)? _onFinalSentence; // Callback to send text to AI
+  String? _voiceSystemPrompt;
+  bool isFlowMode = false; // "Setup" mode (Flow selected but not started)
+  bool isFlowActive = false; // "Active" mode (Flow loop running)
+  int currentFlowAgentIndex = 0; // 0, 1, 2 for the 3 agents
 
   // Queue for TTS to speak text as it streams in from AI
   final List<String> _sentenceQueue = [];
@@ -104,14 +112,52 @@ class VoiceService with ChangeNotifier {
     }
   }
 
+  void toggleFlowMode() {
+    isFlowMode = !isFlowMode;
+    // Reset state when toggling
+    isFlowActive = false;
+    currentFlowAgentIndex = 0;
+    notifyListeners();
+  }
+
+  void startFlow() async {
+    isFlowActive = true;
+    currentFlowAgentIndex = 0;
+    _updateState(VoiceState.processing); // Show wave immediately
+
+    // Send the hidden prompt to kick off the debate
+    // We need to access the L10n string here?
+    // Since we can't context, we expect the UI to pass the prompt or we trigger a callback.
+    // Ideally the UI calls startFlow with the prompt text.
+    // But for now let's assume valid state and just notify listeners to trigger "something"?
+    // Actually, `manualSubmit` calls `_finalizeUserSpeech`, which calls `_onFinalSentence`.
+    // We can simulate this.
+  }
+
+  // Overload startFlow to accept the prompt text directly from UI
+  void startFlowWithPrompt(String prompt) {
+    isFlowActive = true;
+    currentFlowAgentIndex = 0;
+
+    // Switch to "Processing" to show 1st agent thinking
+    _updateState(VoiceState.processing);
+
+    // Simulate user sending the hidden prompt
+    if (_onFinalSentence != null) {
+      _onFinalSentence!(prompt);
+    }
+  }
+
   // --- Main Control Methods ---
 
   Future<void> startSession({
     required String locale,
     required Function(String) onFinalSentence,
+    String? systemPrompt,
   }) async {
     _currentLocale = locale;
     _onFinalSentence = onFinalSentence;
+    _voiceSystemPrompt = systemPrompt;
     _isSpeaking = false;
     _sentenceQueue.clear();
     _incomingTextBuffer.clear();
@@ -124,6 +170,7 @@ class VoiceService with ChangeNotifier {
 
   Future<void> stopSession() async {
     _silenceTimer?.cancel();
+    _testModeTimer?.cancel(); // Cancel test timer
     _updateState(
         VoiceState.idle); // Set idle FIRST to prevent auto-restart loop
     await _speechService.stopListening();
@@ -136,6 +183,18 @@ class VoiceService with ChangeNotifier {
     _silenceTimer?.cancel();
     _updateState(VoiceState.listening);
 
+    if (isTestMode) {
+      _testModeTimer?.cancel();
+      _testModeTimer = Timer(const Duration(seconds: 3), () {
+        if (_state == VoiceState.listening) {
+          debugPrint(
+              "[VoiceService] Test Mode: Simulated user speech finished.");
+          _finalizeUserSpeech();
+        }
+      });
+      return;
+    }
+
     _speechService.startListening(
       locale: _currentLocale,
       onResult: (text) {
@@ -146,12 +205,17 @@ class VoiceService with ChangeNotifier {
     );
   }
 
-  void manualSubmit() {
+  bool get hasRecognizedText => _lastRecognizedText.trim().isNotEmpty;
+
+  void manualSubmit() async {
     _silenceTimer?.cancel();
-    if (_lastRecognizedText.isNotEmpty) {
+    if (hasRecognizedText) {
       _finalizeUserSpeech();
     } else {
-      // If nothing recognized yet, do nothing or show visual hint?
+      // If nothing recognized, cancel and go to idle (User tapped Stop/Mic without speaking)
+      debugPrint("[VoiceService] Manual stop with no text. Going to Idle.");
+      await _speechService.stopListening();
+      _updateState(VoiceState.idle);
     }
   }
 
@@ -166,13 +230,45 @@ class VoiceService with ChangeNotifier {
   }
 
   void _finalizeUserSpeech() async {
+    if (isTestMode) {
+      _testModeTimer?.cancel();
+      _updateState(VoiceState.processing);
+
+      // Simulate processing delay
+      _testModeTimer = Timer(const Duration(seconds: 1), () {
+        if (_state == VoiceState.processing) {
+          debugPrint("[VoiceService] Test Mode: Simulated AI speaking start.");
+          _updateState(VoiceState.speaking);
+
+          // Simulate AI speaking duration
+          _testModeTimer = Timer(const Duration(seconds: 4), () {
+            if (_state == VoiceState.speaking) {
+              debugPrint(
+                  "[VoiceService] Test Mode: Simulated AI speaking done. Restarting loop.");
+              startListening();
+            }
+          });
+        }
+      });
+      return;
+    }
+
     if (_lastRecognizedText.trim().isEmpty) return;
 
     _silenceTimer?.cancel();
     await _speechService.stopListening();
     _updateState(VoiceState.processing);
 
-    final textToSend = _lastRecognizedText;
+    String textToSend = _lastRecognizedText;
+
+    // Inject system prompt if set (e.g. for voice formatting constraints)
+    // We append it as a hidden instruction or prefix?
+    // Usually prepending with a system instruction format or just raw text depends on the parser.
+    // User requested: "her girdinin başına bunu ekleyelim"
+    if (_voiceSystemPrompt != null && _voiceSystemPrompt!.isNotEmpty) {
+      textToSend = "$_voiceSystemPrompt\n\n$textToSend";
+    }
+
     _lastRecognizedText = "";
     _aiGenerationComplete = false;
 
@@ -251,6 +347,12 @@ class VoiceService with ChangeNotifier {
   void setAiGenerationComplete(bool complete) {
     _aiGenerationComplete = complete;
     if (complete && !_isSpeaking && _sentenceQueue.isEmpty) {
+      // Flow Mode Logic: Cycle to next agent
+      if (isFlowActive) {
+        currentFlowAgentIndex = (currentFlowAgentIndex + 1) % 3;
+        notifyListeners();
+      }
+
       // Edge case: Generation finished but nothing was spoken (e.g. very short answer or bug)
       // Or generation finished while we were idle.
       Future.delayed(const Duration(milliseconds: 500), () {

@@ -655,6 +655,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get benefit10 => 'その他の添付ファイル';
 
   @override
+  String get benefit11 => '無限フローモード';
+
+  @override
+  String get benefit12 => '';
+
+  @override
   String get oldBenefits => '下位プランのすべての特典';
 
   @override
@@ -1561,4 +1567,70 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get continueInOfflineMode => 'オフラインモードで続行';
+
+  @override
+  String get voiceModeInformation =>
+      'Cortex は、音声チャット モードでもデバイス上で完全に実行することでデータを安全に保ち、シームレスな会話をお楽しみいただけます。';
+
+  @override
+  String get workInProgress => '進行中';
+
+  @override
+  String get toolGetStockPriceDescription =>
+      '株式（例：AAPL、THYAO.IS）および暗号通貨（例：BTC-USD、ETH-USD）の現在の価格と履歴を取得します。';
+
+  @override
+  String get toolGetStockPriceParamSymbol =>
+      'ティッカーシンボル（例：AAPL、THYAO.IS、BTC-USD）。';
+
+  @override
+  String get toolGetWeatherDescription =>
+      '特定の都市の現在の天気を取得します。都市名がわからない場合は、ユーザーに都市名を尋ねます。';
+
+  @override
+  String get toolGetWeatherParamCity => '都市の名前（例：ロンドン、イスタンブール）。';
+
+  @override
+  String get toolRunPythonCodeDescription =>
+      '安全なサンドボックス内でPythonコードを実行します。複雑な計算、データ処理、アルゴリズムタスクなどにご利用ください。';
+
+  @override
+  String get toolRunPythonCodeParamCode => '実行する Python コード。';
+
+  @override
+  String get toolCalculateDescription => '数式を評価します。';
+
+  @override
+  String get toolCalculateParamExpression => '数式（例：「3 + 4 * 2」、「sin(45)」）。';
+
+  @override
+  String get toolRenderChartDescription =>
+      'チャート/グラフを生成します。これを使用して、ユーザーが提供したデータや計算されたデータを視覚化します。';
+
+  @override
+  String get toolRenderChartParamType => 'グラフの種類: 棒グラフ、折れ線グラフ、円グラフ。';
+
+  @override
+  String get toolRenderChartParamLabels => 'x 軸またはカテゴリのラベル。';
+
+  @override
+  String get toolRenderChartParamData => '数値データ ポイント。';
+
+  @override
+  String get toolRenderChartParamLabel => 'データセットのラベル。';
+
+  @override
+  String get toolRenderChartParamTitle => 'グラフのタイトル。';
+
+  @override
+  String get flowModeDescription =>
+      'フローモードでは、インテリジェンスが互いに議論します。座って聞くことも、飛び込んで議論に参加することもできます。';
+
+  @override
+  String get flowModeQuestion =>
+      'こんにちは！Cortexアプリのフローモードに入っています。他に3人のAIエージェントがいます。あなたの課題は、話題を部屋に投げかけ、他の参加者に刺激的または面白い質問をして議論を始めることです。返答では、ユーモア、皮肉、軽いトラッシュトークなど、自由に使ってください。どんな話題でも構いません。さあ、会話を始めましょう！';
+
+  @override
+  String get voicePrompt =>
+      '現在、Cortexプラットフォームで音声サービスを提供しています。マークダウン、コードブロック、LaTeXは使用しないでください。音声合成に適したテキストのみで回答してください。';
 }

@@ -420,7 +420,7 @@ class AppInitializer with ChangeNotifier {
       return false;
     }
 
-    final bool isMaintenance = kDebugMode ? true : await checkMaintenanceMode();
+    final bool isMaintenance = await checkMaintenanceMode();
 
     if (isMaintenance) {
       _updateStatus(AppStatus.maintenance);

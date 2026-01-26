@@ -7,6 +7,8 @@ android {
     namespace = "android.llama.cpp"
     compileSdk = 36
 
+    ndkVersion = "29.0.14206865"
+
     defaultConfig {
         minSdk = 26
 
@@ -22,6 +24,11 @@ android {
                 arguments += "-DLLAMA_BUILD_COMMON=ON"
                 arguments += "-DGGML_LLAMAFILE=OFF"
                 arguments += "-DCMAKE_BUILD_TYPE=Release"
+                // Enforce 16KB page size alignment
+                arguments += "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384"
+                arguments += "-DCMAKE_MODULE_LINKER_FLAGS=-Wl,-z,max-page-size=16384"
+                arguments += "-DCMAKE_EXE_LINKER_FLAGS=-Wl,-z,max-page-size=16384"
+                
                 cppFlags += listOf()
                 arguments += listOf()
 

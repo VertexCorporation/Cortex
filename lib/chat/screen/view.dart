@@ -3,7 +3,7 @@
 import 'package:cortex/chat/screen/widgets/bottom/bottom.dart';
 import 'package:cortex/chat/screen/widgets/bottom/panels/briefing.dart';
 import 'package:cortex/chat/screen/widgets/list.dart';
-import 'package:cortex/chat/screen/widgets/tts_player.dart';
+import 'package:cortex/chat/screen/widgets/player.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/chat/providers/conversation.dart';
@@ -137,6 +137,9 @@ class ChatViewState extends State<ChatView>
   }
 
   void _handleModelChange(ChatSessionProvider session) {
+    // FIX: Hide scroll button when switching models/chats
+    _scrollService.hideButtonImmediately();
+
     final modelService = context.read<ModelService>();
     final inputProvider = context.read<InputProvider>();
 
