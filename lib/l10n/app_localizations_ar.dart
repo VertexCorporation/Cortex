@@ -658,6 +658,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get benefit10 => 'المزيد من المرفقات';
 
   @override
+  String get benefit11 => 'وضع التدفق غير المحدود';
+
+  @override
+  String get benefit12 => '';
+
+  @override
   String get oldBenefits => 'جميع مزايا الخطط الأقل';
 
   @override
@@ -1589,4 +1595,73 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get continueInOfflineMode => 'متابعة في وضع عدم الاتصال';
+
+  @override
+  String get voiceModeInformation =>
+      'يحافظ برنامج Cortex على أمان بياناتك من خلال تشغيله بالكامل على الجهاز، حتى في وضع الدردشة الصوتية؛ استمتع بمحادثات سلسة!';
+
+  @override
+  String get workInProgress => 'العمل قيد التنفيذ';
+
+  @override
+  String get toolGetStockPriceDescription =>
+      'احصل على السعر الحالي والتاريخ للأسهم (مثل AAPL، THYAO.IS) والعملات المشفرة (مثل BTC-USD، ETH-USD).';
+
+  @override
+  String get toolGetStockPriceParamSymbol =>
+      'رمز المؤشر (على سبيل المثال AAPL، THYAO.IS، BTC-USD).';
+
+  @override
+  String get toolGetWeatherDescription =>
+      'احصل على معلومات الطقس الحالية لمدينة معينة. اطلب من المستخدم تحديد المدينة إذا لم يكن يعرفها.';
+
+  @override
+  String get toolGetWeatherParamCity =>
+      'اسم المدينة (على سبيل المثال، لندن، إسطنبول).';
+
+  @override
+  String get toolRunPythonCodeDescription =>
+      'قم بتنفيذ كود بايثون في بيئة معزولة آمنة. استخدم هذه الميزة لإجراء حسابات معقدة، أو معالجة البيانات، أو تنفيذ مهام خوارزمية.';
+
+  @override
+  String get toolRunPythonCodeParamCode => 'كود بايثون المراد تنفيذه.';
+
+  @override
+  String get toolCalculateDescription => 'قم بتقييم تعبير رياضي.';
+
+  @override
+  String get toolCalculateParamExpression =>
+      'التعبير الرياضي (على سبيل المثال، \"3 + 4 * 2\"، \"sin(45)\").';
+
+  @override
+  String get toolRenderChartDescription =>
+      'أنشئ مخططًا بيانيًا. استخدمه لعرض البيانات التي يقدمها المستخدم أو البيانات المحسوبة.';
+
+  @override
+  String get toolRenderChartParamType =>
+      'نوع الرسم البياني: شريطي، خطي، دائري.';
+
+  @override
+  String get toolRenderChartParamLabels => 'تسميات للمحور السيني أو الفئات.';
+
+  @override
+  String get toolRenderChartParamData => 'نقاط البيانات الرقمية.';
+
+  @override
+  String get toolRenderChartParamLabel => 'تسمية مجموعة البيانات.';
+
+  @override
+  String get toolRenderChartParamTitle => 'عنوان الرسم البياني.';
+
+  @override
+  String get flowModeDescription =>
+      'في وضع التدفق، تتناقش الذكاءات فيما بينها؛ يمكنك إما الجلوس والاستماع أو المشاركة في النقاش!';
+
+  @override
+  String get flowModeQuestion =>
+      'مرحباً! أنت الآن في وضع التدفق على تطبيق كورتكس. يوجد معك ثلاثة عملاء ذكاء اصطناعي آخرين. مهمتك هي طرح موضوع في الغرفة وبدء نقاش من خلال طرح سؤال مثير أو مسلٍّ على الآخرين. في ردودك، لا تتردد في استخدام الفكاهة والسخرية والتعليقات الطريفة. أي موضوع مناسب. هيا، ابدأ المحادثة.';
+
+  @override
+  String get voicePrompt =>
+      'أنت تقدم حاليًا خدمة صوتية على منصة Cortex. لا تستخدم لغة Markdown أو كتل التعليمات البرمجية أو LaTeX. أجب بنص مناسب لتوليف الكلام فقط.';
 }

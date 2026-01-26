@@ -197,13 +197,28 @@ class ConversationProvider with ChangeNotifier {
   void appendToLastBotMessage(String chunk) {
     if (_messages.isNotEmpty && !_messages.last.isUserMessage) {
       final lastMessage = _messages.last;
+
+      // Trim leading newlines if this is the very beginning of the message
+      String textToAppend = chunk;
+      if (lastMessage.text.isEmpty && textToAppend.trimLeft().isEmpty) {
+        // If message is empty and chunk is only whitespace/newline, ignore it
+        return;
+      }
+      if (lastMessage.text.isEmpty && textToAppend.startsWith('\n')) {
+        textToAppend = textToAppend.trimLeft();
+      }
+
       _messages[_messages.length - 1] = lastMessage.copyWith(
-        text: lastMessage.text + chunk,
+        text: lastMessage.text + textToAppend,
       );
     } else {
       // This case handles a stream starting before the thinking bubble is in place.
-      _messages
-          .add(Message(text: chunk, isUserMessage: false, isThinking: true));
+      String initialText = chunk;
+      if (initialText.startsWith('\n')) {
+        initialText = initialText.trimLeft();
+      }
+      _messages.add(
+          Message(text: initialText, isUserMessage: false, isThinking: true));
     }
     notifyListeners();
   }
@@ -258,16 +273,19 @@ class ConversationProvider with ChangeNotifier {
 
     final aiMessage = _messages[index];
 
-    if (aiMessage.isThinking && aiMessage.text.isEmpty) {
+    // REFACTORED: We want to show the error message to the user (e.g. "Check your internet")
+    // instead of silently removing the bubble, which makes it look like the app is ignoring them.
+
+    // Only fade out if there is NO error message (which shouldn't happen usually)
+    if (aiMessage.isThinking &&
+        aiMessage.text.isEmpty &&
+        errorMessage.isEmpty) {
       debugPrint(
-          "[ConversationProvider] Error occurred during thinking phase. Fading out empty bubble.");
-      // Instead of instant removal, fade out the message for smooth animation
-      // The UI (AIMessageTile) will handle the fade animation via opacity
+          "[ConversationProvider] Error/Stop occurred with empty message. Fading out.");
       _messages[index] = aiMessage.copyWith(opacity: 0.0);
       _isWaitingForResponse = false;
       notifyListeners();
 
-      // Remove the message after a short delay to allow fade animation to complete
       Future.delayed(const Duration(milliseconds: 250), () {
         if (index < _messages.length && _messages[index].opacity == 0.0) {
           _messages.removeAt(index);

@@ -654,6 +654,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get benefit10 => '추가 첨부 파일';
 
   @override
+  String get benefit11 => '무한 흐름 모드';
+
+  @override
+  String get benefit12 => '';
+
+  @override
   String get oldBenefits => '하위 플랜의 모든 혜택';
 
   @override
@@ -1561,4 +1567,71 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get continueInOfflineMode => '오프라인 모드에서 계속하기';
+
+  @override
+  String get voiceModeInformation =>
+      'Cortex는 음성 채팅 모드에서도 기기 내에서 완벽하게 실행되어 데이터를 안전하게 보호합니다. 끊김 없는 대화를 즐겨보세요!';
+
+  @override
+  String get workInProgress => '작업 진행 중';
+
+  @override
+  String get toolGetStockPriceDescription =>
+      '주식(예: AAPL, THYAO.IS) 및 암호화폐(예: BTC-USD, ETH-USD)의 현재 가격과 과거 가격을 확인하세요.';
+
+  @override
+  String get toolGetStockPriceParamSymbol =>
+      '종목 코드(예: AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolGetWeatherDescription =>
+      '특정 도시의 현재 날씨를 가져옵니다. 도시 이름을 모르는 경우 사용자에게 물어봅니다.';
+
+  @override
+  String get toolGetWeatherParamCity => '도시 이름 (예: 런던, 이스탄불).';
+
+  @override
+  String get toolRunPythonCodeDescription =>
+      '안전한 샌드박스 환경에서 파이썬 코드를 실행하세요. 복잡한 계산, 데이터 처리 또는 알고리즘 작업에 활용할 수 있습니다.';
+
+  @override
+  String get toolRunPythonCodeParamCode => '실행할 파이썬 코드입니다.';
+
+  @override
+  String get toolCalculateDescription => '수학적 표현식을 평가하십시오.';
+
+  @override
+  String get toolCalculateParamExpression =>
+      '수학 표현식(예: \"3 + 4 * 2\", \"sin(45)\").';
+
+  @override
+  String get toolRenderChartDescription =>
+      '차트/그래프를 생성합니다. 이 기능을 사용하여 사용자가 제공하거나 계산된 데이터를 시각화할 수 있습니다.';
+
+  @override
+  String get toolRenderChartParamType => '차트 유형: 막대형, 선형, 원형.';
+
+  @override
+  String get toolRenderChartParamLabels => 'x축 또는 범주에 대한 레이블입니다.';
+
+  @override
+  String get toolRenderChartParamData => '수치 데이터 포인트.';
+
+  @override
+  String get toolRenderChartParamLabel => '데이터셋의 레이블입니다.';
+
+  @override
+  String get toolRenderChartParamTitle => '차트 제목.';
+
+  @override
+  String get flowModeDescription =>
+      '몰입 모드에서는 지능들이 서로 토론을 벌입니다. 당신은 가만히 앉아서 듣기만 하거나, 직접 토론에 참여할 수도 있습니다!';
+
+  @override
+  String get flowModeQuestion =>
+      '안녕하세요! 지금 Cortex 앱의 플로우 모드에 접속하셨습니다. 다른 세 명의 AI 에이전트가 함께하고 있습니다. 여러분의 임무는 주제를 하나 제시하고, 다른 에이전트들에게 도발적이거나 재미있는 질문을 던져 토론을 시작하는 것입니다. 답변할 때는 유머, 아이러니, 가벼운 농담도 자유롭게 사용하세요. 어떤 주제든 상관없습니다. 자, 이제 대화를 시작해 보세요!';
+
+  @override
+  String get voicePrompt =>
+      '현재 Cortex 플랫폼에서 음성 서비스를 제공하고 있습니다. 마크다운, 코드 블록 또는 LaTeX를 사용하지 마십시오. 음성 합성에 적합한 텍스트로만 응답하십시오.';
 }

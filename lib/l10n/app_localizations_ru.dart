@@ -667,6 +667,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get benefit10 => 'Дополнительные вложения';
 
   @override
+  String get benefit11 => 'Режим безграничного потока';
+
+  @override
+  String get benefit12 => '';
+
+  @override
   String get oldBenefits => 'Все преимущества предыдущих планов';
 
   @override
@@ -1613,4 +1619,74 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get continueInOfflineMode => 'Продолжить в автономном режиме';
+
+  @override
+  String get voiceModeInformation =>
+      'Cortex обеспечивает безопасность ваших данных, работая полностью на устройстве, даже в режиме голосового чата; наслаждайтесь бесперебойным общением!';
+
+  @override
+  String get workInProgress => 'Работа в процессе';
+
+  @override
+  String get toolGetStockPriceDescription =>
+      'Получите текущую цену и историю колебаний для акций (например, AAPL, THYAO.IS) и криптовалют (например, BTC-USD, ETH-USD).';
+
+  @override
+  String get toolGetStockPriceParamSymbol =>
+      'Тикер (например, AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolGetWeatherDescription =>
+      'Получите текущую погоду для конкретного города. Если город неизвестен, запросите у пользователя его название.';
+
+  @override
+  String get toolGetWeatherParamCity =>
+      'Название города (например, Лондон, Стамбул).';
+
+  @override
+  String get toolRunPythonCodeDescription =>
+      'Выполняйте код Python в защищенной песочнице. Используйте это для сложных вычислений, обработки данных или алгоритмических задач.';
+
+  @override
+  String get toolRunPythonCodeParamCode => 'Код на Python для выполнения.';
+
+  @override
+  String get toolCalculateDescription =>
+      'Оцените значение математического выражения.';
+
+  @override
+  String get toolCalculateParamExpression =>
+      'Математическое выражение (например, \"3 + 4 * 2\", \"sin(45)\").';
+
+  @override
+  String get toolRenderChartDescription =>
+      'Создайте диаграмму/график. Используйте его для визуализации данных, предоставленных пользователем или рассчитанных им.';
+
+  @override
+  String get toolRenderChartParamType =>
+      'Тип диаграммы: столбчатая, линейная, круговая.';
+
+  @override
+  String get toolRenderChartParamLabels => 'Подписи для оси X или категорий.';
+
+  @override
+  String get toolRenderChartParamData => 'Числовые данные.';
+
+  @override
+  String get toolRenderChartParamLabel => 'Метка для набора данных.';
+
+  @override
+  String get toolRenderChartParamTitle => 'Заголовок диаграммы.';
+
+  @override
+  String get flowModeDescription =>
+      'В режиме «Поток» интеллекты спорят между собой; вы можете либо сидеть и слушать, либо присоединиться к обсуждению!';
+
+  @override
+  String get flowModeQuestion =>
+      'Привет! Вы находитесь в режиме «Поток» в приложении Cortex. С вами находятся ещё три ИИ-агента. Ваша задача — предложить тему для обсуждения и начать дискуссию, задав другим провокационный или занимательный вопрос. В своих ответах смело используйте юмор, иронию и лёгкие подколки. Любая тема подходит. Вперёд, начинайте разговор!';
+
+  @override
+  String get voicePrompt =>
+      'В данный момент вы предоставляете услуги голосовой связи на платформе Cortex. Не используйте Markdown, блоки кода или LaTeX. Отвечайте исключительно текстом, подходящим для синтеза речи.';
 }

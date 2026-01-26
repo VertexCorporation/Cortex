@@ -667,6 +667,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get benefit10 => 'Meer bijlagen';
 
   @override
+  String get benefit11 => 'Onbeperkte stroommodus';
+
+  @override
+  String get benefit12 => '';
+
+  @override
   String get oldBenefits => 'Alle voordelen van lagere abonnementen';
 
   @override
@@ -1615,4 +1621,75 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get continueInOfflineMode => 'Doorgaan in offline modus';
+
+  @override
+  String get voiceModeInformation =>
+      'Cortex houdt je gegevens veilig doordat het volledig lokaal op je apparaat draait, zelfs in de spraakchatmodus; geniet van naadloze gesprekken!';
+
+  @override
+  String get workInProgress => 'Werk in uitvoering';
+
+  @override
+  String get toolGetStockPriceDescription =>
+      'Bekijk de actuele koers en koershistorie van aandelen (bijv. AAPL, THYAO.IS) en cryptovaluta (bijv. BTC-USD, ETH-USD).';
+
+  @override
+  String get toolGetStockPriceParamSymbol =>
+      'Het tickersymbool (bijv. AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolGetWeatherDescription =>
+      'Bekijk de actuele weersvoorspelling voor een specifieke stad. Vraag de gebruiker om de stad in te voeren als deze niet bekend is.';
+
+  @override
+  String get toolGetWeatherParamCity =>
+      'De naam van de stad (bijv. Londen, Istanbul).';
+
+  @override
+  String get toolRunPythonCodeDescription =>
+      'Voer Python-code uit in een beveiligde sandbox. Gebruik dit voor complexe berekeningen, gegevensverwerking of algoritmische taken.';
+
+  @override
+  String get toolRunPythonCodeParamCode =>
+      'De Python-code die moet worden uitgevoerd.';
+
+  @override
+  String get toolCalculateDescription => 'Evalueer een wiskundige uitdrukking.';
+
+  @override
+  String get toolCalculateParamExpression =>
+      'De wiskundige uitdrukking (bijv. \"3 + 4 * 2\", \"sin(45)\").';
+
+  @override
+  String get toolRenderChartDescription =>
+      'Genereer een diagram/grafiek. Gebruik dit om gegevens te visualiseren die door de gebruiker zijn aangeleverd of die zijn berekend.';
+
+  @override
+  String get toolRenderChartParamType =>
+      'Grafiektype: staafdiagram, lijndiagram, cirkeldiagram.';
+
+  @override
+  String get toolRenderChartParamLabels =>
+      'Labels voor de x-as of categorieën.';
+
+  @override
+  String get toolRenderChartParamData => 'Numerieke gegevenspunten.';
+
+  @override
+  String get toolRenderChartParamLabel => 'Label voor de dataset.';
+
+  @override
+  String get toolRenderChartParamTitle => 'Titel van de grafiek.';
+
+  @override
+  String get flowModeDescription =>
+      'In de Flow-modus voeren de verschillende intelligenties een debat met elkaar; je kunt achterover leunen en luisteren, of actief deelnemen aan de discussie!';
+
+  @override
+  String get flowModeQuestion =>
+      'Hallo! Je bevindt je nu in de Flow-modus van de Cortex-app. Er zijn drie andere AI-agenten bij je. Jouw taak is om een onderwerp aan te snijden en een discussie op gang te brengen door de anderen een prikkelende of vermakelijke vraag te stellen. Je mag in je antwoorden gerust humor, ironie en een beetje plagen gebruiken. Elk onderwerp is bespreekbaar. Ga je gang, begin het gesprek.';
+
+  @override
+  String get voicePrompt =>
+      'U levert momenteel spraakdiensten via het Cortex-platform. Gebruik geen markdown, codeblokken of LaTeX. Reageer uitsluitend in tekst die geschikt is voor spraaksynthese.';
 }

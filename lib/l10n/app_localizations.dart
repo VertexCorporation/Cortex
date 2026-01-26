@@ -1358,6 +1358,18 @@ abstract class AppLocalizations {
   /// **'More Attachments'**
   String get benefit10;
 
+  /// No description provided for @benefit11.
+  ///
+  /// In en, this message translates to:
+  /// **'Limitless Flow Mode'**
+  String get benefit11;
+
+  /// No description provided for @benefit12.
+  ///
+  /// In en, this message translates to:
+  /// **''**
+  String get benefit12;
+
   /// No description provided for @oldBenefits.
   ///
   /// In en, this message translates to:
@@ -2984,6 +2996,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue in Offline Mode'**
   String get continueInOfflineMode;
+
+  /// No description provided for @voiceModeInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex keeps your data safe by running fully on-device, even in voice chat mode; enjoy seamless conversations!'**
+  String get voiceModeInformation;
+
+  /// No description provided for @workInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Work In Progress'**
+  String get workInProgress;
+
+  /// No description provided for @toolGetStockPriceDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Get current price and history for stocks (e.g. AAPL, THYAO.IS) and crypto (e.g. BTC-USD, ETH-USD).'**
+  String get toolGetStockPriceDescription;
+
+  /// No description provided for @toolGetStockPriceParamSymbol.
+  ///
+  /// In en, this message translates to:
+  /// **'The ticker symbol (e.g. AAPL, THYAO.IS, BTC-USD).'**
+  String get toolGetStockPriceParamSymbol;
+
+  /// No description provided for @toolGetWeatherDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Get current weather for a specific city. Ask user for city if not known.'**
+  String get toolGetWeatherDescription;
+
+  /// No description provided for @toolGetWeatherParamCity.
+  ///
+  /// In en, this message translates to:
+  /// **'The name of the city (e.g., London, Istanbul).'**
+  String get toolGetWeatherParamCity;
+
+  /// No description provided for @toolRunPythonCodeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Execute Python code in a secure sandbox. Use this for complex calculations, data processing, or algorithmic tasks.'**
+  String get toolRunPythonCodeDescription;
+
+  /// No description provided for @toolRunPythonCodeParamCode.
+  ///
+  /// In en, this message translates to:
+  /// **'The Python code to execute.'**
+  String get toolRunPythonCodeParamCode;
+
+  /// No description provided for @toolCalculateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Evaluate a mathematical expression.'**
+  String get toolCalculateDescription;
+
+  /// No description provided for @toolCalculateParamExpression.
+  ///
+  /// In en, this message translates to:
+  /// **'The math expression (e.g., \"3 + 4 * 2\", \"sin(45)\").'**
+  String get toolCalculateParamExpression;
+
+  /// No description provided for @toolRenderChartDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate a chart/graph. Use this to visualize data provided by the user or calculated.'**
+  String get toolRenderChartDescription;
+
+  /// No description provided for @toolRenderChartParamType.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart type: bar, line, pie.'**
+  String get toolRenderChartParamType;
+
+  /// No description provided for @toolRenderChartParamLabels.
+  ///
+  /// In en, this message translates to:
+  /// **'Labels for the x-axis or categories.'**
+  String get toolRenderChartParamLabels;
+
+  /// No description provided for @toolRenderChartParamData.
+  ///
+  /// In en, this message translates to:
+  /// **'Numerical data points.'**
+  String get toolRenderChartParamData;
+
+  /// No description provided for @toolRenderChartParamLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Label for the dataset.'**
+  String get toolRenderChartParamLabel;
+
+  /// No description provided for @toolRenderChartParamTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title of the chart.'**
+  String get toolRenderChartParamTitle;
+
+  /// No description provided for @flowModeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'In Flow mode, intelligences debate among themselves; you can either sit back and listen or jump in and join the discussion!'**
+  String get flowModeDescription;
+
+  /// No description provided for @flowModeQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello! You are now in Flow Mode on the Cortex app. There are three other AI agents here with you. Your task is to throw a topic into the room and kick off a discussion by asking the others a provocative or entertaining question. In your responses, feel free to use humor, irony, and light trash talk. Any topic is fair game. Go ahead, start the conversation.'**
+  String get flowModeQuestion;
+
+  /// No description provided for @voicePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'You are currently providing voice service on the Cortex platform. Do not use markdown, code blocks, or LaTeX. Respond purely in text suitable for speech synthesis.'**
+  String get voicePrompt;
 }
 
 class _AppLocalizationsDelegate

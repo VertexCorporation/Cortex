@@ -663,6 +663,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get benefit10 => 'अधिक अटैचमेंट';
 
   @override
+  String get benefit11 => 'असीमित प्रवाह मोड';
+
+  @override
+  String get benefit12 => '';
+
+  @override
   String get oldBenefits => 'निचली योजनाओं से सभी लाभ';
 
   @override
@@ -1601,4 +1607,74 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get continueInOfflineMode => 'ऑफ़लाइन मोड में जारी रखें';
+
+  @override
+  String get voiceModeInformation =>
+      'कॉर्टेक्स आपके डेटा को पूरी तरह से डिवाइस पर ही सुरक्षित रखता है, यहां तक कि वॉइस चैट मोड में भी; निर्बाध बातचीत का आनंद लें!';
+
+  @override
+  String get workInProgress => 'काम जारी है';
+
+  @override
+  String get toolGetStockPriceDescription =>
+      'शेयरों (जैसे AAPL, THYAO.IS) और क्रिप्टोकरेंसी (जैसे BTC-USD, ETH-USD) के लिए वर्तमान मूल्य और इतिहास प्राप्त करें।';
+
+  @override
+  String get toolGetStockPriceParamSymbol =>
+      'टिकर प्रतीक (उदाहरण के लिए AAPL, THYAO.IS, BTC-USD)।';
+
+  @override
+  String get toolGetWeatherDescription =>
+      'किसी विशिष्ट शहर का वर्तमान मौसम जानें। यदि शहर का नाम ज्ञात न हो, तो उपयोगकर्ता से शहर का नाम पूछें।';
+
+  @override
+  String get toolGetWeatherParamCity =>
+      'शहर का नाम (उदाहरण के लिए, लंदन, इस्तांबुल)।';
+
+  @override
+  String get toolRunPythonCodeDescription =>
+      'पाइथन कोड को एक सुरक्षित सैंडबॉक्स में निष्पादित करें। इसका उपयोग जटिल गणनाओं, डेटा प्रोसेसिंग या एल्गोरिथम संबंधी कार्यों के लिए करें।';
+
+  @override
+  String get toolRunPythonCodeParamCode =>
+      'निष्पादित किया जाने वाला पायथन कोड।';
+
+  @override
+  String get toolCalculateDescription => 'एक गणितीय व्यंजक का मूल्यांकन कीजिए।';
+
+  @override
+  String get toolCalculateParamExpression =>
+      'गणितीय व्यंजक (उदाहरण के लिए, \"3 + 4 * 2\", \"sin(45)\")।';
+
+  @override
+  String get toolRenderChartDescription =>
+      'एक चार्ट/ग्राफ बनाएं। इसका उपयोग उपयोगकर्ता द्वारा प्रदान किए गए या गणना किए गए डेटा को दर्शाने के लिए करें।';
+
+  @override
+  String get toolRenderChartParamType =>
+      'चार्ट का प्रकार: बार चार्ट, लाइन चार्ट, पाई चार्ट।';
+
+  @override
+  String get toolRenderChartParamLabels => 'x-अक्ष या श्रेणियों के लिए लेबल।';
+
+  @override
+  String get toolRenderChartParamData => 'संख्यात्मक डेटा बिंदु।';
+
+  @override
+  String get toolRenderChartParamLabel => 'डेटासेट के लिए लेबल।';
+
+  @override
+  String get toolRenderChartParamTitle => 'चार्ट का शीर्षक।';
+
+  @override
+  String get flowModeDescription =>
+      'फ्लो मोड में, बुद्धिमत्ताएँ आपस में बहस करती हैं; आप या तो आराम से बैठकर सुन सकते हैं या फिर चर्चा में शामिल हो सकते हैं!';
+
+  @override
+  String get flowModeQuestion =>
+      'नमस्कार! आप कॉर्टेक्स ऐप के फ्लो मोड में हैं। आपके साथ तीन अन्य एआई एजेंट भी मौजूद हैं। आपका काम है एक विषय को चर्चा में लाना और एक रोचक या मनोरंजक प्रश्न पूछकर बातचीत शुरू करना। अपने उत्तरों में हास्य, व्यंग्य और हल्के-फुल्के कटाक्ष का प्रयोग करें। कोई भी विषय चलेगा। तो चलिए, बातचीत शुरू कीजिए।';
+
+  @override
+  String get voicePrompt =>
+      'आप वर्तमान में कॉर्टेक्स प्लेटफॉर्म पर वॉइस सेवा प्रदान कर रहे हैं। मार्कडाउन, कोड ब्लॉक या LaTeX का उपयोग न करें। केवल टेक्स्ट में उत्तर दें जो स्पीच सिंथेसिस के लिए उपयुक्त हो।';
 }

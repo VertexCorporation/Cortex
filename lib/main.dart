@@ -67,6 +67,7 @@ import 'news/service.dart';
 import 'notifications/extrovert.dart';
 import 'notifications/introvert.dart';
 import 'theme.dart';
+import 'chat/services/tools.dart';
 
 /// Global keys used across the app.
 ///
@@ -257,6 +258,9 @@ void main() async {
   GoogleFonts.config.allowRuntimeFetching = false;
 
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  // Initialize Tools
+  ToolRegistry.initialize();
 
   runApp(const AppGatekeeper());
 }
@@ -582,9 +586,10 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
     ),
 
     // Chat session.
-    ChangeNotifierProxyProvider3<UserProvider,
+    ChangeNotifierProxyProvider4<UserProvider,
         ModelService,
         ModelLocalStateProvider,
+        LocaleProvider,
         ChatSessionProvider>(
       create: (BuildContext context) =>
           ChatSessionProvider(
@@ -599,6 +604,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
           UserProvider user,
           ModelService modelService,
           ModelLocalStateProvider local,
+          LocaleProvider localeProvider,
           ChatSessionProvider? previous,) {
         // Note: We don't re-pass initialModelId on update because the session preserves state itself.
         final session = previous ??
@@ -611,6 +617,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
                   : const Locale('en'),
             );
         session.setDependencies(local);
+        session.setLocale(localeProvider.locale);
 
         if (user.userData != null) {
           session.updateUserData(user.userData!);

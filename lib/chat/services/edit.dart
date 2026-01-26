@@ -7,6 +7,8 @@ import 'package:cortex/chat/services/regenerate.dart';
 import 'package:cortex/chat/services/scroll.dart';
 import 'package:flutter/foundation.dart'; // for listEquals
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/session.dart';
 import '../messages/messages.dart';
 
 /// Service responsible for managing the message editing lifecycle.
@@ -59,20 +61,18 @@ class EditService {
     final String newText = _controller.text.trim();
 
     // Get new list of attachment paths from InputProvider
-    final List<String> newAttachmentPaths = _inputProvider.attachments
-        .map((a) => a.file.path)
-        .toList();
+    final List<String> newAttachmentPaths =
+    _inputProvider.attachments.map((a) => a.file.path).toList();
 
     final originalMessage = originalMessages[editingIndex];
 
     // Determine changes
     final bool textChanged = newText != originalMessage.text;
-    final bool attachmentsChanged = !listEquals(
-        newAttachmentPaths, originalMessage.attachmentPaths);
+    final bool attachmentsChanged =
+    !listEquals(newAttachmentPaths, originalMessage.attachmentPaths);
 
     debugPrint(
-        "[EditService] textChanged=$textChanged, attachmentsChanged=$attachmentsChanged"
-    );
+        "[EditService] textChanged=$textChanged, attachmentsChanged=$attachmentsChanged");
 
     if (!textChanged && !attachmentsChanged) {
       debugPrint("[EditService] Nothing changed. Cancelling edit mode.");
@@ -103,10 +103,18 @@ class EditService {
 
     final int newAiMessageIndex = updatedList.length;
 
+    // FIX: Get the currently active model from the session.
+    // This ensures that if the user switched models before editing, the new model is used.
+    final sessionProvider = context.read<ChatSessionProvider>();
+    // If dynamic, we pass null to let regenerate logic decide, or we pass 'cortex/auto' explicitly.
+    // The session provider's modelId is robust.
+    final String currentModelId = sessionProvider.modelId ?? 'cortex/auto';
+
     if (context.mounted) {
       await _regenerateService.onRegenerate(
         newAiMessageIndex,
         context: context,
+        newModelId: currentModelId, // Pass the active model!
       );
     }
 

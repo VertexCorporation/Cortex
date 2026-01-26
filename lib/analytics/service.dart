@@ -164,7 +164,7 @@ class AnalyticsService {
 
   Future<void> logConversationStarted({required bool isNew}) => logEvent(
         name: 'conversation_started',
-        parameters: {'is_new': isNew},
+        parameters: {'is_new': isNew ? 1 : 0},
       );
 
   Future<void> logMessageSent({
@@ -175,7 +175,7 @@ class AnalyticsService {
         name: 'message_sent',
         parameters: {
           'model_type': modelType,
-          'has_attachments': hasAttachments,
+          'has_attachments': hasAttachments ? 1 : 0,
         },
       );
 

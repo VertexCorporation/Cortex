@@ -14,6 +14,7 @@ class ModelDefaults {
     // --- PRIORITY 1: EXACT MODEL IDS ---
     // Use this for specific models that need a unique image, overriding any family/producer rule.
     'neuro': 'assets/characters/neuro.webp',
+    'ally': 'assets/characters/ally.webp',
     'jannano128k': 'assets/models/jannano128k.jpg',
     'gptneox': 'assets/models/gptneox.jpg',
     'supernova-medius': 'assets/producers/arceeai.jpg',
@@ -43,6 +44,8 @@ class ModelDefaults {
     'detective': 'assets/characters/detective.webp',
     'grandmother': 'assets/characters/grandmother.webp',
     'miner': 'assets/characters/miner.webp',
+    'rich': 'assets/characters/rich.webp',
+    'philosopher': 'assets/characters/philosopher.webp',
 
     // --- PRIORITY 2: MODEL FAMILIES / SERIES ---
     // These keys will match if a model's ID *contains* them. Longer keys are prioritized.

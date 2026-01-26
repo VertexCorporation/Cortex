@@ -24,6 +24,7 @@ class ScrollService {
   /// Call this when leaving the chat (dispose) or switching conversations.
   void reset() {
     detachListener();
+    hideButtonImmediately(); // FIX: Explicitly hide button when resetting/leaving chat
     _scrollController = null;
   }
 
