@@ -1,1 +1,0 @@
-/home/baba/Documents/cortex/build/llama/intermediates/cxx/Release/3113x3s3/obj/arm64-v8a

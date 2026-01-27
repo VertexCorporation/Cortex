@@ -1,7 +1,0 @@
-/home/baba/Documents/cortex/android/llama/src/main/cpp/CMakeLists.txt
-/home/baba/Documents/cortex/vendor/llama.cpp/CMakeLists.txt
-/home/baba/Documents/cortex/vendor/llama.cpp/common/CMakeLists.txt
-/home/baba/Documents/cortex/vendor/llama.cpp/ggml/CMakeLists.txt
-/home/baba/Documents/cortex/vendor/llama.cpp/ggml/src/CMakeLists.txt
-/home/baba/Documents/cortex/vendor/llama.cpp/ggml/src/ggml-cpu/CMakeLists.txt
-/home/baba/Documents/cortex/vendor/llama.cpp/src/CMakeLists.txt
