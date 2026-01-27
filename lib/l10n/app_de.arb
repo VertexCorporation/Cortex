@@ -565,6 +565,7 @@
   "toolChartDataParam": "Numerische Datenwerte für das Diagramm.",
   "toolChartLabelParam": "Datensatzbezeichnung für die Diagrammlegende.",
   "toolChartTitleParam": "Titel des Diagramms.",
-  "toolReadDocumentDescription": "Liest und extrahiert Textinhalte aus hochgeladenen Dokumenten (PDF, Excel-Tabellen). Verwenden Sie diese Funktion, wenn der Benutzer eine Dokumentdatei angehängt hat.",
-  "toolReadDocumentIndexParam": "Der Index des zu lesenden Dokumentenanhangs (beginnend bei 0). Normalerweise 0 für das erste Dokument."
+  "toolReadDocumentDescription": "Liest und extrahiert Textinhalte aus hochgeladenen Dokumenten. Unterstützt PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) und OpenDocument-Formate. Verwenden Sie diese Funktion, wenn der Benutzer eine Dokumentdatei angehängt hat.",
+  "toolReadDocumentIndexParam": "Der Index des zu lesenden Dokumentenanhangs (beginnend bei 0). Normalerweise 0 für das erste Dokument.",
+  "thinkingModeInstruction": "DENKMODUS AKTIVIERT: Sie MÜSSEN <think></think>-Tags verwenden, um Ihren Gedankengang darzustellen, bevor Sie Ihre endgültige Antwort geben. Denken Sie innerhalb der Tags Schritt für Schritt und geben Sie Ihre Antwort anschließend außerhalb der Tags an."
 }

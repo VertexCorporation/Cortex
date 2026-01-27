@@ -565,6 +565,7 @@
   "toolChartDataParam": "Nilai data numerik untuk grafik.",
   "toolChartLabelParam": "Label dataset untuk legenda grafik.",
   "toolChartTitleParam": "Judul grafik.",
-  "toolReadDocumentDescription": "Membaca dan mengekstrak konten teks dari dokumen yang diunggah (PDF, spreadsheet Excel). Gunakan ini ketika pengguna telah melampirkan file dokumen.",
-  "toolReadDocumentIndexParam": "Indeks lampiran dokumen yang akan dibaca (berbasis 0). Biasanya 0 untuk dokumen pertama."
+  "toolReadDocumentDescription": "Membaca dan mengekstrak konten teks dari dokumen yang diunggah. Mendukung format PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX), dan OpenDocument. Gunakan ini ketika pengguna telah melampirkan file dokumen.",
+  "toolReadDocumentIndexParam": "Indeks lampiran dokumen yang akan dibaca (berbasis 0). Biasanya 0 untuk dokumen pertama.",
+  "thinkingModeInstruction": "MODE BERPIKIR DIAKTIFKAN: Anda HARUS menggunakan tag <think></think> untuk menunjukkan proses penalaran Anda sebelum memberikan jawaban akhir. Pikirkan langkah demi langkah di dalam tag, lalu berikan respons Anda di luar tag."
 }

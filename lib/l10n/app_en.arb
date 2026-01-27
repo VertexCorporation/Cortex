@@ -657,5 +657,6 @@
   "toolChartLabelsParam": "Labels for chart axes or segments.",
   "toolChartDataParam": "Numeric data values for the chart.",
   "toolChartLabelParam": "Dataset label for the chart legend.",
-  "toolChartTitleParam": "Title of the chart."
+  "toolChartTitleParam": "Title of the chart.",
+  "thinkingModeInstruction": "THINKING MODE ENABLED: You MUST use <think></think> tags to show your reasoning process before giving your final answer. Think step by step inside the tags, then provide your response outside the tags."
 }

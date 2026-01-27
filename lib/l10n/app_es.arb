@@ -576,5 +576,6 @@
   "toolChartLabelParam": "Etiqueta del conjunto de datos para la leyenda del gráfico.",
   "toolChartTitleParam": "Título del gráfico.",
   "toolReadDocumentDescription": "Lee y extrae texto de documentos subidos. Compatible con los formatos PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) y OpenDocument. Úselo cuando el usuario haya adjuntado un documento.",
-  "toolReadDocumentIndexParam": "Índice del documento adjunto que se va a leer (basado en 0). Generalmente, 0 para el primer documento."
+  "toolReadDocumentIndexParam": "Índice del documento adjunto que se va a leer (basado en 0). Generalmente, 0 para el primer documento.",
+  "thinkingModeInstruction": "MODO DE PENSAMIENTO ACTIVADO: DEBES usar las etiquetas <think></think> para mostrar tu proceso de razonamiento antes de dar tu respuesta final. Piensa paso a paso dentro de las etiquetas y luego proporciona tu respuesta fuera de ellas."
 }

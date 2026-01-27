@@ -1650,4 +1650,8 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => '차트 제목.';
+
+  @override
+  String get thinkingModeInstruction =>
+      '사고 모드 활성화: 최종 답변을 작성하기 전에 <think></think> 태그를 사용하여 사고 과정을 반드시 보여주세요. 태그 안에서 단계별로 생각한 후, 태그 바깥에 답변을 작성하세요.';
 }

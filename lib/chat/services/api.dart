@@ -50,12 +50,12 @@ class ApiService {
     required List<Map<String, dynamic>> messages,
     required String model,
     required bool isPremium,
-    List<Map<String, dynamic>>? tools, // ADDED: Tools support
-    bool enablefeatureReasoning = false, // ADDED: featureReasoning flag for server
+    List<Map<String, dynamic>>? tools,
+    bool enablefeatureReasoning = false,
     Function(String textChunk)? onTextChunk,
-    Function(String featureReasoning)? onfeatureReasoning, // ADDED: featureReasoning support
+    Function(String featureReasoning)? onfeatureReasoning,
     Function(String imageUrl)? onImageReceived,
-    Function(List<dynamic> toolCalls)? onToolCall, // ADDED: Tool Calls
+    Function(List<dynamic> toolCalls)? onToolCall,
     required AppLocalizations localizations,
   }) async {
     _cancelToken = CancelToken();
@@ -105,7 +105,10 @@ class ApiService {
           throw ApiException(localizations.errorServer, code: 'NULL_STREAM');
         }
 
-        stream.map(utf8.decode).transform(const LineSplitter()).listen(
+        // CRITICAL: Use utf8.decoder (stateful) instead of utf8.decode (stateless)
+        // This properly handles multi-byte UTF-8 characters (Turkish: ş,ğ,ü,ç,ı,ö)
+        // that may be split across chunk boundaries
+        stream.cast<List<int>>().transform(utf8.decoder).transform(const LineSplitter()).listen(
           (line) {
             if (completer.isCompleted) return;
 
@@ -161,9 +164,9 @@ class ApiService {
                     break;
 
                   case 'reasoning':
-                    final reasoningText = data['text'] as String?;
-                    if (reasoningText != null) {
-                      onfeatureReasoning?.call(reasoningText);
+                    final reasoning = data['text'] as String?;
+                    if (reasoning != null) {
+                      onfeatureReasoning?.call(reasoning);
                     }
                     break;
 
@@ -174,10 +177,9 @@ class ApiService {
 
                   case 'tool_calls':
                     // Accumulate tool call deltas
-                    // OpenRouter/OpenAI streaming format: List of objects with index
                     if (data is List) {
                       for (var item in data) {
-                        final index = item['index'] as int;
+                        final index = item['index'] as int? ?? 0;
                         if (!toolCallBuffer.containsKey(index)) {
                           toolCallBuffer[index] = {
                             'id': '',
@@ -206,12 +208,14 @@ class ApiService {
                     break;
 
                   case 'usage':
-                    // Optional: Log usage or update provider
-                    debugPrint("Usage Stats: $data");
+                    // Usage stats received - could be used for analytics
                     break;
                 }
               } catch (e) {
-                // Ignore parse errors for individual chunks
+                // JSON parse error - likely incomplete chunk, will be handled next
+                if (kDebugMode) {
+                  debugPrint("[SSE] JSON parse error: $e");
+                }
               }
               currentEvent = '';
             }
@@ -279,7 +283,6 @@ class ApiService {
     Function(String)? onImageReceived,
     required AppLocalizations localizations,
   }) async {
-    // Character models usually don't use tools (for now), keeping simpler.
     List<Map<String, dynamic>> messages = List.from(context);
     List<Map<String, dynamic>> userMessageContent = [];
 
@@ -303,7 +306,6 @@ class ApiService {
       onTextChunk: onTextChunk,
       onfeatureReasoning: onfeatureReasoning,
       onImageReceived: onImageReceived,
-      // No tools for characters typically
     );
   }
 
@@ -317,7 +319,7 @@ class ApiService {
     Function(String)? onTextChunk,
     Function(String)? onfeatureReasoning,
     Function(String)? onImageReceived,
-    Function(List<dynamic>)? onToolCall, // Exposed for logic loop
+    Function(List<dynamic>)? onToolCall,
     required AppLocalizations localizations,
     required String langCode,
     bool useTools = true,

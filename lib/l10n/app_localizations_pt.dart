@@ -1652,7 +1652,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get toolReadDocumentDescription =>
-      'Leia e extraia o conteúdo de texto de documentos carregados (PDF, planilhas do Excel). Use esta função quando o usuário anexar um arquivo de documento.';
+      'Leia e extraia o conteúdo de texto de documentos carregados. Suporta os formatos PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) e OpenDocument. Use esta função quando o usuário anexar um arquivo de documento.';
 
   @override
   String get toolReadDocumentIndexParam =>
@@ -1708,4 +1708,8 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Título do gráfico.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'MODO DE PENSAMENTO ATIVADO: Você DEVE usar as tags <think></think> para mostrar seu raciocínio antes de dar sua resposta final. Pense passo a passo dentro das tags e, em seguida, forneça sua resposta fora delas.';
 }

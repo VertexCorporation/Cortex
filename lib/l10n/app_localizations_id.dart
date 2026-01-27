@@ -1651,7 +1651,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get toolReadDocumentDescription =>
-      'Membaca dan mengekstrak konten teks dari dokumen yang diunggah (PDF, spreadsheet Excel). Gunakan ini ketika pengguna telah melampirkan file dokumen.';
+      'Membaca dan mengekstrak konten teks dari dokumen yang diunggah. Mendukung format PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX), dan OpenDocument. Gunakan ini ketika pengguna telah melampirkan file dokumen.';
 
   @override
   String get toolReadDocumentIndexParam =>
@@ -1704,4 +1704,8 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Judul grafik.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'MODE BERPIKIR DIAKTIFKAN: Anda HARUS menggunakan tag <think></think> untuk menunjukkan proses penalaran Anda sebelum memberikan jawaban akhir. Pikirkan langkah demi langkah di dalam tag, lalu berikan respons Anda di luar tag.';
 }

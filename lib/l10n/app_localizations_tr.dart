@@ -1694,4 +1694,8 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Grafiğin başlığı.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'DÜŞÜNME MODU AKTİF: Cevabını vermeden önce düşünce sürecini göstermek için <think></think> etiketlerini KULLANMALISIN. Etiketlerin içinde adım adım düşün, sonra cevabını etiketlerin dışında ver.';
 }

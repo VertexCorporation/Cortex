@@ -1650,4 +1650,8 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'グラフのタイトル。';
+
+  @override
+  String get thinkingModeInstruction =>
+      '思考モード有効：最終的な回答を出す前に、必ず<think></think>タグを使って推論のプロセスを示してください。タグ内で段階的に考え、タグの外で回答を記入してください。';
 }

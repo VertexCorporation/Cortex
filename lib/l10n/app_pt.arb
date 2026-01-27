@@ -565,6 +565,7 @@
   "toolChartDataParam": "Valores numéricos para o gráfico.",
   "toolChartLabelParam": "Rótulo do conjunto de dados para a legenda do gráfico.",
   "toolChartTitleParam": "Título do gráfico.",
-  "toolReadDocumentDescription": "Leia e extraia o conteúdo de texto de documentos carregados (PDF, planilhas do Excel). Use esta função quando o usuário anexar um arquivo de documento.",
-  "toolReadDocumentIndexParam": "O índice do anexo do documento a ser lido (baseado em 0). Normalmente 0 para o primeiro documento."
+  "toolReadDocumentDescription": "Leia e extraia o conteúdo de texto de documentos carregados. Suporta os formatos PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) e OpenDocument. Use esta função quando o usuário anexar um arquivo de documento.",
+  "toolReadDocumentIndexParam": "O índice do anexo do documento a ser lido (baseado em 0). Normalmente 0 para o primeiro documento.",
+  "thinkingModeInstruction": "MODO DE PENSAMENTO ATIVADO: Você DEVE usar as tags <think></think> para mostrar seu raciocínio antes de dar sua resposta final. Pense passo a passo dentro das tags e, em seguida, forneça sua resposta fora delas."
 }

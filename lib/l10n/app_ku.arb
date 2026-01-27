@@ -568,5 +568,6 @@
   "toolChartLabelParam": "Etîketa daneyê ji bo efsaneya nexşeyê.",
   "toolChartTitleParam": "Sernavê nexşeyê.",
   "toolReadDocumentDescription": "Naveroka nivîsê ji belgeyên barkirî bixwîne û derxe. Formatên PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX), û OpenDocument piştgirî dike. Dema ku bikarhêner pelê belgeyekê pêve kiribe, vê yekê bikar bînin.",
-  "toolReadDocumentIndexParam": "Îndeksa pêveka belgeyê ya ku were xwendin (li ser bingeha 0). Bi gelemperî 0 ji bo belgeya yekem."
+  "toolReadDocumentIndexParam": "Îndeksa pêveka belgeyê ya ku were xwendin (li ser bingeha 0). Bi gelemperî 0 ji bo belgeya yekem.",
+  "thinkingModeInstruction": "MODA BIFIKIRINÊ AKTÎF KIRIN: DIVÊ hûn etîketên <think></think> bikar bînin da ku pêvajoya aqilmendiya xwe nîşan bidin berî ku hûn bersiva xwe ya dawî bidin. Gav bi gav di hundirê etîketan de bifikirin, dûv re bersiva xwe li derveyî etîketan bidin."
 }

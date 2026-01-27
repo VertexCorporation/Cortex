@@ -1640,7 +1640,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get toolReadDocumentDescription =>
-      'अपलोड किए गए दस्तावेज़ों (पीडीएफ, एक्सेल स्प्रेडशीट) से पाठ सामग्री पढ़ें और निकालें। इसका उपयोग तब करें जब उपयोगकर्ता ने कोई दस्तावेज़ फ़ाइल संलग्न की हो।';
+      'अपलोड किए गए दस्तावेज़ों से पाठ सामग्री पढ़ें और निकालें। PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) और OpenDocument प्रारूपों का समर्थन करता है। इसका उपयोग तब करें जब उपयोगकर्ता ने कोई दस्तावेज़ फ़ाइल संलग्न की हो।';
 
   @override
   String get toolReadDocumentIndexParam =>
@@ -1695,4 +1695,8 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'चार्ट का शीर्षक।';
+
+  @override
+  String get thinkingModeInstruction =>
+      'सोचने की प्रक्रिया शुरू करें: अंतिम उत्तर देने से पहले अपनी तर्क प्रक्रिया को दर्शाने के लिए आपको <think></think> टैग का उपयोग करना होगा। टैग के अंदर चरण दर चरण सोचें, फिर टैग के बाहर अपना उत्तर दें।';
 }

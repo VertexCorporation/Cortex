@@ -509,6 +509,7 @@
   "toolChartDataParam": "Diaqram üçün ədədi məlumat dəyərləri.",
   "toolChartLabelParam": "Diaqram əfsanəsi üçün verilənlər dəsti etiketi.",
   "toolChartTitleParam": "Diaqramın başlığı.",
-  "toolReadDocumentDescription": "Yüklənmiş sənədlərdən (PDF, Excel elektron cədvəlləri) mətn məzmununu oxuyun və çıxarın. İstifadəçi sənəd faylı əlavə etdikdə bundan istifadə edin.",
-  "toolReadDocumentIndexParam": "Oxunacaq sənəd əlavəsinin indeksi (0-əsaslı). Adətən ilk sənəd üçün 0 olur."
+  "toolReadDocumentDescription": "Yüklənmiş sənədlərdən mətn məzmununu oxuyun və çıxarın. PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) və OpenDocument formatlarını dəstəkləyir. İstifadəçi sənəd faylı əlavə etdikdə bundan istifadə edin.",
+  "toolReadDocumentIndexParam": "Oxunacaq sənəd əlavəsinin indeksi (0-əsaslı). Adətən ilk sənəd üçün 0 olur.",
+  "thinkingModeInstruction": "DÜŞÜNMƏ REJİMİ AKTİVDİR: Son cavabınızı verməzdən əvvəl mühakimə prosesinizi göstərmək üçün <think></think> etiketlərindən istifadə etməlisiniz. Etiketlərin içərisində addım-addım düşünün, sonra cavabınızı etiketlərin xaricində verin."
 }

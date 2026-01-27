@@ -390,11 +390,17 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
         // isThinkingFinished: true if the block is closed OR the entire message is finished
         final bool isThinkingFinished = hasCloseTag || isFinished;
 
-        // 1. Remove <think> tags wrapper
+        // 1. Remove <think> tags wrapper (outer tags only)
         content =
             content.replaceAll(RegExp(r'(^<think>\s*)|(\s*</think>$)'), '');
 
-        // 2. Aggressively clean up ANY repetitive headers or quote markers
+        // 2. CRITICAL: Remove ALL nested <think> tags inside the content
+        // This happens when offline models produce their own thinking format
+        // e.g., "<think>Okay...<think>I need to...</think>...</think>"
+        // or when the model outputs "<think>" as plain text in its reasoning
+        content = content.replaceAll(RegExp(r'</?think>', caseSensitive: false), '');
+
+        // 3. Aggressively clean up ANY repetitive headers or quote markers
         // We use the verified regex logic from tests.
 
         // Remove "Scattered Thinking" lines and merge broken words
@@ -783,9 +789,17 @@ String _mergeFragmentedThinkingBlocks(String text) {
   // Step 3: Extract all thinking contents
   final List<String> thinkingContents = [];
 
+  // Helper function to clean nested think tags from content
+  String cleanNestedThinkTags(String content) {
+    // Remove any nested <think> or </think> tags inside the content
+    // This handles offline models that produce their own thinking format
+    return content.replaceAll(RegExp(r'</?think>', caseSensitive: false), '');
+  }
+
   // Add closed blocks content
   for (final match in closedMatches) {
-    final content = match.group(1)?.trim() ?? '';
+    var content = match.group(1)?.trim() ?? '';
+    content = cleanNestedThinkTags(content);
     if (content.isNotEmpty) {
       thinkingContents.add(content);
     }
@@ -794,6 +808,7 @@ String _mergeFragmentedThinkingBlocks(String text) {
   // Add unclosed block content (if any)
   if (hasUnclosedBlock && unclosedContent != null &&
       unclosedContent.isNotEmpty) {
+    unclosedContent = cleanNestedThinkTags(unclosedContent);
     thinkingContents.add(unclosedContent);
   }
 

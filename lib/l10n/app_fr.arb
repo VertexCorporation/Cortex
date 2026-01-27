@@ -524,6 +524,7 @@
   "toolChartDataParam": "Valeurs numériques des données du graphique.",
   "toolChartLabelParam": "Étiquette du jeu de données pour la légende du graphique.",
   "toolChartTitleParam": "Titre du graphique.",
-  "toolReadDocumentDescription": "Lire et extraire le contenu textuel des documents téléchargés (PDF, feuilles de calcul Excel). À utiliser lorsqu'un utilisateur a joint un fichier.",
-  "toolReadDocumentIndexParam": "L'index du document joint à lire (à partir de 0). Généralement 0 pour le premier document."
+  "toolReadDocumentDescription": "Lire et extraire le contenu textuel des documents téléchargés. Prend en charge les formats PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) et OpenDocument. À utiliser lorsqu'un utilisateur a joint un fichier.",
+  "toolReadDocumentIndexParam": "L'index du document joint à lire (à partir de 0). Généralement 0 pour le premier document.",
+  "thinkingModeInstruction": "MODE RÉFLEXION ACTIVÉ : Vous DEVEZ utiliser les balises <think></think> pour indiquer votre raisonnement avant de donner votre réponse finale. Réfléchissez étape par étape à l’intérieur des balises, puis indiquez votre réponse à l’extérieur."
 }

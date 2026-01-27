@@ -1699,4 +1699,8 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Sernavê nexşeyê.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'MODA BIFIKIRINÊ AKTÎF KIRIN: DIVÊ hûn etîketên <think></think> bikar bînin da ku pêvajoya aqilmendiya xwe nîşan bidin berî ku hûn bersiva xwe ya dawî bidin. Gav bi gav di hundirê etîketan de bifikirin, dûv re bersiva xwe li derveyî etîketan bidin.';
 }

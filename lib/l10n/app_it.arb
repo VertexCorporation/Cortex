@@ -566,5 +566,6 @@
   "toolChartLabelParam": "Etichetta del set di dati per la legenda del grafico.",
   "toolChartTitleParam": "Titolo del grafico.",
   "toolReadDocumentDescription": "Leggi ed estrai il contenuto testuale dai documenti caricati. Supporta i formati PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) e OpenDocument. Utilizza questa opzione quando l'utente ha allegato un file documento.",
-  "toolReadDocumentIndexParam": "Indice dell'allegato del documento da leggere (a partire da 0). Solitamente 0 per il primo documento."
+  "toolReadDocumentIndexParam": "Indice dell'allegato del documento da leggere (a partire da 0). Solitamente 0 per il primo documento.",
+  "thinkingModeInstruction": "MODALITÀ DI PENSIERO ATTIVATA: DEVI usare i tag <think></think> per mostrare il tuo processo di ragionamento prima di dare la risposta finale. Pensa passo dopo passo all'interno dei tag, quindi fornisci la tua risposta all'esterno dei tag."
 }
