@@ -1,7 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cortex/chat/messages/parser.dart';
-import 'package:cortex/theme.dart';
 
 // Copy of the logic from ai.dart for isolation testing
 List<InlineSpan> _parseThinkingTextTest(String text) {
@@ -420,10 +420,31 @@ Selam kanka!''';
           final thinkingMatches = RegexPatterns.thinkingLegacy.allMatches(text);
           if (thinkingMatches.isNotEmpty) {
             final match = thinkingMatches.first;
-            print("Thinking Match: \n${match.group(0)}");
+            if (kDebugMode) {
+              print("Thinking Match: \n${match.group(0)}");
+            }
             expect(match.group(0)!.contains("<<<WIDGET"), isFalse,
                 reason: "Thinking block should NOT contain widget");
           }
         });
+
+    test('Scenario: Widget at start of message (User Reported Failure)', () {
+      const raw =
+      '''<<<WIDGET:weather_card>>>{"city":"Istanbul","country":"Türkiye","current":{"time":"2026-01-25T23:00","interval":900,"temperature_2m":11.6,"relative_humidity_2m":83,"apparent_temperature":10.7,"precipitation":0,"weather_code":3,"wind_speed_10m":3.5},"units":{"time":"iso8601","interval":"seconds","temperature_2m":"°C","relative_humidity_2m":"%","apparent_temperature":"°C","precipitation":"mm","weather_code":"wmo code","wind_speed_10m":"km/h"}}<<<END>>>
+Selam kanka! İyiyim, teşekkürler. Sen nasılsın?''';
+
+      final spans = _parseThinkingTextTest(raw);
+
+      // Should have 2 spans: WidgetSpan (weather_card) and TextSpan ("Selam kanka!...")
+      // If it fails, it will likely be one TextSpan containing the raw widget text.
+
+      expect(spans.length, greaterThanOrEqualTo(2),
+          reason: 'Should parse widget and text separately');
+      expect(spans[0], isA<WidgetSpan>(),
+          reason: 'First span should be a Widget');
+      // Check second span text
+      expect(spans[1].toPlainText().trim(),
+          equals('Selam kanka! İyiyim, teşekkürler. Sen nasılsın?'));
+    });
   });
 }

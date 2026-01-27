@@ -29,6 +29,7 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
     with TickerProviderStateMixin {
   bool _isExpanded = false;
   bool _isVisible = true;
+  bool _wasFinished = false; // Track if we've transitioned to "finished" state
 
   late AnimationController _arrowController;
   late Animation<double> _arrowTurns;
@@ -36,6 +37,11 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
   late AnimationController _contentController;
   late Animation<double> _contentFade;
   late Animation<Offset> _contentSlide;
+
+  // Animation for the "Thinking" -> "Thought" text transition
+  late AnimationController _labelTransitionController;
+  late Animation<double> _labelFadeOut;
+  late Animation<double> _labelFadeIn;
 
   @override
   void initState() {
@@ -59,6 +65,30 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
             CurvedAnimation(
                 parent: _contentController, curve: Curves.easeOutQuad));
 
+    // Label transition animation (Thinking -> Thought)
+    _labelTransitionController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    _labelFadeOut = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _labelTransitionController,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+      ),
+    );
+    _labelFadeIn = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _labelTransitionController,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+      ),
+    );
+
+    // Initialize finished state
+    _wasFinished = widget.isFinished;
+    if (_wasFinished) {
+      _labelTransitionController.value = 1.0;
+    }
+
     // Auto fade out logic
     if (widget.autoFadeOut && widget.content.isEmpty) {
       Future.delayed(const Duration(seconds: 2), () {
@@ -74,12 +104,22 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
   @override
   void didUpdateWidget(ThinkingWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+    
+    // Detect transition from "thinking" to "finished"
+    if (widget.isFinished && !_wasFinished) {
+      _wasFinished = true;
+      _labelTransitionController.forward();
+    }
+    
+    // IMPORTANT: Do NOT reset _isExpanded when content updates!
+    // This preserves the expanded state across streaming updates.
   }
 
   @override
   void dispose() {
     _arrowController.dispose();
     _contentController.dispose();
+    _labelTransitionController.dispose();
     super.dispose();
   }
 
@@ -110,16 +150,9 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
     final localizations = AppLocalizations.of(context);
     final hasContent = widget.content.isNotEmpty;
 
-    // Determine label text
-    String labelText;
-    if (!widget.isFinished) {
-      // Still thinking
-      labelText = widget.label ?? (localizations?.thinking ?? 'Thinking');
-    } else {
-      // Finished logic
-      // User requested to remove duration info ("ne kadar düşündüğü süre bilgisini vermeyelim")
-      labelText = localizations?.thought ?? 'Thought';
-    }
+    // Label texts for both states
+    final thinkingLabel = widget.label ?? (localizations?.thinking ?? 'Thinking');
+    final thoughtLabel = localizations?.thought ?? 'Thought';
 
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 300),
@@ -138,32 +171,46 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Text section
-                    widget.isFinished
-                        ? Text(
-                            labelText,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.tertiaryColor,
-                              // NO ITALIC
-                            ),
-                          )
-                        : Shimmer.fromColors(
-                            baseColor: AppColors.tertiaryColor,
-                            highlightColor:
-                                AppColors.primaryColor.withValues(alpha: 0.5),
-                            period: const Duration(milliseconds: 2000),
-                            child: Text(
-                              labelText,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.tertiaryColor,
-                                // NO ITALIC
-                              ),
-                            ),
-                          ),
+                    // Animated text transition from "Thinking" -> "Thought"
+                    AnimatedBuilder(
+                      animation: _labelTransitionController,
+                      builder: (context, child) {
+                        // Show "Thinking" with shimmer when fading out, "Thought" when fading in
+                        final showThinking = _labelTransitionController.value < 0.5;
+                        final opacity = showThinking 
+                            ? _labelFadeOut.value 
+                            : _labelFadeIn.value;
+                        
+                        final labelText = showThinking ? thinkingLabel : thoughtLabel;
+                        
+                        return Opacity(
+                          opacity: opacity.clamp(0.0, 1.0),
+                          child: showThinking && !_wasFinished
+                              ? Shimmer.fromColors(
+                                  baseColor: AppColors.tertiaryColor,
+                                  highlightColor:
+                                      AppColors.primaryColor.withValues(alpha: 0.5),
+                                  period: const Duration(milliseconds: 2000),
+                                  child: Text(
+                                    labelText,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.tertiaryColor,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  labelText,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.tertiaryColor,
+                                  ),
+                                ),
+                        );
+                      },
+                    ),
 
                     const SizedBox(width: 8),
 

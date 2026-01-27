@@ -488,7 +488,7 @@ class SendService {
           if (tool != null) {
             try {
               final args = jsonDecode(argsStr);
-              // Notify UI gently
+              // Notify UI gently (will be hidden by parser.dart)
               _conversationProvider
                   .appendToLastBotMessage("\n*Using $name...*");
               // Execute
@@ -517,11 +517,13 @@ class SendService {
                 // Use the summary for the LLM context so it doesn't get confused by raw JSON
                 result = summaryForContext;
               } else {
-                _conversationProvider.appendToLastBotMessage(" ✅\n");
+                // Tool execution success - emoji will be stripped by parser
+                _conversationProvider.appendToLastBotMessage("✅\n");
               }
             } catch (e) {
               result = "Error executing tool '$name': $e";
-              _conversationProvider.appendToLastBotMessage(" ❌\n");
+              // Tool execution error - emoji will be stripped by parser
+              _conversationProvider.appendToLastBotMessage("❌\n");
             }
           } else {
             result = "Tool not found.";
