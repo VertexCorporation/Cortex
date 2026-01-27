@@ -153,10 +153,20 @@ List<InlineSpan> parseText(BuildContext context, String text,
   try {
     // [FIX] Pre-clean text to remove artifacts
     // Remove "*Using tool...*" lines with optional emojis
-    text = text.replaceAll(RegexPatterns.usingToolLine, '\n');
+    text = text.replaceAll(RegexPatterns.usingToolLine, '');
     // Remove standalone tool result emojis
     text = text.replaceAll(RegExp(r'(?<=\n|^)\s*[✅❌✓✗]\s*(?=\n|$)'), '');
     text = text.replaceAll(RegExp(r'\n>\s*\n'), '\n');
+
+    // Clean up excessive whitespace around widgets
+    text = text.replaceAll(RegExp(r'\n{2,}(?=<<<WIDGET)'), '\n');
+    text = text.replaceAll(RegExp(r'(?<=<<<END>>>)\n{2,}'), '\n');
+
+    // [FIX] Merge consecutive/fragmented thinking blocks
+    // Sometimes streaming produces: <think>A</think>X<think>B</think>
+    // where X is a small fragment that should be part of thinking
+    // Merge them into a single <think>A X B</think> block
+    text = _mergeFragmentedThinkingBlocks(text);
 
     // --- Source Extraction Logic ---
     // Detect "Sources:" at the end of the text and extract them
@@ -420,12 +430,9 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
 
         content = content.trim();
 
-        // Generate a stable key based on content hash to preserve widget state
-        // Use first 50 chars to create a stable identity that doesn't change with content updates
-        final keyBase = matchText.length > 50
-            ? matchText.substring(0, 50)
-            : matchText;
-        final widgetKey = ValueKey('thinking_${keyBase.hashCode}');
+        // Use a stable key so the widget state persists across content updates
+        // The key is constant so the same widget instance is reused
+        const widgetKey = ValueKey('thinking_block_main');
 
         if (content.isEmpty) {
           // If empty (e.g. just started thinking), show empty widget with active state
@@ -742,6 +749,82 @@ InlineSpan _processInlineMatch(BuildContext context, _MatchRange match,
             color: AppColors.primaryColor.inverted,
             fontSize: fs));
   }
+}
+
+/// Merges fragmented/consecutive thinking blocks into a single block.
+/// 
+/// During streaming, the model sometimes sends complex think tags.
+/// This function extracts ALL thinking content and consolidates it into
+/// a single think block at the beginning.
+String _mergeFragmentedThinkingBlocks(String text) {
+  // Step 1: Find ALL closed <think>...</think> blocks
+  final closedThinkPattern = RegExp(
+      r'<think>([\s\S]*?)</think>', multiLine: true);
+  final closedMatches = closedThinkPattern.allMatches(text).toList();
+
+  // Step 2: Check for unclosed <think> block at the end (streaming)
+  final unclosedThinkPattern = RegExp(r'<think>([\s\S]*)$', multiLine: true);
+  String? unclosedContent;
+  bool hasUnclosedBlock = false;
+
+  // Remove all closed blocks first to check for unclosed
+  String textWithoutClosed = text.replaceAll(closedThinkPattern, '');
+  final unclosedMatch = unclosedThinkPattern.firstMatch(textWithoutClosed);
+  if (unclosedMatch != null) {
+    unclosedContent = unclosedMatch.group(1)?.trim();
+    hasUnclosedBlock = unclosedContent?.isNotEmpty ?? false;
+  }
+
+  // If no thinking blocks at all, return as-is
+  if (closedMatches.isEmpty && !hasUnclosedBlock) {
+    return text;
+  }
+
+  // Step 3: Extract all thinking contents
+  final List<String> thinkingContents = [];
+
+  // Add closed blocks content
+  for (final match in closedMatches) {
+    final content = match.group(1)?.trim() ?? '';
+    if (content.isNotEmpty) {
+      thinkingContents.add(content);
+    }
+  }
+
+  // Add unclosed block content (if any)
+  if (hasUnclosedBlock && unclosedContent != null &&
+      unclosedContent.isNotEmpty) {
+    thinkingContents.add(unclosedContent);
+  }
+
+  if (thinkingContents.isEmpty) {
+    return text; // All thinking blocks were empty
+  }
+
+  // Step 4: Remove all think blocks from text
+  String cleanedText = text;
+  // Remove closed think blocks
+  cleanedText = cleanedText.replaceAll(closedThinkPattern, '');
+  // Remove unclosed think blocks (streaming)
+  cleanedText = cleanedText.replaceAll(unclosedThinkPattern, '');
+
+  // Step 5: Merge all thinking contents with paragraph breaks
+  final mergedThinking = thinkingContents.join('\n\n');
+
+  // Step 6: Create the single merged thinking block
+  final thinkTag = hasUnclosedBlock
+      ? '<think>$mergedThinking' // Keep unclosed for streaming
+      : '<think>$mergedThinking</think>'; // Close it
+
+  // Step 7: Clean up the remaining text
+  cleanedText = cleanedText.trim();
+  // Remove any leading/trailing newlines from cleaned text
+  cleanedText = cleanedText.replaceAll(RegExp(r'^\n+|\n+$'), '');
+
+  // Add a single newline separator if there's content after thinking
+  final separator = cleanedText.isNotEmpty ? '\n' : '';
+
+  return '$thinkTag$separator$cleanedText';
 }
 
 class _MatchRange {

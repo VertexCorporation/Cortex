@@ -467,14 +467,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return '快来看看 Cortex 应用，它太棒了！在这里下载：$cortexLink';
-  }
-
-  @override
-  String get shareFailed => '分享应用失败。请稍后再试';
-
-  @override
   String get selectText => '选择文本';
 
   @override
@@ -649,9 +641,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get benefit11 => '更多流动模式';
 
   @override
-  String get benefit12 => '';
-
-  @override
   String get oldBenefits => '包含所有较低级别计划的权益';
 
   @override
@@ -822,9 +811,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get errorNetwork => '发生网络错误。请检查您的连接并重试。';
 
   @override
-  String get errorApiAuthentication => '认证失败。请尝试重新登录。';
-
-  @override
   String get baseModelForCharacterDescription => '所选的基础模型将决定角色的推理和响应能力。';
 
   @override
@@ -987,9 +973,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get featureImageGenerationDescription => '该模型可以根据您的文本描述创建原始图像。';
-
-  @override
-  String get errorImageLoad => '无法加载生成的图像。';
 
   @override
   String get premiumModelNoticeTitle => '高级型号';
@@ -1445,28 +1428,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get featuresTitle => '特征';
 
   @override
-  String get useOfflineDescription => '无需网络连接即可私密聊天';
+  String get useOfflineDescription => '无需网络连接即可私密聊天。';
+
+  @override
+  String get featureReasoning => '深度思考';
+
+  @override
+  String get featureReasoningDescription => '在深度思考模式下，人工智能会在内部进行思考，尽其所能地完成任务。';
 
   @override
   String get featureCreateImageTitle => '创建图像';
 
   @override
-  String get featureCreateImageDescription => '从文本生成人工智能艺术作品';
+  String get featureCreateImageDescription => '根据文本生成AI艺术作品。';
 
   @override
   String get featureStudyTitle => '学习';
 
   @override
-  String get featureStudyDescription => '获取解释和摘要';
+  String get featureStudyDescription => '获取解释和摘要。';
 
   @override
   String get featureQuizzesTitle => '测验';
 
   @override
-  String get featureQuizzesDescription => '测试你的知识';
+  String get featureQuizzesDescription => '测试一下你的知识。';
 
   @override
-  String get featureExploreDescription => '探索所有可用型号';
+  String get featureExploreDescription => '发现所有可用模型。';
 
   @override
   String get featureStudyMessage =>
@@ -1528,50 +1517,6 @@ class AppLocalizationsZh extends AppLocalizations {
       'Cortex 完全在设备端运行，即使在语音聊天模式下也能确保您的数据安全；享受流畅的对话体验！';
 
   @override
-  String get toolGetStockPriceDescription =>
-      '获取股票（例如 AAPL、THYAO.IS）和加密货币（例如 BTC-USD、ETH-USD）的当前价格和历史价格。';
-
-  @override
-  String get toolGetStockPriceParamSymbol => '股票代码（例如 AAPL、THYAO.IS、BTC-USD）。';
-
-  @override
-  String get toolGetWeatherDescription => '获取指定城市的当前天气。如果不知道城市名称，请询问用户。';
-
-  @override
-  String get toolGetWeatherParamCity => '城市名称（例如，伦敦，伊斯坦布尔）。';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      '在安全沙箱中执行Python代码。可用于复杂计算、数据处理或算法任务。';
-
-  @override
-  String get toolRunPythonCodeParamCode => '要执行的Python代码。';
-
-  @override
-  String get toolCalculateDescription => '计算数学表达式的值。';
-
-  @override
-  String get toolCalculateParamExpression => '数学表达式（例如，“3 + 4 * 2”，“sin(45)”）。';
-
-  @override
-  String get toolRenderChartDescription => '生成图表。用于可视化用户提供的数据或计算得出的数据。';
-
-  @override
-  String get toolRenderChartParamType => '图表类型：柱状图、折线图、饼图。';
-
-  @override
-  String get toolRenderChartParamLabels => 'x 轴标签或类别标签。';
-
-  @override
-  String get toolRenderChartParamData => '数值数据点。';
-
-  @override
-  String get toolRenderChartParamLabel => '数据集标签。';
-
-  @override
-  String get toolRenderChartParamTitle => '图表标题。';
-
-  @override
   String get flowModeDescription => '在“心流”模式下，智能体之间会进行辩论；您可以坐下来倾听，也可以加入讨论！';
 
   @override
@@ -1579,37 +1524,7 @@ class AppLocalizationsZh extends AppLocalizations {
       '你好！你现在已进入Cortex应用程序的“心流模式”。这里还有三位其他AI智能体。你的任务是抛出一个话题，并通过向其他智能体提出一个引人深思或趣味十足的问题来开启讨论。在你的回答中，可以随意运用幽默、反讽和轻微的调侃。任何话题都可以。开始吧，开启对话！';
 
   @override
-  String get voicePrompt =>
-      '您目前正在使用 Cortex 平台提供语音服务。请勿使用 Markdown、代码块或 LaTeX。请仅以适合语音合成的文本形式回复。';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => '思考了';
 
   @override
   String get agentRed => 'Red';
@@ -1622,10 +1537,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get flowMode => '流动模式';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => '优质的';
@@ -1641,4 +1552,55 @@ class AppLocalizationsZh extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'Cortex 流模式（$agentName）。上一个：$previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      '读取并提取上传文档（PDF、Excel 表格）中的文本内容。当用户附加文档文件时，请使用此功能。';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      '要读取的文档附件的索引（从 0 开始计数）。通常 0 表示第一个文档。';
+
+  @override
+  String get toolStockDescription =>
+      '获取股票（例如 AAPL、THYAO.IS）和加密货币（例如 BTC-USD）的当前价格和历史记录。';
+
+  @override
+  String get toolStockSymbolParam => '股票代码（例如 AAPL、THYAO.IS、BTC-USD）。';
+
+  @override
+  String get toolWeatherDescription => '获取特定城市的实时天气。';
+
+  @override
+  String get toolWeatherCityParam => '城市名称（例如：伦敦、伊斯坦布尔）。';
+
+  @override
+  String get toolPythonDescription => '在安全沙箱中执行Python代码。';
+
+  @override
+  String get toolPythonCodeParam => '要执行的Python代码。';
+
+  @override
+  String get toolCalculateDescription => '计算数学表达式的值。';
+
+  @override
+  String get toolCalculateExpressionParam => '数学表达式（例如“3 + 4 * 2”）。';
+
+  @override
+  String get toolChartDescription => '生成图表/图形可视化效果。';
+
+  @override
+  String get toolChartTypeParam => '图表类型：柱状图、折线图或饼图。';
+
+  @override
+  String get toolChartLabelsParam => '图表坐标轴或分段的标签。';
+
+  @override
+  String get toolChartDataParam => '图表的数值数据。';
+
+  @override
+  String get toolChartLabelParam => '图表图例的数据集标签。';
+
+  @override
+  String get toolChartTitleParam => '图表标题。';
 }

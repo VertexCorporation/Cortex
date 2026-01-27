@@ -474,14 +474,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return 'Cortexアプリをチェックしてみてください、とても素晴らしいです！ここからダウンロードしてください: $cortexLink';
-  }
-
-  @override
-  String get shareFailed => 'アプリの共有に失敗しました。後でもう一度お試しください';
-
-  @override
   String get selectText => 'テキストを選択';
 
   @override
@@ -658,9 +650,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get benefit11 => 'より多くの流れモード';
 
   @override
-  String get benefit12 => '';
-
-  @override
   String get oldBenefits => '下位プランのすべての特典';
 
   @override
@@ -832,9 +821,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get errorNetwork => 'ネットワークエラーが発生しました。接続を確認してもう一度お試しください。';
-
-  @override
-  String get errorApiAuthentication => '認証に失敗しました。もう一度ログインしてみてください。';
 
   @override
   String get baseModelForCharacterDescription =>
@@ -1010,9 +996,6 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get featureImageGenerationDescription =>
       'このモデルは、テキストの説明に基づいてオリジナルの画像を作成できます。';
-
-  @override
-  String get errorImageLoad => '生成された画像の読み込みに失敗しました。';
 
   @override
   String get premiumModelNoticeTitle => 'プレミアムモデル';
@@ -1489,28 +1472,35 @@ class AppLocalizationsJa extends AppLocalizations {
   String get featuresTitle => '特徴';
 
   @override
-  String get useOfflineDescription => 'インターネットに接続せずにプライベートチャット';
+  String get useOfflineDescription => 'インターネットに接続せずにプライベートにチャットできます。';
+
+  @override
+  String get featureReasoning => '深い思考';
+
+  @override
+  String get featureReasoningDescription =>
+      'ディープ シンキング モードでは、AI はタスクを内部的に考え、能力を最大限に発揮して完了させます。';
 
   @override
   String get featureCreateImageTitle => '画像を作成';
 
   @override
-  String get featureCreateImageDescription => 'テキストからAIアートを生成する';
+  String get featureCreateImageDescription => 'テキストから AI アートを生成します。';
 
   @override
   String get featureStudyTitle => '勉強と学習';
 
   @override
-  String get featureStudyDescription => '説明と要約を入手する';
+  String get featureStudyDescription => '説明と要約を入手します。';
 
   @override
   String get featureQuizzesTitle => 'クイズ';
 
   @override
-  String get featureQuizzesDescription => 'あなたの知識をテストしましょう';
+  String get featureQuizzesDescription => 'あなたの知識をテストしてください。';
 
   @override
-  String get featureExploreDescription => '利用可能なすべてのモデルを見る';
+  String get featureExploreDescription => '利用可能なすべてのモデルをご覧ください。';
 
   @override
   String get featureStudyMessage =>
@@ -1573,53 +1563,6 @@ class AppLocalizationsJa extends AppLocalizations {
       'Cortex は、音声チャット モードでもデバイス上で完全に実行することでデータを安全に保ち、シームレスな会話をお楽しみいただけます。';
 
   @override
-  String get toolGetStockPriceDescription =>
-      '株式（例：AAPL、THYAO.IS）および暗号通貨（例：BTC-USD、ETH-USD）の現在の価格と履歴を取得します。';
-
-  @override
-  String get toolGetStockPriceParamSymbol =>
-      'ティッカーシンボル（例：AAPL、THYAO.IS、BTC-USD）。';
-
-  @override
-  String get toolGetWeatherDescription =>
-      '特定の都市の現在の天気を取得します。都市名がわからない場合は、ユーザーに都市名を尋ねます。';
-
-  @override
-  String get toolGetWeatherParamCity => '都市の名前（例：ロンドン、イスタンブール）。';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      '安全なサンドボックス内でPythonコードを実行します。複雑な計算、データ処理、アルゴリズムタスクなどにご利用ください。';
-
-  @override
-  String get toolRunPythonCodeParamCode => '実行する Python コード。';
-
-  @override
-  String get toolCalculateDescription => '数式を評価します。';
-
-  @override
-  String get toolCalculateParamExpression => '数式（例：「3 + 4 * 2」、「sin(45)」）。';
-
-  @override
-  String get toolRenderChartDescription =>
-      'チャート/グラフを生成します。これを使用して、ユーザーが提供したデータや計算されたデータを視覚化します。';
-
-  @override
-  String get toolRenderChartParamType => 'グラフの種類: 棒グラフ、折れ線グラフ、円グラフ。';
-
-  @override
-  String get toolRenderChartParamLabels => 'x 軸またはカテゴリのラベル。';
-
-  @override
-  String get toolRenderChartParamData => '数値データ ポイント。';
-
-  @override
-  String get toolRenderChartParamLabel => 'データセットのラベル。';
-
-  @override
-  String get toolRenderChartParamTitle => 'グラフのタイトル。';
-
-  @override
   String get flowModeDescription =>
       '流れモードでは、インテリジェンスが互いに議論します。座って聞くことも、飛び込んで議論に参加することもできます。';
 
@@ -1628,37 +1571,7 @@ class AppLocalizationsJa extends AppLocalizations {
       'こんにちは！Cortexアプリの流れモードに入っています。他に3人のAIエージェントがいます。あなたの課題は、話題を部屋に投げかけ、他の参加者に刺激的または面白い質問をして議論を始めることです。返答では、ユーモア、皮肉、軽いトラッシュトークなど、自由に使ってください。どんな話題でも構いません。さあ、会話を始めましょう！';
 
   @override
-  String get voicePrompt =>
-      '現在、Cortexプラットフォームで音声サービスを提供しています。マークダウン、コードブロック、LaTeXは使用しないでください。音声合成に適したテキストのみで回答してください。';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => '考えた';
 
   @override
   String get agentRed => 'Red';
@@ -1671,10 +1584,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get flowMode => '流れモード';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => 'プレミアム';
@@ -1690,4 +1599,55 @@ class AppLocalizationsJa extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'Cortex Flow Mode ($agentName)。前: $previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      'アップロードされたドキュメントからテキストコンテンツを読み取り、抽出します。PDF、Word (DOCX)、Excel (XLSX)、PowerPoint (PPTX)、OpenDocument形式に対応しています。ユーザーがドキュメントファイルを添付している場合にご利用ください。';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      '読み取るドキュメント添付ファイルのインデックス（0ベース）。通常、最初のドキュメントは0です。';
+
+  @override
+  String get toolStockDescription =>
+      '株式（例：AAPL、THYAO.IS）および暗号通貨（例：BTC-USD）の現在の価格と履歴を取得します。';
+
+  @override
+  String get toolStockSymbolParam => 'ティッカーシンボル（例：AAPL、THYAO.IS、BTC-USD）。';
+
+  @override
+  String get toolWeatherDescription => '特定の都市の現在の天気を取得します。';
+
+  @override
+  String get toolWeatherCityParam => '都市名（例：ロンドン、イスタンブール）。';
+
+  @override
+  String get toolPythonDescription => '安全なサンドボックス内で Python コードを実行します。';
+
+  @override
+  String get toolPythonCodeParam => '実行する Python コード。';
+
+  @override
+  String get toolCalculateDescription => '数式を評価します。';
+
+  @override
+  String get toolCalculateExpressionParam => '数式（例：\'3 + 4 * 2\'）。';
+
+  @override
+  String get toolChartDescription => 'チャート/グラフの視覚化を生成します。';
+
+  @override
+  String get toolChartTypeParam => 'グラフの種類: 棒グラフ、折れ線グラフ、円グラフ。';
+
+  @override
+  String get toolChartLabelsParam => 'グラフの軸またはセグメントのラベル。';
+
+  @override
+  String get toolChartDataParam => 'グラフの数値データ値。';
+
+  @override
+  String get toolChartLabelParam => 'グラフの凡例のデータセット ラベル。';
+
+  @override
+  String get toolChartTitleParam => 'グラフのタイトル。';
 }

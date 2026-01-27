@@ -484,15 +484,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return 'Зацени приложение Cortex, оно просто потрясающее! Скачай его здесь: $cortexLink';
-  }
-
-  @override
-  String get shareFailed =>
-      'Не удалось поделиться приложением. Пожалуйста, попробуйте позже.';
-
-  @override
   String get selectText => 'Выбрать текст';
 
   @override
@@ -668,9 +659,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get benefit11 => 'Больше режима потока';
-
-  @override
-  String get benefit12 => '';
 
   @override
   String get oldBenefits => 'Все преимущества предыдущих планов';
@@ -852,10 +840,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get errorNetwork =>
       'Произошла сетевая ошибка. Пожалуйста, проверьте ваше соединение и попробуйте снова.';
-
-  @override
-  String get errorApiAuthentication =>
-      'Аутентификация не удалась. Пожалуйста, попробуйте войти снова.';
 
   @override
   String get baseModelForCharacterDescription =>
@@ -1042,10 +1026,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get featureImageGenerationDescription =>
       'Эта модель может создавать оригинальные изображения на основе ваших текстовых описаний.';
-
-  @override
-  String get errorImageLoad =>
-      'Не удалось загрузить сгенерированное изображение.';
 
   @override
   String get premiumModelNoticeTitle => 'Премиум-модель';
@@ -1542,11 +1522,18 @@ class AppLocalizationsRu extends AppLocalizations {
       'Общайтесь в приватном чате без подключения к интернету.';
 
   @override
+  String get featureReasoning => 'Глубокое мышление';
+
+  @override
+  String get featureReasoningDescription =>
+      'В режиме глубокого мышления ИИ продумывает задачи самостоятельно, чтобы выполнить их наилучшим образом.';
+
+  @override
   String get featureCreateImageTitle => 'Создать изображение';
 
   @override
   String get featureCreateImageDescription =>
-      'Создание изображений с помощью ИИ из текста';
+      'Создавайте изображения с помощью ИИ из текста.';
 
   @override
   String get featureStudyTitle => 'Учитесь и получайте знания';
@@ -1558,11 +1545,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get featureQuizzesTitle => 'Викторины';
 
   @override
-  String get featureQuizzesDescription => 'Проверьте свои знания';
+  String get featureQuizzesDescription => 'Проверьте свои знания.';
 
   @override
   String get featureExploreDescription =>
-      'Ознакомьтесь со всеми доступными моделями';
+      'Ознакомьтесь со всеми доступными моделями.';
 
   @override
   String get featureStudyMessage =>
@@ -1625,57 +1612,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Cortex обеспечивает безопасность ваших данных, работая полностью на устройстве, даже в режиме голосового чата; наслаждайтесь бесперебойным общением!';
 
   @override
-  String get toolGetStockPriceDescription =>
-      'Получите текущую цену и историю колебаний для акций (например, AAPL, THYAO.IS) и криптовалют (например, BTC-USD, ETH-USD).';
-
-  @override
-  String get toolGetStockPriceParamSymbol =>
-      'Тикер (например, AAPL, THYAO.IS, BTC-USD).';
-
-  @override
-  String get toolGetWeatherDescription =>
-      'Получите текущую погоду для конкретного города. Если город неизвестен, запросите у пользователя его название.';
-
-  @override
-  String get toolGetWeatherParamCity =>
-      'Название города (например, Лондон, Стамбул).';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      'Выполняйте код Python в защищенной песочнице. Используйте это для сложных вычислений, обработки данных или алгоритмических задач.';
-
-  @override
-  String get toolRunPythonCodeParamCode => 'Код на Python для выполнения.';
-
-  @override
-  String get toolCalculateDescription =>
-      'Оцените значение математического выражения.';
-
-  @override
-  String get toolCalculateParamExpression =>
-      'Математическое выражение (например, \"3 + 4 * 2\", \"sin(45)\").';
-
-  @override
-  String get toolRenderChartDescription =>
-      'Создайте диаграмму/график. Используйте его для визуализации данных, предоставленных пользователем или рассчитанных им.';
-
-  @override
-  String get toolRenderChartParamType =>
-      'Тип диаграммы: столбчатая, линейная, круговая.';
-
-  @override
-  String get toolRenderChartParamLabels => 'Подписи для оси X или категорий.';
-
-  @override
-  String get toolRenderChartParamData => 'Числовые данные.';
-
-  @override
-  String get toolRenderChartParamLabel => 'Метка для набора данных.';
-
-  @override
-  String get toolRenderChartParamTitle => 'Заголовок диаграммы.';
-
-  @override
   String get flowModeDescription =>
       'В режиме «Поток» интеллекты спорят между собой; вы можете либо сидеть и слушать, либо присоединиться к обсуждению!';
 
@@ -1684,37 +1620,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Привет! Вы находитесь в режиме «Поток» в приложении Cortex. С вами находятся ещё три ИИ-агента. Ваша задача — предложить тему для обсуждения и начать дискуссию, задав другим провокационный или занимательный вопрос. В своих ответах смело используйте юмор, иронию и лёгкие подколки. Любая тема подходит. Вперёд, начинайте разговор!';
 
   @override
-  String get voicePrompt =>
-      'В данный момент вы предоставляете услуги голосовой связи на платформе Cortex. Не используйте Markdown, блоки кода или LaTeX. Отвечайте исключительно текстом, подходящим для синтеза речи.';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => 'Подумал';
 
   @override
   String get agentRed => 'Red';
@@ -1727,10 +1633,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get flowMode => 'Режим потока';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => 'Премиум';
@@ -1746,4 +1648,65 @@ class AppLocalizationsRu extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'Режим Cortex Flow ($agentName). Предыдущий: $previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      'Чтение и извлечение текстового содержимого из загруженных документов. Поддерживает форматы PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) и OpenDocument. Используйте эту функцию, если пользователь прикрепил файл документа.';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      'Индекс вложенного документа для чтения (начиная с 0). Обычно 0 для первого документа.';
+
+  @override
+  String get toolStockDescription =>
+      'Получите текущую цену и историю колебаний для акций (например, AAPL, THYAO.IS) и криптовалют (например, BTC-USD).';
+
+  @override
+  String get toolStockSymbolParam =>
+      'Тикер (например, AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolWeatherDescription =>
+      'Узнайте текущую погоду в конкретном городе.';
+
+  @override
+  String get toolWeatherCityParam =>
+      'Название города (например, Лондон, Стамбул).';
+
+  @override
+  String get toolPythonDescription =>
+      'Выполняйте код Python в защищенной песочнице.';
+
+  @override
+  String get toolPythonCodeParam => 'Код на Python для выполнения.';
+
+  @override
+  String get toolCalculateDescription =>
+      'Оцените значение математического выражения.';
+
+  @override
+  String get toolCalculateExpressionParam =>
+      'Математическое выражение (например, \'3 + 4 * 2\').';
+
+  @override
+  String get toolChartDescription =>
+      'Создайте диаграмму/график для визуализации.';
+
+  @override
+  String get toolChartTypeParam =>
+      'Тип диаграммы: столбчатая, линейная или круговая.';
+
+  @override
+  String get toolChartLabelsParam =>
+      'Подписи для осей или сегментов диаграммы.';
+
+  @override
+  String get toolChartDataParam => 'Числовые значения данных для диаграммы.';
+
+  @override
+  String get toolChartLabelParam =>
+      'Метка набора данных для легенды диаграммы.';
+
+  @override
+  String get toolChartTitleParam => 'Заголовок диаграммы.';
 }

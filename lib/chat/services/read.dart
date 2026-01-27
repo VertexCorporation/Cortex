@@ -34,6 +34,10 @@ class ReadService {
       {required String languageCode}) async {
     const String logPrefix = "[ReadService.loadConversation]";
 
+    // CRITICAL: Clear messages and show skeleton immediately
+    _conversationProvider.clearConversation();
+    _conversationProvider.setLoadingMessages(true);
+
     // 1. Resolve the Model ID
     String resolvedModelId = manager.modelId;
     if (resolvedModelId == 'dynamic') {
@@ -66,7 +70,7 @@ class ReadService {
       manager.conversationTitle,
     );
 
-    // 7. Load Messages
+    // 7. Load Messages (will set loading to false when done)
     await _loadAndSetMessages(manager.conversationID);
   }
 

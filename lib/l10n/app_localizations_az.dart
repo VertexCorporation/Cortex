@@ -481,15 +481,6 @@ class AppLocalizationsAz extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return 'Cortex tətbiqinə bax, çox heyrətamizdir! Buradan yükləyin: $cortexLink';
-  }
-
-  @override
-  String get shareFailed =>
-      'Tətbiqi paylaşmaq mümkün olmadı. Zəhmət olmasa, daha sonra yenidən cəhd edin';
-
-  @override
   String get selectText => 'Mətni Seç';
 
   @override
@@ -664,9 +655,6 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get benefit11 => 'Daha çox Axın Rejimi';
-
-  @override
-  String get benefit12 => '';
 
   @override
   String get oldBenefits => 'Aşağı planların bütün üstünlükləri';
@@ -849,10 +837,6 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get errorNetwork =>
       'Şəbəkə xətası baş verdi. Zəhmət olmasa bağlantınızı yoxlayın və yenidən cəhd edin.';
-
-  @override
-  String get errorApiAuthentication =>
-      'Doğrulama uğursuz oldu. Zəhmət olmasa yenidən daxil olmağa cəhd edin.';
 
   @override
   String get baseModelForCharacterDescription =>
@@ -1039,9 +1023,6 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get featureImageGenerationDescription =>
       'Bu model mətn təsvirləriniz əsasında orijinal şəkillər yarada bilər.';
-
-  @override
-  String get errorImageLoad => 'Yaradılmış şəkli yükləmək alınmadı.';
 
   @override
   String get premiumModelNoticeTitle => 'Premium Model';
@@ -1531,29 +1512,37 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get useOfflineDescription =>
-      'İnternet bağlantısı olmadan şəxsi söhbət edin';
+      'İnternet bağlantısı olmadan şəxsi söhbət edin.';
+
+  @override
+  String get featureReasoning => 'Dərin Düşüncə';
+
+  @override
+  String get featureReasoningDescription =>
+      'Dərin Düşünmə rejimində süni intellekt tapşırıqları bacardığı qədər yerinə yetirmək üçün daxildə düşünür.';
 
   @override
   String get featureCreateImageTitle => 'Şəkil Yarat';
 
   @override
   String get featureCreateImageDescription =>
-      'Mətndən süni intellekt sənəti yaradın';
+      'Mətndən süni intellekt sənəti yaradın.';
 
   @override
   String get featureStudyTitle => 'Oxu və Öyrən';
 
   @override
-  String get featureStudyDescription => 'İzahatlar və xülasələr alın';
+  String get featureStudyDescription => 'İzahatlar və xülasələr alın.';
 
   @override
   String get featureQuizzesTitle => 'Testlər';
 
   @override
-  String get featureQuizzesDescription => 'Biliklərinizi sınayın';
+  String get featureQuizzesDescription => 'Biliklərinizi sınayın.';
 
   @override
-  String get featureExploreDescription => 'Bütün mövcud modelləri kəşf edin';
+  String get featureExploreDescription =>
+      'Mövcud olan bütün modelləri kəşf edin.';
 
   @override
   String get featureStudyMessage =>
@@ -1616,56 +1605,6 @@ class AppLocalizationsAz extends AppLocalizations {
       'Cortex, səsli söhbət rejimində belə cihazınızda tam işləyərək məlumatlarınızı təhlükəsiz saxlayır; problemsiz söhbətlərdən zövq alın!';
 
   @override
-  String get toolGetStockPriceDescription =>
-      'Səhmlərin (məsələn, AAPL, THYAO.IS) və kriptovalyutanın (məsələn, BTC-USD, ETH-USD) cari qiymətini və tarixini əldə edin.';
-
-  @override
-  String get toolGetStockPriceParamSymbol =>
-      'Ticker simvolu (məsələn, AAPL, THYAO.IS, BTC-USD).';
-
-  @override
-  String get toolGetWeatherDescription =>
-      'Müəyyən bir şəhər üçün cari hava proqnozunu əldə edin. Əgər məlum deyilsə, istifadəçidən şəhəri soruşun.';
-
-  @override
-  String get toolGetWeatherParamCity =>
-      'Şəhərin adı (məsələn, London, İstanbul).';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      'Python kodunu təhlükəsiz bir sandboxda icra edin. Bundan mürəkkəb hesablamalar, məlumatların emalı və ya alqoritmik tapşırıqlar üçün istifadə edin.';
-
-  @override
-  String get toolRunPythonCodeParamCode => 'İcra ediləcək Python kodu.';
-
-  @override
-  String get toolCalculateDescription => 'Riyazi ifadəni qiymətləndirin.';
-
-  @override
-  String get toolCalculateParamExpression =>
-      'Riyazi ifadə (məsələn, \"3 + 4 * 2\", \"sin(45)\").';
-
-  @override
-  String get toolRenderChartDescription =>
-      'Diaqram/qrafik yaradın. İstifadəçi tərəfindən təqdim edilən və ya hesablanan məlumatları vizuallaşdırmaq üçün bundan istifadə edin.';
-
-  @override
-  String get toolRenderChartParamType => 'Diaqram növü: sütun, xətt, dairə.';
-
-  @override
-  String get toolRenderChartParamLabels =>
-      'X oxu və ya kateqoriyalar üçün etiketlər.';
-
-  @override
-  String get toolRenderChartParamData => 'Rəqəmsal məlumat nöqtələri.';
-
-  @override
-  String get toolRenderChartParamLabel => 'Məlumat dəsti üçün etiket.';
-
-  @override
-  String get toolRenderChartParamTitle => 'Diaqramın başlığı.';
-
-  @override
   String get flowModeDescription =>
       'Axın rejimində zəkalar öz aralarında mübahisə edirlər; ya arxayın oturub dinləyə, ya da müzakirəyə qoşula bilərsiniz!';
 
@@ -1674,37 +1613,7 @@ class AppLocalizationsAz extends AppLocalizations {
       'Salam! Artıq Cortex tətbiqində Axın Rejimindəsiniz. Burada sizinlə birlikdə daha üç süni intellekt agenti var. Tapşırığınız otağa bir mövzu əlavə etmək və digərlərinə təxribatçı və ya əyləncəli bir sual verərək müzakirəyə başlamaqdır. Cavablarınızda yumor, istehza və yüngül cəfəngiyatdan istifadə etməkdən çəkinməyin. İstənilən mövzu ədalətli oyundur. Davam edin, söhbətə başlayın.';
 
   @override
-  String get voicePrompt =>
-      'Hazırda Cortex platformasında səs xidməti təqdim edirsiniz. Markdown, kod blokları və ya LaTeX istifadə etməyin. Yalnız nitq sintezi üçün uyğun mətnlə cavab verin.';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => 'Düşündü';
 
   @override
   String get agentRed => 'Red';
@@ -1717,10 +1626,6 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get flowMode => 'Axın Rejimi';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => 'Premium';
@@ -1736,4 +1641,62 @@ class AppLocalizationsAz extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'Korteks Axın Rejimi ($agentName). Əvvəlki: $previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      'Yüklənmiş sənədlərdən (PDF, Excel elektron cədvəlləri) mətn məzmununu oxuyun və çıxarın. İstifadəçi sənəd faylı əlavə etdikdə bundan istifadə edin.';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      'Oxunacaq sənəd əlavəsinin indeksi (0-əsaslı). Adətən ilk sənəd üçün 0 olur.';
+
+  @override
+  String get toolStockDescription =>
+      'Səhmlərin (məsələn, AAPL, THYAO.IS) və kriptovalyutanın (məsələn, BTC-USD) cari qiymətini və tarixini əldə edin.';
+
+  @override
+  String get toolStockSymbolParam =>
+      'Ticker simvolu (məsələn, AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolWeatherDescription =>
+      'Müəyyən bir şəhər üçün cari hava şəraitini əldə edin.';
+
+  @override
+  String get toolWeatherCityParam => 'Şəhər adı (məsələn, London, İstanbul).';
+
+  @override
+  String get toolPythonDescription =>
+      'Python kodunu təhlükəsiz bir sandboxda icra edin.';
+
+  @override
+  String get toolPythonCodeParam => 'İcra ediləcək Python kodu.';
+
+  @override
+  String get toolCalculateDescription => 'Riyazi ifadəni qiymətləndirin.';
+
+  @override
+  String get toolCalculateExpressionParam =>
+      'Riyazi ifadə (məsələn, \'3 + 4 * 2\').';
+
+  @override
+  String get toolChartDescription => 'Diaqram/qrafik vizuallaşdırması yaradın.';
+
+  @override
+  String get toolChartTypeParam =>
+      'Diaqram növü: sütun, xətt və ya dairəvi forma.';
+
+  @override
+  String get toolChartLabelsParam =>
+      'Diaqram oxları və ya seqmentləri üçün etiketlər.';
+
+  @override
+  String get toolChartDataParam => 'Diaqram üçün ədədi məlumat dəyərləri.';
+
+  @override
+  String get toolChartLabelParam =>
+      'Diaqram əfsanəsi üçün verilənlər dəsti etiketi.';
+
+  @override
+  String get toolChartTitleParam => 'Diaqramın başlığı.';
 }

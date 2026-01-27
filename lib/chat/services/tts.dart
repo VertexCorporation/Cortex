@@ -118,12 +118,10 @@ class TtsService with ChangeNotifier {
     _isInterrupted = false;
 
     // --- ENHANCED REGEX FILTERING ---
-    // 0. Remove <think> blocks (Reasoning)
+    // 0. Remove <think> blocks (featureReasoning)
     String cleanText = text.replaceAll(RegExp(r'<think>[\s\S]*?</think>'), '');
 
-    // 1. Remove Code Blocks (```...```) content entirely or just fences?
-    // Usually reading code is bad. Let's remove the whole block for now as per "processable expressions"
-    // Regex for code blocks: ```[\s\S]*?```
+    // 1. Remove Code Blocks (```...```) content entirely
     cleanText = cleanText.replaceAll(RegExp(r'```[\s\S]*?```'), '');
 
     // 2. Remove Inline Code (`...`)
@@ -149,8 +147,27 @@ class TtsService with ChangeNotifier {
         r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]|[\u2700-\u27bf])');
     cleanText = cleanText.replaceAll(emojiRegex, '');
 
-    // 8. Remove LaTeX/Math markers and other noisy symbols
-    cleanText = cleanText.replaceAll(RegExp(r'[\=\\\$\;\<\>\{\}]'), '');
+    // 8. Remove LaTeX/Math markers and block math
+    // Remove display math blocks: $$...$$ or \[...\]
+    cleanText = cleanText.replaceAll(RegExp(r'\$\$[\s\S]*?\$\$'), '');
+    cleanText = cleanText.replaceAll(RegExp(r'\\\[[\s\S]*?\\\]'), '');
+    // Remove inline math: $...$ or \(...\)
+    cleanText = cleanText.replaceAll(RegExp(r'\$[^\$\n]+\$'), '');
+    cleanText = cleanText.replaceAll(RegExp(r'\\\([\s\S]*?\\\)'), '');
+    // Remove remaining LaTeX commands like \frac{}{}, \sqrt{}, etc.
+    cleanText = cleanText.replaceAll(RegExp(r'\\[a-zA-Z]+\{[^}]*\}'), '');
+    cleanText = cleanText.replaceAll(RegExp(r'\\[a-zA-Z]+'), '');
+
+    // 9. Remove Widget/Flutter notation patterns (e.g., Widget(), Container(), etc.)
+    // Match PascalCase followed by parentheses with content
+    cleanText = cleanText.replaceAll(RegExp(r'\b[A-Z][a-zA-Z]*\s*\([^)]*\)'), '');
+
+    // 10. Remove remaining noisy symbols
+    cleanText = cleanText.replaceAll(RegExp(r'[\=\\\$\;\<\>\{\}\[\]\^\_\|\~]'), '');
+
+    // 11. Remove standalone numbers that aren't part of sentences
+    // (e.g., step numbers like "1." at start of line)
+    cleanText = cleanText.replaceAll(RegExp(r'^\d+\.\s*', multiLine: true), '');
 
     // Cleanup extra whitespace
     cleanText = cleanText.replaceAll(RegExp(r'\s+'), ' ').trim();

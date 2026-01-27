@@ -483,15 +483,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return 'Bekijk de Cortex-app, hij is geweldig! Download hem hier: $cortexLink';
-  }
-
-  @override
-  String get shareFailed =>
-      'Het delen van de app is mislukt. Probeer het later opnieuw.';
-
-  @override
   String get selectText => 'Selecteer Tekst';
 
   @override
@@ -668,9 +659,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get benefit11 => 'Meer Stroommodus';
-
-  @override
-  String get benefit12 => '';
 
   @override
   String get oldBenefits => 'Alle voordelen van lagere abonnementen';
@@ -854,10 +842,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get errorNetwork =>
       'Er is een netwerkfout opgetreden. Controleer je verbinding en probeer het opnieuw.';
-
-  @override
-  String get errorApiAuthentication =>
-      'Authenticatie mislukt. Probeer opnieuw in te loggen.';
 
   @override
   String get baseModelForCharacterDescription =>
@@ -1046,10 +1030,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get featureImageGenerationDescription =>
       'Dit model kan originele afbeeldingen maken op basis van uw tekstbeschrijvingen.';
-
-  @override
-  String get errorImageLoad =>
-      'Het is niet gelukt om de gegenereerde afbeelding te laden.';
 
   @override
   String get premiumModelNoticeTitle => 'Premiummodel';
@@ -1542,7 +1522,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get featuresTitle => 'Functies';
 
   @override
-  String get useOfflineDescription => 'Chat privé zonder internetverbinding';
+  String get useOfflineDescription => 'Chat privé zonder internetverbinding.';
+
+  @override
+  String get featureReasoning => 'Diep nadenken';
+
+  @override
+  String get featureReasoningDescription =>
+      'In de modus \'Deep Thinking\' denkt de AI intern na over taken om deze zo goed mogelijk te voltooien.';
 
   @override
   String get featureCreateImageTitle => 'Afbeelding maken';
@@ -1561,10 +1548,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get featureQuizzesTitle => 'Quizzen';
 
   @override
-  String get featureQuizzesDescription => 'Test je kennis';
+  String get featureQuizzesDescription => 'Test je kennis.';
 
   @override
-  String get featureExploreDescription => 'Ontdek alle beschikbare modellen';
+  String get featureExploreDescription => 'Ontdek alle beschikbare modellen.';
 
   @override
   String get featureStudyMessage =>
@@ -1627,58 +1614,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Cortex houdt je gegevens veilig doordat het volledig lokaal op je apparaat draait, zelfs in de spraakchatmodus; geniet van naadloze gesprekken!';
 
   @override
-  String get toolGetStockPriceDescription =>
-      'Bekijk de actuele koers en koershistorie van aandelen (bijv. AAPL, THYAO.IS) en cryptovaluta (bijv. BTC-USD, ETH-USD).';
-
-  @override
-  String get toolGetStockPriceParamSymbol =>
-      'Het tickersymbool (bijv. AAPL, THYAO.IS, BTC-USD).';
-
-  @override
-  String get toolGetWeatherDescription =>
-      'Bekijk de actuele weersvoorspelling voor een specifieke stad. Vraag de gebruiker om de stad in te voeren als deze niet bekend is.';
-
-  @override
-  String get toolGetWeatherParamCity =>
-      'De naam van de stad (bijv. Londen, Istanbul).';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      'Voer Python-code uit in een beveiligde sandbox. Gebruik dit voor complexe berekeningen, gegevensverwerking of algoritmische taken.';
-
-  @override
-  String get toolRunPythonCodeParamCode =>
-      'De Python-code die moet worden uitgevoerd.';
-
-  @override
-  String get toolCalculateDescription => 'Evalueer een wiskundige uitdrukking.';
-
-  @override
-  String get toolCalculateParamExpression =>
-      'De wiskundige uitdrukking (bijv. \"3 + 4 * 2\", \"sin(45)\").';
-
-  @override
-  String get toolRenderChartDescription =>
-      'Genereer een diagram/grafiek. Gebruik dit om gegevens te visualiseren die door de gebruiker zijn aangeleverd of die zijn berekend.';
-
-  @override
-  String get toolRenderChartParamType =>
-      'Grafiektype: staafdiagram, lijndiagram, cirkeldiagram.';
-
-  @override
-  String get toolRenderChartParamLabels =>
-      'Labels voor de x-as of categorieën.';
-
-  @override
-  String get toolRenderChartParamData => 'Numerieke gegevenspunten.';
-
-  @override
-  String get toolRenderChartParamLabel => 'Label voor de dataset.';
-
-  @override
-  String get toolRenderChartParamTitle => 'Titel van de grafiek.';
-
-  @override
   String get flowModeDescription =>
       'In de Stroommodus voeren de verschillende intelligenties een debat met elkaar; je kunt achterover leunen et luisteren, of actief deelnemen aan de discussie!';
 
@@ -1687,37 +1622,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Hallo! Je bevindt je nu in de Stroommodus van de Cortex-app. Er zijn drie andere AI-agenten bij je. Jouw taak is om een onderwerp aan te snijden en een discussie op gang te brengen door de anderen een prikkelende of vermakelijke vraag te stellen. Je mag in je antwoorden gerust humor, ironie en een beetje plagen gebruiken. Elk onderwerp is bespreekbaar. Ga je gang, begin het gesprek.';
 
   @override
-  String get voicePrompt =>
-      'U levert momenteel spraakdiensten via het Cortex-platform. Gebruik geen markdown, codeblokken of LaTeX. Reageer uitsluitend in tekst die geschikt is voor spraaksynthese.';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => 'Dacht';
 
   @override
   String get agentRed => 'Red';
@@ -1730,10 +1635,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get flowMode => 'Stroommodus';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => 'Premie';
@@ -1749,4 +1650,63 @@ class AppLocalizationsNl extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'Cortex Flow-modus ($agentName). Vorige: $previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      'Lees en extraheer tekstinhoud uit geüploade documenten. Ondersteunt PDF-, Word (DOCX)-, Excel (XLSX)-, PowerPoint (PPTX)- en OpenDocument-formaten. Gebruik dit wanneer de gebruiker een documentbestand heeft bijgevoegd.';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      'De index van het te lezen document (0-gebaseerd). Meestal 0 voor het eerste document.';
+
+  @override
+  String get toolStockDescription =>
+      'Bekijk de actuele koers en koershistorie van aandelen (bijv. AAPL, THYAO.IS) en cryptovaluta (bijv. BTC-USD).';
+
+  @override
+  String get toolStockSymbolParam =>
+      'Het tickersymbool (bijv. AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolWeatherDescription =>
+      'Bekijk het actuele weer voor een specifieke stad.';
+
+  @override
+  String get toolWeatherCityParam => 'De stadsnaam (bijv. Londen, Istanbul).';
+
+  @override
+  String get toolPythonDescription =>
+      'Voer Python-code uit in een beveiligde sandbox.';
+
+  @override
+  String get toolPythonCodeParam =>
+      'De Python-code die moet worden uitgevoerd.';
+
+  @override
+  String get toolCalculateDescription => 'Evalueer een wiskundige uitdrukking.';
+
+  @override
+  String get toolCalculateExpressionParam =>
+      'Wiskundige uitdrukking (bijv. \'3 + 4 * 2\').';
+
+  @override
+  String get toolChartDescription =>
+      'Genereer een diagram/grafiekvisualisatie.';
+
+  @override
+  String get toolChartTypeParam =>
+      'Grafiektype: staafdiagram, lijndiagram of cirkeldiagram.';
+
+  @override
+  String get toolChartLabelsParam => 'Labels voor grafiekassen of -segmenten.';
+
+  @override
+  String get toolChartDataParam => 'Numerieke gegevenswaarden voor de grafiek.';
+
+  @override
+  String get toolChartLabelParam =>
+      'Label voor de dataset in de legenda van de grafiek.';
+
+  @override
+  String get toolChartTitleParam => 'Titel van de grafiek.';
 }

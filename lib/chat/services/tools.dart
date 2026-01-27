@@ -44,11 +44,153 @@ class ToolRegistry {
   static const String _executeToolUrl =
       "https://executetool-o5h7dmtija-ew.a.run.app";
 
+  /// Returns localized tool definitions to send to the server.
+  /// The server will use these definitions for the AI model.
   static List<Map<String, dynamic>> getLocalizedToolsJson(String langCode,
-      AppLocalizations localizations) {
-    // Tools are now injected on the server side (message.js).
-    // Access: functions/src/tools.js
-    return [];
+      AppLocalizations l10n) {
+    return [
+      // 0. Read Document - for PDF/XLSX/etc parsing
+      {
+        'type': 'function',
+        'function': {
+          'name': 'read_document',
+          'description': l10n.toolReadDocumentDescription,
+          'parameters': {
+            'type': 'object',
+            'properties': {
+              'document_index': {
+                'type': 'integer',
+                'description': l10n.toolReadDocumentIndexParam,
+              }
+            },
+            'required': ['document_index']
+          }
+        }
+      },
+      // 1. Stock & Crypto Price
+      {
+        'type': 'function',
+        'function': {
+          'name': 'get_stock_price',
+          'description': l10n.toolStockDescription,
+          'parameters': {
+            'type': 'object',
+            'properties': {
+              'symbol': {
+                'type': 'string',
+                'description': l10n.toolStockSymbolParam,
+              }
+            },
+            'required': ['symbol']
+          }
+        }
+      },
+      // 2. Weather
+      {
+        'type': 'function',
+        'function': {
+          'name': 'get_weather',
+          'description': l10n.toolWeatherDescription,
+          'parameters': {
+            'type': 'object',
+            'properties': {
+              'city': {
+                'type': 'string',
+                'description': l10n.toolWeatherCityParam,
+              }
+            },
+            'required': ['city']
+          }
+        }
+      },
+      // 3. Python Code Execution
+      {
+        'type': 'function',
+        'function': {
+          'name': 'run_python_code',
+          'description': l10n.toolPythonDescription,
+          'parameters': {
+            'type': 'object',
+            'properties': {
+              'code': {
+                'type': 'string',
+                'description': l10n.toolPythonCodeParam,
+              }
+            },
+            'required': ['code']
+          }
+        }
+      },
+      // 4. Calculator
+      {
+        'type': 'function',
+        'function': {
+          'name': 'calculate',
+          'description': l10n.toolCalculateDescription,
+          'parameters': {
+            'type': 'object',
+            'properties': {
+              'expression': {
+                'type': 'string',
+                'description': l10n.toolCalculateExpressionParam,
+              }
+            },
+            'required': ['expression']
+          }
+        }
+      },
+      // 5. Chart Rendering
+      {
+        'type': 'function',
+        'function': {
+          'name': 'render_chart',
+          'description': l10n.toolChartDescription,
+          'parameters': {
+            'type': 'object',
+            'properties': {
+              'type': {
+                'type': 'string',
+                'enum': ['bar', 'line', 'pie'],
+                'description': l10n.toolChartTypeParam,
+              },
+              'labels': {
+                'type': 'array',
+                'items': {'type': 'string'},
+                'description': l10n.toolChartLabelsParam,
+              },
+              'data': {
+                'type': 'array',
+                'items': {'type': 'number'},
+                'description': l10n.toolChartDataParam,
+              },
+              'label': {
+                'type': 'string',
+                'description': l10n.toolChartLabelParam,
+              },
+              'title': {
+                'type': 'string',
+                'description': l10n.toolChartTitleParam,
+              }
+            },
+            'required': ['type', 'labels', 'data', 'label']
+          }
+        }
+      },
+    ];
+  }
+
+  /// Stores documents for the current request context (PDF, XLSX, etc.)
+  static List<Map<String, dynamic>>? _currentDocuments;
+
+  /// Sets the documents context for tool execution.
+  /// Call this before executing tools that need document access.
+  static void setDocumentsContext(List<Map<String, dynamic>> documents) {
+    _currentDocuments = documents;
+  }
+
+  /// Clears the documents context after tool execution.
+  static void clearDocumentsContext() {
+    _currentDocuments = null;
   }
 
   static Future<String> _executeOnServer(String name,
@@ -60,9 +202,19 @@ class ToolRegistry {
       final token = await user.getIdToken();
       final dio = Dio();
 
+      // Include documents if this is a read_document call
+      final Map<String, dynamic> requestData = {
+        'name': name,
+        'args': args,
+      };
+
+      if (name == 'read_document' && _currentDocuments != null) {
+        requestData['documents'] = _currentDocuments;
+      }
+
       final response = await dio.post(
         _executeToolUrl,
-        data: {'name': name, 'args': args},
+        data: requestData,
         options: Options(headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -89,6 +241,14 @@ class ToolRegistry {
 
   /// Initializes the default set of free, premium tools.
   static void initialize() {
+    // 0. Read Document (PDF, XLSX, etc.)
+    register(CortexTool(
+      name: 'read_document',
+      description: 'Read document content.',
+      parameters: {},
+      function: (args) => _executeOnServer('read_document', args),
+    ));
+
     // 1. Stock & Crypto Price
     register(CortexTool(
       name: 'get_stock_price',

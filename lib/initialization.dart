@@ -187,13 +187,16 @@ class AppInitializer with ChangeNotifier {
     // 1. Check Connectivity IMMEDIATELY.
     await _internetProvider.checkInternetConnection();
 
-    // [STARTUP FIX] Pre-fetch models immediately to prevent "Unknown Model" flash.
-    // We use the system locale as a best-effort default during this early phase.
+    // [STARTUP FIX] Pre-fetch models to prevent "Unknown Model" flash.
+    // We await this to ensure model data is ready before UI renders.
+    // This happens during splash screen, so user won't notice the delay.
     try {
       final sysLocale = Platform.localeName.split('_').first;
-      unawaited(_modelService.getModels(langCode: sysLocale));
-    } catch (_) {
-      // Ignore locale errors, service handles defaults
+      await _modelService.getModels(langCode: sysLocale);
+      dev.log("[AppInitializer] Model catalog loaded successfully");
+    } catch (e) {
+      dev.log("[AppInitializer] Model fetch failed (will retry later): $e");
+      // Continue - service will handle defaults and retry
     }
 
     if (_internetProvider.isConnected) {

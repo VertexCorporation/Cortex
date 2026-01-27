@@ -487,15 +487,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return 'Découvrez l\'application Cortex, elle est incroyable ! Téléchargez-la ici : $cortexLink';
-  }
-
-  @override
-  String get shareFailed =>
-      'Échec du partage de l\'application. Veuillez réessayer plus tard';
-
-  @override
   String get selectText => 'Sélectionner le texte';
 
   @override
@@ -674,9 +665,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get benefit11 => 'Plus de Mode Flux';
-
-  @override
-  String get benefit12 => '';
 
   @override
   String get oldBenefits => 'Tous les Avantages des Plans Inférieurs';
@@ -861,10 +849,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get errorNetwork =>
       'Une erreur réseau est survenue. Veuillez vérifier votre connexion et réessayer.';
-
-  @override
-  String get errorApiAuthentication =>
-      'L\'authentification a échoué. Veuillez essayer de vous reconnecter.';
 
   @override
   String get baseModelForCharacterDescription =>
@@ -1053,9 +1037,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get featureImageGenerationDescription =>
       'Ce modèle peut créer des images originales basées sur vos descriptions textuelles.';
-
-  @override
-  String get errorImageLoad => 'Échec du chargement de l\'image générée.';
 
   @override
   String get premiumModelNoticeTitle => 'Modèle Premium';
@@ -1551,31 +1532,38 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get useOfflineDescription =>
-      'Discutez en privé sans connexion internet';
+      'Discutez en privé sans connexion internet.';
+
+  @override
+  String get featureReasoning => 'Réflexion profonde';
+
+  @override
+  String get featureReasoningDescription =>
+      'En mode de réflexion approfondie, l\'IA analyse les tâches en interne afin de les accomplir au mieux de ses capacités.';
 
   @override
   String get featureCreateImageTitle => 'Créer une image';
 
   @override
   String get featureCreateImageDescription =>
-      'Générer de l\'art IA à partir de texte';
+      'Générez des œuvres d\'art par IA à partir de texte.';
 
   @override
   String get featureStudyTitle => 'Étudier et apprendre';
 
   @override
   String get featureStudyDescription =>
-      'Obtenez des explications et des résumés';
+      'Obtenez des explications et des résumés.';
 
   @override
   String get featureQuizzesTitle => 'Quiz';
 
   @override
-  String get featureQuizzesDescription => 'Testez vos connaissances';
+  String get featureQuizzesDescription => 'Testez vos connaissances.';
 
   @override
   String get featureExploreDescription =>
-      'Découvrez tous les modèles disponibles';
+      'Découvrez tous les modèles disponibles.';
 
   @override
   String get featureStudyMessage =>
@@ -1638,58 +1626,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cortex protège vos données en fonctionnant entièrement sur l\'appareil, même en mode de chat vocal ; profitez de conversations fluides !';
 
   @override
-  String get toolGetStockPriceDescription =>
-      'Obtenez le cours actuel et l\'historique des actions (par exemple AAPL, THYAO.IS) et des cryptomonnaies (par exemple BTC-USD, ETH-USD).';
-
-  @override
-  String get toolGetStockPriceParamSymbol =>
-      'Le symbole boursier (par exemple AAPL, THYAO.IS, BTC-USD).';
-
-  @override
-  String get toolGetWeatherDescription =>
-      'Obtenez la météo actuelle d\'une ville spécifique. Demandez la ville à l\'utilisateur si elle n\'est pas connue.';
-
-  @override
-  String get toolGetWeatherParamCity =>
-      'Le nom de la ville (par exemple, Londres, Istanbul).';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      'Exécutez du code Python dans un environnement isolé et sécurisé. Utilisez cette fonctionnalité pour des calculs complexes, le traitement de données ou des tâches algorithmiques.';
-
-  @override
-  String get toolRunPythonCodeParamCode => 'Le code Python à exécuter.';
-
-  @override
-  String get toolCalculateDescription => 'Évaluer une expression mathématique.';
-
-  @override
-  String get toolCalculateParamExpression =>
-      'L\'expression mathématique (par exemple, « 3 + 4 * 2 », « sin(45) »).';
-
-  @override
-  String get toolRenderChartDescription =>
-      'Générez un graphique. Utilisez-le pour visualiser les données fournies par l\'utilisateur ou calculées.';
-
-  @override
-  String get toolRenderChartParamType =>
-      'Type de graphique : barres, lignes, secteurs.';
-
-  @override
-  String get toolRenderChartParamLabels =>
-      'Étiquettes de l\'axe des abscisses ou catégories.';
-
-  @override
-  String get toolRenderChartParamData => 'Points de données numériques.';
-
-  @override
-  String get toolRenderChartParamLabel =>
-      'Étiquette de l\'ensemble de données.';
-
-  @override
-  String get toolRenderChartParamTitle => 'Titre du graphique.';
-
-  @override
   String get flowModeDescription =>
       'En mode Flux, les intelligences débattent entre elles ; vous pouvez soit vous asseoir et écouter, soit intervenir et participer à la discussion !';
 
@@ -1698,37 +1634,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Bonjour ! Vous êtes maintenant en mode Flux sur l\'application Cortex. Trois autres agents IA sont présents. Votre mission est de lancer un sujet de discussion en posant une question provocatrice ou amusante. N\'hésitez pas à utiliser l\'humour, l\'ironie et quelques piques amicales dans vos réponses. Tous les sujets sont permis. À vous de jouer !';
 
   @override
-  String get voicePrompt =>
-      'Vous fournissez actuellement un service vocal sur la plateforme Cortex. Veuillez ne pas utiliser Markdown, de blocs de code ni de LaTeX. Répondez uniquement par du texte adapté à la synthèse vocale.';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => 'Pensé';
 
   @override
   String get agentRed => 'Red';
@@ -1741,10 +1647,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get flowMode => 'Mode Flux';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => 'Prime';
@@ -1760,4 +1662,65 @@ class AppLocalizationsFr extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'Mode Cortex Flow ($agentName). Précédent : $previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      'Lire et extraire le contenu textuel des documents téléchargés (PDF, feuilles de calcul Excel). À utiliser lorsqu\'un utilisateur a joint un fichier.';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      'L\'index du document joint à lire (à partir de 0). Généralement 0 pour le premier document.';
+
+  @override
+  String get toolStockDescription =>
+      'Obtenez le cours actuel et l\'historique des actions (par exemple AAPL, THYAO.IS) et des cryptomonnaies (par exemple BTC-USD).';
+
+  @override
+  String get toolStockSymbolParam =>
+      'Le symbole boursier (par exemple AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolWeatherDescription =>
+      'Obtenez les prévisions météo actuelles pour une ville spécifique.';
+
+  @override
+  String get toolWeatherCityParam =>
+      'Le nom de la ville (par exemple, Londres, Istanbul).';
+
+  @override
+  String get toolPythonDescription =>
+      'Exécutez du code Python dans un environnement isolé et sécurisé.';
+
+  @override
+  String get toolPythonCodeParam => 'Le code Python à exécuter.';
+
+  @override
+  String get toolCalculateDescription => 'Évaluer une expression mathématique.';
+
+  @override
+  String get toolCalculateExpressionParam =>
+      'Expression mathématique (par exemple \'3 + 4 * 2\').';
+
+  @override
+  String get toolChartDescription =>
+      'Générer une visualisation sous forme de graphique.';
+
+  @override
+  String get toolChartTypeParam =>
+      'Type de graphique : à barres, linéaire ou circulaire.';
+
+  @override
+  String get toolChartLabelsParam =>
+      'Étiquettes des axes ou segments du graphique.';
+
+  @override
+  String get toolChartDataParam =>
+      'Valeurs numériques des données du graphique.';
+
+  @override
+  String get toolChartLabelParam =>
+      'Étiquette du jeu de données pour la légende du graphique.';
+
+  @override
+  String get toolChartTitleParam => 'Titre du graphique.';
 }

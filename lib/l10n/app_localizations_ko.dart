@@ -473,14 +473,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return 'Cortex 앱을 확인해보세요, 정말 놀랍습니다! 여기서 다운로드하세요: $cortexLink';
-  }
-
-  @override
-  String get shareFailed => '앱 공유에 실패했습니다. 나중에 다시 시도해주세요.';
-
-  @override
   String get selectText => '텍스트 선택';
 
   @override
@@ -657,9 +649,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get benefit11 => '더 많은 흐름 모드';
 
   @override
-  String get benefit12 => '';
-
-  @override
   String get oldBenefits => '하위 플랜의 모든 혜택';
 
   @override
@@ -831,9 +820,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get errorNetwork => '네트워크 오류가 발생했습니다. 연결을 확인하고 다시 시도해주세요.';
-
-  @override
-  String get errorApiAuthentication => '인증에 실패했습니다. 다시 로그인해주세요.';
 
   @override
   String get baseModelForCharacterDescription =>
@@ -1009,9 +995,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get featureImageGenerationDescription =>
       '이 모델은 귀하의 텍스트 설명을 기반으로 독창적인 이미지를 만들 수 있습니다.';
-
-  @override
-  String get errorImageLoad => '생성된 이미지를 로드하는 데 실패했습니다.';
 
   @override
   String get premiumModelNoticeTitle => '프리미엄 모델';
@@ -1489,28 +1472,35 @@ class AppLocalizationsKo extends AppLocalizations {
   String get featuresTitle => '특징';
 
   @override
-  String get useOfflineDescription => '인터넷 연결 없이 비공개 채팅';
+  String get useOfflineDescription => '인터넷 연결 없이 비공개 채팅을 즐기세요.';
+
+  @override
+  String get featureReasoning => '심층적 사고';
+
+  @override
+  String get featureReasoningDescription =>
+      '심층 사고 모드에서 AI는 작업을 내부적으로 심사숙고하여 최선을 다해 완료합니다.';
 
   @override
   String get featureCreateImageTitle => '이미지 생성';
 
   @override
-  String get featureCreateImageDescription => '텍스트를 기반으로 AI 아트 생성';
+  String get featureCreateImageDescription => '텍스트를 기반으로 AI 아트를 생성합니다.';
 
   @override
   String get featureStudyTitle => '공부하고 배우세요';
 
   @override
-  String get featureStudyDescription => '설명과 요약을 확인하세요';
+  String get featureStudyDescription => '설명과 요약을 확인하세요.';
 
   @override
   String get featureQuizzesTitle => '퀴즈';
 
   @override
-  String get featureQuizzesDescription => '지식을 테스트해 보세요';
+  String get featureQuizzesDescription => '지식을 테스트해 보세요.';
 
   @override
-  String get featureExploreDescription => '모든 모델을 확인해 보세요';
+  String get featureExploreDescription => '모든 모델을 확인해 보세요.';
 
   @override
   String get featureStudyMessage =>
@@ -1573,54 +1563,6 @@ class AppLocalizationsKo extends AppLocalizations {
       'Cortex는 음성 채팅 모드에서도 기기 내에서 완벽하게 실행되어 데이터를 안전하게 보호합니다. 끊김 없는 대화를 즐겨보세요!';
 
   @override
-  String get toolGetStockPriceDescription =>
-      '주식(예: AAPL, THYAO.IS) 및 암호화폐(예: BTC-USD, ETH-USD)의 현재 가격과 과거 가격을 확인하세요.';
-
-  @override
-  String get toolGetStockPriceParamSymbol =>
-      '종목 코드(예: AAPL, THYAO.IS, BTC-USD).';
-
-  @override
-  String get toolGetWeatherDescription =>
-      '특정 도시의 현재 날씨를 가져옵니다. 도시 이름을 모르는 경우 사용자에게 물어봅니다.';
-
-  @override
-  String get toolGetWeatherParamCity => '도시 이름 (예: 런던, 이스탄불).';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      '안전한 샌드박스 환경에서 파이썬 코드를 실행하세요. 복잡한 계산, 데이터 처리 또는 알고리즘 작업에 활용할 수 있습니다.';
-
-  @override
-  String get toolRunPythonCodeParamCode => '실행할 파이썬 코드입니다.';
-
-  @override
-  String get toolCalculateDescription => '수학적 표현식을 평가하십시오.';
-
-  @override
-  String get toolCalculateParamExpression =>
-      '수학 표현식(예: \"3 + 4 * 2\", \"sin(45)\").';
-
-  @override
-  String get toolRenderChartDescription =>
-      '차트/그래프를 생성합니다. 이 기능을 사용하여 사용자가 제공하거나 계산된 데이터를 시각화할 수 있습니다.';
-
-  @override
-  String get toolRenderChartParamType => '차트 유형: 막대형, 선형, 원형.';
-
-  @override
-  String get toolRenderChartParamLabels => 'x축 또는 범주에 대한 레이블입니다.';
-
-  @override
-  String get toolRenderChartParamData => '수치 데이터 포인트.';
-
-  @override
-  String get toolRenderChartParamLabel => '데이터셋의 레이블입니다.';
-
-  @override
-  String get toolRenderChartParamTitle => '차트 제목.';
-
-  @override
   String get flowModeDescription =>
       '몰입 모드에서는 지능들이 서로 토론을 벌입니다. 당신은 가만히 앉아서 듣기만 하거나, 직접 토론에 참여할 수도 있습니다!';
 
@@ -1629,37 +1571,7 @@ class AppLocalizationsKo extends AppLocalizations {
       '안녕하세요! 지금 Cortex 앱의 플로우 모드에 접속하셨습니다. 다른 세 명의 AI 에이전트가 함께하고 있습니다. 여러분의 임무는 주제를 하나 제시하고, 다른 에이전트들에게 도발적이거나 재미있는 질문을 던져 토론을 시작하는 것입니다. 답변할 때는 유머, 아이러니, 가벼운 농담도 자유롭게 사용하세요. 어떤 주제든 상관없습니다. 자, 이제 대화를 시작해 보세요!';
 
   @override
-  String get voicePrompt =>
-      '현재 Cortex 플랫폼에서 음성 서비스를 제공하고 있습니다. 마크다운, 코드 블록 또는 LaTeX를 사용하지 마십시오. 음성 합성에 적합한 텍스트로만 응답하십시오.';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => '생각했다';
 
   @override
   String get agentRed => 'Red';
@@ -1672,10 +1584,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get flowMode => '흐름 모드';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => '프리미엄';
@@ -1691,4 +1599,55 @@ class AppLocalizationsKo extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'Cortex Flow 모드($agentName). 이전: $previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      '업로드된 문서에서 텍스트 내용을 읽고 추출합니다. PDF, Word(DOCX), Excel(XLSX), PowerPoint(PPTX) 및 OpenDocument 형식을 지원합니다. 사용자가 문서 파일을 첨부했을 때 사용하세요.';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      '읽을 문서 첨부 파일의 인덱스(0부터 시작). 일반적으로 첫 번째 문서는 0입니다.';
+
+  @override
+  String get toolStockDescription =>
+      '주식(예: AAPL, THYAO.IS) 및 암호화폐(예: BTC-USD)의 현재 가격과 과거 가격을 확인하세요.';
+
+  @override
+  String get toolStockSymbolParam => '종목 코드(예: AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolWeatherDescription => '특정 도시의 현재 날씨를 확인하세요.';
+
+  @override
+  String get toolWeatherCityParam => '도시 이름 (예: 런던, 이스탄불).';
+
+  @override
+  String get toolPythonDescription => '안전한 샌드박스 환경에서 파이썬 코드를 실행하세요.';
+
+  @override
+  String get toolPythonCodeParam => '실행할 파이썬 코드입니다.';
+
+  @override
+  String get toolCalculateDescription => '수학적 표현식을 평가하십시오.';
+
+  @override
+  String get toolCalculateExpressionParam => '수학 표현식 (예: \'3 + 4 * 2\').';
+
+  @override
+  String get toolChartDescription => '차트/그래프 시각화를 생성합니다.';
+
+  @override
+  String get toolChartTypeParam => '차트 유형: 막대형, 선형 또는 원형.';
+
+  @override
+  String get toolChartLabelsParam => '차트 축 또는 세그먼트에 대한 레이블입니다.';
+
+  @override
+  String get toolChartDataParam => '차트에 표시되는 숫자 데이터 값입니다.';
+
+  @override
+  String get toolChartLabelParam => '차트 범례에 사용할 데이터셋 레이블입니다.';
+
+  @override
+  String get toolChartTitleParam => '차트 제목.';
 }

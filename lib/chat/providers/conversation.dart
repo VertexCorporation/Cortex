@@ -1,5 +1,6 @@
 // lib/chat/providers/conversation.dart
 
+import 'dart:async';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cortex/chat/messages/messages.dart';
@@ -22,14 +23,27 @@ class ConversationProvider with ChangeNotifier {
   String? _conversationTitle;
   bool _isWaitingForResponse = false;
   bool _responseStopped = false;
-  final bool _isLoadingMessages = false;
+  bool _isLoadingMessages = false;
   bool _justFinishedLoading = false;
   bool _isEphemeral = false; // [NEW] Track if session is not yet saved
+
+  // Streaming performance: throttle UI updates
+  Timer? _streamThrottleTimer;
+  bool _hasPendingStreamUpdate = false;
+  static const _streamThrottleDuration = Duration(milliseconds: 32); // ~30fps
 
   // ===========================================================================
   // SECTION 2: PUBLIC GETTERS
   // ===========================================================================
   bool get isLoadingMessages => _isLoadingMessages;
+
+  /// Marks the conversation as loading, showing skeleton UI.
+  void setLoadingMessages(bool value) {
+    if (_isLoadingMessages != value) {
+      _isLoadingMessages = value;
+      notifyListeners();
+    }
+  }
 
   List<Message> get messages => _messages;
 
@@ -59,6 +73,11 @@ class ConversationProvider with ChangeNotifier {
   /// Clears all message and conversation data. This should be called when
   /// a chat is exited or a new one is started.
   void clearConversation() {
+    // Cancel any pending stream updates
+    _streamThrottleTimer?.cancel();
+    _streamThrottleTimer = null;
+    _hasPendingStreamUpdate = false;
+    
     _messages = [];
     _conversationID = null;
     _conversationTitle = null;
@@ -74,6 +93,8 @@ class ConversationProvider with ChangeNotifier {
     if (_isWaitingForResponse) {
       _responseStopped = true;
       _isWaitingForResponse = false;
+      // Flush pending updates when stopping
+      flushStreamUpdates();
       notifyListeners();
     }
   }
@@ -83,6 +104,7 @@ class ConversationProvider with ChangeNotifier {
   /// Adds a full list of messages, typically when loading a conversation from history.
   void loadMessages(List<Message> loadedMessages) {
     _messages = loadedMessages;
+    _isLoadingMessages = false; // Loading complete
     _justFinishedLoading = true;
     notifyListeners();
   }
@@ -247,6 +269,7 @@ class ConversationProvider with ChangeNotifier {
   }
 
   /// Appends a chunk of text to the last AI message in the list (for streaming responses).
+  /// Uses throttling to prevent excessive UI rebuilds during fast streaming.
   void appendToLastBotMessage(String chunk) {
     if (_messages.isNotEmpty && !_messages.last.isUserMessage) {
       final lastMessage = _messages.last;
@@ -273,7 +296,39 @@ class ConversationProvider with ChangeNotifier {
       _messages.add(
           Message(text: initialText, isUserMessage: false, isThinking: true));
     }
-    notifyListeners();
+    
+    // Throttle UI updates for better streaming performance
+    _scheduleStreamUpdate();
+  }
+
+  /// Schedules a throttled UI update for streaming.
+  /// This prevents excessive rebuilds when tokens arrive rapidly.
+  void _scheduleStreamUpdate() {
+    _hasPendingStreamUpdate = true;
+    
+    // If no timer is running, start one and notify immediately
+    if (_streamThrottleTimer == null || !_streamThrottleTimer!.isActive) {
+      notifyListeners();
+      _hasPendingStreamUpdate = false;
+      
+      _streamThrottleTimer = Timer(_streamThrottleDuration, () {
+        if (_hasPendingStreamUpdate) {
+          _hasPendingStreamUpdate = false;
+          notifyListeners();
+        }
+      });
+    }
+  }
+
+  /// Forces an immediate UI update, bypassing throttle.
+  /// Use this for important state changes like stream end.
+  void flushStreamUpdates() {
+    _streamThrottleTimer?.cancel();
+    _streamThrottleTimer = null;
+    if (_hasPendingStreamUpdate) {
+      _hasPendingStreamUpdate = false;
+      notifyListeners();
+    }
   }
 
   /// Updates a specific message in the list with new data.
@@ -305,6 +360,9 @@ class ConversationProvider with ChangeNotifier {
     // Guard against race conditions (e.g. StopService vs SendService completion)
     if (!_isWaitingForResponse) return;
     _isWaitingForResponse = false;
+
+    // Flush any pending stream updates before finalizing
+    flushStreamUpdates();
 
     if (index >= 0 && index < _messages.length) {
       final msg = _messages[index];
