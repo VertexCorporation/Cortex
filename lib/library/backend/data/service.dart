@@ -165,6 +165,7 @@ class ModelService with ChangeNotifier {
         allOnlineVariantIds.add(model.id);
       }
     });
+    allOnlineVariantIds.add('cortex/auto');
 
     for (final model in allModels) {
       if (model.category == 'roleplay' || model.category == 'self') {
@@ -183,7 +184,7 @@ class ModelService with ChangeNotifier {
   }
 
   /// Finds a suitable default online model from a list of raw model maps.
-  /// PRIORITIZES Gemini series models first.
+  /// PRIORITIZES 'cortex/auto' (Always Best) as the default.
   String? findDefaultBaseModel(List<Map<String, dynamic>> modelsAsMaps) {
     if (modelsAsMaps.isEmpty) {
       debugPrint(
@@ -191,73 +192,8 @@ class ModelService with ChangeNotifier {
       return null;
     }
 
-    // This helper function finds the best text-only, non-pro variant within a series.
-    String? findBestSafeVariant(Map<String, dynamic>? variants) {
-      if (variants == null || variants.isEmpty) return null;
-
-      final textOnlyVariants = Map.fromEntries(
-        variants.entries.where((entry) {
-          final variantData = entry.value;
-          if (variantData is Map<String, dynamic>) {
-            final outputs = variantData['outputs'] as Map<String, dynamic>?;
-            return !(outputs != null && outputs['image'] == true);
-          }
-          return false;
-        }),
-      );
-
-      if (textOnlyVariants.isNotEmpty) {
-        // Prefer a non-"pro" model if available, otherwise take the first text-only one.
-        final nonProEntry = textOnlyVariants.entries.firstWhere(
-          (e) =>
-              e.value['title'] is String &&
-              !(e.value['title'] as String).toLowerCase().contains('pro'),
-          orElse: () => textOnlyVariants.entries.first,
-        );
-        return nonProEntry.key;
-      }
-      return null;
-    }
-
-    String? defaultBaseModelId;
-
-    // --- STEP 1: Prioritize Gemini ---
-    // Try to find the Gemini model series first.
-    final geminiModel =
-        modelsAsMaps.firstWhere((m) => m['id'] == 'gemini', orElse: () => {});
-    if (geminiModel.isNotEmpty) {
-      debugPrint(
-          "[ModelRepository] Attempt 1: Searching for a safe variant within the Gemini series.");
-      defaultBaseModelId =
-          findBestSafeVariant(geminiModel['variants'] as Map<String, dynamic>?);
-    }
-
-    // --- STEP 2: Fallback to other online models if Gemini is not found or has no suitable variant ---
-    if (defaultBaseModelId == null) {
-      debugPrint(
-          "[ModelRepository] Attempt 1 Failed. Attempt 2: Searching other online series.");
-      final otherOnlineSeries = modelsAsMaps
-          .where((m) => m['type'] == 'online' && m['id'] != 'gemini');
-
-      for (final model in otherOnlineSeries) {
-        defaultBaseModelId =
-            findBestSafeVariant(model['variants'] as Map<String, dynamic>?);
-        if (defaultBaseModelId != null) {
-          // Found a suitable model, stop searching.
-          break;
-        }
-      }
-    }
-
-    if (defaultBaseModelId != null) {
-      debugPrint(
-          "[ModelRepository] Selected '$defaultBaseModelId' as the final default base model.");
-    } else {
-      debugPrint(
-          "[ModelRepository] CRITICAL: Could not find any suitable text-only variant in any series.");
-    }
-
-    return defaultBaseModelId;
+    // Always prefer 'cortex/auto' as the default.
+    return 'cortex/auto';
   }
 
   /// Returns the cached list of [ModelEntity] objects synchronously.

@@ -21,8 +21,14 @@ class CreationSaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final localizations = AppLocalizations.of(context)!;
     final bool isTablet = screenWidth >= 600;
 
@@ -63,13 +69,13 @@ class CreationSaveButton extends StatelessWidget {
             child: ElevatedButton(
               onPressed: isEnabled
                   ? () {
-                      HapticFeedback.lightImpact();
-                      onPressed();
-                    }
+                HapticFeedback.lightImpact();
+                onPressed();
+              }
                   : null,
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                  (Set<WidgetState> states) {
+                      (Set<WidgetState> states) {
                     if (states.contains(WidgetState.disabled)) {
                       return AppColors.senaryColor.withValues(alpha: 0.5);
                     }
@@ -87,20 +93,20 @@ class CreationSaveButton extends StatelessWidget {
               ),
               child: isSaving
                   ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: Colors.white,
-                      ),
-                    )
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: Colors.white,
+                ),
+              )
                   : Text(
-                      localizations.save,
-                      style: TextStyle(
-                        fontSize: fontSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                localizations.save,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ),

@@ -654,7 +654,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get benefit10 => '추가 첨부 파일';
 
   @override
-  String get benefit11 => '무한 흐름 모드';
+  String get benefit11 => '더 많은 흐름 모드';
 
   @override
   String get benefit12 => '';
@@ -1573,9 +1573,6 @@ class AppLocalizationsKo extends AppLocalizations {
       'Cortex는 음성 채팅 모드에서도 기기 내에서 완벽하게 실행되어 데이터를 안전하게 보호합니다. 끊김 없는 대화를 즐겨보세요!';
 
   @override
-  String get workInProgress => '작업 진행 중';
-
-  @override
   String get toolGetStockPriceDescription =>
       '주식(예: AAPL, THYAO.IS) 및 암호화폐(예: BTC-USD, ETH-USD)의 현재 가격과 과거 가격을 확인하세요.';
 
@@ -1634,4 +1631,64 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get voicePrompt =>
       '현재 Cortex 플랫폼에서 음성 서비스를 제공하고 있습니다. 마크다운, 코드 블록 또는 LaTeX를 사용하지 마십시오. 음성 합성에 적합한 텍스트로만 응답하십시오.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => '흐름 모드';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => '프리미엄';
+
+  @override
+  String get workInProgress => '작업 진행 중';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      '중요: 마크다운 서식(굵게, 기울임체)을 사용하지 마세요. 코드 블록(```)을 출력하지 마세요. 답변은 대화체로 간결하게 작성하세요.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Cortex Flow 모드($agentName). 이전: $previousResponse';
+  }
 }

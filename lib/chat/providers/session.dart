@@ -73,19 +73,37 @@ class ChatSessionProvider with ChangeNotifier {
     final baseId =
         _modelService.getBaseIdFromFullId(currentModel.id, langCode: langCode);
 
-    if (baseId == currentModel.id) {
-      return currentModel.displayTitle;
+    // [FIX] Absolute Hardening: "Unknown Model"
+    // The user wants to NEVER see "Unknown Model", even for a split second.
+    // If the data returns that string, we MUST fallback to "Cortex" or the stub title.
+
+    String resolvedTitle = currentModel.displayTitle;
+
+    // Try to get precise data if possible
+    if (baseId != currentModel.id) {
+      try {
+        final seriesModel =
+            _modelService.getPreciseModelData(baseId, langCode: langCode);
+        resolvedTitle = seriesModel.displayTitle;
+      } catch (_) {
+        // Keep using currentModel.displayTitle
+      }
     }
 
-    try {
-      final seriesModel =
-          _modelService.getPreciseModelData(baseId, langCode: langCode);
-      return seriesModel.displayTitle;
-    } catch (e) {
-      return currentModel.displayTitle.isNotEmpty
-          ? currentModel.displayTitle
-          : null;
+    if (resolvedTitle == 'Unknown Model' || resolvedTitle.isEmpty) {
+      // Fallback hierarchy:
+      // 1. "Cortex" (if it's the auto model)
+      // 2. The Model ID capitalized (better than "Unknown")
+
+      if (baseId == 'cortex/auto' || baseId == 'dynamic') {
+        return 'Cortex';
+      }
+
+      // Return a cleaner version of ID if title is missing
+      return baseId.split('/').last.toUpperCase();
     }
+
+    return resolvedTitle;
   }
 
   String? get modelImagePath {
@@ -193,13 +211,24 @@ class ChatSessionProvider with ChangeNotifier {
       debugPrint(
           "[ChatSessionProvider] Initialization fallback. Storing pending ID: $modelId");
 
+      // [FIX] Ensure title is never empty for the stub
+      String effectiveTitle = title;
+      if (effectiveTitle.isEmpty) {
+        if (modelId == 'cortex/auto') {
+          effectiveTitle = 'Cortex';
+        } else {
+          // Try to make it look decent
+          effectiveTitle = 'Cortex';
+        }
+      }
+
       // Store for later resolution when catalog loads
       _pendingModelId = modelId;
 
       // Create stub with valid title if cached, otherwise empty
       final stubEntity = ModelEntity(
         id: modelId,
-        displayTitle: title,
+        displayTitle: effectiveTitle,
         producer: 'Vertex',
         displaySummary: '',
         displayDescription: '',

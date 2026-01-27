@@ -103,6 +103,8 @@ class EditService {
 
     final int newAiMessageIndex = updatedList.length;
 
+    if (!context.mounted) return;
+
     // FIX: Get the currently active model from the session.
     // This ensures that if the user switched models before editing, the new model is used.
     final sessionProvider = context.read<ChatSessionProvider>();

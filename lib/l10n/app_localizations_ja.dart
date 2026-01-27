@@ -655,7 +655,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get benefit10 => 'その他の添付ファイル';
 
   @override
-  String get benefit11 => '無限フローモード';
+  String get benefit11 => 'より多くの流れモード';
 
   @override
   String get benefit12 => '';
@@ -1573,9 +1573,6 @@ class AppLocalizationsJa extends AppLocalizations {
       'Cortex は、音声チャット モードでもデバイス上で完全に実行することでデータを安全に保ち、シームレスな会話をお楽しみいただけます。';
 
   @override
-  String get workInProgress => '進行中';
-
-  @override
   String get toolGetStockPriceDescription =>
       '株式（例：AAPL、THYAO.IS）および暗号通貨（例：BTC-USD、ETH-USD）の現在の価格と履歴を取得します。';
 
@@ -1624,13 +1621,73 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get flowModeDescription =>
-      'フローモードでは、インテリジェンスが互いに議論します。座って聞くことも、飛び込んで議論に参加することもできます。';
+      '流れモードでは、インテリジェンスが互いに議論します。座って聞くことも、飛び込んで議論に参加することもできます。';
 
   @override
   String get flowModeQuestion =>
-      'こんにちは！Cortexアプリのフローモードに入っています。他に3人のAIエージェントがいます。あなたの課題は、話題を部屋に投げかけ、他の参加者に刺激的または面白い質問をして議論を始めることです。返答では、ユーモア、皮肉、軽いトラッシュトークなど、自由に使ってください。どんな話題でも構いません。さあ、会話を始めましょう！';
+      'こんにちは！Cortexアプリの流れモードに入っています。他に3人のAIエージェントがいます。あなたの課題は、話題を部屋に投げかけ、他の参加者に刺激的または面白い質問をして議論を始めることです。返答では、ユーモア、皮肉、軽いトラッシュトークなど、自由に使ってください。どんな話題でも構いません。さあ、会話を始めましょう！';
 
   @override
   String get voicePrompt =>
       '現在、Cortexプラットフォームで音声サービスを提供しています。マークダウン、コードブロック、LaTeXは使用しないでください。音声合成に適したテキストのみで回答してください。';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => '流れモード';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'プレミアム';
+
+  @override
+  String get workInProgress => '進行中';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      '重要：マークダウン形式（太字、斜体）は使用しないでください。コードブロック（```）は出力しないでください。回答は会話形式で簡潔にしてください。';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Cortex Flow Mode ($agentName)。前: $previousResponse';
+  }
 }

@@ -13,7 +13,9 @@ import 'chat/providers/session.dart';
 import 'chat/services/read.dart';
 import 'chat/services/select.dart';
 import 'chat/services/stop.dart';
+import 'chat/services/voice.dart';
 import 'axon/inbox/logic/manager.dart';
+import 'axon/inbox/panel/view.dart'; // [NEW] For global panel close
 import 'initialization.dart';
 import 'language.dart';
 import 'library/backend/data/entity.dart';
@@ -112,6 +114,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       context.read<IntrovertNotificationService>().dismissAxonNotification();
     }
 
+    // Close any open context menu (Long Press Panel)
+    ActionPanelController.closeCurrent();
+
     AnalyticsService().logSidebarClosed();
 
     if (_isSearchFocused) {
@@ -160,6 +165,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     }
 
     _ignoreDrag = false;
+
+    // Auto-close any open panel when user starts dragging the drawer
+    ActionPanelController.closeCurrent();
 
     if (_axonController.value == 0) {
       FocusManager.instance.primaryFocus?.unfocus();
@@ -381,6 +389,13 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       final conv = context.read<ConversationProvider>();
       final input = context.read<InputProvider>();
       final stopService = context.read<StopService>();
+      final voiceService = context.read<VoiceService>();
+
+      // Force Voice Mode OFF
+      if (input.isVoiceModeActive) {
+        await voiceService.stopSession();
+        input.setVoiceModeActive(false);
+      }
 
       // CRITICAL: Stop any active response stream BEFORE clearing
       // This prevents response chunks from appearing in the new empty chat

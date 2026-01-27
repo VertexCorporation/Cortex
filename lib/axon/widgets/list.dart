@@ -188,18 +188,11 @@ class _AxonConversationListState extends State<AxonConversationList> {
       switchOutCurve: Curves.easeInCubic,
 
       // --- CRITICAL UPDATE: Custom Transition ---
-      // Scale + Fade effect to mask any layout shift
+      // Smooth Fade to Content (Shimmer -> Content)
       transitionBuilder: (Widget child, Animation<double> animation) {
         return FadeTransition(
           opacity: animation,
-          child: ScaleTransition(
-            // Starts slightly smaller (0.98) and grows to natural size (1.0)
-            // A subtle pop effect is better than a large zoom.
-            scale: Tween<double>(begin: 0.98, end: 1.0).animate(animation),
-            // Pin to top-center so the list doesn't jump up/down relative to header
-            alignment: Alignment.topCenter,
-            child: child,
-          ),
+          child: child, // Removed ScaleTransition to prevent layout jumps
         );
       },
 
@@ -218,12 +211,12 @@ class _AxonConversationListState extends State<AxonConversationList> {
               key: const ValueKey('loading_skeletons'),
               padding: EdgeInsets.fromLTRB(
                 horizontalPadding * 0.5,
-                widget.screenHeight * 0.005,
+                0,
                 horizontalPadding * 0.5,
-                widget.screenHeight * 0.1,
+                0,
               ),
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: 14,
+              itemCount: 50,
               separatorBuilder: (context, index) => const SizedBox(height: 0),
               itemBuilder: (context, index) {
                 return _SkeletonTile(
@@ -279,9 +272,9 @@ class _AxonConversationListState extends State<AxonConversationList> {
                 controller: widget.scrollController,
                 padding: EdgeInsets.fromLTRB(
                   horizontalPadding * 0.5,
-                  widget.screenHeight * 0.005,
+                  0,
                   horizontalPadding * 0.5,
-                  widget.screenHeight * 0.1,
+                  0,
                 ),
                 initialItemCount: _displayedIds.length,
                 itemBuilder: (context, index, animation) {

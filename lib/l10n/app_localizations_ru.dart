@@ -667,7 +667,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get benefit10 => 'Дополнительные вложения';
 
   @override
-  String get benefit11 => 'Режим безграничного потока';
+  String get benefit11 => 'Больше режима потока';
 
   @override
   String get benefit12 => '';
@@ -1625,9 +1625,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Cortex обеспечивает безопасность ваших данных, работая полностью на устройстве, даже в режиме голосового чата; наслаждайтесь бесперебойным общением!';
 
   @override
-  String get workInProgress => 'Работа в процессе';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Получите текущую цену и историю колебаний для акций (например, AAPL, THYAO.IS) и криптовалют (например, BTC-USD, ETH-USD).';
 
@@ -1689,4 +1686,64 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get voicePrompt =>
       'В данный момент вы предоставляете услуги голосовой связи на платформе Cortex. Не используйте Markdown, блоки кода или LaTeX. Отвечайте исключительно текстом, подходящим для синтеза речи.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Режим потока';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'Премиум';
+
+  @override
+  String get workInProgress => 'Работа в процессе';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'ВАЖНО: Не используйте форматирование Markdown (жирный шрифт, курсив). НЕ выводите блоки кода (```). Ответы должны быть в разговорном и кратком стиле.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Режим Cortex Flow ($agentName). Предыдущий: $previousResponse';
+  }
 }

@@ -79,64 +79,75 @@ class _CodeExecutionWidgetState extends State<CodeExecutionWidget> {
             ),
           ),
 
-          if (_isExpanded) ...[
-            const Divider(height: 1),
-            // Code Block
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: CodeBlockWidget(
-                code: code,
-                language: 'python',
-              ),
-            ),
-            // Output Section
-            if (output.isNotEmpty || hasError) ...[
-              const Divider(height: 1),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(
-                      0xFF1E1E1E), // Always dark terminal background
-                  borderRadius:
-                      const BorderRadius.vertical(bottom: Radius.circular(12)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'OUTPUT',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white.withValues(alpha: 0.5),
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    if (hasError)
-                      SelectableText(
-                        error,
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 13,
-                          color: Color(0xFFEF5350), // Soft Red
+          // Animated Content
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: _isExpanded
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Divider(height: 1),
+                      // Code Block
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: CodeBlockWidget(
+                          code: code,
+                          language: 'python',
                         ),
                       ),
-                    if (output.isNotEmpty)
-                      SelectableText(
-                        output,
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 13,
-                          color: Color(0xFFE0E0E0), // Off-white
+                      // Output Section
+                      if (output.isNotEmpty || hasError) ...[
+                        const Divider(height: 1),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(
+                                0xFF1E1E1E), // Always dark terminal background
+                            borderRadius: const BorderRadius.vertical(
+                                bottom: Radius.circular(12)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'OUTPUT',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white.withValues(alpha: 0.5),
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              if (hasError)
+                                SelectableText(
+                                  error,
+                                  style: const TextStyle(
+                                    fontFamily: 'monospace',
+                                    fontSize: 13,
+                                    color: Color(0xFFEF5350), // Soft Red
+                                  ),
+                                ),
+                              if (output.isNotEmpty)
+                                SelectableText(
+                                  output,
+                                  style: const TextStyle(
+                                    fontFamily: 'monospace',
+                                    fontSize: 13,
+                                    color: Color(0xFFE0E0E0), // Off-white
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ]
+                      ],
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );

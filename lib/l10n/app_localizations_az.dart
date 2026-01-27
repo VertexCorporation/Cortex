@@ -663,7 +663,7 @@ class AppLocalizationsAz extends AppLocalizations {
   String get benefit10 => 'Daha çox əlavə';
 
   @override
-  String get benefit11 => 'Limitsiz Axın Rejimi';
+  String get benefit11 => 'Daha çox Axın Rejimi';
 
   @override
   String get benefit12 => '';
@@ -1616,9 +1616,6 @@ class AppLocalizationsAz extends AppLocalizations {
       'Cortex, səsli söhbət rejimində belə cihazınızda tam işləyərək məlumatlarınızı təhlükəsiz saxlayır; problemsiz söhbətlərdən zövq alın!';
 
   @override
-  String get workInProgress => 'İşlər Davam Edir';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Səhmlərin (məsələn, AAPL, THYAO.IS) və kriptovalyutanın (məsələn, BTC-USD, ETH-USD) cari qiymətini və tarixini əldə edin.';
 
@@ -1679,4 +1676,64 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get voicePrompt =>
       'Hazırda Cortex platformasında səs xidməti təqdim edirsiniz. Markdown, kod blokları və ya LaTeX istifadə etməyin. Yalnız nitq sintezi üçün uyğun mətnlə cavab verin.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Axın Rejimi';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'Premium';
+
+  @override
+  String get workInProgress => 'İşlər Davam Edir';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'VACİBDİR: Markdown formatlamasından (qalın, kursiv) istifadə etməyin. Kod bloklarını (```) ÇIXARMAYIN. Cavabları danışıq xarakterli və qısa saxlayın.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Korteks Axın Rejimi ($agentName). Əvvəlki: $previousResponse';
+  }
 }

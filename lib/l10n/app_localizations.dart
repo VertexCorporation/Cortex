@@ -1361,7 +1361,7 @@ abstract class AppLocalizations {
   /// No description provided for @benefit11.
   ///
   /// In en, this message translates to:
-  /// **'Limitless Flow Mode'**
+  /// **'More Flow Mode'**
   String get benefit11;
 
   /// No description provided for @benefit12.
@@ -3003,12 +3003,6 @@ abstract class AppLocalizations {
   /// **'Cortex keeps your data safe by running fully on-device, even in voice chat mode; enjoy seamless conversations!'**
   String get voiceModeInformation;
 
-  /// No description provided for @workInProgress.
-  ///
-  /// In en, this message translates to:
-  /// **'Work In Progress'**
-  String get workInProgress;
-
   /// No description provided for @toolGetStockPriceDescription.
   ///
   /// In en, this message translates to:
@@ -3110,6 +3104,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You are currently providing voice service on the Cortex platform. Do not use markdown, code blocks, or LaTeX. Respond purely in text suitable for speech synthesis.'**
   String get voicePrompt;
+
+  /// Indicates how long the model thought before generating a response.
+  ///
+  /// In en, this message translates to:
+  /// **'Thought for {seconds} seconds'**
+  String thoughtForSeconds(int seconds);
+
+  /// No description provided for @thought.
+  ///
+  /// In en, this message translates to:
+  /// **'Thought'**
+  String get thought;
+
+  /// No description provided for @weatherClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get weatherClear;
+
+  /// No description provided for @weatherCloudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloudy'**
+  String get weatherCloudy;
+
+  /// No description provided for @weatherFoggy.
+  ///
+  /// In en, this message translates to:
+  /// **'Foggy'**
+  String get weatherFoggy;
+
+  /// No description provided for @weatherRainy.
+  ///
+  /// In en, this message translates to:
+  /// **'Rainy'**
+  String get weatherRainy;
+
+  /// No description provided for @weatherSnowy.
+  ///
+  /// In en, this message translates to:
+  /// **'Snowy'**
+  String get weatherSnowy;
+
+  /// No description provided for @weatherThunderstorm.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm'**
+  String get weatherThunderstorm;
+
+  /// No description provided for @weatherDrizzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drizzle'**
+  String get weatherDrizzle;
+
+  /// No description provided for @agentRed.
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get agentRed;
+
+  /// No description provided for @agentBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get agentBlue;
+
+  /// No description provided for @agentPurple.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get agentPurple;
+
+  /// No description provided for @flowMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Flow Mode'**
+  String get flowMode;
+
+  /// No description provided for @limitReachedVoiceStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice session ended due to limit limits.'**
+  String get limitReachedVoiceStop;
+
+  /// No description provided for @premium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get premium;
+
+  /// No description provided for @workInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Work In Progress'**
+  String get workInProgress;
+
+  /// No description provided for @voiceSystemPromptSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.'**
+  String get voiceSystemPromptSuffix;
+
+  /// Context string for Flow Mode with agent name and previous response placeholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex Flow Mode ({agentName}). Previous: {previousResponse}'**
+  String flowModeContextParams(String agentName, String previousResponse);
 }
 
 class _AppLocalizationsDelegate

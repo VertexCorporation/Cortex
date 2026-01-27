@@ -40,7 +40,7 @@ class InputField extends StatefulWidget {
   final bool canHandleImage; // Maintained for legacy check logic
   final bool isEditingMode;
   final File?
-  preselectedPhoto; // Deprecated but kept for signature compatibility
+      preselectedPhoto; // Deprecated but kept for signature compatibility
   final bool modelMissing;
   final VoidCallback onCancelEditing;
 
@@ -209,10 +209,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
 
     final inputProvider = context.watch<InputProvider>();
@@ -239,7 +236,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
               topRight: Radius.circular(radius),
             ),
             border:
-            Border(top: BorderSide(color: AppColors.border, width: 1.0)),
+                Border(top: BorderSide(color: AppColors.border, width: 1.0)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -302,9 +299,9 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                               key: const ValueKey('textfield'),
                                               controller: widget.controller,
                                               focusNode:
-                                              widget.textFieldFocusNode,
+                                                  widget.textFieldFocusNode,
                                               localizations:
-                                              widget.localizations,
+                                                  widget.localizations,
                                               screenWidth: screenWidth,
                                               isTablet: isTablet,
                                               showHintText: true,
@@ -385,7 +382,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
   void _updateHeight() {
     final RenderBox? renderBox =
-    _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
+        _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       final newHeight = renderBox.size.height;
       if (newHeight != _inputFieldHeight) {
@@ -402,10 +399,7 @@ class _WaveformSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
 
     // Calculate right padding to stop exactly at the center of main action button
@@ -423,7 +417,7 @@ class _WaveformSection extends StatelessWidget {
     return Padding(
       // Wave line now originates from exactly under the main action button center
       padding: EdgeInsetsDirectional.fromSTEB(12.0, 24.0, rightPadding, 16.0),
-      child: const WaveformVisualizer(),
+      child: const WaveformVisualizer(origin: WaveOrigin.right),
     );
   }
 }
@@ -523,7 +517,7 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
           _displayedItems.removeAt(i);
           _listKey.currentState?.removeItem(
             i,
-                (context, animation) =>
+            (context, animation) =>
                 _buildItem(removedItem, animation, i, isRemoving: true),
             duration: const Duration(milliseconds: 300),
           );
@@ -540,8 +534,8 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
     super.dispose();
   }
 
-  Widget _buildItem(InputAttachment attachment, Animation<double> animation,
-      int index,
+  Widget _buildItem(
+      InputAttachment attachment, Animation<double> animation, int index,
       {bool isRemoving = false}) {
     // Combined Fade and Size transition for polished effect
     return FadeTransition(
@@ -672,24 +666,24 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
         width: double.infinity,
         child: widget.attachments.isNotEmpty
             ? ScrollFogHorizontal(
-          scrollController: _scrollController,
-          child: AnimatedList(
-            key: _listKey,
-            controller: _scrollController,
-            clipBehavior: Clip.none,
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(
-                horizontal: widget.padding, vertical: widget.padding),
-            initialItemCount: _displayedItems.length,
-            itemBuilder: (context, index, animation) {
-              // Safety for fast tapping
-              if (index >= _displayedItems.length) {
-                return const SizedBox.shrink();
-              }
-              return _buildItem(_displayedItems[index], animation, index);
-            },
-          ),
-        )
+                scrollController: _scrollController,
+                child: AnimatedList(
+                  key: _listKey,
+                  controller: _scrollController,
+                  clipBehavior: Clip.none,
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(
+                      horizontal: widget.padding, vertical: widget.padding),
+                  initialItemCount: _displayedItems.length,
+                  itemBuilder: (context, index, animation) {
+                    // Safety for fast tapping
+                    if (index >= _displayedItems.length) {
+                      return const SizedBox.shrink();
+                    }
+                    return _buildItem(_displayedItems[index], animation, index);
+                  },
+                ),
+              )
             : const SizedBox.shrink(),
       ),
     );
@@ -939,9 +933,10 @@ class _ToolsSection extends StatelessWidget {
   final bool isTablet;
   final InputField widget;
 
-  const _ToolsSection({required this.screenWidth,
-    required this.isTablet,
-    required this.widget});
+  const _ToolsSection(
+      {required this.screenWidth,
+      required this.isTablet,
+      required this.widget});
 
   @override
   Widget build(BuildContext context) {
@@ -992,9 +987,7 @@ class _SendButtonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isConnected = context
-        .watch<InternetProvider>()
-        .isConnected;
+    final bool isConnected = context.watch<InternetProvider>().isConnected;
     final inputProvider = context.watch<InputProvider>();
     final speechService = context.watch<SpeechService>();
 
@@ -1024,9 +1017,7 @@ class _SendButtonSection extends StatelessWidget {
         isEnabled: effectiveEnabled,
         isSending: widget.isSending,
         isRecording: inputProvider.isVoiceRecording,
-        isTextEmpty: controller.text
-            .trim()
-            .isEmpty,
+        isTextEmpty: controller.text.trim().isEmpty,
         onSend: widget.onSend,
         onStop: effectiveOnStop,
         controller: controller,

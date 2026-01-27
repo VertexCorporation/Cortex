@@ -646,7 +646,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get benefit10 => '更多附件';
 
   @override
-  String get benefit11 => '无限流模式';
+  String get benefit11 => '更多流动模式';
 
   @override
   String get benefit12 => '';
@@ -1528,9 +1528,6 @@ class AppLocalizationsZh extends AppLocalizations {
       'Cortex 完全在设备端运行，即使在语音聊天模式下也能确保您的数据安全；享受流畅的对话体验！';
 
   @override
-  String get workInProgress => '进行中';
-
-  @override
   String get toolGetStockPriceDescription =>
       '获取股票（例如 AAPL、THYAO.IS）和加密货币（例如 BTC-USD、ETH-USD）的当前价格和历史价格。';
 
@@ -1584,4 +1581,64 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get voicePrompt =>
       '您目前正在使用 Cortex 平台提供语音服务。请勿使用 Markdown、代码块或 LaTeX。请仅以适合语音合成的文本形式回复。';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => '流动模式';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => '优质的';
+
+  @override
+  String get workInProgress => '进行中';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      '重要提示：请勿使用 Markdown 格式（粗体、斜体）。请勿输出代码块（```）。请保持回复简洁明了，如同日常对话。';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Cortex 流模式（$agentName）。上一个：$previousResponse';
+  }
 }

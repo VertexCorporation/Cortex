@@ -11,12 +11,24 @@ class ActionPanelController {
   final Future<void> Function() _closeImpl;
   bool _isClosed = false;
 
+  // Global reference to the currently open panel
+  static ActionPanelController? _activeController;
+
   ActionPanelController._(this._closeImpl);
 
   Future<void> close() async {
     if (_isClosed) return;
     _isClosed = true;
+    if (_activeController == this) {
+      _activeController = null;
+    }
     await _closeImpl();
+  }
+
+  static Future<void> closeCurrent() async {
+    if (_activeController != null) {
+      await _activeController!.close();
+    }
   }
 }
 
@@ -94,6 +106,10 @@ ActionPanelController showActionPanel({
   );
 
   overlay.insert(entry);
+
+  // Register as active
+  ActionPanelController._activeController = controller;
+
   return controller;
 }
 

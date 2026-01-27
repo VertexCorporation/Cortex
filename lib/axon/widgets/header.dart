@@ -100,7 +100,10 @@ class AxonHeader extends StatelessWidget {
                           },
                           child: isSearchActive
                               ? Transform.rotate(
-                                  angle: math.pi / 2,
+                                  angle: (Directionality.of(context) ==
+                                          TextDirection.rtl)
+                                      ? -math.pi / 2
+                                      : math.pi / 2,
                                   child: SvgPicture.asset(
                                     'assets/icons/arrov.svg',
                                     key: const ValueKey('arrow'),

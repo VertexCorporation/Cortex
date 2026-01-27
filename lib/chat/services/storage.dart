@@ -71,6 +71,73 @@ class ChatStorageService {
     }
   }
 
+  /// Optimized fetch: Gets all conversations joined with their last message details.
+  /// Replaces the N+1 loop in InboxViewModel.
+  static Future<List<Map<String, dynamic>>>
+      getConversationsWithLastMessage() async {
+    try {
+      final db = await DbHelper().db;
+      // We use a LEFT JOIN on the last message for each conversation.
+      // Since 'conversations' table has 'lastMessageDate', we usually just need the snippet.
+      // However, to be perfectly accurate with the 'lastMsg' logic usually used:
+      // We'll subquery or just fetch the text.
+      //
+      // SIMPLIFICATION:
+      // The current system stores 'lastMessageDate' in the conversation table.
+      // We just need to fetch the snippet text reliably.
+      // A correlated subquery is clean enough for SQLite.
+
+      final results = await db.rawQuery('''
+        SELECT 
+          c.id, 
+          c.title, 
+          c.modelId, 
+          c.isStarred, 
+          c.starredDate, 
+          c.lastMessageDate,
+          (
+            SELECT text 
+            FROM messages m 
+            WHERE m.conversationId = c.id 
+              AND (
+                (m.text IS NOT NULL AND length(m.text) > 0) OR 
+                (m.photoPath IS NOT NULL AND length(m.photoPath) > 0)
+              )
+            ORDER BY m.idx DESC 
+            LIMIT 1
+          ) as lastMessageText,
+           (
+            SELECT photoPath 
+            FROM messages m 
+            WHERE m.conversationId = c.id 
+              AND (
+                (m.text IS NOT NULL AND length(m.text) > 0) OR 
+                (m.photoPath IS NOT NULL AND length(m.photoPath) > 0)
+              )
+            ORDER BY m.idx DESC 
+            LIMIT 1
+          ) as lastMessagePhoto,
+          (
+            SELECT ts 
+            FROM messages m 
+            WHERE m.conversationId = c.id 
+              AND (
+                (m.text IS NOT NULL AND length(m.text) > 0) OR 
+                (m.photoPath IS NOT NULL AND length(m.photoPath) > 0)
+              )
+            ORDER BY m.idx DESC 
+            LIMIT 1
+          ) as realLastMessageTs
+        FROM conversations c
+      ''');
+
+      return results;
+    } catch (e) {
+      debugPrint("[Storage] Error fetching optimized conversations: $e");
+      return [];
+    }
+  }
+
   static Future<void> addRecentModel(
     String modelId, {
     required String langCode,
@@ -177,7 +244,7 @@ class ChatStorageService {
 
   static Future<void> updateStoredMessage(
       String convId, Message m, int idx) async {
-    if (isFluxMode) return;
+    if (isFluxMode || !m.isVisible) return;
     try {
       final db = await DbHelper().db;
 
@@ -212,14 +279,17 @@ class ChatStorageService {
   static Future<void> saveCurrentMessages(
       String convId, List<Message> msgs) async {
     if (isFluxMode) return;
+    // Filter out invisible messages from the batch save
+    final visibleMsgs = msgs.where((m) => m.isVisible).toList();
+
     try {
       final db = await DbHelper().db;
       final batch = db.batch();
       batch
           .delete('messages', where: 'conversationId = ?', whereArgs: [convId]);
 
-      for (int i = 0; i < msgs.length; i++) {
-        final m = msgs[i];
+      for (int i = 0; i < visibleMsgs.length; i++) {
+        final m = visibleMsgs[i];
 
         // LOGIC UPDATE: Serialize attachment paths
         String? serializedAttachments;
@@ -311,7 +381,7 @@ class ChatStorageService {
   }
 
   static Future<void> upsertMessage(String convId, int idx, Message m) async {
-    if (isFluxMode) return;
+    if (isFluxMode || !m.isVisible) return;
     try {
       final db = await DbHelper().db;
 

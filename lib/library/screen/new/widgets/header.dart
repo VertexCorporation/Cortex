@@ -51,7 +51,10 @@ class CreationProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final bool isTablet = screenWidth >= 600;
 
     // --- TABLET OPTIMIZATIONS ---
@@ -154,15 +157,21 @@ class CreationProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildConfirmationDialog(
-      BuildContext ctx, AppLocalizations localizations) {
+  Widget _buildConfirmationDialog(BuildContext ctx,
+      AppLocalizations localizations) {
     return Center(
       child: Material(
         color: Colors.transparent,
         child: Container(
-          width: MediaQuery.of(ctx).size.width >= 600
+          width: MediaQuery
+              .of(ctx)
+              .size
+              .width >= 600
               ? 500
-              : MediaQuery.of(ctx).size.width * 0.8,
+              : MediaQuery
+              .of(ctx)
+              .size
+              .width * 0.8,
           decoration: BoxDecoration(
               color: AppColors.secondaryColor,
               borderRadius: BorderRadius.circular(10)),
@@ -199,7 +208,7 @@ class CreationProfileHeader extends StatelessWidget {
                           ctx,
                           localizations.cancel,
                           AppColors.senaryColor,
-                          () => Navigator.of(ctx).pop(false)),
+                              () => Navigator.of(ctx).pop(false)),
                       VerticalDivider(
                           width: 1,
                           thickness: 0.5,
@@ -208,7 +217,7 @@ class CreationProfileHeader extends StatelessWidget {
                           ctx,
                           localizations.remove,
                           AppColors.septenaryColor,
-                          () => Navigator.of(ctx).pop(true)),
+                              () => Navigator.of(ctx).pop(true)),
                     ],
                   ),
                 ),
@@ -220,8 +229,8 @@ class CreationProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildDialogButton(
-      BuildContext ctx, String text, Color color, VoidCallback onPressed) {
+  Widget _buildDialogButton(BuildContext ctx, String text, Color color,
+      VoidCallback onPressed) {
     return Expanded(
       child: Material(
         color: Colors.transparent,
@@ -277,7 +286,7 @@ class _AvatarPicker extends StatelessWidget {
               backgroundImage: image != null ? FileImage(image!) : null,
               child: image == null
                   ? Icon(Icons.broken_image,
-                      size: size / 2.5, color: AppColors.primaryColor.inverted)
+                  size: size / 2.5, color: AppColors.primaryColor.inverted)
                   : null,
             ),
             Positioned(
@@ -322,7 +331,9 @@ class _AvatarPicker extends StatelessWidget {
 class ShakeWidget extends StatelessWidget {
   final Widget child;
   final AnimationController controller;
+
   const ShakeWidget({super.key, required this.child, required this.controller});
+
   @override
   Widget build(BuildContext context) => child;
 }

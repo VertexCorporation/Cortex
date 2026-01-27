@@ -17,6 +17,7 @@ class FeaturesSheetButton extends StatelessWidget {
   final IconData? iconData;
 
   final bool isDisabled;
+  final bool isSelected;
 
   const FeaturesSheetButton({
     super.key,
@@ -26,38 +27,51 @@ class FeaturesSheetButton extends StatelessWidget {
     this.iconPath,
     this.iconData,
     this.isDisabled = false,
+    this.isSelected = false,
   }) : assert(iconPath != null || iconData != null,
-            'Provide either iconPath or iconData');
+  'Provide either iconPath or iconData');
 
   @override
   Widget build(BuildContext context) {
-    // --- Responsive Dimensions ---
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     final isTablet = screenWidth >= 600;
 
-    // Container sizing
+    // Dimensions
     final double horizontalMargin = isTablet ? 24.0 : 16.0;
     final double verticalMargin = isTablet ? 6.0 : 4.0;
     final double paddingVertical = isTablet ? 16.0 : 14.0;
     final double paddingHorizontal = isTablet ? 20.0 : 16.0;
     final double borderRadius = isTablet ? 16.0 : 14.0;
 
-    // Icon sizing
-    final double iconContainerSize =
-        isTablet ? screenWidth * 0.09 : screenWidth * 0.11;
+    final double iconContainerSize = isTablet
+        ? screenWidth * 0.09
+        : screenWidth * 0.11;
     final double innerIconSize = iconContainerSize * 0.5;
-
-    // Font sizing
-    final double titleSize =
-        isTablet ? screenWidth * 0.028 : screenWidth * 0.04;
+    final double titleSize = isTablet ? screenWidth * 0.028 : screenWidth *
+        0.04;
     final double descSize = isTablet ? screenWidth * 0.02 : screenWidth * 0.032;
-    final double arrowSize = isTablet ? 20.0 : 18.0;
 
-    final Color contentColor = AppColors.primaryColor.inverted;
-    final Color borderColor = AppColors.border;
+    // --- COLOR ANIMATION LOGIC ---
+    // Normal:   Bg = Background, Text = Inverted
+    // Selected: Bg = Inverted,   Text = Background
+    final Color normalBg = AppColors.background;
+    final Color normalFg = AppColors.primaryColor.inverted;
 
-    // Opacity for disabled state
+    final Color targetBg = isSelected ? normalFg : normalBg;
+    final Color targetFg = isSelected ? normalBg : normalFg;
+
+    // Border disappears when selected to look cleaner
+    final Color targetBorder = isSelected ? Colors.transparent : AppColors
+        .border;
+
     final double opacity = isDisabled ? 0.4 : 1.0;
+
+    // Animation Duration
+    const Duration animDuration = Duration(milliseconds: 400);
+    const Curve animCurve = Curves.easeOutCubic;
 
     return Opacity(
       opacity: opacity,
@@ -66,12 +80,15 @@ class FeaturesSheetButton extends StatelessWidget {
           horizontal: horizontalMargin,
           vertical: verticalMargin,
         ),
-        child: Container(
+        // 1. ANIMATED CONTAINER for smooth Background Fade
+        child: AnimatedContainer(
+          duration: animDuration,
+          curve: animCurve,
           decoration: BoxDecoration(
-            color: AppColors.background,
+            color: targetBg,
             borderRadius: BorderRadius.circular(borderRadius),
             border: Border.all(
-              color: borderColor,
+              color: targetBorder,
               width: 1.0,
             ),
           ),
@@ -82,12 +99,12 @@ class FeaturesSheetButton extends StatelessWidget {
               onTap: isDisabled
                   ? null
                   : () {
-                      HapticFeedback.lightImpact();
-                      onTap?.call();
-                    },
+                HapticFeedback.lightImpact();
+                onTap?.call();
+              },
               borderRadius: BorderRadius.circular(borderRadius),
-              splashColor: contentColor.withValues(alpha: 0.1),
-              highlightColor: contentColor.withValues(alpha: 0.05),
+              splashColor: targetFg.withValues(alpha: 0.1),
+              highlightColor: targetFg.withValues(alpha: 0.05),
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   vertical: paddingVertical,
@@ -95,73 +112,86 @@ class FeaturesSheetButton extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    // 1. Circle Icon Container
-                    Container(
+                    // 2. Icon Container
+                    AnimatedContainer(
+                      duration: animDuration,
+                      curve: animCurve,
                       width: iconContainerSize,
                       height: iconContainerSize,
                       decoration: BoxDecoration(
-                        color: AppColors.secondaryColor.withValues(alpha: 0.5),
+                        // Logic: When selected, the icon circle is slightly visible against the dark bg
+                        color: isSelected
+                            ? targetFg.withValues(alpha: 0.2)
+                            : AppColors.secondaryColor.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
+                        // Note: SVG color animation isn't implicit, but the container fade
+                        // makes the switch look smooth enough.
                         child: iconPath != null
                             ? SvgPicture.asset(
-                                iconPath!,
-                                width: innerIconSize,
-                                height: innerIconSize,
-                                colorFilter: ColorFilter.mode(
-                                  contentColor,
-                                  BlendMode.srcIn,
-                                ),
-                              )
+                          iconPath!,
+                          width: innerIconSize,
+                          height: innerIconSize,
+                          colorFilter: ColorFilter.mode(
+                            targetFg,
+                            BlendMode.srcIn,
+                          ),
+                        )
                             : Icon(
-                                iconData,
-                                size: innerIconSize,
-                                color: contentColor,
-                              ),
+                          iconData,
+                          size: innerIconSize,
+                          color: targetFg,
+                        ),
                       ),
                     ),
                     SizedBox(width: paddingHorizontal * 0.8),
 
-                    // 2. Texts
+                    // 3. Texts with Animated Styles
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            title,
+                          AnimatedDefaultTextStyle(
+                            duration: animDuration,
+                            curve: animCurve,
                             style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: titleSize,
                               fontWeight: FontWeight.w600,
-                              color: contentColor,
+                              color: targetFg,
                               letterSpacing: 0.3,
                             ),
+                            child: Text(title),
                           ),
                           SizedBox(height: isTablet ? 4.0 : 2.0),
-                          Text(
-                            description,
+                          AnimatedDefaultTextStyle(
+                            duration: animDuration,
+                            curve: animCurve,
                             style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: descSize,
                               fontWeight: FontWeight.w400,
-                              color: contentColor.withValues(alpha: 0.6),
+                              color: targetFg.withValues(alpha: 0.6),
                               height: 1.2,
                             ),
+                            child: Text(description),
                           ),
                         ],
                       ),
                     ),
 
-                    // 3. Arrow Icon (always visible, styled consistently)
-                    if (!isDisabled)
+                    // 4. Navigation Arrow (Only for non-selectable actions like Explore)
+                    // We REMOVED the Checkmark (Tick) as requested.
+                    if (!isDisabled && !isSelected &&
+                        (title == 'Explore' || title == 'Keşfet'))
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Icon(
                           Icons.chevron_right_rounded,
                           color: AppColors.tertiaryColor.withValues(alpha: 0.5),
-                          size: arrowSize,
+                          size: 18.0,
                         ),
                       ),
                   ],

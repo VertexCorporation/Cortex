@@ -20,6 +20,8 @@ class TtsService with ChangeNotifier {
   String _currentText = '';
   String get currentText => _currentText;
 
+  String get originalText => _originalText;
+
   double _progress = 0.0;
   double get progress => _progress;
 
@@ -32,6 +34,7 @@ class TtsService with ChangeNotifier {
       await _flutterTts.setLanguage('en-US');
       await _flutterTts.setSpeechRate(0.5);
       await _flutterTts.setVolume(1.0);
+
       await _flutterTts.setPitch(1.0);
 
       _flutterTts.setStartHandler(() {
@@ -40,19 +43,25 @@ class TtsService with ChangeNotifier {
       });
 
       _flutterTts.setCompletionHandler(() {
+        if (_isInterrupted) return; // Don't reset if we are seeking or pausing
+
         _state = TtsState.idle;
         _progress = 1.0;
         notifyListeners();
 
-        // Reset after a short delay
-        Future.delayed(const Duration(milliseconds: 500), () {
-          _progress = 0.0;
-          _currentText = '';
-          notifyListeners();
+        // Reset after 2 seconds delay as requested
+        Future.delayed(const Duration(milliseconds: 2000), () {
+          if (_state == TtsState.idle) {
+            _progress = 0.0;
+            _currentText = '';
+            notifyListeners();
+          }
         });
       });
 
       _flutterTts.setCancelHandler(() {
+        if (_isInterrupted) return;
+
         _state = TtsState.idle;
         _progress = 0.0;
         _currentText = '';
@@ -67,9 +76,12 @@ class TtsService with ChangeNotifier {
       });
 
       _flutterTts.setProgressHandler((text, start, end, word) {
-        // Calculate progress based on character position
-        if (_currentText.isNotEmpty) {
-          _progress = end / _currentText.length;
+        // Calculate progress based on character position relative to ORIGINAL full text
+        if (_originalText.isNotEmpty) {
+          // end is relative to the current chunk being spoken
+          int globalPos = _currentOffset + end;
+          _progress = globalPos / _originalText.length;
+          if (_progress > 1.0) _progress = 1.0;
           notifyListeners();
         }
       });
@@ -81,38 +93,140 @@ class TtsService with ChangeNotifier {
     }
   }
 
-  Future<void> speak(String text) async {
+  String _originalText = '';
+  int _currentOffset = 0;
+  bool _isInterrupted =
+      false; // To prevent completion handler from clearing state during seek/pause
+
+  Future<void> speak(String text, {String? languageCode}) async {
     if (!_isInitialized) {
       await initialize();
     }
 
-    // Stop any current speech
-    if (_state == TtsState.playing) {
-      await stop();
+    if (languageCode != null) {
+      await setLanguage(languageCode);
     }
 
-    _currentText = text;
+    // Stop and Reset
+    _isInterrupted =
+        true; // prevent completion handler from nuking state immediately
+    if (_state == TtsState.playing) {
+      await _flutterTts.stop();
+      // [FIX] Error -8 often happens if we speak too fast after stop
+      await Future.delayed(const Duration(milliseconds: 50));
+    }
+    _isInterrupted = false;
+
+    // --- ENHANCED REGEX FILTERING ---
+    // 0. Remove <think> blocks (Reasoning)
+    String cleanText = text.replaceAll(RegExp(r'<think>[\s\S]*?</think>'), '');
+
+    // 1. Remove Code Blocks (```...```) content entirely or just fences?
+    // Usually reading code is bad. Let's remove the whole block for now as per "processable expressions"
+    // Regex for code blocks: ```[\s\S]*?```
+    cleanText = cleanText.replaceAll(RegExp(r'```[\s\S]*?```'), '');
+
+    // 2. Remove Inline Code (`...`)
+    cleanText = cleanText.replaceAll(RegExp(r'`.*?`'), '');
+
+    // 3. Remove Markdown Links [Label](URL) -> Label
+    cleanText =
+        cleanText.replaceAllMapped(RegExp(r'\[([^\]]+)\]\([^\)]+\)'), (match) {
+      return match.group(1) ?? '';
+    });
+
+    // 4. Remove generic URLs
+    cleanText = cleanText.replaceAll(RegExp(r'https?://\S+'), '');
+
+    // 5. Remove Bold/Italic markers (*, _)
+    cleanText = cleanText.replaceAll(RegExp(r'[\*_]{1,3}'), '');
+
+    // 6. Remove Headers (#)
+    cleanText = cleanText.replaceAll(RegExp(r'^#+\s*', multiLine: true), '');
+
+    // 7. Filter Emojis & Specific Symbols
+    final emojiRegex = RegExp(
+        r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]|[\u2700-\u27bf])');
+    cleanText = cleanText.replaceAll(emojiRegex, '');
+
+    // 8. Remove LaTeX/Math markers and other noisy symbols
+    cleanText = cleanText.replaceAll(RegExp(r'[\=\\\$\;\<\>\{\}]'), '');
+
+    // Cleanup extra whitespace
+    cleanText = cleanText.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+    if (cleanText.isEmpty) return;
+
+    _originalText = cleanText;
+    _currentOffset = 0;
     _progress = 0.0;
+
+    await _speakInternal(cleanText);
+  }
+
+  Future<void> _speakInternal(String textChunk) async {
+    _currentText = textChunk; // This is the chunk currently being spoken
     _state = TtsState.playing;
     notifyListeners();
-
-    await _flutterTts.speak(text);
+    await _flutterTts.speak(textChunk);
   }
 
   Future<void> stop() async {
+    _isInterrupted = false; // Allow completion handler to clean up
     await _flutterTts.stop();
+    // Handler will be called, but we can double check:
     _state = TtsState.idle;
     _progress = 0.0;
     _currentText = '';
+    _originalText = '';
+    _currentOffset = 0;
     notifyListeners();
   }
 
   Future<void> pause() async {
     if (_state == TtsState.playing) {
-      await _flutterTts.pause();
+      _isInterrupted = true; // Don't treat this as "finished"
+      await _flutterTts
+          .stop(); // Using stop to ensure we can restart from offset precisely
       _state = TtsState.paused;
+      _isInterrupted = false;
       notifyListeners();
     }
+  }
+
+  Future<void> resume() async {
+    if (_state == TtsState.paused && _originalText.isNotEmpty) {
+      // Calculate text remaining based on last progress
+      // Progress = (offset + current_chunk_pos) / total
+      // We can approximate the resumption point based on _progress
+      int startIdx = (_progress * _originalText.length).toInt();
+      if (startIdx >= _originalText.length) startIdx = 0;
+
+      _currentOffset = startIdx;
+      String textToSpeak = _originalText.substring(startIdx);
+      await _speakInternal(textToSpeak);
+    }
+  }
+
+  Future<void> seek(double newProgress) async {
+    if (_originalText.isEmpty) return;
+
+    _isInterrupted = true;
+    await _flutterTts.stop();
+    _isInterrupted = false;
+
+    int newIndex = (newProgress * _originalText.length).toInt();
+    if (newIndex >= _originalText.length) newIndex = _originalText.length - 1;
+    if (newIndex < 0) newIndex = 0;
+
+    _currentOffset = newIndex;
+    _progress = newProgress; // Optimistic update
+
+    // Only resume playing if we were playing or if requested (usually seek implies play)
+    // But if we were paused, maybe stay paused? User usually expects seek -> play.
+    // Let's assume seek -> play.
+    String textToSpeak = _originalText.substring(newIndex);
+    await _speakInternal(textToSpeak);
   }
 
   /// Set language based on app locale

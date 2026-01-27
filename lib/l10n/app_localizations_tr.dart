@@ -12,7 +12,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get cancel => 'İptal';
 
   @override
-  String get remove => 'Kaldırmak';
+  String get remove => 'Kaldır';
 
   @override
   String get download => 'İndir';
@@ -661,7 +661,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get benefit10 => 'Daha Fazla Ek';
 
   @override
-  String get benefit11 => 'Sınırsız Akış Modu';
+  String get benefit11 => 'Daha Fazla Akış Modu';
 
   @override
   String get benefit12 => '';
@@ -1613,9 +1613,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Cortex, sesli sohbet modunda bile tamamen cihaz üzerinde çalışarak verilerinizi güvende tutar; sorunsuz konuşmaların tadını çıkarın!';
 
   @override
-  String get workInProgress => 'Çalışmalar Devam Ediyor';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Hisse senetleri (örneğin AAPL, THYAO.IS) ve kripto paralar (örneğin BTC-USD, ETH-USD) için güncel fiyat ve geçmiş verilerini alın.';
 
@@ -1677,4 +1674,64 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get voicePrompt =>
       'Şu anda Cortex platformunda ses hizmeti veriyorsunuz. Markdown, kod blokları veya LaTeX kullanmayın. Yalnızca konuşma sentezine uygun metin biçiminde yanıt verin.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Akış Modu';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'Premium';
+
+  @override
+  String get workInProgress => 'Çalışmalar Devam Ediyor';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'ÖNEMLİ: Markdown biçimlendirmesi (kalın, italik) kullanmayın. Kod blokları (```) çıktısı vermeyin. Yanıtlarınızı konuşma diline yakın ve kısa tutun.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Cortex Akış Modu ($agentName). Önceki: $previousResponse';
+  }
 }

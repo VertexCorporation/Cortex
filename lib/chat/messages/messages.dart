@@ -45,6 +45,9 @@ class Message {
   /// A UI-specific notifier to efficiently update only the text of this message.
   final ValueNotifier<String> notifier;
 
+  /// Indicates if the message should be visible in the UI.
+  final bool isVisible;
+
   Message({
     this.id,
     required this.text,
@@ -58,6 +61,7 @@ class Message {
     this.opacity = 1.0,
     this.isAttachmentUploading = false,
     this.parsedSpans,
+    this.isVisible = true,
   }) : notifier = ValueNotifier(text);
 
   /// Private constructor used by `copyWith` and `fromMap`.
@@ -75,6 +79,7 @@ class Message {
     required this.isAttachmentUploading,
     required this.parsedSpans,
     required this.notifier,
+    required this.isVisible,
   });
 
   /// Helper getter to check if the message has any attachments.
@@ -109,6 +114,7 @@ class Message {
     double? opacity,
     bool? isAttachmentUploading,
     List<InlineSpan>? parsedSpans,
+    bool? isVisible,
   }) {
     // Reuse existing notifier if text hasn't changed to save resources.
     final newNotifier =
@@ -138,6 +144,7 @@ class Message {
           isAttachmentUploading ?? this.isAttachmentUploading,
       parsedSpans: parsedSpans ?? this.parsedSpans,
       notifier: newNotifier,
+      isVisible: isVisible ?? this.isVisible,
     );
   }
 
@@ -191,6 +198,7 @@ class Message {
       isAttachmentUploading: false,
       parsedSpans: null,
       notifier: ValueNotifier(text),
+      isVisible: (map['isVisible'] as int? ?? 1) == 1,
     );
   }
 }

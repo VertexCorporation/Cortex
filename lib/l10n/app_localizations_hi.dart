@@ -663,7 +663,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get benefit10 => 'अधिक अटैचमेंट';
 
   @override
-  String get benefit11 => 'असीमित प्रवाह मोड';
+  String get benefit11 => 'अधिक प्रवाह मोड';
 
   @override
   String get benefit12 => '';
@@ -1613,9 +1613,6 @@ class AppLocalizationsHi extends AppLocalizations {
       'कॉर्टेक्स आपके डेटा को पूरी तरह से डिवाइस पर ही सुरक्षित रखता है, यहां तक कि वॉइस चैट मोड में भी; निर्बाध बातचीत का आनंद लें!';
 
   @override
-  String get workInProgress => 'काम जारी है';
-
-  @override
   String get toolGetStockPriceDescription =>
       'शेयरों (जैसे AAPL, THYAO.IS) और क्रिप्टोकरेंसी (जैसे BTC-USD, ETH-USD) के लिए वर्तमान मूल्य और इतिहास प्राप्त करें।';
 
@@ -1677,4 +1674,64 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get voicePrompt =>
       'आप वर्तमान में कॉर्टेक्स प्लेटफॉर्म पर वॉइस सेवा प्रदान कर रहे हैं। मार्कडाउन, कोड ब्लॉक या LaTeX का उपयोग न करें। केवल टेक्स्ट में उत्तर दें जो स्पीच सिंथेसिस के लिए उपयुक्त हो।';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'प्रवाह मोड';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'अधिमूल्य';
+
+  @override
+  String get workInProgress => 'काम जारी है';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'महत्वपूर्ण: मार्कडाउन फॉर्मेटिंग (बोल्ड, इटैलिक) का उपयोग न करें। कोड ब्लॉक (```) न लिखें। उत्तर बातचीत के अंदाज़ में और संक्षिप्त रखें।';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'कॉर्टेक्स फ्लो मोड ($agentName). पिछला: $previousResponse';
+  }
 }

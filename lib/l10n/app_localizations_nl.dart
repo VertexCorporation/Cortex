@@ -667,7 +667,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get benefit10 => 'Meer bijlagen';
 
   @override
-  String get benefit11 => 'Onbeperkte stroommodus';
+  String get benefit11 => 'Meer Stroommodus';
 
   @override
   String get benefit12 => '';
@@ -1627,9 +1627,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Cortex houdt je gegevens veilig doordat het volledig lokaal op je apparaat draait, zelfs in de spraakchatmodus; geniet van naadloze gesprekken!';
 
   @override
-  String get workInProgress => 'Werk in uitvoering';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Bekijk de actuele koers en koershistorie van aandelen (bijv. AAPL, THYAO.IS) en cryptovaluta (bijv. BTC-USD, ETH-USD).';
 
@@ -1683,13 +1680,73 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get flowModeDescription =>
-      'In de Flow-modus voeren de verschillende intelligenties een debat met elkaar; je kunt achterover leunen en luisteren, of actief deelnemen aan de discussie!';
+      'In de Stroommodus voeren de verschillende intelligenties een debat met elkaar; je kunt achterover leunen et luisteren, of actief deelnemen aan de discussie!';
 
   @override
   String get flowModeQuestion =>
-      'Hallo! Je bevindt je nu in de Flow-modus van de Cortex-app. Er zijn drie andere AI-agenten bij je. Jouw taak is om een onderwerp aan te snijden en een discussie op gang te brengen door de anderen een prikkelende of vermakelijke vraag te stellen. Je mag in je antwoorden gerust humor, ironie en een beetje plagen gebruiken. Elk onderwerp is bespreekbaar. Ga je gang, begin het gesprek.';
+      'Hallo! Je bevindt je nu in de Stroommodus van de Cortex-app. Er zijn drie andere AI-agenten bij je. Jouw taak is om een onderwerp aan te snijden en een discussie op gang te brengen door de anderen een prikkelende of vermakelijke vraag te stellen. Je mag in je antwoorden gerust humor, ironie en een beetje plagen gebruiken. Elk onderwerp is bespreekbaar. Ga je gang, begin het gesprek.';
 
   @override
   String get voicePrompt =>
       'U levert momenteel spraakdiensten via het Cortex-platform. Gebruik geen markdown, codeblokken of LaTeX. Reageer uitsluitend in tekst die geschikt is voor spraaksynthese.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Stroommodus';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'Premie';
+
+  @override
+  String get workInProgress => 'Werk in uitvoering';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'BELANGRIJK: Gebruik geen markdown-opmaak (vetgedrukt, cursief). Geef GEEN codeblokken (```) weer. Houd de antwoorden informeel en kort.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Cortex Flow-modus ($agentName). Vorige: $previousResponse';
+  }
 }

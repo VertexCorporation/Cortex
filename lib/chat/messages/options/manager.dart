@@ -84,7 +84,9 @@ Future<void> showMessageOptions({
         onSpeak: () {
           // Trigger TTS to speak the message
           final ttsService = TtsService();
-          ttsService.speak(message.text);
+          // [NEW] Pass the current locale to the TTS service
+          final langCode = Localizations.localeOf(context).languageCode;
+          ttsService.speak(message.text, languageCode: langCode);
         },
       );
     },

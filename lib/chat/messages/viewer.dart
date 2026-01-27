@@ -36,7 +36,8 @@ class PhotoViewer extends StatefulWidget {
           child: ScaleTransition(scale: scaleAnim, child: child),
         );
       },
-      barrierColor: Colors.black.withValues(alpha:0.5),
+      settings: const RouteSettings(name: 'PhotoViewer'),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
     );
   }
 
@@ -44,7 +45,8 @@ class PhotoViewer extends StatefulWidget {
   PhotoViewerState createState() => PhotoViewerState();
 }
 
-class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderStateMixin {
+class PhotoViewerState extends State<PhotoViewer>
+    with SingleTickerProviderStateMixin {
   late SystemUiOverlayStyle defaultStyle;
 
   late TransformationController _transformationController;
@@ -58,9 +60,11 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
     final currentSettings = AppColors.getSystemUIOverlayStyleForTheme(theme);
     defaultStyle = SystemUiOverlayStyle(
       systemNavigationBarColor: currentSettings['navigationBarColor'] as Color,
-      systemNavigationBarIconBrightness: currentSettings['navigationBarIconBrightness'] as Brightness,
+      systemNavigationBarIconBrightness:
+          currentSettings['navigationBarIconBrightness'] as Brightness,
       statusBarColor: currentSettings['statusBarColor'] as Color,
-      statusBarIconBrightness: currentSettings['statusBarIconBrightness'] as Brightness,
+      statusBarIconBrightness:
+          currentSettings['statusBarIconBrightness'] as Brightness,
     );
 
     _transformationController = TransformationController();
@@ -68,10 +72,10 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
       vsync: this,
       duration: const Duration(milliseconds: 300),
     )..addListener(() {
-      if (_animation != null) {
-        _transformationController.value = _animation!.value;
-      }
-    });
+        if (_animation != null) {
+          _transformationController.value = _animation!.value;
+        }
+      });
   }
 
   @override
@@ -96,7 +100,7 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final notificationService =
-    Provider.of<IntrovertNotificationService>(context, listen: false);
+        Provider.of<IntrovertNotificationService>(context, listen: false);
     final Size screenSize = MediaQuery.of(context).size;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -108,7 +112,7 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
             Positioned.fill(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Container(color: Colors.black.withValues(alpha:0.2)),
+                child: Container(color: Colors.black.withValues(alpha: 0.2)),
               ),
             ),
             SafeArea(
@@ -139,7 +143,7 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                         clipBehavior: Clip.none,
                         child: ClipRRect(
                           borderRadius:
-                          BorderRadius.circular(screenSize.width * 0.02),
+                              BorderRadius.circular(screenSize.width * 0.02),
                           child: Image.file(
                             widget.imageFile,
                             fit: BoxFit.contain,
@@ -159,7 +163,7 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            Colors.black.withValues(alpha:0.5),
+                            Colors.black.withValues(alpha: 0.5),
                             Colors.transparent,
                           ],
                         ),
@@ -191,11 +195,14 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                         Expanded(
                           child: GestureDetector(
                             onTap: () async {
-                              final box = context.findRenderObject() as RenderBox?;
+                              final box =
+                                  context.findRenderObject() as RenderBox?;
                               await SharePlus.instance.share(
                                 ShareParams(
                                   files: [XFile(widget.imageFile.path)],
-                                  sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+                                  sharePositionOrigin:
+                                      box!.localToGlobal(Offset.zero) &
+                                          box.size,
                                 ),
                               );
                             },
@@ -206,7 +213,8 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                                   'assets/icons/world.svg',
                                   width: screenSize.width * 0.05,
                                   height: screenSize.width * 0.05,
-                                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                  colorFilter: const ColorFilter.mode(
+                                      Colors.white, BlendMode.srcIn),
                                 ),
                                 SizedBox(height: screenSize.height * 0.005),
                                 Text(
@@ -249,7 +257,8 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                                 }
                                 await widget.imageFile.copy(localFile.path);
                                 final bool? success =
-                                await GallerySaver.saveImage(localFile.path);
+                                    await GallerySaver.saveImage(
+                                        localFile.path);
                                 if (success == true) {
                                   notificationService.showNotification(
                                     message: localizations.downloadSuccess,
@@ -278,7 +287,8 @@ class PhotoViewerState extends State<PhotoViewer> with SingleTickerProviderState
                                   'assets/icons/download.svg',
                                   width: screenSize.width * 0.05,
                                   height: screenSize.width * 0.05,
-                                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                  colorFilter: const ColorFilter.mode(
+                                      Colors.white, BlendMode.srcIn),
                                 ),
                                 SizedBox(height: screenSize.height * 0.005),
                                 Text(

@@ -164,8 +164,11 @@ class Tiles {
     final correctImagePath = modelService.getModelImagePath(model);
 
     final bool hasText = message.text.trim().isNotEmpty;
-    final bool isThinkingWithoutContent =
-        message.isThinking && !message.hasAttachments && !hasText;
+    // [FIX] Show placeholder even if isThinking is false, provided we have no text/attachments and no error
+    // This handles the gap between "Thinking done" and "First token arrived"
+    final bool showContent = hasText ||
+        message.isThinking ||
+        (!message.hasAttachments && !message.isError);
 
     // Dimensions
     final double leftPadding =
@@ -191,8 +194,7 @@ class Tiles {
       attachmentWidget = Padding(
         padding: EdgeInsets.only(
           left: leftPadding,
-          bottom:
-              (hasText || isThinkingWithoutContent) ? screenHeight * 0.006 : 0,
+          bottom: (showContent) ? screenHeight * 0.006 : 0,
         ),
         child: _buildAttachmentList(
           context: context,
@@ -208,7 +210,7 @@ class Tiles {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         attachmentWidget,
-        if (hasText || isThinkingWithoutContent) aiMessageContentWidget,
+        if (showContent) aiMessageContentWidget,
       ],
     );
   }
@@ -398,19 +400,29 @@ class Tiles {
     final double statusBarHeight = MediaQuery.of(context).padding.top;
     final double totalTopPadding = statusBarHeight;
 
+    // Filter invisible messages but keep track of original indices
+    final List<int> visibleIndices = [];
+    for (int i = 0; i < messages.length; i++) {
+      if (messages[i].isVisible) {
+        visibleIndices.add(i);
+      }
+    }
+
     return ListView.separated(
       controller: scrollController,
       padding:
           EdgeInsets.only(top: totalTopPadding, bottom: screenHeight * 0.01),
       cacheExtent: 500,
-      itemCount: messages.length,
+      itemCount: visibleIndices.length,
       separatorBuilder: (context, index) =>
           SizedBox(height: screenHeight * 0.01),
       itemBuilder: (context, index) {
-        Message message = messages[index];
+        final int realIndex = visibleIndices[index];
+        Message message = messages[realIndex];
+
         final bool isMessageUnderEdit = isEditingMode &&
             editingMessageIndex != null &&
-            index > editingMessageIndex;
+            realIndex > editingMessageIndex;
         if (isMessageUnderEdit) {
           message = message.copyWith(opacity: 0.0);
         }
@@ -418,19 +430,20 @@ class Tiles {
         return buildMessageTile(
           context: context,
           message: message,
-          index: index,
-          key: ValueKey(messages[index].id),
+          index: realIndex,
+          key: ValueKey(message.id),
           isEditingMode: isEditingMode,
           editingMessageIndex: editingMessageIndex,
-          onEdit: () => onEdit(index),
-          onFadeOutComplete:
-              isMessageUnderEdit ? null : () => onFadeOutComplete?.call(index),
+          onEdit: () => onEdit(realIndex),
+          onFadeOutComplete: isMessageUnderEdit
+              ? null
+              : () => onFadeOutComplete?.call(realIndex),
           screenWidth: screenWidth,
           screenHeight: screenHeight,
           modelId: modelId,
-          onReport: () => onReport(index),
+          onReport: () => onReport(realIndex),
           onRegenerate: ({String? newModelId}) {
-            onRegenerate(index, newModelId: newModelId);
+            onRegenerate(realIndex, newModelId: newModelId);
           },
           onStop: onStop,
           modelService: modelService,

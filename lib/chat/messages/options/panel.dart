@@ -11,6 +11,7 @@ import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:cortex/navigation.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
@@ -228,14 +229,7 @@ class _AnimatedMessageOptionsPanelState
   }
 
   void _navigateToScreen(BuildContext context, Widget screen) {
-    Navigator.of(context).push(PageRouteBuilder(
-      pageBuilder: (_, __, ___) => screen,
-      transitionsBuilder: (_, animation, __, child) {
-        final tween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
-            .chain(CurveTween(curve: Curves.easeOut));
-        return SlideTransition(position: animation.drive(tween), child: child);
-      },
-    ));
+    navigateToScreen(screen, direction: const Offset(1.0, 0.0));
   }
 
   void _onCopyTapped() {

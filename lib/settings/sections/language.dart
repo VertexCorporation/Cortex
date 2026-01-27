@@ -20,8 +20,8 @@ class AppLanguageSection extends StatelessWidget {
   const AppLanguageSection({super.key});
 
   /// Returns the localized language name corresponding to the given language code.
-  String _getLocalizedLanguageName(AppLocalizations localizations,
-      String code) {
+  String _getLocalizedLanguageName(
+      AppLocalizations localizations, String code) {
     switch (code) {
       case 'en':
         return localizations.english;
@@ -67,14 +67,8 @@ class AppLanguageSection extends StatelessWidget {
   Future<void> _showLanguageSelectionDialog(BuildContext context) async {
     final localeProvider = context.read<LocaleProvider>();
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final modelCatalogProvider = context.read<ModelCatalogProvider>();
 
     // Define base languages with native names for sorting
@@ -117,7 +111,21 @@ class AppLanguageSection extends StatelessWidget {
       ...allLanguages
           .where((l) => l['code'] != 'tr' && l['code'] != 'en')
           .toList()
-        ..sort((a, b) => a['native']!.compareTo(b['native']!)),
+        ..sort((a, b) {
+          String getKey(String text) {
+            return text
+                .toLowerCase()
+                .replaceAll('ç', 'c~')
+                .replaceAll('ğ', 'g~')
+                .replaceAll('ı', 'h~')
+                .replaceAll('i', 'i')
+                .replaceAll('ö', 'o~')
+                .replaceAll('ş', 's~')
+                .replaceAll('ü', 'u~');
+          }
+
+          return getKey(a['name']!).compareTo(getKey(b['name']!));
+        }),
     ];
 
     // Temporarily holds the selected language within the dialog.
@@ -171,12 +179,12 @@ class AppLanguageSection extends StatelessWidget {
                             height: 1,
                             thickness: 0.5,
                             color:
-                            AppColors.quinaryColor.withValues(alpha: 0.7)),
+                                AppColors.quinaryColor.withValues(alpha: 0.7)),
 
                         // --- Language List ---
                         ConstrainedBox(
                           constraints:
-                          BoxConstraints(maxHeight: screenHeight * 0.4),
+                              BoxConstraints(maxHeight: screenHeight * 0.4),
                           child: ListView.builder(
                             shrinkWrap: true,
                             padding: EdgeInsets.symmetric(
@@ -187,7 +195,7 @@ class AppLanguageSection extends StatelessWidget {
                               final lang = languages[index];
                               final String langCode = lang['code']!;
                               final bool isSelected =
-                              (tempSelectedLanguageCode == langCode);
+                                  (tempSelectedLanguageCode == langCode);
 
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
@@ -195,7 +203,7 @@ class AppLanguageSection extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? AppColors.primaryColor.inverted
-                                      .withValues(alpha: 0.02)
+                                          .withValues(alpha: 0.02)
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -225,7 +233,7 @@ class AppLanguageSection extends StatelessWidget {
                                     if (!isSelected) {
                                       HapticFeedback.lightImpact();
                                       setStateDialog(() =>
-                                      tempSelectedLanguageCode = langCode);
+                                          tempSelectedLanguageCode = langCode);
                                     }
                                   },
                                   shape: RoundedRectangleBorder(
@@ -244,14 +252,14 @@ class AppLanguageSection extends StatelessWidget {
                             height: 1,
                             thickness: 0.5,
                             color:
-                            AppColors.quinaryColor.withValues(alpha: 0.7)),
+                                AppColors.quinaryColor.withValues(alpha: 0.7)),
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
                             splashColor:
-                            AppColors.senaryColor.withValues(alpha: 0.1),
+                                AppColors.senaryColor.withValues(alpha: 0.1),
                             highlightColor:
-                            AppColors.senaryColor.withValues(alpha: 0.1),
+                                AppColors.senaryColor.withValues(alpha: 0.1),
                             onTap: () {
                               HapticFeedback.lightImpact();
                               Navigator.of(ctx).pop(tempSelectedLanguageCode);
@@ -310,16 +318,10 @@ class AppLanguageSection extends StatelessWidget {
 
     final currentLanguageCode = localeProvider.locale.languageCode;
     final currentLanguageName =
-    _getLocalizedLanguageName(appLocalizations, currentLanguageCode);
+        _getLocalizedLanguageName(appLocalizations, currentLanguageCode);
 
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
