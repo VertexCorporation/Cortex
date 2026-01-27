@@ -1,6 +1,7 @@
 // lib/axon/view.dart
 
 import 'package:cortex/axon/inbox/logic/general.dart';
+import 'package:cortex/axon/inbox/panel/view.dart';
 import 'package:cortex/settings/controller.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +69,7 @@ class _AxonState extends State<Axon> {
     _searchFocusNode.removeListener(_onSearchFocusChange);
     _searchFocusNode.dispose();
     // Note: BannerService is managed by Provider, not disposed here.
+    ActionPanelController.closeCurrent();
     super.dispose();
   }
 
@@ -80,6 +82,7 @@ class _AxonState extends State<Axon> {
   }
 
   void _handleSettingsTap() async {
+    ActionPanelController.closeCurrent(); // Close context menu
     widget.onCloseAxon();
 
     await navigateToScreen(

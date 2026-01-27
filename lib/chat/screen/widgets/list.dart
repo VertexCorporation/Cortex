@@ -12,7 +12,7 @@ import 'package:cortex/chat/services/storage.dart';
 import 'package:cortex/chat/screen/widgets/tiles.dart';
 import 'package:cortex/chat/messages/options/report.dart';
 
-class ChatMessageList extends StatelessWidget {
+class ChatMessageList extends StatefulWidget {
   final ScrollController scrollController;
   final EditService editService;
 
@@ -23,6 +23,31 @@ class ChatMessageList extends StatelessWidget {
   });
 
   @override
+  State<ChatMessageList> createState() => _ChatMessageListState();
+}
+
+class _ChatMessageListState extends State<ChatMessageList> {
+  @override
+  void initState() {
+    super.initState();
+    // Scroll to bottom on initial load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.scrollController.hasClients) {
+        widget.scrollController
+            .jumpTo(widget.scrollController.position.maxScrollExtent);
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant ChatMessageList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If we want to detect "new chat" specifically, we might need to watch the conversation ID.
+    // For now, let's rely on the parent rebuild or key change if checking a new chat.
+    // Usually, changing chats rebuilds this widget entirely if key changes.
+  }
+
+  @override
   Widget build(BuildContext context) {
     final conversationProvider = context.watch<ConversationProvider>();
     final sessionProvider = context.watch<ChatSessionProvider>();
@@ -30,33 +55,30 @@ class ChatMessageList extends StatelessWidget {
 
     final messages = conversationProvider.messages;
 
+    // Use a unique key based on conversation ID to force a fresh state (and thus initState scroll) when chat changes
+    // This is the cleanest way to ensure "open new chat -> scroll to bottom".
+    // We assume conversationProvider.conversationID changes.
+
     return Column(
+      key: ValueKey(conversationProvider.conversationID),
       children: [
         Expanded(
           child: Tiles.buildMessagesList(
             context: context,
             messages: messages.toList(),
-            scrollController: scrollController,
-
+            scrollController: widget.scrollController,
             modelId: sessionProvider.modelId ?? '',
             isEditingMode: inputProvider.isEditingMode,
             editingMessageIndex: inputProvider.editingMessageIndex,
-
-            onStop: context
-                .read<StopService>()
-                .stopResponse,
-
-            onEdit: (index) => editService.startEditingMessage(index),
-
-            onFadeOutComplete: (index) =>
-                context.read<ConversationProvider>().removeMessageAtIndex(
-                    index),
-
+            onStop: context.read<StopService>().stopResponse,
+            onEdit: (index) => widget.editService.startEditingMessage(index),
+            onFadeOutComplete: (index) => context
+                .read<ConversationProvider>()
+                .removeMessageAtIndex(index),
             onRegenerate: (int index, {String? newModelId}) {
               _handleRegenerate(
                   context, index, newModelId, sessionProvider.isDynamicChat);
             },
-
             onReport: (index) {
               _handleReport(context, index, conversationProvider);
             },
@@ -66,20 +88,17 @@ class ChatMessageList extends StatelessWidget {
     );
   }
 
-  void _handleRegenerate(BuildContext context,
-      int index,
-      String? newModelId,
-      bool isDynamic) {
+  void _handleRegenerate(
+      BuildContext context, int index, String? newModelId, bool isDynamic) {
     context.read<RegenerateService>().onRegenerate(
-      index,
-      context: context,
-      newModelId: newModelId,
-      isDynamicRegenerate: isDynamic,
-    );
+          index,
+          context: context,
+          newModelId: newModelId,
+          isDynamicRegenerate: isDynamic,
+        );
   }
 
-  void _handleReport(BuildContext context,
-      int index,
+  void _handleReport(BuildContext context, int index,
       ConversationProvider conversationProvider) {
     final messages = conversationProvider.messages;
     if (index < 0 || index >= messages.length) return;

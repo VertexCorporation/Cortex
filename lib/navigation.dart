@@ -26,15 +26,17 @@ Future<T?> navigateToScreen<T extends Object?>(Widget screen,
   // If RTL, flip the horizontal direction (X-axis).
   // Example: If direction is (1.0, 0.0) [From Right],
   // in RTL it becomes (-1.0, 0.0) [From Left].
-  final Offset effectiveDirection = isRtl
-      ? Offset(-direction.dx, direction.dy)
-      : direction;
+  final Offset effectiveDirection =
+      isRtl ? Offset(-direction.dx, direction.dy) : direction;
 
   return Navigator.push<T>(
     context,
     PageRouteBuilder<T>(
       // The new screen widget itself.
       pageBuilder: (_, __, ___) => screen,
+
+      // Use the runtime type of the screen widget as the route name for Analytics
+      settings: RouteSettings(name: screen.runtimeType.toString()),
 
       // Set a comfortable duration for the complex animation.
       transitionDuration: const Duration(milliseconds: 400),

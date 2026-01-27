@@ -31,6 +31,10 @@ void showFeaturesSheet({
   // Pre-calculate capability availability for the UI
   final catalog = context.read<ModelCatalogProvider>();
 
+  // Watch InputProvider for current feature mode to update UI state
+  final inputProvider = context.watch<InputProvider>();
+  final currentMode = inputProvider.featureMode;
+
   // Logic: Check for models that have 'image' in their 'outputs' map
   final imageGenModels = catalog.allModels.where((m) {
     // Assuming ModelEntity has a raw map or property for outputs.
@@ -105,9 +109,17 @@ void showFeaturesSheet({
                       iconPath: 'assets/icons/context.svg',
                       title: l10n.useOffline,
                       description: l10n.useOfflineDescription,
+                      isSelected: currentMode == ChatInputMode.offline,
                       onTap: () {
+                        // Toggle logic handled in _handleOfflineAction potentially or here?
+                        // If already selected, maybe we toggle off?
+                        // For Offline, it's a bit special. Let's let the handler decide or toggle off if same.
+                        if (currentMode == ChatInputMode.offline) {
+                          context.read<InputProvider>().clearFeatureMode();
+                        } else {
+                          _handleOfflineAction(context, l10n);
+                        }
                         Navigator.pop(context);
-                        _handleOfflineAction(context, l10n);
                       },
                     ),
 
@@ -117,6 +129,10 @@ void showFeaturesSheet({
                       title: l10n.featureCreateImageTitle,
                       description: l10n.featureCreateImageDescription,
                       isDisabled: !canGenerateImages,
+                      isSelected: false,
+                      // Image generation is an action, not a mode?
+                      // Plan didn't specify Image Generation as a mode, but typically it is single-shot.
+                      // Leaving isSelected false for now as it usually sends immediately.
                       onTap: () {
                         Navigator.pop(context);
                         _handleCreateImageAction(
@@ -129,6 +145,7 @@ void showFeaturesSheet({
                       iconPath: 'assets/icons/study.svg',
                       title: l10n.featureStudyTitle,
                       description: l10n.featureStudyDescription,
+                      isSelected: currentMode == ChatInputMode.study,
                       onTap: () {
                         Navigator.pop(context);
                         _handleFeatureSelection(context, ChatInputMode.study);
@@ -140,6 +157,7 @@ void showFeaturesSheet({
                       iconPath: 'assets/icons/test.svg',
                       title: l10n.featureQuizzesTitle,
                       description: l10n.featureQuizzesDescription,
+                      isSelected: currentMode == ChatInputMode.quiz,
                       onTap: () {
                         Navigator.pop(context);
                         _handleFeatureSelection(context, ChatInputMode.quiz);
@@ -187,25 +205,27 @@ void showFeaturesSheet({
 void _handleOfflineAction(BuildContext context, AppLocalizations l10n) {
   final catalog = context.read<ModelCatalogProvider>();
   final local = context.read<ModelLocalStateProvider>();
-  final session = context.read<ChatSessionProvider>();
   final selectionService = context.read<SelectionService>();
+  final inputProvider = context.read<InputProvider>();
 
+  // Find all offline models
   final offlineModels = catalog.allModels.where((m) => m.type == 'offline');
-  final hasDownloadedModel = offlineModels.any((m) {
+
+  // Find which ones are actually downloaded
+  final downloadedModels = offlineModels.where((m) {
     final path = local.getFilePathById(m.id);
     return local.isModelOnDisk(path);
-  });
+  }).toList();
 
-  if (hasDownloadedModel) {
-    showModelSelectionSheet(
-      context: context,
-      localizations: l10n,
-      currentModelId: session.modelId ?? '',
-      onModelSelected: (String id) {
-        final model = catalog.allModels.firstWhere((m) => m.id == id);
-        selectionService.selectModel(model);
-      },
-    );
+  if (downloadedModels.isNotEmpty) {
+    // [CHANGED] Auto-select offline feature mode
+    inputProvider.setFeatureMode(ChatInputMode.offline);
+
+    // [NEW] Auto-select the first downloaded model
+    final firstModel = downloadedModels.first;
+    selectionService.selectModel(firstModel);
+
+    // Don't show sheet, just succeed silently like a boss
   } else {
     mainScreenKey.currentState?.switchToLibrary(pulse: true);
   }
@@ -217,6 +237,8 @@ void _handleCreateImageAction(
   List<ModelEntity> candidates,
   TextEditingController controller,
 ) {
+  _checkAndResetOfflineMode(context); // [NEW] Reset if needed
+
   if (candidates.isEmpty) return;
 
   // Priority: Non-Premium (Free) first, otherwise Premium.
@@ -242,5 +264,37 @@ void _handleCreateImageAction(
 
 /// Logic for "Study" & "Quizzes": Formats input with prefix and sends.
 void _handleFeatureSelection(BuildContext context, ChatInputMode mode) {
-  context.read<InputProvider>().setFeatureMode(mode);
+  final provider = context.read<InputProvider>();
+
+  _checkAndResetOfflineMode(context); // [NEW] Reset if needed
+
+  // [CHANGED] Toggle logic: If already selected, clear it.
+  if (provider.featureMode == mode) {
+    provider.clearFeatureMode();
+  } else {
+    provider.setFeatureMode(mode);
+  }
+}
+
+/// [NEW] Helper to switch to Dynamic Chat if Offline Mode was active
+void _checkAndResetOfflineMode(BuildContext context) {
+  final inputProvider = context.read<InputProvider>();
+  final selectionService = context.read<SelectionService>();
+  final catalog = context.read<ModelCatalogProvider>();
+
+  if (inputProvider.featureMode == ChatInputMode.offline) {
+    // Switch to "auto" (Dynamic Chat)
+    // Finding the 'auto' model or just clearing selection depends on app logic
+    // Usually 'auto' is a special ID or we select the default online model
+    try {
+      // Assuming 'auto' is the ID for dynamic chat or we pick the first online one
+      // The user said "otomatik olarak dinamik sohbete atacak"
+      final dynamicModel = catalog.allModels.firstWhere((m) => m.id == 'auto',
+          orElse: () =>
+              catalog.allModels.firstWhere((m) => m.type != 'offline'));
+      selectionService.selectModel(dynamicModel);
+    } catch (e) {
+      // Fallback safe
+    }
+  }
 }

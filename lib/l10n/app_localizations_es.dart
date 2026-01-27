@@ -601,7 +601,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get italian => 'Italiano';
 
   @override
-  String get arabic => 'árabe';
+  String get arabic => 'Árabe';
 
   @override
   String get ram => 'RAM';
@@ -671,7 +671,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get benefit10 => 'Más archivos adjuntos';
 
   @override
-  String get benefit11 => 'Modo de flujo ilimitado';
+  String get benefit11 => 'Más modo de flujo';
 
   @override
   String get benefit12 => '';
@@ -1632,9 +1632,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Cortex mantiene tus datos seguros al ejecutarse completamente en el dispositivo, incluso en modo de chat de voz; ¡disfruta de conversaciones fluidas!';
 
   @override
-  String get workInProgress => 'Trabajo en progreso';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Obtenga el precio actual y el historial de acciones (por ejemplo, AAPL, THYAO.IS) y criptomonedas (por ejemplo, BTC-USD, ETH-USD).';
 
@@ -1696,4 +1693,64 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get voicePrompt =>
       'Actualmente ofreces servicio de voz en la plataforma Cortex. No uses Markdown, bloques de código ni LaTeX. Responde únicamente con texto apto para síntesis de voz.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Modo de flujo';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'De primera calidad';
+
+  @override
+  String get workInProgress => 'Trabajo en progreso';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'IMPORTANTE: No utilice formato Markdown (negrita, cursiva). NO imprima bloques de código (```). Mantenga sus respuestas breves y concisas.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Modo de flujo de Cortex ($agentName). Anterior: $previousResponse';
+  }
 }

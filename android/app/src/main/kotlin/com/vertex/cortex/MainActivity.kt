@@ -7,17 +7,19 @@ import android.content.Intent
 import android.os.Environment
 import android.os.StatFs
 import android.util.Log
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 import android.os.Bundle
 import androidx.core.view.WindowCompat
 
-class MainActivity : FlutterActivity() {
+import androidx.activity.enableEdgeToEdge // [NEW]
+
+class MainActivity : FlutterFragmentActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge() // [NEW] - Android 15 standard
         super.onCreate(savedInstanceState)
     }
 

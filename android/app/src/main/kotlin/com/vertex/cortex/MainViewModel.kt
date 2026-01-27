@@ -44,7 +44,11 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
     fun stop() {
         Log.d(tag, "ViewModel received stop command.")
         viewModelScope.launch {
-            llamaAndroid.requestStop()
+            try {
+                llamaAndroid.requestStop()
+            } catch (e: Throwable) {
+                Log.e(tag, "Error stopping llama: ${e.message}")
+            }
         }
     }
 

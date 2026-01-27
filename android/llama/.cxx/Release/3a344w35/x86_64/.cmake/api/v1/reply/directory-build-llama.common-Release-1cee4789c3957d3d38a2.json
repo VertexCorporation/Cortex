@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "build-llama/common",
+		"source" : "/home/baba/Documents/cortex/vendor/llama.cpp/common"
+	}
+}

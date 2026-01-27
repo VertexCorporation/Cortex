@@ -11,6 +11,8 @@ import '../../../../main.dart';
 import '../../../../theme.dart';
 import '../../../app.dart';
 import '../../../../chat/providers/conversation.dart';
+import 'package:cortex/chat/providers/input.dart'; // [NEW]
+import 'package:cortex/chat/services/voice.dart'; // [NEW]
 import '../../../overflow.dart';
 import '../logic/manager.dart';
 
@@ -177,6 +179,13 @@ class _AxonConversationTileState extends State<AxonConversationTile>
   }
 
   void _openChat() {
+    // [Clean Up] Ensure Voice/Flow modes are disabled when switching chats
+    // We do not await this to ensure instant UI response.
+    context.read<VoiceService>().stopSession(resetState: true);
+    final inputProvider = context.read<InputProvider>();
+    inputProvider.setVoiceModeActive(false);
+    inputProvider.clearFeatureMode();
+
     if (_panelController != null) {
       // Panel was open, we already hapticed on opening.
       // Closing it might deserve a light impact?
@@ -220,23 +229,23 @@ class _AxonConversationTileState extends State<AxonConversationTile>
 
     // Padding inside the tile
     final double innerPaddingV =
-    isTablet ? screenHeight * 0.012 : screenHeight * 0.012;
+        isTablet ? screenHeight * 0.012 : screenHeight * 0.012;
     final double innerPaddingH =
-    isTablet ? screenWidth * 0.02 : screenWidth * 0.03;
+        isTablet ? screenWidth * 0.02 : screenWidth * 0.03;
 
     final double borderRadius =
-    isTablet ? screenWidth * 0.015 : screenWidth * 0.03;
+        isTablet ? screenWidth * 0.015 : screenWidth * 0.03;
 
     // Avatar Size: Larger on tablet but scaled appropriately
     final double avatarSize =
-    isTablet ? screenWidth * 0.045 : screenWidth * 0.072;
+        isTablet ? screenWidth * 0.045 : screenWidth * 0.072;
 
     // Font Size
     final double fontSize = isTablet ? screenWidth * 0.02 : screenWidth * 0.038;
 
     // Icon Size (Star)
     final double starIconSize =
-    isTablet ? screenWidth * 0.025 : screenWidth * 0.042;
+        isTablet ? screenWidth * 0.025 : screenWidth * 0.042;
 
     // Spacing between elements
     final double gapAvatarText = screenWidth * 0.03;
@@ -244,10 +253,14 @@ class _AxonConversationTileState extends State<AxonConversationTile>
 
     // --- 2. State & Colors ---
     final currentConversationId =
-        context
-            .watch<ConversationProvider>()
-            .conversationID;
-    final isActive = currentConversationId == widget.manager.conversationID;
+        context.watch<ConversationProvider>().conversationID;
+
+    // [FIX] Check if we are actually on the Chat tab (index 0).
+    // If user is in Library (1) or News (2), the tile should NOT be highlighted
+    // even if it matches the currentConversationId.
+    final selectedTab = context.watch<TabProvider>().selectedIndex;
+    final isActive = (selectedTab == 0) &&
+        (currentConversationId == widget.manager.conversationID);
     final Color textColor = AppColors.primaryColor.inverted;
 
     // The animated background color target (Transparent vs Highlighted)
@@ -278,7 +291,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
             onTapCancel: _onTapCancel,
             splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
             highlightColor:
-            AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+                AppColors.primaryColor.inverted.withValues(alpha: 0.1),
             child: Container(
               padding: EdgeInsets.symmetric(
                   horizontal: innerPaddingH, vertical: innerPaddingV),
@@ -323,7 +336,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                               : textColor.withValues(alpha: 0.85),
                           fontSize: fontSize,
                           fontWeight:
-                          isActive ? FontWeight.w600 : FontWeight.w500,
+                              isActive ? FontWeight.w600 : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -340,11 +353,11 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                     },
                     child: widget.manager.isStarred
                         ? Icon(
-                      Icons.star_rounded,
-                      key: const ValueKey('star'),
-                      size: starIconSize,
-                      color: Colors.amber,
-                    )
+                            Icons.star_rounded,
+                            key: const ValueKey('star'),
+                            size: starIconSize,
+                            color: Colors.amber,
+                          )
                         : SizedBox.shrink(key: const ValueKey('empty')),
                   ),
                 ],

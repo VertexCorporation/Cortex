@@ -24,6 +24,7 @@ class ConversationProvider with ChangeNotifier {
   bool _responseStopped = false;
   final bool _isLoadingMessages = false;
   bool _justFinishedLoading = false;
+  bool _isEphemeral = false; // [NEW] Track if session is not yet saved
 
   // ===========================================================================
   // SECTION 2: PUBLIC GETTERS
@@ -65,6 +66,16 @@ class ConversationProvider with ChangeNotifier {
     _responseStopped = false;
     _justFinishedLoading = false;
     notifyListeners();
+  }
+
+  /// Stops the current AI generation/streaming process.
+  /// This sets a flag that services (like SendService) check to abort their loops.
+  void stopGenerating() {
+    if (_isWaitingForResponse) {
+      _responseStopped = true;
+      _isWaitingForResponse = false;
+      notifyListeners();
+    }
   }
 
   // -------------------- Message Management Actions --------------------
@@ -141,6 +152,48 @@ class ConversationProvider with ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  /// Starts a session solely in memory. Does not save to storage yet.
+  /// Used for Flow Mode hidden prompts.
+  void startEphemeralSession(
+      String id, String modelIdForStorage, Message userMessage,
+      {String? title}) {
+    _conversationID = id;
+    _conversationTitle = title ?? "New Chat";
+    _isEphemeral = true;
+
+    final thinkingMessage = Message(
+      text: "",
+      isUserMessage: false,
+      isThinking: true,
+      model: userMessage.model,
+    );
+
+    _messages = [userMessage, thinkingMessage];
+    _isWaitingForResponse = true;
+    _responseStopped = false;
+
+    notifyListeners();
+  }
+
+  /// Promotes an ephemeral session to a real stored conversation.
+  Future<void> promoteToPersistentSession() async {
+    if (!_isEphemeral || _conversationID == null) return;
+
+    // We can use a generic title or generate one later.
+    // For Flow Mode, we might have set a specific title in startEphemeralSession
+    final title = _conversationTitle ?? "New Chat";
+
+    await ChatStorageService.saveConversation(_conversationID!, title, [],
+        modelId: _messages.first.model);
+
+    // Save existing messages
+    for (int i = 0; i < _messages.length; i++) {
+      await ChatStorageService.upsertMessage(_conversationID!, i, _messages[i]);
+    }
+
+    _isEphemeral = false;
   }
 
   /// Prepares the conversation state for a regeneration action in a single, atomic operation.
@@ -249,6 +302,10 @@ class ConversationProvider with ChangeNotifier {
 
   /// Finalizes the AI response at a specific index, marking it as complete.
   void finishBotResponse(int index) {
+    // Guard against race conditions (e.g. StopService vs SendService completion)
+    if (!_isWaitingForResponse) return;
+    _isWaitingForResponse = false;
+
     if (index >= 0 && index < _messages.length) {
       final msg = _messages[index];
       if (msg.isThinking) {
@@ -256,11 +313,21 @@ class ConversationProvider with ChangeNotifier {
             msg.copyWith(isThinking: false, includeInContext: true);
       }
       if (_conversationID != null) {
-        ChatStorageService.upsertMessage(
-            _conversationID!, index, _messages[index]);
+        if (_isEphemeral) {
+          // If we finish a response and it's still ephemeral, save it now?
+          // This handles cases where we finish without streaming (e.g. short/tool).
+          // However, ideally we promote on first chunk.
+          // Let's ensure we promote here just in case.
+          promoteToPersistentSession().then((_) {
+            ChatStorageService.upsertMessage(
+                _conversationID!, index, _messages[index]);
+          });
+        } else {
+          ChatStorageService.upsertMessage(
+              _conversationID!, index, _messages[index]);
+        }
       }
     }
-    _isWaitingForResponse = false;
     notifyListeners();
   }
 

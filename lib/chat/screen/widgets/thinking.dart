@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -28,19 +29,37 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
     with TickerProviderStateMixin {
   bool _isExpanded = false;
   bool _isVisible = true;
-  late AnimationController _controller;
-  late Animation<double> _iconTurns;
+
+  late AnimationController _arrowController;
+  late Animation<double> _arrowTurns;
+
+  late AnimationController _contentController;
+  late Animation<double> _contentFade;
+  late Animation<Offset> _contentSlide;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    // Arrow rotation controller
+    _arrowController = AnimationController(
         duration: const Duration(milliseconds: 300), vsync: this);
-    _iconTurns = Tween<double>(begin: 0.0, end: 0.5).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    _arrowTurns = Tween<double>(begin: 0.0, end: 0.5).animate(
+      CurvedAnimation(parent: _arrowController, curve: Curves.easeInOut),
     );
 
-    // If autoFadeOut is true and there is no content to show, fade out after a delay
+    // Content expand animation (Fade + Slide)
+    _contentController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _contentFade =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_contentController);
+    _contentSlide =
+        Tween<Offset>(begin: const Offset(0.0, -0.1), end: Offset.zero).animate(
+            CurvedAnimation(
+                parent: _contentController, curve: Curves.easeOutQuad));
+
+    // Auto fade out logic
     if (widget.autoFadeOut && widget.content.isEmpty) {
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
@@ -53,135 +72,162 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
   }
 
   @override
+  void didUpdateWidget(ThinkingWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void dispose() {
-    _controller.dispose();
+    _arrowController.dispose();
+    _contentController.dispose();
     super.dispose();
   }
 
   void _toggleExpand() {
-    if (widget.content.isEmpty) return; // Cannot expand empty content
+    if (widget.content.isEmpty) return;
     setState(() {
       _isExpanded = !_isExpanded;
       if (_isExpanded) {
-        _controller.forward();
+        _arrowController.forward();
+        _contentController.forward();
       } else {
-        _controller.reverse();
+        _arrowController.reverse();
+        _contentController.reverse();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // If not visible (faded out), collapse entirely
     if (!_isVisible) {
       return AnimatedSize(
-        duration: const Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
         child: const SizedBox.shrink(),
       );
     }
 
+    final localizations = AppLocalizations.of(context);
     final hasContent = widget.content.isNotEmpty;
-    final labelText =
-        widget.label ?? (AppLocalizations.of(context)?.thinking ?? 'Thinking');
+
+    // Determine label text
+    String labelText;
+    if (!widget.isFinished) {
+      // Still thinking
+      labelText = widget.label ?? (localizations?.thinking ?? 'Thinking');
+    } else {
+      // Finished logic
+      // User requested to remove duration info ("ne kadar düşündüğü süre bilgisini vermeyelim")
+      labelText = localizations?.thought ?? 'Thought';
+    }
 
     return AnimatedOpacity(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 300),
       opacity: _isVisible ? 1.0 : 0.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InkWell(
-            onTap: hasContent ? _toggleExpand : null,
-            borderRadius: BorderRadius.circular(8),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (hasContent)
-                    RotationTransition(
-                      turns: _iconTurns,
-                      child: SvgPicture.asset(
-                        'assets/icons/arrov.svg',
-                        width: 16,
-                        height: 16,
-                        colorFilter: ColorFilter.mode(
-                          AppColors.tertiaryColor,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    )
-                  else
-                    // Placeholder to keep alignment or just nothing
-                    const SizedBox(width: 4),
-
-                  const SizedBox(width: 8),
-
-                  // Label: Shimmer only if NOT finished
-                  widget.isFinished
-                      ? Text(
-                          labelText,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.tertiaryColor,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        )
-                      : Shimmer.fromColors(
-                          baseColor: AppColors.tertiaryColor,
-                          highlightColor:
-                              AppColors.primaryColor.withValues(alpha:0.5),
-                          period: const Duration(milliseconds: 2000),
-                          child: Text(
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: hasContent ? _toggleExpand : null,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Text section
+                    widget.isFinished
+                        ? Text(
                             labelText,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: AppColors.tertiaryColor,
-                              fontStyle: FontStyle.italic,
+                              // NO ITALIC
+                            ),
+                          )
+                        : Shimmer.fromColors(
+                            baseColor: AppColors.tertiaryColor,
+                            highlightColor:
+                                AppColors.primaryColor.withValues(alpha: 0.5),
+                            period: const Duration(milliseconds: 2000),
+                            child: Text(
+                              labelText,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.tertiaryColor,
+                                // NO ITALIC
+                              ),
                             ),
                           ),
+
+                    const SizedBox(width: 8),
+
+                    // Arrow Icon
+                    if (hasContent)
+                      RotationTransition(
+                        turns: _arrowTurns,
+                        child: SvgPicture.asset(
+                          'assets/icons/arrov.svg',
+                          width: 16,
+                          height: 16,
+                          colorFilter: ColorFilter.mode(
+                            AppColors.tertiaryColor,
+                            BlendMode.srcIn,
+                          ),
                         ),
-                ],
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
-          if (hasContent)
-            AnimatedCrossFade(
-              firstChild: const SizedBox.shrink(),
-              secondChild: Container(
-                margin: const EdgeInsets.only(left: 12, bottom: 8),
-                padding: const EdgeInsets.only(left: 12, top: 4, bottom: 4),
-                decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(
-                      color: AppColors.tertiaryColor.withValues(alpha:0.3),
-                      width: 2,
+
+          // Collapsible content with Slide + Fade
+          SizeTransition(
+            sizeFactor: CurvedAnimation(
+              parent: _contentController,
+              curve: Curves.easeInOut,
+            ),
+            axisAlignment: -1.0,
+            child: FadeTransition(
+              opacity: _contentFade,
+              child: SlideTransition(
+                position: _contentSlide,
+                child: Container(
+                  margin: const EdgeInsets.only(left: 4, bottom: 8),
+                  padding: const EdgeInsets.only(left: 12, top: 4, bottom: 4),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: AppColors.tertiaryColor.withValues(alpha: 0.3),
+                        width: 2,
+                      ),
                     ),
                   ),
-                ),
-                child: SelectionArea(
-                  child: RichText(
-                    text: TextSpan(
-                      children:
-                          parseText(context, widget.content, fontSize: 14),
-                      style: TextStyle(
-                        color: AppColors.primaryColor.inverted.withValues(alpha:0.8),
-                        fontSize: 14,
-                        height: 1.4,
+                  child: SelectionArea(
+                    child: RichText(
+                      text: TextSpan(
+                        children: parseText(context, widget.content,
+                            fontSize: 12, isFinished: widget.isFinished),
+                        style: TextStyle(
+                          color: AppColors.primaryColor.inverted
+                              .withValues(alpha: 0.8),
+                          fontSize: 12,
+                          height: 1.4,
+                          // Ensure child text style is normal too, unless overridden
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-              crossFadeState: _isExpanded
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-              duration: const Duration(milliseconds: 300),
             ),
+          ),
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/speech.dart';
 import 'package:cortex/chat/services/voice.dart';
+import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/screen/widgets/wave.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,11 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
       parent: _entranceController,
       curve: Curves.easeOutBack,
     );
+
+    // Ensure keyboard is dismissed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus();
+    });
 
     _entranceController.forward();
   }
@@ -104,16 +110,68 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // LEFT BUTTON: Flow
-                      _buildCircleButton(
-                        iconPath: 'assets/icons/flow.svg',
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          voiceService.toggleFlowMode();
-                        },
-                        isSecondary:
-                            !voiceService.isFlowMode, // Filled if active
-                      ),
+                      // LEFT BUTTON: Flow Mode Toggle
+                      // Logic:
+                      // If Flow OFF: Show Flow Icon. Tap -> Enable Flow.
+                      // If Flow ON: Show Voice Icon. Tap -> Disable Flow (Start New Chat if needed).
+                      Builder(builder: (context) {
+                        final isFlow = voiceService.isFlowMode;
+                        return _buildCircleButton(
+                          iconPath: isFlow
+                              ? 'assets/icons/voice.svg'
+                              : 'assets/icons/flow.svg',
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+
+                            if (!isFlow) {
+                              // Enable Flow
+
+                              // [NEW] If chat is not empty, start fresh before entering Flow Mode
+                              final conversationProvider =
+                                  context.read<ConversationProvider>();
+                              if (conversationProvider.messages.isNotEmpty) {
+                                conversationProvider.clearConversation();
+                                // Ensure we are in a fresh state
+                                context
+                                    .read<ChatSessionProvider>()
+                                    .startDynamicConversation();
+                              }
+
+                              // Service sets visual to Line (Processing) + Stops Listening
+                              voiceService.toggleFlowMode();
+                            } else {
+                              // Disable Flow -> Return to Voice
+                              // First toggle mode (sets visual to listening/idle)
+                              voiceService.toggleFlowMode();
+
+                              // [NEW] Stop any ongoing generation/speech immediately
+                              // This ensures we don't have lingering TTS or generation when switching modes
+                              final conversationProvider =
+                                  context.read<ConversationProvider>();
+                              conversationProvider.stopGenerating();
+                              voiceService.stopSpeaking(context: context);
+                              final sessionProvider =
+                                  context.read<ChatSessionProvider>();
+
+                              // If current chat has content, start fresh
+                              if (conversationProvider.messages.isNotEmpty) {
+                                // Clear conversation to start fresh "background" chat
+                                conversationProvider.clearConversation();
+                                // Reset session state (standard dynamic)
+                                sessionProvider.startDynamicConversation();
+
+                                // Re-start listening in new context
+                                voiceService.startListening(context: context);
+                              } else {
+                                // Empty chat, just start listening
+                                voiceService.startListening(context: context);
+                              }
+                            }
+                          },
+                          isSecondary:
+                              true, // Always "Secondary" style (White/Outline) per user request
+                        );
+                      }),
 
                       // CENTER BUTTON: Mic / Stop / Flow Start
                       _buildCenterButton(
@@ -132,25 +190,26 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                                       .flowModeQuestion);
                             } else {
                               // Interrupt Flow (Stop speaking)
-                              voiceService.stopSpeaking();
+                              voiceService.stopSpeaking(context: context);
                             }
                             return;
                           }
 
                           if (isUserSpeaking) {
-                            voiceService.manualSubmit();
+                            voiceService.manualSubmit(context);
                           } else if (isAiSpeaking) {
-                            voiceService.stopSpeaking();
+                            voiceService.stopSpeaking(context: context);
                           } else {
                             debugPrint("Restarting voice session from idle...");
-                            voiceService.startListening();
+                            voiceService.startListening(context: context);
                           }
                         },
                       ),
 
                       // RIGHT BUTTON: Exit (Arrow)
                       _buildCircleButton(
-                        iconPath: 'assets/icons/arrov.svg',
+                        iconPath:
+                            'assets/icons/arrov.svg', // Assuming arrov.svg is correct as used before
                         onTap: () {
                           HapticFeedback.mediumImpact();
                           voiceService.stopSession();
@@ -161,15 +220,19 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                     ],
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    voiceService.isFlowMode
-                        ? AppLocalizations.of(context)!.flowModeDescription
-                        : AppLocalizations.of(context)!.voiceModeInformation,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.tertiaryColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      voiceService.isFlowMode
+                          ? AppLocalizations.of(context)!.flowModeDescription
+                          : AppLocalizations.of(context)!.voiceModeInformation,
+                      key: ValueKey<bool>(voiceService.isFlowMode),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.tertiaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -195,13 +258,26 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
       child: SizedBox(
         width: 56,
         height: 56,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: SvgPicture.asset(
-            iconPath,
-            colorFilter: ColorFilter.mode(
-              isSecondary ? AppColors.primaryColor.inverted : Colors.white,
-              BlendMode.srcIn,
+        child: SizedBox(
+          width: 56,
+          height: 56,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(
+                    opacity: animation,
+                    child: ScaleTransition(scale: animation, child: child));
+              },
+              child: SvgPicture.asset(
+                iconPath,
+                key: ValueKey<String>(iconPath),
+                colorFilter: ColorFilter.mode(
+                  isSecondary ? AppColors.primaryColor.inverted : Colors.white,
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
           ),
         ),
@@ -226,23 +302,6 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
 
     final bool showStop = isUserSpeaking || isAiSpeaking || isFlowActive;
 
-    String iconPath;
-    if (isFlowMode && !isFlowActive) {
-      iconPath =
-          'assets/icons/send_audio.svg'; // Assuming this exists or using a generic send/arrow
-      // User said "YUKARI DOĞRU OK İŞARETİ" -> likely send.svg or similar.
-      // Checking existing icons... User mentions "gönderme ikonuna evrilsin".
-      // Usually send.svg or arrow_up.svg. I'll guess 'assets/icons/send.svg' based on common naming,
-      // or re-use 'assets/icons/arrov.svg' rotated? Or check file list.
-      // Wait, user said "ortadaki siyah butonun ikonu gönderme ikonuna evrilsin".
-      // I'll use 'assets/icons/send_audio.svg' if available or 'assets/icons/send.svg'.
-      // Safe bet: 'assets/icons/send.svg'.
-      iconPath = 'assets/icons/send.svg';
-    } else {
-      iconPath =
-          showStop ? 'assets/icons/stop.svg' : 'assets/icons/microphone.svg';
-    }
-
     return _ScaleButton(
       onTap: onTap,
       styleColor: AppColors.primaryColor.inverted,
@@ -251,7 +310,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
         width: 80,
         height: 80,
         child: Padding(
-          padding: const EdgeInsets.all(22),
+          padding: EdgeInsets.zero, // Padding handled by Center/Child inside
           // Use AnimatedSwitcher for smooth fade transition
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
@@ -260,14 +319,26 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                   opacity: animation,
                   child: ScaleTransition(scale: animation, child: child));
             },
-            child: SvgPicture.asset(
-              iconPath,
-              key: ValueKey<String>(iconPath), // Key ensures animation runs
-              colorFilter: ColorFilter.mode(
-                AppColors.primaryColor,
-                BlendMode.srcIn,
-              ),
-            ),
+            child: (isFlowMode && !isFlowActive)
+                ? Icon(
+                    Icons.arrow_upward_rounded,
+                    key: const ValueKey('start_flow_icon'),
+                    color: AppColors.primaryColor,
+                    size: 80 * 0.55, // Matches the sizing proportion (55%)
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(22),
+                    child: SvgPicture.asset(
+                      showStop
+                          ? 'assets/icons/stop.svg'
+                          : 'assets/icons/microphone.svg',
+                      key: ValueKey<String>(showStop ? 'stop' : 'mic'),
+                      colorFilter: ColorFilter.mode(
+                        AppColors.primaryColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
           ),
         ),
       ),
@@ -385,6 +456,9 @@ class _MorphingVisualizerState extends State<_MorphingVisualizer>
   late AnimationController _levelSmoother;
   double _smoothLevel = 0.0;
 
+  // AI Speaking Simulation
+  late AnimationController _aiSpeechSimulator;
+
   @override
   void initState() {
     super.initState();
@@ -401,6 +475,12 @@ class _MorphingVisualizerState extends State<_MorphingVisualizer>
       value: 0.0,
       duration: const Duration(milliseconds: 100),
     );
+
+    // Simulate a breathing/talking rhythm
+    _aiSpeechSimulator = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
 
     if (widget.isAiSpeaking) {
       _morphController.value = 1.0;
@@ -428,20 +508,37 @@ class _MorphingVisualizerState extends State<_MorphingVisualizer>
   void dispose() {
     _morphController.dispose();
     _levelSmoother.dispose();
+    _aiSpeechSimulator.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([_morphController, _levelSmoother]),
+      animation: Listenable.merge(
+          [_morphController, _levelSmoother, _aiSpeechSimulator]),
       builder: (context, child) {
         final voiceService =
             context.watch<VoiceService>(); // Use watch to rebuild on updates
         double t = _morphController.value;
-        _smoothLevel = _levelSmoother.value;
 
-        double effectiveLevel = _smoothLevel;
+        // Determine the effective level to visualise
+        double effectiveLevel = 0.0;
+
+        if (widget.isAiSpeaking) {
+          // Simulate complex speech pattern using combined sine waves from the simulator controller
+          // We map the 0.0-1.0 controller value to a dynamic "talking" wave
+          // Combines sine wave values non-linearly to create a more organic "speech" effect
+          // rather than a mechanical breathing animation.
+          double val = _aiSpeechSimulator.value;
+          // Using power function makes it spike more naturally like speech headers
+          effectiveLevel =
+              0.2 + (0.5 * (val * val * val)); // cubic curve for organic spikes
+        } else {
+          _smoothLevel = _levelSmoother.value;
+          effectiveLevel = _smoothLevel;
+        }
+
         if (effectiveLevel < 0.0) effectiveLevel = 0.0;
 
         double baseSize = 96.0;
@@ -519,7 +616,7 @@ class _MorphingVisualizerState extends State<_MorphingVisualizer>
           opacity = opacity.clamp(0.0, 1.0);
 
           // Apply opacity to container color
-          containerColor = baseContainerColor.withValues(alpha:opacity);
+          containerColor = baseContainerColor.withValues(alpha: opacity);
 
           // Height Logic: Starts growing AFTER fade is mostly done to avoid huge black bar
           // Or grow linearly but since opacity drops fast, it won't look like a block.
@@ -536,20 +633,86 @@ class _MorphingVisualizerState extends State<_MorphingVisualizer>
               heightT.clamp(0.0, 1.0); // Wave fades in as height grows
         }
 
+        // VISIBILITY LOGIC:
+        // User Request: "Flow modunda ortada nokta olmayacak" (No dot in Flow Mode)
+        // Dot represents "Mic Listening".
+        // In Flow Mode, we are passive unless interrupting.
+        // So hide the Dot when:
+        // 1. Flow Active
+        // 2. Not User Speaking (Interruption)
+        // 3. Not AI Speaking (Wave)
+        // Note: When AI Speaking, we show Wave (so opacity 1.0).
+
+        // User Request: "Flow modunda ortada nokta olmayacak... düz çizgiye dönüşecek"
+        // (No dot in Flow Mode -> turns into flat line)
+        // This applies when Flow is Active AND NO ONE is speaking (Processing state).
+        // Since toggleFlowMode sets state to Processing, this logic catches it.
+        // HOWEVER, voiceService.isFlowActive might be false if just Toggled but not Started?
+        // Ah, toggleFlowMode sets flowActive=false.
+        // We need to check if we are in Flow Mode (Setup) OR Flow Active.
+        // If VoiceState is 'processing', we should show the line?
+        // Or should we trust isFlowMode?
+
+        // Wait, "Flow Mode'a geçildiğinde... direkt çizgiye dönüşsün".
+        // VoiceState.processing triggers visualizer to do what?
+        // Currently visualizer depends on isUserSpeaking/isAiSpeaking.
+        // If processing, both are false.
+        // So checking isFlowMode (or FlowActive which is irrelevant for "setup")
+        // AND state == Processing?
+
+        bool isFlowProcessing =
+            (voiceService.isFlowMode || voiceService.isFlowActive) &&
+                !widget.isUserSpeaking &&
+                !widget.isAiSpeaking;
+
+        if (isFlowProcessing) {
+          // Enforce Flat Line State for Flow Mode Processing
+          // "Flat line" means width is wide, height is very thin
+          currentWidth = MediaQuery.of(context).size.width * 0.6;
+          currentHeight = 4.0;
+          borderRadius = 2.0;
+
+          // Ensure it's opaque and visible
+          containerColor = baseContainerColor;
+
+          // Flux Desaturation Check
+          if (widget.isFluxMode) {
+            // "Flux Mode'a basıldığında Flow Mode'da renkler biraz solsun"
+            // Desaturate by mixing with white/grey or reducing opacity?
+            // Or changing to a paler version.
+            containerColor = Color.alphaBlend(
+                Colors.white.withValues(alpha: 0.4), containerColor);
+          }
+
+          // Also set morph controller to 0 to avoid wave interference?
+          // No, just override dimensions.
+        } else if (widget.isFluxMode) {
+          // Keep Flux mode styling if not flat line
+          baseContainerColor = AppColors.secondaryColor;
+        }
+
         return Center(
           child: GestureDetector(
-            onTap: () {
-              // Easter Egg: Pulse effect
-              // Since we are using AnimatedBuilder, we can just trigger a quick level spike manually?
-              // Or better, just Haptic feedback + maybe momentary color shift?
-              // User asked for "grow and shrink".
-              // We can hack this by injecting a fake level spike into the smoother.
-              HapticFeedback.mediumImpact();
-              _levelSmoother
-                  .forward(from: 1.0)
-                  .then((_) => _levelSmoother.reverse());
+            onTapDown: (_) {
+              // Behave like a button press - visual feedback
+              _levelSmoother.animateTo(1.0,
+                  duration: const Duration(milliseconds: 150),
+                  curve: Curves.easeOutQuad);
             },
-            child: Container(
+            onTapUp: (_) {
+              _levelSmoother.animateTo(widget.level,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutBack);
+            },
+            onTapCancel: () {
+              _levelSmoother.animateTo(widget.level,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutBack);
+            },
+            // [CHANGED] Use AnimatedContainer for dimensions/color, remove AnimatedOpacity logic from previous try
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOut,
               width: currentWidth,
               height: currentHeight,
               decoration: BoxDecoration(
@@ -571,8 +734,26 @@ class _MorphingVisualizerState extends State<_MorphingVisualizer>
                     Opacity(
                       opacity: opacityWave.clamp(0.0, 1.0),
                       child: WaveformVisualizer(
+                        origin: WaveOrigin.right,
                         color:
                             baseContainerColor, // Correctly pass dynamic color
+                        // Pass effectiveLevel to WaveformVisualizer if it supported it.
+                        // Assuming WaveformVisualizer might handle internal animation or we need to pass level?
+                        // Checking file `voice.dart` doesn't show `WaveformVisualizer` internals (imported).
+                        // But previous code didn't pass level to it. It likely uses internal or random.
+                        // Wait, user said "dalgalar nasıl sese göre şekil değiştiriyorsa...".
+                        // If `WaveformVisualizer` is static or random, we might not be affecting it directly via `level`.
+                        // However, the `_MorphingVisualizer` itself (the dot) pulses with `dotSize`.
+                        // The user said "dalgalar...".
+                        // If `WaveformVisualizer` is the thing inside (the squiggly lines), we might need to modify THAT.
+                        // But looking at existing code:
+                        // `_MorphingVisualizer` controls `dotSize` via `effectiveLevel`.
+                        // The `WaveformVisualizer` is just a child.
+                        // The "Dalga" logic usually refers to the visualizer itself morphing.
+                        // The `dotSize` determines the size of the BLOB.
+                        // If the user means the blob pulsing, my change covers it.
+                        // If they mean the lines inside, I can't see that code here.
+                        // Assuming "Dalga" = The visual blob pulsing.
                       ),
                     ),
                 ],

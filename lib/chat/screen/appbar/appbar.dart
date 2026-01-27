@@ -68,9 +68,12 @@ class AppbarState extends State<Appbar> {
       // Determine Model Name
       String headerModelName;
       try {
-        headerModelName = session.isDynamicChat
-            ? (localizations.dynamicChatTitle)
-            : (session.modelTitle ?? 'AI');
+        if (session.isDynamicChat) {
+          headerModelName = localizations.dynamicChatTitle;
+        } else {
+          // [FIX] Fallback to 'Cortex' immediately if null, avoiding "Unknown"
+          headerModelName = session.modelTitle ?? 'Cortex';
+        }
       } catch (e) {
         headerModelName = session.modelTitle ?? 'Cortex';
       }
@@ -88,9 +91,7 @@ class AppbarState extends State<Appbar> {
         if (msg.isThinking) continue;
 
         // Skip only if text is empty AND no attachments exist
-        if (msg.text
-            .trim()
-            .isEmpty && !msg.hasAttachments) {
+        if (msg.text.trim().isEmpty && !msg.hasAttachments) {
           continue;
         }
 
@@ -117,8 +118,8 @@ class AppbarState extends State<Appbar> {
       final String shareText = buffer.toString();
       const String shareSubject = 'Cortex Chat Export';
 
-      await SharePlus.instance.share(
-          ShareParams(text: shareText, subject: shareSubject));
+      await SharePlus.instance
+          .share(ShareParams(text: shareText, subject: shareSubject));
     } catch (e) {
       debugPrint("Share Error: $e");
     } finally {
@@ -135,9 +136,7 @@ class AppbarState extends State<Appbar> {
     context.watch<ThemeProvider>();
 
     // Responsive Calcs
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     final bool isTablet = size.shortestSide > 600;
     final double buttonSize = isTablet ? 48.0 : 42.0;
     final double iconSize = isTablet ? 26.0 : 22.0;
@@ -163,18 +162,16 @@ class AppbarState extends State<Appbar> {
         },
         child: showPremiumButton
             ? PremiumButton(
-          key: const ValueKey('PremiumBtn'),
-          onTap: () {
-            final isAnonymous = context
-                .read<UserProvider>()
-                .isAnonymous;
-            final target = isAnonymous
-                ? const UpgradeAccountScreen()
-                : const FundsScreen();
-            navigateToScreen(target, direction: const Offset(1.0, 0.0));
-            FocusScope.of(context).unfocus();
-          },
-        )
+                key: const ValueKey('PremiumBtn'),
+                onTap: () {
+                  final isAnonymous = context.read<UserProvider>().isAnonymous;
+                  final target = isAnonymous
+                      ? const UpgradeAccountScreen()
+                      : const FundsScreen();
+                  navigateToScreen(target, direction: const Offset(1.0, 0.0));
+                  FocusScope.of(context).unfocus();
+                },
+              )
             : const SizedBox.shrink(),
       ),
 
@@ -190,27 +187,27 @@ class AppbarState extends State<Appbar> {
         // If chat empty -> Flux Icon (On/Off)
         mainIcon: isChatActive
             ? SvgPicture.asset(
-          'assets/icons/new.svg',
-          key: const ValueKey('new_chat_icon'),
-          width: iconSize,
-          height: iconSize,
-          colorFilter: ColorFilter.mode(
-            AppColors.primaryColor.inverted,
-            BlendMode.srcIn,
-          ),
-        )
+                'assets/icons/new.svg',
+                key: const ValueKey('new_chat_icon'),
+                width: iconSize,
+                height: iconSize,
+                colorFilter: ColorFilter.mode(
+                  AppColors.primaryColor.inverted,
+                  BlendMode.srcIn,
+                ),
+              )
             : SvgPicture.asset(
-          session.isFluxMode
-              ? 'assets/icons/on/ghost.svg'
-              : 'assets/icons/off/ghost.svg',
-          key: ValueKey('ghost_${session.isFluxMode}'),
-          width: iconSize,
-          height: iconSize,
-          colorFilter: ColorFilter.mode(
-            AppColors.primaryColor.inverted,
-            BlendMode.srcIn,
-          ),
-        ),
+                session.isFluxMode
+                    ? 'assets/icons/on/ghost.svg'
+                    : 'assets/icons/off/ghost.svg',
+                key: ValueKey('ghost_${session.isFluxMode}'),
+                width: iconSize,
+                height: iconSize,
+                colorFilter: ColorFilter.mode(
+                  AppColors.primaryColor.inverted,
+                  BlendMode.srcIn,
+                ),
+              ),
         onMainTap: () {
           if (isChatActive) {
             _handleNewChat(context);

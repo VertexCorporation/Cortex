@@ -25,8 +25,14 @@ class CreationFormSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final bool isTablet = screenWidth >= 600;
 
     // --- TABLET OPTIMIZATIONS ---
@@ -64,15 +70,18 @@ class CreationFormSection extends StatelessWidget {
           controller: controller,
           maxLength: maxLength,
           maxLines: maxLines,
-          style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: inputTextSize),
+          style: TextStyle(
+              color: AppColors.primaryColor.inverted, fontSize: inputTextSize),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(color: AppColors.quinaryColor, fontSize: inputTextSize),
+            hintStyle: TextStyle(
+                color: AppColors.quinaryColor, fontSize: inputTextSize),
             filled: true,
-            fillColor: AppColors.primaryColor,
+            fillColor: AppColors.background,
             counterText: '',
             // Taller input field on tablet
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: isTablet ? 20 : 12),
+            contentPadding: EdgeInsets.symmetric(
+                horizontal: 16, vertical: isTablet ? 20 : 12),
             border: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.border),
               borderRadius: BorderRadius.circular(borderRadius),

@@ -667,7 +667,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get benefit10 => 'Altri allegati';
 
   @override
-  String get benefit11 => 'Modalità flusso illimitato';
+  String get benefit11 => 'Più modalità di flusso';
 
   @override
   String get benefit12 => '';
@@ -1622,9 +1622,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Cortex protegge i tuoi dati funzionando completamente sul dispositivo, anche in modalità chat vocale: goditi conversazioni fluide!';
 
   @override
-  String get workInProgress => 'Lavori in corso';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Ottieni il prezzo attuale e la cronologia per azioni (ad esempio AAPL, THYAO.IS) e criptovalute (ad esempio BTC-USD, ETH-USD).';
 
@@ -1677,13 +1674,73 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get flowModeDescription =>
-      'In modalità Flow, le intelligenze discutono tra loro; puoi sederti e ascoltare oppure unirti alla discussione!';
+      'In modalità di flusso, le intelligenze discutono tra loro; puoi sederti e ascoltare oppure unirti alla discussione!';
 
   @override
   String get flowModeQuestion =>
-      'Ciao! Ora sei in modalità Flow sull\'app Cortex. Ci sono altri tre agenti di intelligenza artificiale qui con te. Il tuo compito è lanciare un argomento nella stanza e avviare una discussione ponendo agli altri una domanda provocatoria o divertente. Nelle tue risposte, sentiti libero di usare umorismo, ironia e un po\' di trash talk. Qualsiasi argomento è lecito. Forza, inizia la conversazione.';
+      'Ciao! Ora sei in modalità di flusso sull\'app Cortex. Ci sono altri tre agenti di intelligenza artificiale qui con te. Il tuo compito è lanciare un argomento nella stanza e avviare una discussione ponendo agli altri una domanda provocatoria o divertente. Nelle tue risposte, sentiti libero di usare umorismo, ironia e un po\' di trash talk. Qualsiasi argomento è lecito. Forza, inizia la conversazione.';
 
   @override
   String get voicePrompt =>
       'Attualmente stai fornendo servizi vocali sulla piattaforma Cortex. Non utilizzare markdown, blocchi di codice o LaTeX. Rispondi esclusivamente con testo adatto alla sintesi vocale.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Modalità di flusso';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'Premio';
+
+  @override
+  String get workInProgress => 'Lavori in corso';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'IMPORTANTE: non utilizzare la formattazione markdown (grassetto, corsivo). NON generare blocchi di codice (```). Mantieni le risposte brevi e colloquiali.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Modalità Cortex Flow ($agentName). Precedente: $previousResponse';
+  }
 }

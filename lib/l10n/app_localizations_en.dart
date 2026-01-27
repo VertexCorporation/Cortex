@@ -662,7 +662,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get benefit10 => 'More Attachments';
 
   @override
-  String get benefit11 => 'Limitless Flow Mode';
+  String get benefit11 => 'More Flow Mode';
 
   @override
   String get benefit12 => '';
@@ -1612,9 +1612,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Cortex keeps your data safe by running fully on-device, even in voice chat mode; enjoy seamless conversations!';
 
   @override
-  String get workInProgress => 'Work In Progress';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Get current price and history for stocks (e.g. AAPL, THYAO.IS) and crypto (e.g. BTC-USD, ETH-USD).';
 
@@ -1675,4 +1672,64 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get voicePrompt =>
       'You are currently providing voice service on the Cortex platform. Do not use markdown, code blocks, or LaTeX. Respond purely in text suitable for speech synthesis.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Flow Mode';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'Premium';
+
+  @override
+  String get workInProgress => 'Work In Progress';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Cortex Flow Mode ($agentName). Previous: $previousResponse';
+  }
 }

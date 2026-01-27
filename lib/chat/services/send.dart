@@ -70,6 +70,7 @@ class SendService {
     bool isRegenerate = false,
     int? regenerateAiIndex,
     String? overrideModelId,
+    bool isHidden = false,
   }) async {
     if (_isSending) {
       debugPrint("SendService: Already sending. Ignored.");
@@ -222,6 +223,7 @@ class SendService {
         attachmentPaths: currentAttachmentPaths,
         isAttachmentUploading: currentAttachmentPaths.isNotEmpty,
         model: apiModelIdForSend,
+        isVisible: !isHidden,
       );
 
       int aiMessageIndex;
@@ -238,8 +240,14 @@ class SendService {
               ? (sessionProvider.modelId ?? 'dynamic')
               : apiModelIdForSend;
 
-          _conversationProvider.startNewConversationSession(
-              newConvId, title, modelForStorage, userMessage);
+          if (isHidden) {
+            _conversationProvider.startEphemeralSession(
+                newConvId, modelForStorage, userMessage,
+                title: isHidden ? localizations.flowMode : null);
+          } else {
+            _conversationProvider.startNewConversationSession(
+                newConvId, title, modelForStorage, userMessage);
+          }
         } else {
           _conversationProvider.appendMessageToConversation(userMessage);
         }
@@ -361,23 +369,36 @@ class SendService {
       List<dynamic> turnToolCalls = [];
 
       // Handler Functions (defined here to capture scope)
+      // State for managing reasoning block
+      bool isReasoningBlockActive = false;
+
+      void onReasoning(String reasoningText) {
+        if (_conversationProvider.wasResponseStopped) return;
+
+        // If this is the START of a reasoning block, open the tag
+        if (!isReasoningBlockActive) {
+          _conversationProvider.appendToLastBotMessage("<think>");
+          isReasoningBlockActive = true;
+        }
+
+        // Ensure we don't double-append headers or newlines. Just the raw text.
+        _conversationProvider.appendToLastBotMessage(reasoningText);
+      }
+
       void onTextChunk(String text) {
         if (_conversationProvider.wasResponseStopped) return;
+        if (text.isEmpty) return; // Ignore empty keep-alive chunks
+
+        // If we were reasoning and now switched to ACTUAL content, close the reasoning tag
+        if (isReasoningBlockActive) {
+          _conversationProvider.appendToLastBotMessage("</think>");
+          isReasoningBlockActive = false;
+        }
+
         _conversationProvider.appendToLastBotMessage(text);
         if (_inputProvider.isVoiceModeActive) {
           _voiceService.onAiStreamCallback(text);
         }
-        if (_scrollService.isUserAtBottom()) {
-          _scrollService.scrollToBottom(
-              duration: const Duration(milliseconds: 50));
-        }
-      }
-
-      void onReasoning(String reasoningText) {
-        // Format reasoning (thinking) process nicely in the UI
-        if (_conversationProvider.wasResponseStopped) return;
-        _conversationProvider.appendToLastBotMessage(
-            "\n> *${localizations.thinking}...*\n> $reasoningText\n\n");
         if (_scrollService.isUserAtBottom()) {
           _scrollService.scrollToBottom(
               duration: const Duration(milliseconds: 50));
@@ -427,6 +448,8 @@ class SendService {
           context: contextMessages,
           localizations: localizations,
           langCode: langCode,
+          useTools: !_voiceService.isFlowActive,
+          // Disable tools in Flow Mode
           onTextChunk: onTextChunk,
           onReasoning: onReasoning,
           onImageReceived: onImageReceived,

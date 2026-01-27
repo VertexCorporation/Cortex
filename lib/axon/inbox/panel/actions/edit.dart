@@ -30,7 +30,9 @@ Future<String?> showEditTitleDialog({
     context: context,
     barrierDismissible: true,
     barrierLabel: "EditConversationTitle",
-    barrierColor: AppColors.primaryColor.inverted.withValues(alpha: 0.4),
+    // [FIX] Force a dark backdrop that works in both Light and Dark modes.
+    // Using theme-inverted colors caused it to look white-ish in some dark themes.
+    barrierColor: Colors.black.withValues(alpha: 0.7),
     transitionDuration: const Duration(milliseconds: 200),
     pageBuilder: (ctx, animation, secondaryAnimation) {
       // We wrap with AnimatedBuilder implicitly via showGeneralDialog's rebuilds

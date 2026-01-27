@@ -315,6 +315,7 @@ class ApiService {
     Function(List<dynamic>)? onToolCall, // Exposed for logic loop
     required AppLocalizations localizations,
     required String langCode,
+    bool useTools = true,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
     List<Map<String, dynamic>> userMessageContent = [];
@@ -331,8 +332,9 @@ class ApiService {
     }
 
     // Attach Tools Definition
-    final toolsJson =
-        ToolRegistry.getLocalizedToolsJson(langCode, localizations);
+    final toolsJson = useTools
+        ? ToolRegistry.getLocalizedToolsJson(langCode, localizations)
+        : <Map<String, dynamic>>[];
 
     return _getResponse(
       localizations: localizations,

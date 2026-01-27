@@ -666,7 +666,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get benefit10 => 'Lampiran Lainnya';
 
   @override
-  String get benefit11 => 'Mode Aliran Tanpa Batas';
+  String get benefit11 => 'Lebih banyak Mode Aliran';
 
   @override
   String get benefit12 => '';
@@ -1624,9 +1624,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Cortex menjaga keamanan data Anda dengan berjalan sepenuhnya di perangkat, bahkan dalam mode obrolan suara; nikmati percakapan tanpa hambatan!';
 
   @override
-  String get workInProgress => 'Sedang dalam pengerjaan';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Dapatkan harga terkini dan riwayat untuk saham (misalnya AAPL, THYAO.IS) dan kripto (misalnya BTC-USD, ETH-USD).';
 
@@ -1687,4 +1684,64 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get voicePrompt =>
       'Saat ini Anda menyediakan layanan suara di platform Cortex. Jangan gunakan markdown, blok kode, atau LaTeX. Tanggapi murni dalam teks yang sesuai untuk sintesis suara.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Mode Aliran';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'Premi';
+
+  @override
+  String get workInProgress => 'Sedang dalam pengerjaan';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'PENTING: Jangan gunakan format markdown (tebal, miring). JANGAN keluarkan blok kode (```). Jaga agar respons tetap bersifat percakapan dan singkat.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Mode Aliran Korteks ($agentName). Sebelumnya: $previousResponse';
+  }
 }

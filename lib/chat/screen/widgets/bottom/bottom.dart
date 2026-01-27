@@ -14,6 +14,7 @@ import 'package:cortex/chat/services/scroll.dart';
 import 'package:cortex/chat/services/send.dart';
 import 'package:cortex/chat/services/stop.dart';
 import 'package:cortex/chat/services/utils.dart';
+import 'package:cortex/chat/services/voice.dart'; // [NEW]
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/server/credits.dart';
@@ -194,7 +195,18 @@ class _ChatInputPanelState extends State<ChatInputPanel>
                       conversationProvider),
                   onApplyEditedMessage: () async =>
                       await widget.editService.applyEditedMessage(context),
-                  onStop: context.read<StopService>().stopResponse,
+                  onStop: () {
+                    final voiceService = context.read<VoiceService>();
+                    if (voiceService.isFlowActive) {
+                      // [NEW] Flow Mode: Pause & Listen (Interruption)
+                      voiceService.interruptFlowAndListen();
+                      // Stop any text generation but keep session alive
+                      context.read<ConversationProvider>().stopGenerating();
+                    } else {
+                      // Standard Mode: Stop Everything
+                      context.read<StopService>().stopResponse();
+                    }
+                  },
                   // Logic Update: Null check before adding
                   onPhotoSelected: (photo) {
                     if (photo != null) {

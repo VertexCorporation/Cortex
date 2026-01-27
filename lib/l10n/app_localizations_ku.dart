@@ -665,7 +665,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get benefit10 => 'Pêvekên Zêdetir';
 
   @override
-  String get benefit11 => 'Moda Herikîna Bêsînor';
+  String get benefit11 => 'Moda Herikîna Zêdetir';
 
   @override
   String get benefit12 => '';
@@ -1619,9 +1619,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Cortex bi xebitandina bi tevahî li ser cîhazê, tewra di moda sohbeta dengî de jî, daneyên we ewle dihêle; ji sohbetên bênavber kêfê bistînin!';
 
   @override
-  String get workInProgress => 'Kar berdewam e';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Buhayê niha û dîroka stokan (mînak AAPL, THYAO.IS) û krîptoyê (mînak BTC-USD, ETH-USD) bistînin.';
 
@@ -1672,7 +1669,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get flowModeDescription =>
-      'Di moda Flow de, aqilmend di navbera xwe de nîqaş dikin; hûn dikarin an rûnin û guhdarî bikin an jî xwe bavêjin û beşdarî nîqaşê bibin!';
+      'Di moda Herikînê de, aqilmend di navbera xwe de nîqaş dikin; hûn dikarin an rûnin û guhdarî bikin an jî xwe bavêjin û beşdarî nîqaşê bibin!';
 
   @override
   String get flowModeQuestion =>
@@ -1681,4 +1678,64 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get voicePrompt =>
       'Niha tu li ser platforma Cortex xizmeta deng peyda dikî. Markdown, blokên kodê, an LaTeX bikar neynin. Bi tenê bi nivîsa guncaw ji bo senteza axaftinê bersiv bide.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Moda Herikînê';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'Xelat';
+
+  @override
+  String get workInProgress => 'Kar berdewam e';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'GIRÎNG: Formatkirina markdown (qalind, îtalîk) bi kar neynin. Blokên kodê (```) NEKIN. Bersivên xwe bi şêweyekî diyalogî û kurt bihêlin.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Moda Herikîna Korteksê ($agentName). Berê: $previousResponse';
+  }
 }

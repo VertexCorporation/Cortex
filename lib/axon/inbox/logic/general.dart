@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../cache.dart';
 import '../../../chat/providers/conversation.dart';
-import '../../../chat/services/database.dart';
+
 import '../../../chat/services/storage.dart';
 import '../../../library/backend/data/service.dart';
 import '../../../main.dart';
@@ -180,17 +180,30 @@ class InboxViewModel extends ChangeNotifier {
 
     try {
       await _modelService.getModels(langCode: langCode);
-      final db = await DbHelper().db;
-      final rows = await db.query('conversations');
 
+      // OPTIMIZED: Fetch everything in one go (No N+1)
+      final rows = await ChatStorageService.getConversationsWithLastMessage();
+
+      // Use a temporary map to avoid flickering if possible, but for now clear is safe
+      // because we set isLoading=true.
       _conversationManagers.clear();
-      _allConversationIDs.clear();
+      // Use Set to prevent duplicates
+      final Set<String> uniqueIds = {};
 
       for (final row in rows) {
         final convID = row['id'] as String;
+
+        // Safety check if DB returns duplicates (unlikely with primary key but good practice)
+        if (uniqueIds.contains(convID)) continue;
+
+        uniqueIds.add(convID);
         final modelId = row['modelId'] as String? ?? '';
 
-        final lastMsg = await ChatStorageService.getLastMessage(convID);
+        // Extract last message data from the joined query
+        final String? lastMsgText = row['lastMessageText'] as String?;
+        final String? lastMsgPhoto = row['lastMessagePhoto'] as String?;
+        final int? realLastMsgTs = row['realLastMessageTs'] as int?;
+
         final manager = ConversationManager(
           conversationID: convID,
           conversationTitle: row['title'] as String? ?? 'Untitled',
@@ -200,22 +213,30 @@ class InboxViewModel extends ChangeNotifier {
                   (row['starredDate'] as int) > 0
               ? DateTime.fromMillisecondsSinceEpoch(row['starredDate'] as int)
               : null,
-          lastMessageDate: lastMsg?['ts'] != null
-              ? DateTime.fromMillisecondsSinceEpoch(lastMsg!['ts'] as int)
+          lastMessageDate: realLastMsgTs != null
+              ? DateTime.fromMillisecondsSinceEpoch(realLastMsgTs)
               : DateTime.fromMillisecondsSinceEpoch(
                   row['lastMessageDate'] as int? ?? 0),
           langCode: langCode,
           modelService: _modelService,
         );
 
+        // Pre-populate the manager with the last message snippet so it doesn't have to fetch it
+        if (lastMsgText != null || lastMsgPhoto != null) {
+          manager.updateLastMessage(lastMsgText ?? '', lastMsgPhoto ?? '',
+              DateTime.fromMillisecondsSinceEpoch(realLastMsgTs ?? 0));
+        }
+
         _conversationManagers[convID] = manager;
-        _allConversationIDs.add(convID);
       }
+
+      _allConversationIDs = uniqueIds.toList();
 
       _sortConversations();
     } catch (e) {
       debugPrint("Error loading conversations: $e");
     } finally {
+      // Logic Update: Ensure we don't flash empty state if we have items
       _isLoading = false;
       notifyListeners();
       _updateConversationCache();

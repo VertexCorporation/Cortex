@@ -141,6 +141,8 @@ class ModelCatalogProvider extends ChangeNotifier {
           "[ModelCatalogProvider] Warning: Could not release model from memory: $e");
     }
 
+    if (!context.mounted) return false;
+
     final confirmed = await showRemoveConfirmationDialog(
         context, model.displayTitle, localizations);
     if (confirmed != true) return false;

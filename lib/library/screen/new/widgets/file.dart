@@ -23,8 +23,14 @@ class GgufFilePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     final localizations = AppLocalizations.of(context)!;
     final bool isTablet = screenWidth >= 600;
 
@@ -75,9 +81,9 @@ class GgufFilePicker extends StatelessWidget {
               child: Center(
                 child: ggufFile != null
                     ? _buildFileSelectedView(
-                        context, isTablet, screenWidth, screenHeight)
+                    context, isTablet, screenWidth, screenHeight)
                     : _buildFilePickerPrompt(context, isTablet, screenWidth,
-                        screenHeight, localizations),
+                    screenHeight, localizations),
               ),
             ),
           ),
@@ -86,8 +92,8 @@ class GgufFilePicker extends StatelessWidget {
     );
   }
 
-  Widget _buildFileSelectedView(
-      BuildContext context, bool isTablet, double w, double h) {
+  Widget _buildFileSelectedView(BuildContext context, bool isTablet, double w,
+      double h) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

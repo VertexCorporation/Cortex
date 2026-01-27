@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cortex/app.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +24,7 @@ class ToolWidgetFactory {
         case 'chart_card':
           return ToolAnimationWrapper(child: ChartCard(data: data));
         default:
-          return const SizedBox.shrink();
+          return const WorkInProgressWidget();
       }
     } catch (e) {
       return Text('Error rendering widget: $e',
@@ -68,10 +71,10 @@ class WeatherCard extends StatelessWidget {
     final units = data['units'] ?? {};
     final temp = current['temperature_2m'];
     final tempUnit = units['temperature_2m'] ?? '°C';
-    final conditionCode = current['weather_code'] ?? 0;
+    final conditionCode = (current['weather_code'] as num?)?.toInt() ?? 0;
 
     // Determine condition description and icon
-    String condition = 'Clear';
+
     IconData icon = FontAwesomeIcons.sun;
     List<Color> gradient = [
       const Color(0xFF56CCF2),
@@ -79,25 +82,33 @@ class WeatherCard extends StatelessWidget {
     ]; // Sunny blue
 
     if (conditionCode >= 1 && conditionCode <= 3) {
-      condition = 'Cloudy';
       icon = FontAwesomeIcons.cloud;
       gradient = [const Color(0xFFBDC3C7), const Color(0xFF2C3E50)];
     } else if (conditionCode >= 45 && conditionCode <= 48) {
-      condition = 'Foggy';
       icon = FontAwesomeIcons.smog;
       gradient = [const Color(0xFF757F9A), const Color(0xFFD7DDE8)];
     } else if (conditionCode >= 51 && conditionCode <= 67) {
-      condition = 'Rainy';
       icon = FontAwesomeIcons.cloudRain;
       gradient = [const Color(0xFF4B79A1), const Color(0xFF283E51)];
     } else if (conditionCode >= 71) {
-      condition = 'Snowy';
       icon = FontAwesomeIcons.snowflake;
       gradient = [const Color(0xFF83a4d4), const Color(0xFFb6fbff)];
+    } else if (conditionCode >= 80 && conditionCode <= 82) {
+      icon = FontAwesomeIcons.cloudShowersHeavy;
+      gradient = [
+        const Color(0xFF4B79A1),
+        const Color(0xFF283E51)
+      ]; // Rain gradient
+    } else if (conditionCode >= 95) {
+      icon = FontAwesomeIcons.bolt;
+      gradient = [
+        const Color(0xFF141E30),
+        const Color(0xFF243B55)
+      ]; // Stormy dark
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      // margin: const EdgeInsets.symmetric(vertical: 8), // Removed margin (redundant)
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -141,14 +152,7 @@ class WeatherCard extends StatelessWidget {
               fontWeight: FontWeight.w300,
             ),
           ),
-          Text(
-            condition,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          // Removed text condition description for cleaner UI
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -179,16 +183,29 @@ class WeatherCard extends StatelessWidget {
 }
 
 /// A crypto card with price and a sparkline chart.
-class CryptoCard extends StatelessWidget {
+/// A crypto card with price and a sparkline chart.
+class CryptoCard extends StatefulWidget {
   final Map<String, dynamic> data;
 
   const CryptoCard({super.key, required this.data});
 
   @override
+  State<CryptoCard> createState() => _CryptoCardState();
+}
+
+class _CryptoCardState extends State<CryptoCard> {
+  FlSpot? _touchedSpot;
+  Offset? _touchPosition;
+
+  @override
   Widget build(BuildContext context) {
-    final symbol = data['symbol'] ?? 'CRYPTO';
-    final price = data['price'] ?? 0.0;
-    final List<dynamic> rawSparkline = data['sparkline'] ?? [];
+    final symbolRaw = widget.data['symbol'] ?? 'CRYPTO';
+    // Format symbol: BTC-USD -> Bitcoin | USD if possible, or just clearer format
+    // Simple heuristic: replace - with |
+    final symbol = symbolRaw.toString().replaceAll('-', ' | ');
+
+    final price = widget.data['price'] ?? 0.0;
+    final List<dynamic> rawSparkline = widget.data['sparkline'] ?? [];
     final List<double> sparkline =
     rawSparkline.map((e) => (e as num).toDouble()).toList();
 
@@ -198,107 +215,342 @@ class CryptoCard extends StatelessWidget {
       isUp = sparkline.last >= sparkline.first;
     }
     final trendColor = isUp ? const Color(0xFF00C853) : const Color(0xFFFF3D00);
-    final bgColor = AppColors.background;
+    final bgColor = AppColors.secondaryColor;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Material(
+      color: Colors.transparent,
+      child: InkWithHover(
+        trendColor: trendColor,
+        child: Container(
+          // margin: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.all(16),
+          // Decoration handled by InkWithHover for border/color usually, but here we keep structure
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+          ),
+          child: Column(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    symbol,
-                    style: TextStyle(
-                      color: AppColors.primaryColor.inverted,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        symbol, // Updated formatting
+                        style: TextStyle(
+                          color: AppColors.primaryColor.inverted,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '\$${NumberFormat("#,##0.00").format(price)}',
+                        style: TextStyle(
+                          color: AppColors.primaryColor.inverted,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '\$${NumberFormat("#,##0.00").format(price)}',
-                    style: TextStyle(
-                      color: AppColors.primaryColor.inverted,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: trendColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      isUp ? '+' : '-', // Just show sign as requested
+                      style: TextStyle(
+                          color: trendColor, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
               ),
-              Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: trendColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+              const SizedBox(height: 16),
+              if (sparkline.isNotEmpty)
+                SizedBox(
+                  height: 100,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      LineChart(
+                        LineChartData(
+                          gridData: const FlGridData(
+                              show: true, drawVerticalLine: false),
+                          titlesData: FlTitlesData(
+                            show: true,
+                            rightTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false)),
+                            topTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false)),
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 40,
+                                // Calculate interval dynamically to prevent duplicates
+                                interval: (sparkline.reduce(
+                                        (a, b) => a > b ? a : b) -
+                                    sparkline.reduce(
+                                            (a, b) => a < b ? a : b)) /
+                                    4 >
+                                    0
+                                    ? (sparkline.reduce(
+                                        (a, b) => a > b ? a : b) -
+                                    sparkline.reduce(
+                                            (a, b) => a < b ? a : b)) /
+                                    4
+                                    : 1.0,
+                                getTitlesWidget: (value, meta) {
+                                  if (value == meta.min || value == meta.max) {
+                                    return const SizedBox
+                                        .shrink(); // Hide edge labels if needed
+                                  }
+                                  return Text(
+                                    NumberFormat.compact().format(value),
+                                    style: TextStyle(
+                                        color: AppColors.tertiaryColor,
+                                        fontSize: 10),
+                                  );
+                                },
+                              ),
+                            ),
+                            bottomTitles: const AxisTitles(
+                                sideTitles: SideTitles(showTitles: false)),
+                          ),
+                          borderData: FlBorderData(show: false),
+                          lineTouchData: LineTouchData(
+                            enabled: true,
+                            touchCallback: (event, response) {
+                              if (event is FlTapUpEvent ||
+                                  event is FlPanEndEvent ||
+                                  event is FlLongPressEnd) {
+                                setState(() {
+                                  _touchedSpot = null;
+                                  _touchPosition = null;
+                                });
+                              } else if (response != null &&
+                                  response.lineBarSpots != null &&
+                                  response.lineBarSpots!.isNotEmpty) {
+                                setState(() {
+                                  _touchedSpot = response.lineBarSpots!.first;
+                                  if (event is FlTapDownEvent) {
+                                    _touchPosition = event.localPosition;
+                                  } else if (event is FlLongPressMoveUpdate) {
+                                    _touchPosition = event.localPosition;
+                                  } else if (event is FlPanUpdateEvent) {
+                                    _touchPosition = event.localPosition;
+                                  } else if (event is FlLongPressStart) {
+                                    _touchPosition = event.localPosition;
+                                  }
+                                });
+                              }
+                            },
+                            touchTooltipData: LineTouchTooltipData(
+                              getTooltipColor: (_) => Colors.transparent,
+                              tooltipPadding: EdgeInsets.zero,
+                              tooltipMargin: 0,
+                              getTooltipItems: (spots) =>
+                                  spots.map((e) => null).toList(),
+                            ),
+                            getTouchedSpotIndicator: (LineChartBarData barData,
+                                List<int> spotIndexes) {
+                              return spotIndexes.map((spotIndex) {
+                                return TouchedSpotIndicatorData(
+                                  FlLine(
+                                    color: AppColors.border,
+                                    strokeWidth: 1,
+                                    dashArray: [4, 4],
+                                  ),
+                                  FlDotData(
+                                    getDotPainter:
+                                        (spot, percent, barData, index) {
+                                      return FlDotCirclePainter(
+                                        radius: 6,
+                                        color: AppColors.background,
+                                        strokeWidth: 2,
+                                        strokeColor: AppColors.border,
+                                      );
+                                    },
+                                  ),
+                                );
+                              }).toList();
+                            },
+                          ),
+                          lineBarsData: [
+                            LineChartBarData(
+                              spots: sparkline
+                                  .asMap()
+                                  .entries
+                                  .map((e) {
+                                return FlSpot(e.key.toDouble(), e.value);
+                              }).toList(),
+                              isCurved: true,
+                              color: trendColor,
+                              barWidth: 2,
+                              isStrokeCapRound: true,
+                              dotData: const FlDotData(show: false),
+                              belowBarData: BarAreaData(
+                                show: true,
+                                color: trendColor.withValues(alpha: 0.1),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Overlay Tooltip
+                      if (_touchedSpot != null && _touchPosition != null)
+                        Positioned(
+                          left: _touchPosition!.dx - 30, // Adjust centering
+                          top: _touchPosition!.dy - 50,
+                          child: IgnorePointer(
+                            child: AnimatedOpacity(
+                              duration: const Duration(milliseconds: 200),
+                              opacity: _touchedSpot != null ? 1.0 : 0.0,
+                              child: TweenAnimationBuilder<double>(
+                                tween: Tween(begin: 0.8, end: 1.0),
+                                duration: const Duration(milliseconds: 200),
+                                builder: (context, value, child) {
+                                  return Transform.scale(
+                                    scale: value,
+                                    child: child,
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.background,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: AppColors.border),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                        Colors.black.withValues(alpha: 0.1),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      )
+                                    ],
+                                  ),
+                                  child: Text(
+                                    NumberFormat.compact()
+                                        .format(_touchedSpot!.y),
+                                    style: TextStyle(
+                                      color: AppColors.primaryColor.inverted,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-                child: Text(
-                  isUp ? '+ Trend' : '- Trend',
-                  style:
-                  TextStyle(color: trendColor, fontWeight: FontWeight.bold),
-                ),
-              ),
             ],
           ),
-          const SizedBox(height: 16),
-          if (sparkline.isNotEmpty)
-            SizedBox(
-              height: 60,
-              child: LineChart(
-                LineChartData(
-                  gridData: const FlGridData(show: false),
-                  titlesData: const FlTitlesData(show: false),
-                  borderData: FlBorderData(show: false),
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: sparkline
-                          .asMap()
-                          .entries
-                          .map((e) {
-                        return FlSpot(e.key.toDouble(), e.value);
-                      }).toList(),
-                      isCurved: true,
-                      color: trendColor,
-                      barWidth: 2,
-                      isStrokeCapRound: true,
-                      dotData: const FlDotData(show: false),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        color: trendColor.withValues(alpha: 0.1),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A wrapper to add hover/touch effect (custom border opacity/color)
+class InkWithHover extends StatefulWidget {
+  final Widget child;
+  final Color trendColor;
+
+  const InkWithHover(
+      {super.key, required this.child, required this.trendColor});
+
+  @override
+  State<InkWithHover> createState() => _InkWithHoverState();
+}
+
+class _InkWithHoverState extends State<InkWithHover> {
+  bool _isHovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        // We wrap the child which already has decoration.
+        // Ideally we should pass decoration down.
+        // For now, we wrap with opacity or scale effect?
+        // User asked for: "border rengi border olan ve background rengi de appcolors.background olan şekilde gelsin"
+        // Actually the child already has background. Let's add a slight overlay or border change?
+        foregroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: _isHovering
+              ? Border.all(
+              color: widget.trendColor.withValues(alpha: 0.5), width: 2)
+              : null,
+          color: _isHovering
+              ? widget.trendColor.withValues(alpha: 0.05)
+              : Colors.transparent,
+        ),
+        child: widget.child,
       ),
     );
   }
 }
 
 /// A generic chart card using fl_chart.
-class ChartCard extends StatelessWidget {
+/// A generic chart card using fl_chart.
+class ChartCard extends StatefulWidget {
   final Map<String, dynamic> data;
 
   const ChartCard({super.key, required this.data});
 
   @override
+  State<ChartCard> createState() => _ChartCardState();
+}
+
+class _ChartCardState extends State<ChartCard> {
+  // State for tracking touches (works for both Line and Bar charts mostly)
+  dynamic _touchedValue; // double for Line, int index for Bar
+  Offset? _touchPosition;
+  Timer? _hideTimer;
+
+  @override
+  void dispose() {
+    _hideTimer?.cancel();
+    super.dispose();
+  }
+
+  void _showTooltip(dynamic value, Offset position) {
+    _hideTimer?.cancel();
+    setState(() {
+      _touchedValue = value;
+      _touchPosition = position;
+    });
+
+    _hideTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _touchedValue = null;
+          _touchPosition = null;
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final type = data['type'] ?? 'bar';
-    final List<dynamic> labels = data['labels'] ?? [];
-    final List<dynamic> values = data['data'] ?? [];
-    final title = data['title'] ?? 'Chart';
+    final type = widget.data['type'] ?? 'bar';
+    final List<dynamic> labels = widget.data['labels'] ?? [];
+    final List<dynamic> values = widget.data['data'] ?? [];
+    final title = widget.data['title'] ?? 'Chart';
 
     // Basic validation
     if (labels.isEmpty || values.isEmpty) return const SizedBox.shrink();
@@ -346,6 +598,19 @@ class ChartCard extends StatelessWidget {
             const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             topTitles:
             const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 40,
+                getTitlesWidget: (value, meta) {
+                  return Text(
+                    NumberFormat.compact().format(value),
+                    style:
+                    TextStyle(color: AppColors.tertiaryColor, fontSize: 10),
+                  );
+                },
+              ),
+            ),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
@@ -367,6 +632,61 @@ class ChartCard extends StatelessWidget {
             ),
           ),
           borderData: FlBorderData(show: false),
+          lineTouchData: LineTouchData(
+            enabled: true,
+            touchCallback: (event, response) {
+              if (response != null &&
+                  response.lineBarSpots != null &&
+                  response.lineBarSpots!.isNotEmpty) {
+                final val = NumberFormat.compact()
+                    .format(response.lineBarSpots!.first.y);
+                Offset? pos;
+                // Temporary fix for compilation error
+                if (event is FlTapDownEvent) {
+                  pos = event.localPosition;
+                } else if (event is FlLongPressMoveUpdate) {
+                  pos = event.localPosition;
+                } else if (event is FlPanUpdateEvent) {
+                  pos = event.localPosition;
+                } else if (event is FlLongPressStart) {
+                  pos = event.localPosition;
+                }
+
+                if (pos != null) {
+                  _showTooltip(val, pos);
+                }
+              }
+            },
+            touchTooltipData: LineTouchTooltipData(
+              // Completely hide default tooltip in favor of custom overlay
+              getTooltipColor: (_) => Colors.transparent,
+              tooltipPadding: EdgeInsets.zero,
+              tooltipMargin: 0,
+              getTooltipItems: (spots) => spots.map((e) => null).toList(),
+            ),
+            getTouchedSpotIndicator:
+                (LineChartBarData barData, List<int> spotIndexes) {
+              return spotIndexes.map((spotIndex) {
+                return TouchedSpotIndicatorData(
+                  FlLine(
+                    color: AppColors.border,
+                    strokeWidth: 1,
+                    dashArray: [4, 4],
+                  ),
+                  FlDotData(
+                    getDotPainter: (spot, percent, barData, index) {
+                      return FlDotCirclePainter(
+                        radius: 6,
+                        color: AppColors.background,
+                        strokeWidth: 2,
+                        strokeColor: AppColors.border,
+                      );
+                    },
+                  ),
+                );
+              }).toList();
+            },
+          ),
           lineBarsData: [
             LineChartBarData(
               spots: List.generate(values.length, (i) {
@@ -396,6 +716,19 @@ class ChartCard extends StatelessWidget {
             const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             topTitles:
             const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 40,
+                getTitlesWidget: (value, meta) {
+                  return Text(
+                    NumberFormat.compact().format(value),
+                    style:
+                    TextStyle(color: AppColors.tertiaryColor, fontSize: 10),
+                  );
+                },
+              ),
+            ),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
@@ -417,6 +750,37 @@ class ChartCard extends StatelessWidget {
             ),
           ),
           borderData: FlBorderData(show: false),
+          barTouchData: BarTouchData(
+            enabled: true,
+            touchCallback: (event, response) {
+              if (response != null && response.spot != null) {
+                Offset? pos;
+
+                if (event is FlTapDownEvent) {
+                  pos = event.localPosition;
+                } else if (event is FlLongPressMoveUpdate) {
+                  pos = event.localPosition;
+                } else if (event is FlPanUpdateEvent) {
+                  pos = event.localPosition;
+                } else if (event is FlLongPressStart) {
+                  // Add this just in case
+                  pos = event.localPosition;
+                }
+
+                if (pos != null) {
+                  final val = NumberFormat.compact()
+                      .format(response.spot!.touchedBarGroup.barRods.first.toY);
+                  _showTooltip(val, pos);
+                }
+              }
+            },
+            touchTooltipData: BarTouchTooltipData(
+              getTooltipColor: (_) => Colors.transparent,
+              tooltipPadding: EdgeInsets.zero,
+              tooltipMargin: 0,
+              getTooltipItem: (group, groupIndex, rod, rodIndex) => null,
+            ),
+          ),
           barGroups: List.generate(values.length, (i) {
             return BarChartGroupData(
               x: i,
@@ -466,9 +830,159 @@ class ChartCard extends StatelessWidget {
           const SizedBox(height: 20),
           SizedBox(
             height: 200,
-            child: chartWidget,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                chartWidget,
+                // Overlay Tooltip
+                if (_touchedValue != null && _touchPosition != null)
+                  Positioned(
+                    left: _touchPosition!.dx - 30, // Adjust centering
+                    top: _touchPosition!.dy - 50,
+                    child: IgnorePointer(
+                      child: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 200),
+                        opacity: _touchedValue != null ? 1.0 : 0.0,
+                        child: TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.8, end: 1.0),
+                          duration: const Duration(milliseconds: 200),
+                          builder: (context, value, child) {
+                            return Transform.scale(
+                              scale: value,
+                              child: child,
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: AppColors.background,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppColors.border),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                )
+                              ],
+                            ),
+                            child: Text(
+                              '$_touchedValue',
+                              style: TextStyle(
+                                color: AppColors.primaryColor.inverted,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// A widget indicating that a tool is currently working (loading state).
+class WorkInProgressWidget extends StatefulWidget {
+  const WorkInProgressWidget({super.key});
+
+  @override
+  State<WorkInProgressWidget> createState() => _WorkInProgressWidgetState();
+}
+
+class _WorkInProgressWidgetState extends State<WorkInProgressWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2), // Slower, subtle shimmer
+    )
+      ..repeat();
+
+    _animation = Tween<double>(begin: -1.0, end: 2.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+    final text = appLocalizations.workInProgress; // Ensure ARB key exists!
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.secondaryColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.hourglass_empty_rounded,
+                    size: 16, color: AppColors.tertiaryColor),
+                const SizedBox(width: 8),
+                Text(
+                  text,
+                  style: TextStyle(
+                    color: AppColors.tertiaryColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            // Shimmer Overlay
+            Positioned.fill(
+              child: AnimatedBuilder(
+                animation: _animation,
+                builder: (context, child) {
+                  return FractionallySizedBox(
+                    widthFactor: 0.8,
+                    alignment: Alignment(_animation.value, 0.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.transparent,
+                            AppColors.tertiaryColor.withValues(alpha: 0.1),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.5, 1.0],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -603,7 +603,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get italian => 'Italien';
 
   @override
-  String get arabic => 'arabe';
+  String get arabic => 'Arabe';
 
   @override
   String get ram => 'RAM';
@@ -673,7 +673,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get benefit10 => 'Pièces jointes supplémentaires';
 
   @override
-  String get benefit11 => 'Mode flux illimité';
+  String get benefit11 => 'Plus de Mode Flux';
 
   @override
   String get benefit12 => '';
@@ -1638,9 +1638,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cortex protège vos données en fonctionnant entièrement sur l\'appareil, même en mode de chat vocal ; profitez de conversations fluides !';
 
   @override
-  String get workInProgress => 'Travaux en cours';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Obtenez le cours actuel et l\'historique des actions (par exemple AAPL, THYAO.IS) et des cryptomonnaies (par exemple BTC-USD, ETH-USD).';
 
@@ -1694,13 +1691,73 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get flowModeDescription =>
-      'En mode Flow, les intelligences débattent entre elles ; vous pouvez soit vous asseoir et écouter, soit intervenir et participer à la discussion !';
+      'En mode Flux, les intelligences débattent entre elles ; vous pouvez soit vous asseoir et écouter, soit intervenir et participer à la discussion !';
 
   @override
   String get flowModeQuestion =>
-      'Bonjour ! Vous êtes maintenant en mode Flow sur l\'application Cortex. Trois autres agents IA sont présents. Votre mission est de lancer un sujet de discussion en posant une question provocatrice ou amusante. N\'hésitez pas à utiliser l\'humour, l\'ironie et quelques piques amicales dans vos réponses. Tous les sujets sont permis. À vous de jouer !';
+      'Bonjour ! Vous êtes maintenant en mode Flux sur l\'application Cortex. Trois autres agents IA sont présents. Votre mission est de lancer un sujet de discussion en posant une question provocatrice ou amusante. N\'hésitez pas à utiliser l\'humour, l\'ironie et quelques piques amicales dans vos réponses. Tous les sujets sont permis. À vous de jouer !';
 
   @override
   String get voicePrompt =>
       'Vous fournissez actuellement un service vocal sur la plateforme Cortex. Veuillez ne pas utiliser Markdown, de blocs de code ni de LaTeX. Répondez uniquement par du texte adapté à la synthèse vocale.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Mode Flux';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'Prime';
+
+  @override
+  String get workInProgress => 'Travaux en cours';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'IMPORTANT : N’utilisez pas la mise en forme Markdown (gras, italique). N’affichez PAS de blocs de code (```). Rédigez des réponses concises et conversationnelles.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Mode Cortex Flow ($agentName). Précédent : $previousResponse';
+  }
 }

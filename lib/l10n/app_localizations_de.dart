@@ -668,7 +668,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get benefit10 => 'Weitere Anhänge';
 
   @override
-  String get benefit11 => 'Unbegrenzter Durchflussmodus';
+  String get benefit11 => 'Mehr Flussmodus';
 
   @override
   String get benefit12 => '';
@@ -1634,9 +1634,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Cortex schützt Ihre Daten, indem es vollständig auf dem Gerät ausgeführt wird, sogar im Sprachchat-Modus; genießen Sie reibungslose Gespräche!';
 
   @override
-  String get workInProgress => 'In Arbeit';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Erhalten Sie aktuelle Kurse und Kursverläufe für Aktien (z. B. AAPL, THYAO.IS) und Kryptowährungen (z. B. BTC-USD, ETH-USD).';
 
@@ -1690,13 +1687,73 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get flowModeDescription =>
-      'Im Flow-Modus debattieren die verschiedenen Intelligenzen untereinander; Sie können sich entweder zurücklehnen und zuhören oder sich aktiv an der Diskussion beteiligen!';
+      'Im Flussmodus debattieren die verschiedenen Intelligenzen untereinander; Sie können sich entweder zurücklehnen und zuhören oder sich aktiv an der Diskussion beteiligen!';
 
   @override
   String get flowModeQuestion =>
-      'Hallo! Du befindest dich jetzt im Flow-Modus der Cortex-App. Drei weitere KI-Agenten sind ebenfalls anwesend. Deine Aufgabe ist es, ein Thema in den Raum zu werfen und eine Diskussion anzustoßen, indem du den anderen eine provokante oder unterhaltsame Frage stellst. In deinen Antworten kannst du gerne Humor, Ironie und ein bisschen neckischen Spott verwenden. Jedes Thema ist erlaubt. Leg los und starte das Gespräch!';
+      'Hallo! Du befindest dich jetzt im Flussmodus der Cortex-App. Drei weitere KI-Agenten sind ebenfalls anwesend. Deine Aufgabe ist es, ein Thema in den Raum zu werfen und eine Diskussion anzustoßen, indem du den anderen eine provokante oder unterhaltsame Frage stellst. In deinen Antworten kannst du gerne Humor, Ironie und ein bisschen neckischen Spott verwenden. Jedes Thema ist erlaubt. Leg los und starte das Gespräch!';
 
   @override
   String get voicePrompt =>
       'Sie bieten derzeit Sprachdienste auf der Cortex-Plattform an. Bitte verwenden Sie kein Markdown, keine Codeblöcke und kein LaTeX. Antworten Sie ausschließlich in Textform, der für die Sprachsynthese geeignet ist.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Flussmodus';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'Prämie';
+
+  @override
+  String get workInProgress => 'In Arbeit';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'WICHTIG: Bitte keine Markdown-Formatierung (fett, kursiv) verwenden. Codeblöcke (```) nicht ausgeben. Antworten sollten kurz und in einem lockeren, natürlichen Stil verfasst sein.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Cortex Flow Mode ($agentName). Vorherige Antwort: $previousResponse';
+  }
 }

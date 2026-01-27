@@ -238,7 +238,7 @@
   "benefit8": "Add Models",
   "benefit9": "New Themes",
   "benefit10": "More Attachments",
-  "benefit11": "Limitless Flow Mode",
+  "benefit11": "More Flow Mode",
   "benefit12": "",
   "oldBenefits": "All Benefits From Lower Plans",
   "confirm": "Confirm",
@@ -634,7 +634,6 @@
   "exclusiveOffer": "Exclusive Offer",
   "continueInOfflineMode": "Continue in Offline Mode",
   "voiceModeInformation": "Cortex keeps your data safe by running fully on-device, even in voice chat mode; enjoy seamless conversations!",
-  "workInProgress": "Work In Progress",
   "toolGetStockPriceDescription": "Get current price and history for stocks (e.g. AAPL, THYAO.IS) and crypto (e.g. BTC-USD, ETH-USD).",
   "toolGetStockPriceParamSymbol": "The ticker symbol (e.g. AAPL, THYAO.IS, BTC-USD).",
   "toolGetWeatherDescription": "Get current weather for a specific city. Ask user for city if not known.",
@@ -651,5 +650,45 @@
   "toolRenderChartParamTitle": "Title of the chart.",
   "flowModeDescription": "In Flow mode, intelligences debate among themselves; you can either sit back and listen or jump in and join the discussion!",
   "flowModeQuestion": "Hello! You are now in Flow Mode on the Cortex app. There are three other AI agents here with you. Your task is to throw a topic into the room and kick off a discussion by asking the others a provocative or entertaining question. In your responses, feel free to use humor, irony, and light trash talk. Any topic is fair game. Go ahead, start the conversation.",
-  "voicePrompt": "You are currently providing voice service on the Cortex platform. Do not use markdown, code blocks, or LaTeX. Respond purely in text suitable for speech synthesis."
+  "voicePrompt": "You are currently providing voice service on the Cortex platform. Do not use markdown, code blocks, or LaTeX. Respond purely in text suitable for speech synthesis.",
+  "thoughtForSeconds": "Thought for {seconds} seconds",
+  "@thoughtForSeconds": {
+    "description": "Indicates how long the model thought before generating a response.",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "thought": "Thought",
+  "weatherClear": "Clear",
+  "weatherCloudy": "Cloudy",
+  "weatherFoggy": "Foggy",
+  "weatherRainy": "Rainy",
+  "weatherSnowy": "Snowy",
+  "weatherThunderstorm": "Thunderstorm",
+  "weatherDrizzle": "Drizzle",
+  "agentRed": "Red",
+  "agentBlue": "Blue",
+  "agentPurple": "Purple",
+  "flowMode": "Flow Mode",
+  "limitReachedVoiceStop": "Voice session ended due to limit limits.",
+  "premium": "Premium",
+  "workInProgress": "Work In Progress",
+  "voiceSystemPromptSuffix": "IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.",
+  "flowModeContextParams": "Cortex Flow Mode ({agentName}). Previous: {previousResponse}",
+  "@flowModeContextParams": {
+    "description": "Context string for Flow Mode with agent name and previous response placeholders.",
+    "placeholders": {
+      "agentName": {
+        "type": "String",
+        "example": "Agent Red"
+      },
+      "previousResponse": {
+        "type": "String",
+        "example": "That's an interesting point..."
+      }
+    }
+  }
 }

@@ -669,7 +669,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get benefit10 => 'Mais anexos';
 
   @override
-  String get benefit11 => 'Modo de fluxo ilimitado';
+  String get benefit11 => 'Mais modo de fluxo';
 
   @override
   String get benefit12 => '';
@@ -1625,9 +1625,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'O Cortex protege seus dados, funcionando totalmente no dispositivo, mesmo no modo de bate-papo por voz; desfrute de conversas perfeitas!';
 
   @override
-  String get workInProgress => 'Trabalho em andamento';
-
-  @override
   String get toolGetStockPriceDescription =>
       'Obtenha o preço atual e o histórico de ações (por exemplo, AAPL, THYAO.IS) e criptomoedas (por exemplo, BTC-USD, ETH-USD).';
 
@@ -1689,4 +1686,64 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get voicePrompt =>
       'Atualmente, você está prestando serviços de voz na plataforma Cortex. Não utilize Markdown, blocos de código ou LaTeX. Responda exclusivamente em texto adequado para síntese de voz.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'Modo de fluxo';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'Premium';
+
+  @override
+  String get workInProgress => 'Trabalho em andamento';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'IMPORTANTE: Não utilize formatação Markdown (negrito, itálico). NÃO insira blocos de código (```). Mantenha as respostas em um tom conversacional e conciso.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'Modo Cortex Flow ($agentName). Anterior: $previousResponse';
+  }
 }

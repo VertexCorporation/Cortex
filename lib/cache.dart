@@ -8,7 +8,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-/// Defines the unique keys for each type of data that can be cached.
+/// Defines withValues(alpha:e unique keys for each type of data that can be cached.
 /// This provides type-safety and improves code readability.
 enum CacheKey {
   // Model Selection

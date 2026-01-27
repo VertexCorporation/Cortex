@@ -251,6 +251,8 @@ class _AIMessageTileState extends State<AIMessageTile>
       if (!_headerEntryCtl.isCompleted) _headerEntryCtl.forward();
       if (_textAnimCtl.isAnimating) _textAnimCtl.stop();
 
+      _parseCache
+          .clear(); // Clear cache to allow re-parsing with isFinished: true
       setState(() {
         _stableText = widget.message.text;
         _animatingText = "";
@@ -708,7 +710,8 @@ class _AIMessageTileState extends State<AIMessageTile>
     if (text.isEmpty) return [];
     if (_parseCache.containsKey(text)) return _parseCache[text]!;
 
-    final spans = parseText(context, text);
+    final spans =
+        parseText(context, text, isFinished: !widget.message.isThinking);
 
     if (text.length < 1000) _parseCache[text] = spans;
     return spans;

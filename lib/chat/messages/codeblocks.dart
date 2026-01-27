@@ -1,6 +1,5 @@
 // ================ lib/chat/messages/codeblocks.dart (FULLY REFACTORED AND FIXED) ================
 
-import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
@@ -146,92 +145,80 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
 
     final languageForHighlighter = _resolvedLanguage ?? 'plaintext';
 
-    return Stack(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: oneDarkProTheme['root']?.backgroundColor ??
-                const Color(0xFF141414),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.border, width: 0.5),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  key: ValueKey(
-                      '${widget.code.hashCode}_${languageForHighlighter.hashCode}'),
-                  child: Container(
-                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                    child: HighlightView(
-                      widget.code,
-                      language: languageForHighlighter,
-                      theme: oneDarkProTheme,
-                      padding: const EdgeInsets.fromLTRB(12, 42, 12, 12),
-                      textStyle: const TextStyle(
-                          fontFamily: 'monospace', fontSize: 14),
-                    ),
-                  ),
-                );
-              },
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF141414), // Force dark background
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border, width: 0.5),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Stack(
+          children: [
+            // Code Content
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
+              child: HighlightView(
+                widget.code,
+                language: languageForHighlighter,
+                theme: oneDarkProTheme,
+                padding: const EdgeInsets.fromLTRB(
+                    16, 48, 16, 16), // Adjusted padding
+                textStyle:
+                    const TextStyle(fontFamily: 'monospace', fontSize: 13),
+              ),
             ),
-          ),
-        ),
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor.inverted,
-              borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    languageNameForDisplay,
-                    style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
+            // Header
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E1E1E), // Slightly lighter header
+                  border: Border(
+                      bottom: BorderSide(
+                          color: AppColors.border.withValues(alpha: 0.2))),
                 ),
-                InkWell(
-                  onTap: _copyCodeToClipboard,
-                  borderRadius: BorderRadius.circular(4),
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      transitionBuilder: (child, animation) => FadeTransition(
-                          opacity: animation,
-                          child:
-                              ScaleTransition(scale: animation, child: child)),
-                      child: _copying
-                          ? const Icon(Icons.check,
-                              size: 18,
-                              color: Colors.greenAccent,
-                              key: ValueKey('check'))
-                          : const Icon(Icons.copy_all_outlined,
-                              size: 18,
-                              color: Colors.white70,
-                              key: ValueKey('copy')),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      languageNameForDisplay,
+                      style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500),
                     ),
-                  ),
+                    InkWell(
+                      onTap: _copyCodeToClipboard,
+                      borderRadius: BorderRadius.circular(4),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: _copying
+                              ? const Icon(Icons.check,
+                                  size: 16,
+                                  color: Colors.greenAccent,
+                                  key: ValueKey('check'))
+                              : const Icon(Icons.copy_all_outlined,
+                                  size: 16,
+                                  color: Colors.white54,
+                                  key: ValueKey('copy')),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

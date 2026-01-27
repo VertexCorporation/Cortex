@@ -658,7 +658,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get benefit10 => 'المزيد من المرفقات';
 
   @override
-  String get benefit11 => 'وضع التدفق غير المحدود';
+  String get benefit11 => 'المزيد من وضع التدفق';
 
   @override
   String get benefit12 => '';
@@ -1601,9 +1601,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'يحافظ برنامج Cortex على أمان بياناتك من خلال تشغيله بالكامل على الجهاز، حتى في وضع الدردشة الصوتية؛ استمتع بمحادثات سلسة!';
 
   @override
-  String get workInProgress => 'العمل قيد التنفيذ';
-
-  @override
   String get toolGetStockPriceDescription =>
       'احصل على السعر الحالي والتاريخ للأسهم (مثل AAPL، THYAO.IS) والعملات المشفرة (مثل BTC-USD، ETH-USD).';
 
@@ -1664,4 +1661,64 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get voicePrompt =>
       'أنت تقدم حاليًا خدمة صوتية على منصة Cortex. لا تستخدم لغة Markdown أو كتل التعليمات البرمجية أو LaTeX. أجب بنص مناسب لتوليف الكلام فقط.';
+
+  @override
+  String thoughtForSeconds(int seconds) {
+    return 'Thought for $seconds seconds';
+  }
+
+  @override
+  String get thought => 'Thought';
+
+  @override
+  String get weatherClear => 'Clear';
+
+  @override
+  String get weatherCloudy => 'Cloudy';
+
+  @override
+  String get weatherFoggy => 'Foggy';
+
+  @override
+  String get weatherRainy => 'Rainy';
+
+  @override
+  String get weatherSnowy => 'Snowy';
+
+  @override
+  String get weatherThunderstorm => 'Thunderstorm';
+
+  @override
+  String get weatherDrizzle => 'Drizzle';
+
+  @override
+  String get agentRed => 'Red';
+
+  @override
+  String get agentBlue => 'Blue';
+
+  @override
+  String get agentPurple => 'Purple';
+
+  @override
+  String get flowMode => 'وضع التدفق';
+
+  @override
+  String get limitReachedVoiceStop =>
+      'Voice session ended due to limit limits.';
+
+  @override
+  String get premium => 'غالي';
+
+  @override
+  String get workInProgress => 'العمل قيد التنفيذ';
+
+  @override
+  String get voiceSystemPromptSuffix =>
+      'هام: تجنب استخدام تنسيق Markdown (الخط العريض والمائل). لا تُدرج كتلًا برمجية (```). اجعل الردود موجزة وبسيطة.';
+
+  @override
+  String flowModeContextParams(String agentName, String previousResponse) {
+    return 'وضع تدفق القشرة ($agentName). السابق: $previousResponse';
+  }
 }

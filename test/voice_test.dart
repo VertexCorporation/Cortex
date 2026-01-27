@@ -116,6 +116,8 @@ void main() {
     await voiceService.startSession(
       locale: 'en-US',
       onFinalSentence: (text) {},
+      voiceSystemPromptSuffix: "SUFFIX",
+      flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev",
     );
     expect(voiceService.state, VoiceState.listening);
     expect(mockSpeechService.isListeningMock, true);
@@ -123,7 +125,11 @@ void main() {
 
   test('Speaking logic queues sentences correctly', () async {
     // 1. Start Session
-    await voiceService.startSession(locale: 'en-US', onFinalSentence: (_) {});
+    await voiceService.startSession(
+        locale: 'en-US',
+        onFinalSentence: (_) {},
+        voiceSystemPromptSuffix: "SUFFIX",
+        flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev");
 
     // 2. Simulate AI Streaming text
     // "Hello world. How are you?"
@@ -149,10 +155,18 @@ void main() {
   });
 
   test('VoiceService restarts listening after AI finishes', () async {
-    await voiceService.startSession(locale: 'en-US', onFinalSentence: (_) {});
+    await voiceService.startSession(
+        locale: 'en-US',
+        onFinalSentence: (_) {},
+        voiceSystemPromptSuffix: "SUFFIX",
+        flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev");
     await voiceService.stopSession(); // Reset
 
-    await voiceService.startSession(locale: 'en-US', onFinalSentence: (_) {});
+    await voiceService.startSession(
+        locale: 'en-US',
+        onFinalSentence: (_) {},
+        voiceSystemPromptSuffix: "SUFFIX",
+        flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev");
 
     voiceService.onAiStreamCallback("Hello.");
     await Future.delayed(Duration.zero);

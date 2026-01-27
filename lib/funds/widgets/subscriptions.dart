@@ -535,6 +535,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         localizations.benefit7,
         localizations.benefit9,
         localizations.benefit10,
+        localizations.benefit11,
         localizations.benefitPremiumModels,
       ];
     } else if (planType == 'pro') {
@@ -543,6 +544,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         localizations.benefit5,
         localizations.benefit1,
         localizations.benefit10,
+        localizations.benefit11,
         localizations.benefit7,
       ];
     } else if (planType == 'ultra') {
@@ -552,6 +554,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         localizations.benefit1,
         localizations.benefit5,
         localizations.benefit10,
+        localizations.benefit11,
         localizations.benefit7,
       ];
     }

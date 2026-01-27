@@ -29,8 +29,7 @@ class ThemeProvider extends ChangeNotifier {
 
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-        systemNavigationBarColor:
-        Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
         // Enforce transparent for Edge-to-Edge
         systemNavigationBarDividerColor: Colors.transparent,
         statusBarColor: Colors.transparent,
