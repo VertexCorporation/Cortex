@@ -9,9 +9,41 @@ import 'package:cortex/l10n/app_localizations.dart';
 import '../../notifications/introvert.dart';
 import '../../theme.dart';
 import 'codeblocks.dart';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import '../screen/widgets/tools.dart';
+import '../screen/widgets/thinking.dart';
 import '../screen/widgets/sources.dart';
 
-// ... (other imports remain, but we handle the class content here)
+double _baseFs(BuildContext context) {
+  final view = View.of(context);
+  final physicalWidth = view.physicalSize.width;
+  final devicePixelRatio = view.devicePixelRatio;
+  return (physicalWidth / devicePixelRatio) * 0.042;
+}
+
+class SafeMathTex extends StatelessWidget {
+  final String latex;
+  final TextStyle textStyle;
+
+  const SafeMathTex({required this.latex, required this.textStyle, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    try {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Math.tex(
+          latex,
+          textStyle: textStyle,
+          onErrorFallback: (_) => Text(latex, style: textStyle),
+        ),
+      );
+    } catch (_) {
+      return Text(latex, style: textStyle);
+    }
+  }
+}
 
 void _openLink(BuildContext context, String urlString) async {
   final uri = Uri.tryParse(urlString);
@@ -30,28 +62,31 @@ void _openLink(BuildContext context, String urlString) async {
 
 // Static RegExp constants to avoid recompilation
 class RegexPatterns {
-  // Greedy matching for <think> tags.
-  // Handles unclosed tags at the end of stream for smoother streaming.
+  // Greedy matching for <think> tags - supports BOTH closed and unclosed (streaming) tags
+  // For streaming: matches <think> followed by content until </think> OR end of string
   static final thinking =
-      RegExp(r'(<think>[\s\S]*?</think>)', multiLine: false);
+  RegExp(r'(<think>[\s\S]*?(?:</think>|$))', multiLine: false);
 
-  // Legacy matching for "Thinking..." headers.
-  // multiLine: true required for '^' anchors.
+  // Legacy matching for "Thinking..." headers - scattered/broken format from streaming
+  // This pattern captures the quote-style thinking blocks that some models produce:
+  // > *Thinking...*
+  // > The user asks...
+  // etc.
   static final thinkingLegacy = RegExp(
-      r'(?:^\s*>.*?Thinking.*?(?:\n|$)(?:(?:\s*>[^\n]*?(?:\n|$))|(?:\s*?\n)|(?:\s*?[^>*\s<]{1,5}?\s*?(?:\n|$)))*)',
+      r'(?:(?:^|\n)\s*>\s*\*?Thinking[.\s]*\*?\s*\n?)(?:(?:\s*>[ \t]*[^\n]*\n?)*)',
       multiLine: true);
 
   static final horizontalRule =
-      RegExp(r'^\s*([*\-_]){3,}\s*$', multiLine: true);
+  RegExp(r'^\s*([*\-_]){3,}\s*$', multiLine: true);
   static final codeBlock =
-      RegExp(r'^```([^\r\n]*)\r?\n([\s\S]*?)\r?\n^```$', multiLine: true);
+  RegExp(r'^```([^\r\n]*)\r?\n([\s\S]*?)\r?\n^```$', multiLine: true);
   static final legacyUsing =
-      RegExp(r'^\s*\*Using (.+?)\.\.\.\*.*$', multiLine: true);
+  RegExp(r'^\s*\*Using (.+?)\.\.\.\*.*$', multiLine: true);
   static final table = RegExp(
       r'(^\s*\|.+\|\s*\n\s*\|(?:\s*:?-+:?\s*\|)+\s*\n(?:\s*\|.*\|\s*\n?)+)',
       multiLine: true);
   static final widget = RegExp(
-      r'(?:^|\n)\s*<<<WIDGET:([a-zA-Z0-9_]+)>>>([\s\S]*?)<<<END>>>',
+      r'<<<WIDGET:([a-zA-Z0-9_]+)>>>([\s\S]*?)<<<END>>>',
       multiLine: true);
   static final heading = RegExp(r'^#{1,6} .+?$', multiLine: true);
   static final bulletList = RegExp(r'^\s*[*\-+]\s+(.+)$', multiLine: true);
@@ -63,17 +98,25 @@ class RegexPatterns {
 
   // [NEW] Bare URL pattern: Matches http/https not preceded by ]( or (
   static final bareUrl = RegExp(r'(?<![\]\)])\b(https?:\/\/[^\s<]+)');
+
   // [NEW] Citation pattern: [1], [2], etc.
   static final citation = RegExp(r'\[(\d+)\]');
 
   static final boldItalic =
-      RegExp(r'(\*\*\*.+?\*\*\*|___.+?___)', dotAll: true);
+  RegExp(r'(\*\*\*.+?\*\*\*|___.+?___)', dotAll: true);
   static final bold = RegExp(r'(\*\*.+?\*\*|__.+?__)', dotAll: true);
   static final strikethrough = RegExp(r'~~.+?~~', dotAll: true);
   static final italic =
-      RegExp(r'(?<![*$])\*(?!\*).+?(?<!\*)\*(?![*$])', dotAll: true);
+  RegExp(r'(?<![*$])\*(?!\*).+?(?<!\*)\*(?![*$])', dotAll: true);
   static final thinkStart = RegExp(r'<think>\s*');
   static final thinkEnd = RegExp(r'\s*</think>');
+
+  // Pattern to match tool result emojis that should be hidden from display
+  static final toolResultEmoji = RegExp(r'\s*[✅❌✓✗]\s*');
+
+  // Pattern to match "*Using tool...*" lines completely
+  static final usingToolLine = RegExp(
+      r'\n?\*Using [^*]+\.\.\.[^*]*\*\s*[✅❌✓✗]?\s*\n?');
 
   static final blockPatterns = {
     'thinking': thinking,
@@ -91,14 +134,17 @@ class RegexPatterns {
     'inlineCode': inlineCode,
     'latex': latex,
     'link': link,
-    'bareUrl': bareUrl, // Add bare URL
-    'citation': citation, // Add citation
+    'bareUrl': bareUrl,
+    // Add bare URL
+    'citation': citation,
+    // Add citation
     'boldItalic': boldItalic,
     'bold': bold,
     'strikethrough': strikethrough,
     'italic': italic,
-    'thinkStart': thinkStart,
-    'thinkEnd': thinkEnd,
+    // NOTE: thinkStart/thinkEnd removed from inline patterns
+    // They are now handled at block level via the 'thinking' pattern
+    // which matches both closed (<think>...</think>) and unclosed (<think>...) tags
   };
 }
 
@@ -106,7 +152,10 @@ List<InlineSpan> parseText(BuildContext context, String text,
     {double? fontSize, bool isFinished = false}) {
   try {
     // [FIX] Pre-clean text to remove artifacts
-    text = text.replaceAll(RegExp(r'\n?\*Using .*?\*(?: [^\n]*)?\n?'), '\n');
+    // Remove "*Using tool...*" lines with optional emojis
+    text = text.replaceAll(RegexPatterns.usingToolLine, '\n');
+    // Remove standalone tool result emojis
+    text = text.replaceAll(RegExp(r'(?<=\n|^)\s*[✅❌✓✗]\s*(?=\n|$)'), '');
     text = text.replaceAll(RegExp(r'\n>\s*\n'), '\n');
 
     // --- Source Extraction Logic ---
@@ -134,8 +183,8 @@ List<InlineSpan> parseText(BuildContext context, String text,
 
         // Regex for: 1. [Title](Url) or - [Title](Url) or [1] Title: Url
         final linkMatch =
-            RegExp(r'(?:^\d+\.?\s*|^\-\s*)?\[([^\]]+)\]\(([^)]+)\)')
-                .firstMatch(line);
+        RegExp(r'(?:^\d+\.?\s*|^\-\s*)?\[([^\]]+)\]\(([^)]+)\)')
+            .firstMatch(line);
         if (linkMatch != null) {
           sources.add(Source(
               index: indexCounter++,
@@ -147,7 +196,7 @@ List<InlineSpan> parseText(BuildContext context, String text,
 
         // Regex for: [1] http://...
         final bareUrlMatch =
-            RegExp(r'\[(\d+)\]\s*(https?://\S+)').firstMatch(line);
+        RegExp(r'\[(\d+)\]\s*(https?://\S+)').firstMatch(line);
         if (bareUrlMatch != null) {
           sources.add(Source(
               index: int.tryParse(bareUrlMatch.group(1)!) ?? indexCounter++,
@@ -210,20 +259,22 @@ List<InlineSpan> parseText(BuildContext context, String text,
             .firstMatch(blockMatch.text);
         final content = bulletMatch?.group(1) ?? '';
         final inlineSpans =
-            _processInlineElements(context, content, inlinePatterns, fs);
+        _processInlineElements(context, content, inlinePatterns, fs);
         spans.add(WidgetSpan(
             child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('•  ',
-                  style: TextStyle(
-                      color: AppColors.primaryColor.inverted, fontSize: fs)),
-              Expanded(child: RichText(text: TextSpan(children: inlineSpans))),
-            ],
-          ),
-        )));
+              padding: const EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('•  ',
+                      style: TextStyle(
+                          color: AppColors.primaryColor.inverted,
+                          fontSize: fs)),
+                  Expanded(
+                      child: RichText(text: TextSpan(children: inlineSpans))),
+                ],
+              ),
+            )));
       } else {
         spans.add(_processBlockMatch(context, blockMatch, inlinePatterns, fs,
             isFinished: isFinished));
@@ -272,7 +323,6 @@ List<InlineSpan> _processInlineElements(BuildContext context, String text,
 
   final spans = <InlineSpan>[];
   int currentIndex = 0;
-  bool isThinking = false;
 
   for (final match in combinedPattern.allMatches(text)) {
     if (match.start > currentIndex) {
@@ -280,8 +330,7 @@ List<InlineSpan> _processInlineElements(BuildContext context, String text,
         text: text.substring(currentIndex, match.start),
         style: TextStyle(
             color: AppColors.primaryColor.inverted,
-            fontSize: fs,
-            fontStyle: isThinking ? FontStyle.italic : FontStyle.normal),
+            fontSize: fs),
       ));
     }
 
@@ -294,19 +343,12 @@ List<InlineSpan> _processInlineElements(BuildContext context, String text,
     }
 
     if (matchType != null) {
-      if (matchType == 'thinkStart') {
-        isThinking = true;
-      } else if (matchType == 'thinkEnd') {
-        isThinking = false;
-      } else {
-        final inlineMatch = _MatchRange(
-            start: match.start,
-            end: match.end,
-            text: match.group(0)!,
-            type: matchType);
-        spans.add(_processInlineMatch(context, inlineMatch, patterns, fs,
-            isThinking: isThinking));
-      }
+      final inlineMatch = _MatchRange(
+          start: match.start,
+          end: match.end,
+          text: match.group(0)!,
+          type: matchType);
+      spans.add(_processInlineMatch(context, inlineMatch, patterns, fs));
     }
     currentIndex = match.end;
   }
@@ -316,8 +358,7 @@ List<InlineSpan> _processInlineElements(BuildContext context, String text,
       text: text.substring(currentIndex),
       style: TextStyle(
           color: AppColors.primaryColor.inverted,
-          fontSize: fs,
-          fontStyle: isThinking ? FontStyle.italic : FontStyle.normal),
+          fontSize: fs),
     ));
   }
   return spans;
@@ -332,6 +373,12 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
       case 'thinkingLegacy':
       case 'thinking':
         String content = matchText;
+
+        // Detect if this is an unclosed/streaming think block
+        // The thinking is "finished" when we have a closing tag, regardless of message state
+        final bool hasCloseTag = matchText.contains('</think>');
+        // isThinkingFinished: true if the block is closed OR the entire message is finished
+        final bool isThinkingFinished = hasCloseTag || isFinished;
 
         // 1. Remove <think> tags wrapper
         content =
@@ -359,22 +406,43 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
         content = content.replaceAll(
             RegExp(r'\*?Thinking\.\.\.\*?', caseSensitive: false), '');
 
+        // [FIX] Merge scattered/fragmented text:
+        // When streaming produces word-by-word on separate lines, merge them.
+        // This handles patterns like:
+        // "The\n user\n asks" -> "The user asks"
+        // Preserve double newlines as paragraph breaks
+        content = content.replaceAll(
+            RegExp(r'\n{3,}'), '\n\n'); // Normalize multiple newlines
+        content = content.replaceAll(
+            RegExp(r'(?<!\n)\n(?!\n)'), ' '); // Single newline -> space
+        content = content.replaceAll(
+            RegExp(r' {2,}'), ' '); // Normalize multiple spaces
+
         content = content.trim();
+
+        // Generate a stable key based on content hash to preserve widget state
+        // Use first 50 chars to create a stable identity that doesn't change with content updates
+        final keyBase = matchText.length > 50
+            ? matchText.substring(0, 50)
+            : matchText;
+        final widgetKey = ValueKey('thinking_${keyBase.hashCode}');
 
         if (content.isEmpty) {
           // If empty (e.g. just started thinking), show empty widget with active state
           return WidgetSpan(
             child: ThinkingWidget(
+              key: widgetKey,
               content: "",
-              isFinished: isFinished,
+              isFinished: isThinkingFinished,
             ),
           );
         }
 
         return WidgetSpan(
           child: ThinkingWidget(
+            key: widgetKey,
             content: content,
-            isFinished: isFinished,
+            isFinished: isThinkingFinished,
           ),
         );
       case 'horizontalRule':
@@ -382,7 +450,7 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
         return WidgetSpan(
             child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
                 child: Divider(color: AppColors.border, thickness: 1)));
       case 'widget':
         try {
@@ -391,8 +459,8 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
           // We need to re-match here because blockMatch.group(1) isn't directly available in _MatchRange structure easily without re-parsing or storing it.
           // But wait, the block match text is the WHOLE string.
           final widgetMatch = RegExp(
-                  r'^\s*<<<WIDGET:([a-zA-Z0-9_]+)>>>([\s\S]*?)<<<END>>>\s*$',
-                  multiLine: true)
+              r'<<<WIDGET:([a-zA-Z0-9_]+)>>>([\s\S]*?)<<<END>>>',
+              multiLine: true)
               .firstMatch(matchText);
           if (widgetMatch != null) {
             final type = widgetMatch.group(1)!;
@@ -415,21 +483,22 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
               style: TextStyle(color: Colors.red, fontSize: fs));
         }
       case 'legacyUsing':
-        // User requested to REMOVE legacy tool calling text completely.
+      // User requested to REMOVE legacy tool calling text completely.
         return const WidgetSpan(child: SizedBox.shrink());
       case 'codeBlock':
         final codeMatch = RegExp(r'^(```+)([^\r\n]*)\r?\n([\s\S]*?)\r?\n^\1$',
-                multiLine: true)
+            multiLine: true)
             .firstMatch(matchText);
         if (codeMatch != null) {
           final language = codeMatch.group(2)?.trim() ?? '';
           final content = codeMatch.group(3)?.trim() ?? '';
           return WidgetSpan(
               child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: CodeBlockWidget(
-                code: content, language: language.isEmpty ? null : language),
-          ));
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: CodeBlockWidget(
+                    code: content,
+                    language: language.isEmpty ? null : language),
+              ));
         }
         return TextSpan(
             text: matchText,
@@ -468,7 +537,7 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
             child: RichText(
               text: TextSpan(
                 children:
-                    _processInlineElements(context, text, inlinePatterns, fs),
+                _processInlineElements(context, text, inlinePatterns, fs),
                 style: TextStyle(
                     fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
                     color: AppColors.primaryColor.inverted),
@@ -482,7 +551,9 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
                 .toList()));
         if (lines.length > 2) {
           for (final rowString in lines.sublist(2)) {
-            if (rowString.trim().isEmpty) {
+            if (rowString
+                .trim()
+                .isEmpty) {
               continue;
             }
             final rowCells = splitRow(rowString);
@@ -548,14 +619,12 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
 }
 
 InlineSpan _processInlineMatch(BuildContext context, _MatchRange match,
-    Map<String, RegExp> inlinePatterns, double fs,
-    {bool isThinking = false}) {
+    Map<String, RegExp> inlinePatterns, double fs) {
   try {
     final matchText = match.text;
     final baseStyle = TextStyle(
       color: AppColors.primaryColor.inverted,
       fontSize: fs,
-      fontStyle: isThinking ? FontStyle.italic : FontStyle.normal,
     );
     switch (match.type) {
       case 'latex':
@@ -578,7 +647,7 @@ InlineSpan _processInlineMatch(BuildContext context, _MatchRange match,
             alignment: PlaceholderAlignment.middle,
             child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.0),
+                const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.0),
                 decoration: BoxDecoration(
                     color: AppColors.secondaryColor,
                     borderRadius: BorderRadius.circular(4)),
@@ -595,11 +664,11 @@ InlineSpan _processInlineMatch(BuildContext context, _MatchRange match,
                         color: Colors.blue,
                         decoration: TextDecoration.underline))));
       case 'bareUrl':
-        // matchText is the URL itself (mostly)
-        // Regex group 1 is the url.
-        // Actually our regex is: r'(?<![\]\)])\b(https?:\/\/[^\s<]+)'
-        // so group 1 is the url.
-        // But matchText comes from match.group(0), so we might need to re-extract or just use matchText if valid.
+      // matchText is the URL itself (mostly)
+      // Regex group 1 is the url.
+      // Actually our regex is: r'(?<![\]\)])\b(https?:\/\/[^\s<]+)'
+      // so group 1 is the url.
+      // But matchText comes from match.group(0), so we might need to re-extract or just use matchText if valid.
         final url = matchText.trim();
         return WidgetSpan(
             child: GestureDetector(
@@ -639,26 +708,26 @@ InlineSpan _processInlineMatch(BuildContext context, _MatchRange match,
         final content = matchText.substring(3, matchText.length - 3);
         return TextSpan(
             children:
-                _processInlineElements(context, content, inlinePatterns, fs),
+            _processInlineElements(context, content, inlinePatterns, fs),
             style: baseStyle.copyWith(
                 fontWeight: FontWeight.bold, fontStyle: FontStyle.italic));
       case 'bold':
         final content = matchText.substring(2, matchText.length - 2);
         return TextSpan(
             children:
-                _processInlineElements(context, content, inlinePatterns, fs),
+            _processInlineElements(context, content, inlinePatterns, fs),
             style: baseStyle.copyWith(fontWeight: FontWeight.bold));
       case 'italic':
         final content = matchText.substring(1, matchText.length - 1);
         return TextSpan(
             children:
-                _processInlineElements(context, content, inlinePatterns, fs),
+            _processInlineElements(context, content, inlinePatterns, fs),
             style: baseStyle.copyWith(fontStyle: FontStyle.italic));
       case 'strikethrough':
         final content = matchText.substring(2, matchText.length - 2);
         return TextSpan(
             children:
-                _processInlineElements(context, content, inlinePatterns, fs),
+            _processInlineElements(context, content, inlinePatterns, fs),
             style: baseStyle.copyWith(decoration: TextDecoration.lineThrough));
       default:
         return TextSpan(text: matchText, style: baseStyle);
@@ -671,8 +740,7 @@ InlineSpan _processInlineMatch(BuildContext context, _MatchRange match,
         text: match.text,
         style: TextStyle(
             color: AppColors.primaryColor.inverted,
-            fontSize: fs,
-            fontStyle: isThinking ? FontStyle.italic : FontStyle.normal));
+            fontSize: fs));
   }
 }
 
@@ -680,11 +748,10 @@ class _MatchRange {
   final int start, end;
   final String text, type;
 
-  _MatchRange(
-      {required this.start,
-      required this.end,
-      required this.text,
-      required this.type});
+  _MatchRange({required this.start,
+    required this.end,
+    required this.text,
+    required this.type});
 }
 
 /// Intelligently converts a string with complex Markdown and LaTeX into a highly
@@ -697,7 +764,7 @@ String stripMarkup(String text) {
       RegExp(r'^\s*\|(?:\s*:?-+:?\s*\|)+\s*$', multiLine: true), '');
   text = text.replaceAll('|', '  ');
   text = text.replaceAllMapped(RegexPatterns.heading,
-      (m) => '${m.group(0)!.replaceFirst(RegExp(r"^#+\s*"), "")}\n');
+          (m) => '${m.group(0)!.replaceFirst(RegExp(r"^#+\s*"), "")}\n');
   text =
       text.replaceAllMapped(RegexPatterns.bulletList, (m) => '${m.group(1)}\n');
   text = text.replaceAll(RegExp(r'^---$', multiLine: true), '');
@@ -711,9 +778,9 @@ String stripMarkup(String text) {
 
   // Handle complex structures first.
   text = text.replaceAllMapped(RegExp(r'\\frac\{(.+?)\}\{(.+?)\}'),
-      (m) => '(${m.group(1)}/${m.group(2)})');
+          (m) => '(${m.group(1)}/${m.group(2)})');
   text = text.replaceAllMapped(RegExp(r'\\sqrt\[(.+?)\]\{(.+?)\}'),
-      (m) => '(${m.group(1)})√(${m.group(2)})');
+          (m) => '(${m.group(1)})√(${m.group(2)})');
   text = text.replaceAllMapped(
       RegExp(r'\\sqrt\{(.+?)\}'), (m) => '√(${m.group(1)})');
 
@@ -734,7 +801,7 @@ String stripMarkup(String text) {
       text.replaceAllMapped(RegexPatterns.boldItalic, (m) => m.group(1) ?? '');
   text = text.replaceAllMapped(RegexPatterns.bold, (m) => m.group(1) ?? '');
   text = text.replaceAllMapped(RegExp(r'[*_](.+?)[*_]', dotAll: true),
-      (m) => m.group(1) ?? ''); // Italic simple
+          (m) => m.group(1) ?? ''); // Italic simple
   text = text.replaceAllMapped(
       RegexPatterns.strikethrough, (m) => m.group(1) ?? '');
   text = text.replaceAllMapped(
@@ -742,6 +809,9 @@ String stripMarkup(String text) {
 
   // --- Stage 4: Final cleanup ---
   text = text.replaceAll(RegexPatterns.thinking, '');
+  // Remove tool result emojis and "*Using...*" lines from copied text
+  text = text.replaceAll(RegexPatterns.usingToolLine, '');
+  text = text.replaceAll(RegExp(r'[✅❌✓✗]'), '');
   text = text.replaceAll(RegExp(r'[ \t]{2,}', multiLine: true), ' ');
   text = text.replaceAll(RegExp(r'(\s*\n\s*){2,}'), '\n\n');
 

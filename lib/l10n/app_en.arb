@@ -171,17 +171,6 @@
   "rateUs": "Rate Us",
   "share": "Share",
   "shareSubject": "Cortex",
-  "shareMessage": "Check out the Cortex app, it is so amazing! Download it here: {cortexLink}",
-  "@shareMessage": {
-    "description": "The message sent when sharing the app",
-    "placeholders": {
-      "cortexLink": {
-        "type": "String",
-        "example": "https://vertexishere.com"
-      }
-    }
-  },
-  "shareFailed": "Failed to share the app. Please try again later",
   "selectText": "Select Text",
   "thinking": "Thinking",
   "user": "User",
@@ -239,7 +228,6 @@
   "benefit9": "New Themes",
   "benefit10": "More Attachments",
   "benefit11": "More Flow Mode",
-  "benefit12": "",
   "oldBenefits": "All Benefits From Lower Plans",
   "confirm": "Confirm",
   "changePassword": "Change password",
@@ -295,14 +283,12 @@
   "errorReachedLimit": "You have hit your limit, upgrade to unlock more and keep chatting.",
   "errorServer": "An unexpected server error occurred. Please try again later.",
   "errorNetwork": "A network error occurred. Please check your connection and try again.",
-  "errorApiAuthentication": "Authentication failed. Please try logging in again.",
   "baseModelForCharacterDescription": "The selected base model will determine the character's reasoning and response capabilities.",
   "selectBaseModel": "Select a Base Model",
   "@errorUserNotAuthenticated": {},
   "@errorReachedLimit": {},
   "@errorServer": {},
   "@errorNetwork": {},
-  "@errorApiAuthentication": {},
   "@baseModelForCharacterDescription": {},
   "couldNotOpenLink": "Could not open the link",
   "downloadStarted": "Download started",
@@ -386,10 +372,6 @@
   "featureImageGenerationDescription": "This model can create original images based on your text descriptions.",
   "@featureImageGenerationDescription": {
     "description": "Description for the image generation feature."
-  },
-  "errorImageLoad": "Failed to load the generated image.",
-  "@errorImageLoad": {
-    "description": "Error message shown in an AI message bubble when the generated image data is corrupt or cannot be saved to the device."
   },
   "premiumModelNoticeTitle": "Premium Model",
   "@premiumModelNoticeTitle": {
@@ -634,46 +616,13 @@
   "exclusiveOffer": "Exclusive Offer",
   "continueInOfflineMode": "Continue in Offline Mode",
   "voiceModeInformation": "Cortex keeps your data safe by running fully on-device, even in voice chat mode; enjoy seamless conversations!",
-  "toolGetStockPriceDescription": "Get current price and history for stocks (e.g. AAPL, THYAO.IS) and crypto (e.g. BTC-USD, ETH-USD).",
-  "toolGetStockPriceParamSymbol": "The ticker symbol (e.g. AAPL, THYAO.IS, BTC-USD).",
-  "toolGetWeatherDescription": "Get current weather for a specific city. Ask user for city if not known.",
-  "toolGetWeatherParamCity": "The name of the city (e.g., London, Istanbul).",
-  "toolRunPythonCodeDescription": "Execute Python code in a secure sandbox. Use this for complex calculations, data processing, or algorithmic tasks.",
-  "toolRunPythonCodeParamCode": "The Python code to execute.",
-  "toolCalculateDescription": "Evaluate a mathematical expression.",
-  "toolCalculateParamExpression": "The math expression (e.g., \"3 + 4 * 2\", \"sin(45)\").",
-  "toolRenderChartDescription": "Generate a chart/graph. Use this to visualize data provided by the user or calculated.",
-  "toolRenderChartParamType": "Chart type: bar, line, pie.",
-  "toolRenderChartParamLabels": "Labels for the x-axis or categories.",
-  "toolRenderChartParamData": "Numerical data points.",
-  "toolRenderChartParamLabel": "Label for the dataset.",
-  "toolRenderChartParamTitle": "Title of the chart.",
   "flowModeDescription": "In Flow mode, intelligences debate among themselves; you can either sit back and listen or jump in and join the discussion!",
   "flowModeQuestion": "Hello! You are now in Flow Mode on the Cortex app. There are three other AI agents here with you. Your task is to throw a topic into the room and kick off a discussion by asking the others a provocative or entertaining question. In your responses, feel free to use humor, irony, and light trash talk. Any topic is fair game. Go ahead, start the conversation.",
-  "voicePrompt": "You are currently providing voice service on the Cortex platform. Do not use markdown, code blocks, or LaTeX. Respond purely in text suitable for speech synthesis.",
-  "thoughtForSeconds": "Thought for {seconds} seconds",
-  "@thoughtForSeconds": {
-    "description": "Indicates how long the model thought before generating a response.",
-    "placeholders": {
-      "seconds": {
-        "type": "int",
-        "example": "3"
-      }
-    }
-  },
   "thought": "Thought",
-  "weatherClear": "Clear",
-  "weatherCloudy": "Cloudy",
-  "weatherFoggy": "Foggy",
-  "weatherRainy": "Rainy",
-  "weatherSnowy": "Snowy",
-  "weatherThunderstorm": "Thunderstorm",
-  "weatherDrizzle": "Drizzle",
   "agentRed": "Red",
   "agentBlue": "Blue",
   "agentPurple": "Purple",
   "flowMode": "Flow Mode",
-  "limitReachedVoiceStop": "Voice session ended due to limit limits.",
   "premium": "Premium",
   "workInProgress": "Work In Progress",
   "voiceSystemPromptSuffix": "IMPORTANT: Do not use markdown formatting (bold, italics). Do NOT output code blocks (```). Keep responses conversational and brief.",
