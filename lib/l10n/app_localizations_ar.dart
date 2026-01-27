@@ -1684,4 +1684,8 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'عنوان الرسم البياني.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'وضع التفكير مُفعّل: يجب عليك استخدام وسوم <think></think> لعرض خطوات تفكيرك قبل تقديم إجابتك النهائية. فكّر خطوة بخطوة داخل الوسوم، ثم قدّم إجابتك خارجها.';
 }

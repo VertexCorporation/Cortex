@@ -3146,6 +3146,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Title of the chart.'**
   String get toolChartTitleParam;
+
+  /// No description provided for @thinkingModeInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'THINKING MODE ENABLED: You MUST use <think></think> tags to show your reasoning process before giving your final answer. Think step by step inside the tags, then provide your response outside the tags.'**
+  String get thinkingModeInstruction;
 }
 
 class _AppLocalizationsDelegate

@@ -53,7 +53,8 @@ class SendService {
     required OfflineService offlineService,
     required ModelService modelService,
     required VoiceService voiceService,
-  })  : _conversationProvider = conversationProvider,
+  })
+      : _conversationProvider = conversationProvider,
         _inputProvider = inputProvider,
         _apiService = apiService,
         _contextService = contextService,
@@ -89,7 +90,7 @@ class SendService {
     if (isRegenerate) {
       final messages = _conversationProvider.messages;
       final lastUserMessage = messages.reversed.firstWhere(
-        (m) => m.isUserMessage,
+            (m) => m.isUserMessage,
         orElse: () => Message(text: '', isUserMessage: true),
       );
       currentAttachmentPaths = List.from(lastUserMessage.attachmentPaths);
@@ -111,6 +112,7 @@ class SendService {
       // 2. FEATURE MODES (Study, Quiz, etc.)
       // -----------------------------------------------------------------------
       final activeMode = _inputProvider.featureMode;
+      final bool enableThinkingMode = activeMode == ChatInputMode.featureReasoning;
       String textForApi = text;
 
       if (activeMode == ChatInputMode.study) {
@@ -126,7 +128,9 @@ class SendService {
       String errorMessage = localizations.errorNoModelsAvailable;
 
       final localState = context.read<ModelLocalStateProvider>();
-      final langCode = Localizations.localeOf(context).languageCode;
+      final langCode = Localizations
+          .localeOf(context)
+          .languageCode;
       final hasInternet = await InternetConnection().hasInternetAccess;
 
       if (overrideModelId != null && overrideModelId.isNotEmpty) {
@@ -145,7 +149,7 @@ class SendService {
         if (entity.variants != null && entity.variants!.isNotEmpty) {
           final List<dynamic> variants = entity.variants!.values.toList();
           final bool hasVisualContent =
-              currentAttachmentPaths.any((path) => _isImageFile(path));
+          currentAttachmentPaths.any((path) => _isImageFile(path));
 
           List<dynamic> getPreferredCandidates(List<dynamic> sourceList) {
             final filtered = sourceList.where((v) {
@@ -171,7 +175,7 @@ class SendService {
             } else {
               if (hasVisualContent) {
                 final visionModel = downloadedVariants.firstWhere(
-                  (v) => (v['modalities']?['image'] == true),
+                      (v) => (v['modalities']?['image'] == true),
                   orElse: () => null,
                 );
                 apiModelIdForSend = visionModel != null
@@ -179,14 +183,14 @@ class SendService {
                     : getPreferredCandidates(downloadedVariants).first['id'];
               } else {
                 apiModelIdForSend =
-                    getPreferredCandidates(downloadedVariants).first['id'];
+                getPreferredCandidates(downloadedVariants).first['id'];
               }
             }
           } else {
             // Online Variants
             if (hasVisualContent) {
               final visionModel = variants.firstWhere(
-                (v) => (v['modalities']?['image'] == true),
+                    (v) => (v['modalities']?['image'] == true),
                 orElse: () => null,
               );
               apiModelIdForSend = visionModel != null
@@ -278,6 +282,7 @@ class SendService {
           localizations: localizations,
           aiMessageIndex: aiMessageIndex,
           langCode: langCode,
+          enableThinkingMode: enableThinkingMode,
         );
 
         _conversationProvider.finishBotResponse(aiMessageIndex);
@@ -292,7 +297,7 @@ class SendService {
       // -----------------------------------------------------------------------
       if (!isAutoRouter) {
         ChatStorageService.addRecentModel(apiModelIdForSend,
-                langCode: langCode, modelService: _modelService)
+            langCode: langCode, modelService: _modelService)
             .ignore();
       }
 
@@ -324,21 +329,27 @@ class SendService {
     required AppLocalizations localizations,
     required int aiMessageIndex,
     required String langCode,
+    required bool enableThinkingMode,
   }) async {
     final ModelEntity modelData =
-        _modelService.getPreciseModelData(modelId, langCode: langCode);
+    _modelService.getPreciseModelData(modelId, langCode: langCode);
     final bool isPremium = modelData.isPremium;
 
     final bool isCharacterModel =
         (modelData.category == 'roleplay' || modelData.category == 'self') &&
             modelId != 'cortex/auto';
 
+    // Use the enableThinkingMode passed from sendMessage (captured before clearAllInput)
+    final bool enablefeatureReasoning = enableThinkingMode;
+
     // 1. Build Base Context (History)
     List<Map<String, dynamic>> contextMessages =
-        await _contextService.buildContextMessages(
+    await _contextService.buildContextMessages(
       includeLastUser: false,
       targetModelId: modelId,
       langCode: langCode,
+      enableThinkingMode: enablefeatureReasoning,
+      localizations: localizations,
     );
 
     // 2. Add Current User Message to Context (Manual Construction)
@@ -371,9 +382,7 @@ class SendService {
     const int maxLoops = 5; // Safety break
 
     // State for managing featureReasoning block - OUTSIDE loop to persist across iterations
-    // featureReasoning is enabled when user activates "Deep Thinking" mode from features panel
-    final bool enablefeatureReasoning =
-        _inputProvider.featureMode == ChatInputMode.featureReasoning;
+    // enablefeatureReasoning is already defined above when building context
     bool isfeatureReasoningBlockActive = false;
     bool hasEverHadfeatureReasoning = false; // Track if we've seen any featureReasoning
 
@@ -429,7 +438,9 @@ class SendService {
       Future<void> onImageReceived(String url) async {
         if (_conversationProvider.wasResponseStopped) return;
         try {
-          final bytes = base64Decode(url.split(',').last);
+          final bytes = base64Decode(url
+              .split(',')
+              .last);
           final path =
               '${(await getTemporaryDirectory()).path}/${_uuid.v4()}.png';
           await File(path).writeAsBytes(bytes);
@@ -538,7 +549,8 @@ class SendService {
                 // Inject Widget Marker (no extra newlines to avoid spacing issues)
                 // The UI (parser) will detect this pattern and render the card
                 _conversationProvider.appendToLastBotMessage(
-                    "<<<WIDGET:$widgetType>>>${jsonEncode(widgetData)}<<<END>>>");
+                    "<<<WIDGET:$widgetType>>>${jsonEncode(
+                        widgetData)}<<<END>>>");
                 // Force immediate UI update for widget visibility
                 _conversationProvider.flushStreamUpdates();
 
@@ -574,16 +586,15 @@ class SendService {
     ToolRegistry.clearDocumentsContext();
   }
 
-  void _handleSendError(
-    Object error,
-    bool isRegenerate,
-    int? regenerateAiIndex,
-    AppLocalizations localizations, {
-    String? failedUserText,
-    List<String>? failedAttachmentPaths,
-  }) {
+  void _handleSendError(Object error,
+      bool isRegenerate,
+      int? regenerateAiIndex,
+      AppLocalizations localizations, {
+        String? failedUserText,
+        List<String>? failedAttachmentPaths,
+      }) {
     final String errorMessage =
-        error is ApiException ? error.message : localizations.anErrorOccurred;
+    error is ApiException ? error.message : localizations.anErrorOccurred;
     final bool isContentFlagError = error is ApiException &&
         error.message == localizations.errorPromptFlagged;
 

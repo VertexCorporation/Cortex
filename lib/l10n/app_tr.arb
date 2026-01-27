@@ -577,5 +577,6 @@
   "toolChartLabelsParam": "Grafik eksenleri veya segmentleri için etiketler.",
   "toolChartDataParam": "Grafik için sayısal veri değerleri.",
   "toolChartLabelParam": "Grafik açıklaması için veri seti etiketi.",
-  "toolChartTitleParam": "Grafiğin başlığı."
+  "toolChartTitleParam": "Grafiğin başlığı.",
+  "thinkingModeInstruction": "DÜŞÜNME MODU AKTİF: Cevabını vermeden önce düşünce sürecini göstermek için <think></think> etiketlerini KULLANMALISIN. Etiketlerin içinde adım adım düşün, sonra cevabını etiketlerin dışında ver."
 }

@@ -1555,7 +1555,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get toolReadDocumentDescription =>
-      '读取并提取上传文档（PDF、Excel 表格）中的文本内容。当用户附加文档文件时，请使用此功能。';
+      '读取并提取上传文档中的文本内容。支持 PDF、Word (DOCX)、Excel (XLSX)、PowerPoint (PPTX) 和 OpenDocument 格式。当用户附加文档文件时，请使用此功能。';
 
   @override
   String get toolReadDocumentIndexParam =>
@@ -1603,4 +1603,8 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => '图表标题。';
+
+  @override
+  String get thinkingModeInstruction =>
+      '思考模式已启用：您必须使用 `<think></think>` 标签来展示您的推理过程，然后再给出最终答案。请在标签内逐步思考，然后在标签外给出您的答案。';
 }

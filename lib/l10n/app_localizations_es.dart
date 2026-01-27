@@ -1717,4 +1717,8 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Título del gráfico.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'MODO DE PENSAMIENTO ACTIVADO: DEBES usar las etiquetas <think></think> para mostrar tu proceso de razonamiento antes de dar tu respuesta final. Piensa paso a paso dentro de las etiquetas y luego proporciona tu respuesta fuera de ellas.';
 }

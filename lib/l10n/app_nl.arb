@@ -568,5 +568,6 @@
   "toolChartLabelParam": "Label voor de dataset in de legenda van de grafiek.",
   "toolChartTitleParam": "Titel van de grafiek.",
   "toolReadDocumentDescription": "Lees en extraheer tekstinhoud uit geüploade documenten. Ondersteunt PDF-, Word (DOCX)-, Excel (XLSX)-, PowerPoint (PPTX)- en OpenDocument-formaten. Gebruik dit wanneer de gebruiker een documentbestand heeft bijgevoegd.",
-  "toolReadDocumentIndexParam": "De index van het te lezen document (0-gebaseerd). Meestal 0 voor het eerste document."
+  "toolReadDocumentIndexParam": "De index van het te lezen document (0-gebaseerd). Meestal 0 voor het eerste document.",
+  "thinkingModeInstruction": "DENKMODUS INGESCHAKELD: Je MOET <think></think>-tags gebruiken om je redeneerproces te laten zien voordat je je definitieve antwoord geeft. Denk stap voor stap binnen de tags en geef je antwoord vervolgens buiten de tags."
 }

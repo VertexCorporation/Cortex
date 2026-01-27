@@ -1665,7 +1665,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get toolReadDocumentDescription =>
-      'Lire et extraire le contenu textuel des documents téléchargés (PDF, feuilles de calcul Excel). À utiliser lorsqu\'un utilisateur a joint un fichier.';
+      'Lire et extraire le contenu textuel des documents téléchargés. Prend en charge les formats PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) et OpenDocument. À utiliser lorsqu\'un utilisateur a joint un fichier.';
 
   @override
   String get toolReadDocumentIndexParam =>
@@ -1723,4 +1723,8 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Titre du graphique.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'MODE RÉFLEXION ACTIVÉ : Vous DEVEZ utiliser les balises <think></think> pour indiquer votre raisonnement avant de donner votre réponse finale. Réfléchissez étape par étape à l’intérieur des balises, puis indiquez votre réponse à l’extérieur.';
 }

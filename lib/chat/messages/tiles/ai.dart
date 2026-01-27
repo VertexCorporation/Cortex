@@ -251,8 +251,6 @@ class _AIMessageTileState extends State<AIMessageTile>
       if (!_headerEntryCtl.isCompleted) _headerEntryCtl.forward();
       if (_textAnimCtl.isAnimating) _textAnimCtl.stop();
 
-      _parseCache
-          .clear(); // Clear cache to allow re-parsing with isFinished: true
       setState(() {
         _stableText = widget.message.text;
         _animatingText = "";
@@ -278,26 +276,14 @@ class _AIMessageTileState extends State<AIMessageTile>
         widget.message.text != old.message.text &&
         widget.message.isThinking) {
       setState(() {
-        // Clear parse cache on text change to ensure fresh parsing
-        _parseCache.clear();
-        
         if (_textAnimCtl.isAnimating) {
           _stableText += _animatingText;
-          _animatingText = "";
         }
 
-        // The text may have been reorganized by the parser's merge function
-        // So we need to check if the new text STARTS with our stable text
-        // If not, we need to reset and use the new text entirely
-        final newText = widget.message.text;
-        
-        if (newText.startsWith(_stableText) && _stableText.isNotEmpty) {
-          // Normal append - new text extends our stable text
-          _animatingText = newText.substring(_stableText.length);
+        if (_stableText.length < widget.message.text.length) {
+          _animatingText = widget.message.text.substring(_stableText.length);
         } else {
-          // Text was reorganized or doesn't start with stable text
-          // Reset and use full new text (skip animation for this update)
-          _stableText = newText;
+          _stableText = widget.message.text;
           _animatingText = "";
           if (_textAnimCtl.isAnimating) _textAnimCtl.stop();
         }

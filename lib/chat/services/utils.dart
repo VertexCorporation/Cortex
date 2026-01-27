@@ -9,8 +9,7 @@ import '../../library/backend/data/service.dart';
 
 /// A collection of static utility methods used across the application.
 class Utils {
-  static bool isLocalModel(
-    String? modelId, {
+  static bool isLocalModel(String? modelId, {
     required String langCode,
     required ModelService modelService,
   }) =>
@@ -20,8 +19,7 @@ class Utils {
         modelService: modelService,
       );
 
-  static bool isServerSideModel(
-    String? modelId, {
+  static bool isServerSideModel(String? modelId, {
     required String langCode,
     required ModelService modelService,
   }) {
@@ -37,8 +35,7 @@ class Utils {
   }
 
   /// It requires a `langCode` to ensure correct localization.
-  static ModelEntity getModelEntityFromId(
-    String targetModelId, {
+  static ModelEntity getModelEntityFromId(String targetModelId, {
     required String langCode,
     required ModelService modelService,
   }) {
@@ -111,8 +108,13 @@ class Utils {
       if (!await file.exists()) return null;
 
       final mimeType = lookupMimeType(path) ?? 'application/octet-stream';
-      final String fileName = path.split('/').last;
-      final String extension = fileName.split('.').last.toLowerCase();
+      final String fileName = path
+          .split('/')
+          .last;
+      final String extension = fileName
+          .split('.')
+          .last
+          .toLowerCase();
 
       // 1. Handle Images - send as base64 data URL (OpenRouter/OpenAI compatible)
       if (mimeType.startsWith('image/')) {
@@ -143,13 +145,14 @@ class Utils {
         // Logs
         'log',
       ];
-      
+
       if (textExtensions.contains(extension) || mimeType.startsWith('text/')) {
         try {
           final String content = await file.readAsString();
           // Truncate very large files to prevent token overflow
-          final truncatedContent = content.length > 50000 
-              ? '${content.substring(0, 50000)}\n\n[... truncated, file too large ...]'
+          final truncatedContent = content.length > 50000
+              ? '${content.substring(
+              0, 50000)}\n\n[... truncated, file too large ...]'
               : content;
           return {
             "type": "text",
@@ -164,25 +167,33 @@ class Utils {
       // 3. Binary documents - need server-side processing via tool
       // These require specialized parsers (pdf-parse, mammoth for docx, xlsx, etc.)
       final binaryDocExtensions = [
-        'pdf',                    // PDF documents
-        'doc', 'docx',            // Word documents  
-        'xls', 'xlsx',            // Excel spreadsheets
-        'ppt', 'pptx',            // PowerPoint presentations
-        'odt', 'ods', 'odp',      // OpenDocument formats
+        'pdf', // PDF documents
+        'doc', 'docx', // Word documents
+        'xls', 'xlsx', // Excel spreadsheets
+        'ppt', 'pptx', // PowerPoint presentations
+        'odt', 'ods', 'odp', // OpenDocument formats
       ];
 
       if (binaryDocExtensions.contains(extension)) {
         try {
           final bytes = await file.readAsBytes();
           final base64Data = base64Encode(bytes);
-          
+
           // Determine document type for better tool instructions
           String docType = 'document';
-          if (extension == 'pdf') docType = 'PDF';
-          else if (['doc', 'docx', 'odt'].contains(extension)) docType = 'Word document';
-          else if (['xls', 'xlsx', 'ods', 'csv'].contains(extension)) docType = 'spreadsheet';
-          else if (['ppt', 'pptx', 'odp'].contains(extension)) docType = 'presentation';
-          
+          if (extension == 'pdf') {
+            docType = 'PDF';
+          }
+          else if (['doc', 'docx', 'odt'].contains(extension)) {
+            docType = 'Word document';
+          }
+          else if (['xls', 'xlsx', 'ods', 'csv'].contains(extension)) {
+            docType = 'spreadsheet';
+          }
+          else if (['ppt', 'pptx', 'odp'].contains(extension)) {
+            docType = 'presentation';
+          }
+
           return {
             "type": "text",
             "text": "[Attached: $fileName ($docType)]\nUse the read_document tool to extract and read the contents of this file.",
@@ -220,7 +231,8 @@ class Utils {
 
   /// Extracts document data from processed attachments for tool execution.
   /// Returns a list of document objects that can be sent to the server for read_document tool.
-  static List<Map<String, dynamic>> extractDocuments(List<Map<String, dynamic>> contentBlocks) {
+  static List<Map<String, dynamic>> extractDocuments(
+      List<Map<String, dynamic>> contentBlocks) {
     final documents = <Map<String, dynamic>>[];
     for (final block in contentBlocks) {
       if (block.containsKey('_document')) {
@@ -231,7 +243,8 @@ class Utils {
   }
 
   /// Cleans content blocks by removing internal _document fields before sending to API.
-  static List<Map<String, dynamic>> cleanContentBlocks(List<Map<String, dynamic>> contentBlocks) {
+  static List<Map<String, dynamic>> cleanContentBlocks(
+      List<Map<String, dynamic>> contentBlocks) {
     return contentBlocks.map((block) {
       final cleaned = Map<String, dynamic>.from(block);
       cleaned.remove('_document');

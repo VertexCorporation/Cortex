@@ -1692,4 +1692,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Title of the chart.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'THINKING MODE ENABLED: You MUST use <think></think> tags to show your reasoning process before giving your final answer. Think step by step inside the tags, then provide your response outside the tags.';
 }

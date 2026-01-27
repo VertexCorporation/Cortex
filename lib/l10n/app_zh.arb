@@ -565,6 +565,7 @@
   "toolChartDataParam": "图表的数值数据。",
   "toolChartLabelParam": "图表图例的数据集标签。",
   "toolChartTitleParam": "图表标题。",
-  "toolReadDocumentDescription": "读取并提取上传文档（PDF、Excel 表格）中的文本内容。当用户附加文档文件时，请使用此功能。",
-  "toolReadDocumentIndexParam": "要读取的文档附件的索引（从 0 开始计数）。通常 0 表示第一个文档。"
+  "toolReadDocumentDescription": "读取并提取上传文档中的文本内容。支持 PDF、Word (DOCX)、Excel (XLSX)、PowerPoint (PPTX) 和 OpenDocument 格式。当用户附加文档文件时，请使用此功能。",
+  "toolReadDocumentIndexParam": "要读取的文档附件的索引（从 0 开始计数）。通常 0 表示第一个文档。",
+  "thinkingModeInstruction": "思考模式已启用：您必须使用 `<think></think>` 标签来展示您的推理过程，然后再给出最终答案。请在标签内逐步思考，然后在标签外给出您的答案。"
 }

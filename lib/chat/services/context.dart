@@ -5,6 +5,7 @@ import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/chat/messages/messages.dart';
 import 'package:cortex/library/backend/data/service.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
@@ -30,11 +31,23 @@ class ContextService {
     bool includeLastUser = true,
     required String targetModelId,
     required String langCode,
+    bool enableThinkingMode = false,
+    AppLocalizations? localizations,
   }) async {
     final List<Map<String, dynamic>> contextMessages = [];
 
     // Read the system role from the session provider.
-    final String? systemRole = _sessionProvider.role;
+    String? systemRole = _sessionProvider.role;
+
+    // If thinking mode is enabled, append the localized instruction to system prompt
+    if (enableThinkingMode && localizations != null) {
+      final thinkingInstruction = "\n\n${localizations.thinkingModeInstruction}";
+      if (systemRole != null && systemRole.isNotEmpty) {
+        systemRole = systemRole + thinkingInstruction;
+      } else {
+        systemRole = thinkingInstruction.trim();
+      }
+    }
 
     // Read the message list from the conversation provider and filter for valid context.
     List<Message> history = _conversationProvider.messages

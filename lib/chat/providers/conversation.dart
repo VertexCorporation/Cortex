@@ -302,15 +302,11 @@ class ConversationProvider with ChangeNotifier {
   }
 
   /// Schedules a throttled UI update for streaming.
-  /// This prevents excessive rebuilds when tokens arrive rapidly.
   void _scheduleStreamUpdate() {
     _hasPendingStreamUpdate = true;
     
-    // If no timer is running, start one and notify immediately
+    // If no timer is active, start a new throttle window
     if (_streamThrottleTimer == null || !_streamThrottleTimer!.isActive) {
-      notifyListeners();
-      _hasPendingStreamUpdate = false;
-      
       _streamThrottleTimer = Timer(_streamThrottleDuration, () {
         if (_hasPendingStreamUpdate) {
           _hasPendingStreamUpdate = false;

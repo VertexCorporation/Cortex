@@ -1709,4 +1709,8 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Заголовок диаграммы.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'РЕЖИМ РАЗМЫШЛЕНИЯ ВКЛЮЧЕН: Вы ОБЯЗАТЕЛЬНО должны использовать теги <think></think>, чтобы показать ход своих рассуждений, прежде чем дать окончательный ответ. Размышляйте шаг за шагом внутри тегов, а затем дайте свой ответ вне тегов.';
 }

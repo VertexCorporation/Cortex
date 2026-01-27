@@ -1709,4 +1709,8 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Titel van de grafiek.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'DENKMODUS INGESCHAKELD: Je MOET <think></think>-tags gebruiken om je redeneerproces te laten zien voordat je je definitieve antwoord geeft. Denk stap voor stap binnen de tags en geef je antwoord vervolgens buiten de tags.';
 }

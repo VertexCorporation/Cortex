@@ -1661,7 +1661,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get toolReadDocumentDescription =>
-      'Liest und extrahiert Textinhalte aus hochgeladenen Dokumenten (PDF, Excel-Tabellen). Verwenden Sie diese Funktion, wenn der Benutzer eine Dokumentdatei angehängt hat.';
+      'Liest und extrahiert Textinhalte aus hochgeladenen Dokumenten. Unterstützt PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) und OpenDocument-Formate. Verwenden Sie diese Funktion, wenn der Benutzer eine Dokumentdatei angehängt hat.';
 
   @override
   String get toolReadDocumentIndexParam =>
@@ -1718,4 +1718,8 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Titel des Diagramms.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'DENKMODUS AKTIVIERT: Sie MÜSSEN <think></think>-Tags verwenden, um Ihren Gedankengang darzustellen, bevor Sie Ihre endgültige Antwort geben. Denken Sie innerhalb der Tags Schritt für Schritt und geben Sie Ihre Antwort anschließend außerhalb der Tags an.';
 }

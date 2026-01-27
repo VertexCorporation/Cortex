@@ -1644,7 +1644,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get toolReadDocumentDescription =>
-      'Yüklənmiş sənədlərdən (PDF, Excel elektron cədvəlləri) mətn məzmununu oxuyun və çıxarın. İstifadəçi sənəd faylı əlavə etdikdə bundan istifadə edin.';
+      'Yüklənmiş sənədlərdən mətn məzmununu oxuyun və çıxarın. PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) və OpenDocument formatlarını dəstəkləyir. İstifadəçi sənəd faylı əlavə etdikdə bundan istifadə edin.';
 
   @override
   String get toolReadDocumentIndexParam =>
@@ -1699,4 +1699,8 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get toolChartTitleParam => 'Diaqramın başlığı.';
+
+  @override
+  String get thinkingModeInstruction =>
+      'DÜŞÜNMƏ REJİMİ AKTİVDİR: Son cavabınızı verməzdən əvvəl mühakimə prosesinizi göstərmək üçün <think></think> etiketlərindən istifadə etməlisiniz. Etiketlərin içərisində addım-addım düşünün, sonra cavabınızı etiketlərin xaricində verin.';
 }

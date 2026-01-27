@@ -566,5 +566,6 @@
   "toolChartLabelParam": "グラフの凡例のデータセット ラベル。",
   "toolChartTitleParam": "グラフのタイトル。",
   "toolReadDocumentDescription": "アップロードされたドキュメントからテキストコンテンツを読み取り、抽出します。PDF、Word (DOCX)、Excel (XLSX)、PowerPoint (PPTX)、OpenDocument形式に対応しています。ユーザーがドキュメントファイルを添付している場合にご利用ください。",
-  "toolReadDocumentIndexParam": "読み取るドキュメント添付ファイルのインデックス（0ベース）。通常、最初のドキュメントは0です。"
+  "toolReadDocumentIndexParam": "読み取るドキュメント添付ファイルのインデックス（0ベース）。通常、最初のドキュメントは0です。",
+  "thinkingModeInstruction": "思考モード有効：最終的な回答を出す前に、必ず<think></think>タグを使って推論のプロセスを示してください。タグ内で段階的に考え、タグの外で回答を記入してください。"
 }
