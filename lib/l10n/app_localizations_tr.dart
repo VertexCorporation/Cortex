@@ -479,15 +479,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return 'Cortex uygulamasına bir göz at, harika! Buradan indir: $cortexLink';
-  }
-
-  @override
-  String get shareFailed =>
-      'Uygulama paylaşılamadı. Lütfen daha sonra tekrar deneyin';
-
-  @override
   String get selectText => 'Metin Seç';
 
   @override
@@ -662,9 +653,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get benefit11 => 'Daha Fazla Akış Modu';
-
-  @override
-  String get benefit12 => '';
 
   @override
   String get oldBenefits => 'Alt planlardaki tüm avantajlar';
@@ -848,10 +836,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errorNetwork =>
       'Bir ağ hatası oluştu. Lütfen bağlantınızı kontrol edip tekrar deneyin.';
-
-  @override
-  String get errorApiAuthentication =>
-      'Kimlik doğrulama başarısız oldu. Lütfen tekrar giriş yapmayı deneyin.';
 
   @override
   String get baseModelForCharacterDescription =>
@@ -1038,9 +1022,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get featureImageGenerationDescription =>
       'Bu model, metin açıklamalarınıza dayanarak orijinal görseller oluşturabilir.';
-
-  @override
-  String get errorImageLoad => 'Oluşturulan görüntü yüklenemedi.';
 
   @override
   String get premiumModelNoticeTitle => 'Premium Model';
@@ -1528,29 +1509,36 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get useOfflineDescription =>
-      'İnternet bağlantısı olmadan özel olarak sohbet edin';
+      'İnternet bağlantısı olmadan özel olarak sohbet edin.';
+
+  @override
+  String get featureReasoning => 'Derin Düşünme';
+
+  @override
+  String get featureReasoningDescription =>
+      'Derin Düşünme modunda, yapay zeka görevleri en iyi şekilde tamamlamak için içsel olarak düşünür.';
 
   @override
   String get featureCreateImageTitle => 'Görüntü Oluştur';
 
   @override
   String get featureCreateImageDescription =>
-      'Metinden yapay zeka sanatı üretin';
+      'Metinden yapay zeka destekli sanat eserleri oluşturun.';
 
   @override
   String get featureStudyTitle => 'Öğren ve Çalış';
 
   @override
-  String get featureStudyDescription => 'Açıklamalar ve özetler alın.';
+  String get featureStudyDescription => 'Açıklamaları ve özetleri edinin.';
 
   @override
   String get featureQuizzesTitle => 'Sınavlar';
 
   @override
-  String get featureQuizzesDescription => 'Bilginizi test edin';
+  String get featureQuizzesDescription => 'Bilginizi test edin.';
 
   @override
-  String get featureExploreDescription => 'Mevcut tüm modelleri keşfedin';
+  String get featureExploreDescription => 'Mevcut tüm modelleri keşfedin.';
 
   @override
   String get featureStudyMessage =>
@@ -1613,57 +1601,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Cortex, sesli sohbet modunda bile tamamen cihaz üzerinde çalışarak verilerinizi güvende tutar; sorunsuz konuşmaların tadını çıkarın!';
 
   @override
-  String get toolGetStockPriceDescription =>
-      'Hisse senetleri (örneğin AAPL, THYAO.IS) ve kripto paralar (örneğin BTC-USD, ETH-USD) için güncel fiyat ve geçmiş verilerini alın.';
-
-  @override
-  String get toolGetStockPriceParamSymbol =>
-      'Hisse senedinin sembolü (ör. AAPL, THYAO.IS, BTC-USD).';
-
-  @override
-  String get toolGetWeatherDescription =>
-      'Belirtilen şehir için güncel hava durumunu öğrenin. Şehir bilinmiyorsa kullanıcıdan şehir bilgisini isteyin.';
-
-  @override
-  String get toolGetWeatherParamCity =>
-      'Şehrin adı (örneğin, Londra, İstanbul).';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      'Python kodunu güvenli bir sanal ortamda çalıştırın. Bunu karmaşık hesaplamalar, veri işleme veya algoritmik görevler için kullanın.';
-
-  @override
-  String get toolRunPythonCodeParamCode => 'Çalıştırılacak Python kodu.';
-
-  @override
-  String get toolCalculateDescription =>
-      'Bir matematiksel ifadeyi değerlendirin.';
-
-  @override
-  String get toolCalculateParamExpression =>
-      'Matematiksel ifade (örneğin, \"3 + 4 * 2\", \"sin(45)\").';
-
-  @override
-  String get toolRenderChartDescription =>
-      'Bir grafik oluşturun. Bunu, kullanıcı tarafından sağlanan veya hesaplanan verileri görselleştirmek için kullanın.';
-
-  @override
-  String get toolRenderChartParamType => 'Grafik türü: çubuk, çizgi, pasta.';
-
-  @override
-  String get toolRenderChartParamLabels =>
-      'X ekseni veya kategoriler için etiketler.';
-
-  @override
-  String get toolRenderChartParamData => 'Sayısal veri noktaları.';
-
-  @override
-  String get toolRenderChartParamLabel => 'Veri kümesi için etiket.';
-
-  @override
-  String get toolRenderChartParamTitle => 'Grafiğin başlığı.';
-
-  @override
   String get flowModeDescription =>
       'Akış modunda, zekâlar kendi aralarında tartışır; isterseniz arkanıza yaslanıp dinleyebilir, isterseniz de tartışmaya katılabilirsiniz!';
 
@@ -1672,37 +1609,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Merhaba! Şu anda Cortex uygulamasında Akış Modundasınız. Burada sizinle birlikte üç yapay zeka ajanı daha var. Göreviniz, bir konu ortaya atmak ve diğerlerine kışkırtıcı veya eğlenceli bir soru sorarak bir tartışma başlatmak. Yanıtlarınızda mizah, ironi ve hafif alaycı ifadeler kullanmaktan çekinmeyin. Herhangi bir konu kabul edilebilir. Hadi, sohbeti başlatın.';
 
   @override
-  String get voicePrompt =>
-      'Şu anda Cortex platformunda ses hizmeti veriyorsunuz. Markdown, kod blokları veya LaTeX kullanmayın. Yalnızca konuşma sentezine uygun metin biçiminde yanıt verin.';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => 'Düşündü';
 
   @override
   String get agentRed => 'Red';
@@ -1715,10 +1622,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get flowMode => 'Akış Modu';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => 'Premium';
@@ -1734,4 +1637,61 @@ class AppLocalizationsTr extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'Cortex Akış Modu ($agentName). Önceki: $previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      'Yüklenen belgelerden metin içeriğini okuyun ve çıkarın. PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX) ve OpenDocument formatlarını destekler. Kullanıcı bir belge dosyası eklediğinde bunu kullanın.';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      'Okunacak belge ekinin indeksi (0 tabanlı). Genellikle ilk belge için 0.';
+
+  @override
+  String get toolStockDescription =>
+      'Hisse senetleri (örn. AAPL, THYAO.IS) ve kripto paralar (örn. BTC-USD) için güncel fiyat ve geçmiş bilgisi alın.';
+
+  @override
+  String get toolStockSymbolParam =>
+      'Hisse senedi sembolü (örn. AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolWeatherDescription =>
+      'Belirli bir şehir için güncel hava durumunu alın.';
+
+  @override
+  String get toolWeatherCityParam => 'Şehir adı (örn. Londra, İstanbul).';
+
+  @override
+  String get toolPythonDescription =>
+      'Güvenli bir ortamda Python kodu çalıştırın.';
+
+  @override
+  String get toolPythonCodeParam => 'Çalıştırılacak Python kodu.';
+
+  @override
+  String get toolCalculateDescription => 'Matematiksel bir ifadeyi hesaplayın.';
+
+  @override
+  String get toolCalculateExpressionParam =>
+      'Matematik ifadesi (örn. \'3 + 4 * 2\').';
+
+  @override
+  String get toolChartDescription =>
+      'Grafik/çizelge görselleştirmesi oluşturun.';
+
+  @override
+  String get toolChartTypeParam => 'Grafik türü: bar, line veya pie.';
+
+  @override
+  String get toolChartLabelsParam =>
+      'Grafik eksenleri veya segmentleri için etiketler.';
+
+  @override
+  String get toolChartDataParam => 'Grafik için sayısal veri değerleri.';
+
+  @override
+  String get toolChartLabelParam => 'Grafik açıklaması için veri seti etiketi.';
+
+  @override
+  String get toolChartTitleParam => 'Grafiğin başlığı.';
 }

@@ -668,7 +668,7 @@ class ModelRepository {
         seriesDetails['en'] as String? ?? '';
 
     final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)
-      ..remove('series_description')..remove('reasoning');
+      ..remove('series_description')..remove('featureReasoning');
     if (variantsMap.isEmpty) return null;
 
     final variants = <String, dynamic>{};

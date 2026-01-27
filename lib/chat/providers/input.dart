@@ -16,6 +16,7 @@ enum ChatInputMode {
   study,
   quiz,
   offline,
+  featureReasoning,
 }
 
 enum AttachmentType {
@@ -101,6 +102,16 @@ class InputProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Clears feature mode only if it's offline mode.
+  /// Non-offline features (like reasoning) persist across chat switches.
+  void clearFeatureModeIfOffline() {
+    if (_featureMode == ChatInputMode.offline) {
+      _featureMode = ChatInputMode.none;
+      notifyListeners();
+    }
+  }
+
+  /// Force clears any feature mode (use for full reset).
   void clearFeatureMode() {
     _featureMode = ChatInputMode.none;
     notifyListeners();

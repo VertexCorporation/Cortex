@@ -480,15 +480,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return 'Cortex ऐप देखें, यह बहुत अद्भुत है! इसे यहाँ डाउनलोड करें: $cortexLink';
-  }
-
-  @override
-  String get shareFailed =>
-      'ऐप साझा करने में विफल। कृपया बाद में पुनः प्रयास करें';
-
-  @override
   String get selectText => 'टेक्स्ट चुनें';
 
   @override
@@ -664,9 +655,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get benefit11 => 'अधिक प्रवाह मोड';
-
-  @override
-  String get benefit12 => '';
 
   @override
   String get oldBenefits => 'निचली योजनाओं से सभी लाभ';
@@ -848,10 +836,6 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get errorNetwork =>
       'एक नेटवर्क त्रुटि हुई। कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।';
-
-  @override
-  String get errorApiAuthentication =>
-      'प्रमाणीकरण विफल। कृपया पुनः लॉग इन करने का प्रयास करें।';
 
   @override
   String get baseModelForCharacterDescription =>
@@ -1038,9 +1022,6 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get featureImageGenerationDescription =>
       'यह मॉडल आपके पाठ विवरण के आधार पर मूल चित्र बना सकता है।';
-
-  @override
-  String get errorImageLoad => 'उत्पन्न छवि लोड करने में विफल.';
 
   @override
   String get premiumModelNoticeTitle => 'प्रीमियम मॉडल';
@@ -1529,28 +1510,35 @@ class AppLocalizationsHi extends AppLocalizations {
   String get featuresTitle => 'विशेषताएँ';
 
   @override
-  String get useOfflineDescription => 'इंटरनेट कनेक्शन के बिना निजी चैट करें';
+  String get useOfflineDescription => 'इंटरनेट कनेक्शन के बिना निजी चैट करें।';
+
+  @override
+  String get featureReasoning => 'गहरी सोच';
+
+  @override
+  String get featureReasoningDescription =>
+      'डीप थिंकिंग मोड में, एआई कार्यों को अपनी सर्वोत्तम क्षमता के अनुसार पूरा करने के लिए आंतरिक रूप से उन पर विचार करता है।';
 
   @override
   String get featureCreateImageTitle => 'चित्र बनाएं';
 
   @override
-  String get featureCreateImageDescription => 'टेक्स्ट से एआई आर्ट बनाएं';
+  String get featureCreateImageDescription => 'टेक्स्ट से एआई आर्ट बनाएं।';
 
   @override
   String get featureStudyTitle => 'अध्ययन और सीखना';
 
   @override
-  String get featureStudyDescription => 'स्पष्टीकरण और सारांश प्राप्त करें';
+  String get featureStudyDescription => 'स्पष्टीकरण और सारांश प्राप्त करें।';
 
   @override
   String get featureQuizzesTitle => 'प्रश्नोत्तरी';
 
   @override
-  String get featureQuizzesDescription => 'अपने ज्ञान का परीक्षण करें';
+  String get featureQuizzesDescription => 'अपने ज्ञान का परीक्षण करें।';
 
   @override
-  String get featureExploreDescription => 'सभी उपलब्ध मॉडलों को देखें';
+  String get featureExploreDescription => 'सभी उपलब्ध मॉडलों को देखें।';
 
   @override
   String get featureStudyMessage =>
@@ -1613,57 +1601,6 @@ class AppLocalizationsHi extends AppLocalizations {
       'कॉर्टेक्स आपके डेटा को पूरी तरह से डिवाइस पर ही सुरक्षित रखता है, यहां तक कि वॉइस चैट मोड में भी; निर्बाध बातचीत का आनंद लें!';
 
   @override
-  String get toolGetStockPriceDescription =>
-      'शेयरों (जैसे AAPL, THYAO.IS) और क्रिप्टोकरेंसी (जैसे BTC-USD, ETH-USD) के लिए वर्तमान मूल्य और इतिहास प्राप्त करें।';
-
-  @override
-  String get toolGetStockPriceParamSymbol =>
-      'टिकर प्रतीक (उदाहरण के लिए AAPL, THYAO.IS, BTC-USD)।';
-
-  @override
-  String get toolGetWeatherDescription =>
-      'किसी विशिष्ट शहर का वर्तमान मौसम जानें। यदि शहर का नाम ज्ञात न हो, तो उपयोगकर्ता से शहर का नाम पूछें।';
-
-  @override
-  String get toolGetWeatherParamCity =>
-      'शहर का नाम (उदाहरण के लिए, लंदन, इस्तांबुल)।';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      'पाइथन कोड को एक सुरक्षित सैंडबॉक्स में निष्पादित करें। इसका उपयोग जटिल गणनाओं, डेटा प्रोसेसिंग या एल्गोरिथम संबंधी कार्यों के लिए करें।';
-
-  @override
-  String get toolRunPythonCodeParamCode =>
-      'निष्पादित किया जाने वाला पायथन कोड।';
-
-  @override
-  String get toolCalculateDescription => 'एक गणितीय व्यंजक का मूल्यांकन कीजिए।';
-
-  @override
-  String get toolCalculateParamExpression =>
-      'गणितीय व्यंजक (उदाहरण के लिए, \"3 + 4 * 2\", \"sin(45)\")।';
-
-  @override
-  String get toolRenderChartDescription =>
-      'एक चार्ट/ग्राफ बनाएं। इसका उपयोग उपयोगकर्ता द्वारा प्रदान किए गए या गणना किए गए डेटा को दर्शाने के लिए करें।';
-
-  @override
-  String get toolRenderChartParamType =>
-      'चार्ट का प्रकार: बार चार्ट, लाइन चार्ट, पाई चार्ट।';
-
-  @override
-  String get toolRenderChartParamLabels => 'x-अक्ष या श्रेणियों के लिए लेबल।';
-
-  @override
-  String get toolRenderChartParamData => 'संख्यात्मक डेटा बिंदु।';
-
-  @override
-  String get toolRenderChartParamLabel => 'डेटासेट के लिए लेबल।';
-
-  @override
-  String get toolRenderChartParamTitle => 'चार्ट का शीर्षक।';
-
-  @override
   String get flowModeDescription =>
       'फ्लो मोड में, बुद्धिमत्ताएँ आपस में बहस करती हैं; आप या तो आराम से बैठकर सुन सकते हैं या फिर चर्चा में शामिल हो सकते हैं!';
 
@@ -1672,37 +1609,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'नमस्कार! आप कॉर्टेक्स ऐप के फ्लो मोड में हैं। आपके साथ तीन अन्य एआई एजेंट भी मौजूद हैं। आपका काम है एक विषय को चर्चा में लाना और एक रोचक या मनोरंजक प्रश्न पूछकर बातचीत शुरू करना। अपने उत्तरों में हास्य, व्यंग्य और हल्के-फुल्के कटाक्ष का प्रयोग करें। कोई भी विषय चलेगा। तो चलिए, बातचीत शुरू कीजिए।';
 
   @override
-  String get voicePrompt =>
-      'आप वर्तमान में कॉर्टेक्स प्लेटफॉर्म पर वॉइस सेवा प्रदान कर रहे हैं। मार्कडाउन, कोड ब्लॉक या LaTeX का उपयोग न करें। केवल टेक्स्ट में उत्तर दें जो स्पीच सिंथेसिस के लिए उपयुक्त हो।';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => 'सोचा';
 
   @override
   String get agentRed => 'Red';
@@ -1715,10 +1622,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get flowMode => 'प्रवाह मोड';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => 'अधिमूल्य';
@@ -1734,4 +1637,62 @@ class AppLocalizationsHi extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'कॉर्टेक्स फ्लो मोड ($agentName). पिछला: $previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      'अपलोड किए गए दस्तावेज़ों (पीडीएफ, एक्सेल स्प्रेडशीट) से पाठ सामग्री पढ़ें और निकालें। इसका उपयोग तब करें जब उपयोगकर्ता ने कोई दस्तावेज़ फ़ाइल संलग्न की हो।';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      'पढ़ने के लिए संलग्न दस्तावेज़ का सूचकांक (0-आधारित)। आमतौर पर पहले दस्तावेज़ के लिए 0।';
+
+  @override
+  String get toolStockDescription =>
+      'शेयरों (जैसे AAPL, THYAO.IS) और क्रिप्टोकरेंसी (जैसे BTC-USD) के लिए वर्तमान मूल्य और इतिहास प्राप्त करें।';
+
+  @override
+  String get toolStockSymbolParam =>
+      'टिकर प्रतीक (उदाहरण के लिए AAPL, THYAO.IS, BTC-USD)।';
+
+  @override
+  String get toolWeatherDescription =>
+      'किसी विशिष्ट शहर का वर्तमान मौसम जानें।';
+
+  @override
+  String get toolWeatherCityParam =>
+      'शहर का नाम (उदाहरण के लिए लंदन, इस्तांबुल)।';
+
+  @override
+  String get toolPythonDescription =>
+      'पाइथन कोड को एक सुरक्षित सैंडबॉक्स में निष्पादित करें।';
+
+  @override
+  String get toolPythonCodeParam => 'निष्पादित किया जाने वाला पायथन कोड।';
+
+  @override
+  String get toolCalculateDescription => 'एक गणितीय व्यंजक का मूल्यांकन कीजिए।';
+
+  @override
+  String get toolCalculateExpressionParam =>
+      'गणितीय व्यंजक (उदाहरण के लिए \'3 + 4 * 2\')।';
+
+  @override
+  String get toolChartDescription =>
+      'एक चार्ट/ग्राफ विज़ुअलाइज़ेशन तैयार करें।';
+
+  @override
+  String get toolChartTypeParam =>
+      'चार्ट का प्रकार: बार चार्ट, लाइन चार्ट या पाई चार्ट।';
+
+  @override
+  String get toolChartLabelsParam => 'चार्ट अक्षों या खंडों के लिए लेबल।';
+
+  @override
+  String get toolChartDataParam => 'चार्ट के लिए संख्यात्मक डेटा मान।';
+
+  @override
+  String get toolChartLabelParam => 'चार्ट लेजेंड के लिए डेटासेट लेबल।';
+
+  @override
+  String get toolChartTitleParam => 'चार्ट का शीर्षक।';
 }

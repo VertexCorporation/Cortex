@@ -270,7 +270,7 @@ class SendService {
           throw ApiException(localizations.errorPromptFlagged);
         }
       } else {
-        // Server Flow (with Tool Loop & Reasoning)
+        // Server Flow (with Tool Loop & featureReasoning)
         await _sendServerSideMessageWithLoop(
           initialText: textForApi,
           modelId: apiModelIdForSend,
@@ -313,7 +313,7 @@ class SendService {
 
   /// Manages the full conversation loop:
   /// 1. Sends Request
-  /// 2. Streams Text/Reasoning
+  /// 2. Streams Text/featureReasoning
   /// 3. Captures Tool Calls
   /// 4. Executes Tools
   /// 5. Loops back to step 1 if tools were used.
@@ -352,14 +352,30 @@ class SendService {
       if (block != null) userContent.add(block);
     }
 
-    if (userContent.isNotEmpty) {
-      contextMessages.add({"role": "user", "content": userContent});
+    // Extract documents for tool processing (PDF, XLSX, etc.)
+    final documents = Utils.extractDocuments(userContent);
+    if (documents.isNotEmpty) {
+      ToolRegistry.setDocumentsContext(documents);
+    }
+
+    // Clean content blocks before sending to API (remove internal _document fields)
+    final cleanedUserContent = Utils.cleanContentBlocks(userContent);
+
+    if (cleanedUserContent.isNotEmpty) {
+      contextMessages.add({"role": "user", "content": cleanedUserContent});
     }
 
     // Loop Variables
     bool shouldContinue = true;
     int loopCount = 0;
     const int maxLoops = 5; // Safety break
+
+    // State for managing featureReasoning block - OUTSIDE loop to persist across iterations
+    // featureReasoning is enabled when user activates "Deep Thinking" mode from features panel
+    final bool enablefeatureReasoning =
+        _inputProvider.featureMode == ChatInputMode.featureReasoning;
+    bool isfeatureReasoningBlockActive = false;
+    bool hasEverHadfeatureReasoning = false; // Track if we've seen any featureReasoning
 
     // --- THE LOOP ---
     while (shouldContinue && loopCount < maxLoops) {
@@ -369,30 +385,35 @@ class SendService {
       List<dynamic> turnToolCalls = [];
 
       // Handler Functions (defined here to capture scope)
-      // State for managing reasoning block
-      bool isReasoningBlockActive = false;
 
-      void onReasoning(String reasoningText) {
+      void onfeatureReasoning(String featureReasoningText) {
+        // Skip featureReasoning if disabled
+        if (!enablefeatureReasoning) return;
         if (_conversationProvider.wasResponseStopped) return;
 
-        // If this is the START of a reasoning block, open the tag
-        if (!isReasoningBlockActive) {
+        // If this is the START of a featureReasoning block, open the tag
+        if (!isfeatureReasoningBlockActive) {
+          // If we had featureReasoning before and closed it, we're continuing - add separator
+          if (hasEverHadfeatureReasoning) {
+            _conversationProvider.appendToLastBotMessage("\n\n");
+          }
           _conversationProvider.appendToLastBotMessage("<think>");
-          isReasoningBlockActive = true;
+          isfeatureReasoningBlockActive = true;
+          hasEverHadfeatureReasoning = true;
         }
 
         // Ensure we don't double-append headers or newlines. Just the raw text.
-        _conversationProvider.appendToLastBotMessage(reasoningText);
+        _conversationProvider.appendToLastBotMessage(featureReasoningText);
       }
 
       void onTextChunk(String text) {
         if (_conversationProvider.wasResponseStopped) return;
         if (text.isEmpty) return; // Ignore empty keep-alive chunks
 
-        // If we were reasoning and now switched to ACTUAL content, close the reasoning tag
-        if (isReasoningBlockActive) {
+        // If we were featureReasoning and now switched to ACTUAL content, close the featureReasoning tag
+        if (enablefeatureReasoning && isfeatureReasoningBlockActive) {
           _conversationProvider.appendToLastBotMessage("</think>");
-          isReasoningBlockActive = false;
+          isfeatureReasoningBlockActive = false;
         }
 
         _conversationProvider.appendToLastBotMessage(text);
@@ -431,9 +452,10 @@ class SendService {
           characterId: modelId,
           baseModelId: baseModelId ?? 'cortex/auto',
           isPremium: isPremium,
+          enablefeatureReasoning: enablefeatureReasoning,
           localizations: localizations,
           onTextChunk: onTextChunk,
-          onReasoning: onReasoning,
+          onfeatureReasoning: onfeatureReasoning,
           onImageReceived: onImageReceived,
         );
         // Characters exit loop immediately
@@ -448,10 +470,11 @@ class SendService {
           context: contextMessages,
           localizations: localizations,
           langCode: langCode,
+          enablefeatureReasoning: enablefeatureReasoning,
           useTools: !_voiceService.isFlowActive,
           // Disable tools in Flow Mode
           onTextChunk: onTextChunk,
-          onReasoning: onReasoning,
+          onfeatureReasoning: onfeatureReasoning,
           onImageReceived: onImageReceived,
           // Capture Tools
           onToolCall: (tools) {
@@ -463,6 +486,12 @@ class SendService {
       // Post-Response: Check for Tools
       if (turnToolCalls.isNotEmpty) {
         shouldContinue = true; // We need to loop again to send results
+
+        // Close featureReasoning block before tool execution if it's still open
+        if (enablefeatureReasoning && isfeatureReasoningBlockActive) {
+          _conversationProvider.appendToLastBotMessage("</think>");
+          isfeatureReasoningBlockActive = false;
+        }
 
         // 1. Add Assistant Request to History
         contextMessages.add({
@@ -488,10 +517,7 @@ class SendService {
           if (tool != null) {
             try {
               final args = jsonDecode(argsStr);
-              // Notify UI gently (will be hidden by parser.dart)
-              _conversationProvider
-                  .appendToLastBotMessage("\n*Using $name...*");
-              // Execute
+              // Execute tool
               result = await tool.function(args);
 
               // CHECK FOR STRUCTURED WIDGET RESPONSE
@@ -509,21 +535,18 @@ class SendService {
               }
 
               if (widgetType != null) {
-                // Inject Widget Marker
+                // Inject Widget Marker (no extra newlines to avoid spacing issues)
                 // The UI (parser) will detect this pattern and render the card
                 _conversationProvider.appendToLastBotMessage(
-                    "\n<<<WIDGET:$widgetType>>>${jsonEncode(widgetData)}<<<END>>>\n");
+                    "<<<WIDGET:$widgetType>>>${jsonEncode(widgetData)}<<<END>>>");
+                // Force immediate UI update for widget visibility
+                _conversationProvider.flushStreamUpdates();
 
                 // Use the summary for the LLM context so it doesn't get confused by raw JSON
                 result = summaryForContext;
-              } else {
-                // Tool execution success - emoji will be stripped by parser
-                _conversationProvider.appendToLastBotMessage("✅\n");
               }
             } catch (e) {
               result = "Error executing tool '$name': $e";
-              // Tool execution error - emoji will be stripped by parser
-              _conversationProvider.appendToLastBotMessage("❌\n");
             }
           } else {
             result = "Tool not found.";
@@ -539,6 +562,16 @@ class SendService {
         }
       }
     }
+
+    // Ensure featureReasoning block is closed at the end of all iterations
+    // This handles cases where the final response ends with featureReasoning
+    if (enablefeatureReasoning && isfeatureReasoningBlockActive) {
+      _conversationProvider.appendToLastBotMessage("</think>");
+      isfeatureReasoningBlockActive = false;
+    }
+
+    // Clear documents context after processing
+    ToolRegistry.clearDocumentsContext();
   }
 
   void _handleSendError(

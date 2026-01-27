@@ -1010,18 +1010,6 @@ abstract class AppLocalizations {
   /// **'Cortex'**
   String get shareSubject;
 
-  /// The message sent when sharing the app
-  ///
-  /// In en, this message translates to:
-  /// **'Check out the Cortex app, it is so amazing! Download it here: {cortexLink}'**
-  String shareMessage(String cortexLink);
-
-  /// No description provided for @shareFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to share the app. Please try again later'**
-  String get shareFailed;
-
   /// No description provided for @selectText.
   ///
   /// In en, this message translates to:
@@ -1364,12 +1352,6 @@ abstract class AppLocalizations {
   /// **'More Flow Mode'**
   String get benefit11;
 
-  /// No description provided for @benefit12.
-  ///
-  /// In en, this message translates to:
-  /// **''**
-  String get benefit12;
-
   /// No description provided for @oldBenefits.
   ///
   /// In en, this message translates to:
@@ -1700,16 +1682,10 @@ abstract class AppLocalizations {
   /// **'A network error occurred. Please check your connection and try again.'**
   String get errorNetwork;
 
-  /// No description provided for @errorApiAuthentication.
-  ///
-  /// In en, this message translates to:
-  /// **'Authentication failed. Please try logging in again.'**
-  String get errorApiAuthentication;
-
   /// No description provided for @baseModelForCharacterDescription.
   ///
   /// In en, this message translates to:
-  /// **'The selected base model will determine the character\'s reasoning and response capabilities.'**
+  /// **'The selected base model will determine the character\'s featureReasoning and response capabilities.'**
   String get baseModelForCharacterDescription;
 
   /// No description provided for @selectBaseModel.
@@ -2017,12 +1993,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This model can create original images based on your text descriptions.'**
   String get featureImageGenerationDescription;
-
-  /// Error message shown in an AI message bubble when the generated image data is corrupt or cannot be saved to the device.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load the generated image.'**
-  String get errorImageLoad;
 
   /// Title for the notice banner shown on a premium model's detail page.
   ///
@@ -2856,8 +2826,20 @@ abstract class AppLocalizations {
   /// No description provided for @useOfflineDescription.
   ///
   /// In en, this message translates to:
-  /// **'Chat privately without internet connection'**
+  /// **'Chat privately without internet connection.'**
   String get useOfflineDescription;
+
+  /// No description provided for @featureReasoning.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep Thinking'**
+  String get featureReasoning;
+
+  /// No description provided for @featureReasoningDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'In Deep Thinking mode, AI thinks through tasks internally to complete them to the best of its ability.'**
+  String get featureReasoningDescription;
 
   /// No description provided for @featureCreateImageTitle.
   ///
@@ -2868,7 +2850,7 @@ abstract class AppLocalizations {
   /// No description provided for @featureCreateImageDescription.
   ///
   /// In en, this message translates to:
-  /// **'Generate AI art from text'**
+  /// **'Generate AI art from text.'**
   String get featureCreateImageDescription;
 
   /// No description provided for @featureStudyTitle.
@@ -2880,7 +2862,7 @@ abstract class AppLocalizations {
   /// No description provided for @featureStudyDescription.
   ///
   /// In en, this message translates to:
-  /// **'Get explanations and summaries'**
+  /// **'Get explanations and summaries.'**
   String get featureStudyDescription;
 
   /// No description provided for @featureQuizzesTitle.
@@ -2892,13 +2874,13 @@ abstract class AppLocalizations {
   /// No description provided for @featureQuizzesDescription.
   ///
   /// In en, this message translates to:
-  /// **'Test your knowledge'**
+  /// **'Test your knowledge.'**
   String get featureQuizzesDescription;
 
   /// No description provided for @featureExploreDescription.
   ///
   /// In en, this message translates to:
-  /// **'Discover all available models'**
+  /// **'Discover all available models.'**
   String get featureExploreDescription;
 
   /// No description provided for @featureStudyMessage.
@@ -3003,90 +2985,6 @@ abstract class AppLocalizations {
   /// **'Cortex keeps your data safe by running fully on-device, even in voice chat mode; enjoy seamless conversations!'**
   String get voiceModeInformation;
 
-  /// No description provided for @toolGetStockPriceDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Get current price and history for stocks (e.g. AAPL, THYAO.IS) and crypto (e.g. BTC-USD, ETH-USD).'**
-  String get toolGetStockPriceDescription;
-
-  /// No description provided for @toolGetStockPriceParamSymbol.
-  ///
-  /// In en, this message translates to:
-  /// **'The ticker symbol (e.g. AAPL, THYAO.IS, BTC-USD).'**
-  String get toolGetStockPriceParamSymbol;
-
-  /// No description provided for @toolGetWeatherDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Get current weather for a specific city. Ask user for city if not known.'**
-  String get toolGetWeatherDescription;
-
-  /// No description provided for @toolGetWeatherParamCity.
-  ///
-  /// In en, this message translates to:
-  /// **'The name of the city (e.g., London, Istanbul).'**
-  String get toolGetWeatherParamCity;
-
-  /// No description provided for @toolRunPythonCodeDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Execute Python code in a secure sandbox. Use this for complex calculations, data processing, or algorithmic tasks.'**
-  String get toolRunPythonCodeDescription;
-
-  /// No description provided for @toolRunPythonCodeParamCode.
-  ///
-  /// In en, this message translates to:
-  /// **'The Python code to execute.'**
-  String get toolRunPythonCodeParamCode;
-
-  /// No description provided for @toolCalculateDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Evaluate a mathematical expression.'**
-  String get toolCalculateDescription;
-
-  /// No description provided for @toolCalculateParamExpression.
-  ///
-  /// In en, this message translates to:
-  /// **'The math expression (e.g., \"3 + 4 * 2\", \"sin(45)\").'**
-  String get toolCalculateParamExpression;
-
-  /// No description provided for @toolRenderChartDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Generate a chart/graph. Use this to visualize data provided by the user or calculated.'**
-  String get toolRenderChartDescription;
-
-  /// No description provided for @toolRenderChartParamType.
-  ///
-  /// In en, this message translates to:
-  /// **'Chart type: bar, line, pie.'**
-  String get toolRenderChartParamType;
-
-  /// No description provided for @toolRenderChartParamLabels.
-  ///
-  /// In en, this message translates to:
-  /// **'Labels for the x-axis or categories.'**
-  String get toolRenderChartParamLabels;
-
-  /// No description provided for @toolRenderChartParamData.
-  ///
-  /// In en, this message translates to:
-  /// **'Numerical data points.'**
-  String get toolRenderChartParamData;
-
-  /// No description provided for @toolRenderChartParamLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Label for the dataset.'**
-  String get toolRenderChartParamLabel;
-
-  /// No description provided for @toolRenderChartParamTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Title of the chart.'**
-  String get toolRenderChartParamTitle;
-
   /// No description provided for @flowModeDescription.
   ///
   /// In en, this message translates to:
@@ -3099,65 +2997,11 @@ abstract class AppLocalizations {
   /// **'Hello! You are now in Flow Mode on the Cortex app. There are three other AI agents here with you. Your task is to throw a topic into the room and kick off a discussion by asking the others a provocative or entertaining question. In your responses, feel free to use humor, irony, and light trash talk. Any topic is fair game. Go ahead, start the conversation.'**
   String get flowModeQuestion;
 
-  /// No description provided for @voicePrompt.
-  ///
-  /// In en, this message translates to:
-  /// **'You are currently providing voice service on the Cortex platform. Do not use markdown, code blocks, or LaTeX. Respond purely in text suitable for speech synthesis.'**
-  String get voicePrompt;
-
-  /// Indicates how long the model thought before generating a response.
-  ///
-  /// In en, this message translates to:
-  /// **'Thought for {seconds} seconds'**
-  String thoughtForSeconds(int seconds);
-
   /// No description provided for @thought.
   ///
   /// In en, this message translates to:
   /// **'Thought'**
   String get thought;
-
-  /// No description provided for @weatherClear.
-  ///
-  /// In en, this message translates to:
-  /// **'Clear'**
-  String get weatherClear;
-
-  /// No description provided for @weatherCloudy.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloudy'**
-  String get weatherCloudy;
-
-  /// No description provided for @weatherFoggy.
-  ///
-  /// In en, this message translates to:
-  /// **'Foggy'**
-  String get weatherFoggy;
-
-  /// No description provided for @weatherRainy.
-  ///
-  /// In en, this message translates to:
-  /// **'Rainy'**
-  String get weatherRainy;
-
-  /// No description provided for @weatherSnowy.
-  ///
-  /// In en, this message translates to:
-  /// **'Snowy'**
-  String get weatherSnowy;
-
-  /// No description provided for @weatherThunderstorm.
-  ///
-  /// In en, this message translates to:
-  /// **'Thunderstorm'**
-  String get weatherThunderstorm;
-
-  /// No description provided for @weatherDrizzle.
-  ///
-  /// In en, this message translates to:
-  /// **'Drizzle'**
-  String get weatherDrizzle;
 
   /// No description provided for @agentRed.
   ///
@@ -3183,12 +3027,6 @@ abstract class AppLocalizations {
   /// **'Flow Mode'**
   String get flowMode;
 
-  /// No description provided for @limitReachedVoiceStop.
-  ///
-  /// In en, this message translates to:
-  /// **'Voice session ended due to limit limits.'**
-  String get limitReachedVoiceStop;
-
   /// No description provided for @premium.
   ///
   /// In en, this message translates to:
@@ -3212,6 +3050,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cortex Flow Mode ({agentName}). Previous: {previousResponse}'**
   String flowModeContextParams(String agentName, String previousResponse);
+
+  /// No description provided for @toolReadDocumentDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Read and extract text content from uploaded documents. Supports PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX), and OpenDocument formats. Use this when user has attached a document file.'**
+  String get toolReadDocumentDescription;
+
+  /// No description provided for @toolReadDocumentIndexParam.
+  ///
+  /// In en, this message translates to:
+  /// **'The index of the document attachment to read (0-based). Usually 0 for first document.'**
+  String get toolReadDocumentIndexParam;
+
+  /// No description provided for @toolStockDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Get current price and history for stocks (e.g. AAPL, THYAO.IS) and crypto (e.g. BTC-USD).'**
+  String get toolStockDescription;
+
+  /// No description provided for @toolStockSymbolParam.
+  ///
+  /// In en, this message translates to:
+  /// **'The ticker symbol (e.g. AAPL, THYAO.IS, BTC-USD).'**
+  String get toolStockSymbolParam;
+
+  /// No description provided for @toolWeatherDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Get current weather for a specific city.'**
+  String get toolWeatherDescription;
+
+  /// No description provided for @toolWeatherCityParam.
+  ///
+  /// In en, this message translates to:
+  /// **'The city name (e.g. London, Istanbul).'**
+  String get toolWeatherCityParam;
+
+  /// No description provided for @toolPythonDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Execute Python code in a secure sandbox.'**
+  String get toolPythonDescription;
+
+  /// No description provided for @toolPythonCodeParam.
+  ///
+  /// In en, this message translates to:
+  /// **'The Python code to execute.'**
+  String get toolPythonCodeParam;
+
+  /// No description provided for @toolCalculateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Evaluate a mathematical expression.'**
+  String get toolCalculateDescription;
+
+  /// No description provided for @toolCalculateExpressionParam.
+  ///
+  /// In en, this message translates to:
+  /// **'Math expression (e.g. \'3 + 4 * 2\').'**
+  String get toolCalculateExpressionParam;
+
+  /// No description provided for @toolChartDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate a chart/graph visualization.'**
+  String get toolChartDescription;
+
+  /// No description provided for @toolChartTypeParam.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart type: bar, line, or pie.'**
+  String get toolChartTypeParam;
+
+  /// No description provided for @toolChartLabelsParam.
+  ///
+  /// In en, this message translates to:
+  /// **'Labels for chart axes or segments.'**
+  String get toolChartLabelsParam;
+
+  /// No description provided for @toolChartDataParam.
+  ///
+  /// In en, this message translates to:
+  /// **'Numeric data values for the chart.'**
+  String get toolChartDataParam;
+
+  /// No description provided for @toolChartLabelParam.
+  ///
+  /// In en, this message translates to:
+  /// **'Dataset label for the chart legend.'**
+  String get toolChartLabelParam;
+
+  /// No description provided for @toolChartTitleParam.
+  ///
+  /// In en, this message translates to:
+  /// **'Title of the chart.'**
+  String get toolChartTitleParam;
 }
 
 class _AppLocalizationsDelegate

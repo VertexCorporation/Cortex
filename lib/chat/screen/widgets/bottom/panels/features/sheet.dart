@@ -31,8 +31,8 @@ void showFeaturesSheet({
   // Pre-calculate capability availability for the UI
   final catalog = context.read<ModelCatalogProvider>();
 
-  // Watch InputProvider for current feature mode to update UI state
-  final inputProvider = context.watch<InputProvider>();
+  // Read InputProvider for current feature mode (use read, not watch - we're in an event handler)
+  final inputProvider = context.read<InputProvider>();
   final currentMode = inputProvider.featureMode;
 
   // Logic: Check for models that have 'image' in their 'outputs' map
@@ -123,7 +123,19 @@ void showFeaturesSheet({
                       },
                     ),
 
-                    // 2. CREATE IMAGE (Make)
+                    // 2. DEEP featureReasoning
+                    FeaturesSheetButton(
+                      iconPath: 'assets/icons/memory.svg',
+                      title: l10n.featureReasoning,
+                      description: l10n.featureReasoningDescription,
+                      isSelected: currentMode == ChatInputMode.featureReasoning,
+                      onTap: () {
+                        Navigator.pop(context);
+                        _handleFeatureSelection(context, ChatInputMode.featureReasoning);
+                      },
+                    ),
+
+                    // 3. CREATE IMAGE (Make)
                     FeaturesSheetButton(
                       iconPath: 'assets/icons/make.svg',
                       title: l10n.featureCreateImageTitle,
@@ -140,7 +152,7 @@ void showFeaturesSheet({
                       },
                     ),
 
-                    // 3. STUDY & LEARN
+                    // 4. STUDY & LEARN
                     FeaturesSheetButton(
                       iconPath: 'assets/icons/study.svg',
                       title: l10n.featureStudyTitle,
@@ -152,7 +164,7 @@ void showFeaturesSheet({
                       },
                     ),
 
-                    // 4. QUIZZES
+                    // 5. QUIZZES
                     FeaturesSheetButton(
                       iconPath: 'assets/icons/test.svg',
                       title: l10n.featureQuizzesTitle,
@@ -164,7 +176,7 @@ void showFeaturesSheet({
                       },
                     ),
 
-                    // 5. EXPLORE (Google Fonts Eye Icon)
+                    // 6. EXPLORE (Google Fonts Eye Icon)
                     FeaturesSheetButton(
                       iconData: Icons.visibility_outlined,
                       // Eye icon from Google Fonts

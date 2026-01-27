@@ -184,7 +184,8 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     context.read<VoiceService>().stopSession(resetState: true);
     final inputProvider = context.read<InputProvider>();
     inputProvider.setVoiceModeActive(false);
-    inputProvider.clearFeatureMode();
+    // Only clear offline mode - reasoning and other features persist across chats
+    inputProvider.clearFeatureModeIfOffline();
 
     if (_panelController != null) {
       // Panel was open, we already hapticed on opening.

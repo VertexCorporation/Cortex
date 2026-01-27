@@ -481,15 +481,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return 'Li sepana Cortex binêre, ew pir ecêb e! Ji vir daxe: $cortexLink';
-  }
-
-  @override
-  String get shareFailed =>
-      'Parvekirina sepanê bi ser neket. Ji kerema xwe paşê dîsa biceribîne';
-
-  @override
   String get selectText => 'Nivîsê Hilbijêre';
 
   @override
@@ -666,9 +657,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get benefit11 => 'Moda Herikîna Zêdetir';
-
-  @override
-  String get benefit12 => '';
 
   @override
   String get oldBenefits => 'Hemî feydeyên ji planên jêrîn';
@@ -851,10 +839,6 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get errorNetwork =>
       'Çewtiyek torê çêbû. Ji kerema xwe girêdana xwe kontrol bike û dîsa biceribîne.';
-
-  @override
-  String get errorApiAuthentication =>
-      'Nasnameyê bi ser neket. Ji kerema xwe dîsa têkevinê.';
 
   @override
   String get baseModelForCharacterDescription =>
@@ -1042,9 +1026,6 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get featureImageGenerationDescription =>
       'Ev model dikare li gorî danasînên nivîsa we wêneyên orîjînal biafirîne.';
-
-  @override
-  String get errorImageLoad => 'Barkirina wêneya çêkirî bi ser neket.';
 
   @override
   String get premiumModelNoticeTitle => 'Modela Premium';
@@ -1535,28 +1516,35 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get useOfflineDescription =>
-      'Bêyî girêdana înternetê bi awayekî taybet sohbet bikin';
+      'Bêyî girêdana înternetê bi awayekî taybet sohbet bikin.';
+
+  @override
+  String get featureReasoning => 'Ramanên Kûr';
+
+  @override
+  String get featureReasoningDescription =>
+      'Di moda Ramanîna Kûr de, AI bi navxweyî li ser peywirên heyî difikire da ku wan bi qasî ku ji destê wê tê biqedîne.';
 
   @override
   String get featureCreateImageTitle => 'Wêneyekî Biafirîne';
 
   @override
-  String get featureCreateImageDescription => 'Ji nivîsê hunera AI-ê çêbikin';
+  String get featureCreateImageDescription => 'Ji nivîsê hunera AI-ê çêbikin.';
 
   @override
   String get featureStudyTitle => 'Xwendin û Fêrbûn';
 
   @override
-  String get featureStudyDescription => 'Şirove û kurteyan bistînin';
+  String get featureStudyDescription => 'Şirove û kurteyan bistînin.';
 
   @override
   String get featureQuizzesTitle => 'Quiz';
 
   @override
-  String get featureQuizzesDescription => 'Zanîna xwe biceribîne';
+  String get featureQuizzesDescription => 'Zanîna xwe biceribînin.';
 
   @override
-  String get featureExploreDescription => 'Hemû modelên berdest bibînin';
+  String get featureExploreDescription => 'Hemû modelên berdest bibînin.';
 
   @override
   String get featureStudyMessage =>
@@ -1619,55 +1607,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Cortex bi xebitandina bi tevahî li ser cîhazê, tewra di moda sohbeta dengî de jî, daneyên we ewle dihêle; ji sohbetên bênavber kêfê bistînin!';
 
   @override
-  String get toolGetStockPriceDescription =>
-      'Buhayê niha û dîroka stokan (mînak AAPL, THYAO.IS) û krîptoyê (mînak BTC-USD, ETH-USD) bistînin.';
-
-  @override
-  String get toolGetStockPriceParamSymbol =>
-      'Sembola tîkerê (mînak AAPL, THYAO.IS, BTC-USD).';
-
-  @override
-  String get toolGetWeatherDescription =>
-      'Rewşa hewayê ya niha ji bo bajarekî diyarkirî bistînin. Ger bajar neyê zanîn, ji bikarhêner bipirsin.';
-
-  @override
-  String get toolGetWeatherParamCity => 'Navê bajarî (mînak, London, Stenbol).';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      'Koda Pythonê di sandboxek ewle de bicîh bînin. Vê ji bo hesabên tevlihev, pêvajoya daneyan, an karên algorîtmîk bikar bînin.';
-
-  @override
-  String get toolRunPythonCodeParamCode => 'Koda Pythonê ya ku were bicîhanîn.';
-
-  @override
-  String get toolCalculateDescription => 'Nirxandina îfadeyeke matematîkî.';
-
-  @override
-  String get toolCalculateParamExpression =>
-      'Îfadeya matematîkî (mînak, \"3 + 4 * 2\", \"sin(45)\").';
-
-  @override
-  String get toolRenderChartDescription =>
-      'Nexşeyek/grafek çêbikin. Vê bikar bînin da ku daneyên ku ji hêla bikarhêner ve hatine peyda kirin an jî hatine hesabkirin dîtbar bikin.';
-
-  @override
-  String get toolRenderChartParamType => 'Cureyê nexşeyê: bar, xêz, pî.';
-
-  @override
-  String get toolRenderChartParamLabels =>
-      'Etîket ji bo eksena-x an kategoriyan.';
-
-  @override
-  String get toolRenderChartParamData => 'Xalên daneyên hejmarî.';
-
-  @override
-  String get toolRenderChartParamLabel => 'Etîket ji bo daneyê.';
-
-  @override
-  String get toolRenderChartParamTitle => 'Sernavê nexşeyê.';
-
-  @override
   String get flowModeDescription =>
       'Di moda Herikînê de, aqilmend di navbera xwe de nîqaş dikin; hûn dikarin an rûnin û guhdarî bikin an jî xwe bavêjin û beşdarî nîqaşê bibin!';
 
@@ -1676,37 +1615,7 @@ class AppLocalizationsKu extends AppLocalizations {
       'Silav! Tu niha di Moda Herikînê de li ser sepana Cortex î. Sê ajanên din ên AI li vir bi te re ne. Erka te ew e ku mijarekê bavêjî odeyê û bi pirsîna pirsek provokatîf an kêfxweş ji yên din re nîqaşekê dest pê bikî. Di bersivên xwe de, xwe azad hîs bike ku mîzah, îronî û gotinên sivik ên bêwate bi kar bînî. Her mijarek mafdar e. Berdewam bike, axaftinê dest pê bike.';
 
   @override
-  String get voicePrompt =>
-      'Niha tu li ser platforma Cortex xizmeta deng peyda dikî. Markdown, blokên kodê, an LaTeX bikar neynin. Bi tenê bi nivîsa guncaw ji bo senteza axaftinê bersiv bide.';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => 'Fikirî';
 
   @override
   String get agentRed => 'Red';
@@ -1719,10 +1628,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get flowMode => 'Moda Herikînê';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => 'Xelat';
@@ -1738,4 +1643,60 @@ class AppLocalizationsKu extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'Moda Herikîna Korteksê ($agentName). Berê: $previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      'Naveroka nivîsê ji belgeyên barkirî bixwîne û derxe. Formatên PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX), û OpenDocument piştgirî dike. Dema ku bikarhêner pelê belgeyekê pêve kiribe, vê yekê bikar bînin.';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      'Îndeksa pêveka belgeyê ya ku were xwendin (li ser bingeha 0). Bi gelemperî 0 ji bo belgeya yekem.';
+
+  @override
+  String get toolStockDescription =>
+      'Buhayê niha û dîroka stokan (mînak AAPL, THYAO.IS) û krîptoyê (mînak BTC-USD) bistînin.';
+
+  @override
+  String get toolStockSymbolParam =>
+      'Sembola tîkerê (mînak AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolWeatherDescription =>
+      'Rewşa hewayê ya niha ji bo bajarekî taybetî bistînin.';
+
+  @override
+  String get toolWeatherCityParam => 'Navê bajêr (mînak London, Stenbol).';
+
+  @override
+  String get toolPythonDescription =>
+      'Koda Pythonê di sandboxek ewle de bicîh bîne.';
+
+  @override
+  String get toolPythonCodeParam => 'Koda Pythonê ya ku were bicîhanîn.';
+
+  @override
+  String get toolCalculateDescription => 'Nirxandina îfadeyeke matematîkî.';
+
+  @override
+  String get toolCalculateExpressionParam =>
+      'Îfadeya matematîkî (mînak \'3 + 4 * 2\').';
+
+  @override
+  String get toolChartDescription => 'Nexşe/grafikek dîtbarî çêbikin.';
+
+  @override
+  String get toolChartTypeParam => 'Cureyê nexşeyê: bar, xêz, an pî.';
+
+  @override
+  String get toolChartLabelsParam =>
+      'Etîketên ji bo eksen an jî beşên nexşeyê.';
+
+  @override
+  String get toolChartDataParam => 'Nirxên daneyên hejmarî ji bo nexşeyê.';
+
+  @override
+  String get toolChartLabelParam => 'Etîketa daneyê ji bo efsaneya nexşeyê.';
+
+  @override
+  String get toolChartTitleParam => 'Sernavê nexşeyê.';
 }

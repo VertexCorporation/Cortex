@@ -183,9 +183,12 @@ class _ThinkingWidgetState extends State<ThinkingWidget>
                         
                         final labelText = showThinking ? thinkingLabel : thoughtLabel;
                         
+                        // Show shimmer only when still in thinking state (not transitioning)
+                        final showShimmer = showThinking && !widget.isFinished;
+                        
                         return Opacity(
                           opacity: opacity.clamp(0.0, 1.0),
-                          child: showThinking && !_wasFinished
+                          child: showShimmer
                               ? Shimmer.fromColors(
                                   baseColor: AppColors.tertiaryColor,
                                   highlightColor:

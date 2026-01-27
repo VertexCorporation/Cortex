@@ -483,15 +483,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return 'Cek aplikasi Cortex, keren banget! Unduh di sini: $cortexLink';
-  }
-
-  @override
-  String get shareFailed =>
-      'Gagal membagikan aplikasi. Silakan coba lagi nanti';
-
-  @override
   String get selectText => 'Pilih Teks';
 
   @override
@@ -667,9 +658,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get benefit11 => 'Lebih banyak Mode Aliran';
-
-  @override
-  String get benefit12 => '';
 
   @override
   String get oldBenefits => 'Semua manfaat dari paket yang lebih rendah';
@@ -851,10 +839,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get errorNetwork =>
       'Terjadi kesalahan jaringan. Harap periksa koneksi Anda dan coba lagi.';
-
-  @override
-  String get errorApiAuthentication =>
-      'Otentikasi gagal. Silakan coba masuk lagi.';
 
   @override
   String get baseModelForCharacterDescription =>
@@ -1042,9 +1026,6 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get featureImageGenerationDescription =>
       'Model ini dapat membuat gambar asli berdasarkan deskripsi teks Anda.';
-
-  @override
-  String get errorImageLoad => 'Gagal memuat gambar yang dihasilkan.';
 
   @override
   String get premiumModelNoticeTitle => 'Model Premium';
@@ -1539,7 +1520,14 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get useOfflineDescription =>
-      'Ngobrol secara pribadi tanpa koneksi internet';
+      'Berbincang secara pribadi tanpa koneksi internet.';
+
+  @override
+  String get featureReasoning => 'Pemikiran Mendalam';
+
+  @override
+  String get featureReasoningDescription =>
+      'Dalam mode Berpikir Mendalam, AI memikirkan tugas secara internal untuk menyelesaikannya sebaik mungkin.';
 
   @override
   String get featureCreateImageTitle => 'Buat Gambar';
@@ -1552,16 +1540,16 @@ class AppLocalizationsId extends AppLocalizations {
   String get featureStudyTitle => 'Belajar & Mengajar';
 
   @override
-  String get featureStudyDescription => 'Dapatkan penjelasan dan ringkasan';
+  String get featureStudyDescription => 'Dapatkan penjelasan dan ringkasan.';
 
   @override
   String get featureQuizzesTitle => 'Kuis';
 
   @override
-  String get featureQuizzesDescription => 'Uji pengetahuan Anda';
+  String get featureQuizzesDescription => 'Uji pengetahuan Anda.';
 
   @override
-  String get featureExploreDescription => 'Temukan semua model yang tersedia';
+  String get featureExploreDescription => 'Temukan semua model yang tersedia.';
 
   @override
   String get featureStudyMessage =>
@@ -1624,56 +1612,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Cortex menjaga keamanan data Anda dengan berjalan sepenuhnya di perangkat, bahkan dalam mode obrolan suara; nikmati percakapan tanpa hambatan!';
 
   @override
-  String get toolGetStockPriceDescription =>
-      'Dapatkan harga terkini dan riwayat untuk saham (misalnya AAPL, THYAO.IS) dan kripto (misalnya BTC-USD, ETH-USD).';
-
-  @override
-  String get toolGetStockPriceParamSymbol =>
-      'Simbol saham (misalnya AAPL, THYAO.IS, BTC-USD).';
-
-  @override
-  String get toolGetWeatherDescription =>
-      'Dapatkan informasi cuaca terkini untuk kota tertentu. Tanyakan kepada pengguna untuk memasukkan kota jika tidak diketahui.';
-
-  @override
-  String get toolGetWeatherParamCity =>
-      'Nama kota (misalnya, London, Istanbul).';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      'Jalankan kode Python di lingkungan terisolasi (sandbox) yang aman. Gunakan ini untuk perhitungan kompleks, pemrosesan data, atau tugas-tugas algoritmik.';
-
-  @override
-  String get toolRunPythonCodeParamCode => 'Kode Python yang akan dieksekusi.';
-
-  @override
-  String get toolCalculateDescription => 'Evaluasi suatu ekspresi matematika.';
-
-  @override
-  String get toolCalculateParamExpression =>
-      'Ekspresi matematika (misalnya, \"3 + 4 * 2\", \"sin(45)\").';
-
-  @override
-  String get toolRenderChartDescription =>
-      'Buat bagan/grafik. Gunakan ini untuk memvisualisasikan data yang diberikan oleh pengguna atau yang telah dihitung.';
-
-  @override
-  String get toolRenderChartParamType =>
-      'Jenis grafik: batang, garis, lingkaran.';
-
-  @override
-  String get toolRenderChartParamLabels => 'Label untuk sumbu x atau kategori.';
-
-  @override
-  String get toolRenderChartParamData => 'Titik data numerik.';
-
-  @override
-  String get toolRenderChartParamLabel => 'Label untuk dataset.';
-
-  @override
-  String get toolRenderChartParamTitle => 'Judul grafik.';
-
-  @override
   String get flowModeDescription =>
       'Dalam mode Flow, kecerdasan-kecerdasan berdebat di antara mereka sendiri; Anda dapat duduk santai dan mendengarkan atau ikut serta dan bergabung dalam diskusi!';
 
@@ -1682,37 +1620,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Halo! Anda sekarang berada di Mode Alur pada aplikasi Cortex. Ada tiga agen AI lain di sini bersama Anda. Tugas Anda adalah mengajukan topik ke dalam ruangan dan memulai diskusi dengan mengajukan pertanyaan yang provokatif atau menghibur kepada yang lain. Dalam tanggapan Anda, jangan ragu untuk menggunakan humor, ironi, dan sedikit ejekan. Topik apa pun boleh dibahas. Silakan, mulai percakapannya.';
 
   @override
-  String get voicePrompt =>
-      'Saat ini Anda menyediakan layanan suara di platform Cortex. Jangan gunakan markdown, blok kode, atau LaTeX. Tanggapi murni dalam teks yang sesuai untuk sintesis suara.';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => 'Berpikir';
 
   @override
   String get agentRed => 'Red';
@@ -1725,10 +1633,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get flowMode => 'Mode Aliran';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => 'Premi';
@@ -1744,4 +1648,60 @@ class AppLocalizationsId extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'Mode Aliran Korteks ($agentName). Sebelumnya: $previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      'Membaca dan mengekstrak konten teks dari dokumen yang diunggah (PDF, spreadsheet Excel). Gunakan ini ketika pengguna telah melampirkan file dokumen.';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      'Indeks lampiran dokumen yang akan dibaca (berbasis 0). Biasanya 0 untuk dokumen pertama.';
+
+  @override
+  String get toolStockDescription =>
+      'Dapatkan harga terkini dan riwayat untuk saham (misalnya AAPL, THYAO.IS) dan kripto (misalnya BTC-USD).';
+
+  @override
+  String get toolStockSymbolParam =>
+      'Simbol saham (misalnya AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolWeatherDescription =>
+      'Dapatkan informasi cuaca terkini untuk kota tertentu.';
+
+  @override
+  String get toolWeatherCityParam => 'Nama kota (misalnya London, Istanbul).';
+
+  @override
+  String get toolPythonDescription =>
+      'Jalankan kode Python di dalam lingkungan sandbox yang aman.';
+
+  @override
+  String get toolPythonCodeParam => 'Kode Python yang akan dieksekusi.';
+
+  @override
+  String get toolCalculateDescription => 'Evaluasi suatu ekspresi matematika.';
+
+  @override
+  String get toolCalculateExpressionParam =>
+      'Ekspresi matematika (misalnya, \'3 + 4 * 2\').';
+
+  @override
+  String get toolChartDescription => 'Buat visualisasi bagan/grafik.';
+
+  @override
+  String get toolChartTypeParam =>
+      'Jenis grafik: batang, garis, atau lingkaran.';
+
+  @override
+  String get toolChartLabelsParam => 'Label untuk sumbu atau segmen grafik.';
+
+  @override
+  String get toolChartDataParam => 'Nilai data numerik untuk grafik.';
+
+  @override
+  String get toolChartLabelParam => 'Label dataset untuk legenda grafik.';
+
+  @override
+  String get toolChartTitleParam => 'Judul grafik.';
 }

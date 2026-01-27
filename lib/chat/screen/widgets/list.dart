@@ -32,11 +32,16 @@ class _ChatMessageListState extends State<ChatMessageList> {
     super.initState();
     // Scroll to bottom on initial load
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.scrollController.hasClients) {
-        widget.scrollController
-            .jumpTo(widget.scrollController.position.maxScrollExtent);
-      }
+      _scrollToBottomIfNeeded();
     });
+  }
+
+  void _scrollToBottomIfNeeded() {
+    if (!mounted) return;
+    if (widget.scrollController.hasClients) {
+      widget.scrollController
+          .jumpTo(widget.scrollController.position.maxScrollExtent);
+    }
   }
 
   @override
@@ -54,6 +59,15 @@ class _ChatMessageListState extends State<ChatMessageList> {
     final inputProvider = context.watch<InputProvider>();
 
     final messages = conversationProvider.messages;
+
+    // Scroll to bottom when messages just finished loading (switching chats)
+    if (conversationProvider.justFinishedLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottomIfNeeded();
+        // Consume the flag so we don't scroll again on every rebuild
+        conversationProvider.consumeJustFinishedLoadingFlag();
+      });
+    }
 
     // Use a unique key based on conversation ID to force a fresh state (and thus initState scroll) when chat changes
     // This is the cleanest way to ensure "open new chat -> scroll to bottom".

@@ -485,15 +485,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String shareMessage(String cortexLink) {
-    return 'Vê a aplicação Cortex, é incrível! Baixa-a aqui: $cortexLink';
-  }
-
-  @override
-  String get shareFailed =>
-      'Falha ao partilhar a aplicação. Por favor, tente novamente mais tarde';
-
-  @override
   String get selectText => 'Selecionar Texto';
 
   @override
@@ -670,9 +661,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get benefit11 => 'Mais modo de fluxo';
-
-  @override
-  String get benefit12 => '';
 
   @override
   String get oldBenefits => 'Todos os benefícios dos planos inferiores';
@@ -855,10 +843,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get errorNetwork =>
       'Ocorreu um erro de rede. Por favor, verifique a sua ligação e tente novamente.';
-
-  @override
-  String get errorApiAuthentication =>
-      'A autenticação falhou. Por favor, tente iniciar sessão novamente.';
 
   @override
   String get baseModelForCharacterDescription =>
@@ -1045,9 +1029,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get featureImageGenerationDescription =>
       'Este modelo pode criar imagens originais com base nas suas descrições de texto.';
-
-  @override
-  String get errorImageLoad => 'Falha ao carregar a imagem gerada.';
 
   @override
   String get premiumModelNoticeTitle => 'Modelo Premium';
@@ -1542,6 +1523,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Converse em particular sem conexão com a internet.';
 
   @override
+  String get featureReasoning => 'Pensamento profundo';
+
+  @override
+  String get featureReasoningDescription =>
+      'No modo Deep Thinking, a IA processa as tarefas internamente para concluí-las da melhor maneira possível.';
+
+  @override
   String get featureCreateImageTitle => 'Criar imagem';
 
   @override
@@ -1558,11 +1546,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get featureQuizzesTitle => 'Questionários';
 
   @override
-  String get featureQuizzesDescription => 'Teste seus conhecimentos';
+  String get featureQuizzesDescription => 'Teste seus conhecimentos.';
 
   @override
   String get featureExploreDescription =>
-      'Descubra todos os modelos disponíveis';
+      'Descubra todos os modelos disponíveis.';
 
   @override
   String get featureStudyMessage =>
@@ -1625,57 +1613,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'O Cortex protege seus dados, funcionando totalmente no dispositivo, mesmo no modo de bate-papo por voz; desfrute de conversas perfeitas!';
 
   @override
-  String get toolGetStockPriceDescription =>
-      'Obtenha o preço atual e o histórico de ações (por exemplo, AAPL, THYAO.IS) e criptomoedas (por exemplo, BTC-USD, ETH-USD).';
-
-  @override
-  String get toolGetStockPriceParamSymbol =>
-      'O símbolo da ação (por exemplo, AAPL, THYAO.IS, BTC-USD).';
-
-  @override
-  String get toolGetWeatherDescription =>
-      'Obtenha a previsão do tempo atual para uma cidade específica. Caso o usuário não saiba a cidade, solicite-a.';
-
-  @override
-  String get toolGetWeatherParamCity =>
-      'O nome da cidade (ex.: Londres, Istambul).';
-
-  @override
-  String get toolRunPythonCodeDescription =>
-      'Execute código Python em um ambiente isolado e seguro. Utilize esta funcionalidade para cálculos complexos, processamento de dados ou tarefas algorítmicas.';
-
-  @override
-  String get toolRunPythonCodeParamCode => 'O código Python a ser executado.';
-
-  @override
-  String get toolCalculateDescription => 'Avalie uma expressão matemática.';
-
-  @override
-  String get toolCalculateParamExpression =>
-      'A expressão matemática (por exemplo, \"3 + 4 * 2\", \"sin(45)\").';
-
-  @override
-  String get toolRenderChartDescription =>
-      'Gere um gráfico/tabela. Use-o para visualizar dados fornecidos pelo usuário ou calculados.';
-
-  @override
-  String get toolRenderChartParamType =>
-      'Tipo de gráfico: barra, linha, pizza.';
-
-  @override
-  String get toolRenderChartParamLabels =>
-      'Rótulos para o eixo x ou categorias.';
-
-  @override
-  String get toolRenderChartParamData => 'Pontos de dados numéricos.';
-
-  @override
-  String get toolRenderChartParamLabel => 'Rótulo para o conjunto de dados.';
-
-  @override
-  String get toolRenderChartParamTitle => 'Título do gráfico.';
-
-  @override
   String get flowModeDescription =>
       'No modo Flow, as inteligências debatem entre si; você pode simplesmente relaxar e ouvir ou participar da discussão!';
 
@@ -1684,37 +1621,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Olá! Você agora está no Modo Fluxo do aplicativo Cortex. Há três outros agentes de IA aqui com você. Sua tarefa é lançar um tópico na sala e iniciar uma discussão fazendo uma pergunta provocativa ou divertida aos outros. Em suas respostas, sinta-se à vontade para usar humor, ironia e brincadeiras leves. Qualquer tópico é válido. Vamos lá, comece a conversa.';
 
   @override
-  String get voicePrompt =>
-      'Atualmente, você está prestando serviços de voz na plataforma Cortex. Não utilize Markdown, blocos de código ou LaTeX. Responda exclusivamente em texto adequado para síntese de voz.';
-
-  @override
-  String thoughtForSeconds(int seconds) {
-    return 'Thought for $seconds seconds';
-  }
-
-  @override
-  String get thought => 'Thought';
-
-  @override
-  String get weatherClear => 'Clear';
-
-  @override
-  String get weatherCloudy => 'Cloudy';
-
-  @override
-  String get weatherFoggy => 'Foggy';
-
-  @override
-  String get weatherRainy => 'Rainy';
-
-  @override
-  String get weatherSnowy => 'Snowy';
-
-  @override
-  String get weatherThunderstorm => 'Thunderstorm';
-
-  @override
-  String get weatherDrizzle => 'Drizzle';
+  String get thought => 'Pensou';
 
   @override
   String get agentRed => 'Red';
@@ -1727,10 +1634,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get flowMode => 'Modo de fluxo';
-
-  @override
-  String get limitReachedVoiceStop =>
-      'Voice session ended due to limit limits.';
 
   @override
   String get premium => 'Premium';
@@ -1746,4 +1649,63 @@ class AppLocalizationsPt extends AppLocalizations {
   String flowModeContextParams(String agentName, String previousResponse) {
     return 'Modo Cortex Flow ($agentName). Anterior: $previousResponse';
   }
+
+  @override
+  String get toolReadDocumentDescription =>
+      'Leia e extraia o conteúdo de texto de documentos carregados (PDF, planilhas do Excel). Use esta função quando o usuário anexar um arquivo de documento.';
+
+  @override
+  String get toolReadDocumentIndexParam =>
+      'O índice do anexo do documento a ser lido (baseado em 0). Normalmente 0 para o primeiro documento.';
+
+  @override
+  String get toolStockDescription =>
+      'Obtenha o preço atual e o histórico de ações (por exemplo, AAPL, THYAO.IS) e criptomoedas (por exemplo, BTC-USD).';
+
+  @override
+  String get toolStockSymbolParam =>
+      'O símbolo da ação (por exemplo, AAPL, THYAO.IS, BTC-USD).';
+
+  @override
+  String get toolWeatherDescription =>
+      'Veja a previsão do tempo atual para uma cidade específica.';
+
+  @override
+  String get toolWeatherCityParam =>
+      'O nome da cidade (ex.: Londres, Istambul).';
+
+  @override
+  String get toolPythonDescription =>
+      'Execute código Python em um ambiente isolado e seguro.';
+
+  @override
+  String get toolPythonCodeParam => 'O código Python a ser executado.';
+
+  @override
+  String get toolCalculateDescription => 'Avalie uma expressão matemática.';
+
+  @override
+  String get toolCalculateExpressionParam =>
+      'Expressão matemática (ex.: \'3 + 4 * 2\').';
+
+  @override
+  String get toolChartDescription =>
+      'Gere uma visualização em forma de gráfico/tabela.';
+
+  @override
+  String get toolChartTypeParam => 'Tipo de gráfico: barras, linhas ou pizza.';
+
+  @override
+  String get toolChartLabelsParam =>
+      'Rótulos para eixos ou segmentos de gráficos.';
+
+  @override
+  String get toolChartDataParam => 'Valores numéricos para o gráfico.';
+
+  @override
+  String get toolChartLabelParam =>
+      'Rótulo do conjunto de dados para a legenda do gráfico.';
+
+  @override
+  String get toolChartTitleParam => 'Título do gráfico.';
 }

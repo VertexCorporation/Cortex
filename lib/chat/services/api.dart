@@ -51,8 +51,9 @@ class ApiService {
     required String model,
     required bool isPremium,
     List<Map<String, dynamic>>? tools, // ADDED: Tools support
+    bool enablefeatureReasoning = false, // ADDED: featureReasoning flag for server
     Function(String textChunk)? onTextChunk,
-    Function(String reasoning)? onReasoning, // ADDED: Reasoning support
+    Function(String featureReasoning)? onfeatureReasoning, // ADDED: featureReasoning support
     Function(String imageUrl)? onImageReceived,
     Function(List<dynamic> toolCalls)? onToolCall, // ADDED: Tool Calls
     required AppLocalizations localizations,
@@ -84,6 +85,7 @@ class ApiService {
             "isPremiumModel": isPremium,
             if (tools != null) "tools": tools,
             "tool_choice": (tools != null) ? "auto" : null,
+            "enableReasoning": enablefeatureReasoning,
           }),
           cancelToken: _cancelToken,
           options: Options(
@@ -159,9 +161,9 @@ class ApiService {
                     break;
 
                   case 'reasoning':
-                    final reasoning = data['text'] as String?;
-                    if (reasoning != null) {
-                      onReasoning?.call(reasoning);
+                    final reasoningText = data['text'] as String?;
+                    if (reasoningText != null) {
+                      onfeatureReasoning?.call(reasoningText);
                     }
                     break;
 
@@ -271,8 +273,9 @@ class ApiService {
     required bool isPremium,
     required String baseModelId,
     List<String> attachmentPaths = const [],
+    bool enablefeatureReasoning = false,
     Function(String)? onTextChunk,
-    Function(String)? onReasoning,
+    Function(String)? onfeatureReasoning,
     Function(String)? onImageReceived,
     required AppLocalizations localizations,
   }) async {
@@ -296,8 +299,9 @@ class ApiService {
       messages: messages,
       model: baseModelId,
       isPremium: isPremium,
+      enablefeatureReasoning: enablefeatureReasoning,
       onTextChunk: onTextChunk,
-      onReasoning: onReasoning,
+      onfeatureReasoning: onfeatureReasoning,
       onImageReceived: onImageReceived,
       // No tools for characters typically
     );
@@ -309,8 +313,9 @@ class ApiService {
     required String userInput,
     required List<Map<String, dynamic>> context,
     List<String> attachmentPaths = const [],
+    bool enablefeatureReasoning = false,
     Function(String)? onTextChunk,
-    Function(String)? onReasoning,
+    Function(String)? onfeatureReasoning,
     Function(String)? onImageReceived,
     Function(List<dynamic>)? onToolCall, // Exposed for logic loop
     required AppLocalizations localizations,
@@ -327,8 +332,18 @@ class ApiService {
       final contentBlock = await Utils.processAttachment(path);
       if (contentBlock != null) userMessageContent.add(contentBlock);
     }
-    if (userMessageContent.isNotEmpty) {
-      messages.add({"role": "user", "content": userMessageContent});
+
+    // Extract documents for tool processing (PDF, XLSX, etc.) BEFORE cleaning
+    final documents = Utils.extractDocuments(userMessageContent);
+    if (documents.isNotEmpty) {
+      ToolRegistry.setDocumentsContext(documents);
+    }
+
+    // Clean content blocks - remove internal _document fields before sending to API
+    final cleanedUserContent = Utils.cleanContentBlocks(userMessageContent);
+
+    if (cleanedUserContent.isNotEmpty) {
+      messages.add({"role": "user", "content": cleanedUserContent});
     }
 
     // Attach Tools Definition
@@ -341,9 +356,10 @@ class ApiService {
       messages: messages,
       model: modelId,
       isPremium: isPremium,
+      enablefeatureReasoning: enablefeatureReasoning,
       tools: toolsJson.isNotEmpty ? toolsJson : null,
       onTextChunk: onTextChunk,
-      onReasoning: onReasoning,
+      onfeatureReasoning: onfeatureReasoning,
       onImageReceived: onImageReceived,
       onToolCall: onToolCall,
     );
