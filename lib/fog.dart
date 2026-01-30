@@ -222,6 +222,10 @@ class ScrollFogHorizontal extends StatefulWidget {
   final double scrollThreshold;
   final bool showStart;
   final bool showEnd;
+  
+  /// Extra offset to extend fog beyond the widget bounds (useful for tablets)
+  /// Positive values extend the fog outward from the edges
+  final double edgeOverflow;
 
   const ScrollFogHorizontal({
     super.key,
@@ -232,6 +236,7 @@ class ScrollFogHorizontal extends StatefulWidget {
     this.scrollThreshold = 5.0,
     this.showStart = true,
     this.showEnd = true,
+    this.edgeOverflow = 0.0,
   });
 
   @override
@@ -334,16 +339,19 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
 
   @override
   Widget build(BuildContext context) {
+    final overflow = widget.edgeOverflow;
+    
     return Stack(
       clipBehavior: Clip.none,
       children: [
         Positioned.fill(child: widget.child),
         if (widget.showStart)
           Positioned(
-            left: 0,
+            // Use negative position to extend fog beyond widget bounds
+            left: -overflow,
             top: 0,
             bottom: 0,
-            width: widget.startFogWidth,
+            width: widget.startFogWidth + overflow,
             child: AnimatedBuilder(
               animation: _startOpacity,
               builder: (context, child) {
@@ -371,10 +379,11 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
           ),
         if (widget.showEnd)
           Positioned(
-            right: 0,
+            // Use negative position to extend fog beyond widget bounds
+            right: -overflow,
             top: 0,
             bottom: 0,
-            width: widget.endFogWidth,
+            width: widget.endFogWidth + overflow,
             child: AnimatedBuilder(
               animation: _endOpacity,
               builder: (context, child) {
