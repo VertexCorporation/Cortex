@@ -441,7 +441,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu model, kamera veya resim dosyaları aracılığıyla fotoğraf tarama yeteneğine sahiptir.';
 
   @override
-  String get featureOfflineTitle => 'lokal Çalışma';
+  String get featureOfflineTitle => 'Lokal Çalışma';
 
   @override
   String get featureOfflineDescription =>
@@ -897,7 +897,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get experimentalOfflineWarning =>
-      'lokal mod hâlâ deneyseldir ve indirdiğiniz model optimum verimlilikle çalışmayabilir.';
+      'Lokal mod hâlâ deneyseldir ve indirdiğiniz model optimum verimlilikle çalışmayabilir.';
 
   @override
   String get noConversationsToDelete => 'You have no conversations to delete.';
@@ -1053,7 +1053,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onlineModels => 'Çevrimiçi Modeller';
 
   @override
-  String get offlineModels => 'lokal Modeller';
+  String get offlineModels => 'Lokal Modeller';
 
   @override
   String get characterModels => 'Karakterler';
@@ -1203,7 +1203,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Cortex uyurken de yanında, korkma dokunmaz.';
 
   @override
-  String get notificationOfflineReadyTitle => 'lokal Mod Hazır';
+  String get notificationOfflineReadyTitle => 'Lokal Mod Hazır';
 
   @override
   String get notificationOfflineReadyBody =>
@@ -1594,7 +1594,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get exclusiveOffer => 'Özel Teklif';
 
   @override
-  String get continueInOfflineMode => 'lokal Modda Devam Et';
+  String get continueInOfflineMode => 'Lokal Modda Devam Et';
 
   @override
   String get voiceModeInformation =>

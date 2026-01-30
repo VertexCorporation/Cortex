@@ -50,6 +50,12 @@ class ChatFormatProcessor {
   ChatFormatProcessor(this._format, {this.onStopTokenDetected});
 
   bool _discardNextWhitespace = false;
+  
+  // Track if we've seen any real content yet (to filter leading junk like ":" or ":\n")
+  bool _hasSeenRealContent = false;
+  
+  // Characters to discard at the very beginning of generation (common model artifacts)
+  static const Set<String> _leadingJunkChars = {':', '\n', '\r', ' ', '\t'};
 
   /// Processes a single incoming token and returns the clean, displayable part,
   /// or null if nothing should be shown to the user for this token.
@@ -210,6 +216,17 @@ class ChatFormatProcessor {
         return;
       }
       _discardNextWhitespace = false;
+    }
+    
+    // Filter leading junk characters (e.g., ":" at the very start of generation)
+    // Some models output ":" or ":\n" before actual content due to training artifacts
+    if (!_hasSeenRealContent) {
+      if (_leadingJunkChars.contains(ch)) {
+        debugPrint("[ChatFormatProcessor] Discarding leading junk char: '${ch.replaceAll('\n', '\\n')}'");
+        return;
+      }
+      // First non-junk character - mark as seen real content
+      _hasSeenRealContent = true;
     }
 
     final candidate = '$_pendingControl$ch';

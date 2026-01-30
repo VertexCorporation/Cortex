@@ -63,25 +63,30 @@ actor LlamaContext {
 
     // MARK: - Initialization
 
-    init(model: OpaquePointer, context: OpaquePointer, params: SamplerParams) {
+    init(model: OpaquePointer, context: OpaquePointer, params: SamplerParams, nCtx: Int32) {
         self.model = model
         self.context = context
         self.vocab = llama_model_get_vocab(model)
+        
+        // Store n_len based on context size
+        self.n_len = nCtx
 
-        // Initialize Batch (allocate for 2048 context size)
-        self.batch = llama_batch_init(2048, 0, 1)
+        // Initialize Batch with dynamic context size (matching Android behavior)
+        // Android: new_batch(nCtx, 0, 1)
+        self.batch = llama_batch_init(nCtx, 0, 1)
 
-        // Initialize Sampler Chain
+        // Initialize Sampler Chain with proper ordering (matching Android)
         let sparams = llama_sampler_chain_default_params()
         self.sampling = llama_sampler_chain_init(sparams)
 
-        // Add samplers in correct order: TopK -> TopP -> Temp -> Dist
+        // Add samplers in correct order (same as Android): TopK -> TopP -> Temp -> Dist
         llama_sampler_chain_add(self.sampling, llama_sampler_init_top_k(params.topK))
         llama_sampler_chain_add(self.sampling, llama_sampler_init_top_p(params.topP, 1))
         llama_sampler_chain_add(self.sampling, llama_sampler_init_temp(params.temp))
-        llama_sampler_chain_add(self.sampling, llama_sampler_init_dist(1234)) // Fixed seed for reproducibility/stability test
+        // Use time-based seed for better randomness (matching Android's LLAMA_DEFAULT_SEED)
+        llama_sampler_chain_add(self.sampling, llama_sampler_init_dist(UInt32(time(nil))))
 
-        print("[LlamaContext] Initialized with params: Temp=\(params.temp), TopP=\(params.topP), TopK=\(params.topK)")
+        print("[LlamaContext] Initialized with nCtx=\(nCtx), Temp=\(params.temp), TopP=\(params.topP), TopK=\(params.topK)")
     }
 
     deinit {
@@ -131,7 +136,8 @@ actor LlamaContext {
 
         // Use default params initially, will be updated per-message
         let params = SamplerParams(temp: 0.7, topP: 0.9, topK: 40)
-        return LlamaContext(model: model, context: context, params: params)
+        // Pass nCtx to init so batch size matches context size
+        return LlamaContext(model: model, context: context, params: params, nCtx: nCtx)
     }
 
     // MARK: - Control Methods
@@ -149,11 +155,12 @@ actor LlamaContext {
         let sparams = llama_sampler_chain_default_params()
         sampling = llama_sampler_chain_init(sparams)
         
-        // Add samplers in correct order: TopK -> TopP -> Temp -> Dist
+        // Add samplers in correct order (same as Android): TopK -> TopP -> Temp -> Dist
         llama_sampler_chain_add(sampling, llama_sampler_init_top_k(topK))
         llama_sampler_chain_add(sampling, llama_sampler_init_top_p(topP, 1))
         llama_sampler_chain_add(sampling, llama_sampler_init_temp(temp))
-        llama_sampler_chain_add(sampling, llama_sampler_init_dist(1234))
+        // Use time-based seed for variety (matching Android's LLAMA_DEFAULT_SEED behavior)
+        llama_sampler_chain_add(sampling, llama_sampler_init_dist(UInt32(time(nil))))
         
         print("[LlamaContext] Sampler updated: temp=\(temp), topP=\(topP), topK=\(topK)")
     }
@@ -162,7 +169,13 @@ actor LlamaContext {
         temporary_invalid_cchars.removeAll()
         n_cur = 0
         n_decode = 0
-        print("[LlamaContext] Context variables reset.")
+        
+        // CRITICAL FIX: Clear native KV cache to match Android behavior
+        // Without this, old context bleeds into new generations causing gibberish
+        // New llama.cpp API: llama_memory_clear(llama_get_memory(ctx), clear_data)
+        llama_memory_clear(llama_get_memory(context), true)
+        
+        print("[LlamaContext] Context and KV cache cleared.")
     }
 
     // MARK: - Generation Logic
@@ -173,7 +186,7 @@ actor LlamaContext {
              // TODO: implement llava_eval_image_embed if bindings available
         }
 
-        print("[LlamaContext] Processing prompt: \(text.prefix(50))...")
+        print("[LlamaContext] Processing prompt: \(text.prefix(100))...")
 
         // Reset state
         is_interrupted = false
@@ -181,9 +194,16 @@ actor LlamaContext {
         temporary_invalid_cchars.removeAll()
         n_cur = 0
         n_decode = 0
+        
+        // CRITICAL: Clear KV cache before new generation (matching Android behavior)
+        // New llama.cpp API: llama_memory_clear(llama_get_memory(ctx), clear_data)
+        llama_memory_clear(llama_get_memory(context), true)
 
-        // Tokenize
-        let tokens_list = tokenize(text: text, add_bos: true)
+        // Tokenize with special token parsing enabled (CRITICAL for chat formats!)
+        // This ensures tokens like <|im_start|>, <|im_end|>, <|eot_id|> are parsed correctly
+        let tokens_list = tokenize(text: text, add_bos: true, parseSpecial: true)
+        
+        print("[LlamaContext] Prompt tokenized: \(tokens_list.count) tokens")
 
         // Check context limits
         let n_ctx = llama_n_ctx(context)
@@ -269,14 +289,24 @@ actor LlamaContext {
 
     // MARK: - Private Helpers
 
-    private func tokenize(text: String, add_bos: Bool) -> [llama_token] {
+    /// Tokenizes the input text.
+    /// - Parameters:
+    ///   - text: The text to tokenize
+    ///   - add_bos: Whether to add beginning-of-sequence token
+    ///   - parseSpecial: If true, special tokens like <|im_start|> are parsed as control tokens.
+    ///                   This is CRITICAL for chat formats to work correctly!
+    private func tokenize(text: String, add_bos: Bool, parseSpecial: Bool = true) -> [llama_token] {
         let utf8Count = text.utf8.count
-        let n_tokens = utf8Count + (add_bos ? 1 : 0) + 1
+        // Allocate more space for potential token expansion
+        let n_tokens = utf8Count + (add_bos ? 1 : 0) + 256
 
         let tokens = UnsafeMutablePointer<llama_token>.allocate(capacity: n_tokens)
         defer { tokens.deallocate() }
 
-        let tokenCount = llama_tokenize(vocab, text, Int32(utf8Count), tokens, Int32(n_tokens), add_bos, false)
+        // CRITICAL FIX: Pass parseSpecial=true to properly handle chat format tokens
+        // like <|im_start|>, <|im_end|>, <|eot_id|>, etc.
+        // Without this, these tokens are treated as literal text and break generation!
+        let tokenCount = llama_tokenize(vocab, text, Int32(utf8Count), tokens, Int32(n_tokens), add_bos, parseSpecial)
 
         var swiftTokens: [llama_token] = []
         if tokenCount > 0 {
@@ -284,6 +314,11 @@ actor LlamaContext {
                 swiftTokens.append(tokens[Int(i)])
             }
         }
+        
+        if parseSpecial {
+            print("[LlamaContext] Tokenized \(swiftTokens.count) tokens (special tokens parsed)")
+        }
+        
         return swiftTokens
     }
 

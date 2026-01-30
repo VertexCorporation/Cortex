@@ -183,49 +183,55 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
           padding: EdgeInsets.symmetric(horizontal: sectionHPad),
           child: _buildHeader(screenWidth),
         ),
-        SizedBox(
-          height: _calculateHeight(screenWidth),
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (notification) {
-              if (notification is OverscrollNotification) {
-                if (notification.overscroll < 0 &&
-                    widget.onOverscrollStart != null) {
-                  _triggerEdgeAction(widget.onOverscrollStart!);
-                } else if (notification.overscroll > 0 &&
-                    widget.onOverscrollEnd != null) {
-                  _triggerEdgeAction(widget.onOverscrollEnd!);
-                }
-              }
-              return false;
-            },
-            // --- HİYERARŞİ DEĞİŞİKLİĞİ BURADA ---
-            // ScrollFogHorizontal artık en dışta.
-            // Bu sayede sis efekti Padding'in (boşluğun) üstüne biner ve ekranın tam kenarından başlar.
-            child: ScrollFogHorizontal(
-              scrollController: _pageController,
-              // Sis genişliğini (Padding + biraz içerik) kadar yapıyoruz ki yumuşak geçiş olsun.
-              startFogWidth: sectionHPad + 24.0,
-              endFogWidth: sectionHPad + 24.0,
-
-              // Padding şimdi Fog'un çocuğu oldu.
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: sectionHPad),
-                child: Directionality(
-                  textDirection: TextDirection.ltr,
-                  child: Transform.translate(
-                    offset: Offset(-trackShift, 0),
-                    child: PageView(
-                      clipBehavior: Clip.none,
-                      controller: _pageController,
-                      padEnds: true,
-                      physics: const ClampingScrollPhysics(),
-                      children: _buildModelColumns(context, screenWidth),
+        // Fog efektinin ekranın gerçek kenarına kadar uzanması için Stack kullanıyoruz
+        // Tablet'te fog'un kesik görünmemesi için fog, content'in dışına taşacak
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Ana içerik
+            SizedBox(
+              height: _calculateHeight(screenWidth),
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  if (notification is OverscrollNotification) {
+                    if (notification.overscroll < 0 &&
+                        widget.onOverscrollStart != null) {
+                      _triggerEdgeAction(widget.onOverscrollStart!);
+                    } else if (notification.overscroll > 0 &&
+                        widget.onOverscrollEnd != null) {
+                      _triggerEdgeAction(widget.onOverscrollEnd!);
+                    }
+                  }
+                  return false;
+                },
+                child: ScrollFogHorizontal(
+                  scrollController: _pageController,
+                  // Fog genişliğini padding + ekstra içerik kadar yap
+                  startFogWidth: sectionHPad + 32.0,
+                  endFogWidth: sectionHPad + 32.0,
+                  // Fog'u widget sınırlarının dışına taşır (tablet'te ekran kenarına ulaşması için)
+                  // sectionHPad kadar taşırarak fog'un tam ekran kenarından başlamasını sağlıyoruz
+                  edgeOverflow: sectionHPad,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: sectionHPad),
+                    child: Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: Transform.translate(
+                        offset: Offset(-trackShift, 0),
+                        child: PageView(
+                          clipBehavior: Clip.none,
+                          controller: _pageController,
+                          padEnds: true,
+                          physics: const ClampingScrollPhysics(),
+                          children: _buildModelColumns(context, screenWidth),
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ],
     );
