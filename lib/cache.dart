@@ -28,6 +28,9 @@ enum CacheKey {
   // Premium Products (IAP)
   premiumProducts,
 
+  // Premium Screen State (products + special offer - for preloading)
+  premiumScreenState,
+
   // Models Discovery Screen
   modelsScreenData,
 
@@ -80,7 +83,8 @@ class CacheService {
     CacheKey.starredIds: Duration(minutes: 2),
     CacheKey.userModels: Duration(minutes: 2),
     CacheKey.settingsUserData: Duration(minutes: 3),
-    CacheKey.premiumProducts: Duration(minutes: 10),
+    CacheKey.premiumProducts: Duration(minutes: 15),
+    CacheKey.premiumScreenState: Duration(minutes: 15),
     CacheKey.modelsScreenData: Duration(minutes: 5),
     CacheKey.newsImageUrls: Duration(minutes: 8),
     // URLs expire in 10, so 8 is safer.

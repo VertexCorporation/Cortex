@@ -273,6 +273,126 @@ class FundsBackend with ChangeNotifier {
 
 // --- Special Offer Logic ---
 
+  /// Preloads premium screen data (products + special offer) in the background.
+  /// This should be called from AppInitializer after the app becomes ready.
+  /// Returns true if data was successfully preloaded.
+  static Future<bool> preloadInBackground() async {
+    final logName = '$_logName.preload';
+    
+    // Check if we already have cached state
+    final cachedState = CacheService.get<Map<String, dynamic>>(CacheKey.premiumScreenState);
+    if (cachedState != null) {
+      log('Premium screen state already cached, skipping preload.', name: logName);
+      return true;
+    }
+
+    final auth = FirebaseAuth.instance;
+    final user = auth.currentUser;
+    if (user == null) {
+      log('Cannot preload: User not authenticated.', name: logName);
+      return false;
+    }
+
+    if (!await InternetService().hasInternet()) {
+      log('Cannot preload: No internet connection.', name: logName);
+      return false;
+    }
+
+    try {
+      log('Starting background preload of premium screen data...', name: logName);
+
+      // 1. Preload products
+      final inAppPurchase = InAppPurchase.instance;
+      if (!await inAppPurchase.isAvailable()) {
+        log('In-app purchases not available.', name: logName);
+        return false;
+      }
+
+      final response = await inAppPurchase.queryProductDetails(_subscriptionIds);
+      if (response.error != null || response.productDetails.isEmpty) {
+        log('Failed to fetch products: ${response.error?.message ?? "empty"}', name: logName);
+        return false;
+      }
+
+      // Cache products
+      CacheService.set(CacheKey.premiumProducts, response.productDetails);
+      log('Products cached: ${response.productDetails.length} items', name: logName);
+
+      // 2. Preload special offer state
+      final functions = FirebaseFunctions.instanceFor(region: 'europe-west1');
+      final callable = functions.httpsCallable('checkOrStartSpecialOffer');
+      final result = await callable.call<Map<String, dynamic>>({});
+
+      final data = result.data;
+      final status = data['status'] as String?;
+      final expiresAt = data['expiresAt'] as int?;
+
+      // 3. Cache the complete premium screen state
+      final stateToCache = <String, dynamic>{
+        'productsLoaded': true,
+        'specialOfferActive': status == 'active' && expiresAt != null,
+        'specialOfferExpiresAt': expiresAt,
+        'cachedAt': DateTime.now().millisecondsSinceEpoch,
+      };
+
+      CacheService.set(CacheKey.premiumScreenState, stateToCache);
+      log('Premium screen state preloaded successfully.', name: logName);
+
+      return true;
+    } catch (e) {
+      log('Background preload failed: $e', name: logName, error: e);
+      return false;
+    }
+  }
+
+  /// Checks if premium screen data is already preloaded and valid.
+  /// Returns true only if BOTH products and screen state are cached and valid.
+  static bool get isPreloaded {
+    // 1. Check if screen state exists
+    final cachedState = CacheService.get<Map<String, dynamic>>(CacheKey.premiumScreenState);
+    if (cachedState == null) return false;
+
+    // 2. Check if products exist (must have both)
+    final cachedProducts = CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
+    if (cachedProducts == null || cachedProducts.isEmpty) {
+      // Products expired but state didn't - invalidate state too
+      CacheService.invalidate(CacheKey.premiumScreenState);
+      return false;
+    }
+
+    // 3. Check if special offer has expired (if it was active)
+    final expiresAt = cachedState['specialOfferExpiresAt'] as int?;
+    if (expiresAt != null && cachedState['specialOfferActive'] == true) {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      if (now > expiresAt) {
+        // Offer expired, invalidate cache to get fresh state
+        CacheService.invalidate(CacheKey.premiumScreenState);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /// Loads cached state into this instance (call after checking isPreloaded).
+  void loadFromCache() {
+    final cachedProducts = CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
+    final cachedState = CacheService.get<Map<String, dynamic>>(CacheKey.premiumScreenState);
+
+    if (cachedProducts != null && cachedProducts.isNotEmpty) {
+      _products = cachedProducts;
+      _errorMessage = null;
+    }
+
+    if (cachedState != null) {
+      _isSpecialOfferActive = cachedState['specialOfferActive'] ?? false;
+      _specialOfferExpiresAt = cachedState['specialOfferExpiresAt'] as int?;
+    }
+
+    _setLoading(false);
+    log('Loaded premium screen data from cache.', name: _logName);
+  }
+
   Future<void> checkOrStartSpecialOffer() async {
     final user = _auth.currentUser;
     if (user == null) {

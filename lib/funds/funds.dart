@@ -129,15 +129,30 @@ class _FundsScreenViewState extends State<FundsScreenView> {
             }
           });
 
-      // Check/start special offer and start countdown timer
-      _backend.checkOrStartSpecialOffer().whenComplete(() {
-        if (mounted) {
-          setState(() {
-            _isSpecialOfferChecked = true;
-          });
-          _startCountdownTimer();
-        }
-      });
+      // Check if data is already preloaded (from background)
+      // Only use cache if we have internet OR if we have valid cached data
+      // This ensures offline users still see the normal flow (with error handling)
+      if (FundsBackend.isPreloaded && _backend.allProducts.isEmpty) {
+        log('Premium screen data preloaded - skipping skeleton');
+        _backend.loadFromCache();
+        setState(() {
+          _isSpecialOfferChecked = true;
+          _isContentLoaded = true;
+          _contentOffset = Offset.zero;
+        });
+        _startCountdownTimer();
+      } else {
+        // Fallback: load normally with skeleton
+        // This handles: no cache, offline mode, or products already loaded
+        _backend.checkOrStartSpecialOffer().whenComplete(() {
+          if (mounted) {
+            setState(() {
+              _isSpecialOfferChecked = true;
+            });
+            _startCountdownTimer();
+          }
+        });
+      }
     });
   }
 

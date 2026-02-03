@@ -9,6 +9,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cortex/funds/backend.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/reconcile.dart';
 import 'package:cortex/referral.dart';
@@ -342,6 +343,11 @@ class AppInitializer with ChangeNotifier {
 
       if (Platform.isAndroid) {
         _runInBackground(ReferralHandler.checkAndStoreReferrer);
+      }
+
+      // 5. Preload Premium Screen Data (for instant FundsScreen loading)
+      if (_currentUser != null && _internetProvider.isConnected) {
+        _runInBackground(FundsBackend.preloadInBackground);
       }
 
       if (!_coreServicesReadyCompleter.isCompleted) {
