@@ -1,5 +1,5 @@
-"NSCameraUsageDescription" = "Cortex memerlukan akses ke kamera Anda untuk mengambil foto.";
-"NSPhotoLibraryUsageDescription" = "Cortex memerlukan akses ke galeri Anda untuk mengunggah gambar.";
-"NSPhotoLibraryAddUsageDescription" = "Cortex memerlukan izin untuk menyimpan gambar ke galeri Anda.";
-"NSMicrophoneUsageDescription" = "Cortex memerlukan akses ke mikrofon untuk obrolan suara.";
-"NSSpeechRecognitionUsageDescription" = "Cortex memerlukan akses ke pengenalan suara untuk mengubah suara Anda menjadi teks.";
+"NSCameraUsageDescription" = "Cortex menggunakan kamera Anda untuk mengambil foto yang dapat dibagikan dengan model AI untuk analisis visual. Foto Anda hanya dikirim saat Anda memilih untuk membagikannya.";
+"NSPhotoLibraryUsageDescription" = "Cortex mengakses galeri foto Anda agar Anda dapat memilih gambar untuk dibagikan dengan model AI untuk percakapan visual. Gambar hanya dibagikan saat Anda memilih untuk mengirimnya.";
+"NSPhotoLibraryAddUsageDescription" = "Cortex menyimpan gambar yang dihasilkan AI dan ekspor obrolan ke galeri Anda saat Anda memilih untuk mengunduhnya.";
+"NSMicrophoneUsageDescription" = "Cortex menggunakan mikrofon Anda untuk percakapan suara dengan AI. Suara Anda diproses untuk memahami pertanyaan Anda dan memberikan respons real-time.";
+"NSSpeechRecognitionUsageDescription" = "Cortex menggunakan pengenalan suara untuk mengubah kata-kata Anda menjadi teks, memungkinkan percakapan hands-free dengan AI. Data suara diproses dengan aman.";

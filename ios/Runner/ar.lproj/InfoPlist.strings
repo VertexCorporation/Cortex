@@ -1,5 +1,5 @@
-"NSCameraUsageDescription" = "يحتاج Cortex إلى الوصول للكاميرا لالتقاط الصور.";
-"NSPhotoLibraryUsageDescription" = "يحتاج Cortex إلى الوصول لمعرض الصور لرفع الصور.";
-"NSPhotoLibraryAddUsageDescription" = "يحتاج Cortex إلى إذن لحفظ الصور في المعرض.";
-"NSMicrophoneUsageDescription" = "يحتاج Cortex إلى الوصول للميكروفون للدردشة الصوتية.";
-"NSSpeechRecognitionUsageDescription" = "يحتاج Cortex إلى التعرف على الكلام لتحويل صوتك إلى نص.";
+"NSCameraUsageDescription" = "يستخدم Cortex الكاميرا لالتقاط صور يمكن مشاركتها مع نماذج الذكاء الاصطناعي للتحليل البصري. يتم إرسال صورك فقط عندما تختار مشاركتها.";
+"NSPhotoLibraryUsageDescription" = "يصل Cortex إلى معرض الصور لتتمكن من اختيار صور لمشاركتها مع نماذج الذكاء الاصطناعي للمحادثات البصرية. يتم مشاركة الصور فقط عندما تختار إرسالها.";
+"NSPhotoLibraryAddUsageDescription" = "يحفظ Cortex الصور المُنشأة بالذكاء الاصطناعي وتصدير المحادثات في معرضك عندما تختار تنزيلها.";
+"NSMicrophoneUsageDescription" = "يستخدم Cortex الميكروفون للمحادثات الصوتية مع الذكاء الاصطناعي. تتم معالجة صوتك لفهم أسئلتك وتقديم ردود فورية.";
+"NSSpeechRecognitionUsageDescription" = "يستخدم Cortex التعرف على الكلام لتحويل كلماتك إلى نص، مما يتيح محادثات بدون استخدام اليدين مع الذكاء الاصطناعي. تتم معالجة البيانات الصوتية بشكل آمن.";
