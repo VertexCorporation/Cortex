@@ -1,5 +1,5 @@
-"NSCameraUsageDescription" = "O Cortex precisa de acesso à sua câmera para tirar fotos.";
-"NSPhotoLibraryUsageDescription" = "O Cortex precisa de acesso à sua galeria para enviar imagens.";
-"NSPhotoLibraryAddUsageDescription" = "O Cortex precisa de permissão para salvar imagens na sua galeria.";
-"NSMicrophoneUsageDescription" = "O Cortex precisa de acesso ao microfone para bate-papo por voz.";
-"NSSpeechRecognitionUsageDescription" = "O Cortex precisa de acesso ao reconhecimento de fala para converter sua voz em texto.";
+"NSCameraUsageDescription" = "O Cortex usa sua câmera para capturar fotos que podem ser compartilhadas com modelos de IA para análise visual. Suas fotos só são enviadas quando você escolhe compartilhá-las.";
+"NSPhotoLibraryUsageDescription" = "O Cortex acessa sua galeria de fotos para que você possa selecionar imagens para compartilhar com modelos de IA em conversas visuais. As imagens só são compartilhadas quando você escolhe enviá-las.";
+"NSPhotoLibraryAddUsageDescription" = "O Cortex salva imagens geradas por IA e exportações de chat na sua galeria quando você escolhe baixá-las.";
+"NSMicrophoneUsageDescription" = "O Cortex usa seu microfone para conversas por voz com IA. Sua voz é processada para entender suas perguntas e fornecer respostas em tempo real.";
+"NSSpeechRecognitionUsageDescription" = "O Cortex usa reconhecimento de fala para converter suas palavras em texto, permitindo conversas com as mãos livres com IA. Os dados de voz são processados com segurança.";

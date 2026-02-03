@@ -1,5 +1,5 @@
-"NSCameraUsageDescription" = "Cortex heeft toegang nodig tot uw camera om foto's te maken.";
-"NSPhotoLibraryUsageDescription" = "Cortex heeft toegang nodig tot uw galerij om afbeeldingen te uploaden.";
-"NSPhotoLibraryAddUsageDescription" = "Cortex heeft toestemming nodig om afbeeldingen in uw galerij op te slaan.";
-"NSMicrophoneUsageDescription" = "Cortex heeft toegang nodig tot de microfoon voor voicechat.";
-"NSSpeechRecognitionUsageDescription" = "Cortex heeft toegang tot spraakherkenning nodig om uw stem om te zetten in tekst.";
+"NSCameraUsageDescription" = "Cortex gebruikt uw camera om foto's te maken die kunnen worden gedeeld met AI-modellen voor visuele analyse. Uw foto's worden alleen verzonden wanneer u ervoor kiest ze te delen.";
+"NSPhotoLibraryUsageDescription" = "Cortex heeft toegang tot uw fotogalerij zodat u afbeeldingen kunt selecteren om te delen met AI-modellen voor visuele gesprekken. Afbeeldingen worden alleen gedeeld wanneer u ervoor kiest ze te verzenden.";
+"NSPhotoLibraryAddUsageDescription" = "Cortex slaat door AI gegenereerde afbeeldingen en chat-exports op in uw galerij wanneer u ervoor kiest ze te downloaden.";
+"NSMicrophoneUsageDescription" = "Cortex gebruikt uw microfoon voor spraakgesprekken met AI. Uw stem wordt verwerkt om uw vragen te begrijpen en realtime antwoorden te geven.";
+"NSSpeechRecognitionUsageDescription" = "Cortex gebruikt spraakherkenning om uw gesproken woorden om te zetten in tekst, waardoor handsfree gesprekken met AI mogelijk zijn. Spraakgegevens worden veilig verwerkt.";

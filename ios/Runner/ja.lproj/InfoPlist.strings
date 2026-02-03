@@ -1,5 +1,5 @@
-"NSCameraUsageDescription" = "Cortexは写真を撮るためにカメラへのアクセスを必要とします。";
-"NSPhotoLibraryUsageDescription" = "Cortexは画像をアップロードするためにギャラリーへのアクセスを必要とします。";
-"NSPhotoLibraryAddUsageDescription" = "Cortexは画像をギャラリーに保存するための許可を必要とします。";
-"NSMicrophoneUsageDescription" = "Cortexはボイスチャットのためにマイクへのアクセスを必要とします。";
-"NSSpeechRecognitionUsageDescription" = "Cortexは音声をテキストに変換するために音声認識へのアクセスを必要とします。";
+"NSCameraUsageDescription" = "CortexはAIモデルによる画像分析のために写真を撮影します。写真は共有を選択した場合のみ送信されます。";
+"NSPhotoLibraryUsageDescription" = "Cortexはフォトライブラリにアクセスし、AIモデルとのビジュアル会話用に画像を選択できます。画像は送信を選択した場合のみ共有されます。";
+"NSPhotoLibraryAddUsageDescription" = "CortexはAI生成画像やチャットのエクスポートをダウンロード時にギャラリーに保存します。";
+"NSMicrophoneUsageDescription" = "CortexはAIとの音声会話にマイクを使用します。質問を理解しリアルタイムで応答するために音声が処理されます。";
+"NSSpeechRecognitionUsageDescription" = "Cortexは音声認識を使用して話し言葉をテキストに変換し、AIとのハンズフリー会話を可能にします。音声データは安全に処理されます。";
