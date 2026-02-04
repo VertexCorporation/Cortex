@@ -456,14 +456,25 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildCurrentScreenWidget() {
-    switch (_currentView) {
-      case MainScreenView.chat:
-        return ChatController(key: chatScreenKey);
-      case MainScreenView.library:
-        return LibraryScreen(key: libraryScreenKey);
-      case MainScreenView.news:
-        return const NewsScreen();
-    }
+    // Use IndexedStack to keep all screens alive and prevent rebuilds
+    // This dramatically improves performance when switching tabs
+    return IndexedStack(
+      index: _getCurrentViewIndex(),
+      children: [
+        // Index 0: Chat
+        RepaintBoundary(
+          child: ChatController(key: chatScreenKey),
+        ),
+        // Index 1: Library
+        RepaintBoundary(
+          child: LibraryScreen(key: libraryScreenKey),
+        ),
+        // Index 2: News
+        const RepaintBoundary(
+          child: NewsScreen(),
+        ),
+      ],
+    );
   }
 
   @override
@@ -622,24 +633,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                 ),
                                 child: Stack(
                                   children: [
-                                    AnimatedSwitcher(
-                                      duration:
-                                          const Duration(milliseconds: 250),
-                                      switchInCurve: Curves.easeOutQuad,
-                                      switchOutCurve: Curves.easeInQuad,
-                                      transitionBuilder: (Widget child,
-                                          Animation<double> animation) {
-                                        return FadeTransition(
-                                          opacity: animation,
-                                          child: child,
-                                        );
-                                      },
-                                      child: KeyedSubtree(
-                                        key: ValueKey<MainScreenView>(
-                                            _currentView),
-                                        child: _buildCurrentScreenWidget(),
-                                      ),
-                                    ),
+                                    _buildCurrentScreenWidget(),
                                     if (rawValue > 0)
                                       IgnorePointer(
                                         child: Container(

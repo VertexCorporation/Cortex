@@ -100,11 +100,15 @@ class SelectionService {
     // Select model without clearing conversation
     _sessionProvider.selectModel(newModel);
 
-    // Log model selected event
-    AnalyticsService().logModelSelected(
-      modelId: newModel.id,
-      modelType: newModel.type,
-    );
+    // Log model selected event (safe for test environment)
+    try {
+      AnalyticsService().logModelSelected(
+        modelId: newModel.id,
+        modelType: newModel.type,
+      );
+    } catch (e) {
+      debugPrint("$logPrefix: Analytics logging skipped: $e");
+    }
   }
 
   /// Changes the active model to a different variant within the same series.

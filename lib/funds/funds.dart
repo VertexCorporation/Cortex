@@ -59,7 +59,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   bool _isContentLoaded = false;
 
-  Offset _contentOffset = const Offset(0.0, 0.03);
+  // Start with no offset - content visible immediately when data is ready
+  Offset _contentOffset = Offset.zero;
 
   bool _hasAnyBenefitListAnimated = false;
   late final ConfettiController _confettiController;
@@ -95,6 +96,24 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   @override
   void initState() {
     super.initState();
+    
+    // Check if data is already preloaded BEFORE first frame
+    // If preloaded: skip skeleton entirely
+    // If not preloaded: show skeleton until data loads
+    final isPreloaded = FundsBackend.isPreloaded;
+    log('[FundsScreen] initState - isPreloaded: $isPreloaded');
+    
+    if (isPreloaded) {
+      _isSpecialOfferChecked = true;
+      _isContentLoaded = true;
+      log('[FundsScreen] Data preloaded, skipping skeleton');
+    } else {
+      // Will show skeleton until data loads
+      _isSpecialOfferChecked = false;
+      _isContentLoaded = false;
+      log('[FundsScreen] Data NOT preloaded, will show skeleton');
+    }
+    
     _checkIfEmulator();
     _pageController = PageController(initialPage: _currentPage);
     _scrollControllers =
@@ -130,11 +149,14 @@ class _FundsScreenViewState extends State<FundsScreenView> {
           });
 
       // Check if data is already preloaded (from background)
-      // Only use cache if we have internet OR if we have valid cached data
-      // This ensures offline users still see the normal flow (with error handling)
-      if (FundsBackend.isPreloaded && _backend.allProducts.isEmpty) {
-        log('Premium screen data preloaded - skipping skeleton');
-        _backend.loadFromCache();
+      // This covers: cache exists OR backend already has products loaded
+      if (FundsBackend.isPreloaded || _backend.allProducts.isNotEmpty) {
+        log('[FundsScreen] Data ready - loading from cache/backend');
+        // Load from cache if backend is empty but cache exists
+        if (_backend.allProducts.isEmpty && FundsBackend.isPreloaded) {
+          log('[FundsScreen] Loading from cache...');
+          _backend.loadFromCache();
+        }
         setState(() {
           _isSpecialOfferChecked = true;
           _isContentLoaded = true;
@@ -143,9 +165,11 @@ class _FundsScreenViewState extends State<FundsScreenView> {
         _startCountdownTimer();
       } else {
         // Fallback: load normally with skeleton
-        // This handles: no cache, offline mode, or products already loaded
+        // This handles: first app launch with no cache
+        log('[FundsScreen] No preloaded data, fetching from server...');
         _backend.checkOrStartSpecialOffer().whenComplete(() {
           if (mounted) {
+            log('[FundsScreen] Server fetch complete');
             setState(() {
               _isSpecialOfferChecked = true;
             });

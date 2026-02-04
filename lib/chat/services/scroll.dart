@@ -1,8 +1,7 @@
 // lib/chat/services/scroll.dart
 
 import 'package:cortex/theme.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';import 'package:flutter/services.dart';import 'package:flutter_svg/svg.dart';
 
 /// A service class to manage all scrolling-related logic.
 class ScrollService {
@@ -31,11 +30,16 @@ class ScrollService {
   ScrollPosition? _getSafePosition() {
     final controller = _scrollController;
     if (controller == null || !controller.hasClients) return null;
-    if (controller.positions.length != 1) return null;
+    // Allow multiple positions but use the first valid one
+    if (controller.positions.isEmpty) return null;
 
     try {
       return controller.position;
     } catch (e) {
+      // If multiple positions exist, try to get the first one
+      if (controller.positions.isNotEmpty) {
+        return controller.positions.first;
+      }
       return null;
     }
   }
@@ -88,17 +92,17 @@ class ScrollService {
 
       final int msgCount = messageCountProvider();
 
-      if (msgCount <= 2) {
+      // If no messages, hide button
+      if (msgCount == 0) {
         if (_showScrollDownButtonNotifier!.value) {
           _showScrollDownButtonNotifier!.value = false;
         }
         return;
       }
-      // ---------------------------
 
       final bool isAtBottom = isUserAtBottom();
-
-      final bool shouldShow = !isAtBottom && msgCount > 0;
+      // Show button when NOT at bottom (regardless of message count - long messages need scroll too)
+      final bool shouldShow = !isAtBottom;
 
       try {
         if (_showScrollDownButtonNotifier!.value != shouldShow) {
@@ -111,6 +115,10 @@ class ScrollService {
 
     try {
       _scrollController!.addListener(_listener!);
+      // Initial check - run listener once immediately after attaching
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _listener?.call();
+      });
     } catch (e) {
       debugPrint("[ScrollService] Listener attach error: $e");
     }
@@ -184,71 +192,78 @@ class ScrollService {
     required double screenHeight,
     required double bottomPanelHeight,
     required bool showScrollDownButton,
-    required double safeAreaBottomPadding,
     required bool isKeyboardOpen,
     required double keyboardHeight,
     Offset slideOffset = Offset.zero,
   }) {
     final themeColors = AppColors.getThemeColors(AppColors.currentTheme);
     final Color iconColor =
-        themeColors.statusBarIconBrightness == Brightness.light
-            ? Colors.white.withValues(alpha: 0.9)
-            : Colors.black.withValues(alpha: 0.8);
-
-    final double panelTopMargin = screenHeight * 0.02;
+    themeColors.statusBarIconBrightness == Brightness.light
+        ? Colors.white.withValues(alpha: 0.9)
+        : Colors.black.withValues(alpha: 0.8);
 
     double bottomOffset;
     if (isKeyboardOpen) {
-      bottomOffset = keyboardHeight + bottomPanelHeight + panelTopMargin;
+      bottomOffset = keyboardHeight + bottomPanelHeight;
     } else {
-      bottomOffset = bottomPanelHeight + safeAreaBottomPadding + panelTopMargin;
-      final double minBottomOffset = screenHeight * 0.02;
-      if (bottomOffset < minBottomOffset) {
-        bottomOffset = minBottomOffset;
-      }
+      bottomOffset = bottomPanelHeight;
     }
 
     return Positioned(
-      right: screenWidth * 0.02,
+      left: 0,
+      right: 0,
       bottom: bottomOffset,
-      child: AnimatedSlide(
-        offset: slideOffset,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        child: AnimatedOpacity(
-          opacity: showScrollDownButton ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          child: AnimatedScale(
-            scale: showScrollDownButton ? 1.0 : 0.5,
+      child: Center(
+        child: AnimatedSlide(
+          offset: slideOffset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          child: AnimatedOpacity(
+            opacity: showScrollDownButton ? 1.0 : 0.0,
             duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutBack,
-            child: IgnorePointer(
-              ignoring: !showScrollDownButton,
-              child: GestureDetector(
-                onTap: scrollToBottom,
-                child: Container(
-                  padding: EdgeInsets.all(screenWidth * 0.02),
-                  decoration: BoxDecoration(
-                    color: AppColors.background.withValues(alpha: 0.9),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.border.withValues(alpha: 0.5),
-                      width: 1,
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 8,
-                        offset: Offset(0, 4),
+            curve: Curves.easeOut,
+            child: AnimatedScale(
+              scale: showScrollDownButton ? 1.0 : 0.5,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              child: IgnorePointer(
+                ignoring: !showScrollDownButton,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      // Hide button immediately on tap
+                      hideButtonImmediately();
+                      scrollToBottom();
+                    },
+                    customBorder: const CircleBorder(),
+                    splashColor: AppColors.primaryColor.withValues(alpha: 0.3),
+                    highlightColor: AppColors.primaryColor.withValues(alpha: 0.1),
+                    child: Container(
+                      padding: EdgeInsets.all(screenWidth * 0.025),
+                      decoration: BoxDecoration(
+                        color: AppColors.background.withValues(alpha: 0.95),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.border.withValues(alpha: 0.5),
+                          width: 1,
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black38,
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: SvgPicture.asset(
-                    'assets/icons/arrov.svg',
-                    width: screenWidth * 0.04,
-                    height: screenWidth * 0.04,
-                    colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                      child: SvgPicture.asset(
+                        'assets/icons/arrov.svg',
+                        width: screenWidth * 0.045,
+                        height: screenWidth * 0.045,
+                        colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                      ),
+                    ),
                   ),
                 ),
               ),

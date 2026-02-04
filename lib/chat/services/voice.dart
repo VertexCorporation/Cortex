@@ -236,6 +236,9 @@ class VoiceService with ChangeNotifier {
     _shouldNextMessageBeHidden = false; // consume it
     return val;
   }
+  
+  /// Get the current voice system prompt for API calls
+  String? get voiceSystemPrompt => _voiceSystemPrompt;
 
   void _updateVoiceParams(int index) async {
     // 0: Normal
@@ -475,16 +478,12 @@ class VoiceService with ChangeNotifier {
     // User speech is visible (breaks flow loop temporarily if needed, but per requirement user can intervene)
     _shouldNextMessageBeHidden = false;
 
-    // Inject system prompt if set (e.g. for voice formatting constraints)
-    if (_voiceSystemPrompt != null && _voiceSystemPrompt!.isNotEmpty) {
-      textToSend = "$_voiceSystemPrompt\n\n$textToSend";
-    }
-
     _lastRecognizedText = "";
     _aiGenerationComplete = false;
     _isFlowInterrupted = false; // Reset flag on successful speech
 
     if (_onFinalSentence != null) {
+      // Pass only user text to callback - voice system prompt is handled separately
       _onFinalSentence!(textToSend);
     }
   }

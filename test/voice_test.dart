@@ -119,6 +119,8 @@ void main() {
       voiceSystemPromptSuffix: "SUFFIX",
       flowPromptBuilder: (agent, prev) => "Prompt: $agent $prev",
     );
+    // Context is null in test, so we need to manually start listening
+    voiceService.startListening();
     expect(voiceService.state, VoiceState.listening);
     expect(mockSpeechService.isListeningMock, true);
   });

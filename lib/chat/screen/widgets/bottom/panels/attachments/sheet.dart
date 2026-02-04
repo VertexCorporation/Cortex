@@ -26,6 +26,9 @@ void showAttachmentSheet({
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     useSafeArea: true,
+    constraints: BoxConstraints(
+      maxWidth: MediaQuery.of(context).size.width,
+    ),
     builder: (BuildContext modalContext) {
       // Re-query media query inside builder for correct dimensions if orientation changes
       final mediaQuery = MediaQuery.of(context);

@@ -37,6 +37,9 @@ void showModelSelectionSheet({
     isDismissible: true,
     enableDrag: true,
     useSafeArea: false,
+    constraints: BoxConstraints(
+      maxWidth: MediaQuery.of(context).size.width,
+    ),
     builder: (BuildContext modalContext) {
       return _ModelSheetContent(
         localizations: localizations,

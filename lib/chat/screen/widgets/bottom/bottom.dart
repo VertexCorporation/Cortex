@@ -125,11 +125,14 @@ class _ChatInputPanelState extends State<ChatInputPanel>
       children: [
         // Standard Input Panel (Slides Down)
         AnimatedSlide(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
           // Slide down (hide) when voice mode is active
           offset: isVoiceMode ? const Offset(0, 1.2) : Offset.zero,
-          child: SizeChangedLayoutNotifier(
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
+            opacity: isVoiceMode ? 0.0 : 1.0,
+            child: SizeChangedLayoutNotifier(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -222,6 +225,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
                 ),
               ],
             ),
+          ),
           ),
         ),
       ],

@@ -72,6 +72,7 @@ class SendService {
     int? regenerateAiIndex,
     String? overrideModelId,
     bool isHidden = false,
+    String? voiceSystemPrompt,
   }) async {
     if (_isSending) {
       debugPrint("SendService: Already sending. Ignored.");
@@ -114,6 +115,11 @@ class SendService {
       final activeMode = _inputProvider.featureMode;
       final bool enableThinkingMode = activeMode == ChatInputMode.featureReasoning;
       String textForApi = text;
+      
+      // Apply voice system prompt to API text only (not shown to user)
+      if (voiceSystemPrompt != null && voiceSystemPrompt.isNotEmpty) {
+        textForApi = "$voiceSystemPrompt\n\n$textForApi";
+      }
 
       if (activeMode == ChatInputMode.study) {
         textForApi = "${localizations.featureStudyMessage}\n\n$text";

@@ -11,7 +11,9 @@ import '../../../../app.dart';
 import '../../../../webview.dart';
 
 class ChatEmptyState extends StatefulWidget {
-  const ChatEmptyState({super.key});
+  final double bottomPadding;
+
+  const ChatEmptyState({super.key, this.bottomPadding = 0});
 
   @override
   State<ChatEmptyState> createState() => _ChatEmptyStateState();
@@ -41,7 +43,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     _breathingController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
-    )..repeat(reverse: true);
+    )
+      ..repeat(reverse: true);
 
     _breathingScaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(
@@ -73,7 +76,9 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final isFlux = context.read<ChatSessionProvider>().isFluxMode;
+    final isFlux = context
+        .read<ChatSessionProvider>()
+        .isFluxMode;
 
     // Initialize state on first run
     if (_wasFluxMode == null) {
@@ -153,7 +158,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
 
     final double titleSize = isTablet ? screenWidth * 0.04 : screenWidth * 0.06;
     final double bodyFontSize =
-        isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
+    isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
 
     final double contentMaxWidth = isTablet ? screenWidth * 0.6 : screenWidth;
     final double horizontalPadding = isTablet ? 0 : screenWidth * 0.12;
@@ -169,116 +174,178 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
               slivers: [
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Column(
-                    children: [
-                      const Spacer(),
-                      Container(
-                        width: contentMaxWidth,
-                        padding: EdgeInsets.only(
-                            top: topPadding,
-                            right: horizontalPadding,
-                            left: horizontalPadding),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // --- 1. LOGO AREA (Swapping) ---
-                            Center(
-                              child: SizedBox(
-                                height: logoSize,
-                                width: logoSize,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    // CORTEX Logo
-                                    Opacity(
-                                      opacity: (1.0 - _modeAnimation.value)
-                                          .clamp(0.0, 1.0),
-                                      child: Transform.scale(
-                                        scale:
-                                            1.0 - (_modeAnimation.value * 0.2),
-                                        child: ScaleTransition(
-                                          scale: _breathingScaleAnimation,
-                                          child: IconButton(
-                                            onPressed: () {
-                                              if (_modeAnimation.value < 0.5) {
-                                                HapticFeedback.lightImpact();
-                                                showAppWebViewModal(
-                                                    context,
-                                                    "Vertex",
-                                                    "https://vertexishere.com");
-                                              }
-                                            },
-                                            iconSize: logoSize,
-                                            padding: EdgeInsets.zero,
-                                            icon: SvgPicture.asset(
-                                              'assets/cortex.svg',
-                                              width: logoSize,
-                                              height: logoSize,
-                                              fit: BoxFit.contain,
-                                              colorFilter: ColorFilter.mode(
-                                                AppColors.primaryColor.inverted,
-                                                BlendMode.srcIn,
+                  child: AnimatedPadding(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOutCubic,
+                    padding: EdgeInsets.only(bottom: widget.bottomPadding),
+                    child: Column(
+                      children: [
+                        const Spacer(),
+                        Container(
+                          width: contentMaxWidth,
+                          padding: EdgeInsets.only(
+                              top: topPadding,
+                              right: horizontalPadding,
+                              left: horizontalPadding),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // --- 1. LOGO AREA (Swapping) ---
+                              Center(
+                                child: SizedBox(
+                                  height: logoSize,
+                                  width: logoSize,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      // CORTEX Logo
+                                      Opacity(
+                                        opacity: (1.0 - _modeAnimation.value)
+                                            .clamp(0.0, 1.0),
+                                        child: Transform.scale(
+                                          scale:
+                                          1.0 - (_modeAnimation.value * 0.2),
+                                          child: ScaleTransition(
+                                            scale: _breathingScaleAnimation,
+                                            child: IconButton(
+                                              onPressed: () {
+                                                if (_modeAnimation.value <
+                                                    0.5) {
+                                                  HapticFeedback.lightImpact();
+                                                  showAppWebViewModal(
+                                                      context,
+                                                      "Vertex",
+                                                      "https://vertexishere.com");
+                                                }
+                                              },
+                                              iconSize: logoSize,
+                                              padding: EdgeInsets.zero,
+                                              icon: SvgPicture.asset(
+                                                'assets/cortex.svg',
+                                                width: logoSize,
+                                                height: logoSize,
+                                                fit: BoxFit.contain,
+                                                colorFilter: ColorFilter.mode(
+                                                  AppColors.primaryColor
+                                                      .inverted,
+                                                  BlendMode.srcIn,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
 
-                                    // FLUX (GHOST) Logo
-                                    IgnorePointer(
-                                      child: Opacity(
-                                        opacity: _modeAnimation.value
-                                            .clamp(0.0, 1.0),
-                                        child: Transform.scale(
-                                          scale: 0.8 +
-                                              (_modeAnimation.value * 0.2),
-                                          child: ScaleTransition(
-                                            scale: _breathingScaleAnimation,
-                                            child: SvgPicture.asset(
-                                              'assets/icons/on/ghost.svg',
-                                              width: logoSize,
-                                              height: logoSize,
-                                              fit: BoxFit.contain,
-                                              colorFilter: ColorFilter.mode(
-                                                  contentColor,
-                                                  BlendMode.srcIn),
+                                      // FLUX (GHOST) Logo
+                                      IgnorePointer(
+                                        child: Opacity(
+                                          opacity: _modeAnimation.value
+                                              .clamp(0.0, 1.0),
+                                          child: Transform.scale(
+                                            scale: 0.8 +
+                                                (_modeAnimation.value * 0.2),
+                                            child: ScaleTransition(
+                                              scale: _breathingScaleAnimation,
+                                              child: SvgPicture.asset(
+                                                'assets/icons/on/ghost.svg',
+                                                width: logoSize,
+                                                height: logoSize,
+                                                fit: BoxFit.contain,
+                                                colorFilter: ColorFilter.mode(
+                                                    contentColor,
+                                                    BlendMode.srcIn),
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
 
-                            // Fixed gap
-                            SizedBox(height: verticalSpacing * 0.8),
+                              // Fixed gap
+                              SizedBox(height: verticalSpacing * 0.8),
 
-                            // --- 2. CONTENT AREA (Sliding & Fading) ---
-                            Stack(
-                              children: [
-                                // STANDARD CONTENT
-                                IgnorePointer(
-                                  ignoring: _modeAnimation.value > 0.1,
-                                  child: Opacity(
-                                    opacity: (1.0 - _modeAnimation.value * 2)
-                                        .clamp(0.0, 1.0),
-                                    child: Transform.translate(
-                                      offset: Offset(
-                                          0, -30.0 * _modeAnimation.value),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          // Title (Standard)
-                                          _buildEntranceItem(
-                                            startTime: 0.0,
-                                            endTime: 0.5,
-                                            child: Text(
-                                              l10n.defaultViewTitle,
+                              // --- 2. CONTENT AREA (Sliding & Fading) ---
+                              Stack(
+                                children: [
+                                  // STANDARD CONTENT
+                                  IgnorePointer(
+                                    ignoring: _modeAnimation.value > 0.1,
+                                    child: Opacity(
+                                      opacity: (1.0 - _modeAnimation.value * 2)
+                                          .clamp(0.0, 1.0),
+                                      child: Transform.translate(
+                                        offset: Offset(
+                                            0, -30.0 * _modeAnimation.value),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                          children: [
+                                            // Title (Standard)
+                                            _buildEntranceItem(
+                                              startTime: 0.0,
+                                              endTime: 0.5,
+                                              child: Text(
+                                                l10n.defaultViewTitle,
+                                                style: TextStyle(
+                                                  fontSize: titleSize,
+                                                  letterSpacing: 0.5,
+                                                  color: contentColor,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                                height: verticalSpacing * 0.6),
+
+                                            // Description (Standard)
+                                            _buildEntranceItem(
+                                              startTime: 0.2,
+                                              endTime: 0.7,
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: logoSize * 0.1),
+                                                child: Text(
+                                                  l10n.defaultViewDescription,
+                                                  style: TextStyle(
+                                                    fontSize: bodyFontSize,
+                                                    color: contentColor
+                                                        .withValues(alpha: 0.8),
+                                                    height: 1.5,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  // FLUX CONTENT
+                                  IgnorePointer(
+                                    ignoring: _modeAnimation.value < 0.9,
+                                    child: Opacity(
+                                      opacity: ((_modeAnimation.value - 0.5) *
+                                          2)
+                                          .clamp(0.0, 1.0),
+                                      child: Transform.translate(
+                                        offset: Offset(0,
+                                            30.0 *
+                                                (1.0 - _modeAnimation.value)),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                          children: [
+                                            SizedBox(
+                                                height: verticalSpacing * 0.2),
+                                            Text(
+                                              l10n.fluxChatTitle,
                                               style: TextStyle(
                                                 fontSize: titleSize,
                                                 letterSpacing: 0.5,
@@ -287,88 +354,36 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                               ),
                                               textAlign: TextAlign.center,
                                             ),
-                                          ),
-                                          SizedBox(
-                                              height: verticalSpacing * 0.6),
-
-                                          // Description (Standard)
-                                          _buildEntranceItem(
-                                            startTime: 0.2,
-                                            endTime: 0.7,
-                                            child: Padding(
+                                            SizedBox(
+                                                height: verticalSpacing * 0.6),
+                                            Padding(
                                               padding: EdgeInsets.symmetric(
                                                   horizontal: logoSize * 0.1),
                                               child: Text(
-                                                l10n.defaultViewDescription,
+                                                l10n.fluxChatDescription,
                                                 style: TextStyle(
                                                   fontSize: bodyFontSize,
                                                   color: contentColor
-                                                      .withValues(alpha: 0.8),
+                                                      .withValues(
+                                                      alpha: 0.8),
                                                   height: 1.5,
                                                 ),
                                                 textAlign: TextAlign.center,
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-
-                                // FLUX CONTENT
-                                IgnorePointer(
-                                  ignoring: _modeAnimation.value < 0.9,
-                                  child: Opacity(
-                                    opacity: ((_modeAnimation.value - 0.5) * 2)
-                                        .clamp(0.0, 1.0),
-                                    child: Transform.translate(
-                                      offset: Offset(0,
-                                          30.0 * (1.0 - _modeAnimation.value)),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          SizedBox(
-                                              height: verticalSpacing * 0.2),
-                                          Text(
-                                            l10n.fluxChatTitle,
-                                            style: TextStyle(
-                                              fontSize: titleSize,
-                                              letterSpacing: 0.5,
-                                              color: contentColor,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          SizedBox(
-                                              height: verticalSpacing * 0.6),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: logoSize * 0.1),
-                                            child: Text(
-                                              l10n.fluxChatDescription,
-                                              style: TextStyle(
-                                                fontSize: bodyFontSize,
-                                                color: contentColor.withValues(
-                                                    alpha: 0.8),
-                                                height: 1.5,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                    ],
+                        const Spacer(),
+                      ],
+                    ),
                   ),
                 ),
               ],

@@ -40,9 +40,18 @@ class _ChatMessageListState extends State<ChatMessageList> {
 
   void _scrollToBottomIfNeeded() {
     if (!mounted) return;
-    if (widget.scrollController.hasClients) {
-      widget.scrollController
-          .jumpTo(widget.scrollController.position.maxScrollExtent);
+    final controller = widget.scrollController;
+    if (!controller.hasClients) return;
+    
+    // Handle multiple scroll positions safely
+    if (controller.positions.isEmpty) return;
+    if (controller.positions.length > 1) {
+      // If multiple positions, try to jump each to max extent
+      for (final position in controller.positions) {
+        position.jumpTo(position.maxScrollExtent);
+      }
+    } else {
+      controller.jumpTo(controller.position.maxScrollExtent);
     }
   }
 
