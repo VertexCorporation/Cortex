@@ -322,6 +322,13 @@ class AppInitializer with ChangeNotifier {
       dev.log(
           "[AppInitializer] Phase 2: Starting Background Verification & Heavy Init...");
 
+      // PRIORITY: Preload Premium Screen Data FIRST (no delay!)
+      // This ensures FundsScreen loads instantly when user navigates to it
+      if (_currentUser != null && _internetProvider.isConnected) {
+        // Fire and forget - don't await, let it run in parallel
+        FundsBackend.preloadInBackground();
+      }
+
       await Future.delayed(const Duration(seconds: 2));
 
       // 1. Initialize Heavy Libraries (Only Timezones & Moderator now)
@@ -343,11 +350,6 @@ class AppInitializer with ChangeNotifier {
 
       if (Platform.isAndroid) {
         _runInBackground(ReferralHandler.checkAndStoreReferrer);
-      }
-
-      // 5. Preload Premium Screen Data (for instant FundsScreen loading)
-      if (_currentUser != null && _internetProvider.isConnected) {
-        _runInBackground(FundsBackend.preloadInBackground);
       }
 
       if (!_coreServicesReadyCompleter.isCompleted) {

@@ -104,7 +104,8 @@ class ActionButtonWidget extends StatelessWidget {
 
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
-    final double buttonSize = isTablet ? 40.0 : 36.0;
+    // Dynamic button size: ~8% of screen width, with min/max bounds
+    final double buttonSize = (screenWidth * 0.08).clamp(30.0, 38.0);
 
     bool isDeviceSupported = speechService.isDeviceSupported;
 
@@ -383,7 +384,7 @@ class AddPhotoButton extends StatelessWidget {
 
   const AddPhotoButton({
     super.key,
-    required this.isLimitExceeded, // Refers to Chat History Limit (e.g. Free Tier)
+    required this.isLimitExceeded,
     required this.isPhotoLoading,
     required this.localizations,
   });
@@ -395,22 +396,23 @@ class AddPhotoButton extends StatelessWidget {
     // Check if we have reached the 9 file limit
     final bool isMaxAttachments = inputProvider.attachments.length >= 9;
 
-    // Disable if loading or if main chat limit reached (but not just because we have 1 photo)
+    // Disable if loading or if main chat limit reached
     final bool buttonDisabled = isLimitExceeded;
+    
+    // Dynamic size based on screen width
+    final screenWidth = MediaQuery.of(context).size.width;
+    final double buttonSize = (screenWidth * 0.085).clamp(28.0, 36.0);
+    final double iconSize = buttonSize * 0.65;
 
     return _ToolCircleButton(
+      size: buttonSize,
       disabled: (isPhotoLoading && buttonDisabled) || isMaxAttachments,
       onTap: isPhotoLoading
           ? null
           : () {
-              // Priority 1: Check Chat History Limit
               if (isLimitExceeded) {
-                // The InputField usually handles this by disabling interaction,
-                // but if tapped, we can show a specific upgrade prompt here if needed.
-              }
-              // Priority 2: Open Sheet
-              // Priority 2: Open Sheet
-              else {
+                // Show upgrade prompt if needed
+              } else {
                 final session = context.read<ChatSessionProvider>();
                 showAttachmentSheet(
                   context: context,
@@ -421,8 +423,8 @@ class AddPhotoButton extends StatelessWidget {
             },
       child: SvgPicture.asset(
         'assets/icons/add.svg',
-        width: 24.0,
-        height: 24.0,
+        width: iconSize,
+        height: iconSize,
         colorFilter:
             ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
       ),
@@ -447,19 +449,16 @@ class FeaturesButton extends StatelessWidget {
     final bool isActive = featureMode != ChatInputMode.none;
 
     // Visual Configuration
-    // Active:   Bg = Inverted (Black), Icon = Background (White)
-    // Inactive: Bg = Background (White), Icon = Inverted (Black)
     final Color backgroundColor =
         isActive ? AppColors.primaryColor.inverted : AppColors.background;
-
     final Color iconColor =
         isActive ? AppColors.background : AppColors.primaryColor.inverted;
-
-    // Border is visible only when inactive.
-    // Transitioning to transparent makes it fade out smoothly.
     final Color borderColor = isActive ? Colors.transparent : AppColors.border;
 
-    const double size = 36.0;
+    // Dynamic size based on screen width
+    final screenWidth = MediaQuery.of(context).size.width;
+    final double size = (screenWidth * 0.085).clamp(28.0, 36.0);
+    final double iconSize = size * 0.5;
     const Duration animDuration = Duration(milliseconds: 200);
     const Curve animCurve = Curves.easeInOut;
 
@@ -490,8 +489,8 @@ class FeaturesButton extends StatelessWidget {
             builder: (context, color, child) {
               return SvgPicture.asset(
                 'assets/icons/features.svg',
-                width: 18.0,
-                height: 18.0,
+                width: iconSize,
+                height: iconSize,
                 colorFilter:
                     ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
               );
@@ -525,121 +524,116 @@ class ModelSelectButton extends StatelessWidget {
     final String displayText = isDynamic
         ? localizations.dynamicChatTitle
         : (sessionProvider.modelTitle ?? "Model");
-    final double borderRadius = 30.0;
-    final double fontSize = isTablet ? screenWidth * 0.02 : 13.0;
+    final double borderRadius = screenWidth * 0.075;
+    final double fontSize = screenWidth * (isTablet ? 0.02 : 0.032);
+    final double verticalPadding = screenWidth * 0.02;
+    final double horizontalPadding = screenWidth * (isTablet ? 0.04 : 0.035);
 
-    return Flexible(
-      fit: FlexFit.loose,
-      child: Stack(
-        alignment: Alignment.centerLeft,
-        children: [
-          Material(
-            color: AppColors.background,
-            borderRadius: BorderRadius.circular(borderRadius),
-            child: Ink(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(borderRadius),
-                border: Border.all(color: AppColors.border, width: 1.0),
-              ),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(borderRadius),
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  showModelSelectionSheet(
-                    context: context,
-                    localizations: localizations,
-                    currentModelId: sessionProvider.modelId ?? '',
-                    onModelSelected: (String id) {
-                      // 1. Get Services
-                      final modelService = context.read<ModelService>();
-                      final selectionService = context.read<SelectionService>();
-                      final inputProvider = context.read<InputProvider>();
-                      final langCode =
-                          Localizations.localeOf(context).languageCode;
+    return Stack(
+      alignment: Alignment.centerLeft,
+      children: [
+        Material(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+              border: Border.all(color: AppColors.border, width: 1.0),
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(borderRadius),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                showModelSelectionSheet(
+                  context: context,
+                  localizations: localizations,
+                  currentModelId: sessionProvider.modelId ?? '',
+                  onModelSelected: (String id) {
+                    final modelService = context.read<ModelService>();
+                    final selectionService = context.read<SelectionService>();
+                    final inputProvider = context.read<InputProvider>();
+                    final langCode = Localizations.localeOf(context).languageCode;
 
-                      // 2. Fetch Model Data
-                      final model = modelService.getPreciseModelData(id,
-                          langCode: langCode);
+                    final model = modelService.getPreciseModelData(id, langCode: langCode);
+                    selectionService.switchActiveModel(model);
 
-                      // 3. Select the Model
-                      selectionService.switchActiveModel(model);
-
-                      // 4. [NEW] LOGIC: If offline model is selected, force Offline Feature Mode
-                      if (model.type == 'offline') {
-                        inputProvider.setFeatureMode(ChatInputMode.offline);
-                      }
-                      // Optional: If you want to DISABLE offline mode when switching to an online model:
-                      else if (inputProvider.featureMode ==
-                          ChatInputMode.offline) {
-                        inputProvider.clearFeatureMode();
-                      }
-                    },
-                  );
-                },
-                child: Container(
-                  constraints: BoxConstraints(maxWidth: screenWidth * 0.55),
-                  padding: EdgeInsets.symmetric(
-                      horizontal: isTablet ? 16.0 : 14.0, vertical: 8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 250),
-                          transitionBuilder:
-                              (Widget child, Animation<double> animation) {
-                            return FadeTransition(
-                                opacity: animation,
-                                child: SizeTransition(
-                                    sizeFactor: animation,
-                                    axis: Axis.horizontal,
-                                    axisAlignment: -1.0,
-                                    child: child));
-                          },
-                          child: Text(
-                            displayText,
-                            key: ValueKey<String>(displayText),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: AppColors.primaryColor.inverted,
-                                fontSize: fontSize,
-                                fontWeight: FontWeight.w500),
-                          ),
+                    if (model.type == 'offline') {
+                      inputProvider.setFeatureMode(ChatInputMode.offline);
+                    } else if (inputProvider.featureMode == ChatInputMode.offline) {
+                      inputProvider.clearFeatureMode();
+                    }
+                  },
+                );
+              },
+              child: Container(
+                constraints: BoxConstraints(maxWidth: screenWidth * 0.55),
+                padding: EdgeInsets.symmetric(
+                    horizontal: horizontalPadding, 
+                    vertical: verticalPadding),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        transitionBuilder: (Widget child, Animation<double> animation) {
+                          return FadeTransition(
+                              opacity: animation,
+                              child: SizeTransition(
+                                  sizeFactor: animation,
+                                  axis: Axis.horizontal,
+                                  axisAlignment: -1.0,
+                                  child: child));
+                        },
+                        child: Text(
+                          displayText,
+                          key: ValueKey<String>(displayText),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: AppColors.primaryColor.inverted,
+                              fontSize: fontSize,
+                              fontWeight: FontWeight.w500),
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      Transform.rotate(
-                          angle: -1.5708,
-                          child: Icon(Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primaryColor.inverted,
-                              size: fontSize * 1.2)),
+                    ),
+                    const SizedBox(width: 4),
+                    Transform.rotate(
+                        angle: -1.5708,
+                        child: SvgPicture.asset(
+                          'assets/icons/arrov.svg',
+                          width: fontSize * 1.1,
+                          height: fontSize * 1.1,
+                          colorFilter: ColorFilter.mode(
+                            AppColors.primaryColor.inverted,
+                            BlendMode.srcIn,
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (isDynamic)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.senaryColor.withValues(alpha: 0.1),
+                      Colors.transparent
                     ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
                   ),
                 ),
               ),
             ),
           ),
-          if (isDynamic)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(borderRadius),
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.senaryColor.withValues(alpha: 0.1),
-                        Colors.transparent
-                      ],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+      ],
     );
   }
 }

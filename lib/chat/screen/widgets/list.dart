@@ -15,11 +15,13 @@ import 'package:cortex/chat/messages/options/report.dart';
 class ChatMessageList extends StatefulWidget {
   final ScrollController scrollController;
   final EditService editService;
+  final double bottomPadding;
 
   const ChatMessageList({
     super.key,
     required this.scrollController,
     required this.editService,
+    this.bottomPadding = 0.0,
   });
 
   @override
@@ -84,6 +86,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
             modelId: sessionProvider.modelId ?? '',
             isEditingMode: inputProvider.isEditingMode,
             editingMessageIndex: inputProvider.editingMessageIndex,
+            bottomPadding: widget.bottomPadding,
             onStop: context.read<StopService>().stopResponse,
             onEdit: (index) => widget.editService.startEditingMessage(index),
             onFadeOutComplete: (index) => context
