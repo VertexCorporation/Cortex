@@ -263,41 +263,17 @@ class ChatViewState extends State<ChatView>
                                 // Removed hardcoded alignment to allow dynamic spacing in child
                                 child: const ChatEmptyState(),
                               )
-                            : ChatMessageList(
-                                key: const ValueKey('list'),
-                                scrollController: scrollController,
-                                editService: editService,
+                            : ValueListenableBuilder<double>(
+                                valueListenable: bottomPanelHeightNotifier,
+                                builder: (context, bottomPanelHeight, _) {
+                                  return ChatMessageList(
+                                    key: const ValueKey('list'),
+                                    scrollController: scrollController,
+                                    editService: editService,
+                                    bottomPadding: bottomPanelHeight,
+                                  );
+                                },
                               ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Bottom Panel (Slides Down)
-            AnimatedSlide(
-              offset: inputProvider.isVoiceModeActive
-                  ? const Offset(0, 1)
-                  : Offset.zero,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              child: SafeArea(
-                top: false,
-                bottom: true,
-                child: NotificationListener<SizeChangedLayoutNotification>(
-                  onNotification: (notification) {
-                    WidgetsBinding.instance.addPostFrameCallback(
-                        (_) => _updateBottomPanelHeight());
-                    return true;
-                  },
-                  child: SizedBox(
-                    key: _bottomPanelKey,
-                    width: double.infinity,
-                    child: ChatInputPanel(
-                      editService: editService,
-                      scrollService: _scrollService,
-                      editPanelController: editPanelController,
-                      slideAnimation: slideAnimation,
-                    ),
                   ),
                 ),
               ),
@@ -305,7 +281,68 @@ class ChatViewState extends State<ChatView>
           ],
         ),
 
-        // LAYER 2: Briefing Overlay
+        // LAYER 2: Bottom Fog/Gradient Effect (darkening at bottom edge)
+        // Moved ABOVE content so it appears over the message list
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: IgnorePointer(
+            child: AnimatedOpacity(
+              opacity: inputProvider.isVoiceModeActive ? 0.0 : 1.0,
+              duration: const Duration(milliseconds: 300),
+              child: Container(
+                // Dynamic height: ~5% of screen height + safe area
+                height: (screenHeight * 0.05) + bottomSafe,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      AppColors.background,
+                      AppColors.background.withValues(alpha: 0.8),
+                      AppColors.background.withValues(alpha: 0.0),
+                    ],
+                    stops: const [0.0, 0.5, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // LAYER 3: Bottom Panel (Floating - messages can pass behind)
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: AnimatedSlide(
+            offset: inputProvider.isVoiceModeActive
+                ? const Offset(0, 1)
+                : Offset.zero,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: NotificationListener<SizeChangedLayoutNotification>(
+              onNotification: (notification) {
+                WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => _updateBottomPanelHeight());
+                return true;
+              },
+              child: SizedBox(
+                key: _bottomPanelKey,
+                width: double.infinity,
+                child: ChatInputPanel(
+                  editService: editService,
+                  scrollService: _scrollService,
+                  editPanelController: editPanelController,
+                  slideAnimation: slideAnimation,
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // LAYER 4: Briefing Overlay
         AnimatedBuilder(
           animation: bottomPanelHeightNotifier,
           builder: (context, _) {
@@ -354,7 +391,7 @@ class ChatViewState extends State<ChatView>
           },
         ),
 
-        // LAYER 3: Scroll Down Button
+        // LAYER 5: Scroll Down Button
         AnimatedBuilder(
           animation: Listenable.merge([
             showScrollDownButtonNotifier,
@@ -384,7 +421,7 @@ class ChatViewState extends State<ChatView>
           },
         ),
 
-        // LAYER 4: TTS Player Overlay (Below AppBar)
+        // LAYER 6: TTS Player Overlay (Below AppBar)
         const Positioned(
           top: 0,
           left: 0,
@@ -392,7 +429,7 @@ class ChatViewState extends State<ChatView>
           child: TtsPlayerOverlay(),
         ),
 
-        // LAYER 5: Voice Overlay (Topmost)
+        // LAYER 7: Voice Overlay (Topmost)
         if (context.watch<InputProvider>().isVoiceModeActive)
           const VoiceSessionOverlay(), // Covers everything
       ],

@@ -393,6 +393,7 @@ class Tiles {
     ValueChanged<int>? onFadeOutComplete,
     required void Function(int index, {String? newModelId}) onRegenerate,
     required ValueChanged<int> onReport,
+    double bottomPadding = 0.0,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -411,7 +412,7 @@ class Tiles {
     return ListView.separated(
       controller: scrollController,
       padding:
-          EdgeInsets.only(top: totalTopPadding, bottom: screenHeight * 0.01),
+          EdgeInsets.only(top: totalTopPadding, bottom: bottomPadding + (screenHeight * 0.01)),
       cacheExtent: 500,
       itemCount: visibleIndices.length,
       separatorBuilder: (context, index) =>

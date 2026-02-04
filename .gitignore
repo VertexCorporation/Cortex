@@ -3,6 +3,11 @@ build/
 android/.cxx/
 android/.gradle/
 android/app/build/
+android/llama/build/
+
+# Local configuration (machine-specific)
+android/local.properties
+local.properties
 
 # Miscellaneous
 *.class
@@ -53,3 +58,4 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+android/llama/.cxx/
