@@ -38,8 +38,9 @@ Future<T?> navigateToScreen<T extends Object?>(Widget screen,
       // Use the runtime type of the screen widget as the route name for Analytics
       settings: RouteSettings(name: screen.runtimeType.toString()),
 
-      // Set a comfortable duration for the complex animation.
-      transitionDuration: const Duration(milliseconds: 400),
+      // Snappy duration for smooth feel.
+      transitionDuration: const Duration(milliseconds: 250),
+      reverseTransitionDuration: const Duration(milliseconds: 250),
 
       // The core of the custom animation.
       transitionsBuilder: (_, animation, secondaryAnimation, child) {

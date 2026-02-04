@@ -348,14 +348,20 @@ class FundsBackend with ChangeNotifier {
   /// Checks if premium screen data is already preloaded and valid.
   /// Returns true only if BOTH products and screen state are cached and valid.
   static bool get isPreloaded {
+    final logName = '$_logName.isPreloaded';
+    
     // 1. Check if screen state exists
     final cachedState = CacheService.get<Map<String, dynamic>>(CacheKey.premiumScreenState);
-    if (cachedState == null) return false;
+    if (cachedState == null) {
+      log('isPreloaded: FALSE - no cached state', name: logName);
+      return false;
+    }
 
     // 2. Check if products exist (must have both)
     final cachedProducts = CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
     if (cachedProducts == null || cachedProducts.isEmpty) {
       // Products expired but state didn't - invalidate state too
+      log('isPreloaded: FALSE - no cached products', name: logName);
       CacheService.invalidate(CacheKey.premiumScreenState);
       return false;
     }
@@ -366,31 +372,36 @@ class FundsBackend with ChangeNotifier {
       final now = DateTime.now().millisecondsSinceEpoch;
       if (now > expiresAt) {
         // Offer expired, invalidate cache to get fresh state
+        log('isPreloaded: FALSE - special offer expired', name: logName);
         CacheService.invalidate(CacheKey.premiumScreenState);
         return false;
       }
     }
 
+    log('isPreloaded: TRUE - ${cachedProducts.length} products cached', name: logName);
     return true;
   }
 
   /// Loads cached state into this instance (call after checking isPreloaded).
   void loadFromCache() {
+    final logName = '$_logName.loadFromCache';
     final cachedProducts = CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
     final cachedState = CacheService.get<Map<String, dynamic>>(CacheKey.premiumScreenState);
 
     if (cachedProducts != null && cachedProducts.isNotEmpty) {
       _products = cachedProducts;
       _errorMessage = null;
+      log('Loaded ${cachedProducts.length} products from cache', name: logName);
     }
 
     if (cachedState != null) {
       _isSpecialOfferActive = cachedState['specialOfferActive'] ?? false;
       _specialOfferExpiresAt = cachedState['specialOfferExpiresAt'] as int?;
+      log('Loaded special offer state: active=$_isSpecialOfferActive', name: logName);
     }
 
     _setLoading(false);
-    log('Loaded premium screen data from cache.', name: _logName);
+    notifyListeners();
   }
 
   Future<void> checkOrStartSpecialOffer() async {

@@ -325,8 +325,11 @@ class AppInitializer with ChangeNotifier {
       // PRIORITY: Preload Premium Screen Data FIRST (no delay!)
       // This ensures FundsScreen loads instantly when user navigates to it
       if (_currentUser != null && _internetProvider.isConnected) {
-        // Fire and forget - don't await, let it run in parallel
-        FundsBackend.preloadInBackground();
+        dev.log('[AppInitializer] Starting Premium Screen preload...');
+        final preloadSuccess = await FundsBackend.preloadInBackground();
+        dev.log('[AppInitializer] Premium Screen preload result: $preloadSuccess');
+      } else {
+        dev.log('[AppInitializer] Skipping Premium preload - user: ${_currentUser != null}, internet: ${_internetProvider.isConnected}');
       }
 
       await Future.delayed(const Duration(seconds: 2));

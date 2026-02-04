@@ -353,6 +353,9 @@ class _AIMessageTileState extends State<AIMessageTile>
   // and the error widget using a cross-fade animation.
   @override
   Widget build(BuildContext context) {
+    // Watch ThemeProvider to rebuild on theme changes
+    context.watch<ThemeProvider>();
+    
     final screenWidth = MediaQuery.of(context).size.width;
     final scale = screenWidth / 400;
 

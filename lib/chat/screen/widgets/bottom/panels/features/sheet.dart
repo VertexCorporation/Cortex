@@ -56,6 +56,9 @@ void showFeaturesSheet({
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     useSafeArea: true,
+    constraints: BoxConstraints(
+      maxWidth: mediaQuery.size.width,
+    ),
     builder: (BuildContext modalContext) {
       return Container(
         constraints: BoxConstraints(
