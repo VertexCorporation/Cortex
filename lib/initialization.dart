@@ -7,7 +7,7 @@
 
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/funds/backend.dart';
 import 'package:cortex/library/backend/data/service.dart';
@@ -240,6 +240,9 @@ class AppInitializer with ChangeNotifier {
 
   /// Checks for app updates using a hybrid approach.
   Future<bool> _checkForAppUpdate() async {
+    // --- BYPASS FOR WEB ---
+    if (kIsWeb) return false;
+
     // --- STRATEGY 1: STORE CHECK (UPGRADER) ---
     try {
       await upgrader.initialize();
@@ -327,9 +330,11 @@ class AppInitializer with ChangeNotifier {
       if (_currentUser != null && _internetProvider.isConnected) {
         dev.log('[AppInitializer] Starting Premium Screen preload...');
         final preloadSuccess = await FundsBackend.preloadInBackground();
-        dev.log('[AppInitializer] Premium Screen preload result: $preloadSuccess');
+        dev.log(
+            '[AppInitializer] Premium Screen preload result: $preloadSuccess');
       } else {
-        dev.log('[AppInitializer] Skipping Premium preload - user: ${_currentUser != null}, internet: ${_internetProvider.isConnected}');
+        dev.log(
+            '[AppInitializer] Skipping Premium preload - user: ${_currentUser != null}, internet: ${_internetProvider.isConnected}');
       }
 
       await Future.delayed(const Duration(seconds: 2));
@@ -561,7 +566,8 @@ class AppInitializer with ChangeNotifier {
     final hasCompletedOnboarding =
         prefs.getBool('has_completed_onboarding') ?? false;
 
-    if (!hasCompletedOnboarding) {
+    // Web platform does not need the mobile app onboarding screens
+    if (!kIsWeb && !hasCompletedOnboarding) {
       _updateStatus(AppStatus.needsOnboarding);
       return;
     }
