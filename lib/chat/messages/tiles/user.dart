@@ -24,15 +24,18 @@ class UserMessageTile extends StatefulWidget {
   UserMessageTileState createState() => UserMessageTileState();
 }
 
-class UserMessageTileState extends State<UserMessageTile> with TickerProviderStateMixin {
+class UserMessageTileState extends State<UserMessageTile>
+    with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(duration: const Duration(milliseconds: 200), vsync: this);
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_fadeController);
+    _fadeController = AnimationController(
+        duration: const Duration(milliseconds: 200), vsync: this);
+    _fadeAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_fadeController);
 
     if (widget.message.opacity == 1.0) {
       _fadeController.forward(from: 0.0);
@@ -42,7 +45,8 @@ class UserMessageTileState extends State<UserMessageTile> with TickerProviderSta
     }
 
     _fadeController.addStatusListener((status) {
-      if (status == AnimationStatus.dismissed && widget.message.opacity == 0.0) {
+      if (status == AnimationStatus.dismissed &&
+          widget.message.opacity == 0.0) {
         widget.onFadeOutComplete?.call();
       }
     });
@@ -79,18 +83,23 @@ class UserMessageTileState extends State<UserMessageTile> with TickerProviderSta
   Widget build(BuildContext context) {
     // Watch ThemeProvider to rebuild on theme changes
     context.watch<ThemeProvider>();
-    
+
     final screenWidth = MediaQuery.of(context).size.width;
-    final scale = screenWidth / 400;
+    final bool isDesktop = screenWidth >= 800;
+    final scale = isDesktop ? 1.0 : (screenWidth / 400).clamp(0.8, 1.2);
 
     return FadeTransition(
       opacity: _fadeAnimation,
       child: RawGestureDetector(
         gestures: {
-          ShortLongPressGestureRecognizer: GestureRecognizerFactoryWithHandlers<ShortLongPressGestureRecognizer>(
-                () => ShortLongPressGestureRecognizer(debugOwner: this, shortPressDuration: const Duration(milliseconds: 330)),
-                (instance) {
-              instance.onLongPressStart = (details) => _handleLongPress(context, details.globalPosition);
+          ShortLongPressGestureRecognizer: GestureRecognizerFactoryWithHandlers<
+              ShortLongPressGestureRecognizer>(
+            () => ShortLongPressGestureRecognizer(
+                debugOwner: this,
+                shortPressDuration: const Duration(milliseconds: 330)),
+            (instance) {
+              instance.onLongPressStart = (details) =>
+                  _handleLongPress(context, details.globalPosition);
             },
           ),
         },

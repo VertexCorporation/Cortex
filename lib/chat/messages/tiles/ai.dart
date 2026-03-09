@@ -1,6 +1,7 @@
 // chat/messages/tiles/ai.dart
 
-import 'dart:io';
+import 'package:universal_io/io.dart';
+import 'package:flutter/foundation.dart';
 import 'package:cortex/app.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:flutter/material.dart';
@@ -355,9 +356,10 @@ class _AIMessageTileState extends State<AIMessageTile>
   Widget build(BuildContext context) {
     // Watch ThemeProvider to rebuild on theme changes
     context.watch<ThemeProvider>();
-    
+
     final screenWidth = MediaQuery.of(context).size.width;
-    final scale = screenWidth / 400;
+    final bool isDesktop = screenWidth >= 800;
+    final scale = isDesktop ? 1.0 : (screenWidth / 400).clamp(0.8, 1.2);
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 400), // Smooth transition duration
@@ -632,17 +634,21 @@ class _AIMessageTileState extends State<AIMessageTile>
                     AppColors.primaryColor.inverted, BlendMode.srcIn),
                 fit: BoxFit.contain,
                 placeholderBuilder: (_) => fallbackWidget)
-            : SvgPicture.file(File(widget.avatarPath),
-                width: iconSize,
-                height: iconSize,
-                colorFilter: ColorFilter.mode(
-                    AppColors.primaryColor.inverted, BlendMode.srcIn),
-                fit: BoxFit.contain,
-                placeholderBuilder: (_) => fallbackWidget);
+            : (!kIsWeb
+                ? SvgPicture.file(File(widget.avatarPath) as dynamic,
+                    width: iconSize,
+                    height: iconSize,
+                    colorFilter: ColorFilter.mode(
+                        AppColors.primaryColor.inverted, BlendMode.srcIn),
+                    fit: BoxFit.contain,
+                    placeholderBuilder: (_) => fallbackWidget)
+                : fallbackWidget);
       } else {
         final imageProvider = isAsset
             ? AssetImage(widget.avatarPath) as ImageProvider
-            : FileImage(File(widget.avatarPath));
+            : (!kIsWeb
+                ? FileImage(File(widget.avatarPath))
+                : AssetImage('assets/icons/self.svg') as ImageProvider);
         imageWidget = Image(
             image: imageProvider,
             width: containerSize,

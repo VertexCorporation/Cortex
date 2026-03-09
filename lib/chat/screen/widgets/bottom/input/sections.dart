@@ -21,14 +21,13 @@ class WaveformSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isDesktop = screenWidth >= 800;
     final bool isTablet = screenWidth >= 600;
 
-    final double buttonSize = isTablet ? 40.0 : 36.0;
-    final double buttonPadding = isTablet ? screenWidth * 0.02 : 16.0;
+    final double buttonSize = isDesktop ? 40.0 : (isTablet ? 40.0 : 36.0);
+    final double buttonPadding =
+        isDesktop ? 16.0 : (isTablet ? screenWidth * 0.02 : 16.0);
     final double rightPadding = buttonPadding + (buttonSize / 2);
 
     return Padding(
@@ -53,9 +52,12 @@ class AttachmentPreviewSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final inputProvider = context.watch<InputProvider>();
     final attachments = inputProvider.attachments;
+    final bool isDesktop = screenWidth >= 800;
 
-    final double itemSize = isTablet ? screenWidth * 0.15 : screenWidth * 0.20;
-    final double padding = isTablet ? screenWidth * 0.02 : 12.0;
+    final double itemSize =
+        isDesktop ? 80.0 : (isTablet ? screenWidth * 0.15 : screenWidth * 0.20);
+    final double padding =
+        isDesktop ? 12.0 : (isTablet ? screenWidth * 0.02 : 12.0);
 
     return AttachmentListWithFog(
       attachments: attachments,
@@ -130,7 +132,7 @@ class _AttachmentListWithFogState extends State<AttachmentListWithFog> {
           _displayedItems.removeAt(i);
           _listKey.currentState?.removeItem(
             i,
-                (context, animation) =>
+            (context, animation) =>
                 _buildItem(removedItem, animation, i, isRemoving: true),
             duration: const Duration(milliseconds: 300),
           );
@@ -147,11 +149,12 @@ class _AttachmentListWithFogState extends State<AttachmentListWithFog> {
     super.dispose();
   }
 
-  Widget _buildItem(InputAttachment attachment,
-      Animation<double> animation,
-      int index, {
-        bool isRemoving = false,
-      }) {
+  Widget _buildItem(
+    InputAttachment attachment,
+    Animation<double> animation,
+    int index, {
+    bool isRemoving = false,
+  }) {
     return FadeTransition(
       opacity: animation,
       child: SizeTransition(
@@ -210,25 +213,25 @@ class _AttachmentListWithFogState extends State<AttachmentListWithFog> {
         width: double.infinity,
         child: widget.attachments.isNotEmpty
             ? ScrollFogHorizontal(
-          scrollController: _scrollController,
-          child: AnimatedList(
-            key: _listKey,
-            controller: _scrollController,
-            clipBehavior: Clip.none,
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(
-              horizontal: widget.padding,
-              vertical: widget.padding,
-            ),
-            initialItemCount: _displayedItems.length,
-            itemBuilder: (context, index, animation) {
-              if (index >= _displayedItems.length) {
-                return const SizedBox.shrink();
-              }
-              return _buildItem(_displayedItems[index], animation, index);
-            },
-          ),
-        )
+                scrollController: _scrollController,
+                child: AnimatedList(
+                  key: _listKey,
+                  controller: _scrollController,
+                  clipBehavior: Clip.none,
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: widget.padding,
+                    vertical: widget.padding,
+                  ),
+                  initialItemCount: _displayedItems.length,
+                  itemBuilder: (context, index, animation) {
+                    if (index >= _displayedItems.length) {
+                      return const SizedBox.shrink();
+                    }
+                    return _buildItem(_displayedItems[index], animation, index);
+                  },
+                ),
+              )
             : const SizedBox.shrink(),
       ),
     );
@@ -347,15 +350,21 @@ class TextFieldSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double fontSize =
-    isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
-    final double verticalPadding =
-    isTablet ? screenWidth * 0.015 : screenWidth * 0.03;
-    final double horizontalPadding =
-    isTablet ? screenWidth * 0.015 : screenWidth * 0.02;
+    final bool isDesktop = screenWidth >= 800;
+
+    final double fontSize = isDesktop
+        ? 16.0
+        : (isTablet ? screenWidth * 0.025 : screenWidth * 0.04);
+    final double verticalPadding = isDesktop
+        ? 14.0
+        : (isTablet ? screenWidth * 0.015 : screenWidth * 0.03);
+    final double horizontalPadding = isDesktop
+        ? 12.0
+        : (isTablet ? screenWidth * 0.015 : screenWidth * 0.02);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+      padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? 8.0 : screenWidth * 0.02),
       child: TextField(
         key: const ValueKey('chat_input_field'),
         focusNode: focusNode,
@@ -406,9 +415,13 @@ class ToolsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double startPadding = screenWidth * (isTablet ? 0.02 : 0.03);
-    final double bottomPadding = screenWidth * (isTablet ? 0.015 : 0.025);
-    final double spacing = screenWidth * (isTablet ? 0.02 : 0.025);
+    final bool isDesktop = screenWidth >= 800;
+    final double startPadding =
+        isDesktop ? 16.0 : (screenWidth * (isTablet ? 0.02 : 0.03));
+    final double bottomPadding =
+        isDesktop ? 12.0 : (screenWidth * (isTablet ? 0.015 : 0.025));
+    final double spacing =
+        isDesktop ? 16.0 : (screenWidth * (isTablet ? 0.02 : 0.025));
 
     return Padding(
       padding: EdgeInsetsDirectional.only(
@@ -458,9 +471,7 @@ class SendButtonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isConnected = context
-        .watch<InternetProvider>()
-        .isConnected;
+    final bool isConnected = context.watch<InternetProvider>().isConnected;
     final inputProvider = context.watch<InputProvider>();
     final speechService = context.watch<SpeechService>();
 
@@ -480,18 +491,17 @@ class SendButtonSection extends StatelessWidget {
       effectiveOnStop = widget.onStop;
     }
 
+    final bool isDesktop = screenWidth >= 800;
     return Padding(
       padding: EdgeInsetsDirectional.only(
-        end: screenWidth * (isTablet ? 0.02 : 0.04),
-        bottom: screenWidth * (isTablet ? 0.015 : 0.025),
+        end: isDesktop ? 16.0 : (screenWidth * (isTablet ? 0.02 : 0.04)),
+        bottom: isDesktop ? 12.0 : (screenWidth * (isTablet ? 0.015 : 0.025)),
       ),
       child: ActionButtonWidget(
         isEnabled: effectiveEnabled,
         isSending: widget.isSending,
         isRecording: inputProvider.isVoiceRecording,
-        isTextEmpty: controller.text
-            .trim()
-            .isEmpty,
+        isTextEmpty: controller.text.trim().isEmpty,
         onSend: widget.onSend,
         onStop: effectiveOnStop,
         controller: controller,
