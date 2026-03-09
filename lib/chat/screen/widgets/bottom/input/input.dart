@@ -3,7 +3,7 @@
 // Main InputField widget - the floating chat input bubble.
 // Section widgets are in sections.dart for cleaner organization.
 
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -303,9 +303,17 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       builder: (context, constraints) {
         WidgetsBinding.instance.addPostFrameCallback((_) => _updateHeight());
 
-        final double radius = screenWidth * (isTablet ? 0.035 : 0.05);
-        final double horizontalPadding = screenWidth * (isTablet ? 0.02 : 0.03);
-        final double basePadding = screenWidth * (isTablet ? 0.02 : 0.03);
+        final double availableWidth = constraints.maxWidth;
+        final bool isDesktop = screenWidth >= 800;
+        final double radius =
+            isDesktop ? 24.0 : availableWidth * (isTablet ? 0.035 : 0.05);
+        final double maxWidth = 750.0;
+        final double calculatedPadding = (availableWidth - maxWidth) / 2;
+        final double horizontalPadding = isDesktop
+            ? (calculatedPadding > 0 ? calculatedPadding : 0)
+            : availableWidth * (isTablet ? 0.02 : 0.03);
+        final double basePadding =
+            isDesktop ? 24.0 : availableWidth * (isTablet ? 0.02 : 0.03);
         final double targetBottomPadding = basePadding + safeAreaBottom;
 
         // Animate bottom padding changes smoothly
@@ -361,16 +369,15 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                         AnimatedBuilder(
                           animation: _modeController,
                           builder: (context, child) {
-                            final bool isForward =
-                                _modeController.status ==
+                            final bool isForward = _modeController.status ==
                                     AnimationStatus.forward ||
-                                    _modeController.status ==
-                                        AnimationStatus.completed;
+                                _modeController.status ==
+                                    AnimationStatus.completed;
                             final double inputCutoff = isForward ? 0.5 : 0.9;
-                            final bool showInputLayout = _modeController.value <
-                                inputCutoff;
-                            final bool showWaveLayout = _modeController.value >
-                                0.1;
+                            final bool showInputLayout =
+                                _modeController.value < inputCutoff;
+                            final bool showWaveLayout =
+                                _modeController.value > 0.1;
 
                             return AnimatedSize(
                               duration: const Duration(milliseconds: 250),
@@ -391,24 +398,25 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Row(
-                                              crossAxisAlignment: CrossAxisAlignment
-                                                  .end,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
                                               children: [
                                                 Expanded(
                                                   child: Column(
-                                                    mainAxisSize: MainAxisSize
-                                                        .min,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
                                                     children: [
                                                       TextFieldSection(
                                                         key: const ValueKey(
                                                             'textfield'),
-                                                        controller: widget
-                                                            .controller,
+                                                        controller:
+                                                            widget.controller,
                                                         focusNode: widget
                                                             .textFieldFocusNode,
                                                         localizations: widget
                                                             .localizations,
-                                                        screenWidth: screenWidth,
+                                                        screenWidth:
+                                                            screenWidth,
                                                         isTablet: isTablet,
                                                         showHintText: true,
                                                         onEnterPressed: () {
@@ -418,7 +426,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                                         },
                                                       ),
                                                       ToolsSection(
-                                                        screenWidth: screenWidth,
+                                                        screenWidth:
+                                                            screenWidth,
                                                         isTablet: isTablet,
                                                         widget: widget,
                                                       ),
@@ -434,9 +443,10 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                                     screenWidth: screenWidth,
                                                     isTablet: isTablet,
                                                     widget: widget,
-                                                    isEnabled: isSendButtonEnabled,
-                                                    controller: widget
-                                                        .controller,
+                                                    isEnabled:
+                                                        isSendButtonEnabled,
+                                                    controller:
+                                                        widget.controller,
                                                   ),
                                                 ),
                                               ],
@@ -492,7 +502,7 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
   void _updateHeight() {
     final RenderBox? renderBox =
-    _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
+        _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       final newHeight = renderBox.size.height;
       if (newHeight != _inputFieldHeight) {
