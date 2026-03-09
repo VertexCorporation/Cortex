@@ -43,8 +43,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     _breathingController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
-    )
-      ..repeat(reverse: true);
+    )..repeat(reverse: true);
 
     _breathingScaleAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(
@@ -76,9 +75,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final isFlux = context
-        .read<ChatSessionProvider>()
-        .isFluxMode;
+    final isFlux = context.read<ChatSessionProvider>().isFluxMode;
 
     // Initialize state on first run
     if (_wasFluxMode == null) {
@@ -148,20 +145,27 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     final screenHeight = mediaQuery.size.height;
     final l10n = AppLocalizations.of(context)!;
     final bool isTablet = mediaQuery.size.shortestSide >= 600;
+    final bool isDesktop = screenWidth >= 800;
 
     // Colors
     final Color contentColor = AppColors.primaryColor.inverted;
 
-    final double logoSize = isTablet ? screenWidth * 0.16 : screenWidth * 0.22;
+    final double logoSize = isDesktop
+        ? 120.0
+        : (isTablet ? screenWidth * 0.16 : screenWidth * 0.22);
 
     final double verticalSpacing = screenHeight * 0.025;
 
-    final double titleSize = isTablet ? screenWidth * 0.04 : screenWidth * 0.06;
-    final double bodyFontSize =
-    isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
+    final double titleSize =
+        isDesktop ? 36.0 : (isTablet ? screenWidth * 0.04 : screenWidth * 0.06);
+    final double bodyFontSize = isDesktop
+        ? 16.0
+        : (isTablet ? screenWidth * 0.025 : screenWidth * 0.04);
 
-    final double contentMaxWidth = isTablet ? screenWidth * 0.6 : screenWidth;
-    final double horizontalPadding = isTablet ? 0 : screenWidth * 0.12;
+    final double contentMaxWidth =
+        isDesktop ? 600.0 : (isTablet ? screenWidth * 0.6 : screenWidth);
+    final double horizontalPadding =
+        isDesktop ? 0 : (isTablet ? 0 : screenWidth * 0.12);
     final double topPadding = mediaQuery.padding.top;
 
     return LayoutBuilder(
@@ -204,8 +208,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                         opacity: (1.0 - _modeAnimation.value)
                                             .clamp(0.0, 1.0),
                                         child: Transform.scale(
-                                          scale:
-                                          1.0 - (_modeAnimation.value * 0.2),
+                                          scale: 1.0 -
+                                              (_modeAnimation.value * 0.2),
                                           child: ScaleTransition(
                                             scale: _breathingScaleAnimation,
                                             child: IconButton(
@@ -227,8 +231,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                 height: logoSize,
                                                 fit: BoxFit.contain,
                                                 colorFilter: ColorFilter.mode(
-                                                  AppColors.primaryColor
-                                                      .inverted,
+                                                  AppColors
+                                                      .primaryColor.inverted,
                                                   BlendMode.srcIn,
                                                 ),
                                               ),
@@ -282,7 +286,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                             0, -30.0 * _modeAnimation.value),
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
+                                              CrossAxisAlignment.stretch,
                                           children: [
                                             // Title (Standard)
                                             _buildEntranceItem(
@@ -331,16 +335,17 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                   IgnorePointer(
                                     ignoring: _modeAnimation.value < 0.9,
                                     child: Opacity(
-                                      opacity: ((_modeAnimation.value - 0.5) *
-                                          2)
-                                          .clamp(0.0, 1.0),
+                                      opacity:
+                                          ((_modeAnimation.value - 0.5) * 2)
+                                              .clamp(0.0, 1.0),
                                       child: Transform.translate(
-                                        offset: Offset(0,
+                                        offset: Offset(
+                                            0,
                                             30.0 *
                                                 (1.0 - _modeAnimation.value)),
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
+                                              CrossAxisAlignment.stretch,
                                           children: [
                                             SizedBox(
                                                 height: verticalSpacing * 0.2),
@@ -364,8 +369,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                 style: TextStyle(
                                                   fontSize: bodyFontSize,
                                                   color: contentColor
-                                                      .withValues(
-                                                      alpha: 0.8),
+                                                      .withValues(alpha: 0.8),
                                                   height: 1.5,
                                                 ),
                                                 textAlign: TextAlign.center,
