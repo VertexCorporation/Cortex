@@ -12,7 +12,7 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'package:cortex/library/backend/data/crypto.dart';
 import 'package:cortex/library/backend/data/database.dart';
 import 'package:cortex/library/backend/data/image.dart';
@@ -49,8 +49,8 @@ class ModelRepository {
   final Dio _dio;
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(
-      region: 'europe-west1');
+  final FirebaseFunctions _functions =
+      FirebaseFunctions.instanceFor(region: 'europe-west1');
 
   /// A completer used as a concurrency lock to prevent multiple simultaneous
   /// synchronization processes from running.
@@ -68,8 +68,8 @@ class ModelRepository {
   /// full initialization and sync process.
   /// Returns a list of raw model data maps, or null on a critical failure.
   Future<List<Map<String, dynamic>>?> getAllModels(
-      {required String langCode, required Map<String,
-          String> localAssetMap}) async {
+      {required String langCode,
+      required Map<String, String> localAssetMap}) async {
     // If a sync process is already running, await its completion to ensure consistency.
     if (_syncCompleter != null) {
       debugPrint(
@@ -110,8 +110,9 @@ class ModelRepository {
     const String logPrefix = "[ModelRepository.updateBaseModel]";
     try {
       final db = await _dbHelper.database;
-      final results = await db.query(
-          'models', where: 'id = ?', whereArgs: [modelId]);
+      final results =
+          await db?.query('models', where: 'id = ?', whereArgs: [modelId]) ??
+              [];
 
       if (results.isEmpty) {
         debugPrint(
@@ -120,8 +121,8 @@ class ModelRepository {
       }
 
       final rawJsonString = results.first['raw_json'] as String;
-      final isCustomModel = modelId.startsWith('self_') ||
-          modelId.startsWith('local_');
+      final isCustomModel =
+          modelId.startsWith('self_') || modelId.startsWith('local_');
 
       Map<String, dynamic> updatedJsonData;
       String? finalJsonToSave;
@@ -129,15 +130,13 @@ class ModelRepository {
       if (isCustomModel) {
         final currentUser = _auth.currentUser;
         if (currentUser == null) {
-          throw Exception(
-              "User not authenticated for encrypted operation.");
+          throw Exception("User not authenticated for encrypted operation.");
         }
 
-        final decryptedJson = CryptoHelper.decrypt(
-            rawJsonString, currentUser.uid);
+        final decryptedJson =
+            CryptoHelper.decrypt(rawJsonString, currentUser.uid);
         if (decryptedJson == null) {
-          throw Exception(
-              "Failed to decrypt model data for '$modelId'.");
+          throw Exception("Failed to decrypt model data for '$modelId'.");
         }
 
         updatedJsonData = json.decode(decryptedJson);
@@ -150,8 +149,8 @@ class ModelRepository {
         finalJsonToSave = json.encode(updatedJsonData);
       }
 
-      await db.update('models', {'raw_json': finalJsonToSave}, where: 'id = ?',
-          whereArgs: [modelId]);
+      await db?.update('models', {'raw_json': finalJsonToSave},
+          where: 'id = ?', whereArgs: [modelId]);
 
       // Update the in-memory raw cache to reflect the change immediately.
       if (_rawModelsCache != null) {
@@ -185,24 +184,25 @@ class ModelRepository {
   // --- Private Core Logic ---
 
   /// Orchestrates the entire data initialization and synchronization pipeline.
-  Future<void> _initializeAndSync({required String langCode, required Map<
-      String,
-      String> localAssetMap}) async {
+  Future<void> _initializeAndSync(
+      {required String langCode,
+      required Map<String, String> localAssetMap}) async {
     final prefs = await SharedPreferences.getInstance();
     final lastSyncTimeString = prefs.getString(_prefsKeyLastSync);
-    final lastSyncTime = lastSyncTimeString != null ? DateTime.tryParse(
-        lastSyncTimeString) : null;
+    final lastSyncTime = lastSyncTimeString != null
+        ? DateTime.tryParse(lastSyncTimeString)
+        : null;
     final lastSyncLangCode = prefs.getString(_prefsKeyLastSyncLang);
 
-    final initialDbMaps = await _dbHelper.getAllModels(
-        userId: _auth.currentUser?.uid);
+    final initialDbMaps =
+        await _dbHelper.getAllModels(userId: _auth.currentUser?.uid);
 
     final isDbEmpty = initialDbMaps.isEmpty;
     final isCacheStale = lastSyncTime == null ||
         DateTime.now().difference(lastSyncTime) > _cacheStaleDuration;
     final hasInternet = await InternetConnection().hasInternetAccess;
-    final isLangChanged = lastSyncLangCode != null &&
-        lastSyncLangCode != langCode;
+    final isLangChanged =
+        lastSyncLangCode != null && lastSyncLangCode != langCode;
 
     if (hasInternet && (isDbEmpty || isCacheStale || isLangChanged)) {
       debugPrint(
@@ -212,11 +212,11 @@ class ModelRepository {
       debugPrint("[ModelRepository] Sync not required. Loading from local DB.");
     }
 
-    final mapsFromDb = await _dbHelper.getAllModels(
-        userId: _auth.currentUser?.uid);
+    final mapsFromDb =
+        await _dbHelper.getAllModels(userId: _auth.currentUser?.uid);
     _rawModelsCache = mapsFromDb;
-    debugPrint("[ModelRepository] Raw cache initialized with ${_rawModelsCache
-        ?.length ?? 0} models from database.");
+    debugPrint(
+        "[ModelRepository] Raw cache initialized with ${_rawModelsCache?.length ?? 0} models from database.");
 
     if (hasInternet && _rawModelsCache != null) {
       await _syncModelImages(_rawModelsCache!, localAssetMap);
@@ -236,8 +236,7 @@ class ModelRepository {
     try {
       final validPublicIds = await _fetchAndStorePublicModels(langCode);
       debugPrint(
-          "[ModelRepository] Public model sync complete. Found ${validPublicIds
-              .length} valid IDs.");
+          "[ModelRepository] Public model sync complete. Found ${validPublicIds.length} valid IDs.");
 
       await _cleanupStaleModels(validPublicIds);
 
@@ -273,8 +272,8 @@ class ModelRepository {
       );
 
       if (response.statusCode != 200) {
-        debugPrint("[ModelRepository] Server returned status ${response
-            .statusCode}. Skipping sync.");
+        debugPrint(
+            "[ModelRepository] Server returned status ${response.statusCode}. Skipping sync.");
         return <String>{};
       }
 
@@ -293,9 +292,8 @@ class ModelRepository {
         {'data': rawServerData, 'langCode': langCode},
       );
 
-      final validServerIds = parsedServerModels
-          .map((m) => m['id'] as String)
-          .toSet();
+      final validServerIds =
+          parsedServerModels.map((m) => m['id'] as String).toSet();
 
       // Filter out local/custom models just in case the server sent something weird.
       final modelsToInsert = parsedServerModels.where((modelData) {
@@ -313,17 +311,21 @@ class ModelRepository {
               : modelsToInsert.length;
           final currentBatch = modelsToInsert.sublist(i, end);
 
-          final batch = db.batch();
+          final batch = db?.batch();
+          if (batch == null) continue;
 
           for (var modelData in currentBatch) {
-            batch.insert('models', {
-              'id': modelData['id'],
-              'producer': modelData['producer'] ?? 'Unknown',
-              'title': modelData['title'] ?? modelData['id'],
-              'is_server_side': (modelData['type'] != 'offline') ? 1 : 0,
-              'type': modelData['type'] ?? 'online',
-              'raw_json': json.encode(modelData),
-            }, conflictAlgorithm: ConflictAlgorithm.replace);
+            batch.insert(
+                'models',
+                {
+                  'id': modelData['id'],
+                  'producer': modelData['producer'] ?? 'Unknown',
+                  'title': modelData['title'] ?? modelData['id'],
+                  'is_server_side': (modelData['type'] != 'offline') ? 1 : 0,
+                  'type': modelData['type'] ?? 'online',
+                  'raw_json': json.encode(modelData),
+                },
+                conflictAlgorithm: ConflictAlgorithm.replace);
           }
 
           try {
@@ -354,8 +356,8 @@ class ModelRepository {
       if (e.response?.statusCode == 500) {
         debugPrint(
             "[ModelRepository] Server Error (500). Using local cache instead.");
-        FirebaseCrashlytics.instance.log(
-            "Server 500 error on model sync. Skipping.");
+        FirebaseCrashlytics.instance
+            .log("Server 500 error on model sync. Skipping.");
         return <String>{};
       }
 
@@ -372,19 +374,19 @@ class ModelRepository {
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.connectionError ||
           e.error is SocketException) {
-        debugPrint("[ModelRepository] Network timeout or connection error (${e
-            .type}). Using local cache.");
+        debugPrint(
+            "[ModelRepository] Network timeout or connection error (${e.type}). Using local cache.");
         return <String>{};
       }
 
       debugPrint("[ModelRepository] Unexpected DioException: $e");
-      FirebaseCrashlytics.instance.recordError(
-          e, s, reason: 'Failed to sync public models');
+      FirebaseCrashlytics.instance
+          .recordError(e, s, reason: 'Failed to sync public models');
       return <String>{};
     } catch (e, s) {
       debugPrint("[ModelRepository] Generic error: $e");
-      FirebaseCrashlytics.instance.recordError(
-          e, s, reason: 'Unexpected failure in public model sync');
+      FirebaseCrashlytics.instance
+          .recordError(e, s, reason: 'Unexpected failure in public model sync');
       return <String>{};
     }
   }
@@ -396,28 +398,31 @@ class ModelRepository {
     try {
       final db = await _dbHelper.database;
       final placeholders = List.filled(validPublicIds.length, '?').join(',');
-      final staleModels = await db.query(
-        'models',
-        columns: ['id', 'raw_json'],
-        where: "id NOT IN ($placeholders) AND id NOT LIKE 'self_%' AND id NOT LIKE 'local_%'",
-        whereArgs: validPublicIds.toList(),
-      );
+      final staleModels = await db?.query(
+            'models',
+            columns: ['id', 'raw_json'],
+            where:
+                "id NOT IN ($placeholders) AND id NOT LIKE 'self_%' AND id NOT LIKE 'local_%'",
+            whereArgs: validPublicIds.toList(),
+          ) ??
+          [];
 
       if (staleModels.isNotEmpty) {
-        debugPrint("[ModelRepository] Found ${staleModels
-            .length} stale public models to clean up.");
-        final staleModelIds = staleModels
-            .map((m) => m['id'] as String)
-            .toList();
+        debugPrint(
+            "[ModelRepository] Found ${staleModels.length} stale public models to clean up.");
+        final staleModelIds =
+            staleModels.map((m) => m['id'] as String).toList();
 
         // Concurrently delete associated images from cache.
         await _deleteStaleImages(staleModels);
 
-        final count = await db.delete(
-          'models',
-          where: "id IN (${List.filled(staleModelIds.length, '?').join(',')})",
-          whereArgs: staleModelIds,
-        );
+        final count = await db?.delete(
+              'models',
+              where:
+                  "id IN (${List.filled(staleModelIds.length, '?').join(',')})",
+              whereArgs: staleModelIds,
+            ) ??
+            0;
         debugPrint(
             "[ModelRepository] Cleaned up $count stale models from database.");
       }
@@ -472,8 +477,7 @@ class ModelRepository {
     final docsDir = await getApplicationDocumentsDirectory();
     final imageCacheDir = Directory(p.join(docsDir.path, 'model_images'));
     if (!await imageCacheDir.exists()) {
-      await imageCacheDir.create(
-          recursive: true);
+      await imageCacheDir.create(recursive: true);
     }
 
     final cachedImagePaths = await ModelImageCache.loadPaths();
@@ -482,10 +486,11 @@ class ModelRepository {
       final modelId = modelData['id'] as String;
       final serverImagePath = modelData['imagePath'] as String?;
       final producer = modelData['producer'] as String? ?? '';
-      final isCustomModel = modelId.startsWith('self_') ||
-          modelId.startsWith('local_');
+      final isCustomModel =
+          modelId.startsWith('self_') || modelId.startsWith('local_');
 
-      if (isCustomModel || serverImagePath == null ||
+      if (isCustomModel ||
+          serverImagePath == null ||
           serverImagePath.startsWith('assets/')) {
         continue;
       }
@@ -495,16 +500,14 @@ class ModelRepository {
 
       if (localAssetMap.containsKey(modelIdLower)) {
         hasLocalAsset = true;
-      }
-      else if (_findBestAssetMatch(modelId, localAssetMap) != null) {
+      } else if (_findBestAssetMatch(modelId, localAssetMap) != null) {
         hasLocalAsset = true;
-      }
-      else if (_findBestAssetMatch(producer, localAssetMap) != null) {
+      } else if (_findBestAssetMatch(producer, localAssetMap) != null) {
         hasLocalAsset = true;
       }
 
-      final bool needsDownload = !cachedImagePaths.containsKey(modelId) &&
-          !hasLocalAsset;
+      final bool needsDownload =
+          !cachedImagePaths.containsKey(modelId) && !hasLocalAsset;
 
       if (needsDownload) {
         try {
@@ -536,23 +539,20 @@ class ModelRepository {
             throw DioException(
               requestOptions: response.requestOptions,
               response: response,
-              error: 'Failed image download for $signedUrl with status: ${response
-                  .statusCode}',
+              error:
+                  'Failed image download for $signedUrl with status: ${response.statusCode}',
             );
           }
-        }
-
-        on FirebaseFunctionsException catch (e, s) {
+        } on FirebaseFunctionsException catch (e, s) {
           if (e.code == 'unavailable' || e.code == 'deadline-exceeded') {
-            debugPrint("[ModelRepository] A predictable network error ('${e
-                .code}') occurred during image sync for '$modelId'. This is not a bug. Error: ${e
-                .message}");
+            debugPrint(
+                "[ModelRepository] A predictable network error ('${e.code}') occurred during image sync for '$modelId'. This is not a bug. Error: ${e.message}");
           } else {
             debugPrint(
-                "[ModelRepository] An unexpected FirebaseFunctionsException occurred for '$modelId': ${e
-                    .code} - ${e.message}");
+                "[ModelRepository] An unexpected FirebaseFunctionsException occurred for '$modelId': ${e.code} - ${e.message}");
             FirebaseCrashlytics.instance.recordError(e, s,
-                reason: 'Unexpected Firebase Functions error in image sync for $modelId');
+                reason:
+                    'Unexpected Firebase Functions error in image sync for $modelId');
           }
         } on DioException catch (e, s) {
           if (e.type == DioExceptionType.connectionError ||
@@ -601,12 +601,12 @@ class ModelRepository {
           ..remove('series_description');
         if (variantsMap.isEmpty) return;
 
-        final model = (variantsMap.length == 1 &&
-            variantsMap.containsKey('Default'))
-            ? _staticParseSingleVariantModel(
-            seriesName, producerName, variantsMap['Default'], langCode)
-            : _staticParseMultiVariantSeries(
-            seriesName, producerName, cleanSeriesValue, langCode);
+        final model =
+            (variantsMap.length == 1 && variantsMap.containsKey('Default'))
+                ? _staticParseSingleVariantModel(
+                    seriesName, producerName, variantsMap['Default'], langCode)
+                : _staticParseMultiVariantSeries(
+                    seriesName, producerName, cleanSeriesValue, langCode);
 
         if (model != null) finalList.add(model);
       });
@@ -621,23 +621,21 @@ class ModelRepository {
     final serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
     final modelId = cleanVariantData['id'] as String? ?? seriesName;
     final details = cleanVariantData['details'] as Map<String, dynamic>? ?? {};
-    final localizedDetails = (details[serverLangKey] as Map<String,
-        dynamic>?) ?? {};
+    final localizedDetails =
+        (details[serverLangKey] as Map<String, dynamic>?) ?? {};
     final englishDetails = (details['en'] as Map<String, dynamic>?) ?? {};
 
     final modelCategory = cleanVariantData['category']?.toString() ??
-        cleanVariantData['type']?.toString() ?? 'online';
+        cleanVariantData['type']?.toString() ??
+        'online';
 
     final bool isLocalized = (langCode == 'en' || langCode == 'zh') ||
-        (
-            localizedDetails.isNotEmpty &&
-                localizedDetails['summary'] != null &&
-                localizedDetails['description'] != null
-        );
+        (localizedDetails.isNotEmpty &&
+            localizedDetails['summary'] != null &&
+            localizedDetails['description'] != null);
 
     return {
       ...cleanVariantData,
-
       'id': modelId,
       'title': localizedDetails['title'] ?? englishDetails['title'] ?? modelId,
       'producer': producerName,
@@ -645,7 +643,8 @@ class ModelRepository {
       'category': modelCategory,
       'summary': localizedDetails['summary'] ?? englishDetails['summary'] ?? '',
       'description': localizedDetails['description'] ??
-          englishDetails['description'] ?? '',
+          englishDetails['description'] ??
+          '',
       'role': localizedDetails['role'] ?? englishDetails['role'],
       'isFullyLocalized': isLocalized,
     };
@@ -656,19 +655,20 @@ class ModelRepository {
     final cleanSeriesValue = _staticSanitizeRawData(seriesValue);
 
     final serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
-    final seriesDetails = cleanSeriesValue['series_description'] as Map<
-        String,
-        dynamic>? ?? {};
+    final seriesDetails =
+        cleanSeriesValue['series_description'] as Map<String, dynamic>? ?? {};
 
     final bool isSeriesLocalized = (langCode == 'en' || langCode == 'zh') ||
         (seriesDetails[serverLangKey] != null &&
             (seriesDetails[serverLangKey] as String).isNotEmpty);
 
     final localizedSeriesSummary = seriesDetails[serverLangKey] as String? ??
-        seriesDetails['en'] as String? ?? '';
+        seriesDetails['en'] as String? ??
+        '';
 
     final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)
-      ..remove('series_description')..remove('featureReasoning');
+      ..remove('series_description')
+      ..remove('featureReasoning');
     if (variantsMap.isEmpty) return null;
 
     final variants = <String, dynamic>{};
@@ -677,9 +677,8 @@ class ModelRepository {
 
       final cleanVariantData = _staticSanitizeRawData(variantData);
 
-      final descriptionMap = cleanVariantData['description'] as Map<
-          String,
-          dynamic>? ?? {};
+      final descriptionMap =
+          cleanVariantData['description'] as Map<String, dynamic>? ?? {};
 
       final bool isVariantLocalized = (langCode == 'en' || langCode == 'zh') ||
           (descriptionMap[serverLangKey] != null &&
@@ -690,8 +689,8 @@ class ModelRepository {
         'id': cleanVariantData['id'],
         'title': cleanVariantData['title'] ?? variantKey,
         'summary': localizedSeriesSummary,
-        'description': descriptionMap[serverLangKey] ?? descriptionMap['en'] ??
-            '',
+        'description':
+            descriptionMap[serverLangKey] ?? descriptionMap['en'] ?? '',
         'isFullyLocalized': isVariantLocalized,
       };
     });
@@ -700,7 +699,6 @@ class ModelRepository {
 
     return {
       ...cleanSeriesValue,
-
       'id': seriesName.toLowerCase().replaceAll(' ', '-'),
       'title': cleanSeriesValue['title'] ?? seriesName,
       'producer': producerName,
@@ -721,10 +719,8 @@ class ModelRepository {
     cleanMap.remove('last_syncer_run');
     cleanMap.remove('cumulativeFailureCount');
 
-    cleanMap.removeWhere((key, value) =>
-    key.endsWith('_source_hash') ||
-        key.endsWith('_audit')
-    );
+    cleanMap.removeWhere(
+        (key, value) => key.endsWith('_source_hash') || key.endsWith('_audit'));
 
     for (final key in cleanMap.keys.toList()) {
       final value = cleanMap[key];
@@ -741,8 +737,8 @@ class ModelRepository {
 
   /// Finds the best possible asset path by checking if a model identifier contains
   /// any of the keys from the asset map. It prioritizes longer matches.
-  String? _findBestAssetMatch(String modelIdentifier,
-      Map<String, String> localAssetMap) {
+  String? _findBestAssetMatch(
+      String modelIdentifier, Map<String, String> localAssetMap) {
     String? bestMatchKey;
     final identifier = modelIdentifier.toLowerCase();
 

@@ -21,9 +21,9 @@ Future<void> reconcileLocalAndRemoteModelCounts() async {
   try {
     final db = await DatabaseHelper.instance.database;
     final localRoleplayModels =
-    await db.query('models', where: "id LIKE 'self_%'");
+        await db?.query('models', where: "id LIKE 'self_%'") ?? [];
     final localOfflineModels =
-    await db.query('models', where: "id LIKE 'local_%'");
+        await db?.query('models', where: "id LIKE 'local_%'") ?? [];
 
     final int localRoleplayCount = localRoleplayModels.length;
     final int localOfflineCount = localOfflineModels.length;
@@ -90,11 +90,10 @@ Future<void> reconcileAndSyncPurchases() async {
     }
 
     final completer = Completer<void>();
-    final functions =
-    FirebaseFunctions.instanceFor(region: 'europe-west1');
+    final functions = FirebaseFunctions.instanceFor(region: 'europe-west1');
 
     streamSubscription = iap.purchaseStream.listen(
-          (purchaseDetailsList) async {
+      (purchaseDetailsList) async {
         if (purchaseDetailsList.isEmpty && !completer.isCompleted) {
           completer.complete();
           return;
@@ -107,11 +106,9 @@ Future<void> reconcileAndSyncPurchases() async {
             try {
               final callable = functions.httpsCallable('verifyPurchase');
               await callable.call<dynamic>({
-                'receiptData':
-                purchase.verificationData.serverVerificationData,
+                'receiptData': purchase.verificationData.serverVerificationData,
                 'productId': purchase.productID,
-                'platform':
-                defaultTargetPlatform.name.toLowerCase(),
+                'platform': defaultTargetPlatform.name.toLowerCase(),
               });
 
               if (purchase.pendingCompletePurchase) {
@@ -120,7 +117,7 @@ Future<void> reconcileAndSyncPurchases() async {
             } catch (e) {
               debugPrint(
                 'Purchase Sync: Server verification failed for '
-                    '${purchase.productID}. Error: $e',
+                '${purchase.productID}. Error: $e',
               );
             }
           }

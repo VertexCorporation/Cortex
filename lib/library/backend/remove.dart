@@ -1,7 +1,7 @@
 // lib/library/backend/remove.dart
 
 import 'dart:developer' as dev;
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:cortex/library/backend/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -51,7 +51,7 @@ class ModelRemoveService {
 
       // Step 2: Remove the model's raw data from the local SQLite database.
       final db = await DatabaseHelper.instance.database;
-      await db.delete('models', where: 'id = ?', whereArgs: [id]);
+      await db?.delete('models', where: 'id = ?', whereArgs: [id]);
       dev.log(
           '[ModelRemoveService.deleteCustom] Step 2: Removed from local DB.',
           name: 'ModelRemove');

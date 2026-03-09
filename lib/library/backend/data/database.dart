@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart'; // [NEW] Added for kIsWeb
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 import 'crypto.dart';
@@ -12,7 +13,10 @@ class DatabaseHelper {
 
   DatabaseHelper._privateConstructor();
 
-  Future<Database> get database async {
+  Future<Database?> get database async {
+    // [NEW] Bypass sqflite entirely on web
+    if (kIsWeb) return null;
+
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
@@ -47,7 +51,9 @@ class DatabaseHelper {
   /// REFACTORED: Inserts a new model, automatically encrypting user-created data.
   /// It now accepts an optional `userId` to perform encryption.
   /// Handles SQLITE_FULL errors gracefully.
-  Future<int> insert(String table, Map<String, dynamic> values, {
+  Future<int> insert(
+    String table,
+    Map<String, dynamic> values, {
     ConflictAlgorithm? conflictAlgorithm,
     String? userId, // <-- User ID for encryption
   }) async {
@@ -58,7 +64,8 @@ class DatabaseHelper {
 
       // --- ENCRYPTION LOGIC ---
       // If it's a user-created model and we have a user ID, encrypt the data.
-      if (userId != null && rawJson != null &&
+      if (userId != null &&
+          rawJson != null &&
           (modelId?.startsWith('self_') == true ||
               modelId?.startsWith('local_') == true)) {
         final encryptedJson = CryptoHelper.encrypt(rawJson, userId);
@@ -74,11 +81,12 @@ class DatabaseHelper {
         }
       }
 
-      return await db.insert(
-        table,
-        values,
-        conflictAlgorithm: conflictAlgorithm ?? ConflictAlgorithm.replace,
-      );
+      return await db?.insert(
+            table,
+            values,
+            conflictAlgorithm: conflictAlgorithm ?? ConflictAlgorithm.replace,
+          ) ??
+          0;
     } catch (e) {
       if (e.toString().contains("SQLITE_FULL") ||
           e.toString().contains("database or disk is full")) {
@@ -95,7 +103,9 @@ class DatabaseHelper {
       {String? where, List<Object?>? whereArgs}) async {
     try {
       final db = await instance.database;
-      return await db.update(table, values, where: where, whereArgs: whereArgs);
+      return await db?.update(table, values,
+              where: where, whereArgs: whereArgs) ??
+          0;
     } catch (e) {
       if (e.toString().contains("SQLITE_FULL") ||
           e.toString().contains("database or disk is full")) {
@@ -109,7 +119,8 @@ class DatabaseHelper {
 
   /// Queries rows from the database.
   /// This wrapper is needed because `Repository` calls `db.query`.
-  Future<List<Map<String, dynamic>>> query(String table, {
+  Future<List<Map<String, dynamic>>> query(
+    String table, {
     bool? distinct,
     List<String>? columns,
     String? where,
@@ -121,18 +132,19 @@ class DatabaseHelper {
     int? offset,
   }) async {
     final db = await instance.database;
-    return await db.query(
-      table,
-      distinct: distinct,
-      columns: columns,
-      where: where,
-      whereArgs: whereArgs,
-      groupBy: groupBy,
-      having: having,
-      orderBy: orderBy,
-      limit: limit,
-      offset: offset,
-    );
+    return await db?.query(
+          table,
+          distinct: distinct,
+          columns: columns,
+          where: where,
+          whereArgs: whereArgs,
+          groupBy: groupBy,
+          having: having,
+          orderBy: orderBy,
+          limit: limit,
+          offset: offset,
+        ) ??
+        [];
   }
 
   /// Deletes any models from the local DB that are not present in the provided set of IDs.
@@ -141,7 +153,7 @@ class DatabaseHelper {
     try {
       final db = await instance.database;
       final placeholders = List.filled(validIds.length, '?').join(',');
-      await db.delete(
+      await db?.delete(
         'models',
         where: 'id NOT IN ($placeholders)',
         whereArgs: validIds.toList(),
@@ -158,10 +170,11 @@ class DatabaseHelper {
   Future<void> deleteUserCreatedModels() async {
     try {
       final db = await instance.database;
-      final count = await db.delete(
-        'models',
-        where: "id LIKE 'self_%' OR id LIKE 'local_%'",
-      );
+      final count = await db?.delete(
+            'models',
+            where: "id LIKE 'self_%' OR id LIKE 'local_%'",
+          ) ??
+          0;
       debugPrint(
           "[DatabaseHelper] Logout cleanup: Deleted $count user-created models to protect privacy.");
     } catch (e) {
@@ -171,17 +184,19 @@ class DatabaseHelper {
   }
 
   /// Deletes rows from the specified table based on a 'where' clause.
-  Future<int> delete(String table, {
+  Future<int> delete(
+    String table, {
     String? where,
     List<Object?>? whereArgs,
   }) async {
     try {
       final db = await database;
-      final count = await db.delete(
-        table,
-        where: where,
-        whereArgs: whereArgs,
-      );
+      final count = await db?.delete(
+            table,
+            where: where,
+            whereArgs: whereArgs,
+          ) ??
+          0;
       debugPrint(
           "[DatabaseHelper] Deleted $count rows from '$table' where: $where");
       return count;
@@ -201,7 +216,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getAllModels({String? userId}) async {
     final db = await instance.database;
     final List<Map<String, dynamic>> maps =
-    await db.query('models', orderBy: 'title ASC');
+        await db?.query('models', orderBy: 'title ASC') ?? [];
     if (maps.isEmpty) return [];
 
     final List<Map<String, dynamic>> decodedModels = [];
@@ -236,7 +251,7 @@ class DatabaseHelper {
   Future<void> optimizeDatabase() async {
     try {
       final db = await database;
-      await db.execute('VACUUM');
+      await db?.execute('VACUUM');
       debugPrint(
           "[DatabaseHelper] Database vacuumed and optimized (Disk Space Reclaimed).");
     } catch (e) {
