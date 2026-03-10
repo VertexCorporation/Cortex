@@ -590,8 +590,23 @@ class AppInitializer with ChangeNotifier {
     user ??= await _attemptAutoLogin();
 
     if (user == null) {
-      _updateStatus(AppStatus.needsLogin);
-      return;
+      if (kIsWeb) {
+        debugPrint(
+            'AppInitializer: Web platform detected with no user. Signing in anonymously.');
+        try {
+          final userCredential =
+              await FirebaseAuth.instance.signInAnonymously();
+          user = userCredential.user;
+        } catch (e) {
+          debugPrint(
+              'AppInitializer: Fatal error during anonymous web login: $e');
+        }
+      }
+
+      if (user == null) {
+        _updateStatus(AppStatus.needsLogin);
+        return;
+      }
     }
 
     // --- OPTIMISTIC INIT: Load from cache immediately ---
