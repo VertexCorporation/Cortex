@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../../../../../app.dart';
 import '../../../../../theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:flutter/services.dart';
 import '../../wave.dart';
 import 'buttons.dart';
 import 'input.dart';
@@ -361,6 +362,21 @@ class TextFieldSection extends StatelessWidget {
     final double horizontalPadding = isDesktop
         ? 12.0
         : (isTablet ? screenWidth * 0.015 : screenWidth * 0.02);
+
+    // [NEW] Intercept hardware 'Enter' key on desktop to send message directly, while Shift+Enter adds a new line.
+    focusNode.onKeyEvent = (FocusNode node, KeyEvent event) {
+      if (isDesktop &&
+          event is KeyDownEvent &&
+          event.logicalKey == LogicalKeyboardKey.enter) {
+        if (!HardwareKeyboard.instance.isShiftPressed) {
+          // Send message
+          onEnterPressed();
+          // Consume the key event to prevent TextField from inserting a new line
+          return KeyEventResult.handled;
+        }
+      }
+      return KeyEventResult.ignored;
+    };
 
     return Padding(
       padding: EdgeInsets.symmetric(
