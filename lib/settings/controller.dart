@@ -69,37 +69,51 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final bool isTablet = screenWidth >= 600;
-
     context.watch<ThemeProvider>();
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      extendBodyBehindAppBar: true,
-      appBar: CortexAppBar(
-        titleText: appLocalizations.settings,
-        scrollController: _scrollController,
-        leadingMode: CortexLeadingMode.back,
-      ),
-      body: Consumer<SettingsGeneralProvider>(
-        builder: (context, generalProvider, child) {
-          // Show skeleton whenever user data is missing (e.g. initial load or unfreezing).
-          // We do not wait for explicit 'isLoading' because the stream update might be pending.
-          final bool showSkeleton = generalProvider.userData == null;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Enforce a maximum reference width so dialogs don't scale fonts infinitely.
+        final double containerWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : MediaQuery.of(context).size.width;
+        
+        // Clamp the mathematical width used for fonts/padding to 500px to maintain
+        // reasonable proportions when presented in a 680px desktop dialog.
+        final double scaleReferenceWidth = containerWidth > 500 ? 500 : containerWidth;
+        final bool isTablet = containerWidth >= 600;
 
-          return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (child, animation) =>
-                FadeTransition(opacity: animation, child: child),
-            child: showSkeleton
-                ? const SkeletonLoader(key: ValueKey('skeleton'))
-                : _buildContent(context, widget.isFromActiveChat, isTablet,
-                    appLocalizations),
-          );
-        },
-      ),
+        // Override MediaQuery so child widgets don't calculate based on the massive 1920px screen
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            size: Size(scaleReferenceWidth, MediaQuery.of(context).size.height),
+          ),
+          child: Scaffold(
+            backgroundColor: AppColors.background,
+            extendBodyBehindAppBar: true,
+            appBar: CortexAppBar(
+              titleText: AppLocalizations.of(context)!.settings,
+              scrollController: _scrollController,
+              leadingMode: CortexLeadingMode.back,
+            ),
+            body: Consumer<SettingsGeneralProvider>(
+              builder: (context, generalProvider, child) {
+                final bool showSkeleton = generalProvider.userData == null;
+
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) =>
+                      FadeTransition(opacity: animation, child: child),
+                  child: showSkeleton
+                      ? const SkeletonLoader(key: ValueKey('skeleton'))
+                      : _buildContent(context, widget.isFromActiveChat, isTablet,
+                          AppLocalizations.of(context)!),
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -4,7 +4,7 @@
 // 2. "Ghost Purchase" prevention (ensuring receipts exist before completing).
 
 import 'dart:async';
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'dart:developer';

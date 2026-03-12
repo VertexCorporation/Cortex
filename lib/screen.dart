@@ -1,10 +1,12 @@
-// lib/screen.dart
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/theme.dart';
+import 'package:cortex/app.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'axon/view.dart';
 import 'chat/controller.dart';
 import 'chat/providers/conversation.dart';
@@ -15,7 +17,7 @@ import 'chat/services/select.dart';
 import 'chat/services/stop.dart';
 import 'chat/services/voice.dart';
 import 'axon/inbox/logic/manager.dart';
-import 'axon/inbox/panel/view.dart'; // [NEW] For global panel close
+import 'axon/inbox/panel/view.dart';
 import 'initialization.dart';
 import 'language.dart';
 import 'library/backend/data/entity.dart';
@@ -80,7 +82,143 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       if (!mounted) return;
       context.read<ModelCatalogProvider>().initialize(context: context);
       context.read<ModelLocalStateProvider>().initialize(context: context);
+      if (kIsWeb) {
+        _checkAndShowWebDemoDialog();
+      }
     });
+  }
+
+  Future<void> _checkAndShowWebDemoDialog() async {
+    final prefs = await SharedPreferences.getInstance();
+    final hasSeenDemoDialog = prefs.getBool('has_seen_web_demo') ?? false;
+
+    if (!hasSeenDemoDialog && mounted) {
+      prefs.setBool('has_seen_web_demo', true);
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: AppColors.primaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(
+                  color: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+                  width: 1),
+            ),
+            title: Row(
+              children: [
+                Icon(Icons.info_outline,
+                    color: AppColors.secondaryColor, size: 28),
+                const SizedBox(width: 10),
+                Text(
+                  "Demo Sürümü",
+                  style: TextStyle(
+                    color: AppColors.primaryColor.inverted,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+              ],
+            ),
+            content: Container(
+              constraints: const BoxConstraints(maxWidth: 450),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Cortex'in web sürümü şu anda demo aşamasındadır. Sesli giriş, resim indirme, yerel veritabanı gibi bazı gelişmiş özellikler düzgün çalışmayabilir veya devre dışı bırakılmış olabilir. Tam ve stabil bir deneyim için mobil uygulamamızı kullanmanız önerilir.",
+                    style: TextStyle(
+                      color: AppColors.primaryColor.inverted
+                          .withValues(alpha: 0.8),
+                      fontSize: 16,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildStoreButton(
+                        context,
+                        "App Store",
+                        Icons.apple,
+                        "https://apps.apple.com/tr/app/cortex-online-offline-ai/id6755621587",
+                      ),
+                      _buildStoreButton(
+                        context,
+                        "Play Store",
+                        Icons.android,
+                        "https://play.google.com/store/apps/details?id=com.vertex.cortex&pcampaignid=web_share",
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: TextButton.styleFrom(
+                  backgroundColor:
+                      AppColors.secondaryColor.withValues(alpha: 0.1),
+                  foregroundColor: AppColors.secondaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                child: const Text("Anladım",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Widget _buildStoreButton(
+      BuildContext context, String label, IconData icon, String url) {
+    return InkWell(
+      onTap: () async {
+        if (kIsWeb) {
+          final uri = Uri.parse(url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri);
+          }
+        }
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.primaryColor.inverted.withValues(alpha: 0.05),
+          border: Border.fromBorderSide(BorderSide(
+              color: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+              width: 1)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: AppColors.primaryColor.inverted, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: AppColors.primaryColor.inverted,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -477,11 +615,213 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildMobileLayout(BuildContext context, double standardAxonWidth,
+      double directionMultiplier, bool isRtl) {
+    return Listener(
+      onPointerDown: (_) {
+        context
+            .read<IntrovertNotificationService>()
+            .dismissCurrentNotification();
+      },
+      child: GestureDetector(
+        onHorizontalDragStart: _onDragStart,
+        onHorizontalDragUpdate: _onDragUpdate,
+        onHorizontalDragEnd: _onDragEnd,
+        child: AnimatedBuilder(
+          animation: Listenable.merge(
+              [_axonController, _elasticController, _searchModeController]),
+          builder: (context, child) {
+            final double rawValue = _axonController.value;
+            final double searchValue =
+                Curves.easeInOutCubic.transform(_searchModeController.value);
+
+            final double screenWidth = MediaQuery.of(context).size.width;
+            final double visibleAxonWidth = standardAxonWidth + _elasticWidth;
+            final double currentAxonWidth = visibleAxonWidth +
+                ((screenWidth - visibleAxonWidth) * searchValue);
+
+            final double axonOpenOffset =
+                (standardAxonWidth * rawValue) + _elasticWidth;
+            final double searchOffset =
+                (screenWidth - axonOpenOffset) * searchValue;
+
+            final double mainScreenX =
+                (axonOpenOffset + searchOffset) * directionMultiplier;
+
+            double axonParallaxX =
+                -(standardAxonWidth * 0.25) * (1.0 - rawValue);
+            if (searchValue > 0) {
+              axonParallaxX = axonParallaxX * (1.0 - searchValue);
+            }
+            axonParallaxX *= directionMultiplier;
+
+            final double overlayOpacity = (0.3 * rawValue).clamp(0.0, 1.0);
+
+            return Stack(
+              children: [
+                // --- LAYER 1: Axon (Sidebar) ---
+                Transform.translate(
+                  offset: Offset(axonParallaxX, 0),
+                  child: SizedBox(
+                    width: currentAxonWidth,
+                    height: MediaQuery.of(context).size.height,
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Axon(
+                        onNewChatTap: () => startNewConversation(),
+                        onLibraryTap: switchToLibrary,
+                        onNewsTap: openNewsScreen,
+                        onCloseAxon: closeAxon,
+                        onOpenAxon: () => _animateAxonTo(1.0),
+                        onSearchFocusChanged: _handleSearchFocusChanged,
+                        referenceWidth: standardAxonWidth,
+                        activeTab: _getCurrentViewIndex(),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // --- LAYER 2: MAIN SCREEN (Front) ---
+                Transform.translate(
+                  offset: Offset(mainScreenX, 0),
+                  child: Transform.scale(
+                    scale: 1.0 - (0.08 * rawValue),
+                    alignment:
+                        isRtl ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        boxShadow: [
+                          if (rawValue > 0)
+                            BoxShadow(
+                              color: Colors.black
+                                  .withValues(alpha: 0.2 * rawValue),
+                              blurRadius: 30,
+                              spreadRadius: -5,
+                              offset: Offset(-15 * directionMultiplier, 0),
+                            )
+                        ],
+                        borderRadius: BorderRadius.circular(30.0 * rawValue),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30.0 * rawValue),
+                        child: MediaQuery(
+                          data: MediaQuery.of(context).copyWith(
+                            viewInsets: (rawValue > 0 || searchValue > 0)
+                                ? EdgeInsets.zero
+                                : MediaQuery.of(context).viewInsets,
+                          ),
+                          child: Stack(
+                            children: [
+                              _buildCurrentScreenWidget(),
+                              if (rawValue > 0)
+                                IgnorePointer(
+                                  child: Container(
+                                    color: Colors.black
+                                        .withValues(alpha: overlayOpacity),
+                                  ),
+                                ),
+                              Align(
+                                alignment: isRtl
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                child: Container(
+                                  width: 1.0,
+                                  height: (MediaQuery.of(context).size.height *
+                                          0.6) *
+                                      rawValue,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Theme.of(context)
+                                            .dividerColor
+                                            .withValues(alpha: 0.0),
+                                        Theme.of(context)
+                                            .dividerColor
+                                            .withValues(alpha: 0.3),
+                                        Theme.of(context)
+                                            .dividerColor
+                                            .withValues(alpha: 0.3),
+                                        Theme.of(context)
+                                            .dividerColor
+                                            .withValues(alpha: 0.0),
+                                      ],
+                                      stops: const [0.0, 0.3, 0.7, 1.0],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if (rawValue > 0 && searchValue == 0)
+                                GestureDetector(
+                                  onTap: closeAxon,
+                                  behavior: HitTestBehavior.translucent,
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout(BuildContext context) {
+    const double desktopSidebarWidth = 280.0;
+    return Listener(
+      onPointerDown: (_) {
+        context
+            .read<IntrovertNotificationService>()
+            .dismissCurrentNotification();
+      },
+      child: Row(
+        children: [
+          // Fixed Sidebar
+          SizedBox(
+            width: desktopSidebarWidth,
+            child: Axon(
+              onNewChatTap: () => startNewConversation(closeSidebar: false),
+              onLibraryTap: switchToLibrary,
+              onNewsTap: openNewsScreen,
+              onCloseAxon: () {}, // Desktop sidebar never closes
+              onOpenAxon: () {}, // Desktop sidebar never closes
+              onSearchFocusChanged: _handleSearchFocusChanged,
+              referenceWidth: desktopSidebarWidth,
+              activeTab: _getCurrentViewIndex(),
+            ),
+          ),
+
+          // Divider
+          Container(
+            width: 1.0,
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+          ),
+
+          // Main Content Region
+          Expanded(
+            child: ClipRRect(
+              child: _buildCurrentScreenWidget(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final double standardAxonWidth = screenWidth * 0.85;
-
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
     final double directionMultiplier = isRtl ? -1.0 : 1.0;
 
@@ -529,174 +869,18 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         child: Scaffold(
           backgroundColor: AppColors.background,
           resizeToAvoidBottomInset: false,
-          body: Listener(
-            onPointerDown: (_) {
-              context
-                  .read<IntrovertNotificationService>()
-                  .dismissCurrentNotification();
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              final bool isDesktop = constraints.maxWidth >= 800;
+
+              if (isDesktop) {
+                return _buildDesktopLayout(context);
+              } else {
+                final double standardAxonWidth = constraints.maxWidth * 0.85;
+                return _buildMobileLayout(
+                    context, standardAxonWidth, directionMultiplier, isRtl);
+              }
             },
-            child: GestureDetector(
-              onHorizontalDragStart: _onDragStart,
-              onHorizontalDragUpdate: _onDragUpdate,
-              onHorizontalDragEnd: _onDragEnd,
-              child: AnimatedBuilder(
-                animation: Listenable.merge([
-                  _axonController,
-                  _elasticController,
-                  _searchModeController
-                ]),
-                builder: (context, child) {
-                  final double rawValue = _axonController.value;
-                  final double searchValue = Curves.easeInOutCubic
-                      .transform(_searchModeController.value);
-
-                  final double visibleAxonWidth =
-                      standardAxonWidth + _elasticWidth;
-                  final double currentAxonWidth = visibleAxonWidth +
-                      ((screenWidth - visibleAxonWidth) * searchValue);
-
-                  final double axonOpenOffset =
-                      (standardAxonWidth * rawValue) + _elasticWidth;
-                  final double searchOffset =
-                      (screenWidth - axonOpenOffset) * searchValue;
-
-                  final double mainScreenX =
-                      (axonOpenOffset + searchOffset) * directionMultiplier;
-
-                  double axonParallaxX =
-                      -(standardAxonWidth * 0.25) * (1.0 - rawValue);
-                  if (searchValue > 0) {
-                    axonParallaxX = axonParallaxX * (1.0 - searchValue);
-                  }
-                  axonParallaxX *= directionMultiplier;
-
-                  final double overlayOpacity =
-                      (0.3 * rawValue).clamp(0.0, 1.0);
-
-                  return Stack(
-                    children: [
-                      // --- LAYER 1: Axon (Sidebar) ---
-                      Transform.translate(
-                        offset: Offset(axonParallaxX, 0),
-                        child: SizedBox(
-                          width: currentAxonWidth,
-                          height: MediaQuery.of(context).size.height,
-                          child: Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: Axon(
-                              onNewChatTap: () => startNewConversation(),
-                              onLibraryTap: switchToLibrary,
-                              onNewsTap: openNewsScreen,
-                              onCloseAxon: closeAxon,
-                              onOpenAxon: () => _animateAxonTo(1.0),
-                              onSearchFocusChanged: _handleSearchFocusChanged,
-                              referenceWidth: standardAxonWidth,
-                              activeTab: _getCurrentViewIndex(),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // --- LAYER 2: MAIN SCREEN (Front) ---
-                      Transform.translate(
-                        offset: Offset(mainScreenX, 0),
-                        child: Transform.scale(
-                          scale: 1.0 - (0.08 * rawValue),
-                          alignment: isRtl
-                              ? Alignment.centerRight
-                              : Alignment.centerLeft,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.background,
-                              boxShadow: [
-                                if (rawValue > 0)
-                                  BoxShadow(
-                                    color: Colors.black
-                                        .withValues(alpha: 0.2 * rawValue),
-                                    blurRadius: 30,
-                                    spreadRadius: -5,
-                                    offset:
-                                        Offset(-15 * directionMultiplier, 0),
-                                  )
-                              ],
-                              borderRadius:
-                                  BorderRadius.circular(30.0 * rawValue),
-                            ),
-                            child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.circular(30.0 * rawValue),
-                              child: MediaQuery(
-                                data: MediaQuery.of(context).copyWith(
-                                  viewInsets: (rawValue > 0 || searchValue > 0)
-                                      ? EdgeInsets.zero
-                                      : MediaQuery.of(context).viewInsets,
-                                ),
-                                child: Stack(
-                                  children: [
-                                    _buildCurrentScreenWidget(),
-                                    if (rawValue > 0)
-                                      IgnorePointer(
-                                        child: Container(
-                                          color: Colors.black.withValues(
-                                              alpha: overlayOpacity),
-                                        ),
-                                      ),
-                                    Align(
-                                      alignment: isRtl
-                                          ? Alignment.centerRight
-                                          : Alignment.centerLeft,
-                                      child: Container(
-                                        width: 1.0,
-                                        height: (MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.6) *
-                                            rawValue,
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Theme.of(context)
-                                                  .dividerColor
-                                                  .withValues(alpha: 0.0),
-                                              Theme.of(context)
-                                                  .dividerColor
-                                                  .withValues(alpha: 0.3),
-                                              Theme.of(context)
-                                                  .dividerColor
-                                                  .withValues(alpha: 0.3),
-                                              Theme.of(context)
-                                                  .dividerColor
-                                                  .withValues(alpha: 0.0),
-                                            ],
-                                            stops: const [0.0, 0.3, 0.7, 1.0],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    if (rawValue > 0 && searchValue == 0)
-                                      GestureDetector(
-                                        onTap: closeAxon,
-                                        behavior: HitTestBehavior.translucent,
-                                        child: Container(
-                                          color: Colors.transparent,
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
           ),
         ),
       ),

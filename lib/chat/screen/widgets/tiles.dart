@@ -1,6 +1,6 @@
 // lib/chat/screen/selected/tiles.dart
 
-import 'dart:io';
+import 'package:universal_io/io.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p; // Standard path manipulation

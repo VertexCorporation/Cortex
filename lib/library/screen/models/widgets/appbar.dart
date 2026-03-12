@@ -20,16 +20,17 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
+    final bool isDesktop = screenWidth >= 800; // [NEW] Desktop breakpoint
 
     // Consistent icon sizing
     final double iconSize = isTablet ? 26.0 : 22.0;
 
     return CortexAppBar(
+      // Hide leading button on desktop since sidebar is fixed
+      leadingMode: isDesktop ? CortexLeadingMode.none : CortexLeadingMode.auto,
+
       // Standard title with scroll listener (passed from controller)
       titleText: title,
       scrollController: scrollController,

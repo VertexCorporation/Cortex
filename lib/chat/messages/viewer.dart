@@ -1,6 +1,6 @@
 // viewer.dart
 
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

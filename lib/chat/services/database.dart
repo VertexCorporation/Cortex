@@ -11,9 +11,20 @@ class DbHelper {
   DbHelper._internal();
 
   Database? _db;
+  bool _webWarningPrinted = false;
   static const int _latestVersion = 6; // Define the latest version here
 
   Future<Database> get db async {
+    if (kIsWeb) {
+      if (!_webWarningPrinted) {
+        debugPrint(
+            "[DbHelper] SQLite is not supported on Web. Defaulting to in-memory/No-OP or throwing if used.");
+        _webWarningPrinted = true;
+      }
+      throw UnsupportedError(
+          "sqflite is not supported on the web platform. Use a web-compatible storage solution.");
+    }
+
     if (_db != null) return _db!;
     final dir = await getApplicationDocumentsDirectory();
     final path = join(dir.path, 'chat.sqlite');
@@ -112,6 +123,7 @@ class DbHelper {
   /// Compresses the database and cleans up unused space (Disk Saver).
   /// Call this method occasionally (e.g., after heavy deletions or sync).
   Future<void> optimizeDatabase() async {
+    if (kIsWeb) return;
     try {
       // Ensure the database is initialized
       if (_db == null) await db;

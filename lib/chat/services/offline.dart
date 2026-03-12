@@ -11,7 +11,7 @@
 // - Tuned Sampler Settings (Temp 0.7 default).
 //
 
-import 'dart:io'; // Required for File checks
+import 'package:universal_io/io.dart'; // Required for File checks
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/processor.dart';
 import 'package:cortex/chat/services/response.dart';

@@ -1,6 +1,6 @@
 // lib/chat/providers/input.dart
 
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cortex/chat/messages/messages.dart';
 

@@ -108,38 +108,42 @@ class _NewsArticleCardState extends State<NewsArticleCard>
   }
 
   Widget _buildCardContent(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final double cardRadius = screenWidth * 0.04;
-    final double basePadding = screenWidth * 0.04;
-    final double mediumSpacing = screenWidth * 0.03;
-    final double smallSpacing = screenWidth * 0.01;
-    final double iconSize = screenWidth * 0.05;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Use the available width of the container rather than the entire screen
+        // This prevents massive fonts when cards are placed side-by-side in a Grid.
+        final cardWidth = constraints.maxWidth;
+        // Cap the reference width to prevent scaling infinitely on huge empty screens
+        final referenceWidth = cardWidth > 500 ? 500.0 : cardWidth;
 
-    final title = widget.article.titleFor(context);
-    final summary = widget.article.summaryFor(context);
-    final fullContent = widget.article.contentFor(context);
-    final coverPath = widget.article.coverPathFor(context);
+        final double cardRadius = referenceWidth * 0.04;
+        final double basePadding = referenceWidth * 0.04;
+        final double mediumSpacing = referenceWidth * 0.03;
+        final double smallSpacing = referenceWidth * 0.01;
+        final double iconSize = referenceWidth * 0.06;
 
-    final locale = Localizations.localeOf(context).toLanguageTag();
-    final hasLink = widget.article.link != null &&
-        widget.article.link!.isNotEmpty;
-    final hasExpandableContent = fullContent.isNotEmpty;
+        final title = widget.article.titleFor(context);
+        final summary = widget.article.summaryFor(context);
+        final fullContent = widget.article.contentFor(context);
+        final coverPath = widget.article.coverPathFor(context);
 
-    return Material(
-      color: AppColors.background,
-      borderRadius: BorderRadius.circular(cardRadius),
-      // Optimization: No antiAlias clip here unless strictly necessary to avoid off-screen rendering
-      child: InkWell(
-        onTap: hasExpandableContent ? _toggleExpansion : null,
-        borderRadius: BorderRadius.circular(cardRadius),
-        splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
-        highlightColor: AppColors.primaryColor.inverted.withValues(alpha: 0.05),
-        child: AnimatedSize(
-          // AnimatedSize does cause layout changes, but only on user tap,
-          // so it's acceptable here (unlike in the entry animation).
+        final locale = Localizations.localeOf(context).toLanguageTag();
+        final hasLink = widget.article.link != null &&
+            widget.article.link!.isNotEmpty;
+        final hasExpandableContent = fullContent.isNotEmpty;
+
+        return Material(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(cardRadius),
+          // Optimization: No antiAlias clip here unless strictly necessary to avoid off-screen rendering
+          child: InkWell(
+            onTap: hasExpandableContent ? _toggleExpansion : null,
+            borderRadius: BorderRadius.circular(cardRadius),
+            splashColor: AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+            highlightColor: AppColors.primaryColor.inverted.withValues(alpha: 0.05),
+            child: AnimatedSize(
+              // AnimatedSize does cause layout changes, but only on user tap,
+              // so it's acceptable here (unlike in the entry animation).
           duration: const Duration(milliseconds: 350),
           curve: Curves.easeInOutCubic,
           alignment: Alignment.topCenter,
@@ -175,7 +179,7 @@ class _NewsArticleCardState extends State<NewsArticleCard>
                                 Text(
                                   title,
                                   style: TextStyle(
-                                      fontSize: screenWidth * 0.045,
+                                      fontSize: referenceWidth * 0.045,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.primaryColor.inverted,
                                       height: 1.3),
@@ -185,7 +189,7 @@ class _NewsArticleCardState extends State<NewsArticleCard>
                                   DateFormat.yMd(locale)
                                       .format(widget.article.publishedAt),
                                   style: TextStyle(
-                                      fontSize: screenWidth * 0.032,
+                                      fontSize: referenceWidth * 0.032,
                                       color: AppColors.primaryColor.inverted
                                           .withValues(alpha: 0.6)),
                                 ),
@@ -208,7 +212,7 @@ class _NewsArticleCardState extends State<NewsArticleCard>
                       Text(
                         summary,
                         style: TextStyle(
-                            fontSize: screenWidth * 0.038,
+                            fontSize: referenceWidth * 0.038,
                             color: AppColors.primaryColor.inverted
                                 .withValues(alpha: 0.85),
                             height: 1.5),
@@ -224,7 +228,7 @@ class _NewsArticleCardState extends State<NewsArticleCard>
                             child: Text(
                               fullContent,
                               style: TextStyle(
-                                  fontSize: screenWidth * 0.038,
+                                  fontSize: referenceWidth * 0.038,
                                   color: AppColors.primaryColor.inverted
                                       .withValues(alpha: 0.85),
                                   height: 1.5),
@@ -239,6 +243,8 @@ class _NewsArticleCardState extends State<NewsArticleCard>
           ),
         ),
       ),
+    );
+      },
     );
   }
 }

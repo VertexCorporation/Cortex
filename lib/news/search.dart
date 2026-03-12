@@ -22,26 +22,28 @@ class NewsSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double w = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final bool isTablet = w >= 600;
+    final double w = MediaQuery.of(context).size.width;
+    final bool isDesktop = w >= 800;
+    final bool isTablet = w >= 600 && !isDesktop;
 
     // --- Styling Logic ---
-    final EdgeInsets outerPadding = isTablet
-        ? const EdgeInsets.only(top: 40, bottom: 8, left: 2, right: 2)
-        : const EdgeInsets.symmetric(horizontal: 12, vertical: 6);
+    final EdgeInsets outerPadding = isDesktop
+        ? const EdgeInsets.only(top: 24, bottom: 8, left: 2, right: 2)
+        : isTablet
+            ? const EdgeInsets.only(top: 40, bottom: 8, left: 2, right: 2)
+            : const EdgeInsets.symmetric(horizontal: 12, vertical: 6);
 
     // Dimensions
-    final double iconSize = isTablet ? 36.0 : w * .06;
-    final double borderRadius = isTablet ? 24.0 : 16.0;
-    final double maxBarWidth = isTablet ? 700 : double.infinity;
-    final double? fontSize = isTablet ? 22.0 : null;
+    final double iconSize = isDesktop ? 22.0 : (isTablet ? 36.0 : w * .06);
+    final double borderRadius = isDesktop ? 16.0 : (isTablet ? 24.0 : 16.0);
+    final double maxBarWidth = isDesktop ? 500 : (isTablet ? 700 : double.infinity);
+    final double? fontSize = isDesktop ? 16.0 : (isTablet ? 22.0 : null);
 
-    final EdgeInsets contentPadding = isTablet
-        ? const EdgeInsets.symmetric(horizontal: 30, vertical: 26)
-        : const EdgeInsets.symmetric(horizontal: 20, vertical: 16);
+    final EdgeInsets contentPadding = isDesktop
+        ? const EdgeInsets.symmetric(horizontal: 16, vertical: 12)
+        : isTablet
+            ? const EdgeInsets.symmetric(horizontal: 30, vertical: 26)
+            : const EdgeInsets.symmetric(horizontal: 20, vertical: 16);
 
     final Color contentColor = AppColors.primaryColor.inverted;
     final Color fillColor = AppColors.secondaryColor;

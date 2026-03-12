@@ -1,6 +1,7 @@
 // lib/inbox/widgets/tiles/avatar.dart
 
-import 'dart:io';
+import 'package:universal_io/io.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../app.dart';
@@ -55,7 +56,8 @@ class TileAvatar extends StatelessWidget {
 
     ColorFilter? colorFilter;
 
-    colorFilter = ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn);
+    colorFilter =
+        ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn);
 
     if (isAsset) {
       return SvgPicture.asset(
@@ -65,9 +67,9 @@ class TileAvatar extends StatelessWidget {
         fit: BoxFit.contain,
         colorFilter: colorFilter,
       );
-    } else if (file.existsSync()) {
+    } else if (!kIsWeb && file.existsSync()) {
       return SvgPicture.file(
-        file,
+        file as dynamic,
         width: iconSize,
         height: iconSize,
         fit: BoxFit.contain,
@@ -83,15 +85,16 @@ class TileAvatar extends StatelessWidget {
       padding: EdgeInsets.all(size * 0.15),
       child: isAsset
           ? Image.asset(imagePath, fit: BoxFit.contain)
-          : (file.existsSync()
-          ? Image.file(file, fit: BoxFit.contain)
-          : _buildFallbackIcon()),
+          : (!kIsWeb && file.existsSync()
+              ? Image.file(file, fit: BoxFit.contain)
+              : _buildFallbackIcon()),
     );
   }
 
   Widget _buildRasterImage(bool isAsset, File file) {
     final String variant = imagePath.split('.').last.toLowerCase();
-    final bool isValidImage = ['jpg', 'jpeg', 'webp', 'bmp', 'gif'].contains(variant);
+    final bool isValidImage =
+        ['jpg', 'jpeg', 'webp', 'bmp', 'gif'].contains(variant);
 
     if (!isValidImage && !isAsset) {
       return _buildFallbackIcon();
@@ -99,9 +102,9 @@ class TileAvatar extends StatelessWidget {
 
     return isAsset
         ? Image.asset(imagePath, width: size, height: size, fit: BoxFit.cover)
-        : (file.existsSync()
-        ? Image.file(file, width: size, height: size, fit: BoxFit.cover)
-        : _buildFallbackIcon());
+        : (!kIsWeb && file.existsSync()
+            ? Image.file(file, width: size, height: size, fit: BoxFit.cover)
+            : _buildFallbackIcon());
   }
 
   Widget _buildFallbackIcon() {

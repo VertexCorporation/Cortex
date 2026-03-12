@@ -15,7 +15,7 @@
 
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'package:cortex/library/backend/system.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';

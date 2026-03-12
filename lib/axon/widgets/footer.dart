@@ -69,12 +69,14 @@ class AxonFooter extends StatelessWidget {
           child: InkWell(
             onTap: () {
               HapticFeedback.lightImpact();
-              // Navigate to Settings from Right to Left
-              // Keeping Axon open to avoid UI stutter/lag
-              navigateToScreen(
-                const SettingsScreen(),
-                direction: const Offset(1.0, 0.0), // Slides from Right
-              );
+              if (onSettingsTap != null) {
+                onSettingsTap!();
+              } else {
+                navigateToScreen(
+                  const SettingsScreen(),
+                  direction: const Offset(1.0, 0.0), // Slides from Right
+                );
+              }
               FocusScope.of(context).unfocus();
             },
             borderRadius: BorderRadius.circular(12),
