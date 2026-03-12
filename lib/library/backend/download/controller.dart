@@ -1,8 +1,9 @@
 // library/backend/download/controller.dart
 
 import 'dart:async';
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:collection/collection.dart';
@@ -54,6 +55,11 @@ class ModelDownloadController {
     if (url.isEmpty) {
       debugPrint(
           "[DownloadController] Download for '$id' aborted: URL is empty.");
+      return;
+    }
+
+    if (kIsWeb) {
+      debugPrint("[DownloadController] Downloads are not supported on Web.");
       return;
     }
 
@@ -215,6 +221,8 @@ class ModelDownloadController {
     required Map<String, bool> groundTruthDownloadStates,
     bool isFreshStart = false,
   }) async {
+    if (kIsWeb) return;
+
     final tasks = await FlutterDownloader.loadTasks();
     final safeTasks = tasks ?? [];
 

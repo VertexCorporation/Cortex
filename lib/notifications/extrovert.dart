@@ -7,7 +7,7 @@
 // local notification scheduling, and permission requests.
 
 import 'dart:convert';
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'dart:math';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,6 +15,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -428,6 +429,11 @@ class ExtrovertNotificationService {
 
   /// Sets up Firebase Cloud Messaging, including permissions and message listeners.
   Future<void> _initializeFirebaseMessaging() async {
+    if (kIsWeb) {
+      debugPrint("[Extrovert] Skipping Firebase Messaging init on Web to prevent permission prompts.");
+      return;
+    }
+
     try {
       //
       // --- SAFETY 1: Is the device supports Google Play Services?  ---
@@ -557,6 +563,12 @@ class ExtrovertNotificationService {
   /// Displays the OS permission dialog for notifications.
   /// This method is now protected against concurrent calls.
   Future<void> requestPermission() async {
+    if (kIsWeb) {
+      debugPrint(
+          "[ExtrovertNotificationService] Web platform does not support or require notification permissions at this time.");
+      return;
+    }
+
     if (_isRequestingPermission) {
       debugPrint(
           "[ExtrovertNotificationService] A permission request is already in progress. Ignoring new request.");
@@ -599,6 +611,8 @@ class ExtrovertNotificationService {
 
   /// Handles app lifecycle changes to schedule or cancel notifications.
   void handleAppLifecycleStateChange(AppLifecycleState state) async {
+    if (kIsWeb) return;
+
     if (!_isInitialized) {
       debugPrint(
           "[ExtrovertNotificationService] App lifecycle changed, but service not initialized. Skipping.");
@@ -679,6 +693,7 @@ class ExtrovertNotificationService {
   /// This should be called after a successful login or registration to ensure
   /// the token is immediately associated with the user account.
   Future<void> syncTokenAfterLogin() async {
+    if (kIsWeb) return;
     if (!_isInitialized) {
       debugPrint(
           "[ExtrovertNotificationService] syncTokenAfterLogin called before initialization. Initializing now.");
@@ -715,6 +730,8 @@ class ExtrovertNotificationService {
   /// This is more robust as it includes a fallback to get the current token if
   /// it's not found in local storage.
   Future<void> clearUserTokenOnSignOut() async {
+    if (kIsWeb) return;
+
     final user = _auth.currentUser;
     if (user == null) return;
 

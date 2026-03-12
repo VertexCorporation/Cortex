@@ -108,7 +108,11 @@ class ApiService {
         // CRITICAL: Use utf8.decoder (stateful) instead of utf8.decode (stateless)
         // This properly handles multi-byte UTF-8 characters (Turkish: ş,ğ,ü,ç,ı,ö)
         // that may be split across chunk boundaries
-        stream.cast<List<int>>().transform(utf8.decoder).transform(const LineSplitter()).listen(
+        stream
+            .cast<List<int>>()
+            .transform(utf8.decoder)
+            .transform(const LineSplitter())
+            .listen(
           (line) {
             if (completer.isCompleted) return;
 
@@ -221,6 +225,13 @@ class ApiService {
             }
           },
           onError: (error) {
+            if (kIsWeb) {
+              debugPrint("[CORTEX WEB STREAM ERROR] $error");
+              if (error is DioException) {
+                debugPrint(
+                    "[CORTEX WEB STREAM DIO] ${error.type} - ${error.message}");
+              }
+            }
             if (!completer.isCompleted) {
               if (error is DioException &&
                   error.type == DioExceptionType.cancel) {
@@ -254,6 +265,12 @@ class ApiService {
       final idToken = await user.getIdToken(false);
       return await attemptRequest(idToken!);
     } on DioException catch (e) {
+      if (kIsWeb) {
+        debugPrint("[CORTEX WEB HTTP ERROR] ${e.type}");
+        debugPrint("[CORTEX WEB HTTP MESSAGE] ${e.message}");
+        debugPrint("[CORTEX WEB HTTP ERROR OBJ] ${e.error}");
+        debugPrint("[CORTEX WEB HTTP RESPONSE] ${e.response?.data}");
+      }
       if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
         final refreshedToken = await user.getIdToken(true);
         return await attemptRequest(refreshedToken!);
@@ -261,6 +278,9 @@ class ApiService {
       if (e.type == DioExceptionType.cancel) throw UserCancelledException();
       throw ApiException(localizations.errorNetwork, code: 'CONNECTION_ERROR');
     } catch (e) {
+      if (kIsWeb) {
+        debugPrint("[CORTEX WEB STANDARD ERROR] $e");
+      }
       if (e is UserCancelledException || e is ApiException) rethrow;
       throw ApiException(localizations.errorNetwork);
     } finally {

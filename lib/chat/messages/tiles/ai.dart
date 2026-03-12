@@ -435,10 +435,10 @@ class _AIMessageTileState extends State<AIMessageTile>
   }
 
   // Added the 'key' parameter to support AnimatedSwitcher.
+  // Added the 'key' parameter to support AnimatedSwitcher.
   Widget _buildErrorWidget(BuildContext context, double scale, {Key? key}) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final dynamicFontSize = screenWidth * 0.04;
-    final iconSize = screenWidth * 0.06;
+    final dynamicFontSize = 16.0 * scale;
+    final iconSize = 24.0 * scale;
 
     return GestureDetector(
       key: key, // Critical for animation
@@ -462,14 +462,14 @@ class _AIMessageTileState extends State<AIMessageTile>
       child: FadeTransition(
         opacity: _errorFadeOutAnim, // Uses the specific error fade controller
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+          padding: EdgeInsets.symmetric(horizontal: 8.0 * scale),
           child: Container(
             decoration: BoxDecoration(
                 color: AppColors.septenaryColor.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                borderRadius: BorderRadius.circular(12.0 * scale),
                 border:
                     Border.all(color: AppColors.septenaryColor, width: 0.5)),
-            padding: EdgeInsets.all(screenWidth * 0.03),
+            padding: EdgeInsets.all(12.0 * scale),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -480,7 +480,7 @@ class _AIMessageTileState extends State<AIMessageTile>
                       color: AppColors.septenaryColor,
                       size: iconSize,
                     ),
-                    SizedBox(width: screenWidth * 0.02),
+                    SizedBox(width: 8.0 * scale),
                     Expanded(
                       child: Text(
                         AppLocalizations.of(context)!.requestFailed,
@@ -515,8 +515,7 @@ class _AIMessageTileState extends State<AIMessageTile>
                             child: SlideTransition(
                               position: _errorSlideAnim,
                               child: Padding(
-                                padding:
-                                    EdgeInsets.only(top: screenWidth * 0.02),
+                                padding: EdgeInsets.only(top: 8.0 * scale),
                                 child: SelectableText(widget.message.text,
                                     style: TextStyle(
                                         color: AppColors.septenaryColor,

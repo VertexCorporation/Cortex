@@ -30,6 +30,8 @@ class OfflineModeratorService {
         await _remoteConfig.activate();
         _buildAndCompileRegex();
         debugPrint("[OfflineModerator] Rules updated and re-compiled.");
+      }).onError((error) {
+        debugPrint("[OfflineModerator] Config stream error ignored safely: $error");
       });
     } catch (e) {
       debugPrint("[OfflineModerator] Failed to initialize: $e");

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:cortex/cache.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
@@ -554,6 +555,9 @@ class ChatStorageService {
         e.toString().contains("database or disk is full")) {
       debugPrint(
           "[ChatStorage] CRITICAL: Device storage is full. '$operationName' failed. Data was NOT saved to prevent crash.");
+    } else if (kIsWeb) {
+      debugPrint(
+          "[ChatStorage] Web platform ignored unsupported database write for: '$operationName'.");
     } else {
       debugPrint("[ChatStorage] Unexpected error in '$operationName': $e");
       throw e;

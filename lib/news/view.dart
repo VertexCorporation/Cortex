@@ -231,24 +231,53 @@ class _NewsScreenState extends State<NewsScreen>
       );
     }
 
+    final bool isDesktop = screenWidth >= 800;
+
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final isLast = index == articles.length - 1;
-            return Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : itemSpacing),
-              child: NewsArticleCard(
-                key: ValueKey(articles[index].id),
-                article: articles[index],
-                index: index,
+      sliver: isDesktop
+          ? SliverToBoxAdapter(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final double availableWidth = constraints.maxWidth;
+                  // 3 items across, meaning 2 gaps. We subtract 2.1 gaps to prevent rounding overflow.
+                  final double itemWidth =
+                      (availableWidth - (itemSpacing * 2.1)) / 3.0;
+
+                  return Wrap(
+                    spacing: itemSpacing,
+                    runSpacing: itemSpacing,
+                    children: articles.map((article) {
+                      final index = articles.indexOf(article);
+                      return SizedBox(
+                        width: itemWidth,
+                        child: NewsArticleCard(
+                          key: ValueKey(article.id),
+                          article: article,
+                          index: index,
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
               ),
-            );
-          },
-          childCount: articles.length,
-        ),
-      ),
+            )
+          : SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final isLast = index == articles.length - 1;
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: isLast ? 0 : itemSpacing),
+                    child: NewsArticleCard(
+                      key: ValueKey(articles[index].id),
+                      article: articles[index],
+                      index: index,
+                    ),
+                  );
+                },
+                childCount: articles.length,
+              ),
+            ),
     );
   }
 }

@@ -83,14 +83,45 @@ class _AxonState extends State<Axon> {
 
   void _handleSettingsTap() async {
     ActionPanelController.closeCurrent(); // Close context menu
-    widget.onCloseAxon();
+    
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // For Desktop sizes, open Settings in a centered dialog.
+    if (screenWidth >= 800) {
+      await showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            backgroundColor: AppColors.background,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24.0),
+              side: BorderSide(
+                color: AppColors.senaryColor,
+                width: 1.0,
+              ),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: 680,
+                maxHeight: MediaQuery.of(context).size.height * 0.9,
+              ),
+              child: const SettingsScreen(),
+            ),
+          );
+        },
+      );
+    } else {
+      // Mobile behavior: Close Axon, Push Route, Re-open Axon on back
+      widget.onCloseAxon();
 
-    await navigateToScreen(
-      const SettingsScreen(),
-      direction: const Offset(0.1, 0.0),
-    );
+      await navigateToScreen(
+        const SettingsScreen(),
+        direction: const Offset(0.1, 0.0),
+      );
 
-    if (mounted) widget.onOpenAxon();
+      if (mounted) widget.onOpenAxon();
+    }
   }
 
   void _handleExitSearchMode() {

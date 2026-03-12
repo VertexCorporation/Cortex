@@ -1,6 +1,7 @@
 // lib/library/screen/model/widgets/header.dart
 
-import 'dart:io';
+import 'package:universal_io/io.dart';
+import 'package:flutter/foundation.dart';
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -73,7 +74,6 @@ class ModelHeader extends StatelessWidget {
                 ),
               ),
               SizedBox(height: screenWidth * 0.02),
-
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 transitionBuilder: (child, animation) =>
@@ -85,13 +85,17 @@ class ModelHeader extends StatelessWidget {
                     if (!capabilitiesSource.isServerSide) ...[
                       _InfoRow(
                         label: localizations.storage,
-                        value: capabilitiesSource.size != null ? '${capabilitiesSource.size} MB' : localizations.notAvailable,
+                        value: capabilitiesSource.size != null
+                            ? '${capabilitiesSource.size} MB'
+                            : localizations.notAvailable,
                         iconPath: 'assets/icons/storage.svg',
                       ),
                       SizedBox(height: screenWidth * 0.02),
                       _InfoRow(
                         label: localizations.ram,
-                        value: capabilitiesSource.ram != null ? '${capabilitiesSource.ram} MB' : localizations.notAvailable,
+                        value: capabilitiesSource.ram != null
+                            ? '${capabilitiesSource.ram} MB'
+                            : localizations.notAvailable,
                         iconPath: 'assets/icons/memory.svg',
                       ),
                     ] else ...[
@@ -119,7 +123,8 @@ class ModelHeader extends StatelessWidget {
 
   /// Builds the appropriate image widget based on the file path (SVG or raster).
   Widget _buildImage(String imagePath) {
-    final svgColorFilter = ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn);
+    final svgColorFilter =
+        ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn);
 
     final fallbackImage = Padding(
       padding: const EdgeInsets.all(12.0),
@@ -134,14 +139,16 @@ class ModelHeader extends StatelessWidget {
       if (imagePath.startsWith('assets/')) {
         return Padding(
           padding: const EdgeInsets.all(12.0),
-          child: SvgPicture.asset(imagePath, fit: BoxFit.contain, colorFilter: svgColorFilter),
+          child: SvgPicture.asset(imagePath,
+              fit: BoxFit.contain, colorFilter: svgColorFilter),
         );
       }
       final file = File(imagePath);
-      if (file.existsSync()) {
+      if (!kIsWeb && file.existsSync()) {
         return Padding(
           padding: const EdgeInsets.all(12.0),
-          child: SvgPicture.file(file, fit: BoxFit.contain, colorFilter: svgColorFilter),
+          child: SvgPicture.file(file as dynamic,
+              fit: BoxFit.contain, colorFilter: svgColorFilter),
         );
       }
     } else {
@@ -150,7 +157,9 @@ class ModelHeader extends StatelessWidget {
         provider = AssetImage(imagePath);
       } else {
         final file = File(imagePath);
-        provider = file.existsSync() ? FileImage(file) as ImageProvider : const AssetImage('assets/icons/transparent.png');
+        provider = (!kIsWeb && file.existsSync())
+            ? FileImage(file) as ImageProvider
+            : const AssetImage('assets/icons/transparent.png');
       }
       return Image(
         image: provider,
@@ -184,7 +193,8 @@ class _InfoRow extends StatelessWidget {
           iconPath,
           width: screenWidth * 0.05,
           height: screenWidth * 0.05,
-          colorFilter: ColorFilter.mode(AppColors.quinaryColor, BlendMode.srcIn),
+          colorFilter:
+              ColorFilter.mode(AppColors.quinaryColor, BlendMode.srcIn),
         ),
         SizedBox(width: screenWidth * 0.02),
         // Use Expanded to prevent text overflow issues with long values.

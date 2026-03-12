@@ -138,6 +138,7 @@ class AppbarState extends State<Appbar> {
     // Responsive Calcs
     final size = MediaQuery.of(context).size;
     final bool isTablet = size.shortestSide > 600;
+    final bool isDesktop = size.width >= 800; // [NEW] Desktop breakpoint
     final double buttonSize = isTablet ? 48.0 : 42.0;
     final double iconSize = isTablet ? 26.0 : 22.0;
 
@@ -148,6 +149,9 @@ class AppbarState extends State<Appbar> {
 
     // --- GLOBAL APP BAR IMPLEMENTATION ---
     return CortexAppBar(
+      // Hide leading button on desktop since sidebar is fixed
+      leadingMode: isDesktop ? CortexLeadingMode.none : CortexLeadingMode.auto,
+
       // 1. Left Button: Sidebar Toggle
       onLeadingPressed: () => mainScreenKey.currentState?.toggleAxon(),
 

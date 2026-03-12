@@ -1,6 +1,7 @@
 // lib/chat/screen/widgets/bottom/selection/cards/main.dart
 
-import 'dart:io';
+import 'package:universal_io/io.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter_svg/svg.dart';
@@ -49,21 +50,20 @@ class ModelCard extends StatelessWidget {
     final double arrowIconSize = isTablet ? 24.0 : screenWidth * 0.06;
 
     final Color cardBackgroundColor =
-    isSelected ? AppColors.primaryColor.inverted : AppColors.background;
+        isSelected ? AppColors.primaryColor.inverted : AppColors.background;
 
-    final Color iconContentColor = isSelected
-        ? AppColors.primaryColor
-        : AppColors.primaryColor.inverted;
+    final Color iconContentColor =
+        isSelected ? AppColors.primaryColor : AppColors.primaryColor.inverted;
 
     final Color textColor =
-    isSelected ? AppColors.primaryColor : AppColors.primaryColor.inverted;
+        isSelected ? AppColors.primaryColor : AppColors.primaryColor.inverted;
 
     final Color subTextColor = isSelected
         ? AppColors.primaryColor.withValues(alpha: 0.7)
         : AppColors.tertiaryColor;
 
     final Color borderColor =
-    isSelected ? Colors.transparent : AppColors.border;
+        isSelected ? Colors.transparent : AppColors.border;
 
     final Color arrowColor = isSelected
         ? AppColors.primaryColor
@@ -90,7 +90,6 @@ class ModelCard extends StatelessWidget {
                   ),
                 ),
               ),
-
             Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -100,12 +99,12 @@ class ModelCard extends StatelessWidget {
                     onTap: onBodyTap,
                     splashColor: isSelected
                         ? AppColors.primaryColor.withValues(alpha: 0.2)
-                        : AppColors.primaryColor.inverted.withValues(
-                        alpha: 0.1),
+                        : AppColors.primaryColor.inverted
+                            .withValues(alpha: 0.1),
                     highlightColor: isSelected
                         ? AppColors.primaryColor.withValues(alpha: 0.1)
-                        : AppColors.primaryColor.inverted.withValues(
-                        alpha: 0.05),
+                        : AppColors.primaryColor.inverted
+                            .withValues(alpha: 0.05),
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: innerPadding),
                       child: Row(
@@ -115,45 +114,52 @@ class ModelCard extends StatelessWidget {
                             width: iconBoxSize,
                             height: iconBoxSize,
                             padding: imagePath.endsWith('.svg')
-                                ? EdgeInsets.all(
-                                iconBoxSize * 0.22)
+                                ? EdgeInsets.all(iconBoxSize * 0.22)
                                 : EdgeInsets.zero,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(borderRadius *
-                                  0.45),
+                              borderRadius:
+                                  BorderRadius.circular(borderRadius * 0.45),
                             ),
                             clipBehavior: Clip.antiAlias,
                             child: imagePath.isNotEmpty
                                 ? (imagePath.endsWith('.svg')
-                                ? (imagePath.startsWith('assets')
-                                ? SvgPicture.asset(
-                              imagePath,
-                              fit: BoxFit.contain,
-                              colorFilter: ColorFilter.mode(
-                                iconContentColor,
-                                BlendMode.srcIn,
-                              ),
-                            )
-                                : SvgPicture.file(
-                              File(imagePath),
-                              fit: BoxFit.contain,
-                              colorFilter: ColorFilter.mode(
-                                iconContentColor,
-                                BlendMode.srcIn,
-                              ),
-                            ))
-                                : (imagePath.startsWith('assets')
-                                ? Image.asset(
-                              imagePath,
-                              fit: BoxFit.cover,
-                            )
-                                : Image.file(
-                              File(imagePath),
-                              fit: BoxFit.cover,
-                            )))
+                                    ? (imagePath.startsWith('assets')
+                                        ? SvgPicture.asset(
+                                            imagePath,
+                                            fit: BoxFit.contain,
+                                            colorFilter: ColorFilter.mode(
+                                              iconContentColor,
+                                              BlendMode.srcIn,
+                                            ),
+                                          )
+                                        : (!kIsWeb
+                                            ? SvgPicture.file(
+                                                File(imagePath) as dynamic,
+                                                fit: BoxFit.contain,
+                                                colorFilter: ColorFilter.mode(
+                                                  iconContentColor,
+                                                  BlendMode.srcIn,
+                                                ),
+                                              )
+                                            : Icon(Icons.broken_image,
+                                                size: iconBoxSize * 0.6,
+                                                color: iconContentColor)))
+                                    : (imagePath.startsWith('assets')
+                                        ? Image.asset(
+                                            imagePath,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : (!kIsWeb
+                                            ? Image.file(
+                                                File(imagePath),
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Icon(Icons.broken_image,
+                                                size: iconBoxSize * 0.6,
+                                                color: iconContentColor))))
                                 : Icon(Icons.token,
-                                size: iconBoxSize * 0.6,
-                                color: iconContentColor),
+                                    size: iconBoxSize * 0.6,
+                                    color: iconContentColor),
                           ),
 
                           SizedBox(width: gapSize),
@@ -208,8 +214,8 @@ class ModelCard extends StatelessWidget {
                       onTap: onArrowTap,
                       splashColor: isSelected
                           ? AppColors.primaryColor.withValues(alpha: 0.2)
-                          : AppColors.primaryColor.inverted.withValues(
-                          alpha: 0.1),
+                          : AppColors.primaryColor.inverted
+                              .withValues(alpha: 0.1),
                       child: SizedBox(
                         width: arrowBoxWidth,
                         child: Center(

@@ -1,7 +1,7 @@
 // cards.dart
 
 import 'dart:async';
-import 'dart:io';
+import 'package:universal_io/io.dart';
 import 'package:cortex/app.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
