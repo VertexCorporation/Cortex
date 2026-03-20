@@ -28,6 +28,7 @@ import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/providers/local.dart';
 import '../messages/messages.dart';
+import 'package:cortex/chat/providers/memory.dart';
 import 'tools.dart';
 
 /// Service responsible for sending messages. It orchestrates interactions between providers and other services.
@@ -42,6 +43,7 @@ class SendService {
   bool _isSending = false;
   final ModelService _modelService;
   final VoiceService _voiceService;
+  final UserMemoryProvider _userMemoryProvider;
 
   SendService({
     required ConversationProvider conversationProvider,
@@ -53,6 +55,7 @@ class SendService {
     required OfflineService offlineService,
     required ModelService modelService,
     required VoiceService voiceService,
+    required UserMemoryProvider userMemoryProvider,
   })
       : _conversationProvider = conversationProvider,
         _inputProvider = inputProvider,
@@ -61,7 +64,8 @@ class SendService {
         _scrollService = scrollService,
         _offlineService = offlineService,
         _modelService = modelService,
-        _voiceService = voiceService;
+        _voiceService = voiceService,
+        _userMemoryProvider = userMemoryProvider;
 
   /// Main entry point to send a message.
   Future<bool> sendMessage({
@@ -113,9 +117,10 @@ class SendService {
       // 2. FEATURE MODES (Study, Quiz, etc.)
       // -----------------------------------------------------------------------
       final activeMode = _inputProvider.featureMode;
-      final bool enableThinkingMode = activeMode == ChatInputMode.featureReasoning;
+      final bool enableThinkingMode =
+          activeMode == ChatInputMode.featureReasoning;
       String textForApi = text;
-      
+
       // Apply voice system prompt to API text only (not shown to user)
       if (voiceSystemPrompt != null && voiceSystemPrompt.isNotEmpty) {
         textForApi = "$voiceSystemPrompt\n\n$textForApi";
@@ -242,7 +247,8 @@ class SendService {
       } else {
         if (_conversationProvider.conversationID == null) {
           final newConvId = _uuid.v4();
-          final title = (text.isEmpty && currentAttachmentPaths.isNotEmpty)
+          final defaultTitle =
+          (text.isEmpty && currentAttachmentPaths.isNotEmpty)
               ? "📁"
               : (text.length > 32 ? text.substring(0, 32) : text);
 
@@ -256,7 +262,37 @@ class SendService {
                 title: isHidden ? localizations.flowMode : null);
           } else {
             _conversationProvider.startNewConversationSession(
-                newConvId, title, modelForStorage, userMessage);
+                newConvId, defaultTitle, modelForStorage, userMessage);
+
+            // 🚀 ASYNC AI CHAT TITLE GENERATION
+            if (isServerSide && text.isNotEmpty) {
+              debugPrint("🚀 Triggering TitleGen for new chat...");
+              _apiService
+                  .generateChatTitle(text, localizations.chatTitlePrompt,
+                  localizations.chatTitleCriticalInstruction)
+                  .then((aiTitle) {
+                if (aiTitle != null && aiTitle
+                    .trim()
+                    .isNotEmpty) {
+                  final cleanTitle =
+                  aiTitle.length > 40 ? aiTitle.substring(0, 40) : aiTitle;
+
+                  // Update current UI if we are still on this chat
+                  if (_conversationProvider.conversationID == newConvId) {
+                    _conversationProvider.updateConversationTitle(cleanTitle);
+                    // Also set it in DB and broadcast via storage stream so Axon Inbox sees it
+                    ChatStorageService.renameConversation(
+                        newConvId, cleanTitle);
+                  } else {
+                    // Update local storage in the background
+                    ChatStorageService.renameConversation(
+                        newConvId, cleanTitle);
+                  }
+                }
+              }).catchError((e) {
+                debugPrint("TitleGen error: $e");
+              });
+            }
           }
         } else {
           _conversationProvider.appendMessageToConversation(userMessage);
@@ -390,7 +426,8 @@ class SendService {
     // State for managing featureReasoning block - OUTSIDE loop to persist across iterations
     // enablefeatureReasoning is already defined above when building context
     bool isfeatureReasoningBlockActive = false;
-    bool hasEverHadfeatureReasoning = false; // Track if we've seen any featureReasoning
+    bool hasEverHadfeatureReasoning =
+    false; // Track if we've seen any featureReasoning
 
     // --- THE LOOP ---
     while (shouldContinue && loopCount < maxLoops) {
@@ -479,6 +516,7 @@ class SendService {
         shouldContinue = false;
       } else {
         // Standard Models (Support Tools)
+        final enableWebSearch = _inputProvider.enableWebSearch;
         await _apiService.getOnlineModelResponse(
           modelId: modelId,
           isPremium: isPremium,
@@ -488,6 +526,7 @@ class SendService {
           localizations: localizations,
           langCode: langCode,
           enablefeatureReasoning: enablefeatureReasoning,
+          enableWebSearch: enableWebSearch,
           useTools: !_voiceService.isFlowActive,
           // Disable tools in Flow Mode
           onTextChunk: onTextChunk,
@@ -496,6 +535,9 @@ class SendService {
           // Capture Tools
           onToolCall: (tools) {
             turnToolCalls = tools;
+          },
+          onCitations: (citations) {
+            _conversationProvider.updateLastBotMessageSources(citations);
           },
         );
       }
@@ -590,6 +632,22 @@ class SendService {
 
     // Clear documents context after processing
     ToolRegistry.clearDocumentsContext();
+
+    // Extract memory updates if any
+    final finalResponseText = _conversationProvider.messages.isNotEmpty
+        ? _conversationProvider.messages.last.text
+        : "";
+    final memoryExp =
+    RegExp(r'<memory>([\s\S]*?)(?:</memory>|$)', caseSensitive: false);
+    final memoryMatch = memoryExp.firstMatch(finalResponseText);
+    if (memoryMatch != null) {
+      final newMemory = memoryMatch.group(1)?.trim();
+      if (newMemory != null && newMemory.isNotEmpty) {
+        _userMemoryProvider.updateMemory(newMemory);
+        debugPrint(
+            '[Memory] Successfully extracted and updated memory from response.');
+      }
+    }
   }
 
   void _handleSendError(Object error,

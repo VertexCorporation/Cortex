@@ -507,8 +507,18 @@ class VoiceService with ChangeNotifier {
     // Speak any remaining text in buffer
     if (_incomingTextBuffer.isNotEmpty) {
       // Logic fix: Ensure we don't drop text if it doesn't end with punctuation
-      final text = _incomingTextBuffer.toString();
-      _enqueueSentence(text);
+      String text = _incomingTextBuffer.toString();
+      
+      // Clean remaining block tags
+      text = text.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>'), '');
+      text = text.replaceAll(RegExp(r'<think>[\s\S]*?</think>'), '');
+      // If broken/unclosed tags remain, cut them off
+      if (text.contains('<memory>')) text = text.substring(0, text.indexOf('<memory>'));
+      if (text.contains('<think>')) text = text.substring(0, text.indexOf('<think>'));
+
+      if (text.trim().isNotEmpty) {
+        _enqueueSentence(text);
+      }
       _incomingTextBuffer.clear();
     }
     setAiGenerationComplete(true);
@@ -516,6 +526,17 @@ class VoiceService with ChangeNotifier {
 
   void _checkForSentences() {
     String currentText = _incomingTextBuffer.toString();
+
+    // First strip out any fully formed <memory>...</memory> and <think>...</think> blocks
+    currentText = currentText.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>'), '');
+    currentText = currentText.replaceAll(RegExp(r'<think>[\s\S]*?</think>'), '');
+
+    // If there is an open tag that hasn't closed yet, wait for more chunks.
+    if (currentText.contains('<memory>') || currentText.contains('<think>')) {
+      _incomingTextBuffer.clear();
+      _incomingTextBuffer.write(currentText);
+      return;
+    }
 
     // [FIX] Naive code block removal for TTS
     // If we detect a code block start, we might want to mute until end?
@@ -541,6 +562,10 @@ class VoiceService with ChangeNotifier {
 
         // Recursively check
         _checkForSentences();
+      } else {
+        // If empty sentence before punctuation, just clear it
+        _incomingTextBuffer.clear();
+        _incomingTextBuffer.write(remaining);
       }
     }
   }

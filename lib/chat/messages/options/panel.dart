@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/navigation.dart';
+import 'package:cortex/server/credits.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
@@ -55,6 +56,7 @@ class OptionsPanelViewModel {
   final InternetProvider internet;
   final Message message;
   final ModelService modelService;
+  final int totalCredits;
 
   OptionsPanelViewModel({
     required this.session,
@@ -62,6 +64,7 @@ class OptionsPanelViewModel {
     required this.internet,
     required this.message,
     required this.modelService,
+    required this.totalCredits,
   });
 
   List<MessageOption> get _baseOptions {
@@ -127,6 +130,11 @@ class OptionsPanelViewModel {
       if (option == MessageOption.regenerate) {
         if (isCurrentModelPremium && !hasPremiumAccess) return false;
         if (!isOfflineModel && !internet.isConnected) return false;
+        if (!isOfflineModel && totalCredits <= 0) return false;
+      }
+
+      if (option == MessageOption.changeModel) {
+        if (!isOfflineModel && totalCredits <= 0) return false;
       }
 
       // LOGIC UPDATE: Only restrict model ops if chat has IMAGES and model CAN'T handle them.
@@ -234,7 +242,7 @@ class _AnimatedMessageOptionsPanelState
 
   void _onCopyTapped() {
     final localizations = AppLocalizations.of(context)!;
-    Clipboard.setData(ClipboardData(text: widget.message.text));
+    Clipboard.setData(ClipboardData(text: widget.message.displayableText));
     Provider.of<IntrovertNotificationService>(context, listen: false)
         .showNotification(
             message: localizations.messageCopied,
@@ -266,6 +274,7 @@ class _AnimatedMessageOptionsPanelState
     final internetProvider = context.watch<InternetProvider>();
     final localizations = AppLocalizations.of(context)!;
     final modelService = context.read<ModelService>();
+    final totalCredits = context.watch<CreditsManager>().totalCreditsNotifier.value ?? 0;
 
     final viewModel = OptionsPanelViewModel(
       session: sessionProvider,
@@ -273,6 +282,7 @@ class _AnimatedMessageOptionsPanelState
       internet: internetProvider,
       message: widget.message,
       modelService: modelService,
+      totalCredits: totalCredits,
     );
 
     final List<MessageOption> visibleOptions =

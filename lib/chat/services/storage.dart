@@ -13,6 +13,12 @@ import '../messages/messages.dart';
 
 class ChatStorageService {
   /* ---------- conversation ---------- */
+
+  static final _titleController =
+      StreamController<Map<String, String>>.broadcast();
+
+  static Stream<Map<String, String>> get titleStream => _titleController.stream;
+
   static final _lastMsgController =
       StreamController<Map<String, dynamic>>.broadcast();
 
@@ -305,6 +311,9 @@ class ChatStorageService {
           'isUser': m.isUserMessage ? 1 : 0,
           'text': m.text,
           'photoPath': serializedAttachments, // Store JSON here
+          'webSearchSources': m.webSearchSources != null
+              ? jsonEncode(m.webSearchSources)
+              : null,
           'isReported': m.isReported ? 1 : 0,
           'model': m.model,
           'includeInContext': m.includeInContext ? 1 : 0,
@@ -398,6 +407,8 @@ class ChatStorageService {
         'isUser': m.isUserMessage ? 1 : 0,
         'text': m.text,
         'photoPath': serializedAttachments,
+        'webSearchSources':
+            m.webSearchSources != null ? jsonEncode(m.webSearchSources) : null,
         'isReported': m.isReported ? 1 : 0,
         'model': m.model,
         'includeInContext': m.includeInContext ? 1 : 0,
@@ -513,6 +524,7 @@ class ChatStorageService {
       );
 
       AppDataState().markUserDataAsChanged();
+      _titleController.add({"id": id, "title": newTitle});
     } catch (e) {
       _handleDiskError(e, 'renameConversation');
     }

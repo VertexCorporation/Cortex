@@ -202,12 +202,11 @@ class ScrollService {
         ? Colors.white.withValues(alpha: 0.9)
         : Colors.black.withValues(alpha: 0.8);
 
-    double bottomOffset;
-    if (isKeyboardOpen) {
-      bottomOffset = keyboardHeight + bottomPanelHeight;
-    } else {
-      bottomOffset = bottomPanelHeight;
-    }
+    // Add extra padding so it perfectly clears the input field edge and shadow
+    const double extraMargin = 16.0;
+
+    // Use dynamic height tracking exclusively, avoiding double padding when keyboard pushes the screen stack.
+    double bottomOffset = bottomPanelHeight + extraMargin;
 
     return Positioned(
       left: 0,

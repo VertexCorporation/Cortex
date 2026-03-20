@@ -23,6 +23,17 @@ void main() {
       expect(inputProvider.isAttachmentLoading, false);
       expect(inputProvider.isVoiceRecording, false);
       expect(inputProvider.isVoiceModeActive, false);
+      expect(inputProvider.enableWebSearch, false);
+    });
+
+    test('Web Search toggling', () {
+      expect(inputProvider.enableWebSearch, false);
+      
+      inputProvider.toggleWebSearch();
+      expect(inputProvider.enableWebSearch, true);
+
+      inputProvider.toggleWebSearch();
+      expect(inputProvider.enableWebSearch, false);
     });
 
     test('Feature mode toggling', () {
@@ -119,6 +130,9 @@ void main() {
       inputProvider.setFeatureMode(ChatInputMode.quiz);
       inputProvider.setVoiceRecording(true);
       inputProvider.setAttachmentLoading(true);
+      if (!inputProvider.enableWebSearch) {
+        inputProvider.toggleWebSearch();
+      }
 
       inputProvider.resetInputState();
 
@@ -126,6 +140,7 @@ void main() {
       expect(inputProvider.isVoiceRecording, false);
       expect(inputProvider.isAttachmentLoading, false);
       expect(inputProvider.isEditingMode, false);
+      expect(inputProvider.enableWebSearch, false);
     });
     test('Global Draft logic', () {
       // 1. Initial State

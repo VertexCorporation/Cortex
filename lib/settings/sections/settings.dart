@@ -15,7 +15,8 @@ import '../../theme.dart';
 import '../../webview.dart';
 import '../providers/general.dart';
 import '../providers/actions.dart';
-import 'package:cortex/banner.dart'; // [NEW]
+import 'package:cortex/invite.dart';
+
 
 /// A widget that displays the main settings and information section.
 ///
@@ -381,7 +382,7 @@ class _SettingsSectionState extends State<SettingsSection>
         'key': 'shareApp',
         'icon': 'assets/icons/world.svg',
         'action': () =>
-            context.read<BannerService>().generateAndShareInviteLink(context)
+            InviteService().createAndShareReferralLink(context)
       },
       {
         'key': 'rateUs',

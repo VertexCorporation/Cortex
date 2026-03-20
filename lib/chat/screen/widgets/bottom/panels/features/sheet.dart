@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import '../../../../../providers/input.dart';
 import '../selection/sheet.dart';
 import 'button.dart';
+import '../../../../../../fog.dart';
 
 void showFeaturesSheet({
   required BuildContext context,
@@ -24,32 +25,6 @@ void showFeaturesSheet({
   FocusScope.of(context).unfocus();
 
   final mediaQuery = MediaQuery.of(context);
-  final screenHeight = mediaQuery.size.height;
-  final double topRadius = mediaQuery.size.width * 0.07;
-  final l10n = AppLocalizations.of(context)!;
-
-  // Pre-calculate capability availability for the UI
-  final catalog = context.read<ModelCatalogProvider>();
-
-  // Read InputProvider for current feature mode (use read, not watch - we're in an event handler)
-  final inputProvider = context.read<InputProvider>();
-  final currentMode = inputProvider.featureMode;
-
-  // Logic: Check for models that have 'image' in their 'outputs' map
-  final imageGenModels = catalog.allModels.where((m) {
-    // Assuming ModelEntity has a raw map or property for outputs.
-    try {
-      final map = m.toMap();
-      if (map['outputs'] is Map) {
-        return map['outputs']['image'] == true;
-      }
-      return false;
-    } catch (e) {
-      return false;
-    }
-  }).toList();
-
-  final bool canGenerateImages = imageGenModels.isNotEmpty;
 
   showModalBottomSheet<void>(
     context: context,
@@ -60,49 +35,101 @@ void showFeaturesSheet({
       maxWidth: mediaQuery.size.width,
     ),
     builder: (BuildContext modalContext) {
-      return Container(
-        constraints: BoxConstraints(
-          maxHeight: screenHeight * 0.75,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(topRadius)),
-          // Border removed - now on individual buttons
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Drag Handle
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
-              child: Container(
-                width: mediaQuery.size.width * 0.12,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.secondaryColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
+      return _FeaturesSheetContent(controller: controller);
+    },
+  );
+}
+
+class _FeaturesSheetContent extends StatefulWidget {
+  final TextEditingController controller;
+
+  const _FeaturesSheetContent({required this.controller});
+
+  @override
+  State<_FeaturesSheetContent> createState() => _FeaturesSheetContentState();
+}
+
+class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final double topRadius = mediaQuery.size.width * 0.07;
+    final l10n = AppLocalizations.of(context)!;
+
+    final catalog = context.watch<ModelCatalogProvider>();
+    final inputProvider = context.watch<InputProvider>();
+    final currentMode = inputProvider.featureMode;
+
+    final imageGenModels = catalog.allModels.where((m) {
+      try {
+        final map = m.toMap();
+        if (map['outputs'] is Map) {
+          return map['outputs']['image'] == true;
+        }
+        return false;
+      } catch (e) {
+        return false;
+      }
+    }).toList();
+
+    final bool canGenerateImages = imageGenModels.isNotEmpty;
+
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: screenHeight * 0.75,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(topRadius)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Drag Handle
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
+            child: Container(
+              width: mediaQuery.size.width * 0.12,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.secondaryColor,
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
+          ),
 
-            // Title
-            Padding(
-              padding: EdgeInsets.only(bottom: 12.0),
-              child: Text(
-                l10n.featuresTitle,
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor.inverted,
-                ),
+          // Title
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: Text(
+              l10n.featuresTitle,
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryColor.inverted,
               ),
             ),
+          ),
 
-            // Features List
-            Flexible(
+          // Features List Wrapped with Fog!
+          Flexible(
+            child: ScrollFog(
+              scrollController: _scrollController,
+              topFogHeight: 20,
+              bottomFogHeight: 40,
               child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
+                controller: _scrollController,
+                physics: const ClampingScrollPhysics(), // Removed BouncingScrollPhysics
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).padding.bottom + 20),
                 child: Column(
@@ -114,11 +141,8 @@ void showFeaturesSheet({
                       description: l10n.useOfflineDescription,
                       isSelected: currentMode == ChatInputMode.offline,
                       onTap: () {
-                        // Toggle logic handled in _handleOfflineAction potentially or here?
-                        // If already selected, maybe we toggle off?
-                        // For Offline, it's a bit special. Let's let the handler decide or toggle off if same.
                         if (currentMode == ChatInputMode.offline) {
-                          context.read<InputProvider>().clearFeatureMode();
+                            _checkAndResetOfflineMode(context);
                         } else {
                           _handleOfflineAction(context, l10n);
                         }
@@ -138,24 +162,32 @@ void showFeaturesSheet({
                       },
                     ),
 
-                    // 3. CREATE IMAGE (Make)
+                    // 3. WEB SEARCH
+                    FeaturesSheetButton(
+                      iconPath: 'assets/icons/world.svg',
+                      title: l10n.featureWebSearchTitle,
+                      description: l10n.featureWebSearchDescription,
+                      isSelected: inputProvider.enableWebSearch,
+                      onTap: () {                          _checkAndResetOfflineMode(context);                        inputProvider.toggleWebSearch();
+                        Navigator.pop(context);
+                      },
+                    ),
+
+                    // 4. CREATE IMAGE (Make)
                     FeaturesSheetButton(
                       iconPath: 'assets/icons/make.svg',
                       title: l10n.featureCreateImageTitle,
                       description: l10n.featureCreateImageDescription,
                       isDisabled: !canGenerateImages,
                       isSelected: false,
-                      // Image generation is an action, not a mode?
-                      // Plan didn't specify Image Generation as a mode, but typically it is single-shot.
-                      // Leaving isSelected false for now as it usually sends immediately.
                       onTap: () {
                         Navigator.pop(context);
                         _handleCreateImageAction(
-                            context, imageGenModels, controller);
+                            context, imageGenModels, widget.controller);
                       },
                     ),
 
-                    // 4. STUDY & LEARN
+                    // 5. STUDY & LEARN
                     FeaturesSheetButton(
                       iconPath: 'assets/icons/study.svg',
                       title: l10n.featureStudyTitle,
@@ -167,7 +199,7 @@ void showFeaturesSheet({
                       },
                     ),
 
-                    // 5. QUIZZES
+                    // 6. QUIZZES
                     FeaturesSheetButton(
                       iconPath: 'assets/icons/test.svg',
                       title: l10n.featureQuizzesTitle,
@@ -179,15 +211,13 @@ void showFeaturesSheet({
                       },
                     ),
 
-                    // 6. EXPLORE (Google Fonts Eye Icon)
+                    // 7. EXPLORE
                     FeaturesSheetButton(
                       iconData: Icons.visibility_outlined,
-                      // Eye icon from Google Fonts
                       title: l10n.explore,
                       description: l10n.featureExploreDescription,
                       onTap: () {
-                        Navigator.pop(context); // Close features sheet
-                        // Open selection sheet
+                        Navigator.pop(context);
                         showModelSelectionSheet(
                           context: context,
                           localizations: l10n,
@@ -207,11 +237,11 @@ void showFeaturesSheet({
                 ),
               ),
             ),
-          ],
-        ),
-      );
-    },
-  );
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // --- LOGIC HELPERS ---
@@ -296,20 +326,34 @@ void _checkAndResetOfflineMode(BuildContext context) {
   final inputProvider = context.read<InputProvider>();
   final selectionService = context.read<SelectionService>();
   final catalog = context.read<ModelCatalogProvider>();
+    final sessionProvider = context.read<ChatSessionProvider>();
 
-  if (inputProvider.featureMode == ChatInputMode.offline) {
-    // Switch to "auto" (Dynamic Chat)
-    // Finding the 'auto' model or just clearing selection depends on app logic
-    // Usually 'auto' is a special ID or we select the default online model
-    try {
-      // Assuming 'auto' is the ID for dynamic chat or we pick the first online one
-      // The user said "otomatik olarak dinamik sohbete atacak"
-      final dynamicModel = catalog.allModels.firstWhere((m) => m.id == 'auto',
-          orElse: () =>
-              catalog.allModels.firstWhere((m) => m.type != 'offline'));
-      selectionService.selectModel(dynamicModel);
-    } catch (e) {
-      // Fallback safe
+    final isOfflineFeature = inputProvider.featureMode == ChatInputMode.offline;
+
+    bool isOfflineModel = false;
+    final currentModelId = sessionProvider.modelId;
+    if (currentModelId != null) {
+      try {
+        final currentModel =
+            catalog.allModels.firstWhere((m) => m.id == currentModelId);
+        if (currentModel.type == 'offline') {
+          isOfflineModel = true;
+        }
+      } catch (_) {}
+    }
+
+    if (isOfflineFeature || isOfflineModel) {
+      if (isOfflineFeature) {
+        inputProvider.clearFeatureMode();
+      }
+      try {
+        final dynamicModel = catalog.allModels.firstWhere(
+            (m) => m.id == 'cortex/auto',
+            orElse: () =>
+                catalog.allModels.firstWhere((m) => m.type != 'offline'));
+        selectionService.switchActiveModel(dynamicModel, context: context);
+      } catch (e) {
+        // Fallback safe
+      }
     }
   }
-}

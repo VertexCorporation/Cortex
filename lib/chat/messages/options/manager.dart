@@ -66,7 +66,7 @@ Future<void> showMessageOptions({
   final localPosition = renderBox.globalToLocal(tapPosition);
 
   // A ValueNotifier is still useful for the 'Select Text' feature.
-  final messageNotifier = ValueNotifier<String>(message.text);
+  final messageNotifier = ValueNotifier<String>(message.displayableText);
 
   _currentMessageOptionsEntry = OverlayEntry(
     builder: (overlayContext) {
@@ -86,7 +86,7 @@ Future<void> showMessageOptions({
           final ttsService = TtsService();
           // [NEW] Pass the current locale to the TTS service
           final langCode = Localizations.localeOf(context).languageCode;
-          ttsService.speak(message.text, languageCode: langCode);
+          ttsService.speak(message.displayableText, languageCode: langCode);
         },
       );
     },

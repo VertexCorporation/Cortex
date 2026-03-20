@@ -353,7 +353,13 @@ class ModelService with ChangeNotifier {
     final producerMatch = _findBestAssetMatch(producerLower);
     if (producerMatch != null) return producerMatch;
 
-    if (model.imagePath != null && model.imagePath!.startsWith('assets/')) {
+    if (model.imagePath != null &&
+        (model.imagePath!.startsWith('assets/') ||
+            model.imagePath!.startsWith('http'))) {
+      return model.imagePath!;
+    }
+
+    if (model.imagePath != null && File(model.imagePath!).existsSync()) {
       return model.imagePath!;
     }
 
