@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/chat/providers/conversation.dart';
-import '../../banner.dart';
+
 
 // Modular Widgets
 import 'widgets/header.dart';
@@ -29,7 +29,7 @@ class AxonContent extends StatelessWidget {
   final VoidCallback onExitSearchTap;
   final ValueChanged<String> onSearchChanged;
   final int activeTab;
-  final BannerService bannerService;
+
 
   const AxonContent({
     super.key,
@@ -45,7 +45,7 @@ class AxonContent extends StatelessWidget {
     required this.onExitSearchTap,
     required this.onSearchChanged,
     required this.activeTab,
-    required this.bannerService,
+
   });
 
   @override
@@ -61,8 +61,7 @@ class AxonContent extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final mediaQuery = MediaQuery.of(context);
-    final screenHeight = mediaQuery.size.height;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     final conversationProvider = context.watch<ConversationProvider>();
     final String? currentConversationId = conversationProvider.conversationID;
@@ -185,28 +184,6 @@ class AxonContent extends StatelessWidget {
                 ),
               ),
 
-              // Banner
-              Positioned(
-                bottom: 0,
-                left: horizontalPadding * 0.5,
-                right: horizontalPadding * 0.5,
-                child: ValueListenableBuilder<bool>(
-                  valueListenable: bannerService.showInviteBannerNotifier,
-                  builder: (context, showBanner, child) {
-                    // Only render the banner widget when it should be visible.
-                    if (!showBanner) {
-                      return const SizedBox.shrink();
-                    }
-                    return FloatingInfoBanner(
-                      isEmbedded: true,
-                      referenceWidth: referenceWidth,
-                      onDismissed: () => bannerService.startCooldown(),
-                      onTap: () =>
-                          bannerService.generateAndShareInviteLink(context),
-                    );
-                  },
-                ),
-              ),
             ],
           ),
         ),

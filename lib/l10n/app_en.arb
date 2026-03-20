@@ -1,4 +1,10 @@
 {
+  "chatTitlePrompt": "You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation.",
+  "@chatTitlePrompt": {
+    "description": "Prompt for AI to generate a chat title"
+  },
+  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>",
+  "systemMemoryReminder": "\n\nAlways remember this about the user:\n{userMemory}",
   "@@locale": "en",
   "cancel": "Cancel",
   "remove": "Remove",
@@ -147,6 +153,7 @@
   "termsOfServiceAndPrivacyPolicyWarning": "By placing this order, you agree to the Terms of Service and Privacy Policy. You can click this text to learn more about our Terms of Service and Privacy Policy. The subscription will automatically renew unless auto-renew is turned off at least 24 hours before the end of the current period.",
   "termsOfService": "Terms of Service",
   "privacyPolicy": "Privacy Policy",
+  "renamed": "Renamed",
   "report": "Report",
   "reportDialogTitle": "Submit Report",
   "reportDescriptionLabel": "What is the issue?",
@@ -658,5 +665,50 @@
   "toolChartDataParam": "Numeric data values for the chart.",
   "toolChartLabelParam": "Dataset label for the chart legend.",
   "toolChartTitleParam": "Title of the chart.",
-  "thinkingModeInstruction": "THINKING MODE ENABLED: You MUST use <think></think> tags to show your reasoning process before giving your final answer. Think step by step inside the tags, then provide your response outside the tags."
+  "thinkingModeInstruction": "THINKING MODE ENABLED: You MUST use <think></think> tags to show your reasoning process before giving your final answer. Think step by step inside the tags, then provide your response outside the tags.",
+  "openLinkWarningTitle": "External Link Warning",
+  "openLinkCancel": "Cancel",
+  "openLinkConfirm": "Open Link",
+  "webSearchSources": "Sources",
+  "searching": "Searching",
+  "featureWebSearchTitle": "Web Search",
+  "featureWebSearchDescription": "Search the web for real-time information",
+  "webSearchQuotaExceeded": "Search Quota Exceeded",
+  "clearMemory": "Clear Memory",
+  "clearMemoryConfirm": "Are you sure you want to clear your memory?",
+  "personalization": "Personalization",
+  "personalizationDescription": "Customize your experience",
+  "memoryTitle": "Memory",
+  "memoryDescription": "AIs recognize you like this.",
+  "noMemoryYet": "No memories established yet",
+  "memoryLimitReached": "Memory limit reached",
+  "intelligenceTitle": "Intelligence",
+  "intelligenceDescription": "AIs communicate with you like this.",
+  "customInstructionHint": "Enter your custom instructions here",
+  "openLinkWarningMessage": "You are about to open the following external link:\\n\\n{url}\\n\\nAre you sure you want to proceed?",
+  "@openLinkWarningMessage": {
+    "placeholders": {
+      "url": {
+        "type": "String",
+        "example": "https://example.com"
+      }
+    }
+  },
+  "intelligenceSystemPrompt": "Follow these custom instructions:\\n\\n{instruction}",
+  "@intelligenceSystemPrompt": {
+    "placeholders": {
+      "instruction": {
+        "type": "String",
+        "example": "Always answer in uppercase"
+      }
+    }
+  },
+  "chatTitleCriticalInstruction": "[CRITICAL INSTRUCTION]: You are a TITLE GENERATOR. DO NOT answer the user's question. DO NOT chat or say hello. ONLY output a 2-4 word title summarizing what the user is asking about.",
+  "@chatTitleCriticalInstruction": {
+    "description": "Critical system instruction appended to force the AI to only output a title"
+  },
+  "cortexSystemPersona": "\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\". Remember this and maintain the persona of Cortex if asked.",
+  "@cortexSystemPersona": {
+    "description": "System persona string added to online models"
+  }
 }

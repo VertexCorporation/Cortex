@@ -9,6 +9,19 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'Vous êtes un générateur de titres. Veuillez répondre UNIQUEMENT avec un titre de 2 à 5 mots pour la conversation suivante. N\'utilisez ni guillemets, ni préfixes, ni ponctuation.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nRappelez-vous toujours ceci à propos de l\'utilisateur :\n$userMemory';
+  }
+
+  @override
   String get cancel => 'Annuler';
 
   @override
@@ -409,6 +422,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Politique de Confidentialité';
+
+  @override
+  String get renamed => 'Renamed';
 
   @override
   String get report => 'Signaler';
@@ -1727,4 +1743,84 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'MODE RÉFLEXION ACTIVÉ : Vous DEVEZ utiliser les balises <think></think> pour indiquer votre raisonnement avant de donner votre réponse finale. Réfléchissez étape par étape à l’intérieur des balises, puis indiquez votre réponse à l’extérieur.';
+
+  @override
+  String get openLinkWarningTitle =>
+      'Avertissement concernant les liens externes';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Ouvrir le lien';
+
+  @override
+  String get webSearchSources => 'Sources';
+
+  @override
+  String get searching => 'Recherche';
+
+  @override
+  String get featureWebSearchTitle => 'Recherche Web';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Recherchez sur le Web des informations en temps réel';
+
+  @override
+  String get webSearchQuotaExceeded => 'Quota de recherche dépassé';
+
+  @override
+  String get clearMemory => 'Mémoire claire';
+
+  @override
+  String get clearMemoryConfirm =>
+      'Êtes-vous sûr de vouloir effacer votre mémoire ?';
+
+  @override
+  String get personalization => 'Personnalisation';
+
+  @override
+  String get personalizationDescription => 'Personnalisez votre expérience';
+
+  @override
+  String get memoryTitle => 'Mémoire';
+
+  @override
+  String get memoryDescription => 'Les IA vous reconnaissent ainsi.';
+
+  @override
+  String get noMemoryYet => 'Aucun souvenir établi pour le moment';
+
+  @override
+  String get memoryLimitReached => 'Limite de mémoire atteinte';
+
+  @override
+  String get intelligenceTitle => 'Intelligence';
+
+  @override
+  String get intelligenceDescription =>
+      'Les IA communiquent avec vous de cette manière.';
+
+  @override
+  String get customInstructionHint =>
+      'Saisissez vos instructions personnalisées ici';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'Vous êtes sur le point d\'ouvrir le lien externe suivant :\\n\\n$url\\n\\nÊtes-vous sûr de vouloir continuer ?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Suivez ces instructions personnalisées :\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[INSTRUCTION CRITIQUE]: Vous êtes un GÉNÉRATEUR DE TITRES. NE RÉPONDEZ PAS à la question de l\'utilisateur. NE DISCUTEZ PAS et ne dites PAS bonjour. Générez UNIQUEMENT un titre de 2 à 4 mots résumant la question de l\'utilisateur.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] INSTRUCTION CRITIQUE : Vous opérez actuellement au sein d\'un écosystème d\'IA massif et très avancé nommé « Cortex ». Souvenez-vous-en et maintenez la personnalité de Cortex si on vous le demande.';
 }

@@ -5,6 +5,7 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DownloadManager extends ChangeNotifier {
@@ -47,8 +48,10 @@ class DownloadManager extends ChangeNotifier {
 
 class DownloadedModelsManager extends ChangeNotifier {
   static final DownloadedModelsManager _instance =
-      DownloadedModelsManager._internal();
+  DownloadedModelsManager._internal();
+
   factory DownloadedModelsManager() => _instance;
+
   DownloadedModelsManager._internal();
 
   List<DownloadedModel> downloadedModels = [];
@@ -69,7 +72,7 @@ class DownloadedModelsManager extends ChangeNotifier {
 
   void updateSingleDownloadedModel(String modelTitle, String imagePath) {
     int index =
-        downloadedModels.indexWhere((model) => model.name == modelTitle);
+    downloadedModels.indexWhere((model) => model.name == modelTitle);
     if (index >= 0) {
       downloadedModels[index] =
           DownloadedModel(name: modelTitle, image: imagePath);
@@ -89,6 +92,7 @@ class DownloadedModel {
 
 class FileDownloadHelper extends ChangeNotifier {
   static final FileDownloadHelper _instance = FileDownloadHelper._internal();
+
   factory FileDownloadHelper() => _instance;
 
   FileDownloadHelper._internal() {
@@ -96,10 +100,16 @@ class FileDownloadHelper extends ChangeNotifier {
   }
 
   String _status = "Couldn't Downloaded";
+
   String get status => _status;
 
   final ReceivePort _port = ReceivePort();
   final Map<String, _DownloadTaskInfo> _tasks = {};
+
+  // Dio Failover Additions
+  final Dio _dio = Dio();
+  final Map<String, CancelToken> _dioCancelTokens = {};
+  final Map<String, int> _dioProgressUpdateMs = {};
 
   void refresh() {
     notifyListeners();
@@ -118,26 +128,27 @@ class FileDownloadHelper extends ChangeNotifier {
         final String taskId = data[0];
         final int statusInt = data[1];
         final int progress = data[2];
-        final DownloadTaskStatus status = DownloadTaskStatus.values[statusInt];
+        final DownloadTaskStatus dstatus = DownloadTaskStatus.values[statusInt];
 
         final taskInfo = _tasks[taskId];
-        if (taskInfo != null) {
-          if (status == DownloadTaskStatus.running) {
+        if (taskInfo != null && !taskInfo.isDioFallback) {
+          if (dstatus == DownloadTaskStatus.running) {
             taskInfo.onProgress(taskId, progress.toDouble());
-          } else if (status == DownloadTaskStatus.enqueued) {
+          } else if (dstatus == DownloadTaskStatus.enqueued) {
             // Do nothing
-          } else if (status == DownloadTaskStatus.complete) {
+          } else if (dstatus == DownloadTaskStatus.complete) {
             taskInfo.onDownloadCompleted(taskId);
             _tasks.remove(taskId);
             debugPrint(
                 "[FileDownloadHelper] Download complete for task '$taskId'. Broadcasting global state change.");
             DownloadedModelsManager().notifyListenersOfChange();
-          } else if (status == DownloadTaskStatus.paused) {
+          } else if (dstatus == DownloadTaskStatus.paused) {
             taskInfo.onDownloadPaused();
-          } else if (status == DownloadTaskStatus.failed) {
-            taskInfo.onDownloadError('Download failed');
-            _tasks.remove(taskId);
-          } else if (status == DownloadTaskStatus.canceled) {
+          } else if (dstatus == DownloadTaskStatus.failed) {
+            debugPrint(
+                '[FileDownloadHelper] FlutterDownloader failed for task \'$taskId\'. Initiating Dio fallback...');
+            _startDioFallbackFromFailedTask(taskId);
+          } else if (dstatus == DownloadTaskStatus.canceled) {
             debugPrint(
                 "[FileDownloadHelper] Task '$taskId' was confirmed as canceled by the backend.");
             _tasks.remove(taskId);
@@ -153,6 +164,32 @@ class FileDownloadHelper extends ChangeNotifier {
   void dispose() {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
+  }
+
+  Future<void> _startDioFallbackFromFailedTask(String failedTaskId) async {
+    final taskInfo = _tasks.remove(failedTaskId);
+    if (taskInfo == null) return;
+
+    final newTaskId = 'dio_${taskInfo.modelId}';
+    final cancelToken = CancelToken();
+    _dioCancelTokens[newTaskId] = cancelToken;
+    _dioProgressUpdateMs[newTaskId] = 0;
+
+    _tasks[newTaskId] = _DownloadTaskInfo(
+      modelId: taskInfo.modelId,
+      taskId: newTaskId,
+      title: taskInfo.title,
+      filePath: taskInfo.filePath,
+      url: taskInfo.url,
+      onProgress: taskInfo.onProgress,
+      onDownloadCompleted: taskInfo.onDownloadCompleted,
+      onDownloadError: taskInfo.onDownloadError,
+      onDownloadPaused: taskInfo.onDownloadPaused,
+      isDioFallback: true,
+      cancelToken: cancelToken,
+    );
+
+    _startDioDownload(newTaskId);
   }
 
   Future<String?> downloadModel({
@@ -179,28 +216,59 @@ class FileDownloadHelper extends ChangeNotifier {
         savedDirPath.createSync(recursive: true);
       }
 
-      final taskId = await FlutterDownloader.enqueue(
-        url: url,
-        savedDir: savedDir,
-        fileName: fileName,
-        showNotification: showNotification,
-        // Fix: Re-enabled. Now intercepted by AndroidManifest to open App instead of crashing.
-        openFileFromNotification: true,
-      );
+      String? taskId;
+      bool useDioFallback = false;
 
-      if (taskId != null) {
+      try {
+        taskId = await FlutterDownloader.enqueue(
+          url: url,
+          savedDir: savedDir,
+          fileName: fileName,
+          showNotification: showNotification,
+          openFileFromNotification: true,
+        );
+      } catch (e) {
+        debugPrint(
+            '[FileDownloadHelper] FlutterDownloader enqueue failed: $e, falling back to Dio');
+      }
+
+      if (taskId == null) {
+        useDioFallback = true;
+        taskId = 'dio_$id';
+      }
+
+      if (useDioFallback) {
+        final cancelToken = CancelToken();
+        _dioCancelTokens[taskId] = cancelToken;
+        _dioProgressUpdateMs[taskId] = 0;
+
         _tasks[taskId] = _DownloadTaskInfo(
           modelId: id,
           taskId: taskId,
           title: title,
           filePath: filePath,
+          url: url,
+          cancelToken: cancelToken,
+          isDioFallback: true,
           onProgress: onProgress,
           onDownloadCompleted: onDownloadCompleted,
           onDownloadError: onDownloadError,
           onDownloadPaused: onDownloadPaused,
         );
+
+        _startDioDownload(taskId);
       } else {
-        onDownloadError('Download could not be started.');
+        _tasks[taskId] = _DownloadTaskInfo(
+          modelId: id,
+          taskId: taskId,
+          title: title,
+          filePath: filePath,
+          url: url,
+          onProgress: onProgress,
+          onDownloadCompleted: onDownloadCompleted,
+          onDownloadError: onDownloadError,
+          onDownloadPaused: onDownloadPaused,
+        );
       }
       return taskId;
     } catch (e) {
@@ -211,23 +279,89 @@ class FileDownloadHelper extends ChangeNotifier {
     }
   }
 
-  ///  Its only job is to tell the
-  /// flutter_downloader plugin to cancel a task. It does not rely on the
-  /// in-memory `_tasks` map, so it works perfectly even after an app restart.
+  Future<void> _startDioDownload(String taskId) async {
+    final taskInfo = _tasks[taskId];
+    if (taskInfo == null) return;
+
+    try {
+      String tempFilePath = "${taskInfo.filePath}.tmp";
+
+      if (File(tempFilePath).existsSync()) {
+        File(tempFilePath).deleteSync();
+      }
+
+      await _dio.download(
+        taskInfo.url,
+        tempFilePath,
+        cancelToken: taskInfo.cancelToken,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            double progress = (received / total) * 100;
+
+            int currentMs = DateTime
+                .now()
+                .millisecondsSinceEpoch;
+            int lastUpdate = _dioProgressUpdateMs[taskId] ?? 0;
+            if (currentMs - lastUpdate > 250 || progress == 100) {
+              _dioProgressUpdateMs[taskId] = currentMs;
+              taskInfo.onProgress(taskInfo.modelId,
+                  progress); // use model id or task id? ui might prefer taskid, but let's stick to taskid since that's what we returned
+            }
+          }
+        },
+      );
+
+      final tempFile = File(tempFilePath);
+      if (tempFile.existsSync()) {
+        tempFile.renameSync(taskInfo.filePath);
+      }
+
+      taskInfo.onProgress(taskId, 100);
+      taskInfo.onDownloadCompleted(taskId);
+      _tasks.remove(taskId);
+      _dioCancelTokens.remove(taskId);
+      _dioProgressUpdateMs.remove(taskId);
+
+      debugPrint(
+          "[FileDownloadHelper] Dio Download complete for task '$taskId'.");
+      DownloadedModelsManager().notifyListenersOfChange();
+    } catch (e) {
+      if (e is DioException && CancelToken.isCancel(e)) {
+        debugPrint("[FileDownloadHelper] Dio Download cancelled: $taskId");
+      } else {
+        debugPrint("[FileDownloadHelper] Dio Download error: $e");
+        taskInfo.onDownloadError('Error: $e');
+      }
+      _tasks.remove(taskId);
+      _dioCancelTokens.remove(taskId);
+      _dioProgressUpdateMs.remove(taskId);
+    }
+  }
+
   Future<void> cancelDownload(String taskId) async {
     debugPrint(
         '[FileDownloadHelper] Received request to cancel taskId: $taskId');
     try {
-      // Unconditionally call the plugin to cancel the task. This is the fix.
+      if (taskId.startsWith('dio_')) {
+        final cancelToken = _dioCancelTokens[taskId];
+        cancelToken?.cancel("User requested cancellation");
+        final taskInfo = _tasks.remove(taskId);
+        if (taskInfo != null) {
+          taskInfo.isCancelledByUser = true;
+          final tempFile = File("${taskInfo.filePath}.tmp");
+          if (tempFile.existsSync()) tempFile.deleteSync();
+        }
+        _dioCancelTokens.remove(taskId);
+        _dioProgressUpdateMs.remove(taskId);
+        debugPrint('[FileDownloadHelper] Dio task $taskId cancelled.');
+        return;
+      }
+
       await FlutterDownloader.cancel(taskId: taskId);
       debugPrint(
           '[FileDownloadHelper] Command to cancel taskId: $taskId sent to the OS successfully.');
-
-      // Also remove the task from our in-memory map if it happens to exist
-      // (for the non-restart scenario).
       _tasks.remove(taskId);
     } catch (e) {
-      // This might happen if the task ID is invalid or already completed. It's safe to ignore.
       debugPrint(
           "[FileDownloadHelper] Error while cancelling download task '$taskId': $e");
     }
@@ -235,6 +369,10 @@ class FileDownloadHelper extends ChangeNotifier {
 
   Future<void> removeDownload(String taskId) async {
     try {
+      if (taskId.startsWith('dio_')) {
+        await cancelDownload(taskId);
+        return;
+      }
       await FlutterDownloader.remove(
           taskId: taskId, shouldDeleteContent: false);
     } catch (e) {
@@ -243,6 +381,10 @@ class FileDownloadHelper extends ChangeNotifier {
   }
 
   Future<String?> resumeDownload(String taskId) async {
+    if (taskId.startsWith('dio_')) {
+      return null; // Force controller to start new fallback download
+    }
+
     final newTaskId = await FlutterDownloader.resume(taskId: taskId);
     if (newTaskId != null) {
       final oldInfo = _tasks.remove(taskId);
@@ -252,10 +394,13 @@ class FileDownloadHelper extends ChangeNotifier {
           taskId: newTaskId,
           title: oldInfo.title,
           filePath: oldInfo.filePath,
+          url: oldInfo.url,
           onProgress: oldInfo.onProgress,
           onDownloadCompleted: oldInfo.onDownloadCompleted,
           onDownloadError: oldInfo.onDownloadError,
           onDownloadPaused: oldInfo.onDownloadPaused,
+          cancelToken: oldInfo.cancelToken,
+          isDioFallback: oldInfo.isDioFallback,
         );
       }
       return newTaskId;
@@ -270,21 +415,23 @@ class FileDownloadHelper extends ChangeNotifier {
         await cancelDownload(id);
       }
 
-      final allTasks = await FlutterDownloader.loadTasks();
-      if (allTasks != null) {
-        for (final t in allTasks) {
-          final s = t.status;
-          if (s == DownloadTaskStatus.running ||
-              s == DownloadTaskStatus.enqueued ||
-              s == DownloadTaskStatus.paused) {
-            await FlutterDownloader.cancel(taskId: t.taskId);
+      try {
+        final allTasks = await FlutterDownloader.loadTasks();
+        if (allTasks != null) {
+          for (final t in allTasks) {
+            final s = t.status;
+            if (s == DownloadTaskStatus.running ||
+                s == DownloadTaskStatus.enqueued ||
+                s == DownloadTaskStatus.paused) {
+              await FlutterDownloader.cancel(taskId: t.taskId);
+            }
           }
         }
-      }
+      } catch (_) {}
 
       final prefs = await SharedPreferences.getInstance();
       final keysToWipe =
-          prefs.getKeys().where((k) => k.startsWith('download_task_id_'));
+      prefs.getKeys().where((k) => k.startsWith('download_task_id_'));
       for (final k in keysToWipe) {
         await prefs.remove(k);
       }
@@ -301,6 +448,9 @@ class _DownloadTaskInfo {
   final String taskId;
   final String title;
   final String filePath;
+  final String url;
+  final CancelToken? cancelToken;
+  final bool isDioFallback;
   final Function(String, double) onProgress;
   final Function(String) onDownloadCompleted;
   final Function(String) onDownloadError;
@@ -312,6 +462,9 @@ class _DownloadTaskInfo {
     required this.taskId,
     required this.title,
     required this.filePath,
+    required this.url,
+    this.cancelToken,
+    this.isDioFallback = false,
     required this.onProgress,
     required this.onDownloadCompleted,
     required this.onDownloadError,

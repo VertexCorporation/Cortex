@@ -9,6 +9,19 @@ class AppLocalizationsHi extends AppLocalizations {
   AppLocalizationsHi([String locale = 'hi']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'आप शीर्षक जनरेटर हैं। कृपया निम्नलिखित वार्तालाप के लिए केवल 2-5 शब्दों का शीर्षक ही लिखें। उद्धरण चिह्न, उपसर्ग या विराम चिह्नों का प्रयोग न करें।';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nउपयोगकर्ता के बारे में हमेशा यह याद रखें:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'रद्द करें';
 
   @override
@@ -403,6 +416,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'गोपनीयता नीति';
+
+  @override
+  String get renamed => 'Renamed';
 
   @override
   String get report => 'रिपोर्ट';
@@ -1699,4 +1715,80 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'सोचने की प्रक्रिया शुरू करें: अंतिम उत्तर देने से पहले अपनी तर्क प्रक्रिया को दर्शाने के लिए आपको <think></think> टैग का उपयोग करना होगा। टैग के अंदर चरण दर चरण सोचें, फिर टैग के बाहर अपना उत्तर दें।';
+
+  @override
+  String get openLinkWarningTitle => 'बाह्य लिंक चेतावनी';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'खुला लिंक';
+
+  @override
+  String get webSearchSources => 'सूत्रों का कहना है';
+
+  @override
+  String get searching => 'खोज';
+
+  @override
+  String get featureWebSearchTitle => 'वेब खोज';
+
+  @override
+  String get featureWebSearchDescription => 'वेब पर रीयल-टाइम जानकारी खोजें';
+
+  @override
+  String get webSearchQuotaExceeded => 'खोज कोटा सीमा पार हो गई';
+
+  @override
+  String get clearMemory => 'मेमोरी साफ़ करें';
+
+  @override
+  String get clearMemoryConfirm =>
+      'क्या आप वाकई अपनी याददाश्त मिटाना चाहते हैं?';
+
+  @override
+  String get personalization => 'वैयक्तिकरण';
+
+  @override
+  String get personalizationDescription => 'अपने अनुभव को अनुकूलित करें';
+
+  @override
+  String get memoryTitle => 'याद';
+
+  @override
+  String get memoryDescription => 'एआई आपको इस तरह पहचानता है।';
+
+  @override
+  String get noMemoryYet => 'अभी तक कोई यादें स्थापित नहीं हुई हैं';
+
+  @override
+  String get memoryLimitReached => 'मेमोरी सीमा तक पहुँच गया';
+
+  @override
+  String get intelligenceTitle => 'बुद्धिमत्ता';
+
+  @override
+  String get intelligenceDescription => 'एआई आपसे इस तरह संवाद करते हैं।';
+
+  @override
+  String get customInstructionHint => 'अपने निर्देश यहां दर्ज करें';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'आप निम्नलिखित बाहरी लिंक खोलने वाले हैं:\\n\\n$url\\n\\nक्या आप आगे बढ़ना चाहते हैं?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'इन विशेष निर्देशों का पालन करें:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[महत्वपूर्ण निर्देश]: आप एक शीर्षक जनरेटर हैं। उपयोगकर्ता के प्रश्न का उत्तर न दें। चैट न करें या हैलो न कहें। केवल 2-4 शब्दों का शीर्षक आउटपुट करें जो उपयोगकर्ता के प्रश्न का सारांश प्रस्तुत करता हो।';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] महत्वपूर्ण निर्देश: आप वर्तमान में \"कोर्टेक्स\" नामक एक विशाल, अत्यधिक उन्नत एआई पारिस्थितिकी तंत्र के भीतर काम कर रहे हैं। इसे याद रखें और पूछे जाने पर कॉर्टेक्स का व्यक्तित्व बनाए रखें।';
 }

@@ -233,11 +233,13 @@ class InputService {
     required bool isDynamicChat,
     required bool isPremium,
     required int attachmentCount, // New Parameter: Number of files
+    required bool isSearchEnabled, // Included web search cost
   }) {
     if (!isServerSide) return 0;
 
     // Define Costs
     const int attachmentCostPerUnit = 30;
+    const int searchCost = 5;
 
     // Determine Base Cost
     int baseCost = 5; // Standard
@@ -245,10 +247,58 @@ class InputService {
       baseCost = 20; // Premium / Auto
     }
 
+    if (isSearchEnabled) {
+      baseCost += searchCost;
+    }
+
     // Formula: Base + (N * 30)
     final int totalAttachmentCost = attachmentCount * attachmentCostPerUnit;
 
     return baseCost + totalAttachmentCost;
+  }
+
+  
+  bool isActionPermitted({
+    required BuildContext context,
+    required bool isServerSideModel,
+    required bool isDynamicChatMode,
+    required bool isLimitExceeded,
+    required bool isSending,
+    required bool modelMissing,
+    required bool isStorageSufficient,
+    required bool isPremiumModel,
+    required bool isSubscribed,
+    required int premiumTrialUses,
+    required int totalCredits,
+  }) {
+    // 1. Basic Blockers
+    if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
+      return false;
+    }
+
+    // 2. Trial Limits
+    if (isPremiumModel && !isSubscribed && premiumTrialUses >= 3) {
+      return false;
+    }
+
+    final inputProvider = context.read<InputProvider>();
+
+    final int attachmentCount = inputProvider.attachments.length;
+
+    // 3. Credit Check
+    final needed = calculateRequiredCredits(
+      isServerSide: isServerSideModel,
+      isDynamicChat: isDynamicChatMode,
+      isPremium: isPremiumModel,
+      attachmentCount: attachmentCount,
+      isSearchEnabled: inputProvider.enableWebSearch,
+    );
+
+    if ((isDynamicChatMode || isServerSideModel) && totalCredits < needed) {
+      return false;
+    }
+
+    return true;
   }
 
   bool isSendButtonEnabled({
@@ -288,6 +338,7 @@ class InputService {
       isDynamicChat: isDynamicChatMode,
       isPremium: isPremiumModel,
       attachmentCount: attachmentCount,
+      isSearchEnabled: inputProvider.enableWebSearch,
     );
 
     if ((isDynamicChatMode || isServerSideModel) && totalCredits < needed) {

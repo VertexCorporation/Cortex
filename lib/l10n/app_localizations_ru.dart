@@ -9,6 +9,19 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'Вы — генератор заголовков. Ответьте на следующий разговор ТОЛЬКО заголовком из 2-5 слов. Не используйте кавычки, префиксы или знаки препинания.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nВсегда помните следующее о пользователе:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'Отмена';
 
   @override
@@ -406,6 +419,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Политика конфиденциальности';
+
+  @override
+  String get renamed => 'Renamed';
 
   @override
   String get report => 'Пожаловаться';
@@ -1713,4 +1729,83 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'РЕЖИМ РАЗМЫШЛЕНИЯ ВКЛЮЧЕН: Вы ОБЯЗАТЕЛЬНО должны использовать теги <think></think>, чтобы показать ход своих рассуждений, прежде чем дать окончательный ответ. Размышляйте шаг за шагом внутри тегов, а затем дайте свой ответ вне тегов.';
+
+  @override
+  String get openLinkWarningTitle => 'Предупреждение о внешних ссылках';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Открыть ссылку';
+
+  @override
+  String get webSearchSources => 'Источники';
+
+  @override
+  String get searching => 'Идет поиск';
+
+  @override
+  String get featureWebSearchTitle => 'Поиск в Интернете';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Ищите в интернете информацию в режиме реального времени.';
+
+  @override
+  String get webSearchQuotaExceeded => 'Квота поиска превышена.';
+
+  @override
+  String get clearMemory => 'Очистить память';
+
+  @override
+  String get clearMemoryConfirm =>
+      'Вы уверены, что хотите очистить свою память?';
+
+  @override
+  String get personalization => 'Персонализация';
+
+  @override
+  String get personalizationDescription => 'Настройте свой опыт';
+
+  @override
+  String get memoryTitle => 'Память';
+
+  @override
+  String get memoryDescription => 'Искусственный интеллект узнает вас вот так.';
+
+  @override
+  String get noMemoryYet => 'Воспоминания пока не сформировались.';
+
+  @override
+  String get memoryLimitReached => 'Достигнут лимит памяти.';
+
+  @override
+  String get intelligenceTitle => 'Интеллект';
+
+  @override
+  String get intelligenceDescription =>
+      'Искусственный интеллект общается с вами вот так.';
+
+  @override
+  String get customInstructionHint =>
+      'Введите здесь свои индивидуальные инструкции.';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'Вы собираетесь открыть следующую внешнюю ссылку:\\n\\n$url\\n\\nВы уверены, что хотите продолжить?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Следуйте этим инструкциям:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[КРИТИЧЕСКОЕ УКАЗАНИЕ]: Вы — генератор заголовков. НЕ отвечайте на вопрос пользователя. НЕ общайтесь в чате и НЕ здоровайтесь. Выводите ТОЛЬКО заголовок из 2-4 слов, кратко описывающий вопрос пользователя.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] ВАЖНОЕ УВЕДОМЛЕНИЕ: В данный момент вы работаете внутри масштабной, высокотехнологичной экосистемы искусственного интеллекта под названием «Cortex». Помните об этом и поддерживайте личность Cortex, если вас спросят.';
 }

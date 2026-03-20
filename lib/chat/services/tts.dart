@@ -118,8 +118,10 @@ class TtsService with ChangeNotifier {
     _isInterrupted = false;
 
     // --- ENHANCED REGEX FILTERING ---
-    // 0. Remove <think> blocks (featureReasoning)
+    // 0. Remove <think> and <memory> blocks
     String cleanText = text.replaceAll(RegExp(r'<think>[\s\S]*?</think>'), '');
+    cleanText = cleanText.replaceAll(RegExp(r'<memory>[\s\S]*?</memory>'), '');
+    cleanText = cleanText.replaceAll(RegExp(r'\[SYSTEM MEMORY DIRECTIVE\][\s\S]*'), '');
 
     // 1. Remove Code Blocks (```...```) content entirely
     cleanText = cleanText.replaceAll(RegExp(r'```[\s\S]*?```'), '');

@@ -40,7 +40,10 @@ class AxonFooter extends StatelessWidget {
 
     // --- State Variables ---
     final bool isUserSubscribed = sessionProvider.isUserSubscribed;
-    final String name = userProvider.username;
+    // Inject localization for Guest users
+    final String name = userProvider.username == 'Guest' 
+        ? localizations.guest
+        : userProvider.username;
     final String settingsText = localizations.settings;
 
     // Calculate Font Size based on width

@@ -7,6 +7,7 @@ import '../../../cache.dart';
 import '../../../chat/providers/conversation.dart';
 
 import '../../../chat/services/storage.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../library/backend/data/service.dart';
 import '../../../main.dart';
 import '../../../notifications/introvert.dart';
@@ -23,6 +24,7 @@ class InboxViewModel extends ChangeNotifier {
   bool _isLoading = true;
   String _currentSearchQuery = "";
   StreamSubscription<Map<String, dynamic>>? _lastMessageSubscription;
+  StreamSubscription<Map<String, String>>? _titleSubscription;
   String _currentLangCode = 'en';
   Timer? _searchDebounce;
 
@@ -36,7 +38,8 @@ class InboxViewModel extends ChangeNotifier {
   InboxViewModel({
     required ModelService modelService,
     required IntrovertNotificationService notificationService,
-  })  : _modelService = modelService,
+  })
+      : _modelService = modelService,
         _notificationService = notificationService;
 
   Future<void> initialize(String langCode) async {
@@ -50,6 +53,7 @@ class InboxViewModel extends ChangeNotifier {
   void dispose() {
     _searchDebounce?.cancel();
     _lastMessageSubscription?.cancel();
+    _titleSubscription?.cancel();
     for (var manager in _conversationManagers.values) {
       manager.dispose();
     }
@@ -73,8 +77,8 @@ class InboxViewModel extends ChangeNotifier {
     } else {
       // 1. First, get IDs of conversations where messages match (Deep Search)
       final List<String> deepSearchResults =
-          await ChatStorageService.searchConversations(
-              query: _currentSearchQuery);
+      await ChatStorageService.searchConversations(
+          query: _currentSearchQuery);
 
       // 2. Filter in memory (Title matches or ID is in deep search results)
       _filteredConversationIDs = _allConversationIDs.where((id) {
@@ -133,7 +137,7 @@ class InboxViewModel extends ChangeNotifier {
     final cachedManagers = CacheService.get<Map<String, ConversationManager>>(
         CacheKey.conversationManagers);
     final cachedOrder =
-        CacheService.get<List<String>>(CacheKey.conversationOrder);
+    CacheService.get<List<String>>(CacheKey.conversationOrder);
 
     if (cachedManagers != null && cachedOrder != null) {
       _conversationManagers.addAll(cachedManagers);
@@ -150,25 +154,38 @@ class InboxViewModel extends ChangeNotifier {
   }
 
   void _listenForLastMessageUpdates() {
+    _titleSubscription?.cancel();
+    _titleSubscription = ChatStorageService.titleStream.listen((update) async {
+      final String convId = update["id"] as String;
+      final String newTitle = update["title"] as String;
+      final manager = _conversationManagers[convId];
+      if (manager != null) {
+        manager.updateConversationTitle(newTitle);
+        // Force refresh the list view just in case the tile rebuilds based on it
+        notifyListeners();
+        _updateConversationCache();
+      }
+    });
+
     _lastMessageSubscription?.cancel();
     _lastMessageSubscription =
         ChatStorageService.lastMsgStream.listen((update) async {
-      final String convId = update['convId'] as String;
-      final manager = _conversationManagers[convId];
+          final String convId = update['convId'] as String;
+          final manager = _conversationManagers[convId];
 
-      if (manager == null) {
-        await loadConversations(langCode: _currentLangCode, isReload: true);
-        return;
-      }
+          if (manager == null) {
+            await loadConversations(langCode: _currentLangCode, isReload: true);
+            return;
+          }
 
-      manager.updateLastMessage(
-        update['text'] as String? ?? '',
-        update['photoPath'] as String? ?? '',
-        DateTime.fromMillisecondsSinceEpoch(update['ts'] as int),
-      );
+          manager.updateLastMessage(
+            update['text'] as String? ?? '',
+            update['photoPath'] as String? ?? '',
+            DateTime.fromMillisecondsSinceEpoch(update['ts'] as int),
+          );
 
-      _sortConversations();
-    });
+          _sortConversations();
+        });
   }
 
   Future<void> loadConversations(
@@ -210,13 +227,13 @@ class InboxViewModel extends ChangeNotifier {
           initialModelId: modelId,
           isStarred: (row['isStarred'] as int? ?? 0) == 1,
           starredDate: row['starredDate'] != null &&
-                  (row['starredDate'] as int) > 0
+              (row['starredDate'] as int) > 0
               ? DateTime.fromMillisecondsSinceEpoch(row['starredDate'] as int)
               : null,
           lastMessageDate: realLastMsgTs != null
               ? DateTime.fromMillisecondsSinceEpoch(realLastMsgTs)
               : DateTime.fromMillisecondsSinceEpoch(
-                  row['lastMessageDate'] as int? ?? 0),
+              row['lastMessageDate'] as int? ?? 0),
           langCode: langCode,
           modelService: _modelService,
         );
@@ -250,7 +267,8 @@ class InboxViewModel extends ChangeNotifier {
     // 1. PROTECTION CHECK: Active conversation check
     final BuildContext? context = mainScreenKey.currentContext;
     if (context != null) {
-      final activeId = Provider.of<ConversationProvider>(context, listen: false)
+      final activeId = Provider
+          .of<ConversationProvider>(context, listen: false)
           .conversationID;
 
       if (activeId == conversationID) {
@@ -276,12 +294,18 @@ class InboxViewModel extends ChangeNotifier {
 
   Future<void> editConversation(String conversationID, String newTitle) async {
     final manager = _conversationManagers[conversationID];
+    final context = mainScreenKey.currentContext;
+    final l10n = context != null ? AppLocalizations.of(context) : null;
+
     if (manager == null) return;
 
     await ChatStorageService.renameConversation(conversationID, newTitle);
     manager.updateConversationTitle(newTitle);
+
+    final message = l10n?.renamed ?? "Renamed";
+
     _notificationService.showNotification(
-        message: "Renamed", type: NotificationType.success);
+        message: message, type: NotificationType.success);
   }
 
   Future<void> togglePinStatus(String conversationID) async {

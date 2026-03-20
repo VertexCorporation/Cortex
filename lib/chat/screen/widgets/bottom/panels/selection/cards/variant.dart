@@ -47,7 +47,7 @@ class ModelVariantCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         side: BorderSide(color: borderColor, width: 1.0),
       ),
-      clipBehavior: Clip.antiAlias,
+      clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: onTap,
         splashColor: isSelected
@@ -63,14 +63,16 @@ class ModelVariantCard extends StatelessWidget {
               Expanded(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: OverflowText(
-                    text: title,
-                    scrollable: true,
-                    style: TextStyle(
-                      fontSize: fontSize,
-                      fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.normal,
-                      color: textColor,
+                  child: RepaintBoundary(
+                    child: OverflowText(
+                      text: title,
+                      scrollable: true,
+                      style: TextStyle(
+                        fontSize: fontSize,
+                        fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: textColor,
+                      ),
                     ),
                   ),
                 ),

@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 5.9.5+595
+version: 6.2.2+622
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -68,7 +68,6 @@ dependencies:
   gallery_saver_plus: ^3.2.1
   mime: ^2.0.0
   share_plus: ^12.0.0
-  flutter_downloader: ^1.11.8
 
   # --- SECURITY & MISC ---
   flutter_secure_storage: ^9.2.4
@@ -97,7 +96,7 @@ dependencies:
   flutter_tts: ^4.2.5
   camera: ^0.11.3
   math_expressions: ^3.1.0
-  universal_io: ^2.3.1
+  flutter_downloader: ^1.12.0
 
 dev_dependencies:
   flutter_test:

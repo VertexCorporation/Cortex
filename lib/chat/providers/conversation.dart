@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cortex/chat/messages/messages.dart';
 
 import '../../cache.dart';
@@ -31,6 +32,24 @@ class ConversationProvider with ChangeNotifier {
   Timer? _streamThrottleTimer;
   bool _hasPendingStreamUpdate = false;
   static const _streamThrottleDuration = Duration(milliseconds: 32); // ~30fps
+
+  // ===========================================================================
+  // SECTION 1.5: INITIALIZATION
+  // ===========================================================================
+
+  ConversationProvider() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        resetForLogout();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _streamThrottleTimer?.cancel();
+    super.dispose();
+  }
 
   // ===========================================================================
   // SECTION 2: PUBLIC GETTERS
@@ -72,18 +91,48 @@ class ConversationProvider with ChangeNotifier {
 
   /// Clears all message and conversation data. This should be called when
   /// a chat is exited or a new one is started.
-  void clearConversation() {
+  void updateConversationTitle(String newTitle) {
+    _conversationTitle = newTitle;
+    notifyListeners();
+  }
+
+  void clearConversation({bool resetLoadingState = true, bool startLoading = false}) {
     // Cancel any pending stream updates
     _streamThrottleTimer?.cancel();
     _streamThrottleTimer = null;
     _hasPendingStreamUpdate = false;
-    
+
     _messages = [];
     _conversationID = null;
     _conversationTitle = null;
     _isWaitingForResponse = false;
     _responseStopped = false;
+    
+    if (startLoading) {
+      _isLoadingMessages = true;
+    } else if (resetLoadingState) {
+      _isLoadingMessages = false;
+    }
+    
     _justFinishedLoading = false;
+    notifyListeners();
+  }
+
+  /// Strictly resets all conversation state for a complete sign-out, ensuring
+  /// no memory leaks or persisting sessions leak into another user's account.
+  void resetForLogout() {
+    _streamThrottleTimer?.cancel();
+    _streamThrottleTimer = null;
+    _hasPendingStreamUpdate = false;
+
+    _messages = [];
+    _conversationID = null;
+    _conversationTitle = null;
+    _isWaitingForResponse = false;
+    _responseStopped = false;
+    _isLoadingMessages = false;
+    _justFinishedLoading = false;
+    _isEphemeral = false;
     notifyListeners();
   }
 
@@ -126,8 +175,8 @@ class ConversationProvider with ChangeNotifier {
   /// Starts a new conversation session with the first user message.
   /// This atomic operation sets the conversation ID, title, and adds the
   /// initial user message and a "thinking" bubble.
-  void startNewConversationSession(
-      String id, String title, String modelIdForStorage, Message userMessage) {
+  void startNewConversationSession(String id, String title,
+      String modelIdForStorage, Message userMessage) {
     _conversationID = id;
     _conversationTitle = title;
 
@@ -141,10 +190,11 @@ class ConversationProvider with ChangeNotifier {
     _messages = [userMessage, thinkingMessage];
     _isWaitingForResponse = true;
     _responseStopped = false;
+    _isLoadingMessages = false;
 
     // Persist the new conversation structure asynchronously.
     ChatStorageService.saveConversation(id, title, [],
-            modelId: modelIdForStorage)
+        modelId: modelIdForStorage)
         .then((_) {
       ChatStorageService.upsertMessage(id, 0, userMessage);
     });
@@ -167,6 +217,7 @@ class ConversationProvider with ChangeNotifier {
 
     _isWaitingForResponse = true;
     _responseStopped = false;
+    _isLoadingMessages = false;
 
     if (_conversationID != null) {
       ChatStorageService.upsertMessage(
@@ -178,8 +229,8 @@ class ConversationProvider with ChangeNotifier {
 
   /// Starts a session solely in memory. Does not save to storage yet.
   /// Used for Flow Mode hidden prompts.
-  void startEphemeralSession(
-      String id, String modelIdForStorage, Message userMessage,
+  void startEphemeralSession(String id, String modelIdForStorage,
+      Message userMessage,
       {String? title}) {
     _conversationID = id;
     _conversationTitle = title ?? "New Chat";
@@ -195,6 +246,7 @@ class ConversationProvider with ChangeNotifier {
     _messages = [userMessage, thinkingMessage];
     _isWaitingForResponse = true;
     _responseStopped = false;
+    _isLoadingMessages = false;
 
     notifyListeners();
   }
@@ -243,7 +295,8 @@ class ConversationProvider with ChangeNotifier {
       _messages = _messages.sublist(0, aiMessageIndex);
     } else {
       debugPrint(
-          "[ConversationProvider] Invalid index $aiMessageIndex for list of length ${_messages.length}. Aborting regeneration prep.");
+          "[ConversationProvider] Invalid index $aiMessageIndex for list of length ${_messages
+              .length}. Aborting regeneration prep.");
       return;
     }
 
@@ -262,6 +315,7 @@ class ConversationProvider with ChangeNotifier {
     // Update the provider's state to reflect the new operation.
     _isWaitingForResponse = true;
     _responseStopped = false;
+    _isLoadingMessages = false;
 
     notifyListeners();
     debugPrint(
@@ -276,7 +330,9 @@ class ConversationProvider with ChangeNotifier {
 
       // Trim leading newlines if this is the very beginning of the message
       String textToAppend = chunk;
-      if (lastMessage.text.isEmpty && textToAppend.trimLeft().isEmpty) {
+      if (lastMessage.text.isEmpty && textToAppend
+          .trimLeft()
+          .isEmpty) {
         // If message is empty and chunk is only whitespace/newline, ignore it
         return;
       }
@@ -296,15 +352,44 @@ class ConversationProvider with ChangeNotifier {
       _messages.add(
           Message(text: initialText, isUserMessage: false, isThinking: true));
     }
-    
+
     // Throttle UI updates for better streaming performance
     _scheduleStreamUpdate();
+  }
+
+  void updateLastBotMessageSources(List<dynamic> sources) {
+    if (_messages.isNotEmpty && !_messages.last.isUserMessage) {
+      final lastMessage = _messages.last;
+      
+      // Merge with existing sources if they exist, or just use the new ones
+      List<dynamic> updatedSources = [];
+      if (lastMessage.webSearchSources != null) {
+        updatedSources.addAll(lastMessage.webSearchSources!);
+      }
+      for (var source in sources) {
+        // Prevent duplicates
+        bool exists = updatedSources.any((existing) {
+          if (existing is Map && source is Map) {
+            return existing['url'] == source['url'];
+          }
+           return existing == source;
+        });
+        if (!exists) {
+          updatedSources.add(source);
+        }
+      }
+      
+      _messages[_messages.length - 1] = lastMessage.copyWith(
+        webSearchSources: updatedSources.isNotEmpty ? updatedSources : null,
+      );
+      _scheduleStreamUpdate(); // Reuse throttle logic
+    }
   }
 
   /// Schedules a throttled UI update for streaming.
   void _scheduleStreamUpdate() {
     _hasPendingStreamUpdate = true;
-    
+
     // If no timer is active, start a new throttle window
     if (_streamThrottleTimer == null || !_streamThrottleTimer!.isActive) {
       _streamThrottleTimer = Timer(_streamThrottleDuration, () {
@@ -388,8 +473,8 @@ class ConversationProvider with ChangeNotifier {
   // -------------------- Error Handling Actions --------------------
 
   /// Updates an existing AI message with an error state.
-  void setErrorMessage(
-      int index, String errorMessage, bool isContentFlagError) {
+  void setErrorMessage(int index, String errorMessage,
+      bool isContentFlagError) {
     if (index < 0 || index >= _messages.length) return;
 
     final aiMessage = _messages[index];
@@ -441,15 +526,15 @@ class ConversationProvider with ChangeNotifier {
   }
 
   /// Adds a new user message and a corresponding error message to the list.
-  void showSendError(
-      Message userMessage, String errorMessage, bool isContentFlagError) {
+  void showSendError(Message userMessage, String errorMessage,
+      bool isContentFlagError) {
     if (_messages.isNotEmpty && _messages.last.isThinking) {
       setErrorMessage(_messages.length - 1, errorMessage, isContentFlagError);
       return;
     }
 
     final finalUserMessage =
-        userMessage.copyWith(includeInContext: !isContentFlagError);
+    userMessage.copyWith(includeInContext: !isContentFlagError);
     final errorAIMessage = Message(
         text: errorMessage,
         isUserMessage: false,

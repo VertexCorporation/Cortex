@@ -72,7 +72,8 @@ class ModelDownloadController {
 
       if (freeStorage < (sizeInMB + buffer)) {
         debugPrint(
-            "[DownloadController] Not enough storage. Free: ${freeStorage}MB, Required: ${sizeInMB + buffer}MB");
+            "[DownloadController] Not enough storage. Free: ${freeStorage}MB, Required: ${sizeInMB +
+                buffer}MB");
         // We can't easily show a Toast here without a scaffold key or overlay,
         // but we can abort and let the UI stay in "Download" state (not loading).
         // Or we can throw to trigger the error state.
@@ -298,7 +299,8 @@ class ModelDownloadController {
       effectiveManager.setCancelled(false);
 
       debugPrint(
-          "[DownloadController] Syncing '$id': Status ${task.status}, Progress ${task.progress}");
+          "[DownloadController] Syncing '$id': Status ${task
+              .status}, Progress ${task.progress}");
 
       switch (task.status) {
         case DownloadTaskStatus.running:

@@ -169,8 +169,12 @@ class ModelRemoveService {
             '[Cleanup] Found associated task ID: $taskId. Removing from FlutterDownloader.',
             name: logName);
         try {
-          await FlutterDownloader.remove(
-              taskId: taskId, shouldDeleteContent: true);
+          if (taskId.startsWith('dio_')) {
+            // Already handled by File delete below, just ignore FlutterDownloader
+          } else {
+            await FlutterDownloader.remove(
+                taskId: taskId, shouldDeleteContent: true);
+          }
         } catch (e) {
           dev.log(
               '[Cleanup] FlutterDownloader.remove failed (may be already removed): $e',

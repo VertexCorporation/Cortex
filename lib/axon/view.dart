@@ -6,7 +6,7 @@ import 'package:cortex/settings/controller.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../banner.dart';
+
 import '../../navigation.dart';
 import 'content.dart';
 
@@ -54,11 +54,6 @@ class _AxonState extends State<Axon> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusManager.instance.primaryFocus?.unfocus();
-      // Trigger banner check using the Provider's BannerService.
-      if (mounted) {
-        Provider.of<BannerService>(context, listen: false)
-            .checkAndTriggerBanner();
-      }
     });
   }
 
@@ -68,7 +63,7 @@ class _AxonState extends State<Axon> {
     _searchController.dispose();
     _searchFocusNode.removeListener(_onSearchFocusChange);
     _searchFocusNode.dispose();
-    // Note: BannerService is managed by Provider, not disposed here.
+
     ActionPanelController.closeCurrent();
     super.dispose();
   }
@@ -138,9 +133,6 @@ class _AxonState extends State<Axon> {
 
   @override
   Widget build(BuildContext context) {
-    // Access the shared BannerService from Provider.
-    final bannerService = Provider.of<BannerService>(context, listen: false);
-
     return Material(
       color: AppColors.background,
       child: SafeArea(
@@ -157,7 +149,7 @@ class _AxonState extends State<Axon> {
           onSearchChanged: _handleSearchQueryChanged,
           onExitSearchTap: _handleExitSearchMode,
           activeTab: widget.activeTab,
-          bannerService: bannerService,
+
         ),
       ),
     );

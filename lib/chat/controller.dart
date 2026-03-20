@@ -1,6 +1,7 @@
 // lib/chat/main/controller.dart
 
 import 'dart:async';
+import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/screen/appbar/appbar.dart';
@@ -52,6 +53,14 @@ class ChatControllerState extends State<ChatController>
     _sessionProvider = context.read<ChatSessionProvider>();
     _offlineService = context.read<OfflineService>();
     _modelService = context.read<ModelService>();
+
+    if (widget.conversationID != null) {
+      Future.microtask(() {
+        if (mounted) {
+          context.read<ConversationProvider>().setLoadingMessages(true);
+        }
+      });
+    }
   }
 
   @override
@@ -90,7 +99,9 @@ class ChatControllerState extends State<ChatController>
     // --- FIX: Removed isChatActive check ---
     // We assume if modelId is not null, we might need to release resources.
     // Or we check if model is local directly.
-    final langCode = _sessionProvider.getLocale().languageCode;
+    final langCode = _sessionProvider
+        .getLocale()
+        .languageCode;
     final currentModelId = _sessionProvider.modelId;
 
     if (currentModelId != null &&
@@ -105,7 +116,9 @@ class ChatControllerState extends State<ChatController>
   /// Handles system back press events (called by MainScreen).
   bool handleSystemBackPress() {
     // 1. Cancel Message Editing Mode if active
-    if (context.read<InputProvider>().isEditingMode) {
+    if (context
+        .read<InputProvider>()
+        .isEditingMode) {
       chatViewKey.currentState?.cancelAnyActiveEdit();
       return false; // Handled
     }
@@ -114,11 +127,17 @@ class ChatControllerState extends State<ChatController>
   }
 
   Future<void> _performInitialAsyncSetup(String langCode) async {
-    await context.read<AppInitializer>().onCoreServicesReady;
+    if (widget.conversationID != null) {
+      context.read<ConversationProvider>().setLoadingMessages(true);
+    }
+
+    await context
+        .read<AppInitializer>()
+        .onCoreServicesReady;
     if (!mounted) return;
 
     final newsFuture =
-        context.read<NewsService>().loadNewsForLanguage(langCode);
+    context.read<NewsService>().loadNewsForLanguage(langCode);
     await newsFuture;
 
     if (!mounted) return;
@@ -129,9 +148,18 @@ class ChatControllerState extends State<ChatController>
       context.read<InputProvider>().resetInputState();
 
       await context.read<ReadService>().loadConversationById(
-            widget.conversationID!,
-            languageCode: langCode,
-          );
+        widget.conversationID!,
+        languageCode: langCode,
+      );
+
+      if (mounted) {
+        final session = context.read<ChatSessionProvider>();
+        if (session.selectedModel?.isServerSide == false) {
+          context.read<InputProvider>().setFeatureMode(ChatInputMode.offline);
+        } else {
+          context.read<InputProvider>().setFeatureMode(ChatInputMode.none);
+        }
+      }
     } else {
       // Logic for new chat
       context.read<InputProvider>().resetInputState();
