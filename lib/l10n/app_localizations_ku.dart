@@ -9,6 +9,19 @@ class AppLocalizationsKu extends AppLocalizations {
   AppLocalizationsKu([String locale = 'ku']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'Tu çêkerê sernavan î. Ji bo axaftina jêrîn TENÊ bi sernavek 2-5 peyvan bersiv bide. Kevane, pêşgir, an jî nîşaneyên xalbendiyê bi kar neyne.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nHer tim vê yekê li ser bikarhêner bi bîr bîne:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'Betal bike';
 
   @override
@@ -403,6 +416,9 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Polîtîkaya Nepenîtiyê';
+
+  @override
+  String get renamed => 'Renamed';
 
   @override
   String get report => 'Rapor bike';
@@ -1703,4 +1719,83 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'MODA BIFIKIRINÊ AKTÎF KIRIN: DIVÊ hûn etîketên <think></think> bikar bînin da ku pêvajoya aqilmendiya xwe nîşan bidin berî ku hûn bersiva xwe ya dawî bidin. Gav bi gav di hundirê etîketan de bifikirin, dûv re bersiva xwe li derveyî etîketan bidin.';
+
+  @override
+  String get openLinkWarningTitle => 'Hişyariya Girêdana Derveyî';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Girêdanê Veke';
+
+  @override
+  String get webSearchSources => 'Çavkanî';
+
+  @override
+  String get searching => 'Lêgerîn';
+
+  @override
+  String get featureWebSearchTitle => 'Lêgerîna Webê';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Li ser înternetê ji bo agahdariya demrast bigerin';
+
+  @override
+  String get webSearchQuotaExceeded => 'Kotaya Lêgerînê Derbas Bû';
+
+  @override
+  String get clearMemory => 'Bîrê Paqij Bike';
+
+  @override
+  String get clearMemoryConfirm =>
+      'Tu piştrast î ku dixwazî bîra xwe paqij bikî?';
+
+  @override
+  String get personalization => 'Kesanekirin';
+
+  @override
+  String get personalizationDescription => 'Ezmûna xwe kesane bike';
+
+  @override
+  String get memoryTitle => 'Bîr';
+
+  @override
+  String get memoryDescription => 'AI te bi vî rengî nas dike.';
+
+  @override
+  String get noMemoryYet => 'Hîn bîranîn nehatine sazkirin';
+
+  @override
+  String get memoryLimitReached => 'Sînorê bîrê gihîştiye';
+
+  @override
+  String get intelligenceTitle => 'Nûçe';
+
+  @override
+  String get intelligenceDescription =>
+      'AI bi vî rengî bi we re têkilî daynin.';
+
+  @override
+  String get customInstructionHint =>
+      'Talîmatên xwe yên taybet li vir binivîse';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'Tu li ser vekirina vê lînka derveyî yî:\\n\\n$url\\n\\nMa tu piştrast î ku dixwazî berdewam bikî?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Van rênimayên xwerû bişopînin:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[RÊNÎŞANDANA KRÎTÎK]: Tu GENERATOREKÎ SERNAVAN î. Bersiva pirsa bikarhêner NEKIN. Sohbetê nekin û silav nekin. TENÊ sernavek 2-4 peyvan derxin ku kurteya pirsên bikarhêner bike.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] TALÎMATÊN KRÎTÎK: Hûn niha di hundirê ekosîstemeke AI ya mezin û pir pêşketî ya bi navê \"Cortex\" de dixebitin. Vê yekê ji bîr mekin û heke were pirsîn persona Cortex biparêzin.';
 }

@@ -2,6 +2,7 @@
 
 import 'package:universal_io/io.dart';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cortex/chat/messages/messages.dart';
 
 // ignore: depend_on_referenced_packages
@@ -59,8 +60,27 @@ class InputProvider with ChangeNotifier {
   bool _isVoiceModeActive = false;
   ChatInputMode _featureMode = ChatInputMode.none;
 
+  // --- Web Search ---
+  bool _enableWebSearch = false;
+
   // --- Global Draft (Persist across chats) ---
   String _globalDraft = '';
+
+  // ===========================================================================
+  // SECTION 1.5: INITIALIZATION
+  // ===========================================================================
+
+  InputProvider() {
+    try {
+      FirebaseAuth.instance.authStateChanges().listen((User? user) {
+        if (user == null) {
+          resetForLogout();
+        }
+      });
+    } catch (_) {
+      // Ignore during testing
+    }
+  }
 
   // ===========================================================================
   // SECTION 2: PUBLIC GETTERS
@@ -91,6 +111,9 @@ class InputProvider with ChangeNotifier {
 
   bool get isVoiceModeActive => _isVoiceModeActive;
 
+  // Web Search
+  bool get enableWebSearch => _enableWebSearch;
+
   // ===========================================================================
   // SECTION 3: STATE MUTATION METHODS (ACTIONS)
   // ===========================================================================
@@ -99,6 +122,9 @@ class InputProvider with ChangeNotifier {
 
   void setFeatureMode(ChatInputMode mode) {
     _featureMode = mode;
+    if (mode != ChatInputMode.none) {
+      _enableWebSearch = false;
+    }
     notifyListeners();
   }
 
@@ -126,6 +152,21 @@ class InputProvider with ChangeNotifier {
     if (_isVoiceModeActive == isActive) return;
     _isVoiceModeActive = isActive;
     notifyListeners();
+  }
+
+  void toggleWebSearch() {
+    _enableWebSearch = !_enableWebSearch;
+    if (_enableWebSearch && _featureMode != ChatInputMode.none) {
+      _featureMode = ChatInputMode.none;
+    }
+    notifyListeners();
+  }
+
+  void clearWebSearch() {
+    if (_enableWebSearch) {
+      _enableWebSearch = false;
+      notifyListeners();
+    }
   }
 
   // -------------------- Attachment Management --------------------
@@ -239,15 +280,37 @@ class InputProvider with ChangeNotifier {
     _isVoiceRecording = false;
     _isAttachmentLoading = false;
     _featureMode = ChatInputMode.none;
+    _enableWebSearch = false;
     // NOTE: We do NOT clear _globalDraft here.
     // This allows maintaining text when switching chats.
     notifyListeners();
+  }
+
+  /// Strictly resets everything including the global draft for a complete sign-out, 
+  /// ensuring no drafts leak into another user's account.
+  void resetForLogout() {
+    _globalDraft = '';
+    resetInputState();
   }
 
   /// Clears everything including the draft. Called after successful send.
   void clearAllInput() {
     _globalDraft = '';
     resetInputState();
+  }
+
+  /// Clears text, draft, and attachments after a send, but PERSISTS feature toggles 
+  /// (e.g. Web Search, Reasoning) so the user doesn't have to re-enable them per message.
+  void clearAfterSend() {
+    _globalDraft = '';
+    _isEditingMode = false;
+    _editingMessageIndex = null;
+    _originalMessageText = null;
+    _attachments.clear();
+    _isVoiceRecording = false;
+    _isAttachmentLoading = false;
+    // Note: We deliberately KEEP _featureMode and _enableWebSearch intact!
+    notifyListeners();
   }
 
   // -------------------- Helpers --------------------

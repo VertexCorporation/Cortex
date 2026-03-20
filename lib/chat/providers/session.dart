@@ -2,10 +2,12 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/chat/services/limit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
+import '../../library/utils.dart';
 import '../../library/providers/local.dart';
 import '../services/storage.dart';
 
@@ -25,6 +27,7 @@ class ChatSessionProvider with ChangeNotifier {
 
   // -------------------- Model List State --------------------
   ModelEntity? _selectedModel;
+  ModelEntity? get selectedModel => _selectedModel;
 
   // -------------------- User & Subscription State --------------------
   bool _isUserSubscribed = false;
@@ -100,7 +103,7 @@ class ChatSessionProvider with ChangeNotifier {
       }
 
       // Return a cleaner version of ID if title is missing
-      return baseId.split('/').last.toUpperCase();
+      return ModelDataUtils.formatModelName(baseId.split('/').last);
     }
 
     return resolvedTitle;
@@ -160,6 +163,8 @@ class ChatSessionProvider with ChangeNotifier {
     String initialModelTitle = '', // [NEW] Cached title
     Locale initialLocale = const Locale('en'),
   }) : _modelService = modelService {
+    try { FirebaseAuth.instance.authStateChanges().listen((User? user) { if (user == null) { resetForLogout(); } }); } catch (e) { /* Ignore in tests */ }
+
     // Optimistic Initialization
     _currentLocale = initialLocale;
 
@@ -190,7 +195,7 @@ class ChatSessionProvider with ChangeNotifier {
     if (isCacheEmpty) {
       debugPrint(
           "[ChatSessionProvider] Cache is empty. Using cached title: '$initialModelTitle' for ID: $initialModelId");
-      _initializeWithStub(initialModelId, initialModelTitle);
+      _initializeWithStub(initialModelId, ModelDataUtils.formatModelName(initialModelTitle));
     } else {
       try {
         final langCode = initialLocale.languageCode;
@@ -199,7 +204,7 @@ class ChatSessionProvider with ChangeNotifier {
         selectModel(entity, savePreference: false);
       } catch (e) {
         // Fallback to stub if exact lookup fails even with cache present
-        _initializeWithStub(initialModelId, initialModelTitle);
+        _initializeWithStub(initialModelId, ModelDataUtils.formatModelName(initialModelTitle));
       }
     }
   }
@@ -386,6 +391,23 @@ class ChatSessionProvider with ChangeNotifier {
     required bool isPremium,
   }) {
     selectModel(model, savePreference: false);
+  }
+
+  /// A complete state wipe out for when the user logs out.
+  void resetForLogout() {
+    _isExitingChat = false;
+    _lastExitedModel = null;
+    _selectedModel = null;
+    _isUserSubscribed = false;
+    _premiumTrialUses = 0;
+    _chatLimitManager = null;
+    _displayName = null;
+    _email = null;
+    _isLocalModelLoaded = false;
+    _isFluxMode = false;
+    ChatStorageService.isFluxMode = false;
+    _pendingModelId = null;
+    notifyListeners();
   }
 
   /// Resets session flags (Flux etc) but DOES NOT close the chat view.

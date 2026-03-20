@@ -9,6 +9,19 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'Eres un generador de títulos. Responde ÚNICAMENTE con un título de 2 a 5 palabras para la siguiente conversación. No uses comillas, prefijos ni signos de puntuación.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nRecuerda siempre esto sobre el usuario:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'Cancelar';
 
   @override
@@ -407,6 +420,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Política de Privacidad';
+
+  @override
+  String get renamed => 'Renamed';
 
   @override
   String get report => 'Reportar';
@@ -1721,4 +1737,83 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'MODO DE PENSAMIENTO ACTIVADO: DEBES usar las etiquetas <think></think> para mostrar tu proceso de razonamiento antes de dar tu respuesta final. Piensa paso a paso dentro de las etiquetas y luego proporciona tu respuesta fuera de ellas.';
+
+  @override
+  String get openLinkWarningTitle => 'Advertencia sobre enlaces externos';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Abrir enlace';
+
+  @override
+  String get webSearchSources => 'Fuentes';
+
+  @override
+  String get searching => 'Búsqueda';
+
+  @override
+  String get featureWebSearchTitle => 'Búsqueda web';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Busca en la web información en tiempo real';
+
+  @override
+  String get webSearchQuotaExceeded => 'Se ha superado la cuota de búsqueda.';
+
+  @override
+  String get clearMemory => 'Borrar memoria';
+
+  @override
+  String get clearMemoryConfirm =>
+      '¿Estás seguro de que quieres borrar tu memoria?';
+
+  @override
+  String get personalization => 'Personalización';
+
+  @override
+  String get personalizationDescription => 'Personaliza tu experiencia';
+
+  @override
+  String get memoryTitle => 'Memoria';
+
+  @override
+  String get memoryDescription => 'Las IA te reconocen así.';
+
+  @override
+  String get noMemoryYet => 'Aún no se han establecido recuerdos';
+
+  @override
+  String get memoryLimitReached => 'Se ha alcanzado el límite de memoria.';
+
+  @override
+  String get intelligenceTitle => 'Inteligencia';
+
+  @override
+  String get intelligenceDescription =>
+      'Las IA se comunican contigo de esta manera.';
+
+  @override
+  String get customInstructionHint =>
+      'Introduzca aquí sus instrucciones personalizadas.';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'Estás a punto de abrir el siguiente enlace externo:\\n\\n$url\\n\\n¿Estás seguro de que quieres continuar?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Siga estas instrucciones personalizadas:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[INSTRUCCIÓN CRÍTICA]: Usted es un GENERADOR DE TÍTULOS. NO responda a la pregunta del usuario. NO chatee ni salude. SOLO genere un título de 2 a 4 palabras que resuma la pregunta del usuario.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] INSTRUCCIÓN CRÍTICA: Actualmente está operando dentro de un ecosistema de IA masivo y altamente avanzado llamado \"Cortex\". Recuerde esto y mantenga la personalidad de Cortex si se le pregunta.';
 }

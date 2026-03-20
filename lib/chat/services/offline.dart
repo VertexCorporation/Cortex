@@ -342,6 +342,7 @@ class OfflineService {
       includeLastUser: false,
       targetModelId: model.id,
       langCode: 'en',
+        isServerSide: false,
     );
 
     for (final msg in history) {

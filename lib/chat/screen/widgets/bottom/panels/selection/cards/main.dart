@@ -75,7 +75,7 @@ class ModelCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         side: BorderSide(color: borderColor, width: 1.0),
       ),
-      clipBehavior: Clip.antiAlias,
+      clipBehavior: Clip.hardEdge,
       child: Ink(
         decoration: BoxDecoration(
           color: cardBackgroundColor,
@@ -120,7 +120,7 @@ class ModelCard extends StatelessWidget {
                               borderRadius:
                                   BorderRadius.circular(borderRadius * 0.45),
                             ),
-                            clipBehavior: Clip.antiAlias,
+                            clipBehavior: Clip.hardEdge,
                             child: imagePath.isNotEmpty
                                 ? (imagePath.endsWith('.svg')
                                     ? (imagePath.startsWith('assets')
@@ -170,14 +170,16 @@ class ModelCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                OverflowText(
-                                  text: title,
-                                  scrollable: true,
-                                  style: TextStyle(
-                                    fontFamily: 'Roboto',
-                                    fontSize: titleFontSize,
-                                    fontWeight: FontWeight.bold,
-                                    color: textColor,
+                                RepaintBoundary(
+                                  child: OverflowText(
+                                    text: title,
+                                    scrollable: true,
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: titleFontSize,
+                                      fontWeight: FontWeight.bold,
+                                      color: textColor,
+                                    ),
                                   ),
                                 ),
                                 if (showExpansionArrow) ...[

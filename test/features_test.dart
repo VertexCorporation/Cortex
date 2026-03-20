@@ -5,6 +5,7 @@ import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/library/backend/data/service.dart';
 
 import 'package:flutter_test/flutter_test.dart';
+
 // ignore: depend_on_referenced_packages
 import 'package:mockito/mockito.dart';
 
@@ -22,14 +23,9 @@ class MockChatSessionProvider extends Mock implements ChatSessionProvider {
 }
 
 class MockConversationProvider extends Mock implements ConversationProvider {
-  bool _cleared = false;
+  final bool _cleared = false;
 
   bool get cleared => _cleared;
-
-  @override
-  void clearConversation() {
-    _cleared = true;
-  }
 }
 
 class MockModelService extends Mock implements ModelService {}
@@ -54,20 +50,20 @@ void main() {
     });
 
     test('switchActiveModel changes model but DOES NOT clear conversation',
-        () async {
-      // Setup
-      final newModel =
+            () async {
+          // Setup
+          final newModel =
           ModelEntity.fromMap({'id': 'new-model', 'title': 'New'}, 'en');
 
-      // Execute
-      await selectionService.switchActiveModel(newModel);
+          // Execute
+          await selectionService.switchActiveModel(newModel);
 
-      // Verify
-      // 1. Model ID should be updated (via selectModel)
-      expect(mockSession.modelId, 'new-model');
+          // Verify
+          // 1. Model ID should be updated (via selectModel)
+          expect(mockSession.modelId, 'new-model');
 
-      // 2. Conversation should NOT be cleared
-      expect(mockConversation.cleared, false);
-    });
+          // 2. Conversation should NOT be cleared
+          expect(mockConversation.cleared, false);
+        });
   });
 }

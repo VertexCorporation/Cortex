@@ -9,6 +9,19 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nAlways remember this about the user:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'Cancel';
 
   @override
@@ -403,6 +416,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get renamed => 'Renamed';
 
   @override
   String get report => 'Report';
@@ -1696,4 +1712,81 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'THINKING MODE ENABLED: You MUST use <think></think> tags to show your reasoning process before giving your final answer. Think step by step inside the tags, then provide your response outside the tags.';
+
+  @override
+  String get openLinkWarningTitle => 'External Link Warning';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Open Link';
+
+  @override
+  String get webSearchSources => 'Sources';
+
+  @override
+  String get searching => 'Searching';
+
+  @override
+  String get featureWebSearchTitle => 'Web Search';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Search the web for real-time information';
+
+  @override
+  String get webSearchQuotaExceeded => 'Search Quota Exceeded';
+
+  @override
+  String get clearMemory => 'Clear Memory';
+
+  @override
+  String get clearMemoryConfirm =>
+      'Are you sure you want to clear your memory?';
+
+  @override
+  String get personalization => 'Personalization';
+
+  @override
+  String get personalizationDescription => 'Customize your experience';
+
+  @override
+  String get memoryTitle => 'Memory';
+
+  @override
+  String get memoryDescription => 'AIs recognize you like this.';
+
+  @override
+  String get noMemoryYet => 'No memories established yet';
+
+  @override
+  String get memoryLimitReached => 'Memory limit reached';
+
+  @override
+  String get intelligenceTitle => 'Intelligence';
+
+  @override
+  String get intelligenceDescription => 'AIs communicate with you like this.';
+
+  @override
+  String get customInstructionHint => 'Enter your custom instructions here';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'You are about to open the following external link:\\n\\n$url\\n\\nAre you sure you want to proceed?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Follow these custom instructions:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[CRITICAL INSTRUCTION]: You are a TITLE GENERATOR. DO NOT answer the user\'s question. DO NOT chat or say hello. ONLY output a 2-4 word title summarizing what the user is asking about.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\". Remember this and maintain the persona of Cortex if asked.';
 }
