@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;

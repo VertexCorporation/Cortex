@@ -421,7 +421,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get privacyPolicy => 'Kebijakan Privasi';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => 'Berganti nama';
 
   @override
   String get report => 'Laporkan';

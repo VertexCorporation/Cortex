@@ -413,7 +413,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get privacyPolicy => 'プライバシーポリシー';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => '名称変更';
 
   @override
   String get report => '報告';

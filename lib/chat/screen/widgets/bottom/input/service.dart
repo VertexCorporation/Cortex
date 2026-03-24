@@ -1,6 +1,6 @@
 // lib/chat/screen/selected/widgets/input/service.dart
 
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/library/backend/data/entity.dart';

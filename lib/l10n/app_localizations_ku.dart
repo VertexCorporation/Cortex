@@ -418,7 +418,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get privacyPolicy => 'Polîtîkaya Nepenîtiyê';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => 'Navê wê hat guhertin';
 
   @override
   String get report => 'Rapor bike';

@@ -408,7 +408,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get privacyPolicy => '隐私政策';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => '更名';
 
   @override
   String get report => '举报';

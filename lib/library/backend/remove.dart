@@ -1,7 +1,7 @@
 // lib/library/backend/remove.dart
 
 import 'dart:developer' as dev;
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:cortex/library/backend/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';

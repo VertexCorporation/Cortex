@@ -418,7 +418,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get privacyPolicy => 'गोपनीयता नीति';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => 'नाम बदला गया';
 
   @override
   String get report => 'रिपोर्ट';

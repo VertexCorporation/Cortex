@@ -418,7 +418,7 @@ class AppLocalizationsAz extends AppLocalizations {
   String get privacyPolicy => 'Məxfilik Siyasəti';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => 'Yenidən adlandırıldı';
 
   @override
   String get report => 'Şikayət et';

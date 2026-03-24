@@ -7,7 +7,7 @@
 // local notification scheduling, and permission requests.
 
 import 'dart:convert';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'dart:math';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

@@ -7,7 +7,7 @@
 
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/funds/backend.dart';
 import 'package:cortex/library/backend/data/service.dart';

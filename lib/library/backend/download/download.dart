@@ -1,6 +1,6 @@
 // download.dart
 
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';

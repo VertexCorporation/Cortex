@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cortex/cache.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../library/backend/data/entity.dart';
@@ -15,25 +14,24 @@ class ChatStorageService {
   /* ---------- conversation ---------- */
 
   static final _titleController =
-      StreamController<Map<String, String>>.broadcast();
+  StreamController<Map<String, String>>.broadcast();
 
   static Stream<Map<String, String>> get titleStream => _titleController.stream;
 
   static final _lastMsgController =
-      StreamController<Map<String, dynamic>>.broadcast();
+  StreamController<Map<String, dynamic>>.broadcast();
 
   static Stream<Map<String, dynamic>> get lastMsgStream =>
       _lastMsgController.stream;
 
   static bool isFluxMode = false;
 
-  static Future<void> saveConversation(
-    String id,
-    String title,
-    List<dynamic> _, {
-    String? modelId,
-    bool isStarred = false,
-  }) async {
+  static Future<void> saveConversation(String id,
+      String title,
+      List<dynamic> _, {
+        String? modelId,
+        bool isStarred = false,
+      }) async {
     if (isFluxMode) return;
     try {
       final db = await DbHelper().db;
@@ -44,7 +42,9 @@ class ChatStorageService {
           'title': title,
           'modelId': modelId,
           'isStarred': isStarred ? 1 : 0,
-          'lastMessageDate': DateTime.now().millisecondsSinceEpoch,
+          'lastMessageDate': DateTime
+              .now()
+              .millisecondsSinceEpoch,
         },
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );
@@ -60,7 +60,9 @@ class ChatStorageService {
   /// Returns a list of conversation IDs.
   static Future<List<String>> searchConversations(
       {required String query}) async {
-    if (query.trim().isEmpty) {
+    if (query
+        .trim()
+        .isEmpty) {
       return [];
     }
 
@@ -81,7 +83,7 @@ class ChatStorageService {
   /// Optimized fetch: Gets all conversations joined with their last message details.
   /// Replaces the N+1 loop in InboxViewModel.
   static Future<List<Map<String, dynamic>>>
-      getConversationsWithLastMessage() async {
+  getConversationsWithLastMessage() async {
     try {
       final db = await DbHelper().db;
       // We use a LEFT JOIN on the last message for each conversation.
@@ -145,13 +147,12 @@ class ChatStorageService {
     }
   }
 
-  static Future<void> addRecentModel(
-    String modelId, {
+  static Future<void> addRecentModel(String modelId, {
     required String langCode,
     required ModelService modelService,
   }) async {
     final String modelSeriesId =
-        modelService.getBaseIdFromFullId(modelId, langCode: langCode);
+    modelService.getBaseIdFromFullId(modelId, langCode: langCode);
 
     final allModels = modelService.getCachedModelsSync();
     final bool isValidSeriesId = allModels.any((m) => m.id == modelSeriesId);
@@ -168,7 +169,9 @@ class ChatStorageService {
         'recent_models',
         {
           'model_id': modelSeriesId,
-          'last_used': DateTime.now().millisecondsSinceEpoch
+          'last_used': DateTime
+              .now()
+              .millisecondsSinceEpoch
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
@@ -216,13 +219,15 @@ class ChatStorageService {
     return recentSeriesIds.toList();
   }
 
-  static Future<void> _updateConversationTimestamp(
-      String convId, Database db) async {
+  static Future<void> _updateConversationTimestamp(String convId,
+      Database db) async {
     if (isFluxMode) return;
     try {
       await db.update(
         'conversations',
-        {'lastMessageDate': DateTime.now().millisecondsSinceEpoch},
+        {'lastMessageDate': DateTime
+            .now()
+            .millisecondsSinceEpoch},
         where: 'id = ?',
         whereArgs: [convId],
       );
@@ -231,8 +236,8 @@ class ChatStorageService {
     }
   }
 
-  static Future<void> updateConversationModelId(
-      String id, String newModelId) async {
+  static Future<void> updateConversationModelId(String id,
+      String newModelId) async {
     if (isFluxMode) return;
     try {
       final db = await DbHelper().db;
@@ -249,8 +254,8 @@ class ChatStorageService {
 
   /* ---------- messages (append / update) ---------- */
 
-  static Future<void> updateStoredMessage(
-      String convId, Message m, int idx) async {
+  static Future<void> updateStoredMessage(String convId, Message m,
+      int idx) async {
     if (isFluxMode || !m.isVisible) return;
     try {
       final db = await DbHelper().db;
@@ -272,7 +277,9 @@ class ChatStorageService {
           'photoPath': serializedAttachments,
           'model': m.model,
           'includeInContext': m.includeInContext ? 1 : 0,
-          'ts': DateTime.now().millisecondsSinceEpoch,
+          'ts': DateTime
+              .now()
+              .millisecondsSinceEpoch,
         },
         where: 'conversationId = ? AND idx = ?',
         whereArgs: [convId, idx],
@@ -283,8 +290,8 @@ class ChatStorageService {
     }
   }
 
-  static Future<void> saveCurrentMessages(
-      String convId, List<Message> msgs) async {
+  static Future<void> saveCurrentMessages(String convId,
+      List<Message> msgs) async {
     if (isFluxMode) return;
     // Filter out invisible messages from the batch save
     final visibleMsgs = msgs.where((m) => m.isVisible).toList();
@@ -317,7 +324,9 @@ class ChatStorageService {
           'isReported': m.isReported ? 1 : 0,
           'model': m.model,
           'includeInContext': m.includeInContext ? 1 : 0,
-          'ts': DateTime.now().millisecondsSinceEpoch,
+          'ts': DateTime
+              .now()
+              .millisecondsSinceEpoch,
         });
       }
       await batch.commit(noResult: true);
@@ -336,7 +345,9 @@ class ChatStorageService {
           'text': lastMessage.text,
           'photoPath': displayPath,
           // Stream listeners might expect a single path or null
-          'ts': DateTime.now().millisecondsSinceEpoch,
+          'ts': DateTime
+              .now()
+              .millisecondsSinceEpoch,
         });
       }
     } catch (e) {
@@ -352,7 +363,7 @@ class ChatStorageService {
     final rows = await db.query(
       'messages',
       where:
-          'conversationId = ? AND ((text IS NOT NULL AND length(text) > 0) OR (photoPath IS NOT NULL AND length(photoPath) > 0))',
+      'conversationId = ? AND ((text IS NOT NULL AND length(text) > 0) OR (photoPath IS NOT NULL AND length(photoPath) > 0))',
       whereArgs: [conversationID],
       orderBy: 'idx DESC',
       limit: 1,
@@ -360,13 +371,13 @@ class ChatStorageService {
     return rows.isNotEmpty ? rows.first : null;
   }
 
-  static Future<List<Message>> removeEmptyMessagesForConversation(
-      String convId, List<Message> inMemory) async {
+  static Future<List<Message>> removeEmptyMessagesForConversation(String convId,
+      List<Message> inMemory) async {
     try {
       final db = await DbHelper().db;
       await db.delete('messages',
           where:
-              'conversationId = ? AND (text IS NULL OR length(text) = 0) AND (photoPath IS NULL OR length(photoPath)=0)',
+          'conversationId = ? AND (text IS NULL OR length(text) = 0) AND (photoPath IS NULL OR length(photoPath)=0)',
           whereArgs: [convId]);
     } catch (e) {
       _handleDiskError(e, 'removeEmptyMessagesForConversation');
@@ -374,12 +385,15 @@ class ChatStorageService {
 
     // Logic Update: Check hasAttachments
     return inMemory
-        .where((m) => m.text.trim().isNotEmpty || m.hasAttachments)
+        .where((m) =>
+    m.text
+        .trim()
+        .isNotEmpty || m.hasAttachments)
         .toList();
   }
 
-  static Future<Map<String, dynamic>?> getMessageByIdx(
-      String convId, int idx) async {
+  static Future<Map<String, dynamic>?> getMessageByIdx(String convId,
+      int idx) async {
     final db = await DbHelper().db;
     final rows = await db.query(
       'messages',
@@ -408,11 +422,13 @@ class ChatStorageService {
         'text': m.text,
         'photoPath': serializedAttachments,
         'webSearchSources':
-            m.webSearchSources != null ? jsonEncode(m.webSearchSources) : null,
+        m.webSearchSources != null ? jsonEncode(m.webSearchSources) : null,
         'isReported': m.isReported ? 1 : 0,
         'model': m.model,
         'includeInContext': m.includeInContext ? 1 : 0,
-        'ts': DateTime.now().millisecondsSinceEpoch,
+        'ts': DateTime
+            .now()
+            .millisecondsSinceEpoch,
       };
 
       await db.insert(
@@ -422,10 +438,12 @@ class ChatStorageService {
       );
 
       await _updateConversationTimestamp(convId, db);
-      final now = DateTime.now().millisecondsSinceEpoch;
+      final now = DateTime
+          .now()
+          .millisecondsSinceEpoch;
 
       final displayPath =
-          m.attachmentPaths.isNotEmpty ? m.attachmentPaths.first : null;
+      m.attachmentPaths.isNotEmpty ? m.attachmentPaths.first : null;
 
       _lastMsgController.add({
         'convId': convId,
@@ -468,7 +486,7 @@ class ChatStorageService {
       }
 
       final List<String> convIds =
-          convsToDelete.map((row) => row['id'] as String).toList();
+      convsToDelete.map((row) => row['id'] as String).toList();
 
       await db.transaction((txn) async {
         final placeholders = List.filled(convIds.length, '?').join(',');
@@ -500,7 +518,9 @@ class ChatStorageService {
         {
           'isStarred': starred ? 1 : 0,
           'starredDate': starred
-              ? DateTime.now().millisecondsSinceEpoch
+              ? DateTime
+              .now()
+              .millisecondsSinceEpoch
               : 0 // Save date or 0
         },
         where: 'id = ?',

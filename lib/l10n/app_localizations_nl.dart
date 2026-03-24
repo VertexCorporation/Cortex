@@ -420,7 +420,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get privacyPolicy => 'Privacybeleid';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => 'Hernoemd';
 
   @override
   String get report => 'Rapporteren';

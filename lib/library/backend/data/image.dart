@@ -1,7 +1,7 @@
 // lib/library/backend/data/image.dart
 
 import 'dart:convert';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'package:flutter/foundation.dart'; // Changed from cupertino to foundation for debugPrint
 import 'package:shared_preferences/shared_preferences.dart';
 
