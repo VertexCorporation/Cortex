@@ -240,8 +240,8 @@ class AppInitializer with ChangeNotifier {
 
   /// Checks for app updates using a hybrid approach.
   Future<bool> _checkForAppUpdate() async {
-    // --- BYPASS FOR WEB ---
-    if (kIsWeb) return false;
+    // --- BYPASS FOR WEB & DEBUG ---
+    if (kIsWeb || kDebugMode) return false;
 
     // --- STRATEGY 1: STORE CHECK (UPGRADER) ---
     try {
