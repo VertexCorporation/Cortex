@@ -422,7 +422,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get privacyPolicy => 'Política de Privacidade';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => 'Renomeado';
 
   @override
   String get report => 'Reportar';
