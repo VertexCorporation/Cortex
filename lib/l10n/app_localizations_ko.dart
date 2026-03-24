@@ -412,7 +412,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get privacyPolicy => '개인정보 처리방침';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => '이름이 바뀌었습니다';
 
   @override
   String get report => '신고하기';

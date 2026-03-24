@@ -110,6 +110,8 @@ class ModelRepository {
     const String logPrefix = "[ModelRepository.updateBaseModel]";
     try {
       final db = await _dbHelper.database;
+      if (db == null) return false;
+
       final results = await db.query(
           'models', where: 'id = ?', whereArgs: [modelId]);
 
@@ -317,39 +319,41 @@ class ModelRepository {
 
       if (modelsToInsert.isNotEmpty) {
         final db = await _dbHelper.database;
-        const int batchSize = 50; // Optimal chunk size to prevent locking
+        if (db != null) {
+          const int batchSize = 50; // Optimal chunk size to prevent locking
 
-        for (var i = 0; i < modelsToInsert.length; i += batchSize) {
-          final end = (i + batchSize < modelsToInsert.length)
-              ? i + batchSize
-              : modelsToInsert.length;
-          final currentBatch = modelsToInsert.sublist(i, end);
+          for (var i = 0; i < modelsToInsert.length; i += batchSize) {
+            final end = (i + batchSize < modelsToInsert.length)
+                ? i + batchSize
+                : modelsToInsert.length;
+            final currentBatch = modelsToInsert.sublist(i, end);
 
-          final batch = db.batch();
+            final batch = db.batch();
 
-          for (var modelData in currentBatch) {
-            batch.insert('models', {
-              'id': modelData['id'],
-              'producer': modelData['producer'] ?? 'Unknown',
-              'title': modelData['title'] ?? modelData['id'],
-              'is_server_side': (modelData['type'] != 'offline') ? 1 : 0,
-              'type': modelData['type'] ?? 'online',
-              'raw_json': json.encode(modelData),
-            }, conflictAlgorithm: ConflictAlgorithm.replace);
-          }
+            for (var modelData in currentBatch) {
+              batch.insert('models', {
+                'id': modelData['id'],
+                'producer': modelData['producer'] ?? 'Unknown',
+                'title': modelData['title'] ?? modelData['id'],
+                'is_server_side': (modelData['type'] != 'offline') ? 1 : 0,
+                'type': modelData['type'] ?? 'online',
+                'raw_json': json.encode(modelData),
+              }, conflictAlgorithm: ConflictAlgorithm.replace);
+            }
 
-          try {
-            await batch.commit(noResult: true);
+            try {
+              await batch.commit(noResult: true);
 
-            // 2. Yield to the UI thread to prevent ANRs on slow devices.
-            await Future.delayed(Duration.zero);
-          } catch (e) {
-            if (e.toString().contains("SQLITE_FULL")) {
-              debugPrint(
-                  "[ModelRepository] DISK FULL. Aborting model sync save.");
-              break;
-            } else {
-              rethrow;
+              // 2. Yield to the UI thread to prevent ANRs on slow devices.
+              await Future.delayed(Duration.zero);
+            } catch (e) {
+              if (e.toString().contains("SQLITE_FULL")) {
+                debugPrint(
+                    "[ModelRepository] DISK FULL. Aborting model sync save.");
+                break;
+              } else {
+                rethrow;
+              }
             }
           }
         }
@@ -407,6 +411,8 @@ class ModelRepository {
 
     try {
       final db = await _dbHelper.database;
+      if (db == null) return;
+
       final placeholders = List.filled(validPublicIds.length, '?').join(',');
       final staleModels = await db.query(
         'models',
@@ -600,14 +606,18 @@ class ModelRepository {
   static List<Map<String, dynamic>> _staticParseAndGroupServerModels(
       Map<String, dynamic> rawData, String langCode) {
     final List<Map<String, dynamic>> finalList = [];
-    final producers = rawData['producers'] as Map<String, dynamic>? ?? {};
+    final producers = rawData['producers'] != null
+        ? Map<String, dynamic>.from(rawData['producers'] as Map)
+        : <String, dynamic>{};
 
     producers.forEach((producerName, seriesData) {
-      if (seriesData is! Map<String, dynamic>) return;
-      seriesData.forEach((seriesName, seriesValue) {
-        if (seriesValue is! Map<String, dynamic>) return;
+      if (seriesData is! Map) return;
+      final seriesDataMap = Map<String, dynamic>.from(seriesData);
+      seriesDataMap.forEach((seriesName, seriesValue) {
+        if (seriesValue is! Map) return;
+        final seriesValueMap = Map<String, dynamic>.from(seriesValue);
 
-        final cleanSeriesValue = _staticSanitizeRawData(seriesValue);
+        final cleanSeriesValue = _staticSanitizeRawData(seriesValueMap);
 
         final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)
           ..remove('series_description');

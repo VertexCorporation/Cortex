@@ -421,7 +421,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get privacyPolicy => 'Политика конфиденциальности';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => 'Переименовано';
 
   @override
   String get report => 'Пожаловаться';

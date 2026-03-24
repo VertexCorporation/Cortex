@@ -415,7 +415,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get privacyPolicy => 'سياسة الخصوصية';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => 'تمت إعادة تسميته';
 
   @override
   String get report => 'إبلاغ';

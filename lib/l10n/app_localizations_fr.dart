@@ -424,7 +424,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get privacyPolicy => 'Politique de Confidentialité';
 
   @override
-  String get renamed => 'Renamed';
+  String get renamed => 'Renommé';
 
   @override
   String get report => 'Signaler';

@@ -3,7 +3,7 @@ description: "Core of Artificial Intelligence"
 
 publish_to: 'none'
 
-version: 6.2.2+622
+version: 6.2.3+623
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
