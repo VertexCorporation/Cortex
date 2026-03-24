@@ -311,7 +311,7 @@ To ensure the API correctly associates usage with your project for billing and q
 Your setup is complete! To translate new keys:
 
 1.  Add your new English strings to the `lib/l10n/app_en.arb` file.
-2.  Open a **new System Terminal**.
+2.  Open a **New System Terminal**.
 3.  Simply run the command:
     ```bash
     translate
