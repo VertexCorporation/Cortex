@@ -55,6 +55,7 @@ class ApiService {
     Function(String textChunk)? onTextChunk,
     Function(String featureReasoning)? onfeatureReasoning,
     Function(String imageUrl)? onImageReceived,
+    Function(String audioUrl)? onAudioReceived,
     Function(List<dynamic> toolCalls)? onToolCall,
     required AppLocalizations localizations,
   }) async {
@@ -179,6 +180,11 @@ class ApiService {
                     if (url != null) onImageReceived?.call(url);
                     break;
 
+                  case 'audio_chunk':
+                    final audioUrl = data['url'] as String?;
+                    if (audioUrl != null) onAudioReceived?.call(audioUrl);
+                    break;
+
                   case 'tool_calls':
                     // Accumulate tool call deltas
                     if (data is List) {
@@ -301,6 +307,7 @@ class ApiService {
     Function(String)? onTextChunk,
     Function(String)? onfeatureReasoning,
     Function(String)? onImageReceived,
+    Function(String)? onAudioReceived,
     required AppLocalizations localizations,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
@@ -326,6 +333,7 @@ class ApiService {
       onTextChunk: onTextChunk,
       onfeatureReasoning: onfeatureReasoning,
       onImageReceived: onImageReceived,
+      onAudioReceived: onAudioReceived,
     );
   }
 
@@ -339,6 +347,7 @@ class ApiService {
     Function(String)? onTextChunk,
     Function(String)? onfeatureReasoning,
     Function(String)? onImageReceived,
+    Function(String)? onAudioReceived,
     Function(List<dynamic>)? onToolCall,
     required AppLocalizations localizations,
     required String langCode,
@@ -383,6 +392,7 @@ class ApiService {
       onTextChunk: onTextChunk,
       onfeatureReasoning: onfeatureReasoning,
       onImageReceived: onImageReceived,
+      onAudioReceived: onAudioReceived,
       onToolCall: onToolCall,
     );
   }

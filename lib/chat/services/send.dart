@@ -20,6 +20,7 @@ import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/chat/services/voice.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -444,15 +445,80 @@ class SendService {
       Future<void> onImageReceived(String url) async {
         if (_conversationProvider.wasResponseStopped) return;
         try {
-          final bytes = base64Decode(url
-              .split(',')
-              .last);
-          final path =
-              '${(await getTemporaryDirectory()).path}/${_uuid.v4()}.png';
-          await File(path).writeAsBytes(bytes);
-          // UI update logic implies message provider listens to changes or reloads
+          String finalPath = '';
+          final ext = url.split('?').first.toLowerCase().endsWith('.webp') ? 'webp' : 'png';
+          final dir = await getApplicationDocumentsDirectory();
+          final path = '${dir.path}/${_uuid.v4()}.$ext';
+          
+          if (url.startsWith('data:image')) {
+            final bytes = base64Decode(url.split(',').last);
+            await File(path).writeAsBytes(bytes);
+            finalPath = path;
+          } else if (url.startsWith('http://') || url.startsWith('https://')) {
+            final request = await HttpClient().getUrl(Uri.parse(url));
+            final response = await request.close();
+            final bytes = await consolidateHttpClientResponseBytes(response);
+            await File(path).writeAsBytes(bytes);
+            finalPath = path;
+          } else {
+            finalPath = url; // Fallback to raw string if it's already a local path
+          }
+          
+          final messages = _conversationProvider.messages;
+          if (messages.isNotEmpty) {
+            final int aiMessageIndex = messages.length - 1;
+            final Message currentAiMessage = messages[aiMessageIndex];
+            final updatedAttachments = List<String>.from(currentAiMessage.attachmentPaths)..add(finalPath);
+            _conversationProvider.updateMessageAtIndex(
+              aiMessageIndex,
+              currentAiMessage.copyWith(attachmentPaths: updatedAttachments),
+            );
+            if (_scrollService.isUserAtBottom()) {
+              _scrollService.scrollToBottom(duration: const Duration(milliseconds: 100));
+            }
+          }
         } catch (e) {
-          debugPrint("Image save error: $e");
+          debugPrint("Image parse/save error: $e");
+        }
+      }
+
+      Future<void> onAudioReceived(String url) async {
+        if (_conversationProvider.wasResponseStopped) return;
+        try {
+          String finalPath = '';
+          final ext = url.split('?').first.toLowerCase().endsWith('.wav') ? 'wav' : 'mp3';
+          final dir = await getApplicationDocumentsDirectory();
+          final path = '${dir.path}/${_uuid.v4()}.$ext';
+          
+          if (url.startsWith('data:audio')) {
+            final bytes = base64Decode(url.split(',').last);
+            await File(path).writeAsBytes(bytes);
+            finalPath = path;
+          } else if (url.startsWith('http://') || url.startsWith('https://')) {
+            final request = await HttpClient().getUrl(Uri.parse(url));
+            final response = await request.close();
+            final bytes = await consolidateHttpClientResponseBytes(response);
+            await File(path).writeAsBytes(bytes);
+            finalPath = path;
+          } else {
+            finalPath = url;
+          }
+          
+          final messages = _conversationProvider.messages;
+          if (messages.isNotEmpty) {
+            final int aiMessageIndex = messages.length - 1;
+            final Message currentAiMessage = messages[aiMessageIndex];
+            final updatedAttachments = List<String>.from(currentAiMessage.attachmentPaths)..add(finalPath);
+            _conversationProvider.updateMessageAtIndex(
+              aiMessageIndex,
+              currentAiMessage.copyWith(attachmentPaths: updatedAttachments),
+            );
+            if (_scrollService.isUserAtBottom()) {
+              _scrollService.scrollToBottom(duration: const Duration(milliseconds: 100));
+            }
+          }
+        } catch (e) {
+          debugPrint("Audio parse/save error: $e");
         }
       }
 
@@ -474,6 +540,7 @@ class SendService {
           onTextChunk: onTextChunk,
           onfeatureReasoning: onfeatureReasoning,
           onImageReceived: onImageReceived,
+          onAudioReceived: onAudioReceived,
         );
         // Characters exit loop immediately
         shouldContinue = false;
@@ -493,6 +560,7 @@ class SendService {
           onTextChunk: onTextChunk,
           onfeatureReasoning: onfeatureReasoning,
           onImageReceived: onImageReceived,
+          onAudioReceived: onAudioReceived,
           // Capture Tools
           onToolCall: (tools) {
             turnToolCalls = tools;

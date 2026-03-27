@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import '../../../library/backend/data/service.dart';
 import '../../messages/tiles/ai.dart';
 import '../../messages/tiles/user.dart';
+import 'audio_player.dart';
 
 /// A utility class that acts as a factory for building different types of message widgets.
 class Tiles {
@@ -238,8 +239,18 @@ class Tiles {
       children: paths.map((path) {
         final File file = File(path);
         final bool isImage = _isImageFile(path);
+        final bool isAudio = _isAudioFile(path);
 
-        // A. Image Attachment
+        // A. Audio Attachment
+        if (isAudio) {
+          return AudioPlayerWidget(
+            audioPath: path,
+            isUser: isUser,
+            screenWidth: screenWidth,
+          );
+        }
+
+        // B. Image Attachment
         if (isImage) {
           return GestureDetector(
             onTap: () => Navigator.push(context, PhotoViewer.route(file)),
@@ -302,7 +313,16 @@ class Tiles {
 
   // --- HELPERS ---
 
+  static bool _isAudioFile(String path) {
+    if (path.startsWith('data:audio')) return true;
+    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
+    return ['mp3', 'wav', 'aac', 'm4a', 'flac', 'ogg'].contains(ext);
+  }
+
   static bool _isImageFile(String path) {
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:image')) {
+      return true;
+    }
     final ext = p.extension(path).toLowerCase().replaceAll('.', '');
     return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
   }
