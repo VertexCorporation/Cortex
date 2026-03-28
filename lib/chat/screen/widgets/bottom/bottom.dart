@@ -279,7 +279,7 @@ class _ChatInputPanelState extends State<ChatInputPanel>
 
     // UI Cleanup AFTER initiating send
     _textController.clear();
-    inputProvider.clearAllInput(); // Clears draft and attachments
+    inputProvider.clearAfterSend(); // Clears draft and attachments, persists toggles
 
     // Post-Send Review Triggers
     if (isServerSide) {

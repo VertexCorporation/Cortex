@@ -34,9 +34,8 @@ class ReadService {
       {required String languageCode}) async {
     const String logPrefix = "[ReadService.loadConversation]";
 
-    // CRITICAL: Clear messages and show skeleton immediately
-    _conversationProvider.clearConversation();
-    _conversationProvider.setLoadingMessages(true);
+    // CRITICAL: Clear messages and show skeleton immediately in ONE state update
+    _conversationProvider.clearConversation(startLoading: true);
 
     // 1. Resolve the Model ID
     String resolvedModelId = manager.modelId;
@@ -77,6 +76,11 @@ class ReadService {
   /// Fetches a ConversationManager by its ID and then loads the full conversation.
   Future<void> loadConversationById(String conversationId,
       {required String languageCode}) async {
+    // CRITICAL FIX: Eagerly set loading state before manager resolution (DB fetch)
+    // This prevents the empty screen flash while waiting for the database!
+    // By passing startLoading: true, it clears and sets loading in ONE state update.
+    _conversationProvider.clearConversation(startLoading: true);
+
     final manager = await ConversationManager.fromId(
         conversationId, langCode: languageCode, modelService: _modelService);
 
@@ -93,6 +97,9 @@ class ReadService {
   /// Loads previous messages from the local SQLite database and updates the provider.
   Future<void> _loadAndSetMessages(String convId) async {
     const String logPrefix = "[ReadService._loadAndSetMessages]";
+
+    // Setting _isLoadingMessages to true immediately before awaiting the database read
+    _conversationProvider.setLoadingMessages(true);
 
     try {
       final db = await DbHelper().db;
@@ -139,7 +146,7 @@ class ReadService {
         }
       }
 
-      _conversationProvider.loadMessages(loadedMessages);
+_conversationProvider.loadMessages(loadedMessages);
 
       if (needsDbUpdate) {
         await ChatStorageService.saveCurrentMessages(convId, loadedMessages);

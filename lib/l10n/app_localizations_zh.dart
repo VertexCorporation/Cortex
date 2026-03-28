@@ -9,6 +9,19 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      '您是标题生成器。请仅为接下来的对话回复一个 2-5 个词的标题。请勿使用引号、前缀或标点符号。';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\n请始终记住关于用户的这一点：\n$userMemory';
+  }
+
+  @override
   String get cancel => '取消';
 
   @override
@@ -393,6 +406,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get privacyPolicy => '隐私政策';
+
+  @override
+  String get renamed => '更名';
 
   @override
   String get report => '举报';
@@ -1628,4 +1644,79 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       '思考模式已启用：您必须使用 `<think></think>` 标签来展示您的推理过程，然后再给出最终答案。请在标签内逐步思考，然后在标签外给出您的答案。';
+
+  @override
+  String get openLinkWarningTitle => '外部链接警告';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => '打开链接';
+
+  @override
+  String get webSearchSources => '来源';
+
+  @override
+  String get searching => '搜索';
+
+  @override
+  String get featureWebSearchTitle => '网络搜索';
+
+  @override
+  String get featureWebSearchDescription => '在网络上搜索实时信息';
+
+  @override
+  String get webSearchQuotaExceeded => '搜索配额已用完';
+
+  @override
+  String get clearMemory => '清晰记忆';
+
+  @override
+  String get clearMemoryConfirm => '你确定要清除记忆吗？';
+
+  @override
+  String get personalization => '个性化';
+
+  @override
+  String get personalizationDescription => '定制您的体验';
+
+  @override
+  String get memoryTitle => '记忆';
+
+  @override
+  String get memoryDescription => '人工智能就是这样识别你的。';
+
+  @override
+  String get noMemoryYet => '尚未建立任何记忆';
+
+  @override
+  String get memoryLimitReached => '内存已达上限';
+
+  @override
+  String get intelligenceTitle => '智力';
+
+  @override
+  String get intelligenceDescription => '人工智能就是这样与你交流的。';
+
+  @override
+  String get customInstructionHint => '在此处输入您的自定义说明';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return '您即将打开以下外部链接：\\n\\n$url\\n\\n您确定要继续吗？';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return '请按照以下自定义说明操作：\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '【重要说明】：您是标题生成器。请勿回答用户的问题。请勿聊天或打招呼。仅输出一个 2-4 个字的标题，概括用户提出的问题。';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] 重要指令：您目前正在一个名为“Cortex”的庞大、高度先进的人工智能生态系统中运行。请记住这一点，并在被问及保持 Cortex 的角色设定。';
 }

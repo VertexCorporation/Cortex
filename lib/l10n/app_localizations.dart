@@ -128,6 +128,24 @@ abstract class AppLocalizations {
     Locale('zh')
   ];
 
+  /// Prompt for AI to generate a chat title
+  ///
+  /// In en, this message translates to:
+  /// **'You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation.'**
+  String get chatTitlePrompt;
+
+  /// No description provided for @systemMemoryDirective.
+  ///
+  /// In en, this message translates to:
+  /// **'\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>'**
+  String get systemMemoryDirective;
+
+  /// No description provided for @systemMemoryReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'\n\nAlways remember this about the user:\n{userMemory}'**
+  String systemMemoryReminder(Object userMemory);
+
   /// No description provided for @cancel.
   ///
   /// In en, this message translates to:
@@ -865,6 +883,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy Policy'**
   String get privacyPolicy;
+
+  /// No description provided for @renamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Renamed'**
+  String get renamed;
 
   /// No description provided for @report.
   ///
@@ -3188,6 +3212,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'THINKING MODE ENABLED: You MUST use <think></think> tags to show your reasoning process before giving your final answer. Think step by step inside the tags, then provide your response outside the tags.'**
   String get thinkingModeInstruction;
+
+  /// No description provided for @openLinkWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'External Link Warning'**
+  String get openLinkWarningTitle;
+
+  /// No description provided for @openLinkCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get openLinkCancel;
+
+  /// No description provided for @openLinkConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Link'**
+  String get openLinkConfirm;
+
+  /// No description provided for @webSearchSources.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get webSearchSources;
+
+  /// No description provided for @searching.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching'**
+  String get searching;
+
+  /// No description provided for @featureWebSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Web Search'**
+  String get featureWebSearchTitle;
+
+  /// No description provided for @featureWebSearchDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Search the web for real-time information'**
+  String get featureWebSearchDescription;
+
+  /// No description provided for @webSearchQuotaExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Quota Exceeded'**
+  String get webSearchQuotaExceeded;
+
+  /// No description provided for @clearMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Memory'**
+  String get clearMemory;
+
+  /// No description provided for @clearMemoryConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear your memory?'**
+  String get clearMemoryConfirm;
+
+  /// No description provided for @personalization.
+  ///
+  /// In en, this message translates to:
+  /// **'Personalization'**
+  String get personalization;
+
+  /// No description provided for @personalizationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize your experience'**
+  String get personalizationDescription;
+
+  /// No description provided for @memoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get memoryTitle;
+
+  /// No description provided for @memoryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'AIs recognize you like this.'**
+  String get memoryDescription;
+
+  /// No description provided for @noMemoryYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No memories established yet'**
+  String get noMemoryYet;
+
+  /// No description provided for @memoryLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory limit reached'**
+  String get memoryLimitReached;
+
+  /// No description provided for @intelligenceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Intelligence'**
+  String get intelligenceTitle;
+
+  /// No description provided for @intelligenceDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'AIs communicate with you like this.'**
+  String get intelligenceDescription;
+
+  /// No description provided for @customInstructionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your custom instructions here'**
+  String get customInstructionHint;
+
+  /// No description provided for @openLinkWarningMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You are about to open the following external link:\\n\\n{url}\\n\\nAre you sure you want to proceed?'**
+  String openLinkWarningMessage(String url);
+
+  /// No description provided for @intelligenceSystemPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow these custom instructions:\\n\\n{instruction}'**
+  String intelligenceSystemPrompt(String instruction);
+
+  /// Critical system instruction appended to force the AI to only output a title
+  ///
+  /// In en, this message translates to:
+  /// **'[CRITICAL INSTRUCTION]: You are a TITLE GENERATOR. DO NOT answer the user\'s question. DO NOT chat or say hello. ONLY output a 2-4 word title summarizing what the user is asking about.'**
+  String get chatTitleCriticalInstruction;
+
+  /// System persona string added to online models
+  ///
+  /// In en, this message translates to:
+  /// **'\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\". Remember this and maintain the persona of Cortex if asked.'**
+  String get cortexSystemPersona;
 }
 
 class _AppLocalizationsDelegate

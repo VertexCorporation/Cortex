@@ -9,6 +9,19 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'あなたはタイトル生成者です。以下の会話に対して、2～5語のタイトルのみを返信してください。引用符、接頭辞、句読点は使用しないでください。';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nユーザーについて常に以下を覚えておいてください：\n$userMemory';
+  }
+
+  @override
   String get cancel => 'キャンセル';
 
   @override
@@ -398,6 +411,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'プライバシーポリシー';
+
+  @override
+  String get renamed => '名称変更';
 
   @override
   String get report => '報告';
@@ -1675,4 +1691,79 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       '思考モード有効：最終的な回答を出す前に、必ず<think></think>タグを使って推論のプロセスを示してください。タグ内で段階的に考え、タグの外で回答を記入してください。';
+
+  @override
+  String get openLinkWarningTitle => '外部リンクに関する警告';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'リンクを開く';
+
+  @override
+  String get webSearchSources => '情報源';
+
+  @override
+  String get searching => '検索中';
+
+  @override
+  String get featureWebSearchTitle => 'ウェブ検索';
+
+  @override
+  String get featureWebSearchDescription => 'ウェブでリアルタイム情報を検索する';
+
+  @override
+  String get webSearchQuotaExceeded => '検索割り当て量を超過しました';
+
+  @override
+  String get clearMemory => 'メモリをクリアする';
+
+  @override
+  String get clearMemoryConfirm => '本当にメモリを消去しますか？';
+
+  @override
+  String get personalization => 'パーソナライゼーション';
+
+  @override
+  String get personalizationDescription => '自分好みの体験をカスタマイズ';
+
+  @override
+  String get memoryTitle => 'メモリ';
+
+  @override
+  String get memoryDescription => 'AIはこのようにしてあなたを認識する。';
+
+  @override
+  String get noMemoryYet => 'まだ記憶は確立されていません';
+
+  @override
+  String get memoryLimitReached => 'メモリ制限に達しました';
+
+  @override
+  String get intelligenceTitle => '知能';
+
+  @override
+  String get intelligenceDescription => 'AIはこのようにあなたとコミュニケーションをとります。';
+
+  @override
+  String get customInstructionHint => 'ここにカスタム指示を入力してください';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return '以下の外部リンクを開こうとしています。\\n\\n$url\\n\\n続行しますか？';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return '以下のカスタム手順に従ってください。\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '【重要指示】：あなたはタイトル生成ツールです。ユーザーの質問に答えたり、チャットや挨拶をしたりしないでください。ユーザーの質問内容を要約した2～4語のタイトルのみを出力してください。';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] 重要な指示: あなたは現在、「Cortex」と呼ばれる大規模で高度なAIエコシステム内で動作しています。これを覚えておき、尋ねられたらCortexのペルソナを維持してください。';
 }

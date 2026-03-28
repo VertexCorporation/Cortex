@@ -11,6 +11,20 @@ class Message {
   /// You know
   final String text;
 
+  /// Returns the text completely stripped of any memory tags or their streaming fragments
+  /// so that UI elements (like typing animations or raw text selection screens) never show them.
+  String get displayableText {
+    return text
+        .replaceAll(
+        RegExp(r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:>[\s\S]*)?)?)?)?)?)?$',
+            caseSensitive: false),
+        '')
+        .replaceAll(
+        RegExp(r'\s*<memory>[\s\S]*?(?:</memory>|$)\s*',
+            caseSensitive: false),
+        '');
+  }
+
   /// The boolean variable for controlling the message type
   final bool isUserMessage;
 
@@ -48,6 +62,12 @@ class Message {
   /// Indicates if the message should be visible in the UI.
   final bool isVisible;
 
+  /// Indicates if web search is currently active for this message.
+  final bool isWebSearchActive;
+
+  /// Stores the citations/sources from the web search.
+  final List<dynamic>? webSearchSources;
+
   Message({
     this.id,
     required this.text,
@@ -62,6 +82,8 @@ class Message {
     this.isAttachmentUploading = false,
     this.parsedSpans,
     this.isVisible = true,
+    this.isWebSearchActive = false,
+    this.webSearchSources,
   }) : notifier = ValueNotifier(text);
 
   /// Private constructor used by `copyWith` and `fromMap`.
@@ -80,6 +102,8 @@ class Message {
     required this.parsedSpans,
     required this.notifier,
     required this.isVisible,
+    required this.isWebSearchActive,
+    required this.webSearchSources,
   });
 
   /// Helper getter to check if the message has any attachments.
@@ -115,10 +139,12 @@ class Message {
     bool? isAttachmentUploading,
     List<InlineSpan>? parsedSpans,
     bool? isVisible,
+    bool? isWebSearchActive,
+    List<dynamic>? webSearchSources,
   }) {
     // Reuse existing notifier if text hasn't changed to save resources.
     final newNotifier =
-        (text != null && text != this.text) ? ValueNotifier(text) : notifier;
+    (text != null && text != this.text) ? ValueNotifier(text) : notifier;
 
     if (text != null) {
       newNotifier.value = text;
@@ -141,10 +167,12 @@ class Message {
       isError: isError ?? this.isError,
       opacity: opacity ?? this.opacity,
       isAttachmentUploading:
-          isAttachmentUploading ?? this.isAttachmentUploading,
+      isAttachmentUploading ?? this.isAttachmentUploading,
       parsedSpans: parsedSpans ?? this.parsedSpans,
       notifier: newNotifier,
       isVisible: isVisible ?? this.isVisible,
+      isWebSearchActive: isWebSearchActive ?? this.isWebSearchActive,
+      webSearchSources: webSearchSources ?? this.webSearchSources,
     );
   }
 
@@ -184,6 +212,20 @@ class Message {
       }
     }
 
+    List<dynamic>? webSearchSources;
+    if (map['webSearchSources'] != null) {
+      if (map['webSearchSources'] is String) {
+        try {
+          webSearchSources = jsonDecode(map['webSearchSources'] as String);
+        } catch (e) {
+          // Handle error if JSON decoding fails
+          webSearchSources = null;
+        }
+      } else if (map['webSearchSources'] is List) {
+        webSearchSources = map['webSearchSources'] as List<dynamic>;
+      }
+    }
+
     return Message._private(
       id: map['uuid'] as String?,
       text: text,
@@ -199,6 +241,28 @@ class Message {
       parsedSpans: null,
       notifier: ValueNotifier(text),
       isVisible: (map['isVisible'] as int? ?? 1) == 1,
+      isWebSearchActive: (map['isWebSearchActive'] as int? ?? 0) == 1,
+      webSearchSources: webSearchSources,
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'uuid': id,
+      'text': text,
+      'isUser': isUserMessage ? 1 : 0,
+      'attachmentPaths': attachmentPaths,
+      'model': model,
+      'includeInContext': includeInContext ? 1 : 0,
+      'isReported': isReported ? 1 : 0,
+      'isThinking': isThinking ? 1 : 0,
+      'isError': isError ? 1 : 0,
+      'opacity': opacity,
+      'isAttachmentUploading': isAttachmentUploading ? 1 : 0,
+      'isVisible': isVisible ? 1 : 0,
+      'isWebSearchActive': isWebSearchActive ? 1 : 0,
+      'webSearchSources': webSearchSources != null ? jsonEncode(
+          webSearchSources) : null,
+    };
   }
 }

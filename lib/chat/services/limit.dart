@@ -10,7 +10,8 @@ class ChatLimitManager {
   const ChatLimitManager({
     required int cortexSubscription,
     Timestamp? subscriptionExpiresAt,
-  })  : _cortexSubscription = cortexSubscription,
+  })
+      : _cortexSubscription = cortexSubscription,
         _subscriptionExpiresAt = subscriptionExpiresAt;
 
   /// Calculates the true, trusted subscription level by handling both
@@ -49,15 +50,15 @@ class ChatLimitManager {
 
     // This logic now works correctly for ALL subscription types.
     if (level == 0) {
-      return 50000;
-    } else if (level == 1 || level == 4) {
-      return 70000;
-    } else if (level == 2 || level == 5) {
-      return 90000;
-    } else if (level == 3 || level == 6) {
       return 100000;
+    } else if (level == 1 || level == 4) {
+      return 250000;
+    } else if (level == 2 || level == 5) {
+      return 500000;
+    } else if (level == 3 || level == 6) {
+      return 1000000;
     }
-    return 50000; // Fallback for any unknown cases.
+    return 100000; // Fallback for any unknown cases.
   }
 
   /// Approximate character count equivalent for an image attachment.

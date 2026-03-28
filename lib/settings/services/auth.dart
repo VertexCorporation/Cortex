@@ -108,11 +108,16 @@ class AuthService {
 
   Future<void> signOutFromProviders() async {
     try {
-      await _googleSignIn.signOut();
-      await _firebaseAuth.signOut();
-      debugPrint("AuthService: Signed out from Google and Firebase.");
+      await _googleSignIn.signOut().timeout(const Duration(seconds: 2));
     } catch (e) {
-      debugPrint("AuthService: Error during low-level sign out: $e");
+      debugPrint("AuthService: Google signOut error or timeout: $e");
     }
+
+    try {
+      await _firebaseAuth.signOut().timeout(const Duration(seconds: 2));
+    } catch (e) {
+      debugPrint("AuthService: Firebase signOut error or timeout: $e");
+    }
+    debugPrint("AuthService: Signed out from auth providers.");
   }
 }

@@ -9,6 +9,19 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      '당신은 제목 생성기입니다. 다음 대화에 대해 오직 2~5단어로 된 제목으로만 대답해 주세요. 따옴표, 접두사, 구두점은 사용하지 마세요.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\n사용자에 대해 항상 다음을 기억하세요:\n$userMemory';
+  }
+
+  @override
   String get cancel => '취소';
 
   @override
@@ -397,6 +410,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get privacyPolicy => '개인정보 처리방침';
+
+  @override
+  String get renamed => '이름이 바뀌었습니다';
 
   @override
   String get report => '신고하기';
@@ -1675,4 +1691,79 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       '사고 모드 활성화: 최종 답변을 작성하기 전에 <think></think> 태그를 사용하여 사고 과정을 반드시 보여주세요. 태그 안에서 단계별로 생각한 후, 태그 바깥에 답변을 작성하세요.';
+
+  @override
+  String get openLinkWarningTitle => '외부 링크 경고';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => '링크 열기';
+
+  @override
+  String get webSearchSources => '출처';
+
+  @override
+  String get searching => '수색';
+
+  @override
+  String get featureWebSearchTitle => '웹 검색';
+
+  @override
+  String get featureWebSearchDescription => '웹에서 실시간 정보를 검색하세요.';
+
+  @override
+  String get webSearchQuotaExceeded => '검색 할당량을 초과했습니다';
+
+  @override
+  String get clearMemory => '메모리 지우기';
+
+  @override
+  String get clearMemoryConfirm => '정말로 기억을 지우고 싶으신가요?';
+
+  @override
+  String get personalization => '개인화';
+
+  @override
+  String get personalizationDescription => '나만의 경험을 맞춤 설정하세요';
+
+  @override
+  String get memoryTitle => '메모리';
+
+  @override
+  String get memoryDescription => '인공지능은 이런 식으로 당신을 인식합니다.';
+
+  @override
+  String get noMemoryYet => '아직 저장된 메모리가 없습니다.';
+
+  @override
+  String get memoryLimitReached => '메모리 제한에 도달했습니다.';
+
+  @override
+  String get intelligenceTitle => '지능';
+
+  @override
+  String get intelligenceDescription => '인공지능은 이런 식으로 당신과 소통합니다.';
+
+  @override
+  String get customInstructionHint => '여기에 사용자 지정 지침을 입력하세요.';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return '다음 외부 링크를 열려고 합니다.\\n\\n$url\\n\\n계속 진행하시겠습니까?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return '다음 사용자 지정 지침을 따르세요:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[중요 지시사항]: 당신은 제목 생성기입니다. 사용자의 질문에 답하거나, 채팅을 하거나, 인사하지 마세요. 사용자가 묻는 내용을 요약하는 2~4단어 분량의 제목만 출력하세요.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] 중요 지침: 현재 \"Cortex\"라는 거대하고 고도로 발전된 AI 생태계 내에서 작업 중입니다. 이를 기억하고 요청을 받으면 Cortex의 페르소나를 유지하세요.';
 }

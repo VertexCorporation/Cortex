@@ -9,6 +9,19 @@ class AppLocalizationsAz extends AppLocalizations {
   AppLocalizationsAz([String locale = 'az']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'Siz başlıq yaradıcısısınız. Aşağıdakı söhbət üçün YALNIZ 2-5 sözlük bir başlıq verin. Dırnaq işarəsi, ön ek və ya durğu işarələrindən istifadə etməyin.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nİstifadəçi haqqında həmişə bunu xatırlayın:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'Ləğv et';
 
   @override
@@ -403,6 +416,9 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Məxfilik Siyasəti';
+
+  @override
+  String get renamed => 'Yenidən adlandırıldı';
 
   @override
   String get report => 'Şikayət et';
@@ -1724,4 +1740,83 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'DÜŞÜNMƏ REJİMİ AKTİVDİR: Son cavabınızı verməzdən əvvəl mühakimə prosesinizi göstərmək üçün <think></think> etiketlərindən istifadə etməlisiniz. Etiketlərin içərisində addım-addım düşünün, sonra cavabınızı etiketlərin xaricində verin.';
+
+  @override
+  String get openLinkWarningTitle => 'Xarici Link Xəbərdarlığı';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Linki Açın';
+
+  @override
+  String get webSearchSources => 'Mənbələr';
+
+  @override
+  String get searching => 'Axtarış';
+
+  @override
+  String get featureWebSearchTitle => 'Veb Axtarışı';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Real vaxt məlumatı üçün internetdə axtarış aparın';
+
+  @override
+  String get webSearchQuotaExceeded => 'Axtarış Kvotası Aşıldı';
+
+  @override
+  String get clearMemory => 'Yaddaşı təmizləyin';
+
+  @override
+  String get clearMemoryConfirm =>
+      'Yaddaşınızı təmizləmək istədiyinizə əminsinizmi?';
+
+  @override
+  String get personalization => 'Fərdiləşdirmə';
+
+  @override
+  String get personalizationDescription => 'Təcrübənizi fərdiləşdirin';
+
+  @override
+  String get memoryTitle => 'Yaddaş';
+
+  @override
+  String get memoryDescription => 'Süni intellekt sizi belə tanıyır.';
+
+  @override
+  String get noMemoryYet => 'Hələ heç bir xatirə qurulmayıb';
+
+  @override
+  String get memoryLimitReached => 'Yaddaş limitinə çatıldı';
+
+  @override
+  String get intelligenceTitle => 'Kəşfiyyat';
+
+  @override
+  String get intelligenceDescription =>
+      'Süni intellekt sizinlə bu şəkildə ünsiyyət qurur.';
+
+  @override
+  String get customInstructionHint =>
+      'Xüsusi təlimatlarınızı buraya daxil edin';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'Aşağıdakı xarici linki açmaq üzrəsiniz:\\n\\n$url\\n\\nDavam etmək istədiyinizə əminsinizmi?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Bu xüsusi təlimatları izləyin:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[KRİTİK TƏLİMAT]: Siz BAŞLIQ GENERATORUSUZ. İstifadəçinin sualına CAVAB VERMƏYİN. SÖHBƏT EDİN VƏ YA SALAM VERMƏYİN. YALNIZ istifadəçinin nə haqqında soruşduğunu xülasə edən 2-4 sözdən ibarət başlıq çıxarın.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] VACİB TƏLİMAT: Hal-hazırda \"Cortex\" adlı nəhəng, yüksək dərəcədə inkişaf etmiş süni intellekt ekosistemində fəaliyyət göstərirsiniz. Bunu unutmayın və soruşularsa Cortex personajını qoruyun.';
 }

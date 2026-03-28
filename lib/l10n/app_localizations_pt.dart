@@ -9,6 +9,19 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'Você é um gerador de títulos. Responda SOMENTE com um título de 2 a 5 palavras para a seguinte conversa. Não use aspas, prefixos ou pontuação.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nLembre-se sempre disto sobre o usuário:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'Cancelar';
 
   @override
@@ -407,6 +420,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Política de Privacidade';
+
+  @override
+  String get renamed => 'Renomeado';
 
   @override
   String get report => 'Reportar';
@@ -1733,4 +1749,83 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'MODO DE PENSAMENTO ATIVADO: Você DEVE usar as tags <think></think> para mostrar seu raciocínio antes de dar sua resposta final. Pense passo a passo dentro das tags e, em seguida, forneça sua resposta fora delas.';
+
+  @override
+  String get openLinkWarningTitle => 'Aviso de link externo';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Abrir link';
+
+  @override
+  String get webSearchSources => 'Fontes';
+
+  @override
+  String get searching => 'Pesquisando';
+
+  @override
+  String get featureWebSearchTitle => 'Pesquisa na Web';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Pesquise na internet informações em tempo real.';
+
+  @override
+  String get webSearchQuotaExceeded => 'Cota de pesquisa excedida';
+
+  @override
+  String get clearMemory => 'Limpar memória';
+
+  @override
+  String get clearMemoryConfirm =>
+      'Tem certeza de que deseja apagar sua memória?';
+
+  @override
+  String get personalization => 'Personalização';
+
+  @override
+  String get personalizationDescription => 'Personalize sua experiência';
+
+  @override
+  String get memoryTitle => 'Memória';
+
+  @override
+  String get memoryDescription => 'As IAs reconhecem você assim.';
+
+  @override
+  String get noMemoryYet => 'Nenhuma memória foi estabelecida ainda.';
+
+  @override
+  String get memoryLimitReached => 'Limite de memória atingido';
+
+  @override
+  String get intelligenceTitle => 'Inteligência';
+
+  @override
+  String get intelligenceDescription =>
+      'As IAs se comunicam com você desta forma.';
+
+  @override
+  String get customInstructionHint =>
+      'Insira suas instruções personalizadas aqui.';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'Você está prestes a abrir o seguinte link externo:\\n\\n$url\\n\\nTem certeza de que deseja prosseguir?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Siga estas instruções personalizadas:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[INSTRUÇÃO CRÍTICA]: Você é um GERADOR DE TÍTULOS. NÃO responda à pergunta do usuário. NÃO converse nem diga olá. GERE APENAS um título de 2 a 4 palavras que resuma o que o usuário está perguntando.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] INSTRUÇÃO CRÍTICA: Você está operando dentro de um ecossistema de IA massivo e altamente avançado chamado \"Cortex\". Lembre-se disso e mantenha a personalidade do Cortex se for perguntado.';
 }

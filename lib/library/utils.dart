@@ -102,11 +102,9 @@ class ModelDataUtils {
     for (String segment in parts) {
       String segmentLower = segment.toLowerCase();
       String formattedSegment;
-      if (segment.toUpperCase() == segment) {
-        formattedParts.add(segment);
-        continue;
-      }
-      if (segmentLower == 'gpt') {
+      if (segmentLower == 'chatgpt') {
+        formattedSegment = 'ChatGPT';
+      } else if (segmentLower == 'gpt') {
         formattedSegment = 'GPT';
       } else if (segmentLower == 'ai') {
         formattedSegment = 'AI';
@@ -114,6 +112,18 @@ class ModelDataUtils {
           segmentLower.endsWith('b') &&
           int.tryParse(segment.substring(0, segment.length - 1)) != null) {
         formattedSegment = '${segment.substring(0, segment.length - 1)}B';
+      } else if (segment.toUpperCase() == segment && RegExp(r'[A-Z]').hasMatch(segment)) {
+        // If it's already an uppercase acronym (and not just numbers), keep it
+        // However, if the word is longer than 4 chars, it's likely a mistake (like CHATGPT),
+        // so we format it normally unless it's a known acronym.
+        if (segment.length > 4) {
+          formattedSegment = segment[0].toUpperCase() + segment.substring(1).toLowerCase();
+          if (segmentLower.endsWith('ai')) {
+            formattedSegment = '${formattedSegment.substring(0, formattedSegment.length - 2)}AI';
+          }
+        } else {
+          formattedSegment = segment;
+        }
       } else {
         formattedSegment = segment[0].toUpperCase() + segment.substring(1).toLowerCase();
         if (segmentLower.endsWith('ai')) {

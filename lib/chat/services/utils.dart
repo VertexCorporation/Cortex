@@ -1,7 +1,7 @@
 // utils.dart
 
 import 'dart:convert';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:mime/mime.dart';
 import '../../library/backend/data/entity.dart';

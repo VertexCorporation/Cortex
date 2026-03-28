@@ -132,8 +132,8 @@ class ModelDefaults {
     // Localized Summaries
     'summary': {
       'en': 'Advanced AI Intelligence',
-      'tr': 'Gelişmiş Yapay Zeka',
-      'ku': 'Zekaya Hunerî ya Pêşketî',
+      'tr': 'Gelişmiş Yapay Zekâ',
+      'ku': 'Zekâya Hunerî ya Pêşketî',
       'es': 'Inteligencia Artificial Avanzada',
       'fr': 'Intelligence Artificielle Avancée',
       'de': 'Fortschrittliche KI-Intelligenz',
@@ -155,7 +155,7 @@ class ModelDefaults {
       'en':
           'Cortex intelligently analyzes your request and activates the most capable AI model available to provide the best possible answer.',
       'tr':
-          'Cortex, isteğinizi analiz eder ve en iyi cevabı sunmak için mevcut en yetenekli yapay zeka modelini devreye sokar.',
+          'Cortex, isteğinizi analiz eder ve en iyi cevabı sunmak için mevcut en yetenekli yapay zekâ modelini devreye sokar.',
       'ku':
           'Cortex daxwaza we bi awayekî aqilmend analîz dike û modela AI ya herî jêhatî çalak dike da ku bersiva herî baş bide.',
       'es':

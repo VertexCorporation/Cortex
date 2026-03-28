@@ -47,7 +47,7 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery.sizeOf(context).width;
     final bool isTablet = screenWidth >= 600;
 
     final double buttonSize = isTablet ? 48.0 : 42.0;
@@ -190,7 +190,7 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
           title: null,
         ),
         Positioned(
-          top: MediaQuery.of(context).padding.top,
+          top: MediaQuery.paddingOf(context).top,
           left: 0,
           right: 0,
           height: kToolbarHeight,
@@ -530,7 +530,7 @@ class _AnimatedTitleWrapperState extends State<_AnimatedTitleWrapper> {
     if (widget.controller == null || !widget.controller!.hasClients) return;
     if (!mounted) return;
 
-    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenHeight = MediaQuery.sizeOf(context).height;
     final double dynamicThreshold = screenHeight * 0.025;
     final double offset = widget.controller!.offset;
     final bool shouldBeVisible = offset <= dynamicThreshold;

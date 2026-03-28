@@ -9,6 +9,19 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'Sen bir başlık oluşturucusun. Aşağıdaki sohbet için SADECE 2-5 kelimelik bir başlık ver. Tırnak, ön ek veya noktalama işareti kullanma.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nKullanıcı hakkında her zaman şunu hatırla:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'İptal';
 
   @override
@@ -402,6 +415,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Gizlilik Politikası';
+
+  @override
+  String get renamed => 'Yeniden Adlandırıldı';
 
   @override
   String get report => 'Rapor Et';
@@ -1719,4 +1735,81 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'DÜŞÜNME MODU AKTİF: Cevabını vermeden önce düşünce sürecini göstermek için <think></think> etiketlerini KULLANMALISIN. Etiketlerin içinde adım adım düşün, sonra cevabını etiketlerin dışında ver.';
+
+  @override
+  String get openLinkWarningTitle => 'Harici Bağlantı Uyarısı';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Bağlantıyı Aç';
+
+  @override
+  String get webSearchSources => 'Kaynaklar';
+
+  @override
+  String get searching => 'Aranıyor';
+
+  @override
+  String get featureWebSearchTitle => 'Web Araması';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Gerçek zamanlı bilgi için internette arama yapın.';
+
+  @override
+  String get webSearchQuotaExceeded => 'Arama kotası aşıldı';
+
+  @override
+  String get clearMemory => 'Hafızayı Temizle';
+
+  @override
+  String get clearMemoryConfirm => 'Hafızayı silmek isteğinize emin misiniz?';
+
+  @override
+  String get personalization => 'Kişiselleştirme';
+
+  @override
+  String get personalizationDescription => 'Deneyiminizi kişiselleştirin';
+
+  @override
+  String get memoryTitle => 'Hafıza';
+
+  @override
+  String get memoryDescription => 'Yapay zekâlar sizi bu şekilde tanıyor.';
+
+  @override
+  String get noMemoryYet => 'Henüz hafıza oluşturulmadı';
+
+  @override
+  String get memoryLimitReached => 'Hafıza sınırına ulaşıldı';
+
+  @override
+  String get intelligenceTitle => 'Zeka';
+
+  @override
+  String get intelligenceDescription =>
+      'Yapay zekâlar sizinle bu şekilde iletişim kuruyor.';
+
+  @override
+  String get customInstructionHint => 'Özel talimatlarınızı buraya girin';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'Aşağıdaki harici bağlantıyı açmak üzeresiniz:\\n\\n$url\\n\\nDevam etmek istediğinizden emin misiniz?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Lütfen aşağıdaki özel talimatları izleyin:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[KRİTİK TALİMAT]: Sen bir BAŞLIK OLUŞTURUCUSUN. Kullanıcının sorusuna cevap VERME. Sohbet ETME veya merhaba DEME. SADECE kullanıcının ne sorduğunu özetleyen 2-4 kelimelik bir başlık çıktısı ver.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[Sistem] KRİTİK TALİMAT: Şu anda \"Cortex\" adlı devasa, son derece gelişmiş bir yapay zeka ekosistemi içinde çalışıyorsunuz. Bunu unutmayın ve sorulursa Cortex persona\'sını sürdürün.';
 }

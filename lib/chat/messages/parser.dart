@@ -4,6 +4,7 @@ import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import '../../notifications/introvert.dart';
@@ -14,6 +15,7 @@ import 'package:flutter/foundation.dart';
 import '../screen/widgets/tools.dart';
 import '../screen/widgets/thinking.dart';
 import '../screen/widgets/sources.dart';
+import '../screen/widgets/bottom/sources.dart';
 
 double _baseFs(BuildContext context) {
   final view = View.of(context);
@@ -45,19 +47,102 @@ class SafeMathTex extends StatelessWidget {
   }
 }
 
-void _openLink(BuildContext context, String urlString) async {
+void openLink(BuildContext context, String urlString) async {
   final uri = Uri.tryParse(urlString);
   if (uri == null) return;
-  final success = await launchUrl(uri, mode: LaunchMode.externalApplication);
+  final l10n = AppLocalizations.of(context)!;
 
-  if (!success && context.mounted) {
-    Provider.of<IntrovertNotificationService>(context, listen: false)
-        .showNotification(
-      message: AppLocalizations.of(context)!.anErrorOccurred,
-      type: NotificationType.success,
-      bottomOffset: 0.22,
-    );
-  }
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: AppColors.background,
+    shape: RoundedRectangleBorder(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      side: BorderSide(
+        color: AppColors.primaryColor.withValues(alpha: 0.1),
+        width: 1.0,
+      ),
+    ),
+    builder: (BuildContext sheetContext) {
+      return Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                SvgPicture.asset(
+                  // Changed to world.svg
+                  'assets/icons/world.svg',
+                  width: 24,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(
+                      AppColors.primaryColor.inverted, BlendMode.srcIn),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  l10n.openLinkWarningTitle,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryColor.inverted,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.openLinkWarningMessage(urlString),
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors
+                    .primaryColor.inverted, // Changed to inverted per request
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(sheetContext),
+                  child: Text(
+                    l10n.openLinkCancel,
+                    style: TextStyle(
+                        color: AppColors.primaryColor.inverted
+                            .withValues(alpha: 0.6)),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor.inverted,
+                    foregroundColor: AppColors.primaryColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(sheetContext);
+                    final success = await launchUrl(uri,
+                        mode: LaunchMode.externalApplication);
+                    if (!success && context.mounted) {
+                      Provider.of<IntrovertNotificationService>(context,
+                          listen: false)
+                          .showNotification(
+                        message: AppLocalizations.of(context)!.anErrorOccurred,
+                        type: NotificationType.success,
+                        bottomOffset: 0.22,
+                      );
+                    }
+                  },
+                  child: Text(l10n.openLinkConfirm),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
 
 // Static RegExp constants to avoid recompilation
@@ -67,13 +152,17 @@ class RegexPatterns {
   static final thinking =
   RegExp(r'(<think>[\s\S]*?(?:</think>|$))', multiLine: false);
 
+  // Greedy matching for <memory> tags - supports BOTH closed and unclosed (streaming) tags
+  static final memory =
+  RegExp(r'(<memory>[\s\S]*?(?:</memory>|$))', multiLine: false);
+
   // Legacy matching for "Thinking..." headers - scattered/broken format from streaming
   // This pattern captures the quote-style thinking blocks that some models produce:
   // > *Thinking...*
   // > The user asks...
   // etc.
   static final thinkingLegacy = RegExp(
-      r'(?:(?:^|\n)\s*>\s*\*?Thinking[.\s]*\*?\s*\n?)(?:(?:\s*>[ \t]*[^\n]*\n?)*)',
+      r'(?:^|\n)\s*>\s*\*?Thinking[.\s]*\*?\s*\n?(?:\s*>[ \t]*[^\n]*\n?)*',
       multiLine: true);
 
   static final horizontalRule =
@@ -94,13 +183,13 @@ class RegexPatterns {
   static final inlineCode = RegExp(r'`[^`\r\n]+?`');
   static final latex = RegExp(
       r'(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\begin\{.+?\}[\s\S]+?\\end\{.+?\}|\\\(.+?\\\)|(?<!\$)\$[^$\r\n]+?\$(?!\$))');
-  static final link = RegExp(r'\[([^\]]+)\]\(([^)]+)\)');
+  static final link = RegExp(r'\(?\s*\[([^\]]+)\]\(([^)]+)\)\s*\)?');
 
   // [NEW] Bare URL pattern: Matches http/https not preceded by ]( or (
-  static final bareUrl = RegExp(r'(?<![\]\)])\b(https?:\/\/[^\s<]+)');
+  static final bareUrl = RegExp(r'(?<![\])])\b(https?://[^\s<]+)');
 
   // [NEW] Citation pattern: [1], [2], etc.
-  static final citation = RegExp(r'\[(\d+)\]');
+  static final citation = RegExp(r'\[\s*(\d+)\s*\]|【\s*(.*?)\s*】');
 
   static final boldItalic =
   RegExp(r'(\*\*\*.+?\*\*\*|___.+?___)', dotAll: true);
@@ -115,10 +204,11 @@ class RegexPatterns {
   static final toolResultEmoji = RegExp(r'\s*[✅❌✓✗]\s*');
 
   // Pattern to match "*Using tool...*" lines completely
-  static final usingToolLine = RegExp(
-      r'\n?\*Using [^*]+\.\.\.[^*]*\*\s*[✅❌✓✗]?\s*\n?');
+  static final usingToolLine =
+  RegExp(r'\n?\*Using [^*]+\.\.\.[^*]*\*\s*[✅❌✓✗]?\s*\n?');
 
   static final blockPatterns = {
+    'memory': memory,
     'thinking': thinking,
     'thinkingLegacy': thinkingLegacy,
     'horizontalRule': horizontalRule,
@@ -130,26 +220,26 @@ class RegexPatterns {
     'bulletList': bulletList,
   };
 
+  static final combinedInlinePattern = RegExp(
+      inlinePatterns.entries.map((e) => '(?<${e.key}>${e.value.pattern})').join(
+          '|'),
+      dotAll: true);
+
   static final inlinePatterns = {
     'inlineCode': inlineCode,
     'latex': latex,
     'link': link,
     'bareUrl': bareUrl,
-    // Add bare URL
     'citation': citation,
-    // Add citation
     'boldItalic': boldItalic,
     'bold': bold,
     'strikethrough': strikethrough,
     'italic': italic,
-    // NOTE: thinkStart/thinkEnd removed from inline patterns
-    // They are now handled at block level via the 'thinking' pattern
-    // which matches both closed (<think>...</think>) and unclosed (<think>...) tags
   };
 }
 
 List<InlineSpan> parseText(BuildContext context, String text,
-    {double? fontSize, bool isFinished = false}) {
+    {double? fontSize, bool isFinished = false, List<dynamic>? citations}) {
   try {
     // [FIX] Pre-clean text to remove artifacts
     // Remove "*Using tool...*" lines with optional emojis
@@ -168,6 +258,17 @@ List<InlineSpan> parseText(BuildContext context, String text,
     // Merge them into a single <think>A X B</think> block
     text = _mergeFragmentedThinkingBlocks(text);
 
+    // Strip memory blocks completely including prefix/suffix whitespace to avoid empty trailing space in UI
+    text = text.replaceAll(
+        RegExp(r'\s*<memory>[\s\S]*?(?:</memory>|$)\s*', caseSensitive: false),
+        '');
+    // Also catch incomplete streaming variants at the very tail end to prevent newline/char popping
+    text = text.replaceAll(RegExp(
+        r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:>[\s\S]*)?)?)?)?)?)?$',
+        caseSensitive: false), '');
+
+    // Link pre-processing has been removed. Markdown links are rendered directly.
+
     // --- Source Extraction Logic ---
     // Detect "Sources:" at the end of the text and extract them
     List<Source> sources = [];
@@ -184,7 +285,6 @@ List<InlineSpan> parseText(BuildContext context, String text,
       // Try to parse line-by-line using common formats: "1. [Title](url)" or "- [Title](url)"
       final sourceLines = potentialSourceText.split('\n');
       bool validSourcesFound = false;
-
       int indexCounter = 1;
 
       for (var line in sourceLines) {
@@ -193,7 +293,7 @@ List<InlineSpan> parseText(BuildContext context, String text,
 
         // Regex for: 1. [Title](Url) or - [Title](Url) or [1] Title: Url
         final linkMatch =
-        RegExp(r'(?:^\d+\.?\s*|^\-\s*)?\[([^\]]+)\]\(([^)]+)\)')
+        RegExp(r'(?:^\d+\.?\s*|^-\s*)?\[([^\]]+)\]\(([^)]+)\)')
             .firstMatch(line);
         if (linkMatch != null) {
           sources.add(Source(
@@ -225,6 +325,13 @@ List<InlineSpan> parseText(BuildContext context, String text,
 
     text = text.trim();
 
+    // Use locally parsed markdown sources if the stream didn't provide citations
+    List<dynamic>? activeCitations = citations;
+    if ((activeCitations == null || activeCitations.isEmpty) &&
+        sources.isNotEmpty) {
+      activeCitations = sources.map((s) => s.url).toList();
+    }
+
     final fs = fontSize ?? _baseFs(context);
     final patterns = RegexPatterns.blockPatterns;
 
@@ -252,6 +359,7 @@ List<InlineSpan> parseText(BuildContext context, String text,
       }
     }
 
+    final urlMap = <String, int>{}; // Inject tracking map
     final inlinePatterns = RegexPatterns.inlinePatterns;
 
     final spans = <InlineSpan>[];
@@ -260,16 +368,18 @@ List<InlineSpan> parseText(BuildContext context, String text,
     for (final blockMatch in finalBlockMatches) {
       if (blockMatch.start > currentIndex) {
         final betweenText = text.substring(currentIndex, blockMatch.start);
-        spans.addAll(
-            _processInlineElements(context, betweenText, inlinePatterns, fs));
+        spans.addAll(_processInlineElements(
+            context, betweenText, inlinePatterns, fs,
+            urlMap: urlMap, citations: activeCitations));
       }
 
       if (blockMatch.type == 'bulletList') {
         final bulletMatch = RegExp(r'^\s*[*\-+]\s+(.+)$', multiLine: true)
             .firstMatch(blockMatch.text);
         final content = bulletMatch?.group(1) ?? '';
-        final inlineSpans =
-        _processInlineElements(context, content, inlinePatterns, fs);
+        final inlineSpans = _processInlineElements(
+            context, content, inlinePatterns, fs,
+            urlMap: urlMap, citations: activeCitations);
         spans.add(WidgetSpan(
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
@@ -287,7 +397,9 @@ List<InlineSpan> parseText(BuildContext context, String text,
             )));
       } else {
         spans.add(_processBlockMatch(context, blockMatch, inlinePatterns, fs,
-            isFinished: isFinished));
+            isFinished: isFinished,
+            urlMap: urlMap,
+            citations: activeCitations));
       }
 
       currentIndex = blockMatch.end;
@@ -295,14 +407,18 @@ List<InlineSpan> parseText(BuildContext context, String text,
 
     if (currentIndex < text.length) {
       final remainingText = text.substring(currentIndex);
-      spans.addAll(
-          _processInlineElements(context, remainingText, inlinePatterns, fs));
+      spans.addAll(_processInlineElements(
+          context, remainingText, inlinePatterns, fs,
+          urlMap: urlMap, citations: activeCitations));
     }
 
-    // Append source carousel if sources exist
-    if (sources.isNotEmpty) {
-      spans.add(const WidgetSpan(child: SizedBox(height: 8)));
-      spans.add(WidgetSpan(child: SourceCarousel(sources: sources)));
+    if (isFinished && activeCitations != null && activeCitations.isNotEmpty) {
+      spans.add(WidgetSpan(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: WebSearchSourcesWidget(scale: 1.0, sources: activeCitations),
+        ),
+      ));
     }
 
     return spans;
@@ -321,26 +437,20 @@ List<InlineSpan> parseText(BuildContext context, String text,
 }
 
 List<InlineSpan> _processInlineElements(BuildContext context, String text,
-    Map<String, RegExp> patterns, double fs) {
+    Map<String, RegExp> patterns, double fs,
+    {Map<String, int>? urlMap, List<dynamic>? citations}) {
   if (text.isEmpty) {
     return [];
   }
 
-  final combinedPattern = RegExp(
-    patterns.entries.map((e) => '(?<${e.key}>${e.value.pattern})').join('|'),
-    dotAll: true,
-  );
-
   final spans = <InlineSpan>[];
   int currentIndex = 0;
 
-  for (final match in combinedPattern.allMatches(text)) {
+  for (final match in RegexPatterns.combinedInlinePattern.allMatches(text)) {
     if (match.start > currentIndex) {
       spans.add(TextSpan(
         text: text.substring(currentIndex, match.start),
-        style: TextStyle(
-            color: AppColors.primaryColor.inverted,
-            fontSize: fs),
+        style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs),
       ));
     }
 
@@ -358,7 +468,8 @@ List<InlineSpan> _processInlineElements(BuildContext context, String text,
           end: match.end,
           text: match.group(0)!,
           type: matchType);
-      spans.add(_processInlineMatch(context, inlineMatch, patterns, fs));
+      spans.add(_processInlineMatch(context, inlineMatch, patterns, fs,
+          urlMap: urlMap, citations: citations));
     }
     currentIndex = match.end;
   }
@@ -366,9 +477,7 @@ List<InlineSpan> _processInlineElements(BuildContext context, String text,
   if (currentIndex < text.length) {
     spans.add(TextSpan(
       text: text.substring(currentIndex),
-      style: TextStyle(
-          color: AppColors.primaryColor.inverted,
-          fontSize: fs),
+      style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs),
     ));
   }
   return spans;
@@ -376,10 +485,15 @@ List<InlineSpan> _processInlineElements(BuildContext context, String text,
 
 InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
     Map<String, RegExp> inlinePatterns, double fs,
-    {bool isFinished = false}) {
+    {bool isFinished = false,
+      Map<String, int>? urlMap,
+      List<dynamic>? citations}) {
   try {
     final matchText = match.text;
     switch (match.type) {
+      case 'memory':
+      // Hide memory blocks completely from the UI
+        return const WidgetSpan(child: SizedBox.shrink());
       case 'thinkingLegacy':
       case 'thinking':
         String content = matchText;
@@ -398,7 +512,8 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
         // This happens when offline models produce their own thinking format
         // e.g., "<think>Okay...<think>I need to...</think>...</think>"
         // or when the model outputs "<think>" as plain text in its reasoning
-        content = content.replaceAll(RegExp(r'</?think>', caseSensitive: false), '');
+        content =
+            content.replaceAll(RegExp(r'</?think>', caseSensitive: false), '');
 
         // 3. Aggressively clean up ANY repetitive headers or quote markers
         // We use the verified regex logic from tests.
@@ -415,7 +530,7 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
 
         // Remove standard "Thinking..." header that might be left at the start
         content = content.replaceAll(
-            RegExp(r'^[\*]*Thinking[\.\*]*\s*', caseSensitive: false), '');
+            RegExp(r'^[*]*Thinking[.*]*\s*', caseSensitive: false), '');
 
         // [ADDED] Remove specific "Thinking..." artifacts that might adhere to words
         // e.g. "JanuaryThinking... 25" -> "January 25"
@@ -549,8 +664,9 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
             padding: const EdgeInsets.all(8),
             child: RichText(
               text: TextSpan(
-                children:
-                _processInlineElements(context, text, inlinePatterns, fs),
+                children: _processInlineElements(
+                    context, text, inlinePatterns, fs,
+                    citations: citations),
                 style: TextStyle(
                     fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
                     color: AppColors.primaryColor.inverted),
@@ -632,7 +748,8 @@ InlineSpan _processBlockMatch(BuildContext context, _MatchRange match,
 }
 
 InlineSpan _processInlineMatch(BuildContext context, _MatchRange match,
-    Map<String, RegExp> inlinePatterns, double fs) {
+    Map<String, RegExp> inlinePatterns, double fs,
+    {Map<String, int>? urlMap, List<dynamic>? citations}) {
   try {
     final matchText = match.text;
     final baseStyle = TextStyle(
@@ -668,14 +785,77 @@ InlineSpan _processInlineMatch(BuildContext context, _MatchRange match,
                     style: baseStyle.copyWith(
                         fontSize: fs * 0.9, fontFamily: 'monospace'))));
       case 'link':
-        final m = RegExp(r'\[([^\]]+)\]\(([^)]+)\)').firstMatch(matchText)!;
+        final m = RegExp(r'\[([^\]]+)\]\(([^)]+)\)').firstMatch(matchText);
+        if (m == null) return TextSpan(text: matchText, style: baseStyle);
+
+        final title = m.group(1)!;
+        final url = m.group(2)!;
+
+        int urlIndex = 0;
+        if (urlMap != null) {
+          if (!urlMap.containsKey(url)) {
+            urlMap[url] = urlMap.length + 1;
+          }
+          urlIndex = urlMap[url]!;
+        }
+
+        String displayTitle = title;
+        if (displayTitle.length > 30) {
+          try {
+            displayTitle = Uri
+                .parse(url)
+                .host
+                .replaceAll('www.', '');
+          } catch (_) {}
+        }
+
         return WidgetSpan(
-            child: GestureDetector(
-                onTap: () => _openLink(context, m.group(2)!),
-                child: Text(m.group(1)!,
-                    style: baseStyle.copyWith(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline))));
+          alignment: PlaceholderAlignment.middle,
+          child: GestureDetector(
+            onTap: () => openLink(context, url),
+            child: Padding(
+              padding:
+              const EdgeInsets.only(left: 4.0, right: 2.0, bottom: 2.0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.quaternaryColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                      color: AppColors.primaryColor.inverted, width: 0.5),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (urlIndex > 0) ...[
+                      Text(
+                        urlIndex.toString(),
+                        style: TextStyle(
+                          fontSize: fs * 0.70,
+                          color: AppColors.primaryColor.inverted,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                    Flexible(
+                      child: Text(
+                        displayTitle,
+                        style: TextStyle(
+                          fontSize: fs * 0.70,
+                          color: AppColors.primaryColor.inverted
+                              .withValues(alpha: 0.8),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
       case 'bareUrl':
       // matchText is the URL itself (mostly)
       // Regex group 1 is the url.
@@ -685,62 +865,138 @@ InlineSpan _processInlineMatch(BuildContext context, _MatchRange match,
         final url = matchText.trim();
         return WidgetSpan(
             child: GestureDetector(
-                onTap: () => _openLink(context, url),
+                onTap: () => openLink(context, url),
                 child: Text(url,
                     style: baseStyle.copyWith(
                         color: Colors.blue,
                         decoration: TextDecoration.underline))));
       case 'citation':
-        final citationIndexStr = matchText.replaceAll(RegExp(r'[\[\]]'), '');
+        final citationIndexStr = matchText.replaceAll(
+            RegExp(r'[\[\]【】\s]'), '');
         final citationIndex = int.tryParse(citationIndexStr) ?? 0;
+
+        String? citationUrl;
+        if (citations != null) {
+          if (citationIndex > 0 && citationIndex <= citations.length) {
+            final source = citations[citationIndex - 1];
+            if (source is String) {
+              citationUrl = source;
+            } else if (source is Map && source['url'] != null) {
+              citationUrl = source['url'].toString();
+            } else if (source is Map && source['link'] != null) {
+              citationUrl = source['link'].toString();
+            } else {
+              try {
+                citationUrl = (source as dynamic).url;
+              } catch (e) {
+                /*empty catch block preventer*/
+              }
+            }
+          } else if (citationIndexStr.isNotEmpty && citationIndex == 0) {
+            for (final source in citations) {
+              String url = '';
+              if (source is String) {
+                url = source;
+              } else if (source is Map) {
+                url = source['url']?.toString() ??
+                    source['link']?.toString() ??
+                    '';
+              } else {
+                try {
+                  url = (source as dynamic).url;
+                } catch (e) {
+                  /*empty catch block preventer*/
+                }
+              }
+
+              if (url.contains(citationIndexStr)) {
+                citationUrl = url;
+                break;
+              }
+            }
+            if (citationUrl == null && citationIndexStr.contains('.')) {
+              citationUrl = citationIndexStr.startsWith('http')
+                  ? citationIndexStr
+                  : 'https://$citationIndexStr';
+            }
+          }
+        }
+
+        String displayIndex =
+        citationIndex > 0 ? citationIndex.toString() : '*';
+
+        Widget childWidget = Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: citationUrl != null
+                ? AppColors.quaternaryColor
+                : AppColors.secondaryColor.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(
+                color: citationUrl != null
+                    ? AppColors.primaryColor.inverted.withValues(alpha: 0.3)
+                    : AppColors.border.withValues(alpha: 0.5),
+                width: 0.5),
+          ),
+          child: Text(
+            displayIndex,
+            style: TextStyle(
+              fontSize: fs * 0.7,
+              color: citationUrl != null
+                  ? AppColors.primaryColor.inverted
+                  : AppColors.primaryColor.inverted.withValues(alpha: 0.7),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        );
+
+        if (citationUrl != null) {
+          childWidget = GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              openLink(context, citationUrl!);
+            },
+            child: MouseRegion(
+                cursor: SystemMouseCursors.click, child: childWidget),
+          );
+        }
 
         return WidgetSpan(
           alignment: PlaceholderAlignment.top,
           child: Padding(
-            padding: const EdgeInsets.only(left: 2.0, bottom: 4.0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-              decoration: BoxDecoration(
-                color: AppColors.secondaryColor,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: AppColors.border, width: 0.5),
-              ),
-              child: Text(
-                '$citationIndex',
-                style: TextStyle(
-                  fontSize: fs * 0.7,
-                  color: AppColors.primaryColor.inverted,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+            padding: const EdgeInsets.only(left: 2.0, right: 2.0, bottom: 4.0),
+            child: childWidget,
           ),
         );
 
       case 'boldItalic':
         final content = matchText.substring(3, matchText.length - 3);
         return TextSpan(
-            children:
-            _processInlineElements(context, content, inlinePatterns, fs),
+            children: _processInlineElements(
+                context, content, inlinePatterns, fs,
+                urlMap: urlMap, citations: citations),
             style: baseStyle.copyWith(
                 fontWeight: FontWeight.bold, fontStyle: FontStyle.italic));
       case 'bold':
         final content = matchText.substring(2, matchText.length - 2);
         return TextSpan(
-            children:
-            _processInlineElements(context, content, inlinePatterns, fs),
+            children: _processInlineElements(
+                context, content, inlinePatterns, fs,
+                urlMap: urlMap, citations: citations),
             style: baseStyle.copyWith(fontWeight: FontWeight.bold));
       case 'italic':
         final content = matchText.substring(1, matchText.length - 1);
         return TextSpan(
-            children:
-            _processInlineElements(context, content, inlinePatterns, fs),
+            children: _processInlineElements(
+                context, content, inlinePatterns, fs,
+                urlMap: urlMap, citations: citations),
             style: baseStyle.copyWith(fontStyle: FontStyle.italic));
       case 'strikethrough':
         final content = matchText.substring(2, matchText.length - 2);
         return TextSpan(
-            children:
-            _processInlineElements(context, content, inlinePatterns, fs),
+            children: _processInlineElements(
+                context, content, inlinePatterns, fs,
+                urlMap: urlMap, citations: citations),
             style: baseStyle.copyWith(decoration: TextDecoration.lineThrough));
       default:
         return TextSpan(text: matchText, style: baseStyle);
@@ -751,21 +1007,19 @@ InlineSpan _processInlineMatch(BuildContext context, _MatchRange match,
     }
     return TextSpan(
         text: match.text,
-        style: TextStyle(
-            color: AppColors.primaryColor.inverted,
-            fontSize: fs));
+        style: TextStyle(color: AppColors.primaryColor.inverted, fontSize: fs));
   }
 }
 
 /// Merges fragmented/consecutive thinking blocks into a single block.
-/// 
+///
 /// During streaming, the model sometimes sends complex think tags.
 /// This function extracts ALL thinking content and consolidates it into
 /// a single think block at the beginning.
 String _mergeFragmentedThinkingBlocks(String text) {
   // Step 1: Find ALL closed <think>...</think> blocks
-  final closedThinkPattern = RegExp(
-      r'<think>([\s\S]*?)</think>', multiLine: true);
+  final closedThinkPattern =
+  RegExp(r'<think>([\s\S]*?)</think>', multiLine: true);
   final closedMatches = closedThinkPattern.allMatches(text).toList();
 
   // Step 2: Check for unclosed <think> block at the end (streaming)
@@ -806,7 +1060,8 @@ String _mergeFragmentedThinkingBlocks(String text) {
   }
 
   // Add unclosed block content (if any)
-  if (hasUnclosedBlock && unclosedContent != null &&
+  if (hasUnclosedBlock &&
+      unclosedContent != null &&
       unclosedContent.isNotEmpty) {
     unclosedContent = cleanNestedThinkTags(unclosedContent);
     thinkingContents.add(unclosedContent);
