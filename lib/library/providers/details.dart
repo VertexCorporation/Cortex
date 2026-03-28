@@ -409,6 +409,8 @@ class ModelDetailProvider extends ChangeNotifier {
     if (capabilities.modalities['file'] == true) features.add('document');
     if (capabilities.modalities['audio'] == true) features.add('audio');
     if (capabilities.outputs['image'] == true) features.add('image_generation');
+    if (capabilities.outputs['audio'] == true) features.add('audio_generation');
+    if (capabilities.outputs['video'] == true) features.add('video_generation');
     return features;
   }
 }

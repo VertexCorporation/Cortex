@@ -1994,6 +1994,30 @@ abstract class AppLocalizations {
   /// **'This model can create original images based on your text descriptions.'**
   String get featureImageGenerationDescription;
 
+  /// Title for the feature indicating the model can create audio.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Generation'**
+  String get featureAudioGenerationTitle;
+
+  /// Description for the audio generation feature.
+  ///
+  /// In en, this message translates to:
+  /// **'This model can create original audio based on your text descriptions.'**
+  String get featureAudioGenerationDescription;
+
+  /// Title for the feature indicating the model can create video.
+  ///
+  /// In en, this message translates to:
+  /// **'Video Generation'**
+  String get featureVideoGenerationTitle;
+
+  /// Description for the video generation feature.
+  ///
+  /// In en, this message translates to:
+  /// **'This model can create original video based on your text descriptions.'**
+  String get featureVideoGenerationDescription;
+
   /// Title for the notice banner shown on a premium model's detail page.
   ///
   /// In en, this message translates to:
@@ -2852,6 +2876,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Generate AI art from text.'**
   String get featureCreateImageDescription;
+
+  /// No description provided for @featureCreateAudioTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Audio'**
+  String get featureCreateAudioTitle;
+
+  /// No description provided for @featureCreateAudioDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate sounds or voice from text.'**
+  String get featureCreateAudioDescription;
 
   /// No description provided for @featureStudyTitle.
   ///

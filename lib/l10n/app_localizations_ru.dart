@@ -1028,6 +1028,20 @@ class AppLocalizationsRu extends AppLocalizations {
       'Эта модель может создавать оригинальные изображения на основе ваших текстовых описаний.';
 
   @override
+  String get featureAudioGenerationTitle => 'Audio Generation';
+
+  @override
+  String get featureAudioGenerationDescription =>
+      'This model can create original audio based on your text descriptions.';
+
+  @override
+  String get featureVideoGenerationTitle => 'Video Generation';
+
+  @override
+  String get featureVideoGenerationDescription =>
+      'This model can create original video based on your text descriptions.';
+
+  @override
   String get premiumModelNoticeTitle => 'Премиум-модель';
 
   @override
@@ -1534,6 +1548,13 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get featureCreateImageDescription =>
       'Создавайте изображения с помощью ИИ из текста.';
+
+  @override
+  String get featureCreateAudioTitle => 'Create Audio';
+
+  @override
+  String get featureCreateAudioDescription =>
+      'Generate sounds or voice from text.';
 
   @override
   String get featureStudyTitle => 'Учитесь и получайте знания';

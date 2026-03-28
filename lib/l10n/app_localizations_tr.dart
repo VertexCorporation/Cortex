@@ -1024,6 +1024,20 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu model, metin açıklamalarınıza dayanarak orijinal görseller oluşturabilir.';
 
   @override
+  String get featureAudioGenerationTitle => 'Ses Üretimi';
+
+  @override
+  String get featureAudioGenerationDescription =>
+      'Bu model, metin açıklamalarınıza dayanarak özgün sesler oluşturabilir.';
+
+  @override
+  String get featureVideoGenerationTitle => 'Video Üretimi';
+
+  @override
+  String get featureVideoGenerationDescription =>
+      'Bu model, metin açıklamalarınıza dayanarak özgün videolar oluşturabilir.';
+
+  @override
   String get premiumModelNoticeTitle => 'Premium Model';
 
   @override
@@ -1524,6 +1538,13 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get featureCreateImageDescription =>
       'Metinden yapay zeka destekli sanat eserleri oluşturun.';
+
+  @override
+  String get featureCreateAudioTitle => 'Ses Üret';
+
+  @override
+  String get featureCreateAudioDescription =>
+      'Metinden yapay zeka destekli ses veya müzik oluşturun.';
 
   @override
   String get featureStudyTitle => 'Öğren ve Çalış';

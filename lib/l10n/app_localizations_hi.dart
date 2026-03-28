@@ -1024,6 +1024,20 @@ class AppLocalizationsHi extends AppLocalizations {
       'यह मॉडल आपके पाठ विवरण के आधार पर मूल चित्र बना सकता है।';
 
   @override
+  String get featureAudioGenerationTitle => 'Audio Generation';
+
+  @override
+  String get featureAudioGenerationDescription =>
+      'This model can create original audio based on your text descriptions.';
+
+  @override
+  String get featureVideoGenerationTitle => 'Video Generation';
+
+  @override
+  String get featureVideoGenerationDescription =>
+      'This model can create original video based on your text descriptions.';
+
+  @override
   String get premiumModelNoticeTitle => 'प्रीमियम मॉडल';
 
   @override
@@ -1524,6 +1538,13 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get featureCreateImageDescription => 'टेक्स्ट से एआई आर्ट बनाएं।';
+
+  @override
+  String get featureCreateAudioTitle => 'Create Audio';
+
+  @override
+  String get featureCreateAudioDescription =>
+      'Generate sounds or voice from text.';
 
   @override
   String get featureStudyTitle => 'अध्ययन और सीखना';

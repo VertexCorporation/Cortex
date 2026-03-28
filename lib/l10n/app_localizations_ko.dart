@@ -997,6 +997,20 @@ class AppLocalizationsKo extends AppLocalizations {
       '이 모델은 귀하의 텍스트 설명을 기반으로 독창적인 이미지를 만들 수 있습니다.';
 
   @override
+  String get featureAudioGenerationTitle => 'Audio Generation';
+
+  @override
+  String get featureAudioGenerationDescription =>
+      'This model can create original audio based on your text descriptions.';
+
+  @override
+  String get featureVideoGenerationTitle => 'Video Generation';
+
+  @override
+  String get featureVideoGenerationDescription =>
+      'This model can create original video based on your text descriptions.';
+
+  @override
   String get premiumModelNoticeTitle => '프리미엄 모델';
 
   @override
@@ -1486,6 +1500,13 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get featureCreateImageDescription => '텍스트를 기반으로 AI 아트를 생성합니다.';
+
+  @override
+  String get featureCreateAudioTitle => 'Create Audio';
+
+  @override
+  String get featureCreateAudioDescription =>
+      'Generate sounds or voice from text.';
 
   @override
   String get featureStudyTitle => '공부하고 배우세요';

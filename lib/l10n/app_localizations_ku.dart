@@ -1028,6 +1028,20 @@ class AppLocalizationsKu extends AppLocalizations {
       'Ev model dikare li gorî danasînên nivîsa we wêneyên orîjînal biafirîne.';
 
   @override
+  String get featureAudioGenerationTitle => 'Audio Generation';
+
+  @override
+  String get featureAudioGenerationDescription =>
+      'This model can create original audio based on your text descriptions.';
+
+  @override
+  String get featureVideoGenerationTitle => 'Video Generation';
+
+  @override
+  String get featureVideoGenerationDescription =>
+      'This model can create original video based on your text descriptions.';
+
+  @override
   String get premiumModelNoticeTitle => 'Modela Premium';
 
   @override
@@ -1530,6 +1544,13 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get featureCreateImageDescription => 'Ji nivîsê hunera AI-ê çêbikin.';
+
+  @override
+  String get featureCreateAudioTitle => 'Create Audio';
+
+  @override
+  String get featureCreateAudioDescription =>
+      'Generate sounds or voice from text.';
 
   @override
   String get featureStudyTitle => 'Xwendin û Fêrbûn';

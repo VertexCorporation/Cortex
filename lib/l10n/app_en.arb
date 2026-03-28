@@ -373,6 +373,22 @@
   "@featureImageGenerationDescription": {
     "description": "Description for the image generation feature."
   },
+  "featureAudioGenerationTitle": "Audio Generation",
+  "@featureAudioGenerationTitle": {
+    "description": "Title for the feature indicating the model can create audio."
+  },
+  "featureAudioGenerationDescription": "This model can create original audio based on your text descriptions.",
+  "@featureAudioGenerationDescription": {
+    "description": "Description for the audio generation feature."
+  },
+  "featureVideoGenerationTitle": "Video Generation",
+  "@featureVideoGenerationTitle": {
+    "description": "Title for the feature indicating the model can create video."
+  },
+  "featureVideoGenerationDescription": "This model can create original video based on your text descriptions.",
+  "@featureVideoGenerationDescription": {
+    "description": "Description for the video generation feature."
+  },
   "premiumModelNoticeTitle": "Premium Model",
   "@premiumModelNoticeTitle": {
     "description": "Title for the notice banner shown on a premium model's detail page."
@@ -588,6 +604,8 @@
   "featureReasoningDescription": "In Deep Thinking mode, AI thinks through tasks internally to complete them to the best of its ability.",
   "featureCreateImageTitle": "Create Image",
   "featureCreateImageDescription": "Generate AI art from text.",
+  "featureCreateAudioTitle": "Create Audio",
+  "featureCreateAudioDescription": "Generate sounds or voice from text.",
   "featureStudyTitle": "Study & Learn",
   "featureStudyDescription": "Get explanations and summaries.",
   "featureQuizzesTitle": "Quizzes",

@@ -1024,6 +1024,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'This model can create original images based on your text descriptions.';
 
   @override
+  String get featureAudioGenerationTitle => 'Audio Generation';
+
+  @override
+  String get featureAudioGenerationDescription =>
+      'This model can create original audio based on your text descriptions.';
+
+  @override
+  String get featureVideoGenerationTitle => 'Video Generation';
+
+  @override
+  String get featureVideoGenerationDescription =>
+      'This model can create original video based on your text descriptions.';
+
+  @override
   String get premiumModelNoticeTitle => 'Premium Model';
 
   @override
@@ -1524,6 +1538,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get featureCreateImageDescription => 'Generate AI art from text.';
+
+  @override
+  String get featureCreateAudioTitle => 'Create Audio';
+
+  @override
+  String get featureCreateAudioDescription =>
+      'Generate sounds or voice from text.';
 
   @override
   String get featureStudyTitle => 'Study & Learn';

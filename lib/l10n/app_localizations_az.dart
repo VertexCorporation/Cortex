@@ -1025,6 +1025,20 @@ class AppLocalizationsAz extends AppLocalizations {
       'Bu model mətn təsvirləriniz əsasında orijinal şəkillər yarada bilər.';
 
   @override
+  String get featureAudioGenerationTitle => 'Audio Generation';
+
+  @override
+  String get featureAudioGenerationDescription =>
+      'This model can create original audio based on your text descriptions.';
+
+  @override
+  String get featureVideoGenerationTitle => 'Video Generation';
+
+  @override
+  String get featureVideoGenerationDescription =>
+      'This model can create original video based on your text descriptions.';
+
+  @override
   String get premiumModelNoticeTitle => 'Premium Model';
 
   @override
@@ -1527,6 +1541,13 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get featureCreateImageDescription =>
       'Mətndən süni intellekt sənəti yaradın.';
+
+  @override
+  String get featureCreateAudioTitle => 'Create Audio';
+
+  @override
+  String get featureCreateAudioDescription =>
+      'Generate sounds or voice from text.';
 
   @override
   String get featureStudyTitle => 'Oxu və Öyrən';
