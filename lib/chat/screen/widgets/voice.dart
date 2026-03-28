@@ -320,11 +320,16 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                   child: ScaleTransition(scale: animation, child: child));
             },
             child: (isFlowMode && !isFlowActive)
-                ? Icon(
-                    Icons.arrow_upward_rounded,
+                ? Padding(
                     key: const ValueKey('start_flow_icon'),
-                    color: AppColors.primaryColor,
-                    size: 80 * 0.55, // Matches the sizing proportion (55%)
+                    padding: const EdgeInsets.all(80 * 0.22),
+                    child: RotatedBox(
+                      quarterTurns: 2,
+                      child: SvgPicture.asset(
+                        'assets/icons/arrov.svg',
+                        colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                      ),
+                    ),
                   )
                 : Padding(
                     padding: const EdgeInsets.all(22),

@@ -1016,6 +1016,20 @@ class AppLocalizationsAr extends AppLocalizations {
       'يمكن لهذا النموذج إنشاء صور أصلية استنادًا إلى أوصاف النصوص الخاصة بك.';
 
   @override
+  String get featureAudioGenerationTitle => 'Audio Generation';
+
+  @override
+  String get featureAudioGenerationDescription =>
+      'This model can create original audio based on your text descriptions.';
+
+  @override
+  String get featureVideoGenerationTitle => 'Video Generation';
+
+  @override
+  String get featureVideoGenerationDescription =>
+      'This model can create original video based on your text descriptions.';
+
+  @override
   String get premiumModelNoticeTitle => 'نموذج مميز';
 
   @override
@@ -1514,6 +1528,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get featureCreateImageDescription =>
       'أنشئ فن الذكاء الاصطناعي من النصوص.';
+
+  @override
+  String get featureCreateAudioTitle => 'Create Audio';
+
+  @override
+  String get featureCreateAudioDescription =>
+      'Generate sounds or voice from text.';
 
   @override
   String get featureStudyTitle => 'ادرس وتعلم';

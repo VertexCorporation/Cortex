@@ -975,6 +975,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get featureImageGenerationDescription => '该模型可以根据您的文本描述创建原始图像。';
 
   @override
+  String get featureAudioGenerationTitle => 'Audio Generation';
+
+  @override
+  String get featureAudioGenerationDescription =>
+      'This model can create original audio based on your text descriptions.';
+
+  @override
+  String get featureVideoGenerationTitle => 'Video Generation';
+
+  @override
+  String get featureVideoGenerationDescription =>
+      'This model can create original video based on your text descriptions.';
+
+  @override
   String get premiumModelNoticeTitle => '高级型号';
 
   @override
@@ -1441,6 +1455,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get featureCreateImageDescription => '根据文本生成AI艺术作品。';
+
+  @override
+  String get featureCreateAudioTitle => 'Create Audio';
+
+  @override
+  String get featureCreateAudioDescription =>
+      'Generate sounds or voice from text.';
 
   @override
   String get featureStudyTitle => '学习';

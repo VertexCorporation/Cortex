@@ -275,10 +275,15 @@ class ActionButtonWidget extends StatelessWidget {
           color: backgroundColor,
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          Icons.arrow_upward_rounded,
-          color: iconColor,
-          size: size * 0.55,
+        child: Padding(
+          padding: EdgeInsets.all(size * 0.22),
+          child: RotatedBox(
+            quarterTurns: 2, // Rotates 180 degrees to point UP
+            child: SvgPicture.asset(
+              'assets/icons/arrov.svg',
+              colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+            ),
+          ),
         ),
       ),
     );

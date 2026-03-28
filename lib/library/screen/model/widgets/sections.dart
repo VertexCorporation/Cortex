@@ -587,6 +587,14 @@ class FeaturesSection extends StatelessWidget {
         localizations.featureImageGenerationTitle,
         localizations.featureImageGenerationDescription
       ],
+      'audio_generation': [
+        localizations.featureAudioGenerationTitle,
+        localizations.featureAudioGenerationDescription
+      ],
+      'video_generation': [
+        localizations.featureVideoGenerationTitle,
+        localizations.featureVideoGenerationDescription
+      ],
     };
 
     final validFeatures = provider.parsedFeatures

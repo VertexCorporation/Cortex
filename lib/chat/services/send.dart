@@ -522,6 +522,21 @@ class SendService {
         }
       }
 
+      // MOCK TEST FOR AUDIO AND IMAGE (REMOVE BEFORE PRODUCTION)
+      if (initialText.toLowerCase().trim() == "test image") {
+        await Future.delayed(const Duration(seconds: 1));
+        await onImageReceived("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png");
+        _conversationProvider.finishBotResponse(aiMessageIndex);
+        return;
+      }
+      
+      if (initialText.toLowerCase().trim() == "test audio") {
+        await Future.delayed(const Duration(seconds: 1));
+        await onAudioReceived("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+        _conversationProvider.finishBotResponse(aiMessageIndex);
+        return;
+      }
+
       // Execute Request
       if (isCharacterModel) {
         // Characters typically don't use tools in this architecture yet

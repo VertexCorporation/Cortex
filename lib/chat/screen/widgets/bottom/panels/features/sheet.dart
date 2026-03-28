@@ -49,7 +49,22 @@ void showFeaturesSheet({
     }
   }).toList();
 
-  final bool canGenerateImages = imageGenModels.isNotEmpty;
+  final bool canGenerateImages = imageGenModels.isNotEmpty || true; // MOCK: Keep enabled for testing
+
+  // Logic: Check for models that have 'audio' in their 'outputs' map
+  final audioGenModels = catalog.allModels.where((m) {
+    try {
+      final map = m.toMap();
+      if (map['outputs'] is Map) {
+        return map['outputs']['audio'] == true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }).toList();
+
+  final bool canGenerateAudio = audioGenModels.isNotEmpty || true; // MOCK: Keep enabled for testing
 
   showModalBottomSheet<void>(
     context: context,
@@ -150,12 +165,26 @@ void showFeaturesSheet({
                       // Leaving isSelected false for now as it usually sends immediately.
                       onTap: () {
                         Navigator.pop(context);
-                        _handleCreateImageAction(
-                            context, imageGenModels, controller);
+                        _handleDynamicGenerationAction(
+                            context, imageGenModels, controller, isImage: true);
                       },
                     ),
 
-                    // 4. STUDY & LEARN
+                    // 4. CREATE AUDIO
+                    FeaturesSheetButton(
+                      iconPath: 'assets/icons/voice.svg',
+                      title: l10n.featureCreateAudioTitle,
+                      description: l10n.featureCreateAudioDescription,
+                      isDisabled: !canGenerateAudio,
+                      isSelected: false,
+                      onTap: () {
+                        Navigator.pop(context);
+                        _handleDynamicGenerationAction(
+                            context, audioGenModels, controller, isImage: false);
+                      },
+                    ),
+
+                    // 5. STUDY & LEARN
                     FeaturesSheetButton(
                       iconPath: 'assets/icons/study.svg',
                       title: l10n.featureStudyTitle,
@@ -247,14 +276,24 @@ void _handleOfflineAction(BuildContext context, AppLocalizations l10n) {
 }
 
 /// Logic for "Create Image": Selects best model, sends prompt if available.
-void _handleCreateImageAction(
+void _handleDynamicGenerationAction(
   BuildContext context,
   List<ModelEntity> candidates,
   TextEditingController controller,
+  {required bool isImage}
 ) {
   _checkAndResetOfflineMode(context); // [NEW] Reset if needed
 
-  if (candidates.isEmpty) return;
+  // MOCK FLOW: If no models support it yet, just use a dummy text to trigger the mock in send.dart
+  if (candidates.isEmpty) {
+     final String testCommand = isImage ? "test image" : "test audio";
+     context.read<SendService>().sendMessage(
+          context: context,
+          localizations: AppLocalizations.of(context)!,
+          messageText: testCommand,
+        );
+     return;
+  }
 
   // Priority: Non-Premium (Free) first, otherwise Premium.
   final ModelEntity targetModel = candidates.firstWhere(

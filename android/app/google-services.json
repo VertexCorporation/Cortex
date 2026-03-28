@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "561391430514-6m6v05qa0fljg78u5rgnuoib9vpfcknn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VertexGames.AllStar",
+            "certificate_hash": "989fd64f49eeb52118d2fae1a51f8053f9b35caf"
+          }
+        },
+        {
+          "client_id": "561391430514-eoj9gjhcbdmfuifujnlsls34u8gptcnn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VertexGames.AllStar",
+            "certificate_hash": "126da82cbaa5d9d28b0bc7ad7bdf674f50369f86"
+          }
+        },
+        {
           "client_id": "561391430514-ff16q77t0184nuup8mjug5g4oga945v7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -41,6 +57,78 @@
             {
               "client_id": "561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "561391430514-25v681h9rv5l8r6n0ftpnr6spf1134he.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vertex.Ally",
+                "app_store_id": "6756227081"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561391430514:android:ea1d848d92b7289eb10beb",
+        "android_client_info": {
+          "package_name": "com.vertex.ally"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561391430514-4146b6ulvo0gvcmor771ftckb84tbpbg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vertex.ally",
+            "certificate_hash": "e23a8d0f122f1e1dd162b41d883611647fb8f018"
+          }
+        },
+        {
+          "client_id": "561391430514-4neh4494m40rqd60qm262qsgsu600fcs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vertex.ally",
+            "certificate_hash": "5710ec6df59dfb75614962eba6c0a2cef501a8a2"
+          }
+        },
+        {
+          "client_id": "561391430514-cn3190jn2gf93rkj3jjtidi6pr69r4p4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vertex.ally",
+            "certificate_hash": "126da82cbaa5d9d28b0bc7ad7bdf674f50369f86"
+          }
+        },
+        {
+          "client_id": "561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaNXY_dmb7cV9iFWffX-2B6e13Tbichx0"
+        },
+        {
+          "current_key": "AIzaSyD8nmvwCjZvaz3OWnqJDfZLOTXXJyUG_sY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "561391430514-25v681h9rv5l8r6n0ftpnr6spf1134he.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vertex.Ally",
+                "app_store_id": "6756227081"
+              }
             }
           ]
         }
@@ -97,6 +185,14 @@
             {
               "client_id": "561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "561391430514-25v681h9rv5l8r6n0ftpnr6spf1134he.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vertex.Ally",
+                "app_store_id": "6756227081"
+              }
             }
           ]
         }
@@ -137,6 +233,14 @@
             {
               "client_id": "561391430514-nqjp6jl1s9oqi8ddg2fhm83lbvg94qca.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "561391430514-25v681h9rv5l8r6n0ftpnr6spf1134he.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vertex.Ally",
+                "app_store_id": "6756227081"
+              }
             }
           ]
         }
