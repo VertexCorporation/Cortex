@@ -11,7 +11,7 @@
 //
 
 import 'dart:async';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/library/backend/data/image.dart';
 import 'package:cortex/library/backend/data/repository.dart';
@@ -353,7 +353,13 @@ class ModelService with ChangeNotifier {
     final producerMatch = _findBestAssetMatch(producerLower);
     if (producerMatch != null) return producerMatch;
 
-    if (model.imagePath != null && model.imagePath!.startsWith('assets/')) {
+    if (model.imagePath != null &&
+        (model.imagePath!.startsWith('assets/') ||
+            model.imagePath!.startsWith('http'))) {
+      return model.imagePath!;
+    }
+
+    if (model.imagePath != null && File(model.imagePath!).existsSync()) {
       return model.imagePath!;
     }
 

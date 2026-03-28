@@ -421,12 +421,14 @@ class ToolsSection extends StatelessWidget {
   final double screenWidth;
   final bool isTablet;
   final InputField widget;
+  final bool isActionPermitted;
 
   const ToolsSection({
     super.key,
     required this.screenWidth,
     required this.isTablet,
     required this.widget,
+    required this.isActionPermitted,
   });
 
   @override
@@ -455,7 +457,11 @@ class ToolsSection extends StatelessWidget {
             localizations: widget.localizations,
           ),
           SizedBox(width: spacing),
-          FeaturesButton(controller: widget.controller),
+          FeaturesButton(
+            controller: widget.controller,
+            isLimitExceeded: widget.isLimitExceeded,
+            isActionPermitted: isActionPermitted,
+          ),
           SizedBox(width: spacing),
           ModelSelectButton(
             screenWidth: screenWidth,
@@ -474,6 +480,7 @@ class SendButtonSection extends StatelessWidget {
   final bool isTablet;
   final InputField widget;
   final bool isEnabled;
+  final bool isActionPermitted;
   final TextEditingController controller;
 
   const SendButtonSection({
@@ -482,6 +489,7 @@ class SendButtonSection extends StatelessWidget {
     required this.isTablet,
     required this.widget,
     required this.isEnabled,
+    required this.isActionPermitted,
     required this.controller,
   });
 
@@ -515,6 +523,7 @@ class SendButtonSection extends StatelessWidget {
       ),
       child: ActionButtonWidget(
         isEnabled: effectiveEnabled,
+        isActionPermitted: isActionPermitted,
         isSending: widget.isSending,
         isRecording: inputProvider.isVoiceRecording,
         isTextEmpty: controller.text.trim().isEmpty,

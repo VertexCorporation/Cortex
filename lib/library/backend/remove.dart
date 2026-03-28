@@ -1,7 +1,7 @@
 // lib/library/backend/remove.dart
 
 import 'dart:developer' as dev;
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:cortex/library/backend/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -169,8 +169,12 @@ class ModelRemoveService {
             '[Cleanup] Found associated task ID: $taskId. Removing from FlutterDownloader.',
             name: logName);
         try {
-          await FlutterDownloader.remove(
-              taskId: taskId, shouldDeleteContent: true);
+          if (taskId.startsWith('dio_')) {
+            // Already handled by File delete below, just ignore FlutterDownloader
+          } else {
+            await FlutterDownloader.remove(
+                taskId: taskId, shouldDeleteContent: true);
+          }
         } catch (e) {
           dev.log(
               '[Cleanup] FlutterDownloader.remove failed (may be already removed): $e',

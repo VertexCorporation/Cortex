@@ -48,6 +48,7 @@ class _OverflowTextState extends State<OverflowText> {
   late ScrollController _scrollController;
   bool _showStartFog = false;
   bool _showEndFog = false;
+  bool _canUseShader = false;
 
   @override
   void initState() {
@@ -58,6 +59,34 @@ class _OverflowTextState extends State<OverflowText> {
       _scrollController.addListener(_updateFogVisibility);
       WidgetsBinding.instance.addPostFrameCallback((_) =>
           _updateFogVisibility());
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!widget.scrollable) {
+      _canUseShader = true;
+      return;
+    }
+
+    final route = ModalRoute.of(context);
+    if (route?.animation != null) {
+      if (route!.animation!.isCompleted) {
+        if (!_canUseShader) {
+          setState(() { _canUseShader = true; });
+        }
+      } else {
+        void listener(AnimationStatus status) {
+          if (status == AnimationStatus.completed && mounted) {
+            setState(() { _canUseShader = true; });
+            route.animation?.removeStatusListener(listener);
+          }
+        }
+        route.animation!.addStatusListener(listener);
+      }
+    } else {
+      _canUseShader = true;
     }
   }
 
@@ -197,6 +226,24 @@ class _OverflowTextState extends State<OverflowText> {
           }
 
           // If text overflows, return the Scrollable + Fog + ShaderMask logic
+          // Defer shader masks during sheet transitions
+          if (!_canUseShader) {
+            return SizedBox(
+              height: textPainter.height,
+              width: constraints.maxWidth,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  sanitizedText,
+                  style: effectiveStyle,
+                  softWrap: false,
+                  overflow: TextOverflow.clip,
+                  maxLines: 1,
+                ),
+              ),
+            );
+          }
+
           // Use SizedBox with calculated height to prevent jumping alignment issues
           return SizedBox(
             height: textPainter.height,

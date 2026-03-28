@@ -9,6 +9,19 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'Sei un generatore di titoli. Rispondi SOLO con un titolo di 2-5 parole per la seguente conversazione. Non usare virgolette, prefissi o punteggiatura.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nRicorda sempre questo sull\'utente:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'Annulla';
 
   @override
@@ -407,6 +420,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Informativa sulla Privacy';
+
+  @override
+  String get renamed => 'Rinominato';
 
   @override
   String get report => 'Segnala';
@@ -1732,4 +1748,84 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'MODALITÀ DI PENSIERO ATTIVATA: DEVI usare i tag <think></think> per mostrare il tuo processo di ragionamento prima di dare la risposta finale. Pensa passo dopo passo all\'interno dei tag, quindi fornisci la tua risposta all\'esterno dei tag.';
+
+  @override
+  String get openLinkWarningTitle => 'Avviso di collegamento esterno';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Apri il collegamento';
+
+  @override
+  String get webSearchSources => 'Fonti';
+
+  @override
+  String get searching => 'Ricerca';
+
+  @override
+  String get featureWebSearchTitle => 'Ricerca sul Web';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Cerca sul web informazioni in tempo reale';
+
+  @override
+  String get webSearchQuotaExceeded => 'Quota di ricerca superata';
+
+  @override
+  String get clearMemory => 'Memoria chiara';
+
+  @override
+  String get clearMemoryConfirm =>
+      'Sei sicuro di voler cancellare la tua memoria?';
+
+  @override
+  String get personalization => 'la santità';
+
+  @override
+  String get personalizationDescription => 'Personalizza la tua esperienza';
+
+  @override
+  String get memoryTitle => 'Memoria';
+
+  @override
+  String get memoryDescription =>
+      'Le intelligenze artificiali ti riconoscono in questo modo.';
+
+  @override
+  String get noMemoryYet => 'Nessun ricordo ancora stabilito';
+
+  @override
+  String get memoryLimitReached => 'Limite di memoria raggiunto';
+
+  @override
+  String get intelligenceTitle => 'Intelligenza';
+
+  @override
+  String get intelligenceDescription =>
+      'Le intelligenze artificiali comunicano con te in questo modo.';
+
+  @override
+  String get customInstructionHint =>
+      'Inserisci qui le tue istruzioni personalizzate';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'Stai per aprire il seguente link esterno:\\n\\n$url\\n\\nSei sicuro di voler procedere?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Segui queste istruzioni personalizzate:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[ISTRUZIONE CRITICA]: Sei un GENERATORE DI TITOLI. NON rispondere alla domanda dell\'utente. NON chattare o salutare. Genera SOLO un titolo di 2-4 parole che riassuma l\'argomento della domanda dell\'utente.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] ISTRUZIONI CRITICHE: Attualmente stai operando all\'interno di un ecosistema di intelligenza artificiale enorme e altamente avanzato chiamato \"Cortex\". Ricordalo e mantieni la persona di Cortex se ti viene chiesto.';
 }

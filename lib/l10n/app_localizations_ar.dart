@@ -9,6 +9,19 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'أنت مسؤول عن إنشاء العناوين. أجب فقط بعنوان من كلمتين إلى خمس كلمات للمحادثة التالية. لا تستخدم علامات الاقتباس أو البادئات أو علامات الترقيم.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nتذكر دائمًا هذا عن المستخدم:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'إلغاء';
 
   @override
@@ -400,6 +413,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get renamed => 'تمت إعادة تسميته';
 
   @override
   String get report => 'إبلاغ';
@@ -1709,4 +1725,81 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'وضع التفكير مُفعّل: يجب عليك استخدام وسوم <think></think> لعرض خطوات تفكيرك قبل تقديم إجابتك النهائية. فكّر خطوة بخطوة داخل الوسوم، ثم قدّم إجابتك خارجها.';
+
+  @override
+  String get openLinkWarningTitle => 'تحذير بشأن الروابط الخارجية';
+
+  @override
+  String get openLinkCancel => 'إلغاء';
+
+  @override
+  String get openLinkConfirm => 'افتح الرابط';
+
+  @override
+  String get webSearchSources => 'مصادر';
+
+  @override
+  String get searching => 'البحث';
+
+  @override
+  String get featureWebSearchTitle => 'البحث على الويب';
+
+  @override
+  String get featureWebSearchDescription => 'ابحث في الإنترنت عن معلومات آنية';
+
+  @override
+  String get webSearchQuotaExceeded => 'تم تجاوز حصة البحث';
+
+  @override
+  String get clearMemory => 'ذاكرة صافية';
+
+  @override
+  String get clearMemoryConfirm => 'هل أنت متأكد من رغبتك في مسح ذاكرتك؟';
+
+  @override
+  String get personalization => 'التخصيص';
+
+  @override
+  String get personalizationDescription => 'خصّص تجربتك';
+
+  @override
+  String get memoryTitle => 'ذاكرة';
+
+  @override
+  String get memoryDescription =>
+      'تتعرف عليك أنظمة الذكاء الاصطناعي بهذه الطريقة.';
+
+  @override
+  String get noMemoryYet => 'لم يتم تكوين أي ذكريات بعد';
+
+  @override
+  String get memoryLimitReached => 'تم الوصول إلى الحد الأقصى للذاكرة';
+
+  @override
+  String get intelligenceTitle => 'ذكاء';
+
+  @override
+  String get intelligenceDescription =>
+      'تتواصل معك أنظمة الذكاء الاصطناعي بهذه الطريقة.';
+
+  @override
+  String get customInstructionHint => 'أدخل تعليماتك المخصصة هنا';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'أنت على وشك فتح الرابط الخارجي التالي:\\n\\n$url\\n\\nهل أنت متأكد من رغبتك في المتابعة؟';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'اتبع هذه التعليمات المخصصة:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[تعليمات حاسمة]: أنت مُولِّد عناوين. لا تُجب على سؤال المستخدم. لا تُراسله أو تُلقي عليه التحية. فقط اعرض عنوانًا من كلمتين إلى أربع كلمات يُلخِّص ما يسأل عنه المستخدم.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] تعليمات هامة: أنت تعمل حاليًا داخل نظام بيئي ضخم ومتطور للغاية للذكاء الاصطناعي يسمى \"Cortex\". تذكر ذلك وحافظ على شخصية Cortex إذا سئلت.';
 }

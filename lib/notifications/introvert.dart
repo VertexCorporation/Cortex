@@ -2,8 +2,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../banner.dart';
+
 
 enum NotificationType { success, error, neutral }
 
@@ -67,15 +66,9 @@ class IntrovertNotificationService {
   }) {
     dismissCurrentNotification();
 
-    final context = navigatorKey.currentContext;
 
-    // Retrieve BannerService safely
-    BannerService? bannerService;
-    if (context != null) {
-      try {
-        bannerService = Provider.of<BannerService>(context, listen: false);
-      } catch (_) {}
-    }
+
+
 
     _showOverlayNotification(
       message: message,
@@ -87,7 +80,7 @@ class IntrovertNotificationService {
       onTap: onTap,
       isAxonMode: isAxonMode,
       axonWidth: axonWidth,
-      bannerService: bannerService,
+
       isChatMode: isChatMode,
     );
   }
@@ -102,7 +95,7 @@ class IntrovertNotificationService {
     VoidCallback? onTap,
     required bool isAxonMode,
     required double axonWidth,
-    required BannerService? bannerService,
+
     required bool isChatMode,
   }) {
     final overlay = navigatorKey.currentState?.overlay;
@@ -117,11 +110,9 @@ class IntrovertNotificationService {
         final double screenH = media.size.height;
         final double screenW = media.size.width;
 
-        // Listen to dynamic banner height
-        return ValueListenableBuilder<double>(
-          valueListenable: bannerService?.bannerHeightNotifier ??
-              ValueNotifier(0.0),
-          builder: (context, bannerHeight, child) {
+        return Builder(
+          builder: (context) {
+
             // --- POSITIONING LOGIC (Restored from your working code) ---
             double? leftPos;
             double? rightPos;
@@ -138,11 +129,7 @@ class IntrovertNotificationService {
 
               // Footer Height (~10.5%) + Banner Height
               final double footerHeight = screenH * 0.105;
-              bottomPosition = footerHeight + bannerHeight;
-
-              if (bannerHeight > 0) {
-                bottomPosition += (screenH * 0.02);
-              }
+              bottomPosition = footerHeight;
 
               maxWidthConstraint = axonWidth * 0.90;
             } else {

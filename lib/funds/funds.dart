@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'dart:developer';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'package:confetti/confetti.dart';
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/app.dart';

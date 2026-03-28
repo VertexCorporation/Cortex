@@ -217,20 +217,28 @@ class Variants {
       AnimationController fadeIn,
       Color color,
       ) {
-    double arrowOpacity = 1.0;
-    if (fadeOut.isAnimating) {
-      arrowOpacity = 1.0 - fadeOut.value;
-    } else if (fadeIn.isAnimating) {
-      arrowOpacity = fadeIn.value;
-    }
-    return AnimatedOpacity(
-      opacity: arrowOpacity,
-      duration: const Duration(milliseconds: 50),
+    // Use AnimatedBuilder instead of manual opacity calculation to avoid flickering
+    return AnimatedBuilder(
+      animation: Listenable.merge([fadeOut, fadeIn]),
+      builder: (context, child) {
+        double arrowOpacity = 1.0;
+        if (fadeOut.status == AnimationStatus.forward ||
+            fadeOut.status == AnimationStatus.reverse) {
+          arrowOpacity = 1.0 - fadeOut.value;
+        } else if (fadeIn.status == AnimationStatus.forward ||
+            fadeIn.status == AnimationStatus.reverse) {
+          arrowOpacity = fadeIn.value;
+        }
+        return Opacity(
+          opacity: arrowOpacity.clamp(0.0, 1.0),
+          child: child,
+        );
+      },
       child: Transform.rotate(
         angle: 4.7124,
         child: SvgPicture.asset(
           'assets/icons/arrov.svg',
-          colorFilter: ColorFilter.mode(color.withValues(alpha: arrowOpacity), BlendMode.srcIn),
+          colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
           width: 20,
           height: 20,
         ),
@@ -264,7 +272,7 @@ class Variants {
     required VoidCallback onDismiss,
     required Function(Map<String, dynamic>) onSelect,
   }) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final bool isTablet = screenWidth >= 600;
 
     // --- 1. DEFINE CONSTANTS (Scaled for Tablet/Phone) ---
@@ -298,7 +306,7 @@ class Variants {
         text: TextSpan(text: text, style: measureStyle),
         maxLines: 1,
         textDirection: TextDirection.ltr,
-        textScaler: MediaQuery.of(context).textScaler,
+        textScaler: MediaQuery.textScalerOf(context),
       )..layout();
 
       if (tp.width > maxTextWidth) maxTextWidth = tp.width;
@@ -463,7 +471,7 @@ class Variants {
           text: TextSpan(text: text, style: textStyle),
           maxLines: 1,
           textDirection: TextDirection.ltr,
-          textScaler: MediaQuery.of(context).textScaler,
+          textScaler: MediaQuery.textScalerOf(context),
         )..layout();
 
         final bool shouldScroll = textPainter.width > constraints.maxWidth;

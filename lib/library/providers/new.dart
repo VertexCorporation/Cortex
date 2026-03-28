@@ -1,7 +1,7 @@
 // lib/library/providers/new.dart
 
 import 'dart:convert';
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
