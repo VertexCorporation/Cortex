@@ -7,7 +7,7 @@
 
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'package:universal_io/io.dart';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/funds/backend.dart';
 import 'package:cortex/library/backend/data/service.dart';
@@ -457,12 +457,19 @@ class AppInitializer with ChangeNotifier {
     return false;
   }
 
+  StreamSubscription<User?>? _authSubscription;
+
   void _listenToAuthStateChanges() {
     if (_isSigningOut) {
       return;
     }
 
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    // [BUG FIX] Prevent duplicate listeners if this is called multiple times
+    if (_authSubscription != null) {
+      return;
+    }
+
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (_status == AppStatus.initializing && user != null) {}
       if (_isRegistering) {
         dev.log(
@@ -510,6 +517,10 @@ class AppInitializer with ChangeNotifier {
 
     _isSigningOut = true;
     try {
+      // Cancel the auth subscription to be recreated when we return to login
+      _authSubscription?.cancel();
+      _authSubscription = null;
+
       // STEP 1: Application-level data cleanup.
       _modelService.clearAllCache();
       CacheService.clearAll();
@@ -537,6 +548,8 @@ class AppInitializer with ChangeNotifier {
     } finally {
       await Future.delayed(const Duration(milliseconds: 500));
       _isSigningOut = false;
+      // Re-attach the auth listener now that sign-out is complete
+      _listenToAuthStateChanges();
     }
   }
 
@@ -652,6 +665,15 @@ class AppInitializer with ChangeNotifier {
 
         if (userDocumentReady) {
           // Success Path
+          // Also fetch models here! Useful if they logged out and logged in (cache was cleared).
+          try {
+             final sysLocale = Platform.localeName.split('_').first;
+             // Don't wait for it completely here to not block ready.
+             _modelService.getModels(langCode: sysLocale);
+          } catch (e) {
+             debugPrint("[_determineUserFlow] Failed to getModels: $e");
+          }
+          
           _updateStatus(AppStatus.ready);
         } else {
           // Critical: User verified, internet works, but NO doc exists after retries.

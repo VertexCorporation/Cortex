@@ -9,6 +9,19 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'Sie generieren Titel. Antworten Sie AUSSCHLIESSLICH mit einem 2- bis 5-Wort-Titel für die folgende Konversation. Verwenden Sie keine Anführungszeichen, Präfixe oder Satzzeichen.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nDenken Sie immer an Folgendes über den Benutzer:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'Abbrechen';
 
   @override
@@ -406,6 +419,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Datenschutzrichtlinie';
+
+  @override
+  String get renamed => 'Umbenannt';
 
   @override
   String get report => 'Melden';
@@ -1743,4 +1759,83 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'DENKMODUS AKTIVIERT: Sie MÜSSEN <think></think>-Tags verwenden, um Ihren Gedankengang darzustellen, bevor Sie Ihre endgültige Antwort geben. Denken Sie innerhalb der Tags Schritt für Schritt und geben Sie Ihre Antwort anschließend außerhalb der Tags an.';
+
+  @override
+  String get openLinkWarningTitle => 'Warnung vor externen Links';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Link öffnen';
+
+  @override
+  String get webSearchSources => 'Quellen';
+
+  @override
+  String get searching => 'Suche';
+
+  @override
+  String get featureWebSearchTitle => 'Websuche';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Suchen Sie im Internet nach Echtzeitinformationen.';
+
+  @override
+  String get webSearchQuotaExceeded => 'Suchkontingent überschritten';
+
+  @override
+  String get clearMemory => 'Speicher löschen';
+
+  @override
+  String get clearMemoryConfirm =>
+      'Sind Sie sicher, dass Sie Ihren Speicher löschen möchten?';
+
+  @override
+  String get personalization => 'Personalisierung';
+
+  @override
+  String get personalizationDescription =>
+      'Gestalten Sie Ihr Erlebnis individuell';
+
+  @override
+  String get memoryTitle => 'Erinnerung';
+
+  @override
+  String get memoryDescription => 'So erkennen KIs dich.';
+
+  @override
+  String get noMemoryYet => 'Noch keine Erinnerungen gespeichert';
+
+  @override
+  String get memoryLimitReached => 'Speichergrenze erreicht';
+
+  @override
+  String get intelligenceTitle => 'Intelligenz';
+
+  @override
+  String get intelligenceDescription => 'So kommunizieren KIs mit Ihnen.';
+
+  @override
+  String get customInstructionHint =>
+      'Geben Sie hier Ihre individuellen Anweisungen ein.';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'Sie sind im Begriff, den folgenden externen Link zu öffnen:\\n\\n$url\\n\\nSind Sie sicher, dass Sie fortfahren möchten?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Befolgen Sie diese benutzerdefinierten Anweisungen:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[KRITISCHE ANWEISUNG]: Sie sind ein Titelgenerator. Beantworten Sie NICHT die Frage des Nutzers. Führen Sie KEINEN Chat und begrüßen Sie ihn nicht. Geben Sie AUSSCHLIESSLICH einen Titel mit 2–4 Wörtern aus, der die Frage des Nutzers zusammenfasst.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] WICHTIGER HINWEIS: Sie befinden sich derzeit in einem riesigen, hochentwickelten KI-Ökosystem namens \"Cortex\". Denken Sie daran und behalten Sie die Cortex-Persona bei, wenn Sie danach gefragt werden.';
 }

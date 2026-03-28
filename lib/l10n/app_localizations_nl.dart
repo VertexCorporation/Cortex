@@ -9,6 +9,19 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'Je bent een titelgenerator. Reageer ALLEEN met een titel van 2-5 woorden voor het volgende gesprek. Gebruik geen aanhalingstekens, voorvoegsels of leestekens.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nOnthoud dit altijd over de gebruiker:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'Annuleren';
 
   @override
@@ -405,6 +418,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Privacybeleid';
+
+  @override
+  String get renamed => 'Hernoemd';
 
   @override
   String get report => 'Rapporteren';
@@ -1734,4 +1750,82 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'DENKMODUS INGESCHAKELD: Je MOET <think></think>-tags gebruiken om je redeneerproces te laten zien voordat je je definitieve antwoord geeft. Denk stap voor stap binnen de tags en geef je antwoord vervolgens buiten de tags.';
+
+  @override
+  String get openLinkWarningTitle => 'Waarschuwing voor externe links';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Open link';
+
+  @override
+  String get webSearchSources => 'Bronnen';
+
+  @override
+  String get searching => 'Zoeken';
+
+  @override
+  String get featureWebSearchTitle => 'Webzoekopdracht';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Zoek op internet naar actuele informatie.';
+
+  @override
+  String get webSearchQuotaExceeded => 'Zoekquotum overschreden';
+
+  @override
+  String get clearMemory => 'Geheugen wissen';
+
+  @override
+  String get clearMemoryConfirm =>
+      'Weet je zeker dat je je geheugen wilt wissen?';
+
+  @override
+  String get personalization => 'Personalisatie';
+
+  @override
+  String get personalizationDescription => 'Personaliseer je ervaring';
+
+  @override
+  String get memoryTitle => 'Geheugen';
+
+  @override
+  String get memoryDescription => 'AI\'s herkennen je op deze manier.';
+
+  @override
+  String get noMemoryYet => 'Er zijn nog geen herinneringen vastgelegd.';
+
+  @override
+  String get memoryLimitReached => 'Geheugenlimiet bereikt';
+
+  @override
+  String get intelligenceTitle => 'Intelligentie';
+
+  @override
+  String get intelligenceDescription =>
+      'AI\'s communiceren op deze manier met je.';
+
+  @override
+  String get customInstructionHint => 'Voer hier uw aangepaste instructies in.';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'U staat op het punt de volgende externe link te openen:\\n\\n$url\\n\\nWeet u zeker dat u wilt doorgaan?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Volg deze aangepaste instructies:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[KRITISCHE INSTRUCTIE]: Je bent een TITELGENERATOR. Beantwoord de vraag van de gebruiker NIET. Ga NIET chatten of hallo zeggen. Geef ALLEEN een titel van 2-4 woorden weer die samenvat waar de gebruiker naar vraagt.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] KRITISCHE INSTRUCTIE: U bevindt zich momenteel in een enorm, zeer geavanceerd AI-ecosysteem genaamd \"Cortex\". Onthoud dit en behoud de Cortex-persona als u ernaar wordt gevraagd.';
 }

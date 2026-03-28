@@ -18,6 +18,8 @@ class BriefingOverlay extends StatefulWidget {
   final bool isSubscribed;
   final int premiumTrialUses;
   final bool isDynamicChat;
+  final bool isSearchEnabled;
+  final String? conversationId;
 
   final ValueChanged<double>? onVisibleHeightChanged;
 
@@ -34,6 +36,8 @@ class BriefingOverlay extends StatefulWidget {
     required this.isSubscribed,
     required this.premiumTrialUses,
     required this.isDynamicChat,
+    required this.isSearchEnabled,
+    required this.conversationId,
     this.onVisibleHeightChanged,
   });
 
@@ -83,6 +87,11 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   @override
   void didUpdateWidget(covariant BriefingOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.conversationId != oldWidget.conversationId) {
+      // Force re-evaluation and replay animation for new chats
+      _currentMessageText = null;
+      _slideController.value = 0.0;
+    }
     _evaluateAndAnimate();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -233,7 +242,8 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
   int _requiredCredits() {
     if (widget.isOfflineModel) return 0;
-    final base = (widget.isDynamicChat || widget.isPremiumModel) ? 20 : 10;
+    int base = (widget.isDynamicChat || widget.isPremiumModel) ? 20 : 5;
+    if (widget.isSearchEnabled) base += 5;
     final photo = widget.photoSelected ? 30 : 0;
     return base + photo;
   }

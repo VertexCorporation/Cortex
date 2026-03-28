@@ -135,8 +135,8 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // 1. Content stays at the bottom, untouched
-        Positioned.fill(child: widget.child),
+        // 1. Content defines the stack size
+        widget.child,
 
         // 2. Top Fog Overlay
         if (widget.showTop)
@@ -222,7 +222,7 @@ class ScrollFogHorizontal extends StatefulWidget {
   final double scrollThreshold;
   final bool showStart;
   final bool showEnd;
-  
+
   /// Extra offset to extend fog beyond the widget bounds (useful for tablets)
   /// Positive values extend the fog outward from the edges
   final double edgeOverflow;
@@ -340,11 +340,11 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
   @override
   Widget build(BuildContext context) {
     final overflow = widget.edgeOverflow;
-    
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Positioned.fill(child: widget.child),
+        widget.child,
         if (widget.showStart)
           Positioned(
             // Use negative position to extend fog beyond widget bounds

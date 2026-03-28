@@ -9,6 +9,19 @@ class AppLocalizationsId extends AppLocalizations {
   AppLocalizationsId([String locale = 'id']) : super(locale);
 
   @override
+  String get chatTitlePrompt =>
+      'Anda adalah pembuat judul. Tanggapi HANYA dengan judul 2-5 kata untuk percakapan berikut. Jangan gunakan tanda kutip, awalan, atau tanda baca.';
+
+  @override
+  String get systemMemoryDirective =>
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+
+  @override
+  String systemMemoryReminder(Object userMemory) {
+    return '\n\nSelalu ingat ini tentang pengguna:\n$userMemory';
+  }
+
+  @override
   String get cancel => 'Batal';
 
   @override
@@ -406,6 +419,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Kebijakan Privasi';
+
+  @override
+  String get renamed => 'Berganti nama';
 
   @override
   String get report => 'Laporkan';
@@ -1729,4 +1745,82 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get thinkingModeInstruction =>
       'MODE BERPIKIR DIAKTIFKAN: Anda HARUS menggunakan tag <think></think> untuk menunjukkan proses penalaran Anda sebelum memberikan jawaban akhir. Pikirkan langkah demi langkah di dalam tag, lalu berikan respons Anda di luar tag.';
+
+  @override
+  String get openLinkWarningTitle => 'Peringatan Tautan Eksternal';
+
+  @override
+  String get openLinkCancel => 'Cancel';
+
+  @override
+  String get openLinkConfirm => 'Buka Tautan';
+
+  @override
+  String get webSearchSources => 'Sumber';
+
+  @override
+  String get searching => 'Mencari';
+
+  @override
+  String get featureWebSearchTitle => 'Pencarian Web';
+
+  @override
+  String get featureWebSearchDescription =>
+      'Cari informasi secara real-time di web.';
+
+  @override
+  String get webSearchQuotaExceeded => 'Kuota Pencarian Terlampaui';
+
+  @override
+  String get clearMemory => 'Hapus Memori';
+
+  @override
+  String get clearMemoryConfirm =>
+      'Apakah Anda yakin ingin menghapus ingatan Anda?';
+
+  @override
+  String get personalization => 'Personalisasi';
+
+  @override
+  String get personalizationDescription => 'Sesuaikan pengalaman Anda';
+
+  @override
+  String get memoryTitle => 'Ingatan';
+
+  @override
+  String get memoryDescription => 'AI mengenali Anda seperti ini.';
+
+  @override
+  String get noMemoryYet => 'Belum ada memori yang terealisasi.';
+
+  @override
+  String get memoryLimitReached => 'Batas memori tercapai';
+
+  @override
+  String get intelligenceTitle => 'Intelijen';
+
+  @override
+  String get intelligenceDescription =>
+      'AI berkomunikasi dengan Anda seperti ini.';
+
+  @override
+  String get customInstructionHint => 'Masukkan instruksi khusus Anda di sini.';
+
+  @override
+  String openLinkWarningMessage(String url) {
+    return 'Anda akan membuka tautan eksternal berikut:\\n\\n$url\\n\\nApakah Anda yakin ingin melanjutkan?';
+  }
+
+  @override
+  String intelligenceSystemPrompt(String instruction) {
+    return 'Ikuti petunjuk khusus ini:\\n\\n$instruction';
+  }
+
+  @override
+  String get chatTitleCriticalInstruction =>
+      '[INSTRUKSI PENTING]: Anda adalah PEMBUAT JUDUL. JANGAN menjawab pertanyaan pengguna. JANGAN mengobrol atau menyapa. HANYA keluarkan judul 2-4 kata yang merangkum apa yang ditanyakan pengguna.';
+
+  @override
+  String get cortexSystemPersona =>
+      '\n\n[System] INSTRUKSI KRITIS: Anda saat ini beroperasi di dalam ekosistem AI yang sangat besar dan canggih bernama \"Cortex\". Ingatlah hal ini dan pertahankan persona Cortex jika ditanya.';
 }
