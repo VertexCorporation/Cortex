@@ -4,6 +4,12 @@ import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/chat/screen/appbar/premium.dart';
+import 'package:cortex/funds/funds.dart';
+import 'package:cortex/login/upgrade.dart';
+import 'package:cortex/navigation.dart';
+import 'package:cortex/server/user.dart';
+import 'package:provider/provider.dart';
 import '../../../../../../theme.dart';
 
 class BriefingOverlay extends StatefulWidget {
@@ -282,6 +288,9 @@ class _BriefingPanelContent extends StatelessWidget {
       fontSize: fontSize,
       color: AppColors.primaryColor.inverted,
     );
+    final userProvider = context.watch<UserProvider>();
+    final bool showPremiumButton =
+        !userProvider.isSubscriptionActive || userProvider.isAnonymous;
 
     return AnimatedSize(
       duration: const Duration(milliseconds: 300),
@@ -303,9 +312,30 @@ class _BriefingPanelContent extends StatelessWidget {
             ),
             SizedBox(width: isTablet ? screenWidth * 0.02 : 12.0),
             Expanded(
-              child: Text(
-                message,
-                style: textStyle,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    message,
+                    style: textStyle,
+                  ),
+                  if (showPremiumButton) ...[
+                    SizedBox(height: isTablet ? 10.0 : 8.0),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: PremiumButton(
+                        onTap: () {
+                          final target = userProvider.isAnonymous
+                              ? const UpgradeAccountScreen()
+                              : const FundsScreen();
+                          navigateToScreen(target,
+                              direction: const Offset(1.0, 0.0));
+                          FocusScope.of(context).unfocus();
+                        },
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ],
