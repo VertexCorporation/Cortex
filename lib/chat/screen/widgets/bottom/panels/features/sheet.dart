@@ -191,7 +191,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       iconPath: 'assets/icons/make.svg',
                       title: l10n.featureCreateImageTitle,
                       description: l10n.featureCreateImageDescription,
-                      isDisabled: !canGenerateImages,
+                      isDisabled: false,
                       isSelected: false,
                       onTap: () {
                         Navigator.pop(context);
@@ -205,7 +205,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       iconPath: 'assets/icons/voice.svg',
                       title: l10n.featureCreateAudioTitle,
                       description: l10n.featureCreateAudioDescription,
-                      isDisabled: !canGenerateAudio,
+                      isDisabled: false,
                       isSelected: false,
                       onTap: () {
                         Navigator.pop(context);
