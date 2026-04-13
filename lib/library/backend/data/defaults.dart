@@ -92,6 +92,7 @@ class ModelDefaults {
     'bria': 'assets/models/bria.svg',
     'bytedance': 'assets/models/bytedance.svg',
     'elevenlabs': 'assets/models/elevenlabs.svg',
+    'suno': 'assets/models/suno.svg',
     'musicgen': 'assets/models/meta.svg',
     'stable-audio': 'assets/models/stable-audio.jpg',
     'whisper': 'assets/producers/openai.jpg',
