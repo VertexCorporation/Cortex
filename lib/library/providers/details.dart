@@ -390,7 +390,17 @@ class ModelDetailProvider extends ChangeNotifier {
     }
 
     final dataEntity = _currentCapabilitiesSource ?? _mainModel;
-    displayContext = dataEntity?.context ?? '...';
+    
+    if (dataEntity?.context != null) {
+      if (dataEntity!.context == '8192' || dataEntity.context == '0') {
+        displayContext = '≈ 8192';
+      } else {
+        displayContext = dataEntity.context!;
+      }
+    } else {
+      displayContext = '...';
+    }
+
     displayModality = (dataEntity?.modalities['image'] == true)
         ? localizations.multimodal
         : localizations.text;
@@ -405,12 +415,20 @@ class ModelDetailProvider extends ChangeNotifier {
     }
     if (!_mainModel!.isServerSide) features.add('offline');
     if (isPluralModel) features.add('plural');
-    if (capabilities.modalities['image'] == true) features.add('photo');
-    if (capabilities.modalities['file'] == true) features.add('document');
-    if (capabilities.modalities['audio'] == true) features.add('audio');
+    
+    // Modalities (Input/Recognition)
+    if (capabilities.modalities['image'] == true) features.add('image_recognition');
+    if (capabilities.modalities['video'] == true) features.add('video_recognition');
+    if (capabilities.modalities['audio'] == true) features.add('audio_recognition');
+    if (capabilities.modalities['file'] == true || capabilities.modalities['document'] == true) features.add('document');
+    
+    // Outputs (Generation)
     if (capabilities.outputs['image'] == true) features.add('image_generation');
-    if (capabilities.outputs['audio'] == true) features.add('audio_generation');
     if (capabilities.outputs['video'] == true) features.add('video_generation');
+    if (capabilities.outputs['audio'] == true) features.add('audio_generation');
+    
+    if (capabilities.toolUse) features.add('tool_use');
+
     return features;
   }
 }

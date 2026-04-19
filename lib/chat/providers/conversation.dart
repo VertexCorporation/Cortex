@@ -96,7 +96,8 @@ class ConversationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void clearConversation({bool resetLoadingState = true, bool startLoading = false}) {
+  void clearConversation(
+      {bool resetLoadingState = true, bool startLoading = false}) {
     // Cancel any pending stream updates
     _streamThrottleTimer?.cancel();
     _streamThrottleTimer = null;
@@ -107,13 +108,13 @@ class ConversationProvider with ChangeNotifier {
     _conversationTitle = null;
     _isWaitingForResponse = false;
     _responseStopped = false;
-    
+
     if (startLoading) {
       _isLoadingMessages = true;
     } else if (resetLoadingState) {
       _isLoadingMessages = false;
     }
-    
+
     _justFinishedLoading = false;
     notifyListeners();
   }
@@ -175,8 +176,14 @@ class ConversationProvider with ChangeNotifier {
   /// Starts a new conversation session with the first user message.
   /// This atomic operation sets the conversation ID, title, and adds the
   /// initial user message and a "thinking" bubble.
-  void startNewConversationSession(String id, String title,
-      String modelIdForStorage, Message userMessage) {
+  void startNewConversationSession(
+    String id,
+    String title,
+    String modelIdForStorage,
+    Message userMessage, {
+    String? modelTitleForStorage,
+    String? modelImagePathForStorage,
+  }) {
     _conversationID = id;
     _conversationTitle = title;
 
@@ -194,7 +201,9 @@ class ConversationProvider with ChangeNotifier {
 
     // Persist the new conversation structure asynchronously.
     ChatStorageService.saveConversation(id, title, [],
-        modelId: modelIdForStorage)
+            modelId: modelIdForStorage,
+            modelTitle: modelTitleForStorage,
+            modelImagePath: modelImagePathForStorage)
         .then((_) {
       ChatStorageService.upsertMessage(id, 0, userMessage);
     });
@@ -229,8 +238,8 @@ class ConversationProvider with ChangeNotifier {
 
   /// Starts a session solely in memory. Does not save to storage yet.
   /// Used for Flow Mode hidden prompts.
-  void startEphemeralSession(String id, String modelIdForStorage,
-      Message userMessage,
+  void startEphemeralSession(
+      String id, String modelIdForStorage, Message userMessage,
       {String? title}) {
     _conversationID = id;
     _conversationTitle = title ?? "New Chat";
@@ -295,8 +304,7 @@ class ConversationProvider with ChangeNotifier {
       _messages = _messages.sublist(0, aiMessageIndex);
     } else {
       debugPrint(
-          "[ConversationProvider] Invalid index $aiMessageIndex for list of length ${_messages
-              .length}. Aborting regeneration prep.");
+          "[ConversationProvider] Invalid index $aiMessageIndex for list of length ${_messages.length}. Aborting regeneration prep.");
       return;
     }
 
@@ -330,9 +338,7 @@ class ConversationProvider with ChangeNotifier {
 
       // Trim leading newlines if this is the very beginning of the message
       String textToAppend = chunk;
-      if (lastMessage.text.isEmpty && textToAppend
-          .trimLeft()
-          .isEmpty) {
+      if (lastMessage.text.isEmpty && textToAppend.trimLeft().isEmpty) {
         // If message is empty and chunk is only whitespace/newline, ignore it
         return;
       }
@@ -360,7 +366,7 @@ class ConversationProvider with ChangeNotifier {
   void updateLastBotMessageSources(List<dynamic> sources) {
     if (_messages.isNotEmpty && !_messages.last.isUserMessage) {
       final lastMessage = _messages.last;
-      
+
       // Merge with existing sources if they exist, or just use the new ones
       List<dynamic> updatedSources = [];
       if (lastMessage.webSearchSources != null) {
@@ -372,13 +378,13 @@ class ConversationProvider with ChangeNotifier {
           if (existing is Map && source is Map) {
             return existing['url'] == source['url'];
           }
-           return existing == source;
+          return existing == source;
         });
         if (!exists) {
           updatedSources.add(source);
         }
       }
-      
+
       _messages[_messages.length - 1] = lastMessage.copyWith(
         webSearchSources: updatedSources.isNotEmpty ? updatedSources : null,
       );
@@ -473,8 +479,8 @@ class ConversationProvider with ChangeNotifier {
   // -------------------- Error Handling Actions --------------------
 
   /// Updates an existing AI message with an error state.
-  void setErrorMessage(int index, String errorMessage,
-      bool isContentFlagError) {
+  void setErrorMessage(
+      int index, String errorMessage, bool isContentFlagError) {
     if (index < 0 || index >= _messages.length) return;
 
     final aiMessage = _messages[index];
@@ -526,15 +532,15 @@ class ConversationProvider with ChangeNotifier {
   }
 
   /// Adds a new user message and a corresponding error message to the list.
-  void showSendError(Message userMessage, String errorMessage,
-      bool isContentFlagError) {
+  void showSendError(
+      Message userMessage, String errorMessage, bool isContentFlagError) {
     if (_messages.isNotEmpty && _messages.last.isThinking) {
       setErrorMessage(_messages.length - 1, errorMessage, isContentFlagError);
       return;
     }
 
     final finalUserMessage =
-    userMessage.copyWith(includeInContext: !isContentFlagError);
+        userMessage.copyWith(includeInContext: !isContentFlagError);
     final errorAIMessage = Message(
         text: errorMessage,
         isUserMessage: false,

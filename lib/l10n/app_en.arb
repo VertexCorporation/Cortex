@@ -12,6 +12,7 @@
   "resume": "Resume",
   "copy": "Copy",
   "chat": "Chat",
+  "languageModels": "Language Models",
   "light": "Light",
   "theme": "Theme",
   "no": "No",
@@ -35,7 +36,7 @@
   "usedMemory": "Used Memory",
   "modelsTitle": "Library",
   "localModels": "Local Models",
-  "serverSideModels": "Online Models",
+  "serverSideModels": "Language Models",
   "selectGGUFFile": "Select GGUF File",
   "errorGGUF": "Please select a file in GGUF format only.",
   "myModels": "My Models",
@@ -408,7 +409,7 @@
   "@benefitPremiumModels": {
     "description": "A feature highlighting that the user gets access to higher-quality, premium models with this subscription."
   },
-  "premiumTrialExhaustedMessage": "You have used all your free daily messages for premium models, please upgrade for unlimited access.",
+  "premiumTrialExhaustedMessage": "You have used all your free daily messages for premium models. Upgrade now and **continue where you left off!**",
   "useOffline": "Use without Internet",
   "@useOffline": {
     "description": "Text for the 'Use without Internet' feature card. The newline is intentional."
@@ -570,6 +571,8 @@
   "onboardingFinalDescription": "If you're seeing this screen, it's because we didn't give up. And we have no intention of giving up. Come on, let's take the AI revolution to the world together. To be a part of this story...",
   "onboardingFinalQuestion": "ARE YOU READY?",
   "onboardingFinalButton": "YES!",
+  "paywallAhaTitle": "Unlock the True Power of AI",
+  "paywallAhaSubtitle": "Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.",
   "dude": "Dude",
   "swipeToContinue": "Swipe to continue",
   "cacheIsNotUpToDate": "Your Play Store cache is not up-to-date. Please close and reopen the Play Store app, or restart your device.",
@@ -728,5 +731,42 @@
   "cortexSystemPersona": "\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\". Remember this and maintain the persona of Cortex if asked.",
   "@cortexSystemPersona": {
     "description": "System persona string added to online models"
+  },
+  "featureAudioRecognitionTitle": "Audio Recognition",
+  "featureAudioRecognitionDescription": "This model can understand and process audio inputs.",
+  "featureVideoRecognitionTitle": "Video Recognition",
+  "featureVideoRecognitionDescription": "This model can understand and process video inputs.",
+  "featureImageRecognitionTitle": "Image Recognition",
+  "featureImageRecognitionDescription": "This model can understand and process image inputs.",
+  "featureToolUseTitle": "Tool Use",
+  "featureToolUseDescription": "This model can use external tools and APIs.",
+  "videoModels": "Video Models",
+  "imageModels": "Image Models",
+  "audioModels": "Audio Models",
+  "systemPromptMissingMedia": "This model requires a {mediaType} to work. I have intercepted the request to let you know. Please inform the user gracefully that they need to provide a {mediaType} (tell them in their own language) because I am {modelName}, a visual/audio/video editing model.",
+  "@systemPromptMissingMedia": {
+    "description": "System prompt sent to fallback model when user forgets to upload media.",
+    "placeholders": {
+      "mediaType": {
+        "type": "String",
+        "example": "image"
+      },
+      "modelName": {
+        "type": "String",
+        "example": "Stable Diffusion"
+      }
+    }
+  },
+  "mediaTypeImage": "image",
+  "mediaTypeVideo": "video",
+  "mediaTypeAudio": "audio",
+  "@mediaTypeImage": {
+    "description": "Media type: mediaTypeImage"
+  },
+  "@mediaTypeVideo": {
+    "description": "Media type: mediaTypeVideo"
+  },
+  "@mediaTypeAudio": {
+    "description": "Media type: mediaTypeAudio"
   }
 }

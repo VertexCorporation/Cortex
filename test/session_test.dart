@@ -33,6 +33,12 @@ class FakeModelService extends ChangeNotifier implements ModelService {
   }
 
   @override
+  bool hasModelInCache(String modelId) {
+    if (modelId == 'cortex/auto' || modelId == 'dynamic') return true;
+    return _models.any((m) => m.id == modelId);
+  }
+
+  @override
   ModelEntity getPreciseModelData(String modelId, {required String langCode}) {
     if (_models.isEmpty) {
       // Mimic real service behavior: It might return an "Unknown" entity if called prematurely
@@ -41,6 +47,7 @@ class FakeModelService extends ChangeNotifier implements ModelService {
           id: modelId,
           displayTitle: 'Unknown Model',
           producer: '',
+          source: 'openrouter',
           displayDescription: '',
           displaySummary: '',
           type: 'online',
@@ -48,7 +55,7 @@ class FakeModelService extends ChangeNotifier implements ModelService {
           tier: 'free',
           modalities: {},
           outputs: {},
-          isFullyLocalized: true);
+          isFullyLocalized: true, toolUse: false);
     }
     try {
       return _models.firstWhere((m) => m.id == modelId);
@@ -57,6 +64,7 @@ class FakeModelService extends ChangeNotifier implements ModelService {
           id: modelId,
           displayTitle: 'Unknown Model',
           producer: '',
+          source: 'openrouter',
           displayDescription: '',
           displaySummary: '',
           type: 'online',
@@ -64,7 +72,7 @@ class FakeModelService extends ChangeNotifier implements ModelService {
           tier: 'free',
           modalities: {},
           outputs: {},
-          isFullyLocalized: true);
+          isFullyLocalized: true, toolUse: false);
     }
   }
 
@@ -141,6 +149,7 @@ void main() {
           id: 'gemini-pro',
           displayTitle: 'Gemini Real Deal', // Updated title from server
           producer: 'Google',
+          source: 'openrouter',
           displayDescription: '',
           displaySummary: '',
           type: 'online',
@@ -148,7 +157,7 @@ void main() {
           tier: 'free',
           modalities: {},
           outputs: {},
-          isFullyLocalized: true);
+          isFullyLocalized: true, toolUse: false);
 
       mockModelService.setModels([realEntity]);
 

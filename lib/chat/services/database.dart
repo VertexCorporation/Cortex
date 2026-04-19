@@ -11,7 +11,7 @@ class DbHelper {
   DbHelper._internal();
 
   Database? _db;
-  static const int _latestVersion = 7; // Define the latest version here
+  static const int _latestVersion = 8; // Define the latest version here
 
   Future<Database> get db async {
     if (_db != null) return _db!;
@@ -35,6 +35,8 @@ class DbHelper {
         id              TEXT PRIMARY KEY,
         title           TEXT,
         modelId         TEXT,
+        modelTitle      TEXT DEFAULT '',
+        modelImagePath  TEXT DEFAULT '',
         isStarred       INTEGER DEFAULT 0,
         starredDate     INTEGER DEFAULT 0,
         lastMessageDate INTEGER DEFAULT 0
@@ -105,7 +107,14 @@ class DbHelper {
               'ALTER TABLE conversations ADD COLUMN starredDate INTEGER DEFAULT 0;');
           break;
         case 7:
-          batch.execute('ALTER TABLE messages ADD COLUMN webSearchSources TEXT;');
+          batch.execute(
+              'ALTER TABLE messages ADD COLUMN webSearchSources TEXT;');
+          break;
+        case 8:
+          batch.execute(
+              "ALTER TABLE conversations ADD COLUMN modelTitle TEXT DEFAULT '';");
+          batch.execute(
+              "ALTER TABLE conversations ADD COLUMN modelImagePath TEXT DEFAULT '';");
           break;
       }
     }

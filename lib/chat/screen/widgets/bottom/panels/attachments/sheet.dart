@@ -14,6 +14,8 @@ import 'package:camera/camera.dart';
 void showAttachmentSheet({
   required BuildContext context,
   required bool canHandleImages,
+  required bool canHandleVideo,
+  required bool canHandleAudio,
 }) {
   // Hide keyboard if open to prevent UI glitching during bottom sheet animation
   FocusScope.of(context).unfocus();
@@ -135,16 +137,18 @@ void showAttachmentSheet({
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // 1. Camera (Conditional)
-                      if (hasCamera && canHandleImages) ...[
+                      if (hasCamera && (canHandleImages || canHandleVideo)) ...[
                         Expanded(
                           child: AttachmentSheetButton(
                             iconPath: 'assets/icons/camera.svg',
                             label: l10n.actionCamera,
                             onTap: () {
                               Navigator.pop(futureContext);
-                              inputService.pickPhoto(
+                              inputService.pickMediaAction(
                                 context,
                                 source: ImageSource.camera,
+                                supportImage: canHandleImages,
+                                supportVideo: canHandleVideo,
                                 onSelectionComplete: () {},
                               );
                             },
@@ -154,16 +158,18 @@ void showAttachmentSheet({
                       ],
 
                       // 2. Gallery
-                      if (canHandleImages) ...[
+                      if (canHandleImages || canHandleVideo) ...[
                         Expanded(
                           child: AttachmentSheetButton(
                             iconPath: 'assets/icons/gallery.svg',
                             label: l10n.actionGallery,
                             onTap: () {
                               Navigator.pop(futureContext);
-                              inputService.pickPhoto(
+                              inputService.pickMediaAction(
                                 context,
                                 source: ImageSource.gallery,
+                                supportImage: canHandleImages,
+                                supportVideo: canHandleVideo,
                                 onSelectionComplete: () {},
                               );
                             },
@@ -179,7 +185,11 @@ void showAttachmentSheet({
                           label: l10n.actionFile,
                           onTap: () {
                             Navigator.pop(futureContext);
-                            inputService.pickFile(context);
+                            inputService.pickFile(
+                              context,
+                              canHandleAudio: canHandleAudio,
+                              canHandleVideo: canHandleVideo,
+                            );
                           },
                         ),
                       ),

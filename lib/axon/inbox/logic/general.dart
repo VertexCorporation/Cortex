@@ -38,8 +38,7 @@ class InboxViewModel extends ChangeNotifier {
   InboxViewModel({
     required ModelService modelService,
     required IntrovertNotificationService notificationService,
-  })
-      : _modelService = modelService,
+  })  : _modelService = modelService,
         _notificationService = notificationService;
 
   Future<void> initialize(String langCode) async {
@@ -77,8 +76,8 @@ class InboxViewModel extends ChangeNotifier {
     } else {
       // 1. First, get IDs of conversations where messages match (Deep Search)
       final List<String> deepSearchResults =
-      await ChatStorageService.searchConversations(
-          query: _currentSearchQuery);
+          await ChatStorageService.searchConversations(
+              query: _currentSearchQuery);
 
       // 2. Filter in memory (Title matches or ID is in deep search results)
       _filteredConversationIDs = _allConversationIDs.where((id) {
@@ -137,7 +136,7 @@ class InboxViewModel extends ChangeNotifier {
     final cachedManagers = CacheService.get<Map<String, ConversationManager>>(
         CacheKey.conversationManagers);
     final cachedOrder =
-    CacheService.get<List<String>>(CacheKey.conversationOrder);
+        CacheService.get<List<String>>(CacheKey.conversationOrder);
 
     if (cachedManagers != null && cachedOrder != null) {
       _conversationManagers.addAll(cachedManagers);
@@ -170,22 +169,22 @@ class InboxViewModel extends ChangeNotifier {
     _lastMessageSubscription?.cancel();
     _lastMessageSubscription =
         ChatStorageService.lastMsgStream.listen((update) async {
-          final String convId = update['convId'] as String;
-          final manager = _conversationManagers[convId];
+      final String convId = update['convId'] as String;
+      final manager = _conversationManagers[convId];
 
-          if (manager == null) {
-            await loadConversations(langCode: _currentLangCode, isReload: true);
-            return;
-          }
+      if (manager == null) {
+        await loadConversations(langCode: _currentLangCode, isReload: true);
+        return;
+      }
 
-          manager.updateLastMessage(
-            update['text'] as String? ?? '',
-            update['photoPath'] as String? ?? '',
-            DateTime.fromMillisecondsSinceEpoch(update['ts'] as int),
-          );
+      manager.updateLastMessage(
+        update['text'] as String? ?? '',
+        update['photoPath'] as String? ?? '',
+        DateTime.fromMillisecondsSinceEpoch(update['ts'] as int),
+      );
 
-          _sortConversations();
-        });
+      _sortConversations();
+    });
   }
 
   Future<void> loadConversations(
@@ -225,15 +224,17 @@ class InboxViewModel extends ChangeNotifier {
           conversationID: convID,
           conversationTitle: row['title'] as String? ?? 'Untitled',
           initialModelId: modelId,
+          persistedModelTitle: row['modelTitle'] as String?,
+          persistedModelImagePath: row['modelImagePath'] as String?,
           isStarred: (row['isStarred'] as int? ?? 0) == 1,
           starredDate: row['starredDate'] != null &&
-              (row['starredDate'] as int) > 0
+                  (row['starredDate'] as int) > 0
               ? DateTime.fromMillisecondsSinceEpoch(row['starredDate'] as int)
               : null,
           lastMessageDate: realLastMsgTs != null
               ? DateTime.fromMillisecondsSinceEpoch(realLastMsgTs)
               : DateTime.fromMillisecondsSinceEpoch(
-              row['lastMessageDate'] as int? ?? 0),
+                  row['lastMessageDate'] as int? ?? 0),
           langCode: langCode,
           modelService: _modelService,
         );
@@ -245,6 +246,16 @@ class InboxViewModel extends ChangeNotifier {
         }
 
         _conversationManagers[convID] = manager;
+
+        final persistedTitle = (row['modelTitle'] as String?)?.trim() ?? '';
+        final persistedImage = (row['modelImagePath'] as String?)?.trim() ?? '';
+        if (persistedTitle.isEmpty || persistedImage.isEmpty) {
+          await ChatStorageService.updateConversationModelSnapshot(
+            convID,
+            modelTitle: manager.modelTitle,
+            modelImagePath: manager.modelImagePath,
+          );
+        }
       }
 
       _allConversationIDs = uniqueIds.toList();
@@ -267,8 +278,7 @@ class InboxViewModel extends ChangeNotifier {
     // 1. PROTECTION CHECK: Active conversation check
     final BuildContext? context = mainScreenKey.currentContext;
     if (context != null) {
-      final activeId = Provider
-          .of<ConversationProvider>(context, listen: false)
+      final activeId = Provider.of<ConversationProvider>(context, listen: false)
           .conversationID;
 
       if (activeId == conversationID) {

@@ -138,28 +138,30 @@ class ModelDetailView extends StatelessWidget {
           scrollController: scrollController,
         ),
         bottomNavigationBar: const BottomActionButtons(),
-        body: Stack(
-          children: [
-            ScrollFog(
-              scrollController: scrollController,
-              topFogHeight: screenHeight * 0.02,
-              showTop: true,
-              showBottom: false,
-              child: BodyContent(
-                key: const ValueKey('content'),
-                provider: provider,
+        body: SizedBox.expand(
+          child: Stack(
+            children: [
+              ScrollFog(
                 scrollController: scrollController,
+                topFogHeight: screenHeight * 0.02,
+                showTop: true,
+                showBottom: false,
+                child: BodyContent(
+                  key: const ValueKey('content'),
+                  provider: provider,
+                  scrollController: scrollController,
+                ),
               ),
-            ),
-            // Position the banners at the bottom of the screen.
-            // They are now managed and dismissed from within the WarningOverlays widget.
-            Positioned(
-              bottom: screenHeight * 0.01,
-              left: 0,
-              right: 0,
-              child: WarningOverlays(provider: provider),
-            ),
-          ],
+              // Position the banners at the bottom of the screen.
+              // They are now managed and dismissed from within the WarningOverlays widget.
+              Positioned(
+                bottom: screenHeight * 0.01,
+                left: 0,
+                right: 0,
+                child: WarningOverlays(provider: provider),
+              ),
+            ],
+          ),
         ),
       ),
     );

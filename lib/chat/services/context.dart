@@ -146,7 +146,7 @@ class ContextService {
     if (includeImage && message.hasAttachments) {
       for (final path in message.attachmentPaths) {
         if (_isImageFile(path)) {
-          final String? base64Image = await Utils.formatBase64Image(path);
+          final String? base64Image = await Utils.formatBase64Media(path);
           if (base64Image != null) {
             contentParts.add({
               "type": "image_url",

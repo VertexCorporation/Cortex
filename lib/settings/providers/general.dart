@@ -34,6 +34,7 @@ class SettingsGeneralProvider with ChangeNotifier {
   bool _frozenIsAnonymous = false;
   bool _frozenIsVerified = true;
   int _frozenSubscriptionLevel = 0;
+  String? _frozenAuthUid;
 
   /// Constructor: Injects services and starts the initialization process.
   SettingsGeneralProvider({
@@ -60,6 +61,7 @@ class SettingsGeneralProvider with ChangeNotifier {
     _frozenUserData = _userProvider.userData;
     _frozenIsAnonymous = _userProvider.isAnonymous;
     _frozenIsVerified = _authService.isCurrentUserVerified();
+    _frozenAuthUid = _authService.currentUser?.uid;
 
     // Snapshot subscription level logic
     _frozenSubscriptionLevel = _userProvider.isSubscriptionActive
@@ -195,11 +197,13 @@ class SettingsGeneralProvider with ChangeNotifier {
     debugPrint(
         "[GeneralProvider] onUserProviderUpdate called. Frozen: $_isFrozen, UserData: ${_userProvider.userData != null}, AuthUser: ${currentUser?.uid}");
 
-    // Auto-Unfreeze: If we were frozen (logging out) but now have a valid authenticated user,
-    // we must unfreeze specificially because a new session has started.
-    // relying on _userProvider.userData is risky for Anonymous users or slow network.
-    // _authService.currentUser is the source of truth for "Am I logged in?".
-    if (_isFrozen && currentUser != null) {
+    // Auto-unfreeze only when a NEW authenticated session appears.
+    // While logging out, updates from the same session can still arrive and must
+    // not thaw the snapshot.
+    if (_isFrozen &&
+        currentUser != null &&
+        _frozenAuthUid != null &&
+        currentUser.uid != _frozenAuthUid) {
       debugPrint(
           "[GeneralProvider] Authenticated user detected (${currentUser.uid}). Unfreezing state.");
       resetState();
@@ -222,6 +226,7 @@ class SettingsGeneralProvider with ChangeNotifier {
     _frozenIsAnonymous = false;
     _frozenIsVerified = true;
     _frozenSubscriptionLevel = 0;
+    _frozenAuthUid = null;
     notifyListeners();
   }
 }

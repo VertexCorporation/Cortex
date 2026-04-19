@@ -6,6 +6,7 @@ import '../../../chat/services/storage.dart';
 import '../../../chat/services/database.dart';
 import '../../../library/backend/data/entity.dart';
 import '../../../library/backend/data/service.dart';
+import '../../../library/utils.dart';
 
 class ConversationManager extends ChangeNotifier {
   final String conversationID;
@@ -42,6 +43,8 @@ class ConversationManager extends ChangeNotifier {
   DateTime _lastMessageDate;
   String _lastMessageText;
   String _lastMessagePhotoPath;
+  final String? _persistedModelTitle;
+  final String? _persistedModelImagePath;
 
   // Getters for Last Message details (Used by ViewModel for sorting/search)
   DateTime get lastMessageDate => _lastMessageDate;
@@ -58,12 +61,16 @@ class ConversationManager extends ChangeNotifier {
     this.starredDate, // Add param
     required DateTime lastMessageDate,
     required String langCode,
+    String? persistedModelTitle,
+    String? persistedModelImagePath,
     String lastMessageText = '',
     String lastMessagePhotoPath = '',
     required ModelService modelService,
   })  : _lastMessageText = lastMessageText,
         _lastMessageDate = lastMessageDate,
         _lastMessagePhotoPath = lastMessagePhotoPath,
+        _persistedModelTitle = persistedModelTitle,
+        _persistedModelImagePath = persistedModelImagePath,
         _modelService = modelService {
     if (initialModelId == 'dynamic') {
       _model = ModelEntity.fromMap({
@@ -75,9 +82,22 @@ class ConversationManager extends ChangeNotifier {
         'type': 'online',
         'category': 'dynamic',
       }, langCode);
-    } else {
+    } else if (_modelService.hasModelInCache(initialModelId)) {
       _model =
           _modelService.getPreciseModelData(initialModelId, langCode: langCode);
+    } else {
+      final fallbackTitle =
+          (persistedModelTitle != null && persistedModelTitle.trim().isNotEmpty)
+              ? persistedModelTitle.trim()
+              : ModelDataUtils.formatModelName(initialModelId.split('/').last);
+      _model = ModelEntity.fromMap({
+        'id': initialModelId,
+        'title': fallbackTitle,
+        'producer': 'Unknown',
+        'type': 'online',
+        'category': 'online',
+        'imagePath': persistedModelImagePath,
+      }, langCode);
     }
   }
 
@@ -112,6 +132,8 @@ class ConversationManager extends ChangeNotifier {
                 convRow['lastMessageDate'] as int? ?? 0),
         lastMessageText: lastMsg?['text'] as String? ?? '',
         lastMessagePhotoPath: lastMsg?['photoPath'] as String? ?? '',
+        persistedModelTitle: convRow['modelTitle'] as String?,
+        persistedModelImagePath: convRow['modelImagePath'] as String?,
         langCode: langCode,
         modelService: modelService,
       );
@@ -134,8 +156,23 @@ class ConversationManager extends ChangeNotifier {
       if (result.isNotEmpty) {
         final latestModelId = result.first['modelId'] as String?;
         if (latestModelId != null && latestModelId != modelId) {
-          _model = _modelService.getPreciseModelData(latestModelId,
-              langCode: langCode);
+          if (_modelService.hasModelInCache(latestModelId)) {
+            _model = _modelService.getPreciseModelData(latestModelId,
+                langCode: langCode);
+          } else {
+            _model = ModelEntity.fromMap({
+              'id': latestModelId,
+              'title': (_persistedModelTitle != null &&
+                      _persistedModelTitle.trim().isNotEmpty)
+                  ? _persistedModelTitle.trim()
+                  : ModelDataUtils.formatModelName(
+                      latestModelId.split('/').last),
+              'producer': 'Unknown',
+              'type': 'online',
+              'category': 'online',
+              'imagePath': _persistedModelImagePath,
+            }, langCode);
+          }
           notifyListeners();
           return true;
         }

@@ -40,6 +40,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get chat => 'चैट';
 
   @override
+  String get languageModels => 'भाषा मॉडल';
+
+  @override
   String get light => 'लाइट';
 
   @override
@@ -111,7 +114,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get localModels => 'स्थानीय मॉडल';
 
   @override
-  String get serverSideModels => 'ऑनलाइन मॉडल';
+  String get serverSideModels => 'भाषा मॉडल';
 
   @override
   String get selectGGUFFile => 'GGUF फ़ाइल चुनें';
@@ -1080,7 +1083,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get allModels => 'सभी मॉडल';
 
   @override
-  String get onlineModels => 'ऑनलाइन मॉडल';
+  String get onlineModels => 'भाषा मॉडल';
 
   @override
   String get offlineModels => 'ऑफ़लाइन मॉडल';
@@ -1451,6 +1454,13 @@ class AppLocalizationsHi extends AppLocalizations {
   String get onboardingFinalButton => 'हाँ!';
 
   @override
+  String get paywallAhaTitle => 'Unlock the True Power of AI';
+
+  @override
+  String get paywallAhaSubtitle =>
+      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
+
+  @override
   String get dude => 'दोस्त';
 
   @override
@@ -1812,4 +1822,55 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get cortexSystemPersona =>
       '\n\n[System] महत्वपूर्ण निर्देश: आप वर्तमान में \"कोर्टेक्स\" नामक एक विशाल, अत्यधिक उन्नत एआई पारिस्थितिकी तंत्र के भीतर काम कर रहे हैं। इसे याद रखें और पूछे जाने पर कॉर्टेक्स का व्यक्तित्व बनाए रखें।';
+
+  @override
+  String get featureAudioRecognitionTitle => 'ऑडियो पहचान';
+
+  @override
+  String get featureAudioRecognitionDescription =>
+      'यह मॉडल ऑडियो या भाषण को समझ और संसाधित कर सकता है।';
+
+  @override
+  String get featureVideoRecognitionTitle => 'वीडियो पहचान';
+
+  @override
+  String get featureVideoRecognitionDescription =>
+      'यह मॉडल आपकी फाइलों या कैमरे से प्राप्त वीडियो का विश्लेषण और समझ सकता है।';
+
+  @override
+  String get featureImageRecognitionTitle => 'छवि पहचान';
+
+  @override
+  String get featureImageRecognitionDescription =>
+      'यह मॉडल तस्वीरों या छवियों का विश्लेषण और उन्हें समझ सकता है।';
+
+  @override
+  String get featureToolUseTitle => 'उपकरण का उपयोग';
+
+  @override
+  String get featureToolUseDescription =>
+      'यह मॉडल कार्यों को पूरा करने के लिए बाहरी उपकरणों का बुद्धिमानी से उपयोग कर सकता है।';
+
+  @override
+  String get videoModels => 'Video Models';
+
+  @override
+  String get imageModels => 'Image Models';
+
+  @override
+  String get audioModels => 'Audio Models';
+
+  @override
+  String systemPromptMissingMedia(String mediaType, String modelName) {
+    return 'इस मॉडल को काम करने के लिए एक $mediaType की आवश्यकता है। मैंने आपको बताने के लिए अनुरोध को रोक लिया है। कृपया उपयोगकर्ता को विनम्रतापूर्वक सूचित करें कि उन्हें एक $mediaType प्रदान करने की आवश्यकता है (उन्हें उनकी अपनी भाषा में बताएं) क्योंकि मैं $modelName हूँ, एक दृश्य/ऑडियो/वीडियो संपादन मॉडल।';
+  }
+
+  @override
+  String get mediaTypeImage => 'छवि';
+
+  @override
+  String get mediaTypeVideo => 'वीडियो';
+
+  @override
+  String get mediaTypeAudio => 'ऑडियो फ़ाइल';
 }

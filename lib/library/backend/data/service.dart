@@ -12,6 +12,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/library/backend/data/image.dart';
 import 'package:cortex/library/backend/data/repository.dart';
@@ -98,6 +99,20 @@ class ModelService with ChangeNotifier {
         return tempEntity.copyWith(imagePath: resolvedPath);
       }).toList();
 
+      const int minOfflineSizeMb = 300;
+      const int maxOfflineRamMb = 32000;
+      const int maxOfflineSizeMb = 1024 * 1024; // 1 TB in MB
+
+      finalEntities = finalEntities
+          .map((model) => normalizeOfflineModelForCatalog(
+                model,
+                minOfflineSizeMb: minOfflineSizeMb,
+                maxOfflineRamMb: maxOfflineRamMb,
+                maxOfflineSizeMb: maxOfflineSizeMb,
+              ))
+          .whereType<ModelEntity>()
+          .toList();
+
       final offlineModels =
           finalEntities.where((m) => m.type == 'offline').toList();
       final otherModels =
@@ -105,13 +120,17 @@ class ModelService with ChangeNotifier {
       otherModels.sort((a, b) =>
           a.displayTitle.toLowerCase().compareTo(b.displayTitle.toLowerCase()));
       offlineModels.sort((a, b) {
+        final sizeA = a.size ?? 99999;
+        final sizeB = b.size ?? 99999;
+        final sizeComparison = sizeA.compareTo(sizeB);
+        if (sizeComparison != 0) return sizeComparison;
         final ramA = a.ram ?? 99999;
         final ramB = b.ram ?? 99999;
         final ramComparison = ramA.compareTo(ramB);
         if (ramComparison != 0) return ramComparison;
-        final sizeA = a.size ?? 99999;
-        final sizeB = b.size ?? 99999;
-        return sizeA.compareTo(sizeB);
+        return a.displayTitle
+            .toLowerCase()
+            .compareTo(b.displayTitle.toLowerCase());
       });
       finalEntities = [...otherModels, ...offlineModels];
       final neuroIndex =
@@ -202,6 +221,104 @@ class ModelService with ChangeNotifier {
   /// It provides immediate access to the data without any async operations.
   List<ModelEntity> getCachedModelsSync() {
     return _cachedEntities ?? [];
+  }
+
+  @visibleForTesting
+  static ModelEntity? normalizeOfflineModelForCatalog(
+    ModelEntity model, {
+    required int minOfflineSizeMb,
+    required int maxOfflineRamMb,
+    required int maxOfflineSizeMb,
+  }) {
+    if (model.type != 'offline') return model;
+
+    final imagePath = (model.imagePath ?? '').toLowerCase();
+    final hasSelfPlaceholder = imagePath.endsWith('/self.svg') ||
+        imagePath.endsWith('assets/icons/self.svg');
+    if (hasSelfPlaceholder) return null;
+
+    final ram = model.ram;
+    if (ram != null && ram > maxOfflineRamMb) return null;
+
+    Map<String, dynamic>? filteredVariants;
+    int? effectiveSize = model.size;
+
+    final variants = model.variants;
+    if (variants != null && variants.isNotEmpty) {
+      filteredVariants = <String, dynamic>{};
+      final keptVariantSizes = <int>[];
+
+      for (final entry in variants.entries) {
+        final variantData = entry.value;
+        if (variantData is! Map) continue;
+
+        final variantMap = Map<String, dynamic>.from(variantData);
+        final variantSize = _tryParseInt(variantMap['size']);
+        final variantRam = _tryParseInt(variantMap['ram']);
+
+        if (variantRam != null && variantRam > maxOfflineRamMb) {
+          continue;
+        }
+        if (variantSize != null && variantSize > maxOfflineSizeMb) {
+          continue;
+        }
+        if (variantSize != null && variantSize < minOfflineSizeMb) {
+          continue;
+        }
+
+        filteredVariants[entry.key] = variantMap;
+        if (variantSize != null) {
+          keptVariantSizes.add(variantSize);
+        }
+      }
+
+      if (filteredVariants.isEmpty) return null;
+
+      if (keptVariantSizes.isNotEmpty) {
+        effectiveSize = keptVariantSizes.reduce(math.min);
+      }
+    } else {
+      if (effectiveSize != null && effectiveSize < minOfflineSizeMb) {
+        return null;
+      }
+    }
+
+    if (effectiveSize != null && effectiveSize > maxOfflineSizeMb) return null;
+    if (effectiveSize != null && effectiveSize < minOfflineSizeMb) return null;
+
+    return model.copyWith(
+      size: effectiveSize,
+      variants: filteredVariants ?? model.variants,
+    );
+  }
+
+  static int? _tryParseInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString());
+  }
+
+  /// Returns true if the given ID exists in cache as a series ID or variant ID.
+  bool hasModelInCache(String modelId) {
+    if (modelId == 'cortex/auto' || modelId == 'dynamic') {
+      return true;
+    }
+
+    final allModels = getCachedModelsSync();
+    if (allModels.isEmpty) return false;
+
+    if (allModels.any((model) => model.id == modelId)) {
+      return true;
+    }
+
+    for (final modelSeries in allModels) {
+      if (modelSeries.variants?.containsKey(modelId) ?? false) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /// Clears all in-memory caches for both raw data (in repository) and processed entities.

@@ -13,22 +13,16 @@ class SkeletonScreen extends StatelessWidget {
     // Categories to display shimmering headers
     final List<String> shimmerCategories = [
       localizations.localModels,
-      localizations.serverSideModels,
+      localizations.onlineModels,
       localizations.roleModels,
       localizations.myModels,
     ];
 
     // Total list items: one search bar placeholder + 4 items per category
     final int totalItems = 1 + shimmerCategories.length * 4;
-    final double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double screenWidth = MediaQuery.of(context).size.width;
 
-    final double topPadding = MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final double topPadding = MediaQuery.of(context).padding.top;
 
     return Shimmer.fromColors(
       key: key ?? const ValueKey('skeleton'),

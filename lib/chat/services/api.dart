@@ -40,9 +40,9 @@ class ApiService {
 
   ApiService()
       : _dio = Dio(BaseOptions(
-    connectTimeout: const Duration(seconds: 20),
-    receiveTimeout: const Duration(minutes: 5),
-  ));
+          connectTimeout: const Duration(seconds: 20),
+          receiveTimeout: const Duration(minutes: 5),
+        ));
 
   void cancelRequests() {
     debugPrint("[ApiService] Cancellation requested.");
@@ -54,13 +54,16 @@ class ApiService {
     required List<Map<String, dynamic>> messages,
     required String model,
     required bool isPremium,
+    String? source,
     List<Map<String, dynamic>>? tools,
     bool enablefeatureReasoning = false,
     bool enableWebSearch = false,
     Function(String textChunk)? onTextChunk,
     Function(String featureReasoning)? onfeatureReasoning,
-    Function(String imageUrl)? onImageReceived,
-    Function(String audioUrl)? onAudioReceived,
+    FutureOr<void> Function(String imageUrl)? onImageReceived,
+    FutureOr<void> Function(String videoUrl)? onVideoReceived,
+    FutureOr<void> Function(String audioUrl)? onAudioReceived,
+    FutureOr<void> Function(String mediaType)? onMediaGenerating,
     Function(List<dynamic> toolCalls)? onToolCall,
     Function(List<dynamic> citations)? onCitations,
     required AppLocalizations localizations,
@@ -77,9 +80,22 @@ class ApiService {
       final completer = Completer<String>();
       final finalContent = StringBuffer();
       String currentEvent = '';
+      final List<Future<void>> pendingEventTasks = [];
 
       // Buffers for accumulating streaming parts
       Map<int, Map<String, dynamic>> toolCallBuffer = {};
+
+      void trackCallback(FutureOr<void>? callbackResult) {
+        if (callbackResult is Future) {
+          pendingEventTasks.add(
+            callbackResult.then((_) {}).catchError((e) {
+              if (kDebugMode) {
+                debugPrint("[SSE] Media callback error: $e");
+              }
+            }),
+          );
+        }
+      }
 
       try {
         debugPrint("[ApiService] Sending request. Model: $targetModel");
@@ -103,6 +119,7 @@ class ApiService {
             "model": targetModel,
             "messages": messages,
             "isPremiumModel": isPremium,
+            if (source != null) "source": source,
             if (tools != null) "tools": tools,
             "tool_choice": (tools != null) ? "auto" : null,
             "enableReasoning": enablefeatureReasoning,
@@ -120,9 +137,12 @@ class ApiService {
         // CRITICAL: Use utf8.decoder (stateful) instead of utf8.decode (stateless)
         // This properly handles multi-byte UTF-8 characters (Turkish: ş,ğ,ü,ç,ı,ö)
         // that may be split across chunk boundaries
-        stream.cast<List<int>>().transform(utf8.decoder).transform(
-            const LineSplitter()).listen(
-              (line) {
+        stream
+            .cast<List<int>>()
+            .transform(utf8.decoder)
+            .transform(const LineSplitter())
+            .listen(
+          (line) {
             if (completer.isCompleted) return;
 
             if (line.startsWith('event: ')) {
@@ -140,7 +160,7 @@ class ApiService {
                   final data = jsonDecode(dataString);
                   final code = data['code']?.toString();
                   final message = data['message']?.toString();
-                  
+
                   // Handle legacy backend 200 OK + SSE TOKEN_INVALID error
                   if (code == 'TOKEN_INVALID' || code == 'TOKEN_MISSING') {
                     completer.completeError(
@@ -201,14 +221,37 @@ class ApiService {
 
                   case 'image_chunk':
                     final url = data['url'] as String?;
-                    if (url != null) onImageReceived?.call(url);
+                    if (url != null) {
+                      trackCallback(onImageReceived?.call(url));
+                    }
                     break;
 
                   case 'audio_chunk':
                     final audioUrl = data['url'] as String?;
-                    if (audioUrl != null) onAudioReceived?.call(audioUrl);
+                    if (audioUrl != null) {
+                      trackCallback(onAudioReceived?.call(audioUrl));
+                    }
                     break;
-                    
+
+                  case 'video_chunk':
+                    final videoUrl = data['url'] as String?;
+                    if (videoUrl != null) {
+                      trackCallback(onVideoReceived?.call(videoUrl));
+                    }
+                    break;
+
+                  case 'generating_audio':
+                    trackCallback(onMediaGenerating?.call('audio'));
+                    break;
+
+                  case 'generating_image':
+                    trackCallback(onMediaGenerating?.call('image'));
+                    break;
+
+                  case 'generating_video':
+                    trackCallback(onMediaGenerating?.call('video'));
+                    break;
+
                   case 'citations':
                     if (data['citations'] is List && onCitations != null) {
                       onCitations(data['citations'] as List<dynamic>);
@@ -216,7 +259,7 @@ class ApiService {
                     break;
 
                   case 'tool_calls':
-                  // Accumulate tool call deltas
+                    // Accumulate tool call deltas
                     if (data is List) {
                       for (var item in data) {
                         final index = item['index'] as int? ?? 0;
@@ -236,11 +279,11 @@ class ApiService {
                         if (func != null) {
                           if (func['name'] != null) {
                             toolCallBuffer[index]!['function']['name'] +=
-                            func['name'];
+                                func['name'];
                           }
                           if (func['arguments'] != null) {
                             toolCallBuffer[index]!['function']['arguments'] +=
-                            func['arguments'];
+                                func['arguments'];
                           }
                         }
                       }
@@ -248,7 +291,7 @@ class ApiService {
                     break;
 
                   case 'usage':
-                  // Usage stats received - could be used for analytics
+                    // Usage stats received - could be used for analytics
                     break;
                 }
               } catch (e) {
@@ -273,12 +316,19 @@ class ApiService {
           },
           onDone: () {
             if (!completer.isCompleted) {
-              // Trigger onToolCall with fully accumulated tools if any exist
-              if (toolCallBuffer.isNotEmpty && onToolCall != null) {
-                final List<dynamic> finalTools = toolCallBuffer.values.toList();
-                onToolCall(finalTools);
-              }
-              completer.complete(finalContent.toString());
+              () async {
+                if (pendingEventTasks.isNotEmpty) {
+                  await Future.wait(pendingEventTasks);
+                }
+
+                // Trigger onToolCall with fully accumulated tools if any exist
+                if (toolCallBuffer.isNotEmpty && onToolCall != null) {
+                  final List<dynamic> finalTools =
+                      toolCallBuffer.values.toList();
+                  onToolCall(finalTools);
+                }
+                completer.complete(finalContent.toString());
+              }();
             }
           },
           cancelOnError: true,
@@ -308,8 +358,8 @@ class ApiService {
             final prefs = await SharedPreferences.getInstance();
             final fallbackJson = prefs.getString('fallback_models_cache');
             if (fallbackJson != null) {
-              final fallbacks = List<Map<String, dynamic>>.from(
-                  jsonDecode(fallbackJson));
+              final fallbacks =
+                  List<Map<String, dynamic>>.from(jsonDecode(fallbackJson));
               for (final fallback in fallbacks) {
                 final fallbackId = fallback['id'] as String;
                 try {
@@ -358,12 +408,15 @@ class ApiService {
     required String characterId,
     required bool isPremium,
     required String baseModelId,
+    String? source,
     List<String> attachmentPaths = const [],
     bool enablefeatureReasoning = false,
     Function(String)? onTextChunk,
     Function(String)? onfeatureReasoning,
     Function(String)? onImageReceived,
+    Function(String)? onVideoReceived,
     Function(String)? onAudioReceived,
+    Function(String)? onMediaGenerating,
     required AppLocalizations localizations,
   }) async {
     List<Map<String, dynamic>> messages = List.from(context);
@@ -385,30 +438,32 @@ class ApiService {
       messages: messages,
       model: baseModelId,
       isPremium: isPremium,
+      source: source,
       enablefeatureReasoning: enablefeatureReasoning,
-      enableWebSearch: false, // Characters usually don't need web search, or pass it if needed
+      enableWebSearch: false,
+      // Characters usually don't need web search, or pass it if needed
       onTextChunk: onTextChunk,
       onfeatureReasoning: onfeatureReasoning,
+      onVideoReceived: onVideoReceived,
       onImageReceived: onImageReceived,
       onAudioReceived: onAudioReceived,
+      onMediaGenerating: onMediaGenerating,
     );
   }
 
-
   /// Silently generates a title for a new conversation using the backend's fast new title endpoint.
-  Future<String?> generateChatTitle(String userInput,
-      String systemPrompt, String criticalInstruction, {bool isRetry = false}) async {
+  Future<String?> generateChatTitle(
+      String userInput, String systemPrompt, String criticalInstruction,
+      {bool isRetry = false}) async {
     try {
       debugPrint(
-          '[TitleGen] 🚀 Starting title generation for: "${userInput.length > 20
-              ? userInput.substring(0, 20)
-              : userInput}..."');
+          '[TitleGen] 🚀 Starting title generation for: "${userInput.length > 20 ? userInput.substring(0, 20) : userInput}..."');
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         debugPrint('[TitleGen] ❌ Error: User is null');
         return null;
       }
-      
+
       // SADECE retry modundaysa (ikinci denemeyse) token'i zorla yenile.
       final String? token = await user.getIdToken(isRetry);
 
@@ -424,12 +479,10 @@ class ApiService {
         "messages": [
           {
             "role": "system",
-            "content": "$systemPrompt\n\n[CRITICAL INSTRUCTION]: $criticalInstruction",
+            "content":
+                "$systemPrompt\n\n[CRITICAL INSTRUCTION]: $criticalInstruction",
           },
-          {
-            "role": "user",
-            "content": userInput
-          }
+          {"role": "user", "content": userInput}
         ]
       };
 
@@ -455,8 +508,10 @@ class ApiService {
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401 && !isRetry) {
-        debugPrint('[TitleGen] ⚠️ 401 Unauthorized detected! Refreshing token silently and retrying...');
-        return generateChatTitle(userInput, systemPrompt, criticalInstruction, isRetry: true);
+        debugPrint(
+            '[TitleGen] ⚠️ 401 Unauthorized detected! Refreshing token silently and retrying...');
+        return generateChatTitle(userInput, systemPrompt, criticalInstruction,
+            isRetry: true);
       } else {
         debugPrint('[TitleGen] ❌ DioException generating title: $e');
       }
@@ -471,12 +526,15 @@ class ApiService {
     required bool isPremium,
     required String userInput,
     required List<Map<String, dynamic>> context,
+    String? source,
     List<String> attachmentPaths = const [],
     bool enablefeatureReasoning = false,
     Function(String)? onTextChunk,
     Function(String)? onfeatureReasoning,
     Function(String)? onImageReceived,
+    Function(String)? onVideoReceived,
     Function(String)? onAudioReceived,
+    Function(String)? onMediaGenerating,
     Function(List<dynamic>)? onToolCall,
     Function(List<dynamic>)? onCitations,
     required AppLocalizations localizations,
@@ -519,13 +577,16 @@ class ApiService {
       messages: messages,
       model: modelId,
       isPremium: isPremium,
+      source: source,
       enablefeatureReasoning: enablefeatureReasoning,
       enableWebSearch: enableWebSearch,
       tools: toolsJson.isNotEmpty ? toolsJson : null,
       onTextChunk: onTextChunk,
       onfeatureReasoning: onfeatureReasoning,
+      onVideoReceived: onVideoReceived,
       onImageReceived: onImageReceived,
       onAudioReceived: onAudioReceived,
+      onMediaGenerating: onMediaGenerating,
       onToolCall: onToolCall,
       onCitations: onCitations,
     );

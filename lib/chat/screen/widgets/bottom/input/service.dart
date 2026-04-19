@@ -54,20 +54,46 @@ class InputService {
 
   // --- Image Handling ---
 
-  Future<void> pickPhoto(BuildContext context,
+  Future<void> pickMediaAction(BuildContext context,
       {required ImageSource source,
-        required VoidCallback onSelectionComplete}) async {
+      required bool supportImage,
+      required bool supportVideo,
+      required VoidCallback onSelectionComplete}) async {
     // 1. Check Attachment Limit before opening camera/gallery
     if (!_canAddMoreAttachments(context)) return;
 
     try {
-      // 2. Pick and compress the image
-      final XFile? pickedFile = await _imagePicker.pickImage(
-        source: source,
-        imageQuality: 80, // Good balance for AI analysis
-        maxWidth: 1920, // Standard FHD limit
-        maxHeight: 1920,
-      );
+      XFile? pickedFile;
+      if (source == ImageSource.gallery) {
+        if (supportImage && supportVideo) {
+          pickedFile = await _imagePicker.pickMedia(
+            imageQuality: 80,
+            maxWidth: 1920,
+            maxHeight: 1920,
+          );
+        } else if (supportVideo) {
+          pickedFile = await _imagePicker.pickVideo(source: source);
+        } else {
+          pickedFile = await _imagePicker.pickImage(
+            source: source,
+            imageQuality: 80,
+            maxWidth: 1920,
+            maxHeight: 1920,
+          );
+        }
+      } else {
+        // For camera, usually we separate pickImage and pickVideo, but here we just keep pickImage for now unless video is specifically supported (camera video recording).
+        if (supportImage) {
+          pickedFile = await _imagePicker.pickImage(
+            source: source,
+            imageQuality: 80,
+            maxWidth: 1920,
+            maxHeight: 1920,
+          );
+        } else if (supportVideo) {
+          pickedFile = await _imagePicker.pickVideo(source: source);
+        }
+      }
 
       if (pickedFile == null) return;
 
@@ -75,25 +101,39 @@ class InputService {
 
       // 3. Validate and Add
       if (!context.mounted) return;
-      await _validateAndAddAttachment(context, file, isImage: true);
+
+      final String pathLower = file.path.toLowerCase();
+      final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
+          .any((ext) => pathLower.endsWith(ext));
+
+      await _validateAndAddAttachment(context, file, isImage: isImage);
 
       onSelectionComplete();
     } catch (e) {
-      debugPrint("Error picking photo: $e");
+      debugPrint("Error picking photo/video: $e");
     }
   }
 
   // --- File Selection ---
 
-  Future<void> pickFile(BuildContext context) async {
+  Future<void> pickFile(BuildContext context,
+      {bool canHandleAudio = false, bool canHandleVideo = false}) async {
     // 1. Check Attachment Limit
     if (!_canAddMoreAttachments(context)) return;
+
+    final dynamicExtensions = List<String>.from(_allowedExtensions);
+    if (canHandleAudio) {
+      dynamicExtensions.addAll(['mp3', 'wav', 'm4a', 'ogg', 'aac', 'flac']);
+    }
+    if (canHandleVideo) {
+      dynamicExtensions.addAll(['mp4', 'mov', 'avi', 'mkv', 'webm']);
+    }
 
     try {
       // 2. Open Native File Picker
       final FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: _allowedExtensions,
+        allowedExtensions: dynamicExtensions,
         allowMultiple: true, // Allow selecting multiple files at once
       );
 
@@ -111,7 +151,10 @@ class InputService {
         if (!_canAddMoreAttachments(context)) break;
 
         final File file = File(platformFile.path!);
-        await _validateAndAddAttachment(context, file, isImage: false);
+        final String pathLower = file.path.toLowerCase();
+        final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
+            .any((ext) => pathLower.endsWith(ext));
+        await _validateAndAddAttachment(context, file, isImage: isImage);
       }
     } catch (e) {
       debugPrint("Error picking file: $e");
@@ -144,8 +187,7 @@ class InputService {
       // this check prevents it from entering our system.
       if (sizeInBytes > _maxFileSizeInBytes) {
         debugPrint(
-            "File rejected: Size (${sizeInBytes / 1024 /
-                1024} MB) exceeds limit.");
+            "File rejected: Size (${sizeInBytes / 1024 / 1024} MB) exceeds limit.");
         // Optional: Trigger a UI notification via a helper service
         return;
       }
@@ -168,8 +210,8 @@ class InputService {
 
   // --- Model Selection Logic (Existing) ---
 
-  void openModelSelectionSheet(BuildContext context,
-      AppLocalizations localizations) {
+  void openModelSelectionSheet(
+      BuildContext context, AppLocalizations localizations) {
     final sessionProvider = context.read<ChatSessionProvider>();
     final String currentId = sessionProvider.modelId ?? '';
 
@@ -204,9 +246,7 @@ class InputService {
                 'title': variantMap['title'],
               };
               mergedMap.remove('variants');
-              final langCode = sessionProvider
-                  .getLocale()
-                  .languageCode;
+              final langCode = sessionProvider.getLocale().languageCode;
               targetModel = ModelEntity.fromMap(mergedMap, langCode);
             }
             break;
@@ -257,7 +297,6 @@ class InputService {
     return baseCost + totalAttachmentCost;
   }
 
-  
   bool isActionPermitted({
     required BuildContext context,
     required bool isServerSideModel,
@@ -273,6 +312,12 @@ class InputService {
   }) {
     // 1. Basic Blockers
     if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
+      return false;
+    }
+
+    final isOfflineMode = !isDynamicChatMode && !isServerSideModel;
+    if (isOfflineMode &&
+        !context.read<ChatSessionProvider>().isLocalModelLoaded) {
       return false;
     }
 
@@ -317,6 +362,12 @@ class InputService {
   }) {
     // 1. Basic Blockers
     if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
+      return false;
+    }
+
+    final isOfflineMode = !isDynamicChatMode && !isServerSideModel;
+    if (isOfflineMode &&
+        !context.read<ChatSessionProvider>().isLocalModelLoaded) {
       return false;
     }
 

@@ -67,10 +67,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
     final l10n = AppLocalizations.of(context)!;
     final memoryProvider = context.read<UserMemoryProvider>();
     final RestoreCallback restoreNavBar = Darkener.darken();
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     showGeneralDialog(
       context: context,
@@ -116,7 +113,8 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                         ],
                       ),
                     ),
-                    Divider(color: AppColors.quinaryColor,
+                    Divider(
+                        color: AppColors.quinaryColor,
                         thickness: 0.5,
                         height: 1),
                     IntrinsicHeight(
@@ -126,8 +124,10 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                splashColor: AppColors.senaryColor.withValues(alpha: 0.1),
-                                highlightColor: AppColors.senaryColor.withValues(alpha: 0.1),
+                                splashColor: AppColors.senaryColor
+                                    .withValues(alpha: 0.1),
+                                highlightColor: AppColors.senaryColor
+                                    .withValues(alpha: 0.1),
                                 onTap: () {
                                   HapticFeedback.lightImpact();
                                   Navigator.of(ctx).pop();
@@ -147,15 +147,18 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                               ),
                             ),
                           ),
-                          VerticalDivider(width: 1,
+                          VerticalDivider(
+                              width: 1,
                               thickness: 0.5,
                               color: AppColors.quinaryColor),
                           Expanded(
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                splashColor: AppColors.septenaryColor.withValues(alpha: 0.1),
-                                highlightColor: AppColors.septenaryColor.withValues(alpha: 0.1),
+                                splashColor: AppColors.septenaryColor
+                                    .withValues(alpha: 0.1),
+                                highlightColor: AppColors.septenaryColor
+                                    .withValues(alpha: 0.1),
                                 onTap: () {
                                   HapticFeedback.lightImpact();
                                   memoryProvider.clearMemory();
@@ -197,10 +200,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>(); // Fix reactivity bug
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final double scale = screenWidth / 400.0;
     final memoryProvider = context.watch<UserMemoryProvider>();
 
@@ -242,8 +242,8 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
             'assets/icons/context.svg',
             colorFilter: ColorFilter.mode(
                 AppColors.primaryColor.inverted, BlendMode.srcIn),
-            width: 20 * scale,
-            height: 20 * scale,
+            width: 24 * scale,
+            height: 24 * scale,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,7 +252,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                 controller: _memoryController,
                 focusNode: _memoryFocusNode,
                 maxLines: 10,
-                minLines: 2,
+                minLines: 7,
                 style: TextStyle(
                   color: AppColors.primaryColor.inverted,
                   fontSize: 13 * scale,
@@ -278,13 +278,12 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                   ),
                 ),
                 onChanged: (val) {
-                  // Keep provider in sync for length check or UI updates if any, 
+                  // Keep provider in sync for length check or UI updates if any,
                   // but we mainly write on focus lost or submit.
                   context.read<UserMemoryProvider>().updateMemory(val);
                 },
                 onSubmitted: (value) {
-                  context.read<UserMemoryProvider>().updateMemory(
-                      value.trim());
+                  context.read<UserMemoryProvider>().updateMemory(value.trim());
                 },
               ),
               if (memoryProvider.isMemoryLimitReached)
@@ -340,14 +339,14 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
             'assets/icons/test.svg',
             colorFilter: ColorFilter.mode(
                 AppColors.primaryColor.inverted, BlendMode.srcIn),
-            width: 20 * scale,
-            height: 20 * scale,
+            width: 24 * scale,
+            height: 24 * scale,
           ),
           child: TextField(
             controller: _instructionController,
             focusNode: _instructionFocusNode,
-            maxLines: 4,
-            minLines: 2,
+            maxLines: 10,
+            minLines: 7,
             style: TextStyle(
               color: AppColors.primaryColor.inverted,
               fontSize: 13 * scale,
@@ -370,8 +369,9 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
               ),
             ),
             onSubmitted: (value) {
-              context.read<UserMemoryProvider>().updateCustomInstruction(
-                  value.trim());
+              context
+                  .read<UserMemoryProvider>()
+                  .updateCustomInstruction(value.trim());
             },
           ),
         ),
@@ -379,7 +379,8 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
     );
   }
 
-  Widget _buildPanel(BuildContext context, {
+  Widget _buildPanel(
+    BuildContext context, {
     required double scale,
     required String title,
     required String subtitle,
@@ -399,7 +400,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
           Row(
             children: [
               icon,
-              SizedBox(width: 14 * scale),
+              SizedBox(width: 10 * scale),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -408,7 +409,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                       title,
                       style: TextStyle(
                         color: AppColors.primaryColor.inverted,
-                        fontSize: 16 * scale,
+                        fontSize: 17 * scale,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

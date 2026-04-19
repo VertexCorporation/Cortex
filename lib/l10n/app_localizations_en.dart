@@ -40,6 +40,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
+  String get languageModels => 'Language Models';
+
+  @override
   String get light => 'Light';
 
   @override
@@ -111,7 +114,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get localModels => 'Local Models';
 
   @override
-  String get serverSideModels => 'Online Models';
+  String get serverSideModels => 'Language Models';
 
   @override
   String get selectGGUFFile => 'Select GGUF File';
@@ -1065,7 +1068,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumTrialExhaustedMessage =>
-      'You have used all your free daily messages for premium models, please upgrade for unlimited access.';
+      'You have used all your free daily messages for premium models. Upgrade now and **continue where you left off!**';
 
   @override
   String get useOffline => 'Use without Internet';
@@ -1449,6 +1452,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingFinalButton => 'YES!';
 
   @override
+  String get paywallAhaTitle => 'Unlock the True Power of AI';
+
+  @override
+  String get paywallAhaSubtitle =>
+      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
+
+  @override
   String get dude => 'Dude';
 
   @override
@@ -1810,4 +1820,55 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get cortexSystemPersona =>
       '\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\". Remember this and maintain the persona of Cortex if asked.';
+
+  @override
+  String get featureAudioRecognitionTitle => 'Audio Recognition';
+
+  @override
+  String get featureAudioRecognitionDescription =>
+      'This model can understand and process audio inputs.';
+
+  @override
+  String get featureVideoRecognitionTitle => 'Video Recognition';
+
+  @override
+  String get featureVideoRecognitionDescription =>
+      'This model can understand and process video inputs.';
+
+  @override
+  String get featureImageRecognitionTitle => 'Image Recognition';
+
+  @override
+  String get featureImageRecognitionDescription =>
+      'This model can understand and process image inputs.';
+
+  @override
+  String get featureToolUseTitle => 'Tool Use';
+
+  @override
+  String get featureToolUseDescription =>
+      'This model can use external tools and APIs.';
+
+  @override
+  String get videoModels => 'Video Models';
+
+  @override
+  String get imageModels => 'Image Models';
+
+  @override
+  String get audioModels => 'Audio Models';
+
+  @override
+  String systemPromptMissingMedia(String mediaType, String modelName) {
+    return 'This model requires a $mediaType to work. I have intercepted the request to let you know. Please inform the user gracefully that they need to provide a $mediaType (tell them in their own language) because I am $modelName, a visual/audio/video editing model.';
+  }
+
+  @override
+  String get mediaTypeImage => 'image';
+
+  @override
+  String get mediaTypeVideo => 'video';
+
+  @override
+  String get mediaTypeAudio => 'audio';
 }

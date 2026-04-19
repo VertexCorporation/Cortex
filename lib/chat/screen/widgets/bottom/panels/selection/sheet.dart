@@ -3,6 +3,7 @@
 import 'package:cortex/chat/screen/widgets/bottom/panels/selection/skeleton.dart';
 import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/library/backend/data/service.dart';
+import 'package:cortex/variants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:cortex/theme.dart';
@@ -77,6 +78,9 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
   List<ModelEntity> _selfModels = [];
   List<ModelEntity> _offlineModels = [];
   List<ModelEntity> _onlineSeries = [];
+  List<ModelEntity> _videoSeries = [];
+  List<ModelEntity> _imageSeries = [];
+  List<ModelEntity> _audioSeries = [];
   List<ModelEntity> _characterModels = [];
 
   bool _isLoading = true;
@@ -110,6 +114,9 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     final offline = <ModelEntity>[];
     final character = <ModelEntity>[];
     final online = <ModelEntity>[];
+    final video = <ModelEntity>[];
+    final image = <ModelEntity>[];
+    final audio = <ModelEntity>[];
 
     for (var m in models) {
       if (m.category == 'self') {
@@ -121,16 +128,30 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
           offline.add(m);
         }
       } else if (m.type == 'online') {
-        online.add(m);
+        if (m.category == 'video') {
+          video.add(m);
+        } else if (m.category == 'image') {
+          image.add(m);
+        } else if (m.category == 'audio') {
+          audio.add(m);
+        } else {
+          online.add(m);
+        }
       }
     }
 
     online.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
+    video.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
+    image.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
+    audio.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
 
     _selfModels = self;
     _offlineModels = offline;
     _characterModels = character;
     _onlineSeries = online;
+    _videoSeries = video;
+    _imageSeries = image;
+    _audioSeries = audio;
   }
 
   Future<void> _fetchAsync() async {
@@ -192,9 +213,37 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     });
   }
 
-  void _handleSelection(String modelId) {
-    widget.onModelSelected(modelId);
-    Navigator.pop(context);
+  Future<String> _resolveSeriesSelection(String modelId) async {
+    final allSeries = <ModelEntity>[
+      ..._selfModels,
+      ..._offlineModels,
+      ..._onlineSeries,
+      ..._videoSeries,
+      ..._imageSeries,
+      ..._audioSeries,
+      ..._characterModels,
+    ];
+
+    final int seriesIndex = allSeries.indexWhere((m) => m.id == modelId);
+    if (seriesIndex == -1) return modelId;
+
+    final series = allSeries[seriesIndex];
+    final variantsMap = series.variants;
+    if (variantsMap == null || variantsMap.isEmpty) return modelId;
+
+    final lastUsedId = await Variants.getLastSelectedVariant(series.id);
+    if (lastUsedId.isNotEmpty && variantsMap.containsKey(lastUsedId)) {
+      return lastUsedId;
+    }
+    return variantsMap.keys.first;
+  }
+
+  Future<void> _handleSelection(String modelId) async {
+    final resolvedModelId = await _resolveSeriesSelection(modelId);
+    widget.onModelSelected(resolvedModelId);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   bool _isSeriesActive(ModelEntity series) {
@@ -335,8 +384,23 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                               ],
                               if (_onlineSeries.isNotEmpty) ...[
                                 _buildSliverHeader(
-                                    widget.localizations.onlineModels),
-                                _buildSliverOnlineList(),
+                                    widget.localizations.languageModels),
+                                _buildSliverOnlineList(_onlineSeries),
+                              ],
+                              if (_videoSeries.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.videoModels),
+                                _buildSliverOnlineList(_videoSeries),
+                              ],
+                              if (_imageSeries.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.imageModels),
+                                _buildSliverOnlineList(_imageSeries),
+                              ],
+                              if (_audioSeries.isNotEmpty) ...[
+                                _buildSliverHeader(
+                                    widget.localizations.audioModels),
+                                _buildSliverOnlineList(_audioSeries),
                               ],
                               if (_characterModels.isNotEmpty) ...[
                                 _buildSliverHeader(
@@ -417,8 +481,8 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     );
   }
 
-  Widget _buildSliverOnlineList() {
-    final int rowCount = (_onlineSeries.length / 2).ceil();
+  Widget _buildSliverOnlineList(List<ModelEntity> seriesList) {
+    final int rowCount = (seriesList.length / 2).ceil();
 
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: sp16),
@@ -426,9 +490,9 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final int itemIndex = index * 2;
-            final item1 = _onlineSeries[itemIndex];
-            final item2 = (itemIndex + 1 < _onlineSeries.length)
-                ? _onlineSeries[itemIndex + 1]
+            final item1 = seriesList[itemIndex];
+            final item2 = (itemIndex + 1 < seriesList.length)
+                ? seriesList[itemIndex + 1]
                 : null;
 
             final bool isItem1Expanded = _expandedSeriesId == item1.id;

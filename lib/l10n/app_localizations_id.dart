@@ -40,6 +40,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
+  String get languageModels => 'Model Bahasa';
+
+  @override
   String get light => 'Terang';
 
   @override
@@ -111,7 +114,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get localModels => 'Model Lokal';
 
   @override
-  String get serverSideModels => 'Model Online';
+  String get serverSideModels => 'Model Bahasa';
 
   @override
   String get selectGGUFFile => 'Pilih File GGUF';
@@ -1084,7 +1087,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get allModels => 'Semua Model';
 
   @override
-  String get onlineModels => 'Model Daring';
+  String get onlineModels => 'Model Bahasa';
 
   @override
   String get offlineModels => 'Model Offline';
@@ -1459,6 +1462,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingFinalButton => 'YA!';
 
   @override
+  String get paywallAhaTitle => 'Unlock the True Power of AI';
+
+  @override
+  String get paywallAhaSubtitle =>
+      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
+
+  @override
   String get dude => 'Bung';
 
   @override
@@ -1823,4 +1833,55 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get cortexSystemPersona =>
       '\n\n[System] INSTRUKSI KRITIS: Anda saat ini beroperasi di dalam ekosistem AI yang sangat besar dan canggih bernama \"Cortex\". Ingatlah hal ini dan pertahankan persona Cortex jika ditanya.';
+
+  @override
+  String get featureAudioRecognitionTitle => 'Pengenalan Audio';
+
+  @override
+  String get featureAudioRecognitionDescription =>
+      'Model ini dapat memahami dan memproses audio atau ucapan.';
+
+  @override
+  String get featureVideoRecognitionTitle => 'Pengenalan Video';
+
+  @override
+  String get featureVideoRecognitionDescription =>
+      'Model ini dapat menganalisis dan memahami video dari file atau kamera Anda.';
+
+  @override
+  String get featureImageRecognitionTitle => 'Pengenalan Gambar';
+
+  @override
+  String get featureImageRecognitionDescription =>
+      'Model ini dapat menganalisis dan memahami foto atau gambar.';
+
+  @override
+  String get featureToolUseTitle => 'Penggunaan Alat';
+
+  @override
+  String get featureToolUseDescription =>
+      'Model ini dapat secara cerdas menggunakan alat eksternal untuk menyelesaikan tugas.';
+
+  @override
+  String get videoModels => 'Video Models';
+
+  @override
+  String get imageModels => 'Image Models';
+
+  @override
+  String get audioModels => 'Audio Models';
+
+  @override
+  String systemPromptMissingMedia(String mediaType, String modelName) {
+    return 'Model ini memerlukan $mediaType agar dapat berfungsi. Saya telah mencegat permintaan tersebut untuk memberi tahu Anda. Tolong beri tahu pengguna dengan sopan bahwa mereka perlu menyediakan $mediaType (beri tahu mereka dalam bahasa mereka sendiri) karena saya adalah $modelName, model pengeditan visual/audio/video.';
+  }
+
+  @override
+  String get mediaTypeImage => 'gambar';
+
+  @override
+  String get mediaTypeVideo => 'video';
+
+  @override
+  String get mediaTypeAudio => 'berkas audio';
 }

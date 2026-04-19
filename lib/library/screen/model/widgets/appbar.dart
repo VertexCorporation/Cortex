@@ -72,20 +72,14 @@ class _VariantOverlayPanelState extends State<_VariantOverlayPanel>
 
   @override
   Widget build(BuildContext context) {
-    final screenW = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenW = MediaQuery.of(context).size.width;
     final bool isTablet = screenW >= 600;
 
     // --- DYNAMIC TOP POSITIONING ---
     // Must match the logic in DetailAppBar to align perfectly.
     // Tablet: Dynamic (approx 14%). Phone: Standard 56.0.
     final double toolbarHeight = isTablet ? screenW * 0.14 : kToolbarHeight;
-    final topPx = toolbarHeight + MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final topPx = toolbarHeight + MediaQuery.of(context).padding.top;
 
     return Material(
       color: Colors.transparent,
@@ -146,20 +140,9 @@ class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.provider,
     required this.onBackPressed,
     this.scrollController,
-  })
-      :
-        _isTablet = MediaQuery
-            .of(context)
-            .size
-            .width >= 600,
-        _toolbarHeight = MediaQuery
-            .of(context)
-            .size
-            .width >= 600
-            ? MediaQuery
-            .of(context)
-            .size
-            .width * 0.14
+  })  : _isTablet = MediaQuery.of(context).size.width >= 600,
+        _toolbarHeight = MediaQuery.of(context).size.width >= 600
+            ? MediaQuery.of(context).size.width * 0.14
             : kToolbarHeight;
 
   @override
@@ -174,8 +157,8 @@ class DetailAppBarState extends State<DetailAppBar>
     with TickerProviderStateMixin {
   OverlayEntry? _variantOverlayEntry;
 
-  final GlobalKey<_VariantOverlayPanelState> _overlayKey = GlobalKey<
-      _VariantOverlayPanelState>();
+  final GlobalKey<_VariantOverlayPanelState> _overlayKey =
+      GlobalKey<_VariantOverlayPanelState>();
 
   String _currentDisplayVariantName = '';
 
@@ -193,10 +176,9 @@ class DetailAppBarState extends State<DetailAppBar>
   }
 
   void _onProviderChanged() {
-    final newVariantName =
-        widget.provider.selectedVariant?.displayTitle ??
-            widget.provider.selectedVariantName ??
-            '';
+    final newVariantName = widget.provider.selectedVariant?.displayTitle ??
+        widget.provider.selectedVariantName ??
+        '';
     if (_currentDisplayVariantName != newVariantName) {
       if (mounted) {
         setState(() {
@@ -222,15 +204,14 @@ class DetailAppBarState extends State<DetailAppBar>
     if (isPanelOpen) return;
 
     final provider = widget.provider;
-    final langCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final langCode = Localizations.localeOf(context).languageCode;
 
-    final List<ModelEntity> variantEntities = provider.mainModel?.variants
-        ?.values
-        .whereType<Map<String, dynamic>>()
-        .map((extMap) => ModelEntity.fromMap(extMap, langCode))
-        .toList() ?? [];
+    final List<ModelEntity> variantEntities = provider
+            .mainModel?.variants?.values
+            .whereType<Map<String, dynamic>>()
+            .map((extMap) => ModelEntity.fromMap(extMap, langCode))
+            .toList() ??
+        [];
 
     if (variantEntities.isEmpty) return;
 
@@ -278,27 +259,33 @@ class DetailAppBarState extends State<DetailAppBar>
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = widget._isTablet;
+    final double statusSlotWidth = isTablet ? 150.0 : screenWidth * 0.30;
 
     return CortexAppBar(
       leadingMode: CortexLeadingMode.back,
       showGradient: false,
+      includeTrailingActionsPadding: false,
+      ignoreActionsForCentering: true,
       scrollController: widget.scrollController,
       onLeadingPressed: _handleBackPressed,
       title: _buildTitleWidget(context, isTablet, screenWidth),
       actions: [
-        _buildDownloadStatusIndicator(context, isTablet, screenWidth),
-        SizedBox(width: isTablet ? 16.0 : 16.0),
+        Padding(
+          padding: EdgeInsets.only(right: screenWidth * 0.025),
+          child: SizedBox(
+            width: statusSlotWidth,
+            child:
+                _buildDownloadStatusIndicator(context, isTablet, screenWidth),
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildTitleWidget(BuildContext context, bool isTablet,
-      double screenWidth) {
+  Widget _buildTitleWidget(
+      BuildContext context, bool isTablet, double screenWidth) {
     final provider = widget.provider;
 
     // Tablet: Large Fonts (24/20).
@@ -347,8 +334,8 @@ class DetailAppBarState extends State<DetailAppBar>
     );
   }
 
-  Widget _buildDownloadStatusIndicator(BuildContext context, bool isTablet,
-      double screenWidth) {
+  Widget _buildDownloadStatusIndicator(
+      BuildContext context, bool isTablet, double screenWidth) {
     final provider = widget.provider;
     final localizations = AppLocalizations.of(context)!;
 
@@ -359,27 +346,33 @@ class DetailAppBarState extends State<DetailAppBar>
     if (provider.isDownloading) {
       downloadStatus = provider.downloadProgress >= 95
           ? localizations.finalPreparation
-          : localizations.downloaded(
-          provider.downloadProgress.toStringAsFixed(0));
+          : localizations
+              .downloaded(provider.downloadProgress.toStringAsFixed(0));
     } else if (provider.isPaused) {
       downloadStatus = localizations.downloadPaused;
     }
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
-      transitionBuilder: (child, animation) =>
-          FadeTransition(opacity: animation, child: child),
-      child: downloadStatus.isNotEmpty
-          ? Center(
-        child: Text(
-          downloadStatus,
-          key: ValueKey<String>(downloadStatus),
-          style: TextStyle(
-              color: AppColors.quinaryColor,
-              fontSize: fontSize),
+    final bool hasDownloadStatus = downloadStatus.isNotEmpty;
+    final String displayText = hasDownloadStatus ? downloadStatus : ' ';
+
+    return Align(
+      alignment: Alignment.centerRight,
+      child: AnimatedOpacity(
+        opacity: hasDownloadStatus ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerRight,
+          child: Text(
+            displayText,
+            maxLines: 1,
+            softWrap: false,
+            textAlign: TextAlign.right,
+            style: TextStyle(color: AppColors.quinaryColor, fontSize: fontSize),
+          ),
         ),
-      )
-          : const SizedBox.shrink(key: ValueKey('empty')),
+      ),
     );
   }
 }

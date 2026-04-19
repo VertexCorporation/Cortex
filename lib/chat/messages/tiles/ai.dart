@@ -21,6 +21,8 @@ class AiStreamFinishedNotification extends Notification {
 class AIMessageTile extends StatefulWidget {
   final Message message;
   final String avatarPath;
+  final Widget? embeddedMedia;
+  final bool mediaAboveText;
   final VoidCallback? onFadeOutComplete;
   final VoidCallback? onReport;
   final void Function({String? newModelId})? onRegenerate;
@@ -31,6 +33,8 @@ class AIMessageTile extends StatefulWidget {
     super.key,
     required this.message,
     required this.avatarPath,
+    this.embeddedMedia,
+    this.mediaAboveText = true,
     this.onFadeOutComplete,
     this.onReport,
     this.onRegenerate,
@@ -99,6 +103,10 @@ class _AIMessageTileState extends State<AIMessageTile>
         vsync: this, duration: const Duration(milliseconds: 400));
     _headerEntryAnim =
         CurvedAnimation(parent: _headerEntryCtl, curve: Curves.easeOut);
+        
+    if (widget.message.isThinking && !widget.message.isError && (widget.message.displayableText.isNotEmpty || widget.embeddedMedia != null)) {
+      _headerEntryCtl.forward();
+    }
     _textAnimCtl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 150));
 
@@ -148,7 +156,8 @@ class _AIMessageTileState extends State<AIMessageTile>
       }
     }
 
-    if (!widget.message.isThinking && widget.message.displayableText.isNotEmpty) {
+    if (!widget.message.isThinking &&
+        (widget.message.displayableText.isNotEmpty || widget.message.hasAttachments || widget.embeddedMedia != null)) {
       _stableText = widget.message.displayableText;
       _headerEntryCtl.value = 1.0;
       _entryCtl.value = 1.0;
@@ -174,8 +183,8 @@ class _AIMessageTileState extends State<AIMessageTile>
     final String logPrefix = "[AIMessageTile.didUpdateWidget]";
 
     // 1. Stream Starting Logic
-    final bool isStreamStarting = old.message.displayableText.isEmpty &&
-        widget.message.displayableText.isNotEmpty &&
+    final bool isStreamStarting = (old.message.displayableText.isEmpty && old.embeddedMedia == null) &&
+        (widget.message.displayableText.isNotEmpty || widget.embeddedMedia != null) &&
         widget.message.isThinking;
 
     if (isStreamStarting && !widget.message.isError) {
@@ -281,7 +290,8 @@ class _AIMessageTileState extends State<AIMessageTile>
         }
 
         if (_stableText.length < widget.message.displayableText.length) {
-          _animatingText = widget.message.displayableText.substring(_stableText.length);
+          _animatingText =
+              widget.message.displayableText.substring(_stableText.length);
         } else {
           _stableText = widget.message.displayableText;
           _animatingText = "";
@@ -356,10 +366,7 @@ class _AIMessageTileState extends State<AIMessageTile>
     // Watch ThemeProvider to rebuild on theme changes
     context.watch<ThemeProvider>();
 
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final scale = screenWidth / 400;
 
     return AnimatedSwitcher(
@@ -372,7 +379,7 @@ class _AIMessageTileState extends State<AIMessageTile>
       child: widget.message.isError
           ? _buildErrorWidget(context, scale, key: const ValueKey('error_view'))
           : _buildStandardTile(context, scale,
-          key: const ValueKey('standard_view')),
+              key: const ValueKey('standard_view')),
     );
   }
 
@@ -391,14 +398,12 @@ class _AIMessageTileState extends State<AIMessageTile>
             behavior: HitTestBehavior.deferToChild,
             gestures: {
               ShortLongPressGestureRecognizer:
-              GestureRecognizerFactoryWithHandlers<
-                  ShortLongPressGestureRecognizer>(
-                    () =>
-                    ShortLongPressGestureRecognizer(
-                        debugOwner: this,
-                        shortPressDuration: const Duration(milliseconds: 330)),
-                    (inst) =>
-                inst.onLongPressStart =
+                  GestureRecognizerFactoryWithHandlers<
+                      ShortLongPressGestureRecognizer>(
+                () => ShortLongPressGestureRecognizer(
+                    debugOwner: this,
+                    shortPressDuration: const Duration(milliseconds: 330)),
+                (inst) => inst.onLongPressStart =
                     (d) => _onLongPress(context, d.globalPosition),
               ),
             },
@@ -407,7 +412,7 @@ class _AIMessageTileState extends State<AIMessageTile>
               child: InkWell(
                 borderRadius: BorderRadius.circular(26),
                 splashColor:
-                AppColors.primaryColor.inverted.withValues(alpha: 0.1),
+                    AppColors.primaryColor.inverted.withValues(alpha: 0.1),
                 onTap: _flushAnimation,
                 onLongPress: () {},
                 child: Padding(
@@ -420,11 +425,7 @@ class _AIMessageTileState extends State<AIMessageTile>
                       // Use SizeTransition to smoothly reveal content as header settles
                       SizeTransition(
                         sizeFactor: _headerEntryAnim,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                              top: 8 * scale, left: 2.0 * scale),
-                          child: _buildContent(scale),
-                        ),
+                        child: _buildBodyContent(scale),
                       ),
                     ],
                   ),
@@ -439,33 +440,29 @@ class _AIMessageTileState extends State<AIMessageTile>
 
   // Added the 'key' parameter to support AnimatedSwitcher.
   Widget _buildErrorWidget(BuildContext context, double scale, {Key? key}) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final dynamicFontSize = screenWidth * 0.04;
     final iconSize = screenWidth * 0.06;
 
     return GestureDetector(
       key: key, // Critical for animation
-      onTap: () =>
-          setState(() {
-            if (_isExpandedError) {
-              _errorSlideCtl.reverse().then((_) {
-                if (mounted) {
-                  setState(() {
-                    _isExpandedError = false;
-                    _showErrorText = false;
-                  });
-                }
-              });
-            } else {
-              _isExpandedError = true;
-              _errorSlideCtl.forward().whenComplete(() {
-                if (mounted) setState(() => _showErrorText = true);
+      onTap: () => setState(() {
+        if (_isExpandedError) {
+          _errorSlideCtl.reverse().then((_) {
+            if (mounted) {
+              setState(() {
+                _isExpandedError = false;
+                _showErrorText = false;
               });
             }
-          }),
+          });
+        } else {
+          _isExpandedError = true;
+          _errorSlideCtl.forward().whenComplete(() {
+            if (mounted) setState(() => _showErrorText = true);
+          });
+        }
+      }),
       child: FadeTransition(
         opacity: _errorFadeOutAnim, // Uses the specific error fade controller
         child: Padding(
@@ -475,7 +472,7 @@ class _AIMessageTileState extends State<AIMessageTile>
                 color: AppColors.septenaryColor.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(screenWidth * 0.03),
                 border:
-                Border.all(color: AppColors.septenaryColor, width: 0.5)),
+                    Border.all(color: AppColors.septenaryColor, width: 0.5)),
             padding: EdgeInsets.all(screenWidth * 0.03),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -516,22 +513,23 @@ class _AIMessageTileState extends State<AIMessageTile>
                   child: !_isExpandedError
                       ? const SizedBox.shrink()
                       : ClipRect(
-                    child: AnimatedOpacity(
-                      opacity: _showErrorText ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 200),
-                      child: SlideTransition(
-                        position: _errorSlideAnim,
-                        child: Padding(
-                          padding:
-                          EdgeInsets.only(top: screenWidth * 0.02),
-                          child: SelectableText(widget.message.displayableText,
-                              style: TextStyle(
-                                  color: AppColors.septenaryColor,
-                                  fontSize: dynamicFontSize * 0.9)),
+                          child: AnimatedOpacity(
+                            opacity: _showErrorText ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 200),
+                            child: SlideTransition(
+                              position: _errorSlideAnim,
+                              child: Padding(
+                                padding:
+                                    EdgeInsets.only(top: screenWidth * 0.02),
+                                child: SelectableText(
+                                    widget.message.displayableText,
+                                    style: TextStyle(
+                                        color: AppColors.septenaryColor,
+                                        fontSize: dynamicFontSize * 0.9)),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -543,9 +541,7 @@ class _AIMessageTileState extends State<AIMessageTile>
 
   Widget _buildHeader(double s) {
     final modelService = context.read<ModelService>();
-    final langCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final langCode = Localizations.localeOf(context).languageCode;
 
     final mId = widget.message.model ?? '';
     final model = modelService.getPreciseModelData(mId, langCode: langCode);
@@ -553,9 +549,7 @@ class _AIMessageTileState extends State<AIMessageTile>
     String formatModelId(String rawId) {
       if (rawId.isEmpty) return 'Cortex';
       if (rawId == 'cortex/auto' || rawId == 'dynamic') return 'Cortex';
-      String name = rawId.contains('/') ? rawId
-          .split('/')
-          .last : rawId;
+      String name = rawId.contains('/') ? rawId.split('/').last : rawId;
       return name.split(RegExp(r'[-_]')).map((w) {
         if (w.isEmpty) return '';
         if (w.toLowerCase() == 'gpt') return 'GPT';
@@ -647,7 +641,7 @@ class _AIMessageTileState extends State<AIMessageTile>
         height: iconSize,
         fit: BoxFit.contain,
         colorFilter:
-        ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn));
+            ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn));
     Widget imageWidget;
     if (widget.avatarPath.isEmpty || widget.avatarPath.endsWith('self.svg')) {
       imageWidget = fallbackWidget;
@@ -657,19 +651,19 @@ class _AIMessageTileState extends State<AIMessageTile>
       if (isSvg) {
         imageWidget = isAsset
             ? SvgPicture.asset(widget.avatarPath,
-            width: iconSize,
-            height: iconSize,
-            colorFilter: ColorFilter.mode(
-                AppColors.primaryColor.inverted, BlendMode.srcIn),
-            fit: BoxFit.contain,
-            placeholderBuilder: (_) => fallbackWidget)
+                width: iconSize,
+                height: iconSize,
+                colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted, BlendMode.srcIn),
+                fit: BoxFit.contain,
+                placeholderBuilder: (_) => fallbackWidget)
             : SvgPicture.file(File(widget.avatarPath),
-            width: iconSize,
-            height: iconSize,
-            colorFilter: ColorFilter.mode(
-                AppColors.primaryColor.inverted, BlendMode.srcIn),
-            fit: BoxFit.contain,
-            placeholderBuilder: (_) => fallbackWidget);
+                width: iconSize,
+                height: iconSize,
+                colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted, BlendMode.srcIn),
+                fit: BoxFit.contain,
+                placeholderBuilder: (_) => fallbackWidget);
       } else {
         final imageProvider = isAsset
             ? AssetImage(widget.avatarPath) as ImageProvider
@@ -697,6 +691,56 @@ class _AIMessageTileState extends State<AIMessageTile>
               color: AppColors.secondaryColor, shape: BoxShape.circle),
           alignment: Alignment.center,
           child: imageWidget),
+    );
+  }
+
+  Widget _buildBodyContent(double s) {
+    final bool hasText = _stableText.isNotEmpty || _animatingText.isNotEmpty;
+    final bool hasMedia = widget.embeddedMedia != null;
+
+    if (!hasText && !hasMedia) {
+      return const SizedBox.shrink();
+    }
+
+    final mediaBlock = hasMedia
+        ? Padding(
+            padding: EdgeInsets.only(top: 8 * s, left: 2.0 * s, right: 2.0 * s),
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 320),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.centerLeft,
+              child: Container(
+                padding: EdgeInsets.all(8 * s),
+                decoration: BoxDecoration(
+                  color:
+                      AppColors.primaryColor.inverted.withValues(alpha: 0.03),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: AppColors.border.withValues(alpha: 0.45),
+                    width: 1,
+                  ),
+                ),
+                child: widget.embeddedMedia!,
+              ),
+            ),
+          )
+        : const SizedBox.shrink();
+
+    final textBlock = hasText
+        ? Padding(
+            padding: EdgeInsets.only(top: 8 * s, left: 2.0 * s),
+            child: _buildContent(s),
+          )
+        : const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (hasMedia && widget.mediaAboveText) mediaBlock,
+        if (hasText) textBlock,
+        if (hasMedia && !widget.mediaAboveText) mediaBlock,
+      ],
     );
   }
 
@@ -741,8 +785,7 @@ class _AIMessageTileState extends State<AIMessageTile>
   List<InlineSpan> _getParsedSpans(String text) {
     if (text.isEmpty) return [];
     final cacheKey =
-        '$text:${widget.message.isThinking}:${widget.message.webSearchSources
-        ?.length ?? 0}';
+        '$text:${widget.message.isThinking}:${widget.message.webSearchSources?.length ?? 0}';
     if (_parseCache.containsKey(cacheKey)) return _parseCache[cacheKey]!;
 
     final spans = parseText(context, text,
@@ -763,9 +806,9 @@ class _AIMessageTileState extends State<AIMessageTile>
             ?.map((child) => _applyOpacity(child, opacity, sigma))
             .toList(),
         style: span.style?.copyWith(
-          color: baseColor.withValues(alpha: opacity),
-          foreground: null,
-        ) ??
+              color: baseColor.withValues(alpha: opacity),
+              foreground: null,
+            ) ??
             TextStyle(color: baseColor.withValues(alpha: opacity)),
       );
     } else if (span is WidgetSpan) {

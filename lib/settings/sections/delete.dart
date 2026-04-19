@@ -469,8 +469,11 @@ class DeleteSection extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Material(
-      color: AppColors.septenaryColor,
-      borderRadius: BorderRadius.circular(10.0),
+      color: AppColors.primaryColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        side: BorderSide(color: AppColors.septenaryColor, width: 1.5),
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
@@ -478,7 +481,7 @@ class DeleteSection extends StatelessWidget {
           _showDialog(context, child: const _DeleteAllConversationsDialog());
         },
         borderRadius: BorderRadius.circular(10.0),
-        splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
+        splashColor: AppColors.septenaryColor.withValues(alpha: 0.3),
         child: Container(
           padding: EdgeInsets.symmetric(
               horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
@@ -488,12 +491,12 @@ class DeleteSection extends StatelessWidget {
               Text(
                 appLocalizations.deleteAllConversationsButton,
                 style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.primaryColor.inverted,
                     fontSize: screenWidth * 0.04,
                     fontWeight: FontWeight.w500),
               ),
               Icon(Icons.arrow_forward_ios,
-                  color: Colors.white, size: screenWidth * 0.04),
+                  color: AppColors.primaryColor.inverted, size: screenWidth * 0.04),
             ],
           ),
         ),
@@ -506,8 +509,11 @@ class DeleteSection extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Material(
-      color: AppColors.septenaryColor,
-      borderRadius: BorderRadius.circular(10.0),
+      color: AppColors.primaryColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        side: BorderSide(color: AppColors.septenaryColor, width: 1.5),
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
@@ -515,7 +521,7 @@ class DeleteSection extends StatelessWidget {
           _showDialog(context, child: const _DeleteAccountDialog());
         },
         borderRadius: BorderRadius.circular(10.0),
-        splashColor: AppColors.quaternaryColor.withValues(alpha: 0.3),
+        splashColor: AppColors.septenaryColor.withValues(alpha: 0.3),
         child: Container(
           padding: EdgeInsets.symmetric(
               horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
@@ -525,12 +531,12 @@ class DeleteSection extends StatelessWidget {
               Text(
                 appLocalizations.deleteAccountButton,
                 style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.primaryColor.inverted,
                     fontSize: screenWidth * 0.04,
                     fontWeight: FontWeight.w500),
               ),
               Icon(Icons.arrow_forward_ios,
-                  color: Colors.white, size: screenWidth * 0.04),
+                  color: AppColors.primaryColor.inverted, size: screenWidth * 0.04),
             ],
           ),
         ),

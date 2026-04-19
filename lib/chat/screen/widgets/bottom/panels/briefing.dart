@@ -1,15 +1,13 @@
 // lib/chat/screen/selected/widgets/input/panels/briefing.dart
 
+import 'dart:async';
+
 import 'package:cortex/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import 'package:cortex/chat/screen/appbar/premium.dart';
 import 'package:cortex/funds/funds.dart';
-import 'package:cortex/login/upgrade.dart';
 import 'package:cortex/navigation.dart';
-import 'package:cortex/server/user.dart';
-import 'package:provider/provider.dart';
 import '../../../../../../theme.dart';
 
 class BriefingOverlay extends StatefulWidget {
@@ -61,8 +59,16 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
   final GlobalKey _panelKey = GlobalKey();
   double _measuredPanelHeight = 0.0;
+  double _lastReportedVisibleHeight = -1.0;
+  double? _pendingVisibleHeight;
+  bool _isVisibleHeightReportQueued = false;
 
   static const Duration _animationDuration = Duration(milliseconds: 300);
+
+  bool get _isPremiumUpgradeMessage =>
+      widget.isPremiumModel &&
+      !widget.isSubscribed &&
+      widget.premiumTrialUses >= 3;
 
   @override
   void initState() {
@@ -113,9 +119,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   }
 
   String? _evaluateMessageText(AppLocalizations loc) {
-    if (widget.isPremiumModel &&
-        !widget.isSubscribed &&
-        widget.premiumTrialUses >= 3) {
+    if (_isPremiumUpgradeMessage) {
       return loc.premiumTrialExhaustedMessage;
     }
     if (widget.inappropriate) return loc.inappropriateContentDetected;
@@ -209,7 +213,31 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     double visible = base * slideT;
 
     if (visible < 0.5) visible = 0.0;
-    widget.onVisibleHeightChanged?.call(visible);
+    _scheduleVisibleHeightReport(visible);
+  }
+
+  void _scheduleVisibleHeightReport(double visible) {
+    if (!mounted) return;
+    if (_lastReportedVisibleHeight == visible &&
+        _pendingVisibleHeight == null) {
+      return;
+    }
+
+    _pendingVisibleHeight = visible;
+    if (_isVisibleHeightReportQueued) return;
+    _isVisibleHeightReportQueued = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _isVisibleHeightReportQueued = false;
+      if (!mounted) return;
+
+      final double? pending = _pendingVisibleHeight;
+      _pendingVisibleHeight = null;
+      if (pending == null || pending == _lastReportedVisibleHeight) return;
+
+      _lastReportedVisibleHeight = pending;
+      widget.onVisibleHeightChanged?.call(pending);
+    });
   }
 
   @override
@@ -217,9 +245,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     if (_currentMessageText == null ||
         (_currentMessageText != null && _slideController.isDismissed)) {
       if (_measuredPanelHeight != 0 && _slideController.isDismissed) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) widget.onVisibleHeightChanged?.call(0.0);
-        });
+        _scheduleVisibleHeightReport(0.0);
       }
       if (_slideController.isDismissed) return const SizedBox.shrink();
     }
@@ -231,8 +257,11 @@ class _BriefingOverlayState extends State<BriefingOverlay>
         child: GestureDetector(
           onVerticalDragUpdate: (details) {
             if (details.primaryDelta! > 0) {
-              _slideController.value -=
-                  details.primaryDelta! / _measuredPanelHeight;
+              if (_measuredPanelHeight <= 0) return;
+              final double nextValue = (_slideController.value -
+                      (details.primaryDelta! / _measuredPanelHeight))
+                  .clamp(0.0, 1.0);
+              _slideController.value = nextValue;
             }
           },
           onVerticalDragEnd: _handlePanEnd,
@@ -240,6 +269,7 @@ class _BriefingOverlayState extends State<BriefingOverlay>
           child: _BriefingPanelContent(
             key: _panelKey,
             message: _currentMessageText ?? "",
+            isPremiumUpgradeMessage: _isPremiumUpgradeMessage,
           ),
         ),
       ),
@@ -255,10 +285,77 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   }
 }
 
-class _BriefingPanelContent extends StatelessWidget {
+class _BriefingPanelContent extends StatefulWidget {
   final String message;
+  final bool isPremiumUpgradeMessage;
 
-  const _BriefingPanelContent({super.key, required this.message});
+  const _BriefingPanelContent({
+    super.key,
+    required this.message,
+    required this.isPremiumUpgradeMessage,
+  });
+
+  @override
+  State<_BriefingPanelContent> createState() => _BriefingPanelContentState();
+}
+
+class _BriefingPanelContentState extends State<_BriefingPanelContent>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _shineController;
+  late final Animation<double> _shineAnimation;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _shineController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    _shineAnimation = Tween<double>(begin: -1.5, end: 1.5).animate(
+      CurvedAnimation(parent: _shineController, curve: Curves.easeInOut),
+    );
+
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) _shineController.forward(from: 0.0);
+    });
+
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      if (mounted) {
+        _shineController.forward(from: 0.0);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _shineController.dispose();
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  List<TextSpan> _parseMessage(String message, TextStyle defaultStyle) {
+    final List<TextSpan> spans = [];
+    final RegExp exp = RegExp(r'\*\*(.*?)\*\*');
+    int start = 0;
+    for (final match in exp.allMatches(message)) {
+      if (match.start > start) {
+        spans.add(TextSpan(
+            text: message.substring(start, match.start), style: defaultStyle));
+      }
+      spans.add(TextSpan(
+        text: match.group(1),
+        style: defaultStyle.copyWith(fontWeight: FontWeight.bold),
+      ));
+      start = match.end;
+    }
+    if (start < message.length) {
+      spans.add(TextSpan(text: message.substring(start), style: defaultStyle));
+    }
+    return spans;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -271,9 +368,18 @@ class _BriefingPanelContent extends StatelessWidget {
     final double paddingVertical = isTablet ? screenWidth * 0.02 : 12.0;
     final double borderRadius = isTablet ? screenWidth * 0.015 : 12.0;
 
+    final bool showPremiumButton = widget.isPremiumUpgradeMessage;
+
+    final Color baseColor = AppColors.premium.withValues(alpha: 0.15);
+    final Color backgroundColor =
+        Color.alphaBlend(baseColor, AppColors.background);
+    final Color contentColor = AppColors.premium;
+    final Color borderColor = baseColor.withValues(alpha: 0.8);
+
     final boxDecoration = BoxDecoration(
-      color: AppColors.background,
-      border: Border.fromBorderSide(BorderSide(color: AppColors.border)),
+      color: showPremiumButton ? backgroundColor : AppColors.background,
+      border: Border.fromBorderSide(BorderSide(
+          color: showPremiumButton ? borderColor : AppColors.border)),
       borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
       boxShadow: const [
         BoxShadow(
@@ -286,61 +392,104 @@ class _BriefingPanelContent extends StatelessWidget {
 
     final textStyle = TextStyle(
       fontSize: fontSize,
-      color: AppColors.primaryColor.inverted,
+      color: showPremiumButton ? contentColor : AppColors.primaryColor.inverted,
     );
-    final userProvider = context.watch<UserProvider>();
-    final bool showPremiumButton =
-        !userProvider.isSubscriptionActive || userProvider.isAnonymous;
+
+    Widget innerContent = Container(
+      padding: EdgeInsets.symmetric(
+          vertical: paddingVertical, horizontal: paddingHorizontal),
+      child: Row(
+        children: [
+          SvgPicture.asset(
+            showPremiumButton
+                ? 'assets/icons/sparkle.svg'
+                : 'assets/icons/warning.svg',
+            colorFilter: ColorFilter.mode(
+              showPremiumButton
+                  ? contentColor
+                  : AppColors.primaryColor.inverted,
+              BlendMode.srcIn,
+            ),
+            width: iconSize,
+            height: iconSize,
+          ),
+          SizedBox(width: isTablet ? screenWidth * 0.02 : 12.0),
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                children: _parseMessage(widget.message, textStyle),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    Widget content;
+
+    if (showPremiumButton) {
+      content = Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            navigateToScreen(const FundsScreen(),
+                direction: const Offset(1.0, 0.0));
+            FocusScope.of(context).unfocus();
+          },
+          borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
+          splashColor: contentColor.withValues(alpha: 0.1),
+          highlightColor: contentColor.withValues(alpha: 0.05),
+          child: Stack(
+            children: [
+              Ink(
+                decoration: boxDecoration,
+                child: innerContent,
+              ),
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  child: AnimatedBuilder(
+                    animation: _shineAnimation,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset:
+                            Offset(screenWidth * _shineAnimation.value, 0.0),
+                        child: child,
+                      );
+                    },
+                    child: Container(
+                      width: screenWidth * 0.2,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.white.withValues(alpha: 0.0),
+                            Colors.white.withValues(alpha: 0.2),
+                            Colors.white.withValues(alpha: 0.0),
+                          ],
+                          stops: const [0.1, 0.5, 0.9],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      content = Container(
+        decoration: boxDecoration,
+        child: innerContent,
+      );
+    }
 
     return AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOutCubic,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-            vertical: paddingVertical, horizontal: paddingHorizontal),
-        decoration: boxDecoration,
-        child: Row(
-          children: [
-            SvgPicture.asset(
-              'assets/icons/warning.svg',
-              colorFilter: ColorFilter.mode(
-                AppColors.primaryColor.inverted,
-                BlendMode.srcIn,
-              ),
-              width: iconSize,
-              height: iconSize,
-            ),
-            SizedBox(width: isTablet ? screenWidth * 0.02 : 12.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    message,
-                    style: textStyle,
-                  ),
-                  if (showPremiumButton) ...[
-                    SizedBox(height: isTablet ? 10.0 : 8.0),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: PremiumButton(
-                        onTap: () {
-                          final target = userProvider.isAnonymous
-                              ? const UpgradeAccountScreen()
-                              : const FundsScreen();
-                          navigateToScreen(target,
-                              direction: const Offset(1.0, 0.0));
-                          FocusScope.of(context).unfocus();
-                        },
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: content,
     );
   }
 }

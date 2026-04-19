@@ -5,6 +5,7 @@ import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/select.dart';
 import 'package:cortex/chat/services/send.dart';
 import 'package:cortex/library/backend/data/entity.dart';
+import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/catalog.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/main.dart';
@@ -66,8 +67,13 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
     final l10n = AppLocalizations.of(context)!;
 
     final catalog = context.watch<ModelCatalogProvider>();
+    final sessionProvider = context.watch<ChatSessionProvider>();
     final inputProvider = context.watch<InputProvider>();
     final currentMode = inputProvider.featureMode;
+    final currentModel = sessionProvider.selectedModel;
+    final bool isOfflineModelSelected = currentModel?.type == 'offline';
+    final bool isCurrentImageModel = currentModel?.outputs['image'] == true;
+    final bool isCurrentAudioModel = currentModel?.outputs['audio'] == true;
 
     final imageGenModels = catalog.allModels.where((m) {
       try {
@@ -81,8 +87,6 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
       }
     }).toList();
 
-    final bool canGenerateImages = imageGenModels.isNotEmpty;
-
     final audioGenModels = catalog.allModels.where((m) {
       try {
         final map = m.toMap();
@@ -94,7 +98,6 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
         return false;
       }
     }).toList();
-    final bool canGenerateAudio = audioGenModels.isNotEmpty;
 
     return Container(
       constraints: BoxConstraints(
@@ -142,7 +145,8 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
               bottomFogHeight: 40,
               child: SingleChildScrollView(
                 controller: _scrollController,
-                physics: const ClampingScrollPhysics(), // Removed BouncingScrollPhysics
+                physics: const ClampingScrollPhysics(),
+                // Removed BouncingScrollPhysics
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).padding.bottom + 20),
                 child: Column(
@@ -152,10 +156,12 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       iconPath: 'assets/icons/context.svg',
                       title: l10n.useOffline,
                       description: l10n.useOfflineDescription,
-                      isSelected: currentMode == ChatInputMode.offline,
+                      isSelected: currentMode == ChatInputMode.offline ||
+                          isOfflineModelSelected,
                       onTap: () {
-                        if (currentMode == ChatInputMode.offline) {
-                            _checkAndResetOfflineMode(context);
+                        if (currentMode == ChatInputMode.offline ||
+                            isOfflineModelSelected) {
+                          _selectDynamicModel(context);
                         } else {
                           _handleOfflineAction(context, l10n);
                         }
@@ -170,8 +176,10 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       description: l10n.featureReasoningDescription,
                       isSelected: currentMode == ChatInputMode.featureReasoning,
                       onTap: () {
+                        _prepareForTextFeature(context);
                         Navigator.pop(context);
-                        _handleFeatureSelection(context, ChatInputMode.featureReasoning);
+                        _handleFeatureSelection(
+                            context, ChatInputMode.featureReasoning);
                       },
                     ),
 
@@ -181,7 +189,9 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       title: l10n.featureWebSearchTitle,
                       description: l10n.featureWebSearchDescription,
                       isSelected: inputProvider.enableWebSearch,
-                      onTap: () {                          _checkAndResetOfflineMode(context);                        inputProvider.toggleWebSearch();
+                      onTap: () {
+                        _prepareForTextFeature(context);
+                        inputProvider.toggleWebSearch();
                         Navigator.pop(context);
                       },
                     ),
@@ -191,12 +201,16 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       iconPath: 'assets/icons/make.svg',
                       title: l10n.featureCreateImageTitle,
                       description: l10n.featureCreateImageDescription,
-                      isDisabled: false,
-                      isSelected: false,
+                      isDisabled: imageGenModels.isEmpty,
+                      isSelected: isCurrentImageModel,
                       onTap: () {
                         Navigator.pop(context);
-                        _handleDynamicGenerationAction(
-                            context, imageGenModels, widget.controller, isImage: true);
+                        _handleGenerationFeatureAction(
+                          context,
+                          imageGenModels,
+                          widget.controller,
+                          isImage: true,
+                        );
                       },
                     ),
 
@@ -205,12 +219,16 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       iconPath: 'assets/icons/voice.svg',
                       title: l10n.featureCreateAudioTitle,
                       description: l10n.featureCreateAudioDescription,
-                      isDisabled: false,
-                      isSelected: false,
+                      isDisabled: audioGenModels.isEmpty,
+                      isSelected: isCurrentAudioModel,
                       onTap: () {
                         Navigator.pop(context);
-                        _handleDynamicGenerationAction(
-                            context, audioGenModels, widget.controller, isImage: false);
+                        _handleGenerationFeatureAction(
+                          context,
+                          audioGenModels,
+                          widget.controller,
+                          isImage: false,
+                        );
                       },
                     ),
 
@@ -221,6 +239,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       description: l10n.featureStudyDescription,
                       isSelected: currentMode == ChatInputMode.study,
                       onTap: () {
+                        _prepareForTextFeature(context);
                         Navigator.pop(context);
                         _handleFeatureSelection(context, ChatInputMode.study);
                       },
@@ -233,6 +252,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       description: l10n.featureQuizzesDescription,
                       isSelected: currentMode == ChatInputMode.quiz,
                       onTap: () {
+                        _prepareForTextFeature(context);
                         Navigator.pop(context);
                         _handleFeatureSelection(context, ChatInputMode.quiz);
                       },
@@ -251,11 +271,16 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                           currentModelId:
                               context.read<ChatSessionProvider>().modelId ?? '',
                           onModelSelected: (String id) {
-                            final catalog =
-                                context.read<ModelCatalogProvider>();
-                            final model =
-                                catalog.allModels.firstWhere((m) => m.id == id);
-                            context.read<SelectionService>().selectModel(model);
+                            final modelService = context.read<ModelService>();
+                            final selectionService =
+                                context.read<SelectionService>();
+                            final langCode =
+                                Localizations.localeOf(context).languageCode;
+                            final model = modelService.getPreciseModelData(
+                              id,
+                              langCode: langCode,
+                            );
+                            selectionService.selectModel(model);
                           },
                         );
                       },
@@ -290,38 +315,38 @@ void _handleOfflineAction(BuildContext context, AppLocalizations l10n) {
   }).toList();
 
   if (downloadedModels.isNotEmpty) {
-    // [CHANGED] Auto-select offline feature mode
+    // Offline focus must be singular.
+    inputProvider.clearWebSearch();
     inputProvider.setFeatureMode(ChatInputMode.offline);
 
-    // [NEW] Auto-select the first downloaded model
+    // Auto-select an available offline model.
     final firstModel = downloadedModels.first;
-    selectionService.selectModel(firstModel);
-
-    // Don't show sheet, just succeed silently like a boss
+    selectionService.switchActiveModel(firstModel, context: context);
   } else {
     mainScreenKey.currentState?.switchToLibrary(pulse: true);
   }
 }
 
-/// Logic for "Create Image": Selects best model, sends prompt if available.
-void _handleDynamicGenerationAction(
-  BuildContext context,
-  List<ModelEntity> candidates,
-  TextEditingController controller,
-  {required bool isImage}
-) {
-  _checkAndResetOfflineMode(context); // [NEW] Reset if needed
+/// Logic for "Create Image/Audio": selects a suitable generation model and keeps
+/// feature states coherent (single feature rule).
+void _handleGenerationFeatureAction(BuildContext context,
+    List<ModelEntity> candidates, TextEditingController controller,
+    {required bool isImage}) {
+  if (candidates.isEmpty) return;
 
-  // MOCK FLOW: If no models support it yet, just use a dummy text to trigger the mock in send.dart
-  if (candidates.isEmpty) {
-     final String testCommand = isImage ? "test image" : "test audio";
-     context.read<SendService>().sendMessage(
-          context: context,
-          localizations: AppLocalizations.of(context)!,
-          messageText: testCommand,
-        );
-     return;
-  }
+  final inputProvider = context.read<InputProvider>();
+  final selectionService = context.read<SelectionService>();
+  final session = context.read<ChatSessionProvider>();
+
+  // Image/Audio focus bypasses text features.
+  inputProvider.clearFeatureMode();
+  inputProvider.clearWebSearch();
+
+  final currentModel = session.selectedModel;
+  final bool currentSupportsTarget = currentModel != null &&
+      (isImage
+          ? currentModel.outputs['image'] == true
+          : currentModel.outputs['audio'] == true);
 
   // Priority: Non-Premium (Free) first, otherwise Premium.
   final ModelEntity targetModel = candidates.firstWhere(
@@ -329,10 +354,12 @@ void _handleDynamicGenerationAction(
     orElse: () => candidates.first,
   );
 
-  // 1. Select the model
-  context.read<SelectionService>().selectModel(targetModel);
+  // Select only if current model does not already support this generation type.
+  if (!currentSupportsTarget) {
+    selectionService.switchActiveModel(targetModel, context: context);
+  }
 
-  // 2. If text exists, send it immediately
+  // If text exists, send it immediately.
   final String currentText = controller.text.trim();
   if (currentText.isNotEmpty) {
     context.read<SendService>().sendMessage(
@@ -340,15 +367,13 @@ void _handleDynamicGenerationAction(
           localizations: AppLocalizations.of(context)!,
           messageText: currentText,
         );
-    // Clear controller handled by SendService usually, but safe to clear here if needed logic differs
   }
 }
 
 /// Logic for "Study" & "Quizzes": Formats input with prefix and sends.
 void _handleFeatureSelection(BuildContext context, ChatInputMode mode) {
   final provider = context.read<InputProvider>();
-
-  _checkAndResetOfflineMode(context); // [NEW] Reset if needed
+  provider.clearWebSearch();
 
   // [CHANGED] Toggle logic: If already selected, clear it.
   if (provider.featureMode == mode) {
@@ -358,39 +383,36 @@ void _handleFeatureSelection(BuildContext context, ChatInputMode mode) {
   }
 }
 
-/// [NEW] Helper to switch to Dynamic Chat if Offline Mode was active
-void _checkAndResetOfflineMode(BuildContext context) {
+/// Ensures text-only features run on a compatible text model.
+/// If current model is offline or generation-focused, switch back to dynamic chat.
+void _prepareForTextFeature(BuildContext context) {
   final inputProvider = context.read<InputProvider>();
-  final selectionService = context.read<SelectionService>();
-  final catalog = context.read<ModelCatalogProvider>();
-    final sessionProvider = context.read<ChatSessionProvider>();
+  final sessionProvider = context.read<ChatSessionProvider>();
+  final currentModel = sessionProvider.selectedModel;
 
-    final isOfflineFeature = inputProvider.featureMode == ChatInputMode.offline;
+  final bool isOfflineModel = currentModel?.type == 'offline';
+  final bool isGenerationFocused = currentModel?.outputs['image'] == true ||
+      currentModel?.outputs['audio'] == true;
+  final bool isOfflineFeature =
+      inputProvider.featureMode == ChatInputMode.offline;
 
-    bool isOfflineModel = false;
-    final currentModelId = sessionProvider.modelId;
-    if (currentModelId != null) {
-      try {
-        final currentModel =
-            catalog.allModels.firstWhere((m) => m.id == currentModelId);
-        if (currentModel.type == 'offline') {
-          isOfflineModel = true;
-        }
-      } catch (_) {}
-    }
-
-    if (isOfflineFeature || isOfflineModel) {
-      if (isOfflineFeature) {
-        inputProvider.clearFeatureMode();
-      }
-      try {
-        final dynamicModel = catalog.allModels.firstWhere(
-            (m) => m.id == 'cortex/auto',
-            orElse: () =>
-                catalog.allModels.firstWhere((m) => m.type != 'offline'));
-        selectionService.switchActiveModel(dynamicModel, context: context);
-      } catch (e) {
-        // Fallback safe
-      }
-    }
+  if (isOfflineFeature) {
+    inputProvider.clearFeatureMode();
   }
+
+  if (isOfflineModel || isGenerationFocused) {
+    _selectDynamicModel(context);
+  }
+}
+
+void _selectDynamicModel(BuildContext context) {
+  final inputProvider = context.read<InputProvider>();
+  final sessionProvider = context.read<ChatSessionProvider>();
+
+  if (inputProvider.featureMode == ChatInputMode.offline) {
+    inputProvider.clearFeatureMode();
+  }
+
+  // Dynamic chat is provider-native; do not fallback to arbitrary models (e.g. neuro).
+  sessionProvider.startDynamicConversation(savePreference: true);
+}

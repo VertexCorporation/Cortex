@@ -58,9 +58,9 @@ class _ToolCircleButton extends StatelessWidget {
             onTap: disabled
                 ? null
                 : () {
-              HapticFeedback.lightImpact();
-              onTap?.call();
-            },
+                    HapticFeedback.lightImpact();
+                    onTap?.call();
+                  },
             child: SizedBox(
               width: size,
               height: size,
@@ -100,16 +100,11 @@ class ActionButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isConnected = context
-        .watch<InternetProvider>()
-        .isConnected;
+    final bool isConnected = context.watch<InternetProvider>().isConnected;
     final speechService = context.watch<SpeechService>();
     final inputProvider = context.watch<InputProvider>();
 
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final bool isTablet = screenWidth >= 600;
     final double buttonSize = isTablet ? 40.0 : 36.0;
 
@@ -173,42 +168,42 @@ class ActionButtonWidget extends StatelessWidget {
           },
           child: showMic
               ? Padding(
-            key: const ValueKey('mic_visible'),
-            padding: const EdgeInsetsDirectional.only(end: 8.0),
-            child: _ToolCircleButton(
-              size: buttonSize,
-              onTap: () async {
-                final localeCode = context
-                    .read<ChatSessionProvider>()
-                    .getLocale()
-                    .languageCode;
-                final currentText = controller.text;
+                  key: const ValueKey('mic_visible'),
+                  padding: const EdgeInsetsDirectional.only(end: 8.0),
+                  child: _ToolCircleButton(
+                    size: buttonSize,
+                    onTap: () async {
+                      final localeCode = context
+                          .read<ChatSessionProvider>()
+                          .getLocale()
+                          .languageCode;
+                      final currentText = controller.text;
 
-                inputProvider.setVoiceRecording(true);
+                      inputProvider.setVoiceRecording(true);
 
-                await speechService.startListening(
-                  locale: localeCode,
-                  onResult: (String text) {
-                    String spacer = (currentText.isNotEmpty &&
-                        !currentText.endsWith(' '))
-                        ? ' '
-                        : '';
-                    if (currentText.isEmpty) spacer = '';
-                    controller.text = "$currentText$spacer$text";
-                    controller.selection = TextSelection.fromPosition(
-                        TextPosition(offset: controller.text.length));
-                  },
-                );
-              },
-              child: SvgPicture.asset(
-                'assets/icons/microphone.svg',
-                width: buttonSize * 0.55,
-                height: buttonSize * 0.55,
-                colorFilter: ColorFilter.mode(
-                    AppColors.primaryColor.inverted, BlendMode.srcIn),
-              ),
-            ),
-          )
+                      await speechService.startListening(
+                        locale: localeCode,
+                        onResult: (String text) {
+                          String spacer = (currentText.isNotEmpty &&
+                                  !currentText.endsWith(' '))
+                              ? ' '
+                              : '';
+                          if (currentText.isEmpty) spacer = '';
+                          controller.text = "$currentText$spacer$text";
+                          controller.selection = TextSelection.fromPosition(
+                              TextPosition(offset: controller.text.length));
+                        },
+                      );
+                    },
+                    child: SvgPicture.asset(
+                      'assets/icons/microphone.svg',
+                      width: buttonSize * 0.55,
+                      height: buttonSize * 0.55,
+                      colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted, BlendMode.srcIn),
+                    ),
+                  ),
+                )
               : const SizedBox.shrink(key: ValueKey('mic_hidden')),
         ),
 
@@ -248,7 +243,7 @@ class ActionButtonWidget extends StatelessWidget {
             width: size * 0.4,
             height: size * 0.4,
             colorFilter:
-            ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
           ),
         ),
       ),
@@ -272,9 +267,9 @@ class ActionButtonWidget extends StatelessWidget {
     return GestureDetector(
       onTap: enabled
           ? () {
-        HapticFeedback.lightImpact();
-        onSend();
-      }
+              HapticFeedback.lightImpact();
+              onSend();
+            }
           : null,
       child: Container(
         width: size,
@@ -297,90 +292,88 @@ class ActionButtonWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildVoiceChatButton(BuildContext context, double size,
-      bool isEnabled) {
+  Widget _buildVoiceChatButton(
+      BuildContext context, double size, bool isEnabled) {
     return GestureDetector(
       onTap: !isEnabled
           ? () {
-        HapticFeedback.heavyImpact();
-      }
-          : () async {
-        HapticFeedback.lightImpact();
-
-        final voiceService = context.read<VoiceService>();
-
-        // [FIX] Ensure we always start in Standard Voice Mode, not Flow Mode
-        voiceService.setFlowMode(false);
-
-        final session = context.read<ChatSessionProvider>();
-        final inputProvider = context.read<InputProvider>();
-        final sendService = context.read<SendService>();
-        final localizations = AppLocalizations.of(context)!;
-        final localeCode = session
-            .getLocale()
-            .languageCode;
-        final conversationProvider =
-        context.read<ConversationProvider>(); // [FIX] Restore variable
-
-        // [NEW] LOGIC: If chat is not empty, start a new conversation automatically
-        if (conversationProvider.messages.isNotEmpty) {
-          mainScreenKey.currentState?.startNewConversation(closeSidebar: false);
-          // Wait a brief moment for state to reset?
-          // startNewConversation is async-ish but returns void.
-          // It resets providers. We should yield to event loop.
-          await Future.delayed(const Duration(milliseconds: 100));
-        }
-
-        // [INTERRUPTION] Stop any active text generation
-        if (conversationProvider.isWaitingForResponse) {
-          conversationProvider.stopGenerating();
-        }
-
-        // [INTERRUPTION] Stop any active TTS speaking (and ensure clean slate)
-        await voiceService.stopSession(resetState: true);
-
-        if (!context.mounted) return;
-
-        // Activate UI mode (triggers Overlay)
-        inputProvider.setVoiceModeActive(true);
-
-        // Set Localized Agent Names
-        voiceService.setAgentNames([
-          localizations.agentRed,
-          localizations.agentBlue,
-          localizations.agentPurple
-        ]);
-
-        // Start Voice Session
-        await voiceService.startSession(
-          context: context,
-          locale: localeCode,
-          voiceSystemPromptSuffix: localizations.voiceSystemPromptSuffix,
-          flowPromptBuilder: (agentName, previousResponse) =>
-              localizations.flowModeContextParams(agentName, previousResponse),
-          onFinalSentence: (String text) {
-            if (!context.mounted) return;
-            if (text
-                .trim()
-                .isNotEmpty) {
-              sendService.sendMessage(
-                context: context,
-                localizations: localizations,
-                messageText: text,
-                isHidden: voiceService.shouldNextMessageBeHidden,
-                overrideModelId: 'cortex/auto',
-              );
+              HapticFeedback.heavyImpact();
             }
-          },
-        );
-      },
+          : () async {
+              HapticFeedback.lightImpact();
+
+              final voiceService = context.read<VoiceService>();
+
+              // [FIX] Ensure we always start in Standard Voice Mode, not Flow Mode
+              voiceService.setFlowMode(false);
+
+              final session = context.read<ChatSessionProvider>();
+              final inputProvider = context.read<InputProvider>();
+              final sendService = context.read<SendService>();
+              final localizations = AppLocalizations.of(context)!;
+              final localeCode = session.getLocale().languageCode;
+              final conversationProvider = context
+                  .read<ConversationProvider>(); // [FIX] Restore variable
+
+              // [NEW] LOGIC: If chat is not empty, start a new conversation automatically
+              if (conversationProvider.messages.isNotEmpty) {
+                mainScreenKey.currentState
+                    ?.startNewConversation(closeSidebar: false);
+                // Wait a brief moment for state to reset?
+                // startNewConversation is async-ish but returns void.
+                // It resets providers. We should yield to event loop.
+                await Future.delayed(const Duration(milliseconds: 100));
+              }
+
+              // [INTERRUPTION] Stop any active text generation
+              if (conversationProvider.isWaitingForResponse) {
+                conversationProvider.stopGenerating();
+              }
+
+              // [INTERRUPTION] Stop any active TTS speaking (and ensure clean slate)
+              await voiceService.stopSession(resetState: true);
+
+              if (!context.mounted) return;
+
+              // Activate UI mode (triggers Overlay)
+              inputProvider.setVoiceModeActive(true);
+
+              // Set Localized Agent Names
+              voiceService.setAgentNames([
+                localizations.agentRed,
+                localizations.agentBlue,
+                localizations.agentPurple
+              ]);
+
+              // Start Voice Session
+              await voiceService.startSession(
+                context: context,
+                locale: localeCode,
+                voiceSystemPromptSuffix: localizations.voiceSystemPromptSuffix,
+                flowPromptBuilder: (agentName, previousResponse) =>
+                    localizations.flowModeContextParams(
+                        agentName, previousResponse),
+                onFinalSentence: (String text) {
+                  if (!context.mounted) return;
+                  if (text.trim().isNotEmpty) {
+                    sendService.sendMessage(
+                      context: context,
+                      localizations: localizations,
+                      messageText: text,
+                      isHidden: voiceService.shouldNextMessageBeHidden,
+                      overrideModelId: 'cortex/auto',
+                    );
+                  }
+                },
+              );
+            },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: AppColors.primaryColor.inverted.withValues(alpha:
-          isEnabled ? 1.0 : 0.3),
+          color: AppColors.primaryColor.inverted
+              .withValues(alpha: isEnabled ? 1.0 : 0.3),
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -388,8 +381,7 @@ class ActionButtonWidget extends StatelessWidget {
             'assets/icons/voice.svg',
             width: size * 0.55,
             height: size * 0.55,
-            colorFilter:
-            ColorFilter.mode(
+            colorFilter: ColorFilter.mode(
                 AppColors.primaryColor.withValues(alpha: isEnabled ? 1.0 : 0.3),
                 BlendMode.srcIn),
           ),
@@ -429,28 +421,32 @@ class AddPhotoButton extends StatelessWidget {
       onTap: isPhotoLoading
           ? null
           : () {
-        // Priority 1: Check Chat History Limit
-        if (isLimitExceeded) {
-          // The InputField usually handles this by disabling interaction,
-          // but if tapped, we can show a specific upgrade prompt here if needed.
-        }
-        // Priority 2: Open Sheet
-        // Priority 2: Open Sheet
-        else {
-          final session = context.read<ChatSessionProvider>();
-          showAttachmentSheet(
-            context: context,
-            canHandleImages:
-            session.isDynamicChat ? true : session.canHandleImage,
-          );
-        }
-      },
+              // Priority 1: Check Chat History Limit
+              if (isLimitExceeded) {
+                // The InputField usually handles this by disabling interaction,
+                // but if tapped, we can show a specific upgrade prompt here if needed.
+              }
+              // Priority 2: Open Sheet
+              // Priority 2: Open Sheet
+              else {
+                final session = context.read<ChatSessionProvider>();
+                showAttachmentSheet(
+                  context: context,
+                  canHandleImages:
+                      session.isDynamicChat ? true : session.canHandleImage,
+                  canHandleVideo:
+                      session.isDynamicChat ? true : session.canHandleVideo,
+                  canHandleAudio:
+                      session.isDynamicChat ? true : session.canHandleAudio,
+                );
+              }
+            },
       child: SvgPicture.asset(
         'assets/icons/add.svg',
         width: 24.0,
         height: 24.0,
         colorFilter:
-        ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
+            ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
       ),
     );
   }
@@ -474,19 +470,27 @@ class FeaturesButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inputProvider = context.watch<InputProvider>();
+    final sessionProvider = context.watch<ChatSessionProvider>();
     final featureMode = inputProvider.featureMode;
+    final currentModel = sessionProvider.selectedModel;
+    final bool isOfflineFocused = currentModel?.type == 'offline';
+    final bool isImageFocused = currentModel?.outputs['image'] == true;
+    final bool isAudioFocused = currentModel?.outputs['audio'] == true;
 
     final bool isActive = featureMode != ChatInputMode.none ||
-        inputProvider.enableWebSearch;
+        inputProvider.enableWebSearch ||
+        isOfflineFocused ||
+        isImageFocused ||
+        isAudioFocused;
 
     // Visual Configuration
     // Active:   Bg = Inverted (Black), Icon = Background (White)
     // Inactive: Bg = Background (White), Icon = Inverted (Black)
     final Color backgroundColor =
-    isActive ? AppColors.primaryColor.inverted : AppColors.background;
+        isActive ? AppColors.primaryColor.inverted : AppColors.background;
 
     final Color iconColor =
-    isActive ? AppColors.background : AppColors.primaryColor.inverted;
+        isActive ? AppColors.background : AppColors.primaryColor.inverted;
 
     // Border is visible only when inactive.
     // Transitioning to transparent makes it fade out smoothly.
@@ -502,12 +506,12 @@ class FeaturesButton extends StatelessWidget {
     return GestureDetector(
       onTap: buttonDisabled
           ? () {
-        HapticFeedback.heavyImpact();
-      }
+              HapticFeedback.heavyImpact();
+            }
           : () {
-        HapticFeedback.lightImpact();
-        showFeaturesSheet(context: context, controller: controller);
-      },
+              HapticFeedback.lightImpact();
+              showFeaturesSheet(context: context, controller: controller);
+            },
       // 1. ANIMATED CONTAINER: Handles Background & Border Fade
       child: AnimatedContainer(
         duration: animDuration,
@@ -535,7 +539,7 @@ class FeaturesButton extends StatelessWidget {
                 width: 18.0,
                 height: 18.0,
                 colorFilter:
-                ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
+                    ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
               );
             },
           ),
@@ -597,9 +601,7 @@ class ModelSelectButton extends StatelessWidget {
                       final selectionService = context.read<SelectionService>();
                       final inputProvider = context.read<InputProvider>();
                       final langCode =
-                          Localizations
-                              .localeOf(context)
-                              .languageCode;
+                          Localizations.localeOf(context).languageCode;
 
                       // 2. Fetch Model Data
                       final model = modelService.getPreciseModelData(id,
@@ -608,12 +610,15 @@ class ModelSelectButton extends StatelessWidget {
                       // 3. Select the Model
                       selectionService.switchActiveModel(model);
 
-                      // 4. [NEW] LOGIC: If offline model is selected, force Offline Feature Mode
+                      // Keep input features coherent with selected model capability.
                       if (model.type == 'offline') {
+                        inputProvider.clearWebSearch();
                         inputProvider.setFeatureMode(ChatInputMode.offline);
-                      }
-                      // Optional: If you want to DISABLE offline mode when switching to an online model:
-                      else if (inputProvider.featureMode ==
+                      } else if (model.outputs['image'] == true ||
+                          model.outputs['audio'] == true) {
+                        inputProvider.clearFeatureMode();
+                        inputProvider.clearWebSearch();
+                      } else if (inputProvider.featureMode ==
                           ChatInputMode.offline) {
                         inputProvider.clearFeatureMode();
                       }

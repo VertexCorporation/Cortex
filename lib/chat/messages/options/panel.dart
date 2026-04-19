@@ -93,6 +93,9 @@ class OptionsPanelViewModel {
     }
   }
 
+  bool get _isMediaOnlyMessage =>
+      message.hasAttachments && message.displayableText.trim().isEmpty;
+
   List<MessageOption> getVisibleOptions(BuildContext context) {
     final langCode = Localizations.localeOf(context).languageCode;
     final currentModelId = message.model ?? '';
@@ -117,6 +120,13 @@ class OptionsPanelViewModel {
     final isCurrentModelPremium = currentModel.isPremium;
 
     return _baseOptions.where((option) {
+      if (_isMediaOnlyMessage &&
+          (option == MessageOption.copy ||
+              option == MessageOption.select ||
+              option == MessageOption.speak)) {
+        return false;
+      }
+
       if (conversation.isWaitingForResponse &&
           (option == MessageOption.regenerate ||
               option == MessageOption.changeModel ||
@@ -274,7 +284,8 @@ class _AnimatedMessageOptionsPanelState
     final internetProvider = context.watch<InternetProvider>();
     final localizations = AppLocalizations.of(context)!;
     final modelService = context.read<ModelService>();
-    final totalCredits = context.watch<CreditsManager>().totalCreditsNotifier.value ?? 0;
+    final totalCredits =
+        context.watch<CreditsManager>().totalCreditsNotifier.value ?? 0;
 
     final viewModel = OptionsPanelViewModel(
       session: sessionProvider,

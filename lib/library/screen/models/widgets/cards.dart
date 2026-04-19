@@ -125,7 +125,7 @@ class _ModelTileState extends State<ModelTile> {
         LongPressGestureRecognizer:
             GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
           () => LongPressGestureRecognizer(
-              duration: const Duration(milliseconds: 100)),
+              duration: const Duration(milliseconds: 200)),
           (instance) => instance.onLongPress = canLongPress
               ? () {
                   HapticFeedback.lightImpact();
@@ -356,7 +356,7 @@ class _ModelTileState extends State<ModelTile> {
                 children: [
                   OverflowText(
                     // Use pre-localized 'displayTitle' from the entity.
-                    text: widget.model.displayTitle,
+                    text: (widget.model.category == 'image' || widget.model.category == 'audio' || widget.model.category == 'video') ? (widget.model.series ?? widget.model.displayTitle) : widget.model.displayTitle,
                     style: TextStyle(
                         color: AppColors.primaryColor.inverted,
                         fontSize: w * .04,

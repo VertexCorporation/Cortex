@@ -145,7 +145,8 @@ class AppbarState extends State<Appbar> {
     // State Checks
     final bool isChatActive = conversation.messages.isNotEmpty;
     final bool isSubscribed = userProvider.isSubscriptionActive;
-    final bool showPremiumButton = !isSubscribed || userProvider.isAnonymous;
+    final bool showPremiumButton =
+        (!isSubscribed || userProvider.isAnonymous) && !isChatActive;
 
     // --- GLOBAL APP BAR IMPLEMENTATION ---
     return CortexAppBar(
@@ -157,7 +158,7 @@ class AppbarState extends State<Appbar> {
 
       // 2. Center: Premium Button (or empty)
       title: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 100),
         transitionBuilder: (Widget child, Animation<double> animation) {
           return FadeTransition(
             opacity: animation,

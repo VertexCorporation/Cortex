@@ -13,7 +13,7 @@ import 'main.dart';
 ///              For example, Offset(1.0, 0.0) slides in from the right in LTR.
 ///              In RTL mode, this automatically flips to slide in from the left.
 Future<T?> navigateToScreen<T extends Object?>(Widget screen,
-    {required Offset direction}) {
+    {required Offset direction, bool isReplace = false}) {
   final context = navigatorKey.currentContext;
   if (context == null) {
     debugPrint("Navigation failed: Navigator context is not available.");
@@ -29,48 +29,51 @@ Future<T?> navigateToScreen<T extends Object?>(Widget screen,
   final Offset effectiveDirection =
       isRtl ? Offset(-direction.dx, direction.dy) : direction;
 
-  return Navigator.push<T>(
-    context,
-    PageRouteBuilder<T>(
-      // The new screen widget itself.
-      pageBuilder: (_, __, ___) => screen,
+  final route = PageRouteBuilder<T>(
+    // The new screen widget itself.
+    pageBuilder: (_, __, ___) => screen,
 
-      // Use the runtime type of the screen widget as the route name for Analytics
-      settings: RouteSettings(name: screen.runtimeType.toString()),
+    // Use the runtime type of the screen widget as the route name for Analytics
+    settings: RouteSettings(name: screen.runtimeType.toString()),
 
-      // Snappy duration for smooth feel.
-      transitionDuration: const Duration(milliseconds: 250),
-      reverseTransitionDuration: const Duration(milliseconds: 250),
+    // Snappy duration for smooth feel.
+    transitionDuration: const Duration(milliseconds: 250),
+    reverseTransitionDuration: const Duration(milliseconds: 250),
 
-      // The core of the custom animation.
-      transitionsBuilder: (_, animation, secondaryAnimation, child) {
-        final slideTween = Tween<Offset>(
-          begin: effectiveDirection, // Use the language-aware direction
-          end: Offset.zero,
-        );
-        final curvedAnimation = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic, // A smooth, decelerating curve.
-        );
-        final slideTransition = SlideTransition(
-          position: slideTween.animate(curvedAnimation),
-          child: child,
-        );
-        final scaleTween = Tween<double>(begin: 0.95, end: 1.0);
-        final scaleTransition = ScaleTransition(
-          scale: scaleTween.animate(curvedAnimation),
-          child: slideTransition,
-        );
-        final fadeAnimation = CurvedAnimation(
-          parent: animation,
-          curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
-        );
-        final fadeTransition = FadeTransition(
-          opacity: fadeAnimation,
-          child: scaleTransition,
-        );
-        return fadeTransition;
-      },
-    ),
+    // The core of the custom animation.
+    transitionsBuilder: (_, animation, secondaryAnimation, child) {
+      final slideTween = Tween<Offset>(
+        begin: effectiveDirection, // Use the language-aware direction
+        end: Offset.zero,
+      );
+      final curvedAnimation = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic, // A smooth, decelerating curve.
+      );
+      final slideTransition = SlideTransition(
+        position: slideTween.animate(curvedAnimation),
+        child: child,
+      );
+      final scaleTween = Tween<double>(begin: 0.95, end: 1.0);
+      final scaleTransition = ScaleTransition(
+        scale: scaleTween.animate(curvedAnimation),
+        child: slideTransition,
+      );
+      final fadeAnimation = CurvedAnimation(
+        parent: animation,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
+      );
+      final fadeTransition = FadeTransition(
+        opacity: fadeAnimation,
+        child: scaleTransition,
+      );
+      return fadeTransition;
+    },
   );
+
+  if (isReplace) {
+    return Navigator.pushReplacement(context, route);
+  } else {
+    return Navigator.push<T>(context, route);
+  }
 }

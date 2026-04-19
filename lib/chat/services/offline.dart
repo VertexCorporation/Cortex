@@ -11,6 +11,7 @@
 // - Tuned Sampler Settings (Temp 0.7 default).
 //
 
+import 'dart:async';
 import 'dart:io'; // Required for File checks
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/processor.dart';
@@ -18,6 +19,7 @@ import 'package:cortex/chat/services/response.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../../library/backend/data/entity.dart';
+import '../../library/backend/remove.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/backend/data/format.dart';
 import '../../library/backend/data/defaults.dart';
@@ -69,6 +71,11 @@ class OfflineService {
 
   static const MethodChannel _llamaChannel =
       MethodChannel('com.vertex.cortex/llama');
+
+  static const int _maxModelLoadRetries = 5;
+
+  Completer<bool>? _modelLoadCompleter;
+  Completer<bool>? _singleLoadAttemptCompleter;
 
   OfflineService({
     required ResponseService responseService,
@@ -135,20 +142,33 @@ class OfflineService {
     return 6; // High-end devices
   }
 
-  Future<void> cacheModel(String path) async {
+  Future<bool> cacheModel(String path) async {
+    if (_sessionProvider.isLocalModelLoaded) {
+      return true;
+    }
+
+    if (_modelLoadCompleter != null) {
+      return _modelLoadCompleter!.future;
+    }
+
     if (path.isEmpty) {
       debugPrint("[OfflineService] Aborting cacheModel call: Path is empty.");
-      return;
+      return false;
     }
 
     if (!await File(path).exists()) {
       debugPrint(
           "[OfflineService] Critical Error: Model file not found at $path");
-      _responseService.onMessageResponse(
-          "[Error: Model file not found on device. Please re-download.]");
-      _responseService.finalizeResponse();
-      return;
+      return false;
     }
+
+    _modelLoadCompleter = Completer<bool>();
+    unawaited(_loadModelWithRetries(path));
+    return _modelLoadCompleter!.future;
+  }
+
+  Future<void> _loadModelWithRetries(String path) async {
+    bool loaded = false;
 
     // DYNAMIC CONTEXT SIZE based on device RAM
     final int nCtx = await _computeOptimalContextSize();
@@ -166,18 +186,102 @@ class OfflineService {
         "[OfflineService] 🚀 Caching Model => ctx=$nCtx, gpu=$nGpu, threads=$nThreads (RAM: $ramMB MB)");
 
     try {
+      for (var attempt = 1; attempt <= _maxModelLoadRetries; attempt++) {
+        loaded = await _runSingleModelLoadAttempt(
+          path: path,
+          nCtx: nCtx,
+          nGpu: nGpu,
+          nThreads: nThreads,
+          attempt: attempt,
+        );
+        if (loaded) break;
+
+        await _safeReleaseNativeModel();
+        _sessionProvider.setLocalModelLoaded(false);
+
+        if (attempt < _maxModelLoadRetries) {
+          await Future.delayed(const Duration(milliseconds: 350));
+        }
+      }
+
+      if (!loaded) {
+        await _autoRemoveSelectedOfflineModel();
+      }
+    } catch (e) {
+      debugPrint("[OfflineService] Model load retry loop failed: $e");
+      loaded = false;
+    }
+
+    if (!loaded) {
+      _sessionProvider.setLocalModelLoaded(false);
+    }
+
+    if (_modelLoadCompleter != null && !_modelLoadCompleter!.isCompleted) {
+      _modelLoadCompleter!.complete(loaded);
+    }
+    _modelLoadCompleter = null;
+  }
+
+  Future<bool> _runSingleModelLoadAttempt({
+    required String path,
+    required int nCtx,
+    required int nGpu,
+    required int nThreads,
+    required int attempt,
+  }) async {
+    debugPrint(
+        "[OfflineService] Model load attempt $attempt/$_maxModelLoadRetries");
+    _singleLoadAttemptCompleter = Completer<bool>();
+
+    try {
       await _llamaChannel.invokeMethod<void>('cacheModel', {
         'path': path,
         'nCtx': nCtx,
         'nGpu': nGpu,
         'nThreads': nThreads,
       });
+
+      return await _singleLoadAttemptCompleter!.future.timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          debugPrint(
+              "[OfflineService] Timeout while waiting for model load (attempt $attempt).");
+          return false;
+        },
+      );
     } on PlatformException catch (e) {
       debugPrint(
-          "[OfflineService] Failed to invoke 'cacheModel': ${e.message}");
-      _responseService
-          .onMessageResponse("[Error: Failed to load model. ${e.message}]");
-      _responseService.finalizeResponse();
+          "[OfflineService] Failed to invoke 'cacheModel' (attempt $attempt): ${e.message}");
+      return false;
+    } finally {
+      _singleLoadAttemptCompleter = null;
+    }
+  }
+
+  Future<void> _safeReleaseNativeModel() async {
+    try {
+      await _llamaChannel.invokeMethod<void>('releaseModel');
+    } catch (e) {
+      debugPrint(
+          "[OfflineService] releaseModel after failed load also failed: $e");
+    }
+  }
+
+  Future<void> _autoRemoveSelectedOfflineModel() async {
+    final selected = _sessionProvider.selectedModel;
+    if (selected == null || selected.isServerSide) {
+      return;
+    }
+
+    try {
+      final removed = await ModelRemoveService.uninstallDownloadedModel(
+        id: selected.id,
+        title: selected.displayTitle,
+      );
+      debugPrint(
+          "[OfflineService] Auto-uninstall after failed loads for ${selected.id}: $removed");
+    } catch (e) {
+      debugPrint("[OfflineService] Auto-uninstall failed: $e");
     }
   }
 
@@ -187,6 +291,15 @@ class OfflineService {
     await stopGeneration();
     await _llamaChannel.invokeMethod('releaseModel');
     _sessionProvider.setLocalModelLoaded(false);
+    if (_modelLoadCompleter != null && !_modelLoadCompleter!.isCompleted) {
+      _modelLoadCompleter!.complete(false);
+    }
+    if (_singleLoadAttemptCompleter != null &&
+        !_singleLoadAttemptCompleter!.isCompleted) {
+      _singleLoadAttemptCompleter!.complete(false);
+    }
+    _modelLoadCompleter = null;
+    _singleLoadAttemptCompleter = null;
   }
 
   Future<void> sendMessage(String text, String? photoPath) async {
@@ -199,6 +312,18 @@ class OfflineService {
 
     final ModelEntity model =
         _modelService.getPreciseModelData(modelId, langCode: 'en');
+
+    final modelPath = _sessionProvider.modelPath;
+    if (modelPath == null || modelPath.isEmpty) {
+      _responseService.finalizeResponse();
+      return;
+    }
+
+    final modelReady = await cacheModel(modelPath);
+    if (!modelReady) {
+      _responseService.finalizeResponse();
+      return;
+    }
 
     // Setup Processor (Stops formatting tokens)
     _currentProcessor = ChatFormatProcessor(
@@ -290,12 +415,20 @@ class OfflineService {
       case 'onModelLoaded':
         debugPrint("[OfflineService] Model Loaded Successfully.");
         _sessionProvider.setLocalModelLoaded(true);
+        if (_singleLoadAttemptCompleter != null &&
+            !_singleLoadAttemptCompleter!.isCompleted) {
+          _singleLoadAttemptCompleter!.complete(true);
+        }
         break;
 
       case 'onModelLoadFailed':
         final String error = call.arguments as String? ?? 'Unknown error';
         debugPrint("[OfflineService] Load Failed: $error");
         _sessionProvider.setLocalModelLoaded(false);
+        if (_singleLoadAttemptCompleter != null &&
+            !_singleLoadAttemptCompleter!.isCompleted) {
+          _singleLoadAttemptCompleter!.complete(false);
+        }
         break;
 
       default:
@@ -342,7 +475,7 @@ class OfflineService {
       includeLastUser: false,
       targetModelId: model.id,
       langCode: 'en',
-        isServerSide: false,
+      isServerSide: false,
     );
 
     for (final msg in history) {
