@@ -70,4 +70,17 @@ void main() {
       expect(format.tokens, null);
     });
   });
+
+  group('Offline name formatting tests', () {
+    test('Uses part after slash and hides gguf', () {
+      final name =
+          formatName('ggml-org/stories15m_moe.gguf', isOfflineVariant: true);
+      expect(name, 'Stories15M MOE');
+    });
+
+    test('Uppercases it token and numeric suffix letters', () {
+      final name = formatName('next-it-600m', isOfflineVariant: true);
+      expect(name, 'Next IT 600M');
+    });
+  });
 }

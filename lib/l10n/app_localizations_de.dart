@@ -40,6 +40,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
+  String get languageModels => 'Sprachmodelle';
+
+  @override
   String get light => 'Hell';
 
   @override
@@ -111,7 +114,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get localModels => 'Lokale Modelle';
 
   @override
-  String get serverSideModels => 'Online-Modelle';
+  String get serverSideModels => 'Sprachmodelle';
 
   @override
   String get selectGGUFFile => 'GGUF-Datei auswählen';
@@ -1090,7 +1093,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get allModels => 'Alle Modelle';
 
   @override
-  String get onlineModels => 'Online-Modelle';
+  String get onlineModels => 'Sprachmodelle';
 
   @override
   String get offlineModels => 'Offline-Modelle';
@@ -1463,6 +1466,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get onboardingFinalButton => 'JA!';
+
+  @override
+  String get paywallAhaTitle => 'Unlock the True Power of AI';
+
+  @override
+  String get paywallAhaSubtitle =>
+      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
 
   @override
   String get dude => 'Alter';
@@ -1838,4 +1848,55 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get cortexSystemPersona =>
       '\n\n[System] WICHTIGER HINWEIS: Sie befinden sich derzeit in einem riesigen, hochentwickelten KI-Ökosystem namens \"Cortex\". Denken Sie daran und behalten Sie die Cortex-Persona bei, wenn Sie danach gefragt werden.';
+
+  @override
+  String get featureAudioRecognitionTitle => 'Audioerkennung';
+
+  @override
+  String get featureAudioRecognitionDescription =>
+      'Dieses Modell kann Audio oder Sprache verstehen und verarbeiten.';
+
+  @override
+  String get featureVideoRecognitionTitle => 'Videoerkennung';
+
+  @override
+  String get featureVideoRecognitionDescription =>
+      'Dieses Modell kann Videos aus Ihren Dateien oder von Ihrer Kamera analysieren und verstehen.';
+
+  @override
+  String get featureImageRecognitionTitle => 'Bilderkennung';
+
+  @override
+  String get featureImageRecognitionDescription =>
+      'Dieses Modell kann Fotos oder Bilder analysieren und verstehen.';
+
+  @override
+  String get featureToolUseTitle => 'Werkzeugverwendung';
+
+  @override
+  String get featureToolUseDescription =>
+      'Dieses Modell kann externe Tools intelligent nutzen, um Aufgaben zu erledigen.';
+
+  @override
+  String get videoModels => 'Video Models';
+
+  @override
+  String get imageModels => 'Image Models';
+
+  @override
+  String get audioModels => 'Audio Models';
+
+  @override
+  String systemPromptMissingMedia(String mediaType, String modelName) {
+    return 'Dieses Modell benötigt ein(e) $mediaType, um zu funktionieren. Ich habe die Anfrage abgefangen, um Sie darüber zu informieren. Bitte informieren Sie den Benutzer freundlich, dass er ein(e) $mediaType bereitstellen muss (sagen Sie es ihm in seiner eigenen Sprache), da ich $modelName bin, ein visuelles/Audio-/Video-Bearbeitungsmodell.';
+  }
+
+  @override
+  String get mediaTypeImage => 'Bild';
+
+  @override
+  String get mediaTypeVideo => 'Video';
+
+  @override
+  String get mediaTypeAudio => 'Audiodatei';
 }

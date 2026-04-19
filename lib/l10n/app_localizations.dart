@@ -182,6 +182,12 @@ abstract class AppLocalizations {
   /// **'Chat'**
   String get chat;
 
+  /// No description provided for @languageModels.
+  ///
+  /// In en, this message translates to:
+  /// **'Language Models'**
+  String get languageModels;
+
   /// No description provided for @light.
   ///
   /// In en, this message translates to:
@@ -323,7 +329,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverSideModels.
   ///
   /// In en, this message translates to:
-  /// **'Online Models'**
+  /// **'Language Models'**
   String get serverSideModels;
 
   /// No description provided for @selectGGUFFile.
@@ -2063,7 +2069,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumTrialExhaustedMessage.
   ///
   /// In en, this message translates to:
-  /// **'You have used all your free daily messages for premium models, please upgrade for unlimited access.'**
+  /// **'You have used all your free daily messages for premium models. Upgrade now and **continue where you left off!**'**
   String get premiumTrialExhaustedMessage;
 
   /// Text for the 'Use without Internet' feature card. The newline is intentional.
@@ -2715,6 +2721,18 @@ abstract class AppLocalizations {
   /// **'YES!'**
   String get onboardingFinalButton;
 
+  /// No description provided for @paywallAhaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock the True Power of AI'**
+  String get paywallAhaTitle;
+
+  /// No description provided for @paywallAhaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.'**
+  String get paywallAhaSubtitle;
+
   /// No description provided for @dude.
   ///
   /// In en, this message translates to:
@@ -3350,6 +3368,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\". Remember this and maintain the persona of Cortex if asked.'**
   String get cortexSystemPersona;
+
+  /// No description provided for @featureAudioRecognitionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Recognition'**
+  String get featureAudioRecognitionTitle;
+
+  /// No description provided for @featureAudioRecognitionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This model can understand and process audio inputs.'**
+  String get featureAudioRecognitionDescription;
+
+  /// No description provided for @featureVideoRecognitionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Video Recognition'**
+  String get featureVideoRecognitionTitle;
+
+  /// No description provided for @featureVideoRecognitionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This model can understand and process video inputs.'**
+  String get featureVideoRecognitionDescription;
+
+  /// No description provided for @featureImageRecognitionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Image Recognition'**
+  String get featureImageRecognitionTitle;
+
+  /// No description provided for @featureImageRecognitionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This model can understand and process image inputs.'**
+  String get featureImageRecognitionDescription;
+
+  /// No description provided for @featureToolUseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tool Use'**
+  String get featureToolUseTitle;
+
+  /// No description provided for @featureToolUseDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This model can use external tools and APIs.'**
+  String get featureToolUseDescription;
+
+  /// No description provided for @videoModels.
+  ///
+  /// In en, this message translates to:
+  /// **'Video Models'**
+  String get videoModels;
+
+  /// No description provided for @imageModels.
+  ///
+  /// In en, this message translates to:
+  /// **'Image Models'**
+  String get imageModels;
+
+  /// No description provided for @audioModels.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Models'**
+  String get audioModels;
+
+  /// System prompt sent to fallback model when user forgets to upload media.
+  ///
+  /// In en, this message translates to:
+  /// **'This model requires a {mediaType} to work. I have intercepted the request to let you know. Please inform the user gracefully that they need to provide a {mediaType} (tell them in their own language) because I am {modelName}, a visual/audio/video editing model.'**
+  String systemPromptMissingMedia(String mediaType, String modelName);
+
+  /// Media type: mediaTypeImage
+  ///
+  /// In en, this message translates to:
+  /// **'image'**
+  String get mediaTypeImage;
+
+  /// Media type: mediaTypeVideo
+  ///
+  /// In en, this message translates to:
+  /// **'video'**
+  String get mediaTypeVideo;
+
+  /// Media type: mediaTypeAudio
+  ///
+  /// In en, this message translates to:
+  /// **'audio'**
+  String get mediaTypeAudio;
 }
 
 class _AppLocalizationsDelegate

@@ -120,10 +120,18 @@ class ChatSessionProvider with ChangeNotifier {
     if (_selectedModel == null || _selectedModel!.isServerSide) {
       return null;
     }
-    return _localStateProvider?.getFilePathById(_selectedModel!.id);
+    final localState = _localStateProvider;
+    if (localState == null ||
+        !localState.isInitialized ||
+        !localState.hasResolvedFilesDirectory) {
+      return null;
+    }
+    return localState.getFilePathById(_selectedModel!.id);
   }
 
   bool get canHandleImage => _selectedModel?.modalities['image'] == true;
+  bool get canHandleVideo => _selectedModel?.modalities['video'] == true;
+  bool get canHandleAudio => _selectedModel?.modalities['audio'] == true;
 
   bool _isLocalModelLoaded = false;
 
@@ -163,7 +171,13 @@ class ChatSessionProvider with ChangeNotifier {
     String initialModelTitle = '', // [NEW] Cached title
     Locale initialLocale = const Locale('en'),
   }) : _modelService = modelService {
-    try { FirebaseAuth.instance.authStateChanges().listen((User? user) { if (user == null) { resetForLogout(); } }); } catch (e) { /* Ignore in tests */ }
+    try {
+      FirebaseAuth.instance.authStateChanges().listen((User? user) {
+        if (user == null) {
+          resetForLogout();
+        }
+      });
+    } catch (e) {/* Ignore in tests */}
 
     // Optimistic Initialization
     _currentLocale = initialLocale;
@@ -195,16 +209,23 @@ class ChatSessionProvider with ChangeNotifier {
     if (isCacheEmpty) {
       debugPrint(
           "[ChatSessionProvider] Cache is empty. Using cached title: '$initialModelTitle' for ID: $initialModelId");
-      _initializeWithStub(initialModelId, ModelDataUtils.formatModelName(initialModelTitle));
+      _initializeWithStub(
+          initialModelId, ModelDataUtils.formatModelName(initialModelTitle));
     } else {
-      try {
-        final langCode = initialLocale.languageCode;
-        final entity = _modelService.getPreciseModelData(initialModelId,
-            langCode: langCode);
-        selectModel(entity, savePreference: false);
-      } catch (e) {
-        // Fallback to stub if exact lookup fails even with cache present
-        _initializeWithStub(initialModelId, ModelDataUtils.formatModelName(initialModelTitle));
+      final langCode = initialLocale.languageCode;
+      if (_modelService.hasModelInCache(initialModelId)) {
+        try {
+          final entity = _modelService.getPreciseModelData(initialModelId,
+              langCode: langCode);
+          selectModel(entity, savePreference: false);
+        } catch (e) {
+          // Fallback to stub if exact lookup fails even with cache present
+          _initializeWithStub(initialModelId,
+              ModelDataUtils.formatModelName(initialModelTitle));
+        }
+      } else {
+        // The saved model was removed from catalog. Default to dynamic chat.
+        startDynamicConversation(savePreference: true);
       }
     }
   }
@@ -222,8 +243,7 @@ class ChatSessionProvider with ChangeNotifier {
         if (modelId == 'cortex/auto') {
           effectiveTitle = 'Cortex';
         } else {
-          // Try to make it look decent
-          effectiveTitle = 'Cortex';
+          effectiveTitle = ModelDataUtils.formatModelName(modelId);
         }
       }
 
@@ -238,11 +258,13 @@ class ChatSessionProvider with ChangeNotifier {
         displaySummary: '',
         displayDescription: '',
         type: 'online',
+        source: 'openrouter',
         category: 'general',
         tier: 'free',
         modalities: {'text': true},
         outputs: {'text': true},
         isFullyLocalized: true,
+        toolUse: false,
       );
       selectModel(stubEntity, savePreference: false);
     }
@@ -281,6 +303,14 @@ class ChatSessionProvider with ChangeNotifier {
         return;
       }
 
+      if (!_modelService.hasModelInCache(pendingId)) {
+        debugPrint(
+            "[ChatSessionProvider] Pending model '$pendingId' no longer exists. Falling back to dynamic.");
+        _pendingModelId = null;
+        startDynamicConversation(savePreference: true);
+        return;
+      }
+
       final entity =
           _modelService.getPreciseModelData(pendingId, langCode: langCode);
 
@@ -293,8 +323,8 @@ class ChatSessionProvider with ChangeNotifier {
     } catch (e) {
       debugPrint(
           "[ChatSessionProvider] Failed to resolve pending model: $pendingId. Error: $e");
-      // Keep pending ID to try again next update? Or give up?
-      // If it failed despite cache being present, it might be an invalid ID.
+      _pendingModelId = null;
+      startDynamicConversation(savePreference: true);
     }
   }
 
@@ -338,11 +368,16 @@ class ChatSessionProvider with ChangeNotifier {
 
     final langCode = _currentLocale.languageCode;
     try {
+      if (!_modelService.hasModelInCache(savedId)) {
+        startDynamicConversation(savePreference: true);
+        return;
+      }
+
       final entity =
           _modelService.getPreciseModelData(savedId, langCode: langCode);
       selectModel(entity, savePreference: false);
     } catch (e) {
-      startDynamicConversation(savePreference: false);
+      startDynamicConversation(savePreference: true);
     }
   }
 

@@ -116,7 +116,6 @@ class DescriptionSection extends StatelessWidget {
         .width;
     final fullDescription = provider.displayDescription;
 
-    const collapsedHeight = 100.0;
     final textStyle = TextStyle(
         color: AppColors.quinaryColor,
         fontSize: screenWidth * 0.04,
@@ -124,12 +123,11 @@ class DescriptionSection extends StatelessWidget {
 
     final textPainter = TextPainter(
       text: TextSpan(text: fullDescription, style: textStyle),
-      maxLines: null,
+      maxLines: 4,
       textDirection: TextDirection.ltr,
-    )
-      ..layout(maxWidth: screenWidth - (screenWidth * 0.16));
+    )..layout(maxWidth: screenWidth - (screenWidth * 0.16));
 
-    final bool isOverflowing = textPainter.size.height > collapsedHeight;
+    final bool isOverflowing = textPainter.didExceedMaxLines;
     final isExpanded = provider.isDescriptionExpanded;
 
     return SectionContainer(
@@ -579,9 +577,17 @@ class FeaturesSection extends StatelessWidget {
         localizations.featureDocumentTitle,
         localizations.featureDocumentDescription
       ],
-      'audio': [
-        localizations.featureAudioTitle,
-        localizations.featureAudioDescription
+      'audio_recognition': [
+        localizations.featureAudioRecognitionTitle,
+        localizations.featureAudioRecognitionDescription
+      ],
+      'video_recognition': [
+        localizations.featureVideoRecognitionTitle,
+        localizations.featureVideoRecognitionDescription
+      ],
+      'image_recognition': [
+        localizations.featureImageRecognitionTitle,
+        localizations.featureImageRecognitionDescription
       ],
       'image_generation': [
         localizations.featureImageGenerationTitle,
@@ -594,6 +600,10 @@ class FeaturesSection extends StatelessWidget {
       'video_generation': [
         localizations.featureVideoGenerationTitle,
         localizations.featureVideoGenerationDescription
+      ],
+      'tool_use': [
+        localizations.featureToolUseTitle,
+        localizations.featureToolUseDescription
       ],
     };
 

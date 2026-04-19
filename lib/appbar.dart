@@ -26,6 +26,8 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? title;
   final String? titleText;
   final bool showGradient;
+  final bool includeTrailingActionsPadding;
+  final bool ignoreActionsForCentering;
   final ScrollController? scrollController;
   final CortexLeadingMode leadingMode;
 
@@ -38,6 +40,8 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.title,
     this.titleText,
     this.showGradient = true,
+    this.includeTrailingActionsPadding = true,
+    this.ignoreActionsForCentering = false,
     this.scrollController,
     this.leadingMode = CortexLeadingMode.auto,
   });
@@ -119,19 +123,26 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
         actions ?? (actionButton != null ? [actionButton!] : []);
 
     for (int i = 0; i < sourceActions.length; i++) {
+      final Widget sourceAction = sourceActions[i];
+      double estimatedActionWidth = buttonSize;
+      if (sourceAction is SizedBox && sourceAction.width != null) {
+        estimatedActionWidth = sourceAction.width! <= 0
+            ? 0
+            : math.max(buttonSize, sourceAction.width!);
+      }
+
       // [FIX] Removed fixed SizedBox constraint to allow pills to expand
       rightWidgets.add(
         Container(
           height: buttonSize,
-          constraints: BoxConstraints(minWidth: buttonSize),
+          constraints: BoxConstraints(minWidth: estimatedActionWidth),
           alignment: Alignment.center,
-          child: sourceActions[i],
+          child: sourceAction,
         ),
       );
 
-      // Estimate width for centering logic (Assuming standard size if not dual)
-      // This is an approximation for the center title calculation.
-      calculatedActionsWidth += buttonSize;
+      // Estimate width for centering logic.
+      calculatedActionsWidth += estimatedActionWidth;
 
       if (i < sourceActions.length - 1) {
         rightWidgets.add(SizedBox(width: gapSize));
@@ -139,14 +150,16 @@ class CortexAppBar extends StatelessWidget implements PreferredSizeWidget {
       }
     }
 
-    if (rightWidgets.isNotEmpty) {
+    if (rightWidgets.isNotEmpty && includeTrailingActionsPadding) {
       rightWidgets.add(SizedBox(width: horizontalPadding));
       calculatedActionsWidth += horizontalPadding;
     }
 
     // --- CENTER CALCULATION ---
+    final double effectiveActionsWidth =
+        ignoreActionsForCentering ? 0 : calculatedActionsWidth;
     final double maxSideWidth =
-        math.max(calculatedLeadingWidth, calculatedActionsWidth);
+        math.max(calculatedLeadingWidth, effectiveActionsWidth);
     final double availableCenteredSpace = screenWidth - (maxSideWidth * 2);
     final double targetWidth = screenWidth * 0.70;
     final double finalTitleMaxWidth =

@@ -57,8 +57,7 @@ class SendService {
     required ModelService modelService,
     required VoiceService voiceService,
     required UserMemoryProvider userMemoryProvider,
-  })
-      : _conversationProvider = conversationProvider,
+  })  : _conversationProvider = conversationProvider,
         _inputProvider = inputProvider,
         _apiService = apiService,
         _contextService = contextService,
@@ -96,7 +95,7 @@ class SendService {
     if (isRegenerate) {
       final messages = _conversationProvider.messages;
       final lastUserMessage = messages.reversed.firstWhere(
-            (m) => m.isUserMessage,
+        (m) => m.isUserMessage,
         orElse: () => Message(text: '', isUserMessage: true),
       );
       currentAttachmentPaths = List.from(lastUserMessage.attachmentPaths);
@@ -140,9 +139,7 @@ class SendService {
       String errorMessage = localizations.errorNoModelsAvailable;
 
       final localState = context.read<ModelLocalStateProvider>();
-      final langCode = Localizations
-          .localeOf(context)
-          .languageCode;
+      final langCode = Localizations.localeOf(context).languageCode;
       final hasInternet = await InternetConnection().hasInternetAccess;
 
       if (overrideModelId != null && overrideModelId.isNotEmpty) {
@@ -161,7 +158,7 @@ class SendService {
         if (entity.variants != null && entity.variants!.isNotEmpty) {
           final List<dynamic> variants = entity.variants!.values.toList();
           final bool hasVisualContent =
-          currentAttachmentPaths.any((path) => _isImageFile(path));
+              currentAttachmentPaths.any((path) => _isImageFile(path));
 
           List<dynamic> getPreferredCandidates(List<dynamic> sourceList) {
             final filtered = sourceList.where((v) {
@@ -187,7 +184,7 @@ class SendService {
             } else {
               if (hasVisualContent) {
                 final visionModel = downloadedVariants.firstWhere(
-                      (v) => (v['modalities']?['image'] == true),
+                  (v) => (v['modalities']?['image'] == true),
                   orElse: () => null,
                 );
                 apiModelIdForSend = visionModel != null
@@ -195,14 +192,14 @@ class SendService {
                     : getPreferredCandidates(downloadedVariants).first['id'];
               } else {
                 apiModelIdForSend =
-                getPreferredCandidates(downloadedVariants).first['id'];
+                    getPreferredCandidates(downloadedVariants).first['id'];
               }
             }
           } else {
             // Online Variants
             if (hasVisualContent) {
               final visionModel = variants.firstWhere(
-                    (v) => (v['modalities']?['image'] == true),
+                (v) => (v['modalities']?['image'] == true),
                 orElse: () => null,
               );
               apiModelIdForSend = visionModel != null
@@ -215,9 +212,36 @@ class SendService {
         }
       }
 
-      // -----------------------------------------------------------------------
-      // 4. CHECKS & UI UPDATES
-      // -----------------------------------------------------------------------
+      // =======================================================================
+      // INTERCEPT MEDIA EDITING BOTS WITH MISSING MEDIA
+      // =======================================================================
+      if (apiModelIdForSend != null && apiModelIdForSend != 'cortex/auto') {
+        final ModelEntity entity = _modelService
+            .getPreciseModelData(apiModelIdForSend, langCode: langCode);
+        final String cat = entity.category;
+
+        final bool demandsImage =
+            cat == 'image' && entity.modalities['image'] == true;
+        final bool demandsVideo =
+            cat == 'video' && entity.modalities['video'] == true;
+        final bool demandsAudio =
+            cat == 'audio' && entity.modalities['audio'] == true;
+
+        if ((demandsImage || demandsVideo || demandsAudio) &&
+            currentAttachmentPaths.isEmpty) {
+          String mType = demandsImage
+              ? localizations.mediaTypeImage
+              : (demandsVideo
+                  ? localizations.mediaTypeVideo
+                  : localizations.mediaTypeAudio);
+
+          voiceSystemPrompt = localizations.systemPromptMissingMedia(
+              mType, entity.displayTitle);
+
+          // Route the prompt gracefully back to a text LLM so it can answer properly
+          apiModelIdForSend = "cortex/auto";
+        }
+      }
 
       if (apiModelIdForSend == null) {
         throw ApiException(errorMessage);
@@ -227,6 +251,12 @@ class SendService {
       final isServerSide = isAutoRouter ||
           Utils.isServerSideModel(apiModelIdForSend,
               langCode: langCode, modelService: _modelService);
+
+      final selectedModelForSnapshot = _modelService
+          .getPreciseModelData(apiModelIdForSend, langCode: langCode);
+      final modelTitleForStorage = selectedModelForSnapshot.displayTitle;
+      final modelImagePathForStorage =
+          _modelService.getModelImagePath(selectedModelForSnapshot);
 
       if (isServerSide && !hasInternet) {
         throw ApiException(localizations.checkYourInternet);
@@ -249,13 +279,11 @@ class SendService {
         if (_conversationProvider.conversationID == null) {
           final newConvId = _uuid.v4();
           final defaultTitle =
-          (text.isEmpty && currentAttachmentPaths.isNotEmpty)
-              ? "📁"
-              : (text.length > 32 ? text.substring(0, 32) : text);
+              (text.isEmpty && currentAttachmentPaths.isNotEmpty)
+                  ? "📁"
+                  : (text.length > 32 ? text.substring(0, 32) : text);
 
-          final modelForStorage = sessionProvider.isDynamicChat
-              ? (sessionProvider.modelId ?? 'dynamic')
-              : apiModelIdForSend;
+          final modelForStorage = apiModelIdForSend;
 
           if (isHidden) {
             _conversationProvider.startEphemeralSession(
@@ -263,20 +291,24 @@ class SendService {
                 title: isHidden ? localizations.flowMode : null);
           } else {
             _conversationProvider.startNewConversationSession(
-                newConvId, defaultTitle, modelForStorage, userMessage);
+              newConvId,
+              defaultTitle,
+              modelForStorage,
+              userMessage,
+              modelTitleForStorage: modelTitleForStorage,
+              modelImagePathForStorage: modelImagePathForStorage,
+            );
 
             // 🚀 ASYNC AI CHAT TITLE GENERATION
             if (isServerSide && text.isNotEmpty) {
               debugPrint("🚀 Triggering TitleGen for new chat...");
               _apiService
                   .generateChatTitle(text, localizations.chatTitlePrompt,
-                  localizations.chatTitleCriticalInstruction)
+                      localizations.chatTitleCriticalInstruction)
                   .then((aiTitle) {
-                if (aiTitle != null && aiTitle
-                    .trim()
-                    .isNotEmpty) {
+                if (aiTitle != null && aiTitle.trim().isNotEmpty) {
                   final cleanTitle =
-                  aiTitle.length > 40 ? aiTitle.substring(0, 40) : aiTitle;
+                      aiTitle.length > 40 ? aiTitle.substring(0, 40) : aiTitle;
 
                   // Update current UI if we are still on this chat
                   if (_conversationProvider.conversationID == newConvId) {
@@ -340,7 +372,7 @@ class SendService {
       // -----------------------------------------------------------------------
       if (!isAutoRouter) {
         ChatStorageService.addRecentModel(apiModelIdForSend,
-            langCode: langCode, modelService: _modelService)
+                langCode: langCode, modelService: _modelService)
             .ignore();
       }
 
@@ -375,7 +407,7 @@ class SendService {
     required bool enableThinkingMode,
   }) async {
     final ModelEntity modelData =
-    _modelService.getPreciseModelData(modelId, langCode: langCode);
+        _modelService.getPreciseModelData(modelId, langCode: langCode);
     final bool isPremium = modelData.isPremium;
 
     final bool isCharacterModel =
@@ -387,7 +419,7 @@ class SendService {
 
     // 1. Build Base Context (History)
     List<Map<String, dynamic>> contextMessages =
-    await _contextService.buildContextMessages(
+        await _contextService.buildContextMessages(
       includeLastUser: false,
       targetModelId: modelId,
       langCode: langCode,
@@ -428,7 +460,7 @@ class SendService {
     // enablefeatureReasoning is already defined above when building context
     bool isfeatureReasoningBlockActive = false;
     bool hasEverHadfeatureReasoning =
-    false; // Track if we've seen any featureReasoning
+        false; // Track if we've seen any featureReasoning
 
     // --- THE LOOP ---
     while (shouldContinue && loopCount < maxLoops) {
@@ -482,38 +514,24 @@ class SendService {
       Future<void> onImageReceived(String url) async {
         if (_conversationProvider.wasResponseStopped) return;
         try {
-          String finalPath = '';
-          final ext = url.split('?').first.toLowerCase().endsWith('.webp') ? 'webp' : 'png';
-          final dir = await getApplicationDocumentsDirectory();
-          final path = '${dir.path}/${_uuid.v4()}.$ext';
-          
-          if (url.startsWith('data:image')) {
-            final bytes = base64Decode(url.split(',').last);
-            await File(path).writeAsBytes(bytes);
-            finalPath = path;
-          } else if (url.startsWith('http://') || url.startsWith('https://')) {
-            final request = await HttpClient().getUrl(Uri.parse(url));
-            final response = await request.close();
-            final bytes = await consolidateHttpClientResponseBytes(response);
-            await File(path).writeAsBytes(bytes);
-            finalPath = path;
-          } else {
-            finalPath = url; // Fallback to raw string if it's already a local path
-          }
-          
-          final messages = _conversationProvider.messages;
-          if (messages.isNotEmpty) {
-            final int aiMessageIndex = messages.length - 1;
-            final Message currentAiMessage = messages[aiMessageIndex];
-            final updatedAttachments = List<String>.from(currentAiMessage.attachmentPaths)..add(finalPath);
-            _conversationProvider.updateMessageAtIndex(
-              aiMessageIndex,
-              currentAiMessage.copyWith(attachmentPaths: updatedAttachments),
-            );
-            if (_scrollService.isUserAtBottom()) {
-              _scrollService.scrollToBottom(duration: const Duration(milliseconds: 100));
-            }
-          }
+          final finalPath = await _persistGeneratedMedia(
+            url: url,
+            dataPrefix: 'data:image',
+            allowedExtensions: const [
+              'png',
+              'jpg',
+              'jpeg',
+              'webp',
+              'gif',
+              'bmp',
+              'heic'
+            ],
+            fallbackExtension: 'png',
+          );
+          await _attachGeneratedMediaToAiMessage(
+            aiMessageIndex: aiMessageIndex,
+            mediaPath: finalPath,
+          );
         } catch (e) {
           debugPrint("Image parse/save error: $e");
         }
@@ -522,54 +540,93 @@ class SendService {
       Future<void> onAudioReceived(String url) async {
         if (_conversationProvider.wasResponseStopped) return;
         try {
-          String finalPath = '';
-          final ext = url.split('?').first.toLowerCase().endsWith('.wav') ? 'wav' : 'mp3';
-          final dir = await getApplicationDocumentsDirectory();
-          final path = '${dir.path}/${_uuid.v4()}.$ext';
-          
-          if (url.startsWith('data:audio')) {
-            final bytes = base64Decode(url.split(',').last);
-            await File(path).writeAsBytes(bytes);
-            finalPath = path;
-          } else if (url.startsWith('http://') || url.startsWith('https://')) {
-            final request = await HttpClient().getUrl(Uri.parse(url));
-            final response = await request.close();
-            final bytes = await consolidateHttpClientResponseBytes(response);
-            await File(path).writeAsBytes(bytes);
-            finalPath = path;
-          } else {
-            finalPath = url;
-          }
-          
-          final messages = _conversationProvider.messages;
-          if (messages.isNotEmpty) {
-            final int aiMessageIndex = messages.length - 1;
-            final Message currentAiMessage = messages[aiMessageIndex];
-            final updatedAttachments = List<String>.from(currentAiMessage.attachmentPaths)..add(finalPath);
-            _conversationProvider.updateMessageAtIndex(
-              aiMessageIndex,
-              currentAiMessage.copyWith(attachmentPaths: updatedAttachments),
-            );
-            if (_scrollService.isUserAtBottom()) {
-              _scrollService.scrollToBottom(duration: const Duration(milliseconds: 100));
-            }
-          }
+          final finalPath = await _persistGeneratedMedia(
+            url: url,
+            dataPrefix: 'data:audio',
+            allowedExtensions: const [
+              'mp3',
+              'wav',
+              'm4a',
+              'aac',
+              'ogg',
+              'flac'
+            ],
+            fallbackExtension: 'mp3',
+          );
+          await _attachGeneratedMediaToAiMessage(
+            aiMessageIndex: aiMessageIndex,
+            mediaPath: finalPath,
+          );
         } catch (e) {
           debugPrint("Audio parse/save error: $e");
         }
       }
 
+      Future<void> onVideoReceived(String url) async {
+        if (_conversationProvider.wasResponseStopped) return;
+        try {
+          final finalPath = await _persistGeneratedMedia(
+            url: url,
+            dataPrefix: 'data:video',
+            allowedExtensions: const ['mp4', 'webm', 'mov', 'mkv', 'm4v'],
+            fallbackExtension: 'mp4',
+          );
+          await _attachGeneratedMediaToAiMessage(
+            aiMessageIndex: aiMessageIndex,
+            mediaPath: finalPath,
+          );
+        } catch (e) {
+          debugPrint("Video parse/save error: $e");
+        }
+      }
+
+      // Handler for media generation started signal (shimmer state)
+      void onMediaGenerating(String type) {
+        if (_conversationProvider.wasResponseStopped) return;
+        final mediaType = switch (type) {
+          'audio' => MediaGenerationType.audio,
+          'image' => MediaGenerationType.image,
+          'video' => MediaGenerationType.video,
+          _ => MediaGenerationType.none,
+        };
+        if (mediaType == MediaGenerationType.none) return;
+        final messages = _conversationProvider.messages;
+        if (aiMessageIndex >= 0 && aiMessageIndex < messages.length) {
+          final msg = messages[aiMessageIndex];
+          _conversationProvider.updateMessageAtIndex(
+            aiMessageIndex,
+            msg.copyWith(pendingMediaType: mediaType),
+          );
+          if (_scrollService.isUserAtBottom()) {
+            _scrollService.scrollToBottom(
+                duration: const Duration(milliseconds: 100));
+          }
+        }
+      }
+
       // MOCK TEST FOR AUDIO AND IMAGE (REMOVE BEFORE PRODUCTION)
       if (initialText.toLowerCase().trim() == "test image") {
-        await Future.delayed(const Duration(seconds: 1));
-        await onImageReceived("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png");
+        onMediaGenerating('image');
+        await Future.delayed(const Duration(seconds: 2));
+        await onImageReceived(
+            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png");
         _conversationProvider.finishBotResponse(aiMessageIndex);
         return;
       }
-      
+
       if (initialText.toLowerCase().trim() == "test audio") {
-        await Future.delayed(const Duration(seconds: 1));
-        await onAudioReceived("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+        onMediaGenerating('audio');
+        await Future.delayed(const Duration(seconds: 2));
+        await onAudioReceived(
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+        _conversationProvider.finishBotResponse(aiMessageIndex);
+        return;
+      }
+
+      if (initialText.toLowerCase().trim() == "test video") {
+        onMediaGenerating('video');
+        await Future.delayed(const Duration(seconds: 2));
+        await onVideoReceived("https://www.w3schools.com/html/mov_bbb.mp4");
         _conversationProvider.finishBotResponse(aiMessageIndex);
         return;
       }
@@ -586,35 +643,44 @@ class SendService {
           context: contextMessages,
           characterId: modelId,
           baseModelId: baseModelId ?? 'cortex/auto',
+          source: modelData.source,
           isPremium: isPremium,
           enablefeatureReasoning: enablefeatureReasoning,
           localizations: localizations,
           onTextChunk: onTextChunk,
           onfeatureReasoning: onfeatureReasoning,
           onImageReceived: onImageReceived,
+          onVideoReceived: onVideoReceived,
           onAudioReceived: onAudioReceived,
+          onMediaGenerating: onMediaGenerating,
         );
         // Characters exit loop immediately
         shouldContinue = false;
       } else {
         // Standard Models (Support Tools)
-        final enableWebSearch = _inputProvider.enableWebSearch;
+        final isMediaModel = modelData.category == 'image' ||
+            modelData.category == 'video' ||
+            modelData.category == 'audio';
+        final enableWebSearch = !isMediaModel && _inputProvider.enableWebSearch;
         await _apiService.getOnlineModelResponse(
           modelId: modelId,
           isPremium: isPremium,
           userInput: "",
           // Already in context
           context: contextMessages,
+          source: modelData.source,
           localizations: localizations,
           langCode: langCode,
           enablefeatureReasoning: enablefeatureReasoning,
           enableWebSearch: enableWebSearch,
-          useTools: !_voiceService.isFlowActive,
+          useTools: !isMediaModel && !_voiceService.isFlowActive,
           // Disable tools in Flow Mode
           onTextChunk: onTextChunk,
           onfeatureReasoning: onfeatureReasoning,
           onImageReceived: onImageReceived,
+          onVideoReceived: onVideoReceived,
           onAudioReceived: onAudioReceived,
+          onMediaGenerating: onMediaGenerating,
           // Capture Tools
           onToolCall: (tools) {
             turnToolCalls = tools;
@@ -680,8 +746,7 @@ class SendService {
                 // Inject Widget Marker (no extra newlines to avoid spacing issues)
                 // The UI (parser) will detect this pattern and render the card
                 _conversationProvider.appendToLastBotMessage(
-                    "<<<WIDGET:$widgetType>>>${jsonEncode(
-                        widgetData)}<<<END>>>");
+                    "<<<WIDGET:$widgetType>>>${jsonEncode(widgetData)}<<<END>>>");
                 // Force immediate UI update for widget visibility
                 _conversationProvider.flushStreamUpdates();
 
@@ -721,7 +786,7 @@ class SendService {
         ? _conversationProvider.messages.last.text
         : "";
     final memoryExp =
-    RegExp(r'<memory>([\s\S]*?)(?:</memory>|$)', caseSensitive: false);
+        RegExp(r'<memory>([\s\S]*?)(?:</memory>|$)', caseSensitive: false);
     final memoryMatch = memoryExp.firstMatch(finalResponseText);
     if (memoryMatch != null) {
       final newMemory = memoryMatch.group(1)?.trim();
@@ -733,15 +798,16 @@ class SendService {
     }
   }
 
-  void _handleSendError(Object error,
-      bool isRegenerate,
-      int? regenerateAiIndex,
-      AppLocalizations localizations, {
-        String? failedUserText,
-        List<String>? failedAttachmentPaths,
-      }) {
+  void _handleSendError(
+    Object error,
+    bool isRegenerate,
+    int? regenerateAiIndex,
+    AppLocalizations localizations, {
+    String? failedUserText,
+    List<String>? failedAttachmentPaths,
+  }) {
     final String errorMessage =
-    error is ApiException ? error.message : localizations.anErrorOccurred;
+        error is ApiException ? error.message : localizations.anErrorOccurred;
     final bool isContentFlagError = error is ApiException &&
         error.message == localizations.errorPromptFlagged;
 
@@ -766,6 +832,114 @@ class SendService {
         isContentFlagError,
       );
     }
+  }
+
+  Future<void> _attachGeneratedMediaToAiMessage({
+    required int aiMessageIndex,
+    required String mediaPath,
+  }) async {
+    final messages = _conversationProvider.messages;
+    if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) return;
+
+    final Message currentAiMessage = messages[aiMessageIndex];
+    final updatedAttachments =
+        List<String>.from(currentAiMessage.attachmentPaths);
+    if (!updatedAttachments.contains(mediaPath)) {
+      updatedAttachments.add(mediaPath);
+    }
+
+    final updatedMessage = currentAiMessage.copyWith(
+      attachmentPaths: updatedAttachments,
+      pendingMediaType: MediaGenerationType.none,
+    );
+
+    _conversationProvider.updateMessageAtIndex(aiMessageIndex, updatedMessage);
+    final convId = _conversationProvider.conversationID;
+    if (convId != null) {
+      await ChatStorageService.upsertMessage(
+          convId, aiMessageIndex, updatedMessage);
+    }
+    if (_scrollService.isUserAtBottom()) {
+      _scrollService.scrollToBottom(
+          duration: const Duration(milliseconds: 100));
+    }
+  }
+
+  Future<String> _persistGeneratedMedia({
+    required String url,
+    required String dataPrefix,
+    required List<String> allowedExtensions,
+    required String fallbackExtension,
+  }) async {
+    final ext = _inferMediaExtension(
+      url: url,
+      allowedExtensions: allowedExtensions,
+      fallbackExtension: fallbackExtension,
+    );
+    final dir = await getApplicationDocumentsDirectory();
+    final localPath = '${dir.path}/${_uuid.v4()}.$ext';
+
+    if (url.startsWith(dataPrefix)) {
+      try {
+        final commaIndex = url.indexOf(',');
+        if (commaIndex <= 0 || commaIndex >= url.length - 1) return url;
+        final encoded = url.substring(commaIndex + 1);
+        final bytes = base64Decode(encoded);
+        await File(localPath).writeAsBytes(bytes);
+        return localPath;
+      } catch (e) {
+        debugPrint("Media data URI decode failed. Falling back to raw URL: $e");
+        return url;
+      }
+    }
+
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      try {
+        final request = await HttpClient().getUrl(Uri.parse(url));
+        final response = await request.close();
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          throw HttpException(
+            'Unexpected HTTP status: ${response.statusCode}',
+            uri: Uri.parse(url),
+          );
+        }
+        final bytes = await consolidateHttpClientResponseBytes(response);
+        await File(localPath).writeAsBytes(bytes);
+        return localPath;
+      } catch (e) {
+        debugPrint("Media download failed. Falling back to remote URL: $e");
+        return url;
+      }
+    }
+
+    return url;
+  }
+
+  String _inferMediaExtension({
+    required String url,
+    required List<String> allowedExtensions,
+    required String fallbackExtension,
+  }) {
+    final mimeMatch =
+        RegExp(r'^data:([^;]+);base64,', caseSensitive: false).firstMatch(url);
+    if (mimeMatch != null) {
+      final mime = (mimeMatch.group(1) ?? '').toLowerCase();
+      final slashIndex = mime.indexOf('/');
+      if (slashIndex != -1 && slashIndex < mime.length - 1) {
+        final mimeExt = mime.substring(slashIndex + 1);
+        if (allowedExtensions.contains(mimeExt)) {
+          return mimeExt;
+        }
+      }
+    }
+
+    final ext =
+        p.extension(url.split('?').first).toLowerCase().replaceAll('.', '');
+    if (allowedExtensions.contains(ext)) {
+      return ext;
+    }
+
+    return fallbackExtension;
   }
 
   bool _isImageFile(String path) {

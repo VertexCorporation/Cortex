@@ -449,8 +449,13 @@ class AppInitializer with ChangeNotifier {
     final bool isMaintenance = await checkMaintenanceMode();
 
     if (isMaintenance) {
-      _updateStatus(AppStatus.maintenance);
-      return true;
+      if (kDebugMode) {
+        debugPrint(
+            "[AppInitializer] Server is in maintenance, but bypassing due to kDebugMode.");
+      } else {
+        _updateStatus(AppStatus.maintenance);
+        return true;
+      }
     }
 
     _extrovertNotificationService.schedulePendingNotification();
@@ -469,7 +474,8 @@ class AppInitializer with ChangeNotifier {
       return;
     }
 
-    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    _authSubscription =
+        FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (_status == AppStatus.initializing && user != null) {}
       if (_isRegistering) {
         dev.log(
@@ -529,18 +535,19 @@ class AppInitializer with ChangeNotifier {
       await _extrovertNotificationService.clearUserTokenOnSignOut();
       await FileDownloadHelper().cancelAllPendingDownloads();
 
-      // Clear User Provider Data Explicitly
-      await _userProvider.clearDataOnSignOut();
-      CreditsManager.instance.dispose();
-
       // STEP 2: Sign out from auth providers.
       await _authService.signOutFromProviders();
+      await _ensureFirebaseAuthSessionCleared();
+
+      // STEP 3: Clear local user-bound state only after auth session is closed.
+      await _userProvider.clearDataOnSignOut();
+      CreditsManager.instance.dispose();
 
       _currentUser = null;
 
       debugPrint("AppInitializer: Sign-out complete. Forcing UI transition.");
 
-      // STEP 3: FORCE UI UPDATE
+      // STEP 4: FORCE UI UPDATE
       _updateStatus(AppStatus.needsLogin);
     } catch (e) {
       debugPrint("AppInitializer: Error during sign out: $e");
@@ -550,6 +557,40 @@ class AppInitializer with ChangeNotifier {
       _isSigningOut = false;
       // Re-attach the auth listener now that sign-out is complete
       _listenToAuthStateChanges();
+    }
+  }
+
+  Future<void> _ensureFirebaseAuthSessionCleared() async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      return;
+    }
+
+    debugPrint(
+      "AppInitializer: Firebase user still present after signOut(). Waiting for auth state to settle.",
+    );
+
+    try {
+      await FirebaseAuth.instance
+          .authStateChanges()
+          .firstWhere((user) => user == null)
+          .timeout(const Duration(seconds: 3));
+      return;
+    } on TimeoutException {
+      debugPrint(
+        "AppInitializer: Auth stream did not emit null in time. Retrying hard Firebase signOut.",
+      );
+      await FirebaseAuth.instance.signOut().timeout(const Duration(seconds: 5));
+      await FirebaseAuth.instance
+          .authStateChanges()
+          .firstWhere((user) => user == null)
+          .timeout(const Duration(seconds: 3));
+    }
+
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      throw StateError(
+        "Firebase session is still active after sign-out retry (uid: ${currentUser.uid}).",
+      );
     }
   }
 
@@ -667,13 +708,13 @@ class AppInitializer with ChangeNotifier {
           // Success Path
           // Also fetch models here! Useful if they logged out and logged in (cache was cleared).
           try {
-             final sysLocale = Platform.localeName.split('_').first;
-             // Don't wait for it completely here to not block ready.
-             _modelService.getModels(langCode: sysLocale);
+            final sysLocale = Platform.localeName.split('_').first;
+            // Don't wait for it completely here to not block ready.
+            _modelService.getModels(langCode: sysLocale);
           } catch (e) {
-             debugPrint("[_determineUserFlow] Failed to getModels: $e");
+            debugPrint("[_determineUserFlow] Failed to getModels: $e");
           }
-          
+
           _updateStatus(AppStatus.ready);
         } else {
           // Critical: User verified, internet works, but NO doc exists after retries.

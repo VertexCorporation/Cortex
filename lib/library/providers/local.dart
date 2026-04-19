@@ -95,6 +95,7 @@ class ModelLocalStateProvider extends ChangeNotifier
       Map.unmodifiable(_downloadCompleted);
   Map<String, DownloadManager> get downloadManagers =>
       Map.unmodifiable(_downloadManagers);
+  bool get hasResolvedFilesDirectory => _filesDirectoryPath.isNotEmpty;
 
   //================================================================================
   // Initialization & Lifecycle
