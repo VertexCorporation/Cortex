@@ -921,6 +921,7 @@ class ExtrovertNotificationService {
   /// This version intelligently determines *which* notification to schedule
   /// instead of just re-running the main scheduler.
   Future<void> schedulePendingNotification() async {
+    if (!_isInitialized) await initialize();
     final prefs = await SharedPreferences.getInstance();
     if (!(prefs.getBool('pendingNotificationDueToMaintenance') ?? false)) {
       return;

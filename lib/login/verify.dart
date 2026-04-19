@@ -1,5 +1,7 @@
+import "../../main.dart";
 // verify.dart
 
+import "../navigation.dart";
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:math';
@@ -73,12 +75,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       await _saveRememberMeState();
 
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (_, __, ___) => MainScreen(),
-            transitionsBuilder: (_, animation, __, child) =>
-                FadeTransition(opacity: animation, child: child),
-          ),
+        navigateToScreen(
+          MainScreen(key: mainScreenKey),
+          direction: const Offset(1.0, 0.0),
+          isReplace: true,
         );
       }
     } catch (e, st) {
@@ -201,14 +201,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     await reconcileAndSyncPurchases();
 
     if (mounted) {
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => MainScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 400),
-        ),
+      navigateToScreen(
+        MainScreen(key: mainScreenKey),
+        direction: const Offset(1.0, 0.0),
+        isReplace: true,
       );
     }
   }

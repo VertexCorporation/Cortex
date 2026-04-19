@@ -14,11 +14,17 @@ class ModelEntity {
   /// The display-ready, localized title.
   final String displayTitle;
 
+  /// The series of the model.
+  final String? series;
+
   /// The name of the entity or company that produced the model.
   final String producer;
 
   /// The type of the model (e.g., 'online', 'offline').
   final String type;
+
+  /// The source/provider of the model (e.g., 'openrouter', 'fal', 'huggingface').
+  final String source;
 
   /// The category of the model (e.g., 'roleplay', 'self', 'assistant').
   final String category;
@@ -56,6 +62,9 @@ class ModelEntity {
   /// A map defining the output capabilities of the model (e.g., {'text': true}).
   final Map<String, dynamic> outputs;
 
+  /// Whether the model supports tool use.
+  final bool toolUse;
+
   /// A map containing variant data for variant models.
   final Map<String, dynamic>? variants;
 
@@ -76,8 +85,10 @@ class ModelEntity {
   const ModelEntity({
     required this.id,
     required this.displayTitle,
+    this.series,
     required this.producer,
     required this.type,
+    required this.source,
     required this.category,
     this.role,
     required this.displaySummary,
@@ -90,6 +101,7 @@ class ModelEntity {
     this.ram,
     required this.modalities,
     required this.outputs,
+    required this.toolUse,
     this.variants,
     this.url,
     this.context,
@@ -105,7 +117,8 @@ class ModelEntity {
       if (value is Map) {
         final localizedMap = Map<String, String>.from(
             value.map((key, val) => MapEntry(key.toString(), val.toString())));
-        return localizedMap[langCode] ?? localizedMap['en'] ??
+        return localizedMap[langCode] ??
+            localizedMap['en'] ??
             localizedMap.values.firstOrNull;
       }
       return value.toString();
@@ -113,10 +126,22 @@ class ModelEntity {
 
     return ModelEntity(
       id: map['id']?.toString() ?? 'unknown',
-      displayTitle: getStringOrLocalized(map['title']) ??
-          getStringOrLocalized(map['id']) ?? 'Unknown Model',
-      producer: getStringOrLocalized(map['producer']) ?? 'Unknown',
+      displayTitle: (getStringOrLocalized(map['title']) ??
+          getStringOrLocalized(map['id']) ??
+          '')
+          .isNotEmpty
+          ? formatName(
+        getStringOrLocalized(map['title']) ??
+            getStringOrLocalized(map['id']),
+        isOfflineVariant: map['type'] == 'offline',
+      )
+          : 'Unknown Model',
+      series: formatName(getStringOrLocalized(map['series'])),
+      producer: formatName(getStringOrLocalized(map['producer'])) != ""
+          ? formatName(getStringOrLocalized(map['producer']))
+          : 'Unknown',
       type: getStringOrLocalized(map['type']) ?? 'online',
+      source: getStringOrLocalized(map['source']) ?? 'openrouter',
       category: getStringOrLocalized(map['category']) ?? 'online',
       role: getStringOrLocalized(map['role']),
       displaySummary: getStringOrLocalized(map['summary']) ?? '',
@@ -127,14 +152,12 @@ class ModelEntity {
       tier: getStringOrLocalized(map['tier']) ?? 'free',
       size: int.tryParse(map['size']?.toString() ?? ''),
       ram: int.tryParse(map['ram']?.toString() ?? ''),
-
       modalities: Map<String, dynamic>.from(map['modalities'] as Map? ?? {}),
       outputs: Map<String, dynamic>.from(map['outputs'] as Map? ?? {}),
+      toolUse: map['toolUse'] == true,
       variants: map['variants'] as Map<String, dynamic>?,
-
       url: getStringOrLocalized(map['url']),
       context: getStringOrLocalized(map['context']),
-
       isFullyLocalized: map['isFullyLocalized'] as bool? ?? true,
       chatFormat: map['chatFormat'] != null
           ? ChatFormat.fromMap(map['chatFormat'] as Map<String, dynamic>)
@@ -146,8 +169,10 @@ class ModelEntity {
   ModelEntity copyWith({
     String? id,
     String? displayTitle,
+    String? series,
     String? producer,
     String? type,
+    String? source,
     String? category,
     String? role,
     String? displaySummary,
@@ -160,6 +185,7 @@ class ModelEntity {
     int? ram,
     Map<String, dynamic>? modalities,
     Map<String, dynamic>? outputs,
+    bool? toolUse,
     Map<String, dynamic>? variants,
     String? url,
     String? context,
@@ -169,8 +195,10 @@ class ModelEntity {
     return ModelEntity(
       id: id ?? this.id,
       displayTitle: displayTitle ?? this.displayTitle,
+      series: series ?? this.series,
       producer: producer ?? this.producer,
       type: type ?? this.type,
+      source: source ?? this.source,
       category: category ?? this.category,
       role: role ?? this.role,
       displaySummary: displaySummary ?? this.displaySummary,
@@ -183,6 +211,7 @@ class ModelEntity {
       ram: ram ?? this.ram,
       modalities: modalities ?? this.modalities,
       outputs: outputs ?? this.outputs,
+      toolUse: toolUse ?? this.toolUse,
       variants: variants ?? this.variants,
       url: url ?? this.url,
       context: context ?? this.context,
@@ -196,6 +225,7 @@ class ModelEntity {
     return {
       'id': id,
       'title': displayTitle,
+      'series': series,
       'producer': producer,
       'type': type,
       'category': category,
@@ -210,6 +240,7 @@ class ModelEntity {
       'ram': ram,
       'modalities': modalities,
       'outputs': outputs,
+      'toolUse': toolUse,
       'variants': variants,
       'url': url,
       'context': context,

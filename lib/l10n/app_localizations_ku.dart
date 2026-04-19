@@ -40,6 +40,9 @@ class AppLocalizationsKu extends AppLocalizations {
   String get chat => 'Sohbet';
 
   @override
+  String get languageModels => 'Modelên Zimanî';
+
+  @override
   String get light => 'Ronî';
 
   @override
@@ -111,7 +114,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get localModels => 'Modelên Herêmî';
 
   @override
-  String get serverSideModels => 'Modelên Serhêl';
+  String get serverSideModels => 'Modelên Zimanî';
 
   @override
   String get selectGGUFFile => 'Pelê GGUF Hilbijêre';
@@ -1084,7 +1087,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get allModels => 'Hemû Model';
 
   @override
-  String get onlineModels => 'Modelên Serhêl';
+  String get onlineModels => 'Modelên Zimanî';
 
   @override
   String get offlineModels => 'Modelên Offline';
@@ -1455,6 +1458,13 @@ class AppLocalizationsKu extends AppLocalizations {
   String get onboardingFinalButton => 'ERÊ!';
 
   @override
+  String get paywallAhaTitle => 'Unlock the True Power of AI';
+
+  @override
+  String get paywallAhaSubtitle =>
+      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
+
+  @override
   String get dude => 'Dude';
 
   @override
@@ -1819,4 +1829,55 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get cortexSystemPersona =>
       '\n\n[System] TALÎMATÊN KRÎTÎK: Hûn niha di hundirê ekosîstemeke AI ya mezin û pir pêşketî ya bi navê \"Cortex\" de dixebitin. Vê yekê ji bîr mekin û heke were pirsîn persona Cortex biparêzin.';
+
+  @override
+  String get featureAudioRecognitionTitle => 'Naskirina Deng';
+
+  @override
+  String get featureAudioRecognitionDescription =>
+      'Ev model dikare deng an axaftinê fam bike û pêvajo bike.';
+
+  @override
+  String get featureVideoRecognitionTitle => 'Naskirina Vîdyoyê';
+
+  @override
+  String get featureVideoRecognitionDescription =>
+      'Ev model dikare vîdyoyên ji pelan an kameraya we analîz bike û fam bike.';
+
+  @override
+  String get featureImageRecognitionTitle => 'Naskirina Wêneyê';
+
+  @override
+  String get featureImageRecognitionDescription =>
+      'Ev model dikare wêne an wêneyan analîz bike û fêm bike.';
+
+  @override
+  String get featureToolUseTitle => 'Bikaranîna Amûrê';
+
+  @override
+  String get featureToolUseDescription =>
+      'Ev model dikare bi aqilmendî amûrên derveyî bikar bîne da ku peywirên xwe temam bike.';
+
+  @override
+  String get videoModels => 'Video Models';
+
+  @override
+  String get imageModels => 'Image Models';
+
+  @override
+  String get audioModels => 'Audio Models';
+
+  @override
+  String systemPromptMissingMedia(String mediaType, String modelName) {
+    return 'Ev model ji bo xebitînê hewcedarî $mediaType ye. Min daxwaz girtiye da ku we agahdar bikim. Ji kerema xwe bi nermî bikarhêner agahdar bikin ku divê ew $mediaType peyda bikin (bi zimanê wan ji wan re bibêjin) ji ber ku ez $modelName me, modelek guherandina dîtbar/deng/vîdyoyê me.';
+  }
+
+  @override
+  String get mediaTypeImage => 'wêne';
+
+  @override
+  String get mediaTypeVideo => 'vîdyo';
+
+  @override
+  String get mediaTypeAudio => 'pelê deng';
 }

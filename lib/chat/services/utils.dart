@@ -70,26 +70,28 @@ class Utils {
     return null;
   }
 
-  /// A static utility function to read an image file, encode it to Base64,
+  /// A static utility function to read a media file (image/video/audio), encode it to Base64,
   /// and format it as a data URL string.
-  static Future<String?> formatBase64Image(String photoPath) async {
+  static Future<String?> formatBase64Media(String mediaPath) async {
     try {
-      final imageFile = File(photoPath);
-      if (await imageFile.exists()) {
-        final imageBytes = await imageFile.readAsBytes();
-        final mimeType = lookupMimeType(photoPath, headerBytes: imageBytes);
+      final mediaFile = File(mediaPath);
+      if (await mediaFile.exists()) {
+        // Read file bytes. For very large video files this could OOM, 
+        // but for now we follow the existing pattern.
+        final mediaBytes = await mediaFile.readAsBytes();
+        final mimeType = lookupMimeType(mediaPath, headerBytes: mediaBytes) ?? 'application/octet-stream';
 
-        if (mimeType == null ||
-            !['image/png', 'image/jpeg', 'image/webp'].contains(mimeType)) {
-          debugPrint("Unsupported image type '$mimeType' for file: $photoPath");
+        // Ensure it's media (we optionally could restrict down to mp4, wav, etc.)
+        if (!mimeType.startsWith('image/') && !mimeType.startsWith('video/') && !mimeType.startsWith('audio/')) {
+          debugPrint("Unsupported media type '$mimeType' for file: $mediaPath");
           return null;
         }
 
-        final base64Image = base64Encode(imageBytes);
-        return 'data:$mimeType;base64,$base64Image';
+        final base64Media = base64Encode(mediaBytes);
+        return 'data:$mimeType;base64,$base64Media';
       }
     } catch (e) {
-      debugPrint("Error reading or encoding photo file: $e");
+      debugPrint("Error reading or encoding media file: $e");
     }
     return null;
   }
@@ -116,10 +118,12 @@ class Utils {
           .last
           .toLowerCase();
 
-      // 1. Handle Images - send as base64 data URL (OpenRouter/OpenAI compatible)
-      if (mimeType.startsWith('image/')) {
-        final base64Url = await formatBase64Image(path);
+      // 1. Handle Media (Images, Video, Audio) - send as base64 data URL
+      if (mimeType.startsWith('image/') || mimeType.startsWith('video/') || mimeType.startsWith('audio/')) {
+        final base64Url = await formatBase64Media(path);
         if (base64Url != null) {
+          // OpenRouter/OpenAI structure uses "image_url" conventionally
+          // Fal.ai and custom Vertex routing will pull the URL from this object
           return {
             "type": "image_url",
             "image_url": {"url": base64Url}

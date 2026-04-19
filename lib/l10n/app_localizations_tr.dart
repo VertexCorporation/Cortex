@@ -40,6 +40,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get chat => 'Sohbet';
 
   @override
+  String get languageModels => 'Dil Modelleri';
+
+  @override
   String get light => 'Aydınlık';
 
   @override
@@ -111,7 +114,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get localModels => 'Yerel Modeller';
 
   @override
-  String get serverSideModels => 'Çevrimiçi Modeller';
+  String get serverSideModels => 'Dil Modelleri';
 
   @override
   String get selectGGUFFile => 'GGUF Dosyası Seç';
@@ -1033,25 +1036,25 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu model konuşulan ses girdilerini anlayabilir ve işleyebilir.';
 
   @override
-  String get featureImageGenerationTitle => 'Görüntü Oluşturma';
+  String get featureImageGenerationTitle => 'Fotoğraf Oluşturma';
 
   @override
   String get featureImageGenerationDescription =>
-      'Bu model, metin açıklamalarınıza dayanarak orijinal görseller oluşturabilir.';
+      'Bu model metinlerden yeni görseller oluşturabilir.';
 
   @override
-  String get featureAudioGenerationTitle => 'Ses Üretimi';
+  String get featureAudioGenerationTitle => 'Ses Oluşturma';
 
   @override
   String get featureAudioGenerationDescription =>
-      'Bu model, metin açıklamalarınıza dayanarak özgün sesler oluşturabilir.';
+      'Bu model yeni ses parçaları veya konuşmalar oluşturabilir.';
 
   @override
-  String get featureVideoGenerationTitle => 'Video Üretimi';
+  String get featureVideoGenerationTitle => 'Video Oluşturma';
 
   @override
   String get featureVideoGenerationDescription =>
-      'Bu model, metin açıklamalarınıza dayanarak özgün videolar oluşturabilir.';
+      'Bu model metin veya görsellerden yeni videolar oluşturabilir.';
 
   @override
   String get premiumModelNoticeTitle => 'Premium Model';
@@ -1065,7 +1068,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get premiumTrialExhaustedMessage =>
-      'Premium modeller için tüm ücretsiz günlük mesajlarınızı kullandınız, sınırsız erişim için lütfen yükseltin.';
+      'Premium modeller için tüm ücretsiz günlük mesajlarınızı kullandınız. Şimdi yükseltin ve **kaldığınız yerden devam edin!**';
 
   @override
   String get useOffline => 'İnternetsiz Kullan';
@@ -1080,7 +1083,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get allModels => 'Tüm Modeller';
 
   @override
-  String get onlineModels => 'Çevrimiçi Modeller';
+  String get onlineModels => 'Online Modeller';
 
   @override
   String get offlineModels => 'Lokal Modeller';
@@ -1448,6 +1451,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onboardingFinalButton => 'EVET!';
 
   @override
+  String get paywallAhaTitle => 'Unlock the True Power of AI';
+
+  @override
+  String get paywallAhaSubtitle =>
+      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
+
+  @override
   String get dude => 'Kanka';
 
   @override
@@ -1812,4 +1822,55 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get cortexSystemPersona =>
       '\n\n[Sistem] KRİTİK TALİMAT: Şu anda \"Cortex\" adlı devasa, son derece gelişmiş bir yapay zeka ekosistemi içinde çalışıyorsunuz. Bunu unutmayın ve sorulursa Cortex persona\'sını sürdürün.';
+
+  @override
+  String get featureAudioRecognitionTitle => 'Ses Tanıma';
+
+  @override
+  String get featureAudioRecognitionDescription =>
+      'Bu model ses girdilerini anlayabilir ve işleyebilir.';
+
+  @override
+  String get featureVideoRecognitionTitle => 'Video Tanıma';
+
+  @override
+  String get featureVideoRecognitionDescription =>
+      'Bu model video girdilerini anlayabilir ve işleyebilir.';
+
+  @override
+  String get featureImageRecognitionTitle => 'Görsel Tanıma';
+
+  @override
+  String get featureImageRecognitionDescription =>
+      'Bu model görsel girdileri anlayabilir ve işleyebilir.';
+
+  @override
+  String get featureToolUseTitle => 'Araç Kullanımı';
+
+  @override
+  String get featureToolUseDescription =>
+      'Bu model harici araçlara ve API\'lere erişebilir.';
+
+  @override
+  String get videoModels => 'Video Modelleri';
+
+  @override
+  String get imageModels => 'Görsel Modelleri';
+
+  @override
+  String get audioModels => 'Ses Modelleri';
+
+  @override
+  String systemPromptMissingMedia(String mediaType, String modelName) {
+    return 'Bu modelin çalışması için bir $mediaType gerekiyor. Bunu bildirmek için isteği yakaladım. Lütfen kullanıcıya nazikçe bir $mediaType sağlamaları gerektiğini bildirin (kendi dillerinde) çünkü ben $modelName, bir görsel/işitsel/video düzenleme modeliyim.';
+  }
+
+  @override
+  String get mediaTypeImage => 'görsel';
+
+  @override
+  String get mediaTypeVideo => 'video';
+
+  @override
+  String get mediaTypeAudio => 'ses dosyası';
 }

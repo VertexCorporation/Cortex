@@ -32,6 +32,36 @@ enum MainScreenView {
   news,
 }
 
+class FadeIndexedStack extends StatelessWidget {
+  final int index;
+  final List<Widget> children;
+  final Duration duration;
+
+  const FadeIndexedStack({
+    super.key,
+    required this.index,
+    required this.children,
+    this.duration = const Duration(milliseconds: 100),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: List<Widget>.generate(children.length, (int i) {
+        return IgnorePointer(
+          ignoring: index != i,
+          child: AnimatedOpacity(
+            opacity: index == i ? 1.0 : 0.0,
+            duration: duration,
+            child: children[i],
+          ),
+        );
+      }),
+    );
+  }
+}
+
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -378,7 +408,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     _updateCurrentView(MainScreenView.chat);
 
     await context.read<AppInitializer>().onCoreServicesReady;
-    
+
     if (!mounted) return;
 
     AnalyticsService().logChatScreen();
@@ -450,7 +480,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       if (!mounted) return;
       _updateCurrentView(MainScreenView.chat);
       context.read<SelectionService>().selectModel(model);
-      if (Navigator.canPop(context)) Navigator.pop(context);
+
       closeAxon();
     });
   }
@@ -485,9 +515,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildCurrentScreenWidget() {
-    // Use IndexedStack to keep all screens alive and prevent rebuilds
-    // This dramatically improves performance when switching tabs
-    return IndexedStack(
+    // Use FadeIndexedStack to keep all screens alive and prevent rebuilds
+    // while providing a smooth 0.3s crossfade transition when switching tabs.
+    return FadeIndexedStack(
       index: _getCurrentViewIndex(),
       children: [
         // Index 0: Chat
@@ -677,10 +707,10 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                           : Alignment.centerLeft,
                                       child: Container(
                                         width: 1.0,
-                                        height: (MediaQuery.sizeOf(context)
-                                                    .height *
-                                                0.6) *
-                                            rawValue,
+                                        height:
+                                            (MediaQuery.sizeOf(context).height *
+                                                    0.6) *
+                                                rawValue,
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             begin: Alignment.topCenter,

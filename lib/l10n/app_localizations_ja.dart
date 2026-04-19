@@ -40,6 +40,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chat => 'チャット';
 
   @override
+  String get languageModels => '言語モデル';
+
+  @override
   String get light => 'ライト';
 
   @override
@@ -111,7 +114,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get localModels => 'ローカルモデル';
 
   @override
-  String get serverSideModels => 'オンラインモデル';
+  String get serverSideModels => '言語モデル';
 
   @override
   String get selectGGUFFile => 'GGUFファイルを選択';
@@ -1054,7 +1057,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get allModels => '全モデル';
 
   @override
-  String get onlineModels => 'オンラインモデル';
+  String get onlineModels => '言語モデル';
 
   @override
   String get offlineModels => 'オフラインモデル';
@@ -1416,6 +1419,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboardingFinalButton => 'はい！';
 
   @override
+  String get paywallAhaTitle => 'Unlock the True Power of AI';
+
+  @override
+  String get paywallAhaSubtitle =>
+      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
+
+  @override
   String get dude => '仲間';
 
   @override
@@ -1766,4 +1776,54 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get cortexSystemPersona =>
       '\n\n[System] 重要な指示: あなたは現在、「Cortex」と呼ばれる大規模で高度なAIエコシステム内で動作しています。これを覚えておき、尋ねられたらCortexのペルソナを維持してください。';
+
+  @override
+  String get featureAudioRecognitionTitle => '音声認識';
+
+  @override
+  String get featureAudioRecognitionDescription =>
+      'このモデルは音声や話し言葉を理解して処理することができます。';
+
+  @override
+  String get featureVideoRecognitionTitle => 'ビデオ認識';
+
+  @override
+  String get featureVideoRecognitionDescription =>
+      'このモデルは、ファイルやカメラから取得した動画を分析・理解することができます。';
+
+  @override
+  String get featureImageRecognitionTitle => '画像認識';
+
+  @override
+  String get featureImageRecognitionDescription =>
+      'このモデルは写真や画像を分析・理解することができます。';
+
+  @override
+  String get featureToolUseTitle => 'ツールの使用';
+
+  @override
+  String get featureToolUseDescription => 'このモデルは、外部ツールを賢く活用してタスクを完了することができます。';
+
+  @override
+  String get videoModels => 'Video Models';
+
+  @override
+  String get imageModels => 'Image Models';
+
+  @override
+  String get audioModels => 'Audio Models';
+
+  @override
+  String systemPromptMissingMedia(String mediaType, String modelName) {
+    return 'このモデルが機能するには$mediaTypeが必要です。お知らせするためにリクエストを傍受しました。私は$modelNameという視覚/音声/ビデオ編集モデルであるため、$mediaTypeを提供する必要があることをユーザーに丁寧にお知らせください（彼らの言語で）。';
+  }
+
+  @override
+  String get mediaTypeImage => '画像';
+
+  @override
+  String get mediaTypeVideo => '動画';
+
+  @override
+  String get mediaTypeAudio => '音声ファイル';
 }

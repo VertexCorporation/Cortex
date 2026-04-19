@@ -40,6 +40,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chat => '聊天';
 
   @override
+  String get languageModels => '语言模型';
+
+  @override
   String get light => '浅色';
 
   @override
@@ -111,7 +114,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localModels => '本地模型';
 
   @override
-  String get serverSideModels => '在线模型';
+  String get serverSideModels => '语言模型';
 
   @override
   String get selectGGUFFile => '选择 GGUF 文件';
@@ -1030,7 +1033,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get allModels => '所有模型';
 
   @override
-  String get onlineModels => '在线模型';
+  String get onlineModels => '语言模型';
 
   @override
   String get offlineModels => '离线模型';
@@ -1371,6 +1374,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onboardingFinalButton => '是的！';
+
+  @override
+  String get paywallAhaTitle => 'Unlock the True Power of AI';
+
+  @override
+  String get paywallAhaSubtitle =>
+      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
 
   @override
   String get dude => '哥们';
@@ -1719,4 +1729,51 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get cortexSystemPersona =>
       '\n\n[System] 重要指令：您目前正在一个名为“Cortex”的庞大、高度先进的人工智能生态系统中运行。请记住这一点，并在被问及保持 Cortex 的角色设定。';
+
+  @override
+  String get featureAudioRecognitionTitle => '音频识别';
+
+  @override
+  String get featureAudioRecognitionDescription => '该模型能够理解和处理音频或语音。';
+
+  @override
+  String get featureVideoRecognitionTitle => '视频识别';
+
+  @override
+  String get featureVideoRecognitionDescription => '该型号可以分析和理解来自您的文件或相机的视频。';
+
+  @override
+  String get featureImageRecognitionTitle => '图像识别';
+
+  @override
+  String get featureImageRecognitionDescription => '该模型可以分析和理解照片或图像。';
+
+  @override
+  String get featureToolUseTitle => '工具使用';
+
+  @override
+  String get featureToolUseDescription => '该模型能够智能地利用外部工具完成任务。';
+
+  @override
+  String get videoModels => 'Video Models';
+
+  @override
+  String get imageModels => 'Image Models';
+
+  @override
+  String get audioModels => 'Audio Models';
+
+  @override
+  String systemPromptMissingMedia(String mediaType, String modelName) {
+    return '此模型需要 $mediaType 才能工作。我截获了请求以告知您。请礼貌地通知用户他们需要提供 $mediaType（用他们的语言告诉他们），因为我是 $modelName，一个视觉/音频/视频编辑模型。';
+  }
+
+  @override
+  String get mediaTypeImage => '图片';
+
+  @override
+  String get mediaTypeVideo => '视频';
+
+  @override
+  String get mediaTypeAudio => '音频文件';
 }

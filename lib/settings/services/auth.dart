@@ -46,8 +46,8 @@ class AuthService {
 
   bool hasPasswordProvider() {
     if (!isLoggedIn) return false;
-    return currentUser!.providerData.any((provider) =>
-    provider.providerId == 'password');
+    return currentUser!.providerData
+        .any((provider) => provider.providerId == 'password');
   }
 
   Future<void> reloadCurrentUser() async {
@@ -107,17 +107,15 @@ class AuthService {
   }
 
   Future<void> signOutFromProviders() async {
+    // Best-effort provider cleanup.
     try {
       await _googleSignIn.signOut().timeout(const Duration(seconds: 2));
     } catch (e) {
       debugPrint("AuthService: Google signOut error or timeout: $e");
     }
 
-    try {
-      await _firebaseAuth.signOut().timeout(const Duration(seconds: 2));
-    } catch (e) {
-      debugPrint("AuthService: Firebase signOut error or timeout: $e");
-    }
+    // Firebase sign-out is mandatory. Do not swallow errors here.
+    await _firebaseAuth.signOut().timeout(const Duration(seconds: 5));
     debugPrint("AuthService: Signed out from auth providers.");
   }
 }
