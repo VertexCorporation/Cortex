@@ -97,7 +97,7 @@ class GgufFilePicker extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.check_circle_outline,
+        Icon(Icons.check_circle_rounded,
             color: AppColors.senaryColor, size: isTablet ? 80.0 : w * 0.1),
         SizedBox(height: h * 0.01),
         Padding(

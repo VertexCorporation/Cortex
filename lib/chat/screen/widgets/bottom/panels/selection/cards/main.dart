@@ -175,7 +175,7 @@ class ModelCard extends StatelessWidget {
                                     text: title,
                                     scrollable: true,
                                     style: TextStyle(
-                                      fontFamily: 'Roboto',
+                                      fontFamily: 'Inter',
                                       fontSize: titleFontSize,
                                       fontWeight: FontWeight.bold,
                                       color: textColor,
@@ -190,7 +190,7 @@ class ModelCard extends StatelessWidget {
                                     child: Text(
                                       l10n.alwaysBest,
                                       style: TextStyle(
-                                        fontFamily: 'Roboto',
+                                        fontFamily: 'Inter',
                                         fontSize: subTitleFontSize,
                                         fontWeight: FontWeight.normal,
                                         color: subTextColor,

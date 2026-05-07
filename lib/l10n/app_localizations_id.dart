@@ -493,6 +493,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get shareApp => 'Bagikan Aplikasi';
 
   @override
+  String get ourStory => 'Kisah Kami';
+
+  @override
   String get rateUs => 'Beri Kami Nilai';
 
   @override
@@ -1084,6 +1087,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get news => 'Berita';
 
   @override
+  String get createAI => 'Create';
+
+  @override
+  String get shortcuts => 'Shortcuts';
+
+  @override
   String get allModels => 'Semua Model';
 
   @override
@@ -1584,6 +1593,12 @@ class AppLocalizationsId extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
+  String get featureCreateVideoTitle => 'Buat Video';
+
+  @override
+  String get featureCreateVideoDescription => 'Buat video dari teks.';
+
+  @override
   String get featureStudyTitle => 'Belajar & Mengajar';
 
   @override
@@ -1884,4 +1899,58 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => 'berkas audio';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesName adalah kecerdasan maju yang menunjukkan performa tinggi di Cortex.';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelName adalah kecerdasan buatan berkinerja tinggi yang terintegrasi di dalam ekosistem Cortex. Dirancang untuk menaklukkan berbagai macam tugas kompleks, ia memberikan kemampuan pemrosesan yang sangat andal dan efisien. Dengan menawarkan waktu respons yang cepat dan kekuatan analitis tingkat lanjut, ini secara signifikan meningkatkan produktivitas harian Anda. Beroperasi dengan lancar di infrastruktur lokal Cortex yang aman, model ini dapat membantu Anda dalam berbagai spektrum tugas, mulai dari curah pendapat kreatif hingga analisis teknis mendalam. Mulailah menjelajahi potensi penuhnya hari ini.';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle => 'Suka dengan kecerdasan Cortex?';
+
+  @override
+  String get guestLimitBottomSheetText =>
+      'Bekerja dengan kecerdasan yang lebih canggih, menghasilkan lebih banyak konten, mengobrol lebih banyak, dan melakukan lebih banyak lagi...';
+
+  @override
+  String get arts => 'Seni';
+
+  @override
+  String get noArt => 'Tidak ada Seni';
+
+  @override
+  String get noArtDescription =>
+      'Tidak ada karya seni; saatnya mengisi galeri dengan membuat gambar, video, audio, dan segala macam konten!';
+
+  @override
+  String get videoPremiumWarning =>
+      'Anda memerlukan langganan Ultra untuk membuat video, tingkatkan sekarang dan rasakan kemudahannya!';
+
+  @override
+  String get becomePremiumButton => 'Menjadi Premium';
+
+  @override
+  String get fallbackInfoPanelText =>
+      'Karena beberapa perbaikan yang sedang kami lakukan di sisi server, respons dihasilkan oleh obrolan dinamis Cortex, bukan oleh AI yang Anda pilih secara khusus. Terima kasih atas pengertian Anda sampai proses ini selesai!';
+
+  @override
+  String get falOfflineMessage =>
+      'Karena beberapa perbaikan yang sedang kami lakukan di sisi server, kecerdasan ini saat ini sedang offline. Terima kasih atas pengertian Anda sampai proses ini selesai!';
+
+  @override
+  String get errorInsufficientStorage =>
+      'Ruang penyimpanan tidak mencukupi untuk mengunduh model ini.';
+
+  @override
+  String get backgroundChatNotificationTitle => 'Kembali ke Obrolan!';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return 'Ada pesan baru di $chatName, silakan cek!';
+  }
 }

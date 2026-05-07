@@ -13,10 +13,13 @@ enum WaveOrigin { right, center }
 class WaveformVisualizer extends StatefulWidget {
   final Color? color;
   final WaveOrigin origin; // [NEW] Control origin
+  final bool simulatePlaying;
+
   const WaveformVisualizer({
     super.key,
     this.color,
     this.origin = WaveOrigin.right, // Default to old behavior (Right)
+    this.simulatePlaying = false,
   });
 
   @override
@@ -58,24 +61,32 @@ class _WaveformVisualizerState extends State<WaveformVisualizer>
     final voiceService = context.read<VoiceService>();
 
     double rawLevel = 0.0;
-
-    if (voiceService.state == VoiceState.speaking ||
-        voiceService.state == VoiceState.processing) {
-      final double time = DateTime
-          .now()
-          .millisecondsSinceEpoch / 1000.0;
+    
+    if (widget.simulatePlaying) {
+      final double time = DateTime.now().millisecondsSinceEpoch / 1000.0;
       final double sine = math.sin(time * 15.0).abs();
       final double noise = math.Random().nextDouble();
-
-      if (voiceService.state == VoiceState.processing) {
-        // [FIX] Lower idle amplitude
-        rawLevel = 0.05 + (math.sin(time * 3.0).abs() * 0.05);
-      } else {
-        rawLevel = 0.2 + (sine * 0.4) + (noise * 0.2);
-      }
+      rawLevel = 0.2 + (sine * 0.4) + (noise * 0.2);
     } else {
-      // [FIX] Ensure we handle low levels gracefully
-      rawLevel = (speechService.soundLevel * 15.0).clamp(0.0, 1.0);
+
+      if (voiceService.state == VoiceState.speaking ||
+          voiceService.state == VoiceState.processing) {
+        final double time = DateTime
+            .now()
+            .millisecondsSinceEpoch / 1000.0;
+        final double sine = math.sin(time * 15.0).abs();
+        final double noise = math.Random().nextDouble();
+
+        if (voiceService.state == VoiceState.processing) {
+          // [FIX] Lower idle amplitude
+          rawLevel = 0.05 + (math.sin(time * 3.0).abs() * 0.05);
+        } else {
+          rawLevel = 0.2 + (sine * 0.4) + (noise * 0.2);
+        }
+      } else {
+        // [FIX] Ensure we handle low levels gracefully
+        rawLevel = (speechService.soundLevel * 15.0).clamp(0.0, 1.0);
+      }
     }
 
     if (_history.length >= _historySize) {

@@ -80,24 +80,6 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
       builder: (BuildContext context, AppInitializer initializer, Widget? _) {
         final AppStatus currentStatus = initializer.status;
 
-        if (!_splashRemoved && currentStatus != AppStatus.initializing) {
-          _splashRemoved = true;
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            debugPrint(
-                'AppLifecycleManager: UI Ready. Removing Native Splash.');
-            try {
-              FlutterNativeSplash.remove();
-            } catch (e) {
-              debugPrint("Warning: Failed to remove splash screen: $e");
-            }
-          });
-        }
-
-        debugPrint(
-          'AppLifecycleManager: Rebuilding. Current: $currentStatus, Previous: $_previousStatus',
-        );
-
         // Remove native splash exactly once once we are past the initializing state.
         if (!_splashRemoved && currentStatus != AppStatus.initializing) {
           _splashRemoved = true;
@@ -105,7 +87,11 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
             debugPrint(
               'AppLifecycleManager: First real frame is ready. Removing native splash...',
             );
-            FlutterNativeSplash.remove();
+            try {
+              FlutterNativeSplash.remove();
+            } catch (e) {
+              debugPrint("Warning: Failed to remove splash screen: $e");
+            }
           });
         }
 

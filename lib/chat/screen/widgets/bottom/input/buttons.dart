@@ -280,13 +280,10 @@ class ActionButtonWidget extends StatelessWidget {
         ),
         child: Padding(
           padding: EdgeInsets.all(size * 0.22),
-          child: RotatedBox(
-            quarterTurns: 2, // Rotates 180 degrees to point UP
             child: SvgPicture.asset(
-              'assets/icons/arrov.svg',
+              'assets/icons/arrow.svg',
               colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
             ),
-          ),
         ),
       ),
     );
@@ -474,13 +471,15 @@ class FeaturesButton extends StatelessWidget {
     final featureMode = inputProvider.featureMode;
     final currentModel = sessionProvider.selectedModel;
     final bool isOfflineFocused = currentModel?.type == 'offline';
-    final bool isImageFocused = currentModel?.outputs['image'] == true;
-    final bool isAudioFocused = currentModel?.outputs['audio'] == true;
+    final bool isImageFocused = currentModel?.outputs['image'] == true || currentModel?.category == 'image';
+    final bool isVideoFocused = currentModel?.outputs['video'] == true || currentModel?.category == 'video';
+    final bool isAudioFocused = currentModel?.outputs['audio'] == true || currentModel?.category == 'audio';
 
     final bool isActive = featureMode != ChatInputMode.none ||
         inputProvider.enableWebSearch ||
         isOfflineFocused ||
         isImageFocused ||
+        isVideoFocused ||
         isAudioFocused;
 
     // Visual Configuration
@@ -591,18 +590,18 @@ class ModelSelectButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(borderRadius),
                 onTap: () {
                   HapticFeedback.lightImpact();
+                  
+                  // Eagerly read from context before opening the sheet (and before it closes)
+                  final modelService = context.read<ModelService>();
+                  final selectionService = context.read<SelectionService>();
+                  final inputProvider = context.read<InputProvider>();
+                  final langCode = Localizations.localeOf(context).languageCode;
+
                   showModelSelectionSheet(
                     context: context,
                     localizations: localizations,
                     currentModelId: sessionProvider.modelId ?? '',
                     onModelSelected: (String id) {
-                      // 1. Get Services
-                      final modelService = context.read<ModelService>();
-                      final selectionService = context.read<SelectionService>();
-                      final inputProvider = context.read<InputProvider>();
-                      final langCode =
-                          Localizations.localeOf(context).languageCode;
-
                       // 2. Fetch Model Data
                       final model = modelService.getPreciseModelData(id,
                           langCode: langCode);

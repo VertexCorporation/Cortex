@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart'
 ///
 /// Example:
 /// ```dart
-/// import 'firebase_options.dart';
+/// import 'options.dart';
 /// // ...
 /// await Firebase.initializeApp(
 ///   options: DefaultFirebaseOptions.currentPlatform,
@@ -29,12 +29,12 @@ class DefaultFirebaseOptions {
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       default:
         throw UnsupportedError(
@@ -46,7 +46,8 @@ class DefaultFirebaseOptions {
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyAaNXY_dmb7cV9iFWffX-2B6e13Tbichx0',
     appId:
-        '1:561391430514:web:bb7e4f1ca60d5e4bb10beb', // Dummy Web ID based on Android
+    '1:561391430514:web:bb7e4f1ca60d5e4bb10beb',
+    // Dummy Web ID based on Android
     messagingSenderId: '561391430514',
     projectId: 'vertex-ai-1618',
     authDomain: 'vertex-ai-1618.firebaseapp.com',
@@ -65,7 +66,8 @@ class DefaultFirebaseOptions {
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAaNXY_dmb7cV9iFWffX-2B6e13Tbichx0',
     appId:
-        '1:561391430514:ios:bb7e4f1ca60d5e4bb10beb', // Dummy iOS ID based on Android
+    '1:561391430514:ios:bb7e4f1ca60d5e4bb10beb',
+    // Dummy iOS ID based on Android
     messagingSenderId: '561391430514',
     projectId: 'vertex-ai-1618',
     storageBucket: 'vertex-ai-1618.firebasestorage.app',
@@ -75,7 +77,8 @@ class DefaultFirebaseOptions {
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAaNXY_dmb7cV9iFWffX-2B6e13Tbichx0',
     appId:
-        '1:561391430514:ios:bb7e4f1ca60d5e4bb10beb', // Dummy macOS ID based on Android
+    '1:561391430514:ios:bb7e4f1ca60d5e4bb10beb',
+    // Dummy macOS ID based on Android
     messagingSenderId: '561391430514',
     projectId: 'vertex-ai-1618',
     storageBucket: 'vertex-ai-1618.firebasestorage.app',

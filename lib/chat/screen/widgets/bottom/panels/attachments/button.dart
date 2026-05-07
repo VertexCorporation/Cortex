@@ -83,7 +83,7 @@ class AttachmentSheetButton extends StatelessWidget {
                     color: AppColors.primaryColor.inverted,
                     fontSize: fontSize,
                     fontWeight: FontWeight.w500,
-                    fontFamily: 'Roboto',
+                    fontFamily: 'Inter',
                   ),
                 ),
               ),

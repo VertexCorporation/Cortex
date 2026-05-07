@@ -81,10 +81,13 @@ class _DeleteAllConversationsDialogState
 
   @override
   Widget build(BuildContext context) {
-    context.watch<ThemeProvider>();
+    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
 
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Center(
       child: SingleChildScrollView(
@@ -133,7 +136,7 @@ class _DeleteAllConversationsDialogState
                                   color: AppColors.primaryColor.inverted),
                               enabledBorder: OutlineInputBorder(
                                   borderSide:
-                                      BorderSide(color: AppColors.quinaryColor),
+                                  BorderSide(color: AppColors.quinaryColor),
                                   borderRadius: BorderRadius.circular(10.0)),
                               focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
@@ -146,15 +149,15 @@ class _DeleteAllConversationsDialogState
                           duration: const Duration(milliseconds: 300),
                           child: _confirmError != null
                               ? Padding(
-                                  padding:
-                                      EdgeInsets.only(top: screenWidth * 0.02),
-                                  child: Text(_confirmError!,
-                                      style: TextStyle(
-                                          color: Colors.red,
-                                          fontSize: screenWidth * 0.03),
-                                      key: ValueKey(_confirmError)))
+                              padding:
+                              EdgeInsets.only(top: screenWidth * 0.02),
+                              child: Text(_confirmError!,
+                                  style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: screenWidth * 0.03),
+                                  key: ValueKey(_confirmError)))
                               : const SizedBox.shrink(
-                                  key: ValueKey("emptyConfirmError")),
+                              key: ValueKey("emptyConfirmError")),
                         ),
                       ],
                     ),
@@ -184,7 +187,7 @@ class _DeleteAllConversationsDialogState
                                             style: TextStyle(
                                                 color: AppColors.senaryColor,
                                                 fontSize:
-                                                    screenWidth * 0.04)))))),
+                                                screenWidth * 0.04)))))),
                         VerticalDivider(
                             width: 1,
                             thickness: 0.5,
@@ -194,9 +197,9 @@ class _DeleteAllConversationsDialogState
                                 color: Colors.transparent,
                                 child: InkWell(
                                     splashColor:
-                                        Colors.red.withValues(alpha: 0.3),
+                                    Colors.red.withValues(alpha: 0.3),
                                     highlightColor:
-                                        Colors.red.withValues(alpha: 0.1),
+                                    Colors.red.withValues(alpha: 0.1),
                                     onTap: () {
                                       HapticFeedback.lightImpact();
                                       _handleDelete();
@@ -209,7 +212,7 @@ class _DeleteAllConversationsDialogState
                                             style: TextStyle(
                                                 color: Colors.red,
                                                 fontSize:
-                                                    screenWidth * 0.04)))))),
+                                                screenWidth * 0.04)))))),
                       ],
                     ),
                   ),
@@ -272,10 +275,13 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog>
 
   @override
   Widget build(BuildContext context) {
-    context.watch<ThemeProvider>();
+    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
 
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Center(
       child: SingleChildScrollView(
@@ -326,13 +332,13 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog>
                                       borderSide: BorderSide(
                                           color: AppColors.quinaryColor),
                                       borderRadius:
-                                          BorderRadius.circular(10.0)),
+                                      BorderRadius.circular(10.0)),
                                   focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
                                           color:
-                                              AppColors.primaryColor.inverted),
+                                          AppColors.primaryColor.inverted),
                                       borderRadius:
-                                          BorderRadius.circular(10.0)),
+                                      BorderRadius.circular(10.0)),
                                 ),
                               ),
                             ),
@@ -340,15 +346,15 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog>
                               duration: const Duration(milliseconds: 300),
                               child: _confirmError != null
                                   ? Padding(
-                                      padding: EdgeInsets.only(
-                                          top: screenWidth * 0.02),
-                                      child: Text(_confirmError!,
-                                          style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: screenWidth * 0.03),
-                                          key: ValueKey(_confirmError)))
+                                  padding: EdgeInsets.only(
+                                      top: screenWidth * 0.02),
+                                  child: Text(_confirmError!,
+                                      style: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: screenWidth * 0.03),
+                                      key: ValueKey(_confirmError)))
                                   : const SizedBox.shrink(
-                                      key: ValueKey("emptyConfirmError")),
+                                  key: ValueKey("emptyConfirmError")),
                             ),
                           ],
                         ),
@@ -367,9 +373,9 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog>
                                         onTap: isDeleting
                                             ? null
                                             : () {
-                                                HapticFeedback.lightImpact();
-                                                Navigator.of(context).pop();
-                                              },
+                                          HapticFeedback.lightImpact();
+                                          Navigator.of(context).pop();
+                                        },
                                         splashColor: AppColors.senaryColor
                                             .withValues(alpha: 0.1),
                                         highlightColor: AppColors.senaryColor
@@ -381,7 +387,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog>
                                             child: Text(appLocalizations.cancel,
                                                 style: TextStyle(
                                                     color:
-                                                        AppColors.senaryColor,
+                                                    AppColors.senaryColor,
                                                     fontSize: screenWidth *
                                                         0.04)))))),
                             VerticalDivider(
@@ -393,31 +399,31 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog>
                                 color: Colors.transparent,
                                 child: InkWell(
                                   splashColor:
-                                      Colors.red.withValues(alpha: 0.3),
+                                  Colors.red.withValues(alpha: 0.3),
                                   highlightColor:
-                                      Colors.red.withValues(alpha: 0.1),
+                                  Colors.red.withValues(alpha: 0.1),
                                   onTap: isDeleting
                                       ? null
                                       : () {
-                                          HapticFeedback.lightImpact();
-                                          _handleDelete();
-                                        },
+                                    HapticFeedback.lightImpact();
+                                    _handleDelete();
+                                  },
                                   child: Container(
                                     alignment: Alignment.center,
                                     padding: EdgeInsets.symmetric(
                                         vertical: screenWidth * 0.04),
                                     child: isDeleting
                                         ? SizedBox(
-                                            width: screenWidth * 0.05,
-                                            height: screenWidth * 0.05,
-                                            child: CircularProgressIndicator(
-                                                strokeWidth: 2.0,
-                                                color: AppColors
-                                                    .primaryColor.inverted))
+                                        width: screenWidth * 0.05,
+                                        height: screenWidth * 0.05,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                            color: AppColors
+                                                .primaryColor.inverted))
                                         : Text(appLocalizations.delete,
-                                            style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: screenWidth * 0.04)),
+                                        style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: screenWidth * 0.04)),
                                   ),
                                 ),
                               ),
@@ -453,7 +459,10 @@ class DeleteSection extends StatelessWidget {
       barrierDismissible: true,
       barrierLabel: 'DeleteActionDialog',
       pageBuilder: (ctx, _, __) {
-        final keyboardPadding = MediaQuery.of(ctx).viewInsets.bottom;
+        final keyboardPadding = MediaQuery
+            .of(ctx)
+            .viewInsets
+            .bottom;
         return AnimatedPadding(
           padding: EdgeInsets.only(bottom: keyboardPadding),
           duration: const Duration(milliseconds: 50),
@@ -466,10 +475,16 @@ class DeleteSection extends StatelessWidget {
 
   Widget _buildDeleteAllConversationsButton(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     return Material(
-      color: AppColors.primaryColor,
+      color: AppColors.septenaryColor.withValues(alpha: 0.4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
         side: BorderSide(color: AppColors.septenaryColor, width: 1.5),
@@ -481,7 +496,7 @@ class DeleteSection extends StatelessWidget {
           _showDialog(context, child: const _DeleteAllConversationsDialog());
         },
         borderRadius: BorderRadius.circular(10.0),
-        splashColor: AppColors.septenaryColor.withValues(alpha: 0.3),
+        splashColor: AppColors.septenaryColor,
         child: Container(
           padding: EdgeInsets.symmetric(
               horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
@@ -496,7 +511,8 @@ class DeleteSection extends StatelessWidget {
                     fontWeight: FontWeight.w500),
               ),
               Icon(Icons.arrow_forward_ios,
-                  color: AppColors.primaryColor.inverted, size: screenWidth * 0.04),
+                  color: AppColors.primaryColor.inverted,
+                  size: screenWidth * 0.04),
             ],
           ),
         ),
@@ -506,10 +522,16 @@ class DeleteSection extends StatelessWidget {
 
   Widget _buildDeleteAccountButton(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     return Material(
-      color: AppColors.primaryColor,
+      color: AppColors.septenaryColor.withValues(alpha: 0.4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
         side: BorderSide(color: AppColors.septenaryColor, width: 1.5),
@@ -521,7 +543,7 @@ class DeleteSection extends StatelessWidget {
           _showDialog(context, child: const _DeleteAccountDialog());
         },
         borderRadius: BorderRadius.circular(10.0),
-        splashColor: AppColors.septenaryColor.withValues(alpha: 0.3),
+        splashColor: AppColors.septenaryColor,
         child: Container(
           padding: EdgeInsets.symmetric(
               horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
@@ -536,7 +558,8 @@ class DeleteSection extends StatelessWidget {
                     fontWeight: FontWeight.w500),
               ),
               Icon(Icons.arrow_forward_ios,
-                  color: AppColors.primaryColor.inverted, size: screenWidth * 0.04),
+                  color: AppColors.primaryColor.inverted,
+                  size: screenWidth * 0.04),
             ],
           ),
         ),
@@ -546,7 +569,10 @@ class DeleteSection extends StatelessWidget {
 
   Widget _buildDisabledInfoText(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     return Container(
       padding: EdgeInsets.symmetric(
           horizontal: screenWidth * 0.03, vertical: screenWidth * 0.03),
@@ -562,7 +588,7 @@ class DeleteSection extends StatelessWidget {
           SvgPicture.asset(
             'assets/icons/warning.svg',
             colorFilter:
-                ColorFilter.mode(AppColors.quinaryColor, BlendMode.srcIn),
+            ColorFilter.mode(AppColors.quinaryColor, BlendMode.srcIn),
             width: screenWidth * 0.05,
             height: screenWidth * 0.05,
           ),
@@ -582,15 +608,21 @@ class DeleteSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.watch<ThemeProvider>();
+    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
 
     final generalProvider = context.watch<SettingsGeneralProvider>();
     final hasInternet = generalProvider.hasInternet;
     final isAnonymous = generalProvider.isAnonymous;
 
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

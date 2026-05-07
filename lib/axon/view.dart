@@ -13,10 +13,11 @@ import 'content.dart';
 class Axon extends StatefulWidget {
   final VoidCallback onNewChatTap;
   final VoidCallback onLibraryTap;
+  final VoidCallback onCreateAITap;
+  final VoidCallback onArtsTap;
   final VoidCallback onNewsTap;
   final VoidCallback onCloseAxon;
   final VoidCallback onOpenAxon;
-  final ValueChanged<bool>? onSearchFocusChanged;
   final double referenceWidth;
   final int activeTab;
 
@@ -24,11 +25,12 @@ class Axon extends StatefulWidget {
     super.key,
     required this.onNewChatTap,
     required this.onLibraryTap,
+    required this.onCreateAITap,
+    required this.onArtsTap,
     required this.onNewsTap,
     required this.onCloseAxon,
     required this.onOpenAxon,
     required this.referenceWidth,
-    this.onSearchFocusChanged,
     required this.activeTab,
   });
 
@@ -36,10 +38,13 @@ class Axon extends StatefulWidget {
   State<Axon> createState() => _AxonState();
 }
 
-class _AxonState extends State<Axon> {
+class _AxonState extends State<Axon> with SingleTickerProviderStateMixin {
   late final ScrollController _scrollController;
   late final TextEditingController _searchController;
   late final FocusNode _searchFocusNode;
+
+  // Search mode animation controller — now internal to Axon
+  late final AnimationController _searchModeController;
 
   bool _isSearchActive = false;
 
@@ -49,6 +54,11 @@ class _AxonState extends State<Axon> {
     _scrollController = ScrollController();
     _searchController = TextEditingController();
     _searchFocusNode = FocusNode();
+    _searchModeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+      value: 0.0,
+    );
 
     _searchFocusNode.addListener(_onSearchFocusChange);
 
@@ -63,6 +73,7 @@ class _AxonState extends State<Axon> {
     _searchController.dispose();
     _searchFocusNode.removeListener(_onSearchFocusChange);
     _searchFocusNode.dispose();
+    _searchModeController.dispose();
 
     ActionPanelController.closeCurrent();
     super.dispose();
@@ -72,15 +83,22 @@ class _AxonState extends State<Axon> {
     final isFocused = _searchFocusNode.hasFocus;
     if (_isSearchActive != isFocused) {
       setState(() => _isSearchActive = isFocused);
-      widget.onSearchFocusChanged?.call(isFocused);
+      if (isFocused) {
+        _searchModeController.forward();
+      } else {
+        _searchModeController.reverse();
+      }
     }
   }
 
   void _handleSettingsTap() async {
     ActionPanelController.closeCurrent(); // Close context menu
-    
-    final screenWidth = MediaQuery.of(context).size.width;
-    
+
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+
     // For Desktop sizes, open Settings in a centered dialog.
     if (screenWidth >= 800) {
       await showDialog(
@@ -99,7 +117,10 @@ class _AxonState extends State<Axon> {
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: 680,
-                maxHeight: MediaQuery.of(context).size.height * 0.9,
+                maxHeight: MediaQuery
+                    .of(context)
+                    .size
+                    .height * 0.9,
               ),
               child: const SettingsScreen(),
             ),
@@ -107,15 +128,11 @@ class _AxonState extends State<Axon> {
         },
       );
     } else {
-      // Mobile behavior: Close Axon, Push Route, Re-open Axon on back
-      widget.onCloseAxon();
-
+      // Mobile behavior: Push Route without closing Axon
       await navigateToScreen(
         const SettingsScreen(),
-        direction: const Offset(0.1, 0.0),
+        direction: const Offset(1.0, 0.0), // Slide from right to left
       );
-
-      if (mounted) widget.onOpenAxon();
     }
   }
 
@@ -141,9 +158,12 @@ class _AxonState extends State<Axon> {
           scrollController: _scrollController,
           searchController: _searchController,
           searchFocusNode: _searchFocusNode,
+          searchModeAnimation: _searchModeController,
           isSearchActive: _isSearchActive,
           onNewChatTap: widget.onNewChatTap,
           onLibraryTap: widget.onLibraryTap,
+          onCreateAITap: widget.onCreateAITap,
+          onArtsTap: widget.onArtsTap,
           onNewsTap: widget.onNewsTap,
           onSettingsTap: _handleSettingsTap,
           onSearchChanged: _handleSearchQueryChanged,

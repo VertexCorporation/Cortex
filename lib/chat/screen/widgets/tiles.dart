@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p; // Standard path manipulation
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/messages/messages.dart';
 import 'package:cortex/chat/messages/viewer.dart';
+import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +69,7 @@ class Tiles {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.info_outline,
+              Icon(Icons.info_rounded,
                   color: AppColors.primaryColor.inverted, size: iconSize),
               SizedBox(width: screenWidth * 0.02),
               Expanded(
@@ -322,12 +323,23 @@ class Tiles {
           return Material(
             color: Colors.transparent,
             borderRadius: BorderRadius.circular(borderRadius),
-            clipBehavior: Clip.antiAlias,
+            clipBehavior: Clip.hardEdge, // PERFORMANCE: hardEdge avoids saveLayer
             child: InkWell(
               borderRadius: BorderRadius.circular(borderRadius),
               onTap: isNetworkImage || isDataImage
                   ? null
-                  : () => Navigator.push(context, PhotoViewer.route(file)),
+                  : () => Navigator.push(
+                        context,
+                        PhotoViewer.route(
+                          file,
+                          onEditImage: (imageFile) {
+                            // Add image as attachment and request keyboard focus
+                            final inputProvider =
+                                Provider.of<InputProvider>(context, listen: false);
+                            inputProvider.addAttachment(imageFile, isImage: true);
+                          },
+                        ),
+                      ),
               child: Hero(
                 tag: path, // Basic hero tag
                 child: ClipRRect(
@@ -488,7 +500,8 @@ class Tiles {
     required ModelService modelService,
   }) {
     if (message.isUserMessage) {
-      return buildUserMessageTile(
+      return RepaintBoundary( // PERFORMANCE: Repaint Boundary
+        child: buildUserMessageTile(
         context: context,
         message: message,
         index: index,
@@ -499,9 +512,11 @@ class Tiles {
         onFadeOutComplete: onFadeOutComplete,
         screenWidth: screenWidth,
         screenHeight: screenHeight,
+      ),
       );
     } else {
-      return buildAIMessageTile(
+      return RepaintBoundary( // PERFORMANCE: Repaint Boundary
+        child: buildAIMessageTile(
         context: context,
         message: message,
         modelId: modelId,
@@ -511,6 +526,7 @@ class Tiles {
         screenWidth: screenWidth,
         screenHeight: screenHeight,
         modelService: modelService,
+      ),
       );
     }
   }
@@ -529,20 +545,15 @@ class Tiles {
     required ValueChanged<int> onReport,
     double bottomPadding = 0.0,
   }) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
     final modelService = context.read<ModelService>();
-    final double statusBarHeight = MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final double statusBarHeight = mediaQuery.padding.top;
     final double totalTopPadding = statusBarHeight;
+
+    // Pre-compute separator to avoid closure allocation per frame
+    final separatorWidget = SizedBox(height: screenHeight * 0.01);
 
     // Filter invisible messages but keep track of original indices
     final List<int> visibleIndices = [];
@@ -556,10 +567,11 @@ class Tiles {
       controller: scrollController,
       padding: EdgeInsets.only(
           top: totalTopPadding, bottom: bottomPadding + (screenHeight * 0.01)),
-      cacheExtent: 500,
+      cacheExtent: 2500, // PERFORMANCE: Keep generous cache extent for smooth scrolling
+      addAutomaticKeepAlives: false, // PERFORMANCE: Let cacheExtent manage viewport window instead of keeping ALL tiles alive
+      addRepaintBoundaries: true, // PERFORMANCE: Independent Repaint boundaries per tile
       itemCount: visibleIndices.length,
-      separatorBuilder: (context, index) =>
-          SizedBox(height: screenHeight * 0.01),
+      separatorBuilder: (context, index) => separatorWidget,
       itemBuilder: (context, index) {
         final int realIndex = visibleIndices[index];
         Message message = messages[realIndex];
@@ -671,7 +683,7 @@ class _VideoAttachmentCardState extends State<_VideoAttachmentCard> {
     return Material(
       color: Colors.transparent,
       borderRadius: borderRadius,
-      clipBehavior: Clip.antiAlias,
+      clipBehavior: Clip.hardEdge, // PERFORMANCE: hardEdge avoids saveLayer
       child: InkWell(
         borderRadius: borderRadius,
         onTap: () => Navigator.push(context, VideoViewer.route(widget.path)),

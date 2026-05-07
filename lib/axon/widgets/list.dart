@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:provider/provider.dart';
 
 // Logic & Data
@@ -206,24 +206,31 @@ class _AxonConversationListState extends State<AxonConversationList> {
           ],
         );
       },
+      // PERFORMANCE: Single Shimmer wrapper instead of 8 independent
+      // AnimationControllers. Each Shimmer.fromColors creates its own
+      // controller; wrapping all tiles in one reduces overhead significantly.
       child: showSkeletons
-          ? ListView.separated(
+          ? Shimmer.fromColors(
               key: const ValueKey('loading_skeletons'),
-              padding: EdgeInsets.fromLTRB(
-                horizontalPadding * 0.5,
-                0,
-                horizontalPadding * 0.5,
-                0,
+              baseColor: AppColors.secondaryColor,
+              highlightColor: AppColors.tertiaryColor.withValues(alpha: 0.1),
+              child: ListView.separated(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding * 0.5,
+                  0,
+                  horizontalPadding * 0.5,
+                  0,
+                ),
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 8,
+                separatorBuilder: (context, index) => const SizedBox(height: 0),
+                itemBuilder: (context, index) {
+                  return _SkeletonTilePlain(
+                    referenceWidth: widget.referenceWidth,
+                    screenHeight: widget.screenHeight,
+                  );
+                },
               ),
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 50,
-              separatorBuilder: (context, index) => const SizedBox(height: 0),
-              itemBuilder: (context, index) {
-                return _SkeletonTile(
-                  referenceWidth: widget.referenceWidth,
-                  screenHeight: widget.screenHeight,
-                );
-              },
             )
           : _buildListContent(
               localizations,
@@ -340,7 +347,8 @@ class _AxonConversationListState extends State<AxonConversationList> {
           SizedBox(height: widget.screenHeight * 0.02),
           Text(
             localizations.noFoundTitle,
-            style: GoogleFonts.roboto(
+            style: TextStyle(
+              fontFamily: 'Inter',
               color: AppColors.primaryColor.inverted,
               fontSize: widget.referenceWidth * 0.045,
               fontWeight: FontWeight.w600,
@@ -349,7 +357,8 @@ class _AxonConversationListState extends State<AxonConversationList> {
           SizedBox(height: widget.screenHeight * 0.008),
           Text(
             localizations.noFoundMessage,
-            style: GoogleFonts.roboto(
+            style: TextStyle(
+              fontFamily: 'Inter',
               color: AppColors.tertiaryColor,
               fontSize: widget.referenceWidth * 0.038,
             ),
@@ -361,19 +370,20 @@ class _AxonConversationListState extends State<AxonConversationList> {
   }
 }
 
-class _SkeletonTile extends StatelessWidget {
+/// PERFORMANCE: Plain skeleton tile without its own Shimmer wrapper.
+/// The parent wraps all tiles in a single Shimmer.fromColors to avoid
+/// creating 8 independent AnimationControllers.
+class _SkeletonTilePlain extends StatelessWidget {
   final double referenceWidth;
   final double screenHeight;
 
-  const _SkeletonTile({
+  const _SkeletonTilePlain({
     required this.referenceWidth,
     required this.screenHeight,
   });
 
   @override
   Widget build(BuildContext context) {
-    // --- EXACT DIMENSION REPLICATION ---
-
     // 1. Margins
     final double marginV = screenHeight * 0.003;
     final double marginH = referenceWidth * 0.01;
@@ -390,47 +400,41 @@ class _SkeletonTile extends StatelessWidget {
     // 5. Total Height = Avatar + (InnerPadding * 2)
     final double contentHeight = avatarSize + (innerPaddingV * 2);
 
-    return Shimmer.fromColors(
-      baseColor: AppColors.secondaryColor,
-      highlightColor: AppColors.tertiaryColor.withValues(alpha: 0.1),
-      child: Container(
-        height: contentHeight,
-        margin: EdgeInsets.symmetric(horizontal: marginH, vertical: marginV),
-        decoration: BoxDecoration(
-          color: AppColors.secondaryColor,
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        child: Row(
-          children: [
-            SizedBox(width: referenceWidth * 0.03), // Left Inner Padding
-            // Avatar Circle
-            Container(
-              width: avatarSize,
-              height: avatarSize,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
+    return Container(
+      height: contentHeight,
+      margin: EdgeInsets.symmetric(horizontal: marginH, vertical: marginV),
+      decoration: BoxDecoration(
+        color: AppColors.secondaryColor,
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: referenceWidth * 0.03),
+          Container(
+            width: avatarSize,
+            height: avatarSize,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
             ),
-            SizedBox(width: referenceWidth * 0.03), // Gap
-            // Text Lines
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: referenceWidth * 0.035,
-                    color: Colors.white,
-                    margin: EdgeInsets.only(right: referenceWidth * 0.15),
-                  ),
-                ],
-              ),
+          ),
+          SizedBox(width: referenceWidth * 0.03),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: referenceWidth * 0.035,
+                  color: Colors.white,
+                  margin: EdgeInsets.only(right: referenceWidth * 0.15),
+                ),
+              ],
             ),
-            SizedBox(width: referenceWidth * 0.03), // Right Inner Padding
-          ],
-        ),
+          ),
+          SizedBox(width: referenceWidth * 0.03),
+        ],
       ),
     );
   }

@@ -66,6 +66,7 @@ class ApiService {
     FutureOr<void> Function(String mediaType)? onMediaGenerating,
     Function(List<dynamic> toolCalls)? onToolCall,
     Function(List<dynamic> citations)? onCitations,
+    Function()? onServerFallback,
     required AppLocalizations localizations,
   }) async {
     _cancelToken = CancelToken();
@@ -180,7 +181,14 @@ class ApiService {
 
                   switch (code) {
                     case 'PREMIUM_TRIAL_EXHAUSTED':
+                    case 'PREDIT_EXHAUSTED':
                       userMsg = localizations.premiumTrialExhaustedMessage;
+                      break;
+                    case 'VIDEO_ULTRA_ONLY':
+                      userMsg = localizations.premiumTrialExhaustedMessage;
+                      break;
+                    case 'DREDIT_EXHAUSTED':
+                      userMsg = localizations.errorReachedLimit;
                       break;
                     case 'INSUFFICIENT_USER_CREDITS':
                       userMsg = localizations.errorReachedLimit;
@@ -250,6 +258,10 @@ class ApiService {
 
                   case 'generating_video':
                     trackCallback(onMediaGenerating?.call('video'));
+                    break;
+
+                  case 'server_fallback':
+                    trackCallback(onServerFallback?.call());
                     break;
 
                   case 'citations':
@@ -537,6 +549,7 @@ class ApiService {
     Function(String)? onMediaGenerating,
     Function(List<dynamic>)? onToolCall,
     Function(List<dynamic>)? onCitations,
+    Function()? onServerFallback,
     required AppLocalizations localizations,
     required String langCode,
     bool useTools = true,
@@ -589,6 +602,7 @@ class ApiService {
       onMediaGenerating: onMediaGenerating,
       onToolCall: onToolCall,
       onCitations: onCitations,
+      onServerFallback: onServerFallback,
     );
   }
 }

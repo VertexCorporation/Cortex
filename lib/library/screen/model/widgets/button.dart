@@ -22,17 +22,22 @@ class BottomActionButtons extends StatelessWidget {
 
   /// A unified method to handle starting a chat and navigating away.
   void _startChat(BuildContext context, ModelDetailProvider provider) {
+    // For offline series, use the selected variant ID instead of the parent series ID.
+    final String chatModelId = provider.isOfflineSeries
+        ? provider.selectedVariantId
+        : provider.mainModel!.id;
+
     // filePath is only relevant for downloaded offline models.
     final filePath = !provider.mainModel!.isServerSide && provider.isDownloaded
         ? context
             .read<ModelLocalStateProvider>()
-            .getFilePathById(provider.mainModel!.id)
+            .getFilePathById(chatModelId)
         : null;
 
     // Pop the screen and return a map containing the action and the necessary data.
     Navigator.of(context).pop({
       'action': 'start_chat',
-      'modelId': provider.mainModel!.id,
+      'modelId': chatModelId,
       'filePath': filePath,
       'model_updated':
           provider.didBaseModelChange, // Pass along the update status
@@ -212,10 +217,21 @@ class BottomActionButtons extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final localProvider = context.read<ModelLocalStateProvider>();
 
+    // For offline series, target the selected variant ID.
+    final String targetId = provider.isOfflineSeries
+        ? provider.selectedVariantId
+        : provider.mainModel!.id;
+    final String? targetUrl = provider.isOfflineSeries
+        ? provider.selectedVariantUrl
+        : provider.mainModel!.url;
+    final int? targetSize = provider.isOfflineSeries
+        ? provider.selectedVariantSize
+        : provider.mainModel!.size;
+
     if (provider.isDownloading || provider.isPaused) {
       return AnimatedCancelButton(
           key: const ValueKey('cancelButton'),
-          onPressed: () => localProvider.cancelDownload(provider.mainModel!.id),
+          onPressed: () => localProvider.cancelDownload(targetId),
           width: double.infinity,
           height: buttonHeight,
           borderRadius: screenWidth * 0.03,
@@ -230,7 +246,7 @@ class BottomActionButtons extends StatelessWidget {
     final bool hasInternet = internetProvider.isConnected;
 
     final compatibility =
-        localProvider.getCompatibilityStatus(provider.mainModel!.size);
+        localProvider.getCompatibilityStatus(targetSize);
     final isCompatible = compatibility == CompatibilityStatus.compatible;
 
     String buttonText;
@@ -255,8 +271,8 @@ class BottomActionButtons extends StatelessWidget {
                 HapticFeedback.lightImpact();
                 localProvider.requestPermissionAndStartDownload(
                   context: context,
-                  id: provider.mainModel!.id,
-                  url: provider.mainModel!.url,
+                  id: targetId,
+                  url: targetUrl,
                 );
               }
             : null,

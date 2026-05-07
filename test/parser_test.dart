@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:cortex/chat/messages/parser.dart';
+import 'package:cortex/chat/messages/markdown/patterns.dart';
 
 // Copy of the logic from ai.dart for isolation testing
 List<InlineSpan> _parseThinkingTextTest(String text) {

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:cortex/chat/services/storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:cortex/chat/messages/messages.dart';
 
 import '../../cache.dart';
@@ -38,11 +39,17 @@ class ConversationProvider with ChangeNotifier {
   // ===========================================================================
 
   ConversationProvider() {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user == null) {
-        resetForLogout();
+    try {
+      if (Firebase.apps.isNotEmpty) {
+        FirebaseAuth.instance.authStateChanges().listen((User? user) {
+          if (user == null) {
+            resetForLogout();
+          }
+        });
       }
-    });
+    } catch (e) {
+      // Ignored during testing if Firebase is not mocked
+    }
   }
 
   @override

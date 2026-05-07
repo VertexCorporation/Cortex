@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class SpeechService with ChangeNotifier {
@@ -58,22 +59,35 @@ class SpeechService with ChangeNotifier {
 
     // Ensure initialized if not already
     if (!_isAvailable) {
-      bool initSuccess = await _speech.initialize(
-        onStatus: (status) {
-          _isListening = status == 'listening';
-          if (!_isListening) {
+      bool initSuccess = false;
+      try {
+        initSuccess = await _speech.initialize(
+          onStatus: (status) {
+            _isListening = status == 'listening';
+            if (!_isListening) {
+              _soundLevel = 0.0;
+            }
+            notifyListeners();
+          },
+          onError: (errorNotification) {
+            _isListening = false;
             _soundLevel = 0.0;
-          }
-          notifyListeners();
-        },
-        onError: (errorNotification) {
-          _isListening = false;
-          _soundLevel = 0.0;
-          // Note: We DO NOT set _isDeviceSupported=false here.
-          // Temporary errors (network, silence) should not hide the feature.
-          notifyListeners();
-        },
-      );
+            // Note: We DO NOT set _isDeviceSupported=false here.
+            // Temporary errors (network, silence) should not hide the feature.
+            notifyListeners();
+          },
+        );
+      } on PlatformException catch (e) {
+        debugPrint("Speech recognition not available (PlatformException): $e");
+        _isDeviceSupported = false;
+        notifyListeners();
+        return;
+      } catch (e) {
+        debugPrint("Speech initialization failed in startListening: $e");
+        _isDeviceSupported = false;
+        notifyListeners();
+        return;
+      }
 
       if (!initSuccess) {
         // Initialization failed, but maybe temporary.

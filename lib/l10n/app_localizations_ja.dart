@@ -484,6 +484,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get shareApp => 'アプリを共有';
 
   @override
+  String get ourStory => '私たちの物語';
+
+  @override
   String get rateUs => '評価する';
 
   @override
@@ -1054,6 +1057,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get news => 'ニュース';
 
   @override
+  String get createAI => 'Create';
+
+  @override
+  String get shortcuts => 'Shortcuts';
+
+  @override
   String get allModels => '全モデル';
 
   @override
@@ -1535,6 +1544,12 @@ class AppLocalizationsJa extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
+  String get featureCreateVideoTitle => '動画を作成する';
+
+  @override
+  String get featureCreateVideoDescription => 'テキストから動画を生成する。';
+
+  @override
   String get featureStudyTitle => '勉強と学習';
 
   @override
@@ -1826,4 +1841,57 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => '音声ファイル';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesNameは、Cortex上で高いパフォーマンスを発揮する高度な知能です。';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelNameは、Cortexエコシステムに統合された高性能な人工知能です。さまざまな複雑なタスクを克服するように設計されており、信頼性が高く効率的な処理機能を提供します。迅速な応答時間と高度な分析能力を提供することで、日常の生産性を大幅に向上させます。Cortexの安全なローカルインフラストラクチャ上でシームレスに動作するこのモデルは、創造的なブレインストーミングから深い技術分析まで、幅広いタスクでユーザーを支援します。今日からその可能性を最大限に引き出しましょう。';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle => 'Cortexの知能が好きですか？';
+
+  @override
+  String get guestLimitBottomSheetText =>
+      'さらに高度なインテリジェンスを活用し、より多くのコンテンツを生成し、より多くのチャットを行い、さらに多くのことを実現しましょう。';
+
+  @override
+  String get arts => '芸術';
+
+  @override
+  String get noArt => 'アートなし';
+
+  @override
+  String get noArtDescription =>
+      '作品がありません。画像、動画、音声など、あらゆるコンテンツを作成してギャラリーを充実させましょう！';
+
+  @override
+  String get videoPremiumWarning =>
+      '動画を作成するにはUltraプランへのアップグレードが必要です。今すぐアップグレードして、スムーズな操作感を体験してください！';
+
+  @override
+  String get becomePremiumButton => 'プレミアム会員になる';
+
+  @override
+  String get fallbackInfoPanelText =>
+      'サーバー側の改善作業のため、お客様が選択されたAIではなく、Cortexの動的チャット機能によって応答が生成されました。処理が完了するまで、ご理解いただけますようお願い申し上げます。';
+
+  @override
+  String get falOfflineMessage =>
+      'サーバー側の改善作業のため、現在このサービスは一時的にご利用いただけません。作業完了までご理解いただけますようお願い申し上げます。';
+
+  @override
+  String get errorInsufficientStorage => 'このモデルをダウンロードするにはストレージ容量が不足しています。';
+
+  @override
+  String get backgroundChatNotificationTitle => 'チャットに戻る！';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return '$chatNameに新しいメッセージが届いています。ぜひチェックしてみてください！';
+  }
 }

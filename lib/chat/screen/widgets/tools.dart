@@ -670,7 +670,7 @@ class _WorkInProgressWidgetState extends State<WorkInProgressWidget>
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.hourglass_empty_rounded,
+                Icon(Icons.hourglass_full_rounded,
                     size: 16, color: AppColors.tertiaryColor),
                 const SizedBox(width: 8),
                 Text(

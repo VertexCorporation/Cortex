@@ -34,7 +34,7 @@ class DefaultCard extends StatelessWidget {
       child: InkWell(
         borderRadius: borderRadius,
         onTap: onTap,
-        splashColor: contentColor.withValues(alpha: 0.1),
+        splashColor: AppColors.background.withValues(alpha: 0.1),
         highlightColor: contentColor.withValues(alpha: 0.05),
         child: Container(
           height: height,
