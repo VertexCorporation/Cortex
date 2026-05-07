@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../../app.dart';
@@ -53,7 +53,7 @@ class EmptyStateView extends StatelessWidget {
               // 1. Icon (SVG for Inbox, Icon for Starred)
               isForStarred
                   ? Icon(
-                      Icons.star_border_rounded,
+                      Icons.star_rounded,
                       size: 48,
                       color: AppColors.tertiaryColor.withValues(alpha: 0.4),
                     )
@@ -71,7 +71,8 @@ class EmptyStateView extends StatelessWidget {
               // 2. Title (Increased size: 16 -> 18)
               Text(
                 title,
-                style: GoogleFonts.roboto(
+                style: TextStyle(
+                  fontFamily: 'Inter',
                   color: AppColors.primaryColor.inverted,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -83,7 +84,8 @@ class EmptyStateView extends StatelessWidget {
               // 3. Message (Increased size: 13 -> 14.5)
               Text(
                 message,
-                style: GoogleFonts.roboto(
+                style: TextStyle(
+                  fontFamily: 'Inter',
                   color: AppColors.tertiaryColor,
                   fontSize: 14.5,
                   height: 1.4,

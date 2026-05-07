@@ -182,7 +182,7 @@ class _LoginFormState extends State<LoginForm> {
                 labelStyle: TextStyle(
                     color: Theme.of(context).textTheme.bodySmall?.color,
                     fontSize: 14 * widget.fontScale),
-                prefixIcon: Icon(Icons.lock_outline,
+                prefixIcon: Icon(Icons.lock,
                     color: Theme.of(context).iconTheme.color,
                     size: 24 * widget.fontScale),
                 suffixIcon: IconButton(

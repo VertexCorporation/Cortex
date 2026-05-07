@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:cortex/axon/inbox/panel/view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:provider/provider.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import '../../../../main.dart';
@@ -13,6 +13,8 @@ import '../../../app.dart';
 import '../../../../chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart'; // [NEW]
 import 'package:cortex/chat/services/voice.dart'; // [NEW]
+import 'package:cortex/chat/services/background.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../overflow.dart';
 import '../logic/manager.dart';
 
@@ -72,10 +74,27 @@ class _AxonConversationTileState extends State<AxonConversationTile>
       parent: _deleteController,
       curve: Curves.easeOut,
     );
+
+    // Listen to manager changes (star, title, last message) for reactive UI.
+    widget.manager.addListener(_onManagerChange);
+  }
+
+  @override
+  void didUpdateWidget(covariant AxonConversationTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.manager != widget.manager) {
+      oldWidget.manager.removeListener(_onManagerChange);
+      widget.manager.addListener(_onManagerChange);
+    }
+  }
+
+  void _onManagerChange() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    widget.manager.removeListener(_onManagerChange);
     _holdTimer?.cancel();
     _deleteController.dispose();
     super.dispose();
@@ -252,14 +271,16 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     final double gapAvatarText = screenWidth * 0.03;
     final double gapTextIcon = screenWidth * 0.015;
 
-    // --- 2. State & Colors ---
+    // PERFORMANCE: Use context.select instead of context.watch to prevent
+    // rebuilding ALL sidebar tiles on every stream chunk (~30fps).
+    // We only need rebuilds when conversationID or selectedIndex actually changes.
     final currentConversationId =
-        context.watch<ConversationProvider>().conversationID;
+        context.select<ConversationProvider, String?>((p) => p.conversationID);
 
     // [FIX] Check if we are actually on the Chat tab (index 0).
     // If user is in Library (1) or News (2), the tile should NOT be highlighted
     // even if it matches the currentConversationId.
-    final selectedTab = context.watch<TabProvider>().selectedIndex;
+    final selectedTab = context.select<TabProvider, int>((p) => p.selectedIndex);
     final isActive = (selectedTab == 0) &&
         (currentConversationId == widget.manager.conversationID);
     final Color textColor = AppColors.primaryColor.inverted;
@@ -285,7 +306,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
         child: Material(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(borderRadius),
-          clipBehavior: Clip.antiAlias,
+          clipBehavior: Clip.hardEdge, // PERFORMANCE: hardEdge avoids saveLayer overhead
           child: InkWell(
             onTapDown: _onTapDown,
             onTapUp: _onTapUp,
@@ -331,7 +352,8 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                         text: widget.manager.conversationTitle,
                         maxLines: 1,
                         fadeLength: 8,
-                        style: GoogleFonts.roboto(
+                        style: TextStyle(
+                          fontFamily: 'Inter',
                           color: isActive
                               ? textColor
                               : textColor.withValues(alpha: 0.85),
@@ -344,6 +366,29 @@ class _AxonConversationTileState extends State<AxonConversationTile>
                   ),
 
                   SizedBox(width: gapTextIcon),
+
+                  // Dynamic Play Icon (Background Task Indicator)
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                      return ScaleTransition(scale: animation, child: child);
+                    },
+                    child: context.select<BackgroundTaskService, bool>(
+                      (bg) => bg.isActive(widget.manager.conversationID),
+                    )
+                        ? SvgPicture.asset(
+                            'assets/icons/play.svg',
+                            key: const ValueKey('play'),
+                            width: starIconSize,
+                            height: starIconSize,
+                            colorFilter: ColorFilter.mode(
+                              Colors.greenAccent,
+                              BlendMode.srcIn,
+                            ),
+                          )
+                        : SizedBox.shrink(key: const ValueKey('no_play')),
+                  ),
 
                   // Dynamic Star Icon
                   AnimatedSwitcher(

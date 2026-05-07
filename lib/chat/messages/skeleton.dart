@@ -23,6 +23,10 @@ class _MessageListSkeletonState extends State<MessageListSkeleton>
   late Animation<double> _fadeAnimation;
   late final ScrollController _scrollController;
 
+  // PERFORMANCE: Pre-compute skeleton dimensions in initState instead of
+  // creating new Random() and recalculating on every build() call.
+  late final List<_SkeletonItemData> _skeletonItems;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +41,51 @@ class _MessageListSkeletonState extends State<MessageListSkeleton>
       curve: Curves.easeIn,
     );
     _controller.forward();
+
+    // Pre-compute all skeleton item dimensions once
+    _skeletonItems = _generateSkeletonItems();
+  }
+
+  List<_SkeletonItemData> _generateSkeletonItems() {
+    final random = Random(42); // Fixed seed for consistent layout
+    const itemCount = 12; // Reduced from 16
+    return List.generate(itemCount, (index) {
+      final bool isUserMessage = index % 2 == 0;
+      double heightFraction;
+      double widthFraction;
+
+      if (isUserMessage) {
+        final heightVariant = random.nextInt(100);
+        if (heightVariant < 40) {
+          heightFraction = 0.045;
+          widthFraction = 0.35 + random.nextDouble() * 0.25;
+        } else if (heightVariant < 75) {
+          heightFraction = 0.08;
+          widthFraction = 0.5 + random.nextDouble() * 0.35;
+        } else {
+          heightFraction = 0.12;
+          widthFraction = 0.65 + random.nextDouble() * 0.25;
+        }
+      } else {
+        final heightVariant = random.nextInt(100);
+        if (heightVariant < 25) {
+          heightFraction = 0.07;
+          widthFraction = 0.5 + random.nextDouble() * 0.3;
+        } else if (heightVariant < 60) {
+          heightFraction = 0.12;
+          widthFraction = 0.65 + random.nextDouble() * 0.25;
+        } else {
+          heightFraction = 0.16;
+          widthFraction = 0.75 + random.nextDouble() * 0.2;
+        }
+      }
+
+      return _SkeletonItemData(
+        isUserMessage: isUserMessage,
+        heightFraction: heightFraction,
+        widthFraction: widthFraction,
+      );
+    });
   }
 
   @override
@@ -50,85 +99,63 @@ class _MessageListSkeletonState extends State<MessageListSkeleton>
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    final random = Random();
 
-    // Wrapping in FadeTransition for enter animation, 
-    // and RepaintBoundary to ensure exit fade (AnimatedSwitcher in parent) handles ShaderMask properly
+    // PERFORMANCE: Single Shimmer wrapper instead of 16 (now 12) independent
+    // AnimationControllers. Each Shimmer.fromColors creates its own controller.
     return FadeTransition(
       opacity: _fadeAnimation,
       child: RepaintBoundary(
-        child: ListView.builder(
-          controller: _scrollController,
-          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-          padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-      itemCount: 16, // Realistic number of skeleton items
-      itemBuilder: (context, index) {
-        // Alternate between user and bot message skeletons
-        final bool isUserMessage = index % 2 == 0;
-        final double height;
-        final double width;
+        child: Shimmer.fromColors(
+          baseColor: AppColors.shimmerBase,
+          highlightColor: AppColors.shimmerHighlight,
+          child: ListView.builder(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
+            padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+            itemCount: _skeletonItems.length,
+            itemBuilder: (context, index) {
+              final item = _skeletonItems[index];
+              final height = screenHeight * item.heightFraction;
+              final width = screenWidth * item.widthFraction;
 
-        // Generate varied dimensions with more realistic message lengths
-        if (isUserMessage) {
-          // User messages: shorter, right-aligned
-          final heightVariant = random.nextInt(100);
-          if (heightVariant < 40) {
-            // Short message (single line)
-            height = screenHeight * 0.045;
-            width = screenWidth * (0.35 + random.nextDouble() * 0.25);
-          } else if (heightVariant < 75) {
-            // Medium message (2 lines)
-            height = screenHeight * 0.08;
-            width = screenWidth * (0.5 + random.nextDouble() * 0.35);
-          } else {
-            // Longer message (3 lines)
-            height = screenHeight * 0.12;
-            width = screenWidth * (0.65 + random.nextDouble() * 0.25);
-          }
-        } else {
-          // Bot messages: longer, left-aligned
-          final heightVariant = random.nextInt(100);
-          if (heightVariant < 25) {
-            // Short response
-            height = screenHeight * 0.07;
-            width = screenWidth * (0.5 + random.nextDouble() * 0.3);
-          } else if (heightVariant < 60) {
-            // Medium response (2-3 lines)
-            height = screenHeight * 0.12;
-            width = screenWidth * (0.65 + random.nextDouble() * 0.25);
-          } else {
-            // Longer response (4 lines or more)
-            height = screenHeight * 0.16;
-            width = screenWidth * (0.75 + random.nextDouble() * 0.2);
-          }
-        }
-
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.008,
-            horizontal: screenWidth * 0.04,
-          ),
-          child: Align(
-            alignment: isUserMessage ? Alignment.centerRight : Alignment.centerLeft,
-            child: Shimmer.fromColors(
-              baseColor: AppColors.shimmerBase,
-              highlightColor: AppColors.shimmerHighlight,
-              child: Container(
-                width: width,
-                height: height,
-                decoration: BoxDecoration(
-                  color: AppColors.tertiaryColor,
-                  borderRadius: BorderRadius.circular(
-                      isUserMessage ? (height / 2) : 12
+              return Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: screenHeight * 0.008,
+                  horizontal: screenWidth * 0.04,
+                ),
+                child: Align(
+                  alignment: item.isUserMessage
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: Container(
+                    width: width,
+                    height: height,
+                    decoration: BoxDecoration(
+                      color: AppColors.tertiaryColor,
+                      borderRadius: BorderRadius.circular(
+                          item.isUserMessage ? (height / 2) : 12),
+                    ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
-        );
-      },
-    ),
+        ),
       ),
     );
   }
+}
+
+/// Pre-computed skeleton item dimensions to avoid recalculating on every build.
+class _SkeletonItemData {
+  final bool isUserMessage;
+  final double heightFraction;
+  final double widthFraction;
+
+  const _SkeletonItemData({
+    required this.isUserMessage,
+    required this.heightFraction,
+    required this.widthFraction,
+  });
 }

@@ -44,17 +44,37 @@ Future<_ProcessedStateData> _processModelStatesInBackground(
       model['id'] as String: false
   };
 
+  // Collect variant maps from offline series models for individual tracking.
+  final List<Map<String, dynamic>> variantMaps = [];
+  for (var model in offlineModels) {
+    final variants = model['variants'] as Map<String, dynamic>?;
+    if (variants != null && variants.isNotEmpty) {
+      for (final entry in variants.entries) {
+        if (entry.value is Map<String, dynamic>) {
+          variantMaps.add({
+            'id': entry.key,
+            'type': 'offline',
+            ...entry.value as Map<String, dynamic>,
+          });
+        }
+      }
+    }
+  }
+
+  // Check states for both top-level offline models and their variants.
+  final allOfflineToCheck = [...offlineModels, ...variantMaps];
+
   final newPathStates = await ModelsBackendUtils.collectFileStates(
-      offlineModels, filesDirectoryPath);
+      allOfflineToCheck, filesDirectoryPath);
 
   Map<String, bool> oldPathStates = {};
   if (filesDirectoryPath != oldFilesDirectoryPath) {
     oldPathStates = await ModelsBackendUtils.collectFileStates(
-        offlineModels, oldFilesDirectoryPath);
+        allOfflineToCheck, oldFilesDirectoryPath);
   }
 
   final Map<String, bool> combinedStates = {};
-  for (var model in offlineModels) {
+  for (var model in allOfflineToCheck) {
     final id = model['id'] as String;
     final existsInNew = newPathStates[id] ?? false;
     final existsInOld = oldPathStates[id] ?? false;
@@ -219,9 +239,14 @@ class ModelLocalStateProvider extends ChangeNotifier
 
     try {
       if (Platform.isIOS) {
-        final model = _currentModels.firstWhere((m) => m.id == id,
-            orElse: () => _currentModels.first);
-        final double sizeInGB = (model.size ?? 0) / 1024.0;
+        final double sizeInGB;
+        // For variant downloads, find the size from the variant data.
+        final directModel = _currentModels.where((m) => m.id == id).toList();
+        if (directModel.isNotEmpty) {
+          sizeInGB = (directModel.first.size ?? 0) / 1024.0;
+        } else {
+          sizeInGB = (_findSizeById(id) ?? 0) / 1024.0;
+        }
 
         final bool confirmed = await _showDownloadConfirmationDialog(
             context, modelTitle, sizeInGB);
@@ -274,9 +299,8 @@ class ModelLocalStateProvider extends ChangeNotifier
 
       final canShowSystemNotifications = notificationStatus.isGranted;
 
-      final model = _currentModels.firstWhere((m) => m.id == id,
-          orElse: () => _currentModels.first);
-      final double? sizeVal = model.size?.toDouble();
+      // Resolve size: for variant downloads, find size from variant data.
+      final double? sizeVal = _findSizeById(id);
 
       _dl.startDownload(
           id: id,
@@ -378,21 +402,38 @@ class ModelLocalStateProvider extends ChangeNotifier
   Future<void> _refreshStateAfterFileChange() async {
     if (_filesDirectoryPath.isEmpty) await _initializeDependencies();
 
-    final modelsList = _currentModels.map((e) => e.toMap()).toList();
+    // Build the list: include both top-level models AND their variants.
+    final List<Map<String, dynamic>> allToCheck = [];
+    for (final model in _currentModels) {
+      allToCheck.add(model.toMap());
+      // For offline series, also check each variant's download state.
+      if (!model.isServerSide && (model.variants?.isNotEmpty ?? false)) {
+        for (final entry in model.variants!.entries) {
+          if (entry.value is Map<String, dynamic>) {
+            allToCheck.add({
+              'id': entry.key,
+              'type': 'offline',
+              ...entry.value as Map<String, dynamic>,
+            });
+          }
+        }
+      }
+    }
 
     final newDownloadStates = await ModelsBackendUtils.collectFileStates(
-        modelsList, _filesDirectoryPath);
+        allToCheck, _filesDirectoryPath);
 
     Map<String, bool> oldDownloadStates = {};
     if (_filesDirectoryPath != _oldFilesDirectoryPath) {
       oldDownloadStates = await ModelsBackendUtils.collectFileStates(
-          modelsList, _oldFilesDirectoryPath);
+          allToCheck, _oldFilesDirectoryPath);
     }
 
     final Map<String, bool> combinedStates = {};
-    for (var model in _currentModels) {
-      combinedStates[model.id] = (newDownloadStates[model.id] ?? false) ||
-          (oldDownloadStates[model.id] ?? false);
+    for (var item in allToCheck) {
+      final id = item['id'] as String;
+      combinedStates[id] = (newDownloadStates[id] ?? false) ||
+          (oldDownloadStates[id] ?? false);
     }
 
     bool hasChanged = !mapEquals(_downloadCompleted, combinedStates);
@@ -400,11 +441,13 @@ class ModelLocalStateProvider extends ChangeNotifier
       _downloadCompleted = combinedStates;
     }
 
-    for (final model in _currentModels) {
-      final newState = combinedStates[model.id] ?? false;
-      final oldState = _downloadManagers[model.id]?.isDownloaded ?? !newState;
+    // Update download managers for all tracked IDs.
+    for (var item in allToCheck) {
+      final id = item['id'] as String;
+      final newState = combinedStates[id] ?? false;
+      final oldState = _downloadManagers[id]?.isDownloaded ?? !newState;
       if (newState != oldState) {
-        _downloadManagers[model.id]?.setDownloaded(newState);
+        _downloadManagers.putIfAbsent(id, () => DownloadManager()).setDownloaded(newState);
         hasChanged = true;
       }
     }
@@ -434,11 +477,23 @@ class ModelLocalStateProvider extends ChangeNotifier
 
     _downloadCompleted = processedData.downloadCompleted;
 
-    _downloadManagers.removeWhere((id, _) => !models.any((m) => m.id == id));
+    // Collect all IDs we need managers for: model IDs + their variant IDs.
+    final Set<String> allManagedIds = {};
     for (final model in models) {
+      allManagedIds.add(model.id);
+      // For offline series, also create managers for each variant.
+      if (!model.isServerSide && (model.variants?.isNotEmpty ?? false)) {
+        for (final variantId in model.variants!.keys) {
+          allManagedIds.add(variantId);
+        }
+      }
+    }
+
+    _downloadManagers.removeWhere((id, _) => !allManagedIds.contains(id));
+    for (final id in allManagedIds) {
       _downloadManagers
-          .putIfAbsent(model.id, () => DownloadManager())
-          .setDownloaded(_downloadCompleted[model.id] ?? false);
+          .putIfAbsent(id, () => DownloadManager())
+          .setDownloaded(_downloadCompleted[id] ?? false);
     }
 
     await _dl.checkDownloadingStates(
@@ -465,8 +520,39 @@ class ModelLocalStateProvider extends ChangeNotifier
     try {
       return _currentModels.firstWhere((m) => m.id == id).displayTitle;
     } catch (e) {
+      // If not a top-level model, search inside variants of offline series.
+      for (final model in _currentModels) {
+        if (model.variants?.containsKey(id) == true) {
+          final variantData = model.variants![id];
+          if (variantData is Map<String, dynamic>) {
+            return variantData['title'] as String? ?? id;
+          }
+        }
+      }
       return null;
     }
+  }
+
+  /// Finds a model's size by its ID: first checks top-level models, then variants.
+  double? _findSizeById(String id) {
+    // 1. Direct match in top-level models
+    try {
+      final model = _currentModels.firstWhere((m) => m.id == id);
+      return model.size?.toDouble();
+    } catch (_) {
+      // Not a top-level model
+    }
+    // 2. Search inside variants
+    for (final model in _currentModels) {
+      if (model.variants?.containsKey(id) == true) {
+        final variantData = model.variants![id];
+        if (variantData is Map<String, dynamic>) {
+          final sizeVal = int.tryParse(variantData['size']?.toString() ?? '');
+          return sizeVal?.toDouble();
+        }
+      }
+    }
+    return null;
   }
 
   /// Shows a confirmation dialog required by Apple for large downloads.

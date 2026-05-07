@@ -4,7 +4,7 @@ import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import '../../app.dart';
 
 class AxonItem extends StatelessWidget {
@@ -44,11 +44,12 @@ class AxonItem extends StatelessWidget {
     final FontWeight fontWeight = isActive ? FontWeight.w600 : FontWeight.w500;
 
     // Dimensions
-    final double itemPaddingV = screenHeight * 0.015;
+    // Dimensions — aligned with footer horizontal padding
+    final double itemPaddingV = screenHeight * 0.011;
     final double itemPaddingH = referenceWidth * 0.04;
-    final double baseIconSize = referenceWidth * 0.065;
-    final double iconSize = reduceIconSize ? baseIconSize * 0.85 : baseIconSize;
-    final double fontSize = referenceWidth * 0.042;
+    final double baseIconSize = referenceWidth * 0.055;
+    final double iconSize = reduceIconSize ? baseIconSize * 0.78 : baseIconSize;
+    final double fontSize = referenceWidth * 0.04;
     final double borderRadius = referenceWidth * 0.03;
 
     // --- ANIMATED CONTAINER WRAPPER ---
@@ -65,7 +66,7 @@ class AxonItem extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(borderRadius),
-          clipBehavior: Clip.antiAlias, // Ensures splash doesn't bleed
+          clipBehavior: Clip.hardEdge, // PERFORMANCE: hardEdge avoids saveLayer
           child: InkWell(
             onTap: onTap != null
                 ? () {
@@ -77,12 +78,10 @@ class AxonItem extends StatelessWidget {
             highlightColor:
                 AppColors.primaryColor.inverted.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(borderRadius),
-            child: Container(
-              width: referenceWidth * 0.85,
+            child: Padding(
               padding: EdgeInsets.symmetric(
                   vertical: itemPaddingV, horizontal: itemPaddingH),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   // Icon Area
                   SizedBox(
@@ -105,7 +104,8 @@ class AxonItem extends StatelessWidget {
                   Flexible(
                     child: Text(
                       label,
-                      style: GoogleFonts.roboto(
+                      style: TextStyle(
+                        fontFamily: 'Inter',
                         color: textColor,
                         fontSize: fontSize,
                         fontWeight: fontWeight,

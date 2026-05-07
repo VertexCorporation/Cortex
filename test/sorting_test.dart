@@ -27,6 +27,11 @@ class FakeModelService implements ModelService {
     }, langCode);
   }
 
+  @override
+  bool hasModelInCache(String modelId) {
+    return true;
+  }
+
   // Implement other methods as stubs...
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

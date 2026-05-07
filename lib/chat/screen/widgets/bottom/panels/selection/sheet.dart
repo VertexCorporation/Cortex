@@ -102,8 +102,14 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     super.initState();
 
     if (widget.initialModels != null && widget.initialModels!.isNotEmpty) {
-      _processData(widget.initialModels!);
-      _isLoading = false;
+      // PERFORMANCE: Defer data processing to the next frame so the sheet
+      // slide-in animation renders smoothly without sorting/categorization jank.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _processData(widget.initialModels!);
+          setState(() => _isLoading = false);
+        }
+      });
     }
     // _fetchAsync() is now called in didChangeDependencies
     // to safely access Localizations and context
@@ -124,8 +130,20 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
       } else if (m.category == 'roleplay') {
         character.add(m);
       } else if (m.type == 'offline') {
-        if (widget.downloadMap[m.id] == true) {
-          offline.add(m);
+        // For offline models: check if it's a series with variants.
+        if (m.variants != null && m.variants!.isNotEmpty) {
+          // Series model: include it only if at least one variant is downloaded.
+          final hasDownloadedVariant = m.variants!.keys.any(
+            (variantId) => widget.downloadMap[variantId] == true,
+          );
+          if (hasDownloadedVariant) {
+            offline.add(m);
+          }
+        } else {
+          // Non-series offline model: use the old direct check.
+          if (widget.downloadMap[m.id] == true) {
+            offline.add(m);
+          }
         }
       } else if (m.type == 'online') {
         if (m.category == 'video') {
@@ -144,6 +162,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     video.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
     image.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
     audio.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
+    offline.sort((a, b) => (a.series ?? a.displayTitle).compareTo(b.series ?? b.displayTitle));
 
     _selfModels = self;
     _offlineModels = offline;
@@ -231,9 +250,36 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     final variantsMap = series.variants;
     if (variantsMap == null || variantsMap.isEmpty) return modelId;
 
+    // For offline series: only resolve to DOWNLOADED variants.
+    if (series.type == 'offline') {
+      final lastUsedId = await Variants.getLastSelectedVariant(series.id);
+      // Check if last used variant is still downloaded.
+      if (lastUsedId.isNotEmpty &&
+          variantsMap.containsKey(lastUsedId) &&
+          widget.downloadMap[lastUsedId] == true) {
+        return lastUsedId;
+      }
+      // Fall back to first downloaded variant.
+      for (final variantId in variantsMap.keys) {
+        if (widget.downloadMap[variantId] == true) {
+          return variantId;
+        }
+      }
+      // No variant downloaded — should not happen (filtered in _processData).
+      return modelId;
+    }
+
+    // Online series: original logic.
     final lastUsedId = await Variants.getLastSelectedVariant(series.id);
     if (lastUsedId.isNotEmpty && variantsMap.containsKey(lastUsedId)) {
       return lastUsedId;
+    }
+    // Prefer first non-premium variant to avoid unnecessary credit spend.
+    for (final entry in variantsMap.entries) {
+      final variantData = entry.value;
+      if (variantData is Map<String, dynamic> && variantData['tier'] != 'premium') {
+        return entry.key;
+      }
     }
     return variantsMap.keys.first;
   }
@@ -303,7 +349,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                           child: Text(
                             widget.localizations.allModels,
                             style: TextStyle(
-                              fontFamily: 'Roboto',
+                              fontFamily: 'Inter',
                               fontSize: titleSize,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primaryColor.inverted,
@@ -380,7 +426,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                               if (_offlineModels.isNotEmpty) ...[
                                 _buildSliverHeader(
                                     widget.localizations.offlineModels),
-                                _buildSliverGrid(_offlineModels),
+                                _buildOfflineSeriesList(_offlineModels),
                               ],
                               if (_onlineSeries.isNotEmpty) ...[
                                 _buildSliverHeader(
@@ -439,7 +485,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
               child: Text(
                 title,
                 style: TextStyle(
-                  fontFamily: 'Roboto',
+                  fontFamily: 'Inter',
                   fontSize: categoryTitleSize,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primaryColor.inverted,
@@ -479,6 +525,159 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
         ),
       ),
     );
+  }
+
+  /// Builds the offline model series list — identical to online series but
+  /// shows only downloaded variants in the expansion panel.
+  Widget _buildOfflineSeriesList(List<ModelEntity> seriesList) {
+    // Separate: series models (with variants) vs single offline models
+    final withVariants = seriesList.where((m) => m.variants?.isNotEmpty ?? false).toList();
+    final withoutVariants = seriesList.where((m) => m.variants == null || m.variants!.isEmpty).toList();
+
+    return SliverMainAxisGroup(
+      slivers: [
+        // 1. Series with expandable variants (like online)
+        if (withVariants.isNotEmpty)
+          _buildOfflineSeriesRows(withVariants),
+        // 2. Single offline models (no variants — old behavior grid)
+        if (withoutVariants.isNotEmpty)
+          SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: sp16),
+            sliver: SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: mainCardAspectRatio,
+                crossAxisSpacing: sp12,
+                mainAxisSpacing: sp12,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final model = withoutVariants[index];
+                  return ModelCard(
+                    title: model.displayTitle,
+                    imagePath: model.imagePath ?? '',
+                    isSelected: widget.currentModelId == model.id,
+                    onBodyTap: () => _handleSelection(model.id),
+                    showExpansionArrow: false,
+                  );
+                },
+                childCount: withoutVariants.length,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildOfflineSeriesRows(List<ModelEntity> seriesList) {
+    final int rowCount = (seriesList.length / 2).ceil();
+
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: sp16),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final int itemIndex = index * 2;
+            final item1 = seriesList[itemIndex];
+            final item2 = (itemIndex + 1 < seriesList.length)
+                ? seriesList[itemIndex + 1]
+                : null;
+
+            final bool isItem1Expanded = _expandedSeriesId == item1.id;
+            final bool isItem2Expanded =
+                item2 != null && _expandedSeriesId == item2.id;
+
+            final bool isItem1Active = _isSeriesActive(item1);
+            final bool isItem2Active = item2 != null && _isSeriesActive(item2);
+
+            // Determine if this series has multiple downloaded variants
+            // (only show expansion arrow if more than 1 downloaded variant).
+            final int item1DownloadedCount = _countDownloadedVariants(item1);
+            final int item2DownloadedCount = item2 != null ? _countDownloadedVariants(item2) : 0;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: sp12),
+                  child: SizedBox(
+                    height: (sw - (2 * sp16) - sp12) / 2 / mainCardAspectRatio,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: ModelCard(
+                            title: item1.series ?? item1.displayTitle,
+                            imagePath: item1.imagePath ?? '',
+                            isSelected: isItem1Active,
+                            isExpanded: isItem1Expanded,
+                            showExpansionArrow: item1DownloadedCount > 1,
+                            onBodyTap: () => _handleSelection(item1.id),
+                            onArrowTap: item1DownloadedCount > 1
+                                ? () => _handleSeriesExpansion(item1.id)
+                                : null,
+                          ),
+                        ),
+                        SizedBox(width: sp12),
+                        Expanded(
+                          child: item2 != null
+                              ? ModelCard(
+                                  title: item2.series ?? item2.displayTitle,
+                                  imagePath: item2.imagePath ?? '',
+                                  isSelected: isItem2Active,
+                                  isExpanded: isItem2Expanded,
+                                  showExpansionArrow: item2DownloadedCount > 1,
+                                  onBodyTap: () => _handleSelection(item2.id),
+                                  onArrowTap: item2DownloadedCount > 1
+                                      ? () => _handleSeriesExpansion(item2.id)
+                                      : null,
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                _VariantsPanel(
+                  seriesModel: item1,
+                  isVisible: isItem1Expanded,
+                  localizations: widget.localizations,
+                  currentModelId: widget.currentModelId,
+                  onSelect: _handleSelection,
+                  width: sw,
+                  padding: sp16,
+                  iconSize: iconSize,
+                  titleSize: categoryTitleSize,
+                  downloadMap: widget.downloadMap,
+                ),
+                if (item2 != null)
+                  _VariantsPanel(
+                    seriesModel: item2,
+                    isVisible: isItem2Expanded,
+                    localizations: widget.localizations,
+                    currentModelId: widget.currentModelId,
+                    onSelect: _handleSelection,
+                    width: sw,
+                    padding: sp16,
+                    iconSize: iconSize,
+                    titleSize: categoryTitleSize,
+                    downloadMap: widget.downloadMap,
+                  ),
+              ],
+            );
+          },
+          childCount: rowCount,
+        ),
+      ),
+    );
+  }
+
+  /// Counts how many variants of a model are downloaded.
+  int _countDownloadedVariants(ModelEntity model) {
+    if (model.variants == null || model.variants!.isEmpty) return 0;
+    return model.variants!.keys
+        .where((id) => widget.downloadMap[id] == true)
+        .length;
   }
 
   Widget _buildSliverOnlineList(List<ModelEntity> seriesList) {
@@ -585,6 +784,8 @@ class _VariantsPanel extends StatelessWidget {
   final double padding;
   final double iconSize;
   final double titleSize;
+  /// If provided, only variants with downloadMap[id] == true are shown.
+  final Map<String, bool>? downloadMap;
 
   const _VariantsPanel({
     required this.seriesModel,
@@ -596,6 +797,7 @@ class _VariantsPanel extends StatelessWidget {
     required this.padding,
     required this.iconSize,
     required this.titleSize,
+    this.downloadMap,
   });
 
   @override
@@ -618,12 +820,24 @@ class _VariantsPanel extends StatelessWidget {
     final variantsMap = seriesModel.variants ?? {};
     if (variantsMap.isEmpty) return const SizedBox.shrink();
 
-    final List<Map<String, dynamic>> variants = variantsMap.entries.map((e) {
-      if (e.value is Map<String, dynamic>) {
-        return e.value as Map<String, dynamic>;
-      }
-      return {'id': e.key, 'title': e.key};
-    }).toList();
+    // Build variant list, optionally filtering by download status.
+    final List<Map<String, dynamic>> variants = variantsMap.entries
+        .where((e) {
+          // If downloadMap is provided, only show downloaded variants.
+          if (downloadMap != null) {
+            return downloadMap![e.key] == true;
+          }
+          return true;
+        })
+        .map((e) {
+          if (e.value is Map<String, dynamic>) {
+            return e.value as Map<String, dynamic>;
+          }
+          return {'id': e.key, 'title': e.key};
+        })
+        .toList();
+
+    if (variants.isEmpty) return const SizedBox.shrink();
 
     final gridWidth = width - (2 * padding) - (2 * padding);
     final sp8 = width * 0.02;
@@ -655,7 +869,7 @@ class _VariantsPanel extends StatelessWidget {
               ),
               SizedBox(width: sp8),
               Text(
-                "${seriesModel.displayTitle} ${localizations.variants}",
+                "${seriesModel.series ?? seriesModel.displayTitle} ${localizations.variants}",
                 style: TextStyle(
                     fontSize: titleSize * 0.8,
                     color: AppColors.tertiaryColor,

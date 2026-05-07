@@ -162,6 +162,8 @@ class AnalyticsService {
 
   // --- Chat Events ---
 
+  Future<void> logAhaMomentReached() => logEvent(name: 'aha_moment_reached');
+
   Future<void> logConversationStarted({required bool isNew}) => logEvent(
         name: 'conversation_started',
         parameters: {'is_new': isNew ? 1 : 0},

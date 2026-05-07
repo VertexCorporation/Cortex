@@ -170,7 +170,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
   @override
   Widget build(BuildContext context) {
     // Needed for theme & localization updates
-    context.watch<ThemeProvider>();
+    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
     final l10n = AppLocalizations.of(context)!; // Add localization access
 
     // Use `context.watch` to listen for changes and get the latest data.
@@ -298,7 +298,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
 
                       // Optional: Add a badge for Guest
                       if (isAnonymous && activeLevel == 0)
-                        _buildBadge(context, Icons.person_outline, l10n.guest),
+                        _buildBadge(context, Icons.person, l10n.guest),
                     ],
                   ),
                 ],

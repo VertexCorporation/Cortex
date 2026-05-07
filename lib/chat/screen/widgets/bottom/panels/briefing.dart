@@ -8,10 +8,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/funds/funds.dart';
 import 'package:cortex/navigation.dart';
+import 'package:provider/provider.dart';
+import 'package:cortex/login/upgrade.dart';
+import 'package:cortex/server/user.dart';
 import '../../../../../../theme.dart';
 
 class BriefingOverlay extends StatefulWidget {
   final int? availableCredits;
+  final int? availablePredits;
+  final int? availableDredits;
   final bool photoSelected;
   final bool isOfflineModel;
   final bool modelMissing;
@@ -20,16 +25,21 @@ class BriefingOverlay extends StatefulWidget {
   final bool isStorageSufficient;
   final bool isPremiumModel;
   final bool isSubscribed;
-  final int premiumTrialUses;
   final bool isDynamicChat;
   final bool isSearchEnabled;
+  final bool isFalOffline;
   final String? conversationId;
 
   final ValueChanged<double>? onVisibleHeightChanged;
 
+  final bool isVideoModel;
+  final int userTier;
+
   const BriefingOverlay({
     super.key,
     required this.availableCredits,
+    required this.availablePredits,
+    required this.availableDredits,
     required this.photoSelected,
     required this.isOfflineModel,
     required this.modelMissing,
@@ -37,10 +47,12 @@ class BriefingOverlay extends StatefulWidget {
     required this.limitReached,
     required this.isStorageSufficient,
     required this.isPremiumModel,
+    required this.isVideoModel,
     required this.isSubscribed,
-    required this.premiumTrialUses,
+    required this.userTier,
     required this.isDynamicChat,
     required this.isSearchEnabled,
+    required this.isFalOffline,
     required this.conversationId,
     this.onVisibleHeightChanged,
   });
@@ -65,10 +77,11 @@ class _BriefingOverlayState extends State<BriefingOverlay>
 
   static const Duration _animationDuration = Duration(milliseconds: 300);
 
-  bool get _isPremiumUpgradeMessage =>
-      widget.isPremiumModel &&
-      !widget.isSubscribed &&
-      widget.premiumTrialUses >= 3;
+  bool get _isPremiumUpgradeMessage {
+    if (widget.isSubscribed || !widget.isPremiumModel) return false;
+    // Free user using a premium model requires at least 10 predits
+    return (widget.availablePredits ?? 0) < 10;
+  }
 
   @override
   void initState() {
@@ -119,6 +132,9 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   }
 
   String? _evaluateMessageText(AppLocalizations loc) {
+    if (widget.isVideoModel && widget.userTier != 3 && widget.userTier != 6) {
+      return loc.videoPremiumWarning;
+    }
     if (_isPremiumUpgradeMessage) {
       return loc.premiumTrialExhaustedMessage;
     }
@@ -126,6 +142,11 @@ class _BriefingOverlayState extends State<BriefingOverlay>
     if (widget.limitReached) return loc.chatLengthLimitExceeded;
     if (!widget.isStorageSufficient) return loc.notEnoughStorage;
     if (widget.modelMissing) return loc.offlineModelNotInstalled;
+    if (widget.isFalOffline) return loc.falOfflineMessage;
+
+    if (widget.isDynamicChat && widget.availableDredits != null && widget.availableDredits! < 1) {
+      return loc.reachedLimit;
+    }
 
     if (widget.availableCredits != null &&
         _requiredCredits() > widget.availableCredits!) {
@@ -266,10 +287,19 @@ class _BriefingOverlayState extends State<BriefingOverlay>
           },
           onVerticalDragEnd: _handlePanEnd,
           onTap: _handleDismiss,
-          child: _BriefingPanelContent(
-            key: _panelKey,
-            message: _currentMessageText ?? "",
-            isPremiumUpgradeMessage: _isPremiumUpgradeMessage,
+          child: Builder(
+            builder: (context) {
+              final loc = AppLocalizations.of(context)!;
+              final bool isPremiumMessage = _currentMessageText == loc.videoPremiumWarning ||
+                                            _currentMessageText == loc.premiumTrialExhaustedMessage ||
+                                            _currentMessageText == loc.reachedLimit;
+              return _BriefingPanelContent(
+                key: _panelKey,
+                message: _currentMessageText ?? "",
+                isPremiumUpgradeMessage: _isPremiumUpgradeMessage,
+                isPremiumStyling: !widget.isSubscribed && isPremiumMessage,
+              );
+            }
           ),
         ),
       ),
@@ -277,22 +307,31 @@ class _BriefingOverlayState extends State<BriefingOverlay>
   }
 
   int _requiredCredits() {
-    if (widget.isOfflineModel) return 0;
-    int base = (widget.isDynamicChat || widget.isPremiumModel) ? 20 : 5;
+    if (widget.isOfflineModel || widget.isDynamicChat) return 0; // Dynamic chat uses dredits
+
+    // Wait, is it Fal.ai? Currently we only know via photoSelected = true?
+    // Actually, we don't have the model category here directly, but photoSelected gives a hint.
+    // Fal default cut is 100.
+    if (widget.photoSelected) {
+      return 100;
+    }
+
+    int base = 20; // Default for text models (Premium or not)
     if (widget.isSearchEnabled) base += 5;
-    final photo = widget.photoSelected ? 30 : 0;
-    return base + photo;
+    return base;
   }
 }
 
 class _BriefingPanelContent extends StatefulWidget {
   final String message;
   final bool isPremiumUpgradeMessage;
+  final bool isPremiumStyling;
 
   const _BriefingPanelContent({
     super.key,
     required this.message,
     required this.isPremiumUpgradeMessage,
+    required this.isPremiumStyling,
   });
 
   @override
@@ -368,7 +407,8 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
     final double paddingVertical = isTablet ? screenWidth * 0.02 : 12.0;
     final double borderRadius = isTablet ? screenWidth * 0.015 : 12.0;
 
-    final bool showPremiumButton = widget.isPremiumUpgradeMessage;
+    // The user requested that if the user is NOT subscribed, the briefing ALWAYS gets premium styling and is clickable.
+    final bool showPremiumStyling = widget.isPremiumStyling;
 
     final Color baseColor = AppColors.premium.withValues(alpha: 0.15);
     final Color backgroundColor =
@@ -377,9 +417,9 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
     final Color borderColor = baseColor.withValues(alpha: 0.8);
 
     final boxDecoration = BoxDecoration(
-      color: showPremiumButton ? backgroundColor : AppColors.background,
+      color: showPremiumStyling ? backgroundColor : AppColors.background,
       border: Border.fromBorderSide(BorderSide(
-          color: showPremiumButton ? borderColor : AppColors.border)),
+          color: showPremiumStyling ? borderColor : AppColors.border)),
       borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
       boxShadow: const [
         BoxShadow(
@@ -392,8 +432,12 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
 
     final textStyle = TextStyle(
       fontSize: fontSize,
-      color: showPremiumButton ? contentColor : AppColors.primaryColor.inverted,
+      color: showPremiumStyling ? contentColor : AppColors.primaryColor.inverted,
     );
+
+    // Use sparkle icon for premium upgrades or video block, otherwise warning
+    final bool useSparkleIcon = widget.isPremiumUpgradeMessage || 
+        widget.message == AppLocalizations.of(context)!.videoPremiumWarning;
 
     Widget innerContent = Container(
       padding: EdgeInsets.symmetric(
@@ -401,11 +445,11 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
       child: Row(
         children: [
           SvgPicture.asset(
-            showPremiumButton
+            useSparkleIcon
                 ? 'assets/icons/sparkle.svg'
                 : 'assets/icons/warning.svg',
             colorFilter: ColorFilter.mode(
-              showPremiumButton
+              showPremiumStyling
                   ? contentColor
                   : AppColors.primaryColor.inverted,
               BlendMode.srcIn,
@@ -427,13 +471,19 @@ class _BriefingPanelContentState extends State<_BriefingPanelContent>
 
     Widget content;
 
-    if (showPremiumButton) {
+    if (showPremiumStyling) {
       content = Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            navigateToScreen(const FundsScreen(),
-                direction: const Offset(1.0, 0.0));
+            final userProvider = context.read<UserProvider>();
+            if (userProvider.isAnonymous) {
+              navigateToScreen(const UpgradeAccountScreen(showLoginFirst: true),
+                  direction: const Offset(0, 1));
+            } else {
+              navigateToScreen(const FundsScreen(),
+                  direction: const Offset(1.0, 0.0));
+            }
             FocusScope.of(context).unfocus();
           },
           borderRadius: BorderRadius.all(Radius.circular(borderRadius)),

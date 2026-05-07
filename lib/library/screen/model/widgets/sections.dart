@@ -219,10 +219,13 @@ class _ParsedText extends StatelessWidget {
     // 2. [Label](url) -> (\[([^\]]+)\]\(([^)]+)\))
     // 3. Raw URL -> (https?://\S+)
     final combinedRegExp =
-    RegExp(r'(\*\*(.*?)\*\*)|(\[([^\]]+)\]\(([^)]+)\))|(https?://\S+)');
+    RegExp(r'(\*\*(.*?)\*\*)|(\*(.*?)\*(?!\*))|(\[([^\]]+)\]\(([^)]+)\))|(https?://\S+)');
 
     final spans = <TextSpan>[];
     int lastEnd = 0;
+
+    final italicStyle = style.copyWith(
+        fontStyle: FontStyle.italic, color: AppColors.primaryColor.inverted);
 
     for (final match in combinedRegExp.allMatches(fullText)) {
       // Add plain text before the match
@@ -238,6 +241,11 @@ class _ParsedText extends StatelessWidget {
         // Group 2 contains the text inside **...**
         final content = match.group(2) ?? "";
         spans.add(TextSpan(text: content, style: boldStyle));
+      } else if (matchText.startsWith('*') && !matchText.startsWith('**')) {
+        // --- ITALIC HANDLING ---
+        // Group 4 contains the text inside *...*
+        final content = match.group(4) ?? "";
+        spans.add(TextSpan(text: content, style: italicStyle));
       } else if (matchText.startsWith('[')) {
         // --- MARKDOWN LINK HANDLING ---
         // Group 4 is label, Group 5 is URL

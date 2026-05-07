@@ -1,13 +1,7 @@
 // lib/axon/widgets/menu.dart
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-
-// Providers & Services (Required for New Chat logic)
-import 'package:cortex/chat/providers/conversation.dart';
-import 'package:cortex/chat/providers/session.dart';
-import 'package:cortex/chat/services/storage.dart';
 
 // Components
 import 'item.dart';
@@ -16,9 +10,9 @@ class AxonMenu extends StatelessWidget {
   final double referenceWidth;
   final double screenHeight;
   final int activeTab;
-  final bool isNewChatActive;
-  final VoidCallback onNewChatTap;
   final VoidCallback onLibraryTap;
+  final VoidCallback onCreateAITap;
+  final VoidCallback onArtsTap;
   final VoidCallback onNewsTap;
 
   const AxonMenu({
@@ -26,9 +20,9 @@ class AxonMenu extends StatelessWidget {
     required this.referenceWidth,
     required this.screenHeight,
     required this.activeTab,
-    required this.isNewChatActive,
-    required this.onNewChatTap,
     required this.onLibraryTap,
+    required this.onCreateAITap,
+    required this.onArtsTap,
     required this.onNewsTap,
   });
 
@@ -40,38 +34,12 @@ class AxonMenu extends StatelessWidget {
     final double horizontalPadding = referenceWidth * 0.05;
     final double verticalSpacing = screenHeight * 0.005;
 
+    // Match footer padding for consistent horizontal alignment
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding * 0.8),
       child: Column(
         children: [
-          // --- 1. NEW CHAT ---
-          AxonItem(
-            label: localizations.newChat,
-            iconPath: 'assets/icons/chat.svg',
-            onTap: () {
-              // 1. Close Keyboard
-              FocusScope.of(context).unfocus();
-
-              // 2. Reset Chat Logic if needed
-              final conversation = context.read<ConversationProvider>();
-              if (conversation.messages.isNotEmpty) {
-                // If there was an active conversation, turn off Flux/Ghost mode
-                // to ensure a fresh start.
-                context.read<ChatSessionProvider>().setFluxMode(false);
-                ChatStorageService.isFluxMode = false;
-              }
-
-              // 3. Navigation Callback
-              onNewChatTap();
-            },
-            screenHeight: screenHeight,
-            referenceWidth: referenceWidth,
-            reduceIconSize: true,
-            isActive: isNewChatActive,
-          ),
-          SizedBox(height: verticalSpacing),
-
-          // --- 2. LIBRARY ---
+          // --- 1. LIBRARY ---
           AxonItem(
             label: localizations.library,
             iconPath: 'assets/icons/library.svg',
@@ -83,7 +51,31 @@ class AxonMenu extends StatelessWidget {
           ),
           SizedBox(height: verticalSpacing),
 
-          // --- 3. NEWS ---
+          // --- 2. CREATE AI ---
+          AxonItem(
+            label: localizations.createAI,
+            iconPath: 'assets/icons/intelligence.svg',
+            onTap: onCreateAITap,
+            screenHeight: screenHeight,
+            referenceWidth: referenceWidth,
+            reduceIconSize: true,
+            isActive: activeTab == 3,
+          ),
+          SizedBox(height: verticalSpacing),
+
+          // --- 3. ARTS ---
+          AxonItem(
+            label: localizations.arts,
+            iconPath: 'assets/icons/art.svg',
+            onTap: onArtsTap,
+            screenHeight: screenHeight,
+            referenceWidth: referenceWidth,
+            reduceIconSize: true,
+            isActive: activeTab == 4,
+          ),
+          SizedBox(height: verticalSpacing),
+
+          // --- 4. NEWS ---
           AxonItem(
             label: localizations.news,
             iconPath: 'assets/icons/news.svg',

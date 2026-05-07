@@ -365,7 +365,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get purchasePlus => 'Cortex Plus bikire';
 
   @override
-  String get plusDescription => 'Ezmûna Zekaya Sûni ya Elît';
+  String get plusDescription => 'Ezmûna Zekâya Sûni ya Elît';
 
   @override
   String get annual => 'Salane';
@@ -390,13 +390,13 @@ class AppLocalizationsKu extends AppLocalizations {
   String get purchasePro => 'Cortex Pro bikire';
 
   @override
-  String get proDescription => 'Ezmûna Sereke ya Zekaya Sûni';
+  String get proDescription => 'Ezmûna Sereke ya Zekâya Sûni';
 
   @override
   String get purchaseUltra => 'Cortex Ultra bikire';
 
   @override
-  String get ultraDescription => 'Lûtkeya Zekaya Sûni';
+  String get ultraDescription => 'Lûtkeya Zekâya Sûni';
 
   @override
   String get upgradeSubscription => 'Abonetiyê Nûjen bike';
@@ -489,6 +489,9 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get shareApp => 'Sepanê Parve bike';
+
+  @override
+  String get ourStory => 'Çîroka me';
 
   @override
   String get rateUs => 'Me Binirxîne';
@@ -1084,6 +1087,12 @@ class AppLocalizationsKu extends AppLocalizations {
   String get news => 'Nûçe';
 
   @override
+  String get createAI => 'Xûliqandin';
+
+  @override
+  String get shortcuts => 'Kurterê';
+
+  @override
   String get allModels => 'Hemû Model';
 
   @override
@@ -1301,7 +1310,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get notificationFortuneCookieBody =>
-      'Şîretên ku hûn îro ji zekaya sûnî distînin dikarin rêça jiyana we biguherînin. Heke hûn meraq dikin bikirtînin.';
+      'Şîretên ku hûn îro ji zekâya sûnî distînin dikarin rêça jiyana we biguherînin. Heke hûn meraq dikin bikirtînin.';
 
   @override
   String get notificationSingularityTitle => 'waw!';
@@ -1577,6 +1586,12 @@ class AppLocalizationsKu extends AppLocalizations {
   @override
   String get featureCreateAudioDescription =>
       'Generate sounds or voice from text.';
+
+  @override
+  String get featureCreateVideoTitle => 'Vîdyoyê Biafirîne';
+
+  @override
+  String get featureCreateVideoDescription => 'Vîdyoyan ji nivîsê çêbikin.';
 
   @override
   String get featureStudyTitle => 'Xwendin û Fêrbûn';
@@ -1880,4 +1895,58 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => 'pelê deng';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesName zîrekiyek pêşkeftî ye ku performansa bilind li ser Cortex nîşan dide.';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelName hişmendiyek çêkirî ya bi performansa bilind e ku di hundurê ekosîstema Cortex de yekbûyî ye. Ji bo têkbirina cûrbecûr karên tevlihev hatî çêkirin, ew kapasîteyên pêvajoyek pir pêbawer û bikêr peyda dike. Bi pêşkêşkirina demên bersivdana bilez û hêza analîtîk a pêşkeftî, ew hilberîna weya rojane bi girîngî zêde dike. Vê modela ku bi rengek bêkêmasî li ser binesaziya herêmî ya ewledar a Cortex kar dike, dikare di berfirehiyek kar de ji we re bibe alîkar, ji berhevkirina ramanên afirîner heya vekolîna teknîkî ya kûr. Îro dest bi vekolîna potansiyela wê ya tevahî bikin.';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle => 'Ji aqilê Cortexê hez dikî?';
+
+  @override
+  String get guestLimitBottomSheetText =>
+      'Bi aqilmendiyên hîn zîrektir re bixebite, bêtir naverokê çêbike, bêtir sohbet bike, û gelek tiştên din bike...';
+
+  @override
+  String get arts => 'Huner';
+
+  @override
+  String get noArt => 'Bê Huner';
+
+  @override
+  String get noArtDescription =>
+      'Ne huner; dem hatiye ku galeriyê bi afirandina wêne, vîdyo, deng û her cûre naverokê tijî bikin!';
+
+  @override
+  String get videoPremiumWarning =>
+      'Ji bo çêkirina vîdyoyan, niha nûve bikin û herikînê hîs bikin, hûn hewceyê abonetiyek Ultra ne!';
+
+  @override
+  String get becomePremiumButton => 'Bibe Premium';
+
+  @override
+  String get fallbackInfoPanelText =>
+      'Ji ber hin başkirinên ku em li aliyê servera xwe dikin, bersiv ji hêla sohbeta dînamîk a Cortexê ve hate çêkirin, ne ji hêla AI-ya we ya taybetî ve hatî hilbijartin. Spas ji bo têgihîştina we heta ku pêvajo biqede!';
+
+  @override
+  String get falOfflineMessage =>
+      'Ji ber hin pêşketinên ku em li aliyê servera xwe dikin, ev zîrekî niha negirêdayî ye. Spas ji bo têgihîştina we heta ku pêvajo biqede!';
+
+  @override
+  String get errorInsufficientStorage =>
+      'Cihê hilanînê têrê nake ji bo dakêşana vê modelê.';
+
+  @override
+  String get backgroundChatNotificationTitle => 'Vegere ser Sohbetê!';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return 'Peyamek nû di $chatName de heye, lê binêre!';
+  }
 }

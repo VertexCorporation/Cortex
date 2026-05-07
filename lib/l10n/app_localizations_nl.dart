@@ -493,6 +493,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get shareApp => 'Deel de App';
 
   @override
+  String get ourStory => 'Ons verhaal';
+
+  @override
   String get rateUs => 'Beoordeel Ons';
 
   @override
@@ -1088,6 +1091,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get news => 'Nieuws';
 
   @override
+  String get createAI => 'Creëren';
+
+  @override
+  String get shortcuts => 'Snelkoppelingen';
+
+  @override
   String get allModels => 'Alle modellen';
 
   @override
@@ -1586,6 +1595,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
+  String get featureCreateVideoTitle => 'Video maken';
+
+  @override
+  String get featureCreateVideoDescription =>
+      'Genereer video\'s op basis van tekst.';
+
+  @override
   String get featureStudyTitle => 'Studeren en leren';
 
   @override
@@ -1889,4 +1905,59 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => 'audiobestand';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesName is een geavanceerde intelligentie die hoge prestaties levert op Cortex.';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelName is een hoogwaardige kunstmatige intelligentie geïntegreerd binnen het Cortex-ecosysteem. Ontworpen om een grote verscheidenheid aan complexe taken te overwinnen, biedt het zeer betrouwbare en efficiënte verwerkingsmogelijkheden. Door snelle responstijden en geavanceerde analytische kracht te bieden, verhoogt het uw dagelijkse productiviteit aanzienlijk. Dit model werkt naadloos op de veilige lokale infrastructuur van Cortex en kan u helpen bij een breed scala aan taken, van creatieve brainstormsessies tot diepgaande technische analyses. Begin vandaag nog met het verkennen van zijn volledige potentieel.';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle =>
+      'Ben je gecharmeerd van de intelligentie van Cortex?';
+
+  @override
+  String get guestLimitBottomSheetText =>
+      'Werk samen met nog slimmere systemen, genereer meer content, chat meer en doe nog veel meer...';
+
+  @override
+  String get arts => 'Kunst';
+
+  @override
+  String get noArt => 'Geen kunst';
+
+  @override
+  String get noArtDescription =>
+      'Nog geen kunstwerken; het is tijd om de galerij te vullen met afbeeldingen, video\'s, audio en allerlei soorten content!';
+
+  @override
+  String get videoPremiumWarning =>
+      'Je hebt een Ultra-abonnement nodig om video\'s te maken. Upgrade nu en ervaar de voordelen!';
+
+  @override
+  String get becomePremiumButton => 'Word Premium-lid';
+
+  @override
+  String get fallbackInfoPanelText =>
+      'Vanwege enkele verbeteringen die we aan onze serverkant doorvoeren, is het antwoord gegenereerd door de dynamische chat van Cortex in plaats van door de door u geselecteerde AI. Bedankt voor uw begrip totdat het proces is afgerond!';
+
+  @override
+  String get falOfflineMessage =>
+      'Vanwege enkele verbeteringen aan onze server is deze intelligentie momenteel offline. Bedankt voor uw begrip totdat het proces is afgerond!';
+
+  @override
+  String get errorInsufficientStorage =>
+      'Onvoldoende opslagruimte om dit model te downloaden.';
+
+  @override
+  String get backgroundChatNotificationTitle => 'Terug naar de chat!';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return 'Er is een nieuw bericht in $chatName, bekijk het!';
+  }
 }

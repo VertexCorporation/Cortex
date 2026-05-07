@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:cortex/app.dart';
 import 'package:cortex/library/backend/utils.dart';
+import 'package:cortex/library/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import '../../../../error.dart';
@@ -299,7 +300,12 @@ class ModelsSearchController {
       },
       onRemoveRequested: () => removeModel(model.id),
       onChatPressed: () => startChat(model.id, model.isServerSide, isCustomModel: model.isCustomModel, modelPath: null),
-      onDownloadPressed: () => startDownload(id: model.id, url: model.url ?? '', title: model.displayTitle),
+      onDownloadPressed: () {
+        final isOfflineSeries = !model.isServerSide && (model.variants?.isNotEmpty ?? false);
+        final url = isOfflineSeries ? ModelDataUtils.getOptimalDownloadUrl(model) : model.url;
+        final id = isOfflineSeries ? (ModelDataUtils.getOptimalVariantId(model) ?? model.id) : model.id;
+        startDownload(id: id, url: url ?? '', title: model.displayTitle);
+      },
       onCancelDownload: () => cancelDownload(model.id),
       onResumeDownload: () => resumeDownload(model.id),
     );

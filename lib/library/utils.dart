@@ -19,6 +19,60 @@ class ModelDataUtils {
     return s;
   }
 
+  /// Finds and returns the optimal variant URL with the lowest RAM (and size) requirements.
+  static String? getOptimalDownloadUrl(ModelEntity model) {
+    if (model.isServerSide) return model.url;
+    if (model.variants == null || model.variants!.isEmpty) return model.url;
+
+    var lowestVariantKey = model.variants!.keys.first;
+    int lowestRam = 9999999;
+    
+    for (var entry in model.variants!.entries) {
+      final variantData = entry.value as Map<String, dynamic>;
+      final ram = int.tryParse(variantData['ram']?.toString() ?? '') ?? 999999;
+      final size = int.tryParse(variantData['size']?.toString() ?? '') ?? 999999;
+      
+      if (ram < lowestRam) {
+         lowestRam = ram;
+         lowestVariantKey = entry.key;
+      } else if (ram == lowestRam && ram != 999999) {
+         final currentLowestData = model.variants![lowestVariantKey] as Map<String, dynamic>;
+         final currentLowestSize = int.tryParse(currentLowestData['size']?.toString() ?? '') ?? 999999;
+         if (size < currentLowestSize) {
+           lowestVariantKey = entry.key;
+         }
+      }
+    }
+    return model.variants![lowestVariantKey]['url'] as String?;
+  }
+
+  /// Finds and returns the optimal variant ID with the lowest RAM (and size) requirements.
+  static String? getOptimalVariantId(ModelEntity model) {
+    if (model.isServerSide) return model.id;
+    if (model.variants == null || model.variants!.isEmpty) return model.id;
+
+    var lowestVariantKey = model.variants!.keys.first;
+    int lowestRam = 9999999;
+    
+    for (var entry in model.variants!.entries) {
+      final variantData = entry.value as Map<String, dynamic>;
+      final ram = int.tryParse(variantData['ram']?.toString() ?? '') ?? 999999;
+      final size = int.tryParse(variantData['size']?.toString() ?? '') ?? 999999;
+      
+      if (ram < lowestRam) {
+         lowestRam = ram;
+         lowestVariantKey = entry.key;
+      } else if (ram == lowestRam && ram != 999999) {
+         final currentLowestData = model.variants![lowestVariantKey] as Map<String, dynamic>;
+         final currentLowestSize = int.tryParse(currentLowestData['size']?.toString() ?? '') ?? 999999;
+         if (size < currentLowestSize) {
+           lowestVariantKey = entry.key;
+         }
+      }
+    }
+    return lowestVariantKey;
+  }
+
   /// Finds the parent series [ModelEntity] for a given model variant ID.
   ///
   /// For example, given 'gemini-1.5-pro', it will find and return the main

@@ -75,14 +75,79 @@ class ModelDetailProvider extends ChangeNotifier {
   bool _isUserSubscribed = false;
 
   // --- Dynamic Getters ---
-  bool get isDownloaded =>
-      _localStateProvider.downloadCompleted[_modelId] ?? false;
 
-  bool get isDownloading => _downloadManager?.isDownloading ?? false;
+  /// True if this model is an offline series with multiple variants.
+  bool get isOfflineSeries =>
+      _mainModel != null &&
+          !_mainModel!.isServerSide &&
+          (_mainModel!.variants?.isNotEmpty ?? false);
 
-  bool get isPaused => _downloadManager?.isPaused ?? false;
+  /// For offline series: checks if the currently SELECTED VARIANT is downloaded.
+  /// For regular models: checks if the model itself is downloaded.
+  bool get isDownloaded {
+    if (isOfflineSeries && selectedVariantName != null) {
+      return _localStateProvider.downloadCompleted[selectedVariantName] ??
+          false;
+    }
+    return _localStateProvider.downloadCompleted[_modelId] ?? false;
+  }
 
-  double get downloadProgress => _downloadManager?.progress ?? 0.0;
+  /// For offline series: checks the download manager of the selected variant.
+  bool get isDownloading {
+    if (isOfflineSeries && selectedVariantName != null) {
+      return _localStateProvider.downloadManagers[selectedVariantName]
+          ?.isDownloading ?? false;
+    }
+    return _downloadManager?.isDownloading ?? false;
+  }
+
+  /// For offline series: checks the download manager of the selected variant.
+  bool get isPaused {
+    if (isOfflineSeries && selectedVariantName != null) {
+      return _localStateProvider.downloadManagers[selectedVariantName]
+          ?.isPaused ?? false;
+    }
+    return _downloadManager?.isPaused ?? false;
+  }
+
+  /// For offline series: gets the download progress of the selected variant.
+  double get downloadProgress {
+    if (isOfflineSeries && selectedVariantName != null) {
+      return _localStateProvider.downloadManagers[selectedVariantName]
+          ?.progress ?? 0.0;
+    }
+    return _downloadManager?.progress ?? 0.0;
+  }
+
+  /// The download URL for the currently selected offline variant.
+  String? get selectedVariantUrl {
+    if (!isOfflineSeries || selectedVariantName == null) return _mainModel?.url;
+    final variantData = _mainModel?.variants?[selectedVariantName];
+    if (variantData is Map<String, dynamic>) {
+      return variantData['url'] as String?;
+    }
+    return _mainModel?.url;
+  }
+
+  /// The size (in MB) of the currently selected offline variant.
+  int? get selectedVariantSize {
+    if (!isOfflineSeries || selectedVariantName == null) {
+      return _mainModel?.size;
+    }
+    final variantData = _mainModel?.variants?[selectedVariantName];
+    if (variantData is Map<String, dynamic>) {
+      return int.tryParse(variantData['size']?.toString() ?? '');
+    }
+    return _mainModel?.size;
+  }
+
+  /// The unique ID of the currently selected offline variant.
+  String get selectedVariantId {
+    if (isOfflineSeries && selectedVariantName != null) {
+      return selectedVariantName!;
+    }
+    return _modelId;
+  }
 
   bool get isPremiumModelSelected =>
       _currentCapabilitiesSource?.isPremium ?? false;
@@ -95,9 +160,7 @@ class ModelDetailProvider extends ChangeNotifier {
   bool get shouldShowPremiumWarning =>
       isPremiumModelSelected && !_isUserSubscribed;
 
-  bool get isPluralModel =>
-      _mainModel?.isServerSide == true &&
-      (_mainModel?.variants?.isNotEmpty ?? false);
+  bool get isPluralModel => (_mainModel?.variants?.isNotEmpty ?? false);
 
   //================================================================================
   // Initialization & Lifecycle
@@ -107,7 +170,8 @@ class ModelDetailProvider extends ChangeNotifier {
     required String modelId,
     required BuildContext context,
     required DownloadManager? downloadManager,
-  })  : _modelId = modelId,
+  })
+      : _modelId = modelId,
         _downloadManager = downloadManager,
         _modelService = context.read<ModelService>(),
         _localStateProvider = context.read<ModelLocalStateProvider>(),
@@ -128,6 +192,8 @@ class ModelDetailProvider extends ChangeNotifier {
 
     _downloadManager?.addListener(_onDownloadStateChanged);
     _userProvider.addListener(_onUserStatusChanged);
+    // Listen to local state changes (download completions, etc.)
+    _localStateProvider.addListener(_onLocalStateChanged);
 
     isLoading = false;
     if (!_isDisposed) {
@@ -151,7 +217,32 @@ class ModelDetailProvider extends ChangeNotifier {
 
     selectedBaseModelId = _mainModel!.baseModelId;
     if (_mainModel!.variants?.isNotEmpty ?? false) {
-      selectedVariantName = _mainModel!.variants!.keys.first;
+      var lowestVariantKey = _mainModel!.variants!.keys.first;
+      int lowestRam = 9999999;
+
+      for (var entry in _mainModel!.variants!.entries) {
+        final variantData = entry.value as Map<String, dynamic>;
+        final ram = int.tryParse(variantData['ram']?.toString() ?? '') ??
+            999999;
+        final size = int.tryParse(variantData['size']?.toString() ?? '') ??
+            999999;
+
+        // Prioritize RAM. If equal, prioritize Storage Size.
+        if (ram < lowestRam) {
+          lowestRam = ram;
+          lowestVariantKey = entry.key;
+        } else if (ram == lowestRam && ram != 999999) {
+          final currentLowestData = _mainModel!
+              .variants![lowestVariantKey] as Map<String, dynamic>;
+          final currentLowestSize = int.tryParse(
+              currentLowestData['size']?.toString() ?? '') ?? 999999;
+          if (size < currentLowestSize) {
+            lowestVariantKey = entry.key;
+          }
+        }
+      }
+
+      selectedVariantName = lowestVariantKey;
     }
 
     availableBaseModels = _modelService.getCachedModelsSync().where((model) {
@@ -165,8 +256,8 @@ class ModelDetailProvider extends ChangeNotifier {
     // Add Dynamic Chat as a base model option
     // Add Dynamic Chat as a base model option
     final dynamicModel =
-        ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode)
-            .copyWith(
+    ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode)
+        .copyWith(
       displayTitle: localizations.alwaysBest,
       variants: {
         'cortex/auto': {
@@ -195,6 +286,7 @@ class ModelDetailProvider extends ChangeNotifier {
         name: 'ModelDetail');
     _downloadManager?.removeListener(_onDownloadStateChanged);
     _userProvider.removeListener(_onUserStatusChanged);
+    _localStateProvider.removeListener(_onLocalStateChanged);
     super.dispose();
   }
 
@@ -212,8 +304,8 @@ class ModelDetailProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> selectBaseModel(
-      BuildContext context, String newBaseModelId) async {
+  Future<void> selectBaseModel(BuildContext context,
+      String newBaseModelId) async {
     if (isButtonLocked) return;
     isButtonLocked = true;
     notifyListeners();
@@ -228,7 +320,7 @@ class ModelDetailProvider extends ChangeNotifier {
       }
 
       final success =
-          await _modelService.updateBaseModel(_modelId, newBaseModelId);
+      await _modelService.updateBaseModel(_modelId, newBaseModelId);
       if (!success) {
         _notificationService.showNotification(
             message: localizations.anErrorOccurred,
@@ -303,6 +395,14 @@ class ModelDetailProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Reactive listener for local state changes (download completions for offline variants).
+  void _onLocalStateChanged() {
+    if (_isDisposed) return;
+    // For offline series, the download state of variants can change externally.
+    // We need to rebuild the UI to reflect the latest Download/Chat button state.
+    notifyListeners();
+  }
+
   /// Reactive listener for user subscription status changes.
   void _onUserStatusChanged() {
     if (_isDisposed) return;
@@ -341,7 +441,7 @@ class ModelDetailProvider extends ChangeNotifier {
         // 1. Try to find the model in the local available list (Includes 'dynamic')
         try {
           selectedBaseModel = availableBaseModels.firstWhere(
-            (m) => m.variants?.containsKey(selectedBaseModelId) ?? false,
+                (m) => m.variants?.containsKey(selectedBaseModelId) ?? false,
           );
         } catch (_) {
           // 2. If not found locally, try fetching from the service (Server-side models)
@@ -355,12 +455,33 @@ class ModelDetailProvider extends ChangeNotifier {
       }
 
       _currentCapabilitiesSource = selectedBaseModel ?? _mainModel;
+    } else if (isOfflineSeries) {
+      // Offline series: resolve the selected variant from the variants map.
+      if (selectedVariantName != null && selectedVariantName!.isNotEmpty) {
+        final variantData = _mainModel!.variants?[selectedVariantName];
+        if (variantData is Map<String, dynamic>) {
+          final mergedMap = {
+            ..._mainModel!.toMap(),
+            ...variantData,
+            'id': variantData['id'] ?? selectedVariantName,
+            'title': variantData['title'] ?? selectedVariantName,
+            'imagePath': _mainModel!.imagePath,
+          };
+          mergedMap.remove('variants');
+          selectedVariant = ModelEntity.fromMap(mergedMap, langCode);
+        } else {
+          selectedVariant = null;
+        }
+      } else {
+        selectedVariant = null;
+      }
+      _currentCapabilitiesSource = selectedVariant ?? _mainModel;
     } else if (isPluralModel) {
       selectedVariant =
-          (selectedVariantName != null && selectedVariantName!.isNotEmpty)
-              ? _modelService.getPreciseModelData(selectedVariantName!,
-                  langCode: langCode)
-              : null;
+      (selectedVariantName != null && selectedVariantName!.isNotEmpty)
+          ? _modelService.getPreciseModelData(selectedVariantName!,
+          langCode: langCode)
+          : null;
       _currentCapabilitiesSource = selectedVariant ?? _mainModel;
     } else {
       _currentCapabilitiesSource = _mainModel;
@@ -371,26 +492,59 @@ class ModelDetailProvider extends ChangeNotifier {
     if (_mainModel == null) return;
 
     if (isPluralModel) {
-      displaySummary =
-          selectedVariant?.displaySummary ?? _mainModel!.displaySummary;
-      displayDescription =
-          selectedVariant?.displayDescription ?? _mainModel!.displayDescription;
+      displaySummary = selectedVariant?.displaySummary ?? '';
+      if (displaySummary
+          .trim()
+          .isEmpty) {
+        displaySummary = _mainModel!.displaySummary;
+      }
+
+      displayDescription = selectedVariant?.displayDescription ?? '';
+      if (displayDescription
+          .trim()
+          .isEmpty) {
+        displayDescription = _mainModel!.displayDescription;
+      }
+      if (displayDescription
+          .trim()
+          .isEmpty) {
+        displayDescription =
+            localizations.defaultSeriesDescription(_mainModel!.displayTitle);
+      }
     } else if (isCharacterModel) {
       displaySummary = _mainModel!.displaySummary;
-      displayDescription = _mainModel!.displayDescription;
-      if (displaySummary.trim().isEmpty) {
+      if (displaySummary
+          .trim()
+          .isEmpty) {
         displaySummary = selectedBaseModel?.displaySummary ?? '';
       }
-      if (displayDescription.trim().isEmpty) {
+
+      displayDescription = _mainModel!.displayDescription;
+      if (displayDescription
+          .trim()
+          .isEmpty) {
         displayDescription = selectedBaseModel?.displayDescription ?? '';
+      }
+      if (displayDescription
+          .trim()
+          .isEmpty) {
+        displayDescription =
+            localizations.defaultModelDescription(_mainModel!.displayTitle);
       }
     } else {
       displaySummary = _mainModel!.displaySummary;
       displayDescription = _mainModel!.displayDescription;
+
+      if (displayDescription
+          .trim()
+          .isEmpty) {
+        displayDescription =
+            localizations.defaultModelDescription(_mainModel!.displayTitle);
+      }
     }
 
     final dataEntity = _currentCapabilitiesSource ?? _mainModel;
-    
+
     if (dataEntity?.context != null) {
       if (dataEntity!.context == '8192' || dataEntity.context == '0') {
         displayContext = '≈ 8192';
@@ -415,18 +569,30 @@ class ModelDetailProvider extends ChangeNotifier {
     }
     if (!_mainModel!.isServerSide) features.add('offline');
     if (isPluralModel) features.add('plural');
-    
+
     // Modalities (Input/Recognition)
-    if (capabilities.modalities['image'] == true) features.add('image_recognition');
-    if (capabilities.modalities['video'] == true) features.add('video_recognition');
-    if (capabilities.modalities['audio'] == true) features.add('audio_recognition');
-    if (capabilities.modalities['file'] == true || capabilities.modalities['document'] == true) features.add('document');
-    
+    if (capabilities.modalities['image'] == true) {
+      features.add(
+          'image_recognition');
+    }
+    if (capabilities.modalities['video'] == true) {
+      features.add(
+          'video_recognition');
+    }
+    if (capabilities.modalities['audio'] == true) {
+      features.add(
+          'audio_recognition');
+    }
+    if (capabilities.modalities['file'] == true ||
+        capabilities.modalities['document'] == true) {
+      features.add('document');
+    }
+
     // Outputs (Generation)
     if (capabilities.outputs['image'] == true) features.add('image_generation');
     if (capabilities.outputs['video'] == true) features.add('video_generation');
     if (capabilities.outputs['audio'] == true) features.add('audio_generation');
-    
+
     if (capabilities.toolUse) features.add('tool_use');
 
     return features;

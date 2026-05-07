@@ -262,7 +262,7 @@ class __UnverifiedAccountPanelState extends State<_UnverifiedAccountPanel> {
 
   @override
   Widget build(BuildContext context) {
-    context.watch<ThemeProvider>();
+    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
 
     final appLocalizations = AppLocalizations.of(context)!;
     final generalProvider = context.watch<SettingsGeneralProvider>();

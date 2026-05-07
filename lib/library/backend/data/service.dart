@@ -44,8 +44,7 @@ class ModelService with ChangeNotifier {
   /// This is the final, sorted, and ready-to-use list for the UI.
   List<ModelEntity>? _cachedEntities;
 
-  /// In-memory cache for resolved image paths to avoid frequent disk I/O.
-  Map<String, String>? _cachedImagePaths;
+
 
   // --- Public API ---
 
@@ -75,7 +74,7 @@ class ModelService with ChangeNotifier {
         return _cachedEntities;
       }
 
-      _cachedImagePaths = null;
+
       debugPrint(
           "$logPrefix: Invalidated in-memory image path cache to prepare for full refresh.");
 
@@ -104,19 +103,20 @@ class ModelService with ChangeNotifier {
       const int maxOfflineSizeMb = 1024 * 1024; // 1 TB in MB
 
       finalEntities = finalEntities
-          .map((model) => normalizeOfflineModelForCatalog(
-                model,
-                minOfflineSizeMb: minOfflineSizeMb,
-                maxOfflineRamMb: maxOfflineRamMb,
-                maxOfflineSizeMb: maxOfflineSizeMb,
-              ))
+          .map((model) =>
+          normalizeOfflineModelForCatalog(
+            model,
+            minOfflineSizeMb: minOfflineSizeMb,
+            maxOfflineRamMb: maxOfflineRamMb,
+            maxOfflineSizeMb: maxOfflineSizeMb,
+          ))
           .whereType<ModelEntity>()
           .toList();
 
       final offlineModels =
-          finalEntities.where((m) => m.type == 'offline').toList();
+      finalEntities.where((m) => m.type == 'offline').toList();
       final otherModels =
-          finalEntities.where((m) => m.type != 'offline').toList();
+      finalEntities.where((m) => m.type != 'offline').toList();
       otherModels.sort((a, b) =>
           a.displayTitle.toLowerCase().compareTo(b.displayTitle.toLowerCase()));
       offlineModels.sort((a, b) {
@@ -134,7 +134,7 @@ class ModelService with ChangeNotifier {
       });
       finalEntities = [...otherModels, ...offlineModels];
       final neuroIndex =
-          finalEntities.indexWhere((model) => model.id == 'neuro');
+      finalEntities.indexWhere((model) => model.id == 'neuro');
       if (neuroIndex != -1) {
         final neuroModel = finalEntities.removeAt(neuroIndex);
         finalEntities.insert(0, neuroModel);
@@ -148,7 +148,8 @@ class ModelService with ChangeNotifier {
 
       _cachedEntities = finalEntities;
       debugPrint(
-          "$logPrefix: Caching ${finalEntities.length} ENRICHED model entities.");
+          "$logPrefix: Caching ${finalEntities
+              .length} ENRICHED model entities.");
       unawaited(_validateAndAssignDefaultBaseModels());
 
       return _cachedEntities;
@@ -195,7 +196,8 @@ class ModelService with ChangeNotifier {
 
         if (requiresRepair) {
           debugPrint(
-              "[ModelService] Repairing base model for '${model.id}' to '$defaultBaseModelId'.");
+              "[ModelService] Repairing base model for '${model
+                  .id}' to '$defaultBaseModelId'.");
           await updateBaseModel(model.id, defaultBaseModelId);
         }
       }
@@ -224,8 +226,7 @@ class ModelService with ChangeNotifier {
   }
 
   @visibleForTesting
-  static ModelEntity? normalizeOfflineModelForCatalog(
-    ModelEntity model, {
+  static ModelEntity? normalizeOfflineModelForCatalog(ModelEntity model, {
     required int minOfflineSizeMb,
     required int maxOfflineRamMb,
     required int maxOfflineSizeMb,
@@ -326,7 +327,7 @@ class ModelService with ChangeNotifier {
   void clearAllCache() {
     _repository.clearRawCache();
     _cachedEntities = null;
-    _cachedImagePaths = null;
+
     debugPrint("[ModelService] All model caches cleared.");
   }
 
@@ -365,7 +366,9 @@ class ModelService with ChangeNotifier {
 
     final allModels = getCachedModelsSync();
     if (allModels.isEmpty) {
-      return fullId.contains('/') ? fullId.split('/').first : fullId;
+      return fullId.contains('/') ? fullId
+          .split('/')
+          .first : fullId;
     }
     if (allModels.any((model) => model.id == fullId)) return fullId;
     for (final modelSeries in allModels) {
@@ -382,7 +385,7 @@ class ModelService with ChangeNotifier {
   ModelEntity getPreciseModelData(String modelId, {required String langCode}) {
     if (modelId == 'cortex/auto' || modelId == 'dynamic') {
       var entity =
-          ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
+      ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
       return entity.copyWith(imagePath: getModelImagePath(entity));
     }
 
@@ -392,7 +395,7 @@ class ModelService with ChangeNotifier {
           "[ModelService] CRITICAL WARNING: getPreciseModelData called when entity cache is empty.");
       if (modelId == 'cortex/auto' || modelId == 'dynamic') {
         var entity =
-            ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
+        ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
         return entity.copyWith(imagePath: getModelImagePath(entity));
       }
       return _createFallbackEntity(modelId, langCode: langCode);
@@ -409,7 +412,7 @@ class ModelService with ChangeNotifier {
     for (final modelSeries in allModels) {
       if (modelSeries.variants?.containsKey(modelId) ?? false) {
         final variantData =
-            modelSeries.variants![modelId] as Map<String, dynamic>;
+        modelSeries.variants![modelId] as Map<String, dynamic>;
         final mergedMap = {
           ...modelSeries.toMap(),
           ...variantData,
@@ -439,10 +442,10 @@ class ModelService with ChangeNotifier {
   /// 4. As a final fallback, it returns a default icon.
   /// Determines the definitive image path for a model.
   String getModelImagePath(ModelEntity model) {
-    _cachedImagePaths ??= ModelImageCache.getPathsSync();
+    final cachedImagePaths = ModelImageCache.getPathsSync();
 
-    if (_cachedImagePaths!.containsKey(model.id)) {
-      final localPath = _cachedImagePaths![model.id]!;
+    if (cachedImagePaths.containsKey(model.id)) {
+      final localPath = cachedImagePaths[model.id]!;
       if (File(localPath).existsSync()) {
         return localPath;
       }

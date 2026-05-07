@@ -1022,6 +1022,12 @@ abstract class AppLocalizations {
   /// **'Share the App'**
   String get shareApp;
 
+  /// No description provided for @ourStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Our Story'**
+  String get ourStory;
+
   /// No description provided for @rateUs.
   ///
   /// In en, this message translates to:
@@ -1283,7 +1289,7 @@ abstract class AppLocalizations {
   /// No description provided for @chats.
   ///
   /// In en, this message translates to:
-  /// **'Inbox'**
+  /// **'Recents'**
   String get chats;
 
   /// No description provided for @library.
@@ -2075,7 +2081,7 @@ abstract class AppLocalizations {
   /// Text for the 'Use without Internet' feature card. The newline is intentional.
   ///
   /// In en, this message translates to:
-  /// **'Use without Internet'**
+  /// **'Use Offline'**
   String get useOffline;
 
   /// It's so clear i think.
@@ -2089,6 +2095,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'News'**
   String get news;
+
+  /// No description provided for @createAI.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get createAI;
+
+  /// No description provided for @shortcuts.
+  ///
+  /// In en, this message translates to:
+  /// **'Shortcuts'**
+  String get shortcuts;
 
   /// Filter button text to show all available models
   ///
@@ -2850,7 +2868,7 @@ abstract class AppLocalizations {
   /// No description provided for @newChat.
   ///
   /// In en, this message translates to:
-  /// **'New Chat'**
+  /// **'Chat'**
   String get newChat;
 
   /// No description provided for @variants.
@@ -2930,6 +2948,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Generate sounds or voice from text.'**
   String get featureCreateAudioDescription;
+
+  /// No description provided for @featureCreateVideoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Video'**
+  String get featureCreateVideoTitle;
+
+  /// No description provided for @featureCreateVideoDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate videos from text.'**
+  String get featureCreateVideoDescription;
 
   /// No description provided for @featureStudyTitle.
   ///
@@ -3458,6 +3488,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'audio'**
   String get mediaTypeAudio;
+
+  /// Default description when a series lacks one
+  ///
+  /// In en, this message translates to:
+  /// **'{seriesName} is an advanced intelligence showcasing high performance on Cortex.'**
+  String defaultSeriesDescription(String seriesName);
+
+  /// Default description when a model lacks one
+  ///
+  /// In en, this message translates to:
+  /// **'{modelName} is a high-performance artificial intelligence integrated within the Cortex ecosystem. Designed to conquer a wide variety of complex tasks, it provides highly reliable and efficient processing capabilities. By offering swift response times and advanced analytical power, it significantly boosts your daily productivity. Operating seamlessly on Cortex\'s secure local infrastructure, this model can assist you across a broad spectrum of tasks, from creative brainstorming to deep technical analysis. Start exploring its full potential today.'**
+  String defaultModelDescription(String modelName);
+
+  /// No description provided for @guestLimitBottomSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Love the intelligence of Cortex?'**
+  String get guestLimitBottomSheetTitle;
+
+  /// No description provided for @guestLimitBottomSheetText.
+  ///
+  /// In en, this message translates to:
+  /// **'Work with even smarter intelligences, generate more content, chat more, and do much more...'**
+  String get guestLimitBottomSheetText;
+
+  /// No description provided for @arts.
+  ///
+  /// In en, this message translates to:
+  /// **'Arts'**
+  String get arts;
+
+  /// No description provided for @noArt.
+  ///
+  /// In en, this message translates to:
+  /// **'No Art'**
+  String get noArt;
+
+  /// No description provided for @noArtDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'No art; it\'s time to fill the gallery by creating images, videos, audio, and all kinds of content!'**
+  String get noArtDescription;
+
+  /// No description provided for @videoPremiumWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'You need an Ultra subscription to generate videos, upgrade now and feel the flow!'**
+  String get videoPremiumWarning;
+
+  /// No description provided for @becomePremiumButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Become Premium'**
+  String get becomePremiumButton;
+
+  /// No description provided for @fallbackInfoPanelText.
+  ///
+  /// In en, this message translates to:
+  /// **'Due to some improvements we are making on our server side, the response was generated by Cortex\'s dynamic chat instead of your specifically selected AI. Thank you for your understanding until the process is completed!'**
+  String get fallbackInfoPanelText;
+
+  /// No description provided for @falOfflineMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Due to some improvements we are making on our server side, this intelligence is currently offline. Thank you for your understanding until the process is finished!'**
+  String get falOfflineMessage;
+
+  /// No description provided for @errorInsufficientStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient storage space to download this model.'**
+  String get errorInsufficientStorage;
+
+  /// Notification title when a background chat finishes generating.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Chat!'**
+  String get backgroundChatNotificationTitle;
+
+  /// Notification body when a background chat finishes generating.
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s a new message in {chatName}, check it out!'**
+  String backgroundChatNotificationBody(String chatName);
 }
 
 class _AppLocalizationsDelegate

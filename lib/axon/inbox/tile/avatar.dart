@@ -27,7 +27,7 @@ class TileAvatar extends StatelessWidget {
         color: AppColors.secondaryColor,
         borderRadius: BorderRadius.circular(size * 0.125),
       ),
-      clipBehavior: Clip.antiAlias,
+      clipBehavior: Clip.hardEdge, // PERFORMANCE: hardEdge avoids saveLayer
       alignment: Alignment.center,
       child: _buildImageWidget(),
     );
@@ -109,7 +109,7 @@ class TileAvatar extends StatelessWidget {
 
   Widget _buildFallbackIcon() {
     return Icon(
-      Icons.image_not_supported_outlined,
+      Icons.image_not_supported_rounded,
       color: AppColors.tertiaryColor,
       size: size * 0.6,
     );

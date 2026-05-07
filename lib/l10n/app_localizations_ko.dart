@@ -483,6 +483,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get shareApp => '앱 공유하기';
 
   @override
+  String get ourStory => '우리의 이야기';
+
+  @override
   String get rateUs => '평가하기';
 
   @override
@@ -1053,6 +1056,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get news => '소식';
 
   @override
+  String get createAI => '만들다';
+
+  @override
+  String get shortcuts => '바로가기';
+
+  @override
   String get allModels => '모든 모델';
 
   @override
@@ -1535,6 +1544,12 @@ class AppLocalizationsKo extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
+  String get featureCreateVideoTitle => '동영상 만들기';
+
+  @override
+  String get featureCreateVideoDescription => '텍스트를 이용해 동영상을 생성합니다.';
+
+  @override
   String get featureStudyTitle => '공부하고 배우세요';
 
   @override
@@ -1827,4 +1842,57 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => '오디오 파일';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesName은(는) Cortex에서 고성능을 발휘하는 고급 인공지능입니다.';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelName은(는) Cortex 생태계에 통합된 고성능 인공지능입니다. 다양하고 복잡한 작업을 극복하도록 설계되어 고도로 안정적이고 효율적인 처리 기능을 제공합니다. 빠른 응답 시간과 향상된 분석 기능을 제공하여 일상적인 생산성을 크게 높입니다. Cortex의 안전한 로컬 인프라에서 원활하게 작동하는 이 모델은 창의적인 브레인스토밍부터 심층적인 기술 분석까지 광범위한 작업에서 사용자를 지원할 수 있습니다. 오늘부터 그 잠재력을 최대한 활용해 보세요.';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle => 'Cortex의 지능적인 기능이 마음에 드시나요?';
+
+  @override
+  String get guestLimitBottomSheetText =>
+      '더욱 똑똑한 인공지능과 협력하고, 더 많은 콘텐츠를 생성하고, 더 많은 대화를 나누고, 훨씬 더 많은 일을 하세요...';
+
+  @override
+  String get arts => '예술';
+
+  @override
+  String get noArt => '예술 없음';
+
+  @override
+  String get noArtDescription =>
+      '작품이 없습니다. 이미지, 비디오, 오디오 등 온갖 콘텐츠를 만들어 갤러리를 채울 시간입니다!';
+
+  @override
+  String get videoPremiumWarning =>
+      '동영상 제작을 위해서는 Ultra 구독이 필요합니다. 지금 업그레이드하고 원활한 콘텐츠 제작을 경험해 보세요!';
+
+  @override
+  String get becomePremiumButton => '프리미엄 회원이 되세요';
+
+  @override
+  String get fallbackInfoPanelText =>
+      '서버 측 개선 작업으로 인해, 고객님께서 선택하신 AI가 아닌 Cortex의 동적 채팅 기능으로 응답이 전송되었습니다. 개선 작업이 완료될 때까지 양해 부탁드립니다!';
+
+  @override
+  String get falOfflineMessage =>
+      '서버 개선 작업으로 인해 현재 해당 지능 서비스가 중단되었습니다. 작업이 완료될 때까지 양해 부탁드립니다!';
+
+  @override
+  String get errorInsufficientStorage => '이 모델을 다운로드하기 위한 저장 공간이 부족합니다.';
+
+  @override
+  String get backgroundChatNotificationTitle => '채팅으로 돌아가기!';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return '$chatName 채팅방에 새 메시지가 왔어요! 확인해 보세요!';
+  }
 }

@@ -157,7 +157,7 @@ class FeaturesSheetButton extends StatelessWidget {
                             duration: animDuration,
                             curve: animCurve,
                             style: TextStyle(
-                              fontFamily: 'Roboto',
+                              fontFamily: 'Inter',
                               fontSize: titleSize,
                               fontWeight: FontWeight.w600,
                               color: targetFg,
@@ -170,7 +170,7 @@ class FeaturesSheetButton extends StatelessWidget {
                             duration: animDuration,
                             curve: animCurve,
                             style: TextStyle(
-                              fontFamily: 'Roboto',
+                              fontFamily: 'Inter',
                               fontSize: descSize,
                               fontWeight: FontWeight.w400,
                               color: targetFg.withValues(alpha: 0.6),

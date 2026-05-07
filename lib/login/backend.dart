@@ -70,6 +70,10 @@ class GoogleSignInSuccess extends GoogleSignInResult {
 
 class GoogleSignInFailure extends GoogleSignInResult {}
 
+class GoogleSignInCancelled extends GoogleSignInResult {}
+
+class GoogleSignInNetworkError extends GoogleSignInResult {}
+
 /// Represents the outcomes for an anonymous sign-in attempt.
 sealed class AnonymousSignInResult {}
 
@@ -93,6 +97,10 @@ class AppleSignInSuccess extends AppleSignInResult {
 }
 
 class AppleSignInFailure extends AppleSignInResult {}
+
+class AppleSignInCancelled extends AppleSignInResult {}
+
+class AppleSignInNetworkError extends AppleSignInResult {}
 
 /// A service class that encapsulates all backend authentication logic.
 ///
@@ -224,7 +232,9 @@ class LoginBackendService {
 
       if (availability != UsernameStatus.available) {
         initializer.setRegistrationStatus(false);
-        return RegistrationUsernameTaken(); // Treat error as taken to be safe, or separate? Taken is safer fallback.
+        if (availability == UsernameStatus.taken) return RegistrationUsernameTaken();
+        // Username check failed (functions/internal/network). Don't mislabel as "taken".
+        return RegistrationUnknownError();
       }
 
       // --- ASYNC GAP 2 ---
@@ -320,9 +330,31 @@ class LoginBackendService {
         idToken: googleAuth.idToken,
       );
 
-      // Step 4: Sign in to Firebase.
-      final UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
+      // Step 4: Sign in or Link to Firebase.
+      UserCredential userCredential;
+      final currentUser = _auth.currentUser;
+      bool wasAnonymousLinked = false;
+
+      if (currentUser != null && currentUser.isAnonymous) {
+        try {
+          userCredential = await currentUser.linkWithCredential(credential);
+          wasAnonymousLinked = true;
+          dev.log('[Auth.Google] Successfully linked anonymous account.', name: 'LoginBackend');
+          
+          final callable = _functions.httpsCallable('completeAnonymousRegistration');
+          await callable.call();
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'credential-already-in-use') {
+            dev.log('[Auth.Google] Credential already in use. Falling back to signIn.', name: 'LoginBackend');
+            userCredential = await _auth.signInWithCredential(credential);
+          } else {
+            rethrow;
+          }
+        }
+      } else {
+        userCredential = await _auth.signInWithCredential(credential);
+      }
+
       final User? user = userCredential.user;
       if (user == null) {
         throw Exception("Firebase sign in with Google returned a null user.");
@@ -331,8 +363,8 @@ class LoginBackendService {
       // --- Post-login logic ---
       final bool isNewUser =
           userCredential.additionalUserInfo?.isNewUser ?? false;
-      if (isNewUser) {
-        _postUsernameSuggestion(uid: user.uid, username: null);
+      if (isNewUser || wasAnonymousLinked) {
+        _postUsernameSuggestion(uid: user.uid, username: user.displayName);
       }
 
       await _secureStorage.write(key: 'remember_me', value: 'true');
@@ -349,10 +381,18 @@ class LoginBackendService {
             name: 'LoginBackend', error: e, stackTrace: st);
         notificationService.showNotification(
             message: l10n.noInternetConnection, type: NotificationType.error);
-      } else if (e is GoogleSignInException &&
-          e.code == GoogleSignInExceptionCode.canceled) {
+        await _googleSignIn.disconnect().catchError((_) {});
+        await _auth.signOut().catchError((_) {});
+        return GoogleSignInNetworkError();
+      } else if ((e is GoogleSignInException &&
+              e.code == GoogleSignInExceptionCode.canceled) ||
+          (e is PlatformException && e.code == 'sign_in_canceled') ||
+          (e is FirebaseAuthException && e.code == 'canceled')) {
         dev.log('[Auth.Google] Sign-in process was cancelled by the user.',
             name: 'LoginBackend');
+        await _googleSignIn.disconnect().catchError((_) {});
+        await _auth.signOut().catchError((_) {});
+        return GoogleSignInCancelled();
       } else {
         dev.log(
             '[Auth.Google] An unexpected error occurred during Google Sign-In',
@@ -427,8 +467,29 @@ class LoginBackendService {
         ..addScope('email')
         ..addScope('name');
 
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithProvider(appleProvider);
+      final currentUser = FirebaseAuth.instance.currentUser;
+      UserCredential userCredential;
+      bool wasAnonymousLinked = false;
+
+      if (currentUser != null && currentUser.isAnonymous) {
+        try {
+          userCredential = await currentUser.linkWithProvider(appleProvider);
+          wasAnonymousLinked = true;
+          dev.log('[Auth.Apple] Successfully linked anonymous account.', name: 'LoginBackend');
+          
+          final callable = _functions.httpsCallable('completeAnonymousRegistration');
+          await callable.call();
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'credential-already-in-use' && e.credential != null) {
+            dev.log('[Auth.Apple] Credential already in use. Falling back to signIn.', name: 'LoginBackend');
+            userCredential = await FirebaseAuth.instance.signInWithCredential(e.credential!);
+          } else {
+            rethrow;
+          }
+        }
+      } else {
+        userCredential = await FirebaseAuth.instance.signInWithProvider(appleProvider);
+      }
 
       final User? user = userCredential.user;
       if (user == null) {
@@ -439,7 +500,7 @@ class LoginBackendService {
       final bool isNewUser =
           userCredential.additionalUserInfo?.isNewUser ?? false;
 
-      if (isNewUser) {
+      if (isNewUser || wasAnonymousLinked) {
         // Apple provider may set displayName (not guaranteed). Prefer Firebase user fields when available.
         final String? displayName = user.displayName?.trim().isEmpty ?? true
             ? null
@@ -466,10 +527,21 @@ class LoginBackendService {
 
       return AppleSignInSuccess(user);
     } catch (e, st) {
-      if (e is FirebaseAuthException && e.code == 'canceled') {
+      if (e is FirebaseAuthException && e.code == 'network_request_failed') {
+        dev.log('[Auth.Apple] Network error during Apple Sign-In.',
+            name: 'LoginBackend');
+        notificationService.showNotification(
+          message: l10n.noInternetConnection,
+          type: NotificationType.error,
+        );
+        return AppleSignInNetworkError();
+      }
+      
+      if ((e is FirebaseAuthException && e.code == 'canceled') ||
+          (e is PlatformException && e.code == 'sign_in_canceled')) {
         dev.log('[Auth.Apple] Sign-in cancelled by user.',
             name: 'LoginBackend');
-        return AppleSignInFailure();
+        return AppleSignInCancelled();
       }
 
       dev.log('[Auth.Apple] Error during Apple Sign-In',
@@ -608,7 +680,12 @@ class LoginBackendService {
       await _secureStorage.write(key: 'password', value: password);
       await _secureStorage.write(key: 'remember_me', value: 'true');
     } else {
-      await _secureStorage.deleteAll();
+      // Don't wipe unrelated keys (tokens, device state, etc.).
+      await Future.wait([
+        _secureStorage.delete(key: 'email'),
+        _secureStorage.delete(key: 'password'),
+        _secureStorage.delete(key: 'remember_me'),
+      ]);
     }
   }
 

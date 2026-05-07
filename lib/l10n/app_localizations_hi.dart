@@ -490,6 +490,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get shareApp => 'ऐप साझा करें';
 
   @override
+  String get ourStory => 'हमारी कहानी';
+
+  @override
   String get rateUs => 'हमें रेट करें';
 
   @override
@@ -1080,6 +1083,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get news => 'समाचार';
 
   @override
+  String get createAI => 'Create';
+
+  @override
+  String get shortcuts => 'Shortcuts';
+
+  @override
   String get allModels => 'सभी मॉडल';
 
   @override
@@ -1573,6 +1582,12 @@ class AppLocalizationsHi extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
+  String get featureCreateVideoTitle => 'वीडियो बनाएं';
+
+  @override
+  String get featureCreateVideoDescription => 'टेक्स्ट से वीडियो बनाएं।';
+
+  @override
   String get featureStudyTitle => 'अध्ययन और सीखना';
 
   @override
@@ -1873,4 +1888,59 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => 'ऑडियो फ़ाइल';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesName एक उन्नत बुद्धिमत्ता है जो Cortex पर उच्च प्रदर्शन दिखाती है।';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelName Cortex पारिस्थितिकी तंत्र में एकीकृत एक उच्च-प्रदर्शन कृत्रिम बुद्धिमत्ता है। जटिल कार्यों की एक विस्तृत विविधता को जीतने के लिए डिज़ाइन किया गया, यह अत्यधिक विश्वसनीय और कुशल प्रसंस्करण क्षमता प्रदान करता है। त्वरित प्रतिक्रिया समय और उन्नत विश्लेषणात्मक शक्ति प्रदान करके, यह आपकी दैनिक उत्पादकता को काफी बढ़ाता है। Cortex के सुरक्षित स्थानीय बुनियादी ढांचे पर निर्बाध रूप से काम करते हुए, यह मॉडल रचनात्मक बुद्धिशीलता से लेकर गहरे तकनीकी विश्लेषण तक, कई कार्यों में आपकी सहायता कर सकता है। आज ही इसकी पूरी क्षमता की खोज शुरू करें।';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle =>
+      'क्या आप कॉर्टेक्स की बुद्धिमत्ता से प्रभावित हैं?';
+
+  @override
+  String get guestLimitBottomSheetText =>
+      'और भी अधिक बुद्धिमान लोगों के साथ काम करें, अधिक सामग्री तैयार करें, अधिक चैट करें और बहुत कुछ करें...';
+
+  @override
+  String get arts => 'कला';
+
+  @override
+  String get noArt => 'कोई कला नहीं';
+
+  @override
+  String get noArtDescription =>
+      'कोई कलाकृति नहीं है; अब चित्र, वीडियो, ऑडियो और सभी प्रकार की सामग्री बनाकर गैlery को भरने का समय है!';
+
+  @override
+  String get videoPremiumWarning =>
+      'वीडियो बनाने के लिए आपको अल्ट्रा सब्सक्रिप्शन की आवश्यकता है, अभी अपग्रेड करें और सहजता का अनुभव करें!';
+
+  @override
+  String get becomePremiumButton => 'प्रीमियम बनें';
+
+  @override
+  String get fallbackInfoPanelText =>
+      'हमारे सर्वर में कुछ सुधार किए जा रहे हैं, इसलिए प्रतिक्रिया आपके द्वारा विशेष रूप से चुने गए AI के बजाय कॉर्टेक्स के डायनामिक चैट द्वारा उत्पन्न हुई है। प्रक्रिया पूरी होने तक आपके सहयोग के लिए धन्यवाद!';
+
+  @override
+  String get falOfflineMessage =>
+      'हमारे सर्वर में कुछ सुधार कार्य चल रहे हैं, इसलिए यह इंटेलिजेंस सेवा फिलहाल उपलब्ध नहीं है। सुधार प्रक्रिया पूरी होने तक आपके सहयोग के लिए धन्यवाद!';
+
+  @override
+  String get errorInsufficientStorage =>
+      'इस मॉडल को डाउनलोड करने के लिए पर्याप्त भंडारण स्थान उपलब्ध नहीं है।';
+
+  @override
+  String get backgroundChatNotificationTitle => 'चैट पर वापस!';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return '$chatName में एक नया संदेश आया है, इसे देखें!';
+  }
 }

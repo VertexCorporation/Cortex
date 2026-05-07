@@ -3,11 +3,10 @@
 import 'package:cortex/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import '../../app.dart';
 import '../../login/upgrade.dart';
-import '../../theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../../theme.dart';
 
 class AnonymousUpgradePanel extends StatelessWidget {
   const AnonymousUpgradePanel({super.key});
@@ -18,10 +17,13 @@ class AnonymousUpgradePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.watch<ThemeProvider>();
+    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
 
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Column(
       children: [
@@ -89,7 +91,7 @@ class AnonymousUpgradePanel extends StatelessWidget {
                     backgroundColor: AppColors.primaryColor.inverted,
                     foregroundColor: AppColors.primaryColor,
                     padding:
-                        EdgeInsets.symmetric(vertical: screenWidth * 0.035),
+                    EdgeInsets.symmetric(vertical: screenWidth * 0.035),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

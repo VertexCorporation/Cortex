@@ -39,13 +39,18 @@ class ModelImageCache {
     return {};
   }
 
+  static bool _syncWarningShown = false;
+
   /// Synchronously returns the cached image paths from the in-memory store.
   ///
   /// IMPORTANT: This method relies on `loadPaths()` having been called and completed
   /// at least once. If called before initialization, it will return an empty map.
   static Map<String, String> getPathsSync() {
     if (_inMemoryCache == null) {
-      debugPrint("[ModelImageCache] WARNING: getPathsSync() called before cache was initialized. Returning empty map.");
+      if (!_syncWarningShown) {
+        debugPrint("[ModelImageCache] WARNING: getPathsSync() called before cache was initialized. Returning empty map.");
+        _syncWarningShown = true;
+      }
       return {};
     }
     return _inMemoryCache!;
