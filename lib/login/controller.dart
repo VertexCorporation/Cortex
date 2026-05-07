@@ -156,6 +156,7 @@ class LoginController extends ChangeNotifier {
   /// Handles the login submission logic. Requires a fresh `BuildContext` from the UI.
   Future<void> submitLogin(BuildContext context, String email, String password,
       bool rememberMe) async {
+    if (_isLoading) return;
     _clearServerErrors();
     _setLoading(true);
 
@@ -173,7 +174,7 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case LoginSuccess():
         AnalyticsService().logLoginSuccess('email');
-        // Do NOT stop loading here. Wait for navigation.
+        Navigator.of(context).pop();
         break;
       case LoginInvalidCredentials():
         _loginEmailError = l10n.invalidCredentials;
@@ -225,7 +226,7 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case RegistrationSuccess():
         AnalyticsService().logRegisterSuccess('email');
-        // Do NOT stop loading here. Wait for navigation.
+        Navigator.of(context).pop();
         break;
       case RegistrationUsernameTaken():
         _registerUsernameError = l10n.usernameTaken;
@@ -283,6 +284,13 @@ class LoginController extends ChangeNotifier {
         AnalyticsService().logLoginFailure('google', 'sign_in_failed');
         _setLoading(false);
         break;
+      case GoogleSignInCancelled():
+        _setLoading(false);
+        break;
+      case GoogleSignInNetworkError():
+        AnalyticsService().logLoginFailure('google', 'network_error');
+        _setLoading(false);
+        break;
     }
   }
 
@@ -336,6 +344,13 @@ class LoginController extends ChangeNotifier {
         break;
       case AppleSignInFailure():
         AnalyticsService().logLoginFailure('apple', 'sign_in_failed');
+        _setLoading(false);
+        break;
+      case AppleSignInCancelled():
+        _setLoading(false);
+        break;
+      case AppleSignInNetworkError():
+        AnalyticsService().logLoginFailure('apple', 'network_error');
         _setLoading(false);
         break;
     }
@@ -417,17 +432,25 @@ class LoginController extends ChangeNotifier {
           mode: LaunchMode.externalApplication,
         );
       } else {
-        debugPrint("[LoginController] Browser is not found.");
+        debugPrint("[LoginController] Browser is not found. Falling back to WebView.");
+        if (context.mounted) {
+          await showAppWebViewModal(context, "Reset Password", url);
+        }
       }
     } catch (e) {
-      debugPrint("[LoginController] Link opening error: $e");
-
+      debugPrint("[LoginController] Link opening error: $e. Falling back to WebView.");
       if (context.mounted) {
-        final l10n = AppLocalizations.of(context)!;
-        _notificationService.showNotification(
-          message: l10n.couldNotOpenLink,
-          type: NotificationType.error,
-        );
+        try {
+          await showAppWebViewModal(context, "Reset Password", url);
+        } catch (innerE) {
+          if (context.mounted) {
+            final l10n = AppLocalizations.of(context)!;
+            _notificationService.showNotification(
+              message: l10n.couldNotOpenLink,
+              type: NotificationType.error,
+            );
+          }
+        }
       }
     }
   }

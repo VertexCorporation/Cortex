@@ -1,7 +1,7 @@
-import "../../main.dart";
+
 // verify.dart
 
-import "../navigation.dart";
+
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:math';
@@ -13,8 +13,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import '../notifications/introvert.dart';
 import '../reconcile.dart';
-import '../screen.dart';
+
 import '../theme.dart';
+import '../initialization.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
@@ -75,11 +76,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       await _saveRememberMeState();
 
       if (mounted) {
-        navigateToScreen(
-          MainScreen(key: mainScreenKey),
-          direction: const Offset(1.0, 0.0),
-          isReplace: true,
-        );
+        Provider.of<AppInitializer>(context, listen: false).completeVerificationState();
       }
     } catch (e, st) {
       dev.log('[Continue] Unexpected error during navigation: $e',
@@ -201,11 +198,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     await reconcileAndSyncPurchases();
 
     if (mounted) {
-      navigateToScreen(
-        MainScreen(key: mainScreenKey),
-        direction: const Offset(1.0, 0.0),
-        isReplace: true,
-      );
+      Provider.of<AppInitializer>(context, listen: false).completeVerificationState();
     }
   }
 

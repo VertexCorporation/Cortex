@@ -8,6 +8,39 @@ import 'format.dart';
 /// It is a "dumb" data object that expects to be instantiated with display-ready,
 /// pre-localized data from the service or repository layer.
 class ModelEntity {
+  /// Strips wrapping quotes and asterisks from text fields.
+  /// Handles: "text", 'text', **text**, *text*, and lone leading/trailing " or *.
+  static String _stripWrappedQuotes(String value) {
+    String result = value.trim();
+
+    const wrappers = [
+      ['"', '"'],
+      ["'", "'"],
+      ['\u201c', '\u201d'],
+      ['\u201e', '\u201d'],
+      ['\u00ab', '\u00bb'],
+      ['**', '**'],
+      ['*', '*'],
+    ];
+
+    bool changed = true;
+    while (changed && result.length >= 2) {
+      changed = false;
+      for (final pair in wrappers) {
+        if (result.startsWith(pair[0]) && result.endsWith(pair[1])) {
+          result = result.substring(pair[0].length, result.length - pair[1].length).trim();
+          changed = true;
+          break;
+        }
+      }
+    }
+
+    // Strip lone leading/trailing formatting chars
+    result = result.replaceAll(RegExp(r'^["*]+'), '');
+    result = result.replaceAll(RegExp(r'["*]+$'), '');
+    return result.trim();
+  }
+
   /// The unique identifier for the model (e.g., 'gpt-5', 'neuro').
   final String id;
 
@@ -144,8 +177,8 @@ class ModelEntity {
       source: getStringOrLocalized(map['source']) ?? 'openrouter',
       category: getStringOrLocalized(map['category']) ?? 'online',
       role: getStringOrLocalized(map['role']),
-      displaySummary: getStringOrLocalized(map['summary']) ?? '',
-      displayDescription: getStringOrLocalized(map['description']) ?? '',
+      displaySummary: _stripWrappedQuotes(getStringOrLocalized(map['summary']) ?? ''),
+      displayDescription: _stripWrappedQuotes(getStringOrLocalized(map['description']) ?? ''),
       baseModelId: getStringOrLocalized(map['baseModelId']),
       imagePath: getStringOrLocalized(map['imagePath']),
       ggufPath: getStringOrLocalized(map['ggufPath']),

@@ -72,32 +72,16 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
     final currentMode = inputProvider.featureMode;
     final currentModel = sessionProvider.selectedModel;
     final bool isOfflineModelSelected = currentModel?.type == 'offline';
-    final bool isCurrentImageModel = currentModel?.outputs['image'] == true;
-    final bool isCurrentAudioModel = currentModel?.outputs['audio'] == true;
+    final bool isCurrentImageModel = currentModel?.outputs['image'] == true || currentModel?.category == 'image';
+    final bool isCurrentAudioModel = currentModel?.outputs['audio'] == true || currentModel?.category == 'audio';
+    final bool isCurrentVideoModel = currentModel?.outputs['video'] == true || currentModel?.category == 'video';
 
-    final imageGenModels = catalog.allModels.where((m) {
-      try {
-        final map = m.toMap();
-        if (map['outputs'] is Map) {
-          return map['outputs']['image'] == true;
-        }
-        return false;
-      } catch (e) {
-        return false;
-      }
-    }).toList();
-
-    final audioGenModels = catalog.allModels.where((m) {
-      try {
-        final map = m.toMap();
-        if (map['outputs'] is Map) {
-          return map['outputs']['audio'] == true;
-        }
-        return false;
-      } catch (e) {
-        return false;
-      }
-    }).toList();
+    final imageGenModels = catalog.allModels.where((m) =>
+    m.outputs['image'] == true || m.category == 'image').toList();
+    final audioGenModels = catalog.allModels.where((m) =>
+    m.outputs['audio'] == true || m.category == 'audio').toList();
+    final videoGenModels = catalog.allModels.where((m) =>
+    m.outputs['video'] == true || m.category == 'video').toList();
 
     return Container(
       constraints: BoxConstraints(
@@ -129,7 +113,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
             child: Text(
               l10n.featuresTitle,
               style: TextStyle(
-                fontFamily: 'Roboto',
+                fontFamily: 'Inter',
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryColor.inverted,
@@ -148,7 +132,10 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                 physics: const ClampingScrollPhysics(),
                 // Removed BouncingScrollPhysics
                 padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).padding.bottom + 20),
+                    bottom: MediaQuery
+                        .of(context)
+                        .padding
+                        .bottom + 20),
                 child: Column(
                   children: [
                     // 1. USE OFFLINE
@@ -171,7 +158,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
 
                     // 2. DEEP featureReasoning
                     FeaturesSheetButton(
-                      iconPath: 'assets/icons/memory.svg',
+                      iconPath: 'assets/icons/intelligence.svg',
                       title: l10n.featureReasoning,
                       description: l10n.featureReasoningDescription,
                       isSelected: currentMode == ChatInputMode.featureReasoning,
@@ -205,12 +192,16 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       isSelected: isCurrentImageModel,
                       onTap: () {
                         Navigator.pop(context);
-                        _handleGenerationFeatureAction(
-                          context,
-                          imageGenModels,
-                          widget.controller,
-                          isImage: true,
-                        );
+                        if (isCurrentImageModel) {
+                          _selectDynamicModel(context);
+                        } else {
+                          _handleGenerationFeatureAction(
+                            context,
+                            imageGenModels,
+                            widget.controller,
+                            targetType: 'image',
+                          );
+                        }
                       },
                     ),
 
@@ -223,12 +214,38 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       isSelected: isCurrentAudioModel,
                       onTap: () {
                         Navigator.pop(context);
-                        _handleGenerationFeatureAction(
-                          context,
-                          audioGenModels,
-                          widget.controller,
-                          isImage: false,
-                        );
+                        if (isCurrentAudioModel) {
+                          _selectDynamicModel(context);
+                        } else {
+                          _handleGenerationFeatureAction(
+                            context,
+                            audioGenModels,
+                            widget.controller,
+                            targetType: 'audio',
+                          );
+                        }
+                      },
+                    ),
+
+                    // 4.5. CREATE VIDEO
+                    FeaturesSheetButton(
+                      iconPath: 'assets/icons/transition.svg',
+                      title: l10n.featureCreateVideoTitle,
+                      description: l10n.featureCreateVideoDescription,
+                      isDisabled: videoGenModels.isEmpty,
+                      isSelected: isCurrentVideoModel,
+                      onTap: () {
+                        Navigator.pop(context);
+                        if (isCurrentVideoModel) {
+                          _selectDynamicModel(context);
+                        } else {
+                          _handleGenerationFeatureAction(
+                            context,
+                            videoGenModels,
+                            widget.controller,
+                            targetType: 'video',
+                          );
+                        }
                       },
                     ),
 
@@ -260,7 +277,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
 
                     // 7. EXPLORE
                     FeaturesSheetButton(
-                      iconData: Icons.visibility_outlined,
+                      iconData: Icons.visibility,
                       title: l10n.explore,
                       description: l10n.featureExploreDescription,
                       onTap: () {
@@ -269,13 +286,17 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                           context: context,
                           localizations: l10n,
                           currentModelId:
-                              context.read<ChatSessionProvider>().modelId ?? '',
+                          context
+                              .read<ChatSessionProvider>()
+                              .modelId ?? '',
                           onModelSelected: (String id) {
                             final modelService = context.read<ModelService>();
                             final selectionService =
-                                context.read<SelectionService>();
+                            context.read<SelectionService>();
                             final langCode =
-                                Localizations.localeOf(context).languageCode;
+                                Localizations
+                                    .localeOf(context)
+                                    .languageCode;
                             final model = modelService.getPreciseModelData(
                               id,
                               langCode: langCode,
@@ -331,26 +352,25 @@ void _handleOfflineAction(BuildContext context, AppLocalizations l10n) {
 /// feature states coherent (single feature rule).
 void _handleGenerationFeatureAction(BuildContext context,
     List<ModelEntity> candidates, TextEditingController controller,
-    {required bool isImage}) {
+    {required String targetType}) {
   if (candidates.isEmpty) return;
 
   final inputProvider = context.read<InputProvider>();
   final selectionService = context.read<SelectionService>();
   final session = context.read<ChatSessionProvider>();
 
-  // Image/Audio focus bypasses text features.
+  // Image/Audio/Video focus bypasses text features.
   inputProvider.clearFeatureMode();
   inputProvider.clearWebSearch();
 
   final currentModel = session.selectedModel;
   final bool currentSupportsTarget = currentModel != null &&
-      (isImage
-          ? currentModel.outputs['image'] == true
-          : currentModel.outputs['audio'] == true);
+      (currentModel.outputs[targetType] == true ||
+          currentModel.category == targetType);
 
   // Priority: Non-Premium (Free) first, otherwise Premium.
   final ModelEntity targetModel = candidates.firstWhere(
-    (m) => !m.isPremium,
+        (m) => !m.isPremium,
     orElse: () => candidates.first,
   );
 
@@ -363,10 +383,10 @@ void _handleGenerationFeatureAction(BuildContext context,
   final String currentText = controller.text.trim();
   if (currentText.isNotEmpty) {
     context.read<SendService>().sendMessage(
-          context: context,
-          localizations: AppLocalizations.of(context)!,
-          messageText: currentText,
-        );
+      context: context,
+      localizations: AppLocalizations.of(context)!,
+      messageText: currentText,
+    );
   }
 }
 
@@ -392,7 +412,11 @@ void _prepareForTextFeature(BuildContext context) {
 
   final bool isOfflineModel = currentModel?.type == 'offline';
   final bool isGenerationFocused = currentModel?.outputs['image'] == true ||
-      currentModel?.outputs['audio'] == true;
+      currentModel?.outputs['audio'] == true ||
+      currentModel?.outputs['video'] == true ||
+      currentModel?.category == 'image' ||
+      currentModel?.category == 'audio' ||
+      currentModel?.category == 'video';
   final bool isOfflineFeature =
       inputProvider.featureMode == ChatInputMode.offline;
 

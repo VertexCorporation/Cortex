@@ -491,6 +491,9 @@ class AppLocalizationsAz extends AppLocalizations {
   String get shareApp => 'Tətbiqi Paylaş';
 
   @override
+  String get ourStory => 'Bizim Hekayəmiz';
+
+  @override
   String get rateUs => 'Bizi Qiymətləndir';
 
   @override
@@ -1081,6 +1084,12 @@ class AppLocalizationsAz extends AppLocalizations {
   String get news => 'Xəbərlər';
 
   @override
+  String get createAI => 'Create';
+
+  @override
+  String get shortcuts => 'Shortcuts';
+
+  @override
   String get allModels => 'Bütün Modellər';
 
   @override
@@ -1576,6 +1585,12 @@ class AppLocalizationsAz extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
+  String get featureCreateVideoTitle => 'Video yaradın';
+
+  @override
+  String get featureCreateVideoDescription => 'Mətndən videolar yaradın.';
+
+  @override
   String get featureStudyTitle => 'Oxu və Öyrən';
 
   @override
@@ -1880,4 +1895,58 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => 'audio faylı';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesName, Cortex-də yüksək performans göstərən qabaqcıl bir zəkadır.';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelName, Cortex ekosisteminə inteqrasiya olunmuş yüksək performanslı süni intellektdir. Geniş çeşidli mürəkkəb tapşırıqları həll etmək üçün nəzərdə tutulub, yüksək etibarlı və səmərəli emal imkanları təqdim edir. Sürətli cavab müddətləri və təkmil analitik gücü təqdim edərək, gündəlik məhsuldarlığınızı əhəmiyyətli dərəcədə artırır. Cortex-in təhlükəsiz yerli infrastrukturu üzərində tam inteqrasiya olunmuş şəkildə işləyən bu model yaradıcı fikir mübadiləsindən tutmuş dərin texniki analizlərə qədər geniş bir spektrdə sizə kömək edə bilər. Tam potensialını bu gündən kəşf etməyə başlayın.';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle => 'Cortex-in zəkasını sevirsiniz?';
+
+  @override
+  String get guestLimitBottomSheetText =>
+      'Daha da ağıllı zəkalarla işləyin, daha çox məzmun yaradın, daha çox söhbət edin və daha çox şey edin...';
+
+  @override
+  String get arts => 'İncəsənət';
+
+  @override
+  String get noArt => 'Sənət yoxdur';
+
+  @override
+  String get noArtDescription =>
+      'Hələ ki, heç bir əsər yoxdur; qalereyanı şəkillər, videolar, audio və hər cür məzmunla doldurmağın vaxtıdır!';
+
+  @override
+  String get videoPremiumWarning =>
+      'Videolar yaratmaq, indi təkmilləşdirmək və axını hiss etmək üçün Ultra abunəliyinə ehtiyacınız var!';
+
+  @override
+  String get becomePremiumButton => 'Premium olun';
+
+  @override
+  String get fallbackInfoPanelText =>
+      'Server tərəfimizdə etdiyimiz bəzi təkmilləşdirmələrə görə, cavab sizin xüsusi seçdiyiniz süni intellekt əvəzinə Cortex-in dinamik söhbəti ilə yaradılıb. Proses başa çatana qədər anlayışınız üçün təşəkkür edirik!';
+
+  @override
+  String get falOfflineMessage =>
+      'Server tərəfimizdə etdiyimiz bəzi təkmilləşdirmələrə görə, bu zəka hazırda oflayndır. Proses bitənə qədər anlayışınız üçün təşəkkür edirik!';
+
+  @override
+  String get errorInsufficientStorage =>
+      'Bu modeli yükləmək üçün yaddaş yeri kifayət deyil.';
+
+  @override
+  String get backgroundChatNotificationTitle => 'Söhbətə qayıt!';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return '$chatName söhbətində yeni bir mesaj var, baxın!';
+  }
 }

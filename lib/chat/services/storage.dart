@@ -477,6 +477,44 @@ class ChatStorageService {
     }
   }
 
+  /// Returns all media attachment paths from all conversations.
+  /// Used by the Arts gallery to display user-created content.
+  static Future<List<Map<String, dynamic>>> getAllGeneratedMedia() async {
+    try {
+      final db = await DbHelper().db;
+      final rows = await db.query(
+        'messages',
+        columns: ['photoPath', 'conversationId'],
+        where: 'photoPath IS NOT NULL AND length(photoPath) > 0 AND isUser = 0',
+      );
+      return rows;
+    } catch (e) {
+      debugPrint("[ChatStorage] Error fetching all generated media: $e");
+      return [];
+    }
+  }
+
+  /// Returns all media attachment paths for a specific conversation.
+  /// Used to clean up files from disk when a conversation is deleted.
+  static Future<List<String>> getMediaPathsForConversation(String convId) async {
+    try {
+      final db = await DbHelper().db;
+      final rows = await db.query(
+        'messages',
+        columns: ['photoPath'],
+        where: 'conversationId = ? AND photoPath IS NOT NULL AND length(photoPath) > 0',
+        whereArgs: [convId],
+      );
+      return rows
+          .map((r) => r['photoPath'] as String)
+          .where((p) => p.isNotEmpty)
+          .toList();
+    } catch (e) {
+      debugPrint("[ChatStorage] Error fetching media paths for conversation: $e");
+      return [];
+    }
+  }
+
   static Future<void> deleteConversation(String id) async {
     try {
       final db = await DbHelper().db;
@@ -566,6 +604,27 @@ class ChatStorageService {
       _titleController.add({"id": id, "title": newTitle});
     } catch (e) {
       _handleDiskError(e, 'renameConversation');
+    }
+  }
+
+  /// Retrieves the title of a conversation by its ID.
+  static Future<String?> getConversationTitle(String id) async {
+    try {
+      final db = await DbHelper().db;
+      final results = await db.query(
+        'conversations',
+        columns: ['title'],
+        where: 'id = ?',
+        whereArgs: [id],
+        limit: 1,
+      );
+      if (results.isNotEmpty) {
+        return results.first['title'] as String?;
+      }
+      return null;
+    } catch (e) {
+      _handleDiskError(e, 'getConversationTitle');
+      return null;
     }
   }
 

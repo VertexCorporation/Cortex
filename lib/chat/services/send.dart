@@ -11,6 +11,7 @@ import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/api.dart';
+import 'package:cortex/chat/services/background.dart';
 import 'package:cortex/chat/services/context.dart';
 import 'package:cortex/chat/services/moderator.dart';
 import 'package:cortex/chat/services/offline.dart';
@@ -21,6 +22,8 @@ import 'package:cortex/chat/services/voice.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    hide Message;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +31,8 @@ import 'package:uuid/uuid.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/providers/local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cortex/chat/screen/widgets/bottom/guest.dart';
 import '../messages/messages.dart';
 import 'package:cortex/chat/providers/memory.dart';
 import 'tools.dart';
@@ -41,10 +46,14 @@ class SendService {
   final ScrollService _scrollService;
   final OfflineService _offlineService;
   final Uuid _uuid = const Uuid();
-  bool _isSending = false;
   final ModelService _modelService;
   final VoiceService _voiceService;
   final UserMemoryProvider _userMemoryProvider;
+  final BackgroundTaskService _backgroundTaskService;
+
+  /// Track which conversations are currently sending.
+  /// Replaces the old single boolean `_isSending`.
+  final Set<String> _activeSendConversations = {};
 
   SendService({
     required ConversationProvider conversationProvider,
@@ -57,7 +66,9 @@ class SendService {
     required ModelService modelService,
     required VoiceService voiceService,
     required UserMemoryProvider userMemoryProvider,
-  })  : _conversationProvider = conversationProvider,
+    required BackgroundTaskService backgroundTaskService,
+  })
+      : _conversationProvider = conversationProvider,
         _inputProvider = inputProvider,
         _apiService = apiService,
         _contextService = contextService,
@@ -65,7 +76,13 @@ class SendService {
         _offlineService = offlineService,
         _modelService = modelService,
         _voiceService = voiceService,
-        _userMemoryProvider = userMemoryProvider;
+        _userMemoryProvider = userMemoryProvider,
+        _backgroundTaskService = backgroundTaskService;
+
+  /// Returns true if the given conversation is the one currently being viewed.
+  bool _isConversationActive(String convId) {
+    return _conversationProvider.conversationID == convId;
+  }
 
   /// Main entry point to send a message.
   Future<bool> sendMessage({
@@ -78,11 +95,6 @@ class SendService {
     bool isHidden = false,
     String? voiceSystemPrompt,
   }) async {
-    if (_isSending) {
-      debugPrint("SendService: Already sending. Ignored.");
-      return false;
-    }
-
     final sessionProvider = context.read<ChatSessionProvider>();
 
     // -----------------------------------------------------------------------
@@ -95,7 +107,7 @@ class SendService {
     if (isRegenerate) {
       final messages = _conversationProvider.messages;
       final lastUserMessage = messages.reversed.firstWhere(
-        (m) => m.isUserMessage,
+            (m) => m.isUserMessage,
         orElse: () => Message(text: '', isUserMessage: true),
       );
       currentAttachmentPaths = List.from(lastUserMessage.attachmentPaths);
@@ -110,7 +122,10 @@ class SendService {
       return false;
     }
 
-    _isSending = true;
+    // _isSending guard replaced by per-conversation tracking below.
+
+    // Declare targetConvId outside try so the finally block can access it.
+    String? targetConvId;
 
     try {
       // -----------------------------------------------------------------------
@@ -139,7 +154,9 @@ class SendService {
       String errorMessage = localizations.errorNoModelsAvailable;
 
       final localState = context.read<ModelLocalStateProvider>();
-      final langCode = Localizations.localeOf(context).languageCode;
+      final langCode = Localizations
+          .localeOf(context)
+          .languageCode;
       final hasInternet = await InternetConnection().hasInternetAccess;
 
       if (overrideModelId != null && overrideModelId.isNotEmpty) {
@@ -158,7 +175,7 @@ class SendService {
         if (entity.variants != null && entity.variants!.isNotEmpty) {
           final List<dynamic> variants = entity.variants!.values.toList();
           final bool hasVisualContent =
-              currentAttachmentPaths.any((path) => _isImageFile(path));
+          currentAttachmentPaths.any((path) => _isImageFile(path));
 
           List<dynamic> getPreferredCandidates(List<dynamic> sourceList) {
             final filtered = sourceList.where((v) {
@@ -184,7 +201,7 @@ class SendService {
             } else {
               if (hasVisualContent) {
                 final visionModel = downloadedVariants.firstWhere(
-                  (v) => (v['modalities']?['image'] == true),
+                      (v) => (v['modalities']?['image'] == true),
                   orElse: () => null,
                 );
                 apiModelIdForSend = visionModel != null
@@ -192,14 +209,14 @@ class SendService {
                     : getPreferredCandidates(downloadedVariants).first['id'];
               } else {
                 apiModelIdForSend =
-                    getPreferredCandidates(downloadedVariants).first['id'];
+                getPreferredCandidates(downloadedVariants).first['id'];
               }
             }
           } else {
             // Online Variants
             if (hasVisualContent) {
               final visionModel = variants.firstWhere(
-                (v) => (v['modalities']?['image'] == true),
+                    (v) => (v['modalities']?['image'] == true),
                 orElse: () => null,
               );
               apiModelIdForSend = visionModel != null
@@ -232,8 +249,8 @@ class SendService {
           String mType = demandsImage
               ? localizations.mediaTypeImage
               : (demandsVideo
-                  ? localizations.mediaTypeVideo
-                  : localizations.mediaTypeAudio);
+              ? localizations.mediaTypeVideo
+              : localizations.mediaTypeAudio);
 
           voiceSystemPrompt = localizations.systemPromptMissingMedia(
               mType, entity.displayTitle);
@@ -256,7 +273,7 @@ class SendService {
           .getPreciseModelData(apiModelIdForSend, langCode: langCode);
       final modelTitleForStorage = selectedModelForSnapshot.displayTitle;
       final modelImagePathForStorage =
-          _modelService.getModelImagePath(selectedModelForSnapshot);
+      _modelService.getModelImagePath(selectedModelForSnapshot);
 
       if (isServerSide && !hasInternet) {
         throw ApiException(localizations.checkYourInternet);
@@ -272,16 +289,21 @@ class SendService {
         isVisible: !isHidden,
       );
 
+      // Determine conversation ID for this send operation.
+      // This is critical for background task tracking.
+      targetConvId = _conversationProvider.conversationID;
+
       int aiMessageIndex;
       if (isRegenerate && regenerateAiIndex != null) {
         aiMessageIndex = regenerateAiIndex;
       } else {
-        if (_conversationProvider.conversationID == null) {
+        if (targetConvId == null) {
           final newConvId = _uuid.v4();
+          targetConvId = newConvId;
           final defaultTitle =
-              (text.isEmpty && currentAttachmentPaths.isNotEmpty)
-                  ? "📁"
-                  : (text.length > 32 ? text.substring(0, 32) : text);
+          (text.isEmpty && currentAttachmentPaths.isNotEmpty)
+              ? "📁"
+              : (text.length > 32 ? text.substring(0, 32) : text);
 
           final modelForStorage = apiModelIdForSend;
 
@@ -304,11 +326,13 @@ class SendService {
               debugPrint("🚀 Triggering TitleGen for new chat...");
               _apiService
                   .generateChatTitle(text, localizations.chatTitlePrompt,
-                      localizations.chatTitleCriticalInstruction)
+                  localizations.chatTitleCriticalInstruction)
                   .then((aiTitle) {
-                if (aiTitle != null && aiTitle.trim().isNotEmpty) {
+                if (aiTitle != null && aiTitle
+                    .trim()
+                    .isNotEmpty) {
                   final cleanTitle =
-                      aiTitle.length > 40 ? aiTitle.substring(0, 40) : aiTitle;
+                  aiTitle.length > 40 ? aiTitle.substring(0, 40) : aiTitle;
 
                   // Update current UI if we are still on this chat
                   if (_conversationProvider.conversationID == newConvId) {
@@ -333,6 +357,14 @@ class SendService {
         aiMessageIndex = _conversationProvider.messages.length - 1;
       }
 
+      // Guard: prevent duplicate sends for the same conversation.
+      if (targetConvId != null &&
+          _activeSendConversations.contains(targetConvId)) {
+        debugPrint("SendService: Already sending for $targetConvId. Ignored.");
+        return false;
+      }
+      if (targetConvId != null) _activeSendConversations.add(targetConvId);
+
       _inputProvider.clearAttachments();
 
       // -----------------------------------------------------------------------
@@ -350,19 +382,53 @@ class SendService {
         }
       } else {
         // Server Flow (with Tool Loop & featureReasoning)
-        await _sendServerSideMessageWithLoop(
-          initialText: textForApi,
-          modelId: apiModelIdForSend,
-          attachments: currentAttachmentPaths,
-          localizations: localizations,
-          aiMessageIndex: aiMessageIndex,
-          langCode: langCode,
-          enableThinkingMode: enableThinkingMode,
-        );
+        final String convId = targetConvId!;
+        int attempt = 0;
+        bool success = false;
+        
+        while (attempt < 3 && !success) {
+          attempt++;
+          try {
+            await _sendServerSideMessageWithLoop(
+              initialText: textForApi,
+              modelId: apiModelIdForSend,
+              attachments: currentAttachmentPaths,
+              localizations: localizations,
+              aiMessageIndex: aiMessageIndex,
+              langCode: langCode,
+              enableThinkingMode: enableThinkingMode,
+              targetConvId: convId,
+            );
+            success = true;
+          } catch (e) {
+            if (e is ApiException && e.code == 'EMPTY_RESPONSE') {
+              if (attempt >= 3) {
+                rethrow;
+              }
+              debugPrint("SendService: Empty response detected, retrying attempt $attempt...");
+              // Reset the message text before retrying
+              if (_isConversationActive(convId)) {
+                final currentMsg = _conversationProvider.messages[aiMessageIndex];
+                _conversationProvider.updateMessageAtIndex(aiMessageIndex, currentMsg.copyWith(text: ""));
+              } else {
+                _backgroundTaskService.resetBuffer(convId);
+              }
+              await Future.delayed(const Duration(milliseconds: 500));
+            } else {
+              rethrow;
+            }
+          }
+        }
 
-        _conversationProvider.finishBotResponse(aiMessageIndex);
+        // Only update UI provider if user is still on this conversation.
+        if (_isConversationActive(convId)) {
+          _conversationProvider.finishBotResponse(aiMessageIndex);
+        } else {
+          // Background: persist the final message to DB.
+          await _persistBackgroundCompletion(convId, aiMessageIndex);
+        }
 
-        if (_inputProvider.isVoiceModeActive) {
+        if (_inputProvider.isVoiceModeActive && _isConversationActive(convId)) {
           _voiceService.onAiResponseFinished();
         }
       }
@@ -372,7 +438,7 @@ class SendService {
       // -----------------------------------------------------------------------
       if (!isAutoRouter) {
         ChatStorageService.addRecentModel(apiModelIdForSend,
-                langCode: langCode, modelService: _modelService)
+            langCode: langCode, modelService: _modelService)
             .ignore();
       }
 
@@ -381,13 +447,24 @@ class SendService {
         hasAttachments: currentAttachmentPaths.isNotEmpty,
       );
 
+      // Mark background task complete and send notification if needed.
+      if (targetConvId != null &&
+          _backgroundTaskService.isActive(targetConvId)) {
+        final chatTitle = await _getChatTitleForNotification(targetConvId);
+        _backgroundTaskService.markComplete(targetConvId);
+        _sendBackgroundCompletionNotification(chatTitle, localizations);
+      }
+
       return true;
     } catch (e) {
       if (e is UserCancelledException) return false;
       _handleSendError(e, isRegenerate, regenerateAiIndex, localizations);
       return false;
     } finally {
-      _isSending = false;
+      if (targetConvId != null) {
+        _activeSendConversations.remove(targetConvId);
+        _backgroundTaskService.markComplete(targetConvId);
+      }
     }
   }
 
@@ -405,9 +482,10 @@ class SendService {
     required int aiMessageIndex,
     required String langCode,
     required bool enableThinkingMode,
+    required String targetConvId,
   }) async {
     final ModelEntity modelData =
-        _modelService.getPreciseModelData(modelId, langCode: langCode);
+    _modelService.getPreciseModelData(modelId, langCode: langCode);
     final bool isPremium = modelData.isPremium;
 
     final bool isCharacterModel =
@@ -419,7 +497,7 @@ class SendService {
 
     // 1. Build Base Context (History)
     List<Map<String, dynamic>> contextMessages =
-        await _contextService.buildContextMessages(
+    await _contextService.buildContextMessages(
       includeLastUser: false,
       targetModelId: modelId,
       langCode: langCode,
@@ -460,7 +538,7 @@ class SendService {
     // enablefeatureReasoning is already defined above when building context
     bool isfeatureReasoningBlockActive = false;
     bool hasEverHadfeatureReasoning =
-        false; // Track if we've seen any featureReasoning
+    false; // Track if we've seen any featureReasoning
 
     // --- THE LOOP ---
     while (shouldContinue && loopCount < maxLoops) {
@@ -474,40 +552,70 @@ class SendService {
       void onfeatureReasoning(String featureReasoningText) {
         // Skip featureReasoning if disabled
         if (!enablefeatureReasoning) return;
-        if (_conversationProvider.wasResponseStopped) return;
+        if (_conversationProvider.wasResponseStopped &&
+            _isConversationActive(targetConvId)) {
+          return;
+        }
 
         // If this is the START of a featureReasoning block, open the tag
         if (!isfeatureReasoningBlockActive) {
           // If we had featureReasoning before and closed it, we're continuing - add separator
           if (hasEverHadfeatureReasoning) {
-            _conversationProvider.appendToLastBotMessage("\n\n");
+            if (_isConversationActive(targetConvId)) {
+              _conversationProvider.appendToLastBotMessage("\n\n");
+            } else {
+              _backgroundTaskService.appendChunk(targetConvId, "\n\n");
+            }
           }
-          _conversationProvider.appendToLastBotMessage("<think>");
+          if (_isConversationActive(targetConvId)) {
+            _conversationProvider.appendToLastBotMessage("<think>");
+          } else {
+            _backgroundTaskService.markActive(targetConvId);
+            _backgroundTaskService.appendChunk(targetConvId, "<think>");
+          }
           isfeatureReasoningBlockActive = true;
           hasEverHadfeatureReasoning = true;
         }
 
         // Ensure we don't double-append headers or newlines. Just the raw text.
-        _conversationProvider.appendToLastBotMessage(featureReasoningText);
+        if (_isConversationActive(targetConvId)) {
+          _conversationProvider.appendToLastBotMessage(featureReasoningText);
+        } else {
+          _backgroundTaskService.appendChunk(
+              targetConvId, featureReasoningText);
+        }
       }
 
       void onTextChunk(String text) {
-        if (_conversationProvider.wasResponseStopped) return;
+        if (_conversationProvider.wasResponseStopped &&
+            _isConversationActive(targetConvId)) {
+          return;
+        }
         if (text.isEmpty) return; // Ignore empty keep-alive chunks
 
         // If we were featureReasoning and now switched to ACTUAL content, close the featureReasoning tag
         if (enablefeatureReasoning && isfeatureReasoningBlockActive) {
-          _conversationProvider.appendToLastBotMessage("</think>");
+          if (_isConversationActive(targetConvId)) {
+            _conversationProvider.appendToLastBotMessage("</think>");
+          } else {
+            _backgroundTaskService.appendChunk(targetConvId, "</think>");
+          }
           isfeatureReasoningBlockActive = false;
         }
 
-        _conversationProvider.appendToLastBotMessage(text);
-        if (_inputProvider.isVoiceModeActive) {
-          _voiceService.onAiStreamCallback(text);
-        }
-        if (_scrollService.isUserAtBottom()) {
-          _scrollService.scrollToBottom(
-              duration: const Duration(milliseconds: 50));
+        if (_isConversationActive(targetConvId)) {
+          _conversationProvider.appendToLastBotMessage(text);
+          if (_inputProvider.isVoiceModeActive) {
+            _voiceService.onAiStreamCallback(text);
+          }
+          if (_scrollService.isUserAtBottom()) {
+            _scrollService.scrollToBottom(
+                duration: const Duration(milliseconds: 50));
+          }
+        } else {
+          // BACKGROUND MODE: accumulate in the background buffer.
+          _backgroundTaskService.markActive(targetConvId);
+          _backgroundTaskService.appendChunk(targetConvId, text);
         }
       }
 
@@ -697,7 +805,11 @@ class SendService {
 
         // Close featureReasoning block before tool execution if it's still open
         if (enablefeatureReasoning && isfeatureReasoningBlockActive) {
-          _conversationProvider.appendToLastBotMessage("</think>");
+          if (_isConversationActive(targetConvId)) {
+            _conversationProvider.appendToLastBotMessage("</think>");
+          } else {
+            _backgroundTaskService.appendChunk(targetConvId, "</think>");
+          }
           isfeatureReasoningBlockActive = false;
         }
 
@@ -745,10 +857,16 @@ class SendService {
               if (widgetType != null) {
                 // Inject Widget Marker (no extra newlines to avoid spacing issues)
                 // The UI (parser) will detect this pattern and render the card
-                _conversationProvider.appendToLastBotMessage(
-                    "<<<WIDGET:$widgetType>>>${jsonEncode(widgetData)}<<<END>>>");
-                // Force immediate UI update for widget visibility
-                _conversationProvider.flushStreamUpdates();
+                final widgetMarker = "<<<WIDGET:$widgetType>>>${jsonEncode(
+                    widgetData)}<<<END>>>";
+                if (_isConversationActive(targetConvId)) {
+                  _conversationProvider.appendToLastBotMessage(widgetMarker);
+                  // Force immediate UI update for widget visibility
+                  _conversationProvider.flushStreamUpdates();
+                } else {
+                  _backgroundTaskService.appendChunk(
+                      targetConvId, widgetMarker);
+                }
 
                 // Use the summary for the LLM context so it doesn't get confused by raw JSON
                 result = summaryForContext;
@@ -774,7 +892,11 @@ class SendService {
     // Ensure featureReasoning block is closed at the end of all iterations
     // This handles cases where the final response ends with featureReasoning
     if (enablefeatureReasoning && isfeatureReasoningBlockActive) {
-      _conversationProvider.appendToLastBotMessage("</think>");
+      if (_isConversationActive(targetConvId)) {
+        _conversationProvider.appendToLastBotMessage("</think>");
+      } else {
+        _backgroundTaskService.appendChunk(targetConvId, "</think>");
+      }
       isfeatureReasoningBlockActive = false;
     }
 
@@ -786,7 +908,7 @@ class SendService {
         ? _conversationProvider.messages.last.text
         : "";
     final memoryExp =
-        RegExp(r'<memory>([\s\S]*?)(?:</memory>|$)', caseSensitive: false);
+    RegExp(r'<memory[)>]?([\s\S]*?)(?:</memory[)>]?|$)', caseSensitive: false);
     final memoryMatch = memoryExp.firstMatch(finalResponseText);
     if (memoryMatch != null) {
       final newMemory = memoryMatch.group(1)?.trim();
@@ -796,18 +918,24 @@ class SendService {
             '[Memory] Successfully extracted and updated memory from response.');
       }
     }
+
+    // CHECK FOR EMPTY RESPONSE
+    final cleanResponse = finalResponseText.replaceAll(memoryExp, '').trim();
+    final bool hasGeneratedMedia = _conversationProvider.messages.isNotEmpty && _conversationProvider.messages.last.attachmentPaths.isNotEmpty;
+    if (cleanResponse.isEmpty && !hasGeneratedMedia) {
+      throw ApiException(localizations.errorServer, code: 'EMPTY_RESPONSE');
+    }
   }
 
-  void _handleSendError(
-    Object error,
-    bool isRegenerate,
-    int? regenerateAiIndex,
-    AppLocalizations localizations, {
-    String? failedUserText,
-    List<String>? failedAttachmentPaths,
-  }) {
+  void _handleSendError(Object error,
+      bool isRegenerate,
+      int? regenerateAiIndex,
+      AppLocalizations localizations, {
+        String? failedUserText,
+        List<String>? failedAttachmentPaths,
+      }) {
     final String errorMessage =
-        error is ApiException ? error.message : localizations.anErrorOccurred;
+    error is ApiException ? error.message : localizations.anErrorOccurred;
     final bool isContentFlagError = error is ApiException &&
         error.message == localizations.errorPromptFlagged;
 
@@ -843,7 +971,7 @@ class SendService {
 
     final Message currentAiMessage = messages[aiMessageIndex];
     final updatedAttachments =
-        List<String>.from(currentAiMessage.attachmentPaths);
+    List<String>.from(currentAiMessage.attachmentPaths);
     if (!updatedAttachments.contains(mediaPath)) {
       updatedAttachments.add(mediaPath);
     }
@@ -921,7 +1049,7 @@ class SendService {
     required String fallbackExtension,
   }) {
     final mimeMatch =
-        RegExp(r'^data:([^;]+);base64,', caseSensitive: false).firstMatch(url);
+    RegExp(r'^data:([^;]+);base64,', caseSensitive: false).firstMatch(url);
     if (mimeMatch != null) {
       final mime = (mimeMatch.group(1) ?? '').toLowerCase();
       final slashIndex = mime.indexOf('/');
@@ -934,7 +1062,9 @@ class SendService {
     }
 
     final ext =
-        p.extension(url.split('?').first).toLowerCase().replaceAll('.', '');
+    p.extension(url
+        .split('?')
+        .first).toLowerCase().replaceAll('.', '');
     if (allowedExtensions.contains(ext)) {
       return ext;
     }
@@ -945,5 +1075,111 @@ class SendService {
   bool _isImageFile(String path) {
     final ext = p.extension(path).toLowerCase().replaceAll('.', '');
     return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
+  }
+
+  /// Checks the daily guest limit and returns true if the user can send a message.
+  /// If the user is blocked, it shows the bottom sheet and returns false.
+  Future<bool> checkGuestLimit(BuildContext context,
+      AppLocalizations localizations) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String today = DateTime.now().toIso8601String().substring(0, 10);
+
+    final String lastDate = prefs.getString('guest_message_date') ?? '';
+    int guestMessageCount = prefs.getInt('guest_message_count') ?? 0;
+
+    if (lastDate != today) {
+      guestMessageCount = 0;
+      await prefs.setString('guest_message_date', today);
+    }
+
+    guestMessageCount++;
+    await prefs.setInt('guest_message_count', guestMessageCount);
+
+    // Guest limit check is now performed before this method is called. 
+    if ([5, 10, 25, 50, 100].contains(guestMessageCount)) {
+      if (context.mounted) {
+        showGuestLimitSheet(context, localizations);
+      }
+      return false; // Blocked this time
+    }
+
+    return true; // Allowed
+  }
+
+  /// Persists the accumulated background buffer to the database as the AI message.
+  Future<void> _persistBackgroundCompletion(String convId,
+      int aiMessageIndex) async {
+    try {
+      final accumulatedText = _backgroundTaskService.consumeBuffer(convId);
+      if (accumulatedText.isEmpty) return;
+
+      // Build a finalized AI message from the accumulated text.
+      final finalMessage = Message(
+        text: accumulatedText,
+        isUserMessage: false,
+        isThinking: false,
+        includeInContext: true,
+      );
+
+      await ChatStorageService.upsertMessage(
+          convId, aiMessageIndex, finalMessage);
+      debugPrint(
+          '[SendService] Background completion persisted for $convId (${accumulatedText
+              .length} chars).');
+    } catch (e) {
+      debugPrint('[SendService] Error persisting background completion: $e');
+    }
+  }
+
+  /// Gets the conversation title for the notification.
+  Future<String> _getChatTitleForNotification(String convId) async {
+    try {
+      final db = await ChatStorageService.getConversationTitle(convId);
+      return db ?? 'Chat';
+    } catch (_) {
+      return 'Chat';
+    }
+  }
+
+  /// Sends a local push notification when a background chat finishes.
+  void _sendBackgroundCompletionNotification(String chatTitle,
+      AppLocalizations localizations) {
+    try {
+      final plugin = FlutterLocalNotificationsPlugin();
+
+      final title = localizations.backgroundChatNotificationTitle;
+      final body = localizations.backgroundChatNotificationBody(chatTitle);
+
+      const androidDetails = AndroidNotificationDetails(
+        'background_chat',
+        'Background Chats',
+        channelDescription: 'Notifications when background chats finish generating.',
+        importance: Importance.high,
+        priority: Priority.high,
+      );
+
+      const platformDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      );
+
+      plugin.show(
+        DateTime
+            .now()
+            .millisecondsSinceEpoch
+            .toSigned(31),
+        title,
+        body,
+        platformDetails,
+      );
+
+      debugPrint('[SendService] Background notification sent for: $chatTitle');
+    } catch (e) {
+      debugPrint('[SendService] Failed to send background notification: $e');
+    }
   }
 }

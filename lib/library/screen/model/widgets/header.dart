@@ -96,7 +96,7 @@ class ModelHeader extends StatelessWidget {
                         value: capabilitiesSource.ram != null
                             ? '${capabilitiesSource.ram} MB'
                             : localizations.notAvailable,
-                        iconPath: 'assets/icons/memory.svg',
+                        iconPath: 'assets/icons/intelligence.svg',
                       ),
                     ] else ...[
                       _InfoRow(

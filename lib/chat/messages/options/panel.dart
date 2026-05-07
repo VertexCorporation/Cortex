@@ -94,29 +94,40 @@ class OptionsPanelViewModel {
   }
 
   bool get _isMediaOnlyMessage =>
-      message.hasAttachments && message.displayableText.trim().isEmpty;
+      message.hasAttachments && message.displayableText
+          .trim()
+          .isEmpty;
 
   List<MessageOption> getVisibleOptions(BuildContext context) {
-    final langCode = Localizations.localeOf(context).languageCode;
+    final langCode = Localizations
+        .localeOf(context)
+        .languageCode;
     final currentModelId = message.model ?? '';
 
-    // LOGIC UPDATE: Iterate attachments to find images.
-    final bool conversationHasImages = conversation.messages.any((m) {
-      return m.attachmentPaths.any((path) => _isImageFile(path));
+    // LOGIC UPDATE: Iterate attachments to find user images only.
+    final bool conversationHasUserImages = conversation.messages.any((m) {
+      return m.isUserMessage &&
+          m.attachmentPaths.any((path) => _isImageFile(path));
     });
 
     final modelSeriesData = ModelDataUtils.findParentSeriesData(currentModelId,
         langCode: langCode, modelService: modelService);
     final currentModel =
-        modelService.getPreciseModelData(currentModelId, langCode: langCode);
+    modelService.getPreciseModelData(currentModelId, langCode: langCode);
 
     final isDynamicContext = session.isDynamicChat;
     final isOfflineModel = modelSeriesData?.isServerSide == false;
 
     final currentModelCanHandleImages = modelService.hasModality(currentModelId,
         langCode: langCode, modality: 'image');
-    final hasPremiumAccess =
-        session.isUserSubscribed || session.premiumTrialUses < 3;
+
+    // We check predits from the viewmodel directly
+    final hasPreditsForPremium = session.isUserSubscribed ||
+        (context
+            .read<CreditsManager>()
+            .preditsNotifier
+            .value ?? 0) >= 10;
+
     final isCurrentModelPremium = currentModel.isPremium;
 
     return _baseOptions.where((option) {
@@ -138,7 +149,7 @@ class OptionsPanelViewModel {
       }
 
       if (option == MessageOption.regenerate) {
-        if (isCurrentModelPremium && !hasPremiumAccess) return false;
+        if (isCurrentModelPremium && !hasPreditsForPremium) return false;
         if (!isOfflineModel && !internet.isConnected) return false;
         if (!isOfflineModel && totalCredits <= 0) return false;
       }
@@ -147,9 +158,9 @@ class OptionsPanelViewModel {
         if (!isOfflineModel && totalCredits <= 0) return false;
       }
 
-      // LOGIC UPDATE: Only restrict model ops if chat has IMAGES and model CAN'T handle them.
+      // LOGIC UPDATE: Only restrict model ops if chat has USER IMAGES and model CAN'T handle them.
       // (Text files are safe for any model).
-      if (conversationHasImages && !currentModelCanHandleImages) {
+      if (conversationHasUserImages && !currentModelCanHandleImages) {
         if (option == MessageOption.regenerate ||
             option == MessageOption.edit ||
             option == MessageOption.changeModel) {
@@ -160,10 +171,9 @@ class OptionsPanelViewModel {
       if (option == MessageOption.changeModel) {
         if (!isDynamicContext && modelSeriesData != null) {
           final int validExtCount =
-              ModelDataUtils.validVariantCountForChangingModel(
+          ModelDataUtils.validVariantCountForChangingModel(
             parentSeries: modelSeriesData,
-            conversationHasPhoto:
-                conversationHasImages, // Renamed in utility call logic if needed, or pass boolean
+            conversationHasPhoto: conversationHasUserImages,
           );
           if (validExtCount <= 1) return false;
         } else if (modelSeriesData == null) {
@@ -255,10 +265,10 @@ class _AnimatedMessageOptionsPanelState
     Clipboard.setData(ClipboardData(text: widget.message.displayableText));
     Provider.of<IntrovertNotificationService>(context, listen: false)
         .showNotification(
-            message: localizations.messageCopied,
-            type: NotificationType.success,
-            bottomOffset: 0.07,
-            isChatMode: true);
+        message: localizations.messageCopied,
+        type: NotificationType.success,
+        bottomOffset: 0.07,
+        isChatMode: true);
     _dismissPanel();
   }
 
@@ -285,7 +295,10 @@ class _AnimatedMessageOptionsPanelState
     final localizations = AppLocalizations.of(context)!;
     final modelService = context.read<ModelService>();
     final totalCredits =
-        context.watch<CreditsManager>().totalCreditsNotifier.value ?? 0;
+        context
+            .watch<CreditsManager>()
+            .totalCreditsNotifier
+            .value ?? 0;
 
     final viewModel = OptionsPanelViewModel(
       session: sessionProvider,
@@ -297,15 +310,20 @@ class _AnimatedMessageOptionsPanelState
     );
 
     final List<MessageOption> visibleOptions =
-        viewModel.getVisibleOptions(context);
+    viewModel.getVisibleOptions(context);
 
     if (visibleOptions.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _dismissPanel());
       return const SizedBox.shrink();
     }
 
-    final screenSize = MediaQuery.of(context).size;
-    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final screenSize = MediaQuery
+        .of(context)
+        .size;
+    final keyboardHeight = MediaQuery
+        .of(context)
+        .viewInsets
+        .bottom;
     final panelWidth = screenSize.width * _UIFactors.panelWidthFactor;
     final optionHeight = screenSize.height * _UIFactors.optionHeightFactor;
     final borderRadius = screenSize.width * _UIFactors.borderRadiusFactor;
@@ -360,8 +378,14 @@ class _AnimatedMessageOptionsPanelState
                   child: Container(
                     width: panelWidth,
                     decoration: BoxDecoration(
-                      color: AppColors.secondaryColor,
+                      color: widget.message.isUserMessage
+                          ? AppColors.secondaryColor
+                          : AppColors.background,
                       borderRadius: BorderRadius.circular(borderRadius),
+                      border: Border.all(
+                        color: AppColors.border,
+                        width: 0.8,
+                      ),
                       boxShadow: const [
                         BoxShadow(
                             color: Colors.black26,

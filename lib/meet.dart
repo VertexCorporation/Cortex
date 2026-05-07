@@ -8,6 +8,7 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/server/user.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:cortex/appbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,8 +48,14 @@ class _OnboardingPageData {
 
 /// The main onboarding screen widget.
 /// Manages the PageView, state, and navigation logic.
+///
+/// When [isStoryMode] is true, the screen is shown from Settings as "Our Story"
+/// and will simply fade-pop on finish instead of triggering the full onboarding
+/// completion flow.
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  final bool isStoryMode;
+
+  const OnboardingScreen({super.key, this.isStoryMode = false});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -94,6 +101,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _onFinish() async {
+    if (widget.isStoryMode) {
+      // Story mode: just pop back to Settings with a fade.
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      return;
+    }
+
+    // Normal onboarding flow: mark as completed and continue.
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('has_completed_onboarding', true);
 
@@ -110,6 +125,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final double screenHeight = mediaQuery.size.height;
     final l10n = AppLocalizations.of(context)!;
     final userProvider = context.watch<UserProvider>();
 
@@ -150,35 +167,59 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: false,
-        child: PageView.builder(
-          controller: _pageController,
-          physics: _isPageReady
-              ? const NoGoBackScrollPhysics()
-              : const NeverScrollableScrollPhysics(),
-          onPageChanged: (int page) {
-            setState(() {
-              _isPageReady = false;
-              _currentPage =
-                  page; // Update current page for the scroll listener.
-            });
-          },
-          itemCount: pages.length + 1,
-          itemBuilder: (context, index) {
-            if (index < pages.length) {
-              return _OnboardingContentPage(
-                key: ValueKey('onboarding_page_$index'),
-                data: pages[index],
-                pageController: _pageController,
-                onAnimationComplete: () {
-                  if (mounted) {
-                    setState(() => _isPageReady = true);
-                  }
-                },
-              );
-            } else {
-              return _FinalOnboardingPage(onFinish: _onFinish);
-            }
-          },
+        child: Stack(
+          children: [
+            // Main PageView content
+            PageView.builder(
+              controller: _pageController,
+              physics: _isPageReady
+                  ? const NoGoBackScrollPhysics()
+                  : const NeverScrollableScrollPhysics(),
+              onPageChanged: (int page) {
+                setState(() {
+                  _isPageReady = false;
+                  _currentPage =
+                      page; // Update current page for the scroll listener.
+                });
+              },
+              itemCount: pages.length + 1,
+              itemBuilder: (context, index) {
+                if (index < pages.length) {
+                  return _OnboardingContentPage(
+                    key: ValueKey('onboarding_page_$index'),
+                    data: pages[index],
+                    pageController: _pageController,
+                    onAnimationComplete: () {
+                      if (mounted) {
+                        setState(() => _isPageReady = true);
+                      }
+                    },
+                  );
+                } else {
+                  return _FinalOnboardingPage(onFinish: _onFinish);
+                }
+              },
+            ),
+
+            // X close button — only in story mode (Our Story from Settings)
+            if (widget.isStoryMode)
+              Positioned(
+                top: screenHeight * 0.015,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: AppBarButton(
+                    size: 40.0,
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 20.0,
+                      color: AppColors.primaryColor.inverted,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

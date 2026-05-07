@@ -1,6 +1,8 @@
 // lib/axon/inbox/logic/general.dart
 
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../cache.dart';
@@ -38,7 +40,8 @@ class InboxViewModel extends ChangeNotifier {
   InboxViewModel({
     required ModelService modelService,
     required IntrovertNotificationService notificationService,
-  })  : _modelService = modelService,
+  })
+      : _modelService = modelService,
         _notificationService = notificationService;
 
   Future<void> initialize(String langCode) async {
@@ -76,8 +79,8 @@ class InboxViewModel extends ChangeNotifier {
     } else {
       // 1. First, get IDs of conversations where messages match (Deep Search)
       final List<String> deepSearchResults =
-          await ChatStorageService.searchConversations(
-              query: _currentSearchQuery);
+      await ChatStorageService.searchConversations(
+          query: _currentSearchQuery);
 
       // 2. Filter in memory (Title matches or ID is in deep search results)
       _filteredConversationIDs = _allConversationIDs.where((id) {
@@ -136,7 +139,7 @@ class InboxViewModel extends ChangeNotifier {
     final cachedManagers = CacheService.get<Map<String, ConversationManager>>(
         CacheKey.conversationManagers);
     final cachedOrder =
-        CacheService.get<List<String>>(CacheKey.conversationOrder);
+    CacheService.get<List<String>>(CacheKey.conversationOrder);
 
     if (cachedManagers != null && cachedOrder != null) {
       _conversationManagers.addAll(cachedManagers);
@@ -169,27 +172,30 @@ class InboxViewModel extends ChangeNotifier {
     _lastMessageSubscription?.cancel();
     _lastMessageSubscription =
         ChatStorageService.lastMsgStream.listen((update) async {
-      final String convId = update['convId'] as String;
-      final manager = _conversationManagers[convId];
+          final String convId = update['convId'] as String;
+          final manager = _conversationManagers[convId];
 
-      if (manager == null) {
-        await loadConversations(langCode: _currentLangCode, isReload: true);
-        return;
-      }
+          if (manager == null) {
+            await loadConversations(langCode: _currentLangCode, isReload: true);
+            return;
+          }
 
-      manager.updateLastMessage(
-        update['text'] as String? ?? '',
-        update['photoPath'] as String? ?? '',
-        DateTime.fromMillisecondsSinceEpoch(update['ts'] as int),
-      );
+          manager.updateLastMessage(
+            update['text'] as String? ?? '',
+            update['photoPath'] as String? ?? '',
+            DateTime.fromMillisecondsSinceEpoch(update['ts'] as int),
+          );
 
-      _sortConversations();
-    });
+          _sortConversations();
+        });
   }
 
   Future<void> loadConversations(
       {required String langCode, bool isReload = false}) async {
-    if (_conversationManagers.isEmpty || isReload) {
+    // PERF FIX: Only show skeleton loading if we truly have nothing to display.
+    // If cache already populated the list, skip the skeleton entirely — users
+    // see real data while we silently refresh from DB in the background.
+    if (_conversationManagers.isEmpty && !isReload) {
       _isLoading = true;
       notifyListeners();
     }
@@ -200,19 +206,25 @@ class InboxViewModel extends ChangeNotifier {
       // OPTIMIZED: Fetch everything in one go (No N+1)
       final rows = await ChatStorageService.getConversationsWithLastMessage();
 
-      // Use a temporary map to avoid flickering if possible, but for now clear is safe
-      // because we set isLoading=true.
-      _conversationManagers.clear();
-      // Use Set to prevent duplicates
-      final Set<String> uniqueIds = {};
+      // PERF FIX: Incremental update instead of clear+rebuild.
+      // Build a fresh set from DB, then reconcile with existing managers
+      // to avoid destroying and recreating identical objects (prevents flicker).
+      final Set<String> freshIds = {};
+      final List<_SnapshotUpdate> pendingSnapshotUpdates = [];
 
       for (final row in rows) {
         final convID = row['id'] as String;
 
         // Safety check if DB returns duplicates (unlikely with primary key but good practice)
-        if (uniqueIds.contains(convID)) continue;
+        if (freshIds.contains(convID)) continue;
 
-        uniqueIds.add(convID);
+        freshIds.add(convID);
+
+        // If manager already exists, update it in place instead of recreating
+        if (_conversationManagers.containsKey(convID)) {
+          continue;
+        }
+
         final modelId = row['modelId'] as String? ?? '';
 
         // Extract last message data from the joined query
@@ -228,13 +240,13 @@ class InboxViewModel extends ChangeNotifier {
           persistedModelImagePath: row['modelImagePath'] as String?,
           isStarred: (row['isStarred'] as int? ?? 0) == 1,
           starredDate: row['starredDate'] != null &&
-                  (row['starredDate'] as int) > 0
+              (row['starredDate'] as int) > 0
               ? DateTime.fromMillisecondsSinceEpoch(row['starredDate'] as int)
               : null,
           lastMessageDate: realLastMsgTs != null
               ? DateTime.fromMillisecondsSinceEpoch(realLastMsgTs)
               : DateTime.fromMillisecondsSinceEpoch(
-                  row['lastMessageDate'] as int? ?? 0),
+              row['lastMessageDate'] as int? ?? 0),
           langCode: langCode,
           modelService: _modelService,
         );
@@ -247,24 +259,46 @@ class InboxViewModel extends ChangeNotifier {
 
         _conversationManagers[convID] = manager;
 
+        // PERF FIX: Collect snapshot updates instead of awaiting each one (N+1 → batch)
         final persistedTitle = (row['modelTitle'] as String?)?.trim() ?? '';
         final persistedImage = (row['modelImagePath'] as String?)?.trim() ?? '';
         if (persistedTitle.isEmpty || persistedImage.isEmpty) {
-          await ChatStorageService.updateConversationModelSnapshot(
-            convID,
+          pendingSnapshotUpdates.add(_SnapshotUpdate(
+            convID: convID,
             modelTitle: manager.modelTitle,
             modelImagePath: manager.modelImagePath,
-          );
+          ));
         }
       }
 
-      _allConversationIDs = uniqueIds.toList();
+      // Remove managers for conversations that no longer exist in DB
+      final staleIds = _conversationManagers.keys
+          .where((id) => !freshIds.contains(id))
+          .toList();
+      for (final staleId in staleIds) {
+        _conversationManagers[staleId]?.dispose();
+        _conversationManagers.remove(staleId);
+      }
+
+      _allConversationIDs = freshIds.toList();
 
       _sortConversations();
+
+      // PERF FIX: Fire-and-forget snapshot updates in background (non-blocking)
+      if (pendingSnapshotUpdates.isNotEmpty) {
+        Future.microtask(() async {
+          for (final update in pendingSnapshotUpdates) {
+            await ChatStorageService.updateConversationModelSnapshot(
+              update.convID,
+              modelTitle: update.modelTitle,
+              modelImagePath: update.modelImagePath,
+            );
+          }
+        });
+      }
     } catch (e) {
       debugPrint("Error loading conversations: $e");
     } finally {
-      // Logic Update: Ensure we don't flash empty state if we have items
       _isLoading = false;
       notifyListeners();
       _updateConversationCache();
@@ -278,7 +312,8 @@ class InboxViewModel extends ChangeNotifier {
     // 1. PROTECTION CHECK: Active conversation check
     final BuildContext? context = mainScreenKey.currentContext;
     if (context != null) {
-      final activeId = Provider.of<ConversationProvider>(context, listen: false)
+      final activeId = Provider
+          .of<ConversationProvider>(context, listen: false)
           .conversationID;
 
       if (activeId == conversationID) {
@@ -296,10 +331,67 @@ class InboxViewModel extends ChangeNotifier {
     // Notify to update UI
     notifyListeners();
 
-    // 3. Dispose and delete from DB
+    // 3. Dispose and delete from DB (with media cleanup)
     manager.dispose();
+
+    // 3a. Clean up media files from disk (fire-and-forget)
+    _cleanupMediaFiles(conversationID);
+
     await ChatStorageService.deleteConversation(conversationID);
     _updateConversationCache();
+  }
+
+  /// Deletes all generated media files associated with a conversation from disk.
+  void _cleanupMediaFiles(String conversationID) {
+    Future.microtask(() async {
+      try {
+        final paths =
+        await ChatStorageService.getMediaPathsForConversation(conversationID);
+        for (final path in paths) {
+          _deleteMediaPath(path);
+        }
+      } catch (e) {
+        debugPrint('[InboxViewModel] Media cleanup error: $e');
+      }
+    });
+  }
+
+  /// Parses a media path (could be JSON array or single path) and deletes files.
+  void _deleteMediaPath(String raw) {
+    List<String> filePaths;
+    try {
+      final decoded = _tryJsonDecode(raw);
+      if (decoded is List) {
+        filePaths = decoded.cast<String>();
+      } else {
+        filePaths = [raw];
+      }
+    } catch (_) {
+      filePaths = [raw];
+    }
+
+    for (final filePath in filePaths) {
+      if (filePath.isEmpty) continue;
+      if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+        continue;
+      }
+      try {
+        final file = File(filePath);
+        if (file.existsSync()) {
+          file.deleteSync();
+        }
+      } catch (e) {
+        debugPrint('[InboxViewModel] Failed to delete file $filePath: $e');
+      }
+    }
+  }
+
+  static dynamic _tryJsonDecode(String raw) {
+    try {
+      return jsonDecode(raw);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> editConversation(String conversationID, String newTitle) async {
@@ -335,4 +427,17 @@ class InboxViewModel extends ChangeNotifier {
         CacheKey.conversationManagers, Map.of(_conversationManagers));
     CacheService.set(CacheKey.conversationOrder, List.of(_allConversationIDs));
   }
+}
+
+/// Lightweight data class for batching model snapshot SQL writes.
+class _SnapshotUpdate {
+  final String convID;
+  final String modelTitle;
+  final String modelImagePath;
+
+  const _SnapshotUpdate({
+    required this.convID,
+    required this.modelTitle,
+    required this.modelImagePath,
+  });
 }

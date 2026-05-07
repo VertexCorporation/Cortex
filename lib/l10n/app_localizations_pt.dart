@@ -495,6 +495,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get shareApp => 'Partilhar a App';
 
   @override
+  String get ourStory => 'Nossa história';
+
+  @override
   String get rateUs => 'Avalie-nos';
 
   @override
@@ -1087,6 +1090,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get news => 'Notícias';
 
   @override
+  String get createAI => 'Create';
+
+  @override
+  String get shortcuts => 'Shortcuts';
+
+  @override
   String get allModels => 'Todos os modelos';
 
   @override
@@ -1584,6 +1593,12 @@ class AppLocalizationsPt extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
+  String get featureCreateVideoTitle => 'Criar vídeo';
+
+  @override
+  String get featureCreateVideoDescription => 'Gere vídeos a partir de texto.';
+
+  @override
   String get featureStudyTitle => 'Estudar e aprender';
 
   @override
@@ -1889,4 +1904,58 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => 'arquivo de áudio';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesName é uma inteligência avançada demonstrando alto desempenho no Cortex.';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelName é uma inteligência artificial de alto desempenho integrada ao ecossistema Cortex. Projetada para conquistar uma ampla variedade de tarefas complexas, oferece capacidades de processamento altamente confiáveis e eficientes. Ao oferecer tempos de resposta rápidos e poder analítico avançado, aumenta significativamente sua produtividade diária. Operando perfeitamente na infraestrutura local segura do Cortex, este modelo pode auxiliá-lo em um amplo espectro de tarefas, desde brainstorming criativo a análises técnicas profundas. Comece a explorar todo o seu potencial hoje.';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle => 'Adora a inteligência do Cortex?';
+
+  @override
+  String get guestLimitBottomSheetText =>
+      'Trabalhe com inteligências ainda mais avançadas, gere mais conteúdo, converse mais e faça muito mais...';
+
+  @override
+  String get arts => 'Artes';
+
+  @override
+  String get noArt => 'Sem arte';
+
+  @override
+  String get noArtDescription =>
+      'Ainda não há obras; é hora de preencher a galeria criando imagens, vídeos, áudio e todo tipo de conteúdo!';
+
+  @override
+  String get videoPremiumWarning =>
+      'Você precisa de uma assinatura Ultra para gerar vídeos. Atualize agora e sinta a fluidez!';
+
+  @override
+  String get becomePremiumButton => 'Torne-se Premium';
+
+  @override
+  String get fallbackInfoPanelText =>
+      'Devido a algumas melhorias que estamos implementando em nosso servidor, a resposta foi gerada pelo chat dinâmico do Cortex em vez da IA que você selecionou. Agradecemos a sua compreensão enquanto o processo é concluído!';
+
+  @override
+  String get falOfflineMessage =>
+      'Devido a algumas melhorias que estamos implementando em nosso servidor, esta ferramenta está temporariamente indisponível. Agradecemos a sua compreensão enquanto o processo é concluído!';
+
+  @override
+  String get errorInsufficientStorage =>
+      'Espaço de armazenamento insuficiente para baixar este modelo.';
+
+  @override
+  String get backgroundChatNotificationTitle => 'De volta ao chat!';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return 'Há uma nova mensagem em $chatName, confira!';
+  }
 }

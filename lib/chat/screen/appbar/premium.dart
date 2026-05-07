@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../theme.dart';
 
@@ -130,7 +129,7 @@ class _PremiumButtonState extends State<PremiumButton>
                       Flexible(
                         child: Text(
                           "Cortex Premium",
-                          style: GoogleFonts.ubuntu(
+                          style: TextStyle(
                             fontSize: fontSize,
                             fontWeight: FontWeight.w500,
                             letterSpacing: -0.5,

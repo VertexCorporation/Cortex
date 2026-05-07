@@ -1,5 +1,3 @@
-// chat/messages/tiles/ai.dart
-
 import 'dart:io';
 import 'package:cortex/app.dart';
 import 'package:cortex/library/backend/data/service.dart';
@@ -7,12 +5,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../../../library/utils.dart';
-import '../../../recognizer.dart';
 import '../../../theme.dart';
-import '../options/manager.dart';
 import '../messages.dart';
-import '../parser.dart';
+import 'package:cortex/chat/messages/markdown/parser.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+
+import 'package:flutter/services.dart';
+import 'package:cortex/chat/providers/conversation.dart';
+import 'package:cortex/chat/providers/session.dart';
+import 'package:cortex/internet.dart';
+import 'package:cortex/server/credits.dart';
+import '../../../notifications/introvert.dart';
+import '../options/change.dart';
+import '../options/panel.dart';
+import 'package:cortex/chat/services/tts.dart';
+
+part 'ai/error.dart';
+
+part 'ai/header.dart';
+
+part 'ai/content.dart';
+
+part 'ai/options.dart';
 
 class AiStreamFinishedNotification extends Notification {
   const AiStreamFinishedNotification();
@@ -60,22 +74,17 @@ class _AIMessageTileState extends State<AIMessageTile>
   late final Animation<double> _headerEntryAnim;
   late final AnimationController _textAnimCtl;
 
-  // State for text animation
   String _stableText = "";
   String _animatingText = "";
 
-  // State for error display
-  bool _isExpandedError = false;
-  bool _showErrorText = false;
-  late AnimationController _errorSlideCtl;
-  late Animation<Offset> _errorSlideAnim;
-  late AnimationController _errorFadeOutCtl;
-  late Animation<double> _errorFadeOutAnim;
   final Map<String, List<InlineSpan>> _parseCache = {};
+
+  late bool _isInitialLoad;
 
   @override
   void initState() {
     super.initState();
+    _isInitialLoad = !widget.message.isThinking && !widget.message.isError;
     _entryCtl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));
     _entryScaleAnim =
@@ -103,10 +112,7 @@ class _AIMessageTileState extends State<AIMessageTile>
         vsync: this, duration: const Duration(milliseconds: 400));
     _headerEntryAnim =
         CurvedAnimation(parent: _headerEntryCtl, curve: Curves.easeOut);
-        
-    if (widget.message.isThinking && !widget.message.isError && (widget.message.displayableText.isNotEmpty || widget.embeddedMedia != null)) {
-      _headerEntryCtl.forward();
-    }
+
     _textAnimCtl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 150));
 
@@ -121,34 +127,15 @@ class _AIMessageTileState extends State<AIMessageTile>
       }
     });
 
-    _errorSlideCtl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    _errorSlideAnim = Tween<Offset>(
-      begin: const Offset(0, -0.5),
-      end: Offset.zero,
-    ).animate(
-        CurvedAnimation(parent: _errorSlideCtl, curve: Curves.easeOutQuad));
-
-    _errorFadeOutCtl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 220),
-    );
-    _errorFadeOutAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _errorFadeOutCtl, curve: Curves.easeOut),
-    );
+    if (widget.message.isThinking && !widget.message.isError &&
+        (widget.message.displayableText.isNotEmpty ||
+            widget.embeddedMedia != null)) {
+      _headerEntryCtl.forward();
+    }
 
     if (widget.message.isError) {
       _fadeCtl.value = 0.0;
-      _errorFadeOutCtl.value = 0.0;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _errorFadeOutCtl.forward(); // smooth fade-in
-        }
-      });
     } else {
-      _errorFadeOutCtl.value = 0.0;
       if (widget.message.opacity == 1) {
         _fadeCtl.forward(from: 0);
       } else {
@@ -157,7 +144,8 @@ class _AIMessageTileState extends State<AIMessageTile>
     }
 
     if (!widget.message.isThinking &&
-        (widget.message.displayableText.isNotEmpty || widget.message.hasAttachments || widget.embeddedMedia != null)) {
+        (widget.message.displayableText.isNotEmpty ||
+            widget.message.hasAttachments || widget.embeddedMedia != null)) {
       _stableText = widget.message.displayableText;
       _headerEntryCtl.value = 1.0;
       _entryCtl.value = 1.0;
@@ -172,8 +160,6 @@ class _AIMessageTileState extends State<AIMessageTile>
     _thinkRotateCtl.dispose();
     _headerEntryCtl.dispose();
     _textAnimCtl.dispose();
-    _errorSlideCtl.dispose();
-    _errorFadeOutCtl.dispose();
     super.dispose();
   }
 
@@ -183,8 +169,10 @@ class _AIMessageTileState extends State<AIMessageTile>
     final String logPrefix = "[AIMessageTile.didUpdateWidget]";
 
     // 1. Stream Starting Logic
-    final bool isStreamStarting = (old.message.displayableText.isEmpty && old.embeddedMedia == null) &&
-        (widget.message.displayableText.isNotEmpty || widget.embeddedMedia != null) &&
+    final bool isStreamStarting = (old.message.displayableText.isEmpty &&
+        old.embeddedMedia == null) &&
+        (widget.message.displayableText.isNotEmpty ||
+            widget.embeddedMedia != null) &&
         widget.message.isThinking;
 
     if (isStreamStarting && !widget.message.isError) {
@@ -205,8 +193,7 @@ class _AIMessageTileState extends State<AIMessageTile>
       if (widget.message.isError) {
         debugPrint("$logPrefix Error detected. Halting thinking animations.");
 
-        final bool hasContent =
-            _stableText.isNotEmpty || widget.message.displayableText.isNotEmpty;
+        final bool hasContent = widget.message.displayableText.isNotEmpty;
 
         if (_thinkPulseCtl.isAnimating) _thinkPulseCtl.stop();
         if (_thinkRotateCtl.isAnimating) _thinkRotateCtl.stop();
@@ -221,13 +208,8 @@ class _AIMessageTileState extends State<AIMessageTile>
 
         if (!hasContent) {
           _fadeCtl.reverse();
-        } else {}
-
-        _errorFadeOutCtl
-          ..value = 0.0
-          ..forward();
+        }
       } else {
-        _errorFadeOutCtl.reverse();
         _fadeCtl.forward();
       }
     }
@@ -258,6 +240,7 @@ class _AIMessageTileState extends State<AIMessageTile>
       );
 
       if (!_headerEntryCtl.isCompleted) _headerEntryCtl.forward();
+
       if (_textAnimCtl.isAnimating) _textAnimCtl.stop();
 
       setState(() {
@@ -320,7 +303,7 @@ class _AIMessageTileState extends State<AIMessageTile>
       _textAnimCtl.value = 1.0;
     }
 
-    // 7. Opacity Updates
+    // 5. Opacity Updates
     if (old.message.opacity != widget.message.opacity &&
         !widget.message.isError) {
       if (widget.message.opacity == 1.0) {
@@ -335,16 +318,6 @@ class _AIMessageTileState extends State<AIMessageTile>
     }
   }
 
-  void _onLongPress(BuildContext context, Offset pos) {
-    showMessageOptions(
-      context: context,
-      tapPosition: pos,
-      message: widget.message,
-      onReport: widget.onReport,
-      onRegenerate: widget.onRegenerate,
-      onStop: widget.onStop,
-    );
-  }
 
   void _flushAnimation() {
     if (_textAnimCtl.isAnimating) {
@@ -358,465 +331,158 @@ class _AIMessageTileState extends State<AIMessageTile>
     }
   }
 
-  // This replaces the old logic that had a hard 'if (isError) return ...' check.
-  // Now, it smoothly transitions between the standard tile (spinning icon)
-  // and the error widget using a cross-fade animation.
   @override
   Widget build(BuildContext context) {
-    // Watch ThemeProvider to rebuild on theme changes
-    context.watch<ThemeProvider>();
-
     final screenWidth = MediaQuery.of(context).size.width;
     final scale = screenWidth / 400;
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 400), // Smooth transition duration
-      transitionBuilder: (Widget child, Animation<double> animation) {
-        return FadeTransition(opacity: animation, child: child);
-      },
-      // Swaps between the Error Widget and the Standard Layout based on state.
-      // Unique Keys are essential here for the animation to trigger correctly.
-      child: widget.message.isError
-          ? _buildErrorWidget(context, scale, key: const ValueKey('error_view'))
-          : _buildStandardTile(context, scale,
-              key: const ValueKey('standard_view')),
+    return AnimatedCrossFade(
+      duration: const Duration(milliseconds: 300),
+      crossFadeState: widget.message.isError
+          ? CrossFadeState.showFirst
+          : CrossFadeState.showSecond,
+      firstChild: _buildErrorOnlyTile(context, scale),
+      secondChild: _buildStandardTile(context, scale),
     );
   }
 
-  // --- NEW: Extracted Standard Layout ---
-  // This contains the original UI logic (Spinner, Header, Content)
-  // moved into a dedicated helper to make the build method clean.
-  Widget _buildStandardTile(BuildContext context, double scale, {Key? key}) {
+  Widget _buildErrorOnlyTile(BuildContext context, double scale) {
     return ScaleTransition(
-      key: key,
+      scale: _entryScaleAnim,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(6, 8, 6, 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 8 * scale),
+                  child: _AiErrorWidget(
+                    message: widget.message,
+                    scale: scale,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStandardTile(BuildContext context, double scale) {
+    return ScaleTransition(
       scale: _entryScaleAnim,
       child: FadeTransition(
         opacity: _fadeAnim,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6),
-          child: RawGestureDetector(
+          child: GestureDetector(
             behavior: HitTestBehavior.deferToChild,
-            gestures: {
-              ShortLongPressGestureRecognizer:
-                  GestureRecognizerFactoryWithHandlers<
-                      ShortLongPressGestureRecognizer>(
-                () => ShortLongPressGestureRecognizer(
-                    debugOwner: this,
-                    shortPressDuration: const Duration(milliseconds: 330)),
-                (inst) => inst.onLongPressStart =
-                    (d) => _onLongPress(context, d.globalPosition),
-              ),
-            },
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(26),
-                splashColor:
-                    AppColors.primaryColor.inverted.withValues(alpha: 0.1),
-                onTap: _flushAnimation,
-                onLongPress: () {},
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(6, 8, 6, 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildHeader(scale),
-                      // Use SizeTransition to smoothly reveal content as header settles
-                      SizeTransition(
-                        sizeFactor: _headerEntryAnim,
-                        child: _buildBodyContent(scale),
-                      ),
-                    ],
+            onTap: _flushAnimation,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(6, 8, 6, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _AiHeader(
+                    message: widget.message,
+                    avatarPath: widget.avatarPath,
+                    scale: scale,
+                    thinkPulseAnim: _thinkPulseAnim,
+                    thinkRotateAnim: _thinkRotateCtl,
+                    headerEntryAnim: _headerEntryAnim,
                   ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Added the 'key' parameter to support AnimatedSwitcher.
-  Widget _buildErrorWidget(BuildContext context, double scale, {Key? key}) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final dynamicFontSize = screenWidth * 0.04;
-    final iconSize = screenWidth * 0.06;
-
-    return GestureDetector(
-      key: key, // Critical for animation
-      onTap: () => setState(() {
-        if (_isExpandedError) {
-          _errorSlideCtl.reverse().then((_) {
-            if (mounted) {
-              setState(() {
-                _isExpandedError = false;
-                _showErrorText = false;
-              });
-            }
-          });
-        } else {
-          _isExpandedError = true;
-          _errorSlideCtl.forward().whenComplete(() {
-            if (mounted) setState(() => _showErrorText = true);
-          });
-        }
-      }),
-      child: FadeTransition(
-        opacity: _errorFadeOutAnim, // Uses the specific error fade controller
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-          child: Container(
-            decoration: BoxDecoration(
-                color: AppColors.septenaryColor.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                border:
-                    Border.all(color: AppColors.septenaryColor, width: 0.5)),
-            padding: EdgeInsets.all(screenWidth * 0.03),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      color: AppColors.septenaryColor,
-                      size: iconSize,
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    Expanded(
-                      child: Text(
-                        AppLocalizations.of(context)!.requestFailed,
-                        style: TextStyle(
-                          color: AppColors.septenaryColor,
-                          fontSize: dynamicFontSize,
+                  SizeTransition(
+                    sizeFactor: _headerEntryAnim,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _AiBodyContent(
+                          message: widget.message,
+                          embeddedMedia: widget.embeddedMedia,
+                          mediaAboveText: widget.mediaAboveText,
+                          stableText: _stableText,
+                          animatingText: _animatingText,
+                          textAnimCtl: _textAnimCtl,
+                          scale: scale,
+                          parseCache: _parseCache,
                         ),
-                      ),
-                    ),
-                    AnimatedRotation(
-                      turns: _isExpandedError ? 0.50 : 0.0,
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeOutQuad,
-                      child: Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: AppColors.septenaryColor,
-                        size: iconSize,
-                      ),
-                    ),
-                  ],
-                ),
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOutQuad,
-                  alignment: Alignment.topCenter,
-                  child: !_isExpandedError
-                      ? const SizedBox.shrink()
-                      : ClipRect(
-                          child: AnimatedOpacity(
-                            opacity: _showErrorText ? 1.0 : 0.0,
-                            duration: const Duration(milliseconds: 200),
-                            child: SlideTransition(
-                              position: _errorSlideAnim,
-                              child: Padding(
-                                padding:
-                                    EdgeInsets.only(top: screenWidth * 0.02),
-                                child: SelectableText(
-                                    widget.message.displayableText,
-                                    style: TextStyle(
-                                        color: AppColors.septenaryColor,
-                                        fontSize: dynamicFontSize * 0.9)),
+                        _InlineOptionsRow(
+                          message: widget.message,
+                          onReport: widget.onReport,
+                          onRegenerate: widget.onRegenerate,
+                          scale: scale,
+                        ),
+                        if (widget.message.isServerFallback && _isInitialLoad)
+                          TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration: const Duration(milliseconds: 600),
+                            curve: Curves.easeOutCubic,
+                            builder: (context, value, child) {
+                              return Transform.translate(
+                                offset: Offset(0, 10 * (1 - value)),
+                                child: Opacity(
+                                  opacity: value,
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 8 * scale,
+                                  left: 12 * scale,
+                                  right: 12 * scale),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 2 * scale),
+                                    child: SvgPicture.asset(
+                                      'assets/icons/warning.svg',
+                                      width: 12 * scale,
+                                      height: 12 * scale,
+                                      colorFilter: ColorFilter.mode(
+                                        AppColors.primaryColor.inverted
+                                            .withValues(alpha: 0.5),
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8 * scale),
+                                  Expanded(
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .fallbackInfoPanelText,
+                                      style: TextStyle(
+                                        fontSize: 11 * scale,
+                                        color: AppColors.primaryColor.inverted
+                                            .withValues(alpha: 0.5),
+                                        height: 1.4,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ),
-                ),
-              ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
-  }
-
-  Widget _buildHeader(double s) {
-    final modelService = context.read<ModelService>();
-    final langCode = Localizations.localeOf(context).languageCode;
-
-    final mId = widget.message.model ?? '';
-    final model = modelService.getPreciseModelData(mId, langCode: langCode);
-
-    String formatModelId(String rawId) {
-      if (rawId.isEmpty) return 'Cortex';
-      if (rawId == 'cortex/auto' || rawId == 'dynamic') return 'Cortex';
-      String name = rawId.contains('/') ? rawId.split('/').last : rawId;
-      return name.split(RegExp(r'[-_]')).map((w) {
-        if (w.isEmpty) return '';
-        if (w.toLowerCase() == 'gpt') return 'GPT';
-        return '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}';
-      }).join(' ');
-    }
-
-    String? textToDisplay;
-    if (mId == 'cortex/auto' || mId == 'dynamic') {
-      textToDisplay = 'Cortex';
-    } else if (model.category == 'self') {
-      textToDisplay = model.displayTitle.isNotEmpty
-          ? model.displayTitle
-          : formatModelId(mId);
-    } else {
-      if (model.displayTitle == 'Unknown Model' || model.displayTitle.isEmpty) {
-        textToDisplay = formatModelId(mId);
-      } else if (model.displayTitle == model.id) {
-        textToDisplay = formatModelId(mId);
-      } else {
-        textToDisplay = model.displayTitle;
-      }
-    }
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        ScaleTransition(
-          scale: _thinkPulseAnim,
-          child: RotationTransition(
-            turns: _thinkRotateCtl,
-            child: RepaintBoundary(
-              child: SvgPicture.asset(
-                'assets/cortex.svg',
-                width: 26 * s,
-                height: 26 * s,
-                colorFilter: ColorFilter.mode(
-                  AppColors.primaryColor.inverted,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-        ),
-        SizeTransition(
-          sizeFactor: _headerEntryAnim,
-          axis: Axis.horizontal,
-          axisAlignment: -1.0,
-          child: FadeTransition(
-            opacity: _headerEntryAnim,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(width: 8 * s),
-                _buildAvatar(s * 0.7),
-                if (textToDisplay.isNotEmpty) ...[
-                  SizedBox(width: 6 * s),
-                  Text("•",
-                      style: TextStyle(
-                          color: AppColors.primaryColor.inverted
-                              .withValues(alpha: 0.5),
-                          fontSize: 14 * s,
-                          fontWeight: FontWeight.bold)),
-                  SizedBox(width: 6 * s),
-                  Text(
-                    ModelDataUtils.formatModelName(textToDisplay),
-                    style: TextStyle(
-                        color: AppColors.primaryColor.inverted
-                            .withValues(alpha: 0.7),
-                        fontSize: 12 * s,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAvatar(double s) {
-    final containerSize = 30 * s;
-    final iconSize = 24 * s;
-    final fallbackWidget = SvgPicture.asset('assets/icons/self.svg',
-        width: iconSize,
-        height: iconSize,
-        fit: BoxFit.contain,
-        colorFilter:
-            ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn));
-    Widget imageWidget;
-    if (widget.avatarPath.isEmpty || widget.avatarPath.endsWith('self.svg')) {
-      imageWidget = fallbackWidget;
-    } else {
-      final isSvg = widget.avatarPath.toLowerCase().endsWith('.svg');
-      final isAsset = widget.avatarPath.startsWith('assets/');
-      if (isSvg) {
-        imageWidget = isAsset
-            ? SvgPicture.asset(widget.avatarPath,
-                width: iconSize,
-                height: iconSize,
-                colorFilter: ColorFilter.mode(
-                    AppColors.primaryColor.inverted, BlendMode.srcIn),
-                fit: BoxFit.contain,
-                placeholderBuilder: (_) => fallbackWidget)
-            : SvgPicture.file(File(widget.avatarPath),
-                width: iconSize,
-                height: iconSize,
-                colorFilter: ColorFilter.mode(
-                    AppColors.primaryColor.inverted, BlendMode.srcIn),
-                fit: BoxFit.contain,
-                placeholderBuilder: (_) => fallbackWidget);
-      } else {
-        final imageProvider = isAsset
-            ? AssetImage(widget.avatarPath) as ImageProvider
-            : FileImage(File(widget.avatarPath));
-        imageWidget = Image(
-            image: imageProvider,
-            width: containerSize,
-            height: containerSize,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => fallbackWidget);
-      }
-    }
-    return Container(
-      padding: EdgeInsets.all(1.5 * s),
-      decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-              color: AppColors.primaryColor.inverted.withValues(alpha: 0.2),
-              width: 1.0)),
-      child: Container(
-          width: containerSize,
-          height: containerSize,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-              color: AppColors.secondaryColor, shape: BoxShape.circle),
-          alignment: Alignment.center,
-          child: imageWidget),
-    );
-  }
-
-  Widget _buildBodyContent(double s) {
-    final bool hasText = _stableText.isNotEmpty || _animatingText.isNotEmpty;
-    final bool hasMedia = widget.embeddedMedia != null;
-
-    if (!hasText && !hasMedia) {
-      return const SizedBox.shrink();
-    }
-
-    final mediaBlock = hasMedia
-        ? Padding(
-            padding: EdgeInsets.only(top: 8 * s, left: 2.0 * s, right: 2.0 * s),
-            child: AnimatedSize(
-              duration: const Duration(milliseconds: 320),
-              curve: Curves.easeOutCubic,
-              alignment: Alignment.centerLeft,
-              child: Container(
-                padding: EdgeInsets.all(8 * s),
-                decoration: BoxDecoration(
-                  color:
-                      AppColors.primaryColor.inverted.withValues(alpha: 0.03),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: AppColors.border.withValues(alpha: 0.45),
-                    width: 1,
-                  ),
-                ),
-                child: widget.embeddedMedia!,
-              ),
-            ),
-          )
-        : const SizedBox.shrink();
-
-    final textBlock = hasText
-        ? Padding(
-            padding: EdgeInsets.only(top: 8 * s, left: 2.0 * s),
-            child: _buildContent(s),
-          )
-        : const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (hasMedia && widget.mediaAboveText) mediaBlock,
-        if (hasText) textBlock,
-        if (hasMedia && !widget.mediaAboveText) mediaBlock,
-      ],
-    );
-  }
-
-  Widget _buildContent(double s) {
-    final baseStyle = TextStyle(
-        fontSize: 16 * s, height: 1.35, color: AppColors.primaryColor.inverted);
-
-    // If there's no text at all, render nothing.
-    if (_stableText.isEmpty && _animatingText.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    // If not animating, just show the fully parsed, stable text.
-    if (!_textAnimCtl.isAnimating && _animatingText.isEmpty) {
-      return RichText(
-          text: TextSpan(
-              children: _getParsedSpans(_stableText), style: baseStyle));
-    }
-
-    // Otherwise, build the animated text.
-    return AnimatedBuilder(
-      animation: _textAnimCtl,
-      builder: (context, child) {
-        final animValue = _textAnimCtl.value;
-        final opacity = animValue.clamp(0.0, 1.0);
-        final sigma = (1.0 - opacity) * 2.0;
-        return RichText(
-          text: TextSpan(
-            style: baseStyle,
-            children: [
-              ..._getParsedSpans(_stableText),
-              if (_animatingText.isNotEmpty)
-                ..._getParsedSpans(_animatingText)
-                    .map((span) => _applyOpacity(span, opacity, sigma)),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  List<InlineSpan> _getParsedSpans(String text) {
-    if (text.isEmpty) return [];
-    final cacheKey =
-        '$text:${widget.message.isThinking}:${widget.message.webSearchSources?.length ?? 0}';
-    if (_parseCache.containsKey(cacheKey)) return _parseCache[cacheKey]!;
-
-    final spans = parseText(context, text,
-        isFinished: !widget.message.isThinking,
-        citations: widget.message.webSearchSources);
-
-    if (text.length < 1000) _parseCache[cacheKey] = spans;
-    return spans;
-  }
-
-  InlineSpan _applyOpacity(InlineSpan span, double opacity, double sigma) {
-    if (span is TextSpan) {
-      final baseColor = span.style?.color ?? AppColors.primaryColor.inverted;
-
-      return TextSpan(
-        text: span.text,
-        children: span.children
-            ?.map((child) => _applyOpacity(child, opacity, sigma))
-            .toList(),
-        style: span.style?.copyWith(
-              color: baseColor.withValues(alpha: opacity),
-              foreground: null,
-            ) ??
-            TextStyle(color: baseColor.withValues(alpha: opacity)),
-      );
-    } else if (span is WidgetSpan) {
-      return WidgetSpan(
-          alignment: span.alignment,
-          baseline: span.baseline,
-          child: Opacity(opacity: opacity, child: span.child));
-    }
-    return span;
   }
 }

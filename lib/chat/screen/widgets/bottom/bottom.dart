@@ -1,6 +1,7 @@
 // lib/chat/parts/bottom.dart
 
 import 'dart:async';
+import 'dart:io';
 import 'package:cortex/chat/screen/widgets/bottom/panels/edit.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ import 'package:cortex/chat/services/voice.dart'; // [NEW]
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/server/credits.dart';
+import 'package:cortex/server/user.dart';
 import 'input/input.dart';
 
 class ChatInputPanel extends StatefulWidget {
@@ -46,11 +48,14 @@ class _ChatInputPanelState extends State<ChatInputPanel>
 
   // We use a GlobalKey to access InputField state (specifically for button enabling logic)
   final GlobalKey<InputFieldState> _inputFieldKey =
-      GlobalKey<InputFieldState>();
+  GlobalKey<InputFieldState>();
 
   // Animation for warning fade inside InputField
   late AnimationController _warningController;
   late Animation<double> _warningFadeAnimation;
+
+  // PERFORMANCE: Cache the CurvedAnimation instead of recreating in build()
+  late final Animation<double> _editPanelSizeFactor;
 
   @override
   void initState() {
@@ -60,6 +65,11 @@ class _ChatInputPanelState extends State<ChatInputPanel>
     _warningFadeAnimation =
         Tween<double>(begin: 0.0, end: 1.0).animate(_warningController);
 
+    _editPanelSizeFactor = CurvedAnimation(
+      parent: widget.editPanelController,
+      curve: Curves.easeOut,
+    );
+
     // Update EditService with local controllers so it can manipulate text
     widget.editService.updateControllers(
       controller: _textController,
@@ -67,7 +77,9 @@ class _ChatInputPanelState extends State<ChatInputPanel>
     );
 
     // Initialize from Global Draft
-    final draft = context.read<InputProvider>().globalDraft;
+    final draft = context
+        .read<InputProvider>()
+        .globalDraft;
     if (draft.isNotEmpty) {
       _textController.text = draft;
     }
@@ -88,36 +100,100 @@ class _ChatInputPanelState extends State<ChatInputPanel>
 
   @override
   Widget build(BuildContext context) {
-    final sessionProvider = context.watch<ChatSessionProvider>();
-    final conversationProvider = context.watch<ConversationProvider>();
-    final inputProvider = context.watch<InputProvider>();
-    final creditsManager = context.watch<CreditsManager>();
+    // PERFORMANCE: Use context.select with records to only rebuild when
+    // the specific fields we need actually change, not on any provider notification.
+    final (
+      modelId,
+      isDynamicChat,
+      canHandleImage,
+      isStorageSufficient,
+      role,
+      isCurrentModelPremium,
+      isUserSubscribed,
+      premiumTrialUses,
+      chatLimitManager,
+    ) = context.select<ChatSessionProvider, (
+      String?,
+      bool,
+      bool,
+      bool,
+      String?,
+      bool,
+      bool,
+      int,
+      dynamic,
+    )>((s) => (
+      s.modelId,
+      s.isDynamicChat,
+      s.canHandleImage,
+      s.isStorageSufficient,
+      s.role,
+      s.isCurrentModelPremium,
+      s.isUserSubscribed,
+      s.premiumTrialUses,
+      s.chatLimitManager,
+    ));
+
+    final conversationProvider = context.read<ConversationProvider>();
+
+    final (
+      isVoiceMode,
+      isAttachmentLoading,
+      isEditingMode,
+      originalMessageText,
+      preselectedPhoto,
+    ) = context.select<InputProvider, (
+      bool,
+      bool,
+      bool,
+      String?,
+      String?,
+    )>((p) {
+      final atts = p.attachments;
+      final photoPath = atts.isNotEmpty && atts.first.file.path.isNotEmpty
+          ? atts.first.file.path
+          : null;
+      return (
+        p.isVoiceModeActive,
+        p.isAttachmentLoading,
+        p.isEditingMode,
+        p.originalMessageText,
+        photoPath,
+      );
+    });
+
+    final creditsManager = context.read<CreditsManager>();
     final modelService = context.read<ModelService>();
-    final localStateProvider = context.watch<ModelLocalStateProvider>();
+
+    final isDownloaded = context.select<ModelLocalStateProvider, bool>(
+      (p) => p.downloadCompleted[modelId] ?? false,
+    );
+
     final localizations = AppLocalizations.of(context)!;
 
     // --- Model Status Checks ---
-    final langCode = Localizations.localeOf(context).languageCode;
+    final langCode = Localizations
+        .localeOf(context)
+        .languageCode;
     final isOffline = !Utils.isServerSideModel(
-      sessionProvider.modelId,
+      modelId,
       langCode: langCode,
       modelService: modelService,
     );
 
-    final bool isDownloaded =
-        localStateProvider.downloadCompleted[sessionProvider.modelId] ?? false;
-
     // Check if model is missing (Only for offline non-dynamic models)
     final modelMissing =
-        !sessionProvider.isDynamicChat && isOffline && !isDownloaded;
+        !isDynamicChat && isOffline && !isDownloaded;
 
-    final bool isLimitExceeded = sessionProvider.chatLimitManager
-            ?.isLimitExceeded(conversationProvider.messages) ??
-        false;
+    final bool isLimitExceeded = context.select<ConversationProvider, bool>((
+        c) {
+      return chatLimitManager
+          ?.isLimitExceeded(c.messages) ??
+          false;
+    });
 
-    // We wrap the column in SizeChangedLayoutNotifier so the parent (View)
-    // knows when the panel grows/shrinks (e.g. keyboard open, edit panel open).
-    final isVoiceMode = inputProvider.isVoiceModeActive;
+    final bool isWaitingForResponse = context.select<ConversationProvider,
+        bool>((c) => c.isWaitingForResponse);
 
     return Stack(
       alignment: Alignment.bottomCenter,
@@ -133,99 +209,96 @@ class _ChatInputPanelState extends State<ChatInputPanel>
             duration: const Duration(milliseconds: 200),
             opacity: isVoiceMode ? 0.0 : 1.0,
             child: SizeChangedLayoutNotifier(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 1. Edit Panel (Slides down when editing)
-                SizeTransition(
-                  sizeFactor: CurvedAnimation(
-                    parent: widget.editPanelController,
-                    curve: Curves.easeOut,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 1. Edit Panel (Slides down when editing)
+                  SizeTransition(
+                    sizeFactor: _editPanelSizeFactor,
+                    axis: Axis.vertical,
+                    child: EditPanelWidget(
+                      slideAnimation: widget.slideAnimation,
+                      onCancel: () {
+                        widget.editService.cancelEditingMode();
+                        widget.scrollService.updateButtonVisibility();
+                      },
+                    ),
                   ),
-                  axis: Axis.vertical,
-                  child: EditPanelWidget(
+
+                  // 2. Main Input Field
+                  InputField(
+                    key: _inputFieldKey,
+                    localizations: localizations,
+                    isDynamicChatMode: isDynamicChat,
+                    isModelSelected: true,
+                    isLimitExceeded: isLimitExceeded,
+                    isPhotoLoading: isAttachmentLoading,
+                    isSending: isWaitingForResponse,
+                    canHandleImage: isDynamicChat
+                        ? true
+                        : canHandleImage,
+                    isEditingMode: isEditingMode,
+                    originalMessageText: originalMessageText,
+                    // Legacy photo support for UI
+                    preselectedPhoto: preselectedPhoto != null
+                        ? File(preselectedPhoto)
+                        : null,
+                    isStorageSufficient: isStorageSufficient,
+                    modelMissing: modelMissing,
+                    role: role,
+                    isPremiumModel: isCurrentModelPremium,
+                    isSubscribed: isUserSubscribed,
+                    premiumTrialUses: premiumTrialUses,
+                    isServerSideModel: Utils.isServerSideModel(
+                      modelId,
+                      langCode: langCode,
+                      modelService: modelService,
+                    ),
+                    totalCredits: creditsManager.totalCreditsNotifier.value,
+                    controller: _textController,
+                    textFieldFocusNode: _focusNode,
                     slideAnimation: widget.slideAnimation,
-                    onCancel: () {
+                    fadeAnimation: _warningFadeAnimation,
+
+                    // --- Actions ---
+                    onSend: () async =>
+                        _handleSend(
+                            localizations,
+                            isLimitExceeded,
+                            langCode,
+                            modelService,
+                            context.read<InputProvider>(),
+                            conversationProvider),
+                    onApplyEditedMessage: () async =>
+                    await widget.editService.applyEditedMessage(context),
+                    onStop: () {
+                      final voiceService = context.read<VoiceService>();
+                      if (voiceService.isFlowActive) {
+                        // [NEW] Flow Mode: Pause & Listen (Interruption)
+                        voiceService.interruptFlowAndListen();
+                        // Stop any text generation but keep session alive
+                        context.read<ConversationProvider>().stopGenerating();
+                      } else {
+                        // Standard Mode: Stop Everything
+                        context.read<StopService>().stopResponse();
+                      }
+                    },
+                    // Logic Update: Null check before adding
+                    onPhotoSelected: (photo) {
+                      if (photo != null) {
+                        context
+                            .read<InputProvider>()
+                            .addAttachment(photo, isImage: true);
+                      }
+                    },
+                    onCancelEditing: () {
                       widget.editService.cancelEditingMode();
                       widget.scrollService.updateButtonVisibility();
                     },
                   ),
-                ),
-
-                // 2. Main Input Field
-                InputField(
-                  key: _inputFieldKey,
-                  localizations: localizations,
-                  isDynamicChatMode: sessionProvider.isDynamicChat,
-                  isModelSelected: true,
-                  isLimitExceeded: isLimitExceeded,
-                  isPhotoLoading: inputProvider.isAttachmentLoading,
-                  isSending: conversationProvider.isWaitingForResponse,
-                  canHandleImage: sessionProvider.isDynamicChat
-                      ? true
-                      : sessionProvider.canHandleImage,
-                  isEditingMode: inputProvider.isEditingMode,
-                  originalMessageText: inputProvider.originalMessageText,
-                  // Legacy photo support for UI (optional, can be null if InputField uses provider directly)
-                  preselectedPhoto: inputProvider.attachments.isNotEmpty &&
-                          inputProvider.attachments.first.file.path.isNotEmpty
-                      ? inputProvider.attachments.first.file
-                      : null,
-                  isStorageSufficient: sessionProvider.isStorageSufficient,
-                  modelMissing: modelMissing,
-                  role: sessionProvider.role,
-                  isPremiumModel: sessionProvider.isCurrentModelPremium,
-                  isSubscribed: sessionProvider.isUserSubscribed,
-                  premiumTrialUses: sessionProvider.premiumTrialUses,
-                  isServerSideModel: Utils.isServerSideModel(
-                    sessionProvider.modelId,
-                    langCode: langCode,
-                    modelService: modelService,
-                  ),
-                  totalCredits: creditsManager.totalCreditsNotifier.value ?? 0,
-                  controller: _textController,
-                  textFieldFocusNode: _focusNode,
-                  slideAnimation: widget.slideAnimation,
-                  fadeAnimation: _warningFadeAnimation,
-
-                  // --- Actions ---
-                  onSend: () async => _handleSend(
-                      localizations,
-                      isLimitExceeded,
-                      langCode,
-                      modelService,
-                      inputProvider,
-                      conversationProvider),
-                  onApplyEditedMessage: () async =>
-                      await widget.editService.applyEditedMessage(context),
-                  onStop: () {
-                    final voiceService = context.read<VoiceService>();
-                    if (voiceService.isFlowActive) {
-                      // [NEW] Flow Mode: Pause & Listen (Interruption)
-                      voiceService.interruptFlowAndListen();
-                      // Stop any text generation but keep session alive
-                      context.read<ConversationProvider>().stopGenerating();
-                    } else {
-                      // Standard Mode: Stop Everything
-                      context.read<StopService>().stopResponse();
-                    }
-                  },
-                  // Logic Update: Null check before adding
-                  onPhotoSelected: (photo) {
-                    if (photo != null) {
-                      context
-                          .read<InputProvider>()
-                          .addAttachment(photo, isImage: true);
-                    }
-                  },
-                  onCancelEditing: () {
-                    widget.editService.cancelEditingMode();
-                    widget.scrollService.updateButtonVisibility();
-                  },
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           ),
         ),
       ],
@@ -234,14 +307,12 @@ class _ChatInputPanelState extends State<ChatInputPanel>
 
   // --- Logic Helpers ---
 
-  Future<void> _handleSend(
-    AppLocalizations localizations,
-    bool isLimitExceeded,
-    String langCode,
-    ModelService modelService,
-    InputProvider inputProvider,
-    ConversationProvider conversationProvider,
-  ) async {
+  Future<void> _handleSend(AppLocalizations localizations,
+      bool isLimitExceeded,
+      String langCode,
+      ModelService modelService,
+      InputProvider inputProvider,
+      ConversationProvider conversationProvider,) async {
     // Basic validation
     final isEnabled = _inputFieldKey.currentState?.isSendButtonEnabled ?? false;
     if (!isEnabled || conversationProvider.isWaitingForResponse) return;
@@ -264,22 +335,30 @@ class _ChatInputPanelState extends State<ChatInputPanel>
       modelService: modelService,
     );
 
+    final sendService = context.read<SendService>();
+    final userProvider = context.read<UserProvider>();
+    if (userProvider.isAnonymous) {
+      final canSend = await sendService.checkGuestLimit(context, localizations);
+      if (!mounted) return;
+      if (!canSend) return;
+    }
+
     // InputProvider clears attachments inside SendService, but we unfocus here
     FocusScope.of(context).unfocus();
     // Send Logic
-    // FIX: Removed the 'photo' parameter to match the new SendService signature.
-    // The service will read attachments directly from the InputProvider.
     debugPrint(
-        "ChatInputPanel: Sending message. Text length: ${messageText.length}. Attachments: ${inputProvider.attachments.length}");
-    final sendFuture = context.read<SendService>().sendMessage(
-          context: context,
-          localizations: localizations,
-          messageText: messageText,
-        );
+        "ChatInputPanel: Sending message. Text length: ${messageText
+            .length}. Attachments: ${inputProvider.attachments.length}");
+    final sendFuture = sendService.sendMessage(
+      context: context,
+      localizations: localizations,
+      messageText: messageText,
+    );
 
     // UI Cleanup AFTER initiating send
     _textController.clear();
-    inputProvider.clearAfterSend(); // Clears draft and attachments, persists toggles
+    inputProvider
+        .clearAfterSend(); // Clears draft and attachments, persists toggles
 
     // Post-Send Review Triggers
     if (isServerSide) {

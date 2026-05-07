@@ -135,6 +135,30 @@ class ModelCreationProvider extends ChangeNotifier {
     }
   }
 
+  void updateBaseModels(List<ModelEntity> baseModels, AppLocalizations localizations) {
+    final dynamicModel =
+        ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, localizations.localeName)
+            .copyWith(
+      displayTitle: localizations.alwaysBest,
+      variants: {
+        'dynamic': {
+          'id': 'dynamic',
+          'title': localizations.alwaysBest,
+          'tier': 'free',
+        }
+      },
+    );
+
+    _availableBaseModels = List.from(baseModels);
+    _availableBaseModels.insert(0, dynamicModel);
+    
+    if (_selectedBaseModelId == null && _availableBaseModels.isNotEmpty) {
+      _initializeDefaultBaseModelSync(localizations.localeName);
+    }
+    
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     dev.log("[ModelCreationProvider] Disposing.", name: 'ModelCreation');

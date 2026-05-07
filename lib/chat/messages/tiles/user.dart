@@ -4,7 +4,6 @@ import 'package:cortex/app.dart';
 import 'package:cortex/recognizer.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../options/manager.dart';
 import '../messages.dart';
 
@@ -81,8 +80,6 @@ class UserMessageTileState extends State<UserMessageTile>
 
   @override
   Widget build(BuildContext context) {
-    // Watch ThemeProvider to rebuild on theme changes
-    context.watch<ThemeProvider>();
 
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isDesktop = screenWidth >= 800;

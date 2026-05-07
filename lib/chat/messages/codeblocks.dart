@@ -205,7 +205,7 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
                                   size: 16,
                                   color: Colors.greenAccent,
                                   key: ValueKey('check'))
-                              : const Icon(Icons.copy_all_outlined,
+                              : const Icon(Icons.copy_all_rounded,
                                   size: 16,
                                   color: Colors.white54,
                                   key: ValueKey('copy')),

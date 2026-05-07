@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/internet.dart';
-import 'package:cortex/chat/messages/parser.dart';
+import 'package:cortex/chat/messages/markdown/utils.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/fog.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -52,7 +52,7 @@ class WebSearchSourcesWidget extends StatelessWidget {
                 Text(
                   AppLocalizations.of(context)!.webSearchSources,
                   style: TextStyle(
-                    fontFamily: 'SF Pro Text',
+                    fontFamily: 'Inter',
                     fontSize: 12 * scale,
                     color: AppColors.primaryColor.inverted,
                     fontWeight: FontWeight.w500,
@@ -113,7 +113,7 @@ class WebSearchSourcesWidget extends StatelessWidget {
                     Text(
                       AppLocalizations.of(context)!.webSearchSources,
                       style: TextStyle(
-                        fontFamily: 'SF Pro Display',
+                        fontFamily: 'Inter',
                         fontSize: 18 * scale,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primaryColor.inverted,
@@ -200,7 +200,7 @@ class WebSearchSourcesWidget extends StatelessWidget {
                                         child: Text(
                                           '${index + 1}',
                                           style: TextStyle(
-                                            fontFamily: 'SF Pro Text',
+                                            fontFamily: 'Inter',
                                             fontSize: 12 * scale,
                                             fontWeight: FontWeight.w600,
                                             color: AppColors.primaryColor
@@ -249,7 +249,7 @@ class WebSearchSourcesWidget extends StatelessWidget {
                                             Text(
                                               title,
                                               style: TextStyle(
-                                                fontFamily: 'SF Pro Text',
+                                                fontFamily: 'Inter',
                                                 fontSize: 15 * scale,
                                                 color:
                                                 AppColors.primaryColor.inverted,
@@ -262,7 +262,7 @@ class WebSearchSourcesWidget extends StatelessWidget {
                                             Text(
                                               host,
                                               style: TextStyle(
-                                                fontFamily: 'SF Pro Text',
+                                                fontFamily: 'Inter',
                                                 fontSize: 12 * scale,
                                                 color: AppColors
                                                     .primaryColor.inverted

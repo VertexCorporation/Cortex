@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
-import 'dart:math' as math;
 
 /// A private utility function to sanitize a string.
 String _sanitizeText(String text) {
@@ -137,58 +136,6 @@ class _OverflowTextState extends State<OverflowText> {
     }
   }
 
-  // --- Helper: Calculate Fitting Length (Original Logic) ---
-  int _findFittingTextLength(String textToMeasure, TextStyle? style,
-      BoxConstraints constraints, BuildContext context) {
-    final sanitizedText = _sanitizeText(textToMeasure);
-    if (sanitizedText.isEmpty) return 0;
-
-    final TextStyle effectiveStyle = style ?? DefaultTextStyle
-        .of(context)
-        .style;
-    final TextPainter textPainter = TextPainter(
-      text: TextSpan(text: sanitizedText, style: effectiveStyle),
-      maxLines: widget.maxLines,
-      textDirection: ui.TextDirection.ltr,
-    );
-
-    final double maxWidth = constraints.maxWidth > 0
-        ? constraints.maxWidth
-        : double.infinity;
-    textPainter.layout(maxWidth: maxWidth);
-
-    if (!textPainter.didExceedMaxLines && textPainter.width <= maxWidth) {
-      return sanitizedText.runes.length;
-    }
-
-    final runes = sanitizedText.runes.toList();
-    int low = 0;
-    int high = runes.length;
-    int fittingRuneCount = 0;
-
-    while (low <= high) {
-      int mid = (low + high) ~/ 2;
-      if (mid == 0) {
-        low = mid + 1;
-        continue;
-      }
-      final testText = String.fromCharCodes(runes.sublist(0, mid));
-      final testPainter = TextPainter(
-        text: TextSpan(text: testText, style: effectiveStyle),
-        maxLines: widget.maxLines,
-        textDirection: ui.TextDirection.ltr,
-      );
-      testPainter.layout(maxWidth: maxWidth);
-
-      if (testPainter.didExceedMaxLines || testPainter.width > maxWidth) {
-        high = mid - 1;
-      } else {
-        fittingRuneCount = mid;
-        low = mid + 1;
-      }
-    }
-    return fittingRuneCount;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -293,18 +240,28 @@ class _OverflowTextState extends State<OverflowText> {
         }
 
         // ----------------------------------------------------------
-        // MODE 2: TRUNCATE & FADE (Old Logic)
+        // MODE 2: TRUNCATE & FADE (GPU-Accelerated ShaderMask)
         // ----------------------------------------------------------
-        final fittingRuneLength = _findFittingTextLength(
-            sanitizedText, widget.style, constraints, context);
+        // PERFORMANCE: Replaced CPU-heavy binary search TextPainter
+        // measurement (O(log n) TextPainter allocations per tile) with
+        // a GPU-accelerated ShaderMask fade. This eliminates ~7
+        // TextPainter.layout() calls per sidebar tile.
 
-        if (fittingRuneLength == 0) {
-          return const SizedBox.shrink();
-        }
+        // First, check if text even overflows
+        final TextStyle effectiveStyleForMeasure = widget.style ??
+            DefaultTextStyle.of(context).style;
+        final TextPainter measurePainter = TextPainter(
+          text: TextSpan(text: sanitizedText, style: effectiveStyleForMeasure),
+          maxLines: widget.maxLines,
+          textDirection: ui.TextDirection.ltr,
+        );
+        measurePainter.layout(maxWidth: constraints.maxWidth > 0
+            ? constraints.maxWidth
+            : double.infinity);
 
-        final totalRunes = sanitizedText.runes.length;
-
-        if (fittingRuneLength >= totalRunes) {
+        // If text fits without overflow, render simply
+        if (!measurePainter.didExceedMaxLines &&
+            measurePainter.width <= constraints.maxWidth) {
           return Text(
             sanitizedText,
             style: widget.style,
@@ -313,70 +270,38 @@ class _OverflowTextState extends State<OverflowText> {
           );
         }
 
-        // Construct Faded RichText
-        final String displayText = String.fromCharCodes(
-            sanitizedText.runes.take(fittingRuneLength));
-        final int displayRunesLength = displayText.runes.length;
-        final int actualCharsToFade = math.min(
-            displayRunesLength, widget.fadeLength);
+        // Text overflows — use ShaderMask for GPU-accelerated fade
+        // Calculate fade fraction: fadeLength chars worth of fade at the end
+        final double fadeWidthFraction = widget.fadeLength > 0
+            ? (widget.fadeLength * (effectiveStyleForMeasure.fontSize ?? 14.0) *
+                    0.6 / constraints.maxWidth)
+                .clamp(0.05, 0.3)
+            : 0.15;
 
-        if (actualCharsToFade <= 0) {
-          return Text(
-            displayText,
+        final double animMultiplier = widget.animation?.value ?? 1.0;
+        final double fadeStop = (1.0 - fadeWidthFraction).clamp(0.5, 1.0);
+
+        return ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                Colors.black,
+                Colors.black,
+                Colors.black.withAlpha((255 * 0.2 * animMultiplier).round()),
+              ],
+              stops: [0.0, fadeStop, 1.0],
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.dstIn,
+          child: Text(
+            sanitizedText,
             style: widget.style,
             maxLines: widget.maxLines,
             overflow: TextOverflow.clip,
-          );
-        }
-
-        final int solidPartRuneLength = displayRunesLength - actualCharsToFade;
-        final String solidText = String.fromCharCodes(
-            displayText.runes.take(solidPartRuneLength));
-        final String fadingText = String.fromCharCodes(
-            displayText.runes.skip(solidPartRuneLength));
-
-        final List<InlineSpan> spans = [];
-        if (solidText.isNotEmpty) {
-          spans.add(TextSpan(text: solidText, style: widget.style));
-        }
-
-        final Color defaultColor = DefaultTextStyle
-            .of(context)
-            .style
-            .color ?? Colors.black;
-        final Color effectiveColor = widget.style?.color ?? defaultColor;
-        final Color baseColorForFade = effectiveColor.withAlpha(255);
-        // ignore: deprecated_member_use
-        final double originalStyleAlpha = effectiveColor.alpha / 255.0;
-        const double fadeTargetMinRelativeOpacity = 0.2;
-
-        final fadingRunes = fadingText.runes.toList();
-        for (int i = 0; i < fadingRunes.length; i++) {
-          final double relativeFadeProgress = (actualCharsToFade <= 1)
-              ? 1.0
-              : i / (actualCharsToFade - 1);
-
-          final double charOpacity = originalStyleAlpha * (1.0 -
-              relativeFadeProgress * (1.0 - fadeTargetMinRelativeOpacity));
-          final double animatedOpacity = (widget.animation?.value ?? 1.0) *
-              charOpacity;
-
-          final int newAlpha = (animatedOpacity * 255).round().clamp(0, 255);
-
-          final TextStyle? charStyle = widget.style?.copyWith(
-            color: baseColorForFade.withAlpha(newAlpha),
-          );
-
-          spans.add(TextSpan(
-            text: String.fromCharCode(fadingRunes[i]),
-            style: charStyle,
-          ));
-        }
-
-        return RichText(
-          text: TextSpan(children: spans),
-          maxLines: widget.maxLines,
-          overflow: TextOverflow.clip,
+            softWrap: widget.maxLines > 1,
+          ),
         );
       },
     );

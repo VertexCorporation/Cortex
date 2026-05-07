@@ -26,11 +26,22 @@ class Cortex extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final Widget? startupScreen;
 
-  ThemeData _buildTheme(String currentTheme) {
-    final bool isDark = currentTheme == 'dark';
-    final ThemeData baseTheme = isDark ? ThemeData.dark() : ThemeData.light();
+  static ThemeData? _cachedThemeData;
+  static String? _cachedThemeName;
 
-    return baseTheme.copyWith(
+  ThemeData _buildTheme(String currentTheme) {
+    if (_cachedThemeName == currentTheme && _cachedThemeData != null) {
+      return _cachedThemeData!;
+    }
+
+    final bool isDark = currentTheme == 'dark';
+    final ThemeData baseTheme = ThemeData(
+      brightness: isDark ? Brightness.dark : Brightness.light,
+      fontFamily: 'Inter',
+    );
+
+    _cachedThemeName = currentTheme;
+    _cachedThemeData = baseTheme.copyWith(
       primaryColor: AppColors.background,
       scaffoldBackgroundColor: AppColors.background,
       colorScheme: baseTheme.colorScheme.copyWith(
@@ -44,7 +55,9 @@ class Cortex extends StatelessWidget {
       ),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: AppColors.primaryColor.inverted,
-        selectionColor: AppColors.quaternaryColor,
+        selectionColor: AppColors.secondaryColor.inverted.withValues(
+            alpha: 0.3),
+        selectionHandleColor: AppColors.primaryColor.inverted,
       ),
       inputDecorationTheme: InputDecorationTheme(
         focusColor: AppColors.primaryColor.inverted,
@@ -52,14 +65,14 @@ class Cortex extends StatelessWidget {
         labelStyle: TextStyle(color: AppColors.tertiaryColor),
       ),
     );
+
+    return _cachedThemeData!;
   }
 
   @override
   Widget build(BuildContext context) {
     final ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
     final LocaleProvider localeProvider = Provider.of<LocaleProvider>(context);
-
-    context.watch<ThemeProvider>();
 
     return MaterialApp(
       navigatorKey: navigatorKey,

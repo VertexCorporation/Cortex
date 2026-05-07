@@ -31,11 +31,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'axon/inbox/logic/general.dart';
+import 'arts/provider.dart';
 
 import 'chat/providers/conversation.dart';
 import 'chat/providers/input.dart';
@@ -51,6 +52,7 @@ import 'chat/services/response.dart';
 import 'chat/services/scroll.dart';
 import 'chat/services/select.dart';
 import 'chat/services/send.dart';
+import 'chat/services/background.dart';
 import 'chat/services/speech.dart';
 import 'chat/services/stop.dart';
 import 'chat/services/voice.dart';
@@ -60,6 +62,7 @@ import 'internet.dart';
 import 'language.dart';
 import 'library/backend/data/repository.dart';
 import 'library/backend/data/service.dart';
+import 'library/backend/data/image.dart';
 import 'library/backend/download/download.dart';
 import 'library/providers/catalog.dart';
 import 'library/providers/local.dart';
@@ -154,6 +157,7 @@ class AppBootstrap {
         DeviceOrientation.portraitUp,
         DeviceOrientation.portraitDown,
       ]),
+      ModelImageCache.loadPaths(),
     ]);
 
     // 2. Wire Crashlytics.
@@ -199,18 +203,14 @@ class AppBootstrap {
 
     FlutterDownloader.registerCallback(downloadCallback);
 
-    // 4. Load shared preferences (already awaited above).
-    final bool hasCompletedOnboarding =
-        prefs.getBool('has_completed_onboarding') ?? false;
-
-    // 5. Optimistic Auth Check.
+    // 5. Bypass Auth Check for Splash/Onboarding.
     AppStatus initialStatus;
-    if (!hasCompletedOnboarding) {
-      initialStatus = AppStatus.needsOnboarding;
-    } else {
-      final initialUser = FirebaseAuth.instance.currentUser;
+    final initialUser = FirebaseAuth.instance.currentUser;
+    if (initialUser == null) {
       initialStatus =
-      initialUser == null ? AppStatus.needsLogin : AppStatus.ready;
+          AppStatus.initializing; // Let AppInitializer attempt anonymous login
+    } else {
+      initialStatus = AppStatus.ready;
     }
 
     // 6. Determine Theme.
@@ -256,7 +256,6 @@ class AppBootstrap {
 void main() async {
   final WidgetsBinding widgetsBinding =
   WidgetsFlutterBinding.ensureInitialized();
-  GoogleFonts.config.allowRuntimeFetching = false;
 
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
@@ -568,6 +567,9 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
     ChangeNotifierProvider<DownloadedModelsManager>(
       create: (_) => DownloadedModelsManager(),
     ),
+    ChangeNotifierProvider<ArtsProvider>(
+      create: (_) => ArtsProvider(),
+    ),
 
     ChangeNotifierProxyProvider<ModelCatalogProvider, ModelLocalStateProvider>(
       create: (BuildContext context) {
@@ -634,6 +636,9 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
     ),
     ChangeNotifierProvider<UserMemoryProvider>(
       create: (_) => UserMemoryProvider(),
+    ),
+    ChangeNotifierProvider<BackgroundTaskService>(
+      create: (_) => BackgroundTaskService(),
     ),
 
     // Core chat services.
@@ -708,6 +713,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
             modelService: context.read<ModelService>(),
             voiceService: context.read<VoiceService>(),
             userMemoryProvider: context.read<UserMemoryProvider>(),
+            backgroundTaskService: context.read<BackgroundTaskService>(),
           ),
     ),
     Provider<StopService>(

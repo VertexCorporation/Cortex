@@ -148,6 +148,23 @@ class _ModelTileState extends State<ModelTile> {
     );
   }
 
+  /// Resolves the display title for models:
+  /// - For media categories (image, audio, video): use series name
+  /// - For offline series with variants: use series name
+  /// - For everything else: use displayTitle
+  String _resolveDisplayTitle(ModelEntity model) {
+    final isMediaCategory = model.category == 'image' ||
+        model.category == 'audio' ||
+        model.category == 'video';
+    final isOfflineSeries =
+        !model.isServerSide && (model.variants?.isNotEmpty ?? false);
+
+    if ((isMediaCategory || isOfflineSeries) && model.series != null && model.series!.isNotEmpty) {
+      return model.series!;
+    }
+    return model.displayTitle;
+  }
+
   Widget _buildButton(BuildContext context, double w, AppLocalizations loc) {
     const double radiusFactor = .08;
     final double h = w * .09;
@@ -355,8 +372,9 @@ class _ModelTileState extends State<ModelTile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   OverflowText(
-                    // Use pre-localized 'displayTitle' from the entity.
-                    text: (widget.model.category == 'image' || widget.model.category == 'audio' || widget.model.category == 'video') ? (widget.model.series ?? widget.model.displayTitle) : widget.model.displayTitle,
+                    // Use series name for models with series names: image, audio, video categories,
+                    // and offline series models (which have variants).
+                    text: _resolveDisplayTitle(widget.model),
                     style: TextStyle(
                         color: AppColors.primaryColor.inverted,
                         fontSize: w * .04,
@@ -364,8 +382,13 @@ class _ModelTileState extends State<ModelTile> {
                   ),
                   SizedBox(height: w * .005),
                   OverflowText(
-                    // Use pre-localized 'displaySummary' from the entity.
-                    text: widget.model.displaySummary,
+                    text: widget.model.displaySummary.trim().isNotEmpty
+                        ? widget.model.displaySummary
+                        : (widget.model.variants?.isNotEmpty == true
+                            ? loc.defaultSeriesDescription(
+                                widget.model.displayTitle)
+                            : loc.defaultModelDescription(
+                                widget.model.displayTitle)),
                     maxLines: 2,
                     fadeLength: 6,
                     style: TextStyle(

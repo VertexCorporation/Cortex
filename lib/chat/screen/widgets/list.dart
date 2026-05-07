@@ -6,6 +6,7 @@ import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/edit.dart';
+import 'package:cortex/theme.dart';
 import 'package:cortex/chat/services/regenerate.dart';
 import 'package:cortex/chat/services/stop.dart';
 import 'package:cortex/chat/services/storage.dart';
@@ -68,6 +69,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
     final conversationProvider = context.watch<ConversationProvider>();
     final sessionProvider = context.watch<ChatSessionProvider>();
     final inputProvider = context.watch<InputProvider>();
+    context.watch<ThemeProvider>();
 
     final messages = conversationProvider.messages;
 
@@ -84,33 +86,26 @@ class _ChatMessageListState extends State<ChatMessageList> {
     // This is the cleanest way to ensure "open new chat -> scroll to bottom".
     // We assume conversationProvider.conversationID changes.
 
-    return Column(
-      key: ValueKey(conversationProvider.conversationID),
-      children: [
-        Expanded(
-          child: Tiles.buildMessagesList(
-            context: context,
-            messages: messages.toList(),
-            scrollController: widget.scrollController,
-            modelId: sessionProvider.modelId ?? '',
-            isEditingMode: inputProvider.isEditingMode,
-            editingMessageIndex: inputProvider.editingMessageIndex,
-            bottomPadding: widget.bottomPadding,
-            onStop: context.read<StopService>().stopResponse,
-            onEdit: (index) => widget.editService.startEditingMessage(index),
-            onFadeOutComplete: (index) => context
-                .read<ConversationProvider>()
-                .removeMessageAtIndex(index),
-            onRegenerate: (int index, {String? newModelId}) {
-              _handleRegenerate(
-                  context, index, newModelId, sessionProvider.isDynamicChat);
-            },
-            onReport: (index) {
-              _handleReport(context, index, conversationProvider);
-            },
-          ),
-        ),
-      ],
+    return Tiles.buildMessagesList(
+      context: context,
+      messages: messages,
+      scrollController: widget.scrollController,
+      modelId: sessionProvider.modelId ?? '',
+      isEditingMode: inputProvider.isEditingMode,
+      editingMessageIndex: inputProvider.editingMessageIndex,
+      bottomPadding: widget.bottomPadding,
+      onStop: context.read<StopService>().stopResponse,
+      onEdit: (index) => widget.editService.startEditingMessage(index),
+      onFadeOutComplete: (index) => context
+          .read<ConversationProvider>()
+          .removeMessageAtIndex(index),
+      onRegenerate: (int index, {String? newModelId}) {
+        _handleRegenerate(
+            context, index, newModelId, sessionProvider.isDynamicChat);
+      },
+      onReport: (index) {
+        _handleReport(context, index, conversationProvider);
+      },
     );
   }
 

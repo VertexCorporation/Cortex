@@ -22,6 +22,8 @@ class CreditsManager {
   /// It is nullable (`int?`) to represent the loading state (`null`).
   /// Widgets can listen to this to get real-time updates.
   final ValueNotifier<int?> totalCreditsNotifier = ValueNotifier<int?>(null);
+  final ValueNotifier<int?> preditsNotifier = ValueNotifier<int?>(null);
+  final ValueNotifier<int?> dreditsNotifier = ValueNotifier<int?>(null);
 
   // --- Internal State ---
   StreamSubscription? _creditsSubscription;
@@ -35,11 +37,15 @@ class CreditsManager {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       totalCreditsNotifier.value = 0; // User logged out, set to 0
+      preditsNotifier.value = 0;
+      dreditsNotifier.value = 0;
       return;
     }
 
     // Set to null to indicate that we are now fetching data for a new user.
     totalCreditsNotifier.value = null;
+    preditsNotifier.value = null;
+    dreditsNotifier.value = null;
 
     // Listen to the user's document for real-time changes.
     _creditsSubscription = FirebaseFirestore.instance
@@ -51,18 +57,28 @@ class CreditsManager {
         final data = snapshot.data() ?? {};
         final main = (data['credits'] ?? 0) as int;
         final bonus = (data['bonusCredits'] ?? 0) as int;
+        final predits = (data['predits'] ?? 100) as int;
+        final dredits = (data['dredits'] ?? 100) as int;
+
         // Notify listeners with the new total.
         totalCreditsNotifier.value = main + bonus;
-        debugPrint("Credits updated: Total=${totalCreditsNotifier.value}");
+        preditsNotifier.value = predits;
+        dreditsNotifier.value = dredits;
+        
+        debugPrint("Balances updated: Credits=${totalCreditsNotifier.value}, Predits=${preditsNotifier.value}, Dredits=${dreditsNotifier.value}");
       } else {
         // User document doesn't exist yet, so they have 0 credits.
         debugPrint("CreditsManager: User document does not exist for ${user.uid}.");
         totalCreditsNotifier.value = 0;
+        preditsNotifier.value = 0;
+        dreditsNotifier.value = 0;
       }
     }, onError: (error) {
       debugPrint("Error listening to credits: $error");
       // On error, we might want to set to a known state, like 0.
       totalCreditsNotifier.value = 0;
+      preditsNotifier.value = 0;
+      dreditsNotifier.value = 0;
     });
   }
 
@@ -71,5 +87,7 @@ class CreditsManager {
     _creditsSubscription?.cancel();
     _creditsSubscription = null;
     totalCreditsNotifier.value = null; // Reset to null on dispose
+    preditsNotifier.value = null;
+    dreditsNotifier.value = null;
   }
 }

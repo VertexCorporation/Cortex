@@ -100,32 +100,34 @@ class OfflineService {
       const memoryChannel = MethodChannel('com.vertex.cortex/memory');
 
       // Get total and used RAM
-      final int totalRAM =
+      int totalRAM =
           await memoryChannel.invokeMethod<int>('getDeviceMemory') ?? 4096;
-      final int usedRAM =
+      int usedRAM =
           await memoryChannel.invokeMethod<int>('getUsedMemory') ?? 2048;
 
       // Calculate free RAM
-      final int freeRAM = totalRAM - usedRAM;
+      int freeRAM = totalRAM - usedRAM;
+      
+      // If freeRAM is negative or abnormally low, fall back to safe defaults
+      if (freeRAM <= 0) {
+        freeRAM = 1024; 
+      }
 
-      // Use 80% of free RAM for context (leave 20% as safety buffer)
-      final double usableRAM = freeRAM * 0.80;
-
-      // Heuristic: ~0.5 MB per 1024 context tokens for typical 7B models (KV cache)
-      // So: usableRAM (MB) * 2 ≈ max context tokens
-      // Example: 4000 MB free * 0.8 = 3200 MB usable -> 6400 tokens
-      final int rawContext = (usableRAM * 2).toInt();
-
-      // Round down to nearest 256 (optimal for GPU memory alignment)
-      final int alignedContext = (rawContext ~/ 256) * 256;
-
-      // Clamp between safe min/max
-      final int nCtx = alignedContext.clamp(512, 8192);
+      // We should assume that the model itself takes huge RAM (e.g. 2-5 GB).
+      // So instead of just looking at current freeRAM, we use a conservative clamp based on total RAM or cap it around 4096 to prevent silent OOM crashes in native libraries.
+      int nCtx = 2048;
+      if (totalRAM >= 8192) {
+        nCtx = 8192; // 8GB+ devices can handle 8K
+      } else if (totalRAM >= 6144) {
+        nCtx = 4096; // 6GB devices 
+      } else {
+        nCtx = 2048; // Standard safe fallback
+      }
 
       debugPrint(
           "[OfflineService] RAM Status: total=$totalRAM MB, used=$usedRAM MB, free=$freeRAM MB");
       debugPrint(
-          "[OfflineService] Computed Context: $nCtx tokens (80% of free: ${usableRAM.toInt()} MB)");
+          "[OfflineService] Computed Context: $nCtx tokens for offline model.");
 
       return nCtx;
     } catch (e) {
@@ -173,8 +175,13 @@ class OfflineService {
     // DYNAMIC CONTEXT SIZE based on device RAM
     final int nCtx = await _computeOptimalContextSize();
 
-    // GPU Layers: 99 = offload as many layers as possible (if GPU supported)
-    const int nGpu = 99;
+    // GPU Layers: On Android, forcing GPU can cause silent crashes if Vulkan/OpenCL is unsupported. 
+    // We pass 99 for iOS since Metal usually handles it well, but let's be careful on Android.
+    int nGpu = 0;
+    if (Platform.isIOS) {
+       nGpu = 99;
+    }
+
 
     // DYNAMIC THREADS based on RAM (proxy for CPU power)
     const memoryChannel = MethodChannel('com.vertex.cortex/memory');
@@ -241,8 +248,9 @@ class OfflineService {
         'nThreads': nThreads,
       });
 
+      // Reduced timeout but also changed how fast we return
       return await _singleLoadAttemptCompleter!.future.timeout(
-        const Duration(seconds: 30),
+        const Duration(seconds: 15),
         onTimeout: () {
           debugPrint(
               "[OfflineService] Timeout while waiting for model load (attempt $attempt).");

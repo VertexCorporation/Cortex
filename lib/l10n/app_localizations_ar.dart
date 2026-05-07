@@ -487,6 +487,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get shareApp => 'مشاركة التطبيق';
 
   @override
+  String get ourStory => 'قصتنا';
+
+  @override
   String get rateUs => 'قيّمنا';
 
   @override
@@ -1072,6 +1075,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get news => 'أخبار';
 
   @override
+  String get createAI => 'يخلق';
+
+  @override
+  String get shortcuts => 'اختصارات';
+
+  @override
   String get allModels => 'جميع الموديلات';
 
   @override
@@ -1563,6 +1572,12 @@ class AppLocalizationsAr extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
+  String get featureCreateVideoTitle => 'إنشاء فيديو';
+
+  @override
+  String get featureCreateVideoDescription => 'إنشاء مقاطع فيديو من النصوص.';
+
+  @override
   String get featureStudyTitle => 'ادرس وتعلم';
 
   @override
@@ -1863,4 +1878,58 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => 'ملف صوتي';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesName هو ذكاء متقدم يعرض أداءً عاليًا على Cortex.';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelName هو ذكاء اصطناعي عالي الأداء مدمج في نظام Cortex البيئي. مصمم للتعامل مع مجموعة واسعة من المهام المعقدة، ويوفر قدرات معالجة موثوقة وفعالة عالية. من خلال تقديم أوقات استجابة سريعة وقوة تحليلية متقدمة، فإنه يعزز إنتاجيتك اليومية بشكل كبير. يعمل هذا النموذج بسلاسة على البنية التحتية المحلية الآمنة لـ Cortex، ويمكنه مساعدتك في مجموعة واسعة من المهام، من العصف الذهني الإبداعي إلى التحليل الفني العميق. ابدأ باستكشاف إمكاناته الكاملة اليوم.';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle => 'هل تعجبك ذكاء كورتكس؟';
+
+  @override
+  String get guestLimitBottomSheetText =>
+      'اعمل مع ذكاء اصطناعي أكثر تطوراً، وأنتج المزيد من المحتوى، وتواصل أكثر، وافعل المزيد...';
+
+  @override
+  String get arts => 'الفنون';
+
+  @override
+  String get noArt => 'لا فن';
+
+  @override
+  String get noArtDescription =>
+      'لا توجد أعمال فنية بعد؛ حان الوقت لملء المعرض بإنشاء الصور ومقاطع الفيديو والمقاطع الصوتية وجميع أنواع المحتوى!';
+
+  @override
+  String get videoPremiumWarning =>
+      'أنت بحاجة إلى اشتراك Ultra لإنشاء مقاطع الفيديو، قم بالترقية الآن واستمتع بالتجربة!';
+
+  @override
+  String get becomePremiumButton => 'اشترك في العضوية المميزة';
+
+  @override
+  String get fallbackInfoPanelText =>
+      'نظراً لبعض التحسينات التي نجريها على خوادمنا، تم إنشاء الرد بواسطة نظام الدردشة الديناميكي الخاص بـ Cortex بدلاً من الذكاء الاصطناعي الذي اخترته. نشكرك على تفهمك ريثما تكتمل العملية!';
+
+  @override
+  String get falOfflineMessage =>
+      'نظراً لبعض التحسينات التي نجريها على خوادمنا، فإن هذه الخدمة غير متاحة حالياً. نشكركم على تفهمكم ريثما تنتهي العملية!';
+
+  @override
+  String get errorInsufficientStorage =>
+      'لا توجد مساحة تخزين كافية لتنزيل هذا النموذج.';
+
+  @override
+  String get backgroundChatNotificationTitle => 'العودة إلى الدردشة!';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return 'هناك رسالة جديدة في $chatName، ألقِ نظرة عليها!';
+  }
 }

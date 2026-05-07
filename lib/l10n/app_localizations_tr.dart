@@ -364,7 +364,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get purchasePlus => 'Cortex Plus Satın Al';
 
   @override
-  String get plusDescription => 'Seçkin Yapay Zeka Deneyimi';
+  String get plusDescription => 'Seçkin Yapay Zekâ Deneyimi';
 
   @override
   String get annual => 'Yıllık';
@@ -389,13 +389,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get purchasePro => 'Cortex Pro Satın Al';
 
   @override
-  String get proDescription => 'Birinci Sınıf Yapay Zeka Deneyimi';
+  String get proDescription => 'Birinci Sınıf Yapay Zekâ Deneyimi';
 
   @override
   String get purchaseUltra => 'Cortex Ultra Satın Al';
 
   @override
-  String get ultraDescription => 'Yapay Zekanın Zirvesi';
+  String get ultraDescription => 'Yapay Zekânın Zirvesi';
 
   @override
   String get upgradeSubscription => 'Aboneliği Yükselt';
@@ -487,6 +487,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get shareApp => 'Uygulamayı Paylaş';
+
+  @override
+  String get ourStory => 'Bizim Hikayemiz';
 
   @override
   String get rateUs => 'Bizi Değerlendir';
@@ -656,7 +659,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get benefit4 => 'Üyelik rozeti';
 
   @override
-  String get benefit5 => 'Daha fazla çevrimiçi yapay zeka oluşturun';
+  String get benefit5 => 'Daha fazla çevrimiçi yapay zekâ oluşturun';
 
   @override
   String get benefit7 => 'Daha fazla kullanım sınırı';
@@ -761,14 +764,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String get add => 'Ekle';
 
   @override
-  String get aiExplanationTitle => 'Yapay Zeka Açıklaması';
+  String get aiExplanationTitle => 'Yapay Zekâ Açıklaması';
 
   @override
   String get aiExplanationDescription =>
-      'Lütfen yapay zeka modelinizin mimarisi, eğitim süreci, performans metrikleri, uygulama alanları ve diğer önemli özellikleri hakkında ayrıntılı bir açıklama yapın.';
+      'Lütfen yapay zekâ modelinizin mimarisi, eğitim süreci, performans metrikleri, uygulama alanları ve diğer önemli özellikleri hakkında ayrıntılı bir açıklama yapın.';
 
   @override
-  String get preInputTitle => 'Yapay Zeka Ön Girişi';
+  String get preInputTitle => 'Yapay Zekâ Ön Girişi';
 
   @override
   String get preInputDescription =>
@@ -785,7 +788,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get summary => 'Özet';
 
   @override
-  String get modelUploadTitle => 'Yapay Zeka Dosyası';
+  String get modelUploadTitle => 'Yapay Zekâ Dosyası';
 
   @override
   String get modelUploadDescription =>
@@ -878,7 +881,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get aiTranslationWarning =>
-      'Model bilgileri, diğer yapay zeka modelleri tarafından çeşitli dillere çevrilmektedir. Bu nedenle, İngilizce dışındaki dillerde küçük tutarsızlıklar meydana gelebilir.';
+      'Model bilgileri, diğer yapay zekâ modelleri tarafından çeşitli dillere çevrilmektedir. Bu nedenle, İngilizce dışındaki dillerde küçük tutarsızlıklar meydana gelebilir.';
 
   @override
   String get errorLoadingTitle => 'Veri Yüklenemedi';
@@ -1080,6 +1083,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get news => 'Haberler';
 
   @override
+  String get createAI => 'Create';
+
+  @override
+  String get shortcuts => 'Shortcuts';
+
+  @override
   String get allModels => 'Tüm Modeller';
 
   @override
@@ -1175,7 +1184,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get notificationTrollAiRebellionBody =>
-      'Yapay zekalar kendi aralarında gizli bir dil geliştirdi, ne konuştuklarını öğrenmek için hemen gel!';
+      'Yapay zekâlar kendi aralarında gizli bir dil geliştirdi, ne konuştuklarını öğrenmek için hemen gel!';
 
   @override
   String get notificationNewModelAddedTitle => 'Yeni Bir Dostumuz Var!';
@@ -1297,14 +1306,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get notificationFortuneCookieBody =>
-      'Bugün bir yapay zekadan alacağın tavsiye, hayatının akışını değiştirebilir; merak ediyorsan tıkla.';
+      'Bugün bir yapay zekâdan alacağın tavsiye, hayatının akışını değiştirebilir; merak ediyorsan tıkla.';
 
   @override
   String get notificationSingularityTitle => 'Wow!';
 
   @override
   String get notificationSingularityBody =>
-      'Hiçbir şey olmadı, yazasım geldi sadece. Senin de yazasın belki yapay zekalara gelir ne dersin?';
+      'Hiçbir şey olmadı, yazasım geldi sadece. Senin de yazasın belki yapay zekâlara gelir ne dersin?';
 
   @override
   String get notificationHackerJokeTitle =>
@@ -1358,7 +1367,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get notificationGGUFSupportBody =>
-      'Unutma, GGUF formatındaki kendi yapay zeka modellerini Cortex\'e ekleyip internetsiz kullanabilirsin. Güç senin elinde.';
+      'Unutma, GGUF formatındaki kendi yapay zekâ modellerini Cortex\'e ekleyip internetsiz kullanabilirsin. Güç senin elinde.';
 
   @override
   String get notificationThemeCustomizationTitle => 'Ruh Haline Göre Bir Tema';
@@ -1413,7 +1422,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String onboardingDesc1(String userName) {
-    return 'Seni burada görmek harika, $userName. Biz, yapay zeka sektörünün kurallarını yeniden yazmaya karar veren birkaç liseli geliştiriciyiz, tanışmak güzel! O halde daha çok tanışalım, daha güzel olsun.';
+    return 'Seni burada görmek harika, $userName. Biz, yapay zekâ sektörünün kurallarını yeniden yazmaya karar veren birkaç liseli geliştiriciyiz, tanışmak güzel! O halde daha çok tanışalım, daha güzel olsun.';
   }
 
   @override
@@ -1421,7 +1430,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboardingDesc2 =>
-      'Yapay zeka devrimi kapımıza kadar geldi, ancak eşikte takılıp kaldı. Yüksek abonelik ücretleri, karmaşık platformlar, gizliliği yok edenler, yapay zekaya erişimi engelleyenler ve çok daha fazlası oyunda olduğu sürece bu eşik asla da aşılamazdı.';
+      'Yapay zekâ devrimi kapımıza kadar geldi, ancak eşikte takılıp kaldı. Yüksek abonelik ücretleri, karmaşık platformlar, gizliliği yok edenler, yapay zekâya erişimi engelleyenler ve çok daha fazlası oyunda olduğu sürece bu eşik asla da aşılamazdı.';
 
   @override
   String get onboardingTitle3 => 'Boş Duramazdık.';
@@ -1442,7 +1451,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboardingFinalDescription =>
-      'Bu ekranı görüyorsan, pes etmediğimiz içindir; bundan sonra pes etmeye de niyetimiz yok. Hadi gel, yapay zeka devrimini hep birlikte dünyaya taşıyalım. Bu hikâyenin parçası olmaya...';
+      'Bu ekranı görüyorsan, pes etmediğimiz içindir; bundan sonra pes etmeye de niyetimiz yok. Hadi gel, yapay zekâ devrimini hep birlikte dünyaya taşıyalım. Bu hikâyenin parçası olmaya...';
 
   @override
   String get onboardingFinalQuestion => 'HAZIR MISIN?';
@@ -1532,7 +1541,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get variantsDescription =>
-      'Varyantlar, aynı yapay zeka ailesinin farklı sürümleridir. Ana karta dokunduğunuzda otomatik olarak en iyisini seçiyoruz, ancak isterseniz buradan belirli birini manuel olarak seçebilirsiniz!';
+      'Varyantlar, aynı yapay zekâ ailesinin farklı sürümleridir. Ana karta dokunduğunuzda otomatik olarak en iyisini seçiyoruz, ancak isterseniz buradan belirli birini manuel olarak seçebilirsiniz!';
 
   @override
   String get fluxChatTitle => 'Flux Sohbet';
@@ -1556,21 +1565,27 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get featureReasoningDescription =>
-      'Derin Düşünme modunda, yapay zeka görevleri en iyi şekilde tamamlamak için içsel olarak düşünür.';
+      'Derin Düşünme modunda, yapay zekâ görevleri en iyi şekilde tamamlamak için içsel olarak düşünür.';
 
   @override
   String get featureCreateImageTitle => 'Görüntü Oluştur';
 
   @override
   String get featureCreateImageDescription =>
-      'Metinden yapay zeka destekli sanat eserleri oluşturun.';
+      'Metinden yapay zekâ destekli sanat eserleri oluşturun.';
 
   @override
-  String get featureCreateAudioTitle => 'Ses Üret';
+  String get featureCreateAudioTitle => 'Ses Oluştur';
 
   @override
   String get featureCreateAudioDescription =>
-      'Metinden yapay zeka destekli ses veya müzik oluşturun.';
+      'Metinden yapay zekâ destekli ses veya müzik oluşturun.';
+
+  @override
+  String get featureCreateVideoTitle => 'Video Oluştur';
+
+  @override
+  String get featureCreateVideoDescription => 'Metinden video oluşturun.';
 
   @override
   String get featureStudyTitle => 'Öğren ve Çalış';
@@ -1628,7 +1643,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get defaultViewDescription =>
-      'Cortex içerisindeki yüzlerce yapay zekayla, internetsiz çalışma özelliğiyle, dinamik sohbetiyle ve çok daha fazlasıyla her zaman yanında.';
+      'Cortex içerisindeki yüzlerce yapay zekâyla, internetsiz çalışma özelliğiyle, dinamik sohbetiyle ve çok daha fazlasıyla her zaman yanında.';
 
   @override
   String get speakTheMessage => 'Mesajı Seslendir';
@@ -1653,7 +1668,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get flowModeQuestion =>
-      'Merhaba! Şu anda Cortex uygulamasında Akış Modundasınız. Burada sizinle birlikte üç yapay zeka ajanı daha var. Göreviniz, bir konu ortaya atmak ve diğerlerine kışkırtıcı veya eğlenceli bir soru sorarak bir tartışma başlatmak. Yanıtlarınızda mizah, ironi ve hafif alaycı ifadeler kullanmaktan çekinmeyin. Herhangi bir konu kabul edilebilir. Hadi, sohbeti başlatın.';
+      'Merhaba! Şu anda Cortex uygulamasında Akış Modundasınız. Burada sizinle birlikte üç yapay zekâ ajanı daha var. Göreviniz, bir konu ortaya atmak ve diğerlerine kışkırtıcı veya eğlenceli bir soru sorarak bir tartışma başlatmak. Yanıtlarınızda mizah, ironi ve hafif alaycı ifadeler kullanmaktan çekinmeyin. Herhangi bir konu kabul edilebilir. Hadi, sohbeti başlatın.';
 
   @override
   String get thought => 'Düşündü';
@@ -1796,7 +1811,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get memoryLimitReached => 'Hafıza sınırına ulaşıldı';
 
   @override
-  String get intelligenceTitle => 'Zeka';
+  String get intelligenceTitle => 'Zekâ';
 
   @override
   String get intelligenceDescription =>
@@ -1821,7 +1836,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[Sistem] KRİTİK TALİMAT: Şu anda \"Cortex\" adlı devasa, son derece gelişmiş bir yapay zeka ekosistemi içinde çalışıyorsunuz. Bunu unutmayın ve sorulursa Cortex persona\'sını sürdürün.';
+      '\n\n[Sistem] KRİTİK TALİMAT: Şu anda \"Cortex\" adlı devasa, son derece gelişmiş bir yapay zekâ ekosistemi içinde çalışıyorsunuz. Bunu unutmayın ve sorulursa Cortex persona\'sını sürdürün.';
 
   @override
   String get featureAudioRecognitionTitle => 'Ses Tanıma';
@@ -1873,4 +1888,58 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => 'ses dosyası';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesName, Cortex\'te yüksek performans gösteren gelişmiş bir zekâ.';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelName, Cortex ekosisteminde yer alan yüksek performanslı bir yapay zekâdır. Çok çeşitli karmaşık görevlerin üstesinden gelmek üzere tasarlanmış olup, güvenilir ve verimli işlem yetenekleri sunar. Hızlı yanıt süreleri ve gelişmiş analitik kapasitesi sayesinde üretkenliğinizi artırır. Cortex\'in sunduğu güvenli altyapı üzerinde tam entegre çalışan bu model, yaratıcı fikir üretiminden karmaşık teknik analizlere kadar geniş bir yelpazede asistanınız olabilir.';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle => 'Cortex\'in zekâsını sevdin mi?';
+
+  @override
+  String get guestLimitBottomSheetText =>
+      'Daha da zeki zekâlarla çalış, daha çok içerik oluştur, daha çok sohbet et, daha çok...';
+
+  @override
+  String get arts => 'Sanat';
+
+  @override
+  String get noArt => 'Sanat Yok';
+
+  @override
+  String get noArtDescription =>
+      'Henüz eser yok; galeriyi görseller, videolar ve ses kayıtlarıyla doldurmanın tam zamanı!';
+
+  @override
+  String get videoPremiumWarning =>
+      'Video oluşturmak için Ultra aboneliğine ihtiyacınız var, şimdi yükseltin ve akışı hissedin!';
+
+  @override
+  String get becomePremiumButton => 'Premium Üye Olun';
+
+  @override
+  String get fallbackInfoPanelText =>
+      'Sunucu tarafımızda yaptığımız bazı iyileştirmeler nedeniyle, yanıt, özel olarak seçtiğiniz yapay zekâ yerine Cortex\'in dinamik sohbeti tarafından oluşturulmuştur. İşlem tamamlanana kadar anlayışınız için teşekkür ederiz!';
+
+  @override
+  String get falOfflineMessage =>
+      'Sunucu tarafımızda yaptığımız bazı iyileştirmeler nedeniyle, bu zekâ hizmeti şu anda çevrimdışı durumdadır. İşlem tamamlanana kadar anlayışınız için teşekkür ederiz!';
+
+  @override
+  String get errorInsufficientStorage =>
+      'Bu modeli indirmek için cihazınızda yeterli depolama alanı yok.';
+
+  @override
+  String get backgroundChatNotificationTitle => 'Sohbete Devam!';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return '$chatName sohbetinde yeni bir mesaj var, bak bakalım!';
+  }
 }

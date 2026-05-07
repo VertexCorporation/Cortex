@@ -74,6 +74,9 @@ class BaseModelSelector extends StatelessWidget {
           isCurrentlySelectedPremium =
               (variantData['tier'] as String? ?? 'free') == 'premium';
           break;
+        } else if (series.id == selectedBaseModelId) {
+          isCurrentlySelectedPremium = series.tier == 'premium';
+          break;
         }
       }
     }
@@ -178,6 +181,104 @@ class BaseModelSelector extends StatelessWidget {
     final double itemVerticalPadding = isTablet ? 16.0 : screenWidth * 0.03;
     final double itemHorizontalPadding = isTablet ? 24.0 : screenWidth * 0.04;
 
+    Widget buildListItem(ModelEntity series, String modelId, String modelTitle, bool isPremium) {
+      final imagePath = modelService.getModelImagePath(series);
+
+      // --- SVG CHECK LOGIC (Prevents Crashes) ---
+      final bool isSvg = imagePath.endsWith('.svg');
+      final bool isAsset = imagePath.startsWith('assets/');
+
+      Widget imageWidget;
+      if (isSvg) {
+        // Safe rendering for SVGs (like cortex.svg)
+        imageWidget = Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: SvgPicture.asset(
+            imagePath,
+            fit: BoxFit.contain,
+            colorFilter: ColorFilter.mode(
+                AppColors.primaryColor.inverted, BlendMode.srcIn),
+          ),
+        );
+      } else {
+        // Bitmap rendering
+        ImageProvider? provider;
+        if (isAsset) {
+          provider = AssetImage(imagePath);
+        } else {
+          provider = FileImage(File(imagePath));
+        }
+        imageWidget = CircleAvatar(
+          backgroundImage: provider,
+          backgroundColor: Colors.transparent,
+          radius: avatarSize / 2,
+        );
+      }
+      // ------------------------------------------
+
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            onSelectBaseModel(modelId, modelTitle);
+          },
+          // Clean look: No splash/highlight
+          splashFactory: NoSplash.splashFactory,
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          focusColor: Colors.transparent,
+
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: itemHorizontalPadding,
+                vertical: itemVerticalPadding),
+            child: Row(
+              children: [
+                // Leading: Avatar / Icon
+                Container(
+                  width: avatarSize,
+                  height: avatarSize,
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle),
+                  child: imageWidget,
+                ),
+
+                SizedBox(width: screenWidth * 0.04), // Gap
+
+                // Title
+                Expanded(
+                  child: Text(
+                    modelTitle,
+                    style: TextStyle(
+                        color: AppColors.primaryColor.inverted,
+                        fontSize: textSize,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+
+                // Trailing: Sparkle Icon (if premium)
+                if (isPremium)
+                  Padding(
+                    padding: EdgeInsets.only(left: screenWidth * 0.02),
+                    child: SvgPicture.asset(
+                      'assets/icons/sparkle.svg',
+                      width: screenWidth * 0.05,
+                      colorFilter: ColorFilter.mode(
+                        AppColors.primaryColor.inverted
+                            .withValues(alpha: 0.8),
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Container(
       margin: EdgeInsets.only(top: screenWidth * 0.02),
       height: listHeight,
@@ -191,113 +292,22 @@ class BaseModelSelector extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: availableBaseModels.expand<Widget>((series) {
             final Map<String, dynamic> variants = series.variants ?? const {};
-            if (variants.isEmpty) return [];
-
-            return variants.entries.map((ext) {
-              final modelId = ext.key;
-              final variantData = ext.value as Map<String, dynamic>? ?? {};
-              var modelTitle = variantData['title'] as String? ?? modelId;
-              modelTitle = ModelDataUtils.cleanTitle(modelTitle);
-
-              final imagePath = modelService.getModelImagePath(series);
-
-              // --- SVG CHECK LOGIC (Prevents Crashes) ---
-              final bool isSvg = imagePath.endsWith('.svg');
-              final bool isAsset = imagePath.startsWith('assets/');
-
-              Widget imageWidget;
-              if (isSvg) {
-                // Safe rendering for SVGs (like cortex.svg)
-                imageWidget = Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: SvgPicture.asset(
-                    imagePath,
-                    fit: BoxFit.contain,
-                    colorFilter: ColorFilter.mode(
-                        AppColors.primaryColor.inverted, BlendMode.srcIn),
-                  ),
-                );
-              } else {
-                // Bitmap rendering
-                ImageProvider? provider;
-                if (isAsset) {
-                  provider = AssetImage(imagePath);
-                } else {
-                  provider = FileImage(File(imagePath));
-                }
-                imageWidget = CircleAvatar(
-                  backgroundImage: provider,
-                  backgroundColor: Colors.transparent,
-                  radius: avatarSize / 2,
-                );
-              }
-              // ------------------------------------------
-
-              final isVariantPremium =
-                  (variantData['tier'] as String? ?? 'free') == 'premium';
-
-              return Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    onSelectBaseModel(modelId, modelTitle);
-                  },
-                  // Clean look: No splash/highlight
-                  splashFactory: NoSplash.splashFactory,
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  hoverColor: Colors.transparent,
-                  focusColor: Colors.transparent,
-
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: itemHorizontalPadding,
-                        vertical: itemVerticalPadding),
-                    child: Row(
-                      children: [
-                        // Leading: Avatar / Icon
-                        Container(
-                          width: avatarSize,
-                          height: avatarSize,
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle),
-                          child: imageWidget,
-                        ),
-
-                        SizedBox(width: screenWidth * 0.04), // Gap
-
-                        // Title
-                        Expanded(
-                          child: Text(
-                            modelTitle,
-                            style: TextStyle(
-                                color: AppColors.primaryColor.inverted,
-                                fontSize: textSize,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ),
-
-                        // Trailing: Sparkle Icon (if premium)
-                        if (isVariantPremium)
-                          Padding(
-                            padding: EdgeInsets.only(left: screenWidth * 0.02),
-                            child: SvgPicture.asset(
-                              'assets/icons/sparkle.svg',
-                              width: screenWidth * 0.05,
-                              colorFilter: ColorFilter.mode(
-                                AppColors.primaryColor.inverted
-                                    .withValues(alpha: 0.8),
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }).toList();
+            
+            if (variants.isNotEmpty) {
+              return variants.entries.map((ext) {
+                final modelId = ext.key;
+                final variantData = ext.value as Map<String, dynamic>? ?? {};
+                var modelTitle = variantData['title'] as String? ?? modelId;
+                modelTitle = ModelDataUtils.cleanTitle(modelTitle);
+                final isVariantPremium = (variantData['tier'] as String? ?? 'free') == 'premium';
+                return buildListItem(series, modelId, modelTitle, isVariantPremium);
+              }).toList();
+            } else {
+              final modelId = series.id;
+              final modelTitle = ModelDataUtils.cleanTitle(series.displayTitle);
+              final isPremium = series.tier == 'premium';
+              return [buildListItem(series, modelId, modelTitle, isPremium)];
+            }
           }).toList(),
         ),
       ),

@@ -198,7 +198,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
 
   @override
   Widget build(BuildContext context) {
-    context.watch<ThemeProvider>(); // Fix reactivity bug
+    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
     final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final double scale = screenWidth / 400.0;

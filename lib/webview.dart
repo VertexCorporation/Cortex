@@ -292,7 +292,7 @@ class _ErrorDisplay extends StatelessWidget {
           ScaleTransition(
             scale: animation,
             child: Icon(
-                Icons.error_outline_rounded, color: AppColors.septenaryColor,
+                Icons.error_rounded, color: AppColors.septenaryColor,
                 size: 70),
           ),
           const SizedBox(height: 24),

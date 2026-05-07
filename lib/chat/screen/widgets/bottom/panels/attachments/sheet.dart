@@ -78,7 +78,7 @@ void showAttachmentSheet({
               child: Text(
                 l10n.attachmentSheetTitle,
                 style: TextStyle(
-                  fontFamily: 'Roboto',
+                  fontFamily: 'Inter',
                   fontSize: titleFontSize,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryColor.inverted,

@@ -73,7 +73,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   // --- Special Offer Countdown State ---
   Timer? _countdownTimer;
-  String _countdownText = '';
+  final ValueNotifier<String> _countdownNotifier = ValueNotifier<String>('');
   bool _isSpecialOfferChecked = false;
 
   Future<void> _checkIfEmulator() async {
@@ -192,8 +192,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     if (!mounted) return;
 
     if (_uiActiveSubscriptionLevel > 0) {
-      if (_countdownText.isNotEmpty) {
-        setState(() => _countdownText = '');
+      if (_countdownNotifier.value.isNotEmpty) {
+        _countdownNotifier.value = '';
       }
       return;
     }
@@ -202,8 +202,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
     // If logic says offer is inactive (null expiry or inactive flag)
     if (expiresAt == null || !_backend.isSpecialOfferActive) {
-      if (_countdownText.isNotEmpty) {
-        setState(() => _countdownText = '');
+      if (_countdownNotifier.value.isNotEmpty) {
+        _countdownNotifier.value = '';
       }
       return;
     }
@@ -216,10 +216,10 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     // --- CRITICAL CHANGE: Handle expiration cleanly ---
     if (remaining <= 0) {
       // Time is up!
-      if (_countdownText.isNotEmpty) {
+      if (_countdownNotifier.value.isNotEmpty) {
         // Clear text immediately to trigger badge removal animation
         // and revert benefits colors.
-        setState(() => _countdownText = '');
+        _countdownNotifier.value = '';
       }
       _countdownTimer?.cancel();
       return;
@@ -230,12 +230,13 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
     final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
 
-    setState(() => _countdownText = '$hours:$minutes:$seconds');
+    _countdownNotifier.value = '$hours:$minutes:$seconds';
   }
 
   @override
   void dispose() {
     _countdownTimer?.cancel();
+    _countdownNotifier.dispose();
     _backend.removeListener(_onBackendUpdate);
     _pageController.dispose();
     for (var controller in _scrollControllers) {
@@ -444,11 +445,16 @@ class _FundsScreenViewState extends State<FundsScreenView> {
               extendBodyBehindAppBar: true,
               appBar: CortexAppBar(
                 leadingMode: CortexLeadingMode.back,
-                title: _buildFixedDiscountBadge(
-                    context, MediaQuery
-                    .of(context)
-                    .size
-                    .width),
+                title: ValueListenableBuilder<String>(
+                  valueListenable: _countdownNotifier,
+                  builder: (context, countdownText, _) {
+                    return _buildFixedDiscountBadge(
+                        context, MediaQuery
+                        .of(context)
+                        .size
+                        .width, countdownText);
+                  },
+                ),
               ),
               body: Stack(
                 children: [
@@ -573,18 +579,10 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   Widget _buildMainContent(BuildContext context, FundsBackend backend) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
-    final double topPadding = MediaQuery
-        .of(context)
-        .padding
-        .top;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final double topPadding = mediaQuery.padding.top;
 
     if (!backend.isLoading && _isSpecialOfferChecked && !_isContentLoaded) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -602,7 +600,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final bool isOfferVisuallyActive =
         backend.currentUserSubscriptionLevel == 0 &&
             backend.isSpecialOfferActive &&
-            _countdownText.isNotEmpty;
+            _countdownNotifier.value.isNotEmpty;
 
     return AnimatedSlide(
       key: const ValueKey('main_content'),
@@ -793,13 +791,13 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     );
   }
 
-  Widget _buildFixedDiscountBadge(BuildContext context, double screenWidth) {
+  Widget _buildFixedDiscountBadge(BuildContext context, double screenWidth, String countdownText) {
     final backend = Provider.of<FundsBackend>(context, listen: false);
     // Rely on countdown text being present to show badge
     final bool showSpecialOffer =
         backend.currentUserSubscriptionLevel == 0 &&
             backend.isSpecialOfferActive &&
-            _countdownText.isNotEmpty;
+            countdownText.isNotEmpty;
 
     final scale = (screenWidth / 375.0).clamp(0.85, 1.2);
     final badgeHeight = 36.0 * scale;
@@ -815,8 +813,8 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final borderColor = baseColor.withValues(alpha: 0.8);
     final localizations = AppLocalizations.of(context)!;
     final String badgeText = backend.isWelcomeOffer
-        ? localizations.welcomeOfferBadge(_countdownText)
-        : localizations.exclusiveOfferBadge(_countdownText);
+        ? localizations.welcomeOfferBadge(countdownText)
+        : localizations.exclusiveOfferBadge(countdownText);
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 600),
@@ -868,9 +866,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   child: Text(
                     badgeText,
                     // Key changes every second for fade effect
-                    key: ValueKey(_countdownText),
+                    key: ValueKey(countdownText),
                     style: TextStyle(
-                      fontFamily: 'Ubuntu',
+                      fontFamily: 'Inter',
                       fontSize: fontSize,
                       fontWeight: FontWeight.w500,
                       letterSpacing: -0.5,

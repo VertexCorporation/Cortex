@@ -256,7 +256,32 @@ class ModelCatalogProvider extends ChangeNotifier {
   /// Initiates a chat session with the selected model.
   Future<void> startChatWithModel(String id) async {
     try {
-      final model = _allModels.firstWhere((m) => m.id == id);
+      ModelEntity? model;
+
+      // 1. Try direct match in top-level models.
+      try {
+        model = _allModels.firstWhere((m) => m.id == id);
+      } catch (_) {
+        // Not a top-level model — may be a variant ID from an offline series.
+      }
+
+      // 2. If not found, search inside variants of offline series.
+      if (model == null) {
+        for (final seriesModel in _allModels) {
+          if (seriesModel.variants?.containsKey(id) == true) {
+            // Use the parent series entity but override the ID to the variant.
+            model = seriesModel.copyWith(id: id);
+            break;
+          }
+        }
+      }
+
+      if (model == null) {
+        debugPrint(
+            "[ModelCatalogProvider.startChat] Error: Model with ID '$id' not found.");
+        return;
+      }
+
       mainScreenKey.currentState?.startChatWithModel(model);
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('selected_model_id', id);

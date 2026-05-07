@@ -1,35 +1,41 @@
 // lib/axon/content.dart
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 // Theme & Logic
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/chat/providers/conversation.dart';
-
+import 'package:cortex/fog.dart';
+import 'package:cortex/server/user.dart';
+import 'package:cortex/login/upgrade.dart';
 
 // Modular Widgets
+import '../app.dart';
+import '../../navigation.dart';
 import 'widgets/header.dart';
 import 'widgets/menu.dart';
 import 'widgets/list.dart';
-import 'widgets/footer.dart';
 
 class AxonContent extends StatelessWidget {
   final double referenceWidth;
   final ScrollController scrollController;
   final TextEditingController searchController;
   final FocusNode searchFocusNode;
+  final Animation<double> searchModeAnimation;
   final bool isSearchActive;
   final VoidCallback onNewChatTap;
   final VoidCallback onLibraryTap;
+  final VoidCallback onCreateAITap;
+  final VoidCallback onArtsTap;
   final VoidCallback onNewsTap;
   final VoidCallback onSettingsTap;
   final VoidCallback onExitSearchTap;
   final ValueChanged<String> onSearchChanged;
   final int activeTab;
-
 
   const AxonContent({
     super.key,
@@ -37,23 +43,21 @@ class AxonContent extends StatelessWidget {
     required this.scrollController,
     required this.searchController,
     required this.searchFocusNode,
+    required this.searchModeAnimation,
     required this.isSearchActive,
     required this.onNewChatTap,
     required this.onLibraryTap,
+    required this.onCreateAITap,
+    required this.onArtsTap,
     required this.onNewsTap,
     required this.onSettingsTap,
     required this.onExitSearchTap,
     required this.onSearchChanged,
     required this.activeTab,
-
   });
 
   @override
   Widget build(BuildContext context) {
-    // 1. PERFORMANCE: RepaintBoundary
-    // This creates a separate display list for the drawer.
-    // When the drawer slides closed, Flutter composites this texture
-    // instead of repainting the entire widget tree every pixel.
     return RepaintBoundary(
       child: _buildBody(context),
     );
@@ -61,98 +65,174 @@ class AxonContent extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenHeight = MediaQuery.sizeOf(context).height;
+    final screenHeight = MediaQuery
+        .sizeOf(context)
+        .height;
+    final screenWidth = MediaQuery
+        .sizeOf(context)
+        .width;
 
-    final conversationProvider = context.watch<ConversationProvider>();
-    final String? currentConversationId = conversationProvider.conversationID;
-
-    // Logic: Active Tab is Chat (0) AND no conversation loaded
-    final bool isNewChatActive = (activeTab == 0) &&
-        (currentConversationId == null || currentConversationId.isEmpty);
+    context.select<ConversationProvider, String?>((p) => p.conversationID);
 
     final double horizontalPadding = referenceWidth * 0.05;
-    final double fontSizeBody = referenceWidth * 0.045;
+    final double fontSizeBody = referenceWidth * 0.04;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
       children: [
-        // --- 1. HEADER ---
-        AxonHeader(
-          referenceWidth: referenceWidth,
-          screenHeight: screenHeight,
-          searchController: searchController,
-          searchFocusNode: searchFocusNode,
-          isSearchActive: isSearchActive,
-          onExitSearchTap: onExitSearchTap,
-          onSearchChanged: onSearchChanged,
-        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 1. HEADER
+            AxonHeader(
+              referenceWidth: referenceWidth,
+              screenHeight: screenHeight,
+              screenWidth: screenWidth,
+              searchController: searchController,
+              searchFocusNode: searchFocusNode,
+              searchModeAnimation: searchModeAnimation,
+              isSearchActive: isSearchActive,
+              onExitSearchTap: onExitSearchTap,
+              onSearchChanged: onSearchChanged,
+              onSettingsTap: onSettingsTap,
+            ),
 
-        // --- 2. MENU ---
-        AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOutCubic,
-          alignment: Alignment.topCenter,
-          child: isSearchActive
-              ? const SizedBox(width: double.infinity, height: 0)
-              : AnimatedSlide(
-                  offset: isSearchActive ? const Offset(0, -0.2) : Offset.zero,
+            // 2. SHORTCUTS HEADER
+            AnimatedSlide(
+              offset: isSearchActive ? const Offset(0, -0.3) : Offset.zero,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: isSearchActive ? 0.0 : 1.0,
+                child: AnimatedSize(
                   duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOut,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 300),
-                    opacity: isSearchActive ? 0.0 : 1.0,
-                    child: AxonMenu(
-                      referenceWidth: referenceWidth,
-                      screenHeight: screenHeight,
-                      activeTab: activeTab,
-                      isNewChatActive: isNewChatActive,
-                      onNewChatTap: onNewChatTap,
-                      onLibraryTap: onLibraryTap,
-                      onNewsTap: onNewsTap,
+                  curve: Curves.easeInOutCubic,
+                  alignment: Alignment.topCenter,
+                  child: isSearchActive
+                      ? const SizedBox(width: double.infinity, height: 0)
+                      : Padding(
+                    padding: EdgeInsets.only(
+                      left: horizontalPadding * 1.5,
+                      right: horizontalPadding,
+                      bottom: screenHeight * 0.008,
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          localizations.shortcuts,
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            color: AppColors.primaryColor.inverted,
+                            fontSize: fontSizeBody * 0.95,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        SizedBox(width: referenceWidth * 0.04),
+                        Expanded(
+                          child: Container(
+                            height: 0.8,
+                            margin: EdgeInsets.only(
+                                right: horizontalPadding * 0.5),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF333333),
+                              borderRadius: BorderRadius.circular(2.0),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-        ),
-
-        // --- 3. DIVIDER ---
-        if (!isSearchActive)
-          Padding(
-            padding: EdgeInsets.only(
-              left: horizontalPadding * 1.5,
-              right: horizontalPadding,
-              bottom: screenHeight * 0.008,
+              ),
             ),
-            child: Row(
-              children: [
-                Text(
-                  localizations.chats,
-                  style: GoogleFonts.roboto(
-                    color: AppColors.tertiaryColor,
-                    fontSize: fontSizeBody * 0.85,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+
+            // 3. MENU
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOutCubic,
+              alignment: Alignment.topCenter,
+              child: isSearchActive
+                  ? const SizedBox(width: double.infinity, height: 0)
+                  : AnimatedSlide(
+                offset: isSearchActive ? const Offset(0, -0.3) : Offset.zero,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 200),
+                  opacity: isSearchActive ? 0.0 : 1.0,
+                  child: AxonMenu(
+                    referenceWidth: referenceWidth,
+                    screenHeight: screenHeight,
+                    activeTab: activeTab,
+                    onLibraryTap: onLibraryTap,
+                    onCreateAITap: onCreateAITap,
+                    onArtsTap: onArtsTap,
+                    onNewsTap: onNewsTap,
                   ),
                 ),
-                SizedBox(width: referenceWidth * 0.04),
-                Expanded(
-                  child: Container(
-                    height: 0.8,
-                    margin: EdgeInsets.only(right: horizontalPadding * 0.5),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF333333),
-                      borderRadius: BorderRadius.circular(2.0),
+              ),
+            ),
+
+            // 4. RECENTS HEADER
+            AnimatedSlide(
+              offset: isSearchActive ? const Offset(0, -0.3) : Offset.zero,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: isSearchActive ? 0.0 : 1.0,
+                child: AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOutCubic,
+                  alignment: Alignment.topCenter,
+                  child: isSearchActive
+                      ? const SizedBox(width: double.infinity, height: 0)
+                      : Padding(
+                    padding: EdgeInsets.only(
+                      left: horizontalPadding * 1.5,
+                      right: horizontalPadding,
+                      bottom: screenHeight * 0.008,
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          localizations.chats,
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            color: AppColors.primaryColor.inverted,
+                            fontSize: fontSizeBody * 0.95,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        SizedBox(width: referenceWidth * 0.04),
+                        Expanded(
+                          child: Container(
+                            height: 0.8,
+                            margin: EdgeInsets.only(
+                                right: horizontalPadding * 0.5),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF333333),
+                              borderRadius: BorderRadius.circular(2.0),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
 
-        // --- 4. LIST AREA ---
-        Expanded(
-          child: Stack(
-            children: [
-              Positioned.fill(
+            // 4. LIST AREA
+            Expanded(
+              child: ScrollFog(
+                scrollController: scrollController,
+                topFogHeight: 30.0,
+                bottomFogHeight: 50.0,
+                showTop: true,
+                showBottom: true,
                 child: AxonConversationList(
                   referenceWidth: referenceWidth,
                   screenHeight: screenHeight,
@@ -161,39 +241,114 @@ class AxonContent extends StatelessWidget {
                   searchController: searchController,
                 ),
               ),
+            ),
+          ],
+        ),
 
-              // Gradient Overlay
-              Positioned(
-                right: 0,
-                top: 0,
-                bottom: 0,
-                width: referenceWidth * 0.1,
-                child: IgnorePointer(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [
-                          AppColors.background.withValues(alpha: 0.0),
-                          AppColors.background,
-                        ],
+        Positioned(
+          right: horizontalPadding,
+          bottom: screenHeight * 0.03,
+          child: Material(
+            color: AppColors.primaryColor.inverted,
+            shape: const StadiumBorder(),
+            elevation: 8.0,
+            shadowColor: Colors.black54,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                onNewChatTap();
+              },
+              customBorder: const StadiumBorder(),
+              splashColor: AppColors.primaryColor.withValues(alpha: 0.15),
+              highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: referenceWidth * 0.05,
+                  vertical: referenceWidth * 0.035,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/new.svg',
+                      width: referenceWidth * 0.055,
+                      height: referenceWidth * 0.055,
+                      colorFilter: ColorFilter.mode(
+                        AppColors.primaryColor,
+                        BlendMode.srcIn,
                       ),
                     ),
-                  ),
+                    SizedBox(width: referenceWidth * 0.02),
+                    Text(
+                      localizations.newChat,
+                      style: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontSize: referenceWidth * 0.04,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
                 ),
               ),
-
-            ],
+            ),
           ),
         ),
 
-        // --- 5. FOOTER ---
-        AxonFooter(
-          referenceWidth: referenceWidth,
-          isSearchActive: isSearchActive,
-          onSettingsTap: onSettingsTap,
-        ),
+        // Login Button — bottom-left, shown only for anonymous users
+        if (context
+            .watch<UserProvider>()
+            .isAnonymous)
+          Positioned(
+            left: horizontalPadding,
+            bottom: screenHeight * 0.03,
+            child: Material(
+              color: AppColors.primaryColor.inverted,
+              shape: const StadiumBorder(),
+              elevation: 8.0,
+              shadowColor: Colors.black54,
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  navigateToScreen(
+                    const UpgradeAccountScreen(showLoginFirst: true),
+                    direction: const Offset(0.0, 1.0),
+                  );
+                },
+                customBorder: const StadiumBorder(),
+                splashColor: AppColors.primaryColor.withValues(alpha: 0.15),
+                highlightColor: AppColors.primaryColor.withValues(alpha: 0.05),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: referenceWidth * 0.05,
+                    vertical: referenceWidth * 0.035,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.person_rounded,
+                        color: AppColors.primaryColor,
+                        size: referenceWidth * 0.055,
+                      ),
+                      SizedBox(width: referenceWidth * 0.02),
+                      Text(
+                        "Log In",
+                        style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontSize: referenceWidth * 0.04,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }

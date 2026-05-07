@@ -2,7 +2,7 @@
 
 import 'package:cortex/app.dart';
 import 'package:cortex/appbar.dart';
-import 'package:cortex/chat/messages/parser.dart';
+import 'package:cortex/chat/messages/markdown/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cortex/l10n/app_localizations.dart';
@@ -102,8 +102,8 @@ class SelectTextScreenState extends State<SelectTextScreen> {
                   ScaleTransition(scale: animation, child: child),
               child: Icon(
                 _hideSpecialFormatting
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
+                    ? Icons.visibility_off
+                    : Icons.visibility,
                 key: ValueKey(_hideSpecialFormatting),
                 color: fg,
                 size: iconSize,

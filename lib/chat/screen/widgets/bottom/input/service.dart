@@ -307,11 +307,17 @@ class InputService {
     required bool isStorageSufficient,
     required bool isPremiumModel,
     required bool isSubscribed,
+    required bool isVideoModel,
+    required int userTier,
     required int premiumTrialUses,
-    required int totalCredits,
+    required int? totalCredits,
   }) {
     // 1. Basic Blockers
     if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
+      return false;
+    }
+
+    if (isVideoModel && userTier != 3 && userTier != 6) {
       return false;
     }
 
@@ -339,7 +345,7 @@ class InputService {
       isSearchEnabled: inputProvider.enableWebSearch,
     );
 
-    if ((isDynamicChatMode || isServerSideModel) && totalCredits < needed) {
+    if ((isDynamicChatMode || isServerSideModel) && totalCredits != null && totalCredits < needed) {
       return false;
     }
 
@@ -357,11 +363,17 @@ class InputService {
     required bool isStorageSufficient,
     required bool isPremiumModel,
     required bool isSubscribed,
+    required bool isVideoModel,
+    required int userTier,
     required int premiumTrialUses,
-    required int totalCredits,
+    required int? totalCredits,
   }) {
     // 1. Basic Blockers
     if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
+      return false;
+    }
+
+    if (isVideoModel && userTier != 3 && userTier != 6) {
       return false;
     }
 
@@ -392,7 +404,7 @@ class InputService {
       isSearchEnabled: inputProvider.enableWebSearch,
     );
 
-    if ((isDynamicChatMode || isServerSideModel) && totalCredits < needed) {
+    if ((isDynamicChatMode || isServerSideModel) && totalCredits != null && totalCredits < needed) {
       return false;
     }
 

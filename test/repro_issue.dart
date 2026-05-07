@@ -1,4 +1,4 @@
-import 'package:cortex/chat/messages/parser.dart';
+import 'package:cortex/chat/messages/markdown/parser.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -90,15 +90,13 @@ class MainViewModel(private val llamaAndroid: LLamaAndroid = LLamaAndroid.instan
         }
     }
 
-    fun load(pathToModel: String, nCtx: Int, nGpuLayers: Int, nThreads: Int) {
-        viewModelScope.launch {
-            try {
-                llamaAndroid.load(pathToModel, nCtx, nGpuLayers, nThreads)
-                Log.d(tag, "Loaded $pathToModel with nCtx=$nCtx")
-            } catch (exc: IllegalStateException) {
-                Log.e(tag, "load() failed", exc)
-                LlamaService.sendModelLoadFailedToFlutter(exc.message ?: "Unknown error")
-            }
+    suspend fun load(pathToModel: String, nCtx: Int, nGpuLayers: Int, nThreads: Int) {
+        try {
+            llamaAndroid.load(pathToModel, nCtx, nGpuLayers, nThreads)
+            Log.d(tag, "Loaded $pathToModel with nCtx=$nCtx")
+        } catch (exc: IllegalStateException) {
+            Log.e(tag, "load() failed", exc)
+            throw exc
         }
     }
 }

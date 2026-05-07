@@ -344,10 +344,11 @@ class ChatSessionProvider with ChangeNotifier {
   /// Selects a specific model entity for the session.
   /// [savePreference]: If true, remembers this model as the default for future new chats.
   void selectModel(ModelEntity entity, {bool savePreference = true}) {
+    final bool isSameModel = _selectedModel?.id == entity.id;
     _isExitingChat = false;
     _selectedModel = entity;
 
-    if (!entity.isServerSide) {
+    if (!entity.isServerSide && !isSameModel) {
       _isLocalModelLoaded = false;
     }
 
@@ -451,8 +452,7 @@ class ChatSessionProvider with ChangeNotifier {
     _lastExitedModel = _selectedModel;
     _isExitingChat = true;
 
-    // Reset flags
-    _isLocalModelLoaded = false;
+    // Reset flags (Do not reset _isLocalModelLoaded here, it is tied to the physical cpp model instance)
     _isFluxMode = false;
     ChatStorageService.isFluxMode = false;
 

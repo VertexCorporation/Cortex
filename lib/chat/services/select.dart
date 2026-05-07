@@ -58,10 +58,20 @@ class SelectionService {
 
     if (variantsMap != null && variantsMap.isNotEmpty) {
       String lastUsedId = await Variants.getLastSelectedVariant(aiEntity.id);
-      finalModelId =
-          (lastUsedId.isNotEmpty && variantsMap.containsKey(lastUsedId))
-              ? lastUsedId
-              : variantsMap.keys.first;
+      if (lastUsedId.isNotEmpty && variantsMap.containsKey(lastUsedId)) {
+        finalModelId = lastUsedId;
+      } else {
+        // Prefer first non-premium variant to avoid unnecessary credit spend.
+        String? nonPremiumId;
+        for (final entry in variantsMap.entries) {
+          final variantData = entry.value;
+          if (variantData is Map<String, dynamic> && variantData['tier'] != 'premium') {
+            nonPremiumId = entry.key;
+            break;
+          }
+        }
+        finalModelId = nonPremiumId ?? variantsMap.keys.first;
+      }
     } else {
       finalModelId = aiEntity.id;
     }

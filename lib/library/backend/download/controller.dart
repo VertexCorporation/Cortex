@@ -2,8 +2,11 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:cortex/notifications/introvert.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:collection/collection.dart';
@@ -74,12 +77,18 @@ class ModelDownloadController {
         debugPrint(
             "[DownloadController] Not enough storage. Free: ${freeStorage}MB, Required: ${sizeInMB +
                 buffer}MB");
-        // We can't easily show a Toast here without a scaffold key or overlay,
-        // but we can abort and let the UI stay in "Download" state (not loading).
-        // Or we can throw to trigger the error state.
-        // Better: throw a specific exception message.
-        throw Exception(
-            "Insufficient storage space via SystemInfoProvider check.");
+        if (context.mounted) {
+          final l10n = AppLocalizations.of(context);
+          final errorMessage = l10n?.errorInsufficientStorage ??
+              "Insufficient storage space to download this model.";
+          Provider
+              .of<IntrovertNotificationService>(context, listen: false)
+              .showNotification(
+            message: errorMessage,
+            type: NotificationType.error,
+          );
+        }
+        return;
       }
     }
 

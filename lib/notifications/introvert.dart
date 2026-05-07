@@ -2,7 +2,8 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import 'package:cortex/server/user.dart';
 
 enum NotificationType { success, error, neutral }
 
@@ -17,12 +18,12 @@ class _NotificationStyle {
       case NotificationType.success:
         return _NotificationStyle(
           backgroundColor: Colors.green.shade500,
-          icon: Icons.check_circle_outline,
+          icon: Icons.check_circle,
         );
       case NotificationType.error:
         return _NotificationStyle(
           backgroundColor: Colors.red.shade500,
-          icon: Icons.highlight_off,
+          icon: Icons.cancel,
         );
       case NotificationType.neutral:
         return _NotificationStyle(
@@ -67,9 +68,6 @@ class IntrovertNotificationService {
     dismissCurrentNotification();
 
 
-
-
-
     _showOverlayNotification(
       message: message,
       type: type,
@@ -112,13 +110,14 @@ class IntrovertNotificationService {
 
         return Builder(
           builder: (context) {
-
             // --- POSITIONING LOGIC (Restored from your working code) ---
             double? leftPos;
             double? rightPos;
             double? explicitWidth;
             double bottomPosition;
             double maxWidthConstraint;
+
+            bool centerInAxon = false;
 
             if (isAxonMode && axonWidth > 0) {
               // --- AXON MODE ---
@@ -128,8 +127,17 @@ class IntrovertNotificationService {
               explicitWidth = axonWidth;
 
               // Footer Height (~10.5%) + Banner Height
-              final double footerHeight = screenH * 0.105;
-              bottomPosition = footerHeight;
+              final double footerHeight = screenH * 0.08;
+              bottomPosition = footerHeight * (2 / 3);
+
+              // If the login button is present (anonymous user), push notifications higher
+              try {
+                final isAnonymous = Provider.of<UserProvider>(context, listen: false).isAnonymous;
+                if (isAnonymous) {
+                  bottomPosition = screenH * 0.15;
+                  centerInAxon = true;
+                }
+              } catch (_) {}
 
               maxWidthConstraint = axonWidth * 0.90;
             } else {
@@ -174,37 +182,44 @@ class IntrovertNotificationService {
                   left: leftPos,
                   right: rightPos,
                   width: explicitWidth,
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: maxWidthConstraint),
-                      child: _AnimatedNotification(
-                        message: message,
-                        backgroundColor: style.backgroundColor,
-                        icon: style.icon,
-                        textColor: Colors.white,
-                        duration: duration,
-                        fontSize: 13.5,
-                        // Fixed Style
-                        oneLine: oneLine,
-                        registerDismiss: (dismissFn) {
-                          _activeNotification = _ActiveNotificationHandle(
-                            entry: entry,
-                            dismiss: dismissFn,
-                            isAxonMode: isAxonMode,
-                          );
-                        },
-                        onRemove: () {
-                          try {
-                            entry.remove();
-                          } catch (_) {}
-                          if (_activeNotification?.entry == entry) {
-                            _activeNotification = null;
-                          }
-                        },
-                        onTap: () {
-                          dismissCurrentNotification();
-                          onTap?.call();
-                        },
+                  child: Align(
+                    alignment: (isAxonMode && !centerInAxon) ? Alignment.centerLeft : Alignment.center,
+                    child: Padding(
+                      padding: (isAxonMode && !centerInAxon)
+                          ? const EdgeInsets.only(left: 16.0)
+                          : EdgeInsets.zero,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                            maxWidth: maxWidthConstraint),
+                        child: _AnimatedNotification(
+                          message: message,
+                          backgroundColor: style.backgroundColor,
+                          icon: style.icon,
+                          textColor: Colors.white,
+                          duration: duration,
+                          fontSize: 13.5,
+                          // Fixed Style
+                          oneLine: oneLine,
+                          registerDismiss: (dismissFn) {
+                            _activeNotification = _ActiveNotificationHandle(
+                              entry: entry,
+                              dismiss: dismissFn,
+                              isAxonMode: isAxonMode,
+                            );
+                          },
+                          onRemove: () {
+                            try {
+                              entry.remove();
+                            } catch (_) {}
+                            if (_activeNotification?.entry == entry) {
+                              _activeNotification = null;
+                            }
+                          },
+                          onTap: () {
+                            dismissCurrentNotification();
+                            onTap?.call();
+                          },
+                        ),
                       ),
                     ),
                   ),

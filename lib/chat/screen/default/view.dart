@@ -7,8 +7,15 @@ import 'package:provider/provider.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/chat/providers/session.dart';
+import 'package:cortex/library/providers/catalog.dart';
+import 'package:cortex/library/providers/local.dart';
+import 'package:cortex/chat/providers/input.dart';
+import 'package:cortex/chat/services/select.dart';
+import 'package:cortex/main.dart';
+import 'package:cortex/server/user.dart';
+import 'package:cortex/navigation.dart';
+import 'package:cortex/login/upgrade.dart';
 import '../../../../app.dart';
-import '../../../../webview.dart';
 
 class ChatEmptyState extends StatefulWidget {
   final double bottomPadding;
@@ -27,6 +34,14 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
 
   // 2. Entrance Animation (On Load)
   late AnimationController _entranceController;
+
+  // 2.5 Timed sequence (description <-> buttons)
+  late final AnimationController _swapController;
+  int _sequenceToken = 0;
+
+  // 2.6 Bounce Animation (Cortex Icon Tap)
+  late AnimationController _bounceController;
+  late Animation<double> _bounceAnimation;
 
   // 3. Mode Transition Animation (Standard <-> Flux)
   late AnimationController _modeController;
@@ -59,6 +74,24 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     );
     _entranceController.forward();
 
+    _swapController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+
+    // --- Bounce Setup (for Cortex icon tap) ---
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _bounceAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.85), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 0.85, end: 1.0), weight: 50),
+    ]).animate(CurvedAnimation(
+      parent: _bounceController,
+      curve: Curves.easeInOut,
+    ));
+
     // --- Mode Transition Setup ---
     _modeController = AnimationController(
       vsync: this,
@@ -69,29 +102,390 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
       parent: _modeController,
       curve: Curves.easeInOutCubic,
     );
+
+    _startStandardDefaultSequence();
   }
+
+  bool _isVisible = true;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    
+    // TickerMode Visibility Handling
+    final isVisible = TickerMode.of(context);
+    if (_isVisible != isVisible) {
+      _isVisible = isVisible;
+      if (!isVisible) {
+        // Stop async sequence loop when hidden
+        _sequenceToken++;
+      } else {
+        // Resume sequence when visible
+        _startStandardDefaultSequence();
+      }
+    }
 
+    // Flux Mode State Handling
     final isFlux = context.read<ChatSessionProvider>().isFluxMode;
 
     // Initialize state on first run
     if (_wasFluxMode == null) {
       _wasFluxMode = isFlux;
-      _modeController.value = isFlux ? 1.0 : 0.0;
+      if (isFlux) {
+        _modeController.value = 1.0;
+        _sequenceToken++;
+      }
       return;
     }
 
-    // Trigger animation if state changed
+    // Handle subsequent mode changes
     if (_wasFluxMode != isFlux) {
       _wasFluxMode = isFlux;
       if (isFlux) {
+        _sequenceToken++; // Cancel text cycle
         _modeController.forward();
       } else {
         _modeController.reverse();
+        _startStandardDefaultSequence();
       }
+    }
+  }
+
+  void _startStandardDefaultSequence([bool? startingWithButtonsOverride]) {
+    final int token = ++_sequenceToken;
+
+    // Kick a rebuild in case we were mid-state (e.g. widget recreated).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _sequenceToken != token) return;
+      setState(() {});
+    });
+
+    () async {
+      // Determine starting mode based on current _swapController value
+      final bool startingWithButtons =
+          startingWithButtonsOverride ?? (_swapController.value > 0.5);
+
+      if (startingWithButtons) {
+        // We're in Button Mode — wait 8s, then crossfade to text
+        await Future.delayed(const Duration(seconds: 8));
+        if (!mounted || _sequenceToken != token) return;
+
+        await _swapController.reverse(from: 1.0).catchError((_) {});
+        if (!mounted || _sequenceToken != token) return;
+      }
+
+      // Infinite loop: Text(4s) -> Buttons(8s) -> repeat
+      while (mounted && _sequenceToken == token) {
+        // Text mode for 4 seconds
+        await Future.delayed(const Duration(seconds: 4));
+        if (!mounted || _sequenceToken != token) return;
+
+        // Crossfade to buttons
+        await _swapController.forward(from: 0.0).catchError((_) {});
+        if (!mounted || _sequenceToken != token) return;
+
+        // Button mode for 8 seconds
+        await Future.delayed(const Duration(seconds: 8));
+        if (!mounted || _sequenceToken != token) return;
+
+        // Crossfade back to text
+        await _swapController.reverse(from: 1.0).catchError((_) {});
+        if (!mounted || _sequenceToken != token) return;
+      }
+    }();
+  }
+
+  void _handleIconTap() {
+    HapticFeedback.lightImpact();
+
+    // 1. Play bounce animation
+    _bounceController.forward(from: 0.0);
+
+    bool targetAsButtons;
+    // 2. Toggle current mode (let animation complete naturally)
+    if (_swapController.value > 0.5) {
+      // Currently showing buttons -> switch to text
+      _swapController.reverse();
+      targetAsButtons = false;
+    } else {
+      // Currently showing text -> switch to buttons
+      _swapController.forward();
+      targetAsButtons = true;
+    }
+
+    // 3. Restart the timer loop for the new mode
+    _startStandardDefaultSequence(targetAsButtons);
+  }
+
+
+
+  Widget _buildFeatureButtons(BuildContext context, AppLocalizations l10n) {
+    context.watch<ThemeProvider>();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final horizontalPadding = screenWidth * 0.02;
+    final buttonSpacing = screenWidth * 0.04;
+    final rowSpacing = screenHeight * 0.012;
+    final buttonHeight = screenHeight * 0.05;
+    final iconSize = screenWidth * 0.052;
+    final fontSize = screenWidth * 0.03;
+    final borderRadius = screenWidth * 0.12;
+
+    final catalog = context.watch<ModelCatalogProvider>();
+
+    final hasImage = catalog.allModels
+        .any((m) => m.outputs['image'] == true || m.category == 'image');
+    final hasVideo = catalog.allModels
+        .any((m) => m.outputs['video'] == true || m.category == 'video');
+    final hasAudio = catalog.allModels
+        .any((m) => m.outputs['audio'] == true || m.category == 'audio');
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: horizontalPadding,
+        right: horizontalPadding,
+        top: buttonHeight * 0.15,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: _buildBoxButton(
+                  context,
+                  width: null,
+                  height: buttonHeight,
+                  iconSize: iconSize,
+                  fontSize: fontSize,
+                  borderRadius: borderRadius,
+                  buttonSpacing: buttonSpacing,
+                  iconPath: 'assets/icons/make.svg',
+                  title: l10n.featureCreateImageTitle,
+                  iconColor: AppColors.background.inverted.withValues(alpha: 0.2),
+                  isDisabled: !hasImage,
+                  onTap: () => _handleGeneration(context, 'image'),
+                ),
+              ),
+              SizedBox(width: buttonSpacing),
+              Expanded(
+                child: _buildBoxButton(
+                  context,
+                  width: null,
+                  height: buttonHeight,
+                  iconSize: iconSize,
+                  fontSize: fontSize,
+                  borderRadius: borderRadius,
+                  buttonSpacing: buttonSpacing,
+                  iconPath: 'assets/icons/transition.svg',
+                  title: l10n.featureCreateVideoTitle,
+                  iconColor: AppColors.background.inverted.withValues(alpha: 0.2),
+                  isDisabled: !hasVideo,
+                  isPremiumFeature: true,
+                  onTap: () => _handleGeneration(context, 'video'),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: rowSpacing),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: _buildBoxButton(
+                  context,
+                  width: null,
+                  height: buttonHeight,
+                  iconSize: iconSize,
+                  fontSize: fontSize,
+                  borderRadius: borderRadius,
+                  buttonSpacing: buttonSpacing,
+                  iconPath: 'assets/icons/voice.svg',
+                  title: l10n.featureCreateAudioTitle,
+                  iconColor: AppColors.background.inverted.withValues(alpha: 0.2),
+                  isDisabled: !hasAudio,
+                  onTap: () => _handleGeneration(context, 'audio'),
+                ),
+              ),
+              SizedBox(width: buttonSpacing),
+              Expanded(
+                child: _buildBoxButton(
+                  context,
+                  width: null,
+                  height: buttonHeight,
+                  iconSize: iconSize,
+                  fontSize: fontSize,
+                  borderRadius: borderRadius,
+                  buttonSpacing: buttonSpacing,
+                  iconPath: 'assets/icons/context.svg',
+                  title: l10n.useOffline,
+                  iconColor: AppColors.background.inverted.withValues(alpha: 0.2),
+                  isDisabled: false,
+                  onTap: () => _handleOfflineAction(context),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBoxButton(
+    BuildContext context, {
+    double? width,
+    required double height,
+    required double iconSize,
+    required double fontSize,
+    required double borderRadius,
+    required double buttonSpacing,
+    required String iconPath,
+    required String title,
+    required Color iconColor,
+    required bool isDisabled,
+    required VoidCallback onTap,
+    bool isPremiumFeature = false,
+  }) {
+    final horizontalPadding = MediaQuery.of(context).size.width * 0.018;
+
+    final border = BorderRadius.circular(borderRadius);
+
+    return Opacity(
+      opacity: isDisabled ? 0.4 : 1.0,
+      child: Material(
+        color: AppColors.background,
+        borderRadius: border,
+        child: InkWell(
+          borderRadius: border,
+          onTap: isDisabled ? null : onTap,
+          splashColor: iconColor.withValues(alpha: 0.14),
+          highlightColor: iconColor.withValues(alpha: 0.06),
+          child: Container(
+            width: width,
+            height: height,
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            decoration: BoxDecoration(
+              color: AppColors.background.withValues(alpha: 0.4),
+              border: Border.all(
+                color: AppColors.border,
+                width: 0.5,
+              ),
+              borderRadius: border,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(
+                  iconPath,
+                  width: iconSize,
+                  height: iconSize,
+                  colorFilter: ColorFilter.mode(
+                    AppColors.primaryColor.inverted,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                SizedBox(width: buttonSpacing * 0.35),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            color: AppColors.primaryColor.inverted,
+                            fontSize: fontSize,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (isPremiumFeature) ...[
+                          SizedBox(width: buttonSpacing * 0.2),
+                          SvgPicture.asset(
+                            'assets/icons/sparkle.svg',
+                            width: fontSize * 0.9,
+                            height: fontSize * 0.9,
+                            colorFilter: ColorFilter.mode(
+                              AppColors.primaryColor.inverted,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _handleGeneration(BuildContext context, String targetType) {
+    if (targetType == 'video') {
+      final userProvider = context.read<UserProvider>();
+      if (userProvider.isAnonymous) {
+        navigateToScreen(const UpgradeAccountScreen(showLoginFirst: true),
+            direction: const Offset(0, 1));
+        return;
+      }
+    }
+
+    final catalog = context.read<ModelCatalogProvider>();
+    final session = context.read<ChatSessionProvider>();
+    final inputProvider = context.read<InputProvider>();
+    final selectionService = context.read<SelectionService>();
+
+    final candidates = catalog.allModels
+        .where((m) =>
+            m.outputs[targetType] == true || m.category == targetType)
+        .toList();
+
+    if (candidates.isEmpty) return;
+
+    final currentModel = session.selectedModel;
+    final bool currentSupportsTarget = currentModel != null &&
+        (currentModel.outputs[targetType] == true ||
+            currentModel.category == targetType);
+
+    inputProvider.clearFeatureMode();
+    inputProvider.clearWebSearch();
+
+    final targetModel = candidates.firstWhere(
+      (m) => !m.isPremium,
+      orElse: () => candidates.first,
+    );
+
+    // Select only if current model does not already support this generation type.
+    if (!currentSupportsTarget) {
+      selectionService.switchActiveModel(targetModel, context: context);
+    }
+  }
+
+  void _handleOfflineAction(BuildContext context) {
+    final catalog = context.read<ModelCatalogProvider>();
+    final local = context.read<ModelLocalStateProvider>();
+    final selectionService = context.read<SelectionService>();
+    final inputProvider = context.read<InputProvider>();
+
+    final offlineModels = catalog.allModels.where((m) => m.type == 'offline');
+    final downloadedModels = offlineModels.where((m) {
+      final path = local.getFilePathById(m.id);
+      return local.isModelOnDisk(path);
+    }).toList();
+
+    if (downloadedModels.isNotEmpty) {
+      inputProvider.clearWebSearch();
+      inputProvider.setFeatureMode(ChatInputMode.offline);
+      selectionService.switchActiveModel(downloadedModels.first,
+          context: context);
+    } else {
+      mainScreenKey.currentState?.switchToLibrary(pulse: true);
     }
   }
 
@@ -99,6 +493,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
   void dispose() {
     _breathingController.dispose();
     _entranceController.dispose();
+    _swapController.dispose();
+    _bounceController.dispose();
     _modeController.dispose();
     super.dispose();
   }
@@ -150,9 +546,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     // Colors
     final Color contentColor = AppColors.primaryColor.inverted;
 
-    final double logoSize = isDesktop
-        ? 120.0
-        : (isTablet ? screenWidth * 0.16 : screenWidth * 0.22);
+    final double logoSize =
+        isDesktop ? 120.0 : (isTablet ? screenWidth * 0.2 : screenWidth * 0.16);
 
     final double verticalSpacing = screenHeight * 0.025;
 
@@ -212,28 +607,30 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                               (_modeAnimation.value * 0.2),
                                           child: ScaleTransition(
                                             scale: _breathingScaleAnimation,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                if (_modeAnimation.value <
-                                                    0.5) {
-                                                  HapticFeedback.lightImpact();
-                                                  showAppWebViewModal(
-                                                      context,
-                                                      "Vertex",
-                                                      "https://vertexishere.com");
-                                                }
+                                            child: AnimatedBuilder(
+                                              animation: _bounceAnimation,
+                                              builder: (context, child) {
+                                                return Transform.scale(
+                                                  scale: _bounceAnimation.value,
+                                                  child: child,
+                                                );
                                               },
-                                              iconSize: logoSize,
-                                              padding: EdgeInsets.zero,
-                                              icon: SvgPicture.asset(
-                                                'assets/cortex.svg',
-                                                width: logoSize,
-                                                height: logoSize,
-                                                fit: BoxFit.contain,
-                                                colorFilter: ColorFilter.mode(
-                                                  AppColors
-                                                      .primaryColor.inverted,
-                                                  BlendMode.srcIn,
+                                              child: IconButton(
+                                                onPressed: _modeAnimation.value < 0.5
+                                                    ? _handleIconTap
+                                                    : null,
+                                                iconSize: logoSize,
+                                                padding: EdgeInsets.zero,
+                                                icon: SvgPicture.asset(
+                                                  'assets/cortex.svg',
+                                                  width: logoSize,
+                                                  height: logoSize,
+                                                  fit: BoxFit.fitWidth,
+                                                  colorFilter: ColorFilter.mode(
+                                                    AppColors
+                                                        .primaryColor.inverted,
+                                                    BlendMode.srcIn,
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -304,25 +701,97 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                               ),
                                             ),
                                             SizedBox(
-                                                height: verticalSpacing * 0.6),
+                                                height: verticalSpacing * 0.5),
 
-                                            // Description (Standard)
-                                            _buildEntranceItem(
-                                              startTime: 0.2,
-                                              endTime: 0.7,
-                                              child: Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: logoSize * 0.1),
-                                                child: Text(
-                                                  l10n.defaultViewDescription,
-                                                  style: TextStyle(
-                                                    fontSize: bodyFontSize,
-                                                    color: contentColor
-                                                        .withValues(alpha: 0.8),
-                                                    height: 1.5,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
+                                            // Description <-> Buttons (Timed, smooth crossfade, same position)
+                                            SizedBox(
+                                              height:
+                                                  (screenHeight * 0.05) * 2 +
+                                                      (screenHeight * 0.018) +
+                                                      (screenHeight * 0.03),
+                                              child: AnimatedBuilder(
+                                                animation: _swapController,
+                                                builder: (context, _) {
+                                                  final t =
+                                                      _swapController.value;
+                                                  final descOpacity =
+                                                      (1.0 - t).clamp(0.0, 1.0);
+                                                  final btnOpacity =
+                                                      t.clamp(0.0, 1.0);
+                                                  
+                                                  // Adding smooth sliding transition similar to a cube effect
+                                                  final descOffset = Offset(0, 30.0 * t);
+                                                  final btnOffset = Offset(0, -30.0 * (1 - t));
+
+                                                  return Stack(
+                                                    alignment: Alignment.topCenter,
+                                                    children: [
+                                                      IgnorePointer(
+                                                        ignoring:
+                                                            descOpacity < 0.05,
+                                                        child: RepaintBoundary(
+                                                          child: Transform.translate(
+                                                            offset: descOffset,
+                                                            child: Opacity(
+                                                              opacity: descOpacity,
+                                                              child:
+                                                                  _buildEntranceItem(
+                                                                startTime: 0.1,
+                                                                endTime: 0.6,
+                                                                child: Padding(
+                                                                  padding: EdgeInsets
+                                                                      .symmetric(
+                                                                    horizontal:
+                                                                        logoSize *
+                                                                            0.1,
+                                                                  ),
+                                                                  child: Text(
+                                                                    l10n.defaultViewDescription,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          bodyFontSize,
+                                                                      color: contentColor
+                                                                          .withValues(
+                                                                              alpha:
+                                                                                  0.8),
+                                                                      height: 1.5,
+                                                                    ),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      IgnorePointer(
+                                                        ignoring:
+                                                            btnOpacity < 0.05,
+                                                        child: RepaintBoundary(
+                                                          child: Transform.translate(
+                                                            offset: btnOffset,
+                                                            child: Opacity(
+                                                              opacity: btnOpacity,
+                                                              child: Padding(
+                                                                padding: EdgeInsets.symmetric(
+                                                                  horizontal: logoSize * 0.1,
+                                                                ),
+                                                                child:
+                                                                    _buildFeatureButtons(
+                                                                  context,
+                                                                  l10n,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
                                               ),
                                             ),
                                           ],

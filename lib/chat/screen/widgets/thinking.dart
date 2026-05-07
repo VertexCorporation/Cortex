@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:cortex/theme.dart';
 import 'package:cortex/l10n/app_localizations.dart';
-import '../../messages/parser.dart';
+import 'package:cortex/chat/messages/markdown/parser.dart';
 
 class ThinkingWidget extends StatefulWidget {
   final String content;

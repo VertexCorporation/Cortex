@@ -29,6 +29,13 @@ Future<T?> navigateToScreen<T extends Object?>(Widget screen,
   final Offset effectiveDirection =
       isRtl ? Offset(-direction.dx, direction.dy) : direction;
 
+  final slideTween = Tween<Offset>(begin: effectiveDirection, end: Offset.zero)
+      .chain(CurveTween(curve: Curves.easeOutCubic));
+  final scaleTween = Tween<double>(begin: 0.95, end: 1.0)
+      .chain(CurveTween(curve: Curves.easeOutCubic));
+  final fadeTween = Tween<double>(begin: 0.0, end: 1.0)
+      .chain(CurveTween(curve: const Interval(0.0, 0.6, curve: Curves.easeIn)));
+
   final route = PageRouteBuilder<T>(
     // The new screen widget itself.
     pageBuilder: (_, __, ___) => screen,
@@ -42,32 +49,16 @@ Future<T?> navigateToScreen<T extends Object?>(Widget screen,
 
     // The core of the custom animation.
     transitionsBuilder: (_, animation, secondaryAnimation, child) {
-      final slideTween = Tween<Offset>(
-        begin: effectiveDirection, // Use the language-aware direction
-        end: Offset.zero,
+      return FadeTransition(
+        opacity: animation.drive(fadeTween),
+        child: ScaleTransition(
+          scale: animation.drive(scaleTween),
+          child: SlideTransition(
+            position: animation.drive(slideTween),
+            child: child,
+          ),
+        ),
       );
-      final curvedAnimation = CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeOutCubic, // A smooth, decelerating curve.
-      );
-      final slideTransition = SlideTransition(
-        position: slideTween.animate(curvedAnimation),
-        child: child,
-      );
-      final scaleTween = Tween<double>(begin: 0.95, end: 1.0);
-      final scaleTransition = ScaleTransition(
-        scale: scaleTween.animate(curvedAnimation),
-        child: slideTransition,
-      );
-      final fadeAnimation = CurvedAnimation(
-        parent: animation,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
-      );
-      final fadeTransition = FadeTransition(
-        opacity: fadeAnimation,
-        child: scaleTransition,
-      );
-      return fadeTransition;
     },
   );
 

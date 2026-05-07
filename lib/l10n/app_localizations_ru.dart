@@ -494,6 +494,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get shareApp => 'Поделиться приложением';
 
   @override
+  String get ourStory => 'Наша история';
+
+  @override
   String get rateUs => 'Оцените нас';
 
   @override
@@ -1084,6 +1087,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get news => 'Новости';
 
   @override
+  String get createAI => 'Создавать';
+
+  @override
+  String get shortcuts => 'Ярлыки';
+
+  @override
   String get allModels => 'Все модели';
 
   @override
@@ -1583,6 +1592,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
+  String get featureCreateVideoTitle => 'Создать видео';
+
+  @override
+  String get featureCreateVideoDescription =>
+      'Создавайте видеоролики из текста.';
+
+  @override
   String get featureStudyTitle => 'Учитесь и получайте знания';
 
   @override
@@ -1890,4 +1906,58 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => 'аудиофайл';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesName — это продвинутый интеллект, демонстрирующий высокую производительность в Cortex.';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelName — это высокопроизводительный искусственный интеллект, интегрированный в экосистему Cortex. Разработанный для решения широкого круга сложных задач, он обеспечивает высоконадежные и эффективные возможности обработки. Предлагая быстрое время отклика и расширенные аналитические возможности, он значительно повышает вашу повседневную производительность. Безупречно работая в безопасной локальной инфраструктуре Cortex, эта модель может помочь вам в широком спектре задач: от творческого мозгового штурма до глубокого технического анализа. Начните изучать весь его потенциал сегодня.';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle => 'Вам нравится интеллект Кортекса?';
+
+  @override
+  String get guestLimitBottomSheetText =>
+      'Работайте с еще более совершенными системами искусственного интеллекта, создавайте больше контента, больше общайтесь и делайте многое другое...';
+
+  @override
+  String get arts => 'Искусство';
+
+  @override
+  String get noArt => 'Нет искусства';
+
+  @override
+  String get noArtDescription =>
+      'Пока здесь нет работ; пришло время наполнить галерею изображениями, видео, аудио и всевозможным контентом!';
+
+  @override
+  String get videoPremiumWarning =>
+      'Для создания видеороликов вам потребуется подписка Ultra. Оформите подписку прямо сейчас и почувствуйте весь процесс!';
+
+  @override
+  String get becomePremiumButton => 'Станьте премиум-пользователем';
+
+  @override
+  String get fallbackInfoPanelText =>
+      'В связи с некоторыми улучшениями, которые мы вносим на стороне сервера, ответ был сгенерирован динамическим чатом Cortex, а не выбранным вами ИИ. Благодарим вас за понимание до завершения процесса!';
+
+  @override
+  String get falOfflineMessage =>
+      'В связи с проведением работ по модернизации серверной части, эта функция в настоящее время недоступна. Благодарим вас за понимание до завершения процесса!';
+
+  @override
+  String get errorInsufficientStorage =>
+      'Недостаточно места для загрузки этой модели.';
+
+  @override
+  String get backgroundChatNotificationTitle => 'Вернуться в чат!';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return 'В чате $chatName появилось новое сообщение, посмотрите!';
+  }
 }

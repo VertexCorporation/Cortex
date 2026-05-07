@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import '../../../backend/data/entity.dart';
 import '../../../backend/download/download.dart';
 import '../../../backend/utils.dart';
+import 'package:cortex/library/utils.dart';
 import 'cards.dart';
 
 class ModelCategorySection extends StatefulWidget {
@@ -110,7 +111,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
           : startIndex + modelsPerColumn;
 
       final List<ModelEntity> columnModels =
-          widget.models.sublist(startIndex, endIndex);
+      widget.models.sublist(startIndex, endIndex);
 
       columns.add(
         Padding(
@@ -119,9 +120,34 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: columnModels.map((model) {
-              final isDownloaded = widget.downloadedStates[model.id] ?? false;
-              final manager =
-                  model.isServerSide ? null : widget.downloadManagers[model.id];
+              bool isDownloaded = widget.downloadedStates[model.id] ?? false;
+              DownloadManager? manager =
+              model.isServerSide ? null : widget.downloadManagers[model.id];
+
+              // Offline Series Dashboard Logic: check variants for active metrics
+              if (!model.isServerSide &&
+                  (model.variants?.isNotEmpty ?? false)) {
+                bool anyVariantDownloaded = false;
+                bool anyVariantDownloading = false;
+                DownloadManager? activeVariantManager;
+
+                for (final variantKey in model.variants!.keys) {
+                  if (widget.downloadedStates[variantKey] == true) {
+                    anyVariantDownloaded = true;
+                  }
+                  final m = widget.downloadManagers[variantKey];
+                  if (m != null && (m.isDownloading || m.isPaused)) {
+                    anyVariantDownloading = true;
+                    activeVariantManager = m;
+                  }
+                }
+
+                isDownloaded = anyVariantDownloaded;
+                if (anyVariantDownloading && activeVariantManager != null) {
+                  manager = activeVariantManager;
+                }
+              }
+
               final compatibilityStatus = isDownloaded
                   ? CompatibilityStatus.compatible
                   : widget.getCompatibilityStatus(model.size);
@@ -138,19 +164,47 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
                   HapticFeedback.mediumImpact();
                   await widget.onRemovePressed(model.id, model.displayTitle);
                 },
-                onChatPressed: () => widget.onChatPressed(
-                  model.id,
-                  model.isServerSide,
-                  isCustomModel: model.isCustomModel,
-                  modelPath: null,
-                ),
-                onDownloadPressed: () => widget.onDownloadPressed(
-                  id: model.id,
-                  url: model.url,
-                  title: model.displayTitle,
-                ),
-                onCancelDownload: () => widget.onCancelDownload(model.id),
-                onResumeDownload: () => widget.onResumeDownload(model.id),
+                onChatPressed: () =>
+                    widget.onChatPressed(
+                      model.id,
+                      model.isServerSide,
+                      isCustomModel: model.isCustomModel,
+                      modelPath: null,
+                    ),
+                onDownloadPressed: () {
+                    final isOfflineSeries = !model.isServerSide && (model.variants?.isNotEmpty ?? false);
+                    widget.onDownloadPressed(
+                      id: isOfflineSeries ? (ModelDataUtils.getOptimalVariantId(model) ?? model.id) : model.id,
+                      url: isOfflineSeries ? ModelDataUtils.getOptimalDownloadUrl(model) : model.url,
+                      title: model.displayTitle,
+                    );
+                },
+                onCancelDownload: () {
+                  if (!model.isServerSide &&
+                      (model.variants?.isNotEmpty ?? false)) {
+                    for (final variantKey in model.variants!.keys) {
+                      final m = widget.downloadManagers[variantKey];
+                      if (m != null && (m.isDownloading || m.isPaused)) {
+                        widget.onCancelDownload(variantKey);
+                      }
+                    }
+                  } else {
+                    widget.onCancelDownload(model.id);
+                  }
+                },
+                onResumeDownload: () {
+                  if (!model.isServerSide &&
+                      (model.variants?.isNotEmpty ?? false)) {
+                    for (final variantKey in model.variants!.keys) {
+                      final m = widget.downloadManagers[variantKey];
+                      if (m != null && m.isPaused) {
+                        widget.onResumeDownload(variantKey);
+                      }
+                    }
+                  } else {
+                    widget.onResumeDownload(model.id);
+                  }
+                },
               );
             }).toList(),
           ),
@@ -166,7 +220,10 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
       return const SizedBox.shrink();
     }
 
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     const double horizontalPaddingRatio = 0.04;
     final double sectionHPad = screenWidth * horizontalPaddingRatio;
 
@@ -246,7 +303,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
           final double maxDesiredWidth =
               originalContentWidth + maxExpansionInPixels;
           final double targetWidth =
-              (maxDesiredWidth < screenWidth) ? maxDesiredWidth : screenWidth;
+          (maxDesiredWidth < screenWidth) ? maxDesiredWidth : screenWidth;
           final double maxTargetScale = (originalContentWidth > 0)
               ? targetWidth / originalContentWidth
               : 1.0;
@@ -282,7 +339,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
   Widget _buildHeader(double screenWidth) {
     return Padding(
       padding:
-          EdgeInsets.only(top: screenWidth * 0.02, bottom: screenWidth * 0.01),
+      EdgeInsets.only(top: screenWidth * 0.02, bottom: screenWidth * 0.01),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

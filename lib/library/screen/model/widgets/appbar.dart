@@ -215,6 +215,15 @@ class DetailAppBarState extends State<DetailAppBar>
 
     if (variantEntities.isEmpty) return;
 
+    variantEntities.sort((a, b) {
+      final aRam = a.ram ?? 999999;
+      final bRam = b.ram ?? 999999;
+      if (aRam != bRam) return aRam.compareTo(bRam);
+      final aSize = a.size ?? 999999;
+      final bSize = b.size ?? 999999;
+      return aSize.compareTo(bSize);
+    });
+
     final overlay = Overlay.of(context, rootOverlay: true);
 
     _variantOverlayEntry = OverlayEntry(
@@ -297,7 +306,7 @@ class DetailAppBarState extends State<DetailAppBar>
     final titleText = Text(
       provider.displayTitle,
       style: TextStyle(
-          fontFamily: 'Roboto',
+          fontFamily: 'Inter',
           color: AppColors.primaryColor.inverted,
           fontSize: titleFontSize,
           fontWeight: FontWeight.bold),

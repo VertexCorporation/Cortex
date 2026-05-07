@@ -477,6 +477,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get shareApp => '分享应用';
 
   @override
+  String get ourStory => '我们的故事';
+
+  @override
   String get rateUs => '给我们评分';
 
   @override
@@ -1030,6 +1033,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get news => '消息';
 
   @override
+  String get createAI => 'Create';
+
+  @override
+  String get shortcuts => 'Shortcuts';
+
+  @override
   String get allModels => '所有模型';
 
   @override
@@ -1490,6 +1499,12 @@ class AppLocalizationsZh extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
+  String get featureCreateVideoTitle => '制作视频';
+
+  @override
+  String get featureCreateVideoDescription => '将文本生成视频。';
+
+  @override
   String get featureStudyTitle => '学习';
 
   @override
@@ -1776,4 +1791,54 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mediaTypeAudio => '音频文件';
+
+  @override
+  String defaultSeriesDescription(String seriesName) {
+    return '$seriesName是一款在Cortex上展现出高性能的先进智能。';
+  }
+
+  @override
+  String defaultModelDescription(String modelName) {
+    return '$modelName是集成在Cortex生态系统内的高性能人工智能。旨在克服各种复杂任务，提供高度可靠高效的处理能力。通过提供快速响应时间和高级分析能力，它能显著提高您的日常生产力。该模型能够在Cortex的安全本地基础设施上无缝运行，协助您完成从创意头脑风暴到深度技术分析等各种任务。今天就开始探索其全部潜力吧。';
+  }
+
+  @override
+  String get guestLimitBottomSheetTitle => '喜欢Cortex的智能吗？';
+
+  @override
+  String get guestLimitBottomSheetText => '与更智能的智能体合作，创作更多内容，畅聊更多，完成更多事情……';
+
+  @override
+  String get arts => '艺术';
+
+  @override
+  String get noArt => '无艺术';
+
+  @override
+  String get noArtDescription => '目前还没有作品；是时候通过创作图像、视频、音频和各种内容来填满画廊了！';
+
+  @override
+  String get videoPremiumWarning => '您需要 Ultra 会员资格才能生成视频，立即升级，体验流畅体验！';
+
+  @override
+  String get becomePremiumButton => '升级至高级会员';
+
+  @override
+  String get fallbackInfoPanelText =>
+      '由于我们正在对服务器端进行一些改进，因此回复是由 Cortex 的动态聊天功能生成的，而不是您专门选择的 AI。感谢您的理解，我们将尽快完成改进！';
+
+  @override
+  String get falOfflineMessage =>
+      '由于服务器端正在进行一些改进，此智能服务目前暂时离线。感谢您的理解，我们将尽快完成升级！';
+
+  @override
+  String get errorInsufficientStorage => '存储空间不足，无法下载此模型。';
+
+  @override
+  String get backgroundChatNotificationTitle => '返回聊天室！';
+
+  @override
+  String backgroundChatNotificationBody(String chatName) {
+    return '$chatName 中有一条新消息，快来看看吧！';
+  }
 }
