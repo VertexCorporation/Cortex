@@ -10,28 +10,20 @@ class ChatLimitManager {
   const ChatLimitManager({
     required int cortexSubscription,
     Timestamp? subscriptionExpiresAt,
-  })
-      : _cortexSubscription = cortexSubscription,
+  })  : _cortexSubscription = cortexSubscription,
         _subscriptionExpiresAt = subscriptionExpiresAt;
 
-  /// Calculates the true, trusted subscription level by handling both
-  /// standard time-based subscriptions (1, 2, 3) and
-  /// lifetime/manual subscriptions (4, 5, 6).
+  /// Calculates the true, trusted subscription level by requiring the server
+  /// tier and a future expiry timestamp.
   int get _activeSubscriptionLevel {
-    // First, check for lifetime/manual subscription levels.
-    // These are always active and do not need a date check.
-    if (_cortexSubscription >= 4) {
-      return _cortexSubscription;
-    }
-
-    // If not a lifetime sub, perform the standard checks for time-based subs.
     if (_cortexSubscription == 0) {
       return 0; // Not subscribed at all.
     }
 
-    // A time-based subscription MUST have an expiration date.
     if (_subscriptionExpiresAt == null) {
-      return 0; // Missing expiration date means it's not a valid subscription.
+      return _cortexSubscription >= 4 && _cortexSubscription <= 6
+          ? _cortexSubscription
+          : 0;
     }
 
     // Check if the expiration date is in the past.

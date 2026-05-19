@@ -29,13 +29,13 @@ void showAttachmentSheet({
     isScrollControlled: true,
     useSafeArea: true,
     constraints: BoxConstraints(
-      maxWidth: MediaQuery.of(context).size.width,
+      maxWidth: MediaQuery.sizeOf(context).width,
     ),
     builder: (BuildContext modalContext) {
       // Re-query media query inside builder for correct dimensions if orientation changes
-      final mediaQuery = MediaQuery.of(context);
-      final screenWidth = mediaQuery.size.width;
-      final screenHeight = mediaQuery.size.height;
+      
+      final screenWidth = MediaQuery.sizeOf(context).width;
+      final screenHeight = MediaQuery.sizeOf(context).height;
 
       // DYNAMIC DIMENSIONS
       final double topRadius = screenWidth * 0.07;
@@ -49,7 +49,7 @@ void showAttachmentSheet({
 
       return Container(
         padding: EdgeInsets.only(
-          bottom: mediaQuery.padding.bottom + 20,
+          bottom: MediaQuery.paddingOf(context).bottom + 20,
         ),
         decoration: BoxDecoration(
           color: AppColors.background,

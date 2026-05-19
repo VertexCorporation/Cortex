@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/server/user.dart';
+import 'package:cortex/funds/backend/service.dart';
 
 enum NotificationType { success, error, neutral }
 
@@ -104,9 +105,9 @@ class IntrovertNotificationService {
     late final OverlayEntry entry;
     entry = OverlayEntry(
       builder: (context) {
-        final media = MediaQuery.of(context);
-        final double screenH = media.size.height;
-        final double screenW = media.size.width;
+        
+        final double screenH = MediaQuery.sizeOf(context).height;
+        final double screenW = MediaQuery.sizeOf(context).width;
 
         return Builder(
           builder: (context) {
@@ -130,10 +131,13 @@ class IntrovertNotificationService {
               final double footerHeight = screenH * 0.08;
               bottomPosition = footerHeight * (2 / 3);
 
-              // If the login button is present (anonymous user), push notifications higher
+              // If the login button or an offer button is present, push notifications higher
               try {
                 final isAnonymous = Provider.of<UserProvider>(context, listen: false).isAnonymous;
-                if (isAnonymous) {
+                final fundsBackend = Provider.of<FundsBackend>(context, listen: false);
+                final hasOfferButton = fundsBackend.hasFreeTrial || fundsBackend.isSpecialOfferActive;
+                
+                if (isAnonymous || hasOfferButton) {
                   bottomPosition = screenH * 0.15;
                   centerInAxon = true;
                 }
@@ -147,7 +151,7 @@ class IntrovertNotificationService {
               rightPos = 0;
               explicitWidth = null;
 
-              final keyboardInset = media.viewInsets.bottom;
+              final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
               double baseOffset;
 
               if (isChatMode) {
@@ -311,11 +315,7 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
     _dismissTimer?.cancel();
 
     _controller.reverse().then((_) {
-      if (mounted) {
-        widget.onRemove();
-      } else {
-        widget.onRemove();
-      }
+      widget.onRemove();
     });
   }
 

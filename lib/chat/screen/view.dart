@@ -15,6 +15,7 @@ import 'package:cortex/chat/services/scroll.dart';
 import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/chat/services/offline.dart';
 import 'package:cortex/initialization.dart';
+import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/server/credits.dart';
@@ -48,16 +49,18 @@ class ChatViewState extends State<ChatView>
 
   // --- UI Notifiers ---
   final ValueNotifier<bool> showScrollDownButtonNotifier =
-  ValueNotifier<bool>(false);
+      ValueNotifier<bool>(false);
   final ValueNotifier<double> bottomPanelHeightNotifier =
-  ValueNotifier<double>(0.0);
+      ValueNotifier<double>(0.0);
   final ValueNotifier<double> briefingVisibleHeightNotifier =
-  ValueNotifier<double>(0.0);
+      ValueNotifier<double>(0.0);
 
   // Constants
   static const double _briefingBottomOffset = 8.0;
+  static const Duration _keyboardRetryDelay = Duration(milliseconds: 240);
 
   String? _lastActiveOfflineModelId;
+  int _keyboardFocusGeneration = 0;
 
   // Cached references for dispose cleanup (avoid context.read in dispose)
   late final InputProvider _inputProvider;
@@ -86,7 +89,7 @@ class ChatViewState extends State<ChatView>
 
     slideAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
         .animate(CurvedAnimation(
-        parent: editPanelController, curve: Curves.easeOut));
+            parent: editPanelController, curve: Curves.easeOut));
 
     // Initialize EditService. Note: The actual TextEditingController is provided
     // by the ChatInputPanel later via updateControllers.
@@ -141,9 +144,7 @@ class ChatViewState extends State<ChatView>
     // FIX: Hide scroll button when switching models/chats
     _scrollService.hideButtonImmediately();
 
-    final langCode = session
-        .getLocale()
-        .languageCode;
+    final langCode = session.getLocale().languageCode;
     final newModelId = session.modelId;
     final newModelPath = session.modelPath;
 
@@ -177,7 +178,7 @@ class ChatViewState extends State<ChatView>
 
   void _updateBottomPanelHeight() {
     final RenderBox? box =
-    _bottomPanelKey.currentContext?.findRenderObject() as RenderBox?;
+        _bottomPanelKey.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       final newHeight = box.size.height;
       if (bottomPanelHeightNotifier.value != newHeight) {
@@ -210,24 +211,67 @@ class ChatViewState extends State<ChatView>
   }
 
   void cancelAnyActiveEdit() {
-    if (mounted && context
-        .read<InputProvider>()
-        .isEditingMode) {
+    if (mounted && context.read<InputProvider>().isEditingMode) {
       editService.cancelEditingMode();
     }
+  }
+
+  /// Requests keyboard focus on the chat input field.
+  /// Uses EditService's focus node which is always synced with ChatInputPanel's.
+  void requestKeyboardFocus({
+    int delayMs = 150,
+    int maxRetries = 8,
+    int? retryDelayMs,
+  }) {
+    if (!mounted) return;
+
+    final int generation = ++_keyboardFocusGeneration;
+    final Duration initialDelay = Duration(milliseconds: delayMs);
+    final Duration retryDelay = retryDelayMs == null
+        ? _keyboardRetryDelay
+        : Duration(milliseconds: retryDelayMs);
+
+    void attemptFocus(int attempt) {
+      if (!mounted || generation != _keyboardFocusGeneration) return;
+
+      // Akıllı iptal mekanizması: Eğer klavye zaten açıksa (viewInsets.bottom > 0),
+      // daha fazla denemeyi durdur. Bu, kullanıcının klavyeyi bilerek kapattığı
+      // durumlarda klavyenin inatla geri açılmasını engeller.
+      try {
+        final double keyboardHeight = View.of(context).viewInsets.bottom;
+        if (keyboardHeight > 0) {
+          debugPrint(
+              "[KeyboardFocus] Success! Keyboard is open on attempt $attempt.");
+          return;
+        }
+      } catch (_) {}
+
+      debugPrint("[KeyboardFocus] Attempt $attempt to show keyboard.");
+      editService.requestFocus();
+
+      if (attempt < maxRetries) {
+        Future.delayed(retryDelay, () {
+          attemptFocus(attempt + 1);
+        });
+      }
+    }
+
+    // İlk denemeyi başlat
+    Future.delayed(initialDelay, () {
+      attemptFocus(1);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     // We isolate rebuilds by using context.select instead of context.watch
-    final isLoadingMessages = context.select<ConversationProvider, bool>((
-        c) => c.isLoadingMessages);
-    final isMessagesEmpty = context.select<ConversationProvider, bool>((c) =>
-    c
-        .messages.isEmpty);
+    final isLoadingMessages =
+        context.select<ConversationProvider, bool>((c) => c.isLoadingMessages);
+    final isMessagesEmpty =
+        context.select<ConversationProvider, bool>((c) => c.messages.isEmpty);
 
-    final isVoiceModeActive = context.select<InputProvider, bool>((p) =>
-    p.isVoiceModeActive);
+    final isVoiceModeActive =
+        context.select<InputProvider, bool>((p) => p.isVoiceModeActive);
 
     // PERFORMANCE: Use granular MediaQuery accessors that do NOT subscribe
     // to viewInsets changes (keyboard). This prevents the entire ChatView
@@ -237,74 +281,87 @@ class ChatViewState extends State<ChatView>
     final screenHeight = screenSize.height;
     final bottomSafe = MediaQuery.paddingOf(context).bottom;
 
-    return Stack(
+    // By reading viewInsets.bottom, we get the exact keyboard height.
+    // Without native Edge-to-Edge window animation, this updates instantly.
+    // We then smoothly animate this change via AnimatedPadding.
+    // PERFORMANCE: To prevent the ENTIRE ChatView from rebuilding 60fps
+    // during the keyboard animation, we ONLY read viewInsets inside a Builder.
+
+    final mainStack = Stack(
       children: [
         // LAYER 1: Main Content
-        Column(
-          children: [
-            // Chat Body (Morphs into Dot)
-            Expanded(
-              child: AnimatedScale(
-                scale: isVoiceModeActive ? 0.5 : 1.0,
-                duration: const Duration(milliseconds: 300),
-                curve: isVoiceModeActive
-                    ? Curves.easeInBack
-                    : Curves.easeOutCubic,
-                child: AnimatedOpacity(
-                  opacity: isVoiceModeActive ? 0.0 : 1.0,
-                  duration: const Duration(milliseconds: 300),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 600),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    layoutBuilder:
-                        (Widget? currentChild, List<Widget> previousChildren) {
-                      return Stack(
-                        alignment: Alignment.topCenter,
-                        children: <Widget>[
-                          ...previousChildren,
-                          if (currentChild != null) currentChild,
-                        ],
-                      );
-                    },
-                    transitionBuilder:
-                        (Widget child, Animation<double> animation) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                    child: isLoadingMessages
-                        ? const MessageListSkeleton(key: ValueKey('skeleton'))
-                        : isMessagesEmpty
+        // PERFORMANCE: By placing ChatMessageList and ChatInputPanel in separate layers
+        // within a Stack, we prevent the heavy scroll list from relayouting when the
+        // keyboard opens and closes. Scaffold natively resizes the body.
+        AnimatedBuilder(
+          animation: bottomPanelHeightNotifier,
+          builder: (context, child) {
+            return Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: bottomPanelHeightNotifier.value + bottomSafe,
+              child: child!,
+            );
+          },
+          child: AnimatedScale(
+            scale: isVoiceModeActive ? 0.5 : 1.0,
+            duration: const Duration(milliseconds: 300),
+            curve: isVoiceModeActive ? Curves.easeInBack : Curves.easeOutCubic,
+            child: AnimatedOpacity(
+              opacity: isVoiceModeActive ? 0.0 : 1.0,
+              duration: const Duration(milliseconds: 300),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 600),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                layoutBuilder:
+                    (Widget? currentChild, List<Widget> previousChildren) {
+                  return Stack(
+                    alignment: Alignment.topCenter,
+                    children: <Widget>[
+                      ...previousChildren,
+                      if (currentChild != null) currentChild,
+                    ],
+                  );
+                },
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+                child: isLoadingMessages
+                    ? const MessageListSkeleton(key: ValueKey('skeleton'))
+                    : isMessagesEmpty
                         ? Container(
-                      key: const ValueKey('empty'),
-                      // Removed hardcoded alignment to allow dynamic spacing in child
-                      child: const ChatEmptyState(),
-                    )
+                            key: const ValueKey('empty'),
+                            child: const ChatEmptyState(),
+                          )
                         : ChatMessageList(
-                      key: const ValueKey('list'),
-                      scrollController: scrollController,
-                      editService: editService,
-                    ),
-                  ),
-                ),
+                            key: const ValueKey('list'),
+                            scrollController: scrollController,
+                            editService: editService,
+                          ),
               ),
             ),
+          ),
+        ),
 
-            // Bottom Panel (Slides Down)
-            AnimatedSlide(
-              offset: isVoiceModeActive
-                  ? const Offset(0, 1)
-                  : Offset.zero,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              child: SafeArea(
-                top: false,
-                bottom: true,
-                child: NotificationListener<SizeChangedLayoutNotification>(
-                  onNotification: (notification) {
-                    WidgetsBinding.instance.addPostFrameCallback(
-                            (_) => _updateBottomPanelHeight());
-                    return true;
-                  },
+        // Bottom Panel (Slides Down)
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: AnimatedSlide(
+            offset: isVoiceModeActive ? const Offset(0, 1) : Offset.zero,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: SafeArea(
+              top: false,
+              bottom: true,
+              child: NotificationListener<SizeChangedLayoutNotification>(
+                onNotification: (notification) {
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _updateBottomPanelHeight());
+                  return true;
+                },
+                child: SizeChangedLayoutNotifier(
                   child: SizedBox(
                     key: _bottomPanelKey,
                     width: double.infinity,
@@ -318,7 +375,7 @@ class ChatViewState extends State<ChatView>
                 ),
               ),
             ),
-          ],
+          ),
         ),
 
         // LAYER 2: Briefing Overlay
@@ -351,8 +408,6 @@ class ChatViewState extends State<ChatView>
         ),
 
         // LAYER 3: Scroll Down Button
-        // PERFORMANCE: keyboard-dependent MediaQuery is read ONLY here,
-        // inside this isolated AnimatedBuilder, not in the parent build().
         AnimatedBuilder(
           animation: Listenable.merge([
             showScrollDownButtonNotifier,
@@ -366,21 +421,14 @@ class ChatViewState extends State<ChatView>
             final double combinedPanelHeight =
                 basePanel + briefingH + _briefingBottomOffset + bottomSafe;
 
-            // Read keyboard state locally — only this builder rebuilds on keyboard changes.
-            final double keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
-            final bool isKeyboardOpen = keyboardHeight > 0.0;
-
-            // Pass slide offset directly to prevent Positioned nesting crash
             return _scrollService.buildScrollDownButton(
               screenWidth: screenWidth,
               screenHeight: screenHeight,
               bottomPanelHeight: combinedPanelHeight,
               showScrollDownButton: showButton,
-              isKeyboardOpen: isKeyboardOpen,
-              keyboardHeight: keyboardHeight,
-              slideOffset: isVoiceModeActive
-                  ? const Offset(0, 2)
-                  : Offset.zero,
+              isKeyboardOpen: false, // Handled by Scaffold
+              keyboardHeight: 0.0, // Handled by Scaffold
+              slideOffset: isVoiceModeActive ? const Offset(0, 2) : Offset.zero,
             );
           },
         ),
@@ -394,9 +442,22 @@ class ChatViewState extends State<ChatView>
         ),
 
         // LAYER 5: Voice Overlay (Topmost)
-        if (isVoiceModeActive)
-          const VoiceSessionOverlay(), // Covers everything
+        if (isVoiceModeActive) const VoiceSessionOverlay(), // Covers everything
       ],
+    );
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
+      body: Builder(builder: (context) {
+        final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+        return AnimatedPadding(
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeOutCubic,
+          padding: EdgeInsets.only(bottom: bottomInset),
+          child: mainStack,
+        );
+      }),
     );
   }
 }
@@ -406,6 +467,13 @@ class _BriefingOverlayWrapper extends StatelessWidget {
 
   const _BriefingOverlayWrapper({this.onVisibleHeightChanged});
 
+  bool _usesDynamicChatAllowance(ModelEntity? model, bool isDynamicChat) {
+    if (isDynamicChat || model == null) return true;
+
+    final baseModelId = model.baseModelId?.trim().toLowerCase();
+    return baseModelId == 'dynamic' || baseModelId == 'cortex/auto';
+  }
+
   @override
   Widget build(BuildContext context) {
     final creditsManager = context.read<CreditsManager>();
@@ -414,10 +482,9 @@ class _BriefingOverlayWrapper extends StatelessWidget {
     final input = context.watch<InputProvider>();
     final appInitializer = context.watch<AppInitializer>();
     final modelService = context.read<ModelService>();
+    final userProvider = context.watch<UserProvider>();
 
-    final langCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final langCode = Localizations.localeOf(context).languageCode;
 
     final isOffline = !Utils.isServerSideModel(
       session.modelId,
@@ -426,14 +493,17 @@ class _BriefingOverlayWrapper extends StatelessWidget {
     );
 
     final isDownloaded = context
-        .watch<ModelLocalStateProvider>()
-        .downloadCompleted[session.modelId] ?? false;
+            .watch<ModelLocalStateProvider>()
+            .downloadCompleted[session.modelId] ??
+        false;
     final modelMissing = !session.isDynamicChat && isOffline && !isDownloaded;
 
-    final isLimitExceeded = session.chatLimitManager?.isLimitExceeded(
-        conv.messages) ?? false;
+    final isLimitExceeded =
+        session.chatLimitManager?.isLimitExceeded(conv.messages) ?? false;
 
     final currentModel = session.selectedModel;
+    final usesDynamicChatAllowance =
+        _usesDynamicChatAllowance(currentModel, session.isDynamicChat);
     final isVideoModel = currentModel != null &&
         (currentModel.outputs['video'] == true ||
             currentModel.category == 'video');
@@ -441,8 +511,8 @@ class _BriefingOverlayWrapper extends StatelessWidget {
     bool isCurrentModelFal = false;
     if (session.modelId != null) {
       try {
-        final model = modelService.getPreciseModelData(
-            session.modelId!, langCode: langCode);
+        final model = modelService.getPreciseModelData(session.modelId!,
+            langCode: langCode);
         isCurrentModelFal = model.source.toLowerCase() == 'fal';
       } catch (_) {}
     }
@@ -457,7 +527,8 @@ class _BriefingOverlayWrapper extends StatelessWidget {
               valueListenable: creditsManager.dreditsNotifier,
               builder: (context, dredits, _) {
                 return BriefingOverlay(
-                  availableCredits: totalCredits,
+                  availableCredits:
+                      usesDynamicChatAllowance ? null : totalCredits,
                   availablePredits: predits,
                   availableDredits: dredits,
                   photoSelected: input.hasAttachments,
@@ -465,16 +536,17 @@ class _BriefingOverlayWrapper extends StatelessWidget {
                   modelMissing: modelMissing,
                   limitReached: isLimitExceeded,
                   isStorageSufficient: session.isStorageSufficient,
-                  isPremiumModel: session.isCurrentModelPremium,
-                  isVideoModel: isVideoModel,
+                  isPremiumModel: usesDynamicChatAllowance
+                      ? false
+                      : session.isCurrentModelPremium,
+                  isVideoModel: usesDynamicChatAllowance ? false : isVideoModel,
                   isSubscribed: session.isUserSubscribed,
-                  userTier: context
-                      .read<UserProvider>()
-                      .userData?['tier'] ?? 0,
-                  isDynamicChat: session.isDynamicChat,
+                  userTier: userProvider.activeSubscriptionLevel,
+                  isDynamicChat: usesDynamicChatAllowance,
                   isSearchEnabled: input.enableWebSearch,
-                  isFalOffline: appInitializer.isFalOffline &&
-                      isCurrentModelFal,
+                  isFalOffline:
+                      appInitializer.isFalOffline && isCurrentModelFal,
+                  isUserStateReady: userProvider.isUserStateReady,
                   conversationId: conv.conversationID,
                   inappropriate: false,
                   onVisibleHeightChanged: onVisibleHeightChanged,
@@ -487,4 +559,3 @@ class _BriefingOverlayWrapper extends StatelessWidget {
     );
   }
 }
-

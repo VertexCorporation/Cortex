@@ -3,6 +3,7 @@
 import 'package:cortex/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../../app.dart';
 import '../../login/upgrade.dart';
 import '../../l10n/app_localizations.dart';
@@ -17,7 +18,7 @@ class AnonymousUpgradePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
+    context.watch<ThemeProvider>();
 
     final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery

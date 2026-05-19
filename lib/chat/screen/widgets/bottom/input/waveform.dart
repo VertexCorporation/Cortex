@@ -5,7 +5,7 @@ class _WaveformSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final bool isTablet = screenWidth >= 600;
 
     final double buttonSize = isTablet ? 40.0 : 36.0;

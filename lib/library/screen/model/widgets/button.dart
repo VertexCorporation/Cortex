@@ -46,8 +46,8 @@ class BottomActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
     final localizations = AppLocalizations.of(context)!;
     final provider = context.watch<ModelDetailProvider>();
     final mainModel = provider.mainModel;
@@ -122,7 +122,7 @@ class BottomActionButtons extends StatelessWidget {
     ModelDetailProvider provider,
     AppLocalizations localizations,
   ) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     return Container(
       key: const ValueKey('removeAndChat'),
@@ -214,7 +214,7 @@ class BottomActionButtons extends StatelessWidget {
     // Accept buttonHeight as a parameter for consistent sizing.
     double buttonHeight,
   ) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final localProvider = context.read<ModelLocalStateProvider>();
 
     // For offline series, target the selected variant ID.
@@ -304,7 +304,7 @@ class BottomActionButtons extends StatelessWidget {
     ModelDetailProvider provider,
     AppLocalizations localizations,
   ) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     return Container(
       key: const ValueKey('chatOnly'),

@@ -97,8 +97,8 @@ class _MessageListSkeletonState extends State<MessageListSkeleton>
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     // PERFORMANCE: Single Shimmer wrapper instead of 16 (now 12) independent
     // AnimationControllers. Each Shimmer.fromColors creates its own controller.

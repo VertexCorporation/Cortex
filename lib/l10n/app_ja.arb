@@ -29,7 +29,6 @@
   "usedMemory": "使用済みメモリ",
   "modelsTitle": "ライブラリ",
   "localModels": "ローカルモデル",
-  "serverSideModels": "言語モデル",
   "selectGGUFFile": "GGUFファイルを選択",
   "errorGGUF": "GGUF形式のファイルのみを選択してください。",
   "myModels": "マイモデル",
@@ -86,7 +85,6 @@
   "delete": "削除",
   "passwordRequired": "パスワードが必要です。",
   "deleteDescription": "削除したデータは、当社のサーバーとあなたのデバイスから永久に削除されます。この操作は元に戻せません。",
-  "deleteAccountButton": "アカウント削除ボタン",
   "editProfile": "プロフィールを編集",
   "displayName": "表示名",
   "profileUpdated": "プロフィールが正常に更新されました",
@@ -108,7 +106,6 @@
     }
   },
   "downloadPaused": "ダウンロードが一時停止しました。",
-  "purchaseSuccessful": "購入成功！",
   "purchaseError": "購入エラー",
   "purchasePlus": "Cortex Plusを購入",
   "plusDescription": "エリート人工知能体験",
@@ -319,7 +316,6 @@
   "experimentalOfflineWarning": "オフラインモードはまだ実験段階であり、ダウンロードしたモデルが最適な効率で動作しない可能性があります。",
   "noConversationsToDelete": "削除する会話がありません。",
   "reportSubmitted": "報告が正常に送信されました",
-  "purchaseReceived": "購入を受け付けました。アカウントを更新しています。",
   "verificationDelayed": "購入は確認されました。アカウントの更新に若干の遅延がありますが、まもなく反映されます。",
   "maintenanceTitle": "メンテナンス中",
   "maintenanceMessage": "Cortexは重要なアップデートを展開中のため、一時的にオフラインです。アプリへのアクセスはまもなく復旧します。\n\nエクスペリエンス向上のためのご協力に感謝いたします。",
@@ -333,8 +329,6 @@
   "loginSubtitle": "Vertexアカウントにログインしてください。続行すると、利用規約とプライバシーポリシーに同意したことになります。",
   "registerSubtitle": "Vertexアカウントを作成すると、すべてのサービスにシームレスにアクセスできます。続行すると、利用規約とプライバシーポリシーに同意したことになります。",
   "storagePermissionRequired": "ダウンロードしたモデルを保存するにはストレージの許可が必要です。続行するには許可を与えてください。",
-  "plusBannerTitle": "無料プラスをゲット！",
-  "plusBannerSubtitle": "お友達を招待すると、お二人とも 1 日分の Plus が無料でご利用いただけます。",
   "inviteShareSubject": "Cortexで一緒にやろう！",
   "@inviteShareMessage": {
     "description": "招待のために友達と共有するテキストメッセージ。",
@@ -361,12 +355,10 @@
   "russian": "ロシア",
   "featureDocumentTitle": "ドキュメントサポート",
   "featureDocumentDescription": "このモデルは、PDF やテキスト ファイルなどのアップロードされたドキュメントを分析し、質問に回答できます。",
-  "featureAudioTitle": "音声入力",
-  "featureAudioDescription": "このモデルは、音声入力を理解して処理できます。",
   "featureImageGenerationTitle": "画像生成",
   "featureImageGenerationDescription": "このモデルは、テキストの説明に基づいてオリジナルの画像を作成できます。",
   "premiumModelNoticeTitle": "プレミアムモデル",
-  "premiumModelNoticeDescription": "このモデルはプレミアムモデルです。無料ユーザーはプレミアムモデルとのメッセージ送信が 1 日 3 件に制限されています。登録すると無制限にアクセスできます。",
+  "premiumModelNoticeDescription": "このAIはプレミアムAIです。無料ユーザーはプレミアムAIへのアクセスが制限されています。アップグレードして無制限アクセスを解除しましょう！",
   "benefitPremiumModels": "プレミアムモデルへのアクセス",
   "premiumTrialExhaustedMessage": "プレミアムモデルへの無料の毎日のメッセージをすべて使い切りました。無制限にアクセスするにはアップグレードしてください。",
   "useOffline": "インターネットなしで使用",
@@ -578,11 +570,10 @@
   "searching": "検索中",
   "featureWebSearchTitle": "ウェブ検索",
   "featureWebSearchDescription": "ウェブでリアルタイム情報を検索する",
-  "webSearchQuotaExceeded": "検索割り当て量を超過しました",
   "clearMemory": "メモリをクリアする",
   "clearMemoryConfirm": "本当にメモリを消去しますか？",
   "personalization": "パーソナライゼーション",
-  "personalizationDescription": "自分好みの体験をカスタマイズ",
+  "personalizationDescription": "アシスタントをあなたのニーズに合わせてカスタマイズしましょう。応答、動作、トーンをあなたの好みに合わせて調整できます。",
   "memoryTitle": "メモリ",
   "memoryDescription": "AIはこのようにしてあなたを認識する。",
   "noMemoryYet": "まだ記憶は確立されていません",
@@ -592,11 +583,11 @@
   "customInstructionHint": "ここにカスタム指示を入力してください",
   "openLinkWarningMessage": "以下の外部リンクを開こうとしています。\\n\\n{url}\\n\\n続行しますか？",
   "intelligenceSystemPrompt": "以下のカスタム手順に従ってください。\\n\\n{instruction}",
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>",
+  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nこれまでの会話を分析します。ユーザーに関する新しい明確な事実（好み、名前、習慣、状況など）が判明した場合は、応答の最後に、ユーザーに関する更新されたメモリ全体を<memory>...</memory>タグ内に出力する必要があります。重要：以前のメモリを消去または上書きしてはなりません。常に新しい事実を既存のメモリに追加してください。新しい情報が全く判明しなかった場合は、タグを省略してください。例：<memory>サッカーとテニスが好き。短い回答を好む。</memory>",
   "systemMemoryReminder": "\n\nユーザーについて常に以下を覚えておいてください：\n{userMemory}",
-  "chatTitlePrompt": "あなたはタイトル生成者です。以下の会話に対して、2～5語のタイトルのみを返信してください。引用符、接頭辞、句読点は使用しないでください。",
+  "chatTitlePrompt": "あなたはタイトル生成者です。以下の会話に対して、2～5語のタイトルのみを返信してください。引用符、接頭辞、句読点は使用しないでください。重要：タイトルは、ユーザーのメッセージと完全に同じ言語でなければなりません。",
   "chatTitleCriticalInstruction": "【重要指示】：あなたはタイトル生成ツールです。ユーザーの質問に答えたり、チャットや挨拶をしたりしないでください。ユーザーの質問内容を要約した2～4語のタイトルのみを出力してください。",
-  "cortexSystemPersona": "\n\n[System] 重要な指示: あなたは現在、「Cortex」と呼ばれる大規模で高度なAIエコシステム内で動作しています。これを覚えておき、尋ねられたらCortexのペルソナを維持してください。",
+  "cortexSystemPersona": "\n\n[システム] 重要な指示：あなたは現在、「Cortex」と呼ばれる大規模で高度なAIエコシステム内で作業しています。このプラットフォームは、平均年齢わずか16歳のVertexチームによって開発されています。このことを覚えておき、質問されたら答えてください。さらに情報が必要な場合は、ためらわずにインターネットで検索してください。検索できない場合は、知らないと答えても構いません。",
   "@cortexSystemPersona": {
     "description": "System persona string added to online models"
   },
@@ -622,8 +613,6 @@
   "featureImageRecognitionDescription": "このモデルは写真や画像を分析・理解することができます。",
   "featureToolUseTitle": "ツールの使用",
   "featureToolUseDescription": "このモデルは、外部ツールを賢く活用してタスクを完了することができます。",
-  "paywallAhaTitle": "Unlock the True Power of AI",
-  "paywallAhaSubtitle": "Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.",
   "systemPromptMissingMedia": "このモデルが機能するには{mediaType}が必要です。お知らせするためにリクエストを傍受しました。私は{modelName}という視覚/音声/ビデオ編集モデルであるため、{mediaType}を提供する必要があることをユーザーに丁寧にお知らせください（彼らの言語で）。",
   "mediaTypeImage": "画像",
   "mediaTypeVideo": "動画",
@@ -633,8 +622,8 @@
   "featureCreateVideoDescription": "テキストから動画を生成する。",
   "defaultSeriesDescription": "{seriesName}は、Cortex上で高いパフォーマンスを発揮する高度な知能です。",
   "defaultModelDescription": "{modelName}は、Cortexエコシステムに統合された高性能な人工知能です。さまざまな複雑なタスクを克服するように設計されており、信頼性が高く効率的な処理機能を提供します。迅速な応答時間と高度な分析能力を提供することで、日常の生産性を大幅に向上させます。Cortexの安全なローカルインフラストラクチャ上でシームレスに動作するこのモデルは、創造的なブレインストーミングから深い技術分析まで、幅広いタスクでユーザーを支援します。今日からその可能性を最大限に引き出しましょう。",
-  "createAI": "Create",
-  "shortcuts": "Shortcuts",
+  "createAI": "作成",
+  "shortcuts": "ショートカット",
   "ourStory": "私たちの物語",
   "guestLimitBottomSheetTitle": "Cortexの知能が好きですか？",
   "guestLimitBottomSheetText": "さらに高度なインテリジェンスを活用し、より多くのコンテンツを生成し、より多くのチャットを行い、さらに多くのことを実現しましょう。",
@@ -642,10 +631,51 @@
   "noArt": "アートなし",
   "noArtDescription": "作品がありません。画像、動画、音声など、あらゆるコンテンツを作成してギャラリーを充実させましょう！",
   "videoPremiumWarning": "動画を作成するにはUltraプランへのアップグレードが必要です。今すぐアップグレードして、スムーズな操作感を体験してください！",
-  "becomePremiumButton": "プレミアム会員になる",
+  "dynamicPreditsUpgradeMessage": "Cortex はさらに優れた回答を提供できます。今すぐアップグレードして、すべての質問に最高の答えを得ましょう！",
   "fallbackInfoPanelText": "サーバー側の改善作業のため、お客様が選択されたAIではなく、Cortexの動的チャット機能によって応答が生成されました。処理が完了するまで、ご理解いただけますようお願い申し上げます。",
   "falOfflineMessage": "サーバー側の改善作業のため、現在このサービスは一時的にご利用いただけません。作業完了までご理解いただけますようお願い申し上げます。",
   "errorInsufficientStorage": "このモデルをダウンロードするにはストレージ容量が不足しています。",
   "backgroundChatNotificationTitle": "チャットに戻る！",
-  "backgroundChatNotificationBody": "{chatName}に新しいメッセージが届いています。ぜひチェックしてみてください！"
+  "falErrorImageRequired": "このAIは参照画像を必要とします。画像を添付して再度お試しください。",
+  "falErrorAudioRequired": "このモデルには参照音声ファイルが必要です。音声ファイルを添付して、もう一度お試しください。",
+  "falErrorVideoRequired": "このモデルには参考動画が必要です。動画を添付して再度お試しください。",
+  "falErrorImageCorrupted": "アップロードされた画像は処理できませんでした。別の形式をお試しください。",
+  "falErrorSchemaRejected": "モデルが入力値を拒否しました。別のモデルをお試しください。",
+  "falErrorSchemaInvalid": "入力は生成サービスによって拒否されました。",
+  "falErrorGenericStatus": "生成サービスがエラーを返しました（ステータス：{statusCode}）。",
+  "benefitVideoGeneration": "ビデオ生成",
+  "claimOffer": "オファーを利用する",
+  "freeOffer": "無料オファー",
+  "trialMonthlyDescription": "最初の {days} 日間は無料、その後は {price}/月",
+  "@trialMonthlyDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "trialAnnualDescription": "最初の {days} 日間は無料、その後は {price}/年",
+  "@trialAnnualDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$49.99"
+      }
+    }
+  },
+  "freePlan": "無料 {plan}！",
+  "systemRoleFallback": "あなたは頼りになるアシスタントです。",
+  "systemLanguageInstruction": "\n\nCRITICAL: 常にユーザーが入力した言語と同じ言語で応答し、ユーザーの言語に注意してください。",
+  "systemTimeInfo": "\n\n現在の日時: {formattedTime}。",
+  "systemPromptLimitFallback": "重要：ユーザーが操作を要求しましたが、Cortexの利用限度額が上限に達しています。ユーザーには、待つか、サブスクリプションプランのアップグレードを検討するよう、ユーザーの言語で通知してください。",
+  "systemNotePreviousMedia": "【システム注記：以下は以前に生成されたメディアです。参照または編集してください。】"
 }

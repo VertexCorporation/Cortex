@@ -35,6 +35,18 @@ subprojects {
             }
         }
     }
+
+    plugins.withId("com.android.library") {
+        project.android {
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_21
+                targetCompatibility JavaVersion.VERSION_21
+            }
+        }
+    }
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs << "-Xlint:-unchecked" << "-Xlint:-deprecation" << "-Xlint:-options"
+    }
 }
 
 tasks.register("clean", Delete) {

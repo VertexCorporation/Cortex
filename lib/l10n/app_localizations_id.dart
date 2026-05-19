@@ -10,11 +10,27 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'Anda adalah pembuat judul. Tanggapi HANYA dengan judul 2-5 kata untuk percakapan berikut. Jangan gunakan tanda kutip, awalan, atau tanda baca.';
+      'Anda adalah pembuat judul. Balas HANYA dengan judul 2-5 kata untuk percakapan berikut. Jangan gunakan tanda kutip, awalan, atau tanda baca. PENTING: Judul HARUS dalam bahasa yang SAMA PERSIS dengan pesan pengguna.';
+
+  @override
+  String get systemRoleFallback => 'Anda adalah asisten yang sangat membantu.';
+
+  @override
+  String get systemLanguageInstruction =>
+      '\n\nKRITIS: Selalu tanggapi dalam bahasa yang sama dengan yang digunakan pengguna, perhatikan bahasa pengguna.';
+
+  @override
+  String get systemNotePreviousMedia =>
+      '[Catatan Sistem: Berikut adalah media yang dihasilkan sebelumnya. Anda dapat merujuk atau mengeditnya.]';
+
+  @override
+  String systemTimeInfo(String formattedTime) {
+    return '\n\nTanggal dan waktu saat ini: $formattedTime.';
+  }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalisis percakapan sejauh ini. Jika Anda mempelajari FAKTA baru yang berbeda tentang pengguna (preferensi, nama, kebiasaan, konteks), Anda HARUS menampilkan SELURUH memori yang diperbarui tentang pengguna di dalam tag <memory>...</memory> DI AKHIR respons Anda. PENTING: Anda TIDAK PERNAH boleh menghapus atau menimpa memori sebelumnya. SELALU tambahkan fakta baru ke memori yang ada. Jika sama sekali tidak ada hal baru yang dipelajari, hilangkan tag tersebut. Contoh: <memory>Menyukai sepak bola dan tenis. Lebih suka jawaban singkat.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
@@ -112,9 +128,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get localModels => 'Model Lokal';
-
-  @override
-  String get serverSideModels => 'Model Bahasa';
 
   @override
   String get selectGGUFFile => 'Pilih File GGUF';
@@ -304,9 +317,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Data yang Anda hapus akan dihapus secara permanen dari server dan perangkat Anda. Tindakan ini tidak dapat dibatalkan.';
 
   @override
-  String get deleteAccountButton => 'Tombol Hapus Akun';
-
-  @override
   String get editProfile => 'Edit Profil';
 
   @override
@@ -357,9 +367,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get downloadPaused => 'Pengunduhan dijeda.';
-
-  @override
-  String get purchaseSuccessful => 'Pembelian berhasil!';
 
   @override
   String get purchaseError => 'Kesalahan pembelian';
@@ -870,6 +877,35 @@ class AppLocalizationsId extends AppLocalizations {
   String get selectBaseModel => 'Pilih Model Dasar';
 
   @override
+  String get falErrorImageRequired =>
+      'AI ini membutuhkan gambar referensi, harap lampirkan gambar dan coba lagi.';
+
+  @override
+  String get falErrorAudioRequired =>
+      'Model ini memerlukan file audio referensi, harap lampirkan file audio dan coba lagi.';
+
+  @override
+  String get falErrorVideoRequired =>
+      'Model ini memerlukan video referensi, silakan lampirkan video dan coba lagi.';
+
+  @override
+  String get falErrorImageCorrupted =>
+      'Gambar yang diunggah tidak dapat diproses, silakan coba format lain.';
+
+  @override
+  String get falErrorSchemaRejected =>
+      'Model tersebut menolak input, silakan coba model lain.';
+
+  @override
+  String get falErrorSchemaInvalid =>
+      'Input tersebut ditolak oleh layanan pembangkitan.';
+
+  @override
+  String falErrorGenericStatus(int statusCode) {
+    return 'Layanan pembuatan mengembalikan kesalahan (status $statusCode).';
+  }
+
+  @override
   String get couldNotOpenLink => 'Tidak dapat membuka tautan';
 
   @override
@@ -932,9 +968,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportSubmitted => 'Laporan berhasil dikirim';
 
   @override
-  String get purchaseReceived => 'Pembelian diterima, memperbarui akun Anda.';
-
-  @override
   String get verificationDelayed =>
       'Pembelian Anda telah dikonfirmasi. Ada sedikit keterlambatan dalam memperbarui akun Anda, ini akan segera muncul.';
 
@@ -984,13 +1017,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Izin penyimpanan diperlukan untuk menyimpan model yang diunduh. Harap berikan izin untuk melanjutkan.';
 
   @override
-  String get plusBannerTitle => 'Dapatkan Gratis Plus!';
-
-  @override
-  String get plusBannerSubtitle =>
-      'Ajak teman dan kalian berdua akan mendapatkan 1 Hari Plus gratis!';
-
-  @override
   String get inviteShareSubject => 'Bergabunglah dengan saya di Cortex!';
 
   @override
@@ -1036,13 +1062,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Model ini dapat menganalisis dan menjawab pertanyaan tentang dokumen yang diunggah seperti PDF dan berkas teks.';
 
   @override
-  String get featureAudioTitle => 'Masukan Suara';
-
-  @override
-  String get featureAudioDescription =>
-      'Model ini dapat memahami dan memproses masukan audio lisan.';
-
-  @override
   String get featureImageGenerationTitle => 'Pembuatan Gambar';
 
   @override
@@ -1068,7 +1087,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      'Model ini adalah model premium, pengguna gratis dibatasi hingga 3 pesan per hari dengan model premium; berlangganan untuk membuka akses tak terbatas!';
+      'AI ini adalah AI premium, pengguna gratis memiliki akses terbatas ke AI premium; tingkatkan untuk membuka akses tak terbatas!';
 
   @override
   String get benefitPremiumModels => 'Akses ke model premium';
@@ -1087,10 +1106,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get news => 'Berita';
 
   @override
-  String get createAI => 'Create';
+  String get createAI => 'Buat';
 
   @override
-  String get shortcuts => 'Shortcuts';
+  String get shortcuts => 'Jalan pintas';
 
   @override
   String get allModels => 'Semua Model';
@@ -1471,13 +1490,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingFinalButton => 'YA!';
 
   @override
-  String get paywallAhaTitle => 'Unlock the True Power of AI';
-
-  @override
-  String get paywallAhaSubtitle =>
-      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
-
-  @override
   String get dude => 'Bung';
 
   @override
@@ -1667,6 +1679,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get exclusiveOffer => 'Penawaran Eksklusif';
 
   @override
+  String get claimOffer => 'Gunakan Penawaran';
+
+  @override
   String get continueInOfflineMode => 'Lanjutkan dalam Mode Offline';
 
   @override
@@ -1794,9 +1809,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Cari informasi secara real-time di web.';
 
   @override
-  String get webSearchQuotaExceeded => 'Kuota Pencarian Terlampaui';
-
-  @override
   String get clearMemory => 'Hapus Memori';
 
   @override
@@ -1807,7 +1819,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get personalization => 'Personalisasi';
 
   @override
-  String get personalizationDescription => 'Sesuaikan pengalaman Anda';
+  String get personalizationDescription =>
+      'Personalisasikan asisten Anda agar lebih sesuai dengan kebutuhan Anda. Sesuaikan respons, perilaku, dan nada bicaranya agar sesuai dengan preferensi unik Anda.';
 
   @override
   String get memoryTitle => 'Ingatan';
@@ -1847,7 +1860,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[System] INSTRUKSI KRITIS: Anda saat ini beroperasi di dalam ekosistem AI yang sangat besar dan canggih bernama \"Cortex\". Ingatlah hal ini dan pertahankan persona Cortex jika ditanya.';
+      '\n\n[Sistem] INSTRUKSI PENTING: Anda saat ini beroperasi di dalam ekosistem AI yang sangat besar dan canggih bernama \"Cortex\"; platform ini dikembangkan oleh tim Vertex, yang rata-rata baru berusia 16 tahun. Ingat ini dan jawab jika ditanya. Jika informasi lebih lanjut diminta, jangan ragu untuk mencari di internet, atau jika Anda tidak dapat mencari, jangan ragu untuk mengatakan Anda tidak tahu!';
 
   @override
   String get featureAudioRecognitionTitle => 'Pengenalan Audio';
@@ -1932,9 +1945,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Anda memerlukan langganan Ultra untuk membuat video, tingkatkan sekarang dan rasakan kemudahannya!';
 
   @override
-  String get becomePremiumButton => 'Menjadi Premium';
-
-  @override
   String get fallbackInfoPanelText =>
       'Karena beberapa perbaikan yang sedang kami lakukan di sisi server, respons dihasilkan oleh obrolan dinamis Cortex, bukan oleh AI yang Anda pilih secara khusus. Terima kasih atas pengertian Anda sampai proses ini selesai!';
 
@@ -1950,7 +1960,31 @@ class AppLocalizationsId extends AppLocalizations {
   String get backgroundChatNotificationTitle => 'Kembali ke Obrolan!';
 
   @override
-  String backgroundChatNotificationBody(String chatName) {
-    return 'Ada pesan baru di $chatName, silakan cek!';
+  String get benefitVideoGeneration => 'Pembuatan Video';
+
+  @override
+  String get freeOffer => 'Penawaran Gratis';
+
+  @override
+  String trialMonthlyDescription(String days, String price) {
+    return '$days hari pertama gratis, lalu $price/bulan';
   }
+
+  @override
+  String trialAnnualDescription(String days, String price) {
+    return '$days hari pertama gratis, lalu $price/tahun';
+  }
+
+  @override
+  String freePlan(String plan) {
+    return '$plan Gratis!';
+  }
+
+  @override
+  String get systemPromptLimitFallback =>
+      'PENTING: Pengguna meminta suatu tindakan, tetapi kuota mereka di Cortex telah habis; mohon informasikan kepada pengguna dalam bahasa mereka bahwa mereka harus menunggu atau mempertimbangkan untuk meningkatkan paket langganan mereka.';
+
+  @override
+  String get dynamicPreditsUpgradeMessage =>
+      'Cortex dapat memberikan jawaban yang lebih baik; tingkatkan sekarang dan dapatkan jawaban terbaik untuk setiap pertanyaan!';
 }

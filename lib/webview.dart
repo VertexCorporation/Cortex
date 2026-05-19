@@ -226,14 +226,15 @@ class _WebViewModalContentState extends State<_WebViewModalContent>
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  WebViewWidget(
-                    controller: _controller,
-                    gestureRecognizers: {
-                      Factory<VerticalDragGestureRecognizer>(() =>
-                          VerticalDragGestureRecognizer()),
-                    },
-                  ),
-                  if (_isLoading)
+                  if (!_hasError)
+                    WebViewWidget(
+                      controller: _controller,
+                      gestureRecognizers: {
+                        Factory<VerticalDragGestureRecognizer>(() =>
+                            VerticalDragGestureRecognizer()),
+                      },
+                    ),
+                  if (_isLoading && !_hasError)
                     _TriangleLoadingIndicator(animation: _animation),
                   if (_hasError)
                     _ErrorDisplay(

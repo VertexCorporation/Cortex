@@ -15,7 +15,7 @@ class NewsAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final bool isDesktop = MediaQuery.of(context).size.width >= 800; // [NEW]
+    final bool isDesktop = MediaQuery.sizeOf(context).width >= 800; // [NEW]
 
     return CortexAppBar(
       // Hide leading button on desktop since sidebar is fixed

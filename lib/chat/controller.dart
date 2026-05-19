@@ -99,9 +99,7 @@ class ChatControllerState extends State<ChatController>
     // --- FIX: Removed isChatActive check ---
     // We assume if modelId is not null, we might need to release resources.
     // Or we check if model is local directly.
-    final langCode = _sessionProvider
-        .getLocale()
-        .languageCode;
+    final langCode = _sessionProvider.getLocale().languageCode;
     final currentModelId = _sessionProvider.modelId;
 
     if (currentModelId != null &&
@@ -116,9 +114,7 @@ class ChatControllerState extends State<ChatController>
   /// Handles system back press events (called by MainScreen).
   bool handleSystemBackPress() {
     // 1. Cancel Message Editing Mode if active
-    if (context
-        .read<InputProvider>()
-        .isEditingMode) {
+    if (context.read<InputProvider>().isEditingMode) {
       chatViewKey.currentState?.cancelAnyActiveEdit();
       return false; // Handled
     }
@@ -126,18 +122,30 @@ class ChatControllerState extends State<ChatController>
     return true; // Not handled, bubble up (Exit app or Go back)
   }
 
+  /// Requests keyboard focus on the chat input field.
+  /// Called by MainScreen after startNewConversation completes to auto-open keyboard.
+  void requestKeyboardFocus({
+    int delayMs = 150,
+    int maxRetries = 8,
+    int? retryDelayMs,
+  }) {
+    chatViewKey.currentState?.requestKeyboardFocus(
+      delayMs: delayMs,
+      maxRetries: maxRetries,
+      retryDelayMs: retryDelayMs,
+    );
+  }
+
   Future<void> _performInitialAsyncSetup(String langCode) async {
     if (widget.conversationID != null) {
       context.read<ConversationProvider>().setLoadingMessages(true);
     }
 
-    await context
-        .read<AppInitializer>()
-        .onCoreServicesReady;
+    await context.read<AppInitializer>().onCoreServicesReady;
     if (!mounted) return;
 
     final newsFuture =
-    context.read<NewsService>().loadNewsForLanguage(langCode);
+        context.read<NewsService>().loadNewsForLanguage(langCode);
     await newsFuture;
 
     if (!mounted) return;
@@ -148,9 +156,9 @@ class ChatControllerState extends State<ChatController>
       context.read<InputProvider>().resetInputState();
 
       await context.read<ReadService>().loadConversationById(
-        widget.conversationID!,
-        languageCode: langCode,
-      );
+            widget.conversationID!,
+            languageCode: langCode,
+          );
 
       if (mounted) {
         final session = context.read<ChatSessionProvider>();
@@ -172,6 +180,7 @@ class ChatControllerState extends State<ChatController>
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.background,
+      resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
       appBar: Appbar(key: appbarKey),
       body: ChatView(

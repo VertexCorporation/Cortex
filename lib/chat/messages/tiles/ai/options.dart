@@ -50,9 +50,33 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
     super.dispose();
   }
 
-  void _onCopyTapped() {
+  void _onCopyTapped() async {
     final localizations = AppLocalizations.of(context)!;
-    Clipboard.setData(ClipboardData(text: widget.message.displayableText));
+    final message = widget.message;
+    final bool isMediaOnly = message.hasAttachments && message.displayableText.trim().isEmpty;
+
+    if (isMediaOnly) {
+      try {
+        final path = message.attachmentPaths.first;
+        final success = await Pasteboard.writeFiles([path]);
+        if (success) {
+          if (!mounted) return;
+          Provider.of<IntrovertNotificationService>(context, listen: false)
+              .showNotification(
+              message: localizations.messageCopied,
+              type: NotificationType.success,
+              bottomOffset: 0.07,
+              isChatMode: true);
+        } else {
+          _saveFirstMediaToGallery(message, localizations);
+        }
+      } catch (e) {
+        _saveFirstMediaToGallery(message, localizations);
+      }
+      return;
+    }
+
+    Clipboard.setData(ClipboardData(text: message.displayableText));
     Provider
         .of<IntrovertNotificationService>(context, listen: false)
         .showNotification(
@@ -60,6 +84,38 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
         type: NotificationType.success,
         bottomOffset: 0.07,
         isChatMode: true);
+  }
+
+  Future<void> _saveFirstMediaToGallery(Message message, AppLocalizations localizations) async {
+    final notificationService = Provider.of<IntrovertNotificationService>(context, listen: false);
+    try {
+      final firstPath = message.attachmentPaths.first;
+      final ext = firstPath.toLowerCase().split('.').last;
+      final isVideo = ['mp4', 'mov', 'avi', 'mkv', 'webm'].contains(ext);
+
+      bool? success;
+      if (isVideo) {
+        success = await GallerySaver.saveVideo(firstPath);
+      } else {
+        success = await GallerySaver.saveImage(firstPath);
+      }
+
+      notificationService.showNotification(
+        message: success == true
+            ? localizations.downloadSuccess
+            : localizations.downloadFailed,
+        type: success == true ? NotificationType.success : NotificationType.error,
+        bottomOffset: 0.07,
+        isChatMode: true,
+      );
+    } catch (_) {
+      notificationService.showNotification(
+        message: localizations.downloadFailed,
+        type: NotificationType.error,
+        bottomOffset: 0.07,
+        isChatMode: true,
+      );
+    }
   }
 
 
@@ -178,8 +234,7 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
 
     _visibleOptions = viewModel.getVisibleOptions(context);
 
-    // Remove options that are not supported inline directly or requested to be removed
-    _visibleOptions.remove(MessageOption.select);
+    // Remove options that are not supported inline
     _visibleOptions.remove(MessageOption.stop);
 
     if (_visibleOptions.isEmpty) return const SizedBox.shrink();

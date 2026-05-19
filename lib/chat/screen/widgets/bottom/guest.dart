@@ -68,8 +68,8 @@ class _GuestLimitSheetContentState extends State<_GuestLimitSheetContent>
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final sw = mediaQuery.size.width;
+    
+    final sw = MediaQuery.sizeOf(context).width;
 
     // Scaling logic similar to AuthScreen
     double fontScale = sw / 375.0;
@@ -109,7 +109,7 @@ class _GuestLimitSheetContentState extends State<_GuestLimitSheetContent>
       borderRadius: BorderRadius.vertical(top: Radius.circular(topRadius)),
       clipBehavior: Clip.antiAlias,
       child: Padding(
-        padding: EdgeInsets.only(bottom: mediaQuery.padding.bottom),
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: sw * 0.06),
           child: Column(

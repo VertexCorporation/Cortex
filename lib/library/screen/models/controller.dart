@@ -86,6 +86,8 @@ class LibraryScreenState extends State<LibraryScreen>
         final modelToRemove = _catalogProvider!.allModels.firstWhere((m) =>
         m.id == id);
         await _catalogProvider!.removeModel(context, modelToRemove);
+        // FIX: Prevent keyboard from popping up after model removal
+        FocusManager.instance.primaryFocus?.unfocus();
       },
       startChat: (id, _, {String? modelPath, isCustomModel = false}) =>
           _catalogProvider!.startChatWithModel(id),
@@ -228,10 +230,8 @@ class LibraryScreenState extends State<LibraryScreen>
 
         return Scaffold(
           backgroundColor: AppColors.background,
-
-          // UPDATED: This allows the content/fog to scroll BEHIND the app bar
+          resizeToAvoidBottomInset: false,
           extendBodyBehindAppBar: true,
-
           appBar: ModelsAppBar(
             title: localizations.modelsTitle,
             // UPDATED: Pass the controller so the title fades!
@@ -241,38 +241,50 @@ class LibraryScreenState extends State<LibraryScreen>
                     catalog.openCreateScreen(context)),
           ),
 
-          body: ModelsBody(
-            scrollController: _scrollController,
-            isLoading: showLoadingSkeleton,
-            hasError: catalog.loadError,
-            allModels: catalog.allModels,
-            pulseAnimation: _pulseAnimation,
-            onRetry: () => catalog.refreshCatalog(),
-            systemInfo: localState.systemInfo,
-            downloadedStates: localState.downloadCompleted,
-            downloadManagers: Map.from(localState.downloadManagers),
-            getCompatibilityStatus: localState.getCompatibilityStatus,
-            searchController: _searchCtrl!,
-            showLocalizationWarning: _showLocalizationWarning,
-            onDismissWarningPanel: _dismissWarningPanel,
-            onRemovePressed: (id, title) async {
-              final modelToRemove = catalog.allModels.firstWhere((m) =>
-              m.id == id);
-              await catalog.removeModel(context, modelToRemove);
-            },
-            onChatPressed: (id, _,
-                {String? modelPath, isCustomModel = false}) =>
-                catalog.startChatWithModel(id),
-            onDownloadPressed: ({required id, required url, required title}) =>
-                localState.requestPermissionAndStartDownload(
-                    context: context, id: id, url: url),
-            onCancelDownload: localState.cancelDownload,
-            onResumeDownload: localState.resumeDownload,
-            openModelDetail: (id) =>
-                _navigateAndHandleFocus(() =>
-                    catalog.openModelDetail(context, id)),
-            onTriggerAxon: _handleOverscrollStart,
-            onTriggerCreateScreen: _handleOverscrollEnd,
+          body: Builder(
+            builder: (context) {
+              final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+              return AnimatedPadding(
+                padding: EdgeInsets.only(bottom: bottomInset),
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                child: ModelsBody(
+                  scrollController: _scrollController,
+                  isLoading: showLoadingSkeleton,
+                  hasError: catalog.loadError,
+                  allModels: catalog.allModels,
+                  pulseAnimation: _pulseAnimation,
+                  onRetry: () => catalog.refreshCatalog(),
+                  systemInfo: localState.systemInfo,
+                  downloadedStates: localState.downloadCompleted,
+                  downloadManagers: Map.from(localState.downloadManagers),
+                  getCompatibilityStatus: localState.getCompatibilityStatus,
+                  searchController: _searchCtrl!,
+                  showLocalizationWarning: _showLocalizationWarning,
+                  onDismissWarningPanel: _dismissWarningPanel,
+                  onRemovePressed: (id, title) async {
+                    final modelToRemove = catalog.allModels.firstWhere((m) =>
+                    m.id == id);
+                    await catalog.removeModel(context, modelToRemove);
+                    // FIX: Prevent keyboard from popping up after model removal
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
+                  onChatPressed: (id, _,
+                      {String? modelPath, isCustomModel = false}) =>
+                      catalog.startChatWithModel(id),
+                  onDownloadPressed: ({required id, required url, required title}) =>
+                      localState.requestPermissionAndStartDownload(
+                          context: context, id: id, url: url),
+                  onCancelDownload: localState.cancelDownload,
+                  onResumeDownload: localState.resumeDownload,
+                  openModelDetail: (id) =>
+                      _navigateAndHandleFocus(() =>
+                          catalog.openModelDetail(context, id)),
+                  onTriggerAxon: _handleOverscrollStart,
+                  onTriggerCreateScreen: _handleOverscrollEnd,
+                ),
+              );
+            }
           ),
         );
       },

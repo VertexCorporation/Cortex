@@ -20,6 +20,7 @@ import 'package:cortex/chat/services/storage.dart';
 import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/chat/services/voice.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/notifications/extrovert.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
@@ -36,6 +37,17 @@ import 'package:cortex/chat/screen/widgets/bottom/guest.dart';
 import '../messages/messages.dart';
 import 'package:cortex/chat/providers/memory.dart';
 import 'tools.dart';
+
+enum _MediaIntent {
+  none,
+  understand,
+  editImage,
+  editVideo,
+  editAudio,
+  generateImage,
+  generateVideo,
+  generateAudio,
+}
 
 /// Service responsible for sending messages. It orchestrates interactions between providers and other services.
 class SendService {
@@ -67,8 +79,7 @@ class SendService {
     required VoiceService voiceService,
     required UserMemoryProvider userMemoryProvider,
     required BackgroundTaskService backgroundTaskService,
-  })
-      : _conversationProvider = conversationProvider,
+  })  : _conversationProvider = conversationProvider,
         _inputProvider = inputProvider,
         _apiService = apiService,
         _contextService = contextService,
@@ -82,6 +93,137 @@ class SendService {
   /// Returns true if the given conversation is the one currently being viewed.
   bool _isConversationActive(String convId) {
     return _conversationProvider.conversationID == convId;
+  }
+
+  bool _isCurrentAiMessageForModel(
+    String convId,
+    int aiMessageIndex,
+    String modelId,
+  ) {
+    if (!_isConversationActive(convId)) return true;
+
+    final messages = _conversationProvider.messages;
+    if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) return false;
+
+    final messageModelId = messages[aiMessageIndex].model;
+    return messageModelId == null || messageModelId == modelId;
+  }
+
+  void _clearPendingMediaState(String convId, int aiMessageIndex) {
+    _backgroundTaskService.setPendingMediaType(
+        convId, MediaGenerationType.none);
+
+    if (!_isConversationActive(convId)) return;
+
+    final messages = _conversationProvider.messages;
+    if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) return;
+
+    final message = messages[aiMessageIndex];
+    if (message.pendingMediaType == MediaGenerationType.none) return;
+
+    _conversationProvider.updateMessageAtIndex(
+      aiMessageIndex,
+      message.copyWith(pendingMediaType: MediaGenerationType.none),
+    );
+  }
+
+  bool _isCharacterModel(ModelEntity model, String modelId) {
+    return (model.category == 'roleplay' || model.category == 'self') &&
+        modelId != 'cortex/auto';
+  }
+
+  bool _isGroqOrDynamicBase(ModelEntity model) {
+    final id = model.id.toLowerCase();
+    final source = model.source.toLowerCase();
+    return id == 'cortex/auto' ||
+        id == 'dynamic' ||
+        source == 'groq' ||
+        source == 'manual';
+  }
+
+  bool _isUsableCharacterBase(ModelEntity model) {
+    final category = model.category.toLowerCase();
+    return model.isServerSide &&
+        model.source.toLowerCase() == 'openrouter' &&
+        category != 'roleplay' &&
+        category != 'self' &&
+        category != 'image' &&
+        category != 'video' &&
+        category != 'audio' &&
+        model.outputs['text'] == true;
+  }
+
+  ModelEntity? _findOpenRouterCharacterBase(String langCode) {
+    final allModels = _modelService.getCachedModelsSync();
+
+    for (final model in allModels) {
+      if (model.variants?.isNotEmpty ?? false) {
+        for (final entry in model.variants!.entries) {
+          final variantData = entry.value;
+          if (variantData is! Map<String, dynamic>) continue;
+
+          final variantId = variantData['id']?.toString() ?? entry.key;
+          if (variantId.toLowerCase().contains('guard')) continue;
+
+          final tier = variantData['tier']?.toString().toLowerCase() ?? 'free';
+          if (tier == 'premium' || tier == 'plus' || tier == 'pro') continue;
+
+          final source = variantData['source']?.toString().toLowerCase() ??
+              model.source.toLowerCase();
+          if (source != 'openrouter') continue;
+
+          final outputs = Map<String, dynamic>.from(
+              variantData['outputs'] as Map? ?? model.outputs);
+          if (outputs['text'] != true) continue;
+
+          final precise =
+              _modelService.getPreciseModelData(variantId, langCode: langCode);
+          if (_isUsableCharacterBase(precise)) return precise;
+        }
+        continue;
+      }
+
+      if (_isUsableCharacterBase(model) &&
+          !model.id.toLowerCase().contains('guard')) {
+        final tier = model.tier.toLowerCase();
+        if (tier == 'premium' || tier == 'plus' || tier == 'pro') continue;
+        return model;
+      }
+    }
+
+    for (final model in allModels) {
+      if (_isUsableCharacterBase(model)) return model;
+    }
+
+    return null;
+  }
+
+  ModelEntity _resolveCharacterBaseModel({
+    required ModelEntity characterModel,
+    required String langCode,
+  }) {
+    var baseModelId = characterModel.baseModelId;
+    if (baseModelId == null ||
+        baseModelId.isEmpty ||
+        baseModelId == 'dynamic') {
+      baseModelId = 'cortex/auto';
+    }
+
+    final baseModel =
+        _modelService.getPreciseModelData(baseModelId, langCode: langCode);
+
+    if (!_isGroqOrDynamicBase(baseModel)) {
+      return baseModel;
+    }
+
+    final openRouterBase = _findOpenRouterCharacterBase(langCode);
+    if (openRouterBase != null) {
+      debugPrint(
+          "[SendService] Character base '${baseModel.id}' uses ${baseModel.source}. Routing character request through OpenRouter model '${openRouterBase.id}'.");
+      return openRouterBase;
+    }
+
+    return baseModel.copyWith(source: 'openrouter');
   }
 
   /// Main entry point to send a message.
@@ -107,7 +249,7 @@ class SendService {
     if (isRegenerate) {
       final messages = _conversationProvider.messages;
       final lastUserMessage = messages.reversed.firstWhere(
-            (m) => m.isUserMessage,
+        (m) => m.isUserMessage,
         orElse: () => Message(text: '', isUserMessage: true),
       );
       currentAttachmentPaths = List.from(lastUserMessage.attachmentPaths);
@@ -124,8 +266,12 @@ class SendService {
 
     // _isSending guard replaced by per-conversation tracking below.
 
-    // Declare targetConvId outside try so the finally block can access it.
+    // Declare target state outside try so catch/finally can clean up the
+    // exact conversation that launched this request.
     String? targetConvId;
+    int? targetAiMessageIndex;
+    String? targetModelIdForSend;
+    bool targetIsServerSide = false;
 
     try {
       // -----------------------------------------------------------------------
@@ -154,10 +300,12 @@ class SendService {
       String errorMessage = localizations.errorNoModelsAvailable;
 
       final localState = context.read<ModelLocalStateProvider>();
-      final langCode = Localizations
-          .localeOf(context)
-          .languageCode;
+      final langCode = Localizations.localeOf(context).languageCode;
       final hasInternet = await InternetConnection().hasInternetAccess;
+
+      final originalUiModelId = overrideModelId ??
+          (sessionProvider.isDynamicChat ? 'cortex/auto' : sessionProvider.modelId) ??
+          'cortex/auto';
 
       if (overrideModelId != null && overrideModelId.isNotEmpty) {
         apiModelIdForSend = overrideModelId;
@@ -165,6 +313,17 @@ class SendService {
         apiModelIdForSend = 'cortex/auto';
       } else {
         apiModelIdForSend = sessionProvider.modelId;
+      }
+
+      final intentResolvedModelId = _resolveAttachmentIntentModelId(
+        currentModelId: apiModelIdForSend ?? 'cortex/auto',
+        text: text,
+        attachments: currentAttachmentPaths,
+        langCode: langCode,
+        isUserSubscribed: sessionProvider.isUserSubscribed,
+      );
+      if (intentResolvedModelId != null) {
+        apiModelIdForSend = intentResolvedModelId;
       }
 
       // Smart Selection Logic
@@ -175,7 +334,7 @@ class SendService {
         if (entity.variants != null && entity.variants!.isNotEmpty) {
           final List<dynamic> variants = entity.variants!.values.toList();
           final bool hasVisualContent =
-          currentAttachmentPaths.any((path) => _isImageFile(path));
+              currentAttachmentPaths.any((path) => _isImageFile(path));
 
           List<dynamic> getPreferredCandidates(List<dynamic> sourceList) {
             final filtered = sourceList.where((v) {
@@ -201,7 +360,7 @@ class SendService {
             } else {
               if (hasVisualContent) {
                 final visionModel = downloadedVariants.firstWhere(
-                      (v) => (v['modalities']?['image'] == true),
+                  (v) => (v['modalities']?['image'] == true),
                   orElse: () => null,
                 );
                 apiModelIdForSend = visionModel != null
@@ -209,14 +368,14 @@ class SendService {
                     : getPreferredCandidates(downloadedVariants).first['id'];
               } else {
                 apiModelIdForSend =
-                getPreferredCandidates(downloadedVariants).first['id'];
+                    getPreferredCandidates(downloadedVariants).first['id'];
               }
             }
           } else {
             // Online Variants
             if (hasVisualContent) {
               final visionModel = variants.firstWhere(
-                    (v) => (v['modalities']?['image'] == true),
+                (v) => (v['modalities']?['image'] == true),
                 orElse: () => null,
               );
               apiModelIdForSend = visionModel != null
@@ -249,8 +408,8 @@ class SendService {
           String mType = demandsImage
               ? localizations.mediaTypeImage
               : (demandsVideo
-              ? localizations.mediaTypeVideo
-              : localizations.mediaTypeAudio);
+                  ? localizations.mediaTypeVideo
+                  : localizations.mediaTypeAudio);
 
           voiceSystemPrompt = localizations.systemPromptMissingMedia(
               mType, entity.displayTitle);
@@ -263,17 +422,19 @@ class SendService {
       if (apiModelIdForSend == null) {
         throw ApiException(errorMessage);
       }
+      targetModelIdForSend = apiModelIdForSend;
 
       final isAutoRouter = apiModelIdForSend == 'cortex/auto';
       final isServerSide = isAutoRouter ||
           Utils.isServerSideModel(apiModelIdForSend,
               langCode: langCode, modelService: _modelService);
+      targetIsServerSide = isServerSide;
 
       final selectedModelForSnapshot = _modelService
-          .getPreciseModelData(apiModelIdForSend, langCode: langCode);
+          .getPreciseModelData(originalUiModelId, langCode: langCode);
       final modelTitleForStorage = selectedModelForSnapshot.displayTitle;
       final modelImagePathForStorage =
-      _modelService.getModelImagePath(selectedModelForSnapshot);
+          _modelService.getModelImagePath(selectedModelForSnapshot);
 
       if (isServerSide && !hasInternet) {
         throw ApiException(localizations.checkYourInternet);
@@ -285,7 +446,7 @@ class SendService {
         isUserMessage: true,
         attachmentPaths: currentAttachmentPaths,
         isAttachmentUploading: currentAttachmentPaths.isNotEmpty,
-        model: apiModelIdForSend,
+        model: originalUiModelId,
         isVisible: !isHidden,
       );
 
@@ -301,11 +462,11 @@ class SendService {
           final newConvId = _uuid.v4();
           targetConvId = newConvId;
           final defaultTitle =
-          (text.isEmpty && currentAttachmentPaths.isNotEmpty)
-              ? "📁"
-              : (text.length > 32 ? text.substring(0, 32) : text);
+              (text.isEmpty && currentAttachmentPaths.isNotEmpty)
+                  ? "📁"
+                  : (text.length > 32 ? text.substring(0, 32) : text);
 
-          final modelForStorage = apiModelIdForSend;
+          final modelForStorage = originalUiModelId;
 
           if (isHidden) {
             _conversationProvider.startEphemeralSession(
@@ -326,24 +487,40 @@ class SendService {
               debugPrint("🚀 Triggering TitleGen for new chat...");
               _apiService
                   .generateChatTitle(text, localizations.chatTitlePrompt,
-                  localizations.chatTitleCriticalInstruction)
-                  .then((aiTitle) {
-                if (aiTitle != null && aiTitle
-                    .trim()
-                    .isNotEmpty) {
-                  final cleanTitle =
-                  aiTitle.length > 40 ? aiTitle.substring(0, 40) : aiTitle;
+                      localizations.chatTitleCriticalInstruction)
+                  .then((aiTitle) async {
+                if (aiTitle != null && aiTitle.trim().isNotEmpty) {
+                  final rawTitle =
+                      aiTitle.length > 40 ? aiTitle.substring(0, 40) : aiTitle;
+
+                  // Title Case: capitalize the first letter of every word
+                  final cleanTitle = rawTitle
+                      .split(' ')
+                      .map((word) => word.isEmpty
+                          ? word
+                          : '${word[0].toUpperCase()}${word.substring(1)}')
+                      .join(' ');
 
                   // Update current UI if we are still on this chat
+                  // Only replace the temporary first-message title. If the
+                  // user manually renamed the chat while TitleGen was running,
+                  // the WHERE guard below prevents the generated title from
+                  // silently overwriting their choice.
+                  final didRename = await ChatStorageService.renameConversation(
+                    newConvId,
+                    cleanTitle,
+                    source: 'titlegen',
+                    expectedCurrentTitle: defaultTitle,
+                  );
+
+                  if (!didRename) {
+                    debugPrint(
+                        "[TitleGen] Skipped applying generated title for $newConvId because the title changed before completion.");
+                    return;
+                  }
+
                   if (_conversationProvider.conversationID == newConvId) {
                     _conversationProvider.updateConversationTitle(cleanTitle);
-                    // Also set it in DB and broadcast via storage stream so Axon Inbox sees it
-                    ChatStorageService.renameConversation(
-                        newConvId, cleanTitle);
-                  } else {
-                    // Update local storage in the background
-                    ChatStorageService.renameConversation(
-                        newConvId, cleanTitle);
                   }
                 }
               }).catchError((e) {
@@ -356,6 +533,7 @@ class SendService {
         }
         aiMessageIndex = _conversationProvider.messages.length - 1;
       }
+      targetAiMessageIndex = aiMessageIndex;
 
       // Guard: prevent duplicate sends for the same conversation.
       if (targetConvId != null &&
@@ -364,6 +542,9 @@ class SendService {
         return false;
       }
       if (targetConvId != null) _activeSendConversations.add(targetConvId);
+      if (targetConvId != null && isServerSide) {
+        _backgroundTaskService.markActive(targetConvId);
+      }
 
       _inputProvider.clearAttachments();
 
@@ -385,13 +566,46 @@ class SendService {
         final String convId = targetConvId!;
         int attempt = 0;
         bool success = false;
-        
+        String? dynamicFallbackNotice;
+        bool hasTriedDynamicServerFallback =
+            apiModelIdForSend == 'cortex/auto' ||
+                apiModelIdForSend == 'dynamic';
+        final triedMediaFallbackIds = <String>{apiModelIdForSend};
+
+        Future<void> switchToDynamicFallback({
+          String? notice,
+          Object? reason,
+        }) async {
+          debugPrint(
+              "SendService: Server fallback triggered. Model '${apiModelIdForSend ?? 'unknown'}' failed${reason == null ? '' : ' ($reason)'}. Retrying with dynamic chat...");
+
+          dynamicFallbackNotice = notice;
+          apiModelIdForSend = 'cortex/auto';
+          targetModelIdForSend = apiModelIdForSend;
+          attempt = 0;
+          hasTriedDynamicServerFallback = true;
+
+          _backgroundTaskService.resetBuffer(convId);
+          _clearPendingMediaState(convId, aiMessageIndex);
+
+          if (_isConversationActive(convId)) {
+            _conversationProvider.fadeOutMessage(aiMessageIndex);
+            await Future.delayed(const Duration(milliseconds: 300));
+            _conversationProvider.prepareForRegeneration(
+                aiMessageIndex, 'cortex/auto');
+          }
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+
         while (attempt < 3 && !success) {
           attempt++;
           try {
+            final requestText = dynamicFallbackNotice == null
+                ? textForApi
+                : "$dynamicFallbackNotice\n\n$textForApi";
             await _sendServerSideMessageWithLoop(
-              initialText: textForApi,
-              modelId: apiModelIdForSend,
+              initialText: requestText,
+              modelId: apiModelIdForSend!,
               attachments: currentAttachmentPaths,
               localizations: localizations,
               aiMessageIndex: aiMessageIndex,
@@ -403,17 +617,87 @@ class SendService {
           } catch (e) {
             if (e is ApiException && e.code == 'EMPTY_RESPONSE') {
               if (attempt >= 3) {
+                if (!hasTriedDynamicServerFallback &&
+                    _shouldFallbackServerErrorToDynamic(e, apiModelIdForSend)) {
+                  await switchToDynamicFallback(reason: e);
+                  continue;
+                }
                 rethrow;
               }
-              debugPrint("SendService: Empty response detected, retrying attempt $attempt...");
-              // Reset the message text before retrying
+              debugPrint(
+                  "SendService: Empty response detected, retrying attempt $attempt...");
+              // Reset every live copy before retrying. The background buffer is
+              // the source of truth even while the chat is foregrounded.
+              _backgroundTaskService.resetBuffer(convId);
               if (_isConversationActive(convId)) {
-                final currentMsg = _conversationProvider.messages[aiMessageIndex];
-                _conversationProvider.updateMessageAtIndex(aiMessageIndex, currentMsg.copyWith(text: ""));
-              } else {
-                _backgroundTaskService.resetBuffer(convId);
+                final currentMsg =
+                    _conversationProvider.messages[aiMessageIndex];
+                _conversationProvider.updateMessageAtIndex(
+                    aiMessageIndex, currentMsg.copyWith(text: ""));
               }
               await Future.delayed(const Duration(milliseconds: 500));
+            } else if (e is ApiException && (e.code ?? '').startsWith('FAL_')) {
+              final failedModelId = apiModelIdForSend ?? 'cortex/auto';
+              final failedModel = _modelService.getPreciseModelData(
+                failedModelId,
+                langCode: langCode,
+              );
+              final hasImageAttachment =
+                  currentAttachmentPaths.any(_isImageFile);
+              final canRetryImageToImage = hasImageAttachment &&
+                  _isFalMediaModel(failedModel, 'image') &&
+                  failedModel.modalities['image'] != true;
+              final imageToImageFallback = canRetryImageToImage
+                  ? _findFalMediaModel(
+                      langCode: langCode,
+                      isUserSubscribed: sessionProvider.isUserSubscribed,
+                      outputType: 'image',
+                      requiredInputType: 'image',
+                      excludeIds: triedMediaFallbackIds,
+                    )
+                  : null;
+
+              if (imageToImageFallback != null) {
+                debugPrint(
+                    "SendService: FAL text-to-image failed (${e.code}). Retrying with image-to-image model '${imageToImageFallback.id}'.");
+
+                apiModelIdForSend = imageToImageFallback.id;
+                targetModelIdForSend = apiModelIdForSend;
+                triedMediaFallbackIds.add(imageToImageFallback.id);
+                attempt = 0;
+                dynamicFallbackNotice = null;
+
+                _backgroundTaskService.resetBuffer(convId);
+                _clearPendingMediaState(convId, aiMessageIndex);
+
+                if (_isConversationActive(convId)) {
+                  _conversationProvider.fadeOutMessage(aiMessageIndex);
+                  await Future.delayed(const Duration(milliseconds: 300));
+                  _conversationProvider.prepareForRegeneration(
+                      aiMessageIndex, imageToImageFallback.id);
+                }
+                await Future.delayed(const Duration(milliseconds: 100));
+                continue;
+              }
+
+              if (hasTriedDynamicServerFallback &&
+                  (apiModelIdForSend == 'cortex/auto' ||
+                      apiModelIdForSend == 'dynamic')) {
+                rethrow;
+              }
+
+              debugPrint(
+                  "SendService: FAL error detected (${e.code}). Falling back to dynamic chat with localized notice...");
+
+              await switchToDynamicFallback(
+                notice: _localizedFalFallbackMessage(e, localizations),
+                reason: e,
+              );
+              continue;
+            } else if (!hasTriedDynamicServerFallback &&
+                _shouldFallbackServerErrorToDynamic(e, apiModelIdForSend)) {
+              await switchToDynamicFallback(reason: e);
+              continue;
             } else {
               rethrow;
             }
@@ -422,10 +706,98 @@ class SendService {
 
         // Only update UI provider if user is still on this conversation.
         if (_isConversationActive(convId)) {
+          _syncActiveMessageFromBackgroundBuffer(
+              convId, aiMessageIndex, apiModelIdForSend!);
           _conversationProvider.finishBotResponse(aiMessageIndex);
         } else {
           // Background: persist the final message to DB.
-          await _persistBackgroundCompletion(convId, aiMessageIndex);
+          await _persistBackgroundCompletion(
+              convId, aiMessageIndex, apiModelIdForSend!);
+          if (_isConversationActive(convId)) {
+            _syncActiveMessageFromBackgroundBuffer(
+                convId, aiMessageIndex, apiModelIdForSend!);
+            _conversationProvider.finishBotResponse(aiMessageIndex);
+          }
+        }
+
+        // -------------------------------------------------------------------
+        // IMAGE TAG INTERCEPT: If the model responded with only "<image>"
+        // (or variants like "<image>prompt</image>"), it means the text model
+        // tried to delegate to image generation but can't do it itself.
+        // We intercept this, hide the tag, and re-route to an actual
+        // image-generating model.
+        // -------------------------------------------------------------------
+        if (_isConversationActive(convId)) {
+          final messages = _conversationProvider.messages;
+          if (aiMessageIndex >= 0 && aiMessageIndex < messages.length) {
+            final botText = messages[aiMessageIndex].text.trim();
+            // Match patterns: <image>, <image>some prompt</image>, <image />
+            final imageTagRegex = RegExp(
+              r'^\s*<image\s*/?\s*>.*$|^\s*<image>(.*?)</image>\s*$',
+              caseSensitive: false,
+              dotAll: true,
+            );
+            if (imageTagRegex.hasMatch(botText)) {
+              debugPrint(
+                  "[SendService] <image> tag intercepted. Re-routing to image model...");
+
+              // Extract prompt from tag if present, otherwise use original user text
+              final tagMatch = RegExp(r'<image>(.*?)</image>',
+                      caseSensitive: false, dotAll: true)
+                  .firstMatch(botText);
+              final imagePrompt =
+                  (tagMatch != null && tagMatch.group(1)!.trim().isNotEmpty)
+                      ? tagMatch.group(1)!.trim()
+                      : text; // fall back to original user prompt
+
+              // Clear the bot's <image> tag text
+              _conversationProvider.updateMessageAtIndex(
+                aiMessageIndex,
+                messages[aiMessageIndex].copyWith(text: ""),
+              );
+
+              // Find the first available image generation model (non-premium first)
+              final allModels = _modelService.getCachedModelsSync();
+              final imageModels = allModels
+                  .where((m) =>
+                      m.category == 'image' &&
+                      m.outputs['image'] == true &&
+                      m.type == 'online')
+                  .toList();
+
+              if (imageModels.isNotEmpty) {
+                // Prefer free models, then premium
+                final freeImageModels =
+                    imageModels.where((m) => !m.isPremium).toList();
+                final chosenModel = freeImageModels.isNotEmpty
+                    ? freeImageModels.first
+                    : imageModels.first;
+
+                debugPrint(
+                    "[SendService] Re-routing to image model: ${chosenModel.id}");
+
+                if (!context.mounted) return false;
+
+                // Re-send using the image model (recursive call with override)
+                await sendMessage(
+                  messageText: imagePrompt,
+                  context: context,
+                  localizations: localizations,
+                  overrideModelId: chosenModel.id,
+                  isRegenerate: false,
+                );
+                return true; // Exit early — the re-routed call handles everything
+              } else {
+                debugPrint(
+                    "[SendService] No image generation models available. Showing fallback text.");
+                _conversationProvider.updateMessageAtIndex(
+                  aiMessageIndex,
+                  messages[aiMessageIndex]
+                      .copyWith(text: localizations.errorNoModelsAvailable),
+                );
+              }
+            }
+          }
         }
 
         if (_inputProvider.isVoiceModeActive && _isConversationActive(convId)) {
@@ -437,8 +809,8 @@ class SendService {
       // 6. ANALYTICS & HISTORY
       // -----------------------------------------------------------------------
       if (!isAutoRouter) {
-        ChatStorageService.addRecentModel(apiModelIdForSend,
-            langCode: langCode, modelService: _modelService)
+        ChatStorageService.addRecentModel(apiModelIdForSend!,
+                langCode: langCode, modelService: _modelService)
             .ignore();
       }
 
@@ -447,18 +819,50 @@ class SendService {
         hasAttachments: currentAttachmentPaths.isNotEmpty,
       );
 
+      if (!isRegenerate && !isHidden && context.mounted) {
+        try {
+          context
+              .read<ExtrovertNotificationService>()
+              .recordSentMessageAndMaybeRequestPermission()
+              .ignore();
+        } catch (e) {
+          debugPrint(
+              '[SendService] Notification permission prompt scheduling skipped: $e');
+        }
+      }
+
       // Mark background task complete and send notification if needed.
       if (targetConvId != null &&
+          targetIsServerSide &&
+          (!_isConversationActive(targetConvId) || _isAppInBackground()) &&
           _backgroundTaskService.isActive(targetConvId)) {
         final chatTitle = await _getChatTitleForNotification(targetConvId);
         _backgroundTaskService.markComplete(targetConvId);
-        _sendBackgroundCompletionNotification(chatTitle, localizations);
+        _sendBackgroundCompletionNotification(
+            targetConvId, chatTitle, localizations);
       }
 
       return true;
     } catch (e) {
       if (e is UserCancelledException) return false;
-      _handleSendError(e, isRegenerate, regenerateAiIndex, localizations);
+
+      // CRITICAL: Only show error in UI if the user is still on this chat.
+      // Otherwise the error message would corrupt a completely different chat!
+      if (targetConvId == null || _isConversationActive(targetConvId)) {
+        _handleSendError(e, isRegenerate, regenerateAiIndex, localizations);
+      } else {
+        if (targetAiMessageIndex != null) {
+          await _persistBackgroundError(
+            targetConvId,
+            targetAiMessageIndex,
+            targetModelIdForSend,
+            e,
+            localizations,
+          );
+        }
+        debugPrint(
+            '[SendService] Background error for $targetConvId (suppressed): $e');
+      }
       return false;
     } finally {
       if (targetConvId != null) {
@@ -485,24 +889,25 @@ class SendService {
     required String targetConvId,
   }) async {
     final ModelEntity modelData =
-    _modelService.getPreciseModelData(modelId, langCode: langCode);
+        _modelService.getPreciseModelData(modelId, langCode: langCode);
     final bool isPremium = modelData.isPremium;
 
-    final bool isCharacterModel =
-        (modelData.category == 'roleplay' || modelData.category == 'self') &&
-            modelId != 'cortex/auto';
+    final bool isCharacterModel = _isCharacterModel(modelData, modelId);
 
     // Use the enableThinkingMode passed from sendMessage (captured before clearAllInput)
     final bool enablefeatureReasoning = enableThinkingMode;
 
     // 1. Build Base Context (History)
     List<Map<String, dynamic>> contextMessages =
-    await _contextService.buildContextMessages(
+        await _contextService.buildContextMessages(
       includeLastUser: false,
       targetModelId: modelId,
       langCode: langCode,
       enableThinkingMode: enablefeatureReasoning,
       localizations: localizations,
+      isCharacterModel: isCharacterModel,
+      customInstruction: _userMemoryProvider.customInstruction,
+      userMemory: _userMemoryProvider.memory,
     );
 
     // 2. Add Current User Message to Context (Manual Construction)
@@ -538,7 +943,54 @@ class SendService {
     // enablefeatureReasoning is already defined above when building context
     bool isfeatureReasoningBlockActive = false;
     bool hasEverHadfeatureReasoning =
-    false; // Track if we've seen any featureReasoning
+        false; // Track if we've seen any featureReasoning
+
+    void setWebSearchActive(bool active) {
+      _backgroundTaskService.setWebSearchActive(targetConvId, active);
+      if (!_isConversationActive(targetConvId)) return;
+
+      final messages = _conversationProvider.messages;
+      if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) return;
+
+      final message = messages[aiMessageIndex];
+      if (message.isWebSearchActive == active) return;
+
+      _conversationProvider.updateMessageAtIndex(
+        aiMessageIndex,
+        message.copyWith(isWebSearchActive: active),
+      );
+    }
+
+    void appendStreamChunk(
+      String chunk, {
+      bool sendToVoice = false,
+      bool scrollIfNeeded = false,
+      bool flushImmediately = false,
+    }) {
+      if (chunk.isEmpty) return;
+      if (sendToVoice) {
+        setWebSearchActive(false);
+      }
+
+      // Keep the background buffer as the complete source of truth even while
+      // this conversation is foregrounded. If the user leaves at any point,
+      // final persistence still has the whole response, not only later chunks.
+      _backgroundTaskService.appendChunk(targetConvId, chunk);
+
+      if (_isConversationActive(targetConvId)) {
+        _conversationProvider.appendToLastBotMessage(chunk);
+        if (flushImmediately) {
+          _conversationProvider.flushStreamUpdates();
+        }
+        if (sendToVoice && _inputProvider.isVoiceModeActive) {
+          _voiceService.onAiStreamCallback(chunk);
+        }
+        if (scrollIfNeeded && _scrollService.isUserAtBottom()) {
+          _scrollService.scrollToBottom(
+              duration: const Duration(milliseconds: 50));
+        }
+      }
+    }
 
     // --- THE LOOP ---
     while (shouldContinue && loopCount < maxLoops) {
@@ -550,8 +1002,6 @@ class SendService {
       // Handler Functions (defined here to capture scope)
 
       void onfeatureReasoning(String featureReasoningText) {
-        // Skip featureReasoning if disabled
-        if (!enablefeatureReasoning) return;
         if (_conversationProvider.wasResponseStopped &&
             _isConversationActive(targetConvId)) {
           return;
@@ -561,29 +1011,15 @@ class SendService {
         if (!isfeatureReasoningBlockActive) {
           // If we had featureReasoning before and closed it, we're continuing - add separator
           if (hasEverHadfeatureReasoning) {
-            if (_isConversationActive(targetConvId)) {
-              _conversationProvider.appendToLastBotMessage("\n\n");
-            } else {
-              _backgroundTaskService.appendChunk(targetConvId, "\n\n");
-            }
+            appendStreamChunk("\n\n");
           }
-          if (_isConversationActive(targetConvId)) {
-            _conversationProvider.appendToLastBotMessage("<think>");
-          } else {
-            _backgroundTaskService.markActive(targetConvId);
-            _backgroundTaskService.appendChunk(targetConvId, "<think>");
-          }
+          appendStreamChunk("<think>");
           isfeatureReasoningBlockActive = true;
           hasEverHadfeatureReasoning = true;
         }
 
         // Ensure we don't double-append headers or newlines. Just the raw text.
-        if (_isConversationActive(targetConvId)) {
-          _conversationProvider.appendToLastBotMessage(featureReasoningText);
-        } else {
-          _backgroundTaskService.appendChunk(
-              targetConvId, featureReasoningText);
-        }
+        appendStreamChunk(featureReasoningText);
       }
 
       void onTextChunk(String text) {
@@ -593,34 +1029,35 @@ class SendService {
         }
         if (text.isEmpty) return; // Ignore empty keep-alive chunks
 
-        // If we were featureReasoning and now switched to ACTUAL content, close the featureReasoning tag
-        if (enablefeatureReasoning && isfeatureReasoningBlockActive) {
-          if (_isConversationActive(targetConvId)) {
-            _conversationProvider.appendToLastBotMessage("</think>");
-          } else {
-            _backgroundTaskService.appendChunk(targetConvId, "</think>");
-          }
+        // If we were reasoning and now switched to actual content, close the tag.
+        if (isfeatureReasoningBlockActive) {
+          appendStreamChunk("</think>");
           isfeatureReasoningBlockActive = false;
         }
 
-        if (_isConversationActive(targetConvId)) {
-          _conversationProvider.appendToLastBotMessage(text);
-          if (_inputProvider.isVoiceModeActive) {
-            _voiceService.onAiStreamCallback(text);
-          }
-          if (_scrollService.isUserAtBottom()) {
-            _scrollService.scrollToBottom(
-                duration: const Duration(milliseconds: 50));
-          }
-        } else {
-          // BACKGROUND MODE: accumulate in the background buffer.
-          _backgroundTaskService.markActive(targetConvId);
-          _backgroundTaskService.appendChunk(targetConvId, text);
-        }
+        _clearPendingMediaState(targetConvId, aiMessageIndex);
+
+        appendStreamChunk(
+          text,
+          sendToVoice: true,
+          scrollIfNeeded: true,
+        );
       }
 
       Future<void> onImageReceived(String url) async {
-        if (_conversationProvider.wasResponseStopped) return;
+        // Block media in voice/flow mode — can't speak images
+        if (_inputProvider.isVoiceModeActive || _voiceService.isFlowActive) {
+          debugPrint('[SendService] Image blocked: voice/flow mode active.');
+          return;
+        }
+        if (_conversationProvider.wasResponseStopped &&
+            _isConversationActive(targetConvId)) {
+          return;
+        }
+        if (!_isCurrentAiMessageForModel(
+            targetConvId, aiMessageIndex, modelId)) {
+          return;
+        }
         try {
           final finalPath = await _persistGeneratedMedia(
             url: url,
@@ -639,6 +1076,7 @@ class SendService {
           await _attachGeneratedMediaToAiMessage(
             aiMessageIndex: aiMessageIndex,
             mediaPath: finalPath,
+            targetConvId: targetConvId,
           );
         } catch (e) {
           debugPrint("Image parse/save error: $e");
@@ -646,7 +1084,19 @@ class SendService {
       }
 
       Future<void> onAudioReceived(String url) async {
-        if (_conversationProvider.wasResponseStopped) return;
+        // Block media in voice/flow mode
+        if (_inputProvider.isVoiceModeActive || _voiceService.isFlowActive) {
+          debugPrint('[SendService] Audio blocked: voice/flow mode active.');
+          return;
+        }
+        if (_conversationProvider.wasResponseStopped &&
+            _isConversationActive(targetConvId)) {
+          return;
+        }
+        if (!_isCurrentAiMessageForModel(
+            targetConvId, aiMessageIndex, modelId)) {
+          return;
+        }
         try {
           final finalPath = await _persistGeneratedMedia(
             url: url,
@@ -664,6 +1114,7 @@ class SendService {
           await _attachGeneratedMediaToAiMessage(
             aiMessageIndex: aiMessageIndex,
             mediaPath: finalPath,
+            targetConvId: targetConvId,
           );
         } catch (e) {
           debugPrint("Audio parse/save error: $e");
@@ -671,7 +1122,19 @@ class SendService {
       }
 
       Future<void> onVideoReceived(String url) async {
-        if (_conversationProvider.wasResponseStopped) return;
+        // Block media in voice/flow mode — can't speak video
+        if (_inputProvider.isVoiceModeActive || _voiceService.isFlowActive) {
+          debugPrint('[SendService] Video blocked: voice/flow mode active.');
+          return;
+        }
+        if (_conversationProvider.wasResponseStopped &&
+            _isConversationActive(targetConvId)) {
+          return;
+        }
+        if (!_isCurrentAiMessageForModel(
+            targetConvId, aiMessageIndex, modelId)) {
+          return;
+        }
         try {
           final finalPath = await _persistGeneratedMedia(
             url: url,
@@ -682,6 +1145,7 @@ class SendService {
           await _attachGeneratedMediaToAiMessage(
             aiMessageIndex: aiMessageIndex,
             mediaPath: finalPath,
+            targetConvId: targetConvId,
           );
         } catch (e) {
           debugPrint("Video parse/save error: $e");
@@ -690,7 +1154,14 @@ class SendService {
 
       // Handler for media generation started signal (shimmer state)
       void onMediaGenerating(String type) {
-        if (_conversationProvider.wasResponseStopped) return;
+        // Block media generation indicator in voice/flow mode
+        if (_inputProvider.isVoiceModeActive || _voiceService.isFlowActive) {
+          return;
+        }
+        if (_conversationProvider.wasResponseStopped &&
+            _isConversationActive(targetConvId)) {
+          return;
+        }
         final mediaType = switch (type) {
           'audio' => MediaGenerationType.audio,
           'image' => MediaGenerationType.image,
@@ -698,16 +1169,27 @@ class SendService {
           _ => MediaGenerationType.none,
         };
         if (mediaType == MediaGenerationType.none) return;
-        final messages = _conversationProvider.messages;
-        if (aiMessageIndex >= 0 && aiMessageIndex < messages.length) {
-          final msg = messages[aiMessageIndex];
-          _conversationProvider.updateMessageAtIndex(
-            aiMessageIndex,
-            msg.copyWith(pendingMediaType: mediaType),
-          );
-          if (_scrollService.isUserAtBottom()) {
-            _scrollService.scrollToBottom(
-                duration: const Duration(milliseconds: 100));
+        if (!_isCurrentAiMessageForModel(
+            targetConvId, aiMessageIndex, modelId)) {
+          return;
+        }
+
+        // Track this in the background state regardless of the current screen,
+        // so re-entering the chat can restore the shimmer immediately.
+        _backgroundTaskService.setPendingMediaType(targetConvId, mediaType);
+
+        if (_isConversationActive(targetConvId)) {
+          final messages = _conversationProvider.messages;
+          if (aiMessageIndex >= 0 && aiMessageIndex < messages.length) {
+            final msg = messages[aiMessageIndex];
+            _conversationProvider.updateMessageAtIndex(
+              aiMessageIndex,
+              msg.copyWith(pendingMediaType: mediaType),
+            );
+            if (_scrollService.isUserAtBottom()) {
+              _scrollService.scrollToBottom(
+                  duration: const Duration(milliseconds: 100));
+            }
           }
         }
       }
@@ -742,16 +1224,18 @@ class SendService {
       // Execute Request
       if (isCharacterModel) {
         // Characters typically don't use tools in this architecture yet
-        var baseModelId = modelData.baseModelId;
-        if (baseModelId == 'dynamic') baseModelId = 'cortex/auto';
+        final characterBaseModel = _resolveCharacterBaseModel(
+          characterModel: modelData,
+          langCode: langCode,
+        );
 
         await _apiService.getCharacterResponse(
           userInput: "",
           // Already in context
           context: contextMessages,
           characterId: modelId,
-          baseModelId: baseModelId ?? 'cortex/auto',
-          source: modelData.source,
+          baseModelId: characterBaseModel.id,
+          source: characterBaseModel.source,
           isPremium: isPremium,
           enablefeatureReasoning: enablefeatureReasoning,
           localizations: localizations,
@@ -770,6 +1254,9 @@ class SendService {
             modelData.category == 'video' ||
             modelData.category == 'audio';
         final enableWebSearch = !isMediaModel && _inputProvider.enableWebSearch;
+        if (enableWebSearch) {
+          setWebSearchActive(true);
+        }
         await _apiService.getOnlineModelResponse(
           modelId: modelId,
           isPremium: isPremium,
@@ -794,8 +1281,12 @@ class SendService {
             turnToolCalls = tools;
           },
           onCitations: (citations) {
-            _conversationProvider.updateLastBotMessageSources(citations);
+            setWebSearchActive(false);
+            if (_isConversationActive(targetConvId)) {
+              _conversationProvider.updateLastBotMessageSources(citations);
+            }
           },
+          onWebSearchActive: setWebSearchActive,
         );
       }
 
@@ -803,13 +1294,9 @@ class SendService {
       if (turnToolCalls.isNotEmpty) {
         shouldContinue = true; // We need to loop again to send results
 
-        // Close featureReasoning block before tool execution if it's still open
-        if (enablefeatureReasoning && isfeatureReasoningBlockActive) {
-          if (_isConversationActive(targetConvId)) {
-            _conversationProvider.appendToLastBotMessage("</think>");
-          } else {
-            _backgroundTaskService.appendChunk(targetConvId, "</think>");
-          }
+        // Close reasoning block before tool execution if it's still open.
+        if (isfeatureReasoningBlockActive) {
+          appendStreamChunk("</think>");
           isfeatureReasoningBlockActive = false;
         }
 
@@ -857,16 +1344,9 @@ class SendService {
               if (widgetType != null) {
                 // Inject Widget Marker (no extra newlines to avoid spacing issues)
                 // The UI (parser) will detect this pattern and render the card
-                final widgetMarker = "<<<WIDGET:$widgetType>>>${jsonEncode(
-                    widgetData)}<<<END>>>";
-                if (_isConversationActive(targetConvId)) {
-                  _conversationProvider.appendToLastBotMessage(widgetMarker);
-                  // Force immediate UI update for widget visibility
-                  _conversationProvider.flushStreamUpdates();
-                } else {
-                  _backgroundTaskService.appendChunk(
-                      targetConvId, widgetMarker);
-                }
+                final widgetMarker =
+                    "<<<WIDGET:$widgetType>>>${jsonEncode(widgetData)}<<<END>>>";
+                appendStreamChunk(widgetMarker, flushImmediately: true);
 
                 // Use the summary for the LLM context so it doesn't get confused by raw JSON
                 result = summaryForContext;
@@ -889,26 +1369,35 @@ class SendService {
       }
     }
 
-    // Ensure featureReasoning block is closed at the end of all iterations
-    // This handles cases where the final response ends with featureReasoning
-    if (enablefeatureReasoning && isfeatureReasoningBlockActive) {
-      if (_isConversationActive(targetConvId)) {
-        _conversationProvider.appendToLastBotMessage("</think>");
-      } else {
-        _backgroundTaskService.appendChunk(targetConvId, "</think>");
-      }
+    // Ensure reasoning block is closed at the end of all iterations.
+    if (isfeatureReasoningBlockActive) {
+      appendStreamChunk("</think>");
       isfeatureReasoningBlockActive = false;
     }
 
     // Clear documents context after processing
     ToolRegistry.clearDocumentsContext();
+    setWebSearchActive(false);
+
+    // CRITICAL: The background buffer mirrors every chunk, including chunks
+    // that arrived while this chat was foregrounded. This prevents a late tab
+    // switch from making a completed response look empty and triggering retries.
+    final bufferedResponseText =
+        _backgroundTaskService.peekBuffer(targetConvId);
+    String finalResponseText = bufferedResponseText;
+    bool hasGeneratedMedia =
+        _backgroundTaskService.getMediaAttachments(targetConvId).isNotEmpty;
+
+    if (finalResponseText.isEmpty && _isConversationActive(targetConvId)) {
+      final messages = _conversationProvider.messages;
+      finalResponseText = messages.isNotEmpty ? messages.last.text : "";
+      hasGeneratedMedia =
+          messages.isNotEmpty && messages.last.attachmentPaths.isNotEmpty;
+    }
 
     // Extract memory updates if any
-    final finalResponseText = _conversationProvider.messages.isNotEmpty
-        ? _conversationProvider.messages.last.text
-        : "";
-    final memoryExp =
-    RegExp(r'<memory[)>]?([\s\S]*?)(?:</memory[)>]?|$)', caseSensitive: false);
+    final memoryExp = RegExp(r'<memory[)>]?([\s\S]*?)(?:</memory[)>]?|$)',
+        caseSensitive: false);
     final memoryMatch = memoryExp.firstMatch(finalResponseText);
     if (memoryMatch != null) {
       final newMemory = memoryMatch.group(1)?.trim();
@@ -921,21 +1410,21 @@ class SendService {
 
     // CHECK FOR EMPTY RESPONSE
     final cleanResponse = finalResponseText.replaceAll(memoryExp, '').trim();
-    final bool hasGeneratedMedia = _conversationProvider.messages.isNotEmpty && _conversationProvider.messages.last.attachmentPaths.isNotEmpty;
     if (cleanResponse.isEmpty && !hasGeneratedMedia) {
       throw ApiException(localizations.errorServer, code: 'EMPTY_RESPONSE');
     }
   }
 
-  void _handleSendError(Object error,
-      bool isRegenerate,
-      int? regenerateAiIndex,
-      AppLocalizations localizations, {
-        String? failedUserText,
-        List<String>? failedAttachmentPaths,
-      }) {
+  void _handleSendError(
+    Object error,
+    bool isRegenerate,
+    int? regenerateAiIndex,
+    AppLocalizations localizations, {
+    String? failedUserText,
+    List<String>? failedAttachmentPaths,
+  }) {
     final String errorMessage =
-    error is ApiException ? error.message : localizations.anErrorOccurred;
+        error is ApiException ? error.message : localizations.anErrorOccurred;
     final bool isContentFlagError = error is ApiException &&
         error.message == localizations.errorPromptFlagged;
 
@@ -965,31 +1454,77 @@ class SendService {
   Future<void> _attachGeneratedMediaToAiMessage({
     required int aiMessageIndex,
     required String mediaPath,
+    required String targetConvId,
   }) async {
-    final messages = _conversationProvider.messages;
-    if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) return;
+    _backgroundTaskService.addMediaAttachment(targetConvId, mediaPath);
+    _backgroundTaskService.setPendingMediaType(
+        targetConvId, MediaGenerationType.none);
 
-    final Message currentAiMessage = messages[aiMessageIndex];
-    final updatedAttachments =
-    List<String>.from(currentAiMessage.attachmentPaths);
-    if (!updatedAttachments.contains(mediaPath)) {
-      updatedAttachments.add(mediaPath);
-    }
+    if (_isConversationActive(targetConvId)) {
+      // FOREGROUND: Attach to the live UI message.
+      final messages = _conversationProvider.messages;
+      if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) return;
 
-    final updatedMessage = currentAiMessage.copyWith(
-      attachmentPaths: updatedAttachments,
-      pendingMediaType: MediaGenerationType.none,
-    );
+      final Message currentAiMessage = messages[aiMessageIndex];
+      final updatedAttachments =
+          List<String>.from(currentAiMessage.attachmentPaths);
+      if (!updatedAttachments.contains(mediaPath)) {
+        updatedAttachments.add(mediaPath);
+      }
 
-    _conversationProvider.updateMessageAtIndex(aiMessageIndex, updatedMessage);
-    final convId = _conversationProvider.conversationID;
-    if (convId != null) {
-      await ChatStorageService.upsertMessage(
-          convId, aiMessageIndex, updatedMessage);
-    }
-    if (_scrollService.isUserAtBottom()) {
-      _scrollService.scrollToBottom(
-          duration: const Duration(milliseconds: 100));
+      final updatedMessage = currentAiMessage.copyWith(
+        attachmentPaths: updatedAttachments,
+        pendingMediaType: MediaGenerationType.none,
+      );
+
+      _conversationProvider.updateMessageAtIndex(
+          aiMessageIndex, updatedMessage);
+      if (_conversationProvider.conversationID != null) {
+        await ChatStorageService.upsertMessage(
+            _conversationProvider.conversationID!,
+            aiMessageIndex,
+            updatedMessage);
+      }
+      if (_scrollService.isUserAtBottom()) {
+        _scrollService.scrollToBottom(
+            duration: const Duration(milliseconds: 100));
+      }
+    } else {
+      // BACKGROUND: User has left this chat. Persist media directly to DB
+      // and track in background task service so it can be merged on re-entry.
+      // Persist directly to the database.
+      try {
+        final existingMsg = await ChatStorageService.getMessageAtIndex(
+            targetConvId, aiMessageIndex);
+        if (existingMsg != null) {
+          final updatedAttachments =
+              List<String>.from(existingMsg.attachmentPaths);
+          if (!updatedAttachments.contains(mediaPath)) {
+            updatedAttachments.add(mediaPath);
+          }
+          final updatedMessage = existingMsg.copyWith(
+            attachmentPaths: updatedAttachments,
+            pendingMediaType: MediaGenerationType.none,
+          );
+          await ChatStorageService.upsertMessage(
+              targetConvId, aiMessageIndex, updatedMessage);
+        } else {
+          // No existing message yet — create a minimal one with the media.
+          final mediaMessage = Message(
+            text: '',
+            isUserMessage: false,
+            attachmentPaths: [mediaPath],
+            isThinking: false,
+            includeInContext: true,
+          );
+          await ChatStorageService.upsertMessage(
+              targetConvId, aiMessageIndex, mediaMessage);
+        }
+        debugPrint(
+            '[SendService] Background media persisted for $targetConvId: $mediaPath');
+      } catch (e) {
+        debugPrint('[SendService] Error persisting background media: $e');
+      }
     }
   }
 
@@ -1049,7 +1584,7 @@ class SendService {
     required String fallbackExtension,
   }) {
     final mimeMatch =
-    RegExp(r'^data:([^;]+);base64,', caseSensitive: false).firstMatch(url);
+        RegExp(r'^data:([^;]+);base64,', caseSensitive: false).firstMatch(url);
     if (mimeMatch != null) {
       final mime = (mimeMatch.group(1) ?? '').toLowerCase();
       final slashIndex = mime.indexOf('/');
@@ -1062,9 +1597,7 @@ class SendService {
     }
 
     final ext =
-    p.extension(url
-        .split('?')
-        .first).toLowerCase().replaceAll('.', '');
+        p.extension(url.split('?').first).toLowerCase().replaceAll('.', '');
     if (allowedExtensions.contains(ext)) {
       return ext;
     }
@@ -1077,10 +1610,481 @@ class SendService {
     return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
   }
 
+  bool _isVideoFile(String path) {
+    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
+    return ['mp4', 'mov', 'm4v', 'webm', 'mkv', 'avi'].contains(ext);
+  }
+
+  bool _isAudioFile(String path) {
+    final ext = p.extension(path).toLowerCase().replaceAll('.', '');
+    return ['mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac', 'opus'].contains(ext);
+  }
+
+  String _normalizeIntentText(String text) {
+    return text
+        .toLowerCase()
+        .replaceAll('ı', 'i')
+        .replaceAll('ğ', 'g')
+        .replaceAll('ü', 'u')
+        .replaceAll('ş', 's')
+        .replaceAll('ö', 'o')
+        .replaceAll('ç', 'c');
+  }
+
+  bool _containsAny(String value, Iterable<String> needles) {
+    return needles.any((needle) => value.contains(needle));
+  }
+
+  _MediaIntent _inferMediaIntentFromText({
+    required String text,
+    required bool hasImage,
+    required bool hasVideo,
+    required bool hasAudio,
+  }) {
+    final normalized = _normalizeIntentText(text);
+    if (normalized.trim().isEmpty) return _MediaIntent.none;
+
+    const editTerms = [
+      'edit',
+      'modify',
+      'change',
+      'replace',
+      'remove',
+      'erase',
+      'add ',
+      'upscale',
+      'enhance',
+      'restore',
+      'colorize',
+      'background',
+      'better',
+      'beautify',
+      'prettier',
+      'style',
+      'stylize',
+      'turn into',
+      'make it',
+      'duzenle',
+      'degistir',
+      'sil',
+      'kaldir',
+      'ekle',
+      'iyilestir',
+      'netlestir',
+      'renklendir',
+      'arka plan',
+      'fon',
+      'restor',
+      'stille',
+      'stilize',
+      'tarz',
+      'tarzi',
+      'guzel',
+      'daha iyi',
+      'daha kaliteli',
+      'kaliteli yap',
+      'canlandir',
+      'kirp',
+      'dondur',
+      'buyut',
+      'kucult',
+    ];
+    const imageTerms = [
+      'image',
+      'picture',
+      'photo',
+      'gorsel',
+      'resim',
+      'fotograf',
+      'foto',
+    ];
+    const videoTerms = [
+      'video',
+      'clip',
+      'animation',
+      'animate',
+      'motion',
+      'animasyon',
+      'hareket',
+      'hareketlendir',
+      'canlandir',
+    ];
+    const audioTerms = ['audio', 'voice', 'sound', 'music', 'ses', 'muzik'];
+    const generateTerms = [
+      'generate',
+      'create',
+      'draw',
+      'make',
+      'produce',
+      'olustur',
+      'uret',
+      'ciz',
+      'yap',
+    ];
+    const understandTerms = [
+      'what',
+      'describe',
+      'explain',
+      'analyze',
+      'read',
+      'transcribe',
+      'summarize',
+      'ne',
+      'nedir',
+      'acikla',
+      'anlat',
+      'analiz',
+      'oku',
+      'cevir',
+      'ozetle',
+      'yaziyor',
+      'kim',
+      'nerede',
+    ];
+
+    final edits = _containsAny(normalized, editTerms);
+    final generates = _containsAny(normalized, generateTerms);
+    final mentionsImage = _containsAny(normalized, imageTerms);
+    final mentionsVideo = _containsAny(normalized, videoTerms);
+    final mentionsAudio = _containsAny(normalized, audioTerms);
+
+    if (hasImage && !hasVideo && mentionsVideo && (edits || generates)) {
+      return _MediaIntent.generateVideo;
+    }
+    if (hasImage &&
+        (edits ||
+            (generates &&
+                (mentionsImage || !mentionsVideo && !mentionsAudio)))) {
+      return _MediaIntent.editImage;
+    }
+    if (hasVideo && (edits || (generates && mentionsVideo))) {
+      return _MediaIntent.editVideo;
+    }
+    if (hasAudio && (edits || (generates && mentionsAudio))) {
+      return _MediaIntent.editAudio;
+    }
+    if (generates && mentionsImage) return _MediaIntent.generateImage;
+    if (generates && mentionsVideo) return _MediaIntent.generateVideo;
+    if (generates && mentionsAudio) return _MediaIntent.generateAudio;
+    if (_containsAny(normalized, understandTerms)) {
+      return _MediaIntent.understand;
+    }
+
+    return _MediaIntent.understand;
+  }
+
+  Iterable<ModelEntity> _iterPreciseModels(String langCode) sync* {
+    final seen = <String>{};
+    for (final model in _modelService.getCachedModelsSync()) {
+      if (seen.add(model.id)) {
+        yield _modelService.getPreciseModelData(model.id, langCode: langCode);
+      }
+      final variants = model.variants;
+      if (variants == null) continue;
+      for (final entry in variants.entries) {
+        final variantId = entry.key;
+        if (seen.add(variantId)) {
+          yield _modelService.getPreciseModelData(variantId,
+              langCode: langCode);
+        }
+      }
+    }
+  }
+
+  ModelEntity? _pickModel(
+    String langCode,
+    bool isUserSubscribed,
+    bool Function(ModelEntity model) predicate,
+  ) {
+    final candidates = _iterPreciseModels(langCode).where((model) {
+      if (!model.isServerSide) return false;
+      if (!isUserSubscribed && model.isPremium) return false;
+      final id = model.id.toLowerCase();
+      if (id.contains('guard')) return false;
+      return predicate(model);
+    }).toList();
+
+    if (candidates.isEmpty) return null;
+    candidates.sort((a, b) {
+      int score(ModelEntity model) {
+        var value = 0;
+        if (!model.isPremium) value += 100;
+        if (model.source.toLowerCase() == 'openrouter') value += 20;
+        if (model.source.toLowerCase() == 'fal') value += 20;
+        if (model.tier.toLowerCase() == 'free') value += 10;
+        return value;
+      }
+
+      return score(b).compareTo(score(a));
+    });
+    return candidates.first;
+  }
+
+  ModelEntity? _findFalMediaModel({
+    required String langCode,
+    required bool isUserSubscribed,
+    required String outputType,
+    String? requiredInputType,
+    Set<String> excludeIds = const {},
+  }) {
+    return _pickModel(
+      langCode,
+      isUserSubscribed,
+      (model) {
+        if (excludeIds.contains(model.id)) return false;
+        if (model.source.toLowerCase() != 'fal') return false;
+        if (model.outputs[outputType] != true && model.category != outputType) {
+          return false;
+        }
+        if (requiredInputType != null &&
+            model.modalities[requiredInputType] != true) {
+          return false;
+        }
+        return true;
+      },
+    );
+  }
+
+  ModelEntity? _findAttachmentUnderstandingModel({
+    required String langCode,
+    required bool isUserSubscribed,
+    required bool hasImage,
+    required bool hasVideo,
+    required bool hasAudio,
+  }) {
+    return _pickModel(
+      langCode,
+      isUserSubscribed,
+      (model) {
+        final category = model.category.toLowerCase();
+        if (category == 'image' || category == 'video' || category == 'audio') {
+          return false;
+        }
+        if (model.source.toLowerCase() == 'fal') return false;
+        if (hasImage && model.modalities['image'] != true) return false;
+        if (hasVideo && model.modalities['video'] != true) return false;
+        if (hasAudio && model.modalities['audio'] != true) return false;
+        return model.outputs['text'] == true || model.outputs.isEmpty;
+      },
+    );
+  }
+
+  String? _resolveAttachmentIntentModelId({
+    required String currentModelId,
+    required String text,
+    required List<String> attachments,
+    required String langCode,
+    required bool isUserSubscribed,
+  }) {
+    if (attachments.isEmpty || text.trim().isEmpty) return null;
+    if (currentModelId != 'cortex/auto' && currentModelId != 'dynamic') {
+      return null;
+    }
+
+    final hasImage = attachments.any(_isImageFile);
+    final hasVideo = attachments.any(_isVideoFile);
+    final hasAudio = attachments.any(_isAudioFile);
+    if (!hasImage && !hasVideo && !hasAudio) return null;
+
+    final intent = _inferMediaIntentFromText(
+      text: text,
+      hasImage: hasImage,
+      hasVideo: hasVideo,
+      hasAudio: hasAudio,
+    );
+
+    ModelEntity? routed;
+    switch (intent) {
+      case _MediaIntent.editImage:
+        routed = _findFalMediaModel(
+          langCode: langCode,
+          isUserSubscribed: isUserSubscribed,
+          outputType: 'image',
+          requiredInputType: 'image',
+        );
+        break;
+      case _MediaIntent.editVideo:
+        routed = _findFalMediaModel(
+          langCode: langCode,
+          isUserSubscribed: isUserSubscribed,
+          outputType: 'video',
+          requiredInputType: hasVideo ? 'video' : null,
+        );
+        break;
+      case _MediaIntent.editAudio:
+        routed = _findFalMediaModel(
+          langCode: langCode,
+          isUserSubscribed: isUserSubscribed,
+          outputType: 'audio',
+          requiredInputType: hasAudio ? 'audio' : null,
+        );
+        break;
+      case _MediaIntent.generateImage:
+        routed = _findFalMediaModel(
+          langCode: langCode,
+          isUserSubscribed: isUserSubscribed,
+          outputType: 'image',
+          requiredInputType: hasImage ? 'image' : null,
+        );
+        break;
+      case _MediaIntent.generateVideo:
+        routed = _findFalMediaModel(
+          langCode: langCode,
+          isUserSubscribed: isUserSubscribed,
+          outputType: 'video',
+          requiredInputType: hasVideo
+              ? 'video'
+              : hasImage
+                  ? 'image'
+                  : null,
+        );
+        break;
+      case _MediaIntent.generateAudio:
+        routed = _findFalMediaModel(
+          langCode: langCode,
+          isUserSubscribed: isUserSubscribed,
+          outputType: 'audio',
+          requiredInputType: hasAudio ? 'audio' : null,
+        );
+        break;
+      case _MediaIntent.understand:
+      case _MediaIntent.none:
+        routed = _findAttachmentUnderstandingModel(
+          langCode: langCode,
+          isUserSubscribed: isUserSubscribed,
+          hasImage: hasImage,
+          hasVideo: hasVideo,
+          hasAudio: hasAudio,
+        );
+        break;
+    }
+
+    if (routed == null) return null;
+    debugPrint(
+        "[SendService] Attachment intent '$intent' routed dynamic chat to '${routed.id}'.");
+    return routed.id;
+  }
+
+  bool _isFalMediaModel(ModelEntity model, String outputType) {
+    return model.source.toLowerCase() == 'fal' &&
+        (model.outputs[outputType] == true || model.category == outputType);
+  }
+
+  String _localizedFalFallbackMessage(
+    ApiException error,
+    AppLocalizations localizations,
+  ) {
+    switch (error.code) {
+      case 'FAL_IMAGE_REQUIRED':
+        return localizations.falErrorImageRequired;
+      case 'FAL_AUDIO_REQUIRED':
+        return localizations.falErrorAudioRequired;
+      case 'FAL_VIDEO_REQUIRED':
+        return localizations.falErrorVideoRequired;
+      case 'FAL_IMAGE_CORRUPTED':
+        return localizations.falErrorImageCorrupted;
+      case 'FAL_SCHEMA_INVALID':
+        return localizations.falErrorSchemaInvalid;
+      case 'FAL_SCHEMA_REJECTED':
+        return localizations.falErrorSchemaRejected;
+      default:
+        return error.message;
+    }
+  }
+
+  bool _shouldFallbackServerErrorToDynamic(Object error, String? modelId) {
+    final normalizedModelId = (modelId ?? '').toLowerCase();
+    if (normalizedModelId == 'cortex/auto' || normalizedModelId == 'dynamic') {
+      return false;
+    }
+
+    if (error is! ApiException) return true;
+
+    final code = error.code?.toUpperCase();
+    if (code == null || code.isEmpty) return true;
+
+    const userFacingCodes = <String>{
+      'NO_USER',
+      'CONTENT_FLAGGED',
+      'PREMIUM_TRIAL_EXHAUSTED',
+      'PREDIT_EXHAUSTED',
+      'DREDIT_EXHAUSTED',
+      'INSUFFICIENT_USER_CREDITS',
+      'LIMIT_IMAGE_INSUFFICIENT',
+      'LIMIT_VIDEO_INSUFFICIENT',
+      'LIMIT_AUDIO_INSUFFICIENT',
+      'LIMIT_MEDIA_INSUFFICIENT',
+      'VIDEO_ULTRA_ONLY',
+    };
+
+    if (userFacingCodes.contains(code)) return false;
+
+    // Provider-side/runtime failures should not leak as raw model failures.
+    // Give Cortex dynamic chat one clean chance; if that also fails, the
+    // caller will surface the localized error.
+    return true;
+  }
+
+  String _cleanFinalResponseText(String text) {
+    return text.replaceAll(RegExp(r'\n---\s*$'), '').trimRight();
+  }
+
+  bool _isAppInBackground() {
+    final state = WidgetsBinding.instance.lifecycleState;
+    return state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached;
+  }
+
+  void _syncActiveMessageFromBackgroundBuffer(
+    String convId,
+    int aiMessageIndex,
+    String modelId,
+  ) {
+    if (!_isConversationActive(convId)) return;
+
+    final messages = _conversationProvider.messages;
+    if (aiMessageIndex < 0 || aiMessageIndex >= messages.length) return;
+
+    final currentMessage = messages[aiMessageIndex];
+    if (currentMessage.isUserMessage) return;
+
+    final bufferedText = _backgroundTaskService.peekBuffer(convId);
+    final backgroundAttachments =
+        _backgroundTaskService.getMediaAttachments(convId);
+    final mergedAttachments = List<String>.from(currentMessage.attachmentPaths);
+    for (final path in backgroundAttachments) {
+      if (!mergedAttachments.contains(path)) {
+        mergedAttachments.add(path);
+      }
+    }
+
+    var updatedMessage = currentMessage;
+    if (bufferedText.isNotEmpty &&
+        bufferedText != currentMessage.text &&
+        bufferedText.length >= currentMessage.text.length) {
+      updatedMessage = updatedMessage.copyWith(text: bufferedText);
+    }
+    if (mergedAttachments.length != currentMessage.attachmentPaths.length) {
+      updatedMessage =
+          updatedMessage.copyWith(attachmentPaths: mergedAttachments);
+    }
+    if (updatedMessage.model == null) {
+      updatedMessage = updatedMessage.copyWith(model: modelId);
+    }
+
+    if (updatedMessage != currentMessage) {
+      _conversationProvider.updateMessageAtIndex(
+          aiMessageIndex, updatedMessage);
+      _conversationProvider.flushStreamUpdates();
+    }
+  }
+
   /// Checks the daily guest limit and returns true if the user can send a message.
   /// If the user is blocked, it shows the bottom sheet and returns false.
-  Future<bool> checkGuestLimit(BuildContext context,
-      AppLocalizations localizations) async {
+  Future<bool> checkGuestLimit(
+      BuildContext context, AppLocalizations localizations) async {
     final prefs = await SharedPreferences.getInstance();
     final String today = DateTime.now().toIso8601String().substring(0, 10);
 
@@ -1095,7 +2099,7 @@ class SendService {
     guestMessageCount++;
     await prefs.setInt('guest_message_count', guestMessageCount);
 
-    // Guest limit check is now performed before this method is called. 
+    // Guest limit check is now performed before this method is called.
     if ([5, 10, 25, 50, 100].contains(guestMessageCount)) {
       if (context.mounted) {
         showGuestLimitSheet(context, localizations);
@@ -1107,27 +2111,110 @@ class SendService {
   }
 
   /// Persists the accumulated background buffer to the database as the AI message.
-  Future<void> _persistBackgroundCompletion(String convId,
-      int aiMessageIndex) async {
+  Future<void> _persistBackgroundCompletion(
+      String convId, int aiMessageIndex, String modelId) async {
     try {
       final accumulatedText = _backgroundTaskService.consumeBuffer(convId);
-      if (accumulatedText.isEmpty) return;
+      final mediaAttachments =
+          _backgroundTaskService.getMediaAttachments(convId);
 
-      // Build a finalized AI message from the accumulated text.
+      if (accumulatedText.isEmpty && mediaAttachments.isEmpty) return;
+
+      // Check if there's already a message in the DB (e.g. from background
+      // media persistence) and merge with it.
+      Message? existingMsg;
+      try {
+        existingMsg =
+            await ChatStorageService.getMessageAtIndex(convId, aiMessageIndex);
+      } catch (_) {}
+
+      final List<String> mergedAttachments = [];
+      if (existingMsg != null) {
+        mergedAttachments.addAll(existingMsg.attachmentPaths);
+      }
+      for (final path in mediaAttachments) {
+        if (!mergedAttachments.contains(path)) {
+          mergedAttachments.add(path);
+        }
+      }
+
+      // Build a finalized AI message from the accumulated text + media.
+      final rawFinalText = existingMsg != null && accumulatedText.isEmpty
+          ? existingMsg.text
+          : accumulatedText;
+      final String finalText = _cleanFinalResponseText(rawFinalText);
+
       final finalMessage = Message(
-        text: accumulatedText,
+        id: existingMsg?.id,
+        text: finalText,
         isUserMessage: false,
         isThinking: false,
         includeInContext: true,
+        attachmentPaths: mergedAttachments,
+        model: existingMsg?.model ?? modelId,
+        webSearchSources: existingMsg?.webSearchSources,
       );
 
       await ChatStorageService.upsertMessage(
           convId, aiMessageIndex, finalMessage);
-      debugPrint(
-          '[SendService] Background completion persisted for $convId (${accumulatedText
-              .length} chars).');
+      debugPrint('[SendService] Background completion persisted for $convId '
+          '(${finalText.length} chars, ${mergedAttachments.length} media).');
     } catch (e) {
       debugPrint('[SendService] Error persisting background completion: $e');
+    }
+  }
+
+  Future<void> _persistBackgroundError(
+    String convId,
+    int aiMessageIndex,
+    String? modelId,
+    Object error,
+    AppLocalizations localizations,
+  ) async {
+    try {
+      final bufferedText = _backgroundTaskService.peekBuffer(convId);
+      final mediaAttachments =
+          _backgroundTaskService.getMediaAttachments(convId);
+
+      if (bufferedText.trim().isNotEmpty || mediaAttachments.isNotEmpty) {
+        await _persistBackgroundCompletion(
+            convId, aiMessageIndex, modelId ?? 'cortex/auto');
+        return;
+      }
+
+      Message? existingMsg;
+      try {
+        existingMsg =
+            await ChatStorageService.getMessageAtIndex(convId, aiMessageIndex);
+      } catch (_) {}
+
+      final errorText =
+          error is ApiException ? error.message : localizations.anErrorOccurred;
+      final mergedAttachments = <String>[
+        if (existingMsg != null) ...existingMsg.attachmentPaths,
+      ];
+      for (final path in mediaAttachments) {
+        if (!mergedAttachments.contains(path)) {
+          mergedAttachments.add(path);
+        }
+      }
+
+      final errorMessage = Message(
+        id: existingMsg?.id,
+        text: errorText,
+        isUserMessage: false,
+        isThinking: false,
+        isError: true,
+        includeInContext: false,
+        attachmentPaths: mergedAttachments,
+        model: existingMsg?.model ?? modelId,
+      );
+
+      await ChatStorageService.upsertMessage(
+          convId, aiMessageIndex, errorMessage);
+    } catch (persistError) {
+      debugPrint(
+          '[SendService] Error persisting background failure for $convId: $persistError');
     }
   }
 
@@ -1142,18 +2229,19 @@ class SendService {
   }
 
   /// Sends a local push notification when a background chat finishes.
-  void _sendBackgroundCompletionNotification(String chatTitle,
-      AppLocalizations localizations) {
+  void _sendBackgroundCompletionNotification(
+      String convId, String chatTitle, AppLocalizations localizations) {
     try {
       final plugin = FlutterLocalNotificationsPlugin();
 
-      final title = localizations.backgroundChatNotificationTitle;
-      final body = localizations.backgroundChatNotificationBody(chatTitle);
+      final title = chatTitle;
+      final body = localizations.backgroundChatNotificationTitle;
 
       const androidDetails = AndroidNotificationDetails(
         'background_chat',
         'Background Chats',
-        channelDescription: 'Notifications when background chats finish generating.',
+        channelDescription:
+            'Notifications when background chats finish generating.',
         importance: Importance.high,
         priority: Priority.high,
       );
@@ -1168,13 +2256,15 @@ class SendService {
       );
 
       plugin.show(
-        DateTime
-            .now()
-            .millisecondsSinceEpoch
-            .toSigned(31),
+        DateTime.now().millisecondsSinceEpoch.toSigned(31),
         title,
         body,
         platformDetails,
+        payload: jsonEncode({
+          'type': 'background_chat',
+          'screen': 'chat',
+          'conversation_id': convId,
+        }),
       );
 
       debugPrint('[SendService] Background notification sent for: $chatTitle');

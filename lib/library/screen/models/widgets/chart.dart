@@ -54,8 +54,8 @@ class SystemInfoChartState extends State<SystemInfoChart> with SingleTickerProvi
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     final themeProvider = Provider.of<ThemeProvider>(context);
     AppColors.currentTheme = themeProvider.currentTheme;

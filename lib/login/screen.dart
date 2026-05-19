@@ -67,10 +67,17 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     final double containerMaxWidth = 400 * fontScale;
 
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
-      body: Center(
-        child: ConstrainedBox(
+      body: Builder(
+        builder: (context) {
+          final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+          return AnimatedPadding(
+            padding: EdgeInsets.only(bottom: bottomInset),
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+        child: Center(
+          child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: containerMaxWidth),
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(
@@ -165,6 +172,9 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
       ),
     );
   }
+),
+);
+}
 
   // --- Common UI Widgets ---
 

@@ -10,11 +10,16 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as timezone;
 import 'package:timezone/data/latest.dart' as data;
 
+import 'package:cortex/axon/inbox/logic/general.dart';
+import 'package:cortex/axon/inbox/logic/manager.dart';
+import 'package:cortex/language.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/maintenance.dart';
 import 'package:cortex/funds/funds.dart';
 
@@ -26,11 +31,12 @@ part 'interaction.dart';
 
 class ExtrovertNotificationService {
   final GlobalKey<NavigatorState> navigatorKey;
+  final GlobalKey? mainScreenKey;
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FlutterLocalNotificationsPlugin _localNotifications =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   late AndroidNotificationChannel _fcmChannel;
   late AndroidNotificationChannel _engagementChannel;
@@ -40,7 +46,10 @@ class ExtrovertNotificationService {
   Future<void>? _initFuture;
   bool _isRequestingPermission = false;
 
-  ExtrovertNotificationService({required this.navigatorKey});
+  ExtrovertNotificationService({
+    required this.navigatorKey,
+    this.mainScreenKey,
+  });
 
   /// Initializes the entire notification system. This method is self-contained
   /// and can be called early in the app lifecycle without needing a BuildContext.
@@ -80,9 +89,7 @@ class ExtrovertNotificationService {
     final savedLocaleCode = prefs.getString('language_code');
     final locale = savedLocaleCode != null
         ? Locale(savedLocaleCode)
-        : Locale(Platform.localeName
-        .split('_')
-        .first);
+        : Locale(Platform.localeName.split('_').first);
     final l10n = await AppLocalizations.delegate.load(locale);
 
     _fcmChannel = AndroidNotificationChannel(
@@ -114,21 +121,21 @@ class ExtrovertNotificationService {
   Future<void> _initializeLocalNotifications() async {
     await _localNotifications
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(_fcmChannel);
     await _localNotifications
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(_engagementChannel);
     await _localNotifications
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(_greetingsChannel);
 
     const AndroidInitializationSettings initSettingsAndroid =
-    AndroidInitializationSettings('ic_notification');
+        AndroidInitializationSettings('ic_notification');
     const DarwinInitializationSettings initSettingsIOS =
-    DarwinInitializationSettings(
+        DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,

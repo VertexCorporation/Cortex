@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../app.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../theme.dart';
 
 class LoginBubbleButton extends StatelessWidget {
@@ -14,6 +15,7 @@ class LoginBubbleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.watch<ThemeProvider>();
+    final localizations = AppLocalizations.of(context)!;
     final double screenWidth = MediaQuery
         .of(context)
         .size
@@ -54,7 +56,7 @@ class LoginBubbleButton extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: paddingH),
               alignment: Alignment.center,
               child: Text(
-                "Log In",
+                localizations.loginToYourAccount,
                 style: TextStyle(
                   fontSize: fontSize,
                   fontWeight: FontWeight.w600,

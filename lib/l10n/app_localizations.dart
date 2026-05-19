@@ -131,8 +131,32 @@ abstract class AppLocalizations {
   /// Prompt for AI to generate a chat title
   ///
   /// In en, this message translates to:
-  /// **'You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation.'**
+  /// **'You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation. CRITICAL: The title MUST be in the EXACT SAME language as the user\'s message.'**
   String get chatTitlePrompt;
+
+  /// Fallback system role when no specific role is defined.
+  ///
+  /// In en, this message translates to:
+  /// **'You are a helpful assistant.'**
+  String get systemRoleFallback;
+
+  /// Instruction appended to the system prompt to force the model to respect the user's language.
+  ///
+  /// In en, this message translates to:
+  /// **'\n\nCRITICAL: Always respond in the same language the user writes in, pay attention to the user\'s language.'**
+  String get systemLanguageInstruction;
+
+  /// System note prepended to a synthetic user message containing AI-generated media.
+  ///
+  /// In en, this message translates to:
+  /// **'[System Note: Below is the media generated previously. You may reference or edit it.]'**
+  String get systemNotePreviousMedia;
+
+  /// Localized time context injected into all model system prompts.
+  ///
+  /// In en, this message translates to:
+  /// **'\n\nCurrent date and time: {formattedTime}.'**
+  String systemTimeInfo(String formattedTime);
 
   /// No description provided for @systemMemoryDirective.
   ///
@@ -325,12 +349,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Local Models'**
   String get localModels;
-
-  /// No description provided for @serverSideModels.
-  ///
-  /// In en, this message translates to:
-  /// **'Language Models'**
-  String get serverSideModels;
 
   /// No description provided for @selectGGUFFile.
   ///
@@ -674,12 +692,6 @@ abstract class AppLocalizations {
   /// **'The data you delete will be permanently removed from our server and your device. This actions cannot be undone.'**
   String get deleteDescription;
 
-  /// No description provided for @deleteAccountButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Account Deletion Button'**
-  String get deleteAccountButton;
-
   /// No description provided for @editProfile.
   ///
   /// In en, this message translates to:
@@ -769,12 +781,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Download paused.'**
   String get downloadPaused;
-
-  /// No description provided for @purchaseSuccessful.
-  ///
-  /// In en, this message translates to:
-  /// **'Purchase successful!'**
-  String get purchaseSuccessful;
 
   /// No description provided for @purchaseError.
   ///
@@ -1730,6 +1736,48 @@ abstract class AppLocalizations {
   /// **'Select a Base Model'**
   String get selectBaseModel;
 
+  /// No description provided for @falErrorImageRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This AI requires a reference image, please attach an image and try again.'**
+  String get falErrorImageRequired;
+
+  /// No description provided for @falErrorAudioRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This model requires a reference audio file, please attach an audio file and try again.'**
+  String get falErrorAudioRequired;
+
+  /// No description provided for @falErrorVideoRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This model requires a reference video, please attach a video and try again.'**
+  String get falErrorVideoRequired;
+
+  /// No description provided for @falErrorImageCorrupted.
+  ///
+  /// In en, this message translates to:
+  /// **'The uploaded image could not be processed, please try a different format.'**
+  String get falErrorImageCorrupted;
+
+  /// No description provided for @falErrorSchemaRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'The model rejected the input, please try a different model.'**
+  String get falErrorSchemaRejected;
+
+  /// No description provided for @falErrorSchemaInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'The input was rejected by the generation service.'**
+  String get falErrorSchemaInvalid;
+
+  /// No description provided for @falErrorGenericStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'The generation service returned an error (status {statusCode}).'**
+  String falErrorGenericStatus(int statusCode);
+
   /// No description provided for @couldNotOpenLink.
   ///
   /// In en, this message translates to:
@@ -1832,12 +1880,6 @@ abstract class AppLocalizations {
   /// **'Report submitted successfully'**
   String get reportSubmitted;
 
-  /// No description provided for @purchaseReceived.
-  ///
-  /// In en, this message translates to:
-  /// **'Purchase received, updating your account.'**
-  String get purchaseReceived;
-
   /// No description provided for @verificationDelayed.
   ///
   /// In en, this message translates to:
@@ -1915,18 +1957,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Storage permission is required to save downloaded models. Please grant permission to continue.'**
   String get storagePermissionRequired;
-
-  /// No description provided for @plusBannerTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Get Free Plus!'**
-  String get plusBannerTitle;
-
-  /// No description provided for @plusBannerSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Invite a friend and you both get 1 Day of Plus for free!'**
-  String get plusBannerSubtitle;
 
   /// No description provided for @inviteShareSubject.
   ///
@@ -2006,18 +2036,6 @@ abstract class AppLocalizations {
   /// **'This model can analyze and answer questions about uploaded documents such as PDFs and text files.'**
   String get featureDocumentDescription;
 
-  /// Title for the feature indicating the model can process audio/voice.
-  ///
-  /// In en, this message translates to:
-  /// **'Voice Input'**
-  String get featureAudioTitle;
-
-  /// Description for the voice input feature.
-  ///
-  /// In en, this message translates to:
-  /// **'This model can understand and process spoken audio inputs.'**
-  String get featureAudioDescription;
-
   /// Title for the feature indicating the model can create images.
   ///
   /// In en, this message translates to:
@@ -2063,7 +2081,7 @@ abstract class AppLocalizations {
   /// Description for the notice banner on a premium model's detail page, explaining the limitation for free users.
   ///
   /// In en, this message translates to:
-  /// **'This model is a premium model, free users are limited to 3 messages per day with premium models; subscribe to unlock unlimited access!'**
+  /// **'This AI is a premium AI, free users have limited access to premium AIs; upgrade to unlock unlimited access!'**
   String get premiumModelNoticeDescription;
 
   /// A feature highlighting that the user gets access to higher-quality, premium models with this subscription.
@@ -2739,18 +2757,6 @@ abstract class AppLocalizations {
   /// **'YES!'**
   String get onboardingFinalButton;
 
-  /// No description provided for @paywallAhaTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlock the True Power of AI'**
-  String get paywallAhaTitle;
-
-  /// No description provided for @paywallAhaSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.'**
-  String get paywallAhaSubtitle;
-
   /// No description provided for @dude.
   ///
   /// In en, this message translates to:
@@ -3081,6 +3087,12 @@ abstract class AppLocalizations {
   /// **'Exclusive Offer'**
   String get exclusiveOffer;
 
+  /// No description provided for @claimOffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Offer'**
+  String get claimOffer;
+
   /// No description provided for @continueInOfflineMode.
   ///
   /// In en, this message translates to:
@@ -3303,12 +3315,6 @@ abstract class AppLocalizations {
   /// **'Search the web for real-time information'**
   String get featureWebSearchDescription;
 
-  /// No description provided for @webSearchQuotaExceeded.
-  ///
-  /// In en, this message translates to:
-  /// **'Search Quota Exceeded'**
-  String get webSearchQuotaExceeded;
-
   /// No description provided for @clearMemory.
   ///
   /// In en, this message translates to:
@@ -3330,7 +3336,7 @@ abstract class AppLocalizations {
   /// No description provided for @personalizationDescription.
   ///
   /// In en, this message translates to:
-  /// **'Customize your experience'**
+  /// **'Personalize your assistant to better suit your needs. Tailor its responses, behavior, and tone to match your unique preferences.'**
   String get personalizationDescription;
 
   /// No description provided for @memoryTitle.
@@ -3390,13 +3396,13 @@ abstract class AppLocalizations {
   /// Critical system instruction appended to force the AI to only output a title
   ///
   /// In en, this message translates to:
-  /// **'[CRITICAL INSTRUCTION]: You are a TITLE GENERATOR. DO NOT answer the user\'s question. DO NOT chat or say hello. ONLY output a 2-4 word title summarizing what the user is asking about.'**
+  /// **'[CRITICAL INSTRUCTION]: You are a TITLE GENERATOR. DO NOT answer the user\'s question. DO NOT chat or say hello. ONLY output a 2-4 word title summarizing what the user is asking about. The title MUST be in the same language as the user\'s message.'**
   String get chatTitleCriticalInstruction;
 
   /// System persona string added to online models
   ///
   /// In en, this message translates to:
-  /// **'\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\". Remember this and maintain the persona of Cortex if asked.'**
+  /// **'\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\"; this platform is developed by the Vertex team, who are on average just 16 years old. Remember this and answer if asked. If more information is requested, do not hesitate to search the internet, or if you cannot search, feel free to say you don\'t know!'**
   String get cortexSystemPersona;
 
   /// No description provided for @featureAudioRecognitionTitle.
@@ -3537,12 +3543,6 @@ abstract class AppLocalizations {
   /// **'You need an Ultra subscription to generate videos, upgrade now and feel the flow!'**
   String get videoPremiumWarning;
 
-  /// No description provided for @becomePremiumButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Become Premium'**
-  String get becomePremiumButton;
-
   /// No description provided for @fallbackInfoPanelText.
   ///
   /// In en, this message translates to:
@@ -3567,11 +3567,47 @@ abstract class AppLocalizations {
   /// **'Back to Chat!'**
   String get backgroundChatNotificationTitle;
 
-  /// Notification body when a background chat finishes generating.
+  /// No description provided for @benefitVideoGeneration.
   ///
   /// In en, this message translates to:
-  /// **'There\'s a new message in {chatName}, check it out!'**
-  String backgroundChatNotificationBody(String chatName);
+  /// **'Video Generation'**
+  String get benefitVideoGeneration;
+
+  /// No description provided for @freeOffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Offer'**
+  String get freeOffer;
+
+  /// No description provided for @trialMonthlyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'First {days} days free, then {price}/month'**
+  String trialMonthlyDescription(String days, String price);
+
+  /// No description provided for @trialAnnualDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'First {days} days free, then {price}/year'**
+  String trialAnnualDescription(String days, String price);
+
+  /// No description provided for @freePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Free {plan}!'**
+  String freePlan(String plan);
+
+  /// No description provided for @systemPromptLimitFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'CRITICAL: The user requested an action, but their allowance on Cortex has depleted; kindly inform the user in their language that they should wait or consider upgrading their subscription plan.'**
+  String get systemPromptLimitFallback;
+
+  /// No description provided for @dynamicPreditsUpgradeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Cortex can give even better answers; upgrade now and get the best answer for every question!'**
+  String get dynamicPreditsUpgradeMessage;
 }
 
 class _AppLocalizationsDelegate

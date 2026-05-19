@@ -13,8 +13,9 @@ class ArtItem {
   final String path;
   final ArtType type;
   final String conversationID;
+  final String? modelId;
 
-  const ArtItem({required this.path, required this.type, required this.conversationID});
+  const ArtItem({required this.path, required this.type, required this.conversationID, this.modelId});
 }
 
 enum ArtType { image, video, audio }
@@ -62,6 +63,7 @@ class ArtsProvider extends ChangeNotifier {
         }
 
         final conversationID = row['conversationId'] as String?;
+        final modelId = row['modelId'] as String?;
 
         for (final filePath in paths) {
           if (filePath.isEmpty) continue;
@@ -86,7 +88,7 @@ class ArtsProvider extends ChangeNotifier {
           }
 
           if (type != null) {
-            results.add(ArtItem(path: filePath, type: type, conversationID: conversationID ?? ''));
+            results.add(ArtItem(path: filePath, type: type, conversationID: conversationID ?? '', modelId: modelId));
           }
         }
       }

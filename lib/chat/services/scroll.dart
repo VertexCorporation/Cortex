@@ -1,7 +1,9 @@
 // lib/chat/services/scroll.dart
 
 import 'package:cortex/theme.dart';
-import 'package:flutter/material.dart';import 'package:flutter/services.dart';import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 
 /// A service class to manage all scrolling-related logic.
 class ScrollService {
@@ -205,7 +207,8 @@ class ScrollService {
     // Add extra padding so it perfectly clears the input field edge and shadow
     const double extraMargin = 24.0;
 
-    // Use dynamic height tracking exclusively, avoiding double padding when keyboard pushes the screen stack.
+    // Use dynamic height tracking exclusively.
+    // Scaffold natively resizes due to resizeToAvoidBottomInset: true.
     double bottomOffset = bottomPanelHeight + extraMargin;
 
     return Positioned(

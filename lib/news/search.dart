@@ -22,7 +22,7 @@ class NewsSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double w = MediaQuery.of(context).size.width;
+    final double w = MediaQuery.sizeOf(context).width;
     final bool isDesktop = w >= 800;
     final bool isTablet = w >= 600 && !isDesktop;
 

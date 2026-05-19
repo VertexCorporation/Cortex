@@ -1,7 +1,29 @@
 {
-  "chatTitlePrompt": "You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation.",
+  "chatTitlePrompt": "You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation. CRITICAL: The title MUST be in the EXACT SAME language as the user's message.",
   "@chatTitlePrompt": {
     "description": "Prompt for AI to generate a chat title"
+  },
+  "systemRoleFallback": "You are a helpful assistant.",
+  "@systemRoleFallback": {
+    "description": "Fallback system role when no specific role is defined."
+  },
+  "systemLanguageInstruction": "\n\nCRITICAL: Always respond in the same language the user writes in, pay attention to the user's language.",
+  "@systemLanguageInstruction": {
+    "description": "Instruction appended to the system prompt to force the model to respect the user's language."
+  },
+  "systemNotePreviousMedia": "[System Note: Below is the media generated previously. You may reference or edit it.]",
+  "@systemNotePreviousMedia": {
+    "description": "System note prepended to a synthetic user message containing AI-generated media."
+  },
+  "systemTimeInfo": "\n\nCurrent date and time: {formattedTime}.",
+  "@systemTimeInfo": {
+    "description": "Localized time context injected into all model system prompts.",
+    "placeholders": {
+      "formattedTime": {
+        "type": "String",
+        "example": "May 16, 2026 21:23"
+      }
+    }
   },
   "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>",
   "systemMemoryReminder": "\n\nAlways remember this about the user:\n{userMemory}",
@@ -36,7 +58,6 @@
   "usedMemory": "Used Memory",
   "modelsTitle": "Library",
   "localModels": "Local Models",
-  "serverSideModels": "Language Models",
   "selectGGUFFile": "Select GGUF File",
   "errorGGUF": "Please select a file in GGUF format only.",
   "myModels": "My Models",
@@ -94,7 +115,6 @@
   "delete": "Delete",
   "passwordRequired": "Password is required.",
   "deleteDescription": "The data you delete will be permanently removed from our server and your device. This actions cannot be undone.",
-  "deleteAccountButton": "Account Deletion Button",
   "editProfile": "Edit Profile",
   "displayName": "Display Name",
   "profileUpdated": "Profile updated successfully",
@@ -116,7 +136,6 @@
     }
   },
   "downloadPaused": "Download paused.",
-  "purchaseSuccessful": "Purchase successful!",
   "purchaseError": "Purchasing error",
   "purchasePlus": "Buy Cortex Plus",
   "plusDescription": "Elite Artificial Intelligence Experience",
@@ -299,6 +318,20 @@
   "@errorServer": {},
   "@errorNetwork": {},
   "@baseModelForCharacterDescription": {},
+  "falErrorImageRequired": "This AI requires a reference image, please attach an image and try again.",
+  "falErrorAudioRequired": "This model requires a reference audio file, please attach an audio file and try again.",
+  "falErrorVideoRequired": "This model requires a reference video, please attach a video and try again.",
+  "falErrorImageCorrupted": "The uploaded image could not be processed, please try a different format.",
+  "falErrorSchemaRejected": "The model rejected the input, please try a different model.",
+  "falErrorSchemaInvalid": "The input was rejected by the generation service.",
+  "falErrorGenericStatus": "The generation service returned an error (status {statusCode}).",
+  "@falErrorGenericStatus": {
+    "placeholders": {
+      "statusCode": {
+        "type": "int"
+      }
+    }
+  },
   "couldNotOpenLink": "Could not open the link",
   "downloadStarted": "Download started",
   "notAvailable": "Not Available",
@@ -322,7 +355,6 @@
   "experimentalOfflineWarning": "The offline mode is still experimental and the model you download may not perform with optimal efficiency.",
   "noConversationsToDelete": "You have no conversations to delete.",
   "reportSubmitted": "Report submitted successfully",
-  "purchaseReceived": "Purchase received, updating your account.",
   "verificationDelayed": "Your purchase is confirmed. There is a slight delay in updating your account, it will appear shortly.",
   "maintenanceTitle": "Under Maintenance",
   "maintenanceMessage": "Cortex is temporarily offline while we roll out some important updates. Access to the app will be restored shortly.\n\nThank you for your patience as we improve your experience.",
@@ -336,8 +368,6 @@
   "loginSubtitle": "Log in to your Vertex account. By continuing, you agree to our Terms of Service & Privacy Policy.",
   "registerSubtitle": "Create a Vertex account for seamless access across all our services. By continuing, you agree to our Terms of Service & Privacy Policy.",
   "storagePermissionRequired": "Storage permission is required to save downloaded models. Please grant permission to continue.",
-  "plusBannerTitle": "Get Free Plus!",
-  "plusBannerSubtitle": "Invite a friend and you both get 1 Day of Plus for free!",
   "inviteShareSubject": "Join me on Cortex!",
   "@inviteShareMessage": {
     "description": "The text message to share with a friend for an invite.",
@@ -365,14 +395,6 @@
   "featureDocumentDescription": "This model can analyze and answer questions about uploaded documents such as PDFs and text files.",
   "@featureDocumentDescription": {
     "description": "Description for the document support feature."
-  },
-  "featureAudioTitle": "Voice Input",
-  "@featureAudioTitle": {
-    "description": "Title for the feature indicating the model can process audio/voice."
-  },
-  "featureAudioDescription": "This model can understand and process spoken audio inputs.",
-  "@featureAudioDescription": {
-    "description": "Description for the voice input feature."
   },
   "featureImageGenerationTitle": "Image Generation",
   "@featureImageGenerationTitle": {
@@ -402,7 +424,7 @@
   "@premiumModelNoticeTitle": {
     "description": "Title for the notice banner shown on a premium model's detail page."
   },
-  "premiumModelNoticeDescription": "This model is a premium model, free users are limited to 3 messages per day with premium models; subscribe to unlock unlimited access!",
+  "premiumModelNoticeDescription": "This AI is a premium AI, free users have limited access to premium AIs; upgrade to unlock unlimited access!",
   "@premiumModelNoticeDescription": {
     "description": "Description for the notice banner on a premium model's detail page, explaining the limitation for free users."
   },
@@ -574,8 +596,6 @@
   "onboardingFinalDescription": "If you're seeing this screen, it's because we didn't give up. And we have no intention of giving up. Come on, let's take the AI revolution to the world together. To be a part of this story...",
   "onboardingFinalQuestion": "ARE YOU READY?",
   "onboardingFinalButton": "YES!",
-  "paywallAhaTitle": "Unlock the True Power of AI",
-  "paywallAhaSubtitle": "Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.",
   "dude": "Dude",
   "swipeToContinue": "Swipe to continue",
   "cacheIsNotUpToDate": "Your Play Store cache is not up-to-date. Please close and reopen the Play Store app, or restart your device.",
@@ -649,6 +669,7 @@
   "speakTheMessage": "Speak The Message",
   "invalidUsernameFormat": "Invalid username format. Use 3-20 chars, digits, or . - _",
   "exclusiveOffer": "Exclusive Offer",
+  "claimOffer": "Use Offer",
   "continueInOfflineMode": "Continue in Offline Mode",
   "voiceModeInformation": "Cortex keeps your data safe by running fully on-device, even in voice chat mode; enjoy seamless conversations!",
   "flowModeDescription": "In Flow mode, intelligences debate among themselves; you can either sit back and listen or jump in and join the discussion!",
@@ -699,11 +720,10 @@
   "searching": "Searching",
   "featureWebSearchTitle": "Web Search",
   "featureWebSearchDescription": "Search the web for real-time information",
-  "webSearchQuotaExceeded": "Search Quota Exceeded",
   "clearMemory": "Clear Memory",
   "clearMemoryConfirm": "Are you sure you want to clear your memory?",
   "personalization": "Personalization",
-  "personalizationDescription": "Customize your experience",
+  "personalizationDescription": "Personalize your assistant to better suit your needs. Tailor its responses, behavior, and tone to match your unique preferences.",
   "memoryTitle": "Memory",
   "memoryDescription": "AIs recognize you like this.",
   "noMemoryYet": "No memories established yet",
@@ -729,11 +749,11 @@
       }
     }
   },
-  "chatTitleCriticalInstruction": "[CRITICAL INSTRUCTION]: You are a TITLE GENERATOR. DO NOT answer the user's question. DO NOT chat or say hello. ONLY output a 2-4 word title summarizing what the user is asking about.",
+  "chatTitleCriticalInstruction": "[CRITICAL INSTRUCTION]: You are a TITLE GENERATOR. DO NOT answer the user's question. DO NOT chat or say hello. ONLY output a 2-4 word title summarizing what the user is asking about. The title MUST be in the same language as the user's message.",
   "@chatTitleCriticalInstruction": {
     "description": "Critical system instruction appended to force the AI to only output a title"
   },
-  "cortexSystemPersona": "\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\". Remember this and maintain the persona of Cortex if asked.",
+  "cortexSystemPersona": "\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\"; this platform is developed by the Vertex team, who are on average just 16 years old. Remember this and answer if asked. If more information is requested, do not hesitate to search the internet, or if you cannot search, feel free to say you don't know!",
   "@cortexSystemPersona": {
     "description": "System persona string added to online models"
   },
@@ -800,7 +820,6 @@
   "noArt": "No Art",
   "noArtDescription": "No art; it's time to fill the gallery by creating images, videos, audio, and all kinds of content!",
   "videoPremiumWarning": "You need an Ultra subscription to generate videos, upgrade now and feel the flow!",
-  "becomePremiumButton": "Become Premium",
   "fallbackInfoPanelText": "Due to some improvements we are making on our server side, the response was generated by Cortex's dynamic chat instead of your specifically selected AI. Thank you for your understanding until the process is completed!",
   "falOfflineMessage": "Due to some improvements we are making on our server side, this intelligence is currently offline. Thank you for your understanding until the process is finished!",
   "errorInsufficientStorage": "Insufficient storage space to download this model.",
@@ -808,14 +827,43 @@
   "@backgroundChatNotificationTitle": {
     "description": "Notification title when a background chat finishes generating."
   },
-  "backgroundChatNotificationBody": "There's a new message in {chatName}, check it out!",
-  "@backgroundChatNotificationBody": {
-    "description": "Notification body when a background chat finishes generating.",
+  "benefitVideoGeneration": "Video Generation",
+  "freeOffer": "Free Offer",
+  "trialMonthlyDescription": "First {days} days free, then {price}/month",
+  "@trialMonthlyDescription": {
     "placeholders": {
-      "chatName": {
+      "days": {
         "type": "String",
-        "example": "Einstein"
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$4.99"
       }
     }
-  }
+  },
+  "trialAnnualDescription": "First {days} days free, then {price}/year",
+  "@trialAnnualDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$49.99"
+      }
+    }
+  },
+  "freePlan": "Free {plan}!",
+  "@freePlan": {
+    "placeholders": {
+      "plan": {
+        "type": "String",
+        "example": "Pro"
+      }
+    }
+  },
+  "systemPromptLimitFallback": "CRITICAL: The user requested an action, but their allowance on Cortex has depleted; kindly inform the user in their language that they should wait or consider upgrading their subscription plan.",
+  "dynamicPreditsUpgradeMessage": "Cortex can give even better answers; upgrade now and get the best answer for every question!"
 }

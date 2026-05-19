@@ -34,7 +34,9 @@ extension ExtrovertInteraction on ExtrovertNotificationService {
     }
 
     final screen = finalData['screen'];
-    if (screen == 'news') {
+    if (screen == 'chat' || finalData['type'] == 'background_chat') {
+      _openChatFromNotification(finalData['conversation_id']?.toString());
+    } else if (screen == 'news') {
       final slug = finalData['slug'];
       debugPrint("TODO: Navigate to news article with slug: $slug");
       // Example: navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => NewsDetailScreen(slug: slug)));
@@ -51,6 +53,81 @@ extension ExtrovertInteraction on ExtrovertNotificationService {
     } else {
       debugPrint(
           "No specific navigation action for this notification. Defaulting to home screen.");
+    }
+  }
+
+  Future<void> _openChatFromNotification(String? conversationId) async {
+    navigatorKey.currentState?.popUntil((route) => route.isFirst);
+
+    for (int attempt = 0; attempt < 8; attempt++) {
+      final context = navigatorKey.currentContext;
+      final state = mainScreenKey?.currentState;
+      if (context != null && state != null) {
+        InboxViewModel? inbox;
+        LocaleProvider? localeProvider;
+        ModelService? modelService;
+        try {
+          // ignore: use_build_context_synchronously
+          inbox = context.read<InboxViewModel>();
+          // ignore: use_build_context_synchronously
+          localeProvider = context.read<LocaleProvider>();
+          // ignore: use_build_context_synchronously
+          modelService = context.read<ModelService>();
+        } catch (e) {
+          debugPrint("[Extrovert] Providers not ready for chat tap: $e");
+        }
+
+        if (conversationId != null && conversationId.isNotEmpty) {
+          ConversationManager? manager;
+          if (inbox != null) {
+            try {
+              await inbox.refreshIfNeeded();
+              manager = inbox.conversationManagers[conversationId];
+            } catch (e) {
+              debugPrint(
+                  "[Extrovert] Inbox refresh failed for chat notification: $e");
+            }
+          }
+
+          if (manager == null &&
+              localeProvider != null &&
+              modelService != null) {
+            try {
+              final langCode = localeProvider.locale.languageCode;
+              manager = await ConversationManager.fromId(
+                conversationId,
+                langCode: langCode,
+                modelService: modelService,
+              );
+            } catch (e) {
+              debugPrint(
+                  "[Extrovert] Conversation lookup failed for notification: $e");
+            }
+          }
+
+          if (manager != null) {
+            try {
+              (state as dynamic).openConversation(manager);
+              return;
+            } catch (e) {
+              debugPrint(
+                  "[Extrovert] Could not open conversation from notification: $e");
+            }
+          }
+        }
+
+        try {
+          (state as dynamic).startNewConversation(
+            closeSidebar: true,
+            restoreDefaultModel: false,
+          );
+        } catch (e) {
+          debugPrint("[Extrovert] Chat notification fallback failed: $e");
+        }
+        return;
+      }
+
+      await Future.delayed(const Duration(milliseconds: 150));
     }
   }
 }

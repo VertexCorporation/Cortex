@@ -25,8 +25,10 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
         final bool hasCloseTag = matchText.contains('</think>');
         final bool isThinkingFinished = hasCloseTag || isFinished;
 
-        content = content.replaceAll(RegExp(r'(^<think>\s*)|(\s*</think>$)'), '');
-        content = content.replaceAll(RegExp(r'</?think>', caseSensitive: false), '');
+        content =
+            content.replaceAll(RegExp(r'(^<think>\s*)|(\s*</think>$)'), '');
+        content =
+            content.replaceAll(RegExp(r'</?think>', caseSensitive: false), '');
         content = content.replaceAll(
             RegExp(r'(?:^|[\r\n]+)[ \t]*>?\s*\*Thinking\.\.\.\*[\r\n]*>?[ \t]?',
                 caseSensitive: false),
@@ -67,6 +69,53 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
                 padding:
                     const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
                 child: Divider(color: AppColors.border, thickness: 1)));
+      case 'blockquote':
+        final content = matchText
+            .trimRight()
+            .split('\n')
+            .map((line) => line.replaceFirst(RegExp(r'^\s*>\s?'), ''))
+            .join('\n')
+            .trim();
+
+        if (content.isEmpty) {
+          return const WidgetSpan(child: SizedBox.shrink());
+        }
+
+        return WidgetSpan(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6.0),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  left: BorderSide(
+                    color:
+                        AppColors.primaryColor.inverted.withValues(alpha: 0.28),
+                    width: 3,
+                  ),
+                ),
+              ),
+              padding: const EdgeInsets.only(left: 10),
+              child: RichText(
+                text: TextSpan(
+                  children: processInlineElements(
+                    context,
+                    content,
+                    inlinePatterns,
+                    fs,
+                    urlMap: urlMap,
+                    citations: citations,
+                  ),
+                  style: TextStyle(
+                    color:
+                        AppColors.primaryColor.inverted.withValues(alpha: 0.86),
+                    fontSize: fs,
+                    height: 1.45,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
       case 'widget':
         try {
           final widgetMatch = RegExp(
@@ -140,10 +189,15 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
         }
         final colCount = headerCells.length;
         final List<TableRow> tableRows = [];
-        Widget buildCell(String text, {bool isHeader = false}) {
-          return Padding(
+        Widget buildCell(String text,
+            {bool isHeader = false, double? maxWidth}) {
+          return Container(
+            constraints: maxWidth != null
+                ? BoxConstraints(maxWidth: maxWidth)
+                : const BoxConstraints(),
             padding: const EdgeInsets.all(8),
             child: RichText(
+              softWrap: true,
               text: TextSpan(
                 children: processInlineElements(
                     context, text, inlinePatterns, fs,
@@ -155,6 +209,7 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
             ),
           );
         }
+
         tableRows.add(TableRow(
             children: headerCells
                 .map((cell) => buildCell(cell, isHeader: true))
@@ -182,29 +237,105 @@ InlineSpan processBlockMatch(BuildContext context, MatchRange match,
               style: TextStyle(
                   color: AppColors.primaryColor.inverted, fontSize: fs));
         }
-        return WidgetSpan(
+
+        // Use LayoutBuilder to constrain columns to available width.
+        // Each column gets an equal share of the available space.
+        // If there are too many columns (>6), fall back to horizontal scroll
+        // with a minimum per-column width for readability.
+                return WidgetSpan(
             child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Table(
-                    border: TableBorder.all(color: AppColors.border),
-                    defaultColumnWidth: const IntrinsicColumnWidth(),
-                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    children: tableRows,
-                  ),
+                padding: const EdgeInsets.only(top: 2, bottom: 16),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final availableWidth = constraints.maxWidth;
+                    // For tables with many columns, allow horizontal scroll
+                    // with a reasonable minimum column width.
+                    if (colCount > 6) {
+                      const minColWidth = 120.0;
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth: availableWidth,
+                            maxWidth: (minColWidth * colCount)
+                                .clamp(availableWidth, double.infinity),
+                          ),
+                          child: Table(
+                            border: TableBorder.all(color: AppColors.border),
+                            defaultColumnWidth: const FlexColumnWidth(),
+                            defaultVerticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            children: tableRows,
+                          ),
+                        ),
+                      );
+                    }
+
+                    // For normal tables, constrain to available width.
+                    // Text in cells will wrap naturally.
+                    return Table(
+                      border: TableBorder.all(color: AppColors.border),
+                      defaultColumnWidth: const FlexColumnWidth(),
+                      defaultVerticalAlignment:
+                          TableCellVerticalAlignment.middle,
+                      children: tableRows,
+                    );
+                  },
                 )));
+      case 'orderedBoldHeading':
+        final orderedHeadingMatch =
+            RegExp(r'^\s*(\d+)[.)]\s+(\*\*|__)([^\r\n]+?)\2\s*$')
+                .firstMatch(matchText.trimRight());
+        if (orderedHeadingMatch != null) {
+          final number = orderedHeadingMatch.group(1)!;
+          final content = orderedHeadingMatch.group(3)!.trim();
+          final headingSize = fs * 1.34;
+          return TextSpan(
+            style: TextStyle(
+              color: AppColors.primaryColor.inverted,
+              fontSize: headingSize,
+              fontWeight: FontWeight.w800,
+              height: 1.3,
+            ),
+            children: [
+              TextSpan(text: '$number. '),
+              ...processInlineElements(
+                context,
+                content,
+                inlinePatterns,
+                headingSize,
+                urlMap: urlMap,
+                citations: citations,
+              ),
+            ],
+          );
+        }
+        return TextSpan(
+            text: matchText,
+            style: TextStyle(
+                color: AppColors.primaryColor.inverted, fontSize: fs));
       case 'heading':
         final level = matchText.indexOf(' ');
         if (level > 0 && level <= 6) {
           final content = matchText.substring(level + 1);
           final headingSize = fs * (1 + (6 - level) * 0.15);
           return TextSpan(
-              text: '$content\n',
-              style: TextStyle(
-                  color: AppColors.primaryColor.inverted,
-                  fontSize: headingSize,
-                  fontWeight: FontWeight.bold));
+            style: TextStyle(
+              color: AppColors.primaryColor.inverted,
+              fontSize: headingSize,
+              fontWeight: FontWeight.bold,
+            ),
+            children: [
+              ...processInlineElements(
+                context,
+                content,
+                inlinePatterns,
+                headingSize,
+                urlMap: urlMap,
+                citations: citations,
+              ),
+            ],
+          );
         }
         return TextSpan(
             text: matchText,

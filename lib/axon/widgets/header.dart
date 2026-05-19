@@ -49,10 +49,14 @@ class AxonHeader extends StatelessWidget {
     // --- User Data for Avatar ---
     final userProvider = context.watch<UserProvider>();
     final sessionProvider = context.watch<ChatSessionProvider>();
-    final bool isUserSubscribed = sessionProvider.isUserSubscribed;
+    final bool isUserStateReady = userProvider.isUserStateReady;
+    final bool isUserSubscribed =
+        isUserStateReady && sessionProvider.isUserSubscribed;
 
     String initials;
-    if (userProvider.isAnonymous) {
+    if (!isUserStateReady) {
+      initials = '';
+    } else if (userProvider.isAnonymous) {
       final String anonString = localizations.anonymousEntity;
       initials = anonString.isNotEmpty ? anonString[0].toUpperCase() : '?';
     } else {
@@ -86,8 +90,8 @@ class AxonHeader extends StatelessWidget {
         child: AnimatedBuilder(
           animation: searchModeAnimation,
           builder: (context, child) {
-            final double searchProgress = Curves.easeInOutCubic
-                .transform(searchModeAnimation.value);
+            final double searchProgress =
+                Curves.easeInOutCubic.transform(searchModeAnimation.value);
 
             return Stack(
               children: [
@@ -107,13 +111,13 @@ class AxonHeader extends StatelessWidget {
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: SvgPicture.asset(
-                                  'assets/cortext.svg',
-                                  height: iconHeight * 1.1,
-                                  colorFilter: ColorFilter.mode(
-                                    AppColors.primaryColor.inverted,
-                                    BlendMode.srcIn,
-                                  ),
+                                'assets/cortext.svg',
+                                height: iconHeight * 1.1,
+                                colorFilter: ColorFilter.mode(
+                                  AppColors.primaryColor.inverted,
+                                  BlendMode.srcIn,
                                 ),
+                              ),
                             ),
                           ),
 
@@ -127,8 +131,8 @@ class AxonHeader extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: AppColors.background,
                                 borderRadius: BorderRadius.circular(radius),
-                                border: Border.all(
-                                    color: borderColor, width: 0.8),
+                                border:
+                                    Border.all(color: borderColor, width: 0.8),
                               ),
                               child: Material(
                                 color: Colors.transparent,
@@ -150,14 +154,14 @@ class AxonHeader extends StatelessWidget {
                                           bottomLeft: Radius.circular(radius),
                                         ),
                                         splashColor: splashColor,
-                                        highlightColor: splashColor.withValues(
-                                            alpha: 0.05),
+                                        highlightColor:
+                                            splashColor.withValues(alpha: 0.05),
                                         child: Center(
                                           child: Icon(
                                             Icons.search_rounded,
                                             size: referenceWidth * 0.06,
-                                            color: AppColors.primaryColor
-                                                .inverted,
+                                            color:
+                                                AppColors.primaryColor.inverted,
                                           ),
                                         ),
                                       ),
@@ -181,8 +185,10 @@ class AxonHeader extends StatelessWidget {
                                           AxonAvatar(
                                             initials: initials,
                                             isSubscribed: isUserSubscribed,
-                                            size: bubbleHeight, // Exactly pill height
-                                            fontSize: bubbleHeight * 0.35, // Slightly larger letter
+                                            size:
+                                                bubbleHeight, // Exactly pill height
+                                            fontSize: bubbleHeight *
+                                                0.35, // Slightly larger letter
                                           ),
                                           // Tap overlay
                                           Positioned.fill(
@@ -191,16 +197,16 @@ class AxonHeader extends StatelessWidget {
                                               child: InkWell(
                                                 onTap: () {
                                                   HapticFeedback.lightImpact();
-                                                  FocusScope
-                                                      .of(context)
-                                                      .unfocus();
+                                                  FocusManager
+                                                      .instance.primaryFocus
+                                                      ?.unfocus();
                                                   onSettingsTap();
                                                 },
                                                 borderRadius: BorderRadius.only(
-                                                  topRight: Radius.circular(
-                                                      radius),
-                                                  bottomRight: Radius.circular(
-                                                      radius),
+                                                  topRight:
+                                                      Radius.circular(radius),
+                                                  bottomRight:
+                                                      Radius.circular(radius),
                                                 ),
                                                 splashColor: splashColor,
                                                 highlightColor: splashColor
@@ -296,7 +302,8 @@ class AxonHeader extends StatelessWidget {
 
                             // RIGHT: Search icon
                             Padding(
-                              padding: EdgeInsets.only(right: bubbleHeight * 0.25),
+                              padding:
+                                  EdgeInsets.only(right: bubbleHeight * 0.25),
                               child: Icon(
                                 Icons.search_rounded,
                                 size: referenceWidth * 0.055,

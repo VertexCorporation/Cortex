@@ -21,8 +21,8 @@ class AttachmentSheetButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // SCREEN METRICS
-    final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
+    
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     // DYNAMIC DIMENSIONS
     // 3 items per row logic

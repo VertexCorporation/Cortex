@@ -13,6 +13,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cortex/navigation.dart';
 import 'package:cortex/server/credits.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
+import 'package:pasteboard/pasteboard.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
@@ -78,7 +80,6 @@ class OptionsPanelViewModel {
     } else {
       final options = [
         MessageOption.copy,
-        MessageOption.select,
         MessageOption.speak
       ];
       if (!message.isError) {
@@ -93,10 +94,6 @@ class OptionsPanelViewModel {
     }
   }
 
-  bool get _isMediaOnlyMessage =>
-      message.hasAttachments && message.displayableText
-          .trim()
-          .isEmpty;
 
   List<MessageOption> getVisibleOptions(BuildContext context) {
     final langCode = Localizations
@@ -118,26 +115,17 @@ class OptionsPanelViewModel {
     final isDynamicContext = session.isDynamicChat;
     final isOfflineModel = modelSeriesData?.isServerSide == false;
 
-    final currentModelCanHandleImages = modelService.hasModality(currentModelId,
-        langCode: langCode, modality: 'image');
 
     // We check predits from the viewmodel directly
     final hasPreditsForPremium = session.isUserSubscribed ||
         (context
             .read<CreditsManager>()
             .preditsNotifier
-            .value ?? 0) >= 10;
+            .value ?? 0) > 0;
 
     final isCurrentModelPremium = currentModel.isPremium;
 
     return _baseOptions.where((option) {
-      if (_isMediaOnlyMessage &&
-          (option == MessageOption.copy ||
-              option == MessageOption.select ||
-              option == MessageOption.speak)) {
-        return false;
-      }
-
       if (conversation.isWaitingForResponse &&
           (option == MessageOption.regenerate ||
               option == MessageOption.changeModel ||
@@ -148,36 +136,35 @@ class OptionsPanelViewModel {
         return false;
       }
 
+      if (option == MessageOption.speak) {
+        if (message.hasAttachments && message.displayableText
+            .trim()
+            .isEmpty) {
+          return false;
+        }
+      }
+
       if (option == MessageOption.regenerate) {
-        if (isCurrentModelPremium && !hasPreditsForPremium) return false;
+        if (!isDynamicContext) {
+          if (isCurrentModelPremium && !hasPreditsForPremium) return false;
+        }
         if (!isOfflineModel && !internet.isConnected) return false;
         if (!isOfflineModel && totalCredits <= 0) return false;
       }
 
       if (option == MessageOption.changeModel) {
         if (!isOfflineModel && totalCredits <= 0) return false;
-      }
-
-      // LOGIC UPDATE: Only restrict model ops if chat has USER IMAGES and model CAN'T handle them.
-      // (Text files are safe for any model).
-      if (conversationHasUserImages && !currentModelCanHandleImages) {
-        if (option == MessageOption.regenerate ||
-            option == MessageOption.edit ||
-            option == MessageOption.changeModel) {
-          return false;
-        }
-      }
-
-      if (option == MessageOption.changeModel) {
-        if (!isDynamicContext && modelSeriesData != null) {
-          final int validExtCount =
-          ModelDataUtils.validVariantCountForChangingModel(
-            parentSeries: modelSeriesData,
-            conversationHasPhoto: conversationHasUserImages,
-          );
-          if (validExtCount <= 1) return false;
-        } else if (modelSeriesData == null) {
-          return false;
+        if (!isDynamicContext) {
+          if (modelSeriesData != null) {
+            final int validExtCount =
+            ModelDataUtils.validVariantCountForChangingModel(
+              parentSeries: modelSeriesData,
+              conversationHasPhoto: conversationHasUserImages,
+            );
+            if (validExtCount <= 1) return false;
+          } else {
+            return false;
+          }
         }
       }
       return true;
@@ -260,9 +247,39 @@ class _AnimatedMessageOptionsPanelState
     navigateToScreen(screen, direction: const Offset(1.0, 0.0));
   }
 
-  void _onCopyTapped() {
+  void _onCopyTapped() async {
     final localizations = AppLocalizations.of(context)!;
-    Clipboard.setData(ClipboardData(text: widget.message.displayableText));
+    final message = widget.message;
+
+    // Smart copy: if the message is media-only, try to copy the image file.
+    // If copying fails (e.g. unsupported platform), fallback to saving to gallery.
+    final bool isMediaOnly = message.hasAttachments && message.displayableText
+        .trim()
+        .isEmpty;
+
+    if (isMediaOnly) {
+      _dismissPanel();
+      try {
+        final path = message.attachmentPaths.first;
+        final success = await Pasteboard.writeFiles([path]);
+        if (success) {
+          if (!mounted) return;
+          Provider.of<IntrovertNotificationService>(context, listen: false)
+              .showNotification(
+              message: localizations.messageCopied,
+              type: NotificationType.success,
+              bottomOffset: 0.07,
+              isChatMode: true);
+        } else {
+          _saveFirstMediaToGallery(message, localizations);
+        }
+      } catch (e) {
+        _saveFirstMediaToGallery(message, localizations);
+      }
+      return;
+    }
+
+    Clipboard.setData(ClipboardData(text: message.displayableText));
     Provider.of<IntrovertNotificationService>(context, listen: false)
         .showNotification(
         message: localizations.messageCopied,
@@ -270,6 +287,41 @@ class _AnimatedMessageOptionsPanelState
         bottomOffset: 0.07,
         isChatMode: true);
     _dismissPanel();
+  }
+
+  Future<void> _saveFirstMediaToGallery(Message message,
+      AppLocalizations localizations) async {
+    final notificationService = Provider.of<IntrovertNotificationService>(
+        context, listen: false);
+    try {
+      final firstPath = message.attachmentPaths.first;
+      final ext = p.extension(firstPath).toLowerCase();
+      final isVideo = ['.mp4', '.mov', '.avi', '.mkv', '.webm'].contains(ext);
+
+      bool? success;
+      if (isVideo) {
+        success = await GallerySaver.saveVideo(firstPath);
+      } else {
+        success = await GallerySaver.saveImage(firstPath);
+      }
+
+      notificationService.showNotification(
+        message: success == true
+            ? localizations.downloadSuccess
+            : localizations.downloadFailed,
+        type: success == true ? NotificationType.success : NotificationType
+            .error,
+        bottomOffset: 0.07,
+        isChatMode: true,
+      );
+    } catch (_) {
+      notificationService.showNotification(
+        message: localizations.downloadFailed,
+        type: NotificationType.error,
+        bottomOffset: 0.07,
+        isChatMode: true,
+      );
+    }
   }
 
   void _onSelectTapped() {
