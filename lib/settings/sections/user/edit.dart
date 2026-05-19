@@ -73,9 +73,9 @@ class _EditProfileDialogState extends State<_EditProfileDialog>
 
   @override
   Widget build(BuildContext context) {
-    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
+    context.watch<ThemeProvider>();
     final appLocalizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     return Center(
       child: SingleChildScrollView(

@@ -205,7 +205,7 @@ class _ReportDialogState extends State<ReportDialog>
     final colors = Theme.of(context).colorScheme;
 
     // --- DYNAMIC SCALING ---
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery.sizeOf(context).width;
     final double scale = screenWidth / 400.0; // Reference width of 400
 
     return FadeTransition(
@@ -218,7 +218,7 @@ class _ReportDialogState extends State<ReportDialog>
           onTap: () => FocusScope.of(context).unfocus(),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.85,
+              maxHeight: MediaQuery.sizeOf(context).height * 0.85,
               maxWidth: 600 * scale, // Scaled constraint for tablets
             ),
             child: SingleChildScrollView(
@@ -355,7 +355,7 @@ class _ReportDialogState extends State<ReportDialog>
     final localizations = AppLocalizations.of(context)!;
 
     final Color cancelColor = AppColors.senaryColor;
-    final Color submitColor = AppColors.septenaryColor;
+    final Color submitColor = AppColors.senaryColor;
 
     return Column(
       mainAxisSize: MainAxisSize.min,

@@ -119,6 +119,12 @@ class ModelCatalogProvider extends ChangeNotifier {
     _loadCatalogData();
   }
 
+  /// Instantly syncs the UI catalog with the internal Service cache.
+  /// Used after local optimistic updates (e.g. creating a model).
+  void syncWithServiceCache() {
+    _onDataSourceChanged();
+  }
+
   Future<bool> removeModel(BuildContext context, ModelEntity model) async {
     final localizations = AppLocalizations.of(context)!;
     final notificationService = context.read<IntrovertNotificationService>();
@@ -164,13 +170,33 @@ class ModelCatalogProvider extends ChangeNotifier {
           modelService: _modelService,
         );
       } else {
-        final String? uninstalledModelTitle =
-            await localStateProvider.uninstallDownloadedModel(model.id);
-        success = uninstalledModelTitle != null;
+        // Collect all IDs to uninstall. For an offline series, this includes all variants.
+        final List<String> idsToUninstall = [model.id];
+
+        if (!model.isServerSide &&
+            model.variants != null &&
+            model.variants!.isNotEmpty) {
+          // Add all variant IDs
+          idsToUninstall.addAll(model.variants!.keys);
+        }
+
+        bool anySuccess = false;
+
+        // Try uninstalling all associated IDs
+        for (final uninstallId in idsToUninstall) {
+          final String? title =
+              await localStateProvider.uninstallDownloadedModel(uninstallId);
+          if (title != null) {
+            anySuccess = true;
+          }
+        }
+
+        success = anySuccess;
 
         if (success) {
+          // Always use the parent model's title for the notification
           notificationService.showNotification(
-            message: localizations.modelRemovedSuccess(uninstalledModelTitle),
+            message: localizations.modelRemovedSuccess(model.displayTitle),
             type: NotificationType.success,
           );
         } else {
@@ -256,31 +282,15 @@ class ModelCatalogProvider extends ChangeNotifier {
   /// Initiates a chat session with the selected model.
   Future<void> startChatWithModel(String id) async {
     try {
-      ModelEntity? model;
+      final langCode = _localeProvider.locale.languageCode;
 
-      // 1. Try direct match in top-level models.
-      try {
-        model = _allModels.firstWhere((m) => m.id == id);
-      } catch (_) {
-        // Not a top-level model — may be a variant ID from an offline series.
-      }
-
-      // 2. If not found, search inside variants of offline series.
-      if (model == null) {
-        for (final seriesModel in _allModels) {
-          if (seriesModel.variants?.containsKey(id) == true) {
-            // Use the parent series entity but override the ID to the variant.
-            model = seriesModel.copyWith(id: id);
-            break;
-          }
-        }
-      }
-
-      if (model == null) {
+      if (!_modelService.hasModelInCache(id)) {
         debugPrint(
             "[ModelCatalogProvider.startChat] Error: Model with ID '$id' not found.");
         return;
       }
+
+      final model = _modelService.getPreciseModelData(id, langCode: langCode);
 
       mainScreenKey.currentState?.startChatWithModel(model);
       final prefs = await SharedPreferences.getInstance();
@@ -350,8 +360,8 @@ class ModelCatalogProvider extends ChangeNotifier {
       AppLocalizations localizations) async {
     final restoreNavBar = Darkener.darken();
     // Get screen dimensions once for responsive sizing.
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     final result = await showGeneralDialog<bool>(
       context: context,

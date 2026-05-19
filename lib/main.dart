@@ -168,7 +168,9 @@ class AppBootstrap {
           exceptionAsString.contains("ClientException") ||
           exceptionAsString.contains("No route to host") ||
           exceptionAsString.contains("Connection failed") ||
-          exceptionAsString.contains("NetworkImage");
+          exceptionAsString.contains("NetworkImage") ||
+          exceptionAsString.contains("Invalid image data") ||
+          exceptionAsString.contains("DioException");
 
       if (isNetworkNoise) {
         debugPrint(
@@ -189,8 +191,11 @@ class AppBootstrap {
       }
 
       if (errorString.contains("SocketException") ||
-          errorString.contains("No route to host")) {
-        debugPrint("Ignored Network Error in PlatformDispatcher: $errorString");
+          errorString.contains("No route to host") ||
+          errorString.contains("Invalid image data") ||
+          errorString.contains("DioException")) {
+        debugPrint(
+            "Ignored Network/Image Error in PlatformDispatcher: $errorString");
         return true;
       }
 
@@ -397,7 +402,11 @@ List<SingleChildWidget> _buildCoreProviders(AppStatus initialStatus,
       create: (_) => AuthService(),
     ),
     Provider<ExtrovertNotificationService>(
-      create: (_) => ExtrovertNotificationService(navigatorKey: navigatorKey),
+      create: (_) =>
+          ExtrovertNotificationService(
+            navigatorKey: navigatorKey,
+            mainScreenKey: mainScreenKey,
+          ),
     ),
     Provider<IntrovertNotificationService>(
       create: (_) => IntrovertNotificationService(navigatorKey: navigatorKey),
@@ -673,12 +682,19 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
             contextService: context.read<ContextService>(),
           ),
     ),
-    Provider<SelectionService>(
-      create: (BuildContext context) =>
+    ProxyProvider4<ChatSessionProvider,
+        ConversationProvider,
+        ModelService,
+        ModelLocalStateProvider,
+        SelectionService>(
+      update: (BuildContext context, session, conversation, modelService,
+          localState, previous) =>
+      previous ??
           SelectionService(
-            sessionProvider: context.read<ChatSessionProvider>(),
-            conversationProvider: context.read<ConversationProvider>(),
-            modelService: context.read<ModelService>(),
+            sessionProvider: session,
+            conversationProvider: conversation,
+            modelService: modelService,
+            localStateProvider: localState,
           ),
     ),
     Provider<ReadService>(
@@ -687,6 +703,7 @@ List<SingleChildWidget> _buildChatAndLibraryProviders(String initialModelId,
             sessionProvider: context.read<ChatSessionProvider>(),
             conversationProvider: context.read<ConversationProvider>(),
             modelService: context.read<ModelService>(),
+            backgroundTaskService: context.read<BackgroundTaskService>(),
           ),
     ),
     // Speech and Voice services (Must be before SendService)

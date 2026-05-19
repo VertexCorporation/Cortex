@@ -72,14 +72,14 @@ class _VariantOverlayPanelState extends State<_VariantOverlayPanel>
 
   @override
   Widget build(BuildContext context) {
-    final screenW = MediaQuery.of(context).size.width;
+    final screenW = MediaQuery.sizeOf(context).width;
     final bool isTablet = screenW >= 600;
 
     // --- DYNAMIC TOP POSITIONING ---
     // Must match the logic in DetailAppBar to align perfectly.
     // Tablet: Dynamic (approx 14%). Phone: Standard 56.0.
     final double toolbarHeight = isTablet ? screenW * 0.14 : kToolbarHeight;
-    final topPx = toolbarHeight + MediaQuery.of(context).padding.top;
+    final topPx = toolbarHeight + MediaQuery.paddingOf(context).top;
 
     return Material(
       color: Colors.transparent,
@@ -140,9 +140,9 @@ class DetailAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.provider,
     required this.onBackPressed,
     this.scrollController,
-  })  : _isTablet = MediaQuery.of(context).size.width >= 600,
-        _toolbarHeight = MediaQuery.of(context).size.width >= 600
-            ? MediaQuery.of(context).size.width * 0.14
+  })  : _isTablet = MediaQuery.sizeOf(context).width >= 600,
+        _toolbarHeight = MediaQuery.sizeOf(context).width >= 600
+            ? MediaQuery.sizeOf(context).width * 0.14
             : kToolbarHeight;
 
   @override
@@ -268,7 +268,7 @@ class DetailAppBarState extends State<DetailAppBar>
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final bool isTablet = widget._isTablet;
     final double statusSlotWidth = isTablet ? 150.0 : screenWidth * 0.30;
 

@@ -7,6 +7,7 @@ import 'package:cortex/chat/services/regenerate.dart';
 import 'package:cortex/chat/services/scroll.dart';
 import 'package:flutter/foundation.dart'; // for listEquals
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/session.dart';
 import '../messages/messages.dart';
@@ -31,8 +32,7 @@ class EditService {
     required TextEditingController controller,
     required FocusNode focusNode,
     required AnimationController panelController,
-  })
-      : _inputProvider = inputProvider,
+  })  : _inputProvider = inputProvider,
         _conversationProvider = conversationProvider,
         _regenerateService = regenerateService,
         _scrollService = scrollService,
@@ -62,26 +62,25 @@ class EditService {
 
     // Get new list of attachment paths from InputProvider
     final List<String> newAttachmentPaths =
-    _inputProvider.attachments.map((a) => a.file.path).toList();
+        _inputProvider.attachments.map((a) => a.file.path).toList();
 
     final originalMessage = originalMessages[editingIndex];
 
     // Determine changes
     final bool textChanged = newText != originalMessage.text;
     final bool attachmentsChanged =
-    !listEquals(newAttachmentPaths, originalMessage.attachmentPaths);
+        !listEquals(newAttachmentPaths, originalMessage.attachmentPaths);
 
     debugPrint(
         "[EditService] textChanged=$textChanged, attachmentsChanged=$attachmentsChanged");
 
     if (!textChanged && !attachmentsChanged) {
-      debugPrint("[EditService] Nothing changed. Cancelling edit mode.");
-      cancelEditingMode();
-      return;
+      debugPrint(
+          "[EditService] Nothing changed. Regenerating from the same user message.");
     }
 
     List<Message> updatedList =
-    List<Message>.from(originalMessages.sublist(0, editingIndex));
+        List<Message>.from(originalMessages.sublist(0, editingIndex));
 
     final updatedMessage = originalMessage.copyWith(
       text: newText,
@@ -172,6 +171,16 @@ class EditService {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
+  }
+
+  /// Public entry point to request focus on the chat input field.
+  void requestFocus() {
+    if (!_focusNode.hasFocus) {
+      _focusNode.requestFocus();
+    }
+    // Forcefully show the keyboard, just in case the node thinks it is focused
+    // but the system hasn't actually shown the soft keyboard.
+    SystemChannels.textInput.invokeMethod('TextInput.show');
   }
 
   void _clearBackup() {

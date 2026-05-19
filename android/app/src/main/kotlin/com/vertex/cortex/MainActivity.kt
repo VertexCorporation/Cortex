@@ -4,33 +4,81 @@ import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.os.Environment
 import android.os.StatFs
+import android.provider.Settings
 import android.util.Log
+import android.view.WindowInsets
+import android.view.WindowInsetsAnimation
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
-
 import android.os.Bundle
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-
-import androidx.activity.enableEdgeToEdge // [NEW]
+import androidx.core.view.WindowInsetsAnimationCompat
+import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : FlutterFragmentActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge() // [NEW] - Android 15 standard
+        // Disable contrast enforcement to prevent MIUI/HyperOS from forcing
+        // heavy layout animations on the system bars during keyboard transitions.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+            window.isStatusBarContrastEnforced = false
+        }
+
         super.onCreate(savedInstanceState)
+
+        // ── HyperOS/MIUI Keyboard Animation Fix ──────────────────────
+        // NUCLEAR OPTION: Block the native InsetsController animation entirely.
+        //
+        // Problem: HyperOS runs a ~1 second WindowInsetsAnimation when the keyboard
+        // opens/closes. This feeds ~40 intermediate `viewInsets.bottom` values to
+        // Flutter (0.01, 0.04, 0.09, ... 1.0), causing the UI to animate in slow
+        // motion over 1 second regardless of our AnimatedPadding duration.
+        //
+        // Fix: Set DISPATCH_MODE_STOP on the decor view. This prevents Flutter's
+        // internal WindowInsetsAnimation.Callback from receiving ANY intermediate
+        // animation frames. Flutter will only see the FINAL keyboard height via
+        // onApplyWindowInsets (which fires at animation start with the target value).
+        // Result: viewInsets.bottom jumps instantly from 0→985 (or 985→0).
+        // Our AnimatedPadding then smoothly animates this snap over 100ms.
+        // ──────────────────────────────────────────────────────────────
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.decorView.setWindowInsetsAnimationCallback(
+                object : WindowInsetsAnimation.Callback(DISPATCH_MODE_STOP) {
+                    override fun onProgress(
+                        insets: WindowInsets,
+                        runningAnimations: MutableList<WindowInsetsAnimation>
+                    ): WindowInsets {
+                        return insets
+                    }
+                }
+            )
+        }
+
+        // Enable edge-to-edge rendering. The screen won't shrink when the keyboard
+        // opens, preventing HyperOS BarFollowAnimation from crashing/lagging.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // Transparent system bars for proper Edge-to-Edge rendering.
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
     }
 
     /* ────────────────  CONSTANTS  ──────────────── */
     private val STORAGE_CH = "com.vertex.cortex/storage"
     private val LLAMA_CH   = "com.vertex.cortex/llama"
     private val MEMORY_CH  = "com.vertex.cortex/memory"
+    private val DEVICE_CH  = "com.vertex.cortex/device"
     private val TAG        = "CortexMainActivity"
 
     /* ───────────    FLUTTER BRIDGE   ─────────── */
-    @SuppressLint("ObsoleteSdkInt")
+    @SuppressLint("HardwareIds", "ObsoleteSdkInt")
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
@@ -45,6 +93,15 @@ class MainActivity : FlutterFragmentActivity() {
                     "getDeviceMemory" -> result.success(getTotalRamMB())
                     "getUsedMemory"   -> result.success(getUsedRamMB())
                     else              -> result.notImplemented()
+                }
+            }
+
+        /* ---- DEVICE CHANNEL ---- */
+        MethodChannel(messenger, DEVICE_CH)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "getScopedAndroidId" -> result.success(getScopedAndroidId())
+                    else                 -> result.notImplemented()
                 }
             }
 
@@ -174,6 +231,19 @@ class MainActivity : FlutterFragmentActivity() {
     private fun getTotalStorageMB(): Long {
         val stat     = StatFs(Environment.getExternalStorageDirectory().path)
         return stat.blockSizeLong * stat.blockCountLong / (1024L * 1024L)
+    }
+
+    private fun getScopedAndroidId(): String? {
+        val androidId = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ANDROID_ID
+        )?.trim()
+
+        if (androidId.isNullOrBlank() || androidId == "9774d56d682e549c") {
+            return null
+        }
+
+        return androidId
     }
 
     /** Helper to start the background service safely. */

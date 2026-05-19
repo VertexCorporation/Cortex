@@ -1,5 +1,6 @@
 // lib/chat/screen/default/view.dart
 
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -42,6 +43,9 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
   // 2.6 Bounce Animation (Cortex Icon Tap)
   late AnimationController _bounceController;
   late Animation<double> _bounceAnimation;
+
+  // 2.7 Rainbow Border Animation
+  late AnimationController _rainbowController;
 
   // 3. Mode Transition Animation (Standard <-> Flux)
   late AnimationController _modeController;
@@ -92,6 +96,12 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
       curve: Curves.easeInOut,
     ));
 
+    // --- Rainbow Setup ---
+    _rainbowController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat();
+
     // --- Mode Transition Setup ---
     _modeController = AnimationController(
       vsync: this,
@@ -111,7 +121,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    
+
     // TickerMode Visibility Handling
     final isVisible = TickerMode.of(context);
     if (_isVisible != isVisible) {
@@ -217,12 +227,10 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     _startStandardDefaultSequence(targetAsButtons);
   }
 
-
-
   Widget _buildFeatureButtons(BuildContext context, AppLocalizations l10n) {
     context.watch<ThemeProvider>();
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     final horizontalPadding = screenWidth * 0.02;
     final buttonSpacing = screenWidth * 0.04;
@@ -240,6 +248,11 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         .any((m) => m.outputs['video'] == true || m.category == 'video');
     final hasAudio = catalog.allModels
         .any((m) => m.outputs['audio'] == true || m.category == 'audio');
+
+    final userProvider = context.watch<UserProvider>();
+    final int subLevel = userProvider.activeSubscriptionLevel;
+    // Lifetime or Ultra
+    final bool isUltra = subLevel >= 3;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -264,7 +277,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   buttonSpacing: buttonSpacing,
                   iconPath: 'assets/icons/make.svg',
                   title: l10n.featureCreateImageTitle,
-                  iconColor: AppColors.background.inverted.withValues(alpha: 0.2),
+                  iconColor:
+                      AppColors.background.inverted.withValues(alpha: 0.2),
                   isDisabled: !hasImage,
                   onTap: () => _handleGeneration(context, 'image'),
                 ),
@@ -281,9 +295,10 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   buttonSpacing: buttonSpacing,
                   iconPath: 'assets/icons/transition.svg',
                   title: l10n.featureCreateVideoTitle,
-                  iconColor: AppColors.background.inverted.withValues(alpha: 0.2),
+                  iconColor:
+                      AppColors.background.inverted.withValues(alpha: 0.2),
                   isDisabled: !hasVideo,
-                  isPremiumFeature: true,
+                  isAnimatedRainbowBorder: !isUltra,
                   onTap: () => _handleGeneration(context, 'video'),
                 ),
               ),
@@ -304,7 +319,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   buttonSpacing: buttonSpacing,
                   iconPath: 'assets/icons/voice.svg',
                   title: l10n.featureCreateAudioTitle,
-                  iconColor: AppColors.background.inverted.withValues(alpha: 0.2),
+                  iconColor:
+                      AppColors.background.inverted.withValues(alpha: 0.2),
                   isDisabled: !hasAudio,
                   onTap: () => _handleGeneration(context, 'audio'),
                 ),
@@ -321,7 +337,8 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                   buttonSpacing: buttonSpacing,
                   iconPath: 'assets/icons/context.svg',
                   title: l10n.useOffline,
-                  iconColor: AppColors.background.inverted.withValues(alpha: 0.2),
+                  iconColor:
+                      AppColors.background.inverted.withValues(alpha: 0.2),
                   isDisabled: false,
                   onTap: () => _handleOfflineAction(context),
                 ),
@@ -347,80 +364,120 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     required bool isDisabled,
     required VoidCallback onTap,
     bool isPremiumFeature = false,
+    bool isAnimatedRainbowBorder = false,
   }) {
-    final horizontalPadding = MediaQuery.of(context).size.width * 0.018;
+    final horizontalPadding = MediaQuery.sizeOf(context).width * 0.018;
 
     final border = BorderRadius.circular(borderRadius);
+    final innerBorder = BorderRadius.circular(borderRadius - 1.5);
+
+    final innerContent = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SvgPicture.asset(
+          iconPath,
+          width: iconSize,
+          height: iconSize,
+          colorFilter: ColorFilter.mode(
+            AppColors.primaryColor.inverted,
+            BlendMode.srcIn,
+          ),
+        ),
+        SizedBox(width: buttonSpacing * 0.35),
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: AppColors.primaryColor.inverted,
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (isPremiumFeature) ...[
+                  SizedBox(width: buttonSpacing * 0.2),
+                  SvgPicture.asset(
+                    'assets/icons/sparkle.svg',
+                    width: fontSize * 0.9,
+                    height: fontSize * 0.9,
+                    colorFilter: ColorFilter.mode(
+                      AppColors.primaryColor.inverted,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+
+    final innerContainer = Ink(
+      width: isAnimatedRainbowBorder ? null : width,
+      height: isAnimatedRainbowBorder ? null : height,
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+      decoration: BoxDecoration(
+        color: isAnimatedRainbowBorder
+            ? AppColors.background
+            : AppColors.background.withValues(alpha: 0.4),
+        border: isAnimatedRainbowBorder
+            ? null
+            : Border.all(
+                color: AppColors.border,
+                width: 0.5,
+              ),
+        borderRadius: isAnimatedRainbowBorder ? innerBorder : border,
+      ),
+      child: innerContent,
+    );
 
     return Opacity(
       opacity: isDisabled ? 0.4 : 1.0,
       child: Material(
-        color: AppColors.background,
+        color: Colors.transparent,
         borderRadius: border,
         child: InkWell(
           borderRadius: border,
           onTap: isDisabled ? null : onTap,
           splashColor: iconColor.withValues(alpha: 0.14),
           highlightColor: iconColor.withValues(alpha: 0.06),
-          child: Container(
-            width: width,
-            height: height,
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            decoration: BoxDecoration(
-              color: AppColors.background.withValues(alpha: 0.4),
-              border: Border.all(
-                color: AppColors.border,
-                width: 0.5,
-              ),
-              borderRadius: border,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(
-                  iconPath,
-                  width: iconSize,
-                  height: iconSize,
-                  colorFilter: ColorFilter.mode(
-                    AppColors.primaryColor.inverted,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                SizedBox(width: buttonSpacing * 0.35),
-                Flexible(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            color: AppColors.primaryColor.inverted,
-                            fontSize: fontSize,
-                            fontWeight: FontWeight.w600,
-                          ),
+          child: isAnimatedRainbowBorder
+              ? AnimatedBuilder(
+                  animation: _rainbowController,
+                  builder: (context, child) {
+                    return Ink(
+                      width: width,
+                      height: height,
+                      padding: const EdgeInsets.all(1.5),
+                      decoration: BoxDecoration(
+                        borderRadius: border,
+                        gradient: SweepGradient(
+                          transform: GradientRotation(
+                              _rainbowController.value * 2 * math.pi),
+                          colors: const [
+                            Color(0xFFFF0080), // Pink
+                            Color(0xFFFF4D4D), // Red
+                            Color(0xFFFFAA00), // Orange
+                            Color(0xFFFFDD00), // Yellow
+                            Color(0xFF00CC76), // Green
+                            Color(0xFF00AAFF), // Cyan
+                            Color(0xFF7B61FF), // Purple
+                            Color(0xFFFF0080), // Pink
+                          ],
                         ),
-                        if (isPremiumFeature) ...[
-                          SizedBox(width: buttonSpacing * 0.2),
-                          SvgPicture.asset(
-                            'assets/icons/sparkle.svg',
-                            width: fontSize * 0.9,
-                            height: fontSize * 0.9,
-                            colorFilter: ColorFilter.mode(
-                              AppColors.primaryColor.inverted,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+                      ),
+                      child: child,
+                    );
+                  },
+                  child: innerContainer,
+                )
+              : innerContainer,
         ),
       ),
     );
@@ -442,8 +499,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     final selectionService = context.read<SelectionService>();
 
     final candidates = catalog.allModels
-        .where((m) =>
-            m.outputs[targetType] == true || m.category == targetType)
+        .where((m) => m.outputs[targetType] == true || m.category == targetType)
         .toList();
 
     if (candidates.isEmpty) return;
@@ -495,6 +551,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     _entranceController.dispose();
     _swapController.dispose();
     _bounceController.dispose();
+    _rainbowController.dispose();
     _modeController.dispose();
     super.dispose();
   }
@@ -536,11 +593,10 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     context.watch<ThemeProvider>();
     context.watch<ChatSessionProvider>();
 
-    final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
-    final screenHeight = mediaQuery.size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
     final l10n = AppLocalizations.of(context)!;
-    final bool isTablet = mediaQuery.size.shortestSide >= 600;
+    final bool isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
     final bool isDesktop = screenWidth >= 800;
 
     // Colors
@@ -561,7 +617,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         isDesktop ? 600.0 : (isTablet ? screenWidth * 0.6 : screenWidth);
     final double horizontalPadding =
         isDesktop ? 0 : (isTablet ? 0 : screenWidth * 0.12);
-    final double topPadding = mediaQuery.padding.top;
+    final double topPadding = MediaQuery.paddingOf(context).top;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -616,9 +672,10 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                 );
                                               },
                                               child: IconButton(
-                                                onPressed: _modeAnimation.value < 0.5
-                                                    ? _handleIconTap
-                                                    : null,
+                                                onPressed:
+                                                    _modeAnimation.value < 0.5
+                                                        ? _handleIconTap
+                                                        : null,
                                                 iconSize: logoSize,
                                                 padding: EdgeInsets.zero,
                                                 icon: SvgPicture.asset(
@@ -718,29 +775,35 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                       (1.0 - t).clamp(0.0, 1.0);
                                                   final btnOpacity =
                                                       t.clamp(0.0, 1.0);
-                                                  
+
                                                   // Adding smooth sliding transition similar to a cube effect
-                                                  final descOffset = Offset(0, 30.0 * t);
-                                                  final btnOffset = Offset(0, -30.0 * (1 - t));
+                                                  final descOffset =
+                                                      Offset(0, 30.0 * t);
+                                                  final btnOffset = Offset(
+                                                      0, -30.0 * (1 - t));
 
                                                   return Stack(
-                                                    alignment: Alignment.topCenter,
+                                                    alignment:
+                                                        Alignment.topCenter,
                                                     children: [
                                                       IgnorePointer(
                                                         ignoring:
                                                             descOpacity < 0.05,
                                                         child: RepaintBoundary(
-                                                          child: Transform.translate(
+                                                          child: Transform
+                                                              .translate(
                                                             offset: descOffset,
                                                             child: Opacity(
-                                                              opacity: descOpacity,
+                                                              opacity:
+                                                                  descOpacity,
                                                               child:
                                                                   _buildEntranceItem(
                                                                 startTime: 0.1,
                                                                 endTime: 0.6,
                                                                 child: Padding(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .symmetric(
                                                                     horizontal:
                                                                         logoSize *
                                                                             0.1,
@@ -751,11 +814,11 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                                         TextStyle(
                                                                       fontSize:
                                                                           bodyFontSize,
-                                                                      color: contentColor
-                                                                          .withValues(
-                                                                              alpha:
-                                                                                  0.8),
-                                                                      height: 1.5,
+                                                                      color: contentColor.withValues(
+                                                                          alpha:
+                                                                              0.8),
+                                                                      height:
+                                                                          1.5,
                                                                     ),
                                                                     textAlign:
                                                                         TextAlign
@@ -771,13 +834,18 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
                                                         ignoring:
                                                             btnOpacity < 0.05,
                                                         child: RepaintBoundary(
-                                                          child: Transform.translate(
+                                                          child: Transform
+                                                              .translate(
                                                             offset: btnOffset,
                                                             child: Opacity(
-                                                              opacity: btnOpacity,
+                                                              opacity:
+                                                                  btnOpacity,
                                                               child: Padding(
-                                                                padding: EdgeInsets.symmetric(
-                                                                  horizontal: logoSize * 0.1,
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                  horizontal:
+                                                                      logoSize *
+                                                                          0.1,
                                                                 ),
                                                                 child:
                                                                     _buildFeatureButtons(

@@ -29,7 +29,6 @@
   "usedMemory": "已用内存",
   "modelsTitle": "库",
   "localModels": "本地模型",
-  "serverSideModels": "语言模型",
   "selectGGUFFile": "选择 GGUF 文件",
   "errorGGUF": "请仅选择 GGUF 格式的文件。",
   "myModels": "我的模型",
@@ -86,7 +85,6 @@
   "delete": "删除",
   "passwordRequired": "需要密码。",
   "deleteDescription": "您删除的数据将从我们的服务器和您的设备中永久移除。此操作无法撤销。",
-  "deleteAccountButton": "账户删除按钮",
   "editProfile": "编辑个人资料",
   "displayName": "显示名称",
   "profileUpdated": "个人资料更新成功",
@@ -108,7 +106,6 @@
     }
   },
   "downloadPaused": "下载已暂停。",
-  "purchaseSuccessful": "购买成功！",
   "purchaseError": "购买错误",
   "purchasePlus": "购买 Cortex Plus",
   "plusDescription": "精英人工智能体验",
@@ -320,7 +317,6 @@
   "experimentalOfflineWarning": "离线模式仍处于试验阶段，您下载的模型可能无法达到最佳性能。",
   "noConversationsToDelete": "您没有可供删除的对话。",
   "reportSubmitted": "举报已成功提交。",
-  "purchaseReceived": "购买已收到，正在更新您的账户.",
   "verificationDelayed": "您的购买已确认。账户更新稍有延迟，项目将很快到账。",
   "maintenanceTitle": "系统维护中",
   "maintenanceMessage": "为部署重要更新，Cortex 暂时离线。应用访问权限将很快恢复。\n\n感谢您在我们改善用户体验期间的耐心等待。",
@@ -334,8 +330,6 @@
   "loginSubtitle": "登录您的Vertex账户。继续操作即表示您同意我们的服务条款和隐私政策。",
   "registerSubtitle": "创建 Vertex 帐户，即可无缝访问我们的所有服务。继续操作即表示您同意我们的服务条款和隐私政策。",
   "storagePermissionRequired": "需要存储权限才能保存下载的模型。请授予权限以继续。",
-  "plusBannerTitle": "免费获取Plus！",
-  "plusBannerSubtitle": "邀请一位朋友，你们双方即可免费获得 1 天 Plus 会员资格！",
   "inviteShareSubject": "快来加入Cortex！",
   "@inviteShareMessage": {
     "description": "用于邀请朋友时分享的短信。",
@@ -361,12 +355,10 @@
   "russian": "俄语",
   "featureDocumentTitle": "文档支持",
   "featureDocumentDescription": "该模型可以分析和回答有关上传的文档（如 PDF 和文本文件）的问题。",
-  "featureAudioTitle": "语音输入",
-  "featureAudioDescription": "该模型可以理解和处理语音输入。",
   "featureImageGenerationTitle": "图像生成",
   "featureImageGenerationDescription": "该模型可以根据您的文本描述创建原始图像。",
   "premiumModelNoticeTitle": "高级型号",
-  "premiumModelNoticeDescription": "此模特为高级模特，免费用户每天仅限向高级模特发送 3 条消息；订阅即可解锁无限访问权限！",
+  "premiumModelNoticeDescription": "这是一个高级AI，免费用户对高级AI的访问受限；升级以解锁无限访问！",
   "benefitPremiumModels": "访问高级模型",
   "premiumTrialExhaustedMessage": "您已使用高级模型的所有免费每日消息，请升级以获得无限制访问权限。",
   "useOffline": "无需互联网即可使用",
@@ -578,11 +570,10 @@
   "searching": "搜索",
   "featureWebSearchTitle": "网络搜索",
   "featureWebSearchDescription": "在网络上搜索实时信息",
-  "webSearchQuotaExceeded": "搜索配额已用完",
   "clearMemory": "清晰记忆",
   "clearMemoryConfirm": "你确定要清除记忆吗？",
   "personalization": "个性化",
-  "personalizationDescription": "定制您的体验",
+  "personalizationDescription": "个性化您的助手，使其更符合您的需求。您可以根据自己的独特偏好，调整其回复、行为和语气。",
   "memoryTitle": "记忆",
   "memoryDescription": "人工智能就是这样识别你的。",
   "noMemoryYet": "尚未建立任何记忆",
@@ -592,11 +583,11 @@
   "customInstructionHint": "在此处输入您的自定义说明",
   "openLinkWarningMessage": "您即将打开以下外部链接：\\n\\n{url}\\n\\n您确定要继续吗？",
   "intelligenceSystemPrompt": "请按照以下自定义说明操作：\\n\\n{instruction}",
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>",
+  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\n分析到目前为止的对话。如果您了解到任何关于用户的新信息（偏好、姓名、习惯、上下文），您必须在回复的最后，使用 `<memory>...</memory>` 标签输出您更新后的用户记忆。关键：您绝不能擦除或覆盖之前的记忆。始终将新信息添加到现有记忆中。如果没有了解到任何新信息，则省略该标签。例如：`<memory>喜欢足球和网球。喜欢简短的回答。</memory>`",
   "systemMemoryReminder": "\n\n请始终记住关于用户的这一点：\n{userMemory}",
-  "chatTitlePrompt": "您是标题生成器。请仅为接下来的对话回复一个 2-5 个词的标题。请勿使用引号、前缀或标点符号。",
+  "chatTitlePrompt": "您是标题生成器。请仅回复一个2-5个字的标题，用于接下来的对话。请勿使用引号、前缀或标点符号。重要提示：标题必须与用户消息的语言完全相同。",
   "chatTitleCriticalInstruction": "【重要说明】：您是标题生成器。请勿回答用户的问题。请勿聊天或打招呼。仅输出一个 2-4 个字的标题，概括用户提出的问题。",
-  "cortexSystemPersona": "\n\n[System] 重要指令：您目前正在一个名为“Cortex”的庞大、高度先进的人工智能生态系统中运行。请记住这一点，并在被问及保持 Cortex 的角色设定。",
+  "cortexSystemPersona": "\n\n[系统] 重要指示：您目前正在一个名为“Cortex”的庞大且高度先进的人工智能生态系统中操作；该平台由Vertex团队开发，该团队成员平均年龄仅为16岁。请记住这一点，并在被问及时回答。如果需要更多信息，请随时上网搜索；如果您无法搜索，请坦诚地说您不知道！",
   "@cortexSystemPersona": {
     "description": "System persona string added to online models"
   },
@@ -622,8 +613,6 @@
   "featureImageRecognitionDescription": "该模型可以分析和理解照片或图像。",
   "featureToolUseTitle": "工具使用",
   "featureToolUseDescription": "该模型能够智能地利用外部工具完成任务。",
-  "paywallAhaTitle": "Unlock the True Power of AI",
-  "paywallAhaSubtitle": "Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.",
   "systemPromptMissingMedia": "此模型需要 {mediaType} 才能工作。我截获了请求以告知您。请礼貌地通知用户他们需要提供 {mediaType}（用他们的语言告诉他们），因为我是 {modelName}，一个视觉/音频/视频编辑模型。",
   "mediaTypeImage": "图片",
   "mediaTypeVideo": "视频",
@@ -633,8 +622,8 @@
   "featureCreateVideoDescription": "将文本生成视频。",
   "defaultSeriesDescription": "{seriesName}是一款在Cortex上展现出高性能的先进智能。",
   "defaultModelDescription": "{modelName}是集成在Cortex生态系统内的高性能人工智能。旨在克服各种复杂任务，提供高度可靠高效的处理能力。通过提供快速响应时间和高级分析能力，它能显著提高您的日常生产力。该模型能够在Cortex的安全本地基础设施上无缝运行，协助您完成从创意头脑风暴到深度技术分析等各种任务。今天就开始探索其全部潜力吧。",
-  "createAI": "Create",
-  "shortcuts": "Shortcuts",
+  "createAI": "创建",
+  "shortcuts": "快捷方式",
   "ourStory": "我们的故事",
   "guestLimitBottomSheetTitle": "喜欢Cortex的智能吗？",
   "guestLimitBottomSheetText": "与更智能的智能体合作，创作更多内容，畅聊更多，完成更多事情……",
@@ -642,10 +631,51 @@
   "noArt": "无艺术",
   "noArtDescription": "目前还没有作品；是时候通过创作图像、视频、音频和各种内容来填满画廊了！",
   "videoPremiumWarning": "您需要 Ultra 会员资格才能生成视频，立即升级，体验流畅体验！",
-  "becomePremiumButton": "升级至高级会员",
+  "dynamicPreditsUpgradeMessage": "Cortex 可以给出更好的回答；立即升级，为每个问题获得最佳答案！",
   "fallbackInfoPanelText": "由于我们正在对服务器端进行一些改进，因此回复是由 Cortex 的动态聊天功能生成的，而不是您专门选择的 AI。感谢您的理解，我们将尽快完成改进！",
   "falOfflineMessage": "由于服务器端正在进行一些改进，此智能服务目前暂时离线。感谢您的理解，我们将尽快完成升级！",
   "errorInsufficientStorage": "存储空间不足，无法下载此模型。",
   "backgroundChatNotificationTitle": "返回聊天室！",
-  "backgroundChatNotificationBody": "{chatName} 中有一条新消息，快来看看吧！"
+  "falErrorImageRequired": "此人工智能需要参考图像，请上传图像后重试。",
+  "falErrorAudioRequired": "此模型需要参考音频文件，请上传音频文件后重试。",
+  "falErrorVideoRequired": "此模型需要参考视频，请上传视频后再试一次。",
+  "falErrorImageCorrupted": "上传的图片无法处理，请尝试其他格式。",
+  "falErrorSchemaRejected": "模型拒绝了输入，请尝试其他模型。",
+  "falErrorSchemaInvalid": "输入内容被生成服务拒绝。",
+  "falErrorGenericStatus": "生成服务返回错误（状态 {statusCode}）。",
+  "benefitVideoGeneration": "视频生成",
+  "claimOffer": "使用优惠",
+  "freeOffer": "免费优惠",
+  "trialMonthlyDescription": "前 {days} 天免费，之后 {price}/月",
+  "@trialMonthlyDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "trialAnnualDescription": "前 {days} 天免费，之后 {price}/年",
+  "@trialAnnualDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$49.99"
+      }
+    }
+  },
+  "freePlan": "免费 {plan}！",
+  "systemRoleFallback": "你是一位得力的助手。",
+  "systemLanguageInstruction": "\n\nCRITICAL：始终使用用户编写的相同语言进行回复，注意用户的语言。",
+  "systemTimeInfo": "\n\n当前日期和时间：{formattedTime}。",
+  "systemPromptLimitFallback": "紧急：用户请求执行某项操作，但其在 Cortex 上的额度已用完；请用用户的语言告知他们应该等待或考虑升级订阅计划。",
+  "systemNotePreviousMedia": "【系统提示：以下为之前生成的媒体文件，您可以参考或编辑。】"
 }

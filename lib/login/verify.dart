@@ -1,6 +1,4 @@
-
 // verify.dart
-
 
 import 'dart:async';
 import 'dart:developer' as dev;
@@ -76,7 +74,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       await _saveRememberMeState();
 
       if (mounted) {
-        Provider.of<AppInitializer>(context, listen: false).completeVerificationState();
+        Provider.of<AppInitializer>(context, listen: false)
+            .completeVerificationState();
       }
     } catch (e, st) {
       dev.log('[Continue] Unexpected error during navigation: $e',
@@ -120,59 +119,61 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     // This is where the network call happens and where the error must be handled.
     _emailCheckTimer =
         Timer.periodic(const Duration(seconds: 3), (timer) async {
-          // THE FIX IS IMPLEMENTED HERE:
-          // We wrap the entire network-dependent logic in a try-catch block
-          // to gracefully handle potential network failures without crashing the app.
-          try {
-            final user = FirebaseAuth.instance.currentUser;
+      // THE FIX IS IMPLEMENTED HERE:
+      // We wrap the entire network-dependent logic in a try-catch block
+      // to gracefully handle potential network failures without crashing the app.
+      try {
+        final user = FirebaseAuth.instance.currentUser;
 
-            // Safety check: If for some reason the user is no longer signed in,
-            // stop the timer to prevent further errors.
-            if (user == null) {
-              dev.log(
-                  '[EmailVerification] User is null, stopping verification check.',
-                  name: 'EmailVerification');
-              timer.cancel();
-              return;
-            }
+        // Safety check: If for some reason the user is no longer signed in,
+        // stop the timer to prevent further errors.
+        if (user == null) {
+          dev.log(
+              '[EmailVerification] User is null, stopping verification check.',
+              name: 'EmailVerification');
+          timer.cancel();
+          return;
+        }
 
-            // This is the network request that was causing the crash.
-            // It fetches the latest user data from Firebase servers.
-            await user.reload();
+        // This is the network request that was causing the crash.
+        // It fetches the latest user data from Firebase servers.
+        await user.reload();
 
-            // After reload(), we need to get the updated user object instance.
-            final freshUser = FirebaseAuth.instance.currentUser;
+        // After reload(), we need to get the updated user object instance.
+        final freshUser = FirebaseAuth.instance.currentUser;
 
-            // Check the verification status on the fresh user object.
-            if (freshUser != null && freshUser.emailVerified) {
-              dev.log(
-                  '[EmailVerification] Email has been successfully verified for ${freshUser
-                      .email}.', name: 'EmailVerification');
-              _handleVerified(); // Trigger navigation to the main app
-              timer.cancel(); // Stop this timer as its job is done.
-            }
-          } on FirebaseAuthException catch (e) {
-            // This block specifically catches Firebase-related exceptions.
-            if (e.code == 'network-request-failed') {
-              // This is the expected error when the device is offline.
-              // We log it for debugging but do not crash the app. The timer will simply try again.
-              dev.log(
-                  '[EmailVerification] Network request failed while checking email status. Will retry.',
-                  name: 'EmailVerification');
-            } else {
-              // Log other potential Firebase errors (e.g., 'user-token-expired') for diagnostics.
-              dev.log(
-                  '[EmailVerification] A Firebase error occurred during verification check: ${e
-                      .code}', name: 'EmailVerification', error: e);
-            }
-          } catch (e) {
-            // This is a general catch-all for any other unexpected errors,
-            // ensuring the application remains stable under all circumstances.
-            dev.log(
-                '[EmailVerification] A generic error occurred during verification check.',
-                name: 'EmailVerification', error: e);
-          }
-        });
+        // Check the verification status on the fresh user object.
+        if (freshUser != null && freshUser.emailVerified) {
+          dev.log(
+              '[EmailVerification] Email has been successfully verified for ${freshUser.email}.',
+              name: 'EmailVerification');
+          _handleVerified(); // Trigger navigation to the main app
+          timer.cancel(); // Stop this timer as its job is done.
+        }
+      } on FirebaseAuthException catch (e) {
+        // This block specifically catches Firebase-related exceptions.
+        if (e.code == 'network-request-failed') {
+          // This is the expected error when the device is offline.
+          // We log it for debugging but do not crash the app. The timer will simply try again.
+          dev.log(
+              '[EmailVerification] Network request failed while checking email status. Will retry.',
+              name: 'EmailVerification');
+        } else {
+          // Log other potential Firebase errors (e.g., 'user-token-expired') for diagnostics.
+          dev.log(
+              '[EmailVerification] A Firebase error occurred during verification check: ${e.code}',
+              name: 'EmailVerification',
+              error: e);
+        }
+      } catch (e) {
+        // This is a general catch-all for any other unexpected errors,
+        // ensuring the application remains stable under all circumstances.
+        dev.log(
+            '[EmailVerification] A generic error occurred during verification check.',
+            name: 'EmailVerification',
+            error: e);
+      }
+    });
   }
 
   /// Handles successful email verification.
@@ -180,8 +181,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     if (!_isVerified) {
       setState(() => _isVerified = true);
       _cancelTimers();
-      dev.log('Email ${widget
-          .email} successfully verified. Preparing to navigate to MainScreen.',
+      dev.log(
+          'Email ${widget.email} successfully verified. Preparing to navigate to MainScreen.',
           name: 'EmailVerification');
 
       _navigateToMainScreenAfterVerification();
@@ -198,10 +199,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     await reconcileAndSyncPurchases();
 
     if (mounted) {
-      Provider.of<AppInitializer>(context, listen: false).completeVerificationState();
+      Provider.of<AppInitializer>(context, listen: false)
+          .completeVerificationState();
     }
   }
-
 
   void _cancelTimers() {
     _countdownTimer?.cancel();
@@ -216,17 +217,17 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
   Future<void> _initializeRemainingTime() async {
     try {
-      final doc = await FirebaseFirestore.instance.collection('users').doc(
-          widget.userId).get();
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.userId)
+          .get();
       if (doc.exists && doc.data()?['createdAt'] != null) {
         final Timestamp createdAtTimestamp = doc.data()!['createdAt'];
         final DateTime createdAt = createdAtTimestamp.toDate();
         final int verifyAttempts = doc.data()?['verifyAttempts'] ?? 0;
-        final DateTime deadline = createdAt.add(
-            Duration(hours: 24 * (verifyAttempts + 1)));
-        final remaining = deadline
-            .difference(DateTime.now())
-            .inSeconds;
+        final DateTime deadline =
+            createdAt.add(Duration(hours: 24 * (verifyAttempts + 1)));
+        final remaining = deadline.difference(DateTime.now()).inSeconds;
         if (mounted) {
           setState(() {
             _remainingSeconds = remaining > 0 ? remaining : 0;
@@ -234,8 +235,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         }
       }
     } catch (e) {
-      dev.log(
-          'Error fetching user creation data: $e', name: 'EmailVerification');
+      dev.log('Error fetching user creation data: $e',
+          name: 'EmailVerification');
       if (mounted) {
         setState(() {
           _remainingSeconds = totalVerificationDuration;
@@ -253,11 +254,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       if (user == null) {
         throw Exception("User is not signed in.");
       }
-      final userDocRef = FirebaseFirestore.instance.collection('users').doc(
-          widget.userId);
+      final userDocRef =
+          FirebaseFirestore.instance.collection('users').doc(widget.userId);
       final docSnapshot = await userDocRef.get();
-      final int verifyAttempts = docSnapshot.exists ? (docSnapshot
-          .data()?['verifyAttempts'] ?? 0) : 0;
+      final int verifyAttempts =
+          docSnapshot.exists ? (docSnapshot.data()?['verifyAttempts'] ?? 0) : 0;
       if (verifyAttempts >= 2) {
         _notificationService.showNotification(
           message: l10n.maxResendLimitReached,
@@ -269,8 +270,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       dev.log('Attempting to resend verification email to ${user.email}...',
           name: 'EmailVerification');
       await user.sendEmailVerification();
-      dev.log(
-          'Verification email sent successfully.', name: 'EmailVerification');
+      dev.log('Verification email sent successfully.',
+          name: 'EmailVerification');
       await userDocRef.update({
         'verifyAttempts': FieldValue.increment(1),
       });
@@ -286,7 +287,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       dev.log('Error resending verification email: ${e.code}',
           name: 'EmailVerification', error: e);
       if (e.code == 'too-many-requests') {
-        _notificationService.showNotification(message: l10n.tooManyRequests,
+        _notificationService.showNotification(
+            message: l10n.tooManyRequests,
             type: NotificationType.error,
             bottomOffset: 0.02);
       } else {
@@ -296,9 +298,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             bottomOffset: 0.02);
       }
     } catch (e) {
-      dev.log('Unknown error during resend: $e', name: 'EmailVerification',
-          error: e);
-      _notificationService.showNotification(message: l10n.authError,
+      dev.log('Unknown error during resend: $e',
+          name: 'EmailVerification', error: e);
+      _notificationService.showNotification(
+          message: l10n.authError,
           type: NotificationType.error,
           bottomOffset: 0.02);
     } finally {
@@ -319,186 +322,191 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Theme
-          .of(context)
-          .scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             final availableHeight = constraints.maxHeight;
             final availableWidth = constraints.maxWidth;
             return Center(
-              child: Column(
-                children: [
-                  const Spacer(flex: 2),
-                  Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.center,
-                    children: [
-                      Positioned(
-                        top: -availableHeight * 0.21,
-                        left: -availableWidth * 0.2,
-                        child: Transform.rotate(
-                          angle: -80 * pi / 180,
-                          child: Container(
-                            width: availableWidth * 1.2,
-                            height: availableWidth * 1.2,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryColor.withValues(
-                                  alpha: 0.1),
-                              borderRadius: BorderRadius.circular(
-                                  availableWidth * 0.15),
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: availableHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        const Spacer(flex: 2),
+                        Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.center,
+                          children: [
+                            Positioned(
+                              top: -availableHeight * 0.21,
+                              left: -availableWidth * 0.2,
+                              child: Transform.rotate(
+                                angle: -80 * pi / 180,
+                                child: Container(
+                                  width: availableWidth * 1.2,
+                                  height: availableWidth * 1.2,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryColor
+                                        .withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(
+                                        availableWidth * 0.15),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: availableWidth * 0.8,
+                              height: availableWidth * 0.75,
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: Image.asset(
+                                    'assets/icons/verification.png'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(flex: 2),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: availableWidth * 0.1),
+                          child: Text(
+                            appLocalizations.verifyYourEmail,
+                            style: TextStyle(
+                              fontSize: availableHeight * 0.035,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  Theme.of(context).textTheme.bodyLarge?.color,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        SizedBox(height: availableHeight * 0.01),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: availableWidth * 0.06),
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: TextStyle(
+                                fontSize: availableHeight * 0.02,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.color,
+                              ),
+                              children: [
+                                TextSpan(
+                                    text:
+                                        '${appLocalizations.pleaseCheckYourEmail} '),
+                                TextSpan(
+                                  text: widget.email,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.color),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        width: availableWidth * 0.8,
-                        height: availableWidth * 0.75,
-                        child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: Image.asset('assets/icons/verification.png'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(flex: 2),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: availableWidth * 0.1),
-                    child: Text(
-                      appLocalizations.verifyYourEmail,
-                      style: TextStyle(
-                        fontSize: availableHeight * 0.035,
-                        fontWeight: FontWeight.bold,
-                        color: Theme
-                            .of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.color,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  SizedBox(height: availableHeight * 0.01),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: availableWidth * 0.06),
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: TextStyle(
-                          fontSize: availableHeight * 0.02,
-                          color: Theme
-                              .of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.color,
-                        ),
-                        children: [
-                          TextSpan(text: '${appLocalizations
-                              .pleaseCheckYourEmail} '),
-                          TextSpan(
-                            text: widget.email,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Theme
-                                .of(context)
-                                .textTheme
-                                .bodyLarge
-                                ?.color),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Spacer(flex: 2),
-                  if (!_isVerified) ...[
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: availableWidth * 0.1),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.senaryColor,
+                        const Spacer(flex: 2),
+                        if (!_isVerified) ...[
+                          Padding(
                             padding: EdgeInsets.symmetric(
-                                vertical: availableHeight * 0.022),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
+                                horizontal: availableWidth * 0.1),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.senaryColor,
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: availableHeight * 0.022),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                ),
+                                onPressed: _isResendLoading
+                                    ? null
+                                    : _resendVerificationEmail,
+                                child: _isResendLoading
+                                    ? SizedBox(
+                                        height: availableHeight * 0.02,
+                                        width: availableHeight * 0.02,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: AppColors.primaryColor),
+                                      )
+                                    : Text(
+                                        appLocalizations.resendCode,
+                                        style: TextStyle(
+                                            color: AppColors.primaryColor,
+                                            fontSize: availableHeight * 0.02,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                              ),
+                            ),
                           ),
-                          onPressed: _isResendLoading
-                              ? null
-                              : _resendVerificationEmail,
-                          child: _isResendLoading
-                              ? SizedBox(
-                            height: availableHeight * 0.02,
-                            width: availableHeight * 0.02,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: AppColors.primaryColor),
-                          )
-                              : Text(
-                            appLocalizations.resendCode,
-                            style: TextStyle(color: AppColors.primaryColor,
-                                fontSize: availableHeight * 0.02,
-                                fontWeight: FontWeight.bold),
+                          SizedBox(height: availableHeight * 0.01),
+                          // "Continue without verification" button - **MODIFIED**
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: availableWidth * 0.1),
+                            child: TextButton(
+                              onPressed: _isContinuing ? null : _continueToApp,
+                              // **CHANGED**
+                              child: _isContinuing // **CHANGED**
+                                  ? SizedBox(
+                                      // Show a small loader
+                                      height: availableHeight * 0.02,
+                                      width: availableHeight * 0.02,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.primaryColor.inverted,
+                                      ),
+                                    )
+                                  : Text(
+                                      appLocalizations
+                                          .verificationScreenContinueWithoutVerification,
+                                      style: TextStyle(
+                                        fontSize: availableHeight * 0.02,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryColor.inverted,
+                                      ),
+                                    ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: availableHeight * 0.01),
-                    // "Continue without verification" button - **MODIFIED**
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: availableWidth * 0.1),
-                      child: TextButton(
-                        onPressed: _isContinuing ? null : _continueToApp,
-                        // **CHANGED**
-                        child: _isContinuing // **CHANGED**
-                            ? SizedBox( // Show a small loader
-                          height: availableHeight * 0.02,
-                          width: availableHeight * 0.02,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppColors.primaryColor.inverted,
+                          SizedBox(height: availableHeight * 0.01),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: availableHeight * 0.02),
+                            child: Text(
+                              appLocalizations.verificationScreenWarning,
+                              style: TextStyle(
+                                  fontSize: availableHeight * 0.017,
+                                  color: AppColors.primaryColor.inverted),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        )
-                            : Text(
-                          appLocalizations
-                              .verificationScreenContinueWithoutVerification,
-                          style: TextStyle(
-                            fontSize: availableHeight * 0.02,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryColor.inverted,
+                          AnimatedTime(
+                            time: _formatTime(_remainingSeconds),
+                            style: TextStyle(
+                              fontSize: availableHeight * 0.025,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall?.color,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      ),
+                          const Spacer(flex: 1),
+                        ],
+                      ],
                     ),
-                    SizedBox(height: availableHeight * 0.01),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: availableHeight * 0.02),
-                      child: Text(
-                        appLocalizations.verificationScreenWarning,
-                        style: TextStyle(fontSize: availableHeight * 0.017,
-                            color: AppColors.primaryColor.inverted),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    AnimatedTime(
-                      time: _formatTime(_remainingSeconds),
-                      style: TextStyle(
-                        fontSize: availableHeight * 0.025,
-                        color: Theme
-                            .of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const Spacer(flex: 1),
-                  ],
-                ],
+                  ),
+                ),
               ),
             );
           },

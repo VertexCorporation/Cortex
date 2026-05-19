@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p; // Standard path manipulation
 import 'package:cortex/app.dart';
 import 'package:cortex/chat/messages/messages.dart';
 import 'package:cortex/chat/messages/viewer.dart';
+import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/theme.dart';
@@ -15,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import '../../../library/backend/data/service.dart';
+import '../../../library/backend/data/entity.dart';
 import '../../messages/tiles/ai.dart';
 import '../../messages/tiles/user.dart';
 import 'audio.dart';
@@ -112,7 +114,7 @@ class Tiles {
   }) {
     final bool isTablet = screenWidth >= 600;
     final double rightPadding =
-    isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
+        isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
 
     return Column(
       key: ValueKey('normal_user_$index'),
@@ -135,9 +137,7 @@ class Tiles {
           ),
 
         // --- TEXT BUBBLE SECTION ---
-        if (message.text
-            .trim()
-            .isNotEmpty)
+        if (message.text.trim().isNotEmpty)
           UserMessageTile(
             message: message,
             key: key,
@@ -162,18 +162,37 @@ class Tiles {
     required double screenHeight,
     required ModelService modelService,
   }) {
-    final langCode = Localizations
-        .localeOf(context)
-        .languageCode;
+    final langCode = Localizations.localeOf(context).languageCode;
     final preciseModelId = message.model ?? modelId;
 
-    final model =
-    modelService.getPreciseModelData(preciseModelId, langCode: langCode);
-    final correctImagePath = modelService.getModelImagePath(model);
+    ModelEntity model;
+    String correctImagePath;
+    final convProvider = context.read<ConversationProvider>();
 
-    final bool hasText = message.text
-        .trim()
-        .isNotEmpty;
+    if (modelService.hasModelInCache(preciseModelId)) {
+      model =
+          modelService.getPreciseModelData(preciseModelId, langCode: langCode);
+      correctImagePath = modelService.getModelImagePath(model);
+    } else if (convProvider.persistedModelId == preciseModelId &&
+        convProvider.persistedModelTitle != null) {
+      // Restore from conversation snapshot if model is deleted
+      model = ModelEntity.fromMap({
+        'id': preciseModelId,
+        'title': convProvider.persistedModelTitle,
+        'imagePath': convProvider.persistedModelImagePath,
+        'producer': 'Unknown',
+        'type': 'online',
+        'category': 'online',
+      }, langCode);
+      correctImagePath =
+          convProvider.persistedModelImagePath ?? 'assets/icons/self.svg';
+    } else {
+      model =
+          modelService.getPreciseModelData(preciseModelId, langCode: langCode);
+      correctImagePath = modelService.getModelImagePath(model);
+    }
+
+    final bool hasText = message.text.trim().isNotEmpty;
     final bool hasShimmer =
         message.pendingMediaType != MediaGenerationType.none;
     // UX rule:
@@ -210,36 +229,36 @@ class Tiles {
 
     final embeddedMedia = (hasShimmer || message.hasAttachments)
         ? AnimatedSwitcher(
-      duration: const Duration(milliseconds: 500),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      transitionBuilder: (Widget child, Animation<double> animation) {
-        final slideAnimation = Tween<Offset>(
-          begin: const Offset(0.08, 0),
-          end: Offset.zero,
-        ).animate(
-          CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-        );
-        return FadeTransition(
-          opacity: animation,
-          child: SlideTransition(
-            position: slideAnimation,
-            child: child,
-          ),
-        );
-      },
-      layoutBuilder:
-          (Widget? currentChild, List<Widget> previousChildren) {
-        return Stack(
-          alignment: Alignment.centerLeft,
-          children: <Widget>[
-            ...previousChildren,
-            if (currentChild != null) currentChild,
-          ],
-        );
-      },
-      child: mediaWidget,
-    )
+            duration: const Duration(milliseconds: 500),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              final slideAnimation = Tween<Offset>(
+                begin: const Offset(0.08, 0),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+              );
+              return FadeTransition(
+                opacity: animation,
+                child: SlideTransition(
+                  position: slideAnimation,
+                  child: child,
+                ),
+              );
+            },
+            layoutBuilder:
+                (Widget? currentChild, List<Widget> previousChildren) {
+              return Stack(
+                alignment: Alignment.centerLeft,
+                children: <Widget>[
+                  ...previousChildren,
+                  if (currentChild != null) currentChild,
+                ],
+              );
+            },
+            child: mediaWidget,
+          )
         : null;
 
     // Text Content Widget (media is now embedded into the same tap/ripple container)
@@ -323,7 +342,8 @@ class Tiles {
           return Material(
             color: Colors.transparent,
             borderRadius: BorderRadius.circular(borderRadius),
-            clipBehavior: Clip.hardEdge, // PERFORMANCE: hardEdge avoids saveLayer
+            clipBehavior:
+                Clip.hardEdge, // PERFORMANCE: hardEdge avoids saveLayer
             child: InkWell(
               borderRadius: BorderRadius.circular(borderRadius),
               onTap: isNetworkImage || isDataImage
@@ -334,48 +354,44 @@ class Tiles {
                           file,
                           onEditImage: (imageFile) {
                             // Add image as attachment and request keyboard focus
-                            final inputProvider =
-                                Provider.of<InputProvider>(context, listen: false);
-                            inputProvider.addAttachment(imageFile, isImage: true);
+                            final inputProvider = Provider.of<InputProvider>(
+                                context,
+                                listen: false);
+                            inputProvider.addAttachment(imageFile,
+                                isImage: true);
                           },
                         ),
                       ),
-              child: Hero(
-                tag: path, // Basic hero tag
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(borderRadius),
-                  child: isDataImage
-                      ? Image.memory(
-                    base64Decode(path
-                        .split(',')
-                        .last),
-                    width: imageSize,
-                    height: imageSize,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.broken_image,
-                        color: Colors.grey),
-                  )
-                      : isNetworkImage
-                      ? Image.network(
-                    path,
-                    width: imageSize,
-                    height: imageSize,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.broken_image,
-                        color: Colors.grey),
-                  )
-                      : Image.file(
-                    file,
-                    width: imageSize,
-                    height: imageSize,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.broken_image,
-                        color: Colors.grey),
-                  ),
-                ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(borderRadius),
+                child: isDataImage
+                    ? Image.memory(
+                        base64Decode(path.split(',').last),
+                        width: imageSize,
+                        height: imageSize,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.broken_image, color: Colors.grey),
+                      )
+                    : isNetworkImage
+                        ? Image.network(
+                            path,
+                            width: imageSize,
+                            height: imageSize,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.broken_image,
+                                    color: Colors.grey),
+                          )
+                        : Image.file(
+                            file,
+                            width: imageSize,
+                            height: imageSize,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.broken_image,
+                                    color: Colors.grey),
+                          ),
               ),
             ),
           );
@@ -424,30 +440,21 @@ class Tiles {
   // --- HELPERS ---
 
   static bool _isAudioFile(String path) {
-    final normalized = path
-        .split('?')
-        .first
-        .toLowerCase();
+    final normalized = path.split('?').first.toLowerCase();
     if (normalized.startsWith('data:audio')) return true;
     final ext = p.extension(normalized).toLowerCase().replaceAll('.', '');
     return ['mp3', 'wav', 'aac', 'm4a', 'flac', 'ogg'].contains(ext);
   }
 
   static bool _isImageFile(String path) {
-    final normalized = path
-        .split('?')
-        .first
-        .toLowerCase();
+    final normalized = path.split('?').first.toLowerCase();
     if (normalized.startsWith('data:image')) return true;
     final ext = p.extension(normalized).toLowerCase().replaceAll('.', '');
     return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'].contains(ext);
   }
 
   static bool _isVideoFile(String path) {
-    final normalized = path
-        .split('?')
-        .first
-        .toLowerCase();
+    final normalized = path.split('?').first.toLowerCase();
     if (normalized.startsWith('data:video')) return true;
     final ext = p.extension(normalized).toLowerCase().replaceAll('.', '');
     return ['mp4', 'webm', 'mov', 'mkv', 'm4v'].contains(ext);
@@ -500,33 +507,35 @@ class Tiles {
     required ModelService modelService,
   }) {
     if (message.isUserMessage) {
-      return RepaintBoundary( // PERFORMANCE: Repaint Boundary
+      return RepaintBoundary(
+        // PERFORMANCE: Repaint Boundary
         child: buildUserMessageTile(
-        context: context,
-        message: message,
-        index: index,
-        key: key,
-        isEditingMode: isEditingMode,
-        editingMessageIndex: editingMessageIndex,
-        onEdit: onEdit,
-        onFadeOutComplete: onFadeOutComplete,
-        screenWidth: screenWidth,
-        screenHeight: screenHeight,
-      ),
+          context: context,
+          message: message,
+          index: index,
+          key: key,
+          isEditingMode: isEditingMode,
+          editingMessageIndex: editingMessageIndex,
+          onEdit: onEdit,
+          onFadeOutComplete: onFadeOutComplete,
+          screenWidth: screenWidth,
+          screenHeight: screenHeight,
+        ),
       );
     } else {
-      return RepaintBoundary( // PERFORMANCE: Repaint Boundary
+      return RepaintBoundary(
+        // PERFORMANCE: Repaint Boundary
         child: buildAIMessageTile(
-        context: context,
-        message: message,
-        modelId: modelId,
-        onReport: onReport,
-        onRegenerate: onRegenerate,
-        onStop: onStop,
-        screenWidth: screenWidth,
-        screenHeight: screenHeight,
-        modelService: modelService,
-      ),
+          context: context,
+          message: message,
+          modelId: modelId,
+          onReport: onReport,
+          onRegenerate: onRegenerate,
+          onStop: onStop,
+          screenWidth: screenWidth,
+          screenHeight: screenHeight,
+          modelService: modelService,
+        ),
       );
     }
   }
@@ -545,11 +554,10 @@ class Tiles {
     required ValueChanged<int> onReport,
     double bottomPadding = 0.0,
   }) {
-    final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
-    final screenHeight = mediaQuery.size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
     final modelService = context.read<ModelService>();
-    final double statusBarHeight = mediaQuery.padding.top;
+    final double statusBarHeight = MediaQuery.paddingOf(context).top;
     final double totalTopPadding = statusBarHeight;
 
     // Pre-compute separator to avoid closure allocation per frame
@@ -567,9 +575,12 @@ class Tiles {
       controller: scrollController,
       padding: EdgeInsets.only(
           top: totalTopPadding, bottom: bottomPadding + (screenHeight * 0.01)),
-      cacheExtent: 2500, // PERFORMANCE: Keep generous cache extent for smooth scrolling
-      addAutomaticKeepAlives: false, // PERFORMANCE: Let cacheExtent manage viewport window instead of keeping ALL tiles alive
-      addRepaintBoundaries: true, // PERFORMANCE: Independent Repaint boundaries per tile
+      cacheExtent:
+          2500, // PERFORMANCE: Keep generous cache extent for smooth scrolling
+      addAutomaticKeepAlives:
+          false, // PERFORMANCE: Let cacheExtent manage viewport window instead of keeping ALL tiles alive
+      addRepaintBoundaries:
+          true, // PERFORMANCE: Independent Repaint boundaries per tile
       itemCount: visibleIndices.length,
       separatorBuilder: (context, index) => separatorWidget,
       itemBuilder: (context, index) {
@@ -645,9 +656,9 @@ class _VideoAttachmentCardState extends State<_VideoAttachmentCard> {
     try {
       final source = widget.path;
       final controller =
-      source.startsWith('http://') || source.startsWith('https://')
-          ? VideoPlayerController.networkUrl(Uri.parse(source))
-          : VideoPlayerController.file(File(source));
+          source.startsWith('http://') || source.startsWith('https://')
+              ? VideoPlayerController.networkUrl(Uri.parse(source))
+              : VideoPlayerController.file(File(source));
 
       await controller.initialize();
       await controller.seekTo(Duration.zero);
@@ -678,7 +689,7 @@ class _VideoAttachmentCardState extends State<_VideoAttachmentCard> {
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(widget.borderRadius);
     final iconSize =
-    widget.isTablet ? widget.screenWidth * 0.08 : widget.screenWidth * 0.12;
+        widget.isTablet ? widget.screenWidth * 0.08 : widget.screenWidth * 0.12;
 
     return Material(
       color: Colors.transparent,

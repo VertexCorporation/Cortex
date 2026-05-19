@@ -3,6 +3,7 @@ import 'package:cortex/chat/providers/session.dart';
 import 'package:cortex/chat/services/select.dart';
 import 'package:cortex/library/backend/data/entity.dart';
 import 'package:cortex/library/backend/data/service.dart';
+import 'package:cortex/library/providers/local.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 
@@ -30,22 +31,28 @@ class MockConversationProvider extends Mock implements ConversationProvider {
 
 class MockModelService extends Mock implements ModelService {}
 
+class MockModelLocalStateProvider extends Mock
+    implements ModelLocalStateProvider {}
+
 void main() {
   group('SelectionService Tests', () {
     late SelectionService selectionService;
     late MockChatSessionProvider mockSession;
     late MockConversationProvider mockConversation;
     late MockModelService mockModelService;
+    late MockModelLocalStateProvider mockLocalState;
 
     setUp(() {
       mockSession = MockChatSessionProvider();
       mockConversation = MockConversationProvider();
       mockModelService = MockModelService();
+      mockLocalState = MockModelLocalStateProvider();
 
       selectionService = SelectionService(
         sessionProvider: mockSession,
         conversationProvider: mockConversation,
         modelService: mockModelService,
+        localStateProvider: mockLocalState,
       );
     });
 

@@ -42,7 +42,7 @@ extension FundsPurchase on FundsBackend {
       log('Could not refresh product details before purchase: $e',
           name: FundsBackend._logName, error: e);
       _notificationService.showNotification(
-        message: _localizations.productNotFound,
+        message: _localizations?.productNotFound ?? 'productNotFound',
         type: NotificationType.error,
         oneLine: false,
       );
@@ -69,7 +69,7 @@ extension FundsPurchase on FundsBackend {
               .id} is missing a valid offerToken.',
               name: FundsBackend._logName);
           _notificationService.showNotification(
-              message: _localizations.cacheIsNotUpToDate,
+              message: _localizations?.cacheIsNotUpToDate ?? 'cacheIsNotUpToDate',
               type: NotificationType.error,
               oneLine: false);
           _setPurchasePending(false);
@@ -165,7 +165,7 @@ extension FundsPurchase on FundsBackend {
           errorString.contains('storekiterror')) {
       } else {
         _notificationService.showNotification(
-            message: _localizations.anErrorOccurred,
+            message: _localizations?.anErrorOccurred ?? 'anErrorOccurred',
             type: NotificationType.error);
         await _crashlytics.recordError(e, stack,
             reason: 'Error on buy call', fatal: false);
@@ -212,7 +212,7 @@ extension FundsPurchase on FundsBackend {
     } catch (e) {
       log('Restore failed: $e', name: FundsBackend._logName, error: e);
       _notificationService.showNotification(
-        message: _localizations.anErrorOccurred,
+        message: _localizations?.anErrorOccurred ?? 'anErrorOccurred',
         type: NotificationType.error,
       );
       _setPurchasePending(false);
@@ -242,7 +242,7 @@ extension FundsPurchase on FundsBackend {
   void _handleFailedPurchase(PurchaseDetails purchaseDetails) {
     final errorCode = purchaseDetails.error?.code ?? '';
     final errorMessage =
-        purchaseDetails.error?.message ?? _localizations.purchaseStreamError;
+        purchaseDetails.error?.message ?? _localizations?.purchaseStreamError ?? 'purchaseStreamError';
     final errorString = purchaseDetails.error?.toString().toLowerCase() ?? '';
 
     final isUserCancelled =
@@ -274,7 +274,7 @@ extension FundsPurchase on FundsBackend {
   void _onPurchaseStreamError(dynamic error, StackTrace? stack) {
     log('Purchase Stream Error: $error', name: FundsBackend._logName, error: error);
     _notificationService.showNotification(
-      message: _localizations.purchaseStreamError,
+      message: _localizations?.purchaseStreamError ?? 'purchaseStreamError',
       type: NotificationType.error,
       oneLine: false,
     );

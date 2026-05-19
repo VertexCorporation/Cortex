@@ -155,18 +155,20 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
                   child: child,
                 );
               },
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    // Non-linear gradient for smoother "fog" feel
-                    stops: const [0.0, 0.4, 1.0],
-                    colors: [
-                      AppColors.background,
-                      AppColors.background.withValues(alpha: 0.8),
-                      AppColors.background.withValues(alpha: 0),
-                    ],
+              child: IgnorePointer(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      // Non-linear gradient for smoother "fog" feel
+                      stops: const [0.0, 0.4, 1.0],
+                      colors: [
+                        AppColors.background,
+                        AppColors.background.withValues(alpha: 0.8),
+                        AppColors.background.withValues(alpha: 0),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -191,17 +193,19 @@ class _ScrollFogState extends State<ScrollFog> with TickerProviderStateMixin {
                   child: child,
                 );
               },
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    stops: const [0.0, 0.4, 1.0],
-                    colors: [
-                      AppColors.background,
-                      AppColors.background.withValues(alpha: 0.8),
-                      AppColors.background.withValues(alpha: 0),
-                    ],
+              child: IgnorePointer(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      stops: const [0.0, 0.4, 1.0],
+                      colors: [
+                        AppColors.background,
+                        AppColors.background.withValues(alpha: 0.8),
+                        AppColors.background.withValues(alpha: 0),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -361,17 +365,19 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
                   child: child,
                 );
               },
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    stops: const [0.0, 0.4, 1.0],
-                    colors: [
-                      AppColors.background,
-                      AppColors.background.withValues(alpha: 0.8),
-                      AppColors.background.withValues(alpha: 0),
-                    ],
+              child: IgnorePointer(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      stops: const [0.0, 0.4, 1.0],
+                      colors: [
+                        AppColors.background,
+                        AppColors.background.withValues(alpha: 0.8),
+                        AppColors.background.withValues(alpha: 0),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -393,17 +399,19 @@ class _ScrollFogHorizontalState extends State<ScrollFogHorizontal>
                   child: child,
                 );
               },
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerRight,
-                    end: Alignment.centerLeft,
-                    stops: const [0.0, 0.4, 1.0],
-                    colors: [
-                      AppColors.background,
-                      AppColors.background.withValues(alpha: 0.8),
-                      AppColors.background.withValues(alpha: 0),
-                    ],
+              child: IgnorePointer(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerRight,
+                      end: Alignment.centerLeft,
+                      stops: const [0.0, 0.4, 1.0],
+                      colors: [
+                        AppColors.background,
+                        AppColors.background.withValues(alpha: 0.8),
+                        AppColors.background.withValues(alpha: 0),
+                      ],
+                    ),
                   ),
                 ),
               ),

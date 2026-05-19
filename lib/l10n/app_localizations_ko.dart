@@ -10,11 +10,27 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      '당신은 제목 생성기입니다. 다음 대화에 대해 오직 2~5단어로 된 제목으로만 대답해 주세요. 따옴표, 접두사, 구두점은 사용하지 마세요.';
+      '제목 생성기입니다. 다음 대화에 2~5단어로 된 제목만 입력하세요. 따옴표, 접두사, 구두점은 사용하지 마세요. 중요: 제목은 사용자의 메시지와 정확히 동일한 언어로 작성해야 합니다.';
+
+  @override
+  String get systemRoleFallback => '당신은 도움을 주는 조력자입니다.';
+
+  @override
+  String get systemLanguageInstruction =>
+      '\n\n중요: 항상 사용자가 작성한 언어와 동일한 언어로 응답하고, 사용자의 언어에 주의를 기울이십시오.';
+
+  @override
+  String get systemNotePreviousMedia =>
+      '[시스템 참고: 아래는 이전에 생성된 미디어입니다. 참고하거나 편집할 수 있습니다.]';
+
+  @override
+  String systemTimeInfo(String formattedTime) {
+    return '\n\n현재 날짜 및 시간: $formattedTime.';
+  }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\n지금까지의 대화를 분석합니다. 사용자에 대한 새로운 사실(선호도, 이름, 습관, 상황)을 알게 된 경우, 응답의 맨 마지막에 <memory>...</memory> 태그 안에 업데이트된 사용자 정보를 모두 출력해야 합니다. 중요: 이전 메모리를 절대 지우거나 덮어쓰면 안 됩니다. 항상 새로운 사실을 기존 메모리에 추가해야 합니다. 새로운 정보를 전혀 알지 못하는 경우에는 태그를 생략합니다. 예: <memory>축구와 테니스를 좋아합니다. 짧은 답변을 선호합니다.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
@@ -112,9 +128,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get localModels => '로컬 모델';
-
-  @override
-  String get serverSideModels => '언어 모델';
 
   @override
   String get selectGGUFFile => 'GGUF 파일 선택';
@@ -297,9 +310,6 @@ class AppLocalizationsKo extends AppLocalizations {
       '삭제한 데이터는 저희 서버와 기기에서 영구적으로 제거됩니다. 이 작업은 되돌릴 수 없습니다.';
 
   @override
-  String get deleteAccountButton => '계정 삭제 버튼';
-
-  @override
   String get editProfile => '프로필 수정';
 
   @override
@@ -348,9 +358,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get downloadPaused => '다운로드가 일시 중지되었습니다.';
-
-  @override
-  String get purchaseSuccessful => '구매 성공!';
 
   @override
   String get purchaseError => '구매 오류';
@@ -851,6 +858,33 @@ class AppLocalizationsKo extends AppLocalizations {
   String get selectBaseModel => '기본 모델 선택';
 
   @override
+  String get falErrorImageRequired =>
+      '이 AI는 참조 이미지가 필요합니다. 이미지를 첨부하고 다시 시도해 주세요.';
+
+  @override
+  String get falErrorAudioRequired =>
+      '이 모델은 참조 오디오 파일이 필요합니다. 오디오 파일을 첨부하고 다시 시도해 주세요.';
+
+  @override
+  String get falErrorVideoRequired =>
+      '이 모델은 참조 영상이 필요합니다. 영상을 첨부하신 후 다시 시도해 주세요.';
+
+  @override
+  String get falErrorImageCorrupted =>
+      '업로드하신 이미지를 처리할 수 없습니다. 다른 형식의 이미지를 시도해 주세요.';
+
+  @override
+  String get falErrorSchemaRejected => '모델이 입력을 거부했습니다. 다른 모델을 사용해 보세요.';
+
+  @override
+  String get falErrorSchemaInvalid => '해당 입력은 생성 서비스에서 거부되었습니다.';
+
+  @override
+  String falErrorGenericStatus(int statusCode) {
+    return '생성 서비스에서 오류가 반환되었습니다(상태 $statusCode).';
+  }
+
+  @override
   String get couldNotOpenLink => '링크를 열 수 없습니다.';
 
   @override
@@ -907,9 +941,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportSubmitted => '신고가 성공적으로 제출되었습니다.';
 
   @override
-  String get purchaseReceived => '구매가 접수되었으며 계정을 업데이트 중입니다.';
-
-  @override
   String get verificationDelayed =>
       '구매가 확인되었습니다. 계정 업데이트에 약간의 지연이 있으며 곧 반영될 것입니다.';
 
@@ -953,12 +984,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get storagePermissionRequired =>
       '다운로드한 모델을 저장하려면 저장소 권한이 필요합니다. 계속하려면 권한을 허용해주세요.';
-
-  @override
-  String get plusBannerTitle => '플러스 혜택을 무료로 받으세요!';
-
-  @override
-  String get plusBannerSubtitle => '친구를 초대하면 둘 다 플러스 1일을 무료로 받을 수 있어!';
 
   @override
   String get inviteShareSubject => 'Cortex에 저와 함께해요!';
@@ -1006,12 +1031,6 @@ class AppLocalizationsKo extends AppLocalizations {
       '이 모델은 PDF나 텍스트 파일 등 업로드된 문서에 대한 질문을 분석하고 답할 수 있습니다.';
 
   @override
-  String get featureAudioTitle => '음성 입력';
-
-  @override
-  String get featureAudioDescription => '이 모델은 음성 오디오 입력을 이해하고 처리할 수 있습니다.';
-
-  @override
   String get featureImageGenerationTitle => '이미지 생성';
 
   @override
@@ -1037,7 +1056,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      '이 모델은 프리미엄 모델이며, 무료 사용자는 프리미엄 모델을 사용하여 하루에 3개의 메시지로 제한됩니다. 무제한 액세스를 잠금 해제하려면 구독하세요!';
+      '이 AI는 프리미엄 AI이며, 무료 사용자는 프리미엄 AI에 대한 접근이 제한됩니다. 업그레이드하여 무제한 접근을 해제하세요!';
 
   @override
   String get benefitPremiumModels => '프리미엄 모델에 대한 액세스';
@@ -1056,7 +1075,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get news => '소식';
 
   @override
-  String get createAI => '만들다';
+  String get createAI => '생성';
 
   @override
   String get shortcuts => '바로가기';
@@ -1428,13 +1447,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get onboardingFinalButton => '네!';
 
   @override
-  String get paywallAhaTitle => 'Unlock the True Power of AI';
-
-  @override
-  String get paywallAhaSubtitle =>
-      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
-
-  @override
   String get dude => '친구';
 
   @override
@@ -1618,6 +1630,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get exclusiveOffer => '특별 혜택';
 
   @override
+  String get claimOffer => '오퍼 사용하기';
+
+  @override
   String get continueInOfflineMode => '오프라인 모드에서 계속하기';
 
   @override
@@ -1739,9 +1754,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get featureWebSearchDescription => '웹에서 실시간 정보를 검색하세요.';
 
   @override
-  String get webSearchQuotaExceeded => '검색 할당량을 초과했습니다';
-
-  @override
   String get clearMemory => '메모리 지우기';
 
   @override
@@ -1751,7 +1763,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get personalization => '개인화';
 
   @override
-  String get personalizationDescription => '나만의 경험을 맞춤 설정하세요';
+  String get personalizationDescription =>
+      '사용자의 필요에 맞게 어시스턴트를 개인화하세요. 어시스턴트의 응답, 동작, 어조를 사용자의 고유한 선호도에 맞게 조정할 수 있습니다.';
 
   @override
   String get memoryTitle => '메모리';
@@ -1790,7 +1803,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[System] 중요 지침: 현재 \"Cortex\"라는 거대하고 고도로 발전된 AI 생태계 내에서 작업 중입니다. 이를 기억하고 요청을 받으면 Cortex의 페르소나를 유지하세요.';
+      '\n\n[시스템] 중요 지침: 현재 귀하는 \"Cortex\"라는 거대하고 고도로 발전된 AI 생태계 내에서 작업하고 있습니다. 이 플랫폼은 평균 연령이 16세에 불과한 Vertex 팀에서 개발했습니다. 이 점을 기억하고 질문을 받으면 답변하십시오. 추가 정보가 요청되면 주저하지 말고 인터넷을 검색하십시오. 검색할 수 없는 경우 모른다고 답해도 괜찮습니다!';
 
   @override
   String get featureAudioRecognitionTitle => '음성 인식';
@@ -1875,9 +1888,6 @@ class AppLocalizationsKo extends AppLocalizations {
       '동영상 제작을 위해서는 Ultra 구독이 필요합니다. 지금 업그레이드하고 원활한 콘텐츠 제작을 경험해 보세요!';
 
   @override
-  String get becomePremiumButton => '프리미엄 회원이 되세요';
-
-  @override
   String get fallbackInfoPanelText =>
       '서버 측 개선 작업으로 인해, 고객님께서 선택하신 AI가 아닌 Cortex의 동적 채팅 기능으로 응답이 전송되었습니다. 개선 작업이 완료될 때까지 양해 부탁드립니다!';
 
@@ -1892,7 +1902,31 @@ class AppLocalizationsKo extends AppLocalizations {
   String get backgroundChatNotificationTitle => '채팅으로 돌아가기!';
 
   @override
-  String backgroundChatNotificationBody(String chatName) {
-    return '$chatName 채팅방에 새 메시지가 왔어요! 확인해 보세요!';
+  String get benefitVideoGeneration => '비디오 생성';
+
+  @override
+  String get freeOffer => '무료 제공';
+
+  @override
+  String trialMonthlyDescription(String days, String price) {
+    return '첫 $days일 무료, 이후 $price/월';
   }
+
+  @override
+  String trialAnnualDescription(String days, String price) {
+    return '첫 $days일 무료, 이후 $price/년';
+  }
+
+  @override
+  String freePlan(String plan) {
+    return '무료 $plan!';
+  }
+
+  @override
+  String get systemPromptLimitFallback =>
+      '중요: 사용자가 작업을 요청했지만 Cortex 사용량이 소진되었습니다. 해당 사용자에게 모국어로 기다리거나 구독 플랜 업그레이드를 고려하도록 안내해 주세요.';
+
+  @override
+  String get dynamicPreditsUpgradeMessage =>
+      'Cortex는 더 나은 답변을 제공할 수 있습니다. 지금 업그레이드하고 모든 질문에 최고의 답을 받아보세요!';
 }

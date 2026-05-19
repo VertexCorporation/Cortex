@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:cortex/cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
@@ -23,6 +24,12 @@ class ChatStorageService {
 
   static Stream<Map<String, dynamic>> get lastMsgStream =>
       _lastMsgController.stream;
+
+  static final _conversationResetController =
+      StreamController<void>.broadcast();
+
+  static Stream<void> get conversationResetStream =>
+      _conversationResetController.stream;
 
   static bool isFluxMode = false;
 
@@ -107,40 +114,17 @@ class ChatStorageService {
           c.isStarred, 
           c.starredDate, 
           c.lastMessageDate,
-          (
-            SELECT text 
-            FROM messages m 
-            WHERE m.conversationId = c.id 
-              AND (
-                (m.text IS NOT NULL AND length(m.text) > 0) OR 
-                (m.photoPath IS NOT NULL AND length(m.photoPath) > 0)
-              )
-            ORDER BY m.idx DESC 
-            LIMIT 1
-          ) as lastMessageText,
-           (
-            SELECT photoPath 
-            FROM messages m 
-            WHERE m.conversationId = c.id 
-              AND (
-                (m.text IS NOT NULL AND length(m.text) > 0) OR 
-                (m.photoPath IS NOT NULL AND length(m.photoPath) > 0)
-              )
-            ORDER BY m.idx DESC 
-            LIMIT 1
-          ) as lastMessagePhoto,
-          (
-            SELECT ts 
-            FROM messages m 
-            WHERE m.conversationId = c.id 
-              AND (
-                (m.text IS NOT NULL AND length(m.text) > 0) OR 
-                (m.photoPath IS NOT NULL AND length(m.photoPath) > 0)
-              )
-            ORDER BY m.idx DESC 
-            LIMIT 1
-          ) as realLastMessageTs
+          lm.text as lastMessageText,
+          lm.photoPath as lastMessagePhoto,
+          lm.ts as realLastMessageTs
         FROM conversations c
+        LEFT JOIN (
+          SELECT conversationId, text, photoPath, ts,
+            ROW_NUMBER() OVER (PARTITION BY conversationId ORDER BY idx DESC) as rn
+          FROM messages
+          WHERE (text IS NOT NULL AND length(text) > 0)
+             OR (photoPath IS NOT NULL AND length(photoPath) > 0)
+        ) lm ON lm.conversationId = c.id AND lm.rn = 1
       ''');
 
       return results;
@@ -429,6 +413,14 @@ class ChatStorageService {
     return rows.isNotEmpty ? rows.first : null;
   }
 
+  /// Retrieves a Message object at a specific index for a conversation.
+  /// Returns null if no message exists at that index.
+  static Future<Message?> getMessageAtIndex(String convId, int idx) async {
+    final row = await getMessageByIdx(convId, idx);
+    if (row == null) return null;
+    return Message.fromMap(row);
+  }
+
   static Future<void> upsertMessage(String convId, int idx, Message m) async {
     if (isFluxMode || !m.isVisible) return;
     try {
@@ -482,11 +474,14 @@ class ChatStorageService {
   static Future<List<Map<String, dynamic>>> getAllGeneratedMedia() async {
     try {
       final db = await DbHelper().db;
-      final rows = await db.query(
-        'messages',
-        columns: ['photoPath', 'conversationId'],
-        where: 'photoPath IS NOT NULL AND length(photoPath) > 0 AND isUser = 0',
-      );
+      // JOIN with conversations to get the modelId for each media item.
+      // This allows the Arts screen to route to the correct model on edit.
+      final rows = await db.rawQuery('''
+        SELECT m.photoPath, m.conversationId, c.modelId
+        FROM messages m
+        LEFT JOIN conversations c ON c.id = m.conversationId
+        WHERE m.photoPath IS NOT NULL AND length(m.photoPath) > 0 AND m.isUser = 0
+      ''');
       return rows;
     } catch (e) {
       debugPrint("[ChatStorage] Error fetching all generated media: $e");
@@ -496,13 +491,15 @@ class ChatStorageService {
 
   /// Returns all media attachment paths for a specific conversation.
   /// Used to clean up files from disk when a conversation is deleted.
-  static Future<List<String>> getMediaPathsForConversation(String convId) async {
+  static Future<List<String>> getMediaPathsForConversation(
+      String convId) async {
     try {
       final db = await DbHelper().db;
       final rows = await db.query(
         'messages',
         columns: ['photoPath'],
-        where: 'conversationId = ? AND photoPath IS NOT NULL AND length(photoPath) > 0',
+        where:
+            'conversationId = ? AND photoPath IS NOT NULL AND length(photoPath) > 0',
         whereArgs: [convId],
       );
       return rows
@@ -510,13 +507,17 @@ class ChatStorageService {
           .where((p) => p.isNotEmpty)
           .toList();
     } catch (e) {
-      debugPrint("[ChatStorage] Error fetching media paths for conversation: $e");
+      debugPrint(
+          "[ChatStorage] Error fetching media paths for conversation: $e");
       return [];
     }
   }
 
   static Future<void> deleteConversation(String id) async {
     try {
+      final mediaPaths = await getMediaPathsForConversation(id);
+      await _deleteMediaFiles(mediaPaths);
+
       final db = await DbHelper().db;
       await db.delete('messages', where: 'conversationId = ?', whereArgs: [id]);
       await db.delete('conversations', where: 'id = ?', whereArgs: [id]);
@@ -546,6 +547,11 @@ class ChatStorageService {
 
       final List<String> convIds =
           convsToDelete.map((row) => row['id'] as String).toList();
+
+      for (final cid in convIds) {
+        final mediaPaths = await getMediaPathsForConversation(cid);
+        await _deleteMediaFiles(mediaPaths);
+      }
 
       await db.transaction((txn) async {
         final placeholders = List.filled(convIds.length, '?').join(',');
@@ -590,20 +596,45 @@ class ChatStorageService {
     }
   }
 
-  static Future<void> renameConversation(String id, String newTitle) async {
+  static Future<bool> renameConversation(
+    String id,
+    String newTitle, {
+    String source = 'unknown',
+    String? expectedCurrentTitle,
+  }) async {
+    final trimmedTitle = newTitle.trim();
+    if (id.trim().isEmpty || trimmedTitle.isEmpty) {
+      debugPrint(
+          "[ChatStorage.rename] Skipped empty rename. source=$source id='$id' titleLength=${trimmedTitle.length}");
+      return false;
+    }
+
     try {
       final db = await DbHelper().db;
-      await db.update(
+      final whereArgs = expectedCurrentTitle == null
+          ? <Object?>[id]
+          : <Object?>[id, expectedCurrentTitle];
+
+      final affectedRows = await db.update(
         'conversations',
-        {'title': newTitle},
-        where: 'id = ?',
-        whereArgs: [id],
+        {'title': trimmedTitle},
+        where: expectedCurrentTitle == null ? 'id = ?' : 'id = ? AND title = ?',
+        whereArgs: whereArgs,
       );
 
+      debugPrint(
+          "[ChatStorage.rename] source=$source id=$id affectedRows=$affectedRows expected=${expectedCurrentTitle != null} title='$trimmedTitle'");
+
+      if (affectedRows <= 0) {
+        return false;
+      }
+
       AppDataState().markUserDataAsChanged();
-      _titleController.add({"id": id, "title": newTitle});
+      _titleController.add({"id": id, "title": trimmedTitle});
+      return true;
     } catch (e) {
       _handleDiskError(e, 'renameConversation');
+      return false;
     }
   }
 
@@ -634,6 +665,18 @@ class ChatStorageService {
       debugPrint(
           "[ChatStorage] Deleting all conversations, messages, and recent models history.");
 
+      // Delete all media files first
+      final rows = await db.query(
+        'messages',
+        columns: ['photoPath'],
+        where: 'photoPath IS NOT NULL AND length(photoPath) > 0',
+      );
+      final allMediaPaths = rows
+          .map((r) => r['photoPath'] as String)
+          .where((p) => p.isNotEmpty)
+          .toList();
+      await _deleteMediaFiles(allMediaPaths);
+
       await db.transaction((txn) async {
         await txn.delete('messages');
         await txn.delete('conversations');
@@ -646,6 +689,7 @@ class ChatStorageService {
       CacheService.invalidate(CacheKey.recentModels);
 
       AppDataState().markUserDataAsChanged();
+      _conversationResetController.add(null);
 
       await DbHelper().optimizeDatabase();
     } catch (e) {
@@ -671,6 +715,37 @@ class ChatStorageService {
     } else {
       debugPrint("[ChatStorage] Unexpected error in '$operationName': $e");
       throw e;
+    }
+  }
+
+  static Future<void> _deleteMediaFiles(List<String> rawPaths) async {
+    for (final raw in rawPaths) {
+      if (raw.isEmpty) continue;
+
+      List<String> paths = [];
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is List) {
+          paths = decoded.cast<String>();
+        } else {
+          paths = [raw];
+        }
+      } catch (_) {
+        paths = [raw];
+      }
+
+      for (final path in paths) {
+        if (path.isEmpty || path.startsWith('http')) continue;
+        try {
+          final file = File(path);
+          if (file.existsSync()) {
+            await file.delete();
+            debugPrint("[ChatStorage] Deleted media file: $path");
+          }
+        } catch (e) {
+          debugPrint("[ChatStorage] Error deleting media file: $e");
+        }
+      }
     }
   }
 }

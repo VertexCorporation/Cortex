@@ -713,12 +713,9 @@ class ModelRepository {
       String producerName, Map<String, dynamic> variantData, String langCode) {
     final cleanVariantData = _staticSanitizeRawData(variantData);
 
-    final serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
     final modelId = cleanVariantData['id'] as String? ?? seriesName;
-    final details = cleanVariantData['details'] as Map<String, dynamic>? ?? {};
-    final localizedDetails =
-        (details[serverLangKey] as Map<String, dynamic>?) ?? {};
-    final englishDetails = (details['en'] as Map<String, dynamic>?) ?? {};
+    final details = _safeStringKeyMap(cleanVariantData['details']);
+    final englishDetails = _safeStringKeyMap(details['en']);
 
     String modelCategory = cleanVariantData['category']?.toString() ??
         cleanVariantData['type']?.toString() ??
@@ -733,15 +730,17 @@ class ModelRepository {
       modelCategory = 'audio';
     }
 
-    final bool isLocalized = (langCode == 'en' || langCode == 'zh') ||
-        (localizedDetails.isNotEmpty &&
-            localizedDetails['summary'] != null &&
-            localizedDetails['description'] != null);
+    final bool isLocalized = (_normalizedLangCode(langCode) == 'en') ||
+        (_hasLocalizedDetail(details, langCode, 'title') &&
+            _hasLocalizedDetail(details, langCode, 'summary') &&
+            _hasLocalizedDetail(details, langCode, 'description') &&
+            _hasLocalizedDetail(details, langCode, 'role'));
 
     // Check if the single variant is Lyria, instead of Google
     String finalSeriesName = seriesName;
-    String finalTitle =
-        localizedDetails['title'] ?? englishDetails['title'] ?? modelId;
+    String finalTitle = _localizedDetail(details, langCode, 'title') ??
+        englishDetails['title']?.toString() ??
+        seriesName;
 
     if (modelId.toLowerCase().contains('lyria')) {
       finalSeriesName = 'Lyria';
@@ -760,11 +759,14 @@ class ModelRepository {
       'size': cleanVariantData['size'],
       'ram': cleanVariantData['ram'],
       'category': modelCategory,
-      'summary': localizedDetails['summary'] ?? englishDetails['summary'] ?? '',
-      'description': localizedDetails['description'] ??
-          englishDetails['description'] ??
+      'summary': _localizedDetail(details, langCode, 'summary') ??
+          englishDetails['summary']?.toString() ??
           '',
-      'role': localizedDetails['role'] ?? englishDetails['role'],
+      'description': _localizedDetail(details, langCode, 'description') ??
+          englishDetails['description']?.toString() ??
+          '',
+      'role': _localizedDetail(details, langCode, 'role') ??
+          englishDetails['role']?.toString(),
       'isFullyLocalized': isLocalized,
     };
   }
@@ -773,17 +775,14 @@ class ModelRepository {
       String producerName, Map<String, dynamic> seriesValue, String langCode) {
     final cleanSeriesValue = _staticSanitizeRawData(seriesValue);
 
-    final serverLangKey = (langCode == 'zh') ? 'cn' : langCode;
     final seriesDetails =
-        cleanSeriesValue['series_description'] as Map<String, dynamic>? ?? {};
+        _safeStringKeyMap(cleanSeriesValue['series_description']);
 
-    final bool isSeriesLocalized = (langCode == 'en' || langCode == 'zh') ||
-        (seriesDetails[serverLangKey] != null &&
-            (seriesDetails[serverLangKey] as String).isNotEmpty);
+    final localizedSeriesSummary =
+        _localizedString(seriesDetails, langCode) ?? '';
 
-    final localizedSeriesSummary = seriesDetails[serverLangKey] as String? ??
-        seriesDetails['en'] as String? ??
-        '';
+    final bool isSeriesLocalized = (_normalizedLangCode(langCode) == 'en') ||
+        _hasLocalizedString(seriesDetails, langCode);
 
     final variantsMap = Map<String, dynamic>.from(cleanSeriesValue)
       ..remove('series_description')
@@ -796,20 +795,20 @@ class ModelRepository {
 
       final cleanVariantData = _staticSanitizeRawData(variantData);
 
-      final descriptionMap =
-          cleanVariantData['description'] as Map<String, dynamic>? ?? {};
+      final descriptionMap = _safeStringKeyMap(cleanVariantData['description']);
 
-      final bool isVariantLocalized = (langCode == 'en' || langCode == 'zh') ||
-          (descriptionMap[serverLangKey] != null &&
-              (descriptionMap[serverLangKey] as String).isNotEmpty);
+      final localizedVariantDescription =
+          _localizedString(descriptionMap, langCode) ?? '';
+
+      final bool isVariantLocalized = (_normalizedLangCode(langCode) == 'en') ||
+          _hasLocalizedString(descriptionMap, langCode);
 
       variants[cleanVariantData['id'] as String] = {
         ...cleanVariantData,
         'id': cleanVariantData['id'],
         'title': cleanVariantData['title'] ?? variantKey,
         'summary': localizedSeriesSummary,
-        'description':
-            descriptionMap[serverLangKey] ?? descriptionMap['en'] ?? '',
+        'description': localizedVariantDescription,
         'isFullyLocalized': isVariantLocalized,
       };
     });
@@ -880,6 +879,87 @@ class ModelRepository {
     }
 
     return cleanMap;
+  }
+
+  static String _normalizedLangCode(String langCode) =>
+      langCode.split(RegExp(r'[-_]')).first.toLowerCase();
+
+  static List<String> _languageFallbackKeys(String langCode) {
+    final normalized = _normalizedLangCode(langCode);
+    final keys = <String>[
+      normalized,
+      if (normalized == 'zh') 'cn',
+      if (normalized == 'cn') 'zh',
+      'en',
+    ];
+    return keys.toSet().toList();
+  }
+
+  static Map<String, dynamic> _safeStringKeyMap(dynamic value) {
+    if (value is! Map) return {};
+    return Map<String, dynamic>.from(value);
+  }
+
+  static String? _localizedDetail(
+    Map<String, dynamic> details,
+    String langCode,
+    String field,
+  ) {
+    for (final key in _languageFallbackKeys(langCode)) {
+      final localizedDetails = _safeStringKeyMap(details[key]);
+      final value = localizedDetails[field]?.toString().trim();
+      if (value != null && value.isNotEmpty) return value;
+    }
+    return null;
+  }
+
+  static bool _hasLocalizedDetail(
+    Map<String, dynamic> details,
+    String langCode,
+    String field,
+  ) {
+    final normalized = _normalizedLangCode(langCode);
+    final keys = <String>[
+      normalized,
+      if (normalized == 'zh') 'cn',
+      if (normalized == 'cn') 'zh',
+    ];
+
+    for (final key in keys.toSet()) {
+      final localizedDetails = _safeStringKeyMap(details[key]);
+      final value = localizedDetails[field]?.toString().trim();
+      if (value != null && value.isNotEmpty) return true;
+    }
+    return false;
+  }
+
+  static String? _localizedString(
+    Map<String, dynamic> localizedContainer,
+    String langCode,
+  ) {
+    for (final key in _languageFallbackKeys(langCode)) {
+      final value = localizedContainer[key]?.toString().trim();
+      if (value != null && value.isNotEmpty) return value;
+    }
+    return null;
+  }
+
+  static bool _hasLocalizedString(
+    Map<String, dynamic> localizedContainer,
+    String langCode,
+  ) {
+    final normalized = _normalizedLangCode(langCode);
+    final keys = <String>[
+      normalized,
+      if (normalized == 'zh') 'cn',
+      if (normalized == 'cn') 'zh',
+    ];
+
+    for (final key in keys.toSet()) {
+      final value = localizedContainer[key]?.toString().trim();
+      if (value != null && value.isNotEmpty) return true;
+    }
+    return false;
   }
 
   // --- PERSISTENCE HELPERS ---

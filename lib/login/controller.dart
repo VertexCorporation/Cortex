@@ -5,7 +5,6 @@ import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/webview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../cache.dart';
 import '../notifications/introvert.dart';
 import '../settings/providers/general.dart';
@@ -182,7 +181,6 @@ class LoginController extends ChangeNotifier {
             ' '; // Prevents default validator but shows field as invalid.
         loginEmailShakeController.forward(from: 0);
         loginPasswordShakeController.forward(from: 0);
-        AnalyticsService().logLoginFailure('email', 'invalid_credentials');
         _setLoading(false);
         break;
       case LoginUserDisabled():
@@ -192,7 +190,6 @@ class LoginController extends ChangeNotifier {
         _setLoading(false);
         break;
       case LoginNetworkError():
-        AnalyticsService().logLoginFailure('email', 'network_error');
         _setLoading(false);
         break;
       case LoginUnknownError():
@@ -231,29 +228,24 @@ class LoginController extends ChangeNotifier {
       case RegistrationUsernameTaken():
         _registerUsernameError = l10n.usernameTaken;
         registerUsernameShakeController.forward(from: 0);
-        AnalyticsService().logRegisterFailure('email', 'username_taken');
         _setLoading(false);
         break;
       case RegistrationInvalidUsername():
         _registerUsernameError = l10n.invalidUsernameFormat;
         registerUsernameShakeController.forward(from: 0);
-        AnalyticsService().logRegisterFailure('email', 'invalid_username');
         _setLoading(false);
         break;
       case RegistrationEmailInUse():
         _registerEmailError = l10n.emailAlreadyInUse;
         registerEmailShakeController.forward(from: 0);
-        AnalyticsService().logRegisterFailure('email', 'email_in_use');
         _setLoading(false);
         break;
       case RegistrationWeakPassword():
         _registerPasswordError = l10n.weakPassword;
         registerPasswordShakeController.forward(from: 0);
-        AnalyticsService().logRegisterFailure('email', 'weak_password');
         _setLoading(false);
         break;
       case RegistrationNetworkError():
-        AnalyticsService().logRegisterFailure('email', 'network_error');
         _setLoading(false);
         break;
       case RegistrationUnknownError():
@@ -278,7 +270,7 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case GoogleSignInSuccess():
         AnalyticsService().logLoginSuccess('google');
-        // Do NOT stop loading here. Wait for navigation.
+        if (context.mounted) Navigator.of(context).pop();
         break;
       case GoogleSignInFailure():
         AnalyticsService().logLoginFailure('google', 'sign_in_failed');
@@ -294,8 +286,6 @@ class LoginController extends ChangeNotifier {
     }
   }
 
-  /// Handles the anonymous login submission.
-  /// This should usually be called after the user confirms the warning dialog.
   Future<void> submitAnonymousLogin(BuildContext context) async {
     if (_isLoading) return;
 
@@ -312,7 +302,7 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case AnonymousSignInSuccess():
         AnalyticsService().logLoginSuccess('anonymous');
-        // Do NOT stop loading here. Wait for navigation.
+        if (context.mounted) Navigator.of(context).pop();
         break;
       case AnonymousSignInNetworkError():
         AnalyticsService().logLoginFailure('anonymous', 'network_error');
@@ -340,7 +330,7 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case AppleSignInSuccess():
         AnalyticsService().logLoginSuccess('apple');
-        // Do NOT stop loading here. Wait for navigation.
+        if (context.mounted) Navigator.of(context).pop();
         break;
       case AppleSignInFailure():
         AnalyticsService().logLoginFailure('apple', 'sign_in_failed');
@@ -423,34 +413,19 @@ class LoginController extends ChangeNotifier {
 
   Future<void> launchResetPasswordURL(BuildContext context) async {
     const String url = 'https://vertexishere.com/reset-password';
-    final Uri uri = Uri.parse(url);
 
     try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
-      } else {
-        debugPrint("[LoginController] Browser is not found. Falling back to WebView.");
-        if (context.mounted) {
-          await showAppWebViewModal(context, "Reset Password", url);
-        }
+      if (context.mounted) {
+        await showAppWebViewModal(context, "Reset Password", url);
       }
     } catch (e) {
-      debugPrint("[LoginController] Link opening error: $e. Falling back to WebView.");
+      debugPrint("[LoginController] Link opening error: $e");
       if (context.mounted) {
-        try {
-          await showAppWebViewModal(context, "Reset Password", url);
-        } catch (innerE) {
-          if (context.mounted) {
-            final l10n = AppLocalizations.of(context)!;
-            _notificationService.showNotification(
-              message: l10n.couldNotOpenLink,
-              type: NotificationType.error,
-            );
-          }
-        }
+        final l10n = AppLocalizations.of(context)!;
+        _notificationService.showNotification(
+          message: l10n.couldNotOpenLink,
+          type: NotificationType.error,
+        );
       }
     }
   }

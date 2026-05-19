@@ -1,6 +1,7 @@
 // lib/axon/inbox/widgets/tiles/view.dart
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:cortex/axon/inbox/panel/view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +15,6 @@ import '../../../../chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/input.dart'; // [NEW]
 import 'package:cortex/chat/services/voice.dart'; // [NEW]
 import 'package:cortex/chat/services/background.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../../../overflow.dart';
 import '../logic/manager.dart';
 
@@ -26,7 +26,7 @@ import 'avatar.dart';
 class AxonConversationTile extends StatefulWidget {
   final ConversationManager manager;
   final VoidCallback onDelete;
-  final ValueChanged<String> onEdit;
+  final Future<void> Function(String newTitle) onEdit;
   final VoidCallback onTogglePin;
 
   const AxonConversationTile({
@@ -119,6 +119,7 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     final Offset position = _tapPosition ?? Offset.zero;
     final localizations = AppLocalizations.of(context)!;
     final manager = widget.manager;
+    final onEdit = widget.onEdit;
 
     _panelController = showActionPanel(
       context: context,
@@ -132,15 +133,24 @@ class _AxonConversationTileState extends State<AxonConversationTile>
           text: localizations.editConversationTitle,
           textColor: AppColors.primaryColor.inverted,
           onPressed: () async {
-            _panelController?.close();
+            final controller = _panelController;
+            _panelController = null;
+            await controller?.close();
+            if (!mounted) return;
             // Call the dialog to get the new title
             final newTitle = await showEditTitleDialog(
               context: context,
               initialTitle: manager.conversationTitle,
             );
-            // If result is not null and component is still mounted, update it
-            if (newTitle != null && mounted) {
-              widget.onEdit(newTitle);
+            debugPrint(
+                "[AxonRename.Tile] dialog returned hasTitle=${newTitle != null} mounted=$mounted id=${manager.conversationID}");
+            // The tile can unmount while the dialog is open because Axon/list
+            // overlays rebuild aggressively. Rename belongs to the conversation,
+            // so forward the captured callback even if this tile instance died.
+            if (newTitle != null) {
+              debugPrint(
+                  "[AxonRename.Tile] forwarding rename id=${manager.conversationID}");
+              await onEdit(newTitle);
             }
           },
         ),
@@ -233,9 +243,9 @@ class _AxonConversationTileState extends State<AxonConversationTile>
 
   Widget _buildTileContent() {
     // --- 1. Screen & Dynamic Sizing Logic ---
-    final MediaQueryData mediaQuery = MediaQuery.of(context);
-    final double screenWidth = mediaQuery.size.width;
-    final double screenHeight = mediaQuery.size.height;
+
+    final double screenWidth = MediaQuery.sizeOf(context).width;
+    final double screenHeight = MediaQuery.sizeOf(context).height;
 
     // Determine if device is tablet (standard breakpoint > 600)
     final bool isTablet = screenWidth > 600;
@@ -280,7 +290,8 @@ class _AxonConversationTileState extends State<AxonConversationTile>
     // [FIX] Check if we are actually on the Chat tab (index 0).
     // If user is in Library (1) or News (2), the tile should NOT be highlighted
     // even if it matches the currentConversationId.
-    final selectedTab = context.select<TabProvider, int>((p) => p.selectedIndex);
+    final selectedTab =
+        context.select<TabProvider, int>((p) => p.selectedIndex);
     final isActive = (selectedTab == 0) &&
         (currentConversationId == widget.manager.conversationID);
     final Color textColor = AppColors.primaryColor.inverted;
@@ -306,7 +317,8 @@ class _AxonConversationTileState extends State<AxonConversationTile>
         child: Material(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(borderRadius),
-          clipBehavior: Clip.hardEdge, // PERFORMANCE: hardEdge avoids saveLayer overhead
+          clipBehavior:
+              Clip.hardEdge, // PERFORMANCE: hardEdge avoids saveLayer overhead
           child: InkWell(
             onTapDown: _onTapDown,
             onTapUp: _onTapUp,
@@ -367,28 +379,30 @@ class _AxonConversationTileState extends State<AxonConversationTile>
 
                   SizedBox(width: gapTextIcon),
 
-                  // Dynamic Play Icon (Background Task Indicator)
+                  // Dynamic progress indicator (Background Task Indicator)
                   AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
+                    duration: const Duration(milliseconds: 240),
+                    switchInCurve: Curves.easeOutBack,
+                    switchOutCurve: Curves.easeInCubic,
                     transitionBuilder:
                         (Widget child, Animation<double> animation) {
-                      return ScaleTransition(scale: animation, child: child);
+                      return FadeTransition(
+                        opacity: animation,
+                        child: ScaleTransition(scale: animation, child: child),
+                      );
                     },
                     child: context.select<BackgroundTaskService, bool>(
                       (bg) => bg.isActive(widget.manager.conversationID),
                     )
-                        ? SvgPicture.asset(
-                            'assets/icons/play.svg',
-                            key: const ValueKey('play'),
-                            width: starIconSize,
-                            height: starIconSize,
-                            colorFilter: ColorFilter.mode(
-                              Colors.greenAccent,
-                              BlendMode.srcIn,
-                            ),
+                        ? _BackgroundProgressIndicator(
+                            key: const ValueKey('background_progress'),
+                            size: starIconSize * 1.08,
                           )
-                        : SizedBox.shrink(key: const ValueKey('no_play')),
+                        : const SizedBox.shrink(
+                            key: ValueKey('no_background_progress')),
                   ),
+
+                  if (widget.manager.isStarred) SizedBox(width: gapTextIcon),
 
                   // Dynamic Star Icon
                   AnimatedSwitcher(
@@ -413,5 +427,127 @@ class _AxonConversationTileState extends State<AxonConversationTile>
         ),
       ),
     );
+  }
+}
+
+class _BackgroundProgressIndicator extends StatefulWidget {
+  final double size;
+
+  const _BackgroundProgressIndicator({super.key, required this.size});
+
+  @override
+  State<_BackgroundProgressIndicator> createState() =>
+      _BackgroundProgressIndicatorState();
+}
+
+class _BackgroundProgressIndicatorState
+    extends State<_BackgroundProgressIndicator> with TickerProviderStateMixin {
+  late final AnimationController _outerController;
+  late final AnimationController _innerController;
+
+  @override
+  void initState() {
+    super.initState();
+    _outerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1150),
+    )..repeat();
+    _innerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1750),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _outerController.dispose();
+    _innerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: SizedBox.square(
+        dimension: widget.size,
+        child: AnimatedBuilder(
+          animation: Listenable.merge([_outerController, _innerController]),
+          builder: (context, _) {
+            return CustomPaint(
+              painter: _BackgroundProgressPainter(
+                outerTurns: _outerController.value,
+                innerTurns: _innerController.value,
+                color: AppColors.primaryColor.inverted,
+                accentColor: AppColors.primaryColor,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _BackgroundProgressPainter extends CustomPainter {
+  final double outerTurns;
+  final double innerTurns;
+  final Color color;
+  final Color accentColor;
+
+  const _BackgroundProgressPainter({
+    required this.outerTurns,
+    required this.innerTurns,
+    required this.color,
+    required this.accentColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final stroke = (size.shortestSide * 0.16).clamp(2.2, 3.2).toDouble();
+    final rect = Offset.zero & size;
+    final inset = stroke / 2;
+    final arcRect = rect.deflate(inset);
+
+    final trackPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.round
+      ..color = color.withValues(alpha: 0.10);
+
+    final outerPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.round
+      ..shader = SweepGradient(
+        startAngle: 0,
+        endAngle: math.pi * 2,
+        colors: [
+          color.withValues(alpha: 0.18),
+          color.withValues(alpha: 0.78),
+          color.withValues(alpha: 0.18),
+        ],
+      ).createShader(arcRect);
+
+    final innerPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = stroke * 0.72
+      ..strokeCap = StrokeCap.round
+      ..color = accentColor.inverted.withValues(alpha: 0.48);
+
+    canvas.drawCircle(rect.center, arcRect.width / 2, trackPaint);
+
+    final outerStart = -math.pi / 2 + (outerTurns * math.pi * 2);
+    final innerStart = math.pi / 2 - (innerTurns * math.pi * 2);
+    canvas.drawArc(arcRect, outerStart, math.pi * 1.42, false, outerPaint);
+    canvas.drawArc(arcRect.deflate(stroke * 0.45), innerStart, -math.pi * 0.72,
+        false, innerPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _BackgroundProgressPainter oldDelegate) {
+    return oldDelegate.outerTurns != outerTurns ||
+        oldDelegate.innerTurns != innerTurns ||
+        oldDelegate.color != color ||
+        oldDelegate.accentColor != accentColor;
   }
 }

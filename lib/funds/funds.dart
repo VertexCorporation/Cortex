@@ -76,6 +76,13 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   final ValueNotifier<String> _countdownNotifier = ValueNotifier<String>('');
   bool _isSpecialOfferChecked = false;
 
+  int _planLevelFromSubscriptionLevel(int level) {
+    if (level == 4) return 1;
+    if (level == 5) return 2;
+    if (level == 6) return 3;
+    return level;
+  }
+
   Future<void> _checkIfEmulator() async {
     final deviceInfo = DeviceInfoPlugin();
     bool isEm = false;
@@ -96,13 +103,13 @@ class _FundsScreenViewState extends State<FundsScreenView> {
   @override
   void initState() {
     super.initState();
-    
+
     // Check if data is already preloaded BEFORE first frame
     // If preloaded: skip skeleton entirely
     // If not preloaded: show skeleton until data loads
     final isPreloaded = FundsBackend.isPreloaded;
     log('[FundsScreen] initState - isPreloaded: $isPreloaded');
-    
+
     if (isPreloaded) {
       _isSpecialOfferChecked = true;
       _isContentLoaded = true;
@@ -113,7 +120,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
       _isContentLoaded = false;
       log('[FundsScreen] Data NOT preloaded, will show skeleton');
     }
-    
+
     _checkIfEmulator();
     _pageController = PageController(initialPage: _currentPage);
     _scrollControllers =
@@ -162,7 +169,15 @@ class _FundsScreenViewState extends State<FundsScreenView> {
           _isContentLoaded = true;
           _contentOffset = Offset.zero;
         });
-        _startCountdownTimer();
+        if (_backend.isSpecialOfferEligible && !_backend.isSpecialOfferActive) {
+          _backend.checkOrStartSpecialOffer().whenComplete(() {
+            if (mounted) {
+              _startCountdownTimer();
+            }
+          });
+        } else {
+          _startCountdownTimer();
+        }
       } else {
         // Fallback: load normally with skeleton
         // This handles: first app launch with no cache
@@ -357,12 +372,15 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final planType = _planTypes[_currentPage];
     final int planLevel = _currentPage + 1;
     final billingOption = _selectedBillingOptions[planType]!;
+    final int activePlanLevel =
+    _planLevelFromSubscriptionLevel(_uiActiveSubscriptionLevel);
 
     String? productIdToPurchase;
 
-    if (_uiActiveSubscriptionLevel > planLevel ||
-        (_uiActiveSubscriptionLevel == planLevel &&
-            billingOption == _uiActiveSubscriptionOption)) {
+    if (activePlanLevel > planLevel ||
+        (activePlanLevel == planLevel &&
+            (_uiActiveSubscriptionLevel >= 4 ||
+                billingOption == _uiActiveSubscriptionOption))) {
       backend.manageSubscription();
       return;
     }
@@ -448,11 +466,11 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                 title: ValueListenableBuilder<String>(
                   valueListenable: _countdownNotifier,
                   builder: (context, countdownText, _) {
-                    return _buildFixedDiscountBadge(
-                        context, MediaQuery
-                        .of(context)
-                        .size
-                        .width, countdownText);
+                    return _buildFixedDiscountBadge(context,
+                        MediaQuery
+                            .of(context)
+                            .size
+                            .width, countdownText);
                   },
                 ),
               ),
@@ -579,10 +597,16 @@ class _FundsScreenViewState extends State<FundsScreenView> {
 
   Widget _buildMainContent(BuildContext context, FundsBackend backend) {
     final localizations = AppLocalizations.of(context)!;
-    final mediaQuery = MediaQuery.of(context);
-    final screenWidth = mediaQuery.size.width;
-    final screenHeight = mediaQuery.size.height;
-    final double topPadding = mediaQuery.padding.top;
+
+    final screenWidth = MediaQuery
+        .sizeOf(context)
+        .width;
+    final screenHeight = MediaQuery
+        .sizeOf(context)
+        .height;
+    final double topPadding = MediaQuery
+        .paddingOf(context)
+        .top;
 
     if (!backend.isLoading && _isSpecialOfferChecked && !_isContentLoaded) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -791,13 +815,34 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     );
   }
 
-  Widget _buildFixedDiscountBadge(BuildContext context, double screenWidth, String countdownText) {
+  Widget _buildFixedDiscountBadge(BuildContext context, double screenWidth,
+      String countdownText) {
     final backend = Provider.of<FundsBackend>(context, listen: false);
-    // Rely on countdown text being present to show badge
-    final bool showSpecialOffer =
-        backend.currentUserSubscriptionLevel == 0 &&
-            backend.isSpecialOfferActive &&
-            countdownText.isNotEmpty;
+    // Rely on countdown text being present to show special offer badge
+    final bool showSpecialOffer = backend.currentUserSubscriptionLevel == 0 &&
+        backend.isSpecialOfferActive &&
+        countdownText.isNotEmpty;
+
+    bool showFreeTrialBadge = false;
+    if (!showSpecialOffer &&
+        !_isEmulator &&
+        backend.currentUserSubscriptionLevel == 0) {
+      try {
+        final proMonthly = backend.subscriptionProducts
+            .firstWhere((p) => p.id == FundsBackend.monthlySubscriptionPro);
+        if (getTrialInfo(proMonthly) != null) {
+          showFreeTrialBadge = true;
+        } else {
+          final proAnnual = backend.subscriptionProducts
+              .firstWhere((p) => p.id == FundsBackend.annualSubscriptionPro);
+          if (getTrialInfo(proAnnual) != null) {
+            showFreeTrialBadge = true;
+          }
+        }
+      } catch (_) {}
+    }
+
+    final bool showBadge = showSpecialOffer || showFreeTrialBadge;
 
     final scale = (screenWidth / 375.0).clamp(0.85, 1.2);
     final badgeHeight = 36.0 * scale;
@@ -812,9 +857,11 @@ class _FundsScreenViewState extends State<FundsScreenView> {
     final contentColor = AppColors.premium;
     final borderColor = baseColor.withValues(alpha: 0.8);
     final localizations = AppLocalizations.of(context)!;
-    final String badgeText = backend.isWelcomeOffer
+    final String badgeText = showSpecialOffer
+        ? (backend.isWelcomeOffer
         ? localizations.welcomeOfferBadge(countdownText)
-        : localizations.exclusiveOfferBadge(countdownText);
+        : localizations.exclusiveOfferBadge(countdownText))
+        : localizations.freePlan('Pro');
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 600),
@@ -831,7 +878,7 @@ class _FundsScreenViewState extends State<FundsScreenView> {
           ),
         );
       },
-      child: showSpecialOffer
+      child: showBadge
           ? ClipRRect(
         key: const ValueKey('welcomeOfferBadge'),
         borderRadius: BorderRadius.circular(borderRadius),
@@ -866,7 +913,9 @@ class _FundsScreenViewState extends State<FundsScreenView> {
                   child: Text(
                     badgeText,
                     // Key changes every second for fade effect
-                    key: ValueKey(countdownText),
+                    key: ValueKey(showSpecialOffer
+                        ? countdownText
+                        : 'freeTrialBadge'),
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: fontSize,

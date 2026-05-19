@@ -12,7 +12,7 @@ double baseFs(BuildContext context) {
   final view = View.of(context);
   final physicalWidth = view.physicalSize.width;
   final devicePixelRatio = view.devicePixelRatio;
-  return (physicalWidth / devicePixelRatio) * 0.042;
+  return (physicalWidth / devicePixelRatio) * 0.044;
 }
 
 class SafeMathTex extends StatelessWidget {
@@ -53,6 +53,8 @@ void openLink(BuildContext context, String urlString) async {
   final uri = Uri.tryParse(urlString);
   if (uri == null) return;
   final l10n = AppLocalizations.of(context)!;
+  final warningMessage =
+      l10n.openLinkWarningMessage(urlString).replaceAll(r'\n', '\n');
 
   showModalBottomSheet(
     context: context,
@@ -93,7 +95,7 @@ void openLink(BuildContext context, String urlString) async {
             ),
             const SizedBox(height: 16),
             Text(
-              l10n.openLinkWarningMessage(urlString),
+              warningMessage,
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.primaryColor.inverted,

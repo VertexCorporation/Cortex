@@ -10,11 +10,27 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'Vous êtes un générateur de titres. Veuillez répondre UNIQUEMENT avec un titre de 2 à 5 mots pour la conversation suivante. N\'utilisez ni guillemets, ni préfixes, ni ponctuation.';
+      'Vous êtes un générateur de titres. Veuillez répondre UNIQUEMENT avec un titre de 2 à 5 mots pour la conversation suivante. N\'utilisez ni guillemets, ni préfixes, ni ponctuation. IMPORTANT : Le titre DOIT être dans la MÊME langue que le message de l\'utilisateur.';
+
+  @override
+  String get systemRoleFallback => 'Vous êtes un assistant précieux.';
+
+  @override
+  String get systemLanguageInstruction =>
+      '\n\nCRITICAL : Répondez toujours dans la même langue que celle utilisée par l’utilisateur, et tenez compte de sa langue.';
+
+  @override
+  String get systemNotePreviousMedia =>
+      '[Note système : Voici le média généré précédemment. Vous pouvez vous y référer ou le modifier.]';
+
+  @override
+  String systemTimeInfo(String formattedTime) {
+    return '\n\nDate et heure actuelles : $formattedTime.';
+  }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalysez la conversation jusqu\'à présent. Si vous avez appris de nouvelles informations distinctes sur l\'utilisateur (préférences, nom, habitudes, contexte), vous DEVEZ afficher l\'INTÉGRALITÉ de ces informations mises à jour entre les balises <memory>...</memory> À LA TOUTE FIN de votre réponse. IMPORTANT : Vous ne devez JAMAIS effacer ni écraser les informations précédentes. Ajoutez TOUJOURS les nouvelles informations aux informations existantes. Si vous n\'avez absolument rien appris de nouveau, omettez la balise. Exemple : <memory>Aime le football et le tennis. Préfère les réponses courtes.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
@@ -112,9 +128,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get localModels => 'Modèles Locaux';
-
-  @override
-  String get serverSideModels => 'Modèles de langage';
 
   @override
   String get selectGGUFFile => 'Sélectionner un fichier GGUF';
@@ -305,9 +318,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les données que vous supprimez seront définitivement retirées de notre serveur et de votre appareil. Cette action est irréversible.';
 
   @override
-  String get deleteAccountButton => 'Bouton de suppression de compte';
-
-  @override
   String get editProfile => 'Modifier le Profil';
 
   @override
@@ -358,9 +368,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get downloadPaused => 'Téléchargement en pause.';
-
-  @override
-  String get purchaseSuccessful => 'Achat réussi !';
 
   @override
   String get purchaseError => 'Erreur d\'achat';
@@ -880,6 +887,35 @@ class AppLocalizationsFr extends AppLocalizations {
   String get selectBaseModel => 'Sélectionner un Modèle de Base';
 
   @override
+  String get falErrorImageRequired =>
+      'Cette IA nécessite une image de référence, veuillez joindre une image et réessayer.';
+
+  @override
+  String get falErrorAudioRequired =>
+      'Ce modèle nécessite un fichier audio de référence. Veuillez joindre un fichier audio et réessayer.';
+
+  @override
+  String get falErrorVideoRequired =>
+      'Ce modèle nécessite une vidéo de référence. Veuillez joindre une vidéo et réessayer.';
+
+  @override
+  String get falErrorImageCorrupted =>
+      'L\'image téléchargée n\'a pas pu être traitée, veuillez essayer un format différent.';
+
+  @override
+  String get falErrorSchemaRejected =>
+      'Le modèle a rejeté les données d\'entrée, veuillez essayer un autre modèle.';
+
+  @override
+  String get falErrorSchemaInvalid =>
+      'La requête a été rejetée par le service de génération.';
+
+  @override
+  String falErrorGenericStatus(int statusCode) {
+    return 'Le service de génération a renvoyé une erreur (statut $statusCode).';
+  }
+
+  @override
   String get couldNotOpenLink => 'Impossible d\'ouvrir le lien';
 
   @override
@@ -942,10 +978,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reportSubmitted => 'Le signalement a été soumis avec succès.';
 
   @override
-  String get purchaseReceived =>
-      'Achat reçu, mise à jour de votre compte en cours.';
-
-  @override
   String get verificationDelayed =>
       'Votre achat est confirmé. Il y a un léger retard dans la mise à jour de votre compte, il apparaîtra sous peu.';
 
@@ -995,13 +1027,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Une autorisation de stockage est requise pour enregistrer les modèles téléchargés. Veuillez accorder la permission pour continuer.';
 
   @override
-  String get plusBannerTitle => 'Obtenez Plus gratuitement !';
-
-  @override
-  String get plusBannerSubtitle =>
-      'Invite un pote et gagnez tous les deux 1 Jour de Plus offert !';
-
-  @override
   String get inviteShareSubject => 'Rejoins-moi sur Cortex !';
 
   @override
@@ -1047,13 +1072,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ce modèle peut analyser et répondre à des questions sur des documents téléchargés tels que des fichiers PDF et des fichiers texte.';
 
   @override
-  String get featureAudioTitle => 'Entrée vocale';
-
-  @override
-  String get featureAudioDescription =>
-      'Ce modèle peut comprendre et traiter les entrées audio parlées.';
-
-  @override
   String get featureImageGenerationTitle => 'Génération d\'images';
 
   @override
@@ -1079,7 +1097,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      'Ce modèle est un modèle premium, les utilisateurs gratuits sont limités à 3 messages par jour avec les modèles premium ; abonnez-vous pour débloquer un accès illimité !';
+      'Cette IA est une IA premium, les utilisateurs gratuits ont un accès limité aux IA premium ; passez à la version supérieure pour un accès illimité !';
 
   @override
   String get benefitPremiumModels => 'Accès aux modèles premium';
@@ -1098,10 +1116,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get news => 'Nouvelles';
 
   @override
-  String get createAI => 'Create';
+  String get createAI => 'Créer';
 
   @override
-  String get shortcuts => 'Shortcuts';
+  String get shortcuts => 'Raccourcis';
 
   @override
   String get allModels => 'Tous les modèles';
@@ -1482,13 +1500,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get onboardingFinalButton => 'OUI!';
 
   @override
-  String get paywallAhaTitle => 'Unlock the True Power of AI';
-
-  @override
-  String get paywallAhaSubtitle =>
-      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
-
-  @override
   String get dude => 'Mec';
 
   @override
@@ -1682,6 +1693,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get exclusiveOffer => 'Offre exclusive';
 
   @override
+  String get claimOffer => 'Utiliser l\'offre';
+
+  @override
   String get continueInOfflineMode => 'Continuer en mode hors ligne';
 
   @override
@@ -1815,9 +1829,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Recherchez sur le Web des informations en temps réel';
 
   @override
-  String get webSearchQuotaExceeded => 'Quota de recherche dépassé';
-
-  @override
   String get clearMemory => 'Mémoire claire';
 
   @override
@@ -1828,7 +1839,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get personalization => 'Personnalisation';
 
   @override
-  String get personalizationDescription => 'Personnalisez votre expérience';
+  String get personalizationDescription =>
+      'Personnalisez votre assistant pour qu\'il réponde mieux à vos besoins. Adaptez ses réponses, son comportement et son ton à vos préférences.';
 
   @override
   String get memoryTitle => 'Mémoire';
@@ -1869,7 +1881,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[System] INSTRUCTION CRITIQUE : Vous opérez actuellement au sein d\'un écosystème d\'IA massif et très avancé nommé « Cortex ». Souvenez-vous-en et maintenez la personnalité de Cortex si on vous le demande.';
+      '\n\n[Système] INSTRUCTION IMPORTANTE : Vous évoluez actuellement au sein d’un vaste écosystème d’IA de pointe nommé « Cortex ». Cette plateforme est développée par l’équipe Vertex, dont les membres ont en moyenne seulement 16 ans. Veuillez en tenir compte et répondre aux questions posées. Si l’on vous demande des informations supplémentaires, n’hésitez pas à effectuer une recherche sur Internet. Si vous ne parvenez pas à trouver la réponse, dites simplement que vous ne savez pas !';
 
   @override
   String get featureAudioRecognitionTitle => 'Reconnaissance audio';
@@ -1955,9 +1967,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Vous avez besoin d\'un abonnement Ultra pour générer des vidéos, passez à la version supérieure dès maintenant et profitez d\'une expérience optimale !';
 
   @override
-  String get becomePremiumButton => 'Devenez Premium';
-
-  @override
   String get fallbackInfoPanelText =>
       'En raison d\'améliorations apportées à notre serveur, la réponse a été générée par le chat dynamique de Cortex et non par l\'IA que vous aviez sélectionnée. Merci de votre compréhension jusqu\'à la fin du processus.';
 
@@ -1973,7 +1982,31 @@ class AppLocalizationsFr extends AppLocalizations {
   String get backgroundChatNotificationTitle => 'Retour à la conversation !';
 
   @override
-  String backgroundChatNotificationBody(String chatName) {
-    return 'Il y a un nouveau message dans $chatName, allez voir !';
+  String get benefitVideoGeneration => 'Génération vidéo';
+
+  @override
+  String get freeOffer => 'Offre gratuite';
+
+  @override
+  String trialMonthlyDescription(String days, String price) {
+    return 'Les premiers $days jours gratuits, puis $price/mois';
   }
+
+  @override
+  String trialAnnualDescription(String days, String price) {
+    return 'Les premiers $days jours gratuits, puis $price/an';
+  }
+
+  @override
+  String freePlan(String plan) {
+    return '$plan gratuit !';
+  }
+
+  @override
+  String get systemPromptLimitFallback =>
+      'CRITIQUE : L’utilisateur a demandé une action, mais son forfait Cortex est épuisé ; veuillez informer l’utilisateur dans sa langue qu’il doit patienter ou envisager de passer à un forfait supérieur.';
+
+  @override
+  String get dynamicPreditsUpgradeMessage =>
+      'Cortex peut donner des réponses encore meilleures ; passez à la version supérieure maintenant et obtenez la meilleure réponse à chaque question !';
 }

@@ -12,14 +12,17 @@ import '../../wave.dart';
 import 'buttons.dart';
 import 'service.dart';
 import '../../../../../../fog.dart';
-import 'package:cortex/server/user.dart';
 import 'package:cortex/chat/providers/session.dart';
 
 part 'waveform.dart';
+
 part 'attachments.dart';
-part 'text_field.dart';
+
+part 'field.dart';
+
 part 'tools.dart';
-part 'send_button.dart';
+
+part 'send.dart';
 
 class InputField extends StatefulWidget {
   final AppLocalizations localizations;
@@ -36,10 +39,12 @@ class InputField extends StatefulWidget {
   final bool isSending;
   final bool isPremiumModel;
   final bool isSubscribed;
-  final int premiumTrialUses;
+  final int userTier;
   final String? originalMessageText;
   final bool isStorageSufficient;
   final int? totalCredits;
+  final int? availablePredits;
+  final int? availableDredits;
   final String? role;
   final bool isServerSideModel;
   final VoidCallback onStop;
@@ -66,10 +71,12 @@ class InputField extends StatefulWidget {
     required this.isSending,
     required this.isPremiumModel,
     required this.isSubscribed,
-    required this.premiumTrialUses,
+    required this.userTier,
     this.originalMessageText,
     required this.isStorageSufficient,
     required this.totalCredits,
+    this.availablePredits,
+    this.availableDredits,
     this.role,
     required this.isServerSideModel,
     required this.onStop,
@@ -131,12 +138,16 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
 
     // PERFORMANCE: Only rebuild when the send button enabled state actually changes,
     // not on every single keystroke. This prevents full widget tree rebuilds during typing.
-    bool lastSendEnabled = false;
+    bool lastSendEnabled = isSendButtonEnabled;
+    bool lastHasTypedContent = widget.controller.text.trim().isNotEmpty;
     widget.controller.addListener(() {
       if (!mounted) return;
       final nowEnabled = isSendButtonEnabled;
-      if (nowEnabled != lastSendEnabled) {
+      final nowHasTypedContent = widget.controller.text.trim().isNotEmpty;
+      if (nowEnabled != lastSendEnabled ||
+          nowHasTypedContent != lastHasTypedContent) {
         lastSendEnabled = nowEnabled;
+        lastHasTypedContent = nowHasTypedContent;
         setState(() {});
       }
     });
@@ -151,6 +162,23 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
         _modeController.value = 1.0;
       }
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant InputField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isSending != widget.isSending ||
+        oldWidget.isLimitExceeded != widget.isLimitExceeded ||
+        oldWidget.modelMissing != widget.modelMissing ||
+        oldWidget.totalCredits != widget.totalCredits ||
+        oldWidget.availablePredits != widget.availablePredits ||
+        oldWidget.availableDredits != widget.availableDredits ||
+        oldWidget.isServerSideModel != widget.isServerSideModel ||
+        oldWidget.isDynamicChatMode != widget.isDynamicChatMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() {});
+      });
+    }
   }
 
   @override
@@ -207,10 +235,10 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   bool get isActionPermitted {
     final sessionProvider = context.read<ChatSessionProvider>();
     final currentModel = sessionProvider.selectedModel;
-    final isVideoModel = currentModel != null &&
+    final isVideoModel = !widget.isDynamicChatMode &&
+        currentModel != null &&
         (currentModel.outputs['video'] == true ||
             currentModel.category == 'video');
-    final userTier = context.read<UserProvider>().userData?['hasCortexSubscription'] as int? ?? 0;
 
     return _inputService.isActionPermitted(
       context: context,
@@ -223,19 +251,20 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       isPremiumModel: widget.isPremiumModel,
       isSubscribed: widget.isSubscribed,
       isVideoModel: isVideoModel,
-      userTier: userTier,
-      premiumTrialUses: widget.premiumTrialUses,
+      userTier: widget.userTier,
       totalCredits: widget.totalCredits,
+      availablePredits: widget.availablePredits,
+      availableDredits: widget.availableDredits,
     );
   }
 
   bool get isSendButtonEnabled {
     final sessionProvider = context.read<ChatSessionProvider>();
     final currentModel = sessionProvider.selectedModel;
-    final isVideoModel = currentModel != null &&
+    final isVideoModel = !widget.isDynamicChatMode &&
+        currentModel != null &&
         (currentModel.outputs['video'] == true ||
             currentModel.category == 'video');
-    final userTier = context.read<UserProvider>().userData?['hasCortexSubscription'] as int? ?? 0;
 
     return _inputService.isSendButtonEnabled(
       context: context,
@@ -249,9 +278,10 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       isPremiumModel: widget.isPremiumModel,
       isSubscribed: widget.isSubscribed,
       isVideoModel: isVideoModel,
-      userTier: userTier,
-      premiumTrialUses: widget.premiumTrialUses,
+      userTier: widget.userTier,
       totalCredits: widget.totalCredits,
+      availablePredits: widget.availablePredits,
+      availableDredits: widget.availableDredits,
     );
   }
 
@@ -354,7 +384,8 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                               child: _ToolsSection(
                                                 screenWidth: screenWidth,
                                                 isTablet: isTablet,
-                                                isActionPermitted: isActionPermitted,
+                                                isActionPermitted:
+                                                    isActionPermitted,
                                                 widget: widget,
                                               ),
                                             ),

@@ -29,7 +29,6 @@
   "usedMemory": "Memori Terpakai",
   "modelsTitle": "Perpustakaan",
   "localModels": "Model Lokal",
-  "serverSideModels": "Model Bahasa",
   "selectGGUFFile": "Pilih File GGUF",
   "errorGGUF": "Harap pilih file dalam format GGUF saja.",
   "myModels": "Model Saya",
@@ -86,7 +85,6 @@
   "delete": "Hapus",
   "passwordRequired": "Kata sandi diperlukan.",
   "deleteDescription": "Data yang Anda hapus akan dihapus secara permanen dari server dan perangkat Anda. Tindakan ini tidak dapat dibatalkan.",
-  "deleteAccountButton": "Tombol Hapus Akun",
   "editProfile": "Edit Profil",
   "displayName": "Nama Tampilan",
   "profileUpdated": "Profil berhasil diperbarui",
@@ -108,7 +106,6 @@
     }
   },
   "downloadPaused": "Pengunduhan dijeda.",
-  "purchaseSuccessful": "Pembelian berhasil!",
   "purchaseError": "Kesalahan pembelian",
   "purchasePlus": "Beli Cortex Plus",
   "plusDescription": "Pengalaman Kecerdasan Buatan Tingkat Tinggi",
@@ -320,7 +317,6 @@
   "experimentalOfflineWarning": "Mode offline masih bersifat eksperimental dan model yang Anda unduh mungkin tidak berkinerja dengan efisiensi optimal.",
   "noConversationsToDelete": "Anda tidak memiliki percakapan untuk dihapus.",
   "reportSubmitted": "Laporan berhasil dikirim",
-  "purchaseReceived": "Pembelian diterima, memperbarui akun Anda.",
   "verificationDelayed": "Pembelian Anda telah dikonfirmasi. Ada sedikit keterlambatan dalam memperbarui akun Anda, ini akan segera muncul.",
   "maintenanceTitle": "Sedang dalam Pemeliharaan",
   "maintenanceMessage": "Cortex untuk sementara offline saat kami meluncurkan beberapa pembaruan penting. Akses ke aplikasi akan segera dipulihkan.\n\nTerima kasih atas kesabaran Anda saat kami meningkatkan pengalaman Anda.",
@@ -334,8 +330,6 @@
   "loginSubtitle": "Masuk ke akun Vertex Anda. Dengan melanjutkan, Anda menyetujui Persyaratan Layanan & Kebijakan Privasi kami.",
   "registerSubtitle": "Buat akun Vertex untuk akses mudah ke semua layanan kami. Dengan melanjutkan, Anda menyetujui Persyaratan Layanan & Kebijakan Privasi kami.",
   "storagePermissionRequired": "Izin penyimpanan diperlukan untuk menyimpan model yang diunduh. Harap berikan izin untuk melanjutkan.",
-  "plusBannerTitle": "Dapatkan Gratis Plus!",
-  "plusBannerSubtitle": "Ajak teman dan kalian berdua akan mendapatkan 1 Hari Plus gratis!",
   "inviteShareSubject": "Bergabunglah dengan saya di Cortex!",
   "@inviteShareMessage": {
     "description": "Pesan teks untuk dibagikan dengan teman untuk undangan.",
@@ -361,12 +355,10 @@
   "russian": "Rusia",
   "featureDocumentTitle": "Dukungan Dokumen",
   "featureDocumentDescription": "Model ini dapat menganalisis dan menjawab pertanyaan tentang dokumen yang diunggah seperti PDF dan berkas teks.",
-  "featureAudioTitle": "Masukan Suara",
-  "featureAudioDescription": "Model ini dapat memahami dan memproses masukan audio lisan.",
   "featureImageGenerationTitle": "Pembuatan Gambar",
   "featureImageGenerationDescription": "Model ini dapat membuat gambar asli berdasarkan deskripsi teks Anda.",
   "premiumModelNoticeTitle": "Model Premium",
-  "premiumModelNoticeDescription": "Model ini adalah model premium, pengguna gratis dibatasi hingga 3 pesan per hari dengan model premium; berlangganan untuk membuka akses tak terbatas!",
+  "premiumModelNoticeDescription": "AI ini adalah AI premium, pengguna gratis memiliki akses terbatas ke AI premium; tingkatkan untuk membuka akses tak terbatas!",
   "benefitPremiumModels": "Akses ke model premium",
   "premiumTrialExhaustedMessage": "Anda telah menggunakan semua pesan harian gratis untuk model premium, silakan tingkatkan untuk akses tak terbatas.",
   "useOffline": "Gunakan tanpa Internet",
@@ -578,11 +570,10 @@
   "searching": "Mencari",
   "featureWebSearchTitle": "Pencarian Web",
   "featureWebSearchDescription": "Cari informasi secara real-time di web.",
-  "webSearchQuotaExceeded": "Kuota Pencarian Terlampaui",
   "clearMemory": "Hapus Memori",
   "clearMemoryConfirm": "Apakah Anda yakin ingin menghapus ingatan Anda?",
   "personalization": "Personalisasi",
-  "personalizationDescription": "Sesuaikan pengalaman Anda",
+  "personalizationDescription": "Personalisasikan asisten Anda agar lebih sesuai dengan kebutuhan Anda. Sesuaikan respons, perilaku, dan nada bicaranya agar sesuai dengan preferensi unik Anda.",
   "memoryTitle": "Ingatan",
   "memoryDescription": "AI mengenali Anda seperti ini.",
   "noMemoryYet": "Belum ada memori yang terealisasi.",
@@ -592,11 +583,11 @@
   "customInstructionHint": "Masukkan instruksi khusus Anda di sini.",
   "openLinkWarningMessage": "Anda akan membuka tautan eksternal berikut:\\n\\n{url}\\n\\nApakah Anda yakin ingin melanjutkan?",
   "intelligenceSystemPrompt": "Ikuti petunjuk khusus ini:\\n\\n{instruction}",
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>",
+  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalisis percakapan sejauh ini. Jika Anda mempelajari FAKTA baru yang berbeda tentang pengguna (preferensi, nama, kebiasaan, konteks), Anda HARUS menampilkan SELURUH memori yang diperbarui tentang pengguna di dalam tag <memory>...</memory> DI AKHIR respons Anda. PENTING: Anda TIDAK PERNAH boleh menghapus atau menimpa memori sebelumnya. SELALU tambahkan fakta baru ke memori yang ada. Jika sama sekali tidak ada hal baru yang dipelajari, hilangkan tag tersebut. Contoh: <memory>Menyukai sepak bola dan tenis. Lebih suka jawaban singkat.</memory>",
   "systemMemoryReminder": "\n\nSelalu ingat ini tentang pengguna:\n{userMemory}",
-  "chatTitlePrompt": "Anda adalah pembuat judul. Tanggapi HANYA dengan judul 2-5 kata untuk percakapan berikut. Jangan gunakan tanda kutip, awalan, atau tanda baca.",
+  "chatTitlePrompt": "Anda adalah pembuat judul. Balas HANYA dengan judul 2-5 kata untuk percakapan berikut. Jangan gunakan tanda kutip, awalan, atau tanda baca. PENTING: Judul HARUS dalam bahasa yang SAMA PERSIS dengan pesan pengguna.",
   "chatTitleCriticalInstruction": "[INSTRUKSI PENTING]: Anda adalah PEMBUAT JUDUL. JANGAN menjawab pertanyaan pengguna. JANGAN mengobrol atau menyapa. HANYA keluarkan judul 2-4 kata yang merangkum apa yang ditanyakan pengguna.",
-  "cortexSystemPersona": "\n\n[System] INSTRUKSI KRITIS: Anda saat ini beroperasi di dalam ekosistem AI yang sangat besar dan canggih bernama \"Cortex\". Ingatlah hal ini dan pertahankan persona Cortex jika ditanya.",
+  "cortexSystemPersona": "\n\n[Sistem] INSTRUKSI PENTING: Anda saat ini beroperasi di dalam ekosistem AI yang sangat besar dan canggih bernama \"Cortex\"; platform ini dikembangkan oleh tim Vertex, yang rata-rata baru berusia 16 tahun. Ingat ini dan jawab jika ditanya. Jika informasi lebih lanjut diminta, jangan ragu untuk mencari di internet, atau jika Anda tidak dapat mencari, jangan ragu untuk mengatakan Anda tidak tahu!",
   "@cortexSystemPersona": {
     "description": "System persona string added to online models"
   },
@@ -622,8 +613,6 @@
   "featureImageRecognitionDescription": "Model ini dapat menganalisis dan memahami foto atau gambar.",
   "featureToolUseTitle": "Penggunaan Alat",
   "featureToolUseDescription": "Model ini dapat secara cerdas menggunakan alat eksternal untuk menyelesaikan tugas.",
-  "paywallAhaTitle": "Unlock the True Power of AI",
-  "paywallAhaSubtitle": "Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.",
   "systemPromptMissingMedia": "Model ini memerlukan {mediaType} agar dapat berfungsi. Saya telah mencegat permintaan tersebut untuk memberi tahu Anda. Tolong beri tahu pengguna dengan sopan bahwa mereka perlu menyediakan {mediaType} (beri tahu mereka dalam bahasa mereka sendiri) karena saya adalah {modelName}, model pengeditan visual/audio/video.",
   "mediaTypeImage": "gambar",
   "mediaTypeVideo": "video",
@@ -633,8 +622,8 @@
   "featureCreateVideoDescription": "Buat video dari teks.",
   "defaultSeriesDescription": "{seriesName} adalah kecerdasan maju yang menunjukkan performa tinggi di Cortex.",
   "defaultModelDescription": "{modelName} adalah kecerdasan buatan berkinerja tinggi yang terintegrasi di dalam ekosistem Cortex. Dirancang untuk menaklukkan berbagai macam tugas kompleks, ia memberikan kemampuan pemrosesan yang sangat andal dan efisien. Dengan menawarkan waktu respons yang cepat dan kekuatan analitis tingkat lanjut, ini secara signifikan meningkatkan produktivitas harian Anda. Beroperasi dengan lancar di infrastruktur lokal Cortex yang aman, model ini dapat membantu Anda dalam berbagai spektrum tugas, mulai dari curah pendapat kreatif hingga analisis teknis mendalam. Mulailah menjelajahi potensi penuhnya hari ini.",
-  "createAI": "Create",
-  "shortcuts": "Shortcuts",
+  "createAI": "Buat",
+  "shortcuts": "Jalan pintas",
   "ourStory": "Kisah Kami",
   "guestLimitBottomSheetTitle": "Suka dengan kecerdasan Cortex?",
   "guestLimitBottomSheetText": "Bekerja dengan kecerdasan yang lebih canggih, menghasilkan lebih banyak konten, mengobrol lebih banyak, dan melakukan lebih banyak lagi...",
@@ -642,10 +631,51 @@
   "noArt": "Tidak ada Seni",
   "noArtDescription": "Tidak ada karya seni; saatnya mengisi galeri dengan membuat gambar, video, audio, dan segala macam konten!",
   "videoPremiumWarning": "Anda memerlukan langganan Ultra untuk membuat video, tingkatkan sekarang dan rasakan kemudahannya!",
-  "becomePremiumButton": "Menjadi Premium",
+  "dynamicPreditsUpgradeMessage": "Cortex dapat memberikan jawaban yang lebih baik; tingkatkan sekarang dan dapatkan jawaban terbaik untuk setiap pertanyaan!",
   "fallbackInfoPanelText": "Karena beberapa perbaikan yang sedang kami lakukan di sisi server, respons dihasilkan oleh obrolan dinamis Cortex, bukan oleh AI yang Anda pilih secara khusus. Terima kasih atas pengertian Anda sampai proses ini selesai!",
   "falOfflineMessage": "Karena beberapa perbaikan yang sedang kami lakukan di sisi server, kecerdasan ini saat ini sedang offline. Terima kasih atas pengertian Anda sampai proses ini selesai!",
   "errorInsufficientStorage": "Ruang penyimpanan tidak mencukupi untuk mengunduh model ini.",
   "backgroundChatNotificationTitle": "Kembali ke Obrolan!",
-  "backgroundChatNotificationBody": "Ada pesan baru di {chatName}, silakan cek!"
+  "falErrorImageRequired": "AI ini membutuhkan gambar referensi, harap lampirkan gambar dan coba lagi.",
+  "falErrorAudioRequired": "Model ini memerlukan file audio referensi, harap lampirkan file audio dan coba lagi.",
+  "falErrorVideoRequired": "Model ini memerlukan video referensi, silakan lampirkan video dan coba lagi.",
+  "falErrorImageCorrupted": "Gambar yang diunggah tidak dapat diproses, silakan coba format lain.",
+  "falErrorSchemaRejected": "Model tersebut menolak input, silakan coba model lain.",
+  "falErrorSchemaInvalid": "Input tersebut ditolak oleh layanan pembangkitan.",
+  "falErrorGenericStatus": "Layanan pembuatan mengembalikan kesalahan (status {statusCode}).",
+  "benefitVideoGeneration": "Pembuatan Video",
+  "claimOffer": "Gunakan Penawaran",
+  "freeOffer": "Penawaran Gratis",
+  "trialMonthlyDescription": "{days} hari pertama gratis, lalu {price}/bulan",
+  "@trialMonthlyDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "trialAnnualDescription": "{days} hari pertama gratis, lalu {price}/tahun",
+  "@trialAnnualDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$49.99"
+      }
+    }
+  },
+  "freePlan": "{plan} Gratis!",
+  "systemRoleFallback": "Anda adalah asisten yang sangat membantu.",
+  "systemLanguageInstruction": "\n\nKRITIS: Selalu tanggapi dalam bahasa yang sama dengan yang digunakan pengguna, perhatikan bahasa pengguna.",
+  "systemTimeInfo": "\n\nTanggal dan waktu saat ini: {formattedTime}.",
+  "systemPromptLimitFallback": "PENTING: Pengguna meminta suatu tindakan, tetapi kuota mereka di Cortex telah habis; mohon informasikan kepada pengguna dalam bahasa mereka bahwa mereka harus menunggu atau mempertimbangkan untuk meningkatkan paket langganan mereka.",
+  "systemNotePreviousMedia": "[Catatan Sistem: Berikut adalah media yang dihasilkan sebelumnya. Anda dapat merujuk atau mengeditnya.]"
 }

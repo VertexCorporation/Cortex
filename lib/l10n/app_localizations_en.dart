@@ -10,7 +10,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation.';
+      'You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation. CRITICAL: The title MUST be in the EXACT SAME language as the user\'s message.';
+
+  @override
+  String get systemRoleFallback => 'You are a helpful assistant.';
+
+  @override
+  String get systemLanguageInstruction =>
+      '\n\nCRITICAL: Always respond in the same language the user writes in, pay attention to the user\'s language.';
+
+  @override
+  String get systemNotePreviousMedia =>
+      '[System Note: Below is the media generated previously. You may reference or edit it.]';
+
+  @override
+  String systemTimeInfo(String formattedTime) {
+    return '\n\nCurrent date and time: $formattedTime.';
+  }
 
   @override
   String get systemMemoryDirective =>
@@ -112,9 +128,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get localModels => 'Local Models';
-
-  @override
-  String get serverSideModels => 'Language Models';
 
   @override
   String get selectGGUFFile => 'Select GGUF File';
@@ -301,9 +314,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'The data you delete will be permanently removed from our server and your device. This actions cannot be undone.';
 
   @override
-  String get deleteAccountButton => 'Account Deletion Button';
-
-  @override
   String get editProfile => 'Edit Profile';
 
   @override
@@ -354,9 +364,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get downloadPaused => 'Download paused.';
-
-  @override
-  String get purchaseSuccessful => 'Purchase successful!';
 
   @override
   String get purchaseError => 'Purchasing error';
@@ -867,6 +874,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectBaseModel => 'Select a Base Model';
 
   @override
+  String get falErrorImageRequired =>
+      'This AI requires a reference image, please attach an image and try again.';
+
+  @override
+  String get falErrorAudioRequired =>
+      'This model requires a reference audio file, please attach an audio file and try again.';
+
+  @override
+  String get falErrorVideoRequired =>
+      'This model requires a reference video, please attach a video and try again.';
+
+  @override
+  String get falErrorImageCorrupted =>
+      'The uploaded image could not be processed, please try a different format.';
+
+  @override
+  String get falErrorSchemaRejected =>
+      'The model rejected the input, please try a different model.';
+
+  @override
+  String get falErrorSchemaInvalid =>
+      'The input was rejected by the generation service.';
+
+  @override
+  String falErrorGenericStatus(int statusCode) {
+    return 'The generation service returned an error (status $statusCode).';
+  }
+
+  @override
   String get couldNotOpenLink => 'Could not open the link';
 
   @override
@@ -928,9 +964,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportSubmitted => 'Report submitted successfully';
 
   @override
-  String get purchaseReceived => 'Purchase received, updating your account.';
-
-  @override
   String get verificationDelayed =>
       'Your purchase is confirmed. There is a slight delay in updating your account, it will appear shortly.';
 
@@ -980,13 +1013,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Storage permission is required to save downloaded models. Please grant permission to continue.';
 
   @override
-  String get plusBannerTitle => 'Get Free Plus!';
-
-  @override
-  String get plusBannerSubtitle =>
-      'Invite a friend and you both get 1 Day of Plus for free!';
-
-  @override
   String get inviteShareSubject => 'Join me on Cortex!';
 
   @override
@@ -1032,13 +1058,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'This model can analyze and answer questions about uploaded documents such as PDFs and text files.';
 
   @override
-  String get featureAudioTitle => 'Voice Input';
-
-  @override
-  String get featureAudioDescription =>
-      'This model can understand and process spoken audio inputs.';
-
-  @override
   String get featureImageGenerationTitle => 'Image Generation';
 
   @override
@@ -1064,7 +1083,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      'This model is a premium model, free users are limited to 3 messages per day with premium models; subscribe to unlock unlimited access!';
+      'This AI is a premium AI, free users have limited access to premium AIs; upgrade to unlock unlimited access!';
 
   @override
   String get benefitPremiumModels => 'Access to premium models';
@@ -1461,13 +1480,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingFinalButton => 'YES!';
 
   @override
-  String get paywallAhaTitle => 'Unlock the True Power of AI';
-
-  @override
-  String get paywallAhaSubtitle =>
-      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
-
-  @override
   String get dude => 'Dude';
 
   @override
@@ -1656,6 +1668,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exclusiveOffer => 'Exclusive Offer';
 
   @override
+  String get claimOffer => 'Use Offer';
+
+  @override
   String get continueInOfflineMode => 'Continue in Offline Mode';
 
   @override
@@ -1782,9 +1797,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Search the web for real-time information';
 
   @override
-  String get webSearchQuotaExceeded => 'Search Quota Exceeded';
-
-  @override
   String get clearMemory => 'Clear Memory';
 
   @override
@@ -1795,7 +1807,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get personalization => 'Personalization';
 
   @override
-  String get personalizationDescription => 'Customize your experience';
+  String get personalizationDescription =>
+      'Personalize your assistant to better suit your needs. Tailor its responses, behavior, and tone to match your unique preferences.';
 
   @override
   String get memoryTitle => 'Memory';
@@ -1830,11 +1843,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatTitleCriticalInstruction =>
-      '[CRITICAL INSTRUCTION]: You are a TITLE GENERATOR. DO NOT answer the user\'s question. DO NOT chat or say hello. ONLY output a 2-4 word title summarizing what the user is asking about.';
+      '[CRITICAL INSTRUCTION]: You are a TITLE GENERATOR. DO NOT answer the user\'s question. DO NOT chat or say hello. ONLY output a 2-4 word title summarizing what the user is asking about. The title MUST be in the same language as the user\'s message.';
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\". Remember this and maintain the persona of Cortex if asked.';
+      '\n\n[System] CRITICAL INSTRUCTION: You are currently operating inside a massive, highly advanced AI ecosystem named \"Cortex\"; this platform is developed by the Vertex team, who are on average just 16 years old. Remember this and answer if asked. If more information is requested, do not hesitate to search the internet, or if you cannot search, feel free to say you don\'t know!';
 
   @override
   String get featureAudioRecognitionTitle => 'Audio Recognition';
@@ -1919,9 +1932,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'You need an Ultra subscription to generate videos, upgrade now and feel the flow!';
 
   @override
-  String get becomePremiumButton => 'Become Premium';
-
-  @override
   String get fallbackInfoPanelText =>
       'Due to some improvements we are making on our server side, the response was generated by Cortex\'s dynamic chat instead of your specifically selected AI. Thank you for your understanding until the process is completed!';
 
@@ -1937,7 +1947,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backgroundChatNotificationTitle => 'Back to Chat!';
 
   @override
-  String backgroundChatNotificationBody(String chatName) {
-    return 'There\'s a new message in $chatName, check it out!';
+  String get benefitVideoGeneration => 'Video Generation';
+
+  @override
+  String get freeOffer => 'Free Offer';
+
+  @override
+  String trialMonthlyDescription(String days, String price) {
+    return 'First $days days free, then $price/month';
   }
+
+  @override
+  String trialAnnualDescription(String days, String price) {
+    return 'First $days days free, then $price/year';
+  }
+
+  @override
+  String freePlan(String plan) {
+    return 'Free $plan!';
+  }
+
+  @override
+  String get systemPromptLimitFallback =>
+      'CRITICAL: The user requested an action, but their allowance on Cortex has depleted; kindly inform the user in their language that they should wait or consider upgrading their subscription plan.';
+
+  @override
+  String get dynamicPreditsUpgradeMessage =>
+      'Cortex can give even better answers; upgrade now and get the best answer for every question!';
 }

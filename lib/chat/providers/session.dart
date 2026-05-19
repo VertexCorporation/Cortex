@@ -1,5 +1,7 @@
 // lib/chat/providers/session.dart
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/chat/services/limit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +11,7 @@ import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
 import '../../library/utils.dart';
 import '../../library/providers/local.dart';
+import '../../variants.dart';
 import '../services/storage.dart';
 
 class ChatSessionProvider with ChangeNotifier {
@@ -31,7 +34,6 @@ class ChatSessionProvider with ChangeNotifier {
 
   // -------------------- User & Subscription State --------------------
   bool _isUserSubscribed = false;
-  int _premiumTrialUses = 0;
   ChatLimitManager? _chatLimitManager;
   String? _displayName;
   String? _email;
@@ -80,33 +82,64 @@ class ChatSessionProvider with ChangeNotifier {
     // The user wants to NEVER see "Unknown Model", even for a split second.
     // If the data returns that string, we MUST fallback to "Cortex" or the stub title.
 
+    if (baseId == 'cortex/auto' || baseId == 'dynamic') {
+      return 'Cortex';
+    }
+
+    // SERIES NAME PRIORITY: If the current model belongs to a series,
+    // always show the series name instead of the individual variant title.
+    // The user should never see the underlying model technicalities like
+    // "GPT-4o" — they should only see the series name like "ChatGPT".
+    try {
+      final parentSeries = ModelDataUtils.findParentSeriesData(
+        currentModel.id,
+        langCode: langCode,
+        modelService: _modelService,
+      );
+      final isRealVariantSeries = parentSeries != null &&
+          parentSeries.variants != null &&
+          parentSeries.variants!.isNotEmpty;
+      if (isRealVariantSeries) {
+        final seriesTitle = parentSeries.series ?? parentSeries.displayTitle;
+        if (seriesTitle.isNotEmpty && seriesTitle != 'Unknown Model') {
+          return seriesTitle;
+        }
+      }
+    } catch (_) {
+      // Fall through to legacy resolution
+    }
+
     String resolvedTitle = currentModel.displayTitle;
 
-    // Try to get precise data if possible
-    if (baseId != currentModel.id) {
-      try {
-        final seriesModel =
-            _modelService.getPreciseModelData(baseId, langCode: langCode);
-        resolvedTitle = seriesModel.displayTitle;
-      } catch (_) {
-        // Keep using currentModel.displayTitle
-      }
+    // Try to get precise data to ensure title is localized properly
+    try {
+      final seriesModel = _modelService.getPreciseModelData(currentModel.id,
+          langCode: langCode);
+      resolvedTitle = seriesModel.displayTitle;
+    } catch (_) {
+      // Keep using currentModel.displayTitle if precise fetch fails
     }
 
     if (resolvedTitle == 'Unknown Model' || resolvedTitle.isEmpty) {
-      // Fallback hierarchy:
-      // 1. "Cortex" (if it's the auto model)
-      // 2. The Model ID capitalized (better than "Unknown")
-
-      if (baseId == 'cortex/auto' || baseId == 'dynamic') {
-        return 'Cortex';
-      }
-
       // Return a cleaner version of ID if title is missing
       return ModelDataUtils.formatModelName(baseId.split('/').last);
     }
 
+    final seriesTitle = currentModel.series;
+    if (_looksLikeRawId(resolvedTitle, currentModel.id) &&
+        seriesTitle != null &&
+        seriesTitle.isNotEmpty &&
+        !_looksLikeRawId(seriesTitle, currentModel.id)) {
+      return seriesTitle;
+    }
+
     return resolvedTitle;
+  }
+
+  static bool _looksLikeRawId(String value, String id) {
+    String normalize(String input) =>
+        input.replaceAll(RegExp(r'[\s_\-/]+'), '').toLowerCase();
+    return normalize(value) == normalize(id);
   }
 
   String? get modelImagePath {
@@ -139,8 +172,6 @@ class ChatSessionProvider with ChangeNotifier {
 
   bool get isUserSubscribed => _isUserSubscribed;
 
-  int get premiumTrialUses => _premiumTrialUses;
-
   ChatLimitManager? get chatLimitManager => _chatLimitManager;
 
   String? get displayName => _displayName;
@@ -149,7 +180,43 @@ class ChatSessionProvider with ChangeNotifier {
 
   bool get isCurrentModelPremium {
     final model = _isExitingChat ? _lastExitedModel : _selectedModel;
-    return model?.isPremium ?? false;
+    if (model == null) return false;
+
+    // Check if it's a series (it has variants)
+    // If it's a series, it is premium ONLY IF ALL its variants are premium.
+    if (model.variants != null && model.variants!.isNotEmpty) {
+      bool allPremium = true;
+      for (final variantMap in model.variants!.values) {
+        if (variantMap is! Map) continue;
+        final tier = variantMap['tier']?.toString();
+        final source = variantMap['source']?.toString();
+        final isVariantPremium = (tier == 'plus' ||
+            tier == 'pro' ||
+            tier == 'ultra' ||
+            source == 'fal');
+        if (!isVariantPremium) {
+          allPremium = false;
+          break;
+        }
+      }
+      return allPremium;
+    }
+
+    // Explicitly treat Fal models as premium on the client side
+    if (model.source == 'fal') return true;
+    if (model.isPremium) return true;
+
+    if (model.baseModelId != null) {
+      try {
+        final baseModel = _modelService.getPreciseModelData(model.baseModelId!,
+            langCode: _currentLocale.languageCode);
+        if (baseModel.source == 'fal') return true;
+        return baseModel.isPremium;
+      } catch (_) {
+        return false;
+      }
+    }
+    return false;
   }
 
   bool get isStorageSufficient => _isStorageSufficient;
@@ -276,7 +343,7 @@ class ChatSessionProvider with ChangeNotifier {
 
     // If models are loaded and we have a pending ID, try to resolve it
     if (!_modelService.isLoading && _pendingModelId != null) {
-      refreshModelAfterCatalogLoad();
+      unawaited(refreshModelAfterCatalogLoad());
     }
   }
 
@@ -287,7 +354,7 @@ class ChatSessionProvider with ChangeNotifier {
   }
 
   /// Called when model catalog finishes loading to resolve pending model
-  void refreshModelAfterCatalogLoad() {
+  Future<void> refreshModelAfterCatalogLoad() async {
     if (_pendingModelId == null) return;
 
     final pendingId = _pendingModelId!;
@@ -311,11 +378,17 @@ class ChatSessionProvider with ChangeNotifier {
         return;
       }
 
-      final entity =
-          _modelService.getPreciseModelData(pendingId, langCode: langCode);
+      final entity = await _resolveRestorableModelEntity(pendingId, langCode);
 
       // Clear pending ID first so selectModel doesn't get confused or we don't retry unnecessarily
       _pendingModelId = null;
+
+      if (!_canUseRestoredModel(entity)) {
+        debugPrint(
+            "[ChatSessionProvider] Pending model '$pendingId' is unavailable on this device. Falling back to dynamic.");
+        startDynamicConversation(savePreference: true);
+        return;
+      }
 
       selectModel(entity, savePreference: false);
       debugPrint(
@@ -369,13 +442,26 @@ class ChatSessionProvider with ChangeNotifier {
 
     final langCode = _currentLocale.languageCode;
     try {
+      final bool isCacheEmpty = _modelService.getCachedModelsSync().isEmpty;
+
+      // If cache is empty, we must wait for catalog to load before making a final decision.
+      if (isCacheEmpty) {
+        String savedTitle =
+            prefs.getString('${_prefDefaultModelKey}_title') ?? '';
+        _initializeWithStub(savedId, savedTitle);
+        return;
+      }
+
       if (!_modelService.hasModelInCache(savedId)) {
         startDynamicConversation(savePreference: true);
         return;
       }
 
-      final entity =
-          _modelService.getPreciseModelData(savedId, langCode: langCode);
+      final entity = await _resolveRestorableModelEntity(savedId, langCode);
+      if (!_canUseRestoredModel(entity)) {
+        startDynamicConversation(savePreference: true);
+        return;
+      }
       selectModel(entity, savePreference: false);
     } catch (e) {
       startDynamicConversation(savePreference: true);
@@ -404,8 +490,6 @@ class ChatSessionProvider with ChangeNotifier {
         _modelService.getPreciseModelData(newModelId, langCode: langCode);
 
     if (savePreference) {
-      _selectedModel =
-          _modelService.getPreciseModelData(newModelId, langCode: langCode);
       _savePreference(newModelId, _selectedModel!.displayTitle);
     }
 
@@ -435,7 +519,6 @@ class ChatSessionProvider with ChangeNotifier {
     _lastExitedModel = null;
     _selectedModel = null;
     _isUserSubscribed = false;
-    _premiumTrialUses = 0;
     _chatLimitManager = null;
     _displayName = null;
     _email = null;
@@ -468,7 +551,95 @@ class ChatSessionProvider with ChangeNotifier {
   }
 
   void setDependencies(ModelLocalStateProvider localStateProvider) {
-    _localStateProvider ??= localStateProvider;
+    _localStateProvider = localStateProvider;
+    unawaited(_reconcileSelectedModelAvailability());
+  }
+
+  bool get _hasResolvedLocalModelState {
+    final localState = _localStateProvider;
+    return localState != null &&
+        localState.isInitialized &&
+        localState.hasResolvedFilesDirectory;
+  }
+
+  bool _isOfflineModelAvailableById(String id) {
+    final localState = _localStateProvider;
+    if (localState == null || !_hasResolvedLocalModelState) {
+      // Local file state is still booting. Defer the final decision so a
+      // valid saved offline selection does not briefly get overwritten.
+      return true;
+    }
+
+    if (localState.downloadCompleted[id] == true) {
+      return true;
+    }
+
+    final path = localState.getFilePathById(id);
+    return localState.isModelOnDisk(path);
+  }
+
+  bool _canUseRestoredModel(ModelEntity entity) {
+    if (entity.id == 'cortex/auto' || entity.id == 'dynamic') return true;
+    if (entity.isServerSide) return true;
+
+    final variants = entity.variants;
+    if (variants != null && variants.isNotEmpty) {
+      return variants.keys.any(_isOfflineModelAvailableById);
+    }
+
+    return _isOfflineModelAvailableById(entity.id);
+  }
+
+  Future<ModelEntity> _resolveRestorableModelEntity(
+    String savedId,
+    String langCode,
+  ) async {
+    final entity =
+        _modelService.getPreciseModelData(savedId, langCode: langCode);
+
+    final variants = entity.variants;
+    if (entity.isServerSide || variants == null || variants.isEmpty) {
+      return entity;
+    }
+
+    final candidateIds = <String>[];
+    final lastUsedId = await Variants.getLastSelectedVariant(entity.id);
+    if (lastUsedId.isNotEmpty && variants.containsKey(lastUsedId)) {
+      candidateIds.add(lastUsedId);
+    }
+    candidateIds.addAll(variants.keys.where((id) => id != lastUsedId));
+
+    for (final candidateId in candidateIds) {
+      if (_isOfflineModelAvailableById(candidateId)) {
+        return _modelService.getPreciseModelData(
+          candidateId,
+          langCode: langCode,
+        );
+      }
+    }
+
+    return entity;
+  }
+
+  Future<void> _reconcileSelectedModelAvailability() async {
+    final model = _selectedModel;
+    if (model == null || model.isServerSide || !_hasResolvedLocalModelState) {
+      return;
+    }
+
+    final langCode = _currentLocale.languageCode;
+    final resolved = await _resolveRestorableModelEntity(model.id, langCode);
+
+    if (!_canUseRestoredModel(resolved)) {
+      debugPrint(
+          "[ChatSessionProvider] Saved offline model '${model.id}' is no longer available. Falling back to Dynamic Chat.");
+      startDynamicConversation(savePreference: true);
+      return;
+    }
+
+    if (resolved.id != model.id) {
+      selectModel(resolved, savePreference: true);
+    }
   }
 
   void setLocalModelLoaded(bool isLoaded) {
@@ -479,31 +650,8 @@ class ChatSessionProvider with ChangeNotifier {
   }
 
   void updateUserData(Map<String, dynamic> data) {
-    final int subscriptionLevel = data['hasCortexSubscription'] ?? 0;
+    final int subscriptionLevel = _activeSubscriptionLevelFrom(data);
     _isUserSubscribed = subscriptionLevel > 0;
-
-    final dynamic lastResetValue = data['premiumModelTrialLastReset'];
-    Timestamp? lastResetTimestamp;
-    if (lastResetValue is Timestamp) {
-      lastResetTimestamp = lastResetValue;
-    } else if (lastResetValue is String) {
-      final parsedDate = DateTime.tryParse(lastResetValue);
-      if (parsedDate != null) {
-        lastResetTimestamp = Timestamp.fromDate(parsedDate);
-      }
-    }
-
-    int trialUses = data['premiumModelTrialUses'] as int? ?? 0;
-    if (lastResetTimestamp != null) {
-      final lastResetDate = lastResetTimestamp.toDate();
-      final now = DateTime.now();
-      if (lastResetDate.year != now.year ||
-          lastResetDate.month != now.month ||
-          lastResetDate.day != now.day) {
-        trialUses = 0;
-      }
-    }
-    _premiumTrialUses = trialUses;
 
     _displayName =
         data['displayName'] as String? ?? data['username'] as String?;
@@ -526,6 +674,39 @@ class ChatSessionProvider with ChangeNotifier {
     );
 
     notifyListeners();
+  }
+
+  int _parseSubscriptionLevel(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
+  }
+
+  Timestamp? _parseSubscriptionTimestamp(dynamic value) {
+    if (value is Timestamp) return value;
+    if (value is DateTime) return Timestamp.fromDate(value);
+    if (value is String) {
+      final parsedDate = DateTime.tryParse(value);
+      if (parsedDate != null) {
+        return Timestamp.fromDate(parsedDate);
+      }
+    }
+    return null;
+  }
+
+  int _activeSubscriptionLevelFrom(Map<String, dynamic> data) {
+    final user = FirebaseAuth.instance.currentUser;
+    final isAnonymous =
+        (user?.isAnonymous ?? false) || data['accountType'] == 'anonymous';
+    if (isAnonymous) return 0;
+
+    final level = _parseSubscriptionLevel(data['hasCortexSubscription']);
+    if (level <= 0) return 0;
+
+    final expiry = _parseSubscriptionTimestamp(data['subscriptionExpiresAt']);
+    if (expiry == null) return level >= 4 && level <= 6 ? level : 0;
+    return expiry.toDate().isAfter(DateTime.now()) ? level : 0;
   }
 
   void setStorageSufficient(bool isSufficient) {

@@ -133,7 +133,7 @@ class _UpdateRequiredScreenState extends State<UpdateRequiredScreen>
     appInitializer.configureUpgrader(l10n);
     final upgrader = appInitializer.upgrader;
 
-    final safeArea = MediaQuery.of(context).padding;
+    final safeArea = MediaQuery.paddingOf(context);
     final screenHeight = constraints.maxHeight;
 
     return Padding(

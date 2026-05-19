@@ -104,7 +104,7 @@ class ActionButtonWidget extends StatelessWidget {
     final speechService = context.watch<SpeechService>();
     final inputProvider = context.watch<InputProvider>();
 
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final bool isTablet = screenWidth >= 600;
     final double buttonSize = isTablet ? 40.0 : 36.0;
 
@@ -280,10 +280,10 @@ class ActionButtonWidget extends StatelessWidget {
         ),
         child: Padding(
           padding: EdgeInsets.all(size * 0.22),
-            child: SvgPicture.asset(
-              'assets/icons/arrow.svg',
-              colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-            ),
+          child: SvgPicture.asset(
+            'assets/icons/arrow.svg',
+            colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+          ),
         ),
       ),
     );
@@ -471,9 +471,12 @@ class FeaturesButton extends StatelessWidget {
     final featureMode = inputProvider.featureMode;
     final currentModel = sessionProvider.selectedModel;
     final bool isOfflineFocused = currentModel?.type == 'offline';
-    final bool isImageFocused = currentModel?.outputs['image'] == true || currentModel?.category == 'image';
-    final bool isVideoFocused = currentModel?.outputs['video'] == true || currentModel?.category == 'video';
-    final bool isAudioFocused = currentModel?.outputs['audio'] == true || currentModel?.category == 'audio';
+    final bool isImageFocused = currentModel?.outputs['image'] == true ||
+        currentModel?.category == 'image';
+    final bool isVideoFocused = currentModel?.outputs['video'] == true ||
+        currentModel?.category == 'video';
+    final bool isAudioFocused = currentModel?.outputs['audio'] == true ||
+        currentModel?.category == 'audio';
 
     final bool isActive = featureMode != ChatInputMode.none ||
         inputProvider.enableWebSearch ||
@@ -555,12 +558,14 @@ class ModelSelectButton extends StatelessWidget {
   final double screenWidth;
   final bool isTablet;
   final AppLocalizations localizations;
+  final VoidCallback? onSelectionComplete;
 
   const ModelSelectButton({
     super.key,
     required this.screenWidth,
     required this.isTablet,
     required this.localizations,
+    this.onSelectionComplete,
   });
 
   @override
@@ -590,7 +595,7 @@ class ModelSelectButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(borderRadius),
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  
+
                   // Eagerly read from context before opening the sheet (and before it closes)
                   final modelService = context.read<ModelService>();
                   final selectionService = context.read<SelectionService>();
@@ -622,7 +627,12 @@ class ModelSelectButton extends StatelessWidget {
                         inputProvider.clearFeatureMode();
                       }
                     },
-                  );
+                  ).then((didSelect) {
+                    if (didSelect != true) return;
+                    Future.delayed(const Duration(milliseconds: 120), () {
+                      onSelectionComplete?.call();
+                    });
+                  });
                 },
                 child: Container(
                   constraints: BoxConstraints(maxWidth: screenWidth * 0.55),

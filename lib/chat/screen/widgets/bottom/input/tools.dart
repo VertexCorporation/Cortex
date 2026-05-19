@@ -128,6 +128,7 @@ class _ToolsSection extends StatelessWidget {
             screenWidth: screenWidth,
             isTablet: isTablet,
             localizations: widget.localizations,
+            onSelectionComplete: () => widget.textFieldFocusNode.requestFocus(),
           ),
         ],
       ),

@@ -81,8 +81,15 @@ class _AxonConversationListState extends State<AxonConversationList> {
     final vm = context.read<InboxViewModel>();
     final newIds = vm.conversations;
 
+    final wasEmpty = _displayedIds.isEmpty;
+
     if (_areListsEqual(_displayedIds, newIds)) return;
     _calculateDiffs(List.from(_displayedIds), newIds);
+
+    final isEmptyNow = _displayedIds.isEmpty;
+    if (wasEmpty != isEmptyNow) {
+      setState(() {});
+    }
   }
 
   bool _areListsEqual(List<String> a, List<String> b) {
@@ -102,7 +109,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
         _listKey.currentState?.removeItem(
           i,
           (context, animation) => _buildRemovedItem(item, animation),
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 150),
         );
       }
     }
@@ -114,7 +121,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
       if (index >= _displayedIds.length) {
         _displayedIds.insert(index, newItem);
         _listKey.currentState
-            ?.insertItem(index, duration: const Duration(milliseconds: 300));
+            ?.insertItem(index, duration: const Duration(milliseconds: 150));
       } else {
         final currentDisplayedItem = _displayedIds[index];
         if (currentDisplayedItem != newItem) {
@@ -126,11 +133,11 @@ class _AxonConversationListState extends State<AxonConversationList> {
                 duration: Duration.zero);
             _displayedIds.insert(index, movedItem);
             _listKey.currentState?.insertItem(index,
-                duration: const Duration(milliseconds: 300));
+                duration: const Duration(milliseconds: 150));
           } else {
             _displayedIds.insert(index, newItem);
             _listKey.currentState?.insertItem(index,
-                duration: const Duration(milliseconds: 300));
+                duration: const Duration(milliseconds: 150));
           }
         }
       }
@@ -149,23 +156,28 @@ class _AxonConversationListState extends State<AxonConversationList> {
   }
 
   Widget _buildRemovedItem(String id, Animation<double> animation) {
-    final inboxViewModel = context.read<InboxViewModel>();
-    final manager = inboxViewModel.conversationManagers[id];
+    final manager = _viewModel?.conversationManagers[id];
 
+    // The tile has already animated its size and opacity down to 0 via its own
+    // internal _deleteController BEFORE triggering this removal if manually deleted.
+    // Returning SizedBox.shrink() prevents the 'double playback' bug.
+    if (manager == null || manager.isDeleted) {
+      return const SizedBox.shrink();
+    }
+
+    // If it was removed due to search filtering, animate it out smoothly.
     return SizeTransition(
       sizeFactor: animation,
-      axisAlignment: -1.0,
+      axisAlignment: 1.0,
       child: FadeTransition(
         opacity: animation,
-        child: manager != null
-            ? AxonConversationTile(
-                manager: manager,
-                onDelete: () {},
-                onEdit: (_) {},
-                onTogglePin: () {},
-                key: ValueKey(id),
-              )
-            : const SizedBox.shrink(),
+        child: AxonConversationTile(
+          key: ValueKey('removed_$id'),
+          manager: manager,
+          onDelete: () {},
+          onEdit: (_) async {},
+          onTogglePin: () {},
+        ),
       ),
     );
   }
@@ -257,81 +269,93 @@ class _AxonConversationListState extends State<AxonConversationList> {
     return Stack(
       key: const ValueKey('loaded_content'),
       children: [
-        if (isEmpty)
-          Positioned.fill(
-              child: Center(
-            key: const ValueKey('empty_state'),
-            child: showNoResults
-                ? _buildNoResultsFound(context, localizations)
-                : const EmptyStateView(isForStarred: false),
-          )),
-        if (!showNoResults)
-          Positioned.fill(
-            child: ScrollFog(
-              key: const ValueKey('list'),
-              scrollController: widget.scrollController,
-              topFogHeight: 15,
-              bottomFogHeight: 30,
-              showTop: true,
-              showBottom: true,
-              child: AnimatedList(
-                key: _listKey,
-                controller: widget.scrollController,
-                padding: EdgeInsets.fromLTRB(
-                  horizontalPadding * 0.5,
-                  0,
-                  horizontalPadding * 0.5,
-                  0,
-                ),
-                initialItemCount: _displayedIds.length,
-                itemBuilder: (context, index, animation) {
-                  if (index >= _displayedIds.length) {
-                    return const SizedBox.shrink();
-                  }
-                  final id = _displayedIds[index];
-                  final manager = inboxViewModel.conversationManagers[id];
-
-                  if (manager == null) return const SizedBox.shrink();
-
-                  return SlideTransition(
-                    position: animation.drive(
-                        Tween(begin: const Offset(0, 0.5), end: Offset.zero)
-                            .chain(CurveTween(curve: Curves.easeOutCubic))),
-                    child: FadeTransition(
-                      opacity: animation,
-                      child: AxonConversationTile(
-                        key: ValueKey(id),
-                        manager: manager,
-                        onDelete: () {
-                          inboxViewModel.deleteConversation(id);
-                          Provider.of<IntrovertNotificationService>(context,
-                                  listen: false)
-                              .showNotification(
-                            message: localizations.conversationDeleted,
-                            type: NotificationType.success,
-                            isAxonMode: true,
-                            axonWidth: widget.referenceWidth,
-                          );
-                        },
-                        onEdit: (newTitle) =>
-                            inboxViewModel.editConversation(id, newTitle),
-                        onTogglePin: () => inboxViewModel.togglePinStatus(id),
-                      ),
-                    ),
-                  );
-                },
+        Positioned.fill(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: isEmpty
+                ? Center(
+                    key: ValueKey(showNoResults ? 'no_results' : 'empty'),
+                    child: showNoResults
+                        ? _buildNoResultsFound(context, localizations)
+                        : const EmptyStateView(isForStarred: false),
+                  )
+                : const SizedBox.shrink(key: ValueKey('not_empty')),
+          ),
+        ),
+        Positioned.fill(
+          child: ScrollFog(
+            key: const ValueKey('list'),
+            scrollController: widget.scrollController,
+            topFogHeight: 15,
+            bottomFogHeight: 30,
+            showTop: true,
+            showBottom: true,
+            child: AnimatedList(
+              key: _listKey,
+              controller: widget.scrollController,
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding * 0.5,
+                0,
+                horizontalPadding * 0.5,
+                0,
               ),
+              initialItemCount: _displayedIds.length,
+              itemBuilder: (context, index, animation) {
+                if (index >= _displayedIds.length) {
+                  return const SizedBox.shrink();
+                }
+                final id = _displayedIds[index];
+                final manager = inboxViewModel.conversationManagers[id];
+
+                if (manager == null) return const SizedBox.shrink();
+
+                return SizeTransition(
+                  sizeFactor: animation,
+                  axisAlignment: 1.0,
+                  child: FadeTransition(
+                    opacity: animation,
+                    child: AxonConversationTile(
+                      key: ValueKey(id),
+                      manager: manager,
+                      onDelete: () {
+                        inboxViewModel.deleteConversation(id);
+                        Provider.of<IntrovertNotificationService>(context,
+                                listen: false)
+                            .showNotification(
+                          message: localizations.conversationDeleted,
+                          type: NotificationType.success,
+                          isAxonMode: true,
+                          axonWidth: widget.referenceWidth,
+                        );
+                      },
+                      onEdit: (newTitle) =>
+                          inboxViewModel.editConversation(id, newTitle),
+                      onTogglePin: () => inboxViewModel.togglePinStatus(id),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
+        ),
       ],
     );
   }
 
   Widget _buildNoResultsFound(
       BuildContext context, AppLocalizations localizations) {
-    return Padding(
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
       key: const ValueKey('no_results'),
-      padding: EdgeInsets.only(top: widget.screenHeight * 0.05),
+      padding: EdgeInsets.only(
+        top: widget.screenHeight * 0.05,
+        bottom: bottomInset > 0 ? bottomInset * 0.8 : 0,
+        left: widget.referenceWidth * 0.05,
+        right: widget.referenceWidth * 0.05,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

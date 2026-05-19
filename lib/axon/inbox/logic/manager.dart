@@ -24,7 +24,19 @@ class ConversationManager extends ChangeNotifier {
 
   String get modelTitle => _model.displayTitle;
 
-  String get modelImagePath => _modelService.getModelImagePath(_model);
+  String get modelImagePath {
+    // If the model is still in the catalog, use the service's resolution
+    if (_modelService.hasModelInCache(_model.id)) {
+      return _modelService.getModelImagePath(_model);
+    }
+    // For deleted models, prefer the persisted snapshot from the conversation table
+    if (_persistedModelImagePath != null &&
+        _persistedModelImagePath.trim().isNotEmpty) {
+      return _persistedModelImagePath;
+    }
+    // Final fallback via service (will return default icon)
+    return _modelService.getModelImagePath(_model);
+  }
 
   String get modelDescription => _model.displayDescription;
 
@@ -205,8 +217,11 @@ class ConversationManager extends ChangeNotifier {
   }
 
   void updateConversationTitle(String newTitle) {
-    if (conversationTitle != newTitle) {
-      conversationTitle = newTitle;
+    final trimmedTitle = newTitle.trim();
+    if (conversationTitle != trimmedTitle) {
+      debugPrint(
+          "[AxonRename.Manager] id=$conversationID old='$conversationTitle' new='$trimmedTitle'");
+      conversationTitle = trimmedTitle;
       notifyListeners();
     }
   }

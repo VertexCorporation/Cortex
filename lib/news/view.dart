@@ -82,7 +82,7 @@ class _NewsScreenState extends State<NewsScreen>
     final newsService = Provider.of<NewsService>(context);
     final l10n = AppLocalizations.of(context);
 
-    final Size screenSize = MediaQuery.of(context).size;
+    final Size screenSize = MediaQuery.sizeOf(context);
     final double screenHeight = screenSize.height;
     final double screenWidth = screenSize.width;
 
@@ -96,7 +96,7 @@ class _NewsScreenState extends State<NewsScreen>
     final double horizontalPadding = screenWidth * 0.041;
     final double searchGap = screenHeight * 0.02;
 
-    final double topSafeArea = MediaQuery.of(context).padding.top;
+    final double topSafeArea = MediaQuery.paddingOf(context).top;
     final double appBarHeight = kToolbarHeight;
 
     return Scaffold(
@@ -436,7 +436,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final iconSize = screenWidth * 0.08;
     return Material(
       color: AppColors.border.withValues(alpha: 0.5),

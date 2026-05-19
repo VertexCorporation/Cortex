@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserMemoryProvider extends ChangeNotifier {
   static const String _memoryKey = 'cortex_user_portable_memory';
   static const String _instructionKey = 'cortex_user_custom_instruction';
-  static const int memoryCharLimit = 1000;
+  static const int memoryCharLimit = 2048;
 
   String _memory = "";
   String _customInstruction = "";

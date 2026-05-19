@@ -75,14 +75,12 @@ class ModelDownloadController {
 
       if (freeStorage < (sizeInMB + buffer)) {
         debugPrint(
-            "[DownloadController] Not enough storage. Free: ${freeStorage}MB, Required: ${sizeInMB +
-                buffer}MB");
+            "[DownloadController] Not enough storage. Free: ${freeStorage}MB, Required: ${sizeInMB + buffer}MB");
         if (context.mounted) {
           final l10n = AppLocalizations.of(context);
           final errorMessage = l10n?.errorInsufficientStorage ??
               "Insufficient storage space to download this model.";
-          Provider
-              .of<IntrovertNotificationService>(context, listen: false)
+          Provider.of<IntrovertNotificationService>(context, listen: false)
               .showNotification(
             message: errorMessage,
             type: NotificationType.error,
@@ -219,9 +217,8 @@ class ModelDownloadController {
 
   /// Checks for completed model files on app startup.
   Future<void> checkDownloadStates(List<ModelEntity> models) async {
-    for (final model in models) {
-      if (model.isServerSide) continue;
-      await _checkFileExists(model.id);
+    for (final id in _offlineModelAndVariantIds(models)) {
+      await _checkFileExists(id);
     }
   }
 
@@ -239,9 +236,7 @@ class ModelDownloadController {
     final prefs = await SharedPreferences.getInstance();
     bool needsUIRefresh = false;
 
-    for (final model in models) {
-      if (model.isServerSide) continue;
-      final id = model.id;
+    for (final id in _offlineModelAndVariantIds(models)) {
       final manager = managers[id];
       final effectiveManager =
           manager ?? managers.putIfAbsent(id, () => DownloadManager());
@@ -308,24 +303,38 @@ class ModelDownloadController {
       effectiveManager.setCancelled(false);
 
       debugPrint(
-          "[DownloadController] Syncing '$id': Status ${task
-              .status}, Progress ${task.progress}");
+          "[DownloadController] Syncing '$id': Status ${task.status}, Progress ${task.progress}");
 
       switch (task.status) {
         case DownloadTaskStatus.running:
-          effectiveManager
-            ..setDownloading(true)
-            ..setPaused(false)
-            ..setProgress(task.progress.toDouble());
-          needsUIRefresh = true;
-          break;
-
         case DownloadTaskStatus.enqueued:
           effectiveManager
             ..setDownloading(true)
             ..setPaused(false)
             ..setProgress(task.progress.toDouble());
           needsUIRefresh = true;
+
+          // Zombie Task Detection: If the OS brutally killed the background worker,
+          // the DB might still report 'running' indefinitely. We verify it by checking
+          // if it makes any progress within the next 8 seconds after resume.
+          if (!isFreshStart) {
+            final int initialProgress = task.progress;
+            Future.delayed(const Duration(seconds: 8), () async {
+              if (effectiveManager.isDownloading &&
+                  effectiveManager.progress.toInt() == initialProgress) {
+                // Still downloading but ZERO progress updates in 8 seconds after resume?
+                // Highly likely a zombie task killed by OS restrictions.
+                debugPrint(
+                    "[DownloadController] Zombie Task Detected: '${task.taskId}' for model '$id' hasn't progressed since resume. Canceling to reset state.");
+                await FlutterDownloader.cancel(taskId: task.taskId);
+                effectiveManager
+                  ..setDownloading(false)
+                  ..setPaused(false)
+                  ..setProgress(0);
+                onStateChange();
+              }
+            });
+          }
           break;
 
         case DownloadTaskStatus.paused:
@@ -421,6 +430,21 @@ class ModelDownloadController {
   // Private Helpers
   //================================================================================
 
+  Iterable<String> _offlineModelAndVariantIds(List<ModelEntity> models) sync* {
+    for (final model in models) {
+      if (model.isServerSide) continue;
+
+      yield model.id;
+
+      final variants = model.variants;
+      if (variants == null || variants.isEmpty) continue;
+
+      for (final variantId in variants.keys) {
+        yield variantId;
+      }
+    }
+  }
+
   Future<void> _doDownload({
     required String id,
     required String url,
@@ -452,6 +476,13 @@ class ModelDownloadController {
           }
           try {
             await UserModels.addDownloadedModel(id, filePath);
+            // CRITICAL FIX: Update the downloadCompleted map IMMEDIATELY so
+            // that any UI rebuild triggered by onStateChange() sees the
+            // correct state. Previously, this map was only updated
+            // asynchronously via _refreshStateAfterFileChange(), causing a
+            // race condition where the chat screen would still show
+            // "model not installed" right after download completion.
+            downloadCompleted[id] = true;
             manager
               ..setDownloading(false)
               ..setDownloaded(true)

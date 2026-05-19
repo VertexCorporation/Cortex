@@ -29,7 +29,6 @@
   "usedMemory": "Bîra Bikaranî",
   "modelsTitle": "Pirtûkxane",
   "localModels": "Modelên Herêmî",
-  "serverSideModels": "Modelên Zimanî",
   "selectGGUFFile": "Pelê GGUF Hilbijêre",
   "errorGGUF": "Ji kerema xwe tenê pelên bi formata GGUF hilbijêrin.",
   "myModels": "Modelên Min",
@@ -86,7 +85,6 @@
   "delete": "Jê bibe",
   "passwordRequired": "Şîfre pêwîst e.",
   "deleteDescription": "Daneyên ku tu jê dibî dê bi domdarî ji servera me û amûra te werin rakirin. Ev kiryar nayên paşvegerandin.",
-  "deleteAccountButton": "Bişkoka Jêbirina Hesabê",
   "editProfile": "Profîlê Biguherîne",
   "displayName": "Navê Nîşandanê",
   "profileUpdated": "Profîl bi serkeftî hate nûvekirin",
@@ -108,7 +106,6 @@
     }
   },
   "downloadPaused": "Daxistin hate sekinandin.",
-  "purchaseSuccessful": "Kirîn serkeftî bû!",
   "purchaseError": "Çewtiya kirînê",
   "purchasePlus": "Cortex Plus bikire",
   "plusDescription": "Ezmûna Zekâya Sûni ya Elît",
@@ -320,7 +317,6 @@
   "experimentalOfflineWarning": "Moda negirêdayî hîn jî ceribandinî ye û dibe ku modela ku tu dadixînî bi karîgeriya herî baş nexebite.",
   "noConversationsToDelete": "Sohbetên te yên jêbirinê tune ne.",
   "reportSubmitted": "Rapor bi serkeftî hate şandin",
-  "purchaseReceived": "Kirîn hate wergirtin, hesabê te tê nûvekirin.",
   "verificationDelayed": "Kirîna te hate piştrastkirin. Di nûvekirina hesabê te de derengiyek piçûk heye, ew ê di demek nêz de xuya bibe.",
   "maintenanceTitle": "Di bin Lênêrînê de ye",
   "maintenanceMessage": "Cortex demkî negirêdayî ye dema ku em hin nûvekirinên girîng derdixin. Gihîştina sepanê dê di demek nêz de were vegerandin.\n\nSpas ji bo sebra we dema ku em ezmûna we baştir dikin.",
@@ -334,8 +330,6 @@
   "loginSubtitle": "Têkeve hesabê xwe yê Vertex. Bi berdewamkirinê, hûn Mercên Xizmetê û Siyaseta me ya Taybetîtiyê qebûl dikin.",
   "registerSubtitle": "Ji bo gihîştina bênavber a hemî karûbarên me, hesabê Vertex-ê biafirînin. Bi berdewamkirinê, hûn bi Mercên Xizmetê û Siyaseta me ya Taybetîtiyê razî dibin.",
   "storagePermissionRequired": "Ji bo tomarkirina modelên daxistî destûra hilanînê pêwîst e. Ji kerema xwe ji bo berdewamiyê destûrê bide.",
-  "plusBannerTitle": "Plus Belaş Bistînin!",
-  "plusBannerSubtitle": "Hevalekî vexwîne û her du jî 1 Roja Plus belaş distînin!",
   "inviteShareSubject": "Tevlî min bibe li ser Cortex!",
   "@inviteShareMessage": {
     "description": "Nivîsa peyamê ya ku bi hevalekî re ji bo vexwendinê tê parve kirin.",
@@ -361,12 +355,10 @@
   "russian": "Rûsî",
   "featureDocumentTitle": "Piştgiriya Belgeyan",
   "featureDocumentDescription": "Ev model dikare pirsên li ser belgeyên barkirî yên wekî PDF û pelên nivîsê analîz bike û bibersivîne.",
-  "featureAudioTitle": "Têketina Deng",
-  "featureAudioDescription": "Ev model dikare têketinên dengî yên bi axaftin fam bike û pêvajo bike.",
   "featureImageGenerationTitle": "Çêkirina Wêneyan",
   "featureImageGenerationDescription": "Ev model dikare li gorî danasînên nivîsa we wêneyên orîjînal biafirîne.",
   "premiumModelNoticeTitle": "Modela Premium",
-  "premiumModelNoticeDescription": "Ev model modelek premium e, bikarhênerên belaş bi modelên premium re bi 3 peyaman di rojê de sînordar in; ji bo vekirina gihîştina bêsînor bibin abone!",
+  "premiumModelNoticeDescription": "Ev AI-yek premium e, bikarhênerên belaş gihîştina wan bi AI-yên premium re sînorkirî ye; ji bo gihîştina bêsînor bilind bike!",
   "benefitPremiumModels": "Gihîştina modelên premium",
   "premiumTrialExhaustedMessage": "Te hemû peyamên xwe yên rojane yên belaş ji bo modelên premium bi kar anîne, ji kerema xwe ji bo gihîştina bêsînor nûve bike.",
   "useOffline": "Bêyî Înternetê bikar bînin",
@@ -580,11 +572,10 @@
   "searching": "Lêgerîn",
   "featureWebSearchTitle": "Lêgerîna Webê",
   "featureWebSearchDescription": "Li ser înternetê ji bo agahdariya demrast bigerin",
-  "webSearchQuotaExceeded": "Kotaya Lêgerînê Derbas Bû",
   "clearMemory": "Bîrê Paqij Bike",
   "clearMemoryConfirm": "Tu piştrast î ku dixwazî bîra xwe paqij bikî?",
   "personalization": "Kesanekirin",
-  "personalizationDescription": "Ezmûna xwe kesane bike",
+  "personalizationDescription": "Alîkarê xwe kesane bike da ku baştir li gorî hewcedariyên te be. Bersiv, tevger û tonê wî li gorî tercîhên xwe yên bêhempa biguncîne.",
   "memoryTitle": "Bîr",
   "memoryDescription": "AI te bi vî rengî nas dike.",
   "noMemoryYet": "Hîn bîranîn nehatine sazkirin",
@@ -594,11 +585,11 @@
   "customInstructionHint": "Talîmatên xwe yên taybet li vir binivîse",
   "openLinkWarningMessage": "Tu li ser vekirina vê lînka derveyî yî:\\n\\n{url}\\n\\nMa tu piştrast î ku dixwazî berdewam bikî?",
   "intelligenceSystemPrompt": "Van rênimayên xwerû bişopînin:\\n\\n{instruction}",
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>",
+  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nGotûbêja heta niha analîz bike. Ger te HER rastiyên nû yên cuda li ser bikarhêner (tercîh, nav, adet, çarçove) hîn bibî, DIVÊ HÛN TEVAHÎYA bîra xwe ya nûvekirî ya li ser bikarhêner di nav etîketên <memory>...</memory> de LI DAWIYA HERÎ BAŞ a bersiva xwe derxin. KRÎTÎK: Divê tu QET bîra berê jê nebî an jî li ser nenivîsî. HER TIM rastiyên nû li bîra heyî zêde neke. Ger bi tevahî tiştek nû nehatibe hîn kirin, etîketê derxe. Mînak: <memory>Ji futbol û tenîsê hez dike. Bersivên kurt tercîh dike.</memory>",
   "systemMemoryReminder": "\n\nHer tim vê yekê li ser bikarhêner bi bîr bîne:\n{userMemory}",
-  "chatTitlePrompt": "Tu çêkerê sernavan î. Ji bo axaftina jêrîn TENÊ bi sernavek 2-5 peyvan bersiv bide. Kevane, pêşgir, an jî nîşaneyên xalbendiyê bi kar neyne.",
+  "chatTitlePrompt": "Tu çêkerê sernavan î. Ji bo axaftina jêrîn TENÊ bi sernavek 2-5 peyvan bersiv bide. Gotin, pêşgir, an jî nîşaneyên xalbendîyê bi kar neyne. KRÎTÎK: DIVÊ sernav bi HEMAN zimanê peyama bikarhêner be.",
   "chatTitleCriticalInstruction": "[RÊNÎŞANDANA KRÎTÎK]: Tu GENERATOREKÎ SERNAVAN î. Bersiva pirsa bikarhêner NEKIN. Sohbetê nekin û silav nekin. TENÊ sernavek 2-4 peyvan derxin ku kurteya pirsên bikarhêner bike.",
-  "cortexSystemPersona": "\n\n[System] TALÎMATÊN KRÎTÎK: Hûn niha di hundirê ekosîstemeke AI ya mezin û pir pêşketî ya bi navê \"Cortex\" de dixebitin. Vê yekê ji bîr mekin û heke were pirsîn persona Cortex biparêzin.",
+  "cortexSystemPersona": "\n\n[Sîstem] TALÎMATA KRÎTÎK: Hûn niha di nav ekosîstemeke AI ya mezin û pir pêşketî de bi navê \"Cortex\" dixebitin; ev platform ji hêla tîmê Vertex ve hatî pêşve xistin, ku bi navînî tenê 16 salî ne. Vê yekê ji bîr mekin û heke ji we were pirsîn bersiv bidin. Ger bêtir agahdarî were xwestin, dudilî nebin ku li ser înternetê bigerin, an jî heke hûn nekarin bigerin, hûn dikarin bibêjin ku hûn nizanin!",
   "@cortexSystemPersona": {
     "description": "System persona string added to online models"
   },
@@ -624,8 +615,6 @@
   "featureImageRecognitionDescription": "Ev model dikare wêne an wêneyan analîz bike û fêm bike.",
   "featureToolUseTitle": "Bikaranîna Amûrê",
   "featureToolUseDescription": "Ev model dikare bi aqilmendî amûrên derveyî bikar bîne da ku peywirên xwe temam bike.",
-  "paywallAhaTitle": "Unlock the True Power of AI",
-  "paywallAhaSubtitle": "Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.",
   "systemPromptMissingMedia": "Ev model ji bo xebitînê hewcedarî {mediaType} ye. Min daxwaz girtiye da ku we agahdar bikim. Ji kerema xwe bi nermî bikarhêner agahdar bikin ku divê ew {mediaType} peyda bikin (bi zimanê wan ji wan re bibêjin) ji ber ku ez {modelName} me, modelek guherandina dîtbar/deng/vîdyoyê me.",
   "mediaTypeImage": "wêne",
   "mediaTypeVideo": "vîdyo",
@@ -635,7 +624,7 @@
   "featureCreateVideoDescription": "Vîdyoyan ji nivîsê çêbikin.",
   "defaultSeriesDescription": "{seriesName} zîrekiyek pêşkeftî ye ku performansa bilind li ser Cortex nîşan dide.",
   "defaultModelDescription": "{modelName} hişmendiyek çêkirî ya bi performansa bilind e ku di hundurê ekosîstema Cortex de yekbûyî ye. Ji bo têkbirina cûrbecûr karên tevlihev hatî çêkirin, ew kapasîteyên pêvajoyek pir pêbawer û bikêr peyda dike. Bi pêşkêşkirina demên bersivdana bilez û hêza analîtîk a pêşkeftî, ew hilberîna weya rojane bi girîngî zêde dike. Vê modela ku bi rengek bêkêmasî li ser binesaziya herêmî ya ewledar a Cortex kar dike, dikare di berfirehiyek kar de ji we re bibe alîkar, ji berhevkirina ramanên afirîner heya vekolîna teknîkî ya kûr. Îro dest bi vekolîna potansiyela wê ya tevahî bikin.",
-  "createAI": "Xûliqandin",
+  "createAI": "Çêbikin",
   "shortcuts": "Kurterê",
   "ourStory": "Çîroka me",
   "guestLimitBottomSheetTitle": "Ji aqilê Cortexê hez dikî?",
@@ -644,10 +633,51 @@
   "noArt": "Bê Huner",
   "noArtDescription": "Ne huner; dem hatiye ku galeriyê bi afirandina wêne, vîdyo, deng û her cûre naverokê tijî bikin!",
   "videoPremiumWarning": "Ji bo çêkirina vîdyoyan, niha nûve bikin û herikînê hîs bikin, hûn hewceyê abonetiyek Ultra ne!",
-  "becomePremiumButton": "Bibe Premium",
+  "dynamicPreditsUpgradeMessage": "Cortex dikare bersivên hîn baştir bide; niha nûve bike û ji bo her pirsekê bersiva herî baş bistîne!",
   "fallbackInfoPanelText": "Ji ber hin başkirinên ku em li aliyê servera xwe dikin, bersiv ji hêla sohbeta dînamîk a Cortexê ve hate çêkirin, ne ji hêla AI-ya we ya taybetî ve hatî hilbijartin. Spas ji bo têgihîştina we heta ku pêvajo biqede!",
   "falOfflineMessage": "Ji ber hin pêşketinên ku em li aliyê servera xwe dikin, ev zîrekî niha negirêdayî ye. Spas ji bo têgihîştina we heta ku pêvajo biqede!",
   "errorInsufficientStorage": "Cihê hilanînê têrê nake ji bo dakêşana vê modelê.",
   "backgroundChatNotificationTitle": "Vegere ser Sohbetê!",
-  "backgroundChatNotificationBody": "Peyamek nû di {chatName} de heye, lê binêre!"
+  "falErrorImageRequired": "Ev AI wêneyekî referansê hewce dike, ji kerema xwe wêneyekî pê ve girêdin û dîsa biceribînin.",
+  "falErrorAudioRequired": "Ev model pelê dengî yê referansê hewce dike, ji kerema xwe pelê dengî pê ve girêdin û dîsa biceribînin.",
+  "falErrorVideoRequired": "Ev model vîdyoyek referansê hewce dike, ji kerema xwe vîdyoyek pê ve girêdin û dîsa biceribînin.",
+  "falErrorImageCorrupted": "Wêneya barkirî nehat bikaranîn, ji kerema xwe formateke cuda biceribîne.",
+  "falErrorSchemaRejected": "Modelê têketin red kir, ji kerema xwe modelek cûda biceribîne.",
+  "falErrorSchemaInvalid": "Têketin ji hêla karûbarê çêkirinê ve hate redkirin.",
+  "falErrorGenericStatus": "Xizmeta çêkirinê çewtiyek vegerand (status {statusCode}).",
+  "benefitVideoGeneration": "Çêkirina Vîdyoyê",
+  "claimOffer": "Pêşniyarê bikar bînin",
+  "freeOffer": "Pêşniyara Belaş",
+  "trialMonthlyDescription": "{days} rojên yekem belaş, dûv re {price}/meh",
+  "@trialMonthlyDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "trialAnnualDescription": "{days} rojên yekem belaş, dûv re {price}/sal",
+  "@trialAnnualDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$49.99"
+      }
+    }
+  },
+  "systemNotePreviousMedia": "[Nîşeya Sîstemê: Li jêr medya berê hatiye çêkirin heye. Hûn dikarin referans bidin an jî biguherînin.]",
+  "systemRoleFallback": "Tu alîkarekî bikêrhatî yî.",
+  "systemLanguageInstruction": "\n\nKRÎTÎK: Her dem bi heman zimanê ku bikarhêner pê dinivîse bersiv bide; balê bide zimanê bikarhêner.",
+  "systemTimeInfo": "\n\nDîrok û dema niha: {formattedTime}.",
+  "freePlan": "{plan} belaş!",
+  "systemPromptLimitFallback": "KRÎTÎK: Bikarhêner çalakiyek xwest, lê mafê bikaranînê yê li ser Cortexê qediya; ji kerema xwe bi zimanê bikarhêner bi nermî agahdar bike ku divê li bendê bimîne an jî plana abonetiya xwe bilind bike."
 }

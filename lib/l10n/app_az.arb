@@ -29,7 +29,6 @@
   "usedMemory": "İstifadə Edilən Yaddaş",
   "modelsTitle": "Kitabxana",
   "localModels": "Lokal Modellər",
-  "serverSideModels": "Dil Modelləri",
   "selectGGUFFile": "GGUF Faylı seçin",
   "errorGGUF": "Zəhmət olmasa, yalnız GGUF formatında bir fayl seçin.",
   "myModels": "Modellərim",
@@ -86,7 +85,6 @@
   "delete": "Sil",
   "passwordRequired": "Şifrə tələb olunur.",
   "deleteDescription": "Sildiyiniz məlumatlar serverimizdən və cihazınızdan qalıcı olaraq silinəcək. Bu əməliyyatlar geri qaytarıla bilməz.",
-  "deleteAccountButton": "Hesab Silmə Düyməsi",
   "editProfile": "Profili Redaktə et",
   "displayName": "Görünən Ad",
   "profileUpdated": "Profil uğurla yeniləndi",
@@ -102,7 +100,6 @@
   "downloadFailed": "Yükləmə uğursuz oldu",
   "downloaded": "{percent}% yükləndi",
   "downloadPaused": "Yükləmə dayandırıldı.",
-  "purchaseSuccessful": "Alış uğurlu oldu!",
   "purchaseError": "Alış xətası",
   "purchasePlus": "Cortex Plus al",
   "plusDescription": "Elit Süni İntellekt Təcrübəsi",
@@ -273,7 +270,6 @@
   "experimentalOfflineWarning": "Oflayn rejim hələ də eksperimental mərhələdədir və yüklədiyiniz model optimal səmərəliliklə işləməyə bilər.",
   "noConversationsToDelete": "Silinəcək söhbətiniz yoxdur.",
   "reportSubmitted": "Şikayət uğurla göndərildi",
-  "purchaseReceived": "Alış qəbul edildi, hesabınız yenilənir.",
   "verificationDelayed": "Alışınız təsdiqləndi. Hesabınızın yenilənməsində kiçik bir gecikmə var, qısa müddətdə görünəcək.",
   "maintenanceTitle": "Təmir İşləri Gedir",
   "maintenanceMessage": "Bəzi vacib yeniləmələri tətbiq edərkən Cortex müvəqqəti olaraq oflayndır. Tətbiqə giriş qısa müddətdə bərpa ediləcək.\n\nTəcrübənizi yaxşılaşdırarkən göstərdiyiniz səbir üçün təşəkkür edirik.",
@@ -287,8 +283,6 @@
   "loginSubtitle": "Vertex hesabınıza daxil olun. Davam etməklə siz Xidmət Şərtlərimiz və Məxfilik Siyasətimizlə razılaşırsınız.",
   "registerSubtitle": "Bütün xidmətlərimizə problemsiz giriş üçün Vertex hesabı yaradın. Davam etməklə siz Xidmət Şərtlərimiz və Məxfilik Siyasətimizlə razılaşırsınız.",
   "storagePermissionRequired": "Yüklənmiş modelləri saxlamaq üçün yaddaş icazəsi tələb olunur. Davam etmək üçün lütfən icazə verin.",
-  "plusBannerTitle": "Pulsuz Plus Qazan!",
-  "plusBannerSubtitle": "Dostunu dəvət et və hər ikiniz de 1 Günlük Plus qazanın!",
   "inviteShareMessage": "qaqa cortex deyə dəhşət bir tətbiq var adam dəvət edəndə ikimizə də pulsuz plus gəlir ƏLA FÜRSƏT TEZ YÜKLƏ\n\n{cortexLink}",
   "reviewEnjoyingAppTitle": "Cortex-dən zövq alırsınız?",
   "reviewHelpUsGrow": "Sizin reytinqiniz gənc müstəqil komandamız üçün böyük bir dəstəkdir və Cortex-i sizin üçün daha da yaxşı etməyimizə kömək edir.",
@@ -305,12 +299,10 @@
   "russian": "Rus dili",
   "featureDocumentTitle": "Sənəd Dəstəyi",
   "featureDocumentDescription": "Bu model PDF və mətn faylları kimi yüklənmiş sənədləri təhlil edə və suallara cavab verə bilər.",
-  "featureAudioTitle": "Səs daxiletmə",
-  "featureAudioDescription": "Bu model şifahi audio daxiletmələri başa düşə və emal edə bilər.",
   "featureImageGenerationTitle": "Şəkil Yaradılması",
   "featureImageGenerationDescription": "Bu model mətn təsvirləriniz əsasında orijinal şəkillər yarada bilər.",
   "premiumModelNoticeTitle": "Premium Model",
-  "premiumModelNoticeDescription": "Bu model premium modeldir, pulsuz istifadəçilər premium modellərlə gündə 3 mesajla məhdudlaşır; limitsiz girişi açmaq üçün abunə olun!",
+  "premiumModelNoticeDescription": "Bu süni zəka premium süni zəkadır, pulsuz istifadəçilərin premium süni zəkalara girişi məhduddur; limitsiz giriş üçün yüksəldin!",
   "benefitPremiumModels": "Premium modellərə giriş",
   "premiumTrialExhaustedMessage": "Siz bütün pulsuz gündəlik mesajlarınızı premium modellər üçün istifadə etmisiniz, lütfən, limitsiz giriş üçün təkmilləşdirin.",
   "useOffline": "İnternetsiz istifadə et",
@@ -522,11 +514,10 @@
   "searching": "Axtarış",
   "featureWebSearchTitle": "Veb Axtarışı",
   "featureWebSearchDescription": "Real vaxt məlumatı üçün internetdə axtarış aparın",
-  "webSearchQuotaExceeded": "Axtarış Kvotası Aşıldı",
   "clearMemory": "Yaddaşı təmizləyin",
   "clearMemoryConfirm": "Yaddaşınızı təmizləmək istədiyinizə əminsinizmi?",
   "personalization": "Fərdiləşdirmə",
-  "personalizationDescription": "Təcrübənizi fərdiləşdirin",
+  "personalizationDescription": "Köməkçinizi ehtiyaclarınıza daha yaxşı uyğunlaşdırmaq üçün fərdiləşdirin. Onun cavablarını, davranışını və tonunu unikal seçimlərinizə uyğunlaşdırın.",
   "memoryTitle": "Yaddaş",
   "memoryDescription": "Süni intellekt sizi belə tanıyır.",
   "noMemoryYet": "Hələ heç bir xatirə qurulmayıb",
@@ -536,11 +527,11 @@
   "customInstructionHint": "Xüsusi təlimatlarınızı buraya daxil edin",
   "openLinkWarningMessage": "Aşağıdakı xarici linki açmaq üzrəsiniz:\\n\\n{url}\\n\\nDavam etmək istədiyinizə əminsinizmi?",
   "intelligenceSystemPrompt": "Bu xüsusi təlimatları izləyin:\\n\\n{instruction}",
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>",
+  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nİndiyə qədərki söhbəti təhlil edin. İstifadəçi haqqında hər hansı yeni fərqli faktlar (üstünlüklər, ad, vərdişlər, kontekst) öyrənmisinizsə, cavabınızın ƏN SONUNDA istifadəçi haqqında BÜTÜN yenilənmiş yaddaşınızı <memory>...</memory> etiketləri daxilində çıxarmalısınız. TƏNQİD: Əvvəlki yaddaşı HEÇ VAXT silməməli və ya üzərindən yazmamalısınız. Mövcud yaddaşa HƏMİŞƏ yeni faktlar əlavə etməlisiniz. Əgər tamamilə yeni bir şey öyrənilməyibsə, etiketi buraxın. Misal: <memory>Futbol və tennisi sevir. Qısa cavablara üstünlük verir.</memory>",
   "systemMemoryReminder": "\n\nİstifadəçi haqqında həmişə bunu xatırlayın:\n{userMemory}",
-  "chatTitlePrompt": "Siz başlıq yaradıcısısınız. Aşağıdakı söhbət üçün YALNIZ 2-5 sözlük bir başlıq verin. Dırnaq işarəsi, ön ek və ya durğu işarələrindən istifadə etməyin.",
+  "chatTitlePrompt": "Siz başlıq generatorusunuz. Növbəti söhbət üçün YALNIZ 2-5 sözdən ibarət başlıqla cavab verin. Sitat, ön söz və ya durğu işarələrindən istifadə etməyin. VACİB: Başlıq istifadəçinin mesajı ilə TAM EYNİ dildə olmalıdır.",
   "chatTitleCriticalInstruction": "[KRİTİK TƏLİMAT]: Siz BAŞLIQ GENERATORUSUZ. İstifadəçinin sualına CAVAB VERMƏYİN. SÖHBƏT EDİN VƏ YA SALAM VERMƏYİN. YALNIZ istifadəçinin nə haqqında soruşduğunu xülasə edən 2-4 sözdən ibarət başlıq çıxarın.",
-  "cortexSystemPersona": "\n\n[System] VACİB TƏLİMAT: Hal-hazırda \"Cortex\" adlı nəhəng, yüksək dərəcədə inkişaf etmiş süni intellekt ekosistemində fəaliyyət göstərirsiniz. Bunu unutmayın və soruşularsa Cortex personajını qoruyun.",
+  "cortexSystemPersona": "\n\n[Sistem] ƏHƏMİYYƏTLİ TƏLİMAT: Hal-hazırda \"Cortex\" adlı nəhəng, yüksək inkişaf etmiş süni intellekt ekosistemində fəaliyyət göstərirsiniz; bu platforma orta hesabla cəmi 16 yaşında olan Vertex komandası tərəfindən hazırlanmışdır. Bunu yadda saxlayın və soruşulsa, cavab verin. Daha çox məlumat istənildikdə, internetdə axtarış etməkdən çəkinməyin və ya axtarış edə bilmirsinizsə, bilmədiyinizi deməkdən çəkinməyin!",
   "@cortexSystemPersona": {
     "description": "System persona string added to online models"
   },
@@ -566,8 +557,6 @@
   "featureImageRecognitionDescription": "Bu model fotoşəkilləri və ya təsvirləri təhlil edə və başa düşə bilər.",
   "featureToolUseTitle": "Alət İstifadəsi",
   "featureToolUseDescription": "Bu model tapşırıqları yerinə yetirmək üçün xarici vasitələrdən ağıllı şəkildə istifadə edə bilər.",
-  "paywallAhaTitle": "Unlock the True Power of AI",
-  "paywallAhaSubtitle": "Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.",
   "systemPromptMissingMedia": "Bu modelin işləməsi üçün bir {mediaType} lazımdır. Bunu bildirmək üçün sorğunu tutdum. Zəhmət olmasa istifadəçiyə nəzakətlə bir {mediaType} təmin etməli olduqlarını bildirin (öz dillərində deyin) çünki mən {modelName}, vizual/audio/video redaktə modeliyəm.",
   "mediaTypeImage": "şəkil",
   "mediaTypeVideo": "video",
@@ -577,8 +566,8 @@
   "featureCreateVideoDescription": "Mətndən videolar yaradın.",
   "defaultSeriesDescription": "{seriesName}, Cortex-də yüksək performans göstərən qabaqcıl bir zəkadır.",
   "defaultModelDescription": "{modelName}, Cortex ekosisteminə inteqrasiya olunmuş yüksək performanslı süni intellektdir. Geniş çeşidli mürəkkəb tapşırıqları həll etmək üçün nəzərdə tutulub, yüksək etibarlı və səmərəli emal imkanları təqdim edir. Sürətli cavab müddətləri və təkmil analitik gücü təqdim edərək, gündəlik məhsuldarlığınızı əhəmiyyətli dərəcədə artırır. Cortex-in təhlükəsiz yerli infrastrukturu üzərində tam inteqrasiya olunmuş şəkildə işləyən bu model yaradıcı fikir mübadiləsindən tutmuş dərin texniki analizlərə qədər geniş bir spektrdə sizə kömək edə bilər. Tam potensialını bu gündən kəşf etməyə başlayın.",
-  "createAI": "Create",
-  "shortcuts": "Shortcuts",
+  "createAI": "Yarat",
+  "shortcuts": "Qısayolları",
   "ourStory": "Bizim Hekayəmiz",
   "guestLimitBottomSheetTitle": "Cortex-in zəkasını sevirsiniz?",
   "guestLimitBottomSheetText": "Daha da ağıllı zəkalarla işləyin, daha çox məzmun yaradın, daha çox söhbət edin və daha çox şey edin...",
@@ -586,10 +575,51 @@
   "noArt": "Sənət yoxdur",
   "noArtDescription": "Hələ ki, heç bir əsər yoxdur; qalereyanı şəkillər, videolar, audio və hər cür məzmunla doldurmağın vaxtıdır!",
   "videoPremiumWarning": "Videolar yaratmaq, indi təkmilləşdirmək və axını hiss etmək üçün Ultra abunəliyinə ehtiyacınız var!",
-  "becomePremiumButton": "Premium olun",
+  "dynamicPreditsUpgradeMessage": "Cortex daha da yaxşı cavablar verə bilər; indi yüksəlt və hər sual üçün ən yaxşı cavabı al!",
   "fallbackInfoPanelText": "Server tərəfimizdə etdiyimiz bəzi təkmilləşdirmələrə görə, cavab sizin xüsusi seçdiyiniz süni intellekt əvəzinə Cortex-in dinamik söhbəti ilə yaradılıb. Proses başa çatana qədər anlayışınız üçün təşəkkür edirik!",
   "falOfflineMessage": "Server tərəfimizdə etdiyimiz bəzi təkmilləşdirmələrə görə, bu zəka hazırda oflayndır. Proses bitənə qədər anlayışınız üçün təşəkkür edirik!",
   "errorInsufficientStorage": "Bu modeli yükləmək üçün yaddaş yeri kifayət deyil.",
   "backgroundChatNotificationTitle": "Söhbətə qayıt!",
-  "backgroundChatNotificationBody": "{chatName} söhbətində yeni bir mesaj var, baxın!"
+  "falErrorImageRequired": "Bu süni intellekt istinad şəkli tələb edir, zəhmət olmasa, şəkil əlavə edin və yenidən cəhd edin.",
+  "falErrorAudioRequired": "Bu model istinad audio faylı tələb edir, zəhmət olmasa audio fayl əlavə edin və yenidən cəhd edin.",
+  "falErrorVideoRequired": "Bu model istinad videosu tələb edir, zəhmət olmasa, video əlavə edin və yenidən cəhd edin.",
+  "falErrorImageCorrupted": "Yüklənmiş şəkil emal edilə bilmədi, zəhmət olmasa, fərqli format sınayın.",
+  "falErrorSchemaRejected": "Model daxil edilmiş məlumatı rədd etdi, zəhmət olmasa, fərqli bir modeli sınayın.",
+  "falErrorSchemaInvalid": "Giriş generasiya xidməti tərəfindən rədd edildi.",
+  "falErrorGenericStatus": "Generasiya xidməti xəta qaytardı (status {statusCode}).",
+  "benefitVideoGeneration": "Video Nəsli",
+  "claimOffer": "Təklifdən istifadə et",
+  "freeOffer": "Pulsuz Təklif",
+  "trialMonthlyDescription": "İlk {days} gün pulsuz, sonra {price}/ay",
+  "@trialMonthlyDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "trialAnnualDescription": "İlk {days} gün pulsuz, sonra {price}/il",
+  "@trialAnnualDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$49.99"
+      }
+    }
+  },
+  "freePlan": "Pulsuz {plan}!",
+  "systemRoleFallback": "Siz faydalı köməkçisiniz.",
+  "systemLanguageInstruction": "\n\nMÜHÜM: Həmişə istifadəçinin yazdığı dildə cavab verin, istifadəçinin dilinə diqqət yetirin.",
+  "systemTimeInfo": "\n\nHazırkı tarix və vaxt: {formattedTime}.",
+  "systemPromptLimitFallback": "TƏNİDLİ: İstifadəçi əməliyyat tələb etdi, lakin Cortex-də limitləri tükənib; xahiş edirik istifadəçiyə onların dilində gözləməli olduqlarını və ya abunə planlarını təkmilləşdirməyi düşünməli olduqlarını bildirin.",
+  "systemNotePreviousMedia": "[Sistem Qeydi: Aşağıda əvvəllər yaradılmış media verilmişdir. Ona istinad edə bilər və ya onu redaktə edə bilərsiniz.]"
 }

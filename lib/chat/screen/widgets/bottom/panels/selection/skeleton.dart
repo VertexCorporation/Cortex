@@ -9,9 +9,9 @@ class ModelSelectionSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final sw = mediaQuery.size.width;
-    final sh = mediaQuery.size.height;
+    
+    final sw = MediaQuery.sizeOf(context).width;
+    final sh = MediaQuery.sizeOf(context).height;
 
     // Layout constants (matching sheet.dart)
     final sp16 = sw * 0.04;

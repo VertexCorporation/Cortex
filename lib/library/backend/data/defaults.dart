@@ -171,7 +171,7 @@ class ModelDefaults {
     'modalities': {'text': true, 'image': true},
     'outputs': {'text': true},
     'isFullyLocalized': true,
-    'context': '128k',
+    'context': '128000',
 
     // Localized Summaries
     'summary': {

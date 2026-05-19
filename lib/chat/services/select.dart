@@ -1,5 +1,3 @@
-// lib/chat/services/select.dart
-
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/providers/session.dart';
@@ -7,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
+import '../../library/providers/local.dart';
 import '../../main.dart';
 import '../../variants.dart';
 
@@ -17,14 +16,17 @@ class SelectionService {
   final ChatSessionProvider _sessionProvider;
   final ConversationProvider _conversationProvider;
   final ModelService _modelService;
+  final ModelLocalStateProvider _localStateProvider;
 
   SelectionService({
     required ChatSessionProvider sessionProvider,
     required ConversationProvider conversationProvider,
     required ModelService modelService,
+    required ModelLocalStateProvider localStateProvider,
   })  : _sessionProvider = sessionProvider,
         _conversationProvider = conversationProvider,
-        _modelService = modelService;
+        _modelService = modelService,
+        _localStateProvider = localStateProvider;
 
   /// Selects a model to start a new chat session using a ModelEntity.
   ///
@@ -57,11 +59,24 @@ class SelectionService {
     String finalModelId;
 
     if (variantsMap != null && variantsMap.isNotEmpty) {
+      final bool isOfflineSeries = !aiEntity.isServerSide;
+      final downloadStates = _localStateProvider.downloadCompleted;
+
       String lastUsedId = await Variants.getLastSelectedVariant(aiEntity.id);
+
       if (lastUsedId.isNotEmpty && variantsMap.containsKey(lastUsedId)) {
-        finalModelId = lastUsedId;
+        // For offline models, only use lastUsed if it's actually downloaded.
+        if (!isOfflineSeries || (downloadStates[lastUsedId] == true)) {
+          finalModelId = lastUsedId;
+        } else {
+          // Last used variant is no longer on disk. Find a downloaded one.
+          finalModelId = _resolveOfflineVariant(variantsMap, downloadStates);
+        }
+      } else if (isOfflineSeries) {
+        // No last used variant — pick the first downloaded one.
+        finalModelId = _resolveOfflineVariant(variantsMap, downloadStates);
       } else {
-        // Prefer first non-premium variant to avoid unnecessary credit spend.
+        // Online series: prefer first non-premium variant.
         String? nonPremiumId;
         for (final entry in variantsMap.entries) {
           final variantData = entry.value;
@@ -163,5 +178,41 @@ class SelectionService {
 
     debugPrint(
         "$logPrefix: Session provider refreshed with latest model details.");
+  }
+
+  /// Resolves the best variant ID for an offline series model.
+  ///
+  /// Priority:
+  /// 1. First downloaded variant found on the device.
+  /// 2. First non-premium variant (fallback when nothing is downloaded).
+  /// 3. First variant in the map (ultimate fallback).
+  String _resolveOfflineVariant(
+    Map<String, dynamic> variantsMap,
+    Map<String, bool> downloadStates,
+  ) {
+    // 1. Prefer a variant that is actually downloaded on the device.
+    for (final variantId in variantsMap.keys) {
+      if (downloadStates[variantId] == true) {
+        debugPrint(
+            "[SelectionService] Resolved to DOWNLOADED offline variant: '$variantId'");
+        return variantId;
+      }
+    }
+
+    // 2. Nothing downloaded — fall back to first non-premium variant.
+    for (final entry in variantsMap.entries) {
+      final variantData = entry.value;
+      if (variantData is Map<String, dynamic> &&
+          variantData['tier'] != 'premium') {
+        debugPrint(
+            "[SelectionService] No downloaded variant found. Falling back to non-premium: '${entry.key}'");
+        return entry.key;
+      }
+    }
+
+    // 3. Ultimate fallback.
+    debugPrint(
+        "[SelectionService] No downloaded or non-premium variant found. Using first: '${variantsMap.keys.first}'");
+    return variantsMap.keys.first;
   }
 }

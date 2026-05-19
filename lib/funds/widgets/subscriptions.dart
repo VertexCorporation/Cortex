@@ -87,20 +87,23 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
 
   String _getPriceForId(String id) {
     try {
-      return widget.availableProducts
-          .firstWhere((p) => p.id == id)
-          .price;
+      return widget.availableProducts.firstWhere((p) => p.id == id).price;
     } catch (e) {
       return '';
     }
   }
 
+  int _planLevelFromSubscriptionLevel(int level) {
+    if (level == 4) return 1;
+    if (level == 5) return 2;
+    if (level == 6) return 3;
+    return level;
+  }
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
@@ -143,29 +146,60 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
       annualProductDetails = null;
     }
 
+    ProductDetails? monthlyProductDetails;
+    try {
+      monthlyProductDetails =
+          widget.availableProducts.firstWhere((p) => p.id == monthlyId);
+    } catch (e) {
+      monthlyProductDetails = null;
+    }
+
+    final annualTrialInfo = getTrialInfo(annualProductDetails);
+
     // --- Monthly equivalent ---
     final String formattedMonthlyEquivalentPrice;
-    if (annualProductDetails != null && annualProductDetails.rawPrice > 0) {
+    if (annualTrialInfo != null && annualTrialInfo.trueRawPrice > 0) {
       final currencySymbol =
-      annualProductDetails.price.replaceAll(RegExp(r'[\d.,\s]'), '');
+          annualTrialInfo.truePrice.replaceAll(RegExp(r'[\d.,\s]'), '');
       final monthlyPrice =
-      (annualProductDetails.rawPrice / 12).toStringAsFixed(2);
+          (annualTrialInfo.trueRawPrice / 12).toStringAsFixed(2);
+      formattedMonthlyEquivalentPrice = "$currencySymbol$monthlyPrice";
+    } else if (annualProductDetails != null &&
+        annualProductDetails.rawPrice > 0) {
+      final currencySymbol =
+          annualProductDetails.price.replaceAll(RegExp(r'[\d.,\s]'), '');
+      final monthlyPrice =
+          (annualProductDetails.rawPrice / 12).toStringAsFixed(2);
       formattedMonthlyEquivalentPrice = "$currencySymbol$monthlyPrice";
     } else {
       formattedMonthlyEquivalentPrice = '...';
     }
 
     final bool isIOS = defaultTargetPlatform == TargetPlatform.iOS;
-    final String annualTotalPrice =
-        annualProductDetails?.price ?? _getPriceForId(annualId);
-    final String annualPrimaryDesc =
-    localizations.annualTotalDescription(annualTotalPrice);
+    final String annualTotalPrice = annualTrialInfo != null
+        ? annualTrialInfo.truePrice
+        : (annualProductDetails?.price ?? _getPriceForId(annualId));
+    final String annualPrimaryDesc = annualTrialInfo != null
+        ? localizations.trialAnnualDescription(
+            annualTrialInfo.days, annualTrialInfo.truePrice)
+        : localizations.annualTotalDescription(annualTotalPrice);
+
+    final monthlyTrialInfo = getTrialInfo(monthlyProductDetails);
+    final String monthlyTotalPrice = monthlyTrialInfo != null
+        ? monthlyTrialInfo.truePrice
+        : (monthlyProductDetails?.price ?? _getPriceForId(monthlyId));
+    final String monthlyPrimaryDesc = monthlyTrialInfo != null
+        ? localizations.trialMonthlyDescription(
+            monthlyTrialInfo.days, monthlyTrialInfo.truePrice)
+        : localizations.monthlyPlanDescription(monthlyTotalPrice);
+
     final String? annualSecondaryDesc = isIOS
         ? null
         : localizations
-        .equivalentMonthlyDescription(formattedMonthlyEquivalentPrice);
+            .equivalentMonthlyDescription(formattedMonthlyEquivalentPrice);
     final bool isActivePlan =
-        widget.activeSubscriptionLevel == currentPlanLevel;
+        _planLevelFromSubscriptionLevel(widget.activeSubscriptionLevel) ==
+            currentPlanLevel;
 
     return ScrollFog(
       scrollController: widget.scrollController!,
@@ -237,14 +271,14 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                   localizations: localizations,
                   option: 'annual',
                   title:
-                  "${localizations.annual} ${widget.planType.capitalize()}",
+                      "${localizations.annual} ${widget.planType.capitalize()}",
                   primaryDescription: annualPrimaryDesc,
                   secondaryDescription: annualSecondaryDesc,
                   isBestValue: true,
                   isSelected: widget.selectedBillingOption == 'annual',
                   isSubscribedPlan: isActivePlan,
                   activeSubscriptionOption:
-                  widget.activeSubscriptionOption ?? '',
+                      widget.activeSubscriptionOption ?? '',
                 ),
 
                 SizedBox(height: verticalSpacingMedium),
@@ -255,15 +289,14 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                   localizations: localizations,
                   option: 'monthly',
                   title:
-                  "${localizations.monthly} ${widget.planType.capitalize()}",
-                  primaryDescription: localizations
-                      .monthlyPlanDescription(_getPriceForId(monthlyId)),
+                      "${localizations.monthly} ${widget.planType.capitalize()}",
+                  primaryDescription: monthlyPrimaryDesc,
                   secondaryDescription: null,
                   isBestValue: false,
                   isSelected: widget.selectedBillingOption == 'monthly',
                   isSubscribedPlan: isActivePlan,
                   activeSubscriptionOption:
-                  widget.activeSubscriptionOption ?? '',
+                      widget.activeSubscriptionOption ?? '',
                 ),
 
                 SizedBox(height: verticalSpacingLarge),
@@ -289,17 +322,18 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     required bool isSubscribedPlan,
     required String activeSubscriptionOption,
   }) {
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
-    final bool isEffectivelyDisabled = isSubscribedPlan &&
+    final bool isVirtualSubscription = widget.activeSubscriptionLevel >= 4 &&
+        widget.activeSubscriptionLevel <= 6;
+    final bool isEffectivelyDisabled = !isVirtualSubscription &&
+        isSubscribedPlan &&
         activeSubscriptionOption == 'annual' &&
         option == 'monthly';
-    final bool showCheckmark =
-        isSubscribedPlan && activeSubscriptionOption == option;
+    final bool showCheckmark = isSubscribedPlan &&
+        (isVirtualSubscription || activeSubscriptionOption == option);
 
     Widget buildBadge({
       required Color backgroundColor,
@@ -339,7 +373,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color:
-          isSelected ? AppColors.primaryColor.inverted : AppColors.border,
+              isSelected ? AppColors.primaryColor.inverted : AppColors.border,
           width: isSelected ? 2.0 : 1.0,
         ),
       ),
@@ -393,7 +427,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                         style: TextStyle(
                           fontSize: screenWidth * 0.025,
                           color:
-                          AppColors.tertiaryColor.withValues(alpha: 0.85),
+                              AppColors.tertiaryColor.withValues(alpha: 0.85),
                         ),
                         maxLines: 1,
                         softWrap: false,
@@ -411,47 +445,47 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                   FadeTransition(opacity: animation, child: child),
               child: showCheckmark
                   ? Container(
-                key: const ValueKey('checkmark'),
-                alignment: Alignment.center,
-                width: screenWidth * 0.17,
-                child: SvgPicture.asset(
-                  'assets/icons/checkmark.svg',
-                  colorFilter: ColorFilter.mode(
-                    AppColors.primaryColor.inverted,
-                    BlendMode.srcIn,
-                  ),
-                  width: screenWidth * 0.09,
-                  height: screenWidth * 0.09,
-                ),
-              )
+                      key: const ValueKey('checkmark'),
+                      alignment: Alignment.center,
+                      width: screenWidth * 0.17,
+                      child: SvgPicture.asset(
+                        'assets/icons/checkmark.svg',
+                        colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted,
+                          BlendMode.srcIn,
+                        ),
+                        width: screenWidth * 0.09,
+                        height: screenWidth * 0.09,
+                      ),
+                    )
                   : SizedBox(
-                key: const ValueKey('badges'),
-                width: screenWidth * 0.2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Visibility(
-                      visible: isBestValue,
-                      maintainSize: false,
-                      maintainAnimation: true,
-                      maintainState: true,
-                      child: buildBadge(
-                        backgroundColor: AppColors.primaryColor.inverted,
-                        textColor: AppColors.primaryColor,
-                        text: localizations.bestValue,
+                      key: const ValueKey('badges'),
+                      width: screenWidth * 0.2,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Visibility(
+                            visible: isBestValue,
+                            maintainSize: false,
+                            maintainAnimation: true,
+                            maintainState: true,
+                            child: buildBadge(
+                              backgroundColor: AppColors.primaryColor.inverted,
+                              textColor: AppColors.primaryColor,
+                              text: localizations.bestValue,
+                            ),
+                          ),
+                          if (widget.isSpecialOfferActive)
+                            buildBadge(
+                              backgroundColor:
+                                  AppColors.premium.withValues(alpha: 0.15),
+                              textColor: AppColors.premium,
+                              text: localizations.exclusiveOffer,
+                            ),
+                        ],
                       ),
                     ),
-                    if (widget.isSpecialOfferActive)
-                      buildBadge(
-                        backgroundColor:
-                        AppColors.premium.withValues(alpha: 0.15),
-                        textColor: AppColors.premium,
-                        text: localizations.exclusiveOffer,
-                      ),
-                  ],
-                ),
-              ),
             ),
           ],
         ),
@@ -465,9 +499,9 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         onTap: isEffectivelyDisabled
             ? null
             : () {
-          HapticFeedback.lightImpact();
-          widget.onBillingOptionChanged(option);
-        },
+                HapticFeedback.lightImpact();
+                widget.onBillingOptionChanged(option);
+              },
         child: Stack(
           children: [
             content,
@@ -476,17 +510,13 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
                 borderRadius: BorderRadius.circular(20.0),
                 child: AnimatedBuilder(
                   animation: _shineAnimation,
-                  builder: (context, child) =>
-                      Transform.translate(
-                        offset: Offset(
-                            MediaQuery
-                                .of(context)
-                                .size
-                                .width *
-                                _shineAnimation.value,
-                            0),
-                        child: child,
-                      ),
+                  builder: (context, child) => Transform.translate(
+                    offset: Offset(
+                        MediaQuery.of(context).size.width *
+                            _shineAnimation.value,
+                        0),
+                    child: child,
+                  ),
                   child: Container(
                     width: screenWidth * 0.25,
                     decoration: BoxDecoration(
@@ -511,12 +541,9 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     );
   }
 
-  Widget _buildBenefitsList(BuildContext context,
-      AppLocalizations localizations, String planType) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+  Widget _buildBenefitsList(
+      BuildContext context, AppLocalizations localizations, String planType) {
+    final screenWidth = MediaQuery.of(context).size.width;
     final double horizontalPadding = screenWidth * 0.06;
 
     // Benefits that should be highlighted when special offer is active
@@ -550,6 +577,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
     } else if (planType == 'ultra') {
       benefits = [
         localizations.oldBenefits,
+        localizations.benefitVideoGeneration,
         localizations.benefit8,
         localizations.benefit1,
         localizations.benefit5,
@@ -572,10 +600,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
       runAlignment: WrapAlignment.center,
       spacing: screenWidth * 0.012,
       runSpacing: screenWidth * 0.057,
-      children: benefits
-          .asMap()
-          .entries
-          .map((entry) {
+      children: benefits.asMap().entries.map((entry) {
         final int index = entry.key;
         final String benefit = entry.value;
         final double iconSize = screenWidth * 0.057;
@@ -584,12 +609,12 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         final bool isHighlighted = widget.isSpecialOfferActive &&
             highlightedBenefits.contains(benefit);
         final Color benefitColor =
-        isHighlighted ? AppColors.premium : AppColors.primaryColor.inverted;
+            isHighlighted ? AppColors.premium : AppColors.primaryColor.inverted;
 
         final benefitContent = SizedBox(
           width:
-          (screenWidth - (horizontalPadding * 2) - (screenWidth * 0.02)) /
-              2,
+              (screenWidth - (horizontalPadding * 2) - (screenWidth * 0.02)) /
+                  2,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

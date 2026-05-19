@@ -81,7 +81,7 @@ class _DeleteAllConversationsDialogState
 
   @override
   Widget build(BuildContext context) {
-    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
+    context.watch<ThemeProvider>();
 
     final appLocalizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery
@@ -275,7 +275,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog>
 
   @override
   Widget build(BuildContext context) {
-    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
+    context.watch<ThemeProvider>();
 
     final appLocalizations = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery
@@ -551,7 +551,7 @@ class DeleteSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                appLocalizations.deleteAccountButton,
+                appLocalizations.deleteAccount,
                 style: TextStyle(
                     color: AppColors.primaryColor.inverted,
                     fontSize: screenWidth * 0.04,
@@ -608,7 +608,7 @@ class DeleteSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
+    context.watch<ThemeProvider>();
 
     final generalProvider = context.watch<SettingsGeneralProvider>();
     final hasInternet = generalProvider.hasInternet;

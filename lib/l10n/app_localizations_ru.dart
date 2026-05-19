@@ -10,11 +10,27 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'Вы — генератор заголовков. Ответьте на следующий разговор ТОЛЬКО заголовком из 2-5 слов. Не используйте кавычки, префиксы или знаки препинания.';
+      'Вы — генератор заголовков. Отвечайте ТОЛЬКО заголовком из 2-5 слов для следующего разговора. Не используйте кавычки, префиксы или знаки препинания. ВАЖНО: Заголовок ДОЛЖЕН быть на ТОЧНО ТОМ ЖЕ ЯЗЫКЕ, что и сообщение пользователя.';
+
+  @override
+  String get systemRoleFallback => 'Вы — полезный помощник.';
+
+  @override
+  String get systemLanguageInstruction =>
+      '\n\nCRITICAL: Всегда отвечайте на том же языке, на котором пишет пользователь, обращайте внимание на язык пользователя.';
+
+  @override
+  String get systemNotePreviousMedia =>
+      '[Системное примечание: Ниже представлены ранее сгенерированные медиафайлы. Вы можете ссылаться на них или редактировать.]';
+
+  @override
+  String systemTimeInfo(String formattedTime) {
+    return '\n\nТекущая дата и время: $formattedTime.';
+  }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nПроанализируйте разговор на данный момент. Если вы узнали КАКИЕ-ЛИБО новые уникальные факты о пользователе (предпочтения, имя, привычки, контекст), вы ДОЛЖНЫ вывести ВСЮ обновленную информацию о пользователе внутри тегов <memory>...</memory> В САМОМ КОНЦЕ вашего ответа. КРИТИЧЕСКИ ВАЖНО: Вы НИКОГДА не должны стирать или перезаписывать предыдущую информацию. ВСЕГДА добавляйте новые факты к существующей информации. Если абсолютно ничего нового не было обнаружено, опустите тег. Пример: <memory>Любит футбол и теннис. Предпочитает короткие ответы.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
@@ -112,9 +128,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get localModels => 'Локальные модели';
-
-  @override
-  String get serverSideModels => 'Языковые модели';
 
   @override
   String get selectGGUFFile => 'Выберите файл GGUF';
@@ -302,9 +315,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Данные, которые вы удалите, будут навсегда удалены с нашего сервера и вашего устройства. Это действие нельзя отменить.';
 
   @override
-  String get deleteAccountButton => 'Кнопка удаления аккаунта';
-
-  @override
   String get editProfile => 'Редактировать профиль';
 
   @override
@@ -355,9 +365,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get downloadPaused => 'Загрузка приостановлена.';
-
-  @override
-  String get purchaseSuccessful => 'Покупка успешна!';
 
   @override
   String get purchaseError => 'Ошибка покупки';
@@ -871,6 +878,35 @@ class AppLocalizationsRu extends AppLocalizations {
   String get selectBaseModel => 'Выберите базовую модель';
 
   @override
+  String get falErrorImageRequired =>
+      'Для работы этого ИИ требуется эталонное изображение, пожалуйста, прикрепите изображение и попробуйте снова.';
+
+  @override
+  String get falErrorAudioRequired =>
+      'Для работы этой модели требуется эталонный аудиофайл. Пожалуйста, прикрепите аудиофайл и попробуйте снова.';
+
+  @override
+  String get falErrorVideoRequired =>
+      'Для этой модели требуется видеоинструкция, пожалуйста, прикрепите видео и попробуйте снова.';
+
+  @override
+  String get falErrorImageCorrupted =>
+      'Загруженное изображение не удалось обработать, пожалуйста, попробуйте другой формат.';
+
+  @override
+  String get falErrorSchemaRejected =>
+      'Модель отклонила входные данные, пожалуйста, попробуйте другую модель.';
+
+  @override
+  String get falErrorSchemaInvalid =>
+      'Входящие данные были отклонены службой генерации.';
+
+  @override
+  String falErrorGenericStatus(int statusCode) {
+    return 'Служба генерации вернула ошибку (статус $statusCode).';
+  }
+
+  @override
   String get couldNotOpenLink => 'Не удалось открыть ссылку';
 
   @override
@@ -932,9 +968,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get reportSubmitted => 'Жалоба успешно отправлена';
 
   @override
-  String get purchaseReceived => 'Покупка получена, обновляем ваш аккаунт.';
-
-  @override
   String get verificationDelayed =>
       'Ваша покупка подтверждена. Есть небольшая задержка в обновлении вашего аккаунта, он скоро появится.';
 
@@ -984,13 +1017,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Для сохранения загруженных моделей требуется разрешение на доступ к хранилищу. Пожалуйста, предоставьте разрешение для продолжения.';
 
   @override
-  String get plusBannerTitle => 'Получите бесплатный Plus!';
-
-  @override
-  String get plusBannerSubtitle =>
-      'Пригласите друга, и вы оба получите по одному дню подписки Plus бесплатно!';
-
-  @override
   String get inviteShareSubject => 'Присоединяйся ко мне в Cortex!';
 
   @override
@@ -1036,13 +1062,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Эта модель может анализировать и отвечать на вопросы о загруженных документах, таких как PDF-файлы и текстовые файлы.';
 
   @override
-  String get featureAudioTitle => 'Голосовой ввод';
-
-  @override
-  String get featureAudioDescription =>
-      'Эта модель может понимать и обрабатывать речевые аудиоданные.';
-
-  @override
   String get featureImageGenerationTitle => 'Генерация изображений';
 
   @override
@@ -1068,7 +1087,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      'Эта модель является премиум-моделью, бесплатные пользователи ограничены 3 сообщениями в день для премиум-моделей; оформите подписку, чтобы разблокировать неограниченный доступ!';
+      'Этот ИИ является премиум ИИ, бесплатные пользователи имеют ограниченный доступ к премиум ИИ; обновите для неограниченного доступа!';
 
   @override
   String get benefitPremiumModels => 'Доступ к премиум-моделям';
@@ -1087,7 +1106,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get news => 'Новости';
 
   @override
-  String get createAI => 'Создавать';
+  String get createAI => 'Создать';
 
   @override
   String get shortcuts => 'Ярлыки';
@@ -1470,13 +1489,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingFinalButton => 'ДА!';
 
   @override
-  String get paywallAhaTitle => 'Unlock the True Power of AI';
-
-  @override
-  String get paywallAhaSubtitle =>
-      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
-
-  @override
   String get dude => 'Чувак';
 
   @override
@@ -1668,6 +1680,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get exclusiveOffer => 'Эксклюзивное предложение';
 
   @override
+  String get claimOffer => 'Воспользуйтесь предложением';
+
+  @override
   String get continueInOfflineMode => 'Продолжить в автономном режиме';
 
   @override
@@ -1800,9 +1815,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Ищите в интернете информацию в режиме реального времени.';
 
   @override
-  String get webSearchQuotaExceeded => 'Квота поиска превышена.';
-
-  @override
   String get clearMemory => 'Очистить память';
 
   @override
@@ -1813,7 +1825,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get personalization => 'Персонализация';
 
   @override
-  String get personalizationDescription => 'Настройте свой опыт';
+  String get personalizationDescription =>
+      'Настройте своего ассистента так, чтобы он лучше соответствовал вашим потребностям. Адаптируйте его ответы, поведение и тон в соответствии с вашими уникальными предпочтениями.';
 
   @override
   String get memoryTitle => 'Память';
@@ -1854,7 +1867,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[System] ВАЖНОЕ УВЕДОМЛЕНИЕ: В данный момент вы работаете внутри масштабной, высокотехнологичной экосистемы искусственного интеллекта под названием «Cortex». Помните об этом и поддерживайте личность Cortex, если вас спросят.';
+      '\n\n[Система] ВАЖНОЕ УВЕДОМЛЕНИЕ: Вы работаете внутри огромной, высокотехнологичной экосистемы искусственного интеллекта под названием «Cortex»; эта платформа разработана командой Vertex, средний возраст членов которой составляет всего 16 лет. Запомните это и отвечайте на вопросы. Если потребуется дополнительная информация, не стесняйтесь искать ее в интернете, а если поиск невозможен, просто скажите, что не знаете!';
 
   @override
   String get featureAudioRecognitionTitle => 'Распознавание звука';
@@ -1939,9 +1952,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Для создания видеороликов вам потребуется подписка Ultra. Оформите подписку прямо сейчас и почувствуйте весь процесс!';
 
   @override
-  String get becomePremiumButton => 'Станьте премиум-пользователем';
-
-  @override
   String get fallbackInfoPanelText =>
       'В связи с некоторыми улучшениями, которые мы вносим на стороне сервера, ответ был сгенерирован динамическим чатом Cortex, а не выбранным вами ИИ. Благодарим вас за понимание до завершения процесса!';
 
@@ -1957,7 +1967,31 @@ class AppLocalizationsRu extends AppLocalizations {
   String get backgroundChatNotificationTitle => 'Вернуться в чат!';
 
   @override
-  String backgroundChatNotificationBody(String chatName) {
-    return 'В чате $chatName появилось новое сообщение, посмотрите!';
+  String get benefitVideoGeneration => 'Генерация видео';
+
+  @override
+  String get freeOffer => 'Бесплатное предложение';
+
+  @override
+  String trialMonthlyDescription(String days, String price) {
+    return 'Первые $days дней бесплатно, затем $price/мес';
   }
+
+  @override
+  String trialAnnualDescription(String days, String price) {
+    return 'Первые $days дней бесплатно, затем $price/год';
+  }
+
+  @override
+  String freePlan(String plan) {
+    return 'Бесплатный $plan!';
+  }
+
+  @override
+  String get systemPromptLimitFallback =>
+      'КРИТИЧЕСКИ ВАЖНО: Пользователь запросил действие, но его лимит в Cortex исчерпан; пожалуйста, сообщите пользователю на его языке, что ему следует подождать или рассмотреть возможность перехода на более высокий тарифный план.';
+
+  @override
+  String get dynamicPreditsUpgradeMessage =>
+      'Cortex может давать еще более качественные ответы; обновите план сейчас и получайте лучший ответ на каждый вопрос!';
 }

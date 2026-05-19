@@ -67,7 +67,7 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
     final l10n = AppLocalizations.of(context)!;
     final memoryProvider = context.read<UserMemoryProvider>();
     final RestoreCallback restoreNavBar = Darkener.darken();
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     showGeneralDialog(
       context: context,
@@ -198,9 +198,9 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
 
   @override
   Widget build(BuildContext context) {
-    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
+    context.watch<ThemeProvider>();
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final double scale = screenWidth / 400.0;
     final memoryProvider = context.watch<UserMemoryProvider>();
 
@@ -251,6 +251,8 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
               TextField(
                 controller: _memoryController,
                 focusNode: _memoryFocusNode,
+                maxLength: 2048,
+                buildCounter: (BuildContext context, { int? currentLength, int? maxLength, bool? isFocused }) => null,
                 maxLines: 10,
                 minLines: 7,
                 style: TextStyle(
@@ -345,6 +347,8 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
           child: TextField(
             controller: _instructionController,
             focusNode: _instructionFocusNode,
+            maxLength: 2048,
+            buildCounter: (BuildContext context, { int? currentLength, int? maxLength, bool? isFocused }) => null,
             maxLines: 10,
             minLines: 7,
             style: TextStyle(

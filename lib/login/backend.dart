@@ -17,6 +17,7 @@ import '../main.dart';
 import '../notifications/extrovert.dart';
 import '../notifications/introvert.dart';
 import '../referral.dart';
+import 'anonymous_device_entitlement.dart';
 import 'package:flutter/services.dart';
 import 'package:cortex/server/user.dart';
 import 'package:cortex/server/credits.dart';
@@ -232,7 +233,9 @@ class LoginBackendService {
 
       if (availability != UsernameStatus.available) {
         initializer.setRegistrationStatus(false);
-        if (availability == UsernameStatus.taken) return RegistrationUsernameTaken();
+        if (availability == UsernameStatus.taken) {
+          return RegistrationUsernameTaken();
+        }
         // Username check failed (functions/internal/network). Don't mislabel as "taken".
         return RegistrationUnknownError();
       }
@@ -254,11 +257,9 @@ class LoginBackendService {
 
       _safeTokenSync(extrovertNotificationService);
 
-      // Parallelize these independent network tasks to reduce waiting time.
-      await Future.wait([
-        _postUsernameSuggestion(uid: user.uid, username: username),
-        user.sendEmailVerification(),
-      ]);
+      // Fire and forget independent network tasks to reduce waiting time.
+      _postUsernameSuggestion(uid: user.uid, username: username).ignore();
+      user.sendEmailVerification().ignore();
 
       dev.log(
           '[Auth.Register] Verification email sent & suggestion posted for UID: ${user.uid}.',
@@ -339,13 +340,17 @@ class LoginBackendService {
         try {
           userCredential = await currentUser.linkWithCredential(credential);
           wasAnonymousLinked = true;
-          dev.log('[Auth.Google] Successfully linked anonymous account.', name: 'LoginBackend');
-          
-          final callable = _functions.httpsCallable('completeAnonymousRegistration');
+          dev.log('[Auth.Google] Successfully linked anonymous account.',
+              name: 'LoginBackend');
+
+          final callable =
+              _functions.httpsCallable('completeAnonymousRegistration');
           await callable.call();
         } on FirebaseAuthException catch (e) {
           if (e.code == 'credential-already-in-use') {
-            dev.log('[Auth.Google] Credential already in use. Falling back to signIn.', name: 'LoginBackend');
+            dev.log(
+                '[Auth.Google] Credential already in use. Falling back to signIn.',
+                name: 'LoginBackend');
             userCredential = await _auth.signInWithCredential(credential);
           } else {
             rethrow;
@@ -435,6 +440,7 @@ class LoginBackendService {
         throw FirebaseAuthException(code: 'anonymous-user-null');
       }
 
+      await AnonymousDeviceEntitlement.instance.registerIfAnonymous(user);
       _safeTokenSync(extrovertNotificationService);
 
       dev.log('[Auth.Anonymous] Signed in anonymously. UID: ${user.uid}',
@@ -475,20 +481,26 @@ class LoginBackendService {
         try {
           userCredential = await currentUser.linkWithProvider(appleProvider);
           wasAnonymousLinked = true;
-          dev.log('[Auth.Apple] Successfully linked anonymous account.', name: 'LoginBackend');
-          
-          final callable = _functions.httpsCallable('completeAnonymousRegistration');
+          dev.log('[Auth.Apple] Successfully linked anonymous account.',
+              name: 'LoginBackend');
+
+          final callable =
+              _functions.httpsCallable('completeAnonymousRegistration');
           await callable.call();
         } on FirebaseAuthException catch (e) {
           if (e.code == 'credential-already-in-use' && e.credential != null) {
-            dev.log('[Auth.Apple] Credential already in use. Falling back to signIn.', name: 'LoginBackend');
-            userCredential = await FirebaseAuth.instance.signInWithCredential(e.credential!);
+            dev.log(
+                '[Auth.Apple] Credential already in use. Falling back to signIn.',
+                name: 'LoginBackend');
+            userCredential =
+                await FirebaseAuth.instance.signInWithCredential(e.credential!);
           } else {
             rethrow;
           }
         }
       } else {
-        userCredential = await FirebaseAuth.instance.signInWithProvider(appleProvider);
+        userCredential =
+            await FirebaseAuth.instance.signInWithProvider(appleProvider);
       }
 
       final User? user = userCredential.user;
@@ -506,7 +518,7 @@ class LoginBackendService {
             ? null
             : user.displayName?.trim();
 
-        await _postUsernameSuggestion(uid: user.uid, username: displayName);
+        _postUsernameSuggestion(uid: user.uid, username: displayName).ignore();
 
         if (displayName != null && displayName.isNotEmpty) {
           await user.updateDisplayName(displayName);
@@ -536,7 +548,7 @@ class LoginBackendService {
         );
         return AppleSignInNetworkError();
       }
-      
+
       if ((e is FirebaseAuthException && e.code == 'canceled') ||
           (e is PlatformException && e.code == 'sign_in_canceled')) {
         dev.log('[Auth.Apple] Sign-in cancelled by user.',

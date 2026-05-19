@@ -61,18 +61,20 @@
         android:requestLegacyExternalStorage="false"
         tools:replace="android:requestLegacyExternalStorage"
         android:usesCleartextTraffic="true"
+        android:enableOnBackInvokedCallback="false"
         android:theme="@style/LaunchTheme">
 
         <activity
             android:name=".MainActivity"
-            android:enableOnBackInvokedCallback="true"
+            android:enableOnBackInvokedCallback="false"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
             android:theme="@style/LaunchTheme"
+            android:resizeableActivity="false"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustNothing">
 
             <!-- Meta-data for the activity theme -->
             <meta-data

@@ -29,6 +29,11 @@ class ConversationProvider with ChangeNotifier {
   bool _justFinishedLoading = false;
   bool _isEphemeral = false; // [NEW] Track if session is not yet saved
 
+  // Persisted snapshot for deleted models
+  String? _persistedModelId;
+  String? _persistedModelTitle;
+  String? _persistedModelImagePath;
+
   // Streaming performance: throttle UI updates
   Timer? _streamThrottleTimer;
   bool _hasPendingStreamUpdate = false;
@@ -83,6 +88,10 @@ class ConversationProvider with ChangeNotifier {
 
   bool get justFinishedLoading => _justFinishedLoading;
 
+  String? get persistedModelId => _persistedModelId;
+  String? get persistedModelTitle => _persistedModelTitle;
+  String? get persistedModelImagePath => _persistedModelImagePath;
+
   // ===========================================================================
   // SECTION 3: STATE MUTATION METHODS (ACTIONS)
   // ===========================================================================
@@ -90,9 +99,18 @@ class ConversationProvider with ChangeNotifier {
   // -------------------- Conversation Lifecycle Actions --------------------
 
   /// Sets the context for an existing conversation that is being loaded.
-  void setConversationContext(String id, String title) {
+  void setConversationContext(
+    String id,
+    String title, {
+    String? persistedModelId,
+    String? persistedModelTitle,
+    String? persistedModelImagePath,
+  }) {
     _conversationID = id;
     _conversationTitle = title;
+    _persistedModelId = persistedModelId;
+    _persistedModelTitle = persistedModelTitle;
+    _persistedModelImagePath = persistedModelImagePath;
     notifyListeners();
   }
 
@@ -113,6 +131,9 @@ class ConversationProvider with ChangeNotifier {
     _messages = [];
     _conversationID = null;
     _conversationTitle = null;
+    _persistedModelId = null;
+    _persistedModelTitle = null;
+    _persistedModelImagePath = null;
     _isWaitingForResponse = false;
     _responseStopped = false;
 
@@ -136,6 +157,9 @@ class ConversationProvider with ChangeNotifier {
     _messages = [];
     _conversationID = null;
     _conversationTitle = null;
+    _persistedModelId = null;
+    _persistedModelTitle = null;
+    _persistedModelImagePath = null;
     _isWaitingForResponse = false;
     _responseStopped = false;
     _isLoadingMessages = false;
@@ -460,16 +484,32 @@ class ConversationProvider with ChangeNotifier {
 
     if (index >= 0 && index < _messages.length) {
       final msg = _messages[index];
+
+      // COSMETIC: Strip trailing markdown horizontal rules (---) that some
+      // models add at the end of their responses. Only strip standalone ---
+      // on its own line (not inside code blocks or inline).
+      String cleanedText = msg.text;
+      cleanedText = cleanedText.replaceAll(RegExp(r'\n---\s*$'), '');
+      cleanedText = cleanedText.trimRight();
+
       if (msg.isThinking) {
+        _messages[index] = msg.copyWith(
+          text: cleanedText,
+          isThinking: false,
+          includeInContext: true,
+          pendingMediaType: MediaGenerationType.none,
+        );
+      } else if (cleanedText != msg.text) {
+        _messages[index] = msg.copyWith(
+          text: cleanedText,
+          pendingMediaType: MediaGenerationType.none,
+        );
+      } else if (msg.pendingMediaType != MediaGenerationType.none) {
         _messages[index] =
-            msg.copyWith(isThinking: false, includeInContext: true);
+            msg.copyWith(pendingMediaType: MediaGenerationType.none);
       }
       if (_conversationID != null) {
         if (_isEphemeral) {
-          // If we finish a response and it's still ephemeral, save it now?
-          // This handles cases where we finish without streaming (e.g. short/tool).
-          // However, ideally we promote on first chunk.
-          // Let's ensure we promote here just in case.
           promoteToPersistentSession().then((_) {
             ChatStorageService.upsertMessage(
                 _conversationID!, index, _messages[index]);
@@ -480,6 +520,26 @@ class ConversationProvider with ChangeNotifier {
         }
       }
     }
+    notifyListeners();
+  }
+
+  /// Restores the waiting-for-response state when re-entering a conversation
+  /// that has an active background stream. This ensures the UI shows the
+  /// appropriate streaming/thinking indicators.
+  void restoreWaitingState() {
+    if (!_isWaitingForResponse) {
+      _isWaitingForResponse = true;
+      _responseStopped = false;
+      notifyListeners();
+    }
+  }
+
+  /// Appends a message restored from a background stream (e.g., when the
+  /// user left and came back to a chat that was still generating).
+  void appendBackgroundRestoredMessage(Message message) {
+    _messages.add(message);
+    _isWaitingForResponse = true;
+    _responseStopped = false;
     notifyListeners();
   }
 

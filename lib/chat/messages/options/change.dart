@@ -16,6 +16,7 @@ import 'package:path/path.dart' as p;
 import '../../../library/backend/data/entity.dart';
 import '../../../library/backend/data/service.dart';
 import '../../../library/backend/data/user.dart';
+import '../../../server/credits.dart';
 
 // --- UI Metrics (Constants) ---
 class _UIFactors {
@@ -54,8 +55,9 @@ Future<void> showModelSelectionDialog({
     return m.attachmentPaths.any((path) => _isImageFile(path));
   });
 
-  final bool hasPremiumAccess =
-      session.isUserSubscribed || session.premiumTrialUses < 3;
+  // Premium access: subscribed OR has predits balance > 0
+  final hasPremiumAccess = session.isUserSubscribed ||
+      (context.read<CreditsManager>().preditsNotifier.value ?? 0) > 0;
   final Set<String> downloadedModelIds =
       (await UserModels.loadDownloadedModelPaths()).keys.toSet();
 
@@ -171,14 +173,42 @@ String _formatModelId(String rawText) {
   return parts.join(' ');
 }
 
+String _normalizeModelNamePrefix(String value) {
+  return value.toLowerCase().replaceAll(RegExp(r'[\s\-_/.:()]+'), '');
+}
+
+String _withSeriesPrefix({
+  required String seriesName,
+  required String variantName,
+}) {
+  final cleanSeries = seriesName.trim();
+  final cleanVariant = variantName.trim();
+  if (cleanSeries.isEmpty || cleanVariant.isEmpty) {
+    return cleanVariant.isNotEmpty ? cleanVariant : cleanSeries;
+  }
+
+  final normalizedSeries = _normalizeModelNamePrefix(cleanSeries);
+  final normalizedVariant = _normalizeModelNamePrefix(cleanVariant);
+  if (normalizedSeries.isNotEmpty &&
+      normalizedVariant.startsWith(normalizedSeries)) {
+    return cleanVariant;
+  }
+
+  return '$cleanSeries $cleanVariant';
+}
+
 List<Map<String, dynamic>> _buildVariantList(ModelEntity modelSeries,
     {required String langCode, required ModelService modelService}) {
   final allVariantsMap = modelSeries.variants ?? {};
   final items = allVariantsMap.entries.map((entry) {
     final data = entry.value as Map<String, dynamic>;
+    final variantName = data['title'] as String? ?? _formatModelId(entry.key);
     return {
       'code': entry.key,
-      'name': data['title'] as String? ?? _formatModelId(entry.key),
+      'name': _withSeriesPrefix(
+        seriesName: modelSeries.displayTitle,
+        variantName: variantName,
+      ),
       'isPremium': (data['tier'] as String? ?? 'free') == 'premium',
       'canHandleImage': modelService.hasModality(entry.key,
           langCode: langCode, modality: 'image'),
@@ -236,7 +266,10 @@ List<Map<String, dynamic>> _buildCategorizedModelList(
       assembledList.add({'isHeader': true, 'name': title});
       assembledList.addAll(models.map((m) => {
             'code': m.id,
-            'name': m.displayTitle,
+            'name': _withSeriesPrefix(
+              seriesName: m.series ?? '',
+              variantName: m.displayTitle,
+            ),
             'isPremium': m.isPremium,
             'canHandleImage': modelService.hasModality(m.id,
                 langCode: langCode, modality: 'image'),
@@ -321,7 +354,7 @@ class _ModelSelectionDialogContentState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery.sizeOf(context);
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
 
@@ -412,6 +445,9 @@ class _ModelSelectionDialogContentState
                         return ListTile(
                           title: Text(
                             item['name'] as String,
+                            maxLines: 2,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize:
                                   screenWidth * _UIFactors.itemFontSizeFactor,

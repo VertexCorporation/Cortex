@@ -43,8 +43,7 @@ class ModelService with ChangeNotifier {
   /// In-memory cache for processed, type-safe [ModelEntity] objects.
   /// This is the final, sorted, and ready-to-use list for the UI.
   List<ModelEntity>? _cachedEntities;
-
-
+  String? _cachedEntitiesLangCode;
 
   // --- Public API ---
 
@@ -64,16 +63,18 @@ class ModelService with ChangeNotifier {
   /// Returns a list of [ModelEntity] objects, or null on a critical failure.
   Future<List<ModelEntity>?> getModels({required String langCode}) async {
     const String logPrefix = "[ModelService.getModels]";
+    final normalizedLangCode = _normalizeLangCode(langCode);
 
     _isLoading = true;
     _hasError = false; // Reset error state on new attempt
     notifyListeners(); // Notify UI that loading started
 
     try {
-      if (_cachedEntities != null && _cachedEntities!.isNotEmpty) {
+      if (_cachedEntities != null &&
+          _cachedEntities!.isNotEmpty &&
+          _cachedEntitiesLangCode == normalizedLangCode) {
         return _cachedEntities;
       }
-
 
       debugPrint(
           "$logPrefix: Invalidated in-memory image path cache to prepare for full refresh.");
@@ -92,53 +93,8 @@ class ModelService with ChangeNotifier {
         return null;
       }
 
-      var finalEntities = rawModels.map((rawMap) {
-        final tempEntity = ModelEntity.fromMap(rawMap, langCode);
-        final resolvedPath = getModelImagePath(tempEntity);
-        return tempEntity.copyWith(imagePath: resolvedPath);
-      }).toList();
-
-      const int minOfflineSizeMb = 300;
-      const int maxOfflineRamMb = 32000;
-      const int maxOfflineSizeMb = 1024 * 1024; // 1 TB in MB
-
-      finalEntities = finalEntities
-          .map((model) =>
-          normalizeOfflineModelForCatalog(
-            model,
-            minOfflineSizeMb: minOfflineSizeMb,
-            maxOfflineRamMb: maxOfflineRamMb,
-            maxOfflineSizeMb: maxOfflineSizeMb,
-          ))
-          .whereType<ModelEntity>()
-          .toList();
-
-      final offlineModels =
-      finalEntities.where((m) => m.type == 'offline').toList();
-      final otherModels =
-      finalEntities.where((m) => m.type != 'offline').toList();
-      otherModels.sort((a, b) =>
-          a.displayTitle.toLowerCase().compareTo(b.displayTitle.toLowerCase()));
-      offlineModels.sort((a, b) {
-        final sizeA = a.size ?? 99999;
-        final sizeB = b.size ?? 99999;
-        final sizeComparison = sizeA.compareTo(sizeB);
-        if (sizeComparison != 0) return sizeComparison;
-        final ramA = a.ram ?? 99999;
-        final ramB = b.ram ?? 99999;
-        final ramComparison = ramA.compareTo(ramB);
-        if (ramComparison != 0) return ramComparison;
-        return a.displayTitle
-            .toLowerCase()
-            .compareTo(b.displayTitle.toLowerCase());
-      });
-      finalEntities = [...otherModels, ...offlineModels];
-      final neuroIndex =
-      finalEntities.indexWhere((model) => model.id == 'neuro');
-      if (neuroIndex != -1) {
-        final neuroModel = finalEntities.removeAt(neuroIndex);
-        finalEntities.insert(0, neuroModel);
-      }
+      final finalEntities =
+          _buildEntitiesFromRaw(rawModels, normalizedLangCode);
 
       // Final check: if processing resulted in 0 entities, flag error.
       if (finalEntities.isEmpty) {
@@ -147,9 +103,9 @@ class ModelService with ChangeNotifier {
       }
 
       _cachedEntities = finalEntities;
+      _cachedEntitiesLangCode = normalizedLangCode;
       debugPrint(
-          "$logPrefix: Caching ${finalEntities
-              .length} ENRICHED model entities.");
+          "$logPrefix: Caching ${finalEntities.length} ENRICHED model entities.");
       unawaited(_validateAndAssignDefaultBaseModels());
 
       return _cachedEntities;
@@ -177,7 +133,7 @@ class ModelService with ChangeNotifier {
     }
 
     final allOnlineVariantIds = <String>{};
-    final allModels = getCachedModelsSync();
+    final allModels = List<ModelEntity>.from(getCachedModelsSync());
     allModels.where((m) => m.type == 'online').forEach((model) {
       if (model.variants != null && model.variants!.isNotEmpty) {
         allOnlineVariantIds.addAll(model.variants!.keys);
@@ -196,8 +152,7 @@ class ModelService with ChangeNotifier {
 
         if (requiresRepair) {
           debugPrint(
-              "[ModelService] Repairing base model for '${model
-                  .id}' to '$defaultBaseModelId'.");
+              "[ModelService] Repairing base model for '${model.id}' to '$defaultBaseModelId'.");
           await updateBaseModel(model.id, defaultBaseModelId);
         }
       }
@@ -225,8 +180,76 @@ class ModelService with ChangeNotifier {
     return _cachedEntities ?? [];
   }
 
+  String _normalizeLangCode(String langCode) =>
+      langCode.split(RegExp(r'[-_]')).first.toLowerCase();
+
+  List<ModelEntity> _buildEntitiesFromRaw(
+    List<Map<String, dynamic>> rawModels,
+    String langCode,
+  ) {
+    var finalEntities = rawModels.map((rawMap) {
+      final tempEntity = ModelEntity.fromMap(rawMap, langCode);
+      final resolvedPath = getModelImagePath(tempEntity);
+      return tempEntity.copyWith(imagePath: resolvedPath);
+    }).toList();
+
+    const int minOfflineSizeMb = 300;
+    const int maxOfflineRamMb = 32000;
+    const int maxOfflineSizeMb = 1024 * 1024; // 1 TB in MB
+
+    finalEntities = finalEntities
+        .map((model) => normalizeOfflineModelForCatalog(
+              model,
+              minOfflineSizeMb: minOfflineSizeMb,
+              maxOfflineRamMb: maxOfflineRamMb,
+              maxOfflineSizeMb: maxOfflineSizeMb,
+            ))
+        .whereType<ModelEntity>()
+        .toList();
+
+    final offlineModels =
+        finalEntities.where((m) => m.type == 'offline').toList();
+    final otherModels =
+        finalEntities.where((m) => m.type != 'offline').toList();
+    otherModels.sort((a, b) =>
+        a.displayTitle.toLowerCase().compareTo(b.displayTitle.toLowerCase()));
+    offlineModels.sort((a, b) {
+      final sizeA = a.size ?? 99999;
+      final sizeB = b.size ?? 99999;
+      final sizeComparison = sizeA.compareTo(sizeB);
+      if (sizeComparison != 0) return sizeComparison;
+      final ramA = a.ram ?? 99999;
+      final ramB = b.ram ?? 99999;
+      final ramComparison = ramA.compareTo(ramB);
+      if (ramComparison != 0) return ramComparison;
+      return a.displayTitle
+          .toLowerCase()
+          .compareTo(b.displayTitle.toLowerCase());
+    });
+    finalEntities = [...otherModels, ...offlineModels];
+    final neuroIndex = finalEntities.indexWhere((model) => model.id == 'neuro');
+    if (neuroIndex != -1) {
+      final neuroModel = finalEntities.removeAt(neuroIndex);
+      finalEntities.insert(0, neuroModel);
+    }
+
+    return finalEntities;
+  }
+
+  void _ensureCachedLanguage(String langCode) {
+    final normalizedLangCode = _normalizeLangCode(langCode);
+    if (_cachedEntitiesLangCode == normalizedLangCode) return;
+
+    final rawModels = _repository.rawModelsCache;
+    if (rawModels == null || rawModels.isEmpty) return;
+
+    _cachedEntities = _buildEntitiesFromRaw(rawModels, normalizedLangCode);
+    _cachedEntitiesLangCode = normalizedLangCode;
+  }
+
   @visibleForTesting
-  static ModelEntity? normalizeOfflineModelForCatalog(ModelEntity model, {
+  static ModelEntity? normalizeOfflineModelForCatalog(
+    ModelEntity model, {
     required int minOfflineSizeMb,
     required int maxOfflineRamMb,
     required int maxOfflineSizeMb,
@@ -327,6 +350,7 @@ class ModelService with ChangeNotifier {
   void clearAllCache() {
     _repository.clearRawCache();
     _cachedEntities = null;
+    _cachedEntitiesLangCode = null;
 
     debugPrint("[ModelService] All model caches cleared.");
   }
@@ -366,9 +390,7 @@ class ModelService with ChangeNotifier {
 
     final allModels = getCachedModelsSync();
     if (allModels.isEmpty) {
-      return fullId.contains('/') ? fullId
-          .split('/')
-          .first : fullId;
+      return fullId.contains('/') ? fullId.split('/').first : fullId;
     }
     if (allModels.any((model) => model.id == fullId)) return fullId;
     for (final modelSeries in allModels) {
@@ -383,9 +405,15 @@ class ModelService with ChangeNotifier {
   /// It intelligently merges series data with variant data if necessary.
   /// Retrieves a precise [ModelEntity] for a given ID, which can be a base ID or a variant ID.
   ModelEntity getPreciseModelData(String modelId, {required String langCode}) {
+    _ensureCachedLanguage(langCode);
+
+    if (modelId.isEmpty) {
+      return _createFallbackEntity(modelId, langCode: langCode);
+    }
+
     if (modelId == 'cortex/auto' || modelId == 'dynamic') {
       var entity =
-      ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
+          ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
       return entity.copyWith(imagePath: getModelImagePath(entity));
     }
 
@@ -395,7 +423,7 @@ class ModelService with ChangeNotifier {
           "[ModelService] CRITICAL WARNING: getPreciseModelData called when entity cache is empty.");
       if (modelId == 'cortex/auto' || modelId == 'dynamic') {
         var entity =
-        ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
+            ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
         return entity.copyWith(imagePath: getModelImagePath(entity));
       }
       return _createFallbackEntity(modelId, langCode: langCode);
@@ -412,7 +440,7 @@ class ModelService with ChangeNotifier {
     for (final modelSeries in allModels) {
       if (modelSeries.variants?.containsKey(modelId) ?? false) {
         final variantData =
-        modelSeries.variants![modelId] as Map<String, dynamic>;
+            modelSeries.variants![modelId] as Map<String, dynamic>;
         final mergedMap = {
           ...modelSeries.toMap(),
           ...variantData,

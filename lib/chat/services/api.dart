@@ -58,6 +58,7 @@ class ApiService {
     List<Map<String, dynamic>>? tools,
     bool enablefeatureReasoning = false,
     bool enableWebSearch = false,
+    bool isCharacterModel = false,
     Function(String textChunk)? onTextChunk,
     Function(String featureReasoning)? onfeatureReasoning,
     FutureOr<void> Function(String imageUrl)? onImageReceived,
@@ -66,6 +67,7 @@ class ApiService {
     FutureOr<void> Function(String mediaType)? onMediaGenerating,
     Function(List<dynamic> toolCalls)? onToolCall,
     Function(List<dynamic> citations)? onCitations,
+    Function(bool active)? onWebSearchActive,
     Function()? onServerFallback,
     required AppLocalizations localizations,
   }) async {
@@ -98,6 +100,154 @@ class ApiService {
         }
       }
 
+      String? extractString(dynamic value, List<String> keys) {
+        if (value == null) return null;
+        if (value is String) return value;
+        if (value is! Map) return null;
+
+        for (final key in keys) {
+          final direct = value[key];
+          if (direct is String && direct.isNotEmpty) return direct;
+          if (direct is Map) {
+            final nested = extractString(direct, keys);
+            if (nested != null && nested.isNotEmpty) return nested;
+          }
+        }
+
+        final delta = value['delta'];
+        if (delta is Map) {
+          final nested = extractString(delta, keys);
+          if (nested != null && nested.isNotEmpty) return nested;
+        }
+
+        final choices = value['choices'];
+        if (choices is List && choices.isNotEmpty) {
+          final first = choices.first;
+          if (first is Map) {
+            final nested = extractString(first, keys);
+            if (nested != null && nested.isNotEmpty) return nested;
+          }
+        }
+
+        return null;
+      }
+
+      String? extractTextChunk(dynamic value) {
+        return extractString(value, const [
+          'text',
+          'content',
+          'delta',
+          'output_text',
+          'message',
+        ]);
+      }
+
+      String? extractReasoningChunk(dynamic value) {
+        return extractString(value, const [
+          'text',
+          'reasoning',
+          'reasoning_content',
+          'thinking',
+          'thought',
+          'content',
+          'delta',
+        ]);
+      }
+
+      bool extractSearchActive(dynamic value, bool fallback) {
+        if (value is bool) return value;
+        if (value is num) return value != 0;
+        if (value is String) {
+          final normalized = value.toLowerCase();
+          if (['true', '1', 'yes', 'started', 'active', 'searching']
+              .contains(normalized)) {
+            return true;
+          }
+          if (['false', '0', 'no', 'finished', 'complete', 'done', 'idle']
+              .contains(normalized)) {
+            return false;
+          }
+        }
+        if (value is Map) {
+          for (final key in const [
+            'active',
+            'isActive',
+            'searching',
+            'started',
+            'enabled',
+            'value',
+          ]) {
+            if (value.containsKey(key)) {
+              return extractSearchActive(value[key], fallback);
+            }
+          }
+        }
+        return fallback;
+      }
+
+      bool isSearchFinishedEvent(String eventName) {
+        final event = eventName.toLowerCase();
+        return event.contains('finish') ||
+            event.contains('complete') ||
+            event.contains('done') ||
+            event.contains('end') ||
+            event.contains('stop');
+      }
+
+      bool containsWebSearchToolCall(dynamic value) {
+        try {
+          final encoded = jsonEncode(value).toLowerCase();
+          return encoded.contains('need_web_search') ||
+              encoded.contains('web_search');
+        } catch (_) {
+          return false;
+        }
+      }
+
+      bool isProviderLimitFailure(String? code, String? message) {
+        final normalizedCode = (code ?? '').toUpperCase();
+        const limitCodes = {
+          'PREMIUM_TRIAL_EXHAUSTED',
+          'PREDIT_EXHAUSTED',
+          'DREDIT_EXHAUSTED',
+          'INSUFFICIENT_USER_CREDITS',
+          'LIMIT_IMAGE_INSUFFICIENT',
+          'LIMIT_VIDEO_INSUFFICIENT',
+          'LIMIT_AUDIO_INSUFFICIENT',
+          'LIMIT_MEDIA_INSUFFICIENT',
+          'INSUFFICIENT_CREDITS',
+          'INSUFFICIENT_BALANCE',
+          'CREDITS_EXHAUSTED',
+          'CREDIT_EXHAUSTED',
+          'QUOTA_EXCEEDED',
+          'PAYMENT_REQUIRED',
+        };
+
+        if (limitCodes.contains(normalizedCode)) return true;
+
+        final haystack = '${code ?? ''} ${message ?? ''}'.toLowerCase();
+        if (haystack.isEmpty) return false;
+
+        final mentionsProviderLimit = haystack.contains('credit') ||
+            haystack.contains('predit') ||
+            haystack.contains('dredit') ||
+            haystack.contains('balance') ||
+            haystack.contains('quota') ||
+            haystack.contains('billing') ||
+            haystack.contains('payment required') ||
+            haystack.contains('top up');
+
+        final isLimitLanguage = haystack.contains('insufficient') ||
+            haystack.contains('not enough') ||
+            haystack.contains('out of') ||
+            haystack.contains('exhausted') ||
+            haystack.contains('exceeded') ||
+            haystack.contains('ran out') ||
+            haystack.contains('top up');
+
+        return mentionsProviderLimit && isLimitLanguage;
+      }
+
       try {
         debugPrint("[ApiService] Sending request. Model: $targetModel");
 
@@ -125,6 +275,9 @@ class ApiService {
             "tool_choice": (tools != null) ? "auto" : null,
             "enableReasoning": enablefeatureReasoning,
             "enableWebSearch": enableWebSearch,
+            "isCharacterModel": isCharacterModel,
+            "systemPromptLimitFallback":
+                localizations.systemPromptLimitFallback,
           }),
           cancelToken: _cancelToken,
           options: options,
@@ -179,10 +332,18 @@ class ApiService {
 
                   String userMsg;
 
+                  if (isProviderLimitFailure(code, message)) {
+                    completer.completeError(ApiException(
+                      localizations.errorReachedLimit,
+                      code: code ?? 'PROVIDER_LIMIT_REACHED',
+                    ));
+                    return;
+                  }
+
                   switch (code) {
                     case 'PREMIUM_TRIAL_EXHAUSTED':
                     case 'PREDIT_EXHAUSTED':
-                      userMsg = localizations.premiumTrialExhaustedMessage;
+                      userMsg = localizations.errorReachedLimit;
                       break;
                     case 'VIDEO_ULTRA_ONLY':
                       userMsg = localizations.premiumTrialExhaustedMessage;
@@ -196,8 +357,46 @@ class ApiService {
                     case 'CONTENT_FLAGGED':
                       userMsg = localizations.errorPromptFlagged;
                       break;
+                    case 'FAL_IMAGE_REQUIRED':
+                      userMsg = localizations.falErrorImageRequired;
+                      break;
+                    case 'FAL_AUDIO_REQUIRED':
+                      userMsg = localizations.falErrorAudioRequired;
+                      break;
+                    case 'FAL_VIDEO_REQUIRED':
+                      userMsg = localizations.falErrorVideoRequired;
+                      break;
+                    case 'FAL_IMAGE_CORRUPTED':
+                      userMsg = localizations.falErrorImageCorrupted;
+                      break;
+                    case 'FAL_SCHEMA_REJECTED':
+                      userMsg = localizations.falErrorSchemaRejected;
+                      break;
+                    case 'FAL_SCHEMA_INVALID':
+                      userMsg = localizations.falErrorSchemaInvalid;
+                      break;
+                    case 'LIMIT_IMAGE_INSUFFICIENT':
+                      userMsg = localizations.errorReachedLimit;
+                      break;
+                    case 'LIMIT_VIDEO_INSUFFICIENT':
+                      userMsg = localizations.errorReachedLimit;
+                      break;
+                    case 'LIMIT_AUDIO_INSUFFICIENT':
+                      userMsg = localizations.errorReachedLimit;
+                      break;
+                    case 'LIMIT_MEDIA_INSUFFICIENT':
+                      userMsg = localizations.errorReachedLimit;
+                      break;
+                    case 'FAL_GENERIC_ERROR':
+                      final statusCode = int.tryParse(message ?? '') ?? 0;
+                      userMsg = localizations.falErrorGenericStatus(statusCode);
+                      break;
+                    case 'AI_SERVICE_ERROR':
+                      // Always use localized error — never show raw backend messages
+                      userMsg = localizations.errorServer;
+                      break;
                     default:
-                      userMsg = message ?? localizations.errorServer;
+                      userMsg = localizations.errorServer;
                   }
                   completer.completeError(ApiException(userMsg, code: code));
                 } catch (e) {
@@ -213,15 +412,24 @@ class ApiService {
 
                 switch (currentEvent) {
                   case 'text_chunk':
-                    final text = data['text'] as String?;
+                  case 'text_delta':
+                  case 'message_delta':
+                    final text = extractTextChunk(data);
                     if (text != null) {
+                      onWebSearchActive?.call(false);
                       onTextChunk?.call(text);
                       finalContent.write(text);
                     }
                     break;
 
                   case 'reasoning':
-                    final reasoning = data['text'] as String?;
+                  case 'reasoning_chunk':
+                  case 'reasoning_delta':
+                  case 'thinking':
+                  case 'thinking_chunk':
+                  case 'thought':
+                  case 'thought_chunk':
+                    final reasoning = extractReasoningChunk(data);
                     if (reasoning != null) {
                       onfeatureReasoning?.call(reasoning);
                     }
@@ -265,12 +473,31 @@ class ApiService {
                     break;
 
                   case 'citations':
+                    onWebSearchActive?.call(false);
                     if (data['citations'] is List && onCitations != null) {
                       onCitations(data['citations'] as List<dynamic>);
                     }
                     break;
 
+                  case 'web_search_started':
+                  case 'web_search_triggered':
+                  case 'search_started':
+                  case 'searching':
+                  case 'search_start':
+                    onWebSearchActive?.call(extractSearchActive(data, true));
+                    break;
+
+                  case 'web_search_finished':
+                  case 'search_finished':
+                  case 'search_done':
+                  case 'search_end':
+                    onWebSearchActive?.call(extractSearchActive(data, false));
+                    break;
+
                   case 'tool_calls':
+                    if (containsWebSearchToolCall(data)) {
+                      onWebSearchActive?.call(true);
+                    }
                     // Accumulate tool call deltas
                     if (data is List) {
                       for (var item in data) {
@@ -304,6 +531,19 @@ class ApiService {
 
                   case 'usage':
                     // Usage stats received - could be used for analytics
+                    break;
+
+                  default:
+                    final normalizedEvent = currentEvent.toLowerCase();
+                    if (normalizedEvent.contains('search')) {
+                      onWebSearchActive?.call(extractSearchActive(
+                          data, !isSearchFinishedEvent(normalizedEvent)));
+                    } else if (normalizedEvent.contains('reason')) {
+                      final reasoning = extractReasoningChunk(data);
+                      if (reasoning != null) {
+                        onfeatureReasoning?.call(reasoning);
+                      }
+                    }
                     break;
                 }
               } catch (e) {
@@ -453,6 +693,7 @@ class ApiService {
       source: source,
       enablefeatureReasoning: enablefeatureReasoning,
       enableWebSearch: false,
+      isCharacterModel: true,
       // Characters usually don't need web search, or pass it if needed
       onTextChunk: onTextChunk,
       onfeatureReasoning: onfeatureReasoning,
@@ -549,6 +790,7 @@ class ApiService {
     Function(String)? onMediaGenerating,
     Function(List<dynamic>)? onToolCall,
     Function(List<dynamic>)? onCitations,
+    Function(bool)? onWebSearchActive,
     Function()? onServerFallback,
     required AppLocalizations localizations,
     required String langCode,
@@ -602,6 +844,7 @@ class ApiService {
       onMediaGenerating: onMediaGenerating,
       onToolCall: onToolCall,
       onCitations: onCitations,
+      onWebSearchActive: onWebSearchActive,
       onServerFallback: onServerFallback,
     );
   }

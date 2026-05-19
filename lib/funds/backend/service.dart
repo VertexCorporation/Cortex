@@ -12,16 +12,22 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import '../../cache.dart';
 import '../../internet.dart';
 import '../../l10n/app_localizations.dart';
 import '../../notifications/introvert.dart';
 
 part 'receipt.dart';
+
 part 'offer.dart';
+
 part 'products.dart';
+
 part 'purchase.dart';
+
 part 'verification.dart';
+
 part 'user.dart';
 
 class FundsBackend with ChangeNotifier {
@@ -29,7 +35,7 @@ class FundsBackend with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseFunctions _functions =
-  FirebaseFunctions.instanceFor(region: 'europe-west1');
+      FirebaseFunctions.instanceFor(region: 'europe-west1');
   final FirebaseCrashlytics _crashlytics = FirebaseCrashlytics.instance;
 
   StreamSubscription<List<PurchaseDetails>>? _purchaseStreamSubscription;
@@ -50,6 +56,7 @@ class FundsBackend with ChangeNotifier {
 
   int? _specialOfferExpiresAt;
   bool _isSpecialOfferActive = false;
+  bool _isSpecialOfferEligible = false;
 
   bool get isLoading => _isLoading;
 
@@ -72,16 +79,47 @@ class FundsBackend with ChangeNotifier {
 
   bool get isSpecialOfferActive => _isSpecialOfferActive;
 
+  bool get isSpecialOfferEligible => _isSpecialOfferEligible;
+
+  bool get shouldShowSpecialOfferEntryPoint {
+    final user = _auth.currentUser;
+    if (user == null || user.isAnonymous) return false;
+    return _currentUserSubscriptionLevel == 0 &&
+        (_isSpecialOfferActive || _isSpecialOfferEligible);
+  }
+
   int? get specialOfferExpiresAt => _specialOfferExpiresAt;
+
+  bool get hasFreeTrial {
+    List<ProductDetails> productsToCheck = _products;
+    if (productsToCheck.isEmpty) {
+      final cachedProducts =
+          CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
+      if (cachedProducts != null) {
+        productsToCheck = cachedProducts;
+      }
+    }
+
+    if (productsToCheck.isEmpty) return false;
+
+    try {
+      final proMonthly =
+          productsToCheck.firstWhere((p) => p.id == monthlySubscriptionPro);
+      if (getTrialInfo(proMonthly) != null) return true;
+    } catch (_) {}
+    try {
+      final proAnnual =
+          productsToCheck.firstWhere((p) => p.id == annualSubscriptionPro);
+      if (getTrialInfo(proAnnual) != null) return true;
+    } catch (_) {}
+    return false;
+  }
 
   bool get isWelcomeOffer {
     final user = _auth.currentUser;
     if (user?.metadata.creationTime == null) return true;
     final daysSinceCreation =
-        DateTime
-            .now()
-            .difference(user!.metadata.creationTime!)
-            .inDays;
+        DateTime.now().difference(user!.metadata.creationTime!).inDays;
     return daysSinceCreation < 7;
   }
 
@@ -107,7 +145,7 @@ class FundsBackend with ChangeNotifier {
   Stream<String> get onPurchaseCompleted => _purchaseCompletedController.stream;
 
   late IntrovertNotificationService _notificationService;
-  late AppLocalizations _localizations;
+  AppLocalizations? _localizations;
 
   static final List<ProductDetails> _mockProducts = [
     ProductDetails(
@@ -156,8 +194,18 @@ class FundsBackend with ChangeNotifier {
 
   static const String appPackageName = "com.vertex.cortex";
 
+  static VoidCallback? onPreloadComplete;
+
   FundsBackend() {
     _startListeningToPurchases();
+    // Pre-populate state from cache so synchronous UI renders correctly before fetch
+    loadFromCache();
+    // Re-load if a background preload finishes after the instance is created
+    onPreloadComplete = () {
+      log('Background preload completed, reloading state from cache.',
+          name: _logName);
+      loadFromCache();
+    };
   }
 
   void _notify() => notifyListeners();
@@ -167,13 +215,6 @@ class FundsBackend with ChangeNotifier {
   /// Returns true if data was successfully preloaded.
   static Future<bool> preloadInBackground() async {
     final logName = '$_logName.preload';
-    
-    // Check if we already have cached state
-    final cachedState = CacheService.get<Map<String, dynamic>>(CacheKey.premiumScreenState);
-    if (cachedState != null) {
-      log('Premium screen state already cached, skipping preload.', name: logName);
-      return true;
-    }
 
     final auth = FirebaseAuth.instance;
     final user = auth.currentUser;
@@ -182,35 +223,91 @@ class FundsBackend with ChangeNotifier {
       return false;
     }
 
+    Future<bool> hasActiveSubscription() async {
+      if (user.isAnonymous) return false;
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      final data = snapshot.data();
+      if (data == null || data['accountType'] == 'anonymous') return false;
+
+      final rawLevel = data['hasCortexSubscription'];
+      final int level = rawLevel is int
+          ? rawLevel
+          : rawLevel is num
+              ? rawLevel.toInt()
+              : rawLevel is String
+                  ? int.tryParse(rawLevel) ?? 0
+                  : 0;
+      if (level <= 0) return false;
+
+      final rawExpiry = data['subscriptionExpiresAt'];
+      final DateTime? expiry = rawExpiry is Timestamp
+          ? rawExpiry.toDate()
+          : rawExpiry is DateTime
+              ? rawExpiry
+              : rawExpiry is String
+                  ? DateTime.tryParse(rawExpiry)
+                  : null;
+      if (expiry == null) return level >= 4 && level <= 6;
+      return expiry.isAfter(DateTime.now());
+    }
+
+    final suppressOfferPreload =
+        user.isAnonymous || await hasActiveSubscription();
+    if (suppressOfferPreload) {
+      CacheService.invalidate(CacheKey.premiumScreenState);
+      log('Skipping premium offer preload for anonymous/subscribed user.',
+          name: logName);
+      return false;
+    }
+
+    // Check if we already have cached state
+    final cachedState =
+        CacheService.get<Map<String, dynamic>>(CacheKey.premiumScreenState);
+    if (cachedState != null) {
+      log('Premium screen state already cached, skipping preload.',
+          name: logName);
+      return true;
+    }
+
     if (!await InternetService().hasInternet()) {
       log('Cannot preload: No internet connection.', name: logName);
       return false;
     }
 
     try {
-      log('Starting background preload of premium screen data...', name: logName);
+      log('Starting background preload of premium screen data...',
+          name: logName);
 
-      // 1. Preload products
+      // 1. Preload products (Don't abort if it fails, we still want the offer state)
       final inAppPurchase = InAppPurchase.instance;
-      if (!await inAppPurchase.isAvailable()) {
+      bool productsLoaded = false;
+
+      if (await inAppPurchase.isAvailable()) {
+        final response =
+            await inAppPurchase.queryProductDetails(_subscriptionIds);
+        if (response.error == null && response.productDetails.isNotEmpty) {
+          CacheService.set(CacheKey.premiumProducts, response.productDetails);
+          log('Products cached: ${response.productDetails.length} items',
+              name: logName);
+          productsLoaded = true;
+        } else {
+          log('Failed to fetch products: ${response.error?.message ?? "empty"}',
+              name: logName);
+        }
+      } else {
         log('In-app purchases not available.', name: logName);
-        return false;
       }
 
-      final response = await inAppPurchase.queryProductDetails(_subscriptionIds);
-      if (response.error != null || response.productDetails.isEmpty) {
-        log('Failed to fetch products: ${response.error?.message ?? "empty"}', name: logName);
-        return false;
-      }
-
-      // Cache products
-      CacheService.set(CacheKey.premiumProducts, response.productDetails);
-      log('Products cached: ${response.productDetails.length} items', name: logName);
-
-      // 2. Preload special offer state
+      // 2. Preload special offer state without starting the 48h timer.
       final functions = FirebaseFunctions.instanceFor(region: 'europe-west1');
       final callable = functions.httpsCallable('checkOrStartSpecialOffer');
-      final result = await callable.call<Map<String, dynamic>>({});
+      final result = await callable.call<Map<String, dynamic>>({
+        'startIfEligible': false,
+      });
 
       final data = result.data;
       final status = data['status'] as String?;
@@ -218,14 +315,18 @@ class FundsBackend with ChangeNotifier {
 
       // 3. Cache the complete premium screen state
       final stateToCache = <String, dynamic>{
-        'productsLoaded': true,
+        'productsLoaded': productsLoaded,
         'specialOfferActive': status == 'active' && expiresAt != null,
+        'specialOfferEligible': status == 'eligible',
         'specialOfferExpiresAt': expiresAt,
         'cachedAt': DateTime.now().millisecondsSinceEpoch,
       };
 
       CacheService.set(CacheKey.premiumScreenState, stateToCache);
-      log('Premium screen state preloaded successfully.', name: logName);
+      log('Premium screen state preloaded successfully (Offer active: ${status == 'active'}).',
+          name: logName);
+
+      onPreloadComplete?.call();
 
       return true;
     } catch (e) {
@@ -238,16 +339,18 @@ class FundsBackend with ChangeNotifier {
   /// Returns true only if BOTH products and screen state are cached and valid.
   static bool get isPreloaded {
     final logName = '$_logName.isPreloaded';
-    
+
     // 1. Check if screen state exists
-    final cachedState = CacheService.get<Map<String, dynamic>>(CacheKey.premiumScreenState);
+    final cachedState =
+        CacheService.get<Map<String, dynamic>>(CacheKey.premiumScreenState);
     if (cachedState == null) {
       log('isPreloaded: FALSE - no cached state', name: logName);
       return false;
     }
 
     // 2. Check if products exist (must have both)
-    final cachedProducts = CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
+    final cachedProducts =
+        CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
     if (cachedProducts == null || cachedProducts.isEmpty) {
       // Products expired but state didn't - invalidate state too
       log('isPreloaded: FALSE - no cached products', name: logName);
@@ -267,7 +370,8 @@ class FundsBackend with ChangeNotifier {
       }
     }
 
-    log('isPreloaded: TRUE - ${cachedProducts.length} products cached', name: logName);
+    log('isPreloaded: TRUE - ${cachedProducts.length} products cached',
+        name: logName);
     return true;
   }
 
@@ -290,6 +394,12 @@ class FundsBackend with ChangeNotifier {
 
     _purchaseStreamSubscription = _inAppPurchase.purchaseStream
         .listen(_onPurchaseUpdated, onError: _onPurchaseStreamError);
+        
+    _authSubscription?.cancel();
+    _authSubscription = _auth.authStateChanges().listen((user) {
+      _listenToUserChanges();
+    });
+    
     _listenToUserChanges();
   }
 
@@ -304,11 +414,6 @@ class FundsBackend with ChangeNotifier {
     _localizations = localizations;
 
     _startListeningToPurchases();
-
-    _authSubscription?.cancel();
-    _authSubscription = _auth.authStateChanges().listen((user) {
-      _listenToUserChanges();
-    });
 
     await _fetchProductDetails();
   }

@@ -76,7 +76,9 @@ class InternetService {
   static final InternetService _instance = InternetService._internal();
   factory InternetService() => _instance;
 
-  final InternetConnection _checker = InternetConnection();
+  final InternetConnection _checker = InternetConnection.createInstance(
+    checkInterval: const Duration(seconds: 2),
+  );
   final StreamController<bool> _controller = StreamController<bool>.broadcast();
   bool _hasInternet = true;
   late final StreamSubscription<InternetStatus> _subscription;

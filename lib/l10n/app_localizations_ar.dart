@@ -10,11 +10,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'أنت مسؤول عن إنشاء العناوين. أجب فقط بعنوان من كلمتين إلى خمس كلمات للمحادثة التالية. لا تستخدم علامات الاقتباس أو البادئات أو علامات الترقيم.';
+      'أنت مسؤول عن إنشاء العناوين. يُرجى الرد بعنوان من كلمتين إلى خمس كلمات فقط للمحادثة التالية. لا تستخدم علامات الاقتباس أو البادئات أو علامات الترقيم. هام: يجب أن يكون العنوان بنفس لغة رسالة المستخدم تمامًا.';
+
+  @override
+  String get systemRoleFallback => 'أنت مساعد مفيد.';
+
+  @override
+  String get systemLanguageInstruction =>
+      '\n\nCRITICAL: يجب دائمًا الرد بنفس اللغة التي يكتب بها المستخدم، انتبه إلى لغة المستخدم.';
+
+  @override
+  String get systemNotePreviousMedia =>
+      '[ملاحظة النظام: أدناه هي الوسائط التي تم إنشاؤها مسبقًا. يمكنك الإشارة إليها أو تعديلها.]';
+
+  @override
+  String systemTimeInfo(String formattedTime) {
+    return '\n\nالتاريخ والوقت الحالي: $formattedTime.';
+  }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nحلل المحادثة حتى الآن. إذا تعلمت أي حقائق جديدة ومميزة عن المستخدم (تفضيلات، اسم، عادات، سياق)، فيجب عليك إخراج ذاكرتك المحدثة بالكامل عن المستخدم داخل علامات <memory>...</memory> في نهاية ردك. هام: لا تقم أبدًا بمسح أو استبدال الذاكرة السابقة. أضف دائمًا الحقائق الجديدة إلى الذاكرة الموجودة. إذا لم يتم تعلم أي شيء جديد على الإطلاق، فاحذف العلامة. مثال: <memory>يحب كرة القدم والتنس. يفضل الإجابات القصيرة.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
@@ -112,9 +128,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get localModels => 'النماذج المحلية';
-
-  @override
-  String get serverSideModels => 'نماذج اللغة';
 
   @override
   String get selectGGUFFile => 'حدد ملف GGUF';
@@ -299,9 +312,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'سيتم حذف البيانات التي تحذفها بشكل دائم من خادمنا وجهازك. لا يمكن التراجع عن هذا الإجراء.';
 
   @override
-  String get deleteAccountButton => 'زر حذف الحساب';
-
-  @override
   String get editProfile => 'تعديل الملف الشخصي';
 
   @override
@@ -351,9 +361,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get downloadPaused => 'توقف التنزيل مؤقتًا.';
-
-  @override
-  String get purchaseSuccessful => 'تم الشراء بنجاح!';
 
   @override
   String get purchaseError => 'خطأ في الشراء';
@@ -863,6 +870,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get selectBaseModel => 'حدد نموذجًا أساسيًا';
 
   @override
+  String get falErrorImageRequired =>
+      'يتطلب هذا الذكاء الاصطناعي صورة مرجعية، يرجى إرفاق صورة والمحاولة مرة أخرى.';
+
+  @override
+  String get falErrorAudioRequired =>
+      'يتطلب هذا النموذج ملف صوتي مرجعي، يرجى إرفاق ملف صوتي والمحاولة مرة أخرى.';
+
+  @override
+  String get falErrorVideoRequired =>
+      'يتطلب هذا النموذج فيديو مرجعيًا، يرجى إرفاق فيديو والمحاولة مرة أخرى.';
+
+  @override
+  String get falErrorImageCorrupted =>
+      'تعذر معالجة الصورة التي تم تحميلها، يرجى تجربة تنسيق مختلف.';
+
+  @override
+  String get falErrorSchemaRejected =>
+      'رفض النموذج المدخلات، يرجى تجربة نموذج مختلف.';
+
+  @override
+  String get falErrorSchemaInvalid => 'تم رفض المدخلات من قبل خدمة التوليد.';
+
+  @override
+  String falErrorGenericStatus(int statusCode) {
+    return 'أعادت خدمة الإنشاء خطأً (الحالة $statusCode).';
+  }
+
+  @override
   String get couldNotOpenLink => 'تعذر فتح الرابط';
 
   @override
@@ -920,9 +955,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reportSubmitted => 'تم إرسال البلاغ بنجاح';
 
   @override
-  String get purchaseReceived => 'تم استلام الشراء، جاري تحديث حسابك.';
-
-  @override
   String get verificationDelayed =>
       'تم تأكيد عملية الشراء. هناك تأخير طفيف في تحديث حسابك، سيظهر قريبًا.';
 
@@ -972,13 +1004,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'إذن التخزين مطلوب لحفظ النماذج التي تم تنزيلها. يرجى منح الإذن للمتابعة.';
 
   @override
-  String get plusBannerTitle => 'احصل على باقة Free Plus!';
-
-  @override
-  String get plusBannerSubtitle =>
-      'قم بدعوة صديق واحصلوا كلاكما على يوم واحد من خدمة Plus مجاناً!';
-
-  @override
   String get inviteShareSubject => 'انضم إلي في Cortex!';
 
   @override
@@ -1024,13 +1049,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'يمكن لهذا النموذج تحليل والإجابة على الأسئلة حول المستندات التي تم تحميلها مثل ملفات PDF والملفات النصية.';
 
   @override
-  String get featureAudioTitle => 'إدخال الصوت';
-
-  @override
-  String get featureAudioDescription =>
-      'يمكن لهذا النموذج فهم ومعالجة مدخلات الصوت المنطوقة.';
-
-  @override
   String get featureImageGenerationTitle => 'توليد الصور';
 
   @override
@@ -1056,7 +1074,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      'هذا النموذج هو نموذج مميز، ويقتصر المستخدمون المجانيون على 3 رسائل يوميًا مع النماذج المميزة؛ اشترك لفتح الوصول غير المحدود!';
+      'هذا الذكاء الاصطناعي هو ذكاء اصطناعي مميز، المستخدمون المجانيون لديهم وصول محدود إلى الذكاء الاصطناعي المميز؛ قم بالترقية لفتح وصول غير محدود!';
 
   @override
   String get benefitPremiumModels => 'الوصول إلى النماذج المتميزة';
@@ -1075,7 +1093,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get news => 'أخبار';
 
   @override
-  String get createAI => 'يخلق';
+  String get createAI => 'إنشاء';
 
   @override
   String get shortcuts => 'اختصارات';
@@ -1452,13 +1470,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get onboardingFinalButton => 'نعم!';
 
   @override
-  String get paywallAhaTitle => 'Unlock the True Power of AI';
-
-  @override
-  String get paywallAhaSubtitle =>
-      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
-
-  @override
   String get dude => 'يا صديقي';
 
   @override
@@ -1646,6 +1657,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get exclusiveOffer => 'عرض حصري';
 
   @override
+  String get claimOffer => 'استخدم العرض';
+
+  @override
   String get continueInOfflineMode => 'متابعة في وضع عدم الاتصال';
 
   @override
@@ -1773,9 +1787,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get featureWebSearchDescription => 'ابحث في الإنترنت عن معلومات آنية';
 
   @override
-  String get webSearchQuotaExceeded => 'تم تجاوز حصة البحث';
-
-  @override
   String get clearMemory => 'ذاكرة صافية';
 
   @override
@@ -1785,7 +1796,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get personalization => 'التخصيص';
 
   @override
-  String get personalizationDescription => 'خصّص تجربتك';
+  String get personalizationDescription =>
+      'خصّص مساعدك ليناسب احتياجاتك بشكل أفضل. عدّل ردوده وسلوكه ونبرته لتتوافق مع تفضيلاتك الفريدة.';
 
   @override
   String get memoryTitle => 'ذاكرة';
@@ -1826,7 +1838,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[System] تعليمات هامة: أنت تعمل حاليًا داخل نظام بيئي ضخم ومتطور للغاية للذكاء الاصطناعي يسمى \"Cortex\". تذكر ذلك وحافظ على شخصية Cortex إذا سئلت.';
+      '\n\n[النظام] تعليمات هامة: أنت تعمل حاليًا داخل نظام ذكاء اصطناعي ضخم ومتطور للغاية يُسمى \"كورتكس\"؛ هذه المنصة من تطوير فريق فيرتكس، الذين يبلغ متوسط أعمارهم 16 عامًا فقط. تذكر هذا وأجب إذا طُلب منك ذلك. إذا طُلب منك المزيد من المعلومات، فلا تتردد في البحث على الإنترنت، أو إذا لم تتمكن من البحث، فلا تتردد في قول \"لا أعرف\"!';
 
   @override
   String get featureAudioRecognitionTitle => 'التعرف على الصوت';
@@ -1911,9 +1923,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'أنت بحاجة إلى اشتراك Ultra لإنشاء مقاطع الفيديو، قم بالترقية الآن واستمتع بالتجربة!';
 
   @override
-  String get becomePremiumButton => 'اشترك في العضوية المميزة';
-
-  @override
   String get fallbackInfoPanelText =>
       'نظراً لبعض التحسينات التي نجريها على خوادمنا، تم إنشاء الرد بواسطة نظام الدردشة الديناميكي الخاص بـ Cortex بدلاً من الذكاء الاصطناعي الذي اخترته. نشكرك على تفهمك ريثما تكتمل العملية!';
 
@@ -1929,7 +1938,31 @@ class AppLocalizationsAr extends AppLocalizations {
   String get backgroundChatNotificationTitle => 'العودة إلى الدردشة!';
 
   @override
-  String backgroundChatNotificationBody(String chatName) {
-    return 'هناك رسالة جديدة في $chatName، ألقِ نظرة عليها!';
+  String get benefitVideoGeneration => 'إنشاء الفيديو';
+
+  @override
+  String get freeOffer => 'عرض مجاني';
+
+  @override
+  String trialMonthlyDescription(String days, String price) {
+    return 'أول $days أيام مجانًا، ثم $price/شهر';
   }
+
+  @override
+  String trialAnnualDescription(String days, String price) {
+    return 'أول $days أيام مجانًا، ثم $price/سنة';
+  }
+
+  @override
+  String freePlan(String plan) {
+    return '$plan مجاني!';
+  }
+
+  @override
+  String get systemPromptLimitFallback =>
+      'هام: طلب المستخدم إجراءً ما، ولكن رصيده على منصة كورتكس قد نفد؛ يرجى إبلاغ المستخدم بلغته أنه يجب عليه الانتظار أو التفكير في ترقية خطة اشتراكه.';
+
+  @override
+  String get dynamicPreditsUpgradeMessage =>
+      'يمكن لـ Cortex تقديم إجابات أفضل؛ قم بالترقية الآن واحصل على أفضل إجابة لكل سؤال!';
 }

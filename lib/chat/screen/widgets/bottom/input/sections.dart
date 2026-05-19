@@ -22,7 +22,7 @@ class WaveformSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final bool isDesktop = screenWidth >= 800;
     final bool isTablet = screenWidth >= 600;
 
@@ -467,6 +467,7 @@ class ToolsSection extends StatelessWidget {
             screenWidth: screenWidth,
             isTablet: isTablet,
             localizations: widget.localizations,
+            onSelectionComplete: () => widget.textFieldFocusNode.requestFocus(),
           ),
         ],
       ),

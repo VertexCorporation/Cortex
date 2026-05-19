@@ -25,7 +25,7 @@ void showFeaturesSheet({
 }) {
   FocusScope.of(context).unfocus();
 
-  final mediaQuery = MediaQuery.of(context);
+  
 
   showModalBottomSheet<void>(
     context: context,
@@ -33,7 +33,7 @@ void showFeaturesSheet({
     isScrollControlled: true,
     useSafeArea: true,
     constraints: BoxConstraints(
-      maxWidth: mediaQuery.size.width,
+      maxWidth: MediaQuery.sizeOf(context).width,
     ),
     builder: (BuildContext modalContext) {
       return _FeaturesSheetContent(controller: controller);
@@ -61,9 +61,9 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final screenHeight = mediaQuery.size.height;
-    final double topRadius = mediaQuery.size.width * 0.07;
+    
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final double topRadius = MediaQuery.sizeOf(context).width * 0.07;
     final l10n = AppLocalizations.of(context)!;
 
     final catalog = context.watch<ModelCatalogProvider>();
@@ -98,7 +98,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
           Padding(
             padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
             child: Container(
-              width: mediaQuery.size.width * 0.12,
+              width: MediaQuery.sizeOf(context).width * 0.12,
               height: 4,
               decoration: BoxDecoration(
                 color: AppColors.secondaryColor,
@@ -301,7 +301,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                               id,
                               langCode: langCode,
                             );
-                            selectionService.selectModel(model);
+                            selectionService.switchActiveModel(model);
                           },
                         );
                       },

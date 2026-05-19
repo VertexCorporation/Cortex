@@ -4,8 +4,10 @@ extension FundsSpecialOffer on FundsBackend {
   /// Loads cached state into this instance (call after checking isPreloaded).
   void loadFromCache() {
     final logName = '${FundsBackend._logName}.loadFromCache';
-    final cachedProducts = CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
-    final cachedState = CacheService.get<Map<String, dynamic>>(CacheKey.premiumScreenState);
+    final cachedProducts =
+        CacheService.get<List<ProductDetails>>(CacheKey.premiumProducts);
+    final cachedState =
+        CacheService.get<Map<String, dynamic>>(CacheKey.premiumScreenState);
 
     if (cachedProducts != null && cachedProducts.isNotEmpty) {
       _products = cachedProducts;
@@ -14,9 +16,20 @@ extension FundsSpecialOffer on FundsBackend {
     }
 
     if (cachedState != null) {
-      _isSpecialOfferActive = cachedState['specialOfferActive'] ?? false;
-      _specialOfferExpiresAt = cachedState['specialOfferExpiresAt'] as int?;
-      log('Loaded special offer state: active=$_isSpecialOfferActive', name: logName);
+      final user = _auth.currentUser;
+      final shouldSuppressOffer =
+          (user?.isAnonymous ?? false) || _currentUserSubscriptionLevel > 0;
+      _isSpecialOfferActive = shouldSuppressOffer
+          ? false
+          : cachedState['specialOfferActive'] ?? false;
+      _isSpecialOfferEligible = shouldSuppressOffer
+          ? false
+          : cachedState['specialOfferEligible'] ?? false;
+      _specialOfferExpiresAt = _isSpecialOfferActive
+          ? cachedState['specialOfferExpiresAt'] as int?
+          : null;
+      log('Loaded special offer state: active=$_isSpecialOfferActive',
+          name: logName);
     }
 
     _setLoading(false);
@@ -31,9 +44,21 @@ extension FundsSpecialOffer on FundsBackend {
       return;
     }
 
+    if (user.isAnonymous || _currentUserSubscriptionLevel > 0) {
+      _isSpecialOfferActive = false;
+      _isSpecialOfferEligible = false;
+      _specialOfferExpiresAt = null;
+      _notify();
+      log('Special offer suppressed for anonymous/subscribed user.',
+          name: FundsBackend._logName);
+      return;
+    }
+
     try {
       final callable = _functions.httpsCallable('checkOrStartSpecialOffer');
-      final result = await callable.call<Map<String, dynamic>>({});
+      final result = await callable.call<Map<String, dynamic>>({
+        'startIfEligible': true,
+      });
 
       final data = result.data;
       final status = data['status'] as String?;
@@ -41,20 +66,30 @@ extension FundsSpecialOffer on FundsBackend {
 
       if (status == 'active' && expiresAt != null) {
         _isSpecialOfferActive = true;
+        _isSpecialOfferEligible = false;
         _specialOfferExpiresAt = expiresAt;
-        log('Special offer ACTIVE. Expires at: ${DateTime
-            .fromMillisecondsSinceEpoch(expiresAt)}',
+        log('Special offer ACTIVE. Expires at: ${DateTime.fromMillisecondsSinceEpoch(expiresAt)}',
+            name: FundsBackend._logName);
+      } else if (status == 'eligible') {
+        _isSpecialOfferActive = false;
+        _isSpecialOfferEligible = true;
+        _specialOfferExpiresAt = null;
+        log('Special offer ELIGIBLE but not started yet.',
             name: FundsBackend._logName);
       } else {
         _isSpecialOfferActive = false;
+        _isSpecialOfferEligible = false;
         _specialOfferExpiresAt = null;
-        log('Special offer in COOLDOWN or unavailable.', name: FundsBackend._logName);
+        log('Special offer in COOLDOWN or unavailable.',
+            name: FundsBackend._logName);
       }
 
       _notify();
     } on FirebaseFunctionsException catch (e) {
-      log('Special offer check failed: ${e.message}', name: FundsBackend._logName, error: e);
+      log('Special offer check failed: ${e.message}',
+          name: FundsBackend._logName, error: e);
       _isSpecialOfferActive = false;
+      _isSpecialOfferEligible = false;
       _specialOfferExpiresAt = null;
     } catch (e, stack) {
       log('Unexpected error checking special offer: $e',
@@ -66,6 +101,7 @@ extension FundsSpecialOffer on FundsBackend {
         fatal: false,
       );
       _isSpecialOfferActive = false;
+      _isSpecialOfferEligible = false;
       _specialOfferExpiresAt = null;
     }
   }

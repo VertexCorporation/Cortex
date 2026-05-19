@@ -253,8 +253,8 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     // --- SCALING LOGIC ---
     double fontScale = screenWidth / 375.0;
@@ -263,12 +263,18 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
     }
     fontScale = fontScale.clamp(0.85, 1.35);
     final double containerMaxWidth = 400 * fontScale;
-
     return Scaffold(
       backgroundColor: AppColors.background,
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: Stack(
+      resizeToAvoidBottomInset: false,
+      body: Builder(
+        builder: (context) {
+          final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+          return AnimatedPadding(
+            padding: EdgeInsets.only(bottom: bottomInset),
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+        child: SafeArea(
+          child: Stack(
           children: [
             Center(
               child: ConstrainedBox(
@@ -382,4 +388,7 @@ class _UpgradeAccountScreenState extends State<UpgradeAccountScreen>
       ),
     );
   }
+),
+);
+}
 }

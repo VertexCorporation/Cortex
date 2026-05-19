@@ -18,8 +18,8 @@ class EditPanelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
     final bool isTablet = screenWidth >= 600;
     final localizations = AppLocalizations.of(context)!;
 

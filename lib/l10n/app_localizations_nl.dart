@@ -10,11 +10,27 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'Je bent een titelgenerator. Reageer ALLEEN met een titel van 2-5 woorden voor het volgende gesprek. Gebruik geen aanhalingstekens, voorvoegsels of leestekens.';
+      'Je bent een titelgenerator. Reageer ALLEEN met een titel van 2-5 woorden voor het volgende gesprek. Gebruik geen aanhalingstekens, voorvoegsels of leestekens. BELANGRIJK: De titel MOET in EXACT DEZELFDE taal zijn als het bericht van de gebruiker.';
+
+  @override
+  String get systemRoleFallback => 'Je bent een behulpzame assistent.';
+
+  @override
+  String get systemLanguageInstruction =>
+      '\n\nCRITICAL: Reageer altijd in dezelfde taal als waarin de gebruiker schrijft; let op de taal van de gebruiker.';
+
+  @override
+  String get systemNotePreviousMedia =>
+      '[Systeemnotitie: Hieronder staat de eerder gegenereerde media. U kunt hiernaar verwijzen of deze bewerken.]';
+
+  @override
+  String systemTimeInfo(String formattedTime) {
+    return '\n\nHuidige datum en tijd: $formattedTime.';
+  }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyseer het gesprek tot nu toe. Als je OOK maar één nieuw, specifiek feit over de gebruiker hebt geleerd (voorkeuren, naam, gewoonten, context), MOET je je VOLLEDIGE bijgewerkte geheugen over de gebruiker weergeven tussen <memory>...</memory> tags AAN HET EINDE van je antwoord. BELANGRIJK: Je mag NOOIT eerder geheugen wissen of overschrijven. Voeg ALTIJD nieuwe feiten toe aan het bestaande geheugen. Als er absoluut niets nieuws is geleerd, laat je de tag weg. Voorbeeld: <memory>Houdt van voetbal en tennis. Geeft de voorkeur aan korte antwoorden.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
@@ -112,9 +128,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get localModels => 'Lokale Modellen';
-
-  @override
-  String get serverSideModels => 'Taalmodellen';
 
   @override
   String get selectGGUFFile => 'Selecteer GGUF-bestand';
@@ -302,9 +315,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'De gegevens die je verwijdert, worden permanent van onze server en je apparaat verwijderd. Deze acties kunnen niet ongedaan worden gemaakt.';
 
   @override
-  String get deleteAccountButton => 'Knop Accountverwijdering';
-
-  @override
   String get editProfile => 'Profiel Bewerken';
 
   @override
@@ -355,9 +365,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get downloadPaused => 'Download gepauzeerd.';
-
-  @override
-  String get purchaseSuccessful => 'Aankoop succesvol!';
 
   @override
   String get purchaseError => 'Aankoopfout';
@@ -873,6 +880,35 @@ class AppLocalizationsNl extends AppLocalizations {
   String get selectBaseModel => 'Selecteer een Basismodel';
 
   @override
+  String get falErrorImageRequired =>
+      'Deze AI vereist een referentieafbeelding. Voeg een afbeelding toe en probeer het opnieuw.';
+
+  @override
+  String get falErrorAudioRequired =>
+      'Voor dit model is een referentie-audiobestand vereist. Voeg een audiobestand toe en probeer het opnieuw.';
+
+  @override
+  String get falErrorVideoRequired =>
+      'Voor dit model is een referentievideo vereist. Voeg een video toe en probeer het opnieuw.';
+
+  @override
+  String get falErrorImageCorrupted =>
+      'De geüploade afbeelding kon niet worden verwerkt. Probeer een ander formaat.';
+
+  @override
+  String get falErrorSchemaRejected =>
+      'Het model heeft de invoer afgewezen. Probeer een ander model.';
+
+  @override
+  String get falErrorSchemaInvalid =>
+      'De invoer werd afgewezen door de generatiedienst.';
+
+  @override
+  String falErrorGenericStatus(int statusCode) {
+    return 'De generatieservice heeft een fout geretourneerd (status $statusCode).';
+  }
+
+  @override
   String get couldNotOpenLink => 'Kon de link niet openen';
 
   @override
@@ -935,10 +971,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get reportSubmitted => 'Rapport succesvol ingediend';
 
   @override
-  String get purchaseReceived =>
-      'Aankoop ontvangen, je account wordt bijgewerkt.';
-
-  @override
   String get verificationDelayed =>
       'Je aankoop is bevestigd. Er is een kleine vertraging bij het bijwerken van je account, het zal binnenkort verschijnen.';
 
@@ -988,13 +1020,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Opslagtoestemming is vereist om gedownloade modellen op te slaan. Geef toestemming om door te gaan.';
 
   @override
-  String get plusBannerTitle => 'Ontvang Free Plus!';
-
-  @override
-  String get plusBannerSubtitle =>
-      'Nodig een vriend uit en jullie krijgen allebei 1 dag Plus gratis!';
-
-  @override
   String get inviteShareSubject => 'Doe mee met mij op Cortex!';
 
   @override
@@ -1040,13 +1065,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit model kan vragen over geüploade documenten, zoals PDF\'s en tekstbestanden, analyseren en beantwoorden.';
 
   @override
-  String get featureAudioTitle => 'Spraakinvoer';
-
-  @override
-  String get featureAudioDescription =>
-      'Dit model kan gesproken audio-input begrijpen en verwerken.';
-
-  @override
   String get featureImageGenerationTitle => 'Beeldgeneratie';
 
   @override
@@ -1072,7 +1090,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      'Dit model is een premiummodel. Gratis gebruikers zijn beperkt tot 3 berichten per dag. Premiummodellen zijn ook beperkt tot gratis gebruikers. Neem een abonnement om onbeperkte toegang te krijgen!';
+      'Deze AI is een premium AI, gratis gebruikers hebben beperkte toegang tot premium AI\'s; upgrade om onbeperkte toegang te ontgrendelen!';
 
   @override
   String get benefitPremiumModels => 'Toegang tot premiummodellen';
@@ -1091,7 +1109,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get news => 'Nieuws';
 
   @override
-  String get createAI => 'Creëren';
+  String get createAI => 'Maken';
 
   @override
   String get shortcuts => 'Snelkoppelingen';
@@ -1474,13 +1492,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get onboardingFinalButton => 'JA!';
 
   @override
-  String get paywallAhaTitle => 'Unlock the True Power of AI';
-
-  @override
-  String get paywallAhaSubtitle =>
-      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
-
-  @override
   String get dude => 'Kerel';
 
   @override
@@ -1670,6 +1681,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get exclusiveOffer => 'Exclusieve aanbieding';
 
   @override
+  String get claimOffer => 'Aanbieding gebruiken';
+
+  @override
   String get continueInOfflineMode => 'Doorgaan in offline modus';
 
   @override
@@ -1800,9 +1814,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Zoek op internet naar actuele informatie.';
 
   @override
-  String get webSearchQuotaExceeded => 'Zoekquotum overschreden';
-
-  @override
   String get clearMemory => 'Geheugen wissen';
 
   @override
@@ -1813,7 +1824,8 @@ class AppLocalizationsNl extends AppLocalizations {
   String get personalization => 'Personalisatie';
 
   @override
-  String get personalizationDescription => 'Personaliseer je ervaring';
+  String get personalizationDescription =>
+      'Personaliseer je assistent zodat deze beter aansluit op je behoeften. Stem de reacties, het gedrag en de toon af op jouw unieke voorkeuren.';
 
   @override
   String get memoryTitle => 'Geheugen';
@@ -1853,7 +1865,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[System] KRITISCHE INSTRUCTIE: U bevindt zich momenteel in een enorm, zeer geavanceerd AI-ecosysteem genaamd \"Cortex\". Onthoud dit en behoud de Cortex-persona als u ernaar wordt gevraagd.';
+      '\n\n[Systeem] BELANGRIJKE INSTRUCTIE: U bevindt zich momenteel in een enorm, zeer geavanceerd AI-ecosysteem genaamd \"Cortex\"; dit platform is ontwikkeld door het Vertex-team, dat gemiddeld slechts 16 jaar oud is. Onthoud dit en beantwoord de vragen indien nodig. Als er meer informatie wordt gevraagd, aarzel dan niet om op internet te zoeken, of als u niet kunt zoeken, kunt u gerust zeggen dat u het niet weet!';
 
   @override
   String get featureAudioRecognitionTitle => 'Audiorecognitie';
@@ -1939,9 +1951,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Je hebt een Ultra-abonnement nodig om video\'s te maken. Upgrade nu en ervaar de voordelen!';
 
   @override
-  String get becomePremiumButton => 'Word Premium-lid';
-
-  @override
   String get fallbackInfoPanelText =>
       'Vanwege enkele verbeteringen die we aan onze serverkant doorvoeren, is het antwoord gegenereerd door de dynamische chat van Cortex in plaats van door de door u geselecteerde AI. Bedankt voor uw begrip totdat het proces is afgerond!';
 
@@ -1957,7 +1966,31 @@ class AppLocalizationsNl extends AppLocalizations {
   String get backgroundChatNotificationTitle => 'Terug naar de chat!';
 
   @override
-  String backgroundChatNotificationBody(String chatName) {
-    return 'Er is een nieuw bericht in $chatName, bekijk het!';
+  String get benefitVideoGeneration => 'Videogeneratie';
+
+  @override
+  String get freeOffer => 'Gratis aanbieding';
+
+  @override
+  String trialMonthlyDescription(String days, String price) {
+    return 'Eerste $days dagen gratis, daarna $price/maand';
   }
+
+  @override
+  String trialAnnualDescription(String days, String price) {
+    return 'Eerste $days dagen gratis, daarna $price/jaar';
+  }
+
+  @override
+  String freePlan(String plan) {
+    return 'Gratis $plan!';
+  }
+
+  @override
+  String get systemPromptLimitFallback =>
+      'KRITISCH: De gebruiker heeft een actie aangevraagd, maar zijn/haar Cortex-tegoed is op. Informeer de gebruiker in zijn/haar eigen taal dat hij/zij moet wachten of een upgrade van het abonnement moet overwegen.';
+
+  @override
+  String get dynamicPreditsUpgradeMessage =>
+      'Cortex kan nog betere antwoorden geven; upgrade nu en krijg het beste antwoord op elke vraag!';
 }

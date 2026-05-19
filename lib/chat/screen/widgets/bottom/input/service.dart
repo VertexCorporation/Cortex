@@ -309,8 +309,9 @@ class InputService {
     required bool isSubscribed,
     required bool isVideoModel,
     required int userTier,
-    required int premiumTrialUses,
     required int? totalCredits,
+    required int? availablePredits,
+    required int? availableDredits,
   }) {
     // 1. Basic Blockers
     if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
@@ -327,16 +328,27 @@ class InputService {
       return false;
     }
 
-    // 2. Trial Limits
-    if (isPremiumModel && !isSubscribed && premiumTrialUses >= 3) {
-      return false;
+    // 2. Premium / Predits Limits
+    // Dynamic chat is gated by dredits only on the client. The server may still
+    // spend predits/credits after routing if it chooses a premium provider.
+    if (!isDynamicChatMode && isPremiumModel && !isSubscribed) {
+      if ((availablePredits ?? 0) < 10) {
+        return false;
+      }
+    }
+
+    // 3. Dynamic Chat / Dredits Limit
+    if (isDynamicChatMode) {
+      if ((availableDredits ?? 0) < 1) {
+        return false;
+      }
     }
 
     final inputProvider = context.read<InputProvider>();
 
     final int attachmentCount = inputProvider.attachments.length;
 
-    // 3. Credit Check
+    // 4. Overall Credit Check
     final needed = calculateRequiredCredits(
       isServerSide: isServerSideModel,
       isDynamicChat: isDynamicChatMode,
@@ -345,7 +357,10 @@ class InputService {
       isSearchEnabled: inputProvider.enableWebSearch,
     );
 
-    if ((isDynamicChatMode || isServerSideModel) && totalCredits != null && totalCredits < needed) {
+    if (!isDynamicChatMode &&
+        isServerSideModel &&
+        totalCredits != null &&
+        totalCredits < needed) {
       return false;
     }
 
@@ -365,8 +380,9 @@ class InputService {
     required bool isSubscribed,
     required bool isVideoModel,
     required int userTier,
-    required int premiumTrialUses,
     required int? totalCredits,
+    required int? availablePredits,
+    required int? availableDredits,
   }) {
     // 1. Basic Blockers
     if (modelMissing || isSending || !isStorageSufficient || isLimitExceeded) {
@@ -383,9 +399,20 @@ class InputService {
       return false;
     }
 
-    // 2. Trial Limits
-    if (isPremiumModel && !isSubscribed && premiumTrialUses >= 3) {
-      return false;
+    // 2. Premium / Predits Limits
+    // Dynamic chat must remain sendable as long as the user has dredits. Predits
+    // are only a routing/cost concern after the server chooses a premium path.
+    if (!isDynamicChatMode && isPremiumModel && !isSubscribed) {
+      if ((availablePredits ?? 0) < 10) {
+        return false;
+      }
+    }
+
+    // 3. Dynamic Chat / Dredits Limit
+    if (isDynamicChatMode) {
+      if ((availableDredits ?? 0) < 1) {
+        return false;
+      }
     }
 
     final inputProvider = context.read<InputProvider>();
@@ -395,7 +422,7 @@ class InputService {
     final int attachmentCount = inputProvider.attachments.length;
     final bool hasAttachments = attachmentCount > 0;
 
-    // 3. Credit Check
+    // 4. Overall Credit Check
     final needed = calculateRequiredCredits(
       isServerSide: isServerSideModel,
       isDynamicChat: isDynamicChatMode,
@@ -404,17 +431,16 @@ class InputService {
       isSearchEnabled: inputProvider.enableWebSearch,
     );
 
-    if ((isDynamicChatMode || isServerSideModel) && totalCredits != null && totalCredits < needed) {
+    if (!isDynamicChatMode &&
+        isServerSideModel &&
+        totalCredits != null &&
+        totalCredits < needed) {
       return false;
     }
 
-    // 4. Content Validation
+    // 5. Content Validation
     if (inputProvider.isEditingMode) {
-      final String originalText = inputProvider.originalMessageText ?? '';
-      final bool textChanged = currentText != originalText;
-      // Allow send if text changed OR if there are attachments (even if text is same/empty)
-      return (textChanged || hasAttachments) &&
-          (currentText.isNotEmpty || hasAttachments);
+      return currentText.isNotEmpty || hasAttachments;
     }
 
     // Standard Mode: Must have text OR attachments

@@ -64,7 +64,7 @@ class _AiErrorWidgetState extends State<_AiErrorWidget> with TickerProviderState
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final dynamicFontSize = screenWidth * 0.04;
     final iconSize = screenWidth * 0.06;
 

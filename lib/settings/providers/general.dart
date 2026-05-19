@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:cortex/l10n/app_localizations.dart';
 
 // Provider & Service Imports
 import '../../internet.dart';
@@ -64,9 +65,7 @@ class SettingsGeneralProvider with ChangeNotifier {
     _frozenAuthUid = _authService.currentUser?.uid;
 
     // Snapshot subscription level logic
-    _frozenSubscriptionLevel = _userProvider.isSubscriptionActive
-        ? (_userProvider.userData?['hasCortexSubscription'] as int? ?? 0)
-        : 0;
+    _frozenSubscriptionLevel = _userProvider.activeSubscriptionLevel;
 
     _isFrozen = true;
     notifyListeners();
@@ -106,9 +105,7 @@ class SettingsGeneralProvider with ChangeNotifier {
   int get activeSubscriptionLevel {
     if (_isFrozen) return _frozenSubscriptionLevel;
 
-    return _userProvider.isSubscriptionActive
-        ? (userData?['hasCortexSubscription'] as int? ?? 0)
-        : 0;
+    return _userProvider.activeSubscriptionLevel;
   }
 
   /// The number of times a verification email has been resent.
@@ -165,7 +162,7 @@ class SettingsGeneralProvider with ChangeNotifier {
     }
   }
 
-  Future<void> resendVerificationEmail() async {
+  Future<void> resendVerificationEmail(AppLocalizations localizations) async {
     if (isResendingEmail ||
         verificationAttempts >= 2 ||
         !_hasInternet ||
@@ -178,7 +175,7 @@ class SettingsGeneralProvider with ChangeNotifier {
       await _authService.sendVerificationEmail();
       await _profileService.incrementVerificationAttempts();
       _notificationService.showNotification(
-          message: "Verification link sent!", type: NotificationType.success);
+          message: localizations.linkSent, type: NotificationType.success);
       await refreshData();
     } catch (e) {
       _notificationService.showNotification(

@@ -9,6 +9,17 @@ import 'package:cortex/settings/services/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:cortex/l10n/app_localizations.dart';
+
+// --- MOCK LOCALIZATIONS ---
+
+class _MockLocalizations implements AppLocalizations {
+  @override
+  String get linkSent => 'Link sent';
+  
+  @override
+  dynamic noSuchMethod(Invocation invocation) => '';
+}
 
 // --- FAKES ---
 
@@ -208,7 +219,7 @@ void main() {
 
     test('Resend Verification Email Flow', () async {
       auth.verified = false;
-      await provider.resendVerificationEmail();
+      await provider.resendVerificationEmail(_MockLocalizations());
 
       expect(provider.isResendingEmail, false);
       expect(auth.sendEmailCalledCount, 1);
@@ -219,7 +230,7 @@ void main() {
     test('Resend Verification Limit', () async {
       profile.fakeData = {'verifyAttempts': 2};
       await provider.refreshData();
-      await provider.resendVerificationEmail();
+      await provider.resendVerificationEmail(_MockLocalizations());
       expect(auth.sendEmailCalledCount, 0);
     });
   });

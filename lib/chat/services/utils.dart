@@ -9,7 +9,8 @@ import '../../library/backend/data/service.dart';
 
 /// A collection of static utility methods used across the application.
 class Utils {
-  static bool isLocalModel(String? modelId, {
+  static bool isLocalModel(
+    String? modelId, {
     required String langCode,
     required ModelService modelService,
   }) =>
@@ -19,7 +20,8 @@ class Utils {
         modelService: modelService,
       );
 
-  static bool isServerSideModel(String? modelId, {
+  static bool isServerSideModel(
+    String? modelId, {
     required String langCode,
     required ModelService modelService,
   }) {
@@ -35,7 +37,8 @@ class Utils {
   }
 
   /// It requires a `langCode` to ensure correct localization.
-  static ModelEntity getModelEntityFromId(String targetModelId, {
+  static ModelEntity getModelEntityFromId(
+    String targetModelId, {
     required String langCode,
     required ModelService modelService,
   }) {
@@ -76,13 +79,16 @@ class Utils {
     try {
       final mediaFile = File(mediaPath);
       if (await mediaFile.exists()) {
-        // Read file bytes. For very large video files this could OOM, 
+        // Read file bytes. For very large video files this could OOM,
         // but for now we follow the existing pattern.
         final mediaBytes = await mediaFile.readAsBytes();
-        final mimeType = lookupMimeType(mediaPath, headerBytes: mediaBytes) ?? 'application/octet-stream';
+        final mimeType = lookupMimeType(mediaPath, headerBytes: mediaBytes) ??
+            'application/octet-stream';
 
         // Ensure it's media (we optionally could restrict down to mp4, wav, etc.)
-        if (!mimeType.startsWith('image/') && !mimeType.startsWith('video/') && !mimeType.startsWith('audio/')) {
+        if (!mimeType.startsWith('image/') &&
+            !mimeType.startsWith('video/') &&
+            !mimeType.startsWith('audio/')) {
           debugPrint("Unsupported media type '$mimeType' for file: $mediaPath");
           return null;
         }
@@ -100,26 +106,42 @@ class Utils {
   /// - Images -> { "type": "image_url", "image_url": { "url": "..." } }
   /// - Text Files -> { "type": "text", "text": "..." }
   /// - Binary Documents (PDF, DOCX, XLSX, etc.) -> Stored separately for tool processing
-  /// 
+  ///
   /// Returns a map with:
   /// - Standard content fields for API
   /// - "_document": Optional document data for tool processing (binary files)
   static Future<Map<String, dynamic>?> processAttachment(String path) async {
     try {
+      final lowerPath = path.toLowerCase();
+      final isRemoteOrDataUrl = lowerPath.startsWith('http://') ||
+          lowerPath.startsWith('https://') ||
+          lowerPath.startsWith('data:');
+      if (isRemoteOrDataUrl) {
+        final looksLikeMediaUrl = lowerPath.startsWith('data:image/') ||
+            lowerPath.startsWith('data:video/') ||
+            lowerPath.startsWith('data:audio/') ||
+            RegExp(
+              r'\.(jpg|jpeg|png|webp|gif|bmp|heic|mp4|webm|mov|mkv|m4v|mp3|wav|m4a|aac|ogg|flac|opus)(\?|$)',
+            ).hasMatch(lowerPath);
+        if (looksLikeMediaUrl) {
+          return {
+            "type": "image_url",
+            "image_url": {"url": path}
+          };
+        }
+      }
+
       final file = File(path);
       if (!await file.exists()) return null;
 
       final mimeType = lookupMimeType(path) ?? 'application/octet-stream';
-      final String fileName = path
-          .split('/')
-          .last;
-      final String extension = fileName
-          .split('.')
-          .last
-          .toLowerCase();
+      final String fileName = path.split('/').last;
+      final String extension = fileName.split('.').last.toLowerCase();
 
       // 1. Handle Media (Images, Video, Audio) - send as base64 data URL
-      if (mimeType.startsWith('image/') || mimeType.startsWith('video/') || mimeType.startsWith('audio/')) {
+      if (mimeType.startsWith('image/') ||
+          mimeType.startsWith('video/') ||
+          mimeType.startsWith('audio/')) {
         final base64Url = await formatBase64Media(path);
         if (base64Url != null) {
           // OpenRouter/OpenAI structure uses "image_url" conventionally
@@ -155,8 +177,7 @@ class Utils {
           final String content = await file.readAsString();
           // Truncate very large files to prevent token overflow
           final truncatedContent = content.length > 50000
-              ? '${content.substring(
-              0, 50000)}\n\n[... truncated, file too large ...]'
+              ? '${content.substring(0, 50000)}\n\n[... truncated, file too large ...]'
               : content;
           return {
             "type": "text",
@@ -187,20 +208,18 @@ class Utils {
           String docType = 'document';
           if (extension == 'pdf') {
             docType = 'PDF';
-          }
-          else if (['doc', 'docx', 'odt'].contains(extension)) {
+          } else if (['doc', 'docx', 'odt'].contains(extension)) {
             docType = 'Word document';
-          }
-          else if (['xls', 'xlsx', 'ods', 'csv'].contains(extension)) {
+          } else if (['xls', 'xlsx', 'ods', 'csv'].contains(extension)) {
             docType = 'spreadsheet';
-          }
-          else if (['ppt', 'pptx', 'odp'].contains(extension)) {
+          } else if (['ppt', 'pptx', 'odp'].contains(extension)) {
             docType = 'presentation';
           }
 
           return {
             "type": "text",
-            "text": "[Attached: $fileName ($docType)]\nUse the read_document tool to extract and read the contents of this file.",
+            "text":
+                "[Attached: $fileName ($docType)]\nUse the read_document tool to extract and read the contents of this file.",
             "_document": {
               "data": base64Data,
               "media_type": mimeType,
@@ -224,7 +243,8 @@ class Utils {
       } catch (e) {
         return {
           "type": "text",
-          "text": "[Unsupported file: $fileName ($mimeType)]\nThis file type cannot be processed directly."
+          "text":
+              "[Unsupported file: $fileName ($mimeType)]\nThis file type cannot be processed directly."
         };
       }
     } catch (e) {

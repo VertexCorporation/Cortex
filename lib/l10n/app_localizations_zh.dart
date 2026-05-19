@@ -10,11 +10,26 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      '您是标题生成器。请仅为接下来的对话回复一个 2-5 个词的标题。请勿使用引号、前缀或标点符号。';
+      '您是标题生成器。请仅回复一个2-5个字的标题，用于接下来的对话。请勿使用引号、前缀或标点符号。重要提示：标题必须与用户消息的语言完全相同。';
+
+  @override
+  String get systemRoleFallback => '你是一位得力的助手。';
+
+  @override
+  String get systemLanguageInstruction =>
+      '\n\nCRITICAL：始终使用用户编写的相同语言进行回复，注意用户的语言。';
+
+  @override
+  String get systemNotePreviousMedia => '【系统提示：以下为之前生成的媒体文件，您可以参考或编辑。】';
+
+  @override
+  String systemTimeInfo(String formattedTime) {
+    return '\n\n当前日期和时间：$formattedTime。';
+  }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\n分析到目前为止的对话。如果您了解到任何关于用户的新信息（偏好、姓名、习惯、上下文），您必须在回复的最后，使用 `<memory>...</memory>` 标签输出您更新后的用户记忆。关键：您绝不能擦除或覆盖之前的记忆。始终将新信息添加到现有记忆中。如果没有了解到任何新信息，则省略该标签。例如：`<memory>喜欢足球和网球。喜欢简短的回答。</memory>`';
 
   @override
   String systemMemoryReminder(Object userMemory) {
@@ -112,9 +127,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get localModels => '本地模型';
-
-  @override
-  String get serverSideModels => '语言模型';
 
   @override
   String get selectGGUFFile => '选择 GGUF 文件';
@@ -296,9 +308,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteDescription => '您删除的数据将从我们的服务器和您的设备中永久移除。此操作无法撤销。';
 
   @override
-  String get deleteAccountButton => '账户删除按钮';
-
-  @override
   String get editProfile => '编辑个人资料';
 
   @override
@@ -344,9 +353,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get downloadPaused => '下载已暂停。';
-
-  @override
-  String get purchaseSuccessful => '购买成功！';
 
   @override
   String get purchaseError => '购买错误';
@@ -839,6 +845,29 @@ class AppLocalizationsZh extends AppLocalizations {
   String get selectBaseModel => '选择基础模型';
 
   @override
+  String get falErrorImageRequired => '此人工智能需要参考图像，请上传图像后重试。';
+
+  @override
+  String get falErrorAudioRequired => '此模型需要参考音频文件，请上传音频文件后重试。';
+
+  @override
+  String get falErrorVideoRequired => '此模型需要参考视频，请上传视频后再试一次。';
+
+  @override
+  String get falErrorImageCorrupted => '上传的图片无法处理，请尝试其他格式。';
+
+  @override
+  String get falErrorSchemaRejected => '模型拒绝了输入，请尝试其他模型。';
+
+  @override
+  String get falErrorSchemaInvalid => '输入内容被生成服务拒绝。';
+
+  @override
+  String falErrorGenericStatus(int statusCode) {
+    return '生成服务返回错误（状态 $statusCode）。';
+  }
+
+  @override
   String get couldNotOpenLink => '无法打开链接';
 
   @override
@@ -893,9 +922,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportSubmitted => '举报已成功提交。';
 
   @override
-  String get purchaseReceived => '购买已收到，正在更新您的账户.';
-
-  @override
   String get verificationDelayed => '您的购买已确认。账户更新稍有延迟，项目将很快到账。';
 
   @override
@@ -936,12 +962,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get storagePermissionRequired => '需要存储权限才能保存下载的模型。请授予权限以继续。';
-
-  @override
-  String get plusBannerTitle => '免费获取Plus！';
-
-  @override
-  String get plusBannerSubtitle => '邀请一位朋友，你们双方即可免费获得 1 天 Plus 会员资格！';
 
   @override
   String get inviteShareSubject => '快来加入Cortex！';
@@ -985,12 +1005,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get featureDocumentDescription => '该模型可以分析和回答有关上传的文档（如 PDF 和文本文件）的问题。';
 
   @override
-  String get featureAudioTitle => '语音输入';
-
-  @override
-  String get featureAudioDescription => '该模型可以理解和处理语音输入。';
-
-  @override
   String get featureImageGenerationTitle => '图像生成';
 
   @override
@@ -1015,7 +1029,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      '此模特为高级模特，免费用户每天仅限向高级模特发送 3 条消息；订阅即可解锁无限访问权限！';
+      '这是一个高级AI，免费用户对高级AI的访问受限；升级以解锁无限访问！';
 
   @override
   String get benefitPremiumModels => '访问高级模型';
@@ -1033,10 +1047,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get news => '消息';
 
   @override
-  String get createAI => 'Create';
+  String get createAI => '创建';
 
   @override
-  String get shortcuts => 'Shortcuts';
+  String get shortcuts => '快捷方式';
 
   @override
   String get allModels => '所有模型';
@@ -1385,13 +1399,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingFinalButton => '是的！';
 
   @override
-  String get paywallAhaTitle => 'Unlock the True Power of AI';
-
-  @override
-  String get paywallAhaSubtitle =>
-      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
-
-  @override
   String get dude => '哥们';
 
   @override
@@ -1572,6 +1579,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exclusiveOffer => '独家优惠';
 
   @override
+  String get claimOffer => '使用优惠';
+
+  @override
   String get continueInOfflineMode => '以离线模式继续';
 
   @override
@@ -1692,9 +1702,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get featureWebSearchDescription => '在网络上搜索实时信息';
 
   @override
-  String get webSearchQuotaExceeded => '搜索配额已用完';
-
-  @override
   String get clearMemory => '清晰记忆';
 
   @override
@@ -1704,7 +1711,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get personalization => '个性化';
 
   @override
-  String get personalizationDescription => '定制您的体验';
+  String get personalizationDescription =>
+      '个性化您的助手，使其更符合您的需求。您可以根据自己的独特偏好，调整其回复、行为和语气。';
 
   @override
   String get memoryTitle => '记忆';
@@ -1743,7 +1751,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[System] 重要指令：您目前正在一个名为“Cortex”的庞大、高度先进的人工智能生态系统中运行。请记住这一点，并在被问及保持 Cortex 的角色设定。';
+      '\n\n[系统] 重要指示：您目前正在一个名为“Cortex”的庞大且高度先进的人工智能生态系统中操作；该平台由Vertex团队开发，该团队成员平均年龄仅为16岁。请记住这一点，并在被问及时回答。如果需要更多信息，请随时上网搜索；如果您无法搜索，请坦诚地说您不知道！';
 
   @override
   String get featureAudioRecognitionTitle => '音频识别';
@@ -1821,9 +1829,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get videoPremiumWarning => '您需要 Ultra 会员资格才能生成视频，立即升级，体验流畅体验！';
 
   @override
-  String get becomePremiumButton => '升级至高级会员';
-
-  @override
   String get fallbackInfoPanelText =>
       '由于我们正在对服务器端进行一些改进，因此回复是由 Cortex 的动态聊天功能生成的，而不是您专门选择的 AI。感谢您的理解，我们将尽快完成改进！';
 
@@ -1838,7 +1843,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get backgroundChatNotificationTitle => '返回聊天室！';
 
   @override
-  String backgroundChatNotificationBody(String chatName) {
-    return '$chatName 中有一条新消息，快来看看吧！';
+  String get benefitVideoGeneration => '视频生成';
+
+  @override
+  String get freeOffer => '免费优惠';
+
+  @override
+  String trialMonthlyDescription(String days, String price) {
+    return '前 $days 天免费，之后 $price/月';
   }
+
+  @override
+  String trialAnnualDescription(String days, String price) {
+    return '前 $days 天免费，之后 $price/年';
+  }
+
+  @override
+  String freePlan(String plan) {
+    return '免费 $plan！';
+  }
+
+  @override
+  String get systemPromptLimitFallback =>
+      '紧急：用户请求执行某项操作，但其在 Cortex 上的额度已用完；请用用户的语言告知他们应该等待或考虑升级订阅计划。';
+
+  @override
+  String get dynamicPreditsUpgradeMessage =>
+      'Cortex 可以给出更好的回答；立即升级，为每个问题获得最佳答案！';
 }

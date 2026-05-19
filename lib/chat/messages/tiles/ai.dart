@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:cortex/app.dart';
 import 'package:cortex/library/backend/data/service.dart';
+import 'package:cortex/library/backend/data/entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../library/utils.dart';
 import '../../../theme.dart';
 import '../messages.dart';
@@ -19,6 +21,9 @@ import '../../../notifications/introvert.dart';
 import '../options/change.dart';
 import '../options/panel.dart';
 import 'package:cortex/chat/services/tts.dart';
+import 'package:cortex/arts/provider.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
+import 'package:pasteboard/pasteboard.dart';
 
 part 'ai/error.dart';
 
@@ -127,7 +132,8 @@ class _AIMessageTileState extends State<AIMessageTile>
       }
     });
 
-    if (widget.message.isThinking && !widget.message.isError &&
+    if (widget.message.isThinking &&
+        !widget.message.isError &&
         (widget.message.displayableText.isNotEmpty ||
             widget.embeddedMedia != null)) {
       _headerEntryCtl.forward();
@@ -145,7 +151,8 @@ class _AIMessageTileState extends State<AIMessageTile>
 
     if (!widget.message.isThinking &&
         (widget.message.displayableText.isNotEmpty ||
-            widget.message.hasAttachments || widget.embeddedMedia != null)) {
+            widget.message.hasAttachments ||
+            widget.embeddedMedia != null)) {
       _stableText = widget.message.displayableText;
       _headerEntryCtl.value = 1.0;
       _entryCtl.value = 1.0;
@@ -169,11 +176,11 @@ class _AIMessageTileState extends State<AIMessageTile>
     final String logPrefix = "[AIMessageTile.didUpdateWidget]";
 
     // 1. Stream Starting Logic
-    final bool isStreamStarting = (old.message.displayableText.isEmpty &&
-        old.embeddedMedia == null) &&
-        (widget.message.displayableText.isNotEmpty ||
-            widget.embeddedMedia != null) &&
-        widget.message.isThinking;
+    final bool isStreamStarting =
+        (old.message.displayableText.isEmpty && old.embeddedMedia == null) &&
+            (widget.message.displayableText.isNotEmpty ||
+                widget.embeddedMedia != null) &&
+            widget.message.isThinking;
 
     if (isStreamStarting && !widget.message.isError) {
       debugPrint("$logPrefix Stream starting. Revealing header.");
@@ -223,6 +230,9 @@ class _AIMessageTileState extends State<AIMessageTile>
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           const AiStreamFinishedNotification().dispatch(context);
+          if (widget.message.hasAttachments) {
+            Provider.of<ArtsProvider>(context, listen: false).loadMedia();
+          }
         }
       });
 
@@ -318,7 +328,6 @@ class _AIMessageTileState extends State<AIMessageTile>
     }
   }
 
-
   void _flushAnimation() {
     if (_textAnimCtl.isAnimating) {
       _textAnimCtl.stop();
@@ -333,7 +342,7 @@ class _AIMessageTileState extends State<AIMessageTile>
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final scale = screenWidth / 400;
 
     return AnimatedCrossFade(
@@ -437,7 +446,8 @@ class _AIMessageTileState extends State<AIMessageTile>
                               );
                             },
                             child: Padding(
-                              padding: EdgeInsets.only(top: 8 * scale,
+                              padding: EdgeInsets.only(
+                                  top: 8 * scale,
                                   left: 12 * scale,
                                   right: 12 * scale),
                               child: Row(

@@ -13,6 +13,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../library/backend/data/service.dart';
 import '../../../main.dart';
 import '../../../notifications/introvert.dart';
+import '../../../arts/provider.dart';
 import 'manager.dart';
 
 class InboxViewModel extends ChangeNotifier {
@@ -27,6 +28,7 @@ class InboxViewModel extends ChangeNotifier {
   String _currentSearchQuery = "";
   StreamSubscription<Map<String, dynamic>>? _lastMessageSubscription;
   StreamSubscription<Map<String, String>>? _titleSubscription;
+  StreamSubscription<void>? _conversationResetSubscription;
   String _currentLangCode = 'en';
   Timer? _searchDebounce;
 
@@ -40,8 +42,7 @@ class InboxViewModel extends ChangeNotifier {
   InboxViewModel({
     required ModelService modelService,
     required IntrovertNotificationService notificationService,
-  })
-      : _modelService = modelService,
+  })  : _modelService = modelService,
         _notificationService = notificationService;
 
   Future<void> initialize(String langCode) async {
@@ -56,6 +57,7 @@ class InboxViewModel extends ChangeNotifier {
     _searchDebounce?.cancel();
     _lastMessageSubscription?.cancel();
     _titleSubscription?.cancel();
+    _conversationResetSubscription?.cancel();
     for (var manager in _conversationManagers.values) {
       manager.dispose();
     }
@@ -77,12 +79,15 @@ class InboxViewModel extends ChangeNotifier {
     if (_currentSearchQuery.isEmpty) {
       _filteredConversationIDs = List.from(_allConversationIDs);
     } else {
-      // 1. First, get IDs of conversations where messages match (Deep Search)
-      final List<String> deepSearchResults =
-      await ChatStorageService.searchConversations(
-          query: _currentSearchQuery);
+      // For very short queries (1 char), skip expensive DB deep search
+      // and only filter by title in memory
+      List<String> deepSearchResults = const [];
+      if (_currentSearchQuery.length >= 2) {
+        deepSearchResults = await ChatStorageService.searchConversations(
+            query: _currentSearchQuery);
+      }
 
-      // 2. Filter in memory (Title matches or ID is in deep search results)
+      // Filter in memory (Title matches or ID is in deep search results)
       _filteredConversationIDs = _allConversationIDs.where((id) {
         final manager = _conversationManagers[id];
         if (manager == null) return false;
@@ -139,7 +144,7 @@ class InboxViewModel extends ChangeNotifier {
     final cachedManagers = CacheService.get<Map<String, ConversationManager>>(
         CacheKey.conversationManagers);
     final cachedOrder =
-    CacheService.get<List<String>>(CacheKey.conversationOrder);
+        CacheService.get<List<String>>(CacheKey.conversationOrder);
 
     if (cachedManagers != null && cachedOrder != null) {
       _conversationManagers.addAll(cachedManagers);
@@ -161,6 +166,8 @@ class InboxViewModel extends ChangeNotifier {
       final String convId = update["id"] as String;
       final String newTitle = update["title"] as String;
       final manager = _conversationManagers[convId];
+      debugPrint(
+          "[AxonRename.Stream] title update received id=$convId hasManager=${manager != null} title='$newTitle'");
       if (manager != null) {
         manager.updateConversationTitle(newTitle);
         // Force refresh the list view just in case the tile rebuilds based on it
@@ -172,22 +179,50 @@ class InboxViewModel extends ChangeNotifier {
     _lastMessageSubscription?.cancel();
     _lastMessageSubscription =
         ChatStorageService.lastMsgStream.listen((update) async {
-          final String convId = update['convId'] as String;
-          final manager = _conversationManagers[convId];
+      final String convId = update['convId'] as String;
+      final manager = _conversationManagers[convId];
 
-          if (manager == null) {
-            await loadConversations(langCode: _currentLangCode, isReload: true);
-            return;
-          }
+      if (manager == null) {
+        await loadConversations(langCode: _currentLangCode, isReload: true);
+        return;
+      }
 
-          manager.updateLastMessage(
-            update['text'] as String? ?? '',
-            update['photoPath'] as String? ?? '',
-            DateTime.fromMillisecondsSinceEpoch(update['ts'] as int),
-          );
+      manager.updateLastMessage(
+        update['text'] as String? ?? '',
+        update['photoPath'] as String? ?? '',
+        DateTime.fromMillisecondsSinceEpoch(update['ts'] as int),
+      );
 
-          _sortConversations();
-        });
+      _sortConversations();
+    });
+
+    _conversationResetSubscription?.cancel();
+    _conversationResetSubscription =
+        ChatStorageService.conversationResetStream.listen((_) {
+      _clearConversationsAfterStorageReset();
+    });
+  }
+
+  void _clearConversationsAfterStorageReset() {
+    for (final manager in _conversationManagers.values) {
+      manager.dispose();
+    }
+
+    _conversationManagers.clear();
+    _allConversationIDs = [];
+    _filteredConversationIDs = [];
+    _isLoading = false;
+    _currentSearchQuery = '';
+
+    final context = mainScreenKey.currentContext;
+    if (context != null) {
+      Provider.of<ConversationProvider>(context, listen: false)
+          .clearConversation();
+    }
+
+    CacheService.invalidateConversationCache();
+    _updateConversationCache();
+    notifyListeners();
   }
 
   Future<void> loadConversations(
@@ -240,13 +275,13 @@ class InboxViewModel extends ChangeNotifier {
           persistedModelImagePath: row['modelImagePath'] as String?,
           isStarred: (row['isStarred'] as int? ?? 0) == 1,
           starredDate: row['starredDate'] != null &&
-              (row['starredDate'] as int) > 0
+                  (row['starredDate'] as int) > 0
               ? DateTime.fromMillisecondsSinceEpoch(row['starredDate'] as int)
               : null,
           lastMessageDate: realLastMsgTs != null
               ? DateTime.fromMillisecondsSinceEpoch(realLastMsgTs)
               : DateTime.fromMillisecondsSinceEpoch(
-              row['lastMessageDate'] as int? ?? 0),
+                  row['lastMessageDate'] as int? ?? 0),
           langCode: langCode,
           modelService: _modelService,
         );
@@ -312,8 +347,7 @@ class InboxViewModel extends ChangeNotifier {
     // 1. PROTECTION CHECK: Active conversation check
     final BuildContext? context = mainScreenKey.currentContext;
     if (context != null) {
-      final activeId = Provider
-          .of<ConversationProvider>(context, listen: false)
+      final activeId = Provider.of<ConversationProvider>(context, listen: false)
           .conversationID;
 
       if (activeId == conversationID) {
@@ -324,29 +358,44 @@ class InboxViewModel extends ChangeNotifier {
     }
 
     // 2. Remove from internal lists IMMEDIATELY (Animation handled by Tile)
-    _conversationManagers.remove(conversationID);
     _allConversationIDs.remove(conversationID);
     _filteredConversationIDs.remove(conversationID);
+
+    // Mark as deleted so AnimatedList doesn't double-animate
+    manager.setDeleted(true);
 
     // Notify to update UI
     notifyListeners();
 
-    // 3. Dispose and delete from DB (with media cleanup)
-    manager.dispose();
+    // 3. Give UI a moment to animate before deleting from memory and DB
+    Future.delayed(const Duration(milliseconds: 350), () async {
+      _conversationManagers.remove(conversationID);
+      manager.dispose();
 
-    // 3a. Clean up media files from disk (fire-and-forget)
-    _cleanupMediaFiles(conversationID);
+      // 3a. Clean up media files from disk (fire-and-forget)
+      _cleanupMediaFiles(conversationID);
 
-    await ChatStorageService.deleteConversation(conversationID);
-    _updateConversationCache();
+      await ChatStorageService.deleteConversation(conversationID);
+      _updateConversationCache();
+
+      // FIX: Refresh Arts gallery to remove media from deleted conversation
+      try {
+        final ctx = mainScreenKey.currentContext;
+        if (ctx != null && ctx.mounted) {
+          Provider.of<ArtsProvider>(ctx, listen: false).refresh();
+        }
+      } catch (e) {
+        debugPrint('[InboxViewModel] Arts refresh after delete failed: $e');
+      }
+    });
   }
 
   /// Deletes all generated media files associated with a conversation from disk.
   void _cleanupMediaFiles(String conversationID) {
     Future.microtask(() async {
       try {
-        final paths =
-        await ChatStorageService.getMediaPathsForConversation(conversationID);
+        final paths = await ChatStorageService.getMediaPathsForConversation(
+            conversationID);
         for (final path in paths) {
           _deleteMediaPath(path);
         }
@@ -395,19 +444,63 @@ class InboxViewModel extends ChangeNotifier {
   }
 
   Future<void> editConversation(String conversationID, String newTitle) async {
+    final trimmedTitle = newTitle.trim();
+    debugPrint(
+        "[AxonRename] requested id=$conversationID title='$trimmedTitle'");
+
     final manager = _conversationManagers[conversationID];
     final context = mainScreenKey.currentContext;
     final l10n = context != null ? AppLocalizations.of(context) : null;
 
-    if (manager == null) return;
+    if (trimmedTitle.isEmpty) {
+      debugPrint("[AxonRename] rejected empty title for id=$conversationID");
+      return;
+    }
 
-    await ChatStorageService.renameConversation(conversationID, newTitle);
-    manager.updateConversationTitle(newTitle);
+    if (manager == null) {
+      debugPrint("[AxonRename] manager missing for id=$conversationID");
+      return;
+    }
+
+    final persisted = await ChatStorageService.renameConversation(
+      conversationID,
+      trimmedTitle,
+      source: 'axon_manual',
+    );
+
+    if (!persisted) {
+      debugPrint("[AxonRename] persist failed for id=$conversationID");
+      _notificationService.showNotification(
+          message:
+              l10n?.requestFailed ?? "An error occurred, please try again.",
+          type: NotificationType.error);
+      return;
+    }
+
+    manager.updateConversationTitle(trimmedTitle);
+
+    if (context != null && context.mounted) {
+      final conversationProvider =
+          Provider.of<ConversationProvider>(context, listen: false);
+      if (conversationProvider.conversationID == conversationID) {
+        conversationProvider.updateConversationTitle(trimmedTitle);
+        debugPrint("[AxonRename] active conversation title updated in memory.");
+      }
+    }
+
+    if (_currentSearchQuery.isEmpty) {
+      notifyListeners();
+    } else {
+      await _applyFilter();
+    }
+
+    _updateConversationCache();
 
     final message = l10n?.renamed ?? "Renamed";
 
     _notificationService.showNotification(
         message: message, type: NotificationType.success);
+    debugPrint("[AxonRename] completed id=$conversationID");
   }
 
   Future<void> togglePinStatus(String conversationID) async {

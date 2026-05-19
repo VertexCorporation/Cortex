@@ -29,7 +29,6 @@
   "usedMemory": "Memória Usada",
   "modelsTitle": "Biblioteca",
   "localModels": "Modelos Locais",
-  "serverSideModels": "Modelos de linguagem",
   "selectGGUFFile": "Selecione o Ficheiro GGUF",
   "errorGGUF": "Por favor, selecione um ficheiro apenas no formato GGUF.",
   "myModels": "Os Meus Modelos",
@@ -86,7 +85,6 @@
   "delete": "Eliminar",
   "passwordRequired": "A palavra-passe é obrigatória.",
   "deleteDescription": "Os dados que eliminar serão removidos permanentemente do nosso servidor e do seu dispositivo. Estas ações não podem ser desfeitas.",
-  "deleteAccountButton": "Botão de Eliminação de Conta",
   "editProfile": "Editar Perfil",
   "displayName": "Nome de Exibição",
   "profileUpdated": "Perfil atualizado com sucesso",
@@ -108,7 +106,6 @@
     }
   },
   "downloadPaused": "Download em pausa.",
-  "purchaseSuccessful": "Compra bem-sucedida!",
   "purchaseError": "Erro na compra",
   "purchasePlus": "Comprar Cortex Plus",
   "plusDescription": "Experiência de Inteligência Artificial de Elite",
@@ -320,7 +317,6 @@
   "experimentalOfflineWarning": "O modo offline ainda é experimental e o modelo que baixar pode não funcionar com a eficiência ótima.",
   "noConversationsToDelete": "Não tem conversas para eliminar.",
   "reportSubmitted": "Relatório enviado com sucesso",
-  "purchaseReceived": "Compra recebida, a atualizar a sua conta.",
   "verificationDelayed": "A sua compra está confirmada. Há um pequeno atraso na atualização da sua conta, ela aparecerá em breve.",
   "maintenanceTitle": "Em Manutenção",
   "maintenanceMessage": "O Cortex está temporariamente offline enquanto implementamos algumas atualizações importantes. O acesso à aplicação será restaurado em breve.\n\nObrigado pela sua paciência enquanto melhoramos a sua experiência.",
@@ -334,8 +330,6 @@
   "loginSubtitle": "Faça login na sua conta Vertex. Ao continuar, você concorda com nossos Termos de Serviço e Política de Privacidade.",
   "registerSubtitle": "Crie uma conta Vertex para acesso integrado a todos os nossos serviços. Ao continuar, você concorda com nossos Termos de Serviço e Política de Privacidade.",
   "storagePermissionRequired": "É necessária permissão de armazenamento para guardar os modelos baixados. Por favor, conceda permissão para continuar.",
-  "plusBannerTitle": "Obtenha o Plus grátis!",
-  "plusBannerSubtitle": "Convide um amigo e ambos ganham 1 dia de Plus grátis!",
   "inviteShareSubject": "Junta-te a mim no Cortex!",
   "@inviteShareMessage": {
     "description": "A mensagem de texto para partilhar com um amigo para um convite.",
@@ -361,12 +355,10 @@
   "russian": "Russo",
   "featureDocumentTitle": "Suporte a documentos",
   "featureDocumentDescription": "Este modelo pode analisar e responder perguntas sobre documentos enviados, como PDFs e arquivos de texto.",
-  "featureAudioTitle": "Entrada de voz",
-  "featureAudioDescription": "Este modelo pode entender e processar entradas de áudio faladas.",
   "featureImageGenerationTitle": "Geração de Imagem",
   "featureImageGenerationDescription": "Este modelo pode criar imagens originais com base nas suas descrições de texto.",
   "premiumModelNoticeTitle": "Modelo Premium",
-  "premiumModelNoticeDescription": "Este é um modelo premium, usuários gratuitos são limitados a 3 mensagens por dia com modelos premium; assine para desbloquear acesso ilimitado!",
+  "premiumModelNoticeDescription": "Esta IA é uma IA premium; usuários gratuitos têm acesso limitado às IAs premium; atualize para desbloquear o acesso ilimitado!",
   "benefitPremiumModels": "Acesso a modelos premium",
   "premiumTrialExhaustedMessage": "Você usou todas as suas mensagens diárias gratuitas para modelos premium. Faça upgrade para ter acesso ilimitado.",
   "useOffline": "Usar sem Internet",
@@ -578,11 +570,10 @@
   "searching": "Pesquisando",
   "featureWebSearchTitle": "Pesquisa na Web",
   "featureWebSearchDescription": "Pesquise na internet informações em tempo real.",
-  "webSearchQuotaExceeded": "Cota de pesquisa excedida",
   "clearMemory": "Limpar memória",
   "clearMemoryConfirm": "Tem certeza de que deseja apagar sua memória?",
   "personalization": "Personalização",
-  "personalizationDescription": "Personalize sua experiência",
+  "personalizationDescription": "Personalize seu assistente para melhor atender às suas necessidades. Adapte suas respostas, comportamento e tom de voz para corresponder às suas preferências exclusivas.",
   "memoryTitle": "Memória",
   "memoryDescription": "As IAs reconhecem você assim.",
   "noMemoryYet": "Nenhuma memória foi estabelecida ainda.",
@@ -592,11 +583,11 @@
   "customInstructionHint": "Insira suas instruções personalizadas aqui.",
   "openLinkWarningMessage": "Você está prestes a abrir o seguinte link externo:\\n\\n{url}\\n\\nTem certeza de que deseja prosseguir?",
   "intelligenceSystemPrompt": "Siga estas instruções personalizadas:\\n\\n{instruction}",
-  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>",
+  "systemMemoryDirective": "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalise a conversa até o momento. Se você aprendeu QUALQUER novo fato distinto sobre o usuário (preferências, nome, hábitos, contexto), você DEVE exibir TODA a sua memória atualizada sobre o usuário dentro das tags <memory>...</memory> NO FINAL da sua resposta. CRÍTICO: Você NUNCA deve apagar ou sobrescrever a memória anterior. SEMPRE anexe novos fatos à memória existente. Se absolutamente nada de novo foi aprendido, omita a tag. Exemplo: <memory>Gosta de futebol e tênis. Prefere respostas curtas.</memory>",
   "systemMemoryReminder": "\n\nLembre-se sempre disto sobre o usuário:\n{userMemory}",
-  "chatTitlePrompt": "Você é um gerador de títulos. Responda SOMENTE com um título de 2 a 5 palavras para a seguinte conversa. Não use aspas, prefixos ou pontuação.",
+  "chatTitlePrompt": "Você é um gerador de títulos. Responda SOMENTE com um título de 2 a 5 palavras para a conversa a seguir. Não use aspas, prefixos ou pontuação. IMPORTANTE: O título DEVE estar exatamente no mesmo idioma da mensagem do usuário.",
   "chatTitleCriticalInstruction": "[INSTRUÇÃO CRÍTICA]: Você é um GERADOR DE TÍTULOS. NÃO responda à pergunta do usuário. NÃO converse nem diga olá. GERE APENAS um título de 2 a 4 palavras que resuma o que o usuário está perguntando.",
-  "cortexSystemPersona": "\n\n[System] INSTRUÇÃO CRÍTICA: Você está operando dentro de um ecossistema de IA massivo e altamente avançado chamado \"Cortex\". Lembre-se disso e mantenha a personalidade do Cortex se for perguntado.",
+  "cortexSystemPersona": "\n\n[Sistema] INSTRUÇÃO CRÍTICA: Você está operando dentro de um ecossistema de IA massivo e altamente avançado chamado \"Cortex\"; esta plataforma foi desenvolvida pela equipe Vertex, cujos membros têm em média apenas 16 anos de idade. Lembre-se disso e responda se for perguntado. Se mais informações forem solicitadas, não hesite em pesquisar na internet ou, se não conseguir pesquisar, sinta-se à vontade para dizer que não sabe!",
   "@cortexSystemPersona": {
     "description": "System persona string added to online models"
   },
@@ -622,8 +613,6 @@
   "featureImageRecognitionDescription": "Este modelo consegue analisar e compreender fotos ou imagens.",
   "featureToolUseTitle": "Uso de ferramentas",
   "featureToolUseDescription": "Este modelo consegue utilizar ferramentas externas de forma inteligente para concluir tarefas.",
-  "paywallAhaTitle": "Unlock the True Power of AI",
-  "paywallAhaSubtitle": "Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.",
   "systemPromptMissingMedia": "Este modelo requer um(a) {mediaType} para funcionar. Eu interceptei a solicitação para avisá-lo. Informe graciosamente o usuário de que ele precisa fornecer um(a) {mediaType} (diga-lhe no idioma dele) porque eu sou {modelName}, um modelo de edição visual/áudio/vídeo.",
   "mediaTypeImage": "imagem",
   "mediaTypeVideo": "vídeo",
@@ -633,8 +622,8 @@
   "featureCreateVideoDescription": "Gere vídeos a partir de texto.",
   "defaultSeriesDescription": "{seriesName} é uma inteligência avançada demonstrando alto desempenho no Cortex.",
   "defaultModelDescription": "{modelName} é uma inteligência artificial de alto desempenho integrada ao ecossistema Cortex. Projetada para conquistar uma ampla variedade de tarefas complexas, oferece capacidades de processamento altamente confiáveis e eficientes. Ao oferecer tempos de resposta rápidos e poder analítico avançado, aumenta significativamente sua produtividade diária. Operando perfeitamente na infraestrutura local segura do Cortex, este modelo pode auxiliá-lo em um amplo espectro de tarefas, desde brainstorming criativo a análises técnicas profundas. Comece a explorar todo o seu potencial hoje.",
-  "createAI": "Create",
-  "shortcuts": "Shortcuts",
+  "createAI": "Criar",
+  "shortcuts": "Atalhos",
   "ourStory": "Nossa história",
   "guestLimitBottomSheetTitle": "Adora a inteligência do Cortex?",
   "guestLimitBottomSheetText": "Trabalhe com inteligências ainda mais avançadas, gere mais conteúdo, converse mais e faça muito mais...",
@@ -642,10 +631,51 @@
   "noArt": "Sem arte",
   "noArtDescription": "Ainda não há obras; é hora de preencher a galeria criando imagens, vídeos, áudio e todo tipo de conteúdo!",
   "videoPremiumWarning": "Você precisa de uma assinatura Ultra para gerar vídeos. Atualize agora e sinta a fluidez!",
-  "becomePremiumButton": "Torne-se Premium",
+  "dynamicPreditsUpgradeMessage": "O Cortex pode dar respostas ainda melhores; faça upgrade agora e receba a melhor resposta para cada pergunta!",
   "fallbackInfoPanelText": "Devido a algumas melhorias que estamos implementando em nosso servidor, a resposta foi gerada pelo chat dinâmico do Cortex em vez da IA que você selecionou. Agradecemos a sua compreensão enquanto o processo é concluído!",
   "falOfflineMessage": "Devido a algumas melhorias que estamos implementando em nosso servidor, esta ferramenta está temporariamente indisponível. Agradecemos a sua compreensão enquanto o processo é concluído!",
   "errorInsufficientStorage": "Espaço de armazenamento insuficiente para baixar este modelo.",
   "backgroundChatNotificationTitle": "De volta ao chat!",
-  "backgroundChatNotificationBody": "Há uma nova mensagem em {chatName}, confira!"
+  "falErrorImageRequired": "Esta IA requer uma imagem de referência. Por favor, anexe uma imagem e tente novamente.",
+  "falErrorAudioRequired": "Este modelo requer um arquivo de áudio de referência. Por favor, anexe um arquivo de áudio e tente novamente.",
+  "falErrorVideoRequired": "Este modelo requer um vídeo de referência. Por favor, anexe um vídeo e tente novamente.",
+  "falErrorImageCorrupted": "A imagem enviada não pôde ser processada. Por favor, tente um formato diferente.",
+  "falErrorSchemaRejected": "O modelo rejeitou a entrada. Por favor, tente um modelo diferente.",
+  "falErrorSchemaInvalid": "A entrada foi rejeitada pelo serviço de geração.",
+  "falErrorGenericStatus": "O serviço de geração retornou um erro (status {statusCode}).",
+  "benefitVideoGeneration": "Geração de vídeo",
+  "claimOffer": "Usar oferta",
+  "freeOffer": "Oferta gratuita",
+  "trialMonthlyDescription": "Primeiros {days} dias grátis, depois {price}/mês",
+  "@trialMonthlyDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$4.99"
+      }
+    }
+  },
+  "trialAnnualDescription": "Primeiros {days} dias grátis, depois {price}/ano",
+  "@trialAnnualDescription": {
+    "placeholders": {
+      "days": {
+        "type": "String",
+        "example": "7"
+      },
+      "price": {
+        "type": "String",
+        "example": "$49.99"
+      }
+    }
+  },
+  "freePlan": "{plan} gratuito!",
+  "systemRoleFallback": "Você é um assistente prestativo.",
+  "systemLanguageInstruction": "\n\nCRÍTICO: Responda sempre no mesmo idioma em que o usuário escreve, preste atenção à linguagem do usuário.",
+  "systemTimeInfo": "\n\nData e hora atuais: {formattedTime}.",
+  "systemPromptLimitFallback": "CRÍTICO: O usuário solicitou uma ação, mas seu saldo no Cortex se esgotou; informe o usuário em seu idioma que ele deve aguardar ou considerar a possibilidade de atualizar seu plano de assinatura.",
+  "systemNotePreviousMedia": "[Nota do Sistema: Abaixo está a mídia gerada anteriormente. Você pode referenciá-la ou editá-la.]"
 }

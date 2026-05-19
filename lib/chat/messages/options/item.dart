@@ -64,8 +64,8 @@ class OptionPanelItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     // Define layout values based on screen size for responsiveness.
     final double iconSize = iconSizeOverride ?? screenWidth * _UIFactors.iconSizeFactor;

@@ -37,8 +37,8 @@ class PhotoViewer extends StatefulWidget {
 
   static Route route(File imageFile, {void Function(File)? onEditImage}) {
     return PageRouteBuilder(
-      transitionDuration: const Duration(milliseconds: 50),
-      reverseTransitionDuration: const Duration(milliseconds: 50),
+      transitionDuration: const Duration(milliseconds: 150),
+      reverseTransitionDuration: const Duration(milliseconds: 150),
       opaque: false,
       barrierDismissible: false,
       pageBuilder: (_, __, ___) =>
@@ -268,6 +268,15 @@ class PhotoViewerState extends State<PhotoViewer>
                             onTap: () async {
                               final box =
                               context.findRenderObject() as RenderBox?;
+                              
+                              if (!await widget.imageFile.exists()) {
+                                notificationService.showNotification(
+                                  message: localizations.anErrorOccurred,
+                                  type: NotificationType.error,
+                                );
+                                return;
+                              }
+
                               await SharePlus.instance.share(
                                 ShareParams(
                                   files: [XFile(widget.imageFile.path)],
@@ -397,8 +406,8 @@ class VideoViewer extends StatefulWidget {
 
   static Route route(String videoPath, {void Function(String)? onEditVideo}) {
     return PageRouteBuilder(
-      transitionDuration: const Duration(milliseconds: 120),
-      reverseTransitionDuration: const Duration(milliseconds: 120),
+      transitionDuration: const Duration(milliseconds: 150),
+      reverseTransitionDuration: const Duration(milliseconds: 150),
       opaque: false,
       barrierDismissible: false,
       pageBuilder: (_, __, ___) =>
@@ -920,8 +929,8 @@ class AudioViewer extends StatefulWidget {
 
   static Route route(String audioPath, {void Function(String)? onEditAudio}) {
     return PageRouteBuilder(
-      transitionDuration: const Duration(milliseconds: 120),
-      reverseTransitionDuration: const Duration(milliseconds: 120),
+      transitionDuration: const Duration(milliseconds: 150),
+      reverseTransitionDuration: const Duration(milliseconds: 150),
       opaque: false,
       barrierDismissible: false,
       pageBuilder: (_, __, ___) =>

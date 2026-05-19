@@ -170,7 +170,7 @@ class _ProfileHeaderSectionState extends State<ProfileHeaderSection>
   @override
   Widget build(BuildContext context) {
     // Needed for theme & localization updates
-    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
+    context.watch<ThemeProvider>();
     final l10n = AppLocalizations.of(context)!; // Add localization access
 
     // Use `context.watch` to listen for changes and get the latest data.
