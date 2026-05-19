@@ -89,7 +89,7 @@ class _WarningOverlaysState extends State<WarningOverlays>
           ? const SizedBox.shrink(key: ValueKey('empty'))
           : Padding(
               padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.04),
+                  horizontal: MediaQuery.sizeOf(context).width * 0.04),
               child: Column(
                 key: const ValueKey('warnings'),
                 mainAxisSize: MainAxisSize.min,
@@ -107,7 +107,7 @@ class _WarningOverlaysState extends State<WarningOverlays>
 
   /// Builds the tappable premium banner with an animated RGB border.
   Widget _buildPremiumWarningBanner(AppLocalizations localizations) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     const double borderThickness = 2.0;
     final double borderRadius = screenWidth * 0.025;
@@ -198,7 +198,7 @@ class _WarningOverlaysState extends State<WarningOverlays>
 
   /// Builds a generic warning banner with a consistent, responsive design.
   Widget _buildWarningBanner(AppLocalizations localizations, String text) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     const double borderThickness = 1.0;
     final double borderRadius = screenWidth * 0.025;

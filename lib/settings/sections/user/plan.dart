@@ -54,8 +54,8 @@ class _MyPlanButtonState extends State<_MyPlanButton>
 
   @override
   Widget build(BuildContext context) {
-    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
-    final screenWidth = MediaQuery.of(context).size.width;
+    context.watch<ThemeProvider>();
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final appLocalizations = AppLocalizations.of(context)!;
 
     return Consumer<FundsBackend>(

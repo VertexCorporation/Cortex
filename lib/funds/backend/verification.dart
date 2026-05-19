@@ -3,11 +3,6 @@ part of 'service.dart';
 extension FundsVerification on FundsBackend {
   Future<void> _verifyAndCompletePurchase(
       PurchaseDetails purchaseDetails) async {
-    _notificationService.showNotification(
-      message: _localizations.purchaseReceived,
-      type: NotificationType.neutral,
-      oneLine: false,
-    );
 
     String? verificationData;
 
@@ -73,14 +68,13 @@ extension FundsVerification on FundsBackend {
         await _inAppPurchase.completePurchase(purchaseDetails);
       }
 
-      _notificationService.showNotification(
-        message: _localizations.purchaseSuccessful,
-        type: NotificationType.success,
-        oneLine: false,
-      );
-
       AppDataState().markUserDataAsChanged();
 
+      // Only fire the purchase-completed event for genuinely fresh
+      // transactions (within the last 5 minutes).  Google Play's
+      // purchaseStream replays existing subscriptions on every app
+      // launch with PurchaseStatus.purchased / restored, so we must
+      // NOT show any success UI for those stale replays.
       bool isRecentPurchase = true;
       if (purchaseDetails.transactionDate != null) {
         try {
@@ -117,13 +111,13 @@ extension FundsVerification on FundsBackend {
           await _inAppPurchase.completePurchase(purchaseDetails);
         }
         _notificationService.showNotification(
-          message: _localizations.purchaseError,
+          message: _localizations?.purchaseError ?? 'purchaseError',
           type: NotificationType.error,
           oneLine: false,
         );
       } else {
         _notificationService.showNotification(
-          message: _localizations.verificationDelayed,
+          message: _localizations?.verificationDelayed ?? 'verificationDelayed',
           type: NotificationType.error,
           oneLine: false,
         );
@@ -135,7 +129,7 @@ extension FundsVerification on FundsBackend {
     } catch (e, stack) {
       log('Unexpected client verification error: $e', name: FundsBackend._logName);
       _notificationService.showNotification(
-        message: _localizations.anErrorOccurred,
+        message: _localizations?.anErrorOccurred ?? 'anErrorOccurred',
         type: NotificationType.error,
         oneLine: false,
       );

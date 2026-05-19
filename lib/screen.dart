@@ -1,5 +1,7 @@
 // lib/screen.dart
 
+import 'dart:async';
+
 import 'package:cortex/analytics/service.dart';
 import 'package:cortex/theme.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +61,16 @@ class FadeIndexedStack extends StatelessWidget {
             duration: duration,
             child: TickerMode(
               enabled: index == i,
-              child: children[i],
+              child: index == i
+                  ? children[i]
+                  // PERFORMANCE: Strip viewInsets from background tabs so they don't
+                  // do massive 60fps relayouts when the keyboard opens on the active tab.
+                  : MediaQuery(
+                      data: MediaQuery.of(context).copyWith(
+                        viewInsets: EdgeInsets.zero,
+                      ),
+                      child: children[i],
+                    ),
             ),
           ),
         );
@@ -77,9 +88,9 @@ class MainScreen extends StatefulWidget {
 
 class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final GlobalKey<ChatControllerState> chatScreenKey =
-  GlobalKey<ChatControllerState>();
+      GlobalKey<ChatControllerState>();
   final GlobalKey<LibraryScreenState> libraryScreenKey =
-  GlobalKey<LibraryScreenState>();
+      GlobalKey<LibraryScreenState>();
 
   MainScreenView _currentView = MainScreenView.chat;
 
@@ -91,6 +102,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   double _elasticWidth = 0.0;
   bool _ignoreDrag = false;
   bool _isSearchFocused = false;
+  bool _isDialogOpen = false;
+  int _forceCloseGeneration = 0;
+  int _keyboardOpenGeneration = 0;
 
   double _accumulatedDrag = 0.0;
   bool _hasTriggeredNavigation = false;
@@ -126,6 +140,67 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     _searchModeController.dispose();
     _elasticController?.dispose();
     super.dispose();
+  }
+
+  void setDialogOpen(bool isOpen) {
+    _isDialogOpen = isOpen;
+  }
+
+  void _requestChatKeyboardFocus({
+    int initialDelayMs = 0,
+    int controllerRetries = 10,
+    int focusRetries = 8,
+    int retryDelayMs = 240,
+    String source = 'unknown',
+  }) {
+    final int generation = ++_keyboardOpenGeneration;
+
+    // Cancel any pending force-close retry chain. A keyboard-open request is
+    // intentional and should win over stale hide retries from sidebar/tab work.
+    _forceCloseGeneration++;
+
+    Future.delayed(Duration(milliseconds: initialDelayMs), () {
+      void attempt(int attemptNumber) {
+        if (!mounted ||
+            generation != _keyboardOpenGeneration ||
+            _currentView != MainScreenView.chat) {
+          return;
+        }
+
+        if (_isDialogOpen || _isSearchFocused) {
+          debugPrint(
+              "[KeyboardFocus] Deferred by overlay/search for $source. Retrying $attemptNumber/$controllerRetries.");
+          if (attemptNumber < controllerRetries) {
+            Future.delayed(Duration(milliseconds: retryDelayMs), () {
+              attempt(attemptNumber + 1);
+            });
+          }
+          return;
+        }
+
+        final chatState = chatScreenKey.currentState;
+        if (chatState == null) {
+          debugPrint(
+              "[KeyboardFocus] ChatController not ready for $source. Retrying $attemptNumber/$controllerRetries.");
+          if (attemptNumber < controllerRetries) {
+            Future.delayed(Duration(milliseconds: retryDelayMs), () {
+              attempt(attemptNumber + 1);
+            });
+          }
+          return;
+        }
+
+        debugPrint(
+            "[KeyboardFocus] Dispatching focus request from $source. controllerAttempt=$attemptNumber");
+        chatState.requestKeyboardFocus(
+          delayMs: 0,
+          maxRetries: focusRetries,
+          retryDelayMs: retryDelayMs,
+        );
+      }
+
+      attempt(1);
+    });
   }
 
   // --- DRAWER & GESTURE LOGIC ---
@@ -171,6 +246,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   void _animateAxonTo(double target) {
+    if (target > 0.0) {
+      _forceCloseKeyboard();
+    }
     _axonController.animateTo(
       target,
       duration: const Duration(milliseconds: 150),
@@ -183,10 +261,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     _accumulatedDrag = 0.0;
     _hasTriggeredNavigation = false;
 
-    final double screenW = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double screenW = MediaQuery.of(context).size.width;
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
 
     if (isRtl) {
@@ -207,17 +282,14 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     ActionPanelController.closeCurrent();
 
     if (_axonController.value == 0) {
-      FocusManager.instance.primaryFocus?.unfocus();
+      _forceCloseKeyboard();
     }
   }
 
   void _onDragUpdate(DragUpdateDetails details) {
     if (_ignoreDrag) return;
 
-    final double screenW = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final double screenW = MediaQuery.of(context).size.width;
     final double standardAxonW = screenW * 0.85;
     final double searchGapW = screenW - standardAxonW;
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
@@ -379,6 +451,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   void switchToLibrary({bool pulse = false}) {
+    _forceCloseKeyboard();
     if (_currentView == MainScreenView.library && pulse) {
       libraryScreenKey.currentState?.triggerPulseAnimation();
       closeAxon();
@@ -421,7 +494,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     closeAxon();
   }
 
-  void openConversation(ConversationManager manager) async {
+  Future<void> openConversation(ConversationManager manager) async {
     _forceCloseKeyboard();
 
     // CRITICAL FIX: Set loading state synchronously NO MATTER WHAT!
@@ -430,9 +503,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     context.read<ConversationProvider>().setLoadingMessages(true);
     _updateCurrentView(MainScreenView.chat);
 
-    await context
-        .read<AppInitializer>()
-        .onCoreServicesReady;
+    await context.read<AppInitializer>().onCoreServicesReady;
 
     if (!mounted) return;
 
@@ -459,10 +530,32 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
     AnalyticsService().logConversationStarted(isNew: false);
     closeAxon();
+
+    // AUTO-FOCUS: Request keyboard focus after conversation is fully loaded
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _requestChatKeyboardFocus(
+            initialDelayMs: 120,
+            controllerRetries: 6,
+            focusRetries: 7,
+            retryDelayMs: 220,
+            source: 'open_conversation',
+          );
+        }
+      });
+    }
   }
 
-  void startNewConversation({bool closeSidebar = true}) {
-    _forceCloseKeyboard();
+  void startNewConversation({
+    bool closeSidebar = true,
+    bool autoFocus = false,
+    bool restoreDefaultModel = true,
+  }) {
+    // Skip keyboard close on first launch so auto-focus can open it
+    if (!autoFocus) {
+      _forceCloseKeyboard();
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       _updateCurrentView(MainScreenView.chat);
@@ -486,7 +579,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       // and will buffer chunks via BackgroundTaskService.
       // The explicit Stop button in the chat UI still works for the active chat.
 
-      await session.initializeDefaultSession();
+      if (restoreDefaultModel) {
+        await session.initializeDefaultSession();
+      }
 
       conv.clearConversation();
       input.resetInputState();
@@ -495,25 +590,86 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       if (closeSidebar) {
         closeAxon();
       }
+
+      // AUTO-FOCUS: Request focus ONLY if we are navigating to the chat screen
+      // (closeSidebar is true) OR if the sidebar is already fully closed.
+      // If the user deleted a chat inside Axon (closeSidebar: false), suppress keyboard popup!
+      if (closeSidebar || _axonController.value == 0.0) {
+        if (mounted) {
+          _requestChatKeyboardFocus(
+            initialDelayMs: autoFocus ? 650 : 350,
+            controllerRetries: autoFocus ? 14 : 8,
+            focusRetries: autoFocus ? 10 : 7,
+            retryDelayMs: autoFocus ? 260 : 220,
+            source: autoFocus ? 'first_launch' : 'new_chat',
+          );
+        }
+      }
     });
   }
 
-  void startChatWithModel(ModelEntity model) {
+  Future<void> startChatWithModel(ModelEntity model) {
     _forceCloseKeyboard();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _updateCurrentView(MainScreenView.chat);
-      context.read<SelectionService>().selectModel(model);
+    final completer = Completer<void>();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        if (!mounted) return;
+        _updateCurrentView(MainScreenView.chat);
+        await context.read<SelectionService>().selectModel(model);
 
-      closeAxon();
+        closeAxon();
+
+        // AUTO-FOCUS: Request keyboard focus after model selection is complete
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _requestChatKeyboardFocus(
+              initialDelayMs: 180,
+              controllerRetries: 6,
+              focusRetries: 7,
+              retryDelayMs: 220,
+              source: 'start_chat_with_model',
+            );
+          }
+        });
+      } finally {
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
+      }
     });
+    return completer.future;
   }
 
   void _forceCloseKeyboard() {
-    final FocusScopeNode currentFocus = FocusScope.of(context);
-    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
-      FocusManager.instance.primaryFocus?.unfocus();
-    }
+    // Skip if a dialog (e.g. rename) is open — don't steal its focus
+    if (_isDialogOpen) return;
+
+    // Increment generation so any pending retries from a previous call are cancelled
+    final int generation = ++_forceCloseGeneration;
+
+    FocusManager.instance.primaryFocus?.unfocus();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+
+    // Add retries to handle race conditions where keyboard re-opens,
+    // but ONLY if we are NOT in search mode and no dialog opened since.
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (mounted &&
+          !_isSearchFocused &&
+          !_isDialogOpen &&
+          generation == _forceCloseGeneration) {
+        FocusManager.instance.primaryFocus?.unfocus();
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
+        Future.delayed(const Duration(milliseconds: 150), () {
+          if (mounted &&
+              !_isSearchFocused &&
+              !_isDialogOpen &&
+              generation == _forceCloseGeneration) {
+            FocusManager.instance.primaryFocus?.unfocus();
+            SystemChannels.textInput.invokeMethod('TextInput.hide');
+          }
+        });
+      }
+    });
   }
 
   int _getCurrentViewIndex() {
@@ -577,9 +733,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
     final double directionMultiplier = isRtl ? -1.0 : 1.0;
 
-    final dividerColor = Theme
-        .of(context)
-        .dividerColor;
+    final dividerColor = Theme.of(context).dividerColor;
     final gradientColors = [
       dividerColor.withValues(alpha: 0.0),
       dividerColor.withValues(alpha: 0.3),
@@ -587,6 +741,34 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       dividerColor.withValues(alpha: 0.0),
     ];
 
+    // PERFORMANCE: If another screen (like Login or a modal) is pushed on top of MainScreen,
+    // prevent MainScreen from receiving viewInsets. This stops 5 tabs from relayouting
+    // simultaneously in the background when the keyboard opens on the top screen!
+    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+
+    return Builder(builder: (context) {
+      if (isCurrentRoute) {
+        return _buildMainContent(context, screenWidth, screenHeight,
+            standardAxonWidth, isRtl, directionMultiplier, gradientColors);
+      }
+
+      final baseMediaQuery = MediaQuery.of(context);
+      return MediaQuery(
+        data: baseMediaQuery.copyWith(viewInsets: EdgeInsets.zero),
+        child: _buildMainContent(context, screenWidth, screenHeight,
+            standardAxonWidth, isRtl, directionMultiplier, gradientColors),
+      );
+    });
+  }
+
+  Widget _buildMainContent(
+      BuildContext context,
+      double screenWidth,
+      double screenHeight,
+      double standardAxonWidth,
+      bool isRtl,
+      double directionMultiplier,
+      List<Color> gradientColors) {
     return Title(
       title: 'Cortex',
       color: AppColors.background,
@@ -617,9 +799,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             return;
           }
 
-          if (MediaQuery
-              .viewInsetsOf(context)
-              .bottom > 0) {
+          if (MediaQuery.viewInsetsOf(context).bottom > 0) {
             _forceCloseKeyboard();
             return;
           }
@@ -698,6 +878,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                   onOpenAxon: () => _animateAxonTo(1.0),
                                   referenceWidth: standardAxonWidth,
                                   activeTab: _getCurrentViewIndex(),
+                                  isOpen: rawValue > 0.0,
                                 ),
                               ),
                               if (rawValue < 1.0)
@@ -731,44 +912,41 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                 )
                             ],
                           ),
-                          child: MediaQuery(
-                            data: MediaQuery.of(context).copyWith(
-                              viewInsets: (rawValue > 0 || searchValue > 0)
-                                  ? EdgeInsets.zero
-                                  : MediaQuery.viewInsetsOf(context),
-                            ),
-                            child: Stack(
-                              children: [
-                                child!,
-                                Align(
-                                  alignment: isRtl
-                                      ? Alignment.centerRight
-                                      : Alignment.centerLeft,
-                                  child: Container(
-                                    width: 1.0,
-                                    height: (screenHeight * 0.6) * rawValue,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: gradientColors,
-                                        stops: const [0.0, 0.3, 0.7, 1.0],
-                                      ),
+                          // PERFORMANCE: Removed MediaQuery wrapper that caused
+                          // ~60 rebuilds per keyboard animation. resizeToAvoidBottomInset
+                          // is already false; scroll button reads keyboard height in its
+                          // own isolated AnimatedBuilder (view.dart:370).
+                          child: Stack(
+                            children: [
+                              child!,
+                              Align(
+                                alignment: isRtl
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                child: Container(
+                                  width: 1.0,
+                                  height: (screenHeight * 0.6) * rawValue,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: gradientColors,
+                                      stops: const [0.0, 0.3, 0.7, 1.0],
                                     ),
                                   ),
                                 ),
-                                if (rawValue > 0 && searchValue == 0)
-                                  GestureDetector(
-                                    onTap: closeAxon,
-                                    behavior: HitTestBehavior.translucent,
-                                    child: Container(
-                                      color: Colors.transparent,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    ),
+                              ),
+                              if (rawValue > 0 && searchValue == 0)
+                                GestureDetector(
+                                  onTap: closeAxon,
+                                  behavior: HitTestBehavior.translucent,
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    width: double.infinity,
+                                    height: double.infinity,
                                   ),
-                              ],
-                            ),
+                                ),
+                            ],
                           ),
                         ),
                       ),

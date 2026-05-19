@@ -123,7 +123,7 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.quaternaryColor,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                       color: AppColors.primaryColor.inverted, width: 0.5),
@@ -228,7 +228,7 @@ InlineSpan processInlineMatch(BuildContext context, MatchRange match,
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
             color: citationUrl != null
-                ? AppColors.quaternaryColor
+                ? AppColors.background
                 : AppColors.secondaryColor.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(4),
             border: Border.all(

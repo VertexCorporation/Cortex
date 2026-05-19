@@ -64,7 +64,7 @@ class SelectTextScreenState extends State<SelectTextScreen> {
     // --- Dynamic Scaling Calculation ---
     // We establish a scaling factor based on a reference mobile width (400dp).
     // This ensures consistent visual density across phones and tablets.
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery.sizeOf(context).width;
     final double scale = screenWidth / 400.0;
 
     // Define dynamic dimensions

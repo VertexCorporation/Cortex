@@ -98,7 +98,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
 
           // 2. Bottom Controls (3 Buttons)
           Positioned(
-            bottom: MediaQuery.of(context).padding.bottom +
+            bottom: MediaQuery.paddingOf(context).bottom +
                 16, // Reduced padding to move 1x height
             left: 24,
             right: 24,
@@ -326,7 +326,7 @@ class _VoiceSessionOverlayState extends State<VoiceSessionOverlay>
                     child: RotatedBox(
                       quarterTurns: 2,
                       child: SvgPicture.asset(
-                        'assets/icons/arrov.svg',
+                        'assets/icons/arrow.svg',
                         colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
                       ),
                     ),
@@ -599,7 +599,7 @@ class _MorphingVisualizerState extends State<_MorphingVisualizer>
           // PHASE 2: STRETCH
           double localT = (t - 0.3) / 0.4;
           currentHeight = 2.0;
-          double screenWidth = MediaQuery.of(context).size.width;
+          double screenWidth = MediaQuery.sizeOf(context).width;
           currentWidth = dotSize + (screenWidth - dotSize) * localT;
           borderRadius = 1.0;
         } else {
@@ -632,7 +632,7 @@ class _MorphingVisualizerState extends State<_MorphingVisualizer>
           if (heightT < 0) heightT = 0;
 
           currentHeight = 2.0 + (150.0 - 2.0) * heightT;
-          currentWidth = MediaQuery.of(context).size.width;
+          currentWidth = MediaQuery.sizeOf(context).width;
           borderRadius = 0.0;
           opacityWave =
               heightT.clamp(0.0, 1.0); // Wave fades in as height grows
@@ -673,7 +673,7 @@ class _MorphingVisualizerState extends State<_MorphingVisualizer>
         if (isFlowProcessing) {
           // Enforce Flat Line State for Flow Mode Processing
           // "Flat line" means width is wide, height is very thin
-          currentWidth = MediaQuery.of(context).size.width * 0.6;
+          currentWidth = MediaQuery.sizeOf(context).width * 0.6;
           currentHeight = 4.0;
           borderRadius = 2.0;
 

@@ -20,6 +20,7 @@ class Axon extends StatefulWidget {
   final VoidCallback onOpenAxon;
   final double referenceWidth;
   final int activeTab;
+  final bool isOpen;
 
   const Axon({
     super.key,
@@ -32,6 +33,7 @@ class Axon extends StatefulWidget {
     required this.onOpenAxon,
     required this.referenceWidth,
     required this.activeTab,
+    required this.isOpen,
   });
 
   @override
@@ -79,6 +81,14 @@ class _AxonState extends State<Axon> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(Axon oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isOpen && !widget.isOpen) {
+      _handleExitSearchMode();
+    }
+  }
+
   void _onSearchFocusChange() {
     final isFocused = _searchFocusNode.hasFocus;
     if (_isSearchActive != isFocused) {
@@ -87,6 +97,7 @@ class _AxonState extends State<Axon> with SingleTickerProviderStateMixin {
         _searchModeController.forward();
       } else {
         _searchModeController.reverse();
+        _handleExitSearchMode();
       }
     }
   }

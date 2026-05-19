@@ -26,7 +26,7 @@ class ModelHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final mainModel = provider.mainModel!;
 
     final capabilitiesSource = provider.currentCapabilitiesSource ?? mainModel;
@@ -185,7 +185,7 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     return Row(
       children: [

@@ -118,7 +118,7 @@ class ModelsBody extends StatelessWidget {
     final double bottomPosition = showLocalizationWarning
         ? _kWarningPanelVisibleBottom
         : _kWarningPanelHiddenBottom;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final bool isTablet = screenWidth >= 600;
 
     // --- DYNAMIC WIDTH FOR TABLET ---
@@ -201,9 +201,9 @@ class ModelsBody extends StatelessWidget {
   }
 
   Widget _buildContentView(BuildContext context, bool isSearching) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final topPadding = MediaQuery.of(context).padding.top;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final topPadding = MediaQuery.paddingOf(context).top;
     final double safeTopPadding = topPadding;
 
     return ScrollFog(
@@ -253,8 +253,8 @@ class ModelsBody extends StatelessWidget {
 
   Widget _buildDefaultModelList(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
     final bool isTablet = screenWidth >= 600;
 
     final self = allModels.where((model) => model.category == 'self').toList();

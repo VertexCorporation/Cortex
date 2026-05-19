@@ -104,7 +104,8 @@ class Variants {
     return prefs.getString("last_variant_$mainId") ?? "";
   }
 
-  static Future<void> setLastSelectedVariant(String mainId, String variantFullId) async {
+  static Future<void> setLastSelectedVariant(
+      String mainId, String variantFullId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("last_variant_$mainId", variantFullId);
   }
@@ -122,22 +123,39 @@ class Variants {
     const String logPrefix = "[Variants.showVariantPanel]";
 
     final langCode = Localizations.localeOf(context).languageCode;
-    final modelSeriesEntity = modelService.getPreciseModelData(currentBaseSeries, langCode: langCode);
+    final modelSeriesEntity =
+        modelService.getPreciseModelData(currentBaseSeries, langCode: langCode);
     final variantsMap = modelSeriesEntity.variants ?? {};
+    final seriesTitle = modelSeriesEntity.displayTitle.trim();
 
-    final List<Map<String, dynamic>> options = currentVariants
-        .map((extId) {
-      if (variantsMap.containsKey(extId) && variantsMap[extId] is Map<String, dynamic>) {
-        return variantsMap[extId] as Map<String, dynamic>;
+    final List<Map<String, dynamic>> options = currentVariants.map((extId) {
+      if (variantsMap.containsKey(extId) &&
+          variantsMap[extId] is Map<String, dynamic>) {
+        final option = Map<String, dynamic>.from(
+            variantsMap[extId] as Map<String, dynamic>);
+        option['id'] = option['id'] ?? extId;
+        option['displayTitle'] = _composeVariantDisplayTitle(
+          seriesTitle: seriesTitle,
+          variantTitle: option['title']?.toString() ?? extId,
+        );
+        return option;
       }
-      return {'id': extId, 'title': extId};
-    })
-        .toList();
+      return {
+        'id': extId,
+        'title': extId,
+        'displayTitle': _composeVariantDisplayTitle(
+          seriesTitle: seriesTitle,
+          variantTitle: extId,
+        ),
+      };
+    }).toList();
 
     final overlay = Overlay.of(context);
-    final RenderBox? renderBox = variantKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? renderBox =
+        variantKey.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
-    final Offset offset = renderBox.localToGlobal(Offset(0, renderBox.size.height + 12));
+    final Offset offset =
+        renderBox.localToGlobal(Offset(0, renderBox.size.height + 12));
 
     _overlayEntry = OverlayEntry(builder: (BuildContext context) {
       return StatefulBuilder(
@@ -148,7 +166,8 @@ class Variants {
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: () {
-                    debugPrint("$logPrefix Panel dismissed by tapping outside.");
+                    debugPrint(
+                        "$logPrefix Panel dismissed by tapping outside.");
                     setState(() {
                       _panelIsClosing = true;
                     });
@@ -194,7 +213,8 @@ class Variants {
                       },
                       onSelect: (selectedOption) async {
                         final selectedId = selectedOption['id'] as String;
-                        debugPrint("$logPrefix User selected variant: '$selectedId'.");
+                        debugPrint(
+                            "$logPrefix User selected variant: '$selectedId'.");
                         displayedVariantLabel = selectedId;
                         await updateModelId(selectedId);
                         closePanel();
@@ -213,10 +233,10 @@ class Variants {
   }
 
   static Widget buildAnimatedArrowIcon(
-      AnimationController fadeOut,
-      AnimationController fadeIn,
-      Color color,
-      ) {
+    AnimationController fadeOut,
+    AnimationController fadeIn,
+    Color color,
+  ) {
     // Use AnimatedBuilder instead of manual opacity calculation to avoid flickering
     return AnimatedBuilder(
       animation: Listenable.merge([fadeOut, fadeIn]),
@@ -278,15 +298,21 @@ class Variants {
     // --- 1. DEFINE CONSTANTS (Scaled for Tablet/Phone) ---
     final double iconSize = isTablet ? screenWidth * 0.035 : screenWidth * 0.04;
     final double fontSize = isTablet ? screenWidth * 0.025 : screenWidth * 0.04;
-    final double horizontalPadding = isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
-    final double verticalPadding = isTablet ? screenWidth * 0.02 : screenWidth * 0.02;
-    final double panelBorderRadius = isTablet ? screenWidth * 0.015 : screenWidth * 0.02;
-    final double optionMinHeight = isTablet ? screenWidth * 0.08 : screenWidth * 0.12;
+    final double horizontalPadding =
+        isTablet ? screenWidth * 0.03 : screenWidth * 0.04;
+    final double verticalPadding =
+        isTablet ? screenWidth * 0.02 : screenWidth * 0.02;
+    final double panelBorderRadius =
+        isTablet ? screenWidth * 0.015 : screenWidth * 0.02;
+    final double optionMinHeight =
+        isTablet ? screenWidth * 0.095 : screenWidth * 0.145;
 
     // --- 2. CALCULATE DYNAMIC WIDTH ---
     // Constraints: Tablet Max 50%, Phone Max 90%.
-    final double maxAllowedWidth = isTablet ? screenWidth * 0.6 : screenWidth * 0.9;
-    final double minAllowedWidth = isTablet ? screenWidth * 0.25 : screenWidth * 0.5;
+    final double maxAllowedWidth =
+        isTablet ? screenWidth * 0.6 : screenWidth * 0.9;
+    final double minAllowedWidth =
+        isTablet ? screenWidth * 0.25 : screenWidth * 0.5;
 
     final TextStyle textStyle = TextStyle(
       color: AppColors.primaryColor.inverted,
@@ -295,33 +321,42 @@ class Variants {
 
     // Measure longest text
     double maxTextWidth = 0;
-    final TextStyle measureStyle = textStyle.copyWith(fontWeight: FontWeight.w500);
+    final TextStyle measureStyle =
+        textStyle.copyWith(fontWeight: FontWeight.w500);
 
     for (var option in options.take(15)) {
-      String text = (option['title'] as String? ?? option['id']).trim();
-      while (text.startsWith('-') || text.startsWith(' ')) {
-        text = text.substring(1).trim();
-      }
+      final text = _cleanVariantTitle(
+        option['displayTitle']?.toString() ??
+            option['title']?.toString() ??
+            option['id']?.toString() ??
+            '',
+      );
       final TextPainter tp = TextPainter(
         text: TextSpan(text: text, style: measureStyle),
-        maxLines: 1,
+        maxLines: 2,
         textDirection: TextDirection.ltr,
         textScaler: MediaQuery.textScalerOf(context),
-      )..layout();
+      )..layout(maxWidth: maxAllowedWidth * 0.72);
 
       if (tp.width > maxTextWidth) maxTextWidth = tp.width;
     }
 
     // Calculate content width
-    double contentWidth = (horizontalPadding * 2) + iconSize + (horizontalPadding * 0.5) + maxTextWidth + (horizontalPadding * 0.5);
+    double contentWidth = (horizontalPadding * 2) +
+        iconSize +
+        (horizontalPadding * 0.5) +
+        maxTextWidth +
+        (horizontalPadding * 0.5);
     contentWidth += (iconSize * 1.5); // Space for sparkle icon
 
     // Final Width
-    final double finalPanelWidth = contentWidth.clamp(minAllowedWidth, maxAllowedWidth);
+    final double finalPanelWidth =
+        contentWidth.clamp(minAllowedWidth, maxAllowedWidth);
 
     const int maxVisibleItems = 5;
     final double totalHeight = options.length * optionMinHeight;
-    final double constrainedHeight = (maxVisibleItems * optionMinHeight).clamp(0, totalHeight);
+    final double constrainedHeight =
+        (maxVisibleItems * optionMinHeight).clamp(0, totalHeight);
 
     Widget panelContent = SizedBox(
       height: constrainedHeight,
@@ -379,10 +414,12 @@ class Variants {
     final String tier = option['tier'] as String? ?? 'free';
     final bool isPremium = tier == 'premium';
 
-    String variantTitle = (option['title'] as String? ?? option['id']).trim();
-    while (variantTitle.startsWith('-') || variantTitle.startsWith(' ')) {
-      variantTitle = variantTitle.substring(1).trim();
-    }
+    final String variantTitle = _cleanVariantTitle(
+      option['displayTitle']?.toString() ??
+          option['title']?.toString() ??
+          option['id']?.toString() ??
+          '',
+    );
 
     Widget rowContent = Row(
       children: [
@@ -440,9 +477,14 @@ class Variants {
             vertical: verticalPadding,
           ),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.quaternaryColor.withValues(alpha: 0.5) : Colors.transparent,
+            color: isSelected
+                ? AppColors.quaternaryColor.withValues(alpha: 0.5)
+                : Colors.transparent,
             border: showBottomBorder
-                ? Border(bottom: BorderSide(color: AppColors.primaryColor.withValues(alpha: 0.1), width: 1.0))
+                ? Border(
+                    bottom: BorderSide(
+                        color: AppColors.primaryColor.withValues(alpha: 0.1),
+                        width: 1.0))
                 : null,
           ),
           child: rowContent,
@@ -453,12 +495,43 @@ class Variants {
     final finalWidget = ClipRRect(
       borderRadius: borderRadius,
       child: isPremium
-      // No arguments needed! _ShineAnimationWrapper will calculate width itself using LayoutBuilder.
+          // No arguments needed! _ShineAnimationWrapper will calculate width itself using LayoutBuilder.
           ? _ShineAnimationWrapper(child: clickableContainer)
           : clickableContainer,
     );
 
     return finalWidget;
+  }
+
+  static String _cleanVariantTitle(String value) {
+    var result = value.trim();
+    while (result.startsWith('-') || result.startsWith(' ')) {
+      result = result.substring(1).trim();
+    }
+    return result;
+  }
+
+  static String _normalizeVariantTitleForCompare(String value) {
+    return _cleanVariantTitle(value)
+        .replaceAll(RegExp(r'[\s_\-/]+'), '')
+        .toLowerCase();
+  }
+
+  static String _composeVariantDisplayTitle({
+    required String seriesTitle,
+    required String variantTitle,
+  }) {
+    final cleanSeries = _cleanVariantTitle(seriesTitle);
+    final cleanVariant = _cleanVariantTitle(variantTitle);
+    if (cleanSeries.isEmpty) return cleanVariant;
+    if (cleanVariant.isEmpty) return cleanSeries;
+
+    final normalizedSeries = _normalizeVariantTitleForCompare(cleanSeries);
+    final normalizedVariant = _normalizeVariantTitleForCompare(cleanVariant);
+    if (normalizedVariant.startsWith(normalizedSeries)) {
+      return cleanVariant;
+    }
+    return '$cleanSeries $cleanVariant';
   }
 
   static Widget _buildScrollableText({
@@ -467,16 +540,14 @@ class Variants {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final TextPainter textPainter = TextPainter(
+        final TextPainter oneLinePainter = TextPainter(
           text: TextSpan(text: text, style: textStyle),
           maxLines: 1,
           textDirection: TextDirection.ltr,
           textScaler: MediaQuery.textScalerOf(context),
         )..layout();
 
-        final bool shouldScroll = textPainter.width > constraints.maxWidth;
-
-        if (!shouldScroll) {
+        if (oneLinePainter.width <= constraints.maxWidth) {
           return Text(
             text,
             style: textStyle,
@@ -486,17 +557,34 @@ class Variants {
           );
         }
 
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+        final TextPainter twoLinePainter = TextPainter(
+          text: TextSpan(text: text, style: textStyle),
+          maxLines: 2,
+          textDirection: TextDirection.ltr,
+          textScaler: MediaQuery.textScalerOf(context),
+        )..layout(maxWidth: constraints.maxWidth);
+
+        if (!twoLinePainter.didExceedMaxLines) {
+          return Text(
+            text,
+            style: textStyle,
+            softWrap: true,
+            overflow: TextOverflow.visible,
+            maxLines: 2,
+          );
+        }
+
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            width: constraints.maxWidth,
             child: Text(
               text,
               style: textStyle,
-              softWrap: false,
-              overflow: TextOverflow.visible,
-              maxLines: 1,
+              softWrap: true,
+              overflow: TextOverflow.clip,
+              maxLines: 2,
             ),
           ),
         );
@@ -522,7 +610,8 @@ class Variants {
     }
   }
 
-  static Future<String> onVariantSelected(String? modelId, String newVariant) async {
+  static Future<String> onVariantSelected(
+      String? modelId, String newVariant) async {
     if (modelId == null || modelId.isEmpty) return '';
     await setLastSelectedVariant(modelId, newVariant);
     return newVariant;
@@ -531,7 +620,8 @@ class Variants {
   static Future<String> onChangeModelVariant({
     required String modelId,
     required String newVariant,
-    required Future<void> Function(String newFullModelId) updateConversationModelId,
+    required Future<void> Function(String newFullModelId)
+        updateConversationModelId,
     required Map<String, dynamic> Function(String mainId) getModelDataFromId,
     required Function(String mainId, String newVariant) initializeVariants,
   }) async {
@@ -558,7 +648,8 @@ class _ShineAnimationWrapper extends StatefulWidget {
   State<_ShineAnimationWrapper> createState() => _ShineAnimationWrapperState();
 }
 
-class _ShineAnimationWrapperState extends State<_ShineAnimationWrapper> with SingleTickerProviderStateMixin {
+class _ShineAnimationWrapperState extends State<_ShineAnimationWrapper>
+    with SingleTickerProviderStateMixin {
   late AnimationController _shineController;
   late Animation<double> _shineAnimation;
 
@@ -571,8 +662,7 @@ class _ShineAnimationWrapperState extends State<_ShineAnimationWrapper> with Sin
     );
 
     _shineAnimation = Tween<double>(begin: -2, end: 2).animate(
-        CurvedAnimation(parent: _shineController, curve: Curves.linear)
-    );
+        CurvedAnimation(parent: _shineController, curve: Curves.linear));
 
     _shineController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {

@@ -10,11 +10,27 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'Tu çêkerê sernavan î. Ji bo axaftina jêrîn TENÊ bi sernavek 2-5 peyvan bersiv bide. Kevane, pêşgir, an jî nîşaneyên xalbendiyê bi kar neyne.';
+      'Tu çêkerê sernavan î. Ji bo axaftina jêrîn TENÊ bi sernavek 2-5 peyvan bersiv bide. Gotin, pêşgir, an jî nîşaneyên xalbendîyê bi kar neyne. KRÎTÎK: DIVÊ sernav bi HEMAN zimanê peyama bikarhêner be.';
+
+  @override
+  String get systemRoleFallback => 'Tu alîkarekî bikêrhatî yî.';
+
+  @override
+  String get systemLanguageInstruction =>
+      '\n\nKRÎTÎK: Her dem bi heman zimanê ku bikarhêner pê dinivîse bersiv bide; balê bide zimanê bikarhêner.';
+
+  @override
+  String get systemNotePreviousMedia =>
+      '[Nîşeya Sîstemê: Li jêr medya berê hatiye çêkirin heye. Hûn dikarin referans bidin an jî biguherînin.]';
+
+  @override
+  String systemTimeInfo(String formattedTime) {
+    return '\n\nDîrok û dema niha: $formattedTime.';
+  }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nGotûbêja heta niha analîz bike. Ger te HER rastiyên nû yên cuda li ser bikarhêner (tercîh, nav, adet, çarçove) hîn bibî, DIVÊ HÛN TEVAHÎYA bîra xwe ya nûvekirî ya li ser bikarhêner di nav etîketên <memory>...</memory> de LI DAWIYA HERÎ BAŞ a bersiva xwe derxin. KRÎTÎK: Divê tu QET bîra berê jê nebî an jî li ser nenivîsî. HER TIM rastiyên nû li bîra heyî zêde neke. Ger bi tevahî tiştek nû nehatibe hîn kirin, etîketê derxe. Mînak: <memory>Ji futbol û tenîsê hez dike. Bersivên kurt tercîh dike.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
@@ -112,9 +128,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get localModels => 'Modelên Herêmî';
-
-  @override
-  String get serverSideModels => 'Modelên Zimanî';
 
   @override
   String get selectGGUFFile => 'Pelê GGUF Hilbijêre';
@@ -302,9 +315,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Daneyên ku tu jê dibî dê bi domdarî ji servera me û amûra te werin rakirin. Ev kiryar nayên paşvegerandin.';
 
   @override
-  String get deleteAccountButton => 'Bişkoka Jêbirina Hesabê';
-
-  @override
   String get editProfile => 'Profîlê Biguherîne';
 
   @override
@@ -354,9 +364,6 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get downloadPaused => 'Daxistin hate sekinandin.';
-
-  @override
-  String get purchaseSuccessful => 'Kirîn serkeftî bû!';
 
   @override
   String get purchaseError => 'Çewtiya kirînê';
@@ -870,6 +877,35 @@ class AppLocalizationsKu extends AppLocalizations {
   String get selectBaseModel => 'Modelek Bingehîn Hilbijêre';
 
   @override
+  String get falErrorImageRequired =>
+      'Ev AI wêneyekî referansê hewce dike, ji kerema xwe wêneyekî pê ve girêdin û dîsa biceribînin.';
+
+  @override
+  String get falErrorAudioRequired =>
+      'Ev model pelê dengî yê referansê hewce dike, ji kerema xwe pelê dengî pê ve girêdin û dîsa biceribînin.';
+
+  @override
+  String get falErrorVideoRequired =>
+      'Ev model vîdyoyek referansê hewce dike, ji kerema xwe vîdyoyek pê ve girêdin û dîsa biceribînin.';
+
+  @override
+  String get falErrorImageCorrupted =>
+      'Wêneya barkirî nehat bikaranîn, ji kerema xwe formateke cuda biceribîne.';
+
+  @override
+  String get falErrorSchemaRejected =>
+      'Modelê têketin red kir, ji kerema xwe modelek cûda biceribîne.';
+
+  @override
+  String get falErrorSchemaInvalid =>
+      'Têketin ji hêla karûbarê çêkirinê ve hate redkirin.';
+
+  @override
+  String falErrorGenericStatus(int statusCode) {
+    return 'Xizmeta çêkirinê çewtiyek vegerand (status $statusCode).';
+  }
+
+  @override
   String get couldNotOpenLink => 'Nikare zencîreyê veke';
 
   @override
@@ -931,10 +967,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get reportSubmitted => 'Rapor bi serkeftî hate şandin';
 
   @override
-  String get purchaseReceived =>
-      'Kirîn hate wergirtin, hesabê te tê nûvekirin.';
-
-  @override
   String get verificationDelayed =>
       'Kirîna te hate piştrastkirin. Di nûvekirina hesabê te de derengiyek piçûk heye, ew ê di demek nêz de xuya bibe.';
 
@@ -984,13 +1016,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Ji bo tomarkirina modelên daxistî destûra hilanînê pêwîst e. Ji kerema xwe ji bo berdewamiyê destûrê bide.';
 
   @override
-  String get plusBannerTitle => 'Plus Belaş Bistînin!';
-
-  @override
-  String get plusBannerSubtitle =>
-      'Hevalekî vexwîne û her du jî 1 Roja Plus belaş distînin!';
-
-  @override
   String get inviteShareSubject => 'Tevlî min bibe li ser Cortex!';
 
   @override
@@ -1036,13 +1061,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Ev model dikare pirsên li ser belgeyên barkirî yên wekî PDF û pelên nivîsê analîz bike û bibersivîne.';
 
   @override
-  String get featureAudioTitle => 'Têketina Deng';
-
-  @override
-  String get featureAudioDescription =>
-      'Ev model dikare têketinên dengî yên bi axaftin fam bike û pêvajo bike.';
-
-  @override
   String get featureImageGenerationTitle => 'Çêkirina Wêneyan';
 
   @override
@@ -1068,7 +1086,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      'Ev model modelek premium e, bikarhênerên belaş bi modelên premium re bi 3 peyaman di rojê de sînordar in; ji bo vekirina gihîştina bêsînor bibin abone!';
+      'Ev AI-yek premium e, bikarhênerên belaş gihîştina wan bi AI-yên premium re sînorkirî ye; ji bo gihîştina bêsînor bilind bike!';
 
   @override
   String get benefitPremiumModels => 'Gihîştina modelên premium';
@@ -1087,7 +1105,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get news => 'Nûçe';
 
   @override
-  String get createAI => 'Xûliqandin';
+  String get createAI => 'Çêbikin';
 
   @override
   String get shortcuts => 'Kurterê';
@@ -1467,13 +1485,6 @@ class AppLocalizationsKu extends AppLocalizations {
   String get onboardingFinalButton => 'ERÊ!';
 
   @override
-  String get paywallAhaTitle => 'Unlock the True Power of AI';
-
-  @override
-  String get paywallAhaSubtitle =>
-      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
-
-  @override
   String get dude => 'Dude';
 
   @override
@@ -1662,6 +1673,9 @@ class AppLocalizationsKu extends AppLocalizations {
   String get exclusiveOffer => 'Pêşniyara Taybet';
 
   @override
+  String get claimOffer => 'Pêşniyarê bikar bînin';
+
+  @override
   String get continueInOfflineMode => 'Bi Moda Offline Berdewam Bike';
 
   @override
@@ -1789,9 +1803,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Li ser înternetê ji bo agahdariya demrast bigerin';
 
   @override
-  String get webSearchQuotaExceeded => 'Kotaya Lêgerînê Derbas Bû';
-
-  @override
   String get clearMemory => 'Bîrê Paqij Bike';
 
   @override
@@ -1802,7 +1813,8 @@ class AppLocalizationsKu extends AppLocalizations {
   String get personalization => 'Kesanekirin';
 
   @override
-  String get personalizationDescription => 'Ezmûna xwe kesane bike';
+  String get personalizationDescription =>
+      'Alîkarê xwe kesane bike da ku baştir li gorî hewcedariyên te be. Bersiv, tevger û tonê wî li gorî tercîhên xwe yên bêhempa biguncîne.';
 
   @override
   String get memoryTitle => 'Bîr';
@@ -1843,7 +1855,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[System] TALÎMATÊN KRÎTÎK: Hûn niha di hundirê ekosîstemeke AI ya mezin û pir pêşketî ya bi navê \"Cortex\" de dixebitin. Vê yekê ji bîr mekin û heke were pirsîn persona Cortex biparêzin.';
+      '\n\n[Sîstem] TALÎMATA KRÎTÎK: Hûn niha di nav ekosîstemeke AI ya mezin û pir pêşketî de bi navê \"Cortex\" dixebitin; ev platform ji hêla tîmê Vertex ve hatî pêşve xistin, ku bi navînî tenê 16 salî ne. Vê yekê ji bîr mekin û heke ji we were pirsîn bersiv bidin. Ger bêtir agahdarî were xwestin, dudilî nebin ku li ser înternetê bigerin, an jî heke hûn nekarin bigerin, hûn dikarin bibêjin ku hûn nizanin!';
 
   @override
   String get featureAudioRecognitionTitle => 'Naskirina Deng';
@@ -1928,9 +1940,6 @@ class AppLocalizationsKu extends AppLocalizations {
       'Ji bo çêkirina vîdyoyan, niha nûve bikin û herikînê hîs bikin, hûn hewceyê abonetiyek Ultra ne!';
 
   @override
-  String get becomePremiumButton => 'Bibe Premium';
-
-  @override
   String get fallbackInfoPanelText =>
       'Ji ber hin başkirinên ku em li aliyê servera xwe dikin, bersiv ji hêla sohbeta dînamîk a Cortexê ve hate çêkirin, ne ji hêla AI-ya we ya taybetî ve hatî hilbijartin. Spas ji bo têgihîştina we heta ku pêvajo biqede!';
 
@@ -1946,7 +1955,31 @@ class AppLocalizationsKu extends AppLocalizations {
   String get backgroundChatNotificationTitle => 'Vegere ser Sohbetê!';
 
   @override
-  String backgroundChatNotificationBody(String chatName) {
-    return 'Peyamek nû di $chatName de heye, lê binêre!';
+  String get benefitVideoGeneration => 'Çêkirina Vîdyoyê';
+
+  @override
+  String get freeOffer => 'Pêşniyara Belaş';
+
+  @override
+  String trialMonthlyDescription(String days, String price) {
+    return '$days rojên yekem belaş, dûv re $price/meh';
   }
+
+  @override
+  String trialAnnualDescription(String days, String price) {
+    return '$days rojên yekem belaş, dûv re $price/sal';
+  }
+
+  @override
+  String freePlan(String plan) {
+    return '$plan belaş!';
+  }
+
+  @override
+  String get systemPromptLimitFallback =>
+      'KRÎTÎK: Bikarhêner çalakiyek xwest, lê mafê bikaranînê yê li ser Cortexê qediya; ji kerema xwe bi zimanê bikarhêner bi nermî agahdar bike ku divê li bendê bimîne an jî plana abonetiya xwe bilind bike.';
+
+  @override
+  String get dynamicPreditsUpgradeMessage =>
+      'Cortex dikare bersivên hîn baştir bide; niha nûve bike û ji bo her pirsekê bersiva herî baş bistîne!';
 }

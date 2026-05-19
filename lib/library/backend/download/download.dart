@@ -14,10 +14,12 @@ class DownloadManager extends ChangeNotifier {
   bool isDownloaded = false;
   double progress = 0.0; // 0..100
   bool isCancelled = false;
+  DateTime lastProgressUpdateTime = DateTime.now();
 
   void setDownloading(bool val) {
     if (isDownloading == val) return;
     isDownloading = val;
+    if (val) lastProgressUpdateTime = DateTime.now();
     notifyListeners();
   }
 
@@ -36,6 +38,7 @@ class DownloadManager extends ChangeNotifier {
   void setProgress(double val) {
     if (progress == val) return;
     progress = val;
+    lastProgressUpdateTime = DateTime.now();
     notifyListeners();
   }
 
@@ -48,7 +51,7 @@ class DownloadManager extends ChangeNotifier {
 
 class DownloadedModelsManager extends ChangeNotifier {
   static final DownloadedModelsManager _instance =
-  DownloadedModelsManager._internal();
+      DownloadedModelsManager._internal();
 
   factory DownloadedModelsManager() => _instance;
 
@@ -72,7 +75,7 @@ class DownloadedModelsManager extends ChangeNotifier {
 
   void updateSingleDownloadedModel(String modelTitle, String imagePath) {
     int index =
-    downloadedModels.indexWhere((model) => model.name == modelTitle);
+        downloadedModels.indexWhere((model) => model.name == modelTitle);
     if (index >= 0) {
       downloadedModels[index] =
           DownloadedModel(name: modelTitle, image: imagePath);
@@ -151,6 +154,7 @@ class FileDownloadHelper extends ChangeNotifier {
           } else if (dstatus == DownloadTaskStatus.canceled) {
             debugPrint(
                 "[FileDownloadHelper] Task '$taskId' was confirmed as canceled by the backend.");
+            taskInfo.onDownloadError('Download canceled');
             _tasks.remove(taskId);
           }
         }
@@ -298,9 +302,7 @@ class FileDownloadHelper extends ChangeNotifier {
           if (total != -1) {
             double progress = (received / total) * 100;
 
-            int currentMs = DateTime
-                .now()
-                .millisecondsSinceEpoch;
+            int currentMs = DateTime.now().millisecondsSinceEpoch;
             int lastUpdate = _dioProgressUpdateMs[taskId] ?? 0;
             if (currentMs - lastUpdate > 250 || progress == 100) {
               _dioProgressUpdateMs[taskId] = currentMs;
@@ -431,7 +433,7 @@ class FileDownloadHelper extends ChangeNotifier {
 
       final prefs = await SharedPreferences.getInstance();
       final keysToWipe =
-      prefs.getKeys().where((k) => k.startsWith('download_task_id_'));
+          prefs.getKeys().where((k) => k.startsWith('download_task_id_'));
       for (final k in keysToWipe) {
         await prefs.remove(k);
       }

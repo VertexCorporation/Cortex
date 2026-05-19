@@ -125,8 +125,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final double screenHeight = mediaQuery.size.height;
+    
+    final double screenHeight = MediaQuery.sizeOf(context).height;
     final l10n = AppLocalizations.of(context)!;
     final userProvider = context.watch<UserProvider>();
 

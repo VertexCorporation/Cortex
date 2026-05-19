@@ -35,7 +35,9 @@ class ModelDetailPage extends StatelessWidget {
       create: (context) {
         // Read the download manager for this specific model ID.
         final downloadManager =
-            context.read<ModelLocalStateProvider>().downloadManagers[id];
+        context
+            .read<ModelLocalStateProvider>()
+            .downloadManagers[id];
 
         // Create the provider instance, passing all required dependencies
         // from the context via its constructor.
@@ -66,7 +68,7 @@ class _ModelDetailViewWithTicker extends StatefulWidget {
 class __ModelDetailViewWithTickerState extends State<_ModelDetailViewWithTicker>
     with TickerProviderStateMixin {
   final GlobalKey<DetailAppBarState> _appBarKey =
-      GlobalKey<DetailAppBarState>();
+  GlobalKey<DetailAppBarState>();
 
   // A controller to manage the scroll position for the fog effect.
   late final ScrollController _scrollController;
@@ -106,7 +108,9 @@ class ModelDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ModelDetailProvider>();
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = MediaQuery
+        .sizeOf(context)
+        .height;
 
     void handlePop() {
       Navigator.of(context)
@@ -127,42 +131,55 @@ class ModelDetailView extends StatelessWidget {
           handlePop();
         }
       },
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        extendBodyBehindAppBar: true,
-        appBar: DetailAppBar(
-          context: context,
-          key: appBarKey,
-          provider: provider,
-          onBackPressed: handlePop,
-          scrollController: scrollController,
-        ),
-        bottomNavigationBar: const BottomActionButtons(),
-        body: SizedBox.expand(
-          child: Stack(
-            children: [
-              ScrollFog(
-                scrollController: scrollController,
-                topFogHeight: screenHeight * 0.02,
-                showTop: true,
-                showBottom: false,
-                child: BodyContent(
-                  key: const ValueKey('content'),
+      child: Builder(
+          builder: (context) {
+            final bottomInset = MediaQuery
+                .viewInsetsOf(context)
+                .bottom;
+            return AnimatedPadding(
+              padding: EdgeInsets.only(bottom: bottomInset),
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              child: Scaffold(
+                resizeToAvoidBottomInset: false,
+                backgroundColor: AppColors.background,
+                extendBodyBehindAppBar: true,
+                appBar: DetailAppBar(
+                  context: context,
+                  key: appBarKey,
                   provider: provider,
+                  onBackPressed: handlePop,
                   scrollController: scrollController,
                 ),
+                bottomNavigationBar: const BottomActionButtons(),
+                body: SizedBox.expand(
+                  child: Stack(
+                    children: [
+                      ScrollFog(
+                        scrollController: scrollController,
+                        topFogHeight: screenHeight * 0.02,
+                        showTop: true,
+                        showBottom: false,
+                        child: BodyContent(
+                          key: const ValueKey('content'),
+                          provider: provider,
+                          scrollController: scrollController,
+                        ),
+                      ),
+                      // Position the banners at the bottom of the screen.
+                      // They are now managed and dismissed from within the WarningOverlays widget.
+                      Positioned(
+                        bottom: screenHeight * 0.01,
+                        left: 0,
+                        right: 0,
+                        child: WarningOverlays(provider: provider),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              // Position the banners at the bottom of the screen.
-              // They are now managed and dismissed from within the WarningOverlays widget.
-              Positioned(
-                bottom: screenHeight * 0.01,
-                left: 0,
-                right: 0,
-                child: WarningOverlays(provider: provider),
-              ),
-            ],
-          ),
-        ),
+            );
+          }
       ),
     );
   }

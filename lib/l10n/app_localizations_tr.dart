@@ -10,11 +10,27 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'Sen bir başlık oluşturucusun. Aşağıdaki sohbet için SADECE 2-5 kelimelik bir başlık ver. Tırnak, ön ek veya noktalama işareti kullanma.';
+      'Siz bir başlık oluşturucusunuz. Lütfen aşağıdaki konuşma için SADECE 2-5 kelimelik bir başlık yazın. Tırnak işaretleri, ön ekler veya noktalama işaretleri kullanmayın. ÖNEMLİ: Başlık, kullanıcının mesajıyla TAM OLARAK AYNI dilde olmalıdır.';
+
+  @override
+  String get systemRoleFallback => 'Yardımsever bir asistansınız.';
+
+  @override
+  String get systemLanguageInstruction =>
+      '\n\nÖNEMLİ: Her zaman kullanıcının yazdığı dilde yanıt verin, kullanıcının diline dikkat edin.';
+
+  @override
+  String get systemNotePreviousMedia =>
+      '[Sistem Notu: Aşağıda daha önce üretilmiş medya bulunmaktadır. Referans alabilir veya düzenleyebilirsiniz.]';
+
+  @override
+  String systemTimeInfo(String formattedTime) {
+    return '\n\nŞu anki tarih ve saat: $formattedTime.';
+  }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nŞimdiye kadarki konuşmayı analiz edin. Kullanıcı hakkında HERHANGİ bir yeni ve belirgin bilgi (tercihler, isim, alışkanlıklar, bağlam) öğrendiyseniz, güncellenmiş tüm bilgilerinizi yanıtınızın EN SONUNA <memory>...</memory> etiketleri içine yazmalısınız. ÖNEMLİ: Önceki belleği ASLA silmemeli veya üzerine yazmamalısınız. Her zaman yeni bilgileri mevcut belleğe ekleyin. Kesinlikle yeni bir şey öğrenilmediyse, etiketi atlayın. Örnek: <memory>Futbol ve tenisi sever. Kısa cevapları tercih eder.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
@@ -112,9 +128,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get localModels => 'Yerel Modeller';
-
-  @override
-  String get serverSideModels => 'Dil Modelleri';
 
   @override
   String get selectGGUFFile => 'GGUF Dosyası Seç';
@@ -301,9 +314,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Sildiğiniz veriler sunucumuzdan ve cihazınızdan kalıcı olarak kaldırılacaktır. Bu eylemler geri alınamaz.';
 
   @override
-  String get deleteAccountButton => 'Hesap Silme Butonu';
-
-  @override
   String get editProfile => 'Profili Düzenle';
 
   @override
@@ -353,9 +363,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get downloadPaused => 'İndirme duraklatıldı.';
-
-  @override
-  String get purchaseSuccessful => 'Satın alma başarılı!';
 
   @override
   String get purchaseError => 'Satın alma hatası';
@@ -867,6 +874,35 @@ class AppLocalizationsTr extends AppLocalizations {
   String get selectBaseModel => 'Bir Temel Model Seçin';
 
   @override
+  String get falErrorImageRequired =>
+      'Bu yapay zeka bir referans görseli gerektiriyor, lütfen bir görsel ekleyip tekrar deneyin.';
+
+  @override
+  String get falErrorAudioRequired =>
+      'Bu model referans ses dosyası gerektiriyor, lütfen ses dosyasını ekleyip tekrar deneyin.';
+
+  @override
+  String get falErrorVideoRequired =>
+      'Bu model için referans videosu gerekmektedir, lütfen bir video ekleyip tekrar deneyin.';
+
+  @override
+  String get falErrorImageCorrupted =>
+      'Yüklenen görsel işlenemedi, lütfen farklı bir format deneyin.';
+
+  @override
+  String get falErrorSchemaRejected =>
+      'Model, girilen veriyi reddetti, lütfen farklı bir model deneyin.';
+
+  @override
+  String get falErrorSchemaInvalid =>
+      'Giriş, üretim servisi tarafından reddedildi.';
+
+  @override
+  String falErrorGenericStatus(int statusCode) {
+    return 'Üretim hizmeti bir hata döndürdü (durum $statusCode).';
+  }
+
+  @override
   String get couldNotOpenLink => 'Bağlantı açılamadı';
 
   @override
@@ -928,9 +964,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get reportSubmitted => 'Rapor başarıyla gönderildi.';
 
   @override
-  String get purchaseReceived => 'Satın alım alındı, hesabınız güncelleniyor.';
-
-  @override
   String get verificationDelayed =>
       'Satın alımınız onaylandı. Hesabınıza yansımasında kısa bir gecikme yaşanıyor, yakında görünecektir.';
 
@@ -980,13 +1013,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'İndirilen modelleri kaydetmek için depolama izni gereklidir. Devam etmek için lütfen izin verin.';
 
   @override
-  String get plusBannerTitle => 'Bedava Plus!';
-
-  @override
-  String get plusBannerSubtitle =>
-      'Kankanı davet et ve ikiniz de 1 günlük ücretsiz Plus kapın!';
-
-  @override
   String get inviteShareSubject => 'Cortex\'e Katıl!';
 
   @override
@@ -1032,13 +1058,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu model, PDF ve metin dosyaları gibi yüklenen belgelerle ilgili soruları analiz edebilir ve yanıtlayabilir.';
 
   @override
-  String get featureAudioTitle => 'Ses Girişi';
-
-  @override
-  String get featureAudioDescription =>
-      'Bu model konuşulan ses girdilerini anlayabilir ve işleyebilir.';
-
-  @override
   String get featureImageGenerationTitle => 'Fotoğraf Oluşturma';
 
   @override
@@ -1064,7 +1083,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      'Bu model premium bir modeldir, premium modellerde ücretsiz kullanıcılar günde 3 mesajla sınırlıdır; sınırsız erişimin kilidini açmak için abone olun!';
+      'Bu zekâ, üst düzey bir zekâdır; ücretsiz kullanıcıların üst düzey zekâlara erişimi sınırlıdır; sınırsız erişim için yükseltin!';
 
   @override
   String get benefitPremiumModels => 'Premium modellere erişim';
@@ -1083,10 +1102,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get news => 'Haberler';
 
   @override
-  String get createAI => 'Create';
+  String get createAI => 'Oluştur';
 
   @override
-  String get shortcuts => 'Shortcuts';
+  String get shortcuts => 'Kısayollar';
 
   @override
   String get allModels => 'Tüm Modeller';
@@ -1460,13 +1479,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onboardingFinalButton => 'EVET!';
 
   @override
-  String get paywallAhaTitle => 'Unlock the True Power of AI';
-
-  @override
-  String get paywallAhaSubtitle =>
-      'Neuro is ready to assist you. Upgrade to create limitless videos, detailed images, and more.';
-
-  @override
   String get dude => 'Kanka';
 
   @override
@@ -1500,7 +1512,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get accountLinkedSuccess => 'Hesap başarıyla oluşturuldu!';
 
   @override
-  String get continueWithApple => 'Apple ile devam edin';
+  String get continueWithApple => 'Apple ile Devam Et';
 
   @override
   String get guest => 'Misafir';
@@ -1656,6 +1668,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get exclusiveOffer => 'Özel Teklif';
 
   @override
+  String get claimOffer => 'Teklifi Kullan';
+
+  @override
   String get continueInOfflineMode => 'Lokal Modda Devam Et';
 
   @override
@@ -1784,9 +1799,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Gerçek zamanlı bilgi için internette arama yapın.';
 
   @override
-  String get webSearchQuotaExceeded => 'Arama kotası aşıldı';
-
-  @override
   String get clearMemory => 'Hafızayı Temizle';
 
   @override
@@ -1796,7 +1808,8 @@ class AppLocalizationsTr extends AppLocalizations {
   String get personalization => 'Kişiselleştirme';
 
   @override
-  String get personalizationDescription => 'Deneyiminizi kişiselleştirin';
+  String get personalizationDescription =>
+      'Asistanınızı ihtiyaçlarınıza daha iyi uyacak şekilde kişiselleştirin. Yanıtlarını, davranışlarını ve tonunu benzersiz tercihlerinize göre uyarlayın.';
 
   @override
   String get memoryTitle => 'Hafıza';
@@ -1836,7 +1849,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[Sistem] KRİTİK TALİMAT: Şu anda \"Cortex\" adlı devasa, son derece gelişmiş bir yapay zekâ ekosistemi içinde çalışıyorsunuz. Bunu unutmayın ve sorulursa Cortex persona\'sını sürdürün.';
+      '\n\n[Sistem] KRİTİK TALİMAT: Şu anda \"Cortex\" adlı devasa, son derece gelişmiş bir yapay zeka ekosisteminin içinde çalışıyorsunuz; bu platform, ortalama 16 yaşında olan Vertex ekibi tarafından geliştirilmiştir. Bunu hatırlayın ve sorulursa cevap verin. Daha fazla bilgi istenirse, internette arama yapmaktan çekinmeyin veya arama yapamıyorsanız, bilmiyorum demekten çekinmeyin!';
 
   @override
   String get featureAudioRecognitionTitle => 'Ses Tanıma';
@@ -1921,9 +1934,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Video oluşturmak için Ultra aboneliğine ihtiyacınız var, şimdi yükseltin ve akışı hissedin!';
 
   @override
-  String get becomePremiumButton => 'Premium Üye Olun';
-
-  @override
   String get fallbackInfoPanelText =>
       'Sunucu tarafımızda yaptığımız bazı iyileştirmeler nedeniyle, yanıt, özel olarak seçtiğiniz yapay zekâ yerine Cortex\'in dinamik sohbeti tarafından oluşturulmuştur. İşlem tamamlanana kadar anlayışınız için teşekkür ederiz!';
 
@@ -1939,7 +1949,31 @@ class AppLocalizationsTr extends AppLocalizations {
   String get backgroundChatNotificationTitle => 'Sohbete Devam!';
 
   @override
-  String backgroundChatNotificationBody(String chatName) {
-    return '$chatName sohbetinde yeni bir mesaj var, bak bakalım!';
+  String get benefitVideoGeneration => 'Video Üretimi';
+
+  @override
+  String get freeOffer => 'Bedava Teklif';
+
+  @override
+  String trialMonthlyDescription(String days, String price) {
+    return 'İlk $days gün ücretsiz, ardından $price/ay';
   }
+
+  @override
+  String trialAnnualDescription(String days, String price) {
+    return 'İlk $days gün ücretsiz, ardından $price/yıl';
+  }
+
+  @override
+  String freePlan(String plan) {
+    return 'Bedava $plan!';
+  }
+
+  @override
+  String get systemPromptLimitFallback =>
+      '[SİSTEM NOTU: Kullanıcı bir işlem istedi, ancak Cortex\'teki mevcut hakları bitti. Lütfen kullanıcıya kendi dilinde kibarca bu durumu açıkla. Beklemelerini veya planını yükseltmesi gerektiğini söyle.]';
+
+  @override
+  String get dynamicPreditsUpgradeMessage =>
+      'Cortex çok daha iyi yanıtlar verebilir; şimdi hesabını yükselt ve her sorun için en iyi yanıtı al!';
 }

@@ -113,7 +113,7 @@ class _ModelTileState extends State<ModelTile> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final double w = MediaQuery.of(context).size.width;
+    final double w = MediaQuery.sizeOf(context).width;
 
     // Logic now uses the entity's properties for clarity.
     final bool canLongPress = widget.model.isCustomModel || widget.isDownloaded;

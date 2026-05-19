@@ -20,7 +20,7 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery.sizeOf(context).width;
     final bool isTablet = screenWidth >= 600;
     final bool isDesktop = screenWidth >= 800; // [NEW] Desktop breakpoint
 

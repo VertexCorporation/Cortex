@@ -1,10 +1,17 @@
 part of 'service.dart';
 
+const List<int> _notificationPermissionPromptThresholds = <int>[5, 25, 50, 100];
+const String _notificationPermissionMessageCountKey =
+    'notification_permission_message_count';
+const String _notificationPermissionAttemptedThresholdsKey =
+    'notification_permission_attempted_thresholds';
+
 extension ExtrovertTokenManager on ExtrovertNotificationService {
   /// Sets up Firebase Cloud Messaging, including permissions and message listeners.
   Future<void> _initializeFirebaseMessaging() async {
     if (kIsWeb) {
-      debugPrint("[Extrovert] Skipping Firebase Messaging init on Web to prevent permission prompts.");
+      debugPrint(
+          "[Extrovert] Skipping Firebase Messaging init on Web to prevent permission prompts.");
       return;
     }
 
@@ -32,7 +39,7 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
       while (retryCount < maxRetries) {
         try {
           token = await _fcm.getToken();
-          if (token != null) break; 
+          if (token != null) break;
         } catch (e) {
           final String errorStr = e.toString();
 
@@ -40,20 +47,18 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
               errorStr.contains("SERVICE_NOT_AVAILABLE") ||
                   errorStr.contains("java.io.IOException");
           final bool isTooManyRegistrations =
-          errorStr.contains("TOO_MANY_REGISTRATIONS");
+              errorStr.contains("TOO_MANY_REGISTRATIONS");
 
           if (isServiceNotAvailable || isTooManyRegistrations) {
             retryCount++;
             if (retryCount < maxRetries) {
               debugPrint(
-                  "[Extrovert] FCM Token fetch failed ($errorStr). Retrying ($retryCount/$maxRetries) in ${retryCount *
-                      2} seconds...");
-              await Future.delayed(Duration(
-                  seconds: retryCount * 2)); 
+                  "[Extrovert] FCM Token fetch failed ($errorStr). Retrying ($retryCount/$maxRetries) in ${retryCount * 2} seconds...");
+              await Future.delayed(Duration(seconds: retryCount * 2));
             } else {
               debugPrint(
                   "[Extrovert] FCM Token fetch gave up after $maxRetries attempts. Using cached token if available.");
-              token = cachedToken; 
+              token = cachedToken;
             }
           } else {
             debugPrint(
@@ -94,7 +99,7 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
       if (initialMessage != null) {
         Future.delayed(
           const Duration(seconds: 1),
-              () => _handleTapLogic(initialMessage.data),
+          () => _handleTapLogic(initialMessage.data),
         );
       }
     } catch (e, s) {
@@ -106,6 +111,76 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
         FirebaseCrashlytics.instance
             .recordError(e, s, reason: "FCM Initialization Failed (Fatal)");
       }
+    }
+  }
+
+  bool _hasNotificationPermission(NotificationSettings settings) {
+    return settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional;
+  }
+
+  int? _nextPermissionPromptThreshold({
+    required int messageCount,
+    required Set<String> attemptedThresholds,
+  }) {
+    for (final threshold in _notificationPermissionPromptThresholds) {
+      if (messageCount >= threshold &&
+          !attemptedThresholds.contains(threshold.toString())) {
+        return threshold;
+      }
+    }
+    return null;
+  }
+
+  Future<void> recordSentMessageAndMaybeRequestPermission() async {
+    if (kIsWeb || _isRequestingPermission) return;
+
+    try {
+      final bool fcmAvailable = await _fcm.isSupported();
+      if (!fcmAvailable) return;
+
+      final currentSettings = await _fcm.getNotificationSettings();
+      final prefs = await SharedPreferences.getInstance();
+      if (_hasNotificationPermission(currentSettings)) {
+        if (!prefs.containsKey('fcm_token')) {
+          await syncTokenAfterLogin();
+        }
+        return;
+      }
+
+      final messageCount =
+          (prefs.getInt(_notificationPermissionMessageCountKey) ?? 0) + 1;
+      await prefs.setInt(_notificationPermissionMessageCountKey, messageCount);
+
+      final attemptedThresholds =
+          (prefs.getStringList(_notificationPermissionAttemptedThresholdsKey) ??
+                  const <String>[])
+              .toSet();
+      final threshold = _nextPermissionPromptThreshold(
+        messageCount: messageCount,
+        attemptedThresholds: attemptedThresholds,
+      );
+      if (threshold == null) return;
+
+      attemptedThresholds.add(threshold.toString());
+      final sortedThresholds = attemptedThresholds.toList()
+        ..sort(
+            (a, b) => (int.tryParse(a) ?? 0).compareTo(int.tryParse(b) ?? 0));
+      await prefs.setStringList(
+          _notificationPermissionAttemptedThresholdsKey, sortedThresholds);
+
+      debugPrint(
+          "[ExtrovertNotificationService] Requesting notification permission at message #$messageCount (threshold $threshold).");
+      await requestPermission();
+    } catch (e, s) {
+      debugPrint(
+          "[ExtrovertNotificationService] Error while evaluating notification permission prompt: $e");
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        s,
+        reason: "Notification Permission Prompt Evaluation Failed",
+        fatal: false,
+      );
     }
   }
 
@@ -163,12 +238,18 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
       if (tokenToRemove == null) {
         debugPrint(
             "[ExtrovertNotificationService] Local token not found. Fetching current token as a fallback.");
-        tokenToRemove = await _fcm.getToken();
+        try {
+          tokenToRemove = await _fcm.getToken();
+        } catch (e) {
+          debugPrint(
+              "[ExtrovertNotificationService] Ignored error while fetching token during sign-out: \$e");
+        }
       }
 
       if (tokenToRemove != null) {
         if (user.isAnonymous) {
-          debugPrint("[ExtrovertNotificationService] User is anonymous. Skipping Firestore FCM token cleanup.");
+          debugPrint(
+              "[ExtrovertNotificationService] User is anonymous. Skipping Firestore FCM token cleanup.");
         } else {
           final userRef = _db.collection('users').doc(user.uid);
           await userRef.update({
@@ -180,9 +261,9 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
       }
     } catch (e, s) {
       if (e is FirebaseException && e.code == 'permission-denied') {
-         debugPrint(
-             "[ExtrovertNotificationService] Permission denied removing token (likely anonymous or deleted). Ignoring.");
-         return;
+        debugPrint(
+            "[ExtrovertNotificationService] Permission denied removing token (likely anonymous or deleted). Ignoring.");
+        return;
       }
       debugPrint(
           "[ExtrovertNotificationService] Error removing FCM token on sign-out: $e");
@@ -225,7 +306,7 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
     try {
       _isRequestingPermission = true;
 
-      await _fcm.requestPermission(
+      final settings = await _fcm.requestPermission(
         alert: true,
         badge: true,
         sound: true,
@@ -234,12 +315,16 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
       if (Platform.isIOS) {
         await _localNotifications
             .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
+                IOSFlutterLocalNotificationsPlugin>()
             ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
+              alert: true,
+              badge: true,
+              sound: true,
+            );
+      }
+
+      if (_hasNotificationPermission(settings)) {
+        await syncTokenAfterLogin();
       }
     } catch (e, s) {
       if (e is! FirebaseException || e.code != 'failed-precondition') {

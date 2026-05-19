@@ -21,9 +21,48 @@ class _AiHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final modelService = context.read<ModelService>();
     final langCode = Localizations.localeOf(context).languageCode;
+    final isSearching = message.isWebSearchActive && message.isThinking;
 
     final mId = message.model ?? '';
-    final model = modelService.getPreciseModelData(mId, langCode: langCode);
+    final convProvider = context.read<ConversationProvider>();
+    ModelEntity model;
+
+    bool isDynamicConversationId(String? id) {
+      final normalized = (id ?? '').trim().toLowerCase();
+      return normalized == 'cortex/auto' || normalized == 'dynamic';
+    }
+
+    String? associatedUserModelId;
+    final messagesList = convProvider.messages;
+    final msgIndex = messagesList.indexOf(message);
+    if (msgIndex >= 0) {
+      for (int i = msgIndex - 1; i >= 0; i--) {
+        if (messagesList[i].isUserMessage) {
+          associatedUserModelId = messagesList[i].model;
+          break;
+        }
+      }
+    }
+
+    final bool conversationStartedAsDynamic =
+        isDynamicConversationId(convProvider.persistedModelId) ||
+            isDynamicConversationId(associatedUserModelId);
+
+    if (modelService.hasModelInCache(mId)) {
+      model = modelService.getPreciseModelData(mId, langCode: langCode);
+    } else if (convProvider.persistedModelId == mId &&
+        convProvider.persistedModelTitle != null) {
+      model = ModelEntity.fromMap({
+        'id': mId,
+        'title': convProvider.persistedModelTitle,
+        'imagePath': convProvider.persistedModelImagePath,
+        'producer': 'Unknown',
+        'type': 'online',
+        'category': 'online',
+      }, langCode);
+    } else {
+      model = modelService.getPreciseModelData(mId, langCode: langCode);
+    }
 
     String formatModelId(String rawId) {
       if (rawId.isEmpty) return 'Cortex';
@@ -36,15 +75,41 @@ class _AiHeader extends StatelessWidget {
       }).join(' ');
     }
 
-    String? textToDisplay;
-    if (mId == 'cortex/auto' || mId == 'dynamic') {
+    final bool isCortexDynamic = isDynamicConversationId(mId) ||
+        message.isServerFallback ||
+        conversationStartedAsDynamic;
+
+    String textToDisplay = '';
+    if (isCortexDynamic) {
       textToDisplay = 'Cortex';
-    } else if (model.category == 'self') {
+    } else if (model.category == 'self' || model.category == 'roleplay') {
       textToDisplay = model.displayTitle.isNotEmpty
           ? model.displayTitle
           : formatModelId(mId);
     } else {
-      if (model.displayTitle == 'Unknown Model' || model.displayTitle.isEmpty) {
+      // SERIES NAME PRIORITY: Always show the series name instead of
+      // the individual variant title. The user should see "Gemini"
+      // not "Gemini 2.5 Pro" in the AI message header.
+      final parentSeries = ModelDataUtils.findParentSeriesData(
+        mId,
+        langCode: langCode,
+        modelService: modelService,
+      );
+      final isRealVariantSeries = parentSeries != null &&
+          parentSeries.variants != null &&
+          parentSeries.variants!.isNotEmpty;
+      if (isRealVariantSeries) {
+        final seriesTitle = parentSeries.series ?? parentSeries.displayTitle;
+        if (seriesTitle.isNotEmpty && seriesTitle != 'Unknown Model') {
+          textToDisplay = seriesTitle;
+        } else {
+          textToDisplay = model.displayTitle.isNotEmpty &&
+                  model.displayTitle != 'Unknown Model'
+              ? model.displayTitle
+              : formatModelId(mId);
+        }
+      } else if (model.displayTitle == 'Unknown Model' ||
+          model.displayTitle.isEmpty) {
         textToDisplay = formatModelId(mId);
       } else if (model.displayTitle == model.id) {
         textToDisplay = formatModelId(mId);
@@ -74,6 +139,26 @@ class _AiHeader extends StatelessWidget {
             ),
           ),
         ),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 260),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          transitionBuilder: (child, animation) {
+            final offset = Tween<Offset>(
+              begin: const Offset(-0.35, 0),
+              end: Offset.zero,
+            ).animate(animation);
+            return ClipRect(
+              child: FadeTransition(
+                opacity: animation,
+                child: SlideTransition(position: offset, child: child),
+              ),
+            );
+          },
+          child: isSearching
+              ? _SearchingLabel(key: const ValueKey('searching'), scale: scale)
+              : const SizedBox.shrink(key: ValueKey('not_searching')),
+        ),
         SizeTransition(
           sizeFactor: headerEntryAnim,
           axis: Axis.horizontal,
@@ -84,16 +169,19 @@ class _AiHeader extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(width: 8 * scale),
-                _buildAvatar(scale * 0.7),
+                // Hide the avatar when in dynamic/Cortex mode to avoid
+                // showing two identical cortex.svg icons side by side.
+                if (!isCortexDynamic) _buildAvatar(scale * 0.7),
                 if (textToDisplay.isNotEmpty) ...[
-                  SizedBox(width: 6 * scale),
-                  Text("•",
-                      style: TextStyle(
-                          color: AppColors.primaryColor.inverted
-                              .withValues(alpha: 0.5),
-                          fontSize: 14 * scale,
-                          fontWeight: FontWeight.bold)),
-                  SizedBox(width: 6 * scale),
+                  if (!isCortexDynamic) SizedBox(width: 6 * scale),
+                  if (!isCortexDynamic)
+                    Text("•",
+                        style: TextStyle(
+                            color: AppColors.primaryColor.inverted
+                                .withValues(alpha: 0.5),
+                            fontSize: 14 * scale,
+                            fontWeight: FontWeight.bold)),
+                  if (!isCortexDynamic) SizedBox(width: 6 * scale),
                   Text(
                     ModelDataUtils.formatModelName(textToDisplay),
                     style: TextStyle(
@@ -170,6 +258,35 @@ class _AiHeader extends StatelessWidget {
               color: AppColors.secondaryColor, shape: BoxShape.circle),
           alignment: Alignment.center,
           child: imageWidget),
+    );
+  }
+}
+
+class _SearchingLabel extends StatelessWidget {
+  final double scale;
+
+  const _SearchingLabel({super.key, required this.scale});
+
+  @override
+  Widget build(BuildContext context) {
+    final text = AppLocalizations.of(context)!.searching;
+
+    return Padding(
+      padding: EdgeInsets.only(left: 8 * scale),
+      child: Shimmer.fromColors(
+        baseColor: AppColors.primaryColor.inverted.withValues(alpha: 0.38),
+        highlightColor: AppColors.primaryColor.inverted.withValues(alpha: 0.90),
+        period: const Duration(milliseconds: 1250),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: AppColors.primaryColor.inverted.withValues(alpha: 0.55),
+            fontSize: 14 * scale,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0,
+          ),
+        ),
+      ),
     );
   }
 }

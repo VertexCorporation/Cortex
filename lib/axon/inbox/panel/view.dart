@@ -39,8 +39,8 @@ ActionPanelController showActionPanel({
   VoidCallback? onClosed,
 }) {
   final overlay = Overlay.of(context);
-  final screenHeight = MediaQuery.of(context).size.height;
-  final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.sizeOf(context).height;
+  final screenWidth = MediaQuery.sizeOf(context).width;
   
   // Tablet detection - wider panel for tablets to fit buttons properly
   final bool isTablet = screenWidth > 600;

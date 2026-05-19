@@ -316,7 +316,7 @@ class AppLanguageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ThemeProvider is watched by parent SettingsScreen — no need to re-watch here.
+    context.watch<ThemeProvider>();
     // Watch the LocaleProvider to rebuild this section when the language changes.
     final localeProvider = context.watch<LocaleProvider>();
     final appLocalizations = AppLocalizations.of(context)!;

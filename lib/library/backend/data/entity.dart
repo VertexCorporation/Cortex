@@ -28,7 +28,9 @@ class ModelEntity {
       changed = false;
       for (final pair in wrappers) {
         if (result.startsWith(pair[0]) && result.endsWith(pair[1])) {
-          result = result.substring(pair[0].length, result.length - pair[1].length).trim();
+          result = result
+              .substring(pair[0].length, result.length - pair[1].length)
+              .trim();
           changed = true;
           break;
         }
@@ -150,35 +152,73 @@ class ModelEntity {
       if (value is Map) {
         final localizedMap = Map<String, String>.from(
             value.map((key, val) => MapEntry(key.toString(), val.toString())));
-        return localizedMap[langCode] ??
-            localizedMap['en'] ??
-            localizedMap.values.firstOrNull;
+        for (final key in _languageFallbackKeys(langCode)) {
+          final localizedValue = localizedMap[key]?.trim();
+          if (localizedValue != null && localizedValue.isNotEmpty) {
+            return localizedValue;
+          }
+        }
+        return localizedMap.values.firstOrNull;
       }
       return value.toString();
     }
 
+    String? getLocalizedFieldFromDetails(String field) {
+      final details = _safeStringKeyMap(map['details']);
+      if (details.isEmpty) return null;
+
+      for (final key in _languageFallbackKeys(langCode)) {
+        final localizedDetails = _safeStringKeyMap(details[key]);
+        final value = localizedDetails[field]?.toString().trim();
+        if (value != null && value.isNotEmpty) {
+          return value;
+        }
+      }
+      return null;
+    }
+
+    final id = map['id']?.toString() ?? 'unknown';
+    final seriesSource = getStringOrLocalized(map['series']);
+    final rawTitleCandidate = getLocalizedFieldFromDetails('title') ??
+        getStringOrLocalized(map['title']);
+    final rawTitle =
+    rawTitleCandidate
+        ?.trim()
+        .isNotEmpty == true ? rawTitleCandidate : null;
+    final hasUsableSeriesTitle = seriesSource != null &&
+        seriesSource
+            .trim()
+            .isNotEmpty &&
+        !_looksLikeRawId(seriesSource, id);
+    final titleSource = _looksLikeRawId(rawTitle, id) && hasUsableSeriesTitle
+        ? seriesSource
+        : rawTitle ?? seriesSource ?? id;
+
     return ModelEntity(
-      id: map['id']?.toString() ?? 'unknown',
-      displayTitle: (getStringOrLocalized(map['title']) ??
-          getStringOrLocalized(map['id']) ??
-          '')
-          .isNotEmpty
+      id: id,
+      displayTitle: titleSource.isNotEmpty
           ? formatName(
-        getStringOrLocalized(map['title']) ??
-            getStringOrLocalized(map['id']),
+        titleSource,
         isOfflineVariant: map['type'] == 'offline',
       )
           : 'Unknown Model',
-      series: formatName(getStringOrLocalized(map['series'])),
+      series: formatName(seriesSource),
       producer: formatName(getStringOrLocalized(map['producer'])) != ""
           ? formatName(getStringOrLocalized(map['producer']))
           : 'Unknown',
       type: getStringOrLocalized(map['type']) ?? 'online',
       source: getStringOrLocalized(map['source']) ?? 'openrouter',
       category: getStringOrLocalized(map['category']) ?? 'online',
-      role: getStringOrLocalized(map['role']),
-      displaySummary: _stripWrappedQuotes(getStringOrLocalized(map['summary']) ?? ''),
-      displayDescription: _stripWrappedQuotes(getStringOrLocalized(map['description']) ?? ''),
+      role: getLocalizedFieldFromDetails('role') ??
+          getStringOrLocalized(map['role']),
+      displaySummary: _stripWrappedQuotes(
+          getLocalizedFieldFromDetails('summary') ??
+              getStringOrLocalized(map['summary']) ??
+              ''),
+      displayDescription: _stripWrappedQuotes(
+          getLocalizedFieldFromDetails('description') ??
+              getStringOrLocalized(map['description']) ??
+              ''),
       baseModelId: getStringOrLocalized(map['baseModelId']),
       imagePath: getStringOrLocalized(map['imagePath']),
       ggufPath: getStringOrLocalized(map['ggufPath']),
@@ -196,6 +236,39 @@ class ModelEntity {
           ? ChatFormat.fromMap(map['chatFormat'] as Map<String, dynamic>)
           : null,
     );
+  }
+
+  static bool _looksLikeRawId(String? value, String id) {
+    if (value == null || value
+        .trim()
+        .isEmpty) {
+      return false;
+    }
+    String normalize(String input) =>
+        input.replaceAll(RegExp(r'[\s_\-/]+'), '').toLowerCase();
+    return normalize(value) == normalize(id);
+  }
+
+  static String _normalizedLangCode(String langCode) =>
+      langCode
+          .split(RegExp(r'[-_]'))
+          .first
+          .toLowerCase();
+
+  static List<String> _languageFallbackKeys(String langCode) {
+    final normalized = _normalizedLangCode(langCode);
+    final keys = <String>[
+      normalized,
+      if (normalized == 'zh') 'cn',
+      if (normalized == 'cn') 'zh',
+      'en',
+    ];
+    return keys.toSet().toList();
+  }
+
+  static Map<String, dynamic> _safeStringKeyMap(dynamic value) {
+    if (value is! Map) return {};
+    return Map<String, dynamic>.from(value);
   }
 
   /// Creates a copy of this [ModelEntity] but with the given fields replaced.

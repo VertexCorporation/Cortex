@@ -15,14 +15,32 @@ List<InlineSpan> parseText(BuildContext context, String text,
     text = text.replaceAll(RegexPatterns.usingToolLine, '');
     text = text.replaceAll(RegExp(r'(?<=\n|^)\s*[✅❌✓✗]\s*(?=\n|$)'), '');
     text = text.replaceAll(RegExp(r'\n>\s*\n'), '\n');
+    text = _replaceOutsideCode(
+      text,
+      RegExp(r'<\s*br\s*/?\s*>|<\s*/\s*br\s*>', caseSensitive: false),
+      (_) => '\n',
+    );
+    text = _stripTrailingHorizontalRule(text);
+    text = _replaceOutsideCode(
+      text,
+      RegExp(r'\*{4,}([^*\r\n]+?)\*{4,}'),
+      (match) => '**${match.group(1)}**',
+    );
+    text = _replaceOutsideCode(
+      text,
+      RegExp(r'_{4,}([^_\r\n]+?)_{4,}'),
+      (match) => '__${match.group(1)}__',
+    );
 
     text = text.replaceAll(RegExp(r'\n{2,}(?=<<<WIDGET)'), '\n');
     text = text.replaceAll(RegExp(r'(?<=<<<END>>>)\n{2,}'), '\n');
 
     text = mergeFragmentedThinkingBlocks(text);
+    text = _stripFunctionTagsOutsideCode(text);
 
     text = text.replaceAll(
-        RegExp(r'\s*<memory[)>]?[\s\S]*?(?:</memory[)>]?|$)\s*', caseSensitive: false),
+        RegExp(r'\s*<memory[)>]?[\s\S]*?(?:</memory[)>]?|$)\s*',
+            caseSensitive: false),
         '');
     text = text.replaceAll(
         RegExp(r'\s*<m(?:e(?:m(?:o(?:r(?:y(?:[)>][\s\S]*)?)?)?)?)?)?$',
@@ -257,7 +275,10 @@ String stripMarkup(String text) {
       (m) => '${m.group(0)!.replaceFirst(RegExp(r"^#+\s*"), "")}\n');
   text =
       text.replaceAllMapped(RegexPatterns.bulletList, (m) => '${m.group(1)}\n');
+  text = text.replaceAllMapped(RegexPatterns.blockquote,
+      (m) => '${_stripBlockquotePrefix(m.group(0) ?? '')}\n');
   text = text.replaceAll(RegExp(r'^---$', multiLine: true), '');
+  text = text.replaceAll(RegExp(r'^\s*([*\-_]){3,}\s*$', multiLine: true), '');
 
   text = text.replaceAll(RegExp(r'(\$\$|\\\[|\\\]|\\\(|\\\))'), '');
   text = text.replaceAll(r'$', '');
@@ -275,15 +296,14 @@ String stripMarkup(String text) {
       RegExp(r'\\(mathbf|mathbb|mathcal)\{(.+?)\}'), (m) => m.group(2)!);
 
   text = text.replaceAll(RegExp(r'[{}]'), '');
-  text =
-      text.replaceAll(RegExp(r'\\([a-zA-Z]+)'), '');
+  text = text.replaceAll(RegExp(r'\\([a-zA-Z]+)'), '');
 
   text = text.replaceAllMapped(RegexPatterns.link, (m) => m.group(1) ?? '');
   text =
       text.replaceAllMapped(RegexPatterns.boldItalic, (m) => m.group(1) ?? '');
   text = text.replaceAllMapped(RegexPatterns.bold, (m) => m.group(1) ?? '');
-  text = text.replaceAllMapped(RegExp(r'[*_](.+?)[*_]', dotAll: true),
-      (m) => m.group(1) ?? '');
+  text = text.replaceAllMapped(
+      RegExp(r'[*_](.+?)[*_]', dotAll: true), (m) => m.group(1) ?? '');
   text = text.replaceAllMapped(
       RegexPatterns.strikethrough, (m) => m.group(1) ?? '');
   text = text.replaceAllMapped(
@@ -296,4 +316,135 @@ String stripMarkup(String text) {
   text = text.replaceAll(RegExp(r'(\s*\n\s*){2,}'), '\n\n');
 
   return text.trim();
+}
+
+String _stripBlockquotePrefix(String text) {
+  return text
+      .trimRight()
+      .split('\n')
+      .map((line) => line.replaceFirst(RegExp(r'^\s*>\s?'), ''))
+      .join('\n');
+}
+
+String _stripTrailingHorizontalRule(String text) {
+  return _replaceOutsideCode(
+    text,
+    RegExp(r'(?:^|\n)[ \t]*([*\-_]){3,}[ \t]*$'),
+    (_) => '',
+  ).trimRight();
+}
+
+String _replaceOutsideCode(
+  String text,
+  RegExp pattern,
+  String Function(Match match) replace,
+) {
+  final protectedRanges = <MatchRange>[];
+
+  for (final match in RegexPatterns.codeBlock.allMatches(text)) {
+    protectedRanges.add(MatchRange(
+        start: match.start,
+        end: match.end,
+        text: match.group(0)!,
+        type: 'codeBlock'));
+  }
+  for (final match in RegexPatterns.inlineCode.allMatches(text)) {
+    protectedRanges.add(MatchRange(
+        start: match.start,
+        end: match.end,
+        text: match.group(0)!,
+        type: 'inlineCode'));
+  }
+
+  protectedRanges.sort((a, b) => a.start - b.start);
+
+  final mergedRanges = <MatchRange>[];
+  for (final range in protectedRanges) {
+    if (mergedRanges.isEmpty || range.start >= mergedRanges.last.end) {
+      mergedRanges.add(range);
+    }
+  }
+
+  final buffer = StringBuffer();
+  var cursor = 0;
+  for (final range in mergedRanges) {
+    if (range.start > cursor) {
+      buffer.write(text.substring(cursor, range.start).replaceAllMapped(
+            pattern,
+            replace,
+          ));
+    }
+    buffer.write(range.text);
+    cursor = range.end;
+  }
+
+  if (cursor < text.length) {
+    buffer.write(text.substring(cursor).replaceAllMapped(pattern, replace));
+  }
+
+  return buffer.toString();
+}
+
+String _stripFunctionTagsOutsideCode(String text) {
+  final codeBlockRegex = RegexPatterns.codeBlock;
+  final inlineCodeRegex = RegexPatterns.inlineCode;
+
+  final protectedRanges = <MatchRange>[];
+
+  for (final match in codeBlockRegex.allMatches(text)) {
+    protectedRanges.add(MatchRange(
+        start: match.start,
+        end: match.end,
+        text: match.group(0)!,
+        type: 'codeBlock'));
+  }
+  for (final match in inlineCodeRegex.allMatches(text)) {
+    protectedRanges.add(MatchRange(
+        start: match.start,
+        end: match.end,
+        text: match.group(0)!,
+        type: 'inlineCode'));
+  }
+
+  protectedRanges.sort((a, b) => a.start - b.start);
+
+  final finalProtectedRanges = <MatchRange>[];
+  if (protectedRanges.isNotEmpty) {
+    finalProtectedRanges.add(protectedRanges.first);
+    for (int i = 1; i < protectedRanges.length; i++) {
+      if (protectedRanges[i].start >= finalProtectedRanges.last.end) {
+        finalProtectedRanges.add(protectedRanges[i]);
+      }
+    }
+  }
+
+  final StringBuffer result = StringBuffer();
+  int lastMatchEnd = 0;
+
+  // Pattern to match <function> or <function-call> completely until closed or end of string
+  final functionPattern = RegExp(
+      r'\s*<function(?:-call)?[)>]?[\s\S]*?(?:</function(?:-call)?[)>]?|$)\s*',
+      caseSensitive: false);
+
+  // Pattern to match partial unclosed <function> at the very end of the string
+  final partialFunctionPattern = RegExp(
+      r'\s*<f(?:u(?:n(?:c(?:t(?:i(?:o(?:n(?:-?(?:c(?:a(?:l(?:l(?:[)>][\s\S]*)?)?)?)?)?)?)?)?)?)?)?)?)?$',
+      caseSensitive: false);
+
+  for (final range in finalProtectedRanges) {
+    final String beforeCode = text.substring(lastMatchEnd, range.start);
+    String processedBefore = beforeCode.replaceAll(functionPattern, '');
+    processedBefore = processedBefore.replaceAll(partialFunctionPattern, '');
+    result.write(processedBefore);
+    result.write(range.text);
+    lastMatchEnd = range.end;
+  }
+
+  final String remainingText = text.substring(lastMatchEnd);
+  String processedRemaining = remainingText.replaceAll(functionPattern, '');
+  processedRemaining =
+      processedRemaining.replaceAll(partialFunctionPattern, '');
+  result.write(processedRemaining);
+
+  return result.toString();
 }

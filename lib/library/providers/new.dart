@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'dart:developer' as dev;
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
+import 'package:cortex/server/user.dart';
 import '../../../../internet.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../notifications/introvert.dart';
@@ -135,10 +136,11 @@ class ModelCreationProvider extends ChangeNotifier {
     }
   }
 
-  void updateBaseModels(List<ModelEntity> baseModels, AppLocalizations localizations) {
-    final dynamicModel =
-        ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, localizations.localeName)
-            .copyWith(
+  void updateBaseModels(
+      List<ModelEntity> baseModels, AppLocalizations localizations) {
+    final dynamicModel = ModelEntity.fromMap(
+            ModelDefaults.cortexDynamicChatData, localizations.localeName)
+        .copyWith(
       displayTitle: localizations.alwaysBest,
       variants: {
         'dynamic': {
@@ -151,11 +153,11 @@ class ModelCreationProvider extends ChangeNotifier {
 
     _availableBaseModels = List.from(baseModels);
     _availableBaseModels.insert(0, dynamicModel);
-    
+
     if (_selectedBaseModelId == null && _availableBaseModels.isNotEmpty) {
       _initializeDefaultBaseModelSync(localizations.localeName);
     }
-    
+
     notifyListeners();
   }
 
@@ -171,11 +173,10 @@ class ModelCreationProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> fetchUserSubscription() async {
-    _isSubscriptionLoading = true;
-    notifyListeners();
-    await Future.delayed(const Duration(milliseconds: 500));
-    _subscriptionTier = 3;
+  void syncUserSubscription(UserProvider userProvider) {
+    final nextTier = userProvider.activeSubscriptionLevel;
+    if (_subscriptionTier == nextTier && !_isSubscriptionLoading) return;
+    _subscriptionTier = nextTier;
     _isSubscriptionLoading = false;
     notifyListeners();
   }
@@ -243,6 +244,59 @@ class ModelCreationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _authorizeServerModelCreation({
+    required String modelType,
+    required String name,
+    String? summary,
+    String? description,
+    String? prompt,
+    String? base64Image,
+    String? clientModelId,
+  }) async {
+    final callable = _functions.httpsCallable(
+      'createCustomModel',
+      options: HttpsCallableOptions(timeout: const Duration(seconds: 60)),
+    );
+
+    await callable.call({
+      'modelType': modelType,
+      'name': name,
+      'summary': summary,
+      'description': description,
+      'prompt': prompt,
+      'base64Image': base64Image,
+      if (clientModelId != null) 'clientModelId': clientModelId,
+    });
+  }
+
+  Future<void> _rollbackServerModelCreation(String modelType) async {
+    try {
+      final callable = _functions.httpsCallable(
+        'deleteCustomModel',
+        options: HttpsCallableOptions(timeout: const Duration(seconds: 30)),
+      );
+      await callable.call({'modelType': modelType});
+    } catch (e) {
+      dev.log(
+        'Failed to roll back server model counter for $modelType: $e',
+        name: 'ModelCreation',
+      );
+    }
+  }
+
+  String _modelCreationErrorMessage(
+    FirebaseFunctionsException error,
+    AppLocalizations localizations,
+  ) {
+    if (error.code == 'resource-exhausted') {
+      return localizations.errorRateLimit;
+    }
+    if (error.code == 'invalid-argument') {
+      return localizations.errorContentFlagged;
+    }
+    return error.message ?? localizations.anErrorOccurred;
+  }
+
   Future<void> pickGgufFile(BuildContext context) async {
     if (_isPickerActive) return;
 
@@ -293,34 +347,31 @@ class ModelCreationProvider extends ChangeNotifier {
     if (!internetService.currentStatus || user == null) {
       notificationService.showNotification(
           message: localizations.noInternetConnection,
-          type: NotificationType.success);
+          type: NotificationType.error);
       _isSaving = false;
       notifyListeners();
       return false;
     }
 
     final modelId = 'self_${user.uid}_${DateTime.now().millisecondsSinceEpoch}';
+    final imageForModeration = _pickedImage;
+    bool serverAuthorized = false;
 
     try {
-      final String? base64Image = await _imageFileToBase64(_pickedImage);
-
-      final HttpsCallable authCallable = _functions.httpsCallable(
-        'createCustomModel',
-        options: HttpsCallableOptions(timeout: const Duration(seconds: 30)),
+      final base64Image = await _imageFileToBase64(imageForModeration);
+      await _authorizeServerModelCreation(
+        modelType: 'roleplay',
+        name: nameController.text.trim(),
+        summary: summaryController.text.trim(),
+        description: modelExplanationController.text.trim(),
+        prompt: aiPromptController.text.trim(),
+        base64Image: base64Image,
+        clientModelId: modelId,
       );
-
-      await authCallable.call({
-        'modelType': 'roleplay',
-        'name': nameController.text.trim(),
-        'summary': summaryController.text.trim(),
-        'description': modelExplanationController.text.trim(),
-        'prompt': aiPromptController.text.trim(),
-        'base64Image': base64Image,
-        'clientModelId': modelId,
-      });
+      serverAuthorized = true;
 
       String? permanentImagePath;
-      if (_pickedImage != null) {
+      if (imageForModeration != null) {
         try {
           final appDocsDir = await getApplicationDocumentsDirectory();
           final userModelsDir =
@@ -329,12 +380,12 @@ class ModelCreationProvider extends ChangeNotifier {
           if (!await userModelsDir.exists()) {
             await userModelsDir.create(recursive: true);
           }
-          final fileName = p.basename(_pickedImage!.path);
-          final permanentFile =
-              await _pickedImage!.copy(p.join(userModelsDir.path, fileName));
+          final fileName = p.basename(imageForModeration.path);
+          final permanentFile = await imageForModeration
+              .copy(p.join(userModelsDir.path, fileName));
           permanentImagePath = permanentFile.path;
         } catch (e) {
-          permanentImagePath = _pickedImage?.path;
+          permanentImagePath = imageForModeration.path;
         }
       }
 
@@ -372,22 +423,21 @@ class ModelCreationProvider extends ChangeNotifier {
           message: localizations.modelCreatedSuccess,
           type: NotificationType.success);
       clearCreateForm();
+
       return true;
-    } on FirebaseFunctionsException catch (e) {
-      String errorMessage = e.message ?? localizations.anErrorOccurred;
-      if (e.code == 'resource-exhausted') {
-        errorMessage = localizations.errorRateLimit;
-      }
-      if (e.code == 'invalid-argument') {
-        errorMessage = localizations.errorContentFlagged;
-      }
-      if (e.code == 'permission-denied') {
-        nameShakeController.forward(from: 0.0);
-      }
-      notificationService.showNotification(
-          message: errorMessage, type: NotificationType.error);
-      return false;
     } catch (e) {
+      if (serverAuthorized) {
+        await _rollbackServerModelCreation('roleplay');
+      }
+      if (e is FirebaseFunctionsException) {
+        final errorMessage = _modelCreationErrorMessage(e, localizations);
+        if (e.code == 'permission-denied') {
+          nameShakeController.forward(from: 0.0);
+        }
+        notificationService.showNotification(
+            message: errorMessage, type: NotificationType.error);
+        return false;
+      }
       notificationService.showNotification(
           message: localizations.errorCreatingModel,
           type: NotificationType.error);
@@ -404,9 +454,17 @@ class ModelCreationProvider extends ChangeNotifier {
     final localizations = AppLocalizations.of(context)!;
     final notificationService =
         Provider.of<IntrovertNotificationService>(context, listen: false);
+    final internetService = InternetService();
     final user = _auth.currentUser;
 
     if (user == null) return false;
+
+    if (!internetService.currentStatus) {
+      notificationService.showNotification(
+          message: localizations.noInternetConnection,
+          type: NotificationType.error);
+      return false;
+    }
 
     if (![3, 6].contains(_subscriptionTier)) {
       notificationService.showNotification(
@@ -418,9 +476,23 @@ class ModelCreationProvider extends ChangeNotifier {
     _isSaving = true;
     notifyListeners();
 
+    bool serverAuthorized = false;
+
     try {
       final modelId =
           'local_${user.uid}_${DateTime.now().millisecondsSinceEpoch}';
+      final imageForModeration = _pickedImage;
+      final base64Image = await _imageFileToBase64(imageForModeration);
+
+      await _authorizeServerModelCreation(
+        modelType: 'offline',
+        name: nameController.text.trim(),
+        summary: summaryController.text.trim(),
+        description: modelExplanationController.text.trim(),
+        base64Image: base64Image,
+        clientModelId: modelId,
+      );
+      serverAuthorized = true;
 
       final appDocsDir = await getApplicationDocumentsDirectory();
       final userModelsDir =
@@ -432,10 +504,10 @@ class ModelCreationProvider extends ChangeNotifier {
           await _ggufFile!.copy(p.join(userModelsDir.path, ggufFileName));
 
       String? permanentImagePath;
-      if (_pickedImage != null) {
-        final imageFileName = p.basename(_pickedImage!.path);
-        final permanentImageFile =
-            await _pickedImage!.copy(p.join(userModelsDir.path, imageFileName));
+      if (imageForModeration != null) {
+        final imageFileName = p.basename(imageForModeration.path);
+        final permanentImageFile = await imageForModeration
+            .copy(p.join(userModelsDir.path, imageFileName));
         permanentImagePath = permanentImageFile.path;
       }
 
@@ -474,6 +546,15 @@ class ModelCreationProvider extends ChangeNotifier {
       clearAddForm();
       return true;
     } catch (e) {
+      if (serverAuthorized) {
+        await _rollbackServerModelCreation('offline');
+      }
+      if (e is FirebaseFunctionsException) {
+        notificationService.showNotification(
+            message: _modelCreationErrorMessage(e, localizations),
+            type: NotificationType.error);
+        return false;
+      }
       notificationService.showNotification(
           message: localizations.errorCreatingModel,
           type: NotificationType.error);

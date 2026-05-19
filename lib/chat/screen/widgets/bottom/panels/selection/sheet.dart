@@ -16,7 +16,7 @@ import '../../../../../../fog.dart';
 import 'cards/main.dart';
 import 'cards/variant.dart';
 
-void showModelSelectionSheet({
+Future<bool?> showModelSelectionSheet({
   required BuildContext context,
   required AppLocalizations localizations,
   required String currentModelId,
@@ -31,7 +31,7 @@ void showModelSelectionSheet({
   final cachedModels = modelService.getCachedModelsSync();
   final downloadMap = localStateProvider.downloadCompleted;
 
-  showModalBottomSheet<void>(
+  return showModalBottomSheet<bool>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
@@ -39,7 +39,7 @@ void showModelSelectionSheet({
     enableDrag: true,
     useSafeArea: false,
     constraints: BoxConstraints(
-      maxWidth: MediaQuery.of(context).size.width,
+      maxWidth: MediaQuery.sizeOf(context).width,
     ),
     builder: (BuildContext modalContext) {
       return _ModelSheetContent(
@@ -162,7 +162,8 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     video.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
     image.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
     audio.sort((a, b) => a.displayTitle.compareTo(b.displayTitle));
-    offline.sort((a, b) => (a.series ?? a.displayTitle).compareTo(b.series ?? b.displayTitle));
+    offline.sort((a, b) =>
+        (a.series ?? a.displayTitle).compareTo(b.series ?? b.displayTitle));
 
     _selfModels = self;
     _offlineModels = offline;
@@ -204,9 +205,8 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
       });
     }
 
-    final mediaQuery = MediaQuery.of(context);
-    sw = mediaQuery.size.width;
-    sh = mediaQuery.size.height;
+    sw = MediaQuery.sizeOf(context).width;
+    sh = MediaQuery.sizeOf(context).height;
 
     sp16 = sw * 0.04;
     sp12 = sw * 0.03;
@@ -277,7 +277,8 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     // Prefer first non-premium variant to avoid unnecessary credit spend.
     for (final entry in variantsMap.entries) {
       final variantData = entry.value;
-      if (variantData is Map<String, dynamic> && variantData['tier'] != 'premium') {
+      if (variantData is Map<String, dynamic> &&
+          variantData['tier'] != 'premium') {
         return entry.key;
       }
     }
@@ -288,7 +289,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
     final resolvedModelId = await _resolveSeriesSelection(modelId);
     widget.onModelSelected(resolvedModelId);
     if (mounted) {
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }
   }
 
@@ -457,8 +458,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                               SliverPadding(
                                 padding: EdgeInsets.only(
                                   bottom:
-                                      MediaQuery.of(context).padding.bottom +
-                                          20,
+                                      MediaQuery.paddingOf(context).bottom + 20,
                                 ),
                               ),
                             ],
@@ -531,14 +531,16 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
   /// shows only downloaded variants in the expansion panel.
   Widget _buildOfflineSeriesList(List<ModelEntity> seriesList) {
     // Separate: series models (with variants) vs single offline models
-    final withVariants = seriesList.where((m) => m.variants?.isNotEmpty ?? false).toList();
-    final withoutVariants = seriesList.where((m) => m.variants == null || m.variants!.isEmpty).toList();
+    final withVariants =
+        seriesList.where((m) => m.variants?.isNotEmpty ?? false).toList();
+    final withoutVariants = seriesList
+        .where((m) => m.variants == null || m.variants!.isEmpty)
+        .toList();
 
     return SliverMainAxisGroup(
       slivers: [
         // 1. Series with expandable variants (like online)
-        if (withVariants.isNotEmpty)
-          _buildOfflineSeriesRows(withVariants),
+        if (withVariants.isNotEmpty) _buildOfflineSeriesRows(withVariants),
         // 2. Single offline models (no variants — old behavior grid)
         if (withoutVariants.isNotEmpty)
           SliverPadding(
@@ -593,7 +595,8 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
             // Determine if this series has multiple downloaded variants
             // (only show expansion arrow if more than 1 downloaded variant).
             final int item1DownloadedCount = _countDownloadedVariants(item1);
-            final int item2DownloadedCount = item2 != null ? _countDownloadedVariants(item2) : 0;
+            final int item2DownloadedCount =
+                item2 != null ? _countDownloadedVariants(item2) : 0;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -784,6 +787,7 @@ class _VariantsPanel extends StatelessWidget {
   final double padding;
   final double iconSize;
   final double titleSize;
+
   /// If provided, only variants with downloadMap[id] == true are shown.
   final Map<String, bool>? downloadMap;
 
@@ -821,21 +825,18 @@ class _VariantsPanel extends StatelessWidget {
     if (variantsMap.isEmpty) return const SizedBox.shrink();
 
     // Build variant list, optionally filtering by download status.
-    final List<Map<String, dynamic>> variants = variantsMap.entries
-        .where((e) {
-          // If downloadMap is provided, only show downloaded variants.
-          if (downloadMap != null) {
-            return downloadMap![e.key] == true;
-          }
-          return true;
-        })
-        .map((e) {
-          if (e.value is Map<String, dynamic>) {
-            return e.value as Map<String, dynamic>;
-          }
-          return {'id': e.key, 'title': e.key};
-        })
-        .toList();
+    final List<Map<String, dynamic>> variants = variantsMap.entries.where((e) {
+      // If downloadMap is provided, only show downloaded variants.
+      if (downloadMap != null) {
+        return downloadMap![e.key] == true;
+      }
+      return true;
+    }).map((e) {
+      if (e.value is Map<String, dynamic>) {
+        return e.value as Map<String, dynamic>;
+      }
+      return {'id': e.key, 'title': e.key};
+    }).toList();
 
     if (variants.isEmpty) return const SizedBox.shrink();
 
@@ -906,7 +907,9 @@ class _VariantsPanel extends StatelessWidget {
               final String id = variant['id'];
               final String title = variant['title'] ?? id;
               final bool isPremium = variant['tier'] == 'premium';
-              final bool isSelected = currentModelId == id;
+              // Never show individual variant as selected — the user sees
+              // only the series as active; specific variant choice is internal.
+              final bool isSelected = false;
 
               return ModelVariantCard(
                 title: title,

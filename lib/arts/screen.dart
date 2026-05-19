@@ -11,10 +11,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../appbar.dart';
+import '../axon/inbox/logic/manager.dart';
 import '../chat/messages/viewer.dart';
 import '../main.dart';
 import '../axon/inbox/logic/general.dart';
 import '../chat/providers/input.dart';
+import '../library/backend/data/entity.dart';
+import '../library/backend/data/service.dart';
 
 class ArtsScreen extends StatefulWidget {
   const ArtsScreen({super.key});
@@ -45,11 +48,11 @@ class _ArtsScreenState extends State<ArtsScreen>
     final l10n = AppLocalizations.of(context)!;
     final artsProvider = context.watch<ArtsProvider>();
 
-    final Size screenSize = MediaQuery.of(context).size;
+    final Size screenSize = MediaQuery.sizeOf(context);
     final double screenHeight = screenSize.height;
     final double screenWidth = screenSize.width;
     final bool isDesktop = screenWidth >= 800;
-    final double topSafeArea = MediaQuery.of(context).padding.top;
+    final double topSafeArea = MediaQuery.paddingOf(context).top;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -105,7 +108,7 @@ class _ArtsScreenState extends State<ArtsScreen>
     AppLocalizations l10n,
     double screenHeight,
   ) {
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery.sizeOf(context).width;
     final double iconSize = screenWidth * 0.22;
     final double titleFontSize = screenWidth * 0.065;
     final double descFontSize = screenWidth * 0.042;
@@ -174,7 +177,7 @@ class _ArtsScreenState extends State<ArtsScreen>
     ArtsProvider artsProvider,
     double topSafeArea,
   ) {
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery.sizeOf(context).width;
     final double padding = screenWidth * 0.04;
     final double spacing = 3.0;
 
@@ -207,7 +210,7 @@ class _ArtsScreenState extends State<ArtsScreen>
 
         // Bottom spacer
         SliverToBoxAdapter(
-          child: SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+          child: SizedBox(height: MediaQuery.sizeOf(context).height * 0.1),
         ),
       ],
     );
@@ -219,6 +222,65 @@ class _ArtTile extends StatelessWidget {
   final ArtItem item;
 
   const _ArtTile({required this.item});
+
+  Future<void> _openSourceChatAndAttach({
+    required File file,
+    required bool isImage,
+    required InboxViewModel inboxVM,
+    required InputProvider inputProvider,
+    required ModelService modelService,
+    required String langCode,
+  }) async {
+    final mainState = mainScreenKey.currentState;
+    if (mainState == null) {
+      debugPrint('[Arts.Edit] MainScreenState is unavailable.');
+      return;
+    }
+
+    ConversationManager? manager;
+    final conversationId = item.conversationID.trim();
+    if (conversationId.isNotEmpty) {
+      manager = inboxVM.conversationManagers[conversationId] ??
+          await ConversationManager.fromId(
+            conversationId,
+            langCode: langCode,
+            modelService: modelService,
+          );
+    }
+
+    if (manager != null) {
+      debugPrint(
+          '[Arts.Edit] Opening source conversation: ${manager.conversationID}');
+      await mainState.openConversation(manager);
+    } else {
+      final fallbackModel = _resolveFallbackModel(modelService);
+      if (fallbackModel != null) {
+        debugPrint(
+            '[Arts.Edit] Source conversation missing. Starting model: ${fallbackModel.id}');
+        await mainState.startChatWithModel(fallbackModel);
+      } else {
+        debugPrint(
+            '[Arts.Edit] Source conversation/model missing. Starting default chat.');
+        mainState.startNewConversation();
+        await Future<void>.delayed(const Duration(milliseconds: 450));
+      }
+      inputProvider.resetInputState();
+    }
+
+    inputProvider.addAttachment(file, isImage: isImage);
+  }
+
+  ModelEntity? _resolveFallbackModel(ModelService modelService) {
+    final modelId = item.modelId?.trim();
+    if (modelId == null || modelId.isEmpty) return null;
+
+    final allModels = modelService.getCachedModelsSync();
+    for (final model in allModels) {
+      if (model.id == modelId) return model;
+      if (model.variants?.containsKey(modelId) == true) return model;
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -236,24 +298,23 @@ class _ArtTile extends StatelessWidget {
       case ArtType.image:
         return GestureDetector(
           onTap: () {
+            final inboxVM = context.read<InboxViewModel>();
+            final inputProvider = context.read<InputProvider>();
+            final modelService = context.read<ModelService>();
+            final langCode = Localizations.localeOf(context).languageCode;
+
             Navigator.of(context).push(PhotoViewer.route(
               File(item.path),
               onEditImage: (file) {
-                final inboxVM = context.read<InboxViewModel>();
-                final inputProvider = context.read<InputProvider>();
-                final manager = inboxVM.conversationManagers[item.conversationID];
-                
-                if (manager != null) {
-                  mainScreenKey.currentState?.openConversation(manager);
-                } else {
-                  mainScreenKey.currentState?.startNewConversation();
-                }
-                
-                // attach image
-                Future.delayed(const Duration(milliseconds: 300), () {
-                  inputProvider.addAttachment(File(file.path), isImage: true);
-                });
-              }
+                _openSourceChatAndAttach(
+                  file: File(file.path),
+                  isImage: true,
+                  inboxVM: inboxVM,
+                  inputProvider: inputProvider,
+                  modelService: modelService,
+                  langCode: langCode,
+                );
+              },
             ));
           },
           child: Image.file(
@@ -262,71 +323,70 @@ class _ArtTile extends StatelessWidget {
             width: double.infinity,
             height: double.infinity,
             cacheHeight: 300,
-            errorBuilder: (_, __, ___) => _buildFallbackIcon(Icons.broken_image_rounded),
+            errorBuilder: (_, __, ___) =>
+                _buildFallbackIcon(Icons.broken_image_rounded),
           ),
         );
 
       case ArtType.video:
         return GestureDetector(
           onTap: () {
+            final inboxVM = context.read<InboxViewModel>();
+            final inputProvider = context.read<InputProvider>();
+            final modelService = context.read<ModelService>();
+            final langCode = Localizations.localeOf(context).languageCode;
+
             Navigator.of(context).push(VideoViewer.route(
               item.path,
               onEditVideo: (path) {
-                final inboxVM = context.read<InboxViewModel>();
-                final inputProvider = context.read<InputProvider>();
-                final manager = inboxVM.conversationManagers[item.conversationID];
-                
-                if (manager != null) {
-                  mainScreenKey.currentState?.openConversation(manager);
-                } else {
-                  mainScreenKey.currentState?.startNewConversation();
-                }
-                
-                // attach video
-                Future.delayed(const Duration(milliseconds: 300), () {
-                  inputProvider.addAttachment(File(path), isImage: false);
-                });
-              }
+                _openSourceChatAndAttach(
+                  file: File(path),
+                  isImage: false,
+                  inboxVM: inboxVM,
+                  inputProvider: inputProvider,
+                  modelService: modelService,
+                  langCode: langCode,
+                );
+              },
             ));
           },
           child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Container(
-              color: AppColors.senaryColor.withValues(alpha: 0.5),
-            ),
-            Center(
-              child: Icon(
-                Icons.play_circle_filled_rounded,
-                color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
-                size: 36,
+            fit: StackFit.expand,
+            children: [
+              Container(
+                color: AppColors.senaryColor.withValues(alpha: 0.5),
               ),
-            ),
-          ],
-        ),
-      );
+              Center(
+                child: Icon(
+                  Icons.play_circle_filled_rounded,
+                  color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
+                  size: 36,
+                ),
+              ),
+            ],
+          ),
+        );
 
       case ArtType.audio:
         return GestureDetector(
           onTap: () {
+            final inboxVM = context.read<InboxViewModel>();
+            final inputProvider = context.read<InputProvider>();
+            final modelService = context.read<ModelService>();
+            final langCode = Localizations.localeOf(context).languageCode;
+
             Navigator.of(context).push(AudioViewer.route(
               item.path,
               onEditAudio: (path) {
-                final inboxVM = context.read<InboxViewModel>();
-                final inputProvider = context.read<InputProvider>();
-                final manager = inboxVM.conversationManagers[item.conversationID];
-                
-                if (manager != null) {
-                  mainScreenKey.currentState?.openConversation(manager);
-                } else {
-                  mainScreenKey.currentState?.startNewConversation();
-                }
-                
-                // attach audio
-                Future.delayed(const Duration(milliseconds: 300), () {
-                  inputProvider.addAttachment(File(path), isImage: false);
-                });
-              }
+                _openSourceChatAndAttach(
+                  file: File(path),
+                  isImage: false,
+                  inboxVM: inboxVM,
+                  inputProvider: inputProvider,
+                  modelService: modelService,
+                  langCode: langCode,
+                );
+              },
             ));
           },
           child: Stack(

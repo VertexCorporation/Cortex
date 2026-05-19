@@ -94,7 +94,7 @@ class ModelLocalStateProvider extends ChangeNotifier
   //================================================================================
 
   SystemInfoData? _systemInfo;
-  Map<String, bool> _downloadCompleted = {};
+  final Map<String, bool> _downloadCompleted = {};
   String _filesDirectoryPath = '';
   String _oldFilesDirectoryPath = '';
   final Map<String, DownloadManager> _downloadManagers = {};
@@ -438,7 +438,13 @@ class ModelLocalStateProvider extends ChangeNotifier
 
     bool hasChanged = !mapEquals(_downloadCompleted, combinedStates);
     if (hasChanged) {
-      _downloadCompleted = combinedStates;
+      // CRITICAL FIX: Do NOT replace the map reference. The
+      // ModelDownloadController holds a direct reference to this same map
+      // object. If we reassign _downloadCompleted to a new map, the
+      // controller's reference becomes a stale orphan and any writes it
+      // makes (e.g. downloadCompleted[id] = true) are silently lost.
+      _downloadCompleted.clear();
+      _downloadCompleted.addAll(combinedStates);
     }
 
     // Update download managers for all tracked IDs.
@@ -475,7 +481,10 @@ class ModelLocalStateProvider extends ChangeNotifier
       'token': token,
     });
 
-    _downloadCompleted = processedData.downloadCompleted;
+    // CRITICAL FIX: Preserve the map reference for ModelDownloadController.
+    // See _refreshStateAfterFileChange for the full explanation.
+    _downloadCompleted.clear();
+    _downloadCompleted.addAll(processedData.downloadCompleted);
 
     // Collect all IDs we need managers for: model IDs + their variant IDs.
     final Set<String> allManagedIds = {};
@@ -563,8 +572,8 @@ class ModelLocalStateProvider extends ChangeNotifier
     final restoreNavBar = Darkener.darken();
 
     // Get screen dimensions once for responsive sizing.
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     // 1. Smart Size Formatting (MB vs GB)
     String sizeString;

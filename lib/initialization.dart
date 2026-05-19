@@ -29,6 +29,7 @@ import 'chat/services/moderator.dart';
 import 'internet.dart';
 import 'l10n/app_localizations.dart';
 import 'library/backend/download/download.dart';
+import 'login/anonymous_device_entitlement.dart';
 import 'maintenance.dart';
 import 'notifications/extrovert.dart';
 import 'notifications/introvert.dart';
@@ -133,8 +134,7 @@ class AppInitializer with ChangeNotifier {
     required IntrovertNotificationService introvertNotificationService,
     required InternetProvider internetProvider,
     required UserProvider userProvider,
-  })
-      : _status = initialStatus,
+  })  : _status = initialStatus,
         _authService = authService,
         _modelService = modelService,
         _extrovertNotificationService = extrovertNotificationService,
@@ -193,36 +193,18 @@ class AppInitializer with ChangeNotifier {
     // 1. Check Connectivity IMMEDIATELY.
     await _internetProvider.checkInternetConnection();
 
-    // [STARTUP FIX] Pre-fetch models to prevent "Unknown Model" flash.
-    // We await this to ensure model data is ready before UI renders.
-    // This happens during splash screen, so user won't notice the delay.
-    try {
-      final sysLocale = Platform.localeName
-          .split('_')
-          .first;
-      await _modelService.getModels(langCode: sysLocale);
+    // [STARTUP PERF] Non-blocking model fetch — UI renders immediately with
+    // stub model data from SharedPreferences. ChatSessionProvider hydrates
+    // when the catalog arrives via refreshModelAfterCatalogLoad().
+    // This saves 1-3s on cold start (network latency for Firestore fetch).
+    final sysLocale = Platform.localeName.split('_').first;
+    unawaited(_modelService.getModels(langCode: sysLocale).then((_) {
       dev.log("[AppInitializer] Model catalog loaded successfully");
-    } catch (e) {
+    }).catchError((e) {
       dev.log("[AppInitializer] Model fetch failed (will retry later): $e");
-      // Continue - service will handle defaults and retry
-    }
+    }));
 
     if (_internetProvider.isConnected) {
-      // Setup listener for Fal.ai offline status from server config
-      _falStatusSubscription ??= FirebaseFirestore.instance
-            .collection('server')
-            .doc('main')
-            .snapshots()
-            .listen((snapshot) {
-          if (snapshot.exists) {
-            final isOffline = snapshot.data()?['isFalOffline'] ?? false;
-            if (_isFalOffline != isOffline) {
-              _isFalOffline = isOffline;
-              notifyListeners();
-            }
-          }
-        });
-
       // 2. Parallelize Remote Checks (Update & Maintenance)
       // This saves time by not waiting for one to finish before starting the other.
       final results = await Future.wait([
@@ -290,7 +272,7 @@ class AppInitializer with ChangeNotifier {
       await remoteConfig.fetchAndActivate();
 
       final String minRequiredVersion =
-      remoteConfig.getString('min_required_version');
+          remoteConfig.getString('min_required_version');
 
       if (minRequiredVersion.isNotEmpty) {
         final packageInfo = await PackageInfo.fromPlatform();
@@ -322,7 +304,7 @@ class AppInitializer with ChangeNotifier {
 
       // Normalize lengths (e.g. 2.9 vs 2.9.1)
       final length =
-      [currParts.length, reqParts.length].reduce((a, b) => a > b ? a : b);
+          [currParts.length, reqParts.length].reduce((a, b) => a > b ? a : b);
       for (int i = 0; i < length; i++) {
         final int c = i < currParts.length ? currParts[i] : 0;
         final int r = i < reqParts.length ? reqParts[i] : 0;
@@ -356,11 +338,11 @@ class AppInitializer with ChangeNotifier {
             '[AppInitializer] Premium Screen preload result: $preloadSuccess');
       } else {
         dev.log(
-            '[AppInitializer] Skipping Premium preload - user: ${_currentUser !=
-                null}, internet: ${_internetProvider.isConnected}');
+            '[AppInitializer] Skipping Premium preload - user: ${_currentUser != null}, internet: ${_internetProvider.isConnected}');
       }
 
-      await Future.delayed(const Duration(seconds: 2));
+      // Brief yield to let the UI render smoothly before heavy background work.
+      await Future.delayed(const Duration(milliseconds: 300));
 
       // 1. Initialize Heavy Libraries (Only Timezones & Moderator now)
       await _initializeHeavyLibraries();
@@ -450,8 +432,7 @@ class AppInitializer with ChangeNotifier {
           e.code == 'user-token-expired' ||
           e.code == 'user-disabled') {
         dev.log(
-            "[AppInitializer] Remote verification failed (${e
-                .code}). Logging out.");
+            "[AppInitializer] Remote verification failed (${e.code}). Logging out.");
         await signOut();
       }
     } catch (e) {
@@ -499,46 +480,106 @@ class AppInitializer with ChangeNotifier {
     }
 
     _authSubscription =
-        FirebaseAuth.instance.authStateChanges().listen((User? user) {
-          if (_status == AppStatus.initializing && user != null) {}
-          if (_isRegistering) {
-            dev.log(
-              "Auth State Listener: Ignoring auth change because a registration is in progress.",
-            );
-            return;
-          }
+        FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      if (_isRegistering) {
+        dev.log(
+          "Auth State Listener: Ignoring auth change because a registration is in progress.",
+        );
+        return;
+      }
 
-          _currentUser = user;
+      _currentUser = user;
 
-          // If we're mid sign-out and offline, ignore a null user to avoid
-          // flickering state transitions due to connectivity noise.
-          if (!_isSigningOut &&
-              !_internetProvider.isConnected &&
-              _status == AppStatus.ready &&
-              user == null) {
-            debugPrint(
-              'Auth State Listener: Offline and in ready state. '
-                  'Ignoring null user from auth stream to maintain session.',
-            );
-            return;
-          }
+      // If we're mid sign-out and offline, ignore a null user to avoid
+      // flickering state transitions due to connectivity noise.
+      if (!_isSigningOut &&
+          !_internetProvider.isConnected &&
+          _status == AppStatus.ready &&
+          user == null) {
+        debugPrint(
+          'Auth State Listener: Offline and in ready state. '
+          'Ignoring null user from auth stream to maintain session.',
+        );
+        return;
+      }
 
-          if (user == null) {
-            debugPrint(
-              'Auth State Listener: User signed out. Disposing credits listener and clearing user data.',
-            );
-            CreditsManager.instance.dispose();
-            _userProvider.clearDataOnSignOut();
-            _determineUserFlow();
-          } else {
-            debugPrint(
-              'Auth State Listener: User signed in. Initializing credits and user data listeners.',
-            );
-            CreditsManager.instance.listenToCredits();
-            _userProvider.listenToUserData(user);
-            _determineUserFlow();
-          }
-        });
+      if (user == null) {
+        debugPrint(
+          'Auth State Listener: User signed out. Disposing credits listener and clearing user data.',
+        );
+        _falStatusSubscription?.cancel();
+        _falStatusSubscription = null;
+        CreditsManager.instance.dispose();
+        _userProvider.clearDataOnSignOut();
+        _determineUserFlow();
+      } else {
+        debugPrint(
+          'Auth State Listener: User signed in. Initializing credits and user data listeners.',
+        );
+        await _registerAnonymousEntitlement(user);
+        if (FirebaseAuth.instance.currentUser?.uid != user.uid) {
+          debugPrint(
+              'Auth State Listener: Ignoring stale signed-in event for ${user.uid}.');
+          return;
+        }
+        _startFalStatusListener();
+        CreditsManager.instance.listenToCredits();
+        _userProvider.listenToUserData(user);
+        _determineUserFlow();
+      }
+    });
+  }
+
+  void _startFalStatusListener() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (!_internetProvider.isConnected || _falStatusSubscription != null || user == null || user.isAnonymous) {
+      return;
+    }
+
+    _falStatusSubscription = FirebaseFirestore.instance
+        .collection('server')
+        .doc('main')
+        .snapshots()
+        .listen((snapshot) {
+      if (!snapshot.exists) return;
+
+      final isOffline = snapshot.data()?['isFalOffline'] ?? false;
+      if (_isFalOffline != isOffline) {
+        _isFalOffline = isOffline;
+        notifyListeners();
+      }
+    }, onError: (Object error, StackTrace stackTrace) {
+      debugPrint('[AppInitializer] Fal status listener paused: $error');
+      
+      final isPermissionDenied = error.toString().contains('permission-denied');
+      if (!isPermissionDenied) {
+        FirebaseCrashlytics.instance.recordError(
+          error,
+          stackTrace,
+          reason: 'FalStatusListener',
+          fatal: false,
+        );
+      }
+      _falStatusSubscription?.cancel();
+      _falStatusSubscription = null;
+    });
+  }
+
+  Future<void> _registerAnonymousEntitlement(User user) async {
+    if (!user.isAnonymous) return;
+
+    try {
+      await AnonymousDeviceEntitlement.instance.registerIfAnonymous(user);
+    } catch (e, s) {
+      debugPrint(
+          "AppInitializer: Anonymous entitlement registration failed: $e");
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        s,
+        reason: "AnonymousDeviceEntitlement",
+        fatal: false,
+      );
+    }
   }
 
   /// Handles the complete, orchestrated user sign-out process centrally.
@@ -550,6 +591,8 @@ class AppInitializer with ChangeNotifier {
       // Cancel the auth subscription to be recreated when we return to login
       _authSubscription?.cancel();
       _authSubscription = null;
+      await _falStatusSubscription?.cancel();
+      _falStatusSubscription = null;
 
       // STEP 1: Application-level data cleanup.
       _modelService.clearAllCache();
@@ -569,7 +612,8 @@ class AppInitializer with ChangeNotifier {
 
       _currentUser = null;
 
-      debugPrint("AppInitializer: Sign-out complete. Restarting in anonymous mode.");
+      debugPrint(
+          "AppInitializer: Sign-out complete. Restarting in anonymous mode.");
 
       // STEP 4: Re-evaluate user flow to trigger anonymous login
       await _determineUserFlow();
@@ -613,8 +657,7 @@ class AppInitializer with ChangeNotifier {
     final User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       throw StateError(
-        "Firebase session is still active after sign-out retry (uid: ${currentUser
-            .uid}).",
+        "Firebase session is still active after sign-out retry (uid: ${currentUser.uid}).",
       );
     }
   }
@@ -664,6 +707,10 @@ class AppInitializer with ChangeNotifier {
       try {
         final userCredential = await FirebaseAuth.instance.signInAnonymously();
         user = userCredential.user;
+        if (user != null) {
+          await _registerAnonymousEntitlement(user);
+          _startFalStatusListener();
+        }
       } catch (e) {
         debugPrint('AppInitializer: Fatal error during anonymous login: $e');
       }
@@ -678,7 +725,7 @@ class AppInitializer with ChangeNotifier {
     // --- OPTIMISTIC INIT: Load from cache immediately ---
     // This ensures the UI (Premium banner, avatar, username) is populated
     // instantly, eliminating the "blank state" flash while waiting for the network.
-    await _userProvider.loadFromCache();
+    await _userProvider.loadFromCache(user: user);
     // Use notifyListeners inside the provider if needed, or if data is set,
     // the provider getter will return it when the UI builds.
 
@@ -699,6 +746,7 @@ class AppInitializer with ChangeNotifier {
       }
 
       // --- USER IS AUTHENTICATED BEYOND THIS POINT ---
+      _startFalStatusListener();
 
       // 4. Check Verification Status
       if (user.emailVerified || user.isAnonymous) {
@@ -720,9 +768,7 @@ class AppInitializer with ChangeNotifier {
           // Success Path
           // Also fetch models here! Useful if they logged out and logged in (cache was cleared).
           try {
-            final sysLocale = Platform.localeName
-                .split('_')
-                .first;
+            final sysLocale = Platform.localeName.split('_').first;
             // Don't wait for it completely here to not block ready.
             _modelService.getModels(langCode: sysLocale);
           } catch (e) {
@@ -822,9 +868,9 @@ class AppInitializer with ChangeNotifier {
             break;
 
           default:
-          // D. UNKNOWN FIREBASE ERRORS
-          // If we don't know what it is, but it's NOT a network glitch,
-          // it's safer to log it and sign out to prevent stuck states.
+            // D. UNKNOWN FIREBASE ERRORS
+            // If we don't know what it is, but it's NOT a network glitch,
+            // it's safer to log it and sign out to prevent stuck states.
             debugPrint(
                 "[_determineUserFlow] Unhandled Firebase Error: $code. Signing out.");
             FirebaseCrashlytics.instance
@@ -836,9 +882,10 @@ class AppInitializer with ChangeNotifier {
         // E. NON-FIREBASE ERRORS (Platform, etc.)
         // If it's a generic SocketException (not wrapped in FirebaseAuthException), handle it as network.
         if (e.toString().toLowerCase().contains('socketexception') ||
-            e.toString().toLowerCase().contains('handshake')) {
+            e.toString().toLowerCase().contains('handshake') ||
+            e.toString().toLowerCase().contains('certpathvalidator')) {
           debugPrint(
-              "[_determineUserFlow] Socket/Handshake error. Assuming Offline-Ready.");
+              "[_determineUserFlow] Socket/Handshake/Cert error. Assuming Offline-Ready.");
           _updateStatus(AppStatus.ready);
           return;
         }
@@ -867,9 +914,11 @@ class AppInitializer with ChangeNotifier {
           .snapshots(includeMetadataChanges: true);
 
       // Wait for the first snapshot that actually exists
-      final firstValidDoc = await docStream.firstWhere(
+      final firstValidDoc = await docStream
+          .firstWhere(
             (snapshot) => snapshot.exists,
-      ).timeout(const Duration(seconds: 15));
+          )
+          .timeout(const Duration(seconds: 15));
 
       debugPrint(
           "[_waitForUserDocument] Success. Profile document streamed successfully!");
@@ -921,7 +970,7 @@ class AppInitializer with ChangeNotifier {
     } catch (e) {
       debugPrint(
         'Startup: Auto-login failed (credentials might be outdated). '
-            'Clearing secure storage. Error: $e',
+        'Clearing secure storage. Error: $e',
       );
       await secureStorage.deleteAll();
     }

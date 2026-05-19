@@ -174,7 +174,7 @@ class ModelsSearchController {
           maxWidth: maxListWidth,
           // IMPORTANT: We ensure the container fills the height so the Stack doesn't collapse.
           // This allows 'Positioned' to work correctly relative to the search body area.
-          minHeight: MediaQuery.of(context).size.height * 0.5,
+          minHeight: MediaQuery.sizeOf(context).height * 0.5,
         ),
         child: Stack(
           // Stack allows us to overlay the "No Results" exactly where we want.
