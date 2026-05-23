@@ -36,6 +36,7 @@ class AxonContent extends StatelessWidget {
   final VoidCallback onNewsTap;
   final VoidCallback onSettingsTap;
   final VoidCallback onExitSearchTap;
+  final VoidCallback onCloseAxon;
   final ValueChanged<String> onSearchChanged;
   final int activeTab;
 
@@ -54,6 +55,7 @@ class AxonContent extends StatelessWidget {
     required this.onNewsTap,
     required this.onSettingsTap,
     required this.onExitSearchTap,
+    required this.onCloseAxon,
     required this.onSearchChanged,
     required this.activeTab,
   });
@@ -103,6 +105,7 @@ class AxonContent extends StatelessWidget {
               searchModeAnimation: searchModeAnimation,
               isSearchActive: isSearchActive,
               onExitSearchTap: onExitSearchTap,
+              onCloseAxon: onCloseAxon,
               onSearchChanged: onSearchChanged,
               onSettingsTap: onSettingsTap,
             ),
