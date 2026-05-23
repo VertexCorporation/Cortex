@@ -728,7 +728,8 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     final mediaQuery = MediaQuery.sizeOf(context);
     final screenWidth = mediaQuery.width;
     final screenHeight = mediaQuery.height;
-    final double standardAxonWidth = screenWidth;
+    // Leave some space on the right side so the user can easily tap to return to chat.
+    final double standardAxonWidth = screenWidth > 400 ? 340.0 : screenWidth * 0.85;
 
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
     final double directionMultiplier = isRtl ? -1.0 : 1.0;

@@ -24,6 +24,7 @@ class AxonHeader extends StatelessWidget {
   final Animation<double> searchModeAnimation;
   final bool isSearchActive;
   final VoidCallback onExitSearchTap;
+  final VoidCallback onCloseAxon;
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onSettingsTap;
 
@@ -37,6 +38,7 @@ class AxonHeader extends StatelessWidget {
     required this.searchModeAnimation,
     required this.isSearchActive,
     required this.onExitSearchTap,
+    required this.onCloseAxon,
     required this.onSearchChanged,
     required this.onSettingsTap,
   });
@@ -110,12 +112,16 @@ class AxonHeader extends StatelessWidget {
                             bottom: 0,
                             child: Align(
                               alignment: Alignment.centerLeft,
-                              child: SvgPicture.asset(
-                                'assets/cortext.svg',
-                                height: iconHeight * 1.1,
-                                colorFilter: ColorFilter.mode(
-                                  AppColors.primaryColor.inverted,
-                                  BlendMode.srcIn,
+                              child: GestureDetector(
+                                onTap: onCloseAxon,
+                                behavior: HitTestBehavior.opaque,
+                                child: SvgPicture.asset(
+                                  'assets/cortext.svg',
+                                  height: iconHeight * 1.1,
+                                  colorFilter: ColorFilter.mode(
+                                    AppColors.primaryColor.inverted,
+                                    BlendMode.srcIn,
+                                  ),
                                 ),
                               ),
                             ),
