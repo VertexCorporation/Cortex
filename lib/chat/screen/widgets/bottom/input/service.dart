@@ -63,25 +63,40 @@ class InputService {
     if (!_canAddMoreAttachments(context)) return;
 
     try {
-      XFile? pickedFile;
       if (source == ImageSource.gallery) {
+        List<XFile> pickedFiles = [];
         if (supportImage && supportVideo) {
-          pickedFile = await _imagePicker.pickMedia(
+          pickedFiles = await _imagePicker.pickMultipleMedia(
             imageQuality: 80,
             maxWidth: 1920,
             maxHeight: 1920,
           );
         } else if (supportVideo) {
-          pickedFile = await _imagePicker.pickVideo(source: source);
+          final XFile? file = await _imagePicker.pickVideo(source: source);
+          if (file != null) pickedFiles.add(file);
         } else {
-          pickedFile = await _imagePicker.pickImage(
-            source: source,
+          pickedFiles = await _imagePicker.pickMultiImage(
             imageQuality: 80,
             maxWidth: 1920,
             maxHeight: 1920,
           );
         }
+
+        if (pickedFiles.isEmpty) return;
+
+        for (final pickedFile in pickedFiles) {
+          if (!context.mounted) return;
+          if (!_canAddMoreAttachments(context)) break;
+
+          final File file = File(pickedFile.path);
+          final String pathLower = file.path.toLowerCase();
+          final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
+              .any((ext) => pathLower.endsWith(ext));
+
+          await _validateAndAddAttachment(context, file, isImage: isImage);
+        }
       } else {
+        XFile? pickedFile;
         // For camera, usually we separate pickImage and pickVideo, but here we just keep pickImage for now unless video is specifically supported (camera video recording).
         if (supportImage) {
           pickedFile = await _imagePicker.pickImage(
@@ -93,20 +108,17 @@ class InputService {
         } else if (supportVideo) {
           pickedFile = await _imagePicker.pickVideo(source: source);
         }
+
+        if (pickedFile == null) return;
+        if (!context.mounted) return;
+
+        final File file = File(pickedFile.path);
+        final String pathLower = file.path.toLowerCase();
+        final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
+            .any((ext) => pathLower.endsWith(ext));
+
+        await _validateAndAddAttachment(context, file, isImage: isImage);
       }
-
-      if (pickedFile == null) return;
-
-      final File file = File(pickedFile.path);
-
-      // 3. Validate and Add
-      if (!context.mounted) return;
-
-      final String pathLower = file.path.toLowerCase();
-      final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
-          .any((ext) => pathLower.endsWith(ext));
-
-      await _validateAndAddAttachment(context, file, isImage: isImage);
 
       onSelectionComplete();
     } catch (e) {

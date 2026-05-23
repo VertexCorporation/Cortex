@@ -179,6 +179,7 @@ class _AxonState extends State<Axon> with SingleTickerProviderStateMixin {
           onSettingsTap: _handleSettingsTap,
           onSearchChanged: _handleSearchQueryChanged,
           onExitSearchTap: _handleExitSearchMode,
+          onCloseAxon: widget.onCloseAxon,
           activeTab: widget.activeTab,
 
         ),
