@@ -677,5 +677,6 @@
   "systemLanguageInstruction": "\n\n중요: 항상 사용자가 작성한 언어와 동일한 언어로 응답하고, 사용자의 언어에 주의를 기울이십시오.",
   "systemTimeInfo": "\n\n현재 날짜 및 시간: {formattedTime}.",
   "systemPromptLimitFallback": "중요: 사용자가 작업을 요청했지만 Cortex 사용량이 소진되었습니다. 해당 사용자에게 모국어로 기다리거나 구독 플랜 업그레이드를 고려하도록 안내해 주세요.",
-  "systemNotePreviousMedia": "[시스템 참고: 아래는 이전에 생성된 미디어입니다. 참고하거나 편집할 수 있습니다.]"
+  "systemNotePreviousMedia": "[시스템 참고: 아래는 이전에 생성된 미디어입니다. 참고하거나 편집할 수 있습니다.]",
+  "pinLimitReached": "You can pin up to 3 chats."
 }

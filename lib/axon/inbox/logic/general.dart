@@ -503,16 +503,25 @@ class InboxViewModel extends ChangeNotifier {
     debugPrint("[AxonRename] completed id=$conversationID");
   }
 
-  Future<void> togglePinStatus(String conversationID) async {
+  Future<bool> togglePinStatus(String conversationID) async {
     final manager = _conversationManagers[conversationID];
-    if (manager == null) return;
+    if (manager == null) return false;
 
     final newStatus = !manager.isStarred;
+    
+    if (newStatus) {
+      int pinnedCount = _conversationManagers.values.where((m) => m.isStarred).length;
+      if (pinnedCount >= 3) {
+        return false;
+      }
+    }
+
     manager.setStarred(newStatus);
     await ChatStorageService.setStarred(conversationID, newStatus);
 
     _sortConversations();
     _updateConversationCache();
+    return true;
   }
 
   void _updateConversationCache() {

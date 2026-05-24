@@ -679,5 +679,6 @@
   "systemLanguageInstruction": "\n\nKRÎTÎK: Her dem bi heman zimanê ku bikarhêner pê dinivîse bersiv bide; balê bide zimanê bikarhêner.",
   "systemTimeInfo": "\n\nDîrok û dema niha: {formattedTime}.",
   "freePlan": "{plan} belaş!",
-  "systemPromptLimitFallback": "KRÎTÎK: Bikarhêner çalakiyek xwest, lê mafê bikaranînê yê li ser Cortexê qediya; ji kerema xwe bi zimanê bikarhêner bi nermî agahdar bike ku divê li bendê bimîne an jî plana abonetiya xwe bilind bike."
+  "systemPromptLimitFallback": "KRÎTÎK: Bikarhêner çalakiyek xwest, lê mafê bikaranînê yê li ser Cortexê qediya; ji kerema xwe bi zimanê bikarhêner bi nermî agahdar bike ku divê li bendê bimîne an jî plana abonetiya xwe bilind bike.",
+  "pinLimitReached": "You can pin up to 3 chats."
 }
