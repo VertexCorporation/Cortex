@@ -1994,4 +1994,7 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get dynamicPreditsUpgradeMessage =>
       'Cortex может давать еще более качественные ответы; обновите план сейчас и получайте лучший ответ на каждый вопрос!';
+
+  @override
+  String get pinLimitReached => 'You can pin up to 3 chats.';
 }

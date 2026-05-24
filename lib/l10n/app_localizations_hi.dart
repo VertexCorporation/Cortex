@@ -1976,4 +1976,7 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get dynamicPreditsUpgradeMessage =>
       'Cortex और भी बेहतर जवाब दे सकता है; अभी अपग्रेड करें और हर सवाल का सबसे अच्छा जवाब पाएं!';
+
+  @override
+  String get pinLimitReached => 'You can pin up to 3 chats.';
 }

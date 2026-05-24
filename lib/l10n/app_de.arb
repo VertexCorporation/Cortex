@@ -677,5 +677,6 @@
   "systemLanguageInstruction": "\n\nCRITICAL: Antworten Sie immer in der Sprache, in der der Benutzer schreibt, und achten Sie auf die Sprache des Benutzers.",
   "systemTimeInfo": "\n\nAktuelles Datum und Uhrzeit: {formattedTime}.",
   "systemPromptLimitFallback": "KRITISCH: Der Benutzer hat eine Aktion angefordert, aber sein Datenvolumen bei Cortex ist aufgebraucht. Bitte informieren Sie den Benutzer in seiner Sprache, dass er warten oder ein Upgrade seines Abonnements in Betracht ziehen sollte.",
-  "systemNotePreviousMedia": "[Systemhinweis: Unten sehen Sie die zuvor generierten Medien. Sie können diese referenzieren oder bearbeiten.]"
+  "systemNotePreviousMedia": "[Systemhinweis: Unten sehen Sie die zuvor generierten Medien. Sie können diese referenzieren oder bearbeiten.]",
+  "pinLimitReached": "You can pin up to 3 chats."
 }

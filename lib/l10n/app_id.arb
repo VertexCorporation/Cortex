@@ -677,5 +677,6 @@
   "systemLanguageInstruction": "\n\nKRITIS: Selalu tanggapi dalam bahasa yang sama dengan yang digunakan pengguna, perhatikan bahasa pengguna.",
   "systemTimeInfo": "\n\nTanggal dan waktu saat ini: {formattedTime}.",
   "systemPromptLimitFallback": "PENTING: Pengguna meminta suatu tindakan, tetapi kuota mereka di Cortex telah habis; mohon informasikan kepada pengguna dalam bahasa mereka bahwa mereka harus menunggu atau mempertimbangkan untuk meningkatkan paket langganan mereka.",
-  "systemNotePreviousMedia": "[Catatan Sistem: Berikut adalah media yang dihasilkan sebelumnya. Anda dapat merujuk atau mengeditnya.]"
+  "systemNotePreviousMedia": "[Catatan Sistem: Berikut adalah media yang dihasilkan sebelumnya. Anda dapat merujuk atau mengeditnya.]",
+  "pinLimitReached": "You can pin up to 3 chats."
 }

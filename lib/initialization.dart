@@ -20,6 +20,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -377,6 +378,29 @@ class AppInitializer with ChangeNotifier {
     }
   }
 
+  Future<void> _precacheCoreSvgs() async {
+    final List<String> coreSvgs = [
+      'assets/cortex.svg',
+      'assets/icons/chat.svg',
+      'assets/icons/features.svg',
+      'assets/icons/on/axon.svg',
+      'assets/icons/off/axon.svg',
+      'assets/icons/storage.svg',
+    ];
+    try {
+      await Future.wait(coreSvgs.map((asset) async {
+        final loader = SvgAssetLoader(asset);
+        await svg.cache.putIfAbsent(
+          loader.cacheKey(null),
+          () => loader.loadBytes(null),
+        );
+      }));
+      dev.log("[AppInitializer] Core SVGs precached.");
+    } catch (e) {
+      dev.log("Error precaching SVGs: $e");
+    }
+  }
+
   /// Moved here from main.dart to unblock startup.
   Future<void> _initializeHeavyLibraries() async {
     try {
@@ -387,6 +411,7 @@ class AppInitializer with ChangeNotifier {
       await Future.wait([
         OfflineModeratorService().initialize(),
         _extrovertNotificationService.initialize(),
+        _precacheCoreSvgs(),
       ]);
 
       _extrovertNotificationService.recordAppOpen();
@@ -532,7 +557,10 @@ class AppInitializer with ChangeNotifier {
 
   void _startFalStatusListener() {
     final user = FirebaseAuth.instance.currentUser;
-    if (!_internetProvider.isConnected || _falStatusSubscription != null || user == null || user.isAnonymous) {
+    if (!_internetProvider.isConnected ||
+        _falStatusSubscription != null ||
+        user == null ||
+        user.isAnonymous) {
       return;
     }
 
@@ -550,7 +578,7 @@ class AppInitializer with ChangeNotifier {
       }
     }, onError: (Object error, StackTrace stackTrace) {
       debugPrint('[AppInitializer] Fal status listener paused: $error');
-      
+
       final isPermissionDenied = error.toString().contains('permission-denied');
       if (!isPermissionDenied) {
         FirebaseCrashlytics.instance.recordError(

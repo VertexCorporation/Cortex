@@ -677,5 +677,6 @@
   "systemLanguageInstruction": "\n\nCRITICAL: Rispondere sempre nella stessa lingua in cui scrive l'utente, prestare attenzione alla lingua dell'utente.",
   "systemTimeInfo": "\n\nData e ora attuali: {formattedTime}.",
   "systemPromptLimitFallback": "CRITICO: L'utente ha richiesto un'azione, ma la sua quota su Cortex è esaurita; si prega di informare l'utente, nella sua lingua, che dovrebbe attendere o valutare l'aggiornamento del proprio piano di abbonamento.",
-  "systemNotePreviousMedia": "[Nota di sistema: Di seguito sono riportati i media generati in precedenza. Puoi farvi riferimento o modificarli.]"
+  "systemNotePreviousMedia": "[Nota di sistema: Di seguito sono riportati i media generati in precedenza. Puoi farvi riferimento o modificarli.]",
+  "pinLimitReached": "You can pin up to 3 chats."
 }

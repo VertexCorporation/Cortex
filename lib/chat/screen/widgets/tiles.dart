@@ -299,8 +299,7 @@ class Tiles {
 
     // Dynamic sizing for items
     final double imageSize = isTablet ? screenWidth * 0.3 : screenWidth * 0.4;
-    final double borderRadius = isTablet ? screenWidth * 0.015 : 12.0;
-
+    final double borderRadius = isTablet ? screenWidth * 0.015 : 12.0;      final int decodeCacheSize = (imageSize * MediaQuery.devicePixelRatioOf(context)).toInt();
     return Wrap(
       key: key,
       alignment: isUser ? WrapAlignment.end : WrapAlignment.start,
@@ -369,6 +368,7 @@ class Tiles {
                         base64Decode(path.split(',').last),
                         width: imageSize,
                         height: imageSize,
+                        cacheWidth: decodeCacheSize,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
                             const Icon(Icons.broken_image, color: Colors.grey),
@@ -378,6 +378,7 @@ class Tiles {
                             path,
                             width: imageSize,
                             height: imageSize,
+                            cacheWidth: decodeCacheSize,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
                                 const Icon(Icons.broken_image,
@@ -387,6 +388,7 @@ class Tiles {
                             file,
                             width: imageSize,
                             height: imageSize,
+                            cacheWidth: decodeCacheSize,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
                                 const Icon(Icons.broken_image,
