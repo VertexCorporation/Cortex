@@ -1994,5 +1994,5 @@ class AppLocalizationsPt extends AppLocalizations {
       'O Cortex pode dar respostas ainda melhores; faça upgrade agora e receba a melhor resposta para cada pergunta!';
 
   @override
-  String get pinLimitReached => 'You can pin up to 3 chats.';
+  String get pinLimitReached => 'Você pode fixar até 3 chats.';
 }

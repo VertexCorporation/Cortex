@@ -1967,5 +1967,5 @@ class AppLocalizationsAr extends AppLocalizations {
       'يمكن لـ Cortex تقديم إجابات أفضل؛ قم بالترقية الآن واحصل على أفضل إجابة لكل سؤال!';
 
   @override
-  String get pinLimitReached => 'You can pin up to 3 chats.';
+  String get pinLimitReached => 'يمكنك تثبيت ما يصل إلى 3 محادثات.';
 }
