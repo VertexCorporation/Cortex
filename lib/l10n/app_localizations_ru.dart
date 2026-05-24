@@ -1996,5 +1996,5 @@ class AppLocalizationsRu extends AppLocalizations {
       'Cortex может давать еще более качественные ответы; обновите план сейчас и получайте лучший ответ на каждый вопрос!';
 
   @override
-  String get pinLimitReached => 'You can pin up to 3 chats.';
+  String get pinLimitReached => 'Вы можете закрепить до 3 чатов.';
 }
