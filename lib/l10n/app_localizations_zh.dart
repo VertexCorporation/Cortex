@@ -1872,5 +1872,5 @@ class AppLocalizationsZh extends AppLocalizations {
       'Cortex 可以给出更好的回答；立即升级，为每个问题获得最佳答案！';
 
   @override
-  String get pinLimitReached => 'You can pin up to 3 chats.';
+  String get pinLimitReached => '您最多可以固定 3 个聊天。';
 }
