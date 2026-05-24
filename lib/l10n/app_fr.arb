@@ -636,5 +636,6 @@
   "systemLanguageInstruction": "\n\nCRITICAL : Répondez toujours dans la même langue que celle utilisée par l’utilisateur, et tenez compte de sa langue.",
   "systemTimeInfo": "\n\nDate et heure actuelles : {formattedTime}.",
   "systemPromptLimitFallback": "CRITIQUE : L’utilisateur a demandé une action, mais son forfait Cortex est épuisé ; veuillez informer l’utilisateur dans sa langue qu’il doit patienter ou envisager de passer à un forfait supérieur.",
-  "systemNotePreviousMedia": "[Note système : Voici le média généré précédemment. Vous pouvez vous y référer ou le modifier.]"
+  "systemNotePreviousMedia": "[Note système : Voici le média généré précédemment. Vous pouvez vous y référer ou le modifier.]",
+  "pinLimitReached": "You can pin up to 3 chats."
 }

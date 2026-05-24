@@ -3608,6 +3608,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cortex can give even better answers; upgrade now and get the best answer for every question!'**
   String get dynamicPreditsUpgradeMessage;
+
+  /// No description provided for @pinLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You can pin up to 3 chats.'**
+  String get pinLimitReached;
 }
 
 class _AppLocalizationsDelegate

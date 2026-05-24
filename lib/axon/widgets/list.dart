@@ -330,7 +330,20 @@ class _AxonConversationListState extends State<AxonConversationList> {
                       },
                       onEdit: (newTitle) =>
                           inboxViewModel.editConversation(id, newTitle),
-                      onTogglePin: () => inboxViewModel.togglePinStatus(id),
+                      onTogglePin: () async {
+                        bool success = await inboxViewModel.togglePinStatus(id);
+                        if (!success) {
+                          if (!context.mounted) return;
+                          Provider.of<IntrovertNotificationService>(context,
+                                  listen: false)
+                              .showNotification(
+                            message: localizations.pinLimitReached,
+                            type: NotificationType.error,
+                            isAxonMode: true,
+                            axonWidth: widget.referenceWidth,
+                          );
+                        }
+                      },
                     ),
                   ),
                 );

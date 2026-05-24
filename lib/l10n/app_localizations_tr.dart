@@ -1976,4 +1976,7 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get dynamicPreditsUpgradeMessage =>
       'Cortex çok daha iyi yanıtlar verebilir; şimdi hesabını yükselt ve her sorun için en iyi yanıtı al!';
+
+  @override
+  String get pinLimitReached => 'En fazla 3 sohbeti sabitleyebilirsiniz.';
 }
