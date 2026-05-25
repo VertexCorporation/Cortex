@@ -94,7 +94,7 @@ class ModelService with ChangeNotifier {
       }
 
       final finalEntities =
-          _buildEntitiesFromRaw(rawModels, normalizedLangCode);
+          await _buildEntitiesFromRawAsync(rawModels, normalizedLangCode);
 
       // Final check: if processing resulted in 0 entities, flag error.
       if (finalEntities.isEmpty) {
@@ -182,6 +182,67 @@ class ModelService with ChangeNotifier {
 
   String _normalizeLangCode(String langCode) =>
       langCode.split(RegExp(r'[-_]')).first.toLowerCase();
+
+  Future<List<ModelEntity>> _buildEntitiesFromRawAsync(
+    List<Map<String, dynamic>> rawModels,
+    String langCode,
+  ) async {
+    var finalEntities = <ModelEntity>[];
+    for (int i = 0; i < rawModels.length; i++) {
+      final rawMap = rawModels[i];
+      final tempEntity = ModelEntity.fromMap(rawMap, langCode);
+      final resolvedPath = getModelImagePath(tempEntity);
+      finalEntities.add(tempEntity.copyWith(imagePath: resolvedPath));
+      
+      // Yield to the event loop frequently to completely eliminate UI stutter
+      // during heavy synchronous filesystem checks.
+      if (i % 5 == 0) {
+        await Future.delayed(Duration.zero);
+      }
+    }
+
+    const int minOfflineSizeMb = 300;
+    const int maxOfflineRamMb = 32000;
+    const int maxOfflineSizeMb = 1024 * 1024; // 1 TB in MB
+
+    finalEntities = finalEntities
+        .map((model) => normalizeOfflineModelForCatalog(
+              model,
+              minOfflineSizeMb: minOfflineSizeMb,
+              maxOfflineRamMb: maxOfflineRamMb,
+              maxOfflineSizeMb: maxOfflineSizeMb,
+            ))
+        .whereType<ModelEntity>()
+        .toList();
+
+    final offlineModels =
+        finalEntities.where((m) => m.type == 'offline').toList();
+    final otherModels =
+        finalEntities.where((m) => m.type != 'offline').toList();
+    otherModels.sort((a, b) =>
+        a.displayTitle.toLowerCase().compareTo(b.displayTitle.toLowerCase()));
+    offlineModels.sort((a, b) {
+      final sizeA = a.size ?? 99999;
+      final sizeB = b.size ?? 99999;
+      final sizeComparison = sizeA.compareTo(sizeB);
+      if (sizeComparison != 0) return sizeComparison;
+      final ramA = a.ram ?? 99999;
+      final ramB = b.ram ?? 99999;
+      final ramComparison = ramA.compareTo(ramB);
+      if (ramComparison != 0) return ramComparison;
+      return a.displayTitle
+          .toLowerCase()
+          .compareTo(b.displayTitle.toLowerCase());
+    });
+    finalEntities = [...otherModels, ...offlineModels];
+    final neuroIndex = finalEntities.indexWhere((model) => model.id == 'neuro');
+    if (neuroIndex != -1) {
+      final neuroModel = finalEntities.removeAt(neuroIndex);
+      finalEntities.insert(0, neuroModel);
+    }
+
+    return finalEntities;
+  }
 
   List<ModelEntity> _buildEntitiesFromRaw(
     List<Map<String, dynamic>> rawModels,
