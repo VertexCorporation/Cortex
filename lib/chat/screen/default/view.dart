@@ -123,7 +123,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
     super.didChangeDependencies();
 
     // TickerMode Visibility Handling
-    final isVisible = TickerMode.valuesOf(context).enabled;
+    final isVisible = TickerMode.of(context);
     if (_isVisible != isVisible) {
       _isVisible = isVisible;
       if (!isVisible) {
