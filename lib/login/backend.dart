@@ -10,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import '../internet.dart';
 import 'package:provider/provider.dart';
 import '../initialization.dart';
 import '../main.dart';
@@ -128,7 +128,7 @@ class LoginBackendService {
     final extrovertNotificationService =
         context.read<ExtrovertNotificationService>();
 
-    if (!await InternetConnection().hasInternetAccess) {
+    if (!await InternetService().hasInternet()) {
       notificationService.showNotification(
           message: l10n.noInternetConnection, type: NotificationType.error);
       return LoginNetworkError();
@@ -212,7 +212,7 @@ class LoginBackendService {
         navigatorKey.currentContext!,
         listen: false);
 
-    if (!await InternetConnection().hasInternetAccess) {
+    if (!await InternetService().hasInternet()) {
       notificationService.showNotification(
           message: l10n.noInternetConnection, type: NotificationType.error);
       return RegistrationNetworkError();
@@ -424,7 +424,7 @@ class LoginBackendService {
     final extrovertNotificationService =
         context.read<ExtrovertNotificationService>();
 
-    if (!await InternetConnection().hasInternetAccess) {
+    if (!await InternetService().hasInternet()) {
       notificationService.showNotification(
         message: l10n.noInternetConnection,
         type: NotificationType.error,
@@ -583,7 +583,7 @@ class LoginBackendService {
 
     if (user == null || !user.isAnonymous) return RegistrationUnknownError();
 
-    if (!await InternetConnection().hasInternetAccess) {
+    if (!await InternetService().hasInternet()) {
       notificationService.showNotification(
           message: l10n.noInternetConnection, type: NotificationType.error);
       return RegistrationNetworkError();
