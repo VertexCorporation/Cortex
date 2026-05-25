@@ -517,43 +517,41 @@ class _BriefingOverlayWrapper extends StatelessWidget {
       } catch (_) {}
     }
 
-    return ValueListenableBuilder<int?>(
-      valueListenable: creditsManager.totalCreditsNotifier,
-      builder: (context, totalCredits, _) {
-        return ValueListenableBuilder<int?>(
-          valueListenable: creditsManager.preditsNotifier,
-          builder: (context, predits, _) {
-            return ValueListenableBuilder<int?>(
-              valueListenable: creditsManager.dreditsNotifier,
-              builder: (context, dredits, _) {
-                return BriefingOverlay(
-                  availableCredits:
-                      usesDynamicChatAllowance ? null : totalCredits,
-                  availablePredits: predits,
-                  availableDredits: dredits,
-                  photoSelected: input.hasAttachments,
-                  isOfflineModel: isOffline,
-                  modelMissing: modelMissing,
-                  limitReached: isLimitExceeded,
-                  isStorageSufficient: session.isStorageSufficient,
-                  isPremiumModel: usesDynamicChatAllowance
-                      ? false
-                      : session.isCurrentModelPremium,
-                  isVideoModel: usesDynamicChatAllowance ? false : isVideoModel,
-                  isSubscribed: session.isUserSubscribed,
-                  userTier: userProvider.activeSubscriptionLevel,
-                  isDynamicChat: usesDynamicChatAllowance,
-                  isSearchEnabled: input.enableWebSearch,
-                  isFalOffline:
-                      appInitializer.isFalOffline && isCurrentModelFal,
-                  isUserStateReady: userProvider.isUserStateReady,
-                  conversationId: conv.conversationID,
-                  inappropriate: false,
-                  onVisibleHeightChanged: onVisibleHeightChanged,
-                );
-              },
-            );
-          },
+    // PERF: Replaced 3 nested ValueListenableBuilders with a single
+    // AnimatedBuilder + Listenable.merge. A credit update now causes exactly
+    // 1 rebuild instead of 3 cascading passes.
+    return AnimatedBuilder(
+      animation: Listenable.merge([
+        creditsManager.totalCreditsNotifier,
+        creditsManager.preditsNotifier,
+        creditsManager.dreditsNotifier,
+      ]),
+      builder: (context, _) {
+        final totalCredits = creditsManager.totalCreditsNotifier.value;
+        final predits = creditsManager.preditsNotifier.value;
+        final dredits = creditsManager.dreditsNotifier.value;
+        return BriefingOverlay(
+          availableCredits: usesDynamicChatAllowance ? null : totalCredits,
+          availablePredits: predits,
+          availableDredits: dredits,
+          photoSelected: input.hasAttachments,
+          isOfflineModel: isOffline,
+          modelMissing: modelMissing,
+          limitReached: isLimitExceeded,
+          isStorageSufficient: session.isStorageSufficient,
+          isPremiumModel: usesDynamicChatAllowance
+              ? false
+              : session.isCurrentModelPremium,
+          isVideoModel: usesDynamicChatAllowance ? false : isVideoModel,
+          isSubscribed: session.isUserSubscribed,
+          userTier: userProvider.activeSubscriptionLevel,
+          isDynamicChat: usesDynamicChatAllowance,
+          isSearchEnabled: input.enableWebSearch,
+          isFalOffline: appInitializer.isFalOffline && isCurrentModelFal,
+          isUserStateReady: userProvider.isUserStateReady,
+          conversationId: conv.conversationID,
+          inappropriate: false,
+          onVisibleHeightChanged: onVisibleHeightChanged,
         );
       },
     );
