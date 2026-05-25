@@ -798,9 +798,12 @@ class AppInitializer with ChangeNotifier {
           try {
             final sysLocale = Platform.localeName.split('_').first;
             // Don't wait for it completely here to not block ready.
-            _modelService.getModels(langCode: sysLocale);
+            unawaited(_modelService.getModels(langCode: sysLocale).catchError((e) {
+              debugPrint("[_determineUserFlow] Failed to getModels: $e");
+              return null;
+            }));
           } catch (e) {
-            debugPrint("[_determineUserFlow] Failed to getModels: $e");
+            debugPrint("[_determineUserFlow] Setup models try-catch: $e");
           }
 
           _updateStatus(AppStatus.ready);
