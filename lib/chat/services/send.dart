@@ -67,6 +67,9 @@ class SendService {
   /// Replaces the old single boolean `_isSending`.
   final Set<String> _activeSendConversations = {};
 
+  // PERF: Stateless moderator — create once, reuse on every offline send.
+  final OfflineModeratorService _offlineModerator = OfflineModeratorService();
+
   SendService({
     required ConversationProvider conversationProvider,
     required ChatSessionProvider sessionProvider,
@@ -554,8 +557,7 @@ class SendService {
 
       if (!isServerSide) {
         // Offline Flow
-        final offlineModerator = OfflineModeratorService();
-        if (offlineModerator.isPromptAcceptable(textForApi)) {
+        if (_offlineModerator.isPromptAcceptable(textForApi)) {
           await _offlineService.sendMessage(
               textForApi, currentAttachmentPaths.firstOrNull);
         } else {

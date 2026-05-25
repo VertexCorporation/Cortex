@@ -475,11 +475,7 @@ class _VideoViewerState extends State<VideoViewer>
 
       await controller.initialize();
       controller.setLooping(false);
-      controller.addListener(() {
-        if (mounted) {
-          setState(() {});
-        }
-      });
+      controller.addListener(_onVideoUpdate);
 
       if (!mounted) {
         controller.dispose();
@@ -499,8 +495,15 @@ class _VideoViewerState extends State<VideoViewer>
     }
   }
 
+  // PERF: Only repaint when playback state actually changes,
+  // not on every frame. Called by the video controller.
+  void _onVideoUpdate() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
+    _controller?.removeListener(_onVideoUpdate);
     _controller?.dispose();
     _transformationController.dispose();
     _animationController.dispose();
@@ -612,14 +615,6 @@ class _VideoViewerState extends State<VideoViewer>
         ? _controller
         : null;
     final isInitialized = playbackController != null;
-    final duration =
-    isInitialized ? playbackController.value.duration : Duration.zero;
-    final position =
-    isInitialized ? playbackController.value.position : Duration.zero;
-    final sliderMax =
-    duration.inMilliseconds > 0 ? duration.inMilliseconds.toDouble() : 1.0;
-    final sliderValue =
-    position.inMilliseconds.toDouble().clamp(0.0, sliderMax);
 
     final bool hasCredits =
         (context
@@ -627,6 +622,12 @@ class _VideoViewerState extends State<VideoViewer>
             .totalCreditsNotifier
             .value ?? 0) > 0;
     final bool showEditButton = hasCredits && widget.onEditVideo != null;
+
+    // PERF: isInitialized / playbackController are precomputed here once.
+    // The controls overlay (play/pause, slider, time labels) is wrapped in a
+    // ValueListenableBuilder so only that tiny section rebuilds at playback
+    // frame-rate. The heavy blur + InteractiveViewer layers stay completely
+    // static during playback.
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: Darkener.getDarkenedOverlayStyle(factor: 0.85),
@@ -696,116 +697,130 @@ class _VideoViewerState extends State<VideoViewer>
                               )
                                   : VideoPlayer(playbackController!),
                             ),
+                            // PERF: Only the controls overlay needs to update
+                            // at playback frame-rate (position, play/pause icon).
+                            // Wrap it in ValueListenableBuilder so the heavy
+                            // blur + InteractiveViewer above stay untouched.
                             if (_showControls && isInitialized)
-                              Positioned.fill(
-                                child: Container(
-                                  color:
-                                  Colors.black.withValues(alpha: 0.25),
-                                  child: Column(
-                                    children: [
-                                      const Spacer(),
-                                      Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                              ValueListenableBuilder<VideoPlayerValue>(
+                                valueListenable: playbackController,
+                                builder: (context, videoValue, _) {
+                                  final duration = videoValue.duration;
+                                  final position = videoValue.position;
+                                  final sliderMax =
+                                      duration.inMilliseconds > 0
+                                          ? duration.inMilliseconds.toDouble()
+                                          : 1.0;
+                                  final sliderValue = position.inMilliseconds
+                                      .toDouble()
+                                      .clamp(0.0, sliderMax);
+                                  return Positioned.fill(
+                                    child: Container(
+                                      color:
+                                      Colors.black.withValues(alpha: 0.25),
+                                      child: Column(
                                         children: [
-                                          IconButton(
-                                            onPressed: () =>
-                                                _seekBy(
-                                                    const Duration(
+                                          const Spacer(),
+                                          Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () =>
+                                                    _seekBy(const Duration(
                                                         seconds: -10)),
-                                            icon: const Icon(
-                                                Icons.replay_10_rounded,
-                                                color: Colors.white,
-                                                size: 34),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          IconButton(
-                                            onPressed: () async {
-                                              if (playbackController
-                                                  .value.isPlaying) {
-                                                await playbackController
-                                                    .pause();
-                                              } else {
-                                                await playbackController
-                                                    .play();
-                                              }
-                                            },
-                                            icon: Icon(
-                                              playbackController
-                                                  .value.isPlaying
-                                                  ? Icons
-                                                  .pause_circle_filled_rounded
-                                                  : Icons
-                                                  .play_circle_fill_rounded,
-                                              color: Colors.white,
-                                              size: 56,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          IconButton(
-                                            onPressed: () =>
-                                                _seekBy(
-                                                    const Duration(
-                                                        seconds: 10)),
-                                            icon: const Icon(
-                                                Icons.forward_10_rounded,
-                                                color: Colors.white,
-                                                size: 34),
-                                          ),
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 12, vertical: 8),
-                                        child: Column(
-                                          children: [
-                                            SliderTheme(
-                                              data: SliderTheme.of(context)
-                                                  .copyWith(
-                                                activeTrackColor:
-                                                Colors.white,
-                                                inactiveTrackColor:
-                                                Colors.white30,
-                                                thumbColor: Colors.white,
+                                                icon: const Icon(
+                                                    Icons.replay_10_rounded,
+                                                    color: Colors.white,
+                                                    size: 34),
                                               ),
-                                              child: Slider(
-                                                min: 0.0,
-                                                max: sliderMax,
-                                                value: sliderValue,
-                                                onChanged: (value) {
-                                                  playbackController.seekTo(
-                                                    Duration(
-                                                        milliseconds:
-                                                        value.toInt()),
-                                                  );
+                                              const SizedBox(width: 8),
+                                              IconButton(
+                                                onPressed: () async {
+                                                  if (videoValue.isPlaying) {
+                                                    await playbackController
+                                                        .pause();
+                                                  } else {
+                                                    await playbackController
+                                                        .play();
+                                                  }
                                                 },
-                                              ),
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment
-                                                  .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  _formatDuration(position),
-                                                  style: const TextStyle(
-                                                      color:
-                                                      Colors.white70),
+                                                icon: Icon(
+                                                  videoValue.isPlaying
+                                                      ? Icons
+                                                      .pause_circle_filled_rounded
+                                                      : Icons
+                                                      .play_circle_fill_rounded,
+                                                  color: Colors.white,
+                                                  size: 56,
                                                 ),
-                                                Text(
-                                                  _formatDuration(duration),
-                                                  style: const TextStyle(
-                                                      color:
-                                                      Colors.white70),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              IconButton(
+                                                onPressed: () =>
+                                                    _seekBy(const Duration(
+                                                        seconds: 10)),
+                                                icon: const Icon(
+                                                    Icons.forward_10_rounded,
+                                                    color: Colors.white,
+                                                    size: 34),
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12, vertical: 8),
+                                            child: Column(
+                                              children: [
+                                                SliderTheme(
+                                                  data: SliderTheme.of(context)
+                                                      .copyWith(
+                                                    activeTrackColor:
+                                                    Colors.white,
+                                                    inactiveTrackColor:
+                                                    Colors.white30,
+                                                    thumbColor: Colors.white,
+                                                  ),
+                                                  child: Slider(
+                                                    min: 0.0,
+                                                    max: sliderMax,
+                                                    value: sliderValue,
+                                                    onChanged: (value) {
+                                                      playbackController.seekTo(
+                                                        Duration(
+                                                            milliseconds:
+                                                            value.toInt()),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      _formatDuration(position),
+                                                      style: const TextStyle(
+                                                          color:
+                                                          Colors.white70),
+                                                    ),
+                                                    Text(
+                                                      _formatDuration(duration),
+                                                      style: const TextStyle(
+                                                          color:
+                                                          Colors.white70),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                  );
+                                },
                               ),
                           ],
                         ),

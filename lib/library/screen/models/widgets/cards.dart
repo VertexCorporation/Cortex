@@ -314,6 +314,13 @@ class _ModelTileState extends State<ModelTile> {
         ImageProvider provider = resolvedImagePath.startsWith('assets/')
             ? AssetImage(resolvedImagePath)
             : FileImage(File(resolvedImagePath));
+        
+        // PERF: Prevent GC Jank. Constrain the decoded image size in RAM. 
+        // Without this, scrolling past a 4K custom model image would stutter.
+        // Multiply by 3 to keep it sharp on high-DPI Retina screens.
+        final int cacheSize = (imgW * 3).toInt().clamp(100, 300);
+        provider = ResizeImage(provider, width: cacheSize, height: cacheSize);
+
         imageContent = Image(
             image: provider,
             fit: BoxFit.cover,

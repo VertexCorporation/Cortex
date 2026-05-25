@@ -232,9 +232,15 @@ class _AiHeader extends StatelessWidget {
                 fit: BoxFit.contain,
                 placeholderBuilder: (_) => fallbackWidget);
       } else {
-        final imageProvider = isAsset
+        ImageProvider imageProvider = isAsset
             ? AssetImage(avatarPath) as ImageProvider
             : FileImage(File(avatarPath));
+            
+        // PERF: Prevent GC Jank on scrolling chat history.
+        // Limit decode size of high-res custom model avatars in chat.
+        final int cacheSize = (containerSize * 3).toInt().clamp(50, 200);
+        imageProvider = ResizeImage(imageProvider, width: cacheSize, height: cacheSize);
+
         imageWidget = Image(
             image: imageProvider,
             width: containerSize,

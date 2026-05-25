@@ -96,8 +96,9 @@ class CacheService {
   ///
   /// Example: `final List<ModelInfo>? models = CacheService.get<List<ModelInfo>>(CacheKey.allModels);`
   static T? get<T>(CacheKey key) {
-    // Before returning the data, we "touch" the cache to reset its expiration timer.
-    touch(key);
+    // PERF: Do NOT call touch() here. Restarting the timer on every read
+    // creates unnecessary Timer allocations and GC pressure. The TTL runs
+    // from when the value was written via set(), which is the correct behavior.
     if (_cache.containsKey(key)) {
       return _cache[key] as T?;
     }

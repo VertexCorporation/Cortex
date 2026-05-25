@@ -39,14 +39,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    // PERF: Use sizeOf() instead of MediaQuery.of(context).size — the latter
+    // subscribes to ALL MediaQuery aspects (viewInsets, padding, etc.) and
+    // causes a rebuild every time the keyboard opens/closes.
+    final screenSize = MediaQuery.sizeOf(context);
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
 
     // --- FINAL SCALING LOGIC ---
     // 1. Phones (width < 450): Scale is close to 1.0. Keeps the compact look.
