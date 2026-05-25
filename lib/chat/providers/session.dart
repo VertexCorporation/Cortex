@@ -232,6 +232,14 @@ class ChatSessionProvider with ChangeNotifier {
   // Track pending model ID that needs resolution when catalog loads
   String? _pendingModelId;
 
+  // PERF: Cache the SharedPreferences instance to avoid platform channel
+  // round-trips on every model preference save.
+  SharedPreferences? _prefs;
+  Future<SharedPreferences> get _sharedPrefs async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs!;
+  }
+
   ChatSessionProvider({
     required ModelService modelService,
     String initialModelId = 'cortex/auto',
@@ -498,7 +506,7 @@ class ChatSessionProvider with ChangeNotifier {
 
   Future<void> _savePreference(String id, String title) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await _sharedPrefs;
       await prefs.setString(_prefDefaultModelKey, id);
       await prefs.setString('${_prefDefaultModelKey}_title', title);
     } catch (e) {

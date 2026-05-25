@@ -109,6 +109,24 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   double _accumulatedDrag = 0.0;
   bool _hasTriggeredNavigation = false;
 
+  // PERF: Cache gradient colors so build() doesn't allocate a new List<Color>
+  // on every frame. Recomputed only when the theme's divider color changes.
+  List<Color>? _cachedGradientColors;
+  Color? _cachedDividerColor;
+
+  List<Color> _getGradientColors(Color dividerColor) {
+    if (_cachedDividerColor == dividerColor && _cachedGradientColors != null) {
+      return _cachedGradientColors!;
+    }
+    _cachedDividerColor = dividerColor;
+    return _cachedGradientColors = [
+      dividerColor.withValues(alpha: 0.0),
+      dividerColor.withValues(alpha: 0.3),
+      dividerColor.withValues(alpha: 0.3),
+      dividerColor.withValues(alpha: 0.0),
+    ];
+  }
+
   @override
   void initState() {
     super.initState();
@@ -706,13 +724,14 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           child: NewsScreen(),
         ),
         // Index 3: Create AI
+        // PERF: Selector guards rebuilds — only fires when model list length
+        // changes, not on every ModelCatalogProvider notification.
         RepaintBoundary(
-          child: Consumer<ModelCatalogProvider>(
-            builder: (context, catalog, child) {
-              return ModelCreationHost(
-                availableBaseModels: catalog.allModels,
-              );
-            },
+          child: Selector<ModelCatalogProvider, List<ModelEntity>>(
+            selector: (_, catalog) => catalog.allModels,
+            shouldRebuild: (prev, next) => prev.length != next.length,
+            builder: (context, models, _) =>
+                ModelCreationHost(availableBaseModels: models),
           ),
         ),
         // Index 4: Arts
@@ -735,12 +754,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     final double directionMultiplier = isRtl ? -1.0 : 1.0;
 
     final dividerColor = Theme.of(context).dividerColor;
-    final gradientColors = [
-      dividerColor.withValues(alpha: 0.0),
-      dividerColor.withValues(alpha: 0.3),
-      dividerColor.withValues(alpha: 0.3),
-      dividerColor.withValues(alpha: 0.0),
-    ];
+    final gradientColors = _getGradientColors(dividerColor);
 
     // PERFORMANCE: If another screen (like Login or a modal) is pushed on top of MainScreen,
     // prevent MainScreen from receiving viewInsets. This stops 5 tabs from relayouting

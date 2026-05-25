@@ -44,6 +44,13 @@ class ApiService {
           receiveTimeout: const Duration(minutes: 5),
         ));
 
+  // PERF: Reuse a single Dio instance for title generation to avoid
+  // creating a new HTTP connection pool on every new conversation.
+  late final Dio _titleDio = Dio(BaseOptions(
+    connectTimeout: const Duration(seconds: 10),
+    receiveTimeout: const Duration(seconds: 15),
+  ));
+
   void cancelRequests() {
     debugPrint("[ApiService] Cancellation requested.");
     _cancelToken?.cancel("Request was cancelled by the user.");
@@ -741,7 +748,7 @@ class ApiService {
 
       debugPrint('[TitleGen] 🚀 Sending DIO POST request to fast endpoint...');
 
-      final dioForTitle = Dio();
+      final dioForTitle = _titleDio;
       final response = await dioForTitle.post(
         _titleBaseUrl,
         data: jsonEncode(payload),

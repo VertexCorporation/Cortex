@@ -34,10 +34,11 @@ class ConversationProvider with ChangeNotifier {
   String? _persistedModelTitle;
   String? _persistedModelImagePath;
 
-  // Streaming performance: throttle UI updates
+  // Streaming performance: throttle UI updates and use StringBuffer for memory efficiency
   Timer? _streamThrottleTimer;
   bool _hasPendingStreamUpdate = false;
-  static const _streamThrottleDuration = Duration(milliseconds: 32); // ~30fps
+  static const _streamThrottleDuration = Duration(milliseconds: 16); // ~60fps
+  StringBuffer? _streamBuffer;
 
   // ===========================================================================
   // SECTION 1.5: INITIALIZATION
@@ -229,6 +230,7 @@ class ConversationProvider with ChangeNotifier {
     _isWaitingForResponse = true;
     _responseStopped = false;
     _isLoadingMessages = false;
+    _streamBuffer = StringBuffer();
 
     // Persist the new conversation structure asynchronously.
     ChatStorageService.saveConversation(id, title, [],
@@ -258,6 +260,7 @@ class ConversationProvider with ChangeNotifier {
     _isWaitingForResponse = true;
     _responseStopped = false;
     _isLoadingMessages = false;
+    _streamBuffer = StringBuffer();
 
     if (_conversationID != null) {
       ChatStorageService.upsertMessage(
@@ -287,6 +290,7 @@ class ConversationProvider with ChangeNotifier {
     _isWaitingForResponse = true;
     _responseStopped = false;
     _isLoadingMessages = false;
+    _streamBuffer = StringBuffer();
 
     notifyListeners();
   }
@@ -355,6 +359,7 @@ class ConversationProvider with ChangeNotifier {
     _isWaitingForResponse = true;
     _responseStopped = false;
     _isLoadingMessages = false;
+    _streamBuffer = StringBuffer();
 
     notifyListeners();
     debugPrint(
@@ -376,9 +381,13 @@ class ConversationProvider with ChangeNotifier {
       if (lastMessage.text.isEmpty && textToAppend.startsWith('\n')) {
         textToAppend = textToAppend.trimLeft();
       }
+      // PERF: Use StringBuffer instead of string concatenation (lastMessage.text + textToAppend)
+      // which creates thousands of abandoned String objects and forces heavy Garbage Collection.
+      _streamBuffer ??= StringBuffer(lastMessage.text);
+      _streamBuffer!.write(textToAppend);
 
       _messages[_messages.length - 1] = lastMessage.copyWith(
-        text: lastMessage.text + textToAppend,
+        text: _streamBuffer!.toString(),
       );
     } else {
       // This case handles a stream starting before the thinking bubble is in place.
@@ -478,6 +487,7 @@ class ConversationProvider with ChangeNotifier {
     // Guard against race conditions (e.g. StopService vs SendService completion)
     if (!_isWaitingForResponse) return;
     _isWaitingForResponse = false;
+    _streamBuffer = null; // Free up the buffer memory
 
     // Flush any pending stream updates before finalizing
     flushStreamUpdates();
