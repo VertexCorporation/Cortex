@@ -205,30 +205,8 @@ class AppInitializer with ChangeNotifier {
       dev.log("[AppInitializer] Model fetch failed (will retry later): $e");
     }));
 
-    if (_internetProvider.isConnected) {
-      // 2. Parallelize Remote Checks (Update & Maintenance)
-      // This saves time by not waiting for one to finish before starting the other.
-      final results = await Future.wait([
-        _checkForAppUpdate(),
-        _checkServerStatus(),
-      ]);
-
-      final bool updateRequired = results[0];
-      final bool maintenanceActive = results[1];
-
-      if (updateRequired) {
-        dev.log("[AppInitializer] Update required. Flow halted.");
-        return;
-      }
-
-      if (maintenanceActive) {
-        dev.log("[AppInitializer] Maintenance mode. Flow halted.");
-        return;
-      }
-    } else {
-      // Offline fallback: skip remote checks
-      dev.log("[AppInitializer] Offline. Skipping remote checks.");
-    }
+    // [STARTUP PERF] Removed blocking Future.wait for Update & Maintenance.
+    // They are now correctly scheduled in _performPostStartupTasks() to unblock the UI instantly.
 
     if (_status == AppStatus.ready) {
       dev.log(
@@ -330,13 +308,17 @@ class AppInitializer with ChangeNotifier {
       dev.log(
           "[AppInitializer] Phase 2: Starting Background Verification & Heavy Init...");
 
-      // PRIORITY: Preload Premium Screen Data FIRST (no delay!)
-      // This ensures FundsScreen loads instantly when user navigates to it
+      // PERF: Kick off Premium Screen preload in parallel with heavy library init.
+      // Do NOT await here — let it race against the rest of startup so that by the
+      // time the user taps "Use Offer" on the home screen, the cache is likely ready.
+      Future<void>? premiumPreloadFuture;
       if (_currentUser != null && _internetProvider.isConnected) {
-        dev.log('[AppInitializer] Starting Premium Screen preload...');
-        final preloadSuccess = await FundsBackend.preloadInBackground();
-        dev.log(
-            '[AppInitializer] Premium Screen preload result: $preloadSuccess');
+        dev.log('[AppInitializer] Starting Premium Screen preload (parallel)...');
+        premiumPreloadFuture = FundsBackend.preloadInBackground().then((ok) {
+          dev.log('[AppInitializer] Premium Screen preload result: $ok');
+        }).catchError((e) {
+          dev.log('[AppInitializer] Premium preload error (non-fatal): $e');
+        });
       } else {
         dev.log(
             '[AppInitializer] Skipping Premium preload - user: ${_currentUser != null}, internet: ${_internetProvider.isConnected}');
@@ -348,9 +330,16 @@ class AppInitializer with ChangeNotifier {
       // 1. Initialize Heavy Libraries (Only Timezones & Moderator now)
       await _initializeHeavyLibraries();
 
-      // 2. Check Server Maintenance
-      if (await _checkServerStatus()) {
-        return;
+      // 2. Parallelize Remote Checks (Update & Maintenance)
+      if (_internetProvider.isConnected) {
+        final results = await Future.wait([
+          _checkForAppUpdate(),
+          _checkServerStatus(),
+        ]);
+        if (results[0] || results[1]) {
+          dev.log("[AppInitializer] Update or maintenance required. Halting background tasks.");
+          return;
+        }
       }
 
       // 3. Verify the User Session
@@ -364,6 +353,11 @@ class AppInitializer with ChangeNotifier {
 
       if (Platform.isAndroid) {
         _runInBackground(ReferralHandler.checkAndStoreReferrer);
+      }
+
+      // Wait for premium preload to finish (it likely already has by now).
+      if (premiumPreloadFuture != null) {
+        await premiumPreloadFuture;
       }
 
       if (!_coreServicesReadyCompleter.isCompleted) {

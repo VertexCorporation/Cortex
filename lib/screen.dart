@@ -308,8 +308,10 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     if (_ignoreDrag) return;
 
     final double screenW = MediaQuery.of(context).size.width;
-    final double standardAxonW = screenW * 0.85;
-    final double searchGapW = screenW - standardAxonW;
+    // Full-width sidebar: standardAxonW is now the full screen width.
+    final double standardAxonW = screenW;
+    // searchGapW is 0 in full-width mode; guard against division by zero.
+    final double searchGapW = (screenW * 0.15).clamp(1.0, double.infinity);
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
 
     final double rawDelta = details.primaryDelta!;
@@ -747,8 +749,9 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     final mediaQuery = MediaQuery.sizeOf(context);
     final screenWidth = mediaQuery.width;
     final screenHeight = mediaQuery.height;
-    // Leave some space on the right side so the user can easily tap to return to chat.
-    final double standardAxonWidth = screenWidth > 400 ? 340.0 : screenWidth * 0.85;
+    // Full-width sidebar: Axon occupies the entire screen width.
+    // Users close it via left-swipe gesture, tapping "New Chat", or selecting a conversation.
+    final double standardAxonWidth = screenWidth;
 
     final bool isRtl = Directionality.of(context) == TextDirection.rtl;
     final double directionMultiplier = isRtl ? -1.0 : 1.0;

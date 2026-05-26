@@ -13,7 +13,7 @@ import '../../../backend/data/service.dart';
 import '../../../utils.dart';
 
 /// A widget for selecting a base model, used in the 'Create' (roleplay) screen.
-class BaseModelSelector extends StatelessWidget {
+class BaseModelSelector extends StatefulWidget {
   final List<ModelEntity> availableBaseModels;
   final String? selectedBaseModelId;
   final String? selectedBaseModelDisplayTitle;
@@ -32,11 +32,53 @@ class BaseModelSelector extends StatelessWidget {
   });
 
   @override
+  State<BaseModelSelector> createState() => _BaseModelSelectorState();
+}
+
+class _BaseModelSelectorState extends State<BaseModelSelector> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(
+          () => _searchQuery = _searchController.text.toLowerCase().trim());
+    });
+  }
+
+  @override
+  void didUpdateWidget(BaseModelSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Clear search when the panel collapses
+    if (!widget.isPanelExpanded && oldWidget.isPanelExpanded) {
+      _searchController.clear();
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<ModelEntity> _filter(List<ModelEntity> list) {
+    if (_searchQuery.isEmpty) return list;
+    return list.where((series) {
+      final seriesTitle = (series.series ?? series.displayTitle).toLowerCase();
+      if (seriesTitle.contains(_searchQuery)) return true;
+      if (series.variants != null) {
+        return series.variants!.values.whereType<Map<String, dynamic>>().any(
+            (v) => (v['title'] as String? ?? '').toLowerCase().contains(_searchQuery));
+      }
+      return false;
+    }).toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final screenWidth = MediaQuery.of(context).size.width;
     final localizations = AppLocalizations.of(context)!;
     final modelService = context.read<ModelService>();
     final bool isTablet = screenWidth >= 600;
@@ -50,7 +92,7 @@ class BaseModelSelector extends StatelessWidget {
     final double paddingV = isTablet ? 20.0 : screenWidth * 0.035;
     final double paddingH = isTablet ? 24.0 : screenWidth * 0.04;
 
-    if (availableBaseModels.isEmpty) {
+    if (widget.availableBaseModels.isEmpty) {
       return Container(
         padding: EdgeInsets.all(paddingH),
         decoration: BoxDecoration(
@@ -67,19 +109,21 @@ class BaseModelSelector extends StatelessWidget {
     }
 
     bool isCurrentlySelectedPremium = false;
-    if (selectedBaseModelId != null) {
-      for (var series in availableBaseModels) {
-        if (series.variants?.containsKey(selectedBaseModelId) ?? false) {
-          final variantData = series.variants![selectedBaseModelId]!;
+    if (widget.selectedBaseModelId != null) {
+      for (var series in widget.availableBaseModels) {
+        if (series.variants?.containsKey(widget.selectedBaseModelId) ?? false) {
+          final variantData = series.variants![widget.selectedBaseModelId]!;
           isCurrentlySelectedPremium =
               (variantData['tier'] as String? ?? 'free') == 'premium';
           break;
-        } else if (series.id == selectedBaseModelId) {
+        } else if (series.id == widget.selectedBaseModelId) {
           isCurrentlySelectedPremium = series.tier == 'premium';
           break;
         }
       }
     }
+
+    final filteredModels = _filter(widget.availableBaseModels);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +137,7 @@ class BaseModelSelector extends StatelessWidget {
         SizedBox(height: screenWidth * 0.015),
         Text(localizations.baseModelDescription,
             style:
-            TextStyle(color: AppColors.quinaryColor, fontSize: descSize)),
+                TextStyle(color: AppColors.quinaryColor, fontSize: descSize)),
         SizedBox(height: screenWidth * 0.04),
 
         // --- Selection Button ---
@@ -103,10 +147,9 @@ class BaseModelSelector extends StatelessWidget {
           child: InkWell(
             onTap: () {
               HapticFeedback.lightImpact();
-              onTogglePanel();
+              widget.onTogglePanel();
             },
             borderRadius: BorderRadius.circular(borderRadius),
-            // Button Splash/Highlight Removal
             splashFactory: NoSplash.splashFactory,
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
@@ -118,7 +161,7 @@ class BaseModelSelector extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      selectedBaseModelDisplayTitle ??
+                      widget.selectedBaseModelDisplayTitle ??
                           localizations.selectBaseModel,
                       style: TextStyle(
                           color: AppColors.primaryColor.inverted,
@@ -140,7 +183,7 @@ class BaseModelSelector extends StatelessWidget {
                       ),
                     ),
                   AnimatedRotation(
-                    turns: isPanelExpanded ? 0.5 : 0.0,
+                    turns: widget.isPanelExpanded ? 0.5 : 0.0,
                     duration: const Duration(milliseconds: 200),
                     child: Icon(Icons.keyboard_arrow_down,
                         color: AppColors.primaryColor.inverted,
@@ -156,9 +199,9 @@ class BaseModelSelector extends StatelessWidget {
         AnimatedSize(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
-          child: isPanelExpanded
+          child: widget.isPanelExpanded
               ? _buildBaseModelList(context, modelService, borderRadius,
-              textSize, isTablet)
+                  textSize, isTablet, filteredModels, localizations)
               : const SizedBox.shrink(),
         ),
       ],
@@ -166,31 +209,34 @@ class BaseModelSelector extends StatelessWidget {
   }
 
   /// Builds the list of selectable base models.
-  Widget _buildBaseModelList(BuildContext context, ModelService modelService,
-      double radius, double textSize, bool isTablet) {
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+  Widget _buildBaseModelList(
+    BuildContext context,
+    ModelService modelService,
+    double radius,
+    double textSize,
+    bool isTablet,
+    List<ModelEntity> filteredModels,
+    AppLocalizations localizations,
+  ) {
+    final screenWidth = MediaQuery.of(context).size.width;
 
-    // List Layout Constants
     final double listHeight = isTablet ? 350.0 : screenWidth * 0.65;
-    // Avatar size relative to screen width (approx 40px-50px)
     final double avatarSize = isTablet ? 56.0 : screenWidth * 0.11;
-
     final double itemVerticalPadding = isTablet ? 16.0 : screenWidth * 0.03;
     final double itemHorizontalPadding = isTablet ? 24.0 : screenWidth * 0.04;
+    final double searchHeight = isTablet ? 52.0 : screenWidth * 0.115;
+    final double sp12 = isTablet ? 12.0 : screenWidth * 0.03;
+    final double sp8 = isTablet ? 8.0 : screenWidth * 0.02;
 
-    Widget buildListItem(ModelEntity series, String modelId, String modelTitle, bool isPremium) {
+    Widget buildListItem(ModelEntity series, String modelId, String modelTitle,
+        bool isPremium) {
       final imagePath = modelService.getModelImagePath(series);
 
-      // --- SVG CHECK LOGIC (Prevents Crashes) ---
       final bool isSvg = imagePath.endsWith('.svg');
       final bool isAsset = imagePath.startsWith('assets/');
 
       Widget imageWidget;
       if (isSvg) {
-        // Safe rendering for SVGs (like cortex.svg)
         imageWidget = Padding(
           padding: const EdgeInsets.all(2.0),
           child: SvgPicture.asset(
@@ -201,7 +247,6 @@ class BaseModelSelector extends StatelessWidget {
           ),
         );
       } else {
-        // Bitmap rendering
         ImageProvider? provider;
         if (isAsset) {
           provider = AssetImage(imagePath);
@@ -214,40 +259,32 @@ class BaseModelSelector extends StatelessWidget {
           radius: avatarSize / 2,
         );
       }
-      // ------------------------------------------
 
       return Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
             HapticFeedback.lightImpact();
-            onSelectBaseModel(modelId, modelTitle);
+            widget.onSelectBaseModel(modelId, modelTitle);
           },
-          // Clean look: No splash/highlight
           splashFactory: NoSplash.splashFactory,
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           hoverColor: Colors.transparent,
           focusColor: Colors.transparent,
-
           child: Padding(
             padding: EdgeInsets.symmetric(
                 horizontal: itemHorizontalPadding,
                 vertical: itemVerticalPadding),
             child: Row(
               children: [
-                // Leading: Avatar / Icon
                 Container(
                   width: avatarSize,
                   height: avatarSize,
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle),
+                  decoration: const BoxDecoration(shape: BoxShape.circle),
                   child: imageWidget,
                 ),
-
-                SizedBox(width: screenWidth * 0.04), // Gap
-
-                // Title
+                SizedBox(width: screenWidth * 0.04),
                 Expanded(
                   child: Text(
                     modelTitle,
@@ -257,8 +294,6 @@ class BaseModelSelector extends StatelessWidget {
                         fontWeight: FontWeight.w500),
                   ),
                 ),
-
-                // Trailing: Sparkle Icon (if premium)
                 if (isPremium)
                   Padding(
                     padding: EdgeInsets.only(left: screenWidth * 0.02),
@@ -266,8 +301,7 @@ class BaseModelSelector extends StatelessWidget {
                       'assets/icons/sparkle.svg',
                       width: screenWidth * 0.05,
                       colorFilter: ColorFilter.mode(
-                        AppColors.primaryColor.inverted
-                            .withValues(alpha: 0.8),
+                        AppColors.primaryColor.inverted.withValues(alpha: 0.8),
                         BlendMode.srcIn,
                       ),
                     ),
@@ -281,34 +315,108 @@ class BaseModelSelector extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.only(top: screenWidth * 0.02),
-      height: listHeight,
       decoration: BoxDecoration(
         color: AppColors.secondaryColor,
         borderRadius: BorderRadius.circular(radius),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(radius),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: availableBaseModels.expand<Widget>((series) {
-            final Map<String, dynamic> variants = series.variants ?? const {};
-            
-            if (variants.isNotEmpty) {
-              return variants.entries.map((ext) {
-                final modelId = ext.key;
-                final variantData = ext.value as Map<String, dynamic>? ?? {};
-                var modelTitle = variantData['title'] as String? ?? modelId;
-                modelTitle = ModelDataUtils.cleanTitle(modelTitle);
-                final isVariantPremium = (variantData['tier'] as String? ?? 'free') == 'premium';
-                return buildListItem(series, modelId, modelTitle, isVariantPremium);
-              }).toList();
-            } else {
-              final modelId = series.id;
-              final modelTitle = ModelDataUtils.cleanTitle(series.displayTitle);
-              final isPremium = series.tier == 'premium';
-              return [buildListItem(series, modelId, modelTitle, isPremium)];
-            }
-          }).toList(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Search bar inside the panel
+            Padding(
+              padding:
+                  EdgeInsets.symmetric(horizontal: sp12, vertical: sp8),
+              child: SizedBox(
+                height: searchHeight,
+                child: TextField(
+                  controller: _searchController,
+                  style: TextStyle(
+                    color: AppColors.primaryColor.inverted,
+                    fontSize: textSize * 0.9,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: localizations.searchHint,
+                    hintStyle: TextStyle(
+                      color: AppColors.tertiaryColor,
+                      fontSize: textSize * 0.9,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search_rounded,
+                      color: AppColors.tertiaryColor,
+                      size: screenWidth * 0.05,
+                    ),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? GestureDetector(
+                            onTap: () => _searchController.clear(),
+                            child: Icon(
+                              Icons.close_rounded,
+                              color: AppColors.tertiaryColor,
+                              size: screenWidth * 0.045,
+                            ),
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: AppColors.background,
+                    contentPadding: EdgeInsets.symmetric(
+                        horizontal: sp12, vertical: sp8),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(radius * 0.75),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Results list
+            if (filteredModels.isEmpty)
+              Padding(
+                padding: EdgeInsets.all(itemHorizontalPadding),
+                child: Text(
+                  localizations.noMatchingModels,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: AppColors.quinaryColor, fontSize: textSize),
+                ),
+              )
+            else
+              SizedBox(
+                height: listHeight,
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children:
+                      filteredModels.expand<Widget>((series) {
+                    final Map<String, dynamic> variants =
+                        series.variants ?? const {};
+
+                    if (variants.isNotEmpty) {
+                      return variants.entries.map((ext) {
+                        final modelId = ext.key;
+                        final variantData =
+                            ext.value as Map<String, dynamic>? ?? {};
+                        var modelTitle =
+                            variantData['title'] as String? ?? modelId;
+                        modelTitle = ModelDataUtils.cleanTitle(modelTitle);
+                        final isVariantPremium =
+                            (variantData['tier'] as String? ?? 'free') ==
+                                'premium';
+                        return buildListItem(
+                            series, modelId, modelTitle, isVariantPremium);
+                      }).toList();
+                    } else {
+                      final modelId = series.id;
+                      final modelTitle =
+                          ModelDataUtils.cleanTitle(series.displayTitle);
+                      final isPremium = series.tier == 'premium';
+                      return [
+                        buildListItem(series, modelId, modelTitle, isPremium)
+                      ];
+                    }
+                  }).toList(),
+                ),
+              ),
+          ],
         ),
       ),
     );
