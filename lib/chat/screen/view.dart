@@ -183,6 +183,9 @@ class ChatViewState extends State<ChatView>
       final newHeight = box.size.height;
       if (bottomPanelHeightNotifier.value != newHeight) {
         bottomPanelHeightNotifier.value = newHeight;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _scrollService.updateButtonVisibility();
+        });
       }
     }
   }

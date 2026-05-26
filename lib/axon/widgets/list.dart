@@ -40,7 +40,6 @@ class AxonConversationList extends StatefulWidget {
 }
 
 class _AxonConversationListState extends State<AxonConversationList> {
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   List<String> _displayedIds = [];
   InboxViewModel? _viewModel;
 
@@ -71,25 +70,15 @@ class _AxonConversationListState extends State<AxonConversationList> {
     _checkForUpdates();
   }
 
-  @override
-  void didUpdateWidget(AxonConversationList oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // No longer need to check here, listener handles it.
-  }
-
   void _checkForUpdates() {
     final vm = context.read<InboxViewModel>();
     final newIds = vm.conversations;
 
-    final wasEmpty = _displayedIds.isEmpty;
-
     if (_areListsEqual(_displayedIds, newIds)) return;
-    _calculateDiffs(List.from(_displayedIds), newIds);
-
-    final isEmptyNow = _displayedIds.isEmpty;
-    if (wasEmpty != isEmptyNow) {
-      setState(() {});
-    }
+    
+    setState(() {
+      _displayedIds = List.from(newIds);
+    });
   }
 
   bool _areListsEqual(List<String> a, List<String> b) {
@@ -100,93 +89,10 @@ class _AxonConversationListState extends State<AxonConversationList> {
     return true;
   }
 
-  void _calculateDiffs(List<String> oldList, List<String> newList) {
-    // 1. Deletions
-    for (int i = oldList.length - 1; i >= 0; i--) {
-      final item = oldList[i];
-      if (!newList.contains(item)) {
-        _displayedIds.removeAt(i);
-        _listKey.currentState?.removeItem(
-          i,
-          (context, animation) => _buildRemovedItem(item, animation),
-          duration: const Duration(milliseconds: 150),
-        );
-      }
-    }
-
-    // 2. Additions
-    int index = 0;
-    while (index < newList.length) {
-      final newItem = newList[index];
-      if (index >= _displayedIds.length) {
-        _displayedIds.insert(index, newItem);
-        _listKey.currentState
-            ?.insertItem(index, duration: const Duration(milliseconds: 150));
-      } else {
-        final currentDisplayedItem = _displayedIds[index];
-        if (currentDisplayedItem != newItem) {
-          final int existingIndex = _displayedIds.indexOf(newItem, index);
-          if (existingIndex != -1) {
-            final movedItem = _displayedIds.removeAt(existingIndex);
-            _listKey.currentState?.removeItem(
-                existingIndex, (context, animation) => const SizedBox.shrink(),
-                duration: Duration.zero);
-            _displayedIds.insert(index, movedItem);
-            _listKey.currentState?.insertItem(index,
-                duration: const Duration(milliseconds: 150));
-          } else {
-            _displayedIds.insert(index, newItem);
-            _listKey.currentState?.insertItem(index,
-                duration: const Duration(milliseconds: 150));
-          }
-        }
-      }
-      index++;
-    }
-
-    while (_displayedIds.length > newList.length) {
-      final lastIndex = _displayedIds.length - 1;
-      _displayedIds.removeAt(lastIndex);
-      _listKey.currentState?.removeItem(
-        lastIndex,
-        (context, animation) => const SizedBox.shrink(),
-        duration: Duration.zero,
-      );
-    }
-  }
-
-  Widget _buildRemovedItem(String id, Animation<double> animation) {
-    final manager = _viewModel?.conversationManagers[id];
-
-    // The tile has already animated its size and opacity down to 0 via its own
-    // internal _deleteController BEFORE triggering this removal if manually deleted.
-    // Returning SizedBox.shrink() prevents the 'double playback' bug.
-    if (manager == null || manager.isDeleted) {
-      return const SizedBox.shrink();
-    }
-
-    // If it was removed due to search filtering, animate it out smoothly.
-    return SizeTransition(
-      sizeFactor: animation,
-      axisAlignment: 1.0,
-      child: FadeTransition(
-        opacity: animation,
-        child: AxonConversationTile(
-          key: ValueKey('removed_$id'),
-          manager: manager,
-          onDelete: () {},
-          onEdit: (_) async {},
-          onTogglePin: () {},
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     // Use context.select to only rebuild when isLoading changes.
-    // The conversation list updates are handled by the dedicated listener.
     final bool isLoading = context.select<InboxViewModel, bool>(
       (vm) => vm.isLoading,
     );
@@ -198,17 +104,12 @@ class _AxonConversationListState extends State<AxonConversationList> {
       duration: const Duration(milliseconds: 600),
       switchInCurve: Curves.easeOutCubic,
       switchOutCurve: Curves.easeInCubic,
-
-      // --- CRITICAL UPDATE: Custom Transition ---
-      // Smooth Fade to Content (Shimmer -> Content)
       transitionBuilder: (Widget child, Animation<double> animation) {
         return FadeTransition(
           opacity: animation,
-          child: child, // Removed ScaleTransition to prevent layout jumps
+          child: child,
         );
       },
-
-      // Overlap (Stack) Layout
       layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
         return Stack(
           alignment: Alignment.topCenter,
@@ -218,9 +119,6 @@ class _AxonConversationListState extends State<AxonConversationList> {
           ],
         );
       },
-      // PERFORMANCE: Single Shimmer wrapper instead of 8 independent
-      // AnimationControllers. Each Shimmer.fromColors creates its own
-      // controller; wrapping all tiles in one reduces overhead significantly.
       child: showSkeletons
           ? Shimmer.fromColors(
               key: const ValueKey('loading_skeletons'),
@@ -255,9 +153,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
   Widget _buildListContent(AppLocalizations localizations,
       InboxViewModel inboxViewModel, double horizontalPadding) {
     final List<String> currentIds = inboxViewModel.conversations;
-    if (_displayedIds.isEmpty &&
-        currentIds.isNotEmpty &&
-        _listKey.currentState == null) {
+    if (_displayedIds.isEmpty && currentIds.isNotEmpty) {
       _displayedIds = List.from(currentIds);
     }
 
@@ -290,8 +186,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
             bottomFogHeight: 30,
             showTop: true,
             showBottom: true,
-            child: AnimatedList(
-              key: _listKey,
+            child: ListView.builder(
               controller: widget.scrollController,
               padding: EdgeInsets.fromLTRB(
                 horizontalPadding * 0.5,
@@ -299,8 +194,8 @@ class _AxonConversationListState extends State<AxonConversationList> {
                 horizontalPadding * 0.5,
                 0,
               ),
-              initialItemCount: _displayedIds.length,
-              itemBuilder: (context, index, animation) {
+              itemCount: _displayedIds.length,
+              itemBuilder: (context, index) {
                 if (index >= _displayedIds.length) {
                   return const SizedBox.shrink();
                 }
@@ -309,43 +204,36 @@ class _AxonConversationListState extends State<AxonConversationList> {
 
                 if (manager == null) return const SizedBox.shrink();
 
-                return SizeTransition(
-                  sizeFactor: animation,
-                  axisAlignment: 1.0,
-                  child: FadeTransition(
-                    opacity: animation,
-                    child: AxonConversationTile(
-                      key: ValueKey(id),
-                      manager: manager,
-                      onDelete: () {
-                        inboxViewModel.deleteConversation(id);
-                        Provider.of<IntrovertNotificationService>(context,
-                                listen: false)
-                            .showNotification(
-                          message: localizations.conversationDeleted,
-                          type: NotificationType.success,
-                          isAxonMode: true,
-                          axonWidth: widget.referenceWidth,
-                        );
-                      },
-                      onEdit: (newTitle) =>
-                          inboxViewModel.editConversation(id, newTitle),
-                      onTogglePin: () async {
-                        bool success = await inboxViewModel.togglePinStatus(id);
-                        if (!success) {
-                          if (!context.mounted) return;
-                          Provider.of<IntrovertNotificationService>(context,
-                                  listen: false)
-                              .showNotification(
-                            message: localizations.pinLimitReached,
-                            type: NotificationType.error,
-                            isAxonMode: true,
-                            axonWidth: widget.referenceWidth,
-                          );
-                        }
-                      },
-                    ),
-                  ),
+                return AxonConversationTile(
+                  key: ValueKey(id),
+                  manager: manager,
+                  onDelete: () {
+                    inboxViewModel.deleteConversation(id);
+                    Provider.of<IntrovertNotificationService>(context,
+                            listen: false)
+                        .showNotification(
+                      message: localizations.conversationDeleted,
+                      type: NotificationType.success,
+                      isAxonMode: true,
+                      axonWidth: widget.referenceWidth,
+                    );
+                  },
+                  onEdit: (newTitle) =>
+                      inboxViewModel.editConversation(id, newTitle),
+                  onTogglePin: () async {
+                    bool success = await inboxViewModel.togglePinStatus(id);
+                    if (!success) {
+                      if (!context.mounted) return;
+                      Provider.of<IntrovertNotificationService>(context,
+                              listen: false)
+                          .showNotification(
+                        message: localizations.pinLimitReached,
+                        type: NotificationType.error,
+                        isAxonMode: true,
+                        axonWidth: widget.referenceWidth,
+                      );
+                    }
+                  },
                 );
               },
             ),
