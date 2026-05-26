@@ -33,12 +33,16 @@ jobs:
         run: flutter pub get
 
       - name: Decode Android Keystore
+        env:
+          CORTEX_JKS_BASE64: ${{ secrets.CORTEX_JKS }}
         run: |
-          echo "${{ secrets.CORTEX_JKS }}" | base64 --decode > android/app/Cortex.jks
+          echo "$CORTEX_JKS_BASE64" | base64 --decode > android/app/Cortex.jks
 
       - name: Create key.properties
+        env:
+          KEY_PROPERTIES_CONTENT: ${{ secrets.ANDROID_KEY_PROPERTIES }}
         run: |
-          echo "${{ secrets.ANDROID_KEY_PROPERTIES }}" > android/key.properties
+          echo "$KEY_PROPERTIES_CONTENT" > android/key.properties
 
       - name: Build APK (Release)
         run: flutter build apk --release
