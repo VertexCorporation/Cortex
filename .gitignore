@@ -59,3 +59,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 android/llama/.cxx/
+
+# Android signing keys
+android/key.properties
+android/app/Cortex.jks
+android_signing_keys.zip

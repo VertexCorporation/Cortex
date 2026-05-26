@@ -75,7 +75,7 @@ class WeatherCard extends StatelessWidget {
 
     // Determine condition description and icon
 
-    IconData icon = FontAwesomeIcons.sun;
+    var icon = FontAwesomeIcons.sun;
     List<Color> gradient = [
       const Color(0xFF56CCF2),
       const Color(0xFF2F80ED)
@@ -140,7 +140,7 @@ class WeatherCard extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Icon(icon, color: Colors.white, size: 32),
+              FaIcon(icon, color: Colors.white, size: 32),
             ],
           ),
           const SizedBox(height: 10),
@@ -168,10 +168,10 @@ class WeatherCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailItem(IconData icon, String value) {
+  Widget _buildDetailItem(dynamic icon, String value) {
     return Row(
       children: [
-        Icon(icon, color: Colors.white70, size: 16),
+        FaIcon(icon, color: Colors.white70, size: 16),
         const SizedBox(width: 6),
         Text(
           value,
