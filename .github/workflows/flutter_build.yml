@@ -42,7 +42,7 @@ jobs:
 
       - name: Create key.properties
         env:
-          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_PASS: ${{ secrets.JKS_PASSWORD }}
         run: |
           echo "storePassword=$KEY_PASS" > android/key.properties
           echo "keyPassword=$KEY_PASS" >> android/key.properties
