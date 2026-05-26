@@ -162,9 +162,26 @@ class ChatSessionProvider with ChangeNotifier {
     return localState.getFilePathById(_selectedModel!.id);
   }
 
-  bool get canHandleImage => _selectedModel?.modalities['image'] == true;
-  bool get canHandleVideo => _selectedModel?.modalities['video'] == true;
-  bool get canHandleAudio => _selectedModel?.modalities['audio'] == true;
+  bool _checkModality(String modality) {
+    if (_selectedModel == null) return false;
+    if (_selectedModel!.modalities[modality] == true) return true;
+    
+    final isCharacter = _selectedModel!.category == 'roleplay' || _selectedModel!.category == 'self';
+    if (isCharacter && _selectedModel!.baseModelId != null && _selectedModel!.baseModelId!.isNotEmpty) {
+      try {
+        final baseModel = _modelService.getPreciseModelData(
+          _selectedModel!.baseModelId!, 
+          langCode: _currentLocale.languageCode
+        );
+        return baseModel.modalities[modality] == true;
+      } catch (_) {}
+    }
+    return false;
+  }
+
+  bool get canHandleImage => _checkModality('image');
+  bool get canHandleVideo => _checkModality('video');
+  bool get canHandleAudio => _checkModality('audio');
 
   bool _isLocalModelLoaded = false;
 
