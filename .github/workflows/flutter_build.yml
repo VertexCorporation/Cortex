@@ -42,7 +42,11 @@ jobs:
         env:
           KEY_PROPERTIES_CONTENT: ${{ secrets.ANDROID_KEY_PROPERTIES }}
         run: |
-          echo "$KEY_PROPERTIES_CONTENT" > android/key.properties
+          # If the copy-paste stripped newlines and replaced them with spaces, fix it:
+          echo "$KEY_PROPERTIES_CONTENT" | tr ' ' '\n' > android/key.properties
+          # Explicitly append the non-secret configurations just to be absolutely sure:
+          echo "storeFile=Cortex.jks" >> android/key.properties
+          echo "keyAlias=ai" >> android/key.properties
 
       - name: Build APK (Release)
         run: flutter build apk --release
