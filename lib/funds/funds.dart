@@ -179,19 +179,72 @@ class _FundsScreenViewState extends State<FundsScreenView> {
           _startCountdownTimer();
         }
       } else {
-        // Fallback: load normally with skeleton
-        // This handles: first app launch with no cache
-        log('[FundsScreen] No preloaded data, fetching from server...');
-        _backend.checkOrStartSpecialOffer().whenComplete(() {
-          if (mounted) {
-            log('[FundsScreen] Server fetch complete');
-            setState(() {
-              _isSpecialOfferChecked = true;
-            });
-            _startCountdownTimer();
-          }
+        // PERF: Background preload may have just started (parallel with heavy libs).
+        // Poll briefly (max 2.5s, 250ms intervals) before falling back to server fetch.
+        // This avoids showing the skeleton when data arrives shortly after.
+        log('[FundsScreen] Waiting briefly for background preload to complete...');
+        _waitForPreloadOrFetch(localizations);
+      }
+    });
+  }
+
+  /// Polls for background preload completion with a short timeout.
+  /// If data arrives within [maxWaitMs], shows it instantly (no skeleton).
+  /// Falls back to a direct server fetch if the timeout expires.
+  void _waitForPreloadOrFetch(
+    AppLocalizations localizations, {
+    int elapsedMs = 0,
+    int intervalMs = 200,
+    int maxWaitMs = 2000,
+  }) {
+    if (!mounted) return;
+
+    if (FundsBackend.isPreloaded || _backend.allProducts.isNotEmpty) {
+      // Preload finished while we were waiting — use cached data immediately
+      log('[FundsScreen] Preload arrived after ${elapsedMs}ms, skipping skeleton');
+      if (_backend.allProducts.isEmpty && FundsBackend.isPreloaded) {
+        _backend.loadFromCache();
+      }
+      if (mounted) {
+        setState(() {
+          _isSpecialOfferChecked = true;
+          _isContentLoaded = true;
+          _contentOffset = Offset.zero;
         });
       }
+      if (_backend.isSpecialOfferEligible && !_backend.isSpecialOfferActive) {
+        _backend.checkOrStartSpecialOffer().whenComplete(() {
+          if (mounted) _startCountdownTimer();
+        });
+      } else {
+        _startCountdownTimer();
+      }
+      return;
+    }
+
+    if (elapsedMs >= maxWaitMs) {
+      // Timeout — fall back to standard server fetch (will show skeleton)
+      log('[FundsScreen] Preload timeout after ${elapsedMs}ms, fetching from server...');
+      _backend.checkOrStartSpecialOffer().whenComplete(() {
+        if (mounted) {
+          log('[FundsScreen] Server fetch complete');
+          setState(() {
+            _isSpecialOfferChecked = true;
+          });
+          _startCountdownTimer();
+        }
+      });
+      return;
+    }
+
+    // Still waiting — check again after interval
+    Future.delayed(Duration(milliseconds: intervalMs), () {
+      _waitForPreloadOrFetch(
+        localizations,
+        elapsedMs: elapsedMs + intervalMs,
+        intervalMs: intervalMs,
+        maxWaitMs: maxWaitMs,
+      );
     });
   }
 

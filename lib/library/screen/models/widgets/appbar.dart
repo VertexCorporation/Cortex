@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../../app.dart';
 import '../../../../appbar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../theme.dart';
 
 class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -22,10 +23,12 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.sizeOf(context).width;
     final bool isTablet = screenWidth >= 600;
-    final bool isDesktop = screenWidth >= 800; // [NEW] Desktop breakpoint
+    final bool isDesktop = screenWidth >= 800;
 
-    // Consistent icon sizing
-    final double iconSize = isTablet ? 26.0 : 22.0;
+    // Icon size matches the rest of the app
+    final double iconSize = isTablet ? 18.0 : 15.0;
+
+    final loc = AppLocalizations.of(context)!;
 
     return CortexAppBar(
       // Hide leading button on desktop since sidebar is fixed
@@ -35,17 +38,35 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
       titleText: title,
       scrollController: scrollController,
 
-      // Standard Action Button (Add)
+      // [IMPROVED] Prominent "Create" pill button with icon + label
+      // Previously was just a small icon — now clearly communicates its purpose
       actionButton: AppBarButton(
+        isTitle: true,
         onTap: onOpenCreateScreen,
-        child: SvgPicture.asset(
-          'assets/icons/add.svg',
-          width: iconSize,
-          height: iconSize,
-          colorFilter: ColorFilter.mode(
-            AppColors.primaryColor.inverted,
-            BlendMode.srcIn,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(
+              'assets/icons/add.svg',
+              width: iconSize,
+              height: iconSize,
+              colorFilter: ColorFilter.mode(
+                AppColors.primaryColor.inverted,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              loc.create,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w600,
+                fontSize: isTablet ? 14.0 : 13.0,
+                color: AppColors.primaryColor.inverted,
+                letterSpacing: -0.1,
+              ),
+            ),
+          ],
         ),
       ),
     );

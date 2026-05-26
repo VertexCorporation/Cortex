@@ -437,18 +437,13 @@ class ModelDetailProvider extends ChangeNotifier {
 
     if (isCharacterModel) {
       if (selectedBaseModelId != null && selectedBaseModelId!.isNotEmpty) {
-        // --- LOOKUP LOGIC ---
-        // 1. Try to find the model in the local available list (Includes 'dynamic')
         try {
-          selectedBaseModel = availableBaseModels.firstWhere(
-                (m) => m.variants?.containsKey(selectedBaseModelId) ?? false,
-          );
-        } catch (_) {
-          // 2. If not found locally, try fetching from the service (Server-side models)
           selectedBaseModel = _modelService.getPreciseModelData(
             selectedBaseModelId!,
             langCode: langCode,
           );
+        } catch (_) {
+          selectedBaseModel = null;
         }
       } else {
         selectedBaseModel = null;

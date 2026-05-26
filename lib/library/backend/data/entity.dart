@@ -150,28 +150,28 @@ class ModelEntity {
       if (value == null) return null;
       if (value is String) return value;
       if (value is Map) {
-        final localizedMap = Map<String, String>.from(
-            value.map((key, val) => MapEntry(key.toString(), val.toString())));
         for (final key in _languageFallbackKeys(langCode)) {
-          final localizedValue = localizedMap[key]?.trim();
+          final localizedValue = value[key]?.toString().trim();
           if (localizedValue != null && localizedValue.isNotEmpty) {
             return localizedValue;
           }
         }
-        return localizedMap.values.firstOrNull;
+        return value.values.firstOrNull?.toString();
       }
       return value.toString();
     }
 
     String? getLocalizedFieldFromDetails(String field) {
-      final details = _safeStringKeyMap(map['details']);
-      if (details.isEmpty) return null;
+      final details = map['details'];
+      if (details is! Map) return null;
 
       for (final key in _languageFallbackKeys(langCode)) {
-        final localizedDetails = _safeStringKeyMap(details[key]);
-        final value = localizedDetails[field]?.toString().trim();
-        if (value != null && value.isNotEmpty) {
-          return value;
+        final localizedDetails = details[key];
+        if (localizedDetails is Map) {
+          final value = localizedDetails[field]?.toString().trim();
+          if (value != null && value.isNotEmpty) {
+            return value;
+          }
         }
       }
       return null;
@@ -225,10 +225,12 @@ class ModelEntity {
       tier: getStringOrLocalized(map['tier']) ?? 'free',
       size: int.tryParse(map['size']?.toString() ?? ''),
       ram: int.tryParse(map['ram']?.toString() ?? ''),
-      modalities: Map<String, dynamic>.from(map['modalities'] as Map? ?? {}),
-      outputs: Map<String, dynamic>.from(map['outputs'] as Map? ?? {}),
+      modalities: _safeStringKeyMap(map['modalities']),
+      outputs: _safeStringKeyMap(map['outputs']),
       toolUse: map['toolUse'] == true,
-      variants: map['variants'] as Map<String, dynamic>?,
+      variants: map['variants'] is Map
+          ? Map<String, dynamic>.from(map['variants'] as Map)
+          : null,
       url: getStringOrLocalized(map['url']),
       context: getStringOrLocalized(map['context']),
       isFullyLocalized: map['isFullyLocalized'] as bool? ?? true,
