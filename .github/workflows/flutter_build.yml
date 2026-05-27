@@ -110,13 +110,40 @@ jobs:
           security import $CERTIFICATE_PATH -k $KEYCHAIN_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
 
-          # Copy provisioning profile to local profiles folder
+          # Extract UUID from the provisioning profile and rename it correctly
+          UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< $(security cms -D -i $PP_PATH))
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+
+          # Extract Team ID and Profile Name to create a robust ExportOptions.plist
+          TEAM_ID=$(/usr/libexec/PlistBuddy -c "Print TeamIdentifier:0" /dev/stdin <<< $(security cms -D -i $PP_PATH))
+          PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" /dev/stdin <<< $(security cms -D -i $PP_PATH))
+          
+          echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ios/ExportOptions.plist
+          echo "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">" >> ios/ExportOptions.plist
+          echo "<plist version=\"1.0\">" >> ios/ExportOptions.plist
+          echo "<dict>" >> ios/ExportOptions.plist
+          echo "    <key>method</key>" >> ios/ExportOptions.plist
+          echo "    <string>app-store</string>" >> ios/ExportOptions.plist
+          echo "    <key>uploadBitcode</key>" >> ios/ExportOptions.plist
+          echo "    <false/>" >> ios/ExportOptions.plist
+          echo "    <key>uploadSymbols</key>" >> ios/ExportOptions.plist
+          echo "    <true/>" >> ios/ExportOptions.plist
+          echo "    <key>compileBitcode</key>" >> ios/ExportOptions.plist
+          echo "    <false/>" >> ios/ExportOptions.plist
+          echo "    <key>teamID</key>" >> ios/ExportOptions.plist
+          echo "    <string>$TEAM_ID</string>" >> ios/ExportOptions.plist
+          echo "    <key>provisioningProfiles</key>" >> ios/ExportOptions.plist
+          echo "    <dict>" >> ios/ExportOptions.plist
+          echo "        <key>com.vertex.cortex</key>" >> ios/ExportOptions.plist
+          echo "        <string>$PROFILE_NAME</string>" >> ios/ExportOptions.plist
+          echo "    </dict>" >> ios/ExportOptions.plist
+          echo "</dict>" >> ios/ExportOptions.plist
+          echo "</plist>" >> ios/ExportOptions.plist
 
       - name: Build IPA (Release)
         run: |
-          flutter build ipa --release --export-method app-store
+          flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
 
       - name: Upload iOS Release Artifacts
         uses: actions/upload-artifact@v4
