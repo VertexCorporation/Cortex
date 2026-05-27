@@ -580,7 +580,7 @@ class Tiles {
       cacheExtent:
           2500, // PERFORMANCE: Keep generous cache extent for smooth scrolling
       addAutomaticKeepAlives:
-          false, // PERFORMANCE: Let cacheExtent manage viewport window instead of keeping ALL tiles alive
+          true, // FIX: Restored to true to prevent scroll jumps on viewport resize for variable-height messages
       addRepaintBoundaries:
           true, // PERFORMANCE: Independent Repaint boundaries per tile
       itemCount: visibleIndices.length,

@@ -8,6 +8,11 @@ import 'format.dart';
 /// It is a "dumb" data object that expects to be instantiated with display-ready,
 /// pre-localized data from the service or repository layer.
 class ModelEntity {
+  static final _loneLeadingQuotes = RegExp(r'^["*]+');
+  static final _loneTrailingQuotes = RegExp(r'["*]+$');
+  static final _rawIdNormalizer = RegExp(r'[\s_\-/]+');
+  static final _langSplitter = RegExp(r'[-_]');
+
   /// Strips wrapping quotes and asterisks from text fields.
   /// Handles: "text", 'text', **text**, *text*, and lone leading/trailing " or *.
   static String _stripWrappedQuotes(String value) {
@@ -38,8 +43,8 @@ class ModelEntity {
     }
 
     // Strip lone leading/trailing formatting chars
-    result = result.replaceAll(RegExp(r'^["*]+'), '');
-    result = result.replaceAll(RegExp(r'["*]+$'), '');
+    result = result.replaceAll(_loneLeadingQuotes, '');
+    result = result.replaceAll(_loneTrailingQuotes, '');
     return result.trim();
   }
 
@@ -247,13 +252,13 @@ class ModelEntity {
       return false;
     }
     String normalize(String input) =>
-        input.replaceAll(RegExp(r'[\s_\-/]+'), '').toLowerCase();
+        input.replaceAll(_rawIdNormalizer, '').toLowerCase();
     return normalize(value) == normalize(id);
   }
 
   static String _normalizedLangCode(String langCode) =>
       langCode
-          .split(RegExp(r'[-_]'))
+          .split(_langSplitter)
           .first
           .toLowerCase();
 

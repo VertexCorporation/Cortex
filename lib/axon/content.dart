@@ -116,13 +116,13 @@ class AxonContent extends StatelessWidget {
             // This reduces from 9 independent AnimationControllers to 3.
             AnimatedSlide(
               offset: isSearchActive ? const Offset(0, -0.3) : Offset.zero,
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 150),
               curve: Curves.easeOut,
               child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 100),
                 opacity: isSearchActive ? 0.0 : 1.0,
                 child: AnimatedSize(
-                  duration: const Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 150),
                   curve: Curves.easeInOutCubic,
                   alignment: Alignment.topCenter,
                   child: isSearchActive
@@ -220,19 +220,12 @@ class AxonContent extends StatelessWidget {
 
             // 4. LIST AREA
             Expanded(
-              child: ScrollFog(
+              child: AxonConversationList(
+                referenceWidth: referenceWidth,
+                screenHeight: screenHeight,
                 scrollController: scrollController,
-                topFogHeight: 30.0,
-                bottomFogHeight: 50.0,
-                showTop: true,
-                showBottom: true,
-                child: AxonConversationList(
-                  referenceWidth: referenceWidth,
-                  screenHeight: screenHeight,
-                  scrollController: scrollController,
-                  isSearchActive: isSearchActive,
-                  searchController: searchController,
-                ),
+                isSearchActive: isSearchActive,
+                searchController: searchController,
               ),
             ),
           ],
