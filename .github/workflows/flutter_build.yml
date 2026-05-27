@@ -116,7 +116,7 @@ jobs:
 
       - name: Build IPA (Release)
         run: |
-          flutter build ipa --release
+          flutter build ipa --release --export-method app-store
 
       - name: Upload iOS Release Artifacts
         uses: actions/upload-artifact@v4
