@@ -1,12 +1,6 @@
 name: Flutter Build & Release
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
