@@ -86,10 +86,6 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
   bool _isLoading = true;
   String? _expandedSeriesId;
 
-  // Search
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-
   // Cached Layout Values
   late double sw;
   late double sh;
@@ -104,10 +100,6 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
   @override
   void initState() {
     super.initState();
-
-    _searchController.addListener(() {
-      setState(() => _searchQuery = _searchController.text.toLowerCase().trim());
-    });
 
     if (widget.initialModels != null && widget.initialModels!.isNotEmpty) {
       _processData(widget.initialModels!);
@@ -305,50 +297,26 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
 
   @override
   void dispose() {
-    _searchController.dispose();
     super.dispose();
   }
 
   // Internal controller for the list content
   final ScrollController _internalScrollController = ScrollController();
 
-  // Filter a list of ModelEntity by search query
-  List<ModelEntity> _filter(List<ModelEntity> list) {
-    if (_searchQuery.isEmpty) return list;
-    return list.where((m) {
-      final title = (m.series ?? m.displayTitle).toLowerCase();
-      final variants = m.variants?.values.whereType<Map<String, dynamic>>() ?? [];
-      final variantMatch = variants.any((v) =>
-          (v['title'] as String? ?? '').toLowerCase().contains(_searchQuery));
-      return title.contains(_searchQuery) || variantMatch;
-    }).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     final double topRadius = sw * 0.07;
 
-    // Apply search filter to all lists
-    final filteredSelf = _filter(_selfModels);
-    final filteredOffline = _filter(_offlineModels);
-    final filteredOnline = _filter(_onlineSeries);
-    final filteredVideo = _filter(_videoSeries);
-    final filteredImage = _filter(_imageSeries);
-    final filteredAudio = _filter(_audioSeries);
-    final filteredCharacter = _filter(_characterModels);
-
-    final bool cortexVisible = _searchQuery.isEmpty ||
-        'cortex'.contains(_searchQuery) ||
-        'auto'.contains(_searchQuery);
+    final bool cortexVisible = true;
 
     final bool hasAnyResult = cortexVisible ||
-        filteredSelf.isNotEmpty ||
-        filteredOffline.isNotEmpty ||
-        filteredOnline.isNotEmpty ||
-        filteredVideo.isNotEmpty ||
-        filteredImage.isNotEmpty ||
-        filteredAudio.isNotEmpty ||
-        filteredCharacter.isNotEmpty;
+        _selfModels.isNotEmpty ||
+        _offlineModels.isNotEmpty ||
+        _onlineSeries.isNotEmpty ||
+        _videoSeries.isNotEmpty ||
+        _imageSeries.isNotEmpty ||
+        _audioSeries.isNotEmpty ||
+        _characterModels.isNotEmpty;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.55,
@@ -408,7 +376,7 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
               // 2. CONTENT AREA (Switches between Skeleton and Real Data)
               Expanded(
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
+                  duration: const Duration(milliseconds: 200),
                   switchInCurve: Curves.easeOutQuart,
                   switchOutCurve: Curves.easeInQuart,
                   transitionBuilder:
@@ -482,40 +450,40 @@ class _ModelSheetContentState extends State<_ModelSheetContent>
                                     ),
                                   ],
 
-                                  if (filteredSelf.isNotEmpty) ...[
+                                  if (_selfModels.isNotEmpty) ...[
                                     _buildSliverHeader(
                                         widget.localizations.customModels),
-                                    _buildSliverGrid(filteredSelf),
+                                    _buildSliverGrid(_selfModels),
                                   ],
-                                  if (filteredOffline.isNotEmpty) ...[
+                                  if (_offlineModels.isNotEmpty) ...[
                                     _buildSliverHeader(
                                         widget.localizations.offlineModels),
-                                    _buildOfflineSeriesList(filteredOffline),
+                                    _buildOfflineSeriesList(_offlineModels),
                                   ],
-                                  if (filteredOnline.isNotEmpty) ...[
+                                  if (_onlineSeries.isNotEmpty) ...[
                                     _buildSliverHeader(
                                         widget.localizations.languageModels),
-                                    _buildSliverOnlineList(filteredOnline),
+                                    _buildSliverOnlineList(_onlineSeries),
                                   ],
-                                  if (filteredVideo.isNotEmpty) ...[
+                                  if (_videoSeries.isNotEmpty) ...[
                                     _buildSliverHeader(
                                         widget.localizations.videoModels),
-                                    _buildSliverOnlineList(filteredVideo),
+                                    _buildSliverOnlineList(_videoSeries),
                                   ],
-                                  if (filteredImage.isNotEmpty) ...[
+                                  if (_imageSeries.isNotEmpty) ...[
                                     _buildSliverHeader(
                                         widget.localizations.imageModels),
-                                    _buildSliverOnlineList(filteredImage),
+                                    _buildSliverOnlineList(_imageSeries),
                                   ],
-                                  if (filteredAudio.isNotEmpty) ...[
+                                  if (_audioSeries.isNotEmpty) ...[
                                     _buildSliverHeader(
                                         widget.localizations.audioModels),
-                                    _buildSliverOnlineList(filteredAudio),
+                                    _buildSliverOnlineList(_audioSeries),
                                   ],
-                                  if (filteredCharacter.isNotEmpty) ...[
+                                  if (_characterModels.isNotEmpty) ...[
                                     _buildSliverHeader(
                                         widget.localizations.characterModels),
-                                    _buildSliverGrid(filteredCharacter),
+                                    _buildSliverGrid(_characterModels),
                                   ],
 
                                   SliverPadding(

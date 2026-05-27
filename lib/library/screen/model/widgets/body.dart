@@ -44,61 +44,31 @@ class BodyContent extends StatelessWidget {
             .size
             .height * 0.02,
       ),
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 450),
-        layoutBuilder: (currentChild, previousChildren) {
-          return Stack(
-            alignment: Alignment.topCenter,
-            children: <Widget>[
-              ...previousChildren,
-              if (currentChild != null) currentChild,
-            ],
-          );
-        },
-        transitionBuilder: (child, animation) {
-          final expectedKey = ValueKey(provider.selectedVariantName ?? 'default');
-          final isIncoming = child.key is ValueKey &&
-              (child.key as ValueKey).value == expectedKey.value;
-
-          final slideAnimation = Tween<Offset>(
-            begin: isIncoming ? const Offset(0.5, 0) : const Offset(-0.5, 0),
-            end: Offset.zero,
-          ).animate(
-              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
-
-          return FadeTransition(
-            opacity:
-            CurvedAnimation(parent: animation, curve: Curves.easeInOut),
-            child: SlideTransition(position: slideAnimation, child: child),
-          );
-        },
-        child: Column(
-          key: ValueKey(provider.selectedVariantName ?? 'default'),
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ModelHeader(provider: provider),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ModelHeader(provider: provider),
+          const _Spacing(),
+          if (provider.displaySummary
+              .trim()
+              .isNotEmpty) ...[
+            SummarySection(provider: provider),
             const _Spacing(),
-            if (provider.displaySummary
-                .trim()
-                .isNotEmpty) ...[
-              SummarySection(provider: provider),
-              const _Spacing(),
-            ],
-            if (provider.isCharacterModel) ...[
-              BaseModelSelectionSection(provider: provider),
-              const _Spacing(),
-            ],
-            if (provider.displayDescription
-                .trim()
-                .isNotEmpty) ...[
-              DescriptionSection(provider: provider),
-              const _Spacing(),
-            ],
-            if (provider.parsedFeatures.isNotEmpty) ...[
-              FeaturesSection(provider: provider),
-            ],
           ],
-        ),
+          if (provider.isCharacterModel) ...[
+            BaseModelSelectionSection(provider: provider),
+            const _Spacing(),
+          ],
+          if (provider.displayDescription
+              .trim()
+              .isNotEmpty) ...[
+            DescriptionSection(provider: provider),
+            const _Spacing(),
+          ],
+          if (provider.parsedFeatures.isNotEmpty) ...[
+            FeaturesSection(provider: provider),
+          ],
+        ],
       ),
     );
   }

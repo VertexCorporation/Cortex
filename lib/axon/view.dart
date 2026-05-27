@@ -58,7 +58,7 @@ class _AxonState extends State<Axon> with SingleTickerProviderStateMixin {
     _searchFocusNode = FocusNode();
     _searchModeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350),
+      duration: const Duration(milliseconds: 200),
       value: 0.0,
     );
 

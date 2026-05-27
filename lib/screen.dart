@@ -114,6 +114,34 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   List<Color>? _cachedGradientColors;
   Color? _cachedDividerColor;
 
+  // PERF: Cache Axon widget to avoid rebuilding the entire sidebar on every frame
+  // during animation, preventing massive UI lag on the conversation list.
+  Widget? _cachedAxonWidget;
+  bool _cachedAxonIsOpen = false;
+  int _cachedAxonActiveTab = -1;
+
+  Widget _getAxonWidget(bool isOpen, int activeTab, double standardAxonWidth) {
+    if (_cachedAxonWidget != null &&
+        _cachedAxonIsOpen == isOpen &&
+        _cachedAxonActiveTab == activeTab) {
+      return _cachedAxonWidget!;
+    }
+    _cachedAxonIsOpen = isOpen;
+    _cachedAxonActiveTab = activeTab;
+    return _cachedAxonWidget = Axon(
+      onNewChatTap: () => startNewConversation(),
+      onLibraryTap: switchToLibrary,
+      onCreateAITap: switchToCreate,
+      onArtsTap: openArtsScreen,
+      onNewsTap: openNewsScreen,
+      onCloseAxon: closeAxon,
+      onOpenAxon: () => _animateAxonTo(1.0),
+      referenceWidth: standardAxonWidth,
+      activeTab: activeTab,
+      isOpen: isOpen,
+    );
+  }
+
   List<Color> _getGradientColors(Color dividerColor) {
     if (_cachedDividerColor == dividerColor && _cachedGradientColors != null) {
       return _cachedGradientColors!;
@@ -886,17 +914,10 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                             children: [
                               Align(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Axon(
-                                  onNewChatTap: () => startNewConversation(),
-                                  onLibraryTap: switchToLibrary,
-                                  onCreateAITap: switchToCreate,
-                                  onArtsTap: openArtsScreen,
-                                  onNewsTap: openNewsScreen,
-                                  onCloseAxon: closeAxon,
-                                  onOpenAxon: () => _animateAxonTo(1.0),
-                                  referenceWidth: standardAxonWidth,
-                                  activeTab: _getCurrentViewIndex(),
-                                  isOpen: rawValue > 0.0,
+                                child: _getAxonWidget(
+                                  rawValue > 0.0,
+                                  _getCurrentViewIndex(),
+                                  standardAxonWidth,
                                 ),
                               ),
                               if (rawValue < 1.0)

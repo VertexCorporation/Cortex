@@ -148,11 +148,13 @@ class ModelCard extends StatelessWidget {
                                         ? Image.asset(
                                             imagePath,
                                             fit: BoxFit.cover,
+                                            cacheWidth: 120,
                                           )
                                         : (!kIsWeb
                                             ? Image.file(
                                                 File(imagePath),
                                                 fit: BoxFit.cover,
+                                                cacheWidth: 120,
                                               )
                                             : Icon(Icons.broken_image,
                                                 size: iconBoxSize * 0.6,

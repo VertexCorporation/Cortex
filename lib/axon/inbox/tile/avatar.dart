@@ -84,9 +84,9 @@ class TileAvatar extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(size * 0.15),
       child: isAsset
-          ? Image.asset(imagePath, fit: BoxFit.contain)
+          ? Image.asset(imagePath, fit: BoxFit.contain, cacheWidth: 120)
           : (!kIsWeb && file.existsSync()
-              ? Image.file(file, fit: BoxFit.contain)
+              ? Image.file(file, fit: BoxFit.contain, cacheWidth: 120)
               : _buildFallbackIcon()),
     );
   }
@@ -101,9 +101,9 @@ class TileAvatar extends StatelessWidget {
     }
 
     return isAsset
-        ? Image.asset(imagePath, width: size, height: size, fit: BoxFit.cover)
+        ? Image.asset(imagePath, width: size, height: size, fit: BoxFit.cover, cacheWidth: 120)
         : (!kIsWeb && file.existsSync()
-            ? Image.file(file, width: size, height: size, fit: BoxFit.cover)
+            ? Image.file(file, width: size, height: size, fit: BoxFit.cover, cacheWidth: 120)
             : _buildFallbackIcon());
   }
 

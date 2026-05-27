@@ -4,6 +4,7 @@
 
 import 'package:cortex/chat/providers/input.dart';
 import 'package:cortex/chat/services/speech.dart';
+import 'package:cortex/chat/services/scroll.dart';
 import 'package:cortex/fog.dart';
 import 'package:cortex/internet.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +65,9 @@ class AttachmentPreviewSection extends StatelessWidget {
       attachments: attachments,
       itemSize: itemSize,
       padding: padding,
-      onRemove: (index) => inputProvider.removeAttachmentAt(index),
+      onRemove: (index) {
+        inputProvider.removeAttachmentAt(index);
+      },
     );
   }
 }
@@ -87,10 +90,12 @@ class AttachmentListWithFog extends StatefulWidget {
   State<AttachmentListWithFog> createState() => _AttachmentListWithFogState();
 }
 
-class _AttachmentListWithFogState extends State<AttachmentListWithFog> {
+class _AttachmentListWithFogState extends State<AttachmentListWithFog>
+    with TickerProviderStateMixin {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final ScrollController _scrollController = ScrollController();
   late List<InputAttachment> _displayedItems;
+  AnimationController? _syncController;
 
   @override
   void initState() {
@@ -137,6 +142,21 @@ class _AttachmentListWithFogState extends State<AttachmentListWithFog> {
                 _buildItem(removedItem, animation, i, isRemoving: true),
             duration: const Duration(milliseconds: 300),
           );
+
+          _syncController?.dispose();
+          _syncController = AnimationController(
+            vsync: this,
+            duration: const Duration(milliseconds: 300),
+          )
+            ..addListener(() {
+              if (mounted) {
+                try {
+                  context.read<ScrollService>().updateButtonVisibility();
+                } catch (_) {}
+              }
+            })
+            ..forward();
+
           if (newItems.length == _displayedItems.length) break;
           i--;
         }
@@ -146,6 +166,7 @@ class _AttachmentListWithFogState extends State<AttachmentListWithFog> {
 
   @override
   void dispose() {
+    _syncController?.dispose();
     _scrollController.dispose();
     super.dispose();
   }

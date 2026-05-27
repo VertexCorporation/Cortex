@@ -101,7 +101,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
     final bool showSkeletons = isLoading && _displayedIds.isEmpty;
 
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 200),
       switchInCurve: Curves.easeOutCubic,
       switchOutCurve: Curves.easeInCubic,
       transitionBuilder: (Widget child, Animation<double> animation) {
@@ -167,7 +167,7 @@ class _AxonConversationListState extends State<AxonConversationList> {
       children: [
         Positioned.fill(
           child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 150),
             child: isEmpty
                 ? Center(
                     key: ValueKey(showNoResults ? 'no_results' : 'empty'),
@@ -188,6 +188,9 @@ class _AxonConversationListState extends State<AxonConversationList> {
             showBottom: true,
             child: ListView.builder(
               controller: widget.scrollController,
+              cacheExtent: 500,
+              addAutomaticKeepAlives: false,
+              addRepaintBoundaries: true,
               padding: EdgeInsets.fromLTRB(
                 horizontalPadding * 0.5,
                 0,
