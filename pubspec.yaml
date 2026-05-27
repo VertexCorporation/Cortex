@@ -27,7 +27,7 @@ dependencies:
   # --- FIREBASE ---
   firebase_core: ^4.1.1
   firebase_auth: ^6.1.0
-  cloud_firestore: ^6.0.2
+  cloud_firestore: 6.2.0
   firebase_analytics: ^12.0.2
   firebase_remote_config: ^6.0.2
   cloud_functions: ^6.0.2
@@ -136,6 +136,8 @@ flutter_native_splash:
     icon_background_color_dark: "#000000"
 
 flutter:
+  config:
+    enable-swift-package-manager: false
   uses-material-design: true
   generate: true
   fonts:
