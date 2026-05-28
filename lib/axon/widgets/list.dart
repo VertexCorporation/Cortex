@@ -42,6 +42,7 @@ class AxonConversationList extends StatefulWidget {
 class _AxonConversationListState extends State<AxonConversationList> {
   List<String> _displayedIds = [];
   InboxViewModel? _viewModel;
+  int _currentLimit = 15;
 
   @override
   void initState() {
@@ -51,16 +52,37 @@ class _AxonConversationListState extends State<AxonConversationList> {
       _viewModel = context.read<InboxViewModel>();
       _viewModel!.addListener(_onViewModelUpdate);
 
+      widget.scrollController.addListener(_onScroll);
+
       if (_viewModel!.conversations.isNotEmpty) {
         setState(() {
-          _displayedIds = List.from(_viewModel!.conversations);
+          _updateDisplayedIds(_viewModel!.conversations);
         });
       }
     });
   }
 
+  void _onScroll() {
+    if (!widget.scrollController.hasClients) return;
+    
+    // Load more when user scrolls near the bottom
+    if (widget.scrollController.position.pixels >= 
+        widget.scrollController.position.maxScrollExtent - 200) {
+      if (_viewModel == null) return;
+      
+      final newIds = _viewModel!.conversations;
+      if (_currentLimit < newIds.length) {
+        setState(() {
+          _currentLimit += 15;
+          _updateDisplayedIds(newIds);
+        });
+      }
+    }
+  }
+
   @override
   void dispose() {
+    widget.scrollController.removeListener(_onScroll);
     _viewModel?.removeListener(_onViewModelUpdate);
     super.dispose();
   }
@@ -70,14 +92,29 @@ class _AxonConversationListState extends State<AxonConversationList> {
     _checkForUpdates();
   }
 
+  void _updateDisplayedIds(List<String> newIds) {
+    if (newIds.length > _currentLimit) {
+      _displayedIds = newIds.sublist(0, _currentLimit);
+    } else {
+      _displayedIds = List.from(newIds);
+    }
+  }
+
   void _checkForUpdates() {
     final vm = context.read<InboxViewModel>();
     final newIds = vm.conversations;
+    
+    List<String> newDisplayed;
+    if (newIds.length > _currentLimit) {
+      newDisplayed = newIds.sublist(0, _currentLimit);
+    } else {
+      newDisplayed = List.from(newIds);
+    }
 
-    if (_areListsEqual(_displayedIds, newIds)) return;
+    if (_areListsEqual(_displayedIds, newDisplayed)) return;
     
     setState(() {
-      _displayedIds = List.from(newIds);
+      _displayedIds = newDisplayed;
     });
   }
 
@@ -153,9 +190,8 @@ class _AxonConversationListState extends State<AxonConversationList> {
   Widget _buildListContent(AppLocalizations localizations,
       InboxViewModel inboxViewModel, double horizontalPadding) {
     final List<String> currentIds = inboxViewModel.conversations;
-    if (_displayedIds.isEmpty && currentIds.isNotEmpty) {
-      _displayedIds = List.from(currentIds);
-    }
+    // We rely on the _checkForUpdates / initState logic to populate _displayedIds.
+    // Ensure we don't modify state directly during build.
 
     final bool isEmpty = currentIds.isEmpty && _displayedIds.isEmpty;
     final bool hasSearchText = widget.searchController.text.trim().isNotEmpty;
