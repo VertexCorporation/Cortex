@@ -114,17 +114,16 @@ class ChatStorageService {
           c.isStarred, 
           c.starredDate, 
           c.lastMessageDate,
-          lm.text as lastMessageText,
-          lm.photoPath as lastMessagePhoto,
-          lm.ts as realLastMessageTs
+          m.text as lastMessageText,
+          m.photoPath as lastMessagePhoto,
+          m.ts as realLastMessageTs
         FROM conversations c
-        LEFT JOIN (
-          SELECT conversationId, text, photoPath, ts,
-            ROW_NUMBER() OVER (PARTITION BY conversationId ORDER BY idx DESC) as rn
-          FROM messages
-          WHERE (text IS NOT NULL AND length(text) > 0)
-             OR (photoPath IS NOT NULL AND length(photoPath) > 0)
-        ) lm ON lm.conversationId = c.id AND lm.rn = 1
+        LEFT JOIN messages m ON m.idx = (
+            SELECT idx FROM messages 
+            WHERE conversationId = c.id 
+              AND ((text IS NOT NULL AND length(text) > 0) OR (photoPath IS NOT NULL AND length(photoPath) > 0))
+            ORDER BY idx DESC LIMIT 1
+        )
       ''');
 
       return results;
