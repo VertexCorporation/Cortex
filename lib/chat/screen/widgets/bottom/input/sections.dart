@@ -437,65 +437,6 @@ class TextFieldSection extends StatelessWidget {
   }
 }
 
-// --- Tools Section ---
-class ToolsSection extends StatelessWidget {
-  final double screenWidth;
-  final bool isTablet;
-  final InputField widget;
-  final bool isActionPermitted;
-
-  const ToolsSection({
-    super.key,
-    required this.screenWidth,
-    required this.isTablet,
-    required this.widget,
-    required this.isActionPermitted,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isDesktop = screenWidth >= 800;
-    final double startPadding =
-        isDesktop ? 16.0 : (screenWidth * (isTablet ? 0.02 : 0.03));
-    final double bottomPadding =
-        isDesktop ? 12.0 : (screenWidth * (isTablet ? 0.015 : 0.025));
-    final double spacing =
-        isDesktop ? 16.0 : (screenWidth * (isTablet ? 0.02 : 0.025));
-
-    return Padding(
-      padding: EdgeInsetsDirectional.only(
-        start: startPadding,
-        end: screenWidth * 0.02,
-        top: screenWidth * 0.005,
-        bottom: bottomPadding,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          AddPhotoButton(
-            isLimitExceeded: widget.isLimitExceeded,
-            isPhotoLoading: widget.isPhotoLoading,
-            localizations: widget.localizations,
-          ),
-          SizedBox(width: spacing),
-          FeaturesButton(
-            controller: widget.controller,
-            isLimitExceeded: widget.isLimitExceeded,
-            isActionPermitted: isActionPermitted,
-          ),
-          SizedBox(width: spacing),
-          ModelSelectButton(
-            screenWidth: screenWidth,
-            isTablet: isTablet,
-            localizations: widget.localizations,
-            onSelectionComplete: () => widget.textFieldFocusNode.requestFocus(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // --- Send Button Section ---
 class SendButtonSection extends StatelessWidget {
   final double screenWidth;

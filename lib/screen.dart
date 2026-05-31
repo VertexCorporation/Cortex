@@ -938,6 +938,7 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       Transform.translate(
                         offset: Offset(mainScreenX, 0),
                         child: Container(
+                          clipBehavior: Clip.hardEdge,
                           decoration: BoxDecoration(
                             color: AppColors.background,
                             boxShadow: [
