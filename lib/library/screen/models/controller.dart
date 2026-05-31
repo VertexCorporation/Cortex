@@ -13,6 +13,10 @@ import '../../providers/local.dart';
 import '../../../theme.dart';
 import 'widgets/body.dart';
 import 'widgets/appbar.dart';
+import '../../../server/user.dart';
+import '../../../funds/funds.dart';
+import '../../../navigation.dart';
+import 'package:flutter/services.dart';
 
 const _kWarningPanelDelay = Duration(milliseconds: 700);
 
@@ -90,7 +94,7 @@ class LibraryScreenState extends State<LibraryScreen>
         FocusManager.instance.primaryFocus?.unfocus();
       },
       startChat: (id, _, {String? modelPath, isCustomModel = false}) =>
-          _catalogProvider!.startChatWithModel(id),
+          _handleChatPress(id),
       startDownload: ({required id, required url, required title}) =>
           _localStateProvider!.requestPermissionAndStartDownload(
               context: context, id: id, url: url),
@@ -172,6 +176,21 @@ class LibraryScreenState extends State<LibraryScreen>
     if (mounted && _showLocalizationWarning) {
       setState(() => _showLocalizationWarning = false);
     }
+  }
+
+  Future<void> _handleChatPress(String id) async {
+    try {
+      final model = _catalogProvider!.allModels.firstWhere((m) => m.id == id);
+      if (model.isServerSide && !model.isCustomModel && id != 'cortex/auto') {
+        final userProvider = context.read<UserProvider>();
+        if (!userProvider.isSubscriptionActive) {
+          HapticFeedback.lightImpact();
+          navigateToScreen(const FundsScreen(), direction: const Offset(0.0, 1.0));
+          return;
+        }
+      }
+    } catch (_) {}
+    await _catalogProvider!.startChatWithModel(id);
   }
 
   void _handleOverscrollStart() {
@@ -271,7 +290,7 @@ class LibraryScreenState extends State<LibraryScreen>
                   },
                   onChatPressed: (id, _,
                       {String? modelPath, isCustomModel = false}) =>
-                      catalog.startChatWithModel(id),
+                      _handleChatPress(id),
                   onDownloadPressed: ({required id, required url, required title}) =>
                       localState.requestPermissionAndStartDownload(
                           context: context, id: id, url: url),

@@ -18,7 +18,7 @@ import '../../../../services/speech.dart';
 import '../../../../services/voice.dart'; // [NEW]
 import '../../../../services/send.dart'; // [NEW]
 
-import '../panels/attachments/sheet.dart';
+
 import '../panels/features/sheet.dart';
 import '../panels/selection/sheet.dart';
 
@@ -40,30 +40,32 @@ class _ToolCircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: disabled ? 0.5 : 1.0,
-      child: Material(
-        color: AppColors.background,
-        shape: const CircleBorder(),
-        child: Ink(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.border,
-              width: 1.0,
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Opacity(
+        opacity: disabled ? 0.5 : 1.0,
+        child: Material(
+          color: AppColors.background,
+          shape: const CircleBorder(),
+          child: Ink(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.border,
+                width: 1.0,
+              ),
             ),
-          ),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: disabled
-                ? null
-                : () {
-                    HapticFeedback.lightImpact();
-                    onTap?.call();
-                  },
-            child: SizedBox(
-              width: size,
-              height: size,
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: disabled
+                  ? () {
+                      HapticFeedback.heavyImpact();
+                    }
+                  : () {
+                      HapticFeedback.lightImpact();
+                      onTap?.call();
+                    },
               child: Center(child: child),
             ),
           ),
@@ -146,7 +148,7 @@ class ActionButtonWidget extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // UPDATED: Uses AnimatedSwitcher for Slide + Fade transition
         AnimatedSwitcher(
@@ -154,14 +156,20 @@ class ActionButtonWidget extends StatelessWidget {
           reverseDuration: const Duration(milliseconds: 200),
           switchInCurve: Curves.easeOutQuad,
           switchOutCurve: Curves.easeInQuad,
-          transitionBuilder: (Widget child, Animation<double> animation) {
-            // Combines opacity and width expansion (sliding effect)
+          transitionBuilder: (child, animation) {
             return FadeTransition(
               opacity: animation,
-              child: SizeTransition(
-                sizeFactor: animation,
-                axis: Axis.horizontal,
-                axisAlignment: 1.0, // Anchors to the right, expands left
+              child: AnimatedBuilder(
+                animation: animation,
+                builder: (context, child) {
+                  return ClipRect(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      widthFactor: animation.value,
+                      child: child,
+                    ),
+                  );
+                },
                 child: child,
               ),
             );
@@ -391,78 +399,26 @@ class ActionButtonWidget extends StatelessWidget {
 // -----------------------------------------------------------------------------
 // 2. ADD ATTACHMENT BUTTON (Refactored for Multi-file Support)
 // -----------------------------------------------------------------------------
-class AddPhotoButton extends StatelessWidget {
+class AddPhotoButton extends StatefulWidget {
   final bool isLimitExceeded;
   final bool isPhotoLoading;
   final AppLocalizations localizations;
+  final TextEditingController controller;
 
   const AddPhotoButton({
     super.key,
-    required this.isLimitExceeded, // Refers to Chat History Limit (e.g. Free Tier)
+    required this.isLimitExceeded,
     required this.isPhotoLoading,
     required this.localizations,
+    required this.controller,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final inputProvider = context.watch<InputProvider>();
-
-    // Check if we have reached the 9 file limit
-    final bool isMaxAttachments = inputProvider.attachments.length >= 9;
-
-    // Disable if loading or if main chat limit reached (but not just because we have 1 photo)
-    final bool buttonDisabled = isLimitExceeded;
-
-    return _ToolCircleButton(
-      disabled: (isPhotoLoading && buttonDisabled) || isMaxAttachments,
-      onTap: isPhotoLoading
-          ? null
-          : () {
-              // Priority 1: Check Chat History Limit
-              if (isLimitExceeded) {
-                // The InputField usually handles this by disabling interaction,
-                // but if tapped, we can show a specific upgrade prompt here if needed.
-              }
-              // Priority 2: Open Sheet
-              // Priority 2: Open Sheet
-              else {
-                final session = context.read<ChatSessionProvider>();
-                showAttachmentSheet(
-                  context: context,
-                  canHandleImages:
-                      session.isDynamicChat ? true : session.canHandleImage,
-                  canHandleVideo:
-                      session.isDynamicChat ? true : session.canHandleVideo,
-                  canHandleAudio:
-                      session.isDynamicChat ? true : session.canHandleAudio,
-                );
-              }
-            },
-      child: SvgPicture.asset(
-        'assets/icons/add.svg',
-        width: 24.0,
-        height: 24.0,
-        colorFilter:
-            ColorFilter.mode(AppColors.primaryColor.inverted, BlendMode.srcIn),
-      ),
-    );
-  }
+  State<AddPhotoButton> createState() => _AddPhotoButtonState();
 }
 
-// -----------------------------------------------------------------------------
-// 3. FEATURES BUTTON (Updated: Fully Animated Colors including Icon)
-// -----------------------------------------------------------------------------
-class FeaturesButton extends StatelessWidget {
-  final TextEditingController controller;
-  final bool isLimitExceeded;
-  final bool isActionPermitted;
-
-  const FeaturesButton({
-    super.key,
-    required this.controller,
-    required this.isLimitExceeded,
-    required this.isActionPermitted,
-  });
+class _AddPhotoButtonState extends State<AddPhotoButton> {
+  bool _isOpened = false;
 
   @override
   Widget build(BuildContext context) {
@@ -470,54 +426,43 @@ class FeaturesButton extends StatelessWidget {
     final sessionProvider = context.watch<ChatSessionProvider>();
     final featureMode = inputProvider.featureMode;
     final currentModel = sessionProvider.selectedModel;
+    
+    // Check if any feature is active
     final bool isOfflineFocused = currentModel?.type == 'offline';
-    final bool isImageFocused = currentModel?.outputs['image'] == true ||
-        currentModel?.category == 'image';
-    final bool isVideoFocused = currentModel?.outputs['video'] == true ||
-        currentModel?.category == 'video';
-    final bool isAudioFocused = currentModel?.outputs['audio'] == true ||
-        currentModel?.category == 'audio';
+    final bool isImageFocused = currentModel?.outputs['image'] == true || currentModel?.category == 'image';
+    final bool isVideoFocused = currentModel?.outputs['video'] == true || currentModel?.category == 'video';
+    final bool isAudioFocused = currentModel?.outputs['audio'] == true || currentModel?.category == 'audio';
 
     final bool isActive = featureMode != ChatInputMode.none ||
         inputProvider.enableWebSearch ||
         isOfflineFocused ||
         isImageFocused ||
         isVideoFocused ||
-        isAudioFocused;
+        isAudioFocused ||
+        inputProvider.attachments.isNotEmpty; // Also active if there are attachments
 
-    // Visual Configuration
-    // Active:   Bg = Inverted (Black), Icon = Background (White)
-    // Inactive: Bg = Background (White), Icon = Inverted (Black)
-    final Color backgroundColor =
-        isActive ? AppColors.primaryColor.inverted : AppColors.background;
-
-    final Color iconColor =
-        isActive ? AppColors.background : AppColors.primaryColor.inverted;
-
-    // Border is visible only when inactive.
-    // Transitioning to transparent makes it fade out smoothly.
+    final Color backgroundColor = isActive ? AppColors.primaryColor.inverted : AppColors.background;
+    final Color iconColor = isActive ? AppColors.background : AppColors.primaryColor.inverted;
     final Color borderColor = isActive ? Colors.transparent : AppColors.border;
 
-    const double size = 36.0;
-    const Duration animDuration = Duration(milliseconds: 200);
-    const Curve animCurve = Curves.easeInOut;
-
-    // Is the user functionally out of limits? Disable the button block.
-    final bool buttonDisabled = isLimitExceeded || !isActionPermitted;
+    final bool isMaxAttachments = inputProvider.attachments.length >= 9;
+    final bool buttonDisabled = widget.isLimitExceeded || (widget.isPhotoLoading && isMaxAttachments);
+    final double size = 42.0;
 
     return GestureDetector(
-      onTap: buttonDisabled
+      onTap: buttonDisabled || widget.isPhotoLoading
           ? () {
               HapticFeedback.heavyImpact();
             }
-          : () {
+          : () async {
               HapticFeedback.lightImpact();
-              showFeaturesSheet(context: context, controller: controller);
+              if (mounted) setState(() => _isOpened = true);
+              await showFeaturesSheet(context: context, controller: widget.controller);
+              if (mounted) setState(() => _isOpened = false);
             },
-      // 1. ANIMATED CONTAINER: Handles Background & Border Fade
       child: AnimatedContainer(
-        duration: animDuration,
-        curve: animCurve,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
         width: size,
         height: size,
         decoration: BoxDecoration(
@@ -528,22 +473,23 @@ class FeaturesButton extends StatelessWidget {
               width: 1.0),
         ),
         child: Center(
-          // 2. TWEEN ANIMATION BUILDER: Handles Icon Color Fade
-          // This ensures the icon color changes smoothly (interpolates)
-          // alongside the background instead of snapping instantly.
-          child: TweenAnimationBuilder<Color?>(
-            duration: animDuration,
-            curve: animCurve,
-            tween: ColorTween(end: iconColor),
-            builder: (context, color, child) {
-              return SvgPicture.asset(
-                'assets/icons/features.svg',
-                width: 18.0,
-                height: 18.0,
-                colorFilter:
-                    ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
-              );
-            },
+          child: AnimatedRotation(
+            turns: _isOpened ? 0.375 : 0.0,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOutCubic,
+            child: TweenAnimationBuilder<Color?>(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              tween: ColorTween(end: iconColor),
+              builder: (context, color, child) {
+                return SvgPicture.asset(
+                  'assets/icons/add.svg',
+                  width: 24.0,
+                  height: 24.0,
+                  colorFilter: ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -551,6 +497,7 @@ class FeaturesButton extends StatelessWidget {
   }
 }
 
+// FeaturesButton removed as it's merged into AddPhotoButton
 // -----------------------------------------------------------------------------
 // 4. MODEL SELECT BUTTON
 // -----------------------------------------------------------------------------

@@ -42,7 +42,6 @@ class _SendButtonSection extends StatelessWidget {
     return Padding(
       padding: EdgeInsetsDirectional.only(
         end: isTablet ? screenWidth * 0.02 : 16.0,
-        bottom: isTablet ? screenWidth * 0.015 : 12.0,
       ),
       child: ActionButtonWidget(
         isEnabled: effectiveEnabled,

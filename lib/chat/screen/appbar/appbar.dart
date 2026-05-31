@@ -11,8 +11,12 @@ import 'package:cortex/funds/funds.dart';
 import 'package:cortex/l10n/app_localizations.dart';
 import 'package:cortex/login/upgrade.dart';
 import 'package:cortex/navigation.dart';
+import 'package:cortex/internet.dart';
+import 'package:cortex/library/providers/catalog.dart';
+import 'package:cortex/library/providers/local.dart';
 import 'package:cortex/server/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -21,6 +25,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../theme.dart';
 import '../../../../main.dart';
 import '../../../appbar.dart';
+import '../widgets/bottom/input/buttons.dart';
 
 class Appbar extends StatefulWidget implements PreferredSizeWidget {
   const Appbar({
@@ -49,6 +54,53 @@ class AppbarState extends State<Appbar> {
 
     // Logic requires clearing conversation on mode switch
     conversation.clearConversation();
+  }
+
+  // --- LOGIC: Offline Mode Toggle ---
+  void _handleOfflineModeToggle(BuildContext context, ChatSessionProvider session) {
+    final catalog = context.read<ModelCatalogProvider>();
+    final local = context.read<ModelLocalStateProvider>();
+    final internet = context.read<InternetProvider>();
+    final l10n = AppLocalizations.of(context)!;
+
+    final isCurrentlyOffline = session.selectedModel?.type == 'offline';
+
+    if (isCurrentlyOffline) {
+      if (!internet.isConnected) {
+        // Cannot switch to online without internet
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.noInternetConnection),
+            duration: const Duration(seconds: 2),
+            backgroundColor: AppColors.septenaryColor,
+          ),
+        );
+        return;
+      }
+      HapticFeedback.lightImpact();
+      catalog.startChatWithModel('cortex/auto');
+    } else {
+      final offlineModels = catalog.allModels.where((m) => m.type == 'offline');
+      final downloadedModels = offlineModels.where((m) {
+        final path = local.getFilePathById(m.id);
+        return local.isModelOnDisk(path);
+      }).toList();
+
+      if (downloadedModels.isEmpty) {
+        HapticFeedback.lightImpact();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Aktif indirdiğiniz model bulunmamaktadır"),
+            duration: const Duration(seconds: 2),
+            backgroundColor: AppColors.septenaryColor,
+          ),
+        );
+        return;
+      }
+
+      HapticFeedback.lightImpact();
+      catalog.startChatWithModel(downloadedModels.first.id);
+    }
   }
 
   // --- LOGIC: Start New Chat ---
@@ -159,6 +211,17 @@ class AppbarState extends State<Appbar> {
       // 1. Left Button: Sidebar Toggle
       onLeadingPressed: () => mainScreenKey.currentState?.toggleAxon(),
 
+      // Model Selection for Premium Users
+      leadingActions: isSubscribed
+          ? [
+              ModelSelectButton(
+                screenWidth: size.width,
+                isTablet: isTablet,
+                localizations: AppLocalizations.of(context)!,
+              )
+            ]
+          : null,
+
       // 2. Center: Premium / Claim Offer / Login Button (or empty)
       title: AnimatedSwitcher(
         duration: const Duration(milliseconds: 100),
@@ -187,9 +250,8 @@ class AppbarState extends State<Appbar> {
       // 3. Right Action: The Dual-Action Pill
       actionButton: DualActionPill(
         size: buttonSize,
-        // If chat is active, we go DUAL mode.
-        // If chat is empty, we go SINGLE mode (Flux Toggle).
-        isDual: isChatActive,
+        // Always dual mode now.
+        isDual: true,
 
         // --- MAIN ICON (Right Side) ---
         // If chat active -> New Chat Icon
@@ -226,18 +288,37 @@ class AppbarState extends State<Appbar> {
         },
 
         // --- SECONDARY ICON (Left Side) ---
-        // Only visible when isDual is true (Chat Active).
-        // This is the Share button.
-        secondaryIcon: SvgPicture.asset(
-          'assets/icons/world.svg',
-          width: iconSize - 2,
-          height: iconSize - 2,
-          colorFilter: ColorFilter.mode(
-            AppColors.primaryColor.inverted,
-            BlendMode.srcIn,
-          ),
-        ),
-        onSecondaryTap: () => _handleShare(context),
+        // If chat active -> Share button
+        // If chat empty -> Offline Mode Toggle
+        secondaryIcon: isChatActive
+            ? SvgPicture.asset(
+                'assets/icons/world.svg',
+                width: iconSize - 2,
+                height: iconSize - 2,
+                colorFilter: ColorFilter.mode(
+                  AppColors.primaryColor.inverted,
+                  BlendMode.srcIn,
+                ),
+              )
+            : SvgPicture.asset(
+                'assets/icons/storage.svg',
+                key: ValueKey('offline_${session.selectedModel?.type == 'offline'}'),
+                width: iconSize - 2,
+                height: iconSize - 2,
+                colorFilter: ColorFilter.mode(
+                  session.selectedModel?.type == 'offline'
+                      ? AppColors.primaryColor.inverted
+                      : AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                  BlendMode.srcIn,
+                ),
+              ),
+        onSecondaryTap: () {
+          if (isChatActive) {
+            _handleShare(context);
+          } else {
+            _handleOfflineModeToggle(context, session);
+          }
+        },
       ),
     );
   }
