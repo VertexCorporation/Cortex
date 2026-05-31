@@ -573,6 +573,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         localizations.benefit10,
         localizations.benefit11,
         localizations.benefit7,
+        localizations.benefitPremiumModels,
       ];
     } else if (planType == 'ultra') {
       benefits = [
@@ -584,6 +585,7 @@ class _SubscriptionContentWidgetState extends State<SubscriptionContentWidget>
         localizations.benefit10,
         localizations.benefit11,
         localizations.benefit7,
+        localizations.benefitPremiumModels,
       ];
     }
 

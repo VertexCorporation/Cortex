@@ -20,7 +20,7 @@ part 'attachments.dart';
 
 part 'field.dart';
 
-part 'tools.dart';
+
 
 part 'send.dart';
 
@@ -306,24 +306,47 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
           _updateHeight();
         });
 
-        final double radius = isTablet ? screenWidth * 0.025 : 16.0;
+        final double radius = isTablet ? screenWidth * 0.025 : 32.0;
 
-        return Container(
-          key: _inputFieldKey,
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(radius),
-              topRight: Radius.circular(radius),
-            ),
-            border:
-                Border(top: BorderSide(color: AppColors.border, width: 1.0)),
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+            screenWidth * 0.04,
+            0,
+            screenWidth * 0.04,
+            screenWidth * 0.04, // Bottom margin to make it float
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _AttachmentPreviewSection(
-                  screenWidth: screenWidth, isTablet: isTablet),
+          child: Container(
+            key: _inputFieldKey,
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(radius),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.currentTheme == 'light' 
+                      ? Colors.black.withOpacity(0.08)
+                      : Colors.black.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+                if (AppColors.currentTheme == 'light')
+                  BoxShadow(
+                    color: Colors.white.withOpacity(0.8),
+                    blurRadius: 20,
+                    offset: const Offset(0, -4),
+                  ),
+              ],
+              border: Border.all(
+                color: AppColors.border.withOpacity(0.5),
+                width: 0.5,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0), // Extra padding to make it bigger
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _AttachmentPreviewSection(
+                      screenWidth: screenWidth, isTablet: isTablet),
 
               // Main Animated Area
               AnimatedBuilder(
@@ -357,39 +380,35 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.only(
+                                          start: isTablet ? screenWidth * 0.02 : 12.0,
+                                        ),
+                                        child: AddPhotoButton(
+                                          isLimitExceeded: widget.isLimitExceeded,
+                                          isPhotoLoading: widget.isPhotoLoading,
+                                          localizations: widget.localizations,
+                                          controller: widget.controller,
+                                        ),
+                                      ),
                                       Expanded(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            _TextFieldSection(
-                                              key: const ValueKey('textfield'),
-                                              controller: widget.controller,
-                                              focusNode:
-                                                  widget.textFieldFocusNode,
-                                              localizations:
-                                                  widget.localizations,
-                                              screenWidth: screenWidth,
-                                              isTablet: isTablet,
-                                              showHintText: true,
-                                              onEnterPressed: () {
-                                                if (isSendButtonEnabled) {
-                                                  widget.onSend();
-                                                }
-                                              },
-                                            ),
-                                            _SequencedToolsTransition(
-                                              isVisible: true,
-                                              child: _ToolsSection(
-                                                screenWidth: screenWidth,
-                                                isTablet: isTablet,
-                                                isActionPermitted:
-                                                    isActionPermitted,
-                                                widget: widget,
-                                              ),
-                                            ),
-                                          ],
+                                        child: _TextFieldSection(
+                                          key: const ValueKey('textfield'),
+                                          controller: widget.controller,
+                                          focusNode:
+                                              widget.textFieldFocusNode,
+                                          localizations:
+                                              widget.localizations,
+                                          screenWidth: screenWidth,
+                                          isTablet: isTablet,
+                                          showHintText: true,
+                                          onEnterPressed: () {
+                                            if (isSendButtonEnabled) {
+                                              widget.onSend();
+                                            }
+                                          },
                                         ),
                                       ),
                                       Visibility(
@@ -429,15 +448,19 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
                         ),
 
                         // 3. MAIN ACTION BUTTON (PERSISTENT)
-                        Align(
-                          alignment: AlignmentDirectional.bottomEnd,
-                          child: _SendButtonSection(
-                            screenWidth: screenWidth,
-                            isTablet: isTablet,
-                            widget: widget,
-                            isEnabled: isSendButtonEnabled,
-                            isActionPermitted: isActionPermitted,
-                            controller: widget.controller,
+                        Positioned(
+                          top: 0,
+                          bottom: 0,
+                          right: 0,
+                          child: Center(
+                            child: _SendButtonSection(
+                              screenWidth: screenWidth,
+                              isTablet: isTablet,
+                              widget: widget,
+                              isEnabled: isSendButtonEnabled,
+                              isActionPermitted: isActionPermitted,
+                              controller: widget.controller,
+                            ),
                           ),
                         ),
                       ],
@@ -447,9 +470,11 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
               ),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
+  },
+);
   }
 
   void _updateHeight() {

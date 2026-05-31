@@ -14,6 +14,9 @@ import '../../../backend/data/entity.dart';
 import '../../../backend/data/service.dart';
 import '../../../providers/details.dart';
 import '../../../utils.dart';
+import '../../../../../server/user.dart';
+import '../../../../../navigation.dart';
+import '../../../../../login/upgrade.dart';
 
 //================================================================================
 // Section Widgets
@@ -546,6 +549,12 @@ class _BaseModelSelectionSectionState
             child: InkWell(
               onTap: () {
                 HapticFeedback.lightImpact();
+                final userProvider = context.read<UserProvider>();
+                if (variantId != 'cortex/auto' && !userProvider.isSubscriptionActive) {
+                  final target = const UpgradeAccountScreen(showLoginFirst: false);
+                  navigateToScreen(target, direction: const Offset(0.0, 1.0));
+                  return;
+                }
                 widget.provider.selectBaseModel(context, variantId);
               },
               borderRadius: BorderRadius.circular(screenWidth * 0.02),

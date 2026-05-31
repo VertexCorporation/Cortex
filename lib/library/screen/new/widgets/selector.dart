@@ -11,6 +11,10 @@ import '../../../../../theme.dart';
 import '../../../backend/data/entity.dart';
 import '../../../backend/data/service.dart';
 import '../../../utils.dart';
+import '../../../../../server/user.dart';
+import '../../../../../navigation.dart';
+import '../../../../../login/upgrade.dart';
+import '../../../../../funds/funds.dart';
 
 /// A widget for selecting a base model, used in the 'Create' (roleplay) screen.
 class BaseModelSelector extends StatefulWidget {
@@ -147,6 +151,11 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
           child: InkWell(
             onTap: () {
               HapticFeedback.lightImpact();
+              final userProvider = context.read<UserProvider>();
+              if (!userProvider.isSubscriptionActive) {
+                navigateToScreen(const FundsScreen(), direction: const Offset(0.0, 1.0));
+                return;
+              }
               widget.onTogglePanel();
             },
             borderRadius: BorderRadius.circular(borderRadius),
@@ -265,6 +274,12 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
         child: InkWell(
           onTap: () {
             HapticFeedback.lightImpact();
+            final userProvider = context.read<UserProvider>();
+            if (modelId != 'cortex/auto' && !userProvider.isSubscriptionActive) {
+              final target = const UpgradeAccountScreen(showLoginFirst: false);
+              navigateToScreen(target, direction: const Offset(0.0, 1.0));
+              return;
+            }
             widget.onSelectBaseModel(modelId, modelTitle);
           },
           splashFactory: NoSplash.splashFactory,

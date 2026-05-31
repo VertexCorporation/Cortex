@@ -1,11 +1,11 @@
 // lib/chat/providers/session.dart
 
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cortex/chat/services/limit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../library/backend/data/entity.dart';
 import '../../library/backend/data/service.dart';
@@ -475,6 +475,28 @@ class ChatSessionProvider with ChangeNotifier {
             prefs.getString('${_prefDefaultModelKey}_title') ?? '';
         _initializeWithStub(savedId, savedTitle);
         return;
+      }
+
+      // Check internet explicitly for offline fallback
+      final hasInternet = await InternetConnection().hasInternetAccess;
+      if (!hasInternet) {
+        // Find if we have any downloaded offline models
+        final allCachedModels = _modelService.getCachedModelsSync();
+        final offlineModels = allCachedModels.where((m) => m.type == 'offline');
+        final downloadedOfflineModels = offlineModels.where((m) {
+          final provider = _localStateProvider;
+          if (provider == null) return false;
+          final path = provider.getFilePathById(m.id);
+          return provider.isModelOnDisk(path);
+        }).toList();
+
+        if (downloadedOfflineModels.isNotEmpty) {
+          // If the user's saved model is NOT one of the downloaded offline models, override it
+          final isSavedModelDownloadedOffline = downloadedOfflineModels.any((m) => m.id == savedId);
+          if (!isSavedModelDownloadedOffline) {
+            savedId = downloadedOfflineModels.first.id;
+          }
+        }
       }
 
       if (!_modelService.hasModelInCache(savedId)) {

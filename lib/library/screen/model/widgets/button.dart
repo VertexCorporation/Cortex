@@ -11,6 +11,9 @@ import '../../../backend/utils.dart';
 import '../../../providers/details.dart';
 import '../../../providers/local.dart';
 import '../../models/widgets/cancel.dart';
+import '../../../../../server/user.dart';
+import '../../../../../navigation.dart';
+import '../../../../funds/funds.dart';
 
 /// The bottom navigation bar for the Model Detail screen, handling all user actions.
 ///
@@ -22,10 +25,24 @@ class BottomActionButtons extends StatelessWidget {
 
   /// A unified method to handle starting a chat and navigating away.
   void _startChat(BuildContext context, ModelDetailProvider provider) {
+    final userProvider = context.read<UserProvider>();
+    final bool isSubscribed = userProvider.isSubscriptionActive;
+
     // For offline series, use the selected variant ID instead of the parent series ID.
     final String chatModelId = provider.isOfflineSeries
         ? provider.selectedVariantId
         : provider.mainModel!.id;
+
+    // Enforce Premium Restriction for Online Models
+    final bool isRoleplay = provider.mainModel!.category == 'roleplay';
+    final bool isCortexAuto = chatModelId == 'cortex/auto';
+    final bool isPremiumOnlineModel = provider.mainModel!.isServerSide && !provider.mainModel!.isCustomModel && !isRoleplay && !isCortexAuto;
+
+    if (isPremiumOnlineModel && !isSubscribed) {
+      final target = const FundsScreen();
+      navigateToScreen(target, direction: const Offset(0.0, 1.0));
+      return;
+    }
 
     // filePath is only relevant for downloaded offline models.
     final filePath = !provider.mainModel!.isServerSide && provider.isDownloaded

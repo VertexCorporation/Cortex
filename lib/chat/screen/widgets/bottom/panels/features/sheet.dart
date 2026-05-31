@@ -19,15 +19,19 @@ import '../selection/sheet.dart';
 import 'button.dart';
 import '../../../../../../fog.dart';
 
-void showFeaturesSheet({
+import 'package:image_picker/image_picker.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:camera/camera.dart';
+import '../../input/service.dart';
+import '../attachments/button.dart';
+
+Future<void> showFeaturesSheet({
   required BuildContext context,
   required TextEditingController controller,
-}) {
+}) async {
   FocusScope.of(context).unfocus();
 
-  
-
-  showModalBottomSheet<void>(
+  await showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
@@ -61,10 +65,13 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
 
   @override
   Widget build(BuildContext context) {
-    
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final screenHeight = MediaQuery.sizeOf(context).height;
-    final double topRadius = MediaQuery.sizeOf(context).width * 0.07;
+    final double topRadius = screenWidth * 0.07;
+    final double contentHorizontalPadding = screenWidth * 0.05;
+    final double itemGap = screenWidth * 0.03;
     final l10n = AppLocalizations.of(context)!;
+    final inputService = InputService();
 
     final catalog = context.watch<ModelCatalogProvider>();
     final sessionProvider = context.watch<ChatSessionProvider>();
@@ -138,6 +145,107 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                         .bottom + 20),
                 child: Column(
                   children: [
+                    // --- ATTACHMENTS (Camera, Gallery, File) ---
+                    FutureBuilder<List<CameraDescription>>(
+                      future: availableCameras(),
+                      builder: (futureContext, snapshot) {
+                        final bool hasCamera = snapshot.hasData && snapshot.data!.isNotEmpty;
+                        final bool canHandleImages = sessionProvider.isDynamicChat ? true : sessionProvider.canHandleImage;
+                        final bool canHandleVideo = sessionProvider.isDynamicChat ? true : sessionProvider.canHandleVideo;
+                        final bool canHandleAudio = sessionProvider.isDynamicChat ? true : sessionProvider.canHandleAudio;
+
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          final double itemWidth = (screenWidth * 0.85) / 3;
+                          final double borderRadius = screenWidth * 0.04;
+
+                          return Padding(
+                            padding: EdgeInsets.symmetric(horizontal: contentHorizontalPadding),
+                            child: Shimmer.fromColors(
+                              baseColor: AppColors.shimmerBase,
+                              highlightColor: AppColors.shimmerHighlight,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: List.generate(3, (index) {
+                                  return Container(
+                                    width: itemWidth,
+                                    height: itemWidth,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.shimmerBase,
+                                      borderRadius: BorderRadius.circular(borderRadius),
+                                    ),
+                                  );
+                                }),
+                              ),
+                            ),
+                          );
+                        }
+
+                        return Padding(
+                          padding: EdgeInsets.symmetric(horizontal: contentHorizontalPadding, vertical: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (hasCamera && (canHandleImages || canHandleVideo)) ...[
+                                Expanded(
+                                  child: AttachmentSheetButton(
+                                    iconPath: 'assets/icons/camera.svg',
+                                    label: l10n.actionCamera,
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      inputService.pickMediaAction(
+                                        context,
+                                        source: ImageSource.camera,
+                                        supportImage: canHandleImages,
+                                        supportVideo: canHandleVideo,
+                                        onSelectionComplete: () {},
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: itemGap),
+                              ],
+                              if (canHandleImages || canHandleVideo) ...[
+                                Expanded(
+                                  child: AttachmentSheetButton(
+                                    iconPath: 'assets/icons/gallery.svg',
+                                    label: l10n.actionGallery,
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      inputService.pickMediaAction(
+                                        context,
+                                        source: ImageSource.gallery,
+                                        supportImage: canHandleImages,
+                                        supportVideo: canHandleVideo,
+                                        onSelectionComplete: () {},
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: itemGap),
+                              ],
+                              Expanded(
+                                child: AttachmentSheetButton(
+                                  iconPath: 'assets/icons/attachment.svg',
+                                  label: l10n.actionFile,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    inputService.pickFile(
+                                      context,
+                                      canHandleAudio: canHandleAudio,
+                                      canHandleVideo: canHandleVideo,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16.0),
+                    // --- /ATTACHMENTS ---
+
                     // 1. USE OFFLINE
                     FeaturesSheetButton(
                       iconPath: 'assets/icons/context.svg',
