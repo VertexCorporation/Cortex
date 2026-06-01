@@ -181,7 +181,10 @@ class LibraryScreenState extends State<LibraryScreen>
   Future<void> _handleChatPress(String id) async {
     try {
       final model = _catalogProvider!.allModels.firstWhere((m) => m.id == id);
-      if (model.isServerSide && !model.isCustomModel && id != 'cortex/auto') {
+      final bool isPremiumModel = (model.isServerSide && !model.isCustomModel && id != 'cortex/auto') ||
+                                  (model.category == 'roleplay' && !model.isCustomModel);
+                                  
+      if (isPremiumModel) {
         final userProvider = context.read<UserProvider>();
         if (!userProvider.isSubscriptionActive) {
           HapticFeedback.lightImpact();

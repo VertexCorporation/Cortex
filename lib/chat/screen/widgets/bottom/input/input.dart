@@ -323,25 +323,26 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
               boxShadow: [
                 BoxShadow(
                   color: AppColors.currentTheme == 'light' 
-                      ? Colors.black.withOpacity(0.08)
-                      : Colors.black.withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+                      ? Colors.black.withValues(alpha: 0.1)
+                      : Colors.black.withValues(alpha: 0.6),
+                  blurRadius: 15,
+                  offset: const Offset(5, 5),
                 ),
-                if (AppColors.currentTheme == 'light')
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.8),
-                    blurRadius: 20,
-                    offset: const Offset(0, -4),
-                  ),
+                BoxShadow(
+                  color: AppColors.currentTheme == 'light'
+                      ? Colors.white
+                      : Colors.white.withValues(alpha: 0.05),
+                  blurRadius: 15,
+                  offset: const Offset(-5, -5),
+                ),
               ],
               border: Border.all(
-                color: AppColors.border.withOpacity(0.5),
+                color: AppColors.border.withValues(alpha: 0.5),
                 width: 0.5,
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0), // Extra padding to make it bigger
+              padding: const EdgeInsets.symmetric(vertical: 8.0), // Extra padding to make it bigger
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

@@ -314,27 +314,9 @@ class ModelDownloadController {
             ..setProgress(task.progress.toDouble());
           needsUIRefresh = true;
 
-          // Zombie Task Detection: If the OS brutally killed the background worker,
-          // the DB might still report 'running' indefinitely. We verify it by checking
-          // if it makes any progress within the next 8 seconds after resume.
-          if (!isFreshStart) {
-            final int initialProgress = task.progress;
-            Future.delayed(const Duration(seconds: 8), () async {
-              if (effectiveManager.isDownloading &&
-                  effectiveManager.progress.toInt() == initialProgress) {
-                // Still downloading but ZERO progress updates in 8 seconds after resume?
-                // Highly likely a zombie task killed by OS restrictions.
-                debugPrint(
-                    "[DownloadController] Zombie Task Detected: '${task.taskId}' for model '$id' hasn't progressed since resume. Canceling to reset state.");
-                await FlutterDownloader.cancel(taskId: task.taskId);
-                effectiveManager
-                  ..setDownloading(false)
-                  ..setPaused(false)
-                  ..setProgress(0);
-                onStateChange();
-              }
-            });
-          }
+          // Removed overly aggressive zombie task detection here.
+          // It was causing large models on slower networks to be automatically
+          // cancelled because they didn't progress by a full 1% within 8 seconds.
           break;
 
         case DownloadTaskStatus.paused:
