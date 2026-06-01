@@ -299,53 +299,56 @@ class ChatViewState extends State<ChatView>
         AnimatedBuilder(
           animation: bottomPanelHeightNotifier,
           builder: (context, child) {
+            final bottomPadding = bottomPanelHeightNotifier.value + bottomSafe;
             return Positioned(
               top: 0,
               left: 0,
               right: 0,
-              bottom: bottomPanelHeightNotifier.value + bottomSafe,
-              child: child!,
+              bottom: 0,
+              child: AnimatedScale(
+                scale: isVoiceModeActive ? 0.5 : 1.0,
+                duration: const Duration(milliseconds: 300),
+                curve: isVoiceModeActive ? Curves.easeInBack : Curves.easeOutCubic,
+                child: AnimatedOpacity(
+                  opacity: isVoiceModeActive ? 0.0 : 1.0,
+                  duration: const Duration(milliseconds: 300),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 600),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    layoutBuilder:
+                        (Widget? currentChild, List<Widget> previousChildren) {
+                      return Stack(
+                        alignment: Alignment.topCenter,
+                        children: <Widget>[
+                          ...previousChildren,
+                          if (currentChild != null) currentChild,
+                        ],
+                      );
+                    },
+                    transitionBuilder: (Widget child, Animation<double> animation) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                    child: isLoadingMessages
+                        ? const MessageListSkeleton(key: ValueKey('skeleton'))
+                        : isMessagesEmpty
+                            ? Container(
+                                key: const ValueKey('empty'),
+                                child: ChatEmptyState(
+                                  bottomPadding: bottomPadding,
+                                ),
+                              )
+                            : ChatMessageList(
+                                key: const ValueKey('list'),
+                                scrollController: scrollController,
+                                editService: editService,
+                                bottomPadding: bottomPadding,
+                              ),
+                  ),
+                ),
+              ),
             );
           },
-          child: AnimatedScale(
-            scale: isVoiceModeActive ? 0.5 : 1.0,
-            duration: const Duration(milliseconds: 300),
-            curve: isVoiceModeActive ? Curves.easeInBack : Curves.easeOutCubic,
-            child: AnimatedOpacity(
-              opacity: isVoiceModeActive ? 0.0 : 1.0,
-              duration: const Duration(milliseconds: 300),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 600),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                layoutBuilder:
-                    (Widget? currentChild, List<Widget> previousChildren) {
-                  return Stack(
-                    alignment: Alignment.topCenter,
-                    children: <Widget>[
-                      ...previousChildren,
-                      if (currentChild != null) currentChild,
-                    ],
-                  );
-                },
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-                child: isLoadingMessages
-                    ? const MessageListSkeleton(key: ValueKey('skeleton'))
-                    : isMessagesEmpty
-                        ? Container(
-                            key: const ValueKey('empty'),
-                            child: const ChatEmptyState(),
-                          )
-                        : ChatMessageList(
-                            key: const ValueKey('list'),
-                            scrollController: scrollController,
-                            editService: editService,
-                          ),
-              ),
-            ),
-          ),
         ),
 
         // Bottom Panel (Slides Down)

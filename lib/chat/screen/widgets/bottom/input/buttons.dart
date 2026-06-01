@@ -447,7 +447,7 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
 
     final bool isMaxAttachments = inputProvider.attachments.length >= 9;
     final bool buttonDisabled = widget.isLimitExceeded || (widget.isPhotoLoading && isMaxAttachments);
-    final double size = 42.0;
+    final double size = 46.0;
 
     return GestureDetector(
       onTap: buttonDisabled || widget.isPhotoLoading
@@ -474,8 +474,8 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
         ),
         child: Center(
           child: AnimatedRotation(
-            turns: _isOpened ? 0.375 : 0.0,
-            duration: const Duration(milliseconds: 250),
+            turns: _isOpened ? 1.375 : 0.0, // Cooler animation with extra rotation
+            duration: const Duration(milliseconds: 350), // slightly longer for the extra spin
             curve: Curves.easeInOutCubic,
             child: TweenAnimationBuilder<Color?>(
               duration: const Duration(milliseconds: 200),
@@ -484,8 +484,8 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
               builder: (context, color, child) {
                 return SvgPicture.asset(
                   'assets/icons/add.svg',
-                  width: 24.0,
-                  height: 24.0,
+                  width: 26.0,
+                  height: 26.0,
                   colorFilter: ColorFilter.mode(color ?? iconColor, BlendMode.srcIn),
                 );
               },

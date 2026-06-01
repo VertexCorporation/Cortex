@@ -144,62 +144,42 @@ class _BaseModelSelectorState extends State<BaseModelSelector> {
                 TextStyle(color: AppColors.quinaryColor, fontSize: descSize)),
         SizedBox(height: screenWidth * 0.04),
 
-        // --- Selection Button ---
+        // --- Selection Button (Fixed to Cortex) ---
         Material(
-          color: AppColors.secondaryColor,
+          color: AppColors.secondaryColor.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(borderRadius),
-          child: InkWell(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              final userProvider = context.read<UserProvider>();
-              if (!userProvider.isSubscriptionActive) {
-                navigateToScreen(const FundsScreen(), direction: const Offset(0.0, 1.0));
-                return;
-              }
-              widget.onTogglePanel();
-            },
-            borderRadius: BorderRadius.circular(borderRadius),
-            splashFactory: NoSplash.splashFactory,
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: paddingH, vertical: paddingV),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.selectedBaseModelDisplayTitle ??
-                          localizations.selectBaseModel,
-                      style: TextStyle(
-                          color: AppColors.primaryColor.inverted,
-                          fontSize: textSize),
-                      overflow: TextOverflow.ellipsis,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: paddingH, vertical: paddingV),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.selectedBaseModelDisplayTitle ??
+                        localizations.selectBaseModel,
+                    style: TextStyle(
+                        color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                        fontSize: textSize),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (isCurrentlySelectedPremium)
+                  Padding(
+                    padding: EdgeInsets.only(
+                        right: isTablet ? 12.0 : screenWidth * 0.02),
+                    child: SvgPicture.asset(
+                      'assets/icons/sparkle.svg',
+                      width: iconSize,
+                      colorFilter: ColorFilter.mode(
+                          AppColors.primaryColor.inverted
+                              .withValues(alpha: 0.5),
+                          BlendMode.srcIn),
                     ),
                   ),
-                  if (isCurrentlySelectedPremium)
-                    Padding(
-                      padding: EdgeInsets.only(
-                          right: isTablet ? 12.0 : screenWidth * 0.02),
-                      child: SvgPicture.asset(
-                        'assets/icons/sparkle.svg',
-                        width: iconSize,
-                        colorFilter: ColorFilter.mode(
-                            AppColors.primaryColor.inverted
-                                .withValues(alpha: 0.8),
-                            BlendMode.srcIn),
-                      ),
-                    ),
-                  AnimatedRotation(
-                    turns: widget.isPanelExpanded ? 0.5 : 0.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Icon(Icons.keyboard_arrow_down,
-                        color: AppColors.primaryColor.inverted,
-                        size: isTablet ? 32 : screenWidth * 0.06),
-                  ),
-                ],
-              ),
+                Icon(Icons.lock_outline,
+                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                    size: isTablet ? 24 : screenWidth * 0.05),
+              ],
             ),
           ),
         ),

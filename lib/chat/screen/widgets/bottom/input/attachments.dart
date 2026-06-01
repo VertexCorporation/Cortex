@@ -123,26 +123,26 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
               _AttachmentItem(attachment: attachment, size: widget.itemSize),
               if (!isRemoving)
                 Positioned(
-                  top: 2,
-                  right: -6,
+                  top: widget.itemSize * 0.1,
+                  right: 4,
                   child: GestureDetector(
                     onTap: () => widget.onRemove(index),
                     child: Container(
-                      padding: const EdgeInsets.all(4.0),
+                      padding: const EdgeInsets.all(6.0),
                       decoration: const BoxDecoration(
-                        color: Colors.black87,
+                        color: Colors.white,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                              color: Colors.black38,
+                              color: Colors.black26,
                               blurRadius: 4,
-                              offset: Offset(0, 1))
+                              offset: Offset(0, 2))
                         ],
                       ),
                       child: const Icon(
                         Icons.close_rounded,
-                        size: 14,
-                        color: Colors.white,
+                        size: 16,
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -165,26 +165,24 @@ class _AttachmentListWithFogState extends State<_AttachmentListWithFog> {
             ? widget.itemSize + (widget.padding * 2)
             : 0,
         width: double.infinity,
-        child: widget.attachments.isNotEmpty
-            ? ScrollFogHorizontal(
-                scrollController: _scrollController,
-                child: AnimatedList(
-                  key: _listKey,
-                  controller: _scrollController,
-                  clipBehavior: Clip.none,
-                  scrollDirection: Axis.horizontal,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: widget.padding, vertical: widget.padding),
-                  initialItemCount: _displayedItems.length,
-                  itemBuilder: (context, index, animation) {
-                    if (index >= _displayedItems.length) {
-                      return const SizedBox.shrink();
-                    }
-                    return _buildItem(_displayedItems[index], animation, index);
-                  },
-                ),
-              )
-            : const SizedBox.shrink(),
+        child: ScrollFogHorizontal(
+          scrollController: _scrollController,
+          child: AnimatedList(
+            key: _listKey,
+            controller: _scrollController,
+            clipBehavior: Clip.none,
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(
+                horizontal: widget.padding, vertical: widget.padding),
+            initialItemCount: _displayedItems.length,
+            itemBuilder: (context, index, animation) {
+              if (index >= _displayedItems.length) {
+                return const SizedBox.shrink();
+              }
+              return _buildItem(_displayedItems[index], animation, index);
+            },
+          ),
+        ),
       ),
     );
   }
@@ -199,15 +197,23 @@ class _AttachmentItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (attachment.type == AttachmentType.image) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
-        child: Image.file(
-          attachment.file,
-          width: size,
-          height: size,
-          fit: BoxFit.cover,
-          errorBuilder: (ctx, err, stack) =>
-              Icon(Icons.broken_image, color: AppColors.tertiaryColor),
+      return Container(
+        width: size * 2.0, // Make it pill shaped (wider)
+        height: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100.0), // Fully rounded pill
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.2), width: 1.0),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(100.0),
+          child: Image.file(
+            attachment.file,
+            width: size * 2.0,
+            height: size,
+            fit: BoxFit.cover,
+            errorBuilder: (ctx, err, stack) =>
+                Icon(Icons.broken_image, color: AppColors.tertiaryColor),
+          ),
         ),
       );
     } else {

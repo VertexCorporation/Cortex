@@ -298,8 +298,9 @@ class Tiles {
     final bool isTablet = screenWidth >= 600;
 
     // Dynamic sizing for items
-    final double imageSize = isTablet ? screenWidth * 0.3 : screenWidth * 0.4;
-    final double borderRadius = isTablet ? screenWidth * 0.015 : 12.0;      final int decodeCacheSize = (imageSize * MediaQuery.devicePixelRatioOf(context)).toInt();
+    final double imageSize = isTablet ? screenWidth * 0.15 : screenWidth * 0.25;
+    final double borderRadius = isTablet ? screenWidth * 0.015 : 24.0;
+    final int decodeCacheSize = (imageSize * MediaQuery.devicePixelRatioOf(context)).toInt();
     return Wrap(
       key: key,
       alignment: isUser ? WrapAlignment.end : WrapAlignment.start,

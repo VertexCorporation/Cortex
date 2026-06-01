@@ -59,14 +59,15 @@ class InputService {
       required bool supportImage,
       required bool supportVideo,
       required VoidCallback onSelectionComplete}) async {
+    final inputProvider = context.read<InputProvider>();
     // 1. Check Attachment Limit before opening camera/gallery
-    if (!_canAddMoreAttachments(context)) return;
+    if (!_canAddMoreAttachments(inputProvider)) return;
 
     try {
       if (source == ImageSource.gallery) {
         List<XFile> pickedFiles = [];
-        if (supportImage && supportVideo) {
-          pickedFiles = await _imagePicker.pickMultipleMedia(
+        if (supportImage) {
+          pickedFiles = await _imagePicker.pickMultiImage(
             imageQuality: 80,
             maxWidth: 1920,
             maxHeight: 1920,
@@ -74,26 +75,19 @@ class InputService {
         } else if (supportVideo) {
           final XFile? file = await _imagePicker.pickVideo(source: source);
           if (file != null) pickedFiles.add(file);
-        } else {
-          pickedFiles = await _imagePicker.pickMultiImage(
-            imageQuality: 80,
-            maxWidth: 1920,
-            maxHeight: 1920,
-          );
         }
 
         if (pickedFiles.isEmpty) return;
 
         for (final pickedFile in pickedFiles) {
-          if (!context.mounted) return;
-          if (!_canAddMoreAttachments(context)) break;
+          if (!_canAddMoreAttachments(inputProvider)) break;
 
           final File file = File(pickedFile.path);
           final String pathLower = file.path.toLowerCase();
           final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
               .any((ext) => pathLower.endsWith(ext));
 
-          await _validateAndAddAttachment(context, file, isImage: isImage);
+          await _validateAndAddAttachment(inputProvider, file, isImage: isImage);
         }
       } else {
         XFile? pickedFile;
@@ -110,14 +104,13 @@ class InputService {
         }
 
         if (pickedFile == null) return;
-        if (!context.mounted) return;
 
         final File file = File(pickedFile.path);
         final String pathLower = file.path.toLowerCase();
         final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
             .any((ext) => pathLower.endsWith(ext));
 
-        await _validateAndAddAttachment(context, file, isImage: isImage);
+        await _validateAndAddAttachment(inputProvider, file, isImage: isImage);
       }
 
       onSelectionComplete();
@@ -130,8 +123,9 @@ class InputService {
 
   Future<void> pickFile(BuildContext context,
       {bool canHandleAudio = false, bool canHandleVideo = false}) async {
+    final inputProvider = context.read<InputProvider>();
     // 1. Check Attachment Limit
-    if (!_canAddMoreAttachments(context)) return;
+    if (!_canAddMoreAttachments(inputProvider)) return;
 
     final dynamicExtensions = List<String>.from(_allowedExtensions);
     if (canHandleAudio) {
@@ -151,22 +145,19 @@ class InputService {
 
       if (result == null || result.files.isEmpty) return;
 
-      if (!context.mounted) return;
-
       // 3. Process each selected file
       // We loop through them to validate limits individually.
       for (final platformFile in result.files) {
-        if (!context.mounted) return;
         if (platformFile.path == null) continue;
 
         // Stop if user tries to add more than the limit in a batch
-        if (!_canAddMoreAttachments(context)) break;
+        if (!_canAddMoreAttachments(inputProvider)) break;
 
         final File file = File(platformFile.path!);
         final String pathLower = file.path.toLowerCase();
         final bool isImage = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
             .any((ext) => pathLower.endsWith(ext));
-        await _validateAndAddAttachment(context, file, isImage: isImage);
+        await _validateAndAddAttachment(inputProvider, file, isImage: isImage);
       }
     } catch (e) {
       debugPrint("Error picking file: $e");
@@ -176,9 +167,7 @@ class InputService {
   // --- Helper: Validation & State Update ---
 
   /// Checks if the user has reached the maximum number of attachments (4).
-  bool _canAddMoreAttachments(BuildContext context) {
-    final inputProvider = context.read<InputProvider>();
-    // Assuming InputProvider has an 'attachments' list getter
+  bool _canAddMoreAttachments(InputProvider inputProvider) {
     if (inputProvider.attachments.length >= _maxAttachmentCount) {
       // Optional: Show a toast/snackbar here telling the user "Max 4 files".
       debugPrint("Attachment limit reached ($_maxAttachmentCount).");
@@ -188,7 +177,7 @@ class InputService {
   }
 
   /// Validates file size and adds it to the provider if safe.
-  Future<void> _validateAndAddAttachment(BuildContext context, File file,
+  Future<void> _validateAndAddAttachment(InputProvider inputProvider, File file,
       {required bool isImage}) async {
     try {
       // Async operation: Get file size
@@ -205,16 +194,9 @@ class InputService {
       }
 
       // Add to provider
-      if (context.mounted) {
-        debugPrint(
-            "InputService: File validated. Adding to provider: ${file.path}");
-        // Assuming InputProvider has an 'addAttachment' method.
-        // We handle both images and docs as generic attachments now.
-        context.read<InputProvider>().addAttachment(file, isImage: isImage);
-      } else {
-        debugPrint(
-            "InputService: Context not mounted after validation. Skipped.");
-      }
+      debugPrint(
+          "InputService: File validated. Adding to provider: ${file.path}");
+      inputProvider.addAttachment(file, isImage: isImage);
     } catch (e) {
       debugPrint("Error validating file: $e");
     }
