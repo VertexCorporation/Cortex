@@ -956,23 +956,45 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           // ~60 rebuilds per keyboard animation. resizeToAvoidBottomInset
                           // is already false; scroll button reads keyboard height in its
                           // own isolated AnimatedBuilder (view.dart:370).
-                          child: Stack(
-                            children: [
-                              child!,
-                              Align(
-                                alignment: isRtl
-                                    ? Alignment.centerRight
-                                    : Alignment.centerLeft,
-                                child: Container(
-                                  width: 1.0,
-                                  height: (screenHeight * 0.6) * rawValue,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: gradientColors,
-                                      stops: const [0.0, 0.3, 0.7, 1.0],
-                                    ),
+                          child: Column(
+              children: [
+                Expanded(
+                  child: Stack(
+                    children: [
+                      child!,
+                      Align(
+                        alignment: isRtl
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: Container(
+                          width: 1.0,
+                          height: (screenHeight * 0.6) * rawValue,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: gradientColors,
+                              stops: const [0.0, 0.3, 0.7, 1.0],
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (rawValue > 0 && searchValue == 0)
+                        GestureDetector(
+                          onTap: closeAxon,
+                          behavior: HitTestBehavior.translucent,
+                          child: Container(
+                            color: Colors.transparent,
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                _buildBottomNavigationBar(context),
+              ],
+            ),
                                   ),
                                 ),
                               ),
@@ -996,6 +1018,138 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+
+  void _onTabTapped(int index) {
+    switch (index) {
+      case 0:
+        _updateCurrentView(MainScreenView.chat);
+        break;
+      case 1:
+        switchToLibrary();
+        break;
+      case 2:
+        openNewsScreen();
+        break;
+      case 3:
+        switchToCreate();
+        break;
+      case 4:
+        openArtsScreen();
+        break;
+    }
+  }
+
+  Widget _buildBottomNavigationBar(BuildContext context) {
+    final bool isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
+    if (isKeyboardOpen) {
+      return const SizedBox.shrink();
+    }
+
+    final localizations = AppLocalizations.of(context)!;
+    final tabIndex = _getCurrentViewIndex();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        border: Border(
+          top: BorderSide(
+            color: AppColors.border.withValues(alpha: 0.4),
+            width: 0.8,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Container(
+          height: 60,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildBottomNavItem(
+                icon: Icons.chat_bubble_outline_rounded,
+                activeIcon: Icons.chat_bubble_rounded,
+                label: localizations.chat,
+                isActive: tabIndex == 0,
+                onTap: () => _onTabTapped(0),
+              ),
+              _buildBottomNavItem(
+                icon: Icons.local_library_outlined,
+                activeIcon: Icons.local_library_rounded,
+                label: localizations.library,
+                isActive: tabIndex == 1,
+                onTap: () => _onTabTapped(1),
+              ),
+              _buildBottomNavItem(
+                icon: Icons.newspaper_outlined,
+                activeIcon: Icons.newspaper_rounded,
+                label: localizations.news,
+                isActive: tabIndex == 2,
+                onTap: () => _onTabTapped(2),
+              ),
+              _buildBottomNavItem(
+                icon: Icons.auto_awesome_outlined,
+                activeIcon: Icons.auto_awesome_rounded,
+                label: localizations.createAI,
+                isActive: tabIndex == 3,
+                onTap: () => _onTabTapped(3),
+              ),
+              _buildBottomNavItem(
+                icon: Icons.palette_outlined,
+                activeIcon: Icons.palette_rounded,
+                label: localizations.arts,
+                isActive: tabIndex == 4,
+                onTap: () => _onTabTapped(4),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavItem({
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    final activeColor = AppColors.primaryColor.inverted;
+    final inactiveColor = AppColors.tertiaryColor;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isActive ? activeIcon : icon,
+              color: isActive ? activeColor : inactiveColor,
+              size: 22,
+            ),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                color: isActive ? activeColor : inactiveColor,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -323,13 +323,114 @@ class _PersonalizationSectionState extends State<PersonalizationSection> {
                     ),
                   ),
                 ),
-                secondChild: const SizedBox(width: double.infinity, height: 0),
-              ),
-            ],
-          ),
+ secondChild: const SizedBox(width: double.infinity, height: 0),
+ ),
+ Container(
+  margin: EdgeInsets.only(top: 14 * scale),
+  padding: EdgeInsets.all(12 * scale),
+  decoration: BoxDecoration(
+   color: AppColors.background.withValues(alpha: 0.5),
+   borderRadius: BorderRadius.circular(8 * scale),
+   border: Border.all(
+    color: AppColors.quinaryColor.withValues(alpha: 0.2),
+    width: 0.5,
+   ),
+  ),
+  child: Column(
+   crossAxisAlignment: CrossAxisAlignment.start,
+   children: [
+    Row(
+     children: [
+      Icon(
+       Icons.memory_outlined,
+       color: AppColors.septenaryColor,
+       size: 16 * scale,
+      ),
+      SizedBox(width: 8 * scale),
+      Expanded(
+       child: Text(
+        "Hiyerarşik Semantik Bellek (MemGPT)",
+        style: TextStyle(
+         color: AppColors.primaryColor.inverted,
+         fontSize: 12 * scale,
+         fontWeight: FontWeight.bold,
         ),
+       ),
+      ),
+     ],
+    ),
+    SizedBox(height: 8 * scale),
+    Text(
+     "Sohbet geçmişinin tamamı gönderilmez. Sistem; Kısa Süreli Bellek (aktif bağlam), Epizodik Bellek (son olaylar) ve Semantik Bellek (kalıcı bilgi tabanı - Vector DB) olarak üçe ayrılır. Yapay zeka, bilgiye ihtiyaç duyduğunda yerel bir veritabanından sadece ilgili semantik vektörleri çeker.",
+     style: TextStyle(
+      color: AppColors.primaryColor.inverted.withValues(alpha: 0.8),
+      fontSize: 11.5 * scale,
+      height: 1.4,
+     ),
+    ),
+    SizedBox(height: 12 * scale),
+    Row(
+     crossAxisAlignment: CrossAxisAlignment.start,
+     children: [
+      Expanded(
+       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+         Text(
+          "Token & Maliyet Tasarrufu",
+          style: TextStyle(
+           color: AppColors.quinaryColor,
+           fontSize: 10 * scale,
+           fontWeight: FontWeight.w600,
+          ),
+         ),
+         SizedBox(height: 4 * scale),
+         Text(
+          "%70 - %90 Tasarruf. 100 sayfalık sohbet geçmişi yerine sadece o anki konuyu ilgilendiren 2-3 paragraf gönderilir.",
+          style: TextStyle(
+           color: AppColors.primaryColor.inverted.withValues(alpha: 0.75),
+           fontSize: 10.5 * scale,
+           height: 1.35,
+          ),
+         ),
+        ],
+       ),
+      ),
+      SizedBox(width: 12 * scale),
+      Expanded(
+       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+         Text(
+          "Düşünme & Hız Avantajı",
+          style: TextStyle(
+           color: AppColors.quinaryColor,
+           fontSize: 10 * scale,
+           fontWeight: FontWeight.w600,
+          ),
+         ),
+         SizedBox(height: 4 * scale),
+         Text(
+          "Modelin bağlamı şişmediği için dikkati dağılmaz, aylar önceki konuşmaları dahi tutarlı bir şekilde hatırlar.",
+          style: TextStyle(
+           color: AppColors.primaryColor.inverted.withValues(alpha: 0.75),
+           fontSize: 10.5 * scale,
+           height: 1.35,
+          ),
+         ),
+        ],
+       ),
+      ),
+     ],
+    ),
+   ],
+  ),
+ ),
+ ],
+ ),
+ ),
 
-        SizedBox(height: 12 * scale),
+ SizedBox(height: 12 * scale),
 
         // --- Intelligence Panel ---
         _buildPanel(

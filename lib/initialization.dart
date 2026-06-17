@@ -112,11 +112,17 @@ class AppInitializer with ChangeNotifier {
 
   void setRegistrationStatus(bool isRegistering) {
     _isRegistering = isRegistering;
+    if (!isRegistering) {
+      _runInBackground(_determineUserFlow);
+    }
   }
 
   /// Flag used to indicate a deliberate sign-out is in progress. This prevents
   /// the offline check from blocking a user-initiated sign-out.
   bool _isSigningOut = false;
+
+  /// Mutex to prevent concurrent _determineUserFlow() executions.
+  bool _isDeterminingFlow = false;
 
   /// Flag used to follow post startup tasks.
   bool _isPostStartupTasksRunning = false;
@@ -145,17 +151,21 @@ class AppInitializer with ChangeNotifier {
   }
 
   void _updateStatus(AppStatus newStatus) {
-    if (_status != newStatus) {
+    final bool statusChanged = _status != newStatus;
+    if (statusChanged) {
       _status = newStatus;
       debugPrint("AppInitializer: Status changed to $_status");
+    }
 
-      if (_status == AppStatus.ready &&
-          !_coreServicesReadyCompleter.isCompleted) {
-        debugPrint(
-            "[AppInitializer] Status became READY via flow change. Triggering post-startup tasks.");
-        _runInBackground(_performPostStartupTasks);
-      }
+    if (_status == AppStatus.ready &&
+        !_isPostStartupTasksRunning &&
+        !_coreServicesReadyCompleter.isCompleted) {
+      debugPrint(
+          "[AppInitializer] Status became READY. Triggering post-startup tasks.");
+      _runInBackground(_performPostStartupTasks);
+    }
 
+    if (statusChanged) {
       notifyListeners();
     }
   }
@@ -212,7 +222,6 @@ class AppInitializer with ChangeNotifier {
       dev.log(
           "[AppInitializer] User exists locally. UI will render. Scheduling background tasks.");
       _listenToAuthStateChanges();
-      _runInBackground(_performPostStartupTasks);
     } else {
       _listenToAuthStateChanges();
       if (_status != AppStatus.initializing) {
@@ -523,6 +532,12 @@ class AppInitializer with ChangeNotifier {
       }
 
       if (user == null) {
+        if (_isSigningOut) {
+          debugPrint(
+            'Auth State Listener: Sign-out in progress. Ignoring null user event.',
+          );
+          return;
+        }
         debugPrint(
           'Auth State Listener: User signed out. Disposing credits listener and clearing user data.',
         );
@@ -535,7 +550,6 @@ class AppInitializer with ChangeNotifier {
         debugPrint(
           'Auth State Listener: User signed in. Initializing credits and user data listeners.',
         );
-        await _registerAnonymousEntitlement(user);
         if (FirebaseAuth.instance.currentUser?.uid != user.uid) {
           debugPrint(
               'Auth State Listener: Ignoring stale signed-in event for ${user.uid}.');
@@ -620,7 +634,13 @@ class AppInitializer with ChangeNotifier {
       _modelService.clearAllCache();
       CacheService.clearAll();
 
-      await const FlutterSecureStorage().deleteAll();
+      // Only delete auth-related keys, not the entire secure storage
+      const secureStorage = FlutterSecureStorage();
+      await Future.wait([
+        secureStorage.delete(key: 'email'),
+        secureStorage.delete(key: 'password'),
+        secureStorage.delete(key: 'remember_me'),
+      ]);
       await _extrovertNotificationService.clearUserTokenOnSignOut();
       await FileDownloadHelper().cancelAllPendingDownloads();
 
@@ -707,6 +727,12 @@ class AppInitializer with ChangeNotifier {
   /// This version is "BULLETPROOF". It prioritizes keeping the user IN the app
   /// over strict server validation during unstable network conditions.
   Future<void> _determineUserFlow() async {
+    if (_isDeterminingFlow) {
+      dev.log("[AppInitializer] _determineUserFlow already running. Skipping.");
+      return;
+    }
+    _isDeterminingFlow = true;
+    try {
     // 1. Initial Connectivity Check
     // If we are definitely offline, trust the local cache immediately.
     if (!_internetProvider.isConnected) {
@@ -922,6 +948,8 @@ class AppInitializer with ChangeNotifier {
             .recordError(e, s, reason: "AuthFlow_SystemError");
         await signOut();
       }
+    } finally {
+      _isDeterminingFlow = false;
     }
   }
 
@@ -995,9 +1023,13 @@ class AppInitializer with ChangeNotifier {
     } catch (e) {
       debugPrint(
         'Startup: Auto-login failed (credentials might be outdated). '
-        'Clearing secure storage. Error: $e',
+        'Clearing auth-related keys. Error: $e',
       );
-      await secureStorage.deleteAll();
+      await Future.wait([
+        secureStorage.delete(key: 'email'),
+        secureStorage.delete(key: 'password'),
+        secureStorage.delete(key: 'remember_me'),
+      ]);
     }
 
     return null;

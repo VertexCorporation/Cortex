@@ -11,7 +11,7 @@ class DbHelper {
   DbHelper._internal();
 
   Database? _db;
-  static const int _latestVersion = 8; // Define the latest version here
+  static const int _latestVersion = 9; // Define the latest version here
 
   Future<Database> get db async {
     if (_db != null) return _db!;
@@ -68,6 +68,16 @@ class DbHelper {
         last_used   INTEGER
       );
     ''');
+ await d.execute('''
+ CREATE TABLE semantic_memories (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ category TEXT,
+ key_phrase TEXT UNIQUE,
+ content TEXT,
+ created_at INTEGER,
+ importance INTEGER DEFAULT 3
+ );
+ ''');
   }
 
   // This function is called when a user with an OLDER database version opens the app.
@@ -116,6 +126,18 @@ class DbHelper {
           batch.execute(
               "ALTER TABLE conversations ADD COLUMN modelImagePath TEXT DEFAULT '';");
           break;
+ case 9:
+ batch.execute('''
+ CREATE TABLE semantic_memories (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ category TEXT,
+ key_phrase TEXT UNIQUE,
+ content TEXT,
+ created_at INTEGER,
+ importance INTEGER DEFAULT 3
+ );
+ ''');
+ break;
       }
     }
     await batch.commit();

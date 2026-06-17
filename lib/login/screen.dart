@@ -296,10 +296,12 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     return AnimatedOpacity(
       opacity: isDisabled ? 0.6 : 1.0,
       duration: const Duration(milliseconds: 200),
-      child: IgnorePointer(
-        ignoring: isDisabled,
-        child: Column(
-          children: [
+      child: ExcludeSemantics(
+        excluding: isDisabled,
+        child: IgnorePointer(
+          ignoring: isDisabled,
+          child: Column(
+            children: [
             // --- Apple Sign-In Button ---
             SizedBox(
               width: double.infinity,
@@ -351,7 +353,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 ),
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -130,53 +130,6 @@ class AxonContent extends StatelessWidget {
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // SHORTCUTS HEADER
-                            Padding(
-                              padding: EdgeInsets.only(
-                                left: horizontalPadding * 1.5,
-                                right: horizontalPadding,
-                                bottom: screenHeight * 0.008,
-                              ),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    localizations.shortcuts,
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      color: AppColors.primaryColor.inverted,
-                                      fontSize: fontSizeBody * 0.95,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                  SizedBox(width: referenceWidth * 0.04),
-                                  Expanded(
-                                    child: Container(
-                                      height: 0.8,
-                                      margin: EdgeInsets.only(
-                                          right: horizontalPadding * 0.5),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF333333),
-                                        borderRadius:
-                                            BorderRadius.circular(2.0),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            // MENU
-                            AxonMenu(
-                              referenceWidth: referenceWidth,
-                              screenHeight: screenHeight,
-                              activeTab: activeTab,
-                              onLibraryTap: onLibraryTap,
-                              onCreateAITap: onCreateAITap,
-                              onArtsTap: onArtsTap,
-                              onNewsTap: onNewsTap,
-                            ),
-
                             // RECENTS HEADER
                             Padding(
                               padding: EdgeInsets.only(

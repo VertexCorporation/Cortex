@@ -272,20 +272,39 @@ extension ExtrovertTokenManager on ExtrovertNotificationService {
     }
   }
 
-  /// Saves or updates the user's FCM token in their Firestore document.
+  /// Saves or updates the user's FCM token in their Firestore document with retry logic.
   Future<void> _saveTokenToDatabase(String token) async {
     final user = _auth.currentUser;
     if (user == null) return;
     final userRef = _db.collection('users').doc(user.uid);
-    try {
-      await userRef.set({
-        'fcmTokens': FieldValue.arrayUnion([token])
-      }, SetOptions(merge: true));
-      debugPrint(
-          "[ExtrovertNotificationService] FCM Token successfully saved to Firestore.");
-    } catch (e) {
-      debugPrint(
-          "[ExtrovertNotificationService] CRITICAL: Error saving FCM token to Firestore: $e");
+    
+    int attempts = 0;
+    const int maxAttempts = 5;
+    while (attempts < maxAttempts) {
+      try {
+        await userRef.set({
+          'fcmTokens': FieldValue.arrayUnion([token])
+        }, SetOptions(merge: true));
+        debugPrint(
+            "[ExtrovertNotificationService] FCM Token successfully saved to Firestore on attempt ${attempts + 1}.");
+        return;
+      } catch (e, s) {
+        attempts++;
+        debugPrint(
+            "[ExtrovertNotificationService] Attempt $attempts to save FCM token failed: $e");
+        if (attempts >= maxAttempts) {
+          debugPrint(
+              "[ExtrovertNotificationService] CRITICAL: Failed to save FCM token to Firestore after $maxAttempts attempts.");
+          FirebaseCrashlytics.instance.recordError(
+            e,
+            s,
+            reason: "FCM Token Database Save Exhausted Retries",
+          );
+        } else {
+          // Wait with exponential backoff: 500ms, 1000ms, 2000ms, 4000ms...
+          await Future.delayed(Duration(milliseconds: 500 * (1 << (attempts - 1))));
+        }
+      }
     }
   }
 
