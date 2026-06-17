@@ -36,6 +36,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cortex/chat/screen/widgets/bottom/guest.dart';
 import '../messages/messages.dart';
 import 'package:cortex/chat/providers/memory.dart';
+import 'package:cortex/chat/services/memory_store.dart';
 import 'tools.dart';
 
 enum _MediaIntent {
@@ -1398,19 +1399,26 @@ class SendService {
     }
 
     // Extract memory updates if any
-    final memoryExp = RegExp(r'<memory[)>]?([\s\S]*?)(?:</memory[)>]?|$)',
-        caseSensitive: false);
-    final memoryMatch = memoryExp.firstMatch(finalResponseText);
-    if (memoryMatch != null) {
-      final newMemory = memoryMatch.group(1)?.trim();
-      if (newMemory != null && newMemory.isNotEmpty) {
-        _userMemoryProvider.updateMemory(newMemory);
-        debugPrint(
-            '[Memory] Successfully extracted and updated memory from response.');
+  final memoryExp = RegExp(r'<memory[)>]?([\s\S]*?)(?:</memory[)>]?|$)',
+      caseSensitive: false);
+  final memoryMatch = memoryExp.firstMatch(finalResponseText);
+  if (memoryMatch != null) {
+    final newMemory = memoryMatch.group(1)?.trim();
+    if (newMemory != null && newMemory.isNotEmpty) {
+      _userMemoryProvider.updateMemory(newMemory);
+      try {
+        final semanticMemService = SemanticMemoryService();
+        await semanticMemService.saveFromMemoryBlock(newMemory);
+        debugPrint('[Memory] Saved memory block to SQLite semantic memory.');
+      } catch (e) {
+        debugPrint('[Memory] Error saving to SQLite semantic memory: $e');
       }
+      debugPrint(
+          '[Memory] Successfully extracted and updated memory from response.');
     }
+  }
 
-    // CHECK FOR EMPTY RESPONSE
+ // CHECK FOR EMPTY RESPONSE
     final cleanResponse = finalResponseText.replaceAll(memoryExp, '').trim();
     if (cleanResponse.isEmpty && !hasGeneratedMedia) {
       throw ApiException(localizations.errorServer, code: 'EMPTY_RESPONSE');

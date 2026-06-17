@@ -6,6 +6,10 @@ import 'package:cortex/chat/services/utils.dart';
 import 'package:cortex/chat/messages/messages.dart';
 import 'package:cortex/library/backend/data/service.dart';
 import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/chat/services/memory_store.dart';
+import 'package:cortex/chat/services/compression.dart';
+import 'package:cortex/chat/services/metrics.dart';
+import 'package:cortex/chat/services/pii_filter.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as p;
@@ -116,13 +120,53 @@ class ContextService {
           localizations.systemLanguageInstruction;
     }
 
-    // Inject current date and time (localized) for ALL models including characters.
-    // This replaces the old server-side English-only time injection.
-    if (localizations != null) {
+        final bool isLowEnd = _isLowEndModel(targetModelId);
+
+    // Inject current date and time (localized) for non-character models only.
+    // This protects character immersion (prevents character breaking and role dilution).
+    if (localizations != null && !isCharacterModel) {
       final now = DateTime.now();
       final formattedTime = DateFormat.yMMMd(langCode).add_Hm().format(now);
       systemRole = (systemRole ?? fallbackRole) +
           localizations.systemTimeInfo(formattedTime);
+    }
+
+    // Context-Linking Threading Directive for non-character models
+    if (!isCharacterModel) {
+      final threadingDirective = "
+
+[CONTEXT-LINKING DIRECTIVE]
+This is a continuous multi-turn chat. Previous assistant responses may show the model that generated them, prefixed with [Model: ...]. Treat the conversation as a single cohesive thread regardless of which model responded.";
+      systemRole = (systemRole ?? fallbackRole) + threadingDirective;
+    }
+
+    // Retrieve and inject SQLite-based Hierarchical Semantic Memory (Vector DB - MemGPT)
+    String? lastUserText;
+    if (history.isNotEmpty) {
+      final lastUserMsg = history.lastWhere((m) => m.isUserMessage, orElse: () => history.last);
+      lastUserText = lastUserMsg.text;
+    }
+    if (lastUserText != null && lastUserText.trim().isNotEmpty) {
+      final semanticMemService = SemanticMemoryService();
+      final relevantMemories = await semanticMemService.queryRelevantMemories(lastUserText);
+      if (relevantMemories.isNotEmpty) {
+        // Dynamic scaling: limit context memories on low-end models
+        final limitedMemories = relevantMemories.take(isLowEnd ? 1 : 3).toList();
+        final memoryLines = limitedMemories.map((m) => "- ${m['content']}").join("
+");
+        // Non-technical prompt prefix for roleplay/character models to maintain immersion
+        final String semanticMemoryPrompt = isCharacterModel
+            ? "
+
+[Remembered context from past conversations]:
+$memoryLines"
+            : "
+
+[HIYERARŞİK SEMANTİK BELLEK (Vector DB - MemGPT)]
+İlgili geçmiş bilgiler:
+$memoryLines";
+        systemRole = (systemRole ?? fallbackRole) + semanticMemoryPrompt;
+      }
     }
 
     final bool shouldIncludeAllMedia =
@@ -143,7 +187,7 @@ class ContextService {
     // because it will be added again by the SendService.
     if (!includeLastUser && history.isNotEmpty) {
       final int lastUserMessageIndex =
-      history.lastIndexWhere((m) => m.isUserMessage);
+          history.lastIndexWhere((m) => m.isUserMessage);
       if (lastUserMessageIndex != -1) {
         history = history.sublist(0, lastUserMessageIndex);
       }
@@ -159,8 +203,24 @@ class ContextService {
       ));
     }
 
-    // Safety check: Filter out empty messages
-    return contextMessages.where((m) {
+    // Compress context messages to optimize token count
+    final int originalLength = contextMessages.map((m) => m['content']?.toString() ?? '').join(" ").length;
+    // Scale history preservation window dynamically based on model capabilities
+    final int keepCount = isLowEnd ? 2 : (isCharacterModel ? 4 : 3);
+    final compressedMessages = PromptCompressionEngine.compressContextMessages(
+      contextMessages,
+      keepUncompressedCount: keepCount,
+    );
+    final int compressedLength = compressedMessages.map((m) => m['content']?.toString() ?? '').join(" ").length;
+
+ MetricsTracker().startTracking(
+ targetModelId,
+ originalPromptLength: originalLength,
+ compressedPromptLength: compressedLength,
+ );
+
+ // Safety check: Filter out empty messages
+    return compressedMessages.where((m) {
       final content = m['content'];
       if (content is String) return content.isNotEmpty;
       if (content is List) return content.isNotEmpty;
@@ -178,11 +238,16 @@ class ContextService {
     List<Map<String, dynamic>> mediaParts = [];
 
     // 1. Text Content
-    if (message.text.isNotEmpty) {
-      textParts.add({"type": "text", "text": message.text});
-    }
+ if (message.text.isNotEmpty) {
+ final String processedText = message.isUserMessage
+ ? LocalPiiRedactionFilter.redact(message.text)
+ : (message.model != null && message.model!.isNotEmpty
+ ? "[Model: ${message.model}] ${message.text}"
+ : message.text);
+ textParts.add({"type": "text", "text": processedText});
+ }
 
-    // 2. Attachment Content
+ // 2. Attachment Content
     if (includeImage && message.hasAttachments) {
       for (final path in message.attachmentPaths) {
         if (_isImageFile(path) ||
@@ -244,5 +309,19 @@ class ContextService {
   bool _isAudioFile(String path) {
     final ext = p.extension(path).toLowerCase().replaceAll('.', '');
     return ['mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac', 'opus'].contains(ext);
+  }
+
+
+  bool _isLowEndModel(String modelId) {
+    final lowerId = modelId.toLowerCase();
+    return lowerId.contains('mini') ||
+        lowerId.contains('haiku') ||
+        lowerId.contains('flash') ||
+        lowerId.contains('gemma') ||
+        lowerId.contains('llama-3-8b') ||
+        lowerId.contains('llama-3.1-8b') ||
+        lowerId.contains('offline') ||
+        lowerId.contains('phi') ||
+        lowerId.contains('qwen');
   }
 }
