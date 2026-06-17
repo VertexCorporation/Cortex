@@ -97,6 +97,11 @@ class ModelRepository {
     } catch (e, s) {
       debugPrint(
           "[ModelRepository] CRITICAL Error during initialization: $e\n$s");
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        s,
+        reason: 'ModelRepository initialization failure in _syncCompleter',
+      );
       _syncCompleter!.completeError(e);
       return null; // Return null to indicate a failure to the service layer.
     } finally {

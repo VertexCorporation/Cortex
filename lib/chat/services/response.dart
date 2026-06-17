@@ -3,6 +3,7 @@
 import 'package:cortex/chat/providers/conversation.dart';
 import 'package:cortex/chat/services/scroll.dart';
 import 'package:flutter/foundation.dart';
+import 'package:cortex/chat/services/metrics.dart';
 
 /// Manages the processing of incoming AI responses, both streaming and final.
 ///
@@ -30,6 +31,7 @@ class ResponseService {
   /// It appends the token to the current "thinking" message in the `ConversationProvider`
   /// and triggers an auto-scroll if the user is at the bottom of the chat.
   void onMessageResponse(String token) {
+    MetricsTracker().onTokenReceived();
     // Critical Guard: Ensure we are in a state to receive a response.
     if (!_conversationProvider.isWaitingForResponse || _conversationProvider.wasResponseStopped) {
       debugPrint("[ResponseService] Ignored token: state is not 'waiting' or response was stopped.");
@@ -51,6 +53,7 @@ class ResponseService {
   /// This method is the single source of truth for transitioning the conversation
   /// from a "waiting" state to an "idle" state and persisting the final message.
   void finalizeResponse() {
+    MetricsTracker().stopTracking();
     // Guard clause: If we're not expecting a response, there's nothing to finalize.
     if (!_conversationProvider.isWaitingForResponse) {
       debugPrint("[ResponseService] Finalize called, but state was not 'waiting'. No action taken.");
