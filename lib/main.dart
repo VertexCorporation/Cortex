@@ -162,6 +162,16 @@ class AppBootstrap {
       debugPrint("[AppBootstrap] Initialization warning: $e");
     }
 
+  if (prefs == null) {
+    try {
+      prefs = await SharedPreferences.getInstance();
+    } catch (e) {
+      debugPrint("[AppBootstrap] SharedPreferences fallback failed: $e");
+      rethrow;
+    }
+  }
+  final SharedPreferences activePrefs = prefs!;
+
     // 2. Wire Crashlytics.
     FlutterError.onError = (FlutterErrorDetails details) {
       final String exceptionAsString = details.exception.toString();
@@ -221,21 +231,21 @@ class AppBootstrap {
     }
 
     // 6. Determine Theme.
-    final savedTheme = prefs.getString('selectedTheme');
+    final savedTheme = activePrefs.getString('selectedTheme');
     final String initialTheme = savedTheme ??
         (PlatformDispatcher.instance.platformBrightness == Brightness.dark
             ? 'dark'
             : 'light');
 
-    final String? savedLanguage = prefs.getString('language_code');
+    final String? savedLanguage = activePrefs.getString('language_code');
 
     // 7. Determine Initial Model (Optimistic) [NEW]
     // The key 'cortex' is defined in ChatSessionProvider as _prefDefaultModelKey
-    final String initialModelId = prefs.getString('cortex') ?? 'cortex/auto';
-    final String initialModelTitle = prefs.getString('cortex_title') ?? '';
+    final String initialModelId = activePrefs.getString('cortex') ?? 'cortex/auto';
+    final String initialModelTitle = activePrefs.getString('cortex_title') ?? '';
 
     // 8. Preload User Data for synchronous startup (Fixes Guest flash)
-    final String? initialUserDataJson = prefs.getString('cached_user_data');
+    final String? initialUserDataJson = activePrefs.getString('cached_user_data');
 
     debugPrint(
         "[AppBootstrap] Finished in ${stopwatch
