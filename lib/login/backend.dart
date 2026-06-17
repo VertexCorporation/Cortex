@@ -705,8 +705,6 @@ class LoginBackendService {
   /// It waits briefly to allow backend triggers (Cloud Functions) to create
   /// the user document in Firestore, preventing 'permission-denied' errors.
   void _safeTokenSync(ExtrovertNotificationService service) {
-    Future.delayed(const Duration(seconds: 1), () {
-      service.syncTokenAfterLogin().ignore();
-    });
+    service.syncTokenAfterLogin().ignore();
   }
 }

@@ -137,28 +137,40 @@ class AppBootstrap {
 
     // 1. Initialize Firebase, FlutterDownloader, and SharedPreferences concurrently.
     // This significantly reduces cold start time by not waiting sequentially.
-    late final SharedPreferences prefs;
+    SharedPreferences? prefs;
+    try {
+      await Future.wait([
+        Firebase.initializeApp().then((_) async {
+          try {
+            FirebaseFirestore.instance.settings = const Settings(
+              persistenceEnabled: true,
+              cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+            );
+          } catch (e) {
+            debugPrint("Firestore settings warning: $e");
+          }
+        }),
+        FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true),
+        SharedPreferences.getInstance().then((p) => prefs = p),
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]),
+        ModelImageCache.loadPaths(),
+      ]);
+    } catch (e) {
+      debugPrint("[AppBootstrap] Initialization warning: $e");
+    }
 
-    await Future.wait([
-      Firebase.initializeApp().then((_) async {
-        // Fire-and-forget Firestore settings setup once Firebase is ready
-        try {
-          FirebaseFirestore.instance.settings = const Settings(
-            persistenceEnabled: true,
-            cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-          );
-        } catch (e) {
-          debugPrint("Firestore settings warning: $e");
-        }
-      }),
-      FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true),
-      SharedPreferences.getInstance().then((p) => prefs = p),
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ]),
-      ModelImageCache.loadPaths(),
-    ]);
+  if (prefs == null) {
+    try {
+      prefs = await SharedPreferences.getInstance();
+    } catch (e) {
+      debugPrint("[AppBootstrap] SharedPreferences fallback failed: $e");
+      rethrow;
+    }
+  }
+  final SharedPreferences activePrefs = prefs!;
 
     // 2. Wire Crashlytics.
     FlutterError.onError = (FlutterErrorDetails details) {
@@ -219,21 +231,21 @@ class AppBootstrap {
     }
 
     // 6. Determine Theme.
-    final savedTheme = prefs.getString('selectedTheme');
+    final savedTheme = activePrefs.getString('selectedTheme');
     final String initialTheme = savedTheme ??
         (PlatformDispatcher.instance.platformBrightness == Brightness.dark
             ? 'dark'
             : 'light');
 
-    final String? savedLanguage = prefs.getString('language_code');
+    final String? savedLanguage = activePrefs.getString('language_code');
 
     // 7. Determine Initial Model (Optimistic) [NEW]
     // The key 'cortex' is defined in ChatSessionProvider as _prefDefaultModelKey
-    final String initialModelId = prefs.getString('cortex') ?? 'cortex/auto';
-    final String initialModelTitle = prefs.getString('cortex_title') ?? '';
+    final String initialModelId = activePrefs.getString('cortex') ?? 'cortex/auto';
+    final String initialModelTitle = activePrefs.getString('cortex_title') ?? '';
 
     // 8. Preload User Data for synchronous startup (Fixes Guest flash)
-    final String? initialUserDataJson = prefs.getString('cached_user_data');
+    final String? initialUserDataJson = activePrefs.getString('cached_user_data');
 
     debugPrint(
         "[AppBootstrap] Finished in ${stopwatch
