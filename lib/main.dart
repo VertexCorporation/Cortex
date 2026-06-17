@@ -137,28 +137,30 @@ class AppBootstrap {
 
     // 1. Initialize Firebase, FlutterDownloader, and SharedPreferences concurrently.
     // This significantly reduces cold start time by not waiting sequentially.
-    late final SharedPreferences prefs;
-
-    await Future.wait([
-      Firebase.initializeApp().then((_) async {
-        // Fire-and-forget Firestore settings setup once Firebase is ready
-        try {
-          FirebaseFirestore.instance.settings = const Settings(
-            persistenceEnabled: true,
-            cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-          );
-        } catch (e) {
-          debugPrint("Firestore settings warning: $e");
-        }
-      }),
-      FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true),
-      SharedPreferences.getInstance().then((p) => prefs = p),
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ]),
-      ModelImageCache.loadPaths(),
-    ]);
+    SharedPreferences? prefs;
+    try {
+      await Future.wait([
+        Firebase.initializeApp().then((_) async {
+          try {
+            FirebaseFirestore.instance.settings = const Settings(
+              persistenceEnabled: true,
+              cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+            );
+          } catch (e) {
+            debugPrint("Firestore settings warning: $e");
+          }
+        }),
+        FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true),
+        SharedPreferences.getInstance().then((p) => prefs = p),
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]),
+        ModelImageCache.loadPaths(),
+      ]);
+    } catch (e) {
+      debugPrint("[AppBootstrap] Initialization warning: $e");
+    }
 
     // 2. Wire Crashlytics.
     FlutterError.onError = (FlutterErrorDetails details) {

@@ -97,7 +97,6 @@ class InputField extends StatefulWidget {
 
 class InputFieldState extends State<InputField> with TickerProviderStateMixin {
   final InputService _inputService = InputService();
-  double _inputFieldHeight = 0.0;
   final GlobalKey _inputFieldKey = GlobalKey();
 
   // Master controller for Input <-> Voice transition
@@ -299,16 +298,9 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
       return const SizedBox.shrink();
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          _updateHeight();
-        });
+    final double radius = isTablet ? screenWidth * 0.025 : 32.0;
 
-        final double radius = isTablet ? screenWidth * 0.025 : 32.0;
-
-        return Padding(
+    return Padding(
           padding: EdgeInsets.fromLTRB(
             screenWidth * 0.04,
             0,
@@ -473,19 +465,6 @@ class InputFieldState extends State<InputField> with TickerProviderStateMixin {
           ),
         ),
       ),
-    );
-  },
-);
-  }
-
-  void _updateHeight() {
-    final RenderBox? renderBox =
-        _inputFieldKey.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox != null) {
-      final newHeight = renderBox.size.height;
-      if (newHeight != _inputFieldHeight) {
-        setState(() => _inputFieldHeight = newHeight);
-      }
-    }
+       );
   }
 }

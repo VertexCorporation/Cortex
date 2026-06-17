@@ -26,12 +26,17 @@ class WaveformVisualizer extends StatefulWidget {
   State<WaveformVisualizer> createState() => _WaveformVisualizerState();
 }
 
+class _WaveformNotifier extends ChangeNotifier {
+  void update() => notifyListeners();
+}
+
 class _WaveformVisualizerState extends State<WaveformVisualizer>
     with SingleTickerProviderStateMixin {
   late Ticker _ticker;
   final List<double> _history = [];
   static const int _historySize = 60;
   double _animationValue = 0.0;
+  final _WaveformNotifier _notifier = _WaveformNotifier();
 
   @override
   void initState() {
@@ -46,6 +51,7 @@ class _WaveformVisualizerState extends State<WaveformVisualizer>
   @override
   void dispose() {
     _ticker.dispose();
+    _notifier.dispose();
     super.dispose();
   }
 
@@ -53,7 +59,7 @@ class _WaveformVisualizerState extends State<WaveformVisualizer>
     if (!mounted) return;
     _animationValue = (elapsed.inMilliseconds % 2000) / 2000.0;
     _updateHistory();
-    setState(() {});
+    _notifier.update();
   }
 
   void _updateHistory() {
@@ -101,6 +107,7 @@ class _WaveformVisualizerState extends State<WaveformVisualizer>
       height: 50,
       width: double.infinity,
       child: CustomPaint(
+        repaint: _notifier,
         painter: _ModernWavePainter(
           history: _history,
           animationValue: _animationValue,
