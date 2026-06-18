@@ -193,6 +193,31 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
                           fontSize: 12,
                           fontWeight: FontWeight.w500),
                     ),
+ const Spacer(),
+ if (languageNameForDisplay.toLowerCase() == 'html' || 
+     languageNameForDisplay.toLowerCase() == 'javascript' || 
+     languageNameForDisplay.toLowerCase() == 'python')
+   InkWell(
+     onTap: () {
+       Provider.of<IntrovertNotificationService>(context, listen: false).showNotification(
+         message: "Cortex Sandbox (Artifacts) modülü yükleniyor...",
+         type: NotificationType.info,
+         bottomOffset: 0.02,
+       );
+     },
+     borderRadius: BorderRadius.circular(4),
+     child: Padding(
+       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+       child: Row(
+         children: [
+           const Icon(Icons.play_arrow_rounded, size: 16, color: Colors.orangeAccent),
+           const SizedBox(width: 4),
+           const Text("Çalıştır", style: TextStyle(color: Colors.orangeAccent, fontSize: 11, fontWeight: FontWeight.bold)),
+         ],
+       ),
+     ),
+   ),
+ const SizedBox(width: 8),
                     InkWell(
                       onTap: _copyCodeToClipboard,
                       borderRadius: BorderRadius.circular(4),

@@ -152,7 +152,7 @@ class LoginBackendService {
             name: 'LoginBackend');
 
         final initializer = Provider.of<AppInitializer>(
-            navigatorKey.currentContext!,
+            context,
             listen: false);
         initializer.requestEmailVerification(
           email: user.email!,
@@ -209,7 +209,7 @@ class LoginBackendService {
         context.read<ExtrovertNotificationService>();
     final userProvider = context.read<UserProvider>();
     final initializer = Provider.of<AppInitializer>(
-        navigatorKey.currentContext!,
+        context,
         listen: false);
 
     if (!await InternetService().hasInternet()) {
@@ -387,7 +387,7 @@ class LoginBackendService {
         notificationService.showNotification(
             message: l10n.noInternetConnection, type: NotificationType.error);
         await _googleSignIn.disconnect().catchError((_) {});
-        await _auth.signOut().catchError((_) {});
+        if (_auth.currentUser?.isAnonymous != true) { await _auth.signOut().catchError((_) {}); }
         return GoogleSignInNetworkError();
       } else if ((e is GoogleSignInException &&
               e.code == GoogleSignInExceptionCode.canceled) ||
@@ -396,7 +396,7 @@ class LoginBackendService {
         dev.log('[Auth.Google] Sign-in process was cancelled by the user.',
             name: 'LoginBackend');
         await _googleSignIn.disconnect().catchError((_) {});
-        await _auth.signOut().catchError((_) {});
+        if (_auth.currentUser?.isAnonymous != true) { await _auth.signOut().catchError((_) {}); }
         return GoogleSignInCancelled();
       } else {
         dev.log(
@@ -409,7 +409,7 @@ class LoginBackendService {
       }
 
       await _googleSignIn.disconnect().catchError((_) {});
-      await _auth.signOut().catchError((_) {});
+      if (_auth.currentUser?.isAnonymous != true) { await _auth.signOut().catchError((_) {}); }
 
       return GoogleSignInFailure();
     }
@@ -689,7 +689,7 @@ class LoginBackendService {
       String email, String password, bool rememberMe) async {
     if (rememberMe) {
       await _secureStorage.write(key: 'email', value: email);
-      await _secureStorage.write(key: 'password', value: password);
+      // H3 FIX: Do not store plaintext password. Firebase Auth handles session persistence.
       await _secureStorage.write(key: 'remember_me', value: 'true');
     } else {
       // Don't wipe unrelated keys (tokens, device state, etc.).

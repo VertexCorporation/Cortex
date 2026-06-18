@@ -34,6 +34,7 @@ class UserProvider with ChangeNotifier {
   StreamSubscription<DocumentSnapshot>? _userSubscription;
   String? _activeUid;
   int _listenerGeneration = 0;
+  Timer? _cacheDebounceTimer;
 
   int _readSubscriptionLevel(Map<String, dynamic> data) {
     final value = data['hasCortexSubscription'];
@@ -148,7 +149,7 @@ class UserProvider with ChangeNotifier {
     if (level > 0) {
       final expiryDate = _readSubscriptionExpiry(data['subscriptionExpiresAt']);
       if (expiryDate == null) {
-        return level >= 4 && level <= 6 ? level : 0;
+        return level >= 1 && level <= 6 ? level : 0;
       }
       return expiryDate.isAfter(DateTime.now()) ? level : 0;
     }
@@ -294,20 +295,23 @@ class UserProvider with ChangeNotifier {
   /// Caches the user data to SharedPreferences as a JSON string.
   /// Handles Firestore [Timestamp] conversion to String for JSON compatibility.
   Future<void> _cacheUserData(Map<String, dynamic> data) async {
-    try {
-      final uid = _auth.currentUser?.uid;
-      if (uid == null || uid.isEmpty) return;
+    _cacheDebounceTimer?.cancel();
+    _cacheDebounceTimer = Timer(const Duration(seconds: 10), () async {
+      try {
+        final uid = _auth.currentUser?.uid;
+        if (uid == null || uid.isEmpty) return;
 
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = jsonEncode(
-        data,
-        toEncodable: (object) =>
-            object is Timestamp ? object.toDate().toIso8601String() : object,
-      );
-      await prefs.setString(_cacheKeyForUid(uid), jsonString);
-    } catch (e) {
-      debugPrint("[UserProvider] Cache write error: $e");
-    }
+        final prefs = await SharedPreferences.getInstance();
+        final jsonString = jsonEncode(
+          data,
+          toEncodable: (object) =>
+              object is Timestamp ? object.toDate().toIso8601String() : object,
+        );
+        await prefs.setString(_cacheKeyForUid(uid), jsonString);
+      } catch (e) {
+        debugPrint("[UserProvider] Cache write error: $e");
+      }
+    });
   }
 
   /// Loads user data from the SharedPreferences cache, if it exists.

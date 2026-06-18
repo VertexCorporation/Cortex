@@ -173,7 +173,8 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case LoginSuccess():
         AnalyticsService().logLoginSuccess('email');
-        Navigator.of(context).pop();
+        _setLoading(false);
+        if (context.mounted) Navigator.of(context).pop();
         break;
       case LoginInvalidCredentials():
         _loginEmailError = l10n.invalidCredentials;
@@ -223,7 +224,8 @@ class LoginController extends ChangeNotifier {
     switch (result) {
       case RegistrationSuccess():
         AnalyticsService().logRegisterSuccess('email');
-        Navigator.of(context).pop();
+        _setLoading(false);
+        if (context.mounted) Navigator.of(context).pop();
         break;
       case RegistrationUsernameTaken():
         _registerUsernameError = l10n.usernameTaken;
@@ -373,14 +375,14 @@ class LoginController extends ChangeNotifier {
           await context.read<SettingsGeneralProvider>().refreshData();
         }
 
+        _setLoading(false);
+
         if (context.mounted) {
           Navigator.of(context).pop();
           _notificationService.showNotification(
               message: l10n.accountLinkedSuccess,
               type: NotificationType.success);
         }
-        _setLoading(
-            false); // Here we DO unblock because we popped the dialog, we didn't navigate to a new screen.
         break;
       case RegistrationUsernameTaken():
         _registerUsernameError = l10n.usernameTaken;

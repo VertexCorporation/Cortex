@@ -915,7 +915,18 @@ class SendService {
 
     // 2. Add Current User Message to Context (Manual Construction)
     // We do this manually because attachments need to be processed into base64 blocks
-    final List<Map<String, dynamic>> userContent = [];
+    // [CORTEX V2: IMAGE PROMPT ENHANCER]
+ // Resim modellerine giden kuru istekleri ("kedi") zenginlestir
+ if (modelData.category == 'image') {
+   final lower = initialText.toLowerCase();
+   final isSimple = initialText.length < 50 && !lower.contains("masterpiece") && !lower.contains("detailed");
+   if (isSimple) {
+     initialText = initialText + ", masterpiece, high quality, highly detailed, vivid colors, dramatic lighting, 8k resolution, award-winning photography, cinematic, intricate details";
+     debugPrint("[SendService] Image Prompt Enhanced: $initialText");
+   }
+ }
+
+ final List<Map<String, dynamic>> userContent = [];
     if (initialText.isNotEmpty) {
       userContent.add({"type": "text", "text": initialText});
     }

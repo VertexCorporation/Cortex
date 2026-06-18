@@ -122,8 +122,6 @@ class AppInitializer with ChangeNotifier {
   bool _isSigningOut = false;
 
   /// Mutex to prevent concurrent _determineUserFlow() executions.
-  bool _isDeterminingFlow = false;
-
   /// Flag used to follow post startup tasks.
   bool _isPostStartupTasksRunning = false;
 
@@ -726,12 +724,15 @@ class AppInitializer with ChangeNotifier {
   ///
   /// This version is "BULLETPROOF". It prioritizes keeping the user IN the app
   /// over strict server validation during unstable network conditions.
+  Completer<void>? _flowCompleter;
+
   Future<void> _determineUserFlow() async {
-    if (_isDeterminingFlow) {
-      dev.log("[AppInitializer] _determineUserFlow already running. Skipping.");
+    if (_flowCompleter != null) {
+      dev.log("[AppInitializer] _determineUserFlow already running. Waiting for it to finish.");
+      await _flowCompleter!.future;
       return;
     }
-    _isDeterminingFlow = true;
+    _flowCompleter = Completer<void>();
     try {
     // 1. Initial Connectivity Check
     // If we are definitely offline, trust the local cache immediately.
@@ -949,7 +950,10 @@ class AppInitializer with ChangeNotifier {
         await signOut();
       }
     } finally {
-      _isDeterminingFlow = false;
+      if (_flowCompleter != null && !_flowCompleter!.isCompleted) {
+        _flowCompleter!.complete();
+      }
+      _flowCompleter = null;
     }
   }
 
@@ -1009,16 +1013,8 @@ class AppInitializer with ChangeNotifier {
       final rememberMe = await secureStorage.read(key: 'remember_me');
       if (rememberMe == 'true') {
         final email = await secureStorage.read(key: 'email');
-        final password = await secureStorage.read(key: 'password');
-
-        if (email != null && password != null) {
-          final cred = await FirebaseAuth.instance
-              .signInWithEmailAndPassword(email: email, password: password);
-          debugPrint(
-            'Startup: Auto-login successful for UID: ${cred.user!.uid}',
-          );
-          return cred.user;
-        }
+        // H3 FIX: Auto-login with plaintext password removed.
+        // Firebase Auth's default LOCAL persistence is used instead.
       }
     } catch (e) {
       debugPrint(

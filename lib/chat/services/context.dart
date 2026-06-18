@@ -98,6 +98,13 @@ class ContextService {
     m.includeInContext && !m.isThinking && !m.isError && m.isVisible)
         .toList();
 
+    // --- CORTEX V2: DYNAMIC CONTEXT WINDOW ---
+    // Truncate history to avoid token bloat and save credits.
+    final int maxWindow = _isLowEndModel(targetModelId) ? 8 : 16;
+    if (history.length > maxWindow) {
+      history = history.sublist(history.length - maxWindow);
+    }
+
     int userMessageCount = history
         .where((m) => m.isUserMessage)
         .length;
@@ -107,7 +114,7 @@ class ContextService {
     // 1. They should focus on their persona, not analyze user facts.
     // 2. The directive is a massive English-only text block that overwhelms
     //    the localized language instruction, causing characters to default to English.
-    if (isServerSide && !isCharacterModel && userMessageCount >= 0) {
+    if (false) { // isServerSide && !isCharacterModel && userMessageCount >= 0) { // DISABLED IN V2 RAG
       final extractionInstruction = localizations != null
           ? localizations.systemMemoryDirective
           : "\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyze the conversation so far. If you learned ANY new distinct facts about the user (preferences, name, habits, context), you MUST output your ENTIRE updated memory about the user inside <memory>...</memory> tags AT THE VERY END of your response. CRITICAL: You must NEVER erase or overwrite previous memory. ALWAYS append new facts to the existing memory. If absolutely nothing new was learned, omit the tag. Example: <memory>Loves football and tennis. Prefers short answers.</memory>";

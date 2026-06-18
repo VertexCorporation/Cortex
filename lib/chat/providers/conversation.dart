@@ -37,7 +37,7 @@ class ConversationProvider with ChangeNotifier {
   // Streaming performance: throttle UI updates and use StringBuffer for memory efficiency
   Timer? _streamThrottleTimer;
   bool _hasPendingStreamUpdate = false;
-  static const _streamThrottleDuration = Duration(milliseconds: 16); // ~60fps
+  static const _streamThrottleDuration = Duration(milliseconds: 65); // ~15fps (Cortex V2 Stream Optimizer: Markdown rendering stutters on 16ms, 65ms is smooth and chunkier)
   StringBuffer? _streamBuffer;
 
   // ===========================================================================

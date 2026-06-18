@@ -51,7 +51,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     final secureStorage = const FlutterSecureStorage();
     await secureStorage.write(key: 'remember_me', value: 'true');
     await secureStorage.write(key: 'email', value: widget.email);
-    await secureStorage.write(key: 'password', value: widget.password);
+    
     dev.log('[EmailVerification] Saved credentials securely for new user.',
         name: 'EmailVerification');
   }
