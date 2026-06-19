@@ -150,7 +150,7 @@ class AppBootstrap {
             debugPrint("Firestore settings warning: $e");
           }
         }),
-        FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true),
+        !kIsWeb ? FlutterDownloader.initialize(debug: kDebugMode, ignoreSsl: true) : Future.value(),
         SharedPreferences.getInstance().then((p) => prefs = p),
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
@@ -211,14 +211,14 @@ class AppBootstrap {
         return true;
       }
 
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
+      if (!kIsWeb) FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
       return true;
     };
 
     // 3. Register background message handler.
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    if (!kIsWeb) FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-    FlutterDownloader.registerCallback(downloadCallback);
+    if (!kIsWeb) FlutterDownloader.registerCallback(downloadCallback);
 
     // 5. Bypass Auth Check for Splash/Onboarding.
     AppStatus initialStatus;

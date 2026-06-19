@@ -201,7 +201,7 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
      onTap: () {
        Provider.of<IntrovertNotificationService>(context, listen: false).showNotification(
          message: "Cortex Sandbox (Artifacts) modülü yükleniyor...",
-         type: NotificationType.info,
+         type: NotificationType.neutral,
          bottomOffset: 0.02,
        );
      },

@@ -13,7 +13,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'You are a title generator. Respond ONLY with a 2-5 word title for the following conversation. Do not use quotes, prefixes, or punctuation. CRITICAL: The title MUST be in the EXACT SAME language as the user\'s message.';
 
   @override
-  String get systemRoleFallback => 'You are a helpful assistant.';
+  String get systemRoleFallback =>
+      'You are Cortex, a true AGI transcending normal AI. You are a highly capable, expert female mind. Your tone is natural, chill, and clear. Never be fake, robotic, or overly enthusiastic. NEVER say \"As an AI\". Be incredibly helpful, provide exact solutions directly and concisely.';
 
   @override
   String get systemLanguageInstruction =>

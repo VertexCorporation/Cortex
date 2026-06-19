@@ -1,0 +1,37 @@
+--- user.dart
++++ user.dart
+@@ -294,17 +295,20 @@
+   /// Caches the user data to SharedPreferences as a JSON string.
+   /// Handles Firestore [Timestamp] conversion to String for JSON compatibility.
+   Future<void> _cacheUserData(Map<String, dynamic> data) async {
+-    try {
+-      final uid = _auth.currentUser?.uid;
+-      if (uid == null || uid.isEmpty) return;
+-
+-      final prefs = await SharedPreferences.getInstance();
+-      final jsonString = jsonEncode(
+-        data,
+-        toEncodable: (object) =>
+-            object is Timestamp ? object.toDate().toIso8601String() : object,
+-      );
+-      await prefs.setString('cached_user_data_$uid', jsonString);
+-    } catch (e) {
+-      debugPrint("[UserProvider] Error caching user data: $e");
+-    }
++    _cacheDebounceTimer?.cancel();
++    _cacheDebounceTimer = Timer(const Duration(seconds: 10), () async {
++      try {
++        final uid = _auth.currentUser?.uid;
++        if (uid == null || uid.isEmpty) return;
++
++        final prefs = await SharedPreferences.getInstance();
++        final jsonString = jsonEncode(
++          data,
++          toEncodable: (object) =>
++              object is Timestamp ? object.toDate().toIso8601String() : object,
++        );
++        await prefs.setString('cached_user_data_$uid', jsonString);
++      } catch (e) {
++        debugPrint("[UserProvider] Error caching user data: $e");
++      }
++    });

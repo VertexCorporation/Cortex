@@ -149,7 +149,7 @@ class UserProvider with ChangeNotifier {
     if (level > 0) {
       final expiryDate = _readSubscriptionExpiry(data['subscriptionExpiresAt']);
       if (expiryDate == null) {
-        return level >= 1 && level <= 6 ? level : 0;
+      return level >= 4 ? level : 0;
       }
       return expiryDate.isAfter(DateTime.now()) ? level : 0;
     }

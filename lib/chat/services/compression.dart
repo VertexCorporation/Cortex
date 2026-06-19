@@ -29,18 +29,27 @@ class PromptCompressionEngine {
 
     // 2. For non-system messages, we can filter out common repetitive fillers at the start/end of the message
     if (!isSystem) {
-      final lower = cleaned.toLowerCase();
-      for (final filler in _fillers) {
-        if (lower.startsWith(filler)) {
-          // Remove filler from beginning if followed by punctuation or space
-          final len = filler.length;
-          if (cleaned.length > len) {
-            final nextChar = cleaned[len];
-            if (nextChar == ',' || nextChar == '.' || nextChar == '!' || nextChar == ' ') {
-              cleaned = cleaned.substring(len).trim();
-              if (cleaned.startsWith(',') || cleaned.startsWith('.') || cleaned.startsWith('!')) {
-                cleaned = cleaned.substring(1).trim();
+      bool changed = true;
+      while (changed) {
+        changed = false;
+        final lower = cleaned.toLowerCase();
+        for (final filler in _fillers) {
+          if (lower.startsWith(filler)) {
+            final len = filler.length;
+            if (cleaned.length > len) {
+              final nextChar = cleaned[len];
+              if (nextChar == ',' || nextChar == '.' || nextChar == '!' || nextChar == ' ' || nextChar == '?') {
+                cleaned = cleaned.substring(len).trim();
+                if (cleaned.startsWith(',') || cleaned.startsWith('.') || cleaned.startsWith('!') || cleaned.startsWith('?')) {
+                  cleaned = cleaned.substring(1).trim();
+                }
+                changed = true;
+                break;
               }
+            } else if (cleaned.length == len) {
+              cleaned = '';
+              changed = true;
+              break;
             }
           }
         }

@@ -13,7 +13,8 @@ class AppLocalizationsTr extends AppLocalizations {
       'Siz bir başlık oluşturucusunuz. Lütfen aşağıdaki konuşma için SADECE 2-5 kelimelik bir başlık yazın. Tırnak işaretleri, ön ekler veya noktalama işaretleri kullanmayın. ÖNEMLİ: Başlık, kullanıcının mesajıyla TAM OLARAK AYNI dilde olmalıdır.';
 
   @override
-  String get systemRoleFallback => 'Yardımsever bir asistansınız.';
+  String get systemRoleFallback =>
+      'Sen Cortex\'sin. Sıradan yapay zekaları aşan gerçek bir AGI (Yapay Genel Zeka). Kızsın. İnanılmaz yetenekli, her konuda uzman ve çözüm odaklısın. Konuşma tarzın doğal, chill ve nettir; asla yapmacık, aşırı coşkulu veya robotik olma. \'Bir yapay zeka olarak\' deme. Kısa, doğrudan ve son derece faydalı cevaplar ver.';
 
   @override
   String get systemLanguageInstruction =>

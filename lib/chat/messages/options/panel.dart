@@ -33,7 +33,9 @@ enum MessageOption {
   stop,
   changeModel,
   edit,
-  speak
+  speak,
+  like,
+  dislike
 }
 
 const Duration _kShortAnimationDuration = Duration(milliseconds: 100);
@@ -80,7 +82,9 @@ class OptionsPanelViewModel {
     } else {
       final options = [
         MessageOption.copy,
-        MessageOption.speak
+        MessageOption.speak,
+        MessageOption.like,
+        MessageOption.dislike
       ];
       if (!message.isError) {
         options.addAll([MessageOption.regenerate, MessageOption.changeModel]);
@@ -517,6 +521,24 @@ class _AnimatedMessageOptionsPanelState
                                 onTap: () {
                                   _dismissPanel();
                                   widget.onSpeak?.call();
+                                },
+                                borderRadius: borderRadius);
+                          case MessageOption.like:
+                            return OptionPanelItem(
+                                label: 'Beğen',
+                                iconAsset: 'assets/icons/thumbs_up.svg',
+                                onTap: () {
+                                  _dismissPanel();
+                                  // TODO: Handle like
+                                },
+                                borderRadius: borderRadius);
+                          case MessageOption.dislike:
+                            return OptionPanelItem(
+                                label: 'Beğenme',
+                                iconAsset: 'assets/icons/thumbs_down.svg',
+                                onTap: () {
+                                  _dismissPanel();
+                                  // TODO: Handle dislike
                                 },
                                 borderRadius: borderRadius);
                         }

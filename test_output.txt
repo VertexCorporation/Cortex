@@ -1,0 +1,712 @@
+00:00 +0: loading C:/Users/theay/Desktop/Projeler/Cortex/test/auth_lifecycle_test.dart
+00:00 +0: C:/Users/theay/Desktop/Projeler/Cortex/test/auth_lifecycle_test.dart: Auth Lifecycle & State Reset Tests ConversationProvider properly resets state on logout
+00:00 +1: C:/Users/theay/Desktop/Projeler/Cortex/test/auth_lifecycle_test.dart: Auth Lifecycle & State Reset Tests InputProvider properly resets state and global draft on logout
+00:00 +2: C:/Users/theay/Desktop/Projeler/Cortex/test/auth_lifecycle_test.dart: Hidden Message Privacy Filtering Tests UI should filter invisible messages correctly (Logic test)
+00:00 +3: C:/Users/theay/Desktop/Projeler/Cortex/test/auth_lifecycle_test.dart: Hidden Message Privacy Filtering Tests History context should exclude invisible messages
+00:00 +4: C:/Users/theay/Desktop/Projeler/Cortex/test/cache_test.dart: CacheService Tests Set and Get basic value
+CacheService ▸ All caches cleared.
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ All caches cleared.
+00:00 +5: C:/Users/theay/Desktop/Projeler/Cortex/test/cache_test.dart: CacheService Tests Get non-existent value returns null
+CacheService ▸ All caches cleared.
+CacheService ▸ All caches cleared.
+00:00 +6: C:/Users/theay/Desktop/Projeler/Cortex/test/cache_test.dart: CacheService Tests Invalidate removes key
+CacheService ▸ All caches cleared.
+CacheService ▸ Set/Updated data for [recentModels]
+CacheService ▸ Invalidated cache for [recentModels]
+CacheService ▸ All caches cleared.
+00:00 +7: C:/Users/theay/Desktop/Projeler/Cortex/test/cache_test.dart: CacheService Tests Touch refreshes timer (Access Logic)
+CacheService ▸ All caches cleared.
+CacheService ▸ Set/Updated data for [userModels]
+CacheService ▸ All caches cleared.
+00:00 +8: C:/Users/theay/Desktop/Projeler/Cortex/test/cache_test.dart: CacheService Tests Clear All invalidates everything
+CacheService ▸ All caches cleared.
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [settingsUserData]
+CacheService ▸ All caches cleared.
+CacheService ▸ All caches cleared.
+00:00 +9: C:/Users/theay/Desktop/Projeler/Cortex/test/cache_test.dart: CacheService Tests AppDataState singleton logic
+CacheService ▸ All caches cleared.
+[AppDataState] User data marked as changed.
+[AppDataState] Change flag was TRUE. Reporting need for refresh.
+CacheService ▸ All caches cleared.
+00:01 +10: C:/Users/theay/Desktop/Projeler/Cortex/test/chat_test.dart: InputProvider Tests Initial state should be clean
+00:01 +11: C:/Users/theay/Desktop/Projeler/Cortex/test/chat_test.dart: InputProvider Tests Web Search toggling
+00:01 +12: C:/Users/theay/Desktop/Projeler/Cortex/test/chat_test.dart: InputProvider Tests Feature mode toggling
+00:01 +13: C:/Users/theay/Desktop/Projeler/Cortex/test/chat_test.dart: InputProvider Tests Voice recording state toggling
+00:01 +14: C:/Users/theay/Desktop/Projeler/Cortex/test/chat_test.dart: InputProvider Tests Voice mode active toggling
+00:01 +15: C:/Users/theay/Desktop/Projeler/Cortex/test/chat_test.dart: InputProvider Tests Attachment loading state
+00:01 +16: C:/Users/theay/Desktop/Projeler/Cortex/test/chat_test.dart: InputProvider Tests Adding and removing attachments logic
+InputProvider: addAttachment called. Current count: 0. New file: test1.jpg
+InputProvider: Attachment added. New count: 1. Notifying listeners.
+InputProvider: addAttachment called. Current count: 1. New file: test2.pdf
+InputProvider: Attachment added. New count: 2. Notifying listeners.
+00:01 +17: C:/Users/theay/Desktop/Projeler/Cortex/test/chat_test.dart: InputProvider Tests Max attachment limit logic
+InputProvider: addAttachment called. Current count: 0. New file: file0.jpg
+InputProvider: Attachment added. New count: 1. Notifying listeners.
+InputProvider: addAttachment called. Current count: 1. New file: file1.jpg
+InputProvider: Attachment added. New count: 2. Notifying listeners.
+InputProvider: addAttachment called. Current count: 2. New file: file2.jpg
+InputProvider: Attachment added. New count: 3. Notifying listeners.
+InputProvider: addAttachment called. Current count: 3. New file: file3.jpg
+InputProvider: Attachment added. New count: 4. Notifying listeners.
+InputProvider: addAttachment called. Current count: 4. New file: file4.jpg
+InputProvider: Attachment added. New count: 5. Notifying listeners.
+InputProvider: addAttachment called. Current count: 5. New file: file5.jpg
+InputProvider: Attachment added. New count: 6. Notifying listeners.
+InputProvider: addAttachment called. Current count: 6. New file: file6.jpg
+InputProvider: Attachment added. New count: 7. Notifying listeners.
+InputProvider: addAttachment called. Current count: 7. New file: file7.jpg
+InputProvider: Attachment added. New count: 8. Notifying listeners.
+InputProvider: addAttachment called. Current count: 8. New file: file8.jpg
+InputProvider: Attachment added. New count: 9. Notifying listeners.
+InputProvider: addAttachment called. Current count: 9. New file: file9.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: file10.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: file11.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: file12.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: file13.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: file14.jpg
+InputProvider: Attachment limit reached. Ignoring.
+00:01 +18: C:/Users/theay/Desktop/Projeler/Cortex/test/chat_test.dart: InputProvider Tests Editing mode flow logic
+00:01 +19: C:/Users/theay/Desktop/Projeler/Cortex/test/chat_test.dart: InputProvider Tests Reset input state
+00:01 +20: C:/Users/theay/Desktop/Projeler/Cortex/test/chat_test.dart: InputProvider Tests Global Draft logic
+00:02 +21: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Null and Empty Inputs ModelEntity.fromMap with empty map does not crash
+00:02 +22: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Null and Empty Inputs ModelEntity.fromMap with null values does not crash
+00:02 +23: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Null and Empty Inputs ModelEntity.fromMap with partial data does not crash
+00:02 +24: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Null and Empty Inputs ModelDataUtils.cleanTitle with null does not crash
+00:02 +25: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Null and Empty Inputs ModelDataUtils.formatModelName with edge cases does not crash
+00:02 +26: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Null and Empty Inputs ModelEntity.toMap does not crash for any valid entity
+00:02 +27: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Null and Empty Inputs ModelEntity.copyWith does not crash
+00:02 +28: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: ANR Protection — Main Thread Block Prevention [ANR] Message.fromMap never blocks >100ms
+00:02 +29: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: ANR Protection — Main Thread Block Prevention [ANR] InputProvider.resetInputState never blocks >100ms
+00:02 +30: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: ANR Protection — Main Thread Block Prevention [ANR] CacheService.set never blocks >100ms for any key
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [filteredModels]
+CacheService ▸ Set/Updated data for [recentModels]
+CacheService ▸ Set/Updated data for [conversationManagers]
+CacheService ▸ Set/Updated data for [conversationOrder]
+CacheService ▸ Set/Updated data for [starredIds]
+CacheService ▸ Set/Updated data for [userModels]
+CacheService ▸ Set/Updated data for [settingsUserData]
+CacheService ▸ Set/Updated data for [premiumProducts]
+CacheService ▸ Set/Updated data for [premiumScreenState]
+CacheService ▸ Set/Updated data for [modelsScreenData]
+CacheService ▸ Set/Updated data for [newsImageUrls]
+CacheService ▸ All caches cleared.
+00:02 +31: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: ANR Protection — Main Thread Block Prevention [ANR] CacheService.invalidateConversationCache never blocks >100ms
+CacheService ▸ Set/Updated data for [conversationManagers]
+CacheService ▸ Set/Updated data for [conversationOrder]
+CacheService ▸ Invalidated cache for [conversationManagers]
+CacheService ▸ Invalidated cache for [conversationOrder]
+CacheService ▸ All conversation-related caches invalidated.
+00:02 +32: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: ANR Protection — Main Thread Block Prevention [ANR] Parsing 50 ModelEntities never blocks >100ms
+00:02 +33: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Boundary Values InputProvider: adding beyond max (9) attachment limit does not crash
+InputProvider: addAttachment called. Current count: 0. New file: img0.jpg
+InputProvider: Attachment added. New count: 1. Notifying listeners.
+InputProvider: addAttachment called. Current count: 1. New file: img1.jpg
+InputProvider: Attachment added. New count: 2. Notifying listeners.
+InputProvider: addAttachment called. Current count: 2. New file: img2.jpg
+InputProvider: Attachment added. New count: 3. Notifying listeners.
+InputProvider: addAttachment called. Current count: 3. New file: img3.jpg
+InputProvider: Attachment added. New count: 4. Notifying listeners.
+InputProvider: addAttachment called. Current count: 4. New file: img4.jpg
+InputProvider: Attachment added. New count: 5. Notifying listeners.
+InputProvider: addAttachment called. Current count: 5. New file: img5.jpg
+InputProvider: Attachment added. New count: 6. Notifying listeners.
+InputProvider: addAttachment called. Current count: 6. New file: img6.jpg
+InputProvider: Attachment added. New count: 7. Notifying listeners.
+InputProvider: addAttachment called. Current count: 7. New file: img7.jpg
+InputProvider: Attachment added. New count: 8. Notifying listeners.
+InputProvider: addAttachment called. Current count: 8. New file: img8.jpg
+InputProvider: Attachment added. New count: 9. Notifying listeners.
+InputProvider: addAttachment called. Current count: 9. New file: img9.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img10.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img11.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img12.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img13.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img14.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img15.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img16.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img17.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img18.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img19.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img20.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img21.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img22.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img23.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img24.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img25.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img26.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img27.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img28.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img29.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img30.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img31.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img32.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img33.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img34.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img35.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img36.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img37.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img38.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img39.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img40.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img41.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img42.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img43.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img44.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img45.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img46.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img47.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img48.jpg
+InputProvider: Attachment limit reached. Ignoring.
+InputProvider: addAttachment called. Current count: 9. New file: img49.jpg
+InputProvider: Attachment limit reached. Ignoring.
+00:02 +34: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Boundary Values Message with empty attachmentPaths list does not crash
+00:02 +35: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Boundary Values Message with very long text does not crash
+00:02 +36: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Boundary Values ModelEntity with extremely long title does not crash
+00:02 +37: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Boundary Values CacheService: setting very large data does not crash
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ All caches cleared.
+00:02 +38: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Boundary Values CacheService: double invalidate of same key does not crash
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Invalidated cache for [allModels]
+00:02 +39: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Boundary Values CacheService: double clearAll does not crash
+CacheService ▸ All caches cleared.
+CacheService ▸ All caches cleared.
+00:02 +40: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Boundary Values InputProvider: cancelEditing when not editing does not crash
+00:02 +41: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Crash Protection — Boundary Values InputProvider: removeAttachmentAt with invalid index does not crash
+00:02 +42: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Error Recovery — Graceful Degradation ModelEntity.fromMap with malformed variants does not crash
+00:02 +43: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Error Recovery — Graceful Degradation ModelEntity.fromMap with malformed modalities does not crash
+00:02 +44: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Error Recovery — Graceful Degradation Message.fromMap with missing fields falls back gracefully
+00:02 +45: C:/Users/theay/Desktop/Projeler/Cortex/test/crash_anr_test.dart: Error Recovery — Graceful Degradation Message.fromMap with legacy photoPath field works
+00:03 +46: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: CreditsManager Tests Singleton access
+00:03 +47: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: CreditsManager Tests Initial value is null (loading)
+00:03 +48: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: CreditsManager Tests Dispose resets value
+00:03 +49: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 0
+00:03 +50: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 1
+00:03 +51: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 2
+00:03 +52: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 3
+00:03 +53: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 4
+00:03 +54: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 5
+00:03 +55: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 6
+00:03 +56: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 7
+00:03 +57: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 8
+00:03 +58: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 9
+00:03 +59: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 10
+00:03 +60: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 11
+00:03 +61: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 12
+00:03 +62: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 13
+00:03 +63: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 14
+00:03 +64: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 15
+00:03 +65: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 16
+00:03 +66: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 17
+00:03 +67: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 18
+00:03 +68: C:/Users/theay/Desktop/Projeler/Cortex/test/credits_test.dart: Stub tests for volume Credit Calculation Logic permutation 19
+00:04 +69: C:/Users/theay/Desktop/Projeler/Cortex/test/diff_test.dart: Diff Algorithm Logic Deletion from middle
+00:04 +70: C:/Users/theay/Desktop/Projeler/Cortex/test/diff_test.dart: Diff Algorithm Logic Deletion from end
+00:04 +71: C:/Users/theay/Desktop/Projeler/Cortex/test/diff_test.dart: Diff Algorithm Logic Deletion from start
+00:04 +72: C:/Users/theay/Desktop/Projeler/Cortex/test/diff_test.dart: Diff Algorithm Logic Multiple deletions
+00:04 +73: C:/Users/theay/Desktop/Projeler/Cortex/test/diff_test.dart: Diff Algorithm Logic Deletion and move
+00:05 +74: C:/Users/theay/Desktop/Projeler/Cortex/test/features_test.dart: SelectionService Tests switchActiveModel changes model but DOES NOT clear conversation
+[SelectionService.switchActiveModel]: Switching model to 'new-model' while preserving chat.
+[SelectionService.switchActiveModel]: Analytics logging skipped: [core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()
+00:06 +75: C:/Users/theay/Desktop/Projeler/Cortex/test/formatter_test.dart: ChatFormat & ChatTokens Tests ChatTokens parsing
+00:06 +76: C:/Users/theay/Desktop/Projeler/Cortex/test/formatter_test.dart: ChatFormat & ChatTokens Tests ChatTokens serialization
+00:06 +77: C:/Users/theay/Desktop/Projeler/Cortex/test/formatter_test.dart: ChatFormat & ChatTokens Tests ChatTokens null safety
+00:06 +78: C:/Users/theay/Desktop/Projeler/Cortex/test/formatter_test.dart: ChatFormat & ChatTokens Tests ChatFormat parsing (deep)
+00:06 +79: C:/Users/theay/Desktop/Projeler/Cortex/test/formatter_test.dart: ChatFormat & ChatTokens Tests ChatFormat serialization
+00:06 +80: C:/Users/theay/Desktop/Projeler/Cortex/test/formatter_test.dart: ChatFormat & ChatTokens Tests ChatFormat null tokens
+00:06 +81: C:/Users/theay/Desktop/Projeler/Cortex/test/formatter_test.dart: Offline name formatting tests Uses part after slash and hides gguf
+00:06 +82: C:/Users/theay/Desktop/Projeler/Cortex/test/formatter_test.dart: Offline name formatting tests Uppercases it token and numeric suffix letters
+00:07 +83: C:/Users/theay/Desktop/Projeler/Cortex/test/language_test.dart: LocaleProvider Tests Initial locale defaults to English (or device default logic)
+00:07 +84: C:/Users/theay/Desktop/Projeler/Cortex/test/language_test.dart: LocaleProvider Tests Loads saved locale from SharedPreferences
+00:07 +85: C:/Users/theay/Desktop/Projeler/Cortex/test/language_test.dart: LocaleProvider Tests Ignores invalid saved locale
+00:07 +86: C:/Users/theay/Desktop/Projeler/Cortex/test/language_test.dart: LocaleProvider Tests setLocale updates state and preference
+00:07 +87: C:/Users/theay/Desktop/Projeler/Cortex/test/language_test.dart: LocaleProvider Tests setLocale rejects unsupported locale
+00:07 +88: C:/Users/theay/Desktop/Projeler/Cortex/test/language_test.dart: LocaleProvider Tests clearLocale resets to English
+00:07 +89: C:/Users/theay/Desktop/Projeler/Cortex/test/limit_test.dart: ChatLimitManager Tests calculateTotalCharacters with text only
+00:07 +90: C:/Users/theay/Desktop/Projeler/Cortex/test/limit_test.dart: ChatLimitManager Tests calculateTotalCharacters with attachments
+00:07 +91: C:/Users/theay/Desktop/Projeler/Cortex/test/limit_test.dart: ChatLimitManager Tests calculateTotalCharacters with multiple attachments
+00:07 +92: C:/Users/theay/Desktop/Projeler/Cortex/test/limit_test.dart: ChatLimitManager Tests calculateTotalCharacters mixed
+00:08 +93: C:/Users/theay/Desktop/Projeler/Cortex/test/memory_compression_test.dart: PromptCompressionEngine Tests compressText cleans up double spaces and linebreaks
+00:08 +93 -1: C:/Users/theay/Desktop/Projeler/Cortex/test/memory_compression_test.dart: PromptCompressionEngine Tests compressText cleans up double spaces and linebreaks [E]
+  Expected: 'Hello world! This is a test.'
+    Actual: 'world! This is a test.'
+     Which: is different.
+            Expected: Hello worl ...
+              Actual: world! Thi ...
+                      ^
+             Differ at offset 0
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\memory_compression_test.dart 10:7              main.<fn>.<fn>
+  
+00:08 +93 -1: C:/Users/theay/Desktop/Projeler/Cortex/test/memory_compression_test.dart: PromptCompressionEngine Tests compressText removes conversational fillers from start of message
+00:08 +94 -1: C:/Users/theay/Desktop/Projeler/Cortex/test/memory_compression_test.dart: PromptCompressionEngine Tests compressContextMessages keeps last N messages uncompressed
+00:08 +94 -2: C:/Users/theay/Desktop/Projeler/Cortex/test/memory_compression_test.dart: PromptCompressionEngine Tests compressContextMessages keeps last N messages uncompressed [E]
+  Expected: 'Ben bir geliştiriciyim.'
+    Actual: 'nasılsın? Ben bir geliştiriciyim.'
+     Which: is different.
+            Expected: Ben bir ge ...
+              Actual: nasılsın?  ...
+                      ^
+             Differ at offset 0
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\memory_compression_test.dart 34:7              main.<fn>.<fn>
+  
+00:08 +94 -2: C:/Users/theay/Desktop/Projeler/Cortex/test/memory_compression_test.dart: LocalPiiRedactionFilter Tests redact masks sensitive personal data
+00:08 +94 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/memory_compression_test.dart: LocalPiiRedactionFilter Tests redact masks sensitive personal data [E]
+  Expected: <true>
+    Actual: <false>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\memory_compression_test.dart 57:7              main.<fn>.<fn>
+  
+00:08 +94 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/memory_compression_test.dart: LocalPiiRedactionFilter Tests redact leaves normal text untouched
+00:09 +95 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/messages_test.dart: Message Logic Tests User Message Creation
+00:09 +96 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/messages_test.dart: Message Logic Tests copyWith Updates Fields
+00:09 +97 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/messages_test.dart: Message Logic Tests copyWith Force New ID
+00:09 +98 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/messages_test.dart: Message Logic Tests Notifier reuse optimization
+00:09 +99 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/messages_test.dart: Message Logic Tests Serialization: fromMap legacy photoPath
+00:09 +100 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/messages_test.dart: Message Logic Tests Serialization: fromMap new attachmentPaths
+00:09 +101 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/messages_test.dart: Message Logic Tests Logic: hasAttachments
+00:10 +102 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_service_filter_test.dart: ModelService.normalizeOfflineModelForCatalog removes offline models smaller than 300 MB
+00:10 +103 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_service_filter_test.dart: ModelService.normalizeOfflineModelForCatalog keeps 300 MB offline models
+00:10 +104 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_service_filter_test.dart: ModelService.normalizeOfflineModelForCatalog filters offline variants below threshold and keeps valid ones
+00:10 +105 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_service_filter_test.dart: ModelService.normalizeOfflineModelForCatalog removes offline model when all variants are below threshold
+00:11 +106 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Language fallback logic for en
+00:11 +107 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Language fallback logic for tr
+00:11 +108 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Language fallback logic for fr
+00:11 +109 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Language fallback logic for es
+00:11 +110 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Language fallback logic for de
+00:11 +111 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Language fallback logic for it
+00:11 +112 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Language fallback logic for ja
+00:11 +113 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Language fallback logic for ru
+00:11 +114 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Tier detection for free
+00:11 +115 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Tier detection for premium
+00:11 +116 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Tier detection for plus
+00:11 +117 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Tier detection for pro
+00:11 +118 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Tier detection for ultra
+00:11 +119 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Tier detection for standard
+00:11 +120 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Category parsing for chat
+00:11 +121 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Category parsing for roleplay
+00:11 +122 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Category parsing for code
+00:11 +123 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Category parsing for vision
+00:11 +124 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Category parsing for audio
+00:11 +125 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Category parsing for analysis
+00:11 +126 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Handling String inputs for localized fields
+00:11 +127 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Convenience Getters
+00:11 +128 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests Equality and HashCode
+00:11 +129 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests copyWith Functionality
+00:11 +130 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests toMap Serialization
+00:11 +131 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/model_test.dart: ModelEntity Tests ChatFormat Parsing
+00:12 +132 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Standard single line bold
+00:12 +133 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Multiline bold content
+00:12 +134 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Multiple bold blocks
+00:12 +135 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Unclosed markers
+00:12 +136 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Complex mixed content
+00:12 +137 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Empty content inside/outside
+00:12 +138 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests User reported scenario: <think> tags and tool artifacts
+00:12 +139 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Scenario: Weather with <think> leakage
+00:12 +140 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Scenario: Scattered Thinking lines (Legacy/DeepSeek style)
+00:12 +141 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Scenario: Python Chart with <think> and tool
+00:12 +142 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Scenario: Stock Price with checkmark artifact
+00:12 +143 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Scenario: Massive Scattered Thinking (ThinkingWidget detection)
+00:12 +144 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Scenario: Inline Thinking Artifacts (Sticky)
+00:12 +145 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Scenario: Widget after massive scattered thinking
+00:12 +146 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Scenario: Scattered Thinking with Gaps (User Reproduction)
+00:12 +147 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Scenario: Space Preservation (The + user)
+00:12 +148 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Scenario: Widget after massive scattered thinking (Reproduction)
+Thinking Match: 
+> *Thinking...*
+> .
+
+00:12 +149 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/parser_test.dart: Thinking UI Parser Tests Scenario: Widget at start of message (User Reported Failure)
+00:13 +150 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Initial state logic (skipping isLoggedIn)
+00:13 +151 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Anonymous User Logic
+00:13 +152 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Standard User Logic
+00:13 +153 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Subscription Logic Free Tier
+00:13 +154 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Subscription Logic Lifetime Tier (Level 4)
+00:13 +155 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Subscription Logic Premium Tier - Active (Future Date)
+00:13 +156 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Subscription Logic Premium Tier - Active (Cached String Date)
+00:13 +157 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Subscription Logic Premium Tier - Expired (Past Date)
+00:13 +158 -3: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Subscription Logic Premium Tier - Invalid Date
+00:13 +158 -4: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Subscription Logic Premium Tier - Invalid Date [E]
+  Expected: <false>
+    Actual: <true>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\server_test.dart 90:9                          main.<fn>.<fn>.<fn>
+  
+00:13 +158 -4: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Subscription Logic Premium Tier - Missing Date
+00:13 +158 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Subscription Logic Premium Tier - Missing Date [E]
+  Expected: <false>
+    Actual: <true>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\server_test.dart 97:9                          main.<fn>.<fn>.<fn>
+  
+00:14 +158 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/session_test.dart: ChatSessionProvider Unknown Model Fix Tests Should not show null/empty title on cold start (cache empty)
+[ChatSessionProvider] Constructor: Attaching listener. Initial isLoading: false
+[ChatSessionProvider] Cache is empty. Using cached title: 'Gemini 1.5 Pro' for ID: gemini-pro
+[ChatSessionProvider] Initialization fallback. Storing pending ID: gemini-pro
+00:14 +159 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/session_test.dart: ChatSessionProvider Unknown Model Fix Tests Should NEVER show Unknown Model string
+[ChatSessionProvider] Constructor: Attaching listener. Initial isLoading: false
+[ChatSessionProvider] Cache is empty. Using cached title: 'Gemini Cached' for ID: gemini-pro
+[ChatSessionProvider] Initialization fallback. Storing pending ID: gemini-pro
+00:14 +160 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/session_test.dart: ChatSessionProvider Unknown Model Fix Tests Dynamic chat (cortex/auto) returns Cortex title
+[ChatSessionProvider] Constructor: Attaching listener. Initial isLoading: false
+[ChatSessionProvider] Cache is empty. Using cached title: '' for ID: cortex/auto
+00:14 +161 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/session_test.dart: ChatSessionProvider Unknown Model Fix Tests Should resolve to full entity when ModelService loads data
+[ChatSessionProvider] Constructor: Attaching listener. Initial isLoading: false
+[ChatSessionProvider] Cache is empty. Using cached title: 'Gemini Cached' for ID: gemini-pro
+[ChatSessionProvider] Initialization fallback. Storing pending ID: gemini-pro
+[ChatSessionProvider] refreshModelAfterCatalogLoad: Attempting to resolve pending ID: gemini-pro
+[ChatSessionProvider] refreshModelAfterCatalogLoad: Attempting to resolve pending ID: gemini-pro
+[ChatSessionProvider] Successfully resolved pending model: Gemini Real Deal
+[ChatSessionProvider] Successfully resolved pending model: Gemini Real Deal
+00:14 +162 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/session_test.dart: ChatSessionProvider Unknown Model Fix Tests Should fall back to dynamic if model is no longer in catalog
+[ChatSessionProvider] Constructor: Attaching listener. Initial isLoading: false
+[ChatSessionProvider] Cache is empty. Using cached title: 'Old Model Name' for ID: old-model
+[ChatSessionProvider] Initialization fallback. Storing pending ID: old-model
+[ChatSessionProvider] refreshModelAfterCatalogLoad: Attempting to resolve pending ID: old-model
+[ChatSessionProvider] Pending model 'old-model' no longer exists. Falling back to dynamic.
+00:14 +163 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/session_test.dart: ChatSessionProvider Unknown Model Fix Tests resetForLogout clears all model and user state
+[ChatSessionProvider] Constructor: Attaching listener. Initial isLoading: false
+[ChatSessionProvider] Cache is empty. Using cached title: 'Gemini' for ID: gemini-pro
+[ChatSessionProvider] Initialization fallback. Storing pending ID: gemini-pro
+00:14 +164 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/session_test.dart: ChatSessionProvider Unknown Model Fix Tests Flux mode toggling works correctly
+[ChatSessionProvider] Constructor: Attaching listener. Initial isLoading: false
+[ChatSessionProvider] Cache is empty. Using cached title: '' for ID: cortex/auto
+00:14 +165 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/session_test.dart: ChatSessionProvider Unknown Model Fix Tests Storage sufficiency flag updates correctly
+[ChatSessionProvider] Constructor: Attaching listener. Initial isLoading: false
+[ChatSessionProvider] Cache is empty. Using cached title: '' for ID: cortex/auto
+00:15 +166 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/settings_test.dart: SettingsGeneralProvider Tests Initial state getters
+00:15 +167 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/settings_test.dart: SettingsGeneralProvider Tests isAnonymous check
+[GeneralProvider] Data refreshed via UserProvider.
+[GeneralProvider] Data refreshed via UserProvider.
+00:15 +168 -5: C:/Users/theay/Desktop/Projeler/Cortex/test/settings_test.dart: SettingsGeneralProvider Tests Subscription Level Logic
+[GeneralProvider] Data refreshed via UserProvider.
+00:15 +168 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/settings_test.dart: SettingsGeneralProvider Tests Subscription Level Logic [E]
+  Expected: <0>
+    Actual: <1>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test\settings_test.dart 197:7                       main.<fn>.<fn>
+  
+00:15 +168 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/settings_test.dart: SettingsGeneralProvider Tests Resend Verification Email Flow
+[GeneralProvider] Data refreshed via UserProvider.
+00:15 +169 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/settings_test.dart: SettingsGeneralProvider Tests Resend Verification Limit
+[GeneralProvider] Data refreshed via UserProvider.
+00:16 +170 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/skeleton_test.dart: SettingsScreen Skeleton Display Logic
+00:16 +171 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/skeleton_test.dart: SettingsScreen Skeleton Display Logic
+00:16 +172 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/skeleton_test.dart: SettingsScreen Skeleton Display Logic
+00:17 +173 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: AppInitializer — Version Comparison Logic Lower version returns true (update required)
+00:17 +174 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: AppInitializer — Version Comparison Logic Same version returns false (no update needed)
+00:17 +175 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: AppInitializer — Version Comparison Logic Higher version returns false (already up to date)
+00:17 +176 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: AppInitializer — Version Comparison Logic Short version string normalizes correctly
+00:17 +177 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: AppInitializer — Version Comparison Logic Malformed version string does not throw (safe fallback)
+00:17 +178 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: AppInitializer — Version Comparison Logic [PERF] 10k version comparisons complete in <100ms
+00:17 +179 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: Startup — SVG Pre-cache List Integrity Core SVG list has no empty or whitespace-only entries
+00:17 +180 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: Startup — SVG Pre-cache List Integrity No duplicate SVG paths in pre-cache list
+00:17 +181 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: AppStatus State Machine All AppStatus values exist
+00:17 +182 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: AppStatus State Machine Default status is initializing
+00:17 +183 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: CacheService — Startup Cache Performance [PERF] Writing 100 cache entries completes in <200ms
+CacheService ▸ All caches cleared.
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ All caches cleared.
+00:17 +184 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: CacheService — Startup Cache Performance [PERF] Reading 10k cache hits completes in <50ms
+CacheService ▸ All caches cleared.
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ All caches cleared.
+00:17 +185 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: CacheService — Startup Cache Performance Cache miss returns null (no cold-start crash)
+CacheService ▸ All caches cleared.
+CacheService ▸ All caches cleared.
+00:17 +186 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: CacheService — Startup Cache Performance CacheKey enum covers all expected data types
+CacheService ▸ All caches cleared.
+CacheService ▸ All caches cleared.
+00:17 +187 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: CacheService — Startup Cache Performance Set and Get round-trip is lossless
+CacheService ▸ All caches cleared.
+CacheService ▸ Set/Updated data for [settingsUserData]
+CacheService ▸ All caches cleared.
+00:17 +188 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: CacheService — Startup Cache Performance Invalidate removes only the targeted key
+CacheService ▸ All caches cleared.
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [recentModels]
+CacheService ▸ Invalidated cache for [allModels]
+CacheService ▸ All caches cleared.
+00:17 +189 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: CacheService — Startup Cache Performance clearAll removes every key
+CacheService ▸ All caches cleared.
+CacheService ▸ Set/Updated data for [allModels]
+CacheService ▸ Set/Updated data for [filteredModels]
+CacheService ▸ Set/Updated data for [recentModels]
+CacheService ▸ Set/Updated data for [conversationManagers]
+CacheService ▸ Set/Updated data for [conversationOrder]
+CacheService ▸ Set/Updated data for [starredIds]
+CacheService ▸ Set/Updated data for [userModels]
+CacheService ▸ Set/Updated data for [settingsUserData]
+CacheService ▸ Set/Updated data for [premiumProducts]
+CacheService ▸ Set/Updated data for [premiumScreenState]
+CacheService ▸ Set/Updated data for [modelsScreenData]
+CacheService ▸ Set/Updated data for [newsImageUrls]
+CacheService ▸ All caches cleared.
+CacheService ▸ All caches cleared.
+00:17 +190 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: CacheService — Startup Cache Performance invalidateConversationCache removes only conversation keys
+CacheService ▸ All caches cleared.
+CacheService ▸ Set/Updated data for [conversationManagers]
+CacheService ▸ Set/Updated data for [conversationOrder]
+CacheService ▸ Set/Updated data for [starredIds]
+CacheService ▸ Set/Updated data for [userModels]
+CacheService ▸ Set/Updated data for [settingsUserData]
+CacheService ▸ Invalidated cache for [conversationManagers]
+CacheService ▸ Invalidated cache for [conversationOrder]
+CacheService ▸ Invalidated cache for [starredIds]
+CacheService ▸ Invalidated cache for [userModels]
+CacheService ▸ All conversation-related caches invalidated.
+CacheService ▸ All caches cleared.
+00:17 +191 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: Startup Model Formatting — formatModelName Performance [PERF] Formatting 1000 model names completes in <200ms
+00:17 +192 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: Startup Model Formatting — formatModelName Performance formatModelName handles edge cases safely
+00:17 +193 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: Startup Model Formatting — formatModelName Performance formatModelName never returns Unknown Model string
+00:17 +194 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: Model Deserialization — Cold Start Parse Speed [PERF] Parsing 500 model entities from map <500ms
+00:18 +195 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/startup_performance_test.dart: Model Deserialization — Cold Start Parse Speed [PERF] copyWith on 1000 entities completes <100ms
+00:18 +196 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/theme_test.dart: Theme System Tests AppColors returns valid theme definitions
+00:18 +197 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/theme_test.dart: Theme System Tests Theme fallback logic
+00:18 +198 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/theme_test.dart: Theme System Tests Specific theme parameter verification
+00:18 +199 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/theme_test.dart: Theme System Tests Overlay styles map generation
+00:18 +200 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/theme_test.dart: Theme System Tests Darken utility
+00:18 +201 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/theme_test.dart: Theme System Tests Static getters use currentTheme
+00:19 +202 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/title_test.dart: Title Limit Logic Short title logic
+00:19 +203 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/title_test.dart: Title Limit Logic Empty title logic
+00:19 +204 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/title_test.dart: Title Limit Logic Exact 32 chars logic
+00:19 +205 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/title_test.dart: Title Limit Logic Over 32 chars logic
+00:20 +206 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — InputProvider State Transitions [PERF] 1000 feature mode toggles complete in <50ms
+00:20 +207 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — InputProvider State Transitions [PERF] 1000 web search toggles complete in <50ms
+00:20 +208 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — InputProvider State Transitions [PERF] Adding 9 attachments (max capacity) completes in <20ms
+InputProvider: addAttachment called. Current count: 0. New file: img0.jpg
+InputProvider: Attachment added. New count: 1. Notifying listeners.
+InputProvider: addAttachment called. Current count: 1. New file: img1.jpg
+InputProvider: Attachment added. New count: 2. Notifying listeners.
+InputProvider: addAttachment called. Current count: 2. New file: img2.jpg
+InputProvider: Attachment added. New count: 3. Notifying listeners.
+InputProvider: addAttachment called. Current count: 3. New file: img3.jpg
+InputProvider: Attachment added. New count: 4. Notifying listeners.
+InputProvider: addAttachment called. Current count: 4. New file: img4.jpg
+InputProvider: Attachment added. New count: 5. Notifying listeners.
+InputProvider: addAttachment called. Current count: 5. New file: img5.jpg
+InputProvider: Attachment added. New count: 6. Notifying listeners.
+InputProvider: addAttachment called. Current count: 6. New file: img6.jpg
+InputProvider: Attachment added. New count: 7. Notifying listeners.
+InputProvider: addAttachment called. Current count: 7. New file: img7.jpg
+InputProvider: Attachment added. New count: 8. Notifying listeners.
+InputProvider: addAttachment called. Current count: 8. New file: img8.jpg
+InputProvider: Attachment added. New count: 9. Notifying listeners.
+00:20 +209 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — InputProvider State Transitions [PERF] resetInputState is fast (<20ms)
+00:20 +210 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — InputProvider State Transitions State after resetInputState is fully clean
+00:20 +211 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — InputProvider State Transitions Global draft survives resetInputState but clears on clearAllInput
+00:20 +212 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — InputProvider State Transitions enableWebSearch resets after resetInputState
+00:20 +213 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — InputProvider State Transitions clearAllInput calls resetInputState (clears everything including featureMode)
+00:20 +214 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — InputProvider State Transitions clearAfterSend deliberately preserves featureMode
+00:20 +215 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — InputProvider State Transitions clearAfterSend deliberately preserves enableWebSearch
+00:20 +216 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — Message ValueNotifier Reuse Notifier reuse: same ID reuses the existing notifier object
+00:20 +217 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — Message ValueNotifier Reuse Notifier reuse: different ID gets a new notifier
+00:20 +218 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — Message ValueNotifier Reuse [PERF] Creating 200 messages completes in <50ms
+00:20 +219 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — Message ValueNotifier Reuse [PERF] 1000 copyWith calls complete in <50ms
+00:20 +220 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — Message ValueNotifier Reuse Message serialization round-trip is lossless
+00:20 +221 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — ModelDataUtils Display Computations [PERF] cleanTitle on 5000 strings completes <100ms
+00:20 +222 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — ModelDataUtils Display Computations cleanTitle strips leading dashes and spaces correctly
+00:20 +223 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — ModelDataUtils Display Computations [PERF] Optimal variant selection on 1000 models <100ms
+00:20 +224 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — ModelDataUtils Display Computations Optimal variant selects lowest RAM
+00:20 +225 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — Cache Read Performance (UI Critical Path) [PERF] Simulated conversation list cache read 10k times <50ms
+CacheService ▸ All caches cleared.
+CacheService ▸ Set/Updated data for [conversationManagers]
+CacheService ▸ All caches cleared.
+00:20 +226 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/ui_fluency_test.dart: UI Fluency — Cache Read Performance (UI Critical Path) [PERF] Cache miss (null return) is fast <50ms for 10k hits
+CacheService ▸ All caches cleared.
+CacheService ▸ All caches cleared.
+00:21 +227 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/utils_test.dart: Utils Tests isServerSideModel returns true if IDs invalid
+00:21 +228 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/utils_test.dart: Utils Tests isServerSideModel resolves via service
+00:21 +229 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/utils_test.dart: Utils Tests isLocalModel is inverse of server side
+00:21 +230 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/utils_test.dart: Utils Tests getModelEntityFromId call-through
+[Utils.getModelEntityFromId] Fetching entity for 'my-model' using provided modelService.
+00:21 +231 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/voice_test.dart: (setUpAll)
+00:22 +231 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/voice_test.dart: Initial state is idle
+[VoiceService] Initializing TTS...
+00:22 +232 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/voice_test.dart: Start session transitions to listening
+[VoiceService] Initializing TTS...
+00:22 +233 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/voice_test.dart: Speaking logic queues sentences correctly
+[VoiceService] Initializing TTS...
+[VoiceService] Enqueuing Sentence: Hello world....
+[VoiceService] Speaking: Hello world.
+[VoiceService] Native TTS Completion Callback fired.
+[VoiceService] Queue Finished.
+[VoiceService] Enqueuing Sentence: How are you?...
+[VoiceService] Speaking: How are you?
+[VoiceService] Native TTS Completion Callback fired.
+[VoiceService] Queue Finished.
+00:22 +234 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/voice_test.dart: VoiceService restarts listening after AI finishes
+[VoiceService] Initializing TTS...
+[VoiceService] Enqueuing Sentence: Hello....
+[VoiceService] Speaking: Hello.
+[VoiceService] Native TTS Completion Callback fired.
+[VoiceService] Queue Finished.
+00:22 +235 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/voice_test.dart: VoiceService restarts listening after AI finishes
+00:22 +236 -6: C:/Users/theay/Desktop/Projeler/Cortex/test/voice_test.dart: (tearDownAll)
+00:22 +236 -6: Some tests failed.
+
+Failing tests:
+  C:/Users/theay/Desktop/Projeler/Cortex/test/memory_compression_test.dart: LocalPiiRedactionFilter Tests redact masks sensitive personal data
+  C:/Users/theay/Desktop/Projeler/Cortex/test/memory_compression_test.dart: PromptCompressionEngine Tests compressContextMessages keeps last N messages uncompressed
+  C:/Users/theay/Desktop/Projeler/Cortex/test/memory_compression_test.dart: PromptCompressionEngine Tests compressText cleans up double spaces and linebreaks
+  C:/Users/theay/Desktop/Projeler/Cortex/test/server_test.dart: UserProvider Tests Subscription Logic Premium Tier - Invalid Date
+  ... and 2 more

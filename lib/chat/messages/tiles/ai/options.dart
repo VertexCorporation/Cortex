@@ -167,6 +167,18 @@ class _InlineOptionsRowState extends State<_InlineOptionsRow>
               widget.message.displayableText, languageCode: langCode);
         };
         break;
+      case MessageOption.like:
+        iconAsset = 'assets/icons/thumbs_up.svg';
+        onTap = () {
+           // TODO: Implement Like functionality
+        };
+        break;
+      case MessageOption.dislike:
+        iconAsset = 'assets/icons/thumbs_down.svg';
+        onTap = () {
+           // TODO: Implement Dislike functionality
+        };
+        break;
       default:
         break;
     }

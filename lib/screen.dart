@@ -20,6 +20,8 @@ import 'axon/inbox/logic/manager.dart';
 import 'axon/inbox/panel/view.dart'; // [NEW] For global panel close
 import 'initialization.dart';
 import 'language.dart';
+import 'package:cortex/l10n/app_localizations.dart';
+import 'package:cortex/app.dart';
 import 'library/backend/data/entity.dart';
 import 'library/providers/catalog.dart';
 import 'library/providers/local.dart';
@@ -992,38 +994,20 @@ class MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-                _buildBottomNavigationBar(context),
               ],
             ),
                                   ),
                                 ),
-                              ),
-                              if (rawValue > 0 && searchValue == 0)
-                                GestureDetector(
-                                  onTap: closeAxon,
-                                  behavior: HitTestBehavior.translucent,
-                                  child: Container(
-                                    color: Colors.transparent,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
+            ],
+          );
+        },
+      ),
+    ),
+  ),
+),
       ),
     );
   }
-
-
   void _onTabTapped(int index) {
     switch (index) {
       case 0:

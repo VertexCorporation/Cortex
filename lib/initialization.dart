@@ -587,7 +587,7 @@ class AppInitializer with ChangeNotifier {
 
       final isPermissionDenied = error.toString().contains('permission-denied');
       if (!isPermissionDenied) {
-        FirebaseCrashlytics.instance.recordError(
+        if (!kIsWeb) FirebaseCrashlytics.instance.recordError(
           error,
           stackTrace,
           reason: 'FalStatusListener',
@@ -607,7 +607,7 @@ class AppInitializer with ChangeNotifier {
     } catch (e, s) {
       debugPrint(
           "AppInitializer: Anonymous entitlement registration failed: $e");
-      FirebaseCrashlytics.instance.recordError(
+      if (!kIsWeb) FirebaseCrashlytics.instance.recordError(
         e,
         s,
         reason: "AnonymousDeviceEntitlement",
@@ -733,7 +733,6 @@ class AppInitializer with ChangeNotifier {
       return;
     }
     _flowCompleter = Completer<void>();
-    try {
     // 1. Initial Connectivity Check
     // If we are definitely offline, trust the local cache immediately.
     if (!_internetProvider.isConnected) {
@@ -925,7 +924,7 @@ class AppInitializer with ChangeNotifier {
             // it's safer to log it and sign out to prevent stuck states.
             debugPrint(
                 "[_determineUserFlow] Unhandled Firebase Error: $code. Signing out.");
-            FirebaseCrashlytics.instance
+            if (!kIsWeb) FirebaseCrashlytics.instance
                 .recordError(e, s, reason: "AuthFlow_UnhandledFirebase");
             await signOut();
             break;
@@ -945,7 +944,7 @@ class AppInitializer with ChangeNotifier {
         // Otherwise, it's a crash-worthy logic error.
         debugPrint(
             "[_determineUserFlow] Critical system error: $e. Signing out.");
-        FirebaseCrashlytics.instance
+        if (!kIsWeb) FirebaseCrashlytics.instance
             .recordError(e, s, reason: "AuthFlow_SystemError");
         await signOut();
       }
@@ -1035,7 +1034,7 @@ class AppInitializer with ChangeNotifier {
   void _runInBackground(Future<void> Function() task) {
     task().catchError((e, s) {
       debugPrint("Background task failed: $e\n$s");
-      FirebaseCrashlytics.instance.recordError(e, s, reason: "backgroundTask");
+      if (!kIsWeb) FirebaseCrashlytics.instance.recordError(e, s, reason: "backgroundTask");
     });
   }
 }

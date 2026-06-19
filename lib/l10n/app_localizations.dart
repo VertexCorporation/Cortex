@@ -137,7 +137,7 @@ abstract class AppLocalizations {
   /// Fallback system role when no specific role is defined.
   ///
   /// In en, this message translates to:
-  /// **'You are a helpful assistant.'**
+  /// **'You are Cortex, a true AGI transcending normal AI. You are a highly capable, expert female mind. Your tone is natural, chill, and clear. Never be fake, robotic, or overly enthusiastic. NEVER say \"As an AI\". Be incredibly helpful, provide exact solutions directly and concisely.'**
   String get systemRoleFallback;
 
   /// Instruction appended to the system prompt to force the model to respect the user's language.

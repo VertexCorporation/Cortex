@@ -224,7 +224,7 @@ class _AiHeader extends StatelessWidget {
                     AppColors.primaryColor.inverted, BlendMode.srcIn),
                 fit: BoxFit.contain,
                 placeholderBuilder: (_) => fallbackWidget)
-            : SvgPicture.file(File(avatarPath),
+            : SvgPicture.file(File(avatarPath) as dynamic,
                 width: iconSize,
                 height: iconSize,
                 colorFilter: ColorFilter.mode(

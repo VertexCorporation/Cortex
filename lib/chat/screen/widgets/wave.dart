@@ -107,8 +107,8 @@ class _WaveformVisualizerState extends State<WaveformVisualizer>
       height: 50,
       width: double.infinity,
       child: CustomPaint(
-        repaint: _notifier,
-        painter: _ModernWavePainter(
+                painter: _ModernWavePainter(
+                  repaint: _notifier,
           history: _history,
           animationValue: _animationValue,
           color: widget.color ?? AppColors.primaryColor.inverted,
@@ -126,11 +126,12 @@ class _ModernWavePainter extends CustomPainter {
   final WaveOrigin origin;
 
   _ModernWavePainter({
+    required Listenable repaint,
     required this.history,
     required this.animationValue,
     required this.color,
     required this.origin,
-  });
+  }) : super(repaint: repaint);
 
   @override
   void paint(Canvas canvas, Size size) {

@@ -4,7 +4,7 @@ class LocalPiiRedactionFilter {
   );
 
   static final RegExp _phoneRegExp = RegExp(
-    r'\b(?:\+?\d{1,3}[- ]?)?\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}\b',
+    r'(?<!\d)(?:\+?\d{1,3}[- ]?)?\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}(?!\d)',
   );
 
   static final RegExp _creditCardRegExp = RegExp(
@@ -22,8 +22,8 @@ class LocalPiiRedactionFilter {
     String sanitized = text;
     sanitized = sanitized.replaceAllMapped(_emailRegExp, (match) => '[E-POSTA MASKELENDİ]');
     sanitized = sanitized.replaceAllMapped(_creditCardRegExp, (match) => '[KREDİ KARTI MASKELENDİ]');
-    sanitized = sanitized.replaceAllMapped(_phoneRegExp, (match) => '[TELEFON MASKELENDİ]');
     sanitized = sanitized.replaceAllMapped(_tcknRegExp, (match) => '[TC KİMLİK MASKELENDİ]');
+    sanitized = sanitized.replaceAllMapped(_phoneRegExp, (match) => '[TELEFON MASKELENDİ]');
 
     return sanitized;
   }

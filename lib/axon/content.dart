@@ -110,7 +110,18 @@ class AxonContent extends StatelessWidget {
               onSettingsTap: onSettingsTap,
             ),
 
-            // 2-4. COLLAPSIBLE SECTION
+            // 2. MAIN MENU (Library, News, Create, Arts)
+            AxonMenu(
+              referenceWidth: referenceWidth,
+              screenHeight: screenHeight,
+              activeTab: activeTab,
+              onLibraryTap: onLibraryTap,
+              onCreateAITap: onCreateAITap,
+              onArtsTap: onArtsTap,
+              onNewsTap: onNewsTap,
+            ),
+
+            // 3-4. COLLAPSIBLE SECTION
             // PERFORMANCE: Consolidated from 9 implicit animations (3 sections
             // × AnimatedSlide+AnimatedOpacity+AnimatedSize) into 3 total.
             // This reduces from 9 independent AnimationControllers to 3.

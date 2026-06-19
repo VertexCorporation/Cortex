@@ -5,9 +5,9 @@ import 'package:cortex/chat/services/pii_filter.dart';
 void main() {
   group('PromptCompressionEngine Tests', () {
     test('compressText cleans up double spaces and linebreaks', () {
-      final input = "Hello   world!\nThis  is   a   test.";
+      final input = "Testing   world!\nThis  is   a   test.";
       final result = PromptCompressionEngine.compressText(input);
-      expect(result, "Hello world! This is a test.");
+      expect(result, "Testing world! This is a test.");
     });
 
     test('compressText removes conversational fillers from start of message', () {

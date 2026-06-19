@@ -140,10 +140,10 @@ class ContextService {
 
     // Context-Linking Threading Directive for non-character models
     if (!isCharacterModel) {
-      final threadingDirective = "
+      final threadingDirective = """
 
 [CONTEXT-LINKING DIRECTIVE]
-This is a continuous multi-turn chat. Previous assistant responses may show the model that generated them, prefixed with [Model: ...]. Treat the conversation as a single cohesive thread regardless of which model responded.";
+This is a continuous multi-turn chat. Previous assistant responses may show the model that generated them, prefixed with [Model: ...]. Treat the conversation as a single cohesive thread regardless of which model responded.""";
       systemRole = (systemRole ?? fallbackRole) + threadingDirective;
     }
 
@@ -159,19 +159,19 @@ This is a continuous multi-turn chat. Previous assistant responses may show the 
       if (relevantMemories.isNotEmpty) {
         // Dynamic scaling: limit context memories on low-end models
         final limitedMemories = relevantMemories.take(isLowEnd ? 1 : 3).toList();
-        final memoryLines = limitedMemories.map((m) => "- ${m['content']}").join("
-");
+        final memoryLines = limitedMemories.map((m) => "- ${m['content']}").join("""
+	""");
         // Non-technical prompt prefix for roleplay/character models to maintain immersion
         final String semanticMemoryPrompt = isCharacterModel
-            ? "
+            ? """
 
 [Remembered context from past conversations]:
-$memoryLines"
-            : "
+$memoryLines"""
+            : """
 
 [HIYERARŞİK SEMANTİK BELLEK (Vector DB - MemGPT)]
 İlgili geçmiş bilgiler:
-$memoryLines";
+$memoryLines""";
         systemRole = (systemRole ?? fallbackRole) + semanticMemoryPrompt;
       }
     }
