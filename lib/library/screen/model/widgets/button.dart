@@ -12,7 +12,6 @@ import '../../../providers/details.dart';
 import '../../../providers/local.dart';
 import '../../models/widgets/cancel.dart';
 import '../../../../../server/user.dart';
-import '../../models/widgets/animated_gradient_border.dart';
 import '../../models/widgets/premium_bottom_sheet.dart';
 
 /// The bottom navigation bar for the Model Detail screen, handling all user actions.
@@ -135,6 +134,9 @@ class BottomActionButtons extends StatelessWidget {
     AppLocalizations localizations,
   ) {
     final screenWidth = MediaQuery.sizeOf(context).width;
+    final userProvider = context.read<UserProvider>();
+    final bool isSubscribed = userProvider.isSubscriptionActive;
+    final bool isPremiumLocked = provider.mainModel!.isPremium && !isSubscribed;
 
     return Container(
       key: const ValueKey('removeAndChat'),
@@ -148,7 +150,7 @@ class BottomActionButtons extends StatelessWidget {
               onTap: provider.isDeleting
                   ? null
                   : () async {
-                      HapticFeedback.lightImpact(); // Add haptic context
+                      HapticFeedback.lightImpact();
                       final success = await provider.removeModel(context);
                       if (success &&
                           provider.isUserCreatedModel &&
@@ -196,34 +198,34 @@ class BottomActionButtons extends StatelessWidget {
               child: Container(
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: AppColors.senaryColor,
+                  // Soft red for locked premium, soft blue for normal/subscribed
+                  color: isPremiumLocked
+                      ? const Color(0xFFEF5350)
+                      : const Color(0xFF1E88E5),
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(screenWidth * 0.03),
                     bottomRight: Radius.circular(screenWidth * 0.03),
                   ),
                 ),
-                child: provider.mainModel!.isPremium
-                  ? AnimatedGradientBorder(
-                      borderRadius: screenWidth * 0.03,
-                      borderWidth: 2.0,
-                      child: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: AppColors.senaryColor,
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(screenWidth * 0.03),
-                            bottomRight: Radius.circular(screenWidth * 0.03),
-                          ),
+                child: isPremiumLocked
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.lock_outline_rounded,
+                          color: Colors.white,
+                          size: screenWidth * 0.045,
                         ),
-                        child: Text(
-                          localizations.chat,
+                        SizedBox(width: screenWidth * 0.015),
+                        Text(
+                          localizations.locked,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: screenWidth * 0.04,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
+                      ],
                     )
                   : Text(
                       localizations.chat,
@@ -340,6 +342,9 @@ class BottomActionButtons extends StatelessWidget {
     AppLocalizations localizations,
   ) {
     final screenWidth = MediaQuery.sizeOf(context).width;
+    final userProvider = context.read<UserProvider>();
+    final bool isSubscribed = userProvider.isSubscriptionActive;
+    final bool isPremiumLocked = provider.mainModel!.isPremium && !isSubscribed;
 
     return Container(
       key: const ValueKey('chatOnly'),
@@ -353,39 +358,42 @@ class BottomActionButtons extends StatelessWidget {
                 _startChat(context, provider);
               },
         borderRadius: BorderRadius.circular(screenWidth * 0.03),
-        child: provider.mainModel!.isPremium
-          ? AnimatedGradientBorder(
-              borderRadius: screenWidth * 0.03,
-              borderWidth: 2.0,
-              child: Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.senaryColor,
-                  borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                ),
-                child: Text(
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            // Soft red for locked premium, soft blue for normal/subscribed
+            color: isPremiumLocked
+                ? const Color(0xFFEF5350)
+                : const Color(0xFF1E88E5),
+            borderRadius: BorderRadius.circular(screenWidth * 0.03),
+          ),
+          child: isPremiumLocked
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.lock_outline_rounded,
+                      color: Colors.white,
+                      size: screenWidth * 0.05,
+                    ),
+                    SizedBox(width: screenWidth * 0.02),
+                    Text(
+                      localizations.locked,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: screenWidth * 0.04,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                )
+              : Text(
                   localizations.chat,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: screenWidth * 0.04,
                       fontWeight: FontWeight.bold),
                 ),
-              ),
-            )
-          : Container(
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppColors.senaryColor,
-                borderRadius: BorderRadius.circular(screenWidth * 0.03),
-              ),
-              child: Text(
-                localizations.chat,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: screenWidth * 0.04,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
+        ),
       ),
     );
   }

@@ -450,7 +450,11 @@ class ChatSessionProvider with ChangeNotifier {
       _isLocalModelLoaded = false;
     }
 
-    if (savePreference) {
+    final bool shouldSave = savePreference &&
+        entity.category != 'roleplay' &&
+        entity.category != 'self';
+
+    if (shouldSave) {
       _savePreference(entity.id, entity.displayTitle);
     }
 
@@ -460,19 +464,15 @@ class ChatSessionProvider with ChangeNotifier {
   /// Initializes the session based on the user's last selected preference.
   /// This is called when the app starts or "New Chat" is clicked.
   Future<void> initializeDefaultSession() async {
-    final prefs = await SharedPreferences.getInstance();
-    String savedId = prefs.getString(_prefDefaultModelKey) ?? 'cortex/auto';
-
-    if (savedId == 'dynamic') savedId = 'cortex/auto';
-
+    // Always default to Cortex Roleplay for new chats as requested
+    String savedId = 'cortex/roleplay';
     final langCode = _currentLocale.languageCode;
     try {
       final bool isCacheEmpty = _modelService.getCachedModelsSync().isEmpty;
 
       // If cache is empty, we must wait for catalog to load before making a final decision.
       if (isCacheEmpty) {
-        String savedTitle =
-            prefs.getString('${_prefDefaultModelKey}_title') ?? '';
+        String savedTitle = 'Cortex';
         _initializeWithStub(savedId, savedTitle);
         return;
       }
@@ -536,7 +536,11 @@ class ChatSessionProvider with ChangeNotifier {
     _selectedModel =
         _modelService.getPreciseModelData(newModelId, langCode: langCode);
 
-    if (savePreference) {
+    final bool shouldSave = savePreference &&
+        _selectedModel?.category != 'roleplay' &&
+        _selectedModel?.category != 'self';
+
+    if (shouldSave) {
       _savePreference(newModelId, _selectedModel!.displayTitle);
     }
 

@@ -287,6 +287,7 @@ class ModelsBody extends StatelessWidget {
             ModelCategorySection(
               title: loc.localModels,
               models: local,
+              subCategories: const ['Tümü'], // Local models usually don't need extensive filtering
               pulseAnimation: pulseAnimation,
               downloadedStates: downloadedStates,
               downloadManagers: downloadManagers,
@@ -303,6 +304,7 @@ class ModelsBody extends StatelessWidget {
             ModelCategorySection(
               title: loc.onlineModels,
               models: serverSide,
+              subCategories: const ['Tümü', 'Ücretsiz', 'Premium', 'Video', 'Fotoğraf'],
               downloadedStates: downloadedStates,
               downloadManagers: downloadManagers,
               getCompatibilityStatus: getCompatibilityStatus,
@@ -318,6 +320,7 @@ class ModelsBody extends StatelessWidget {
             ModelCategorySection(
               title: loc.roleModels,
               models: role,
+              subCategories: const ['Tümü', 'Eril', 'Dişil', 'Cansız'],
               downloadedStates: downloadedStates,
               downloadManagers: downloadManagers,
               getCompatibilityStatus: getCompatibilityStatus,
@@ -333,6 +336,7 @@ class ModelsBody extends StatelessWidget {
             ModelCategorySection(
               title: loc.myModels,
               models: self,
+              subCategories: const ['Tümü'],
               downloadedStates: downloadedStates,
               downloadManagers: downloadManagers,
               getCompatibilityStatus: getCompatibilityStatus,

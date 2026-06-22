@@ -18,7 +18,6 @@ import '../../../backend/download/download.dart';
 import '../../../backend/utils.dart';
 import 'cancel.dart';
 import 'premium_badge.dart';
-import 'animated_gradient_border.dart';
 import 'premium_bottom_sheet.dart';
 import '../../../../server/user.dart';
 
@@ -229,7 +228,7 @@ class _ModelTileState extends State<ModelTile> {
           widget.onChatPressed();
         },
         style: ElevatedButton.styleFrom(
-            backgroundColor: widget.model.isPremium ? const Color(0xFF427DFF) : AppColors.senaryColor,
+            backgroundColor: widget.model.isPremium ? const Color(0xFFE57373) : AppColors.senaryColor,
             shape: RoundedRectangleBorder(borderRadius: br),
             padding: EdgeInsets.zero),
         child: FittedBox(
@@ -250,14 +249,6 @@ class _ModelTileState extends State<ModelTile> {
               : Text(loc.chat, style: _boldWhite(context, w)),
         ),
       );
-
-      if (widget.model.isPremium) {
-        chatBtn = AnimatedGradientBorder(
-          borderRadius: w * radiusFactor,
-          borderWidth: 2.0,
-          child: chatBtn,
-        );
-      }
 
       return SizedBox(
         key: ValueKey('chat-${widget.model.id}'),

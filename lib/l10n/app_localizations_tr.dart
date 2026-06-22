@@ -56,6 +56,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get chat => 'Sohbet';
 
   @override
+  String get locked => 'Kilitli';
+
+  @override
   String get languageModels => 'Dil Modelleri';
 
   @override
@@ -728,6 +731,18 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get behindTheSlaughter => 'Katliamın Ardında';
+
+  @override
+  String get cyberpunk => 'Cyberpunk';
+
+  @override
+  String get sunset => 'Gün Batımı';
+
+  @override
+  String get coffee => 'Kahve';
+
+  @override
+  String get deepSpace => 'Derin Uzay';
 
   @override
   String get grayscale => 'Gri Tonlama';

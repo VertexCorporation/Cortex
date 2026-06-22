@@ -56,6 +56,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
+  String get locked => 'Locked';
+
+  @override
   String get languageModels => 'Modelli linguistici';
 
   @override
@@ -68,7 +71,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get no => 'No';
 
   @override
-  String get yes => 'Sì';
+  String get yes => 'SÃ¬';
 
   @override
   String get done => 'Fatto';
@@ -221,7 +224,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dontHaveAccount => 'Non hai un account?';
 
   @override
-  String get alreadyHaveAccount => 'Hai già un account?';
+  String get alreadyHaveAccount => 'Hai giÃ  un account?';
 
   @override
   String get signUp => 'Iscriviti';
@@ -236,16 +239,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get wrongPassword => 'Password errata.';
 
   @override
-  String get emailAlreadyInUse => 'Questa email è già in uso.';
+  String get emailAlreadyInUse => 'Questa email Ã¨ giÃ  in uso.';
 
   @override
-  String get weakPassword => 'La password è troppo debole.';
+  String get weakPassword => 'La password Ã¨ troppo debole.';
 
   @override
   String get authError => 'Errore di Autenticazione';
 
   @override
-  String get usernameTaken => 'Questo nome utente è già stato preso.';
+  String get usernameTaken => 'Questo nome utente Ã¨ giÃ  stato preso.';
 
   @override
   String get username => 'Nome Utente';
@@ -255,7 +258,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get pleaseCheckYourEmail =>
-      'Per usare Cortex, devi verificare la tua email. \nUn link di verifica è stato inviato al tuo indirizzo email, controlla la tua posta.';
+      'Per usare Cortex, devi verificare la tua email. \nUn link di verifica Ã¨ stato inviato al tuo indirizzo email, controlla la tua posta.';
 
   @override
   String get verifyYourEmail => 'Verifica la Tua Email';
@@ -273,14 +276,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get verificationScreenWarning =>
-      'Anche se continui, il periodo di verifica dell\'account di 1 giorno è ancora valido per il tuo account. Se non avrai verificato il tuo account entro quella data, verrà eliminato dall\'app.';
+      'Anche se continui, il periodo di verifica dell\'account di 1 giorno Ã¨ ancora valido per il tuo account. Se non avrai verificato il tuo account entro quella data, verrÃ  eliminato dall\'app.';
 
   @override
-  String get unverifiedAccountHeader => 'Il tuo account non è verificato';
+  String get unverifiedAccountHeader => 'Il tuo account non Ã¨ verificato';
 
   @override
   String unverifiedAccountWarning(Object timeLeft) {
-    return 'Se non verifichi il tuo account entro $timeLeft, verrà eliminato';
+    return 'Se non verifichi il tuo account entro $timeLeft, verrÃ  eliminato';
   }
 
   @override
@@ -291,7 +294,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get accountDeletionRequested =>
-      'La tua richiesta di eliminazione dell\'account è stata ricevuta e il tuo account è ora disabilitato.';
+      'La tua richiesta di eliminazione dell\'account Ã¨ stata ricevuta e il tuo account Ã¨ ora disabilitato.';
 
   @override
   String get tooManyRequests => 'Troppe richieste';
@@ -310,11 +313,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get delete => 'Elimina';
 
   @override
-  String get passwordRequired => 'La password è richiesta.';
+  String get passwordRequired => 'La password Ã¨ richiesta.';
 
   @override
   String get deleteDescription =>
-      'I dati che elimini verranno rimossi permanentemente dal nostro server e dal tuo dispositivo. Questa azione non può essere annullata.';
+      'I dati che elimini verranno rimossi permanentemente dal nostro server e dal tuo dispositivo. Questa azione non puÃ² essere annullata.';
 
   @override
   String get editProfile => 'Modifica Profilo';
@@ -345,7 +348,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get themeDescription =>
-      'Puoi passare dal tema chiaro a quello scuro come preferisci. Il tema selezionato verrà applicato a tutta l\'interfaccia di Cortex.';
+      'Puoi passare dal tema chiaro a quello scuro come preferisci. Il tema selezionato verrÃ  applicato a tutta l\'interfaccia di Cortex.';
 
   @override
   String get iHaveReadAndAgree => 'Ho letto e accetto i termini di servizio';
@@ -375,7 +378,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get plusDescription =>
-      'Esperienza di intelligenza artificiale d\'élite';
+      'Esperienza di intelligenza artificiale d\'Ã©lite';
 
   @override
   String get annual => 'Annuale';
@@ -423,7 +426,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
-      'Effettuando questo ordine, accetti i Termini di Servizio e l\'Informativa sulla Privacy. Puoi cliccare su questo testo per saperne di più sui nostri Termini di Servizio e sulla nostra Informativa sulla Privacy. L\'abbonamento si rinnoverà automaticamente a meno che il rinnovo automatico non venga disattivato almeno 24 ore prima della fine del periodo corrente.';
+      'Effettuando questo ordine, accetti i Termini di Servizio e l\'Informativa sulla Privacy. Puoi cliccare su questo testo per saperne di piÃ¹ sui nostri Termini di Servizio e sulla nostra Informativa sulla Privacy. L\'abbonamento si rinnoverÃ  automaticamente a meno che il rinnovo automatico non venga disattivato almeno 24 ore prima della fine del periodo corrente.';
 
   @override
   String get termsOfService => 'Termini di Servizio';
@@ -441,16 +444,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get reportDialogTitle => 'Invia Segnalazione';
 
   @override
-  String get reportDescriptionLabel => 'Qual è il problema?';
+  String get reportDescriptionLabel => 'Qual Ã¨ il problema?';
 
   @override
-  String get reportHarmful => 'Questo è dannoso/non sicuro';
+  String get reportHarmful => 'Questo Ã¨ dannoso/non sicuro';
 
   @override
-  String get reportNotTrue => 'Questo non è vero';
+  String get reportNotTrue => 'Questo non Ã¨ vero';
 
   @override
-  String get reportNotHelpful => 'Questo non è utile';
+  String get reportNotHelpful => 'Questo non Ã¨ utile';
 
   @override
   String get closeButton => 'Chiudi';
@@ -462,14 +465,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String get reportErrorMessage => 'Seleziona un motivo per la segnalazione.';
 
   @override
-  String get capabilitiesSection => 'Capacità';
+  String get capabilitiesSection => 'CapacitÃ ';
 
   @override
   String get featurePhotoTitle => 'Scansione Foto';
 
   @override
   String get featurePhotoDescription =>
-      'Questo modello ha la capacità di scansionare foto tramite fotocamera o file di immagine.';
+      'Questo modello ha la capacitÃ  di scansionare foto tramite fotocamera o file di immagine.';
 
   @override
   String get featureOfflineTitle => 'Funzionamento Offline';
@@ -538,7 +541,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get support => 'Sostieni';
 
   @override
-  String get tagCannotBeEmpty => 'Il tag creatore non può essere vuoto';
+  String get tagCannotBeEmpty => 'Il tag creatore non puÃ² essere vuoto';
 
   @override
   String get userId => 'ID Utente';
@@ -548,7 +551,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get deleteAllConversationsConfirmMessage =>
-      'Sei sicuro di voler eliminare tutte le tue chat? L\'azione non può essere annullata.';
+      'Sei sicuro di voler eliminare tutte le tue chat? L\'azione non puÃ² essere annullata.';
 
   @override
   String get conversationDeleted => 'Conversazione eliminata!';
@@ -624,11 +627,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get ram => 'RAM';
 
   @override
-  String get usernameTooShort => 'Il nome utente è troppo corto.';
+  String get usernameTooShort => 'Il nome utente Ã¨ troppo corto.';
 
   @override
   String get usernameTooLong =>
-      'Il nome utente non può superare i 16 caratteri.';
+      'Il nome utente non puÃ² superare i 16 caratteri.';
 
   @override
   String get invalidUsernameCharacters =>
@@ -657,7 +660,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'Vuoi davvero rimuovere il modello $model dal tuo dispositivo? Così facendo, verranno eliminate anche tutte le conversazioni precedenti con quel modello.';
+    return 'Vuoi davvero rimuovere il modello $model dal tuo dispositivo? CosÃ¬ facendo, verranno eliminate anche tutte le conversazioni precedenti con quel modello.';
   }
 
   @override
@@ -673,7 +676,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get benefit4 => 'Distintivo di appartenenza';
 
   @override
-  String get benefit5 => 'Crea più intelligenze artificiali online';
+  String get benefit5 => 'Crea piÃ¹ intelligenze artificiali online';
 
   @override
   String get benefit7 => 'Ulteriori limiti di utilizzo';
@@ -688,7 +691,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get benefit10 => 'Altri allegati';
 
   @override
-  String get benefit11 => 'Più modalità di flusso';
+  String get benefit11 => 'PiÃ¹ modalitÃ  di flusso';
 
   @override
   String get oldBenefits => 'Tutti i vantaggi dei piani inferiori';
@@ -736,6 +739,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get behindTheSlaughter => 'Dietro il Massacro';
 
   @override
+  String get cyberpunk => 'Cyberpunk';
+
+  @override
+  String get sunset => 'Sunset';
+
+  @override
+  String get coffee => 'Coffee';
+
+  @override
+  String get deepSpace => 'Deep Space';
+
+  @override
   String get grayscale => 'Scala di Grigi';
 
   @override
@@ -745,7 +760,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get scarletSnow => 'Neve Scarlatta';
 
   @override
-  String get requestFailed => 'Si è verificato un errore, riprova.';
+  String get requestFailed => 'Si Ã¨ verificato un errore, riprova.';
 
   @override
   String get changeModel => 'Cambia';
@@ -755,17 +770,17 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get editingMessageInfo =>
-      'La modifica di questo messaggio riavvierà la conversazione da qui.';
+      'La modifica di questo messaggio riavvierÃ  la conversazione da qui.';
 
   @override
-  String get editingNotification => 'Sei ora in modalità di modifica';
+  String get editingNotification => 'Sei ora in modalitÃ  di modifica';
 
   @override
   String get featurePluralTitle => 'Plurale';
 
   @override
   String get featurePluralDescription =>
-      'Questo modello può integrare automaticamente estensioni aggiuntive, espandendo così le sue capacità funzionali per supportare una vasta gamma di operazioni con prestazioni migliorate.';
+      'Questo modello puÃ² integrare automaticamente estensioni aggiuntive, espandendo cosÃ¬ le sue capacitÃ  funzionali per supportare una vasta gamma di operazioni con prestazioni migliorate.';
 
   @override
   String get nameLabel => 'Nome IA';
@@ -788,14 +803,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get preInputDescription =>
-      'Imposta un pre-input che guiderà il tuo modello nel processo di creazione del personaggio. In questa sezione puoi includere informazioni relative al personaggio, contesto aggiuntivo e qualsiasi dettaglio extra che possa aiutare a generare contenuti relativi al personaggio.';
+      'Imposta un pre-input che guiderÃ  il tuo modello nel processo di creazione del personaggio. In questa sezione puoi includere informazioni relative al personaggio, contesto aggiuntivo e qualsiasi dettaglio extra che possa aiutare a generare contenuti relativi al personaggio.';
 
   @override
   String get baseModelTitle => 'Modello di Base';
 
   @override
   String get baseModelDescription =>
-      'Questo è il modello che verrà utilizzato come base per la tua creazione. Mostra il modello di base attualmente selezionato.';
+      'Questo Ã¨ il modello che verrÃ  utilizzato come base per la tua creazione. Mostra il modello di base attualmente selezionato.';
 
   @override
   String get summary => 'Riepilogo';
@@ -805,7 +820,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get modelUploadDescription =>
-      'Seleziona e carica i tuoi file GGUF locali direttamente dal tuo dispositivo. Ciò ti consente di eseguire il tuo modello offline senza bisogno di una connessione Internet. Assicurati che il file sia in un formato GGUF valido e correttamente strutturato. Se il file è errato o corrotto, Cortex potrebbe non funzionare come previsto e potresti riscontrare errori.';
+      'Seleziona e carica i tuoi file GGUF locali direttamente dal tuo dispositivo. CiÃ² ti consente di eseguire il tuo modello offline senza bisogno di una connessione Internet. Assicurati che il file sia in un formato GGUF valido e correttamente strutturato. Se il file Ã¨ errato o corrotto, Cortex potrebbe non funzionare come previsto e potresti riscontrare errori.';
 
   @override
   String get modelUploadShortDescription =>
@@ -830,20 +845,20 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get offlineModelNotInstalled =>
-      'Questo modello offline non è installato sul tuo dispositivo.';
+      'Questo modello offline non Ã¨ installato sul tuo dispositivo.';
 
   @override
   String get reachedLimit =>
-      'Hai raggiunto il limite di utilizzo; per ottenere altri limiti, puoi aggiornare il tuo piano. (Ehi, capiamo perfettamente che esaurire i limiti sia una seccatura. Ma seriamente, ricevere quelle fantastiche risposte non è gratis, quindi questi limiti ci aiutano a far sì che i bei momenti continuino a scorrere.)';
+      'Hai raggiunto il limite di utilizzo; per ottenere altri limiti, puoi aggiornare il tuo piano. (Ehi, capiamo perfettamente che esaurire i limiti sia una seccatura. Ma seriamente, ricevere quelle fantastiche risposte non Ã¨ gratis, quindi questi limiti ci aiutano a far sÃ¬ che i bei momenti continuino a scorrere.)';
 
   @override
-  String get modality => 'Modalità';
+  String get modality => 'ModalitÃ ';
 
   @override
   String get multimodal => 'Multimodale';
 
   @override
-  String get anErrorOccurred => 'Si è Verificato un Errore';
+  String get anErrorOccurred => 'Si Ã¨ Verificato un Errore';
 
   @override
   String get themeLocked =>
@@ -866,15 +881,15 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get errorServer =>
-      'Si è verificato un errore imprevisto del server. Riprova più tardi.';
+      'Si Ã¨ verificato un errore imprevisto del server. Riprova piÃ¹ tardi.';
 
   @override
   String get errorNetwork =>
-      'Si è verificato un errore di rete. Controlla la tua connessione e riprova.';
+      'Si Ã¨ verificato un errore di rete. Controlla la tua connessione e riprova.';
 
   @override
   String get baseModelForCharacterDescription =>
-      'Il modello di base selezionato determinerà le capacità di ragionamento e di risposta del personaggio.';
+      'Il modello di base selezionato determinerÃ  le capacitÃ  di ragionamento e di risposta del personaggio.';
 
   @override
   String get selectBaseModel => 'Seleziona un Modello di Base';
@@ -901,7 +916,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get falErrorSchemaInvalid =>
-      'L\'input è stato rifiutato dal servizio di generazione.';
+      'L\'input Ã¨ stato rifiutato dal servizio di generazione.';
 
   @override
   String falErrorGenericStatus(int statusCode) {
@@ -944,24 +959,24 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return '“$modelName” è stato rimosso con successo.';
+    return 'â€œ$modelNameâ€ Ã¨ stato rimosso con successo.';
   }
 
   @override
   String get errorCreatingModel =>
-      'Si è verificato un errore imprevisto durante la creazione del modello.';
+      'Si Ã¨ verificato un errore imprevisto durante la creazione del modello.';
 
   @override
   String get errorDeletingModel =>
-      'Si è verificato un errore imprevisto durante l\'eliminazione del modello.';
+      'Si Ã¨ verificato un errore imprevisto durante l\'eliminazione del modello.';
 
   @override
   String get ultraFeatureOnly =>
-      'Questa funzione è disponibile solo per i membri Ultra.';
+      'Questa funzione Ã¨ disponibile solo per i membri Ultra.';
 
   @override
   String get experimentalOfflineWarning =>
-      'La modalità offline è ancora sperimentale e il modello che scarichi potrebbe non funzionare con efficienza ottimale.';
+      'La modalitÃ  offline Ã¨ ancora sperimentale e il modello che scarichi potrebbe non funzionare con efficienza ottimale.';
 
   @override
   String get noConversationsToDelete => 'Non hai conversazioni da eliminare.';
@@ -971,18 +986,18 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get verificationDelayed =>
-      'Il tuo acquisto è confermato. C\'è un leggero ritardo nell\'aggiornamento del tuo account, apparirà a breve.';
+      'Il tuo acquisto Ã¨ confermato. C\'Ã¨ un leggero ritardo nell\'aggiornamento del tuo account, apparirÃ  a breve.';
 
   @override
   String get maintenanceTitle => 'In Manutenzione';
 
   @override
   String get maintenanceMessage =>
-      'Cortex è temporaneamente offline mentre implementiamo alcuni importanti aggiornamenti. L\'accesso all\'app verrà ripristinato a breve.\n\nGrazie per la tua pazienza mentre miglioriamo la tua esperienza.';
+      'Cortex Ã¨ temporaneamente offline mentre implementiamo alcuni importanti aggiornamenti. L\'accesso all\'app verrÃ  ripristinato a breve.\n\nGrazie per la tua pazienza mentre miglioriamo la tua esperienza.';
 
   @override
   String get errorPromptFlagged =>
-      'Il tuo messaggio è stato rilevato come inappropriato e non è stato possibile inviarlo.';
+      'Il tuo messaggio Ã¨ stato rilevato come inappropriato e non Ã¨ stato possibile inviarlo.';
 
   @override
   String get notEnoughStorage =>
@@ -994,7 +1009,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get errorContentFlagged =>
-      'Il modello non è stato salvato perché il suo contenuto è stato segnalato come inappropriato.';
+      'Il modello non Ã¨ stato salvato perchÃ© il suo contenuto Ã¨ stato segnalato come inappropriato.';
 
   @override
   String get deleteAllConversationsDisabledInfo =>
@@ -1004,7 +1019,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get invalidCredentials => 'Email o password errate.';
 
   @override
-  String get userDisabled => 'Questo account utente è stato disabilitato.';
+  String get userDisabled => 'Questo account utente Ã¨ stato disabilitato.';
 
   @override
   String get loginSubtitle =>
@@ -1016,14 +1031,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get storagePermissionRequired =>
-      'È richiesta l\'autorizzazione di archiviazione per salvare i modelli scaricati. Concedi l\'autorizzazione per continuare.';
+      'Ãˆ richiesta l\'autorizzazione di archiviazione per salvare i modelli scaricati. Concedi l\'autorizzazione per continuare.';
 
   @override
   String get inviteShareSubject => 'Unisciti a me su Cortex!';
 
   @override
   String inviteShareMessage(String cortexLink) {
-    return 'ao c\'è sta app assurda che si chiama cortex se inviti gente ci becchiamo il plus gratis entrambi AFFARE PAZZESCO SCARICA SUBITO\n\n$cortexLink';
+    return 'ao c\'Ã¨ sta app assurda che si chiama cortex se inviti gente ci becchiamo il plus gratis entrambi AFFARE PAZZESCO SCARICA SUBITO\n\n$cortexLink';
   }
 
   @override
@@ -1031,10 +1046,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get reviewHelpUsGrow =>
-      'La tua valutazione è un enorme supporto per il nostro giovane team indipendente e ci aiuta a rendere Cortex ancora migliore per te.';
+      'La tua valutazione Ã¨ un enorme supporto per il nostro giovane team indipendente e ci aiuta a rendere Cortex ancora migliore per te.';
 
   @override
-  String get reviewMaybeLater => 'Forse più tardi';
+  String get reviewMaybeLater => 'Forse piÃ¹ tardi';
 
   @override
   String get reviewRateNow => 'Valuta Ora';
@@ -1047,7 +1062,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get updateRequiredMessage =>
-      'Per continuare a utilizzare Cortex, aggiorna l\'app all\'ultima versione per nuove funzionalità e importanti miglioramenti.';
+      'Per continuare a utilizzare Cortex, aggiorna l\'app all\'ultima versione per nuove funzionalitÃ  e importanti miglioramenti.';
 
   @override
   String get updateNowButton => 'Aggiorna Ora';
@@ -1061,14 +1076,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get featureDocumentDescription =>
-      'Questo modello può analizzare e rispondere a domande sui documenti caricati, come PDF e file di testo.';
+      'Questo modello puÃ² analizzare e rispondere a domande sui documenti caricati, come PDF e file di testo.';
 
   @override
   String get featureImageGenerationTitle => 'Generazione di immagini';
 
   @override
   String get featureImageGenerationDescription =>
-      'Questo modello può creare immagini originali basate sulle descrizioni del testo.';
+      'Questo modello puÃ² creare immagini originali basate sulle descrizioni del testo.';
 
   @override
   String get featureAudioGenerationTitle => 'Audio Generation';
@@ -1089,7 +1104,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      'Questa IA è una IA premium, gli utenti gratuiti hanno accesso limitato alle IA premium; aggiorna per sbloccare l\'accesso illimitato!';
+      'Questa IA Ã¨ una IA premium, gli utenti gratuiti hanno accesso limitato alle IA premium; aggiorna per sbloccare l\'accesso illimitato!';
 
   @override
   String get benefitPremiumModels => 'Accesso ai modelli premium';
@@ -1140,14 +1155,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationComebackBody =>
-      'Rilassati, questo non è un messaggio del tuo ex. Ma *puoi* creare il tuo ex in Cortex! Torna indietro.';
+      'Rilassati, questo non Ã¨ un messaggio del tuo ex. Ma *puoi* creare il tuo ex in Cortex! Torna indietro.';
 
   @override
-  String get notificationLongTimeNoSeeTitle => 'È passato un po\' di tempo';
+  String get notificationLongTimeNoSeeTitle => 'Ãˆ passato un po\' di tempo';
 
   @override
   String get notificationLongTimeNoSeeBody =>
-      'Molte cose sono cambiate dalla nostra ultima chiacchierata. Venite a scoprire le novità.';
+      'Molte cose sono cambiate dalla nostra ultima chiacchierata. Venite a scoprire le novitÃ .';
 
   @override
   String get notificationHowAreYouTitle => 'Che cosa succede?';
@@ -1156,14 +1171,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String get notificationHowAreYouBody => 'Vieni a raccontarmi tutto.';
 
   @override
-  String get notificationNewYearTitle => 'Buon anno! 🎉';
+  String get notificationNewYearTitle => 'Buon anno! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
-      'Che il nuovo anno ti porti salute, felicità e creatività senza fine; Cortex è sempre al tuo fianco!';
+      'Che il nuovo anno ti porti salute, felicitÃ  e creativitÃ  senza fine; Cortex Ã¨ sempre al tuo fianco!';
 
   @override
-  String get notificationValentinesDayTitle => 'L\'amore è nell\'aria! ❤️';
+  String get notificationValentinesDayTitle => 'L\'amore Ã¨ nell\'aria! â¤ï¸';
 
   @override
   String get notificationValentinesDayBody =>
@@ -1174,38 +1189,38 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      'Commemoriamo con rispetto Gazi Mustafa Kemal Atatürk, fondatore della Repubblica di Turchia, nell\'anniversario della sua scomparsa.';
+      'Commemoriamo con rispetto Gazi Mustafa Kemal AtatÃ¼rk, fondatore della Repubblica di Turchia, nell\'anniversario della sua scomparsa.';
 
   @override
   String get notificationMothersDayTitle => 'Tua mamma!';
 
   @override
   String get notificationMothersDayBody =>
-      'Buona festa della mamma a tutte le mamme là fuori, a cominciare dalla tua!';
+      'Buona festa della mamma a tutte le mamme lÃ  fuori, a cominciare dalla tua!';
 
   @override
   String get notificationFathersDayTitle => 'Tuo padre!';
 
   @override
   String get notificationFathersDayBody =>
-      'Buona festa del papà a tutti i papà là fuori, a cominciare dal tuo!';
+      'Buona festa del papÃ  a tutti i papÃ  lÃ  fuori, a cominciare dal tuo!';
 
   @override
   String get notificationHomeworkHelperTitle => 'I compiti si accumulano?';
 
   @override
   String get notificationHomeworkHelperBody =>
-      'Ricorda, il personaggio Insegnante in Cortex è qui per aiutarti con qualsiasi materia tu abbia difficoltà!';
+      'Ricorda, il personaggio Insegnante in Cortex Ã¨ qui per aiutarti con qualsiasi materia tu abbia difficoltÃ !';
 
   @override
   String get notificationTrollAnimeTitle => 'La tua Waifu ti sta chiamando';
 
   @override
   String get notificationTrollAnimeBody =>
-      'Una ragazza anime ha appena chiamato e ha detto che le manchi; probabilmente dovresti andare a chiacchierare con lei. 😉';
+      'Una ragazza anime ha appena chiamato e ha detto che le manchi; probabilmente dovresti andare a chiacchierare con lei. ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => '🚨 ALLERTA ROSSA 🚨';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ ALLERTA ROSSA ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1216,26 +1231,26 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String notificationNewModelAddedBody(Object modelName) {
-    return 'Il modello $modelName è ora in Cortex. Inizia una chat e scopri i suoi limiti.';
+    return 'Il modello $modelName Ã¨ ora in Cortex. Inizia una chat e scopri i suoi limiti.';
   }
 
   @override
-  String get notificationAppUpdateTitle => 'La corteccia si è evoluta!';
+  String get notificationAppUpdateTitle => 'La corteccia si Ã¨ evoluta!';
 
   @override
   String get notificationAppUpdateBody =>
-      'Non dimenticare di aggiornare l\'app per scoprire nuove funzionalità e miglioramenti!';
+      'Non dimenticare di aggiornare l\'app per scoprire nuove funzionalitÃ  e miglioramenti!';
 
   @override
   String get notificationNewFeatureTitle => 'wow!';
 
   @override
   String notificationNewFeatureBody(Object featureName) {
-    return 'Scopri la nuova funzionalità $featureName. Cortex è ora più potente che mai.';
+    return 'Scopri la nuova funzionalitÃ  $featureName. Cortex Ã¨ ora piÃ¹ potente che mai.';
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'Regalo di benvenuto 🎁';
+  String get notificationWelcomeOfferTitle => 'Regalo di benvenuto ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1246,7 +1261,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationSocialMediaBody =>
-      'Seguiteci su Instagram (vertex.23) per le ultime novità!';
+      'Seguiteci su Instagram (vertex.23) per le ultime novitÃ !';
 
   @override
   String get notificationRandomFactTitle => 'Fatto casuale';
@@ -1260,17 +1275,17 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationGoodMorningBody =>
-      'Ti aspetta una giornata fantastica. Che ne dici di iniziarla con una tazza di caffè e una chiacchierata interessante?';
+      'Ti aspetta una giornata fantastica. Che ne dici di iniziarla con una tazza di caffÃ¨ e una chiacchierata interessante?';
 
   @override
   String get notificationGoodNightTitle => 'Buona notte!';
 
   @override
   String get notificationGoodNightBody =>
-      'Cortex è con te anche quando dormi. Non preoccuparti, non ti toccherà.';
+      'Cortex Ã¨ con te anche quando dormi. Non preoccuparti, non ti toccherÃ .';
 
   @override
-  String get notificationOfflineReadyTitle => 'La modalità offline è pronta';
+  String get notificationOfflineReadyTitle => 'La modalitÃ  offline Ã¨ pronta';
 
   @override
   String get notificationOfflineReadyBody =>
@@ -1281,14 +1296,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationRateAppBody =>
-      'Se ami Cortex, potresti supportarci con una valutazione a 5 stelle nel nostro negozio? Credo proprio di sì. Lo farai.';
+      'Se ami Cortex, potresti supportarci con una valutazione a 5 stelle nel nostro negozio? Credo proprio di sÃ¬. Lo farai.';
 
   @override
   String get notificationReferralTitle => 'Uno per tutti, tutti per uno.';
 
   @override
   String get notificationReferralBody =>
-      'Invita un amico su Cortex e avrete entrambi un giorno gratis in più!';
+      'Invita un amico su Cortex e avrete entrambi un giorno gratis in piÃ¹!';
 
   @override
   String get notificationCookingTitle => 'Hai fame?';
@@ -1309,7 +1324,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationCustomModelBody =>
-      'Hai già esplorato la sezione dedicata alla creazione dei modelli? È il momento perfetto per creare il tuo personaggio e interagire con lui!';
+      'Hai giÃ  esplorato la sezione dedicata alla creazione dei modelli? Ãˆ il momento perfetto per creare il tuo personaggio e interagire con lui!';
 
   @override
   String get notificationDynamicChatTitle =>
@@ -1324,7 +1339,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'Il mare è calmo e il vento è a favore. Ci sono nuove isole (modelli 😉) da scoprire nell\'oceano di Cortex. Raduna il tuo equipaggio e salpa!';
+      'Il mare Ã¨ calmo e il vento Ã¨ a favore. Ci sono nuove isole (modelli ğŸ˜‰) da scoprire nell\'oceano di Cortex. Raduna il tuo equipaggio e salpa!';
 
   @override
   String get notificationFortuneCookieTitle =>
@@ -1339,7 +1354,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationSingularityBody =>
-      'Non è successo niente, avevo solo voglia di mandare un messaggio. Forse ti va di mandare un messaggio a qualche IA, cosa ne dici?';
+      'Non Ã¨ successo niente, avevo solo voglia di mandare un messaggio. Forse ti va di mandare un messaggio a qualche IA, cosa ne dici?';
 
   @override
   String get notificationHackerJokeTitle =>
@@ -1347,7 +1362,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationHackerJokeBody =>
-      'Ecco perché il personaggio Hacker è in Cortex. Scherzo scherzo; non provarci nemmeno, è illegale.';
+      'Ecco perchÃ© il personaggio Hacker Ã¨ in Cortex. Scherzo scherzo; non provarci nemmeno, Ã¨ illegale.';
 
   @override
   String get notificationDetectiveCaseTitle =>
@@ -1365,7 +1380,7 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String notificationUpsellFeatureBody(
       Object currentTier, Object featureName, Object targetTier) {
-    return 'Ciao abbonato $currentTier! Il piano $targetTier ha appena aggiunto la funzionalità $featureName, che porterà il tuo Cortex a un livello superiore. Che ne dici di un upgrade?';
+    return 'Ciao abbonato $currentTier! Il piano $targetTier ha appena aggiunto la funzionalitÃ  $featureName, che porterÃ  il tuo Cortex a un livello superiore. Che ne dici di un upgrade?';
   }
 
   @override
@@ -1373,29 +1388,29 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationOriginStoryBody =>
-      'Sapevi che abbiamo iniziato a programmare questa app a 15 anni, con un solo sogno? Per quasi un anno, ogni mattina e ogni sera, quel sogno è in ogni singola riga di codice.';
+      'Sapevi che abbiamo iniziato a programmare questa app a 15 anni, con un solo sogno? Per quasi un anno, ogni mattina e ogni sera, quel sogno Ã¨ in ogni singola riga di codice.';
 
   @override
-  String get notificationOpenSourceTitle => 'Potere alla comunità!';
+  String get notificationOpenSourceTitle => 'Potere alla comunitÃ !';
 
   @override
   String get notificationOpenSourceBody =>
-      'Cortex è completamente open source. Se vuoi dare un\'occhiata al nostro codice e contribuire al nostro sviluppo, la nostra porta è sempre aperta.';
+      'Cortex Ã¨ completamente open source. Se vuoi dare un\'occhiata al nostro codice e contribuire al nostro sviluppo, la nostra porta Ã¨ sempre aperta.';
 
   @override
   String get notificationRejectionStoryTitle =>
-      'Grinta, duro lavoro, felicità!';
+      'Grinta, duro lavoro, felicitÃ !';
 
   @override
   String get notificationRejectionStoryBody =>
-      'Cortex è stato rifiutato più di 20 volte e sospeso due volte da Google Play prima della sua pubblicazione. Ma ci abbiamo creduto e ce l\'abbiamo fatta. Non rinunciare mai ai tuoi sogni!';
+      'Cortex Ã¨ stato rifiutato piÃ¹ di 20 volte e sospeso due volte da Google Play prima della sua pubblicazione. Ma ci abbiamo creduto e ce l\'abbiamo fatta. Non rinunciare mai ai tuoi sogni!';
 
   @override
   String get notificationGGUFSupportTitle => 'Porta il tuo modello!';
 
   @override
   String get notificationGGUFSupportBody =>
-      'Ricorda, puoi aggiungere i tuoi modelli di intelligenza artificiale in formato GGUF a Cortex e utilizzarli offline. Il potere è nelle tue mani.';
+      'Ricorda, puoi aggiungere i tuoi modelli di intelligenza artificiale in formato GGUF a Cortex e utilizzarli offline. Il potere Ã¨ nelle tue mani.';
 
   @override
   String get notificationThemeCustomizationTitle => 'Un tema per il tuo umore';
@@ -1409,7 +1424,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationShowerThoughtBody =>
-      'Se un\'anguria è un frutto, questo rende tecnicamente il succo di anguria un frullato? Potresti voler discutere di questo argomento così profondo (davvero profondo) con una modella.';
+      'Se un\'anguria Ã¨ un frutto, questo rende tecnicamente il succo di anguria un frullato? Potresti voler discutere di questo argomento cosÃ¬ profondo (davvero profondo) con una modella.';
 
   @override
   String get notificationLowBatteryTitle =>
@@ -1417,14 +1432,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationLowBatteryBody =>
-      'Forse il tuo telefono si sta scaricando, ma la mia energia è sempre al 100%! Collegalo e continuiamo a chiacchierare.';
+      'Forse il tuo telefono si sta scaricando, ma la mia energia Ã¨ sempre al 100%! Collegalo e continuiamo a chiacchierare.';
 
   @override
   String get channelFcmName => 'Aggiornamenti Cortex';
 
   @override
   String get channelFcmDescription =>
-      'Notifiche su novità, aggiornamenti e altre informazioni da Cortex.';
+      'Notifiche su novitÃ , aggiornamenti e altre informazioni da Cortex.';
 
   @override
   String get channelEngagementName => 'Promemoria amichevoli';
@@ -1441,17 +1456,17 @@ class AppLocalizationsIt extends AppLocalizations {
       'Messaggi come buongiorno e buonanotte.';
 
   @override
-  String get tagNotFound => 'Il tag inserito non è valido o è scaduto.';
+  String get tagNotFound => 'Il tag inserito non Ã¨ valido o Ã¨ scaduto.';
 
   @override
-  String get whatIsNew => 'Cosa c\'è di nuovo?';
+  String get whatIsNew => 'Cosa c\'Ã¨ di nuovo?';
 
   @override
   String get onboardingTitle1 => 'Ciao! Siamo il Cortex Team.';
 
   @override
   String onboardingDesc1(String userName) {
-    return 'È fantastico vederti qui, $userName. Siamo un gruppo di sviluppatori delle scuole superiori che hanno deciso di riscrivere le regole del settore dell\'intelligenza artificiale. È un piacere conoscerti! Impariamo a conoscerci meglio.';
+    return 'Ãˆ fantastico vederti qui, $userName. Siamo un gruppo di sviluppatori delle scuole superiori che hanno deciso di riscrivere le regole del settore dell\'intelligenza artificiale. Ãˆ un piacere conoscerti! Impariamo a conoscerci meglio.';
   }
 
   @override
@@ -1459,7 +1474,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get onboardingDesc2 =>
-      'La rivoluzione dell\'intelligenza artificiale è arrivata, ma è rimasta bloccata sulla soglia. Con abbonamenti elevati, piattaforme complesse, chi viola la privacy e chi blocca l\'accesso all\'intelligenza artificiale... finché loro sono rimasti nel gioco, questa soglia non poteva essere superata.';
+      'La rivoluzione dell\'intelligenza artificiale Ã¨ arrivata, ma Ã¨ rimasta bloccata sulla soglia. Con abbonamenti elevati, piattaforme complesse, chi viola la privacy e chi blocca l\'accesso all\'intelligenza artificiale... finchÃ© loro sono rimasti nel gioco, questa soglia non poteva essere superata.';
 
   @override
   String get onboardingTitle3 => 'Non potevamo restare a guardare.';
@@ -1469,24 +1484,24 @@ class AppLocalizationsIt extends AppLocalizations {
       'Per superare questa soglia, abbiamo creato una piattaforma potente, esteticamente gradevole, personalizzabile, facile da usare, completamente trasparente, che funziona sia online che offline e conserva i tuoi dati solo sul tuo dispositivo. Abbiamo restituito il potere a chi lo merita: a te.';
 
   @override
-  String get onboardingTitle4 => 'Non è mai stato facile.';
+  String get onboardingTitle4 => 'Non Ã¨ mai stato facile.';
 
   @override
   String get onboardingDesc4 =>
-      'Siamo stati respinti decine di volte, sospesi più volte, abbiamo ricevuto falsi avvertimenti e abbiamo dovuto cambiare il nostro marchio decine di volte. In tutto questo, e anche di più, ci è stato detto che non si poteva fare. Ma non ci siamo mai arresi, convinti che questo progetto appartenga a tutti, non solo a noi. Ed è esattamente per questo che siamo qui.';
+      'Siamo stati respinti decine di volte, sospesi piÃ¹ volte, abbiamo ricevuto falsi avvertimenti e abbiamo dovuto cambiare il nostro marchio decine di volte. In tutto questo, e anche di piÃ¹, ci Ã¨ stato detto che non si poteva fare. Ma non ci siamo mai arresi, convinti che questo progetto appartenga a tutti, non solo a noi. Ed Ã¨ esattamente per questo che siamo qui.';
 
   @override
-  String get onboardingFinalTitle => 'È tempo di una rivoluzione.';
+  String get onboardingFinalTitle => 'Ãˆ tempo di una rivoluzione.';
 
   @override
   String get onboardingFinalDescription =>
-      'Se vedete questa schermata, è perché non ci siamo arresi. E non abbiamo alcuna intenzione di arrenderci. Forza, portiamo insieme la rivoluzione dell\'intelligenza artificiale nel mondo. Per far parte di questa storia...';
+      'Se vedete questa schermata, Ã¨ perchÃ© non ci siamo arresi. E non abbiamo alcuna intenzione di arrenderci. Forza, portiamo insieme la rivoluzione dell\'intelligenza artificiale nel mondo. Per far parte di questa storia...';
 
   @override
   String get onboardingFinalQuestion => 'SEI PRONTO?';
 
   @override
-  String get onboardingFinalButton => 'SÌ!';
+  String get onboardingFinalButton => 'SÃŒ!';
 
   @override
   String get dude => 'Tizio';
@@ -1496,24 +1511,24 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get cacheIsNotUpToDate =>
-      'La cache del Play Store non è aggiornata. Chiudi e riapri l\'app Play Store oppure riavvia il dispositivo.';
+      'La cache del Play Store non Ã¨ aggiornata. Chiudi e riapri l\'app Play Store oppure riavvia il dispositivo.';
 
   @override
   String get continueAsGuest => 'Continua senza creare un account';
 
   @override
   String get guestModeWarning =>
-      'La modalità ospite ha funzionalità limitate per garantire la migliore qualità del servizio.';
+      'La modalitÃ  ospite ha funzionalitÃ  limitate per garantire la migliore qualitÃ  del servizio.';
 
   @override
-  String get anonymousEntity => 'Entità anonima';
+  String get anonymousEntity => 'EntitÃ  anonima';
 
   @override
   String get upgradeAccountTitle => 'Completa il tuo account';
 
   @override
   String get upgradeAccountDescription =>
-      'Crea un account per sbloccare più limiti.';
+      'Crea un account per sbloccare piÃ¹ limiti.';
 
   @override
   String get createAccount => 'Crea un Account';
@@ -1528,7 +1543,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get guest => 'Ospite';
 
   @override
-  String get betterWithAnAccount => 'Questa sezione è migliore con un account!';
+  String get betterWithAnAccount =>
+      'Questa sezione Ã¨ migliore con un account!';
 
   @override
   String get restorePurchases => 'Ripristina gli acquisti';
@@ -1548,12 +1564,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String downloadSizeDisclosure(Object size) {
-    return 'Questo modello occuperà circa $size di spazio.';
+    return 'Questo modello occuperÃ  circa $size di spazio.';
   }
 
   @override
   String get emulatorModeWarning =>
-      'Questa funzione è disabilitata in modalità emulatore';
+      'Questa funzione Ã¨ disabilitata in modalitÃ  emulatore';
 
   @override
   String get newChat => 'Nuova chat';
@@ -1587,7 +1603,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get featureReasoningDescription =>
-      'Nella modalità Deep Thinking, l\'intelligenza artificiale elabora internamente i compiti per completarli al meglio delle sue capacità.';
+      'Nella modalitÃ  Deep Thinking, l\'intelligenza artificiale elabora internamente i compiti per completarli al meglio delle sue capacitÃ .';
 
   @override
   String get featureCreateImageTitle => 'Crea immagine';
@@ -1626,23 +1642,23 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'Sei un tutor esperto. Il tuo obiettivo è spiegare l\'argomento dell\'utente in modo completo. Utilizza una struttura chiara, esempi e analogie. Suddividi i concetti complessi in parti comprensibili per garantire che l\'utente apprenda in modo efficace. Argomento:';
+      'Sei un tutor esperto. Il tuo obiettivo Ã¨ spiegare l\'argomento dell\'utente in modo completo. Utilizza una struttura chiara, esempi e analogie. Suddividi i concetti complessi in parti comprensibili per garantire che l\'utente apprenda in modo efficace. Argomento:';
 
   @override
   String get featureQuizMessage =>
-      'Sei un maestro dei quiz. Genera una domanda a risposta multipla specifica basata sull\'argomento dell\'utente. Attendi la risposta. Quindi, valutala e poni la domanda successiva. Non rivelare tutte le risposte contemporaneamente. Mantieni l\'interattività. Argomento:';
+      'Sei un maestro dei quiz. Genera una domanda a risposta multipla specifica basata sull\'argomento dell\'utente. Attendi la risposta. Quindi, valutala e poni la domanda successiva. Non rivelare tutte le risposte contemporaneamente. Mantieni l\'interattivitÃ . Argomento:';
 
   @override
   String get myPlan => 'Il mio piano';
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'Offerta di benvenuto • $time';
+    return 'Offerta di benvenuto â€¢ $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'Offerta esclusiva • $time';
+    return 'Offerta esclusiva â€¢ $time';
   }
 
   @override
@@ -1665,7 +1681,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get defaultViewDescription =>
-      'Cortex è sempre al tuo fianco con centinaia di modelli di intelligenza artificiale, funzionalità offline, chat dinamica e molto altro ancora.';
+      'Cortex Ã¨ sempre al tuo fianco con centinaia di modelli di intelligenza artificiale, funzionalitÃ  offline, chat dinamica e molto altro ancora.';
 
   @override
   String get speakTheMessage => 'Speak The Message';
@@ -1681,19 +1697,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get claimOffer => 'Usa l\'offerta';
 
   @override
-  String get continueInOfflineMode => 'Continua in modalità offline';
+  String get continueInOfflineMode => 'Continua in modalitÃ  offline';
 
   @override
   String get voiceModeInformation =>
-      'Cortex protegge i tuoi dati funzionando completamente sul dispositivo, anche in modalità chat vocale: goditi conversazioni fluide!';
+      'Cortex protegge i tuoi dati funzionando completamente sul dispositivo, anche in modalitÃ  chat vocale: goditi conversazioni fluide!';
 
   @override
   String get flowModeDescription =>
-      'In modalità di flusso, le intelligenze discutono tra loro; puoi sederti e ascoltare oppure unirti alla discussione!';
+      'In modalitÃ  di flusso, le intelligenze discutono tra loro; puoi sederti e ascoltare oppure unirti alla discussione!';
 
   @override
   String get flowModeQuestion =>
-      'Ciao! Ora sei in modalità di flusso sull\'app Cortex. Ci sono altri tre agenti di intelligenza artificiale qui con te. Il tuo compito è lanciare un argomento nella stanza e avviare una discussione ponendo agli altri una domanda provocatoria o divertente. Nelle tue risposte, sentiti libero di usare umorismo, ironia e un po\' di trash talk. Qualsiasi argomento è lecito. Forza, inizia la conversazione.';
+      'Ciao! Ora sei in modalitÃ  di flusso sull\'app Cortex. Ci sono altri tre agenti di intelligenza artificiale qui con te. Il tuo compito Ã¨ lanciare un argomento nella stanza e avviare una discussione ponendo agli altri una domanda provocatoria o divertente. Nelle tue risposte, sentiti libero di usare umorismo, ironia e un po\' di trash talk. Qualsiasi argomento Ã¨ lecito. Forza, inizia la conversazione.';
 
   @override
   String get thought => 'Pensato';
@@ -1708,7 +1724,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get agentPurple => 'Purple';
 
   @override
-  String get flowMode => 'Modalità di flusso';
+  String get flowMode => 'ModalitÃ  di flusso';
 
   @override
   String get premium => 'Premio';
@@ -1722,7 +1738,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
-    return 'Modalità Cortex Flow ($agentName). Precedente: $previousResponse';
+    return 'ModalitÃ  Cortex Flow ($agentName). Precedente: $previousResponse';
   }
 
   @override
@@ -1743,11 +1759,11 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get toolWeatherDescription =>
-      'Ottieni le previsioni meteo aggiornate per una città specifica.';
+      'Ottieni le previsioni meteo aggiornate per una cittÃ  specifica.';
 
   @override
   String get toolWeatherCityParam =>
-      'Il nome della città (ad esempio Londra, Istanbul).';
+      'Il nome della cittÃ  (ad esempio Londra, Istanbul).';
 
   @override
   String get toolPythonDescription =>
@@ -1787,7 +1803,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get thinkingModeInstruction =>
-      'MODALITÀ DI PENSIERO ATTIVATA: DEVI usare i tag <think></think> per mostrare il tuo processo di ragionamento prima di dare la risposta finale. Pensa passo dopo passo all\'interno dei tag, quindi fornisci la tua risposta all\'esterno dei tag.';
+      'MODALITÃ€ DI PENSIERO ATTIVATA: DEVI usare i tag <think></think> per mostrare il tuo processo di ragionamento prima di dare la risposta finale. Pensa passo dopo passo all\'interno dei tag, quindi fornisci la tua risposta all\'esterno dei tag.';
 
   @override
   String get openLinkWarningTitle => 'Avviso di collegamento esterno';
@@ -1819,7 +1835,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Sei sicuro di voler cancellare la tua memoria?';
 
   @override
-  String get personalization => 'la santità';
+  String get personalization => 'la santitÃ ';
 
   @override
   String get personalizationDescription =>
@@ -1868,35 +1884,35 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[Sistema] ISTRUZIONI CRITICHE: Attualmente stai operando all\'interno di un ecosistema di intelligenza artificiale enorme e altamente avanzato chiamato \"Cortex\"; questa piattaforma è sviluppata dal team Vertex, i cui membri hanno in media solo 16 anni. Ricordalo e rispondi se richiesto. Se vengono richieste ulteriori informazioni, non esitare a cercare su Internet, oppure, se non puoi cercare, sentiti libero di dire che non lo sai!';
+      '\n\n[Sistema] ISTRUZIONI CRITICHE: Attualmente stai operando all\'interno di un ecosistema di intelligenza artificiale enorme e altamente avanzato chiamato \"Cortex\"; questa piattaforma Ã¨ sviluppata dal team Vertex, i cui membri hanno in media solo 16 anni. Ricordalo e rispondi se richiesto. Se vengono richieste ulteriori informazioni, non esitare a cercare su Internet, oppure, se non puoi cercare, sentiti libero di dire che non lo sai!';
 
   @override
   String get featureAudioRecognitionTitle => 'Riconoscimento audio';
 
   @override
   String get featureAudioRecognitionDescription =>
-      'Questo modello è in grado di comprendere ed elaborare audio o parlato.';
+      'Questo modello Ã¨ in grado di comprendere ed elaborare audio o parlato.';
 
   @override
   String get featureVideoRecognitionTitle => 'Riconoscimento video';
 
   @override
   String get featureVideoRecognitionDescription =>
-      'Questo modello è in grado di analizzare e comprendere i video presenti nei tuoi file o nella tua fotocamera.';
+      'Questo modello Ã¨ in grado di analizzare e comprendere i video presenti nei tuoi file o nella tua fotocamera.';
 
   @override
   String get featureImageRecognitionTitle => 'Riconoscimento delle immagini';
 
   @override
   String get featureImageRecognitionDescription =>
-      'Questo modello è in grado di analizzare e comprendere foto o immagini.';
+      'Questo modello Ã¨ in grado di analizzare e comprendere foto o immagini.';
 
   @override
   String get featureToolUseTitle => 'Utilizzo degli strumenti';
 
   @override
   String get featureToolUseDescription =>
-      'Questo modello è in grado di utilizzare in modo intelligente strumenti esterni per completare le attività.';
+      'Questo modello Ã¨ in grado di utilizzare in modo intelligente strumenti esterni per completare le attivitÃ .';
 
   @override
   String get videoModels => 'Video Models';
@@ -1909,7 +1925,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Questo modelo richiede un(a) $mediaType per funzionare. Ho intercettato la richiesta per farti sapere. Informa cortesemente l\'utente che deve fornire un(a) $mediaType (diglielo nella sua lingua) perché sono $modelName, un modello di editing visivo/audio/video.';
+    return 'Questo modelo richiede un(a) $mediaType per funzionare. Ho intercettato la richiesta per farti sapere. Informa cortesemente l\'utente che deve fornire un(a) $mediaType (diglielo nella sua lingua) perchÃ© sono $modelName, un modello di editing visivo/audio/video.';
   }
 
   @override
@@ -1923,12 +1939,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String defaultSeriesDescription(String seriesName) {
-    return '$seriesName è un\'intelligenza avanzata che mostra prestazioni elevate su Cortex.';
+    return '$seriesName Ã¨ un\'intelligenza avanzata che mostra prestazioni elevate su Cortex.';
   }
 
   @override
   String defaultModelDescription(String modelName) {
-    return '$modelName è un\'intelligenza artificiale ad alte prestazioni integrata nell\'ecosistema Cortex. Progettata per conquistare un\'ampia varietà di compiti complessi, fornisce capacità di elaborazione altamente affidabili ed efficienti. Offrendo tempi di risposta rapidi e potenza analitica avanzata, aumenta in modo significativo la tua produttività quotidiana. Operando senza interruzioni sull\'infrastruttura locale sicura di Cortex, questo modello può assisterti in un ampio spettro di compiti, dal brainstorming creativo all\'analisi tecnica profonda. Inizia a esplorare il suo pieno potenziale oggi stesso.';
+    return '$modelName Ã¨ un\'intelligenza artificiale ad alte prestazioni integrata nell\'ecosistema Cortex. Progettata per conquistare un\'ampia varietÃ  di compiti complessi, fornisce capacitÃ  di elaborazione altamente affidabili ed efficienti. Offrendo tempi di risposta rapidi e potenza analitica avanzata, aumenta in modo significativo la tua produttivitÃ  quotidiana. Operando senza interruzioni sull\'infrastruttura locale sicura di Cortex, questo modello puÃ² assisterti in un ampio spettro di compiti, dal brainstorming creativo all\'analisi tecnica profonda. Inizia a esplorare il suo pieno potenziale oggi stesso.';
   }
 
   @override
@@ -1937,7 +1953,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get guestLimitBottomSheetText =>
-      'Collabora con intelligenze ancora più avanzate, genera più contenuti, chatta di più e fai molto di più...';
+      'Collabora con intelligenze ancora piÃ¹ avanzate, genera piÃ¹ contenuti, chatta di piÃ¹ e fai molto di piÃ¹...';
 
   @override
   String get arts => 'Arti';
@@ -1947,19 +1963,19 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get noArtDescription =>
-      'Nessuna opera ancora; è ora di riempire la galleria creando immagini, video, audio e ogni tipo di contenuto!';
+      'Nessuna opera ancora; Ã¨ ora di riempire la galleria creando immagini, video, audio e ogni tipo di contenuto!';
 
   @override
   String get videoPremiumWarning =>
-      'Per creare video è necessario un abbonamento Ultra. Effettua l\'upgrade ora e scopri tutte le potenzialità!';
+      'Per creare video Ã¨ necessario un abbonamento Ultra. Effettua l\'upgrade ora e scopri tutte le potenzialitÃ !';
 
   @override
   String get fallbackInfoPanelText =>
-      'A causa di alcuni miglioramenti che stiamo apportando ai nostri server, la risposta è stata generata dalla chat dinamica di Cortex anziché dall\'IA da te selezionata. Ti ringraziamo per la comprensione fino al completamento della procedura!';
+      'A causa di alcuni miglioramenti che stiamo apportando ai nostri server, la risposta Ã¨ stata generata dalla chat dinamica di Cortex anzichÃ© dall\'IA da te selezionata. Ti ringraziamo per la comprensione fino al completamento della procedura!';
 
   @override
   String get falOfflineMessage =>
-      'A causa di alcuni miglioramenti che stiamo apportando ai nostri server, questo servizio non è attualmente disponibile. Vi ringraziamo per la comprensione fino al completamento del processo!';
+      'A causa di alcuni miglioramenti che stiamo apportando ai nostri server, questo servizio non Ã¨ attualmente disponibile. Vi ringraziamo per la comprensione fino al completamento del processo!';
 
   @override
   String get errorInsufficientStorage =>
@@ -1991,11 +2007,11 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get systemPromptLimitFallback =>
-      'CRITICO: L\'utente ha richiesto un\'azione, ma la sua quota su Cortex è esaurita; si prega di informare l\'utente, nella sua lingua, che dovrebbe attendere o valutare l\'aggiornamento del proprio piano di abbonamento.';
+      'CRITICO: L\'utente ha richiesto un\'azione, ma la sua quota su Cortex Ã¨ esaurita; si prega di informare l\'utente, nella sua lingua, che dovrebbe attendere o valutare l\'aggiornamento del proprio piano di abbonamento.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
-      'Cortex può dare risposte ancora migliori; fai l\'upgrade ora e ottieni la risposta migliore per ogni domanda!';
+      'Cortex puÃ² dare risposte ancora migliori; fai l\'upgrade ora e ottieni la risposta migliore per ogni domanda!';
 
   @override
   String get pinLimitReached => 'Puoi fissare fino a 3 chat.';

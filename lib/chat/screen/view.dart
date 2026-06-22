@@ -298,9 +298,12 @@ class ChatViewState extends State<ChatView>
         // within a Stack, we prevent the heavy scroll list from relayouting when the
         // keyboard opens and closes. Scaffold natively resizes the body.
         AnimatedBuilder(
-          animation: bottomPanelHeightNotifier,
+          animation: Listenable.merge([
+            bottomPanelHeightNotifier,
+            briefingVisibleHeightNotifier,
+          ]),
           builder: (context, child) {
-            final bottomPadding = bottomPanelHeightNotifier.value + bottomSafe;
+            final bottomPadding = bottomPanelHeightNotifier.value + briefingVisibleHeightNotifier.value + bottomSafe;
             return Positioned(
               top: 0,
               left: 0,

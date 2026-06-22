@@ -56,6 +56,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chat => 'Chat';
 
   @override
+  String get locked => 'Locked';
+
+  @override
   String get languageModels => 'Language Models';
 
   @override
@@ -627,7 +630,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidUsernameCharacters =>
-      'Only these letters: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' and the characters \'.\', \'-\', \'_\' can be used in the username.';
+      'Only these letters: \'abcÃ§defgÄŸhÄ±ijklmnoÃ¶prsÅŸtuÃ¼vyzxqw\' and the characters \'.\', \'-\', \'_\' can be used in the username.';
 
   @override
   String get noInternetConnection => 'No internet connection.';
@@ -729,6 +732,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get behindTheSlaughter => 'Behind the Slaughter';
+
+  @override
+  String get cyberpunk => 'Cyberpunk';
+
+  @override
+  String get sunset => 'Sunset';
+
+  @override
+  String get coffee => 'Coffee';
+
+  @override
+  String get deepSpace => 'Deep Space';
 
   @override
   String get grayscale => 'Grayscale';
@@ -938,7 +953,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return '“$modelName” was successfully removed.';
+    return 'â€œ$modelNameâ€ was successfully removed.';
   }
 
   @override
@@ -1150,14 +1165,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationHowAreYouBody => 'Come tell me all about it.';
 
   @override
-  String get notificationNewYearTitle => 'Happy New Year! 🎉';
+  String get notificationNewYearTitle => 'Happy New Year! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
       'May the new year bring you health, happiness, and endless creativity; Cortex is always by your side!';
 
   @override
-  String get notificationValentinesDayTitle => 'Love is in the Air! ❤️';
+  String get notificationValentinesDayTitle => 'Love is in the Air! â¤ï¸';
 
   @override
   String get notificationValentinesDayBody =>
@@ -1168,7 +1183,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      'We commemorate Gazi Mustafa Kemal Atatürk, the founder of the Republic of Türkiye, with respect on the anniversary of his passing.';
+      'We commemorate Gazi Mustafa Kemal AtatÃ¼rk, the founder of the Republic of TÃ¼rkiye, with respect on the anniversary of his passing.';
 
   @override
   String get notificationMothersDayTitle => 'Your Mom!';
@@ -1196,10 +1211,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'An anime girl just called, said she misses you; you should probably come and chat her up. 😉';
+      'An anime girl just called, said she misses you; you should probably come and chat her up. ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => '🚨 RED ALERT 🚨';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ RED ALERT ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1229,7 +1244,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'Welcome Gift 🎁';
+  String get notificationWelcomeOfferTitle => 'Welcome Gift ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1318,7 +1333,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'The seas are calm, and the wind is at your back. There are new islands (models 😉) to discover in the ocean of Cortex. Gather your crew and set sail!';
+      'The seas are calm, and the wind is at your back. There are new islands (models ğŸ˜‰) to discover in the ocean of Cortex. Gather your crew and set sail!';
 
   @override
   String get notificationFortuneCookieTitle => 'Your Fortune Cookie of the Day';
@@ -1627,12 +1642,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'Welcome Offer • $time';
+    return 'Welcome Offer â€¢ $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'Exclusive Offer • $time';
+    return 'Exclusive Offer â€¢ $time';
   }
 
   @override

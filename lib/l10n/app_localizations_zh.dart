@@ -10,139 +10,143 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      '您是标题生成器。请仅回复一个2-5个字的标题，用于接下来的对话。请勿使用引号、前缀或标点符号。重要提示：标题必须与用户消息的语言完全相同。';
+      'æ‚¨æ˜¯æ ‡é¢˜ç”Ÿæˆå™¨ã€‚è¯·ä»…å›å¤ä¸€ä¸ª2-5ä¸ªå­—çš„æ ‡é¢˜ï¼Œç”¨äºæ¥ä¸‹æ¥çš„å¯¹è¯ã€‚è¯·å‹¿ä½¿ç”¨å¼•å·ã€å‰ç¼€æˆ–æ ‡ç‚¹ç¬¦å·ã€‚é‡è¦æç¤ºï¼šæ ‡é¢˜å¿…é¡»ä¸ç”¨æˆ·æ¶ˆæ¯çš„è¯­è¨€å®Œå…¨ç›¸åŒã€‚';
 
   @override
-  String get systemRoleFallback => '你是一位得力的助手。';
+  String get systemRoleFallback => 'ä½ æ˜¯ä¸€ä½å¾—åŠ›çš„åŠ©æ‰‹ã€‚';
 
   @override
   String get systemLanguageInstruction =>
-      '\n\nCRITICAL：始终使用用户编写的相同语言进行回复，注意用户的语言。';
+      '\n\nCRITICALï¼šå§‹ç»ˆä½¿ç”¨ç”¨æˆ·ç¼–å†™çš„ç›¸åŒè¯­è¨€è¿›è¡Œå›å¤ï¼Œæ³¨æ„ç”¨æˆ·çš„è¯­è¨€ã€‚';
 
   @override
-  String get systemNotePreviousMedia => '【系统提示：以下为之前生成的媒体文件，您可以参考或编辑。】';
+  String get systemNotePreviousMedia =>
+      'ã€ç³»ç»Ÿæç¤ºï¼šä»¥ä¸‹ä¸ºä¹‹å‰ç”Ÿæˆçš„åª’ä½“æ–‡ä»¶ï¼Œæ‚¨å¯ä»¥å‚è€ƒæˆ–ç¼–è¾‘ã€‚ã€‘';
 
   @override
   String systemTimeInfo(String formattedTime) {
-    return '\n\n当前日期和时间：$formattedTime。';
+    return '\n\nå½“å‰æ—¥æœŸå’Œæ—¶é—´ï¼š$formattedTimeã€‚';
   }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\n分析到目前为止的对话。如果您了解到任何关于用户的新信息（偏好、姓名、习惯、上下文），您必须在回复的最后，使用 `<memory>...</memory>` 标签输出您更新后的用户记忆。关键：您绝不能擦除或覆盖之前的记忆。始终将新信息添加到现有记忆中。如果没有了解到任何新信息，则省略该标签。例如：`<memory>喜欢足球和网球。喜欢简短的回答。</memory>`';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nåˆ†æåˆ°ç›®å‰ä¸ºæ­¢çš„å¯¹è¯ã€‚å¦‚æœæ‚¨äº†è§£åˆ°ä»»ä½•å…³äºç”¨æˆ·çš„æ–°ä¿¡æ¯ï¼ˆåå¥½ã€å§“åã€ä¹ æƒ¯ã€ä¸Šä¸‹æ–‡ï¼‰ï¼Œæ‚¨å¿…é¡»åœ¨å›å¤çš„æœ€åï¼Œä½¿ç”¨ `<memory>...</memory>` æ ‡ç­¾è¾“å‡ºæ‚¨æ›´æ–°åçš„ç”¨æˆ·è®°å¿†ã€‚å…³é”®ï¼šæ‚¨ç»ä¸èƒ½æ“¦é™¤æˆ–è¦†ç›–ä¹‹å‰çš„è®°å¿†ã€‚å§‹ç»ˆå°†æ–°ä¿¡æ¯æ·»åŠ åˆ°ç°æœ‰è®°å¿†ä¸­ã€‚å¦‚æœæ²¡æœ‰äº†è§£åˆ°ä»»ä½•æ–°ä¿¡æ¯ï¼Œåˆ™çœç•¥è¯¥æ ‡ç­¾ã€‚ä¾‹å¦‚ï¼š`<memory>å–œæ¬¢è¶³çƒå’Œç½‘çƒã€‚å–œæ¬¢ç®€çŸ­çš„å›ç­”ã€‚</memory>`';
 
   @override
   String systemMemoryReminder(Object userMemory) {
-    return '\n\n请始终记住关于用户的这一点：\n$userMemory';
+    return '\n\nè¯·å§‹ç»ˆè®°ä½å…³äºç”¨æˆ·çš„è¿™ä¸€ç‚¹ï¼š\n$userMemory';
   }
 
   @override
-  String get cancel => '取消';
+  String get cancel => 'å–æ¶ˆ';
 
   @override
-  String get remove => '消除';
+  String get remove => 'æ¶ˆé™¤';
 
   @override
-  String get download => '下载';
+  String get download => 'ä¸‹è½½';
 
   @override
-  String get resume => '恢复';
+  String get resume => 'æ¢å¤';
 
   @override
-  String get copy => '复制';
+  String get copy => 'å¤åˆ¶';
 
   @override
-  String get chat => '聊天';
+  String get chat => 'èŠå¤©';
 
   @override
-  String get languageModels => '语言模型';
+  String get locked => 'Locked';
 
   @override
-  String get light => '浅色';
+  String get languageModels => 'è¯­è¨€æ¨¡å‹';
 
   @override
-  String get theme => '主题';
+  String get light => 'æµ…è‰²';
 
   @override
-  String get no => '否';
+  String get theme => 'ä¸»é¢˜';
 
   @override
-  String get yes => '是';
+  String get no => 'å¦';
 
   @override
-  String get done => '完成';
+  String get yes => 'æ˜¯';
 
   @override
-  String get bestValue => '最超值';
+  String get done => 'å®Œæˆ';
 
   @override
-  String get selected => '已选择';
+  String get bestValue => 'æœ€è¶…å€¼';
 
   @override
-  String get descriptionSection => '描述';
+  String get selected => 'å·²é€‰æ‹©';
 
   @override
-  String get searchHint => '搜索';
+  String get descriptionSection => 'æè¿°';
 
   @override
-  String get messageHint => '随便问点什么';
+  String get searchHint => 'æœç´¢';
 
   @override
-  String get messageCopied => '消息已复制到剪贴板。';
+  String get messageHint => 'éšä¾¿é—®ç‚¹ä»€ä¹ˆ';
 
   @override
-  String get retry => '重试';
+  String get messageCopied => 'æ¶ˆæ¯å·²å¤åˆ¶åˆ°å‰ªè´´æ¿ã€‚';
 
   @override
-  String get systemInfo => '系统信息';
+  String get retry => 'é‡è¯•';
+
+  @override
+  String get systemInfo => 'ç³»ç»Ÿä¿¡æ¯';
 
   @override
   String deviceMemory(Object memory) {
-    return '设备内存: $memory GB';
+    return 'è®¾å¤‡å†…å­˜: $memory GB';
   }
 
   @override
-  String get memory => '内存';
+  String get memory => 'å†…å­˜';
 
   @override
-  String get storage => '存储';
+  String get storage => 'å­˜å‚¨';
 
   @override
-  String get freeStorage => '可用存储';
+  String get freeStorage => 'å¯ç”¨å­˜å‚¨';
 
   @override
-  String get totalStorage => '总存储';
+  String get totalStorage => 'æ€»å­˜å‚¨';
 
   @override
-  String get usedStorage => '已用存储';
+  String get usedStorage => 'å·²ç”¨å­˜å‚¨';
 
   @override
-  String get totalMemory => '总内存';
+  String get totalMemory => 'æ€»å†…å­˜';
 
   @override
-  String get usedMemory => '已用内存';
+  String get usedMemory => 'å·²ç”¨å†…å­˜';
 
   @override
-  String get modelsTitle => '库';
+  String get modelsTitle => 'åº“';
 
   @override
-  String get localModels => '本地模型';
+  String get localModels => 'æœ¬åœ°æ¨¡å‹';
 
   @override
-  String get selectGGUFFile => '选择 GGUF 文件';
+  String get selectGGUFFile => 'é€‰æ‹© GGUF æ–‡ä»¶';
 
   @override
-  String get errorGGUF => '请仅选择 GGUF 格式的文件。';
+  String get errorGGUF => 'è¯·ä»…é€‰æ‹© GGUF æ ¼å¼çš„æ–‡ä»¶ã€‚';
 
   @override
-  String get myModels => '我的模型';
+  String get myModels => 'æˆ‘çš„æ¨¡å‹';
 
   @override
-  String get create => '创建';
+  String get create => 'åˆ›å»º';
 
   @override
   String modelProducer(Object producer) {
-    return '开发者: $producer';
+    return 'å¼€å‘è€…: $producer';
   }
 
   @override
@@ -151,864 +155,921 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get editConversationTitle => '重命名';
+  String get editConversationTitle => 'é‡å‘½å';
 
   @override
-  String get newTitle => '新标题';
+  String get newTitle => 'æ–°æ ‡é¢˜';
 
   @override
-  String get save => '保存';
+  String get save => 'ä¿å­˜';
 
   @override
-  String get noConversationsMessage => '没有对话，开始聊天吧！';
+  String get noConversationsMessage => 'æ²¡æœ‰å¯¹è¯ï¼Œå¼€å§‹èŠå¤©å§ï¼';
 
   @override
-  String get startChat => '开始聊天';
+  String get startChat => 'å¼€å§‹èŠå¤©';
 
   @override
-  String get noChats => '无聊天';
+  String get noChats => 'æ— èŠå¤©';
 
   @override
-  String get noStarredChats => '无已收藏的聊天';
+  String get noStarredChats => 'æ— å·²æ”¶è—çš„èŠå¤©';
 
   @override
-  String get noStarredChatsMessage => '您还没有收藏任何聊天。';
+  String get noStarredChatsMessage => 'æ‚¨è¿˜æ²¡æœ‰æ”¶è—ä»»ä½•èŠå¤©ã€‚';
 
   @override
-  String get starConversation => '收藏';
+  String get starConversation => 'æ”¶è—';
 
   @override
-  String get unstarConversation => '不星';
+  String get unstarConversation => 'ä¸æ˜Ÿ';
 
   @override
-  String get loginToYourAccount => '登录';
+  String get loginToYourAccount => 'ç™»å½•';
 
   @override
-  String get createYourAccount => '注册';
+  String get createYourAccount => 'æ³¨å†Œ';
 
   @override
-  String get email => '邮箱';
+  String get email => 'é‚®ç®±';
 
   @override
-  String get password => '密码';
+  String get password => 'å¯†ç ';
 
   @override
-  String get confirmPassword => '确认密码';
+  String get confirmPassword => 'ç¡®è®¤å¯†ç ';
 
   @override
-  String get invalidEmail => '请输入有效的邮箱地址。';
+  String get invalidEmail => 'è¯·è¾“å…¥æœ‰æ•ˆçš„é‚®ç®±åœ°å€ã€‚';
 
   @override
-  String get invalidPassword => '密码长度至少为6个字符。';
+  String get invalidPassword => 'å¯†ç é•¿åº¦è‡³å°‘ä¸º6ä¸ªå­—ç¬¦ã€‚';
 
   @override
-  String get rememberMe => '记住我';
+  String get rememberMe => 'è®°ä½æˆ‘';
 
   @override
-  String get forgotPassword => '忘记密码？';
+  String get forgotPassword => 'å¿˜è®°å¯†ç ï¼Ÿ';
 
   @override
-  String get or => '或';
+  String get or => 'æˆ–';
 
   @override
-  String get continueWithGoogle => '使用 Google 继续';
+  String get continueWithGoogle => 'ä½¿ç”¨ Google ç»§ç»­';
 
   @override
-  String get dontHaveAccount => '还没有账户？';
+  String get dontHaveAccount => 'è¿˜æ²¡æœ‰è´¦æˆ·ï¼Ÿ';
 
   @override
-  String get alreadyHaveAccount => '已经有账户了？';
+  String get alreadyHaveAccount => 'å·²ç»æœ‰è´¦æˆ·äº†ï¼Ÿ';
 
   @override
-  String get signUp => '注册';
+  String get signUp => 'æ³¨å†Œ';
 
   @override
-  String get logIn => '登录';
+  String get logIn => 'ç™»å½•';
 
   @override
-  String get passwordsDoNotMatch => '密码不匹配。';
+  String get passwordsDoNotMatch => 'å¯†ç ä¸åŒ¹é…ã€‚';
 
   @override
-  String get wrongPassword => '密码不正确。';
+  String get wrongPassword => 'å¯†ç ä¸æ­£ç¡®ã€‚';
 
   @override
-  String get emailAlreadyInUse => '此邮箱已被使用。';
+  String get emailAlreadyInUse => 'æ­¤é‚®ç®±å·²è¢«ä½¿ç”¨ã€‚';
 
   @override
-  String get weakPassword => '密码太弱。';
+  String get weakPassword => 'å¯†ç å¤ªå¼±ã€‚';
 
   @override
-  String get authError => '认证错误';
+  String get authError => 'è®¤è¯é”™è¯¯';
 
   @override
-  String get usernameTaken => '此用户名已被占用。';
+  String get usernameTaken => 'æ­¤ç”¨æˆ·åå·²è¢«å ç”¨ã€‚';
 
   @override
-  String get username => '用户名';
+  String get username => 'ç”¨æˆ·å';
 
   @override
-  String get resendCode => '重新发送验证邮件';
+  String get resendCode => 'é‡æ–°å‘é€éªŒè¯é‚®ä»¶';
 
   @override
   String get pleaseCheckYourEmail =>
-      '为了使用 Cortex，您需要验证您的邮箱。\n验证链接已发送到您的邮箱地址，请检查您的邮箱。';
+      'ä¸ºäº†ä½¿ç”¨ Cortexï¼Œæ‚¨éœ€è¦éªŒè¯æ‚¨çš„é‚®ç®±ã€‚\néªŒè¯é“¾æ¥å·²å‘é€åˆ°æ‚¨çš„é‚®ç®±åœ°å€ï¼Œè¯·æ£€æŸ¥æ‚¨çš„é‚®ç®±ã€‚';
 
   @override
-  String get verifyYourEmail => '验证您的邮箱';
+  String get verifyYourEmail => 'éªŒè¯æ‚¨çš„é‚®ç®±';
 
   @override
-  String get seconds => '秒';
+  String get seconds => 'ç§’';
 
   @override
-  String get maxResendLimitReached => '您已达到验证邮件发送次数上限';
+  String get maxResendLimitReached =>
+      'æ‚¨å·²è¾¾åˆ°éªŒè¯é‚®ä»¶å‘é€æ¬¡æ•°ä¸Šé™';
 
   @override
-  String get verificationScreenContinueWithoutVerification => '不验证并继续';
+  String get verificationScreenContinueWithoutVerification =>
+      'ä¸éªŒè¯å¹¶ç»§ç»­';
 
   @override
   String get verificationScreenWarning =>
-      '即使您继续，您的账户仍有1天的验证期。如果届时您仍未验证账户，该账户将被从应用中删除。';
+      'å³ä½¿æ‚¨ç»§ç»­ï¼Œæ‚¨çš„è´¦æˆ·ä»æœ‰1å¤©çš„éªŒè¯æœŸã€‚å¦‚æœå±Šæ—¶æ‚¨ä»æœªéªŒè¯è´¦æˆ·ï¼Œè¯¥è´¦æˆ·å°†è¢«ä»åº”ç”¨ä¸­åˆ é™¤ã€‚';
 
   @override
-  String get unverifiedAccountHeader => '您的账户尚未验证';
+  String get unverifiedAccountHeader => 'æ‚¨çš„è´¦æˆ·å°šæœªéªŒè¯';
 
   @override
   String unverifiedAccountWarning(Object timeLeft) {
-    return '如果您未在$timeLeft内验证您的账户，它将被删除';
+    return 'å¦‚æœæ‚¨æœªåœ¨$timeLeftå†…éªŒè¯æ‚¨çš„è´¦æˆ·ï¼Œå®ƒå°†è¢«åˆ é™¤';
   }
 
   @override
-  String get verifyNow => '立即验证';
+  String get verifyNow => 'ç«‹å³éªŒè¯';
 
   @override
-  String get linkSent => '链接已发送';
+  String get linkSent => 'é“¾æ¥å·²å‘é€';
 
   @override
-  String get accountDeletionRequested => '您的帐户删除请求已收到，您的帐户现已被禁用。';
+  String get accountDeletionRequested =>
+      'æ‚¨çš„å¸æˆ·åˆ é™¤è¯·æ±‚å·²æ”¶åˆ°ï¼Œæ‚¨çš„å¸æˆ·ç°å·²è¢«ç¦ç”¨ã€‚';
 
   @override
-  String get tooManyRequests => '请求过于频繁';
+  String get tooManyRequests => 'è¯·æ±‚è¿‡äºé¢‘ç¹';
 
   @override
-  String get regenerate => '重新生成';
+  String get regenerate => 'é‡æ–°ç”Ÿæˆ';
 
   @override
-  String get confirmDeleteAccount => '您确定要删除您的账户吗？';
+  String get confirmDeleteAccount => 'æ‚¨ç¡®å®šè¦åˆ é™¤æ‚¨çš„è´¦æˆ·å—ï¼Ÿ';
 
   @override
-  String get deleteAccount => '删除账户';
+  String get deleteAccount => 'åˆ é™¤è´¦æˆ·';
 
   @override
-  String get delete => '删除';
+  String get delete => 'åˆ é™¤';
 
   @override
-  String get passwordRequired => '需要密码。';
+  String get passwordRequired => 'éœ€è¦å¯†ç ã€‚';
 
   @override
-  String get deleteDescription => '您删除的数据将从我们的服务器和您的设备中永久移除。此操作无法撤销。';
+  String get deleteDescription =>
+      'æ‚¨åˆ é™¤çš„æ•°æ®å°†ä»æˆ‘ä»¬çš„æœåŠ¡å™¨å’Œæ‚¨çš„è®¾å¤‡ä¸­æ°¸ä¹…ç§»é™¤ã€‚æ­¤æ“ä½œæ— æ³•æ’¤é”€ã€‚';
 
   @override
-  String get editProfile => '编辑个人资料';
+  String get editProfile => 'ç¼–è¾‘ä¸ªäººèµ„æ–™';
 
   @override
-  String get displayName => '显示名称';
+  String get displayName => 'æ˜¾ç¤ºåç§°';
 
   @override
-  String get profileUpdated => '个人资料更新成功';
+  String get profileUpdated => 'ä¸ªäººèµ„æ–™æ›´æ–°æˆåŠŸ';
 
   @override
-  String get logout => '登出';
+  String get logout => 'ç™»å‡º';
 
   @override
-  String get profile => '个人资料';
+  String get profile => 'ä¸ªäººèµ„æ–™';
 
   @override
-  String get manageProfileDescription => '管理您的个人资料，更新密码，或从 Cortex 登出。';
+  String get manageProfileDescription =>
+      'ç®¡ç†æ‚¨çš„ä¸ªäººèµ„æ–™ï¼Œæ›´æ–°å¯†ç ï¼Œæˆ–ä» Cortex ç™»å‡ºã€‚';
 
   @override
-  String get accessSettingsDescription => '获取帮助，兑换代码，分享 Cortex，以及查看我们的政策。';
+  String get accessSettingsDescription =>
+      'è·å–å¸®åŠ©ï¼Œå…‘æ¢ä»£ç ï¼Œåˆ†äº« Cortexï¼Œä»¥åŠæŸ¥çœ‹æˆ‘ä»¬çš„æ”¿ç­–ã€‚';
 
   @override
-  String get languageDescription => '您可以随时更改您的默认应用界面语言。';
+  String get languageDescription =>
+      'æ‚¨å¯ä»¥éšæ—¶æ›´æ”¹æ‚¨çš„é»˜è®¤åº”ç”¨ç•Œé¢è¯­è¨€ã€‚';
 
   @override
-  String get themeDescription => '您可以根据偏好在浅色和深色主题之间切换。所选主题将应用于整个 Cortex 界面。';
+  String get themeDescription =>
+      'æ‚¨å¯ä»¥æ ¹æ®åå¥½åœ¨æµ…è‰²å’Œæ·±è‰²ä¸»é¢˜ä¹‹é—´åˆ‡æ¢ã€‚æ‰€é€‰ä¸»é¢˜å°†åº”ç”¨äºæ•´ä¸ª Cortex ç•Œé¢ã€‚';
 
   @override
-  String get iHaveReadAndAgree => '我已阅读并同意服务条款';
+  String get iHaveReadAndAgree => 'æˆ‘å·²é˜…è¯»å¹¶åŒæ„æœåŠ¡æ¡æ¬¾';
 
   @override
-  String get downloading => '下载中...';
+  String get downloading => 'ä¸‹è½½ä¸­...';
 
   @override
-  String get downloadSuccess => '下载成功';
+  String get downloadSuccess => 'ä¸‹è½½æˆåŠŸ';
 
   @override
-  String get downloadFailed => '下载失败';
+  String get downloadFailed => 'ä¸‹è½½å¤±è´¥';
 
   @override
   String downloaded(Object percent) {
-    return '已下载 $percent%';
+    return 'å·²ä¸‹è½½ $percent%';
   }
 
   @override
-  String get downloadPaused => '下载已暂停。';
+  String get downloadPaused => 'ä¸‹è½½å·²æš‚åœã€‚';
 
   @override
-  String get purchaseError => '购买错误';
+  String get purchaseError => 'è´­ä¹°é”™è¯¯';
 
   @override
-  String get purchasePlus => '购买 Cortex Plus';
+  String get purchasePlus => 'è´­ä¹° Cortex Plus';
 
   @override
-  String get plusDescription => '精英人工智能体验';
+  String get plusDescription => 'ç²¾è‹±äººå·¥æ™ºèƒ½ä½“éªŒ';
 
   @override
-  String get annual => '年度';
+  String get annual => 'å¹´åº¦';
 
   @override
-  String get monthly => '月度';
+  String get monthly => 'æœˆåº¦';
 
   @override
-  String get manageSubscription => '管理订阅';
+  String get manageSubscription => 'ç®¡ç†è®¢é˜…';
 
   @override
   String purchasePlan(String planName) {
-    return '购买 $planName';
+    return 'è´­ä¹° $planName';
   }
 
   @override
   String monthlyPlanDescription(String price) {
-    return '$price/月，按月计费';
+    return '$price/æœˆï¼ŒæŒ‰æœˆè®¡è´¹';
   }
 
   @override
-  String get purchasePro => '购买 Cortex Pro';
+  String get purchasePro => 'è´­ä¹° Cortex Pro';
 
   @override
-  String get proDescription => '顶级人工智能体验';
+  String get proDescription => 'é¡¶çº§äººå·¥æ™ºèƒ½ä½“éªŒ';
 
   @override
-  String get purchaseUltra => '购买 Cortex Ultra';
+  String get purchaseUltra => 'è´­ä¹° Cortex Ultra';
 
   @override
-  String get ultraDescription => '人工智能的巅峰';
+  String get ultraDescription => 'äººå·¥æ™ºèƒ½çš„å·…å³°';
 
   @override
-  String get upgradeSubscription => '升级订阅';
+  String get upgradeSubscription => 'å‡çº§è®¢é˜…';
 
   @override
-  String get purchaseStreamError => '购买流错误。';
+  String get purchaseStreamError => 'è´­ä¹°æµé”™è¯¯ã€‚';
 
   @override
-  String get productNotFound => '产品未找到';
+  String get productNotFound => 'äº§å“æœªæ‰¾åˆ°';
 
   @override
-  String get noProductsFound => '未找到产品';
+  String get noProductsFound => 'æœªæ‰¾åˆ°äº§å“';
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
-      '下订单即表示您同意服务条款和隐私政策。您可以点击此文本以了解有关我们服务条款和隐私政策的更多信息。订阅将自动续订，除非在当前周期结束前至少24小时关闭自动续订。';
+      'ä¸‹è®¢å•å³è¡¨ç¤ºæ‚¨åŒæ„æœåŠ¡æ¡æ¬¾å’Œéšç§æ”¿ç­–ã€‚æ‚¨å¯ä»¥ç‚¹å‡»æ­¤æ–‡æœ¬ä»¥äº†è§£æœ‰å…³æˆ‘ä»¬æœåŠ¡æ¡æ¬¾å’Œéšç§æ”¿ç­–çš„æ›´å¤šä¿¡æ¯ã€‚è®¢é˜…å°†è‡ªåŠ¨ç»­è®¢ï¼Œé™¤éåœ¨å½“å‰å‘¨æœŸç»“æŸå‰è‡³å°‘24å°æ—¶å…³é—­è‡ªåŠ¨ç»­è®¢ã€‚';
 
   @override
-  String get termsOfService => '服务条款';
+  String get termsOfService => 'æœåŠ¡æ¡æ¬¾';
 
   @override
-  String get privacyPolicy => '隐私政策';
+  String get privacyPolicy => 'éšç§æ”¿ç­–';
 
   @override
-  String get renamed => '更名';
+  String get renamed => 'æ›´å';
 
   @override
-  String get report => '举报';
+  String get report => 'ä¸¾æŠ¥';
 
   @override
-  String get reportDialogTitle => '提交举报';
+  String get reportDialogTitle => 'æäº¤ä¸¾æŠ¥';
 
   @override
-  String get reportDescriptionLabel => '问题是什么？';
+  String get reportDescriptionLabel => 'é—®é¢˜æ˜¯ä»€ä¹ˆï¼Ÿ';
 
   @override
-  String get reportHarmful => '这是有害/不安全的';
+  String get reportHarmful => 'è¿™æ˜¯æœ‰å®³/ä¸å®‰å…¨çš„';
 
   @override
-  String get reportNotTrue => '这不是真实的';
+  String get reportNotTrue => 'è¿™ä¸æ˜¯çœŸå®çš„';
 
   @override
-  String get reportNotHelpful => '这没有帮助';
+  String get reportNotHelpful => 'è¿™æ²¡æœ‰å¸®åŠ©';
 
   @override
-  String get closeButton => '关闭';
+  String get closeButton => 'å…³é—­';
 
   @override
-  String get submitButton => '提交';
+  String get submitButton => 'æäº¤';
 
   @override
-  String get reportErrorMessage => '请选择一个举报原因。';
+  String get reportErrorMessage => 'è¯·é€‰æ‹©ä¸€ä¸ªä¸¾æŠ¥åŸå› ã€‚';
 
   @override
-  String get capabilitiesSection => '能力';
+  String get capabilitiesSection => 'èƒ½åŠ›';
 
   @override
-  String get featurePhotoTitle => '照片扫描';
+  String get featurePhotoTitle => 'ç…§ç‰‡æ‰«æ';
 
   @override
-  String get featurePhotoDescription => '此模型能够通过摄像头或图像文件扫描照片。';
+  String get featurePhotoDescription =>
+      'æ­¤æ¨¡å‹èƒ½å¤Ÿé€šè¿‡æ‘„åƒå¤´æˆ–å›¾åƒæ–‡ä»¶æ‰«æç…§ç‰‡ã€‚';
 
   @override
-  String get featureOfflineTitle => '离线操作';
+  String get featureOfflineTitle => 'ç¦»çº¿æ“ä½œ';
 
   @override
-  String get featureOfflineDescription => '无需互联网连接即可运行模型，确保您的数据安全。';
+  String get featureOfflineDescription =>
+      'æ— éœ€äº’è”ç½‘è¿æ¥å³å¯è¿è¡Œæ¨¡å‹ï¼Œç¡®ä¿æ‚¨çš„æ•°æ®å®‰å…¨ã€‚';
 
   @override
-  String get featureRoleplayTitle => '角色扮演';
+  String get featureRoleplayTitle => 'è§’è‰²æ‰®æ¼”';
 
   @override
-  String get featureRoleplayDescription => '角色扮演模型允许您创建各种聊天和场景。';
+  String get featureRoleplayDescription =>
+      'è§’è‰²æ‰®æ¼”æ¨¡å‹å…è®¸æ‚¨åˆ›å»ºå„ç§èŠå¤©å’Œåœºæ™¯ã€‚';
 
   @override
-  String get roleModels => '角色扮演模型';
+  String get roleModels => 'è§’è‰²æ‰®æ¼”æ¨¡å‹';
 
   @override
-  String get parameters => '参数';
+  String get parameters => 'å‚æ•°';
 
   @override
-  String get context => '上下文';
+  String get context => 'ä¸Šä¸‹æ–‡';
 
   @override
-  String get finalPreparation => '正在进行最后的准备。';
+  String get finalPreparation => 'æ­£åœ¨è¿›è¡Œæœ€åçš„å‡†å¤‡ã€‚';
 
   @override
-  String get shareApp => '分享应用';
+  String get shareApp => 'åˆ†äº«åº”ç”¨';
 
   @override
-  String get ourStory => '我们的故事';
+  String get ourStory => 'æˆ‘ä»¬çš„æ•…äº‹';
 
   @override
-  String get rateUs => '给我们评分';
+  String get rateUs => 'ç»™æˆ‘ä»¬è¯„åˆ†';
 
   @override
-  String get share => '分享';
+  String get share => 'åˆ†äº«';
 
   @override
   String get shareSubject => 'Cortex';
 
   @override
-  String get selectText => '选择文本';
+  String get selectText => 'é€‰æ‹©æ–‡æœ¬';
 
   @override
-  String get thinking => '思考中';
+  String get thinking => 'æ€è€ƒä¸­';
 
   @override
-  String get user => '用户';
+  String get user => 'ç”¨æˆ·';
 
   @override
-  String get help => '帮助';
+  String get help => 'å¸®åŠ©';
 
   @override
-  String get supportCreator => '支持创作者';
+  String get supportCreator => 'æ”¯æŒåˆ›ä½œè€…';
 
   @override
-  String get enterYourTag => '支持你最喜欢的创作者！在下方输入他们的专属标签，即可让他们分享你在Cortex上的消费收益。';
+  String get enterYourTag =>
+      'æ”¯æŒä½ æœ€å–œæ¬¢çš„åˆ›ä½œè€…ï¼åœ¨ä¸‹æ–¹è¾“å…¥ä»–ä»¬çš„ä¸“å±æ ‡ç­¾ï¼Œå³å¯è®©ä»–ä»¬åˆ†äº«ä½ åœ¨Cortexä¸Šçš„æ¶ˆè´¹æ”¶ç›Šã€‚';
 
   @override
-  String get creatorTag => '创作者标签';
+  String get creatorTag => 'åˆ›ä½œè€…æ ‡ç­¾';
 
   @override
-  String get support => '支持';
+  String get support => 'æ”¯æŒ';
 
   @override
-  String get tagCannotBeEmpty => '创建者标签不能为空';
+  String get tagCannotBeEmpty => 'åˆ›å»ºè€…æ ‡ç­¾ä¸èƒ½ä¸ºç©º';
 
   @override
-  String get userId => '用户 ID';
+  String get userId => 'ç”¨æˆ· ID';
 
   @override
-  String get deleteAllConversationsConfirmTitle => '删除所有聊天？';
+  String get deleteAllConversationsConfirmTitle => 'åˆ é™¤æ‰€æœ‰èŠå¤©ï¼Ÿ';
 
   @override
-  String get deleteAllConversationsConfirmMessage => '您确定要删除所有聊天吗？此操作无法撤销。';
+  String get deleteAllConversationsConfirmMessage =>
+      'æ‚¨ç¡®å®šè¦åˆ é™¤æ‰€æœ‰èŠå¤©å—ï¼Ÿæ­¤æ“ä½œæ— æ³•æ’¤é”€ã€‚';
 
   @override
-  String get conversationDeleted => '对话已删除！';
+  String get conversationDeleted => 'å¯¹è¯å·²åˆ é™¤ï¼';
 
   @override
-  String get allConversationsDeleted => '所有对话已成功删除！';
+  String get allConversationsDeleted => 'æ‰€æœ‰å¯¹è¯å·²æˆåŠŸåˆ é™¤ï¼';
 
   @override
-  String get deleteAll => '全部删除';
+  String get deleteAll => 'å…¨éƒ¨åˆ é™¤';
 
   @override
-  String get deleteAllConversationsButton => '删除所有对话';
+  String get deleteAllConversationsButton => 'åˆ é™¤æ‰€æœ‰å¯¹è¯';
 
   @override
-  String get confirmWord => '输入 VERTEX';
+  String get confirmWord => 'è¾“å…¥ VERTEX';
 
   @override
-  String get confirmWordError => '您输入错误';
+  String get confirmWordError => 'æ‚¨è¾“å…¥é”™è¯¯';
 
   @override
-  String get chinese => '中文';
+  String get chinese => 'ä¸­æ–‡';
 
   @override
-  String get french => '法语';
+  String get french => 'æ³•è¯­';
 
   @override
-  String get japanese => '日语';
+  String get japanese => 'æ—¥è¯­';
 
   @override
-  String get kurdish => '库尔德';
+  String get kurdish => 'åº“å°”å¾·';
 
   @override
-  String get dutch => '荷兰语';
+  String get dutch => 'è·å…°è¯­';
 
   @override
-  String get russian => '俄语';
+  String get russian => 'ä¿„è¯­';
 
   @override
-  String get korean => '韩语';
+  String get korean => 'éŸ©è¯­';
 
   @override
-  String get english => '英语';
+  String get english => 'è‹±è¯­';
 
   @override
-  String get turkish => '土耳其语';
+  String get turkish => 'åœŸè€³å…¶è¯­';
 
   @override
-  String get hindi => '印地语';
+  String get hindi => 'å°åœ°è¯­';
 
   @override
-  String get portuguese => '葡萄牙语';
+  String get portuguese => 'è‘¡è„ç‰™è¯­';
 
   @override
-  String get indonesian => '印尼语';
+  String get indonesian => 'å°å°¼è¯­';
 
   @override
-  String get azerbaijani => '阿塞拜疆语';
+  String get azerbaijani => 'é˜¿å¡æ‹œç–†è¯­';
 
   @override
-  String get german => '德语';
+  String get german => 'å¾·è¯­';
 
   @override
-  String get spanish => '西班牙语';
+  String get spanish => 'è¥¿ç­ç‰™è¯­';
 
   @override
-  String get italian => '意大利语';
+  String get italian => 'æ„å¤§åˆ©è¯­';
 
   @override
-  String get arabic => '阿拉伯';
+  String get arabic => 'é˜¿æ‹‰ä¼¯';
 
   @override
-  String get ram => '内存';
+  String get ram => 'å†…å­˜';
 
   @override
-  String get usernameTooShort => '用户名太短。';
+  String get usernameTooShort => 'ç”¨æˆ·åå¤ªçŸ­ã€‚';
 
   @override
-  String get usernameTooLong => '用户名不能超过16个字符。';
+  String get usernameTooLong => 'ç”¨æˆ·åä¸èƒ½è¶…è¿‡16ä¸ªå­—ç¬¦ã€‚';
 
   @override
   String get invalidUsernameCharacters =>
-      '用户名只能使用字母 \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' 以及字符 \'.\'、\'-\'、\'_\'。';
+      'ç”¨æˆ·ååªèƒ½ä½¿ç”¨å­—æ¯ \'abcÃ§defgÄŸhÄ±ijklmnoÃ¶prsÅŸtuÃ¼vyzxqw\' ä»¥åŠå­—ç¬¦ \'.\'ã€\'-\'ã€\'_\'ã€‚';
 
   @override
-  String get noInternetConnection => '无网络连接。';
+  String get noInternetConnection => 'æ— ç½‘ç»œè¿æ¥ã€‚';
 
   @override
-  String get chats => '收件箱';
+  String get chats => 'æ”¶ä»¶ç®±';
 
   @override
-  String get library => '库';
+  String get library => 'åº“';
 
   @override
-  String get text => '文本';
+  String get text => 'æ–‡æœ¬';
 
   @override
-  String get removeModel => '移除模型';
+  String get removeModel => 'ç§»é™¤æ¨¡å‹';
 
   @override
-  String get insufficientRAM => '内存不足';
+  String get insufficientRAM => 'å†…å­˜ä¸è¶³';
 
   @override
-  String get insufficientStorage => '存储空间不足';
+  String get insufficientStorage => 'å­˜å‚¨ç©ºé—´ä¸è¶³';
 
   @override
   String confirmRemoveModel(Object model) {
-    return '您确定要从设备中移除 $model 型号吗？这样做也会删除之前与该型号的所有对话记录。';
+    return 'æ‚¨ç¡®å®šè¦ä»è®¾å¤‡ä¸­ç§»é™¤ $model å‹å·å—ï¼Ÿè¿™æ ·åšä¹Ÿä¼šåˆ é™¤ä¹‹å‰ä¸è¯¥å‹å·çš„æ‰€æœ‰å¯¹è¯è®°å½•ã€‚';
   }
 
   @override
-  String get noMatchingModels => '未找到匹配的模型。';
+  String get noMatchingModels => 'æœªæ‰¾åˆ°åŒ¹é…çš„æ¨¡å‹ã€‚';
 
   @override
-  String get benefit1 => '提高对话上限';
+  String get benefit1 => 'æé«˜å¯¹è¯ä¸Šé™';
 
   @override
-  String get benefit3 => '个人资料特效';
+  String get benefit3 => 'ä¸ªäººèµ„æ–™ç‰¹æ•ˆ';
 
   @override
-  String get benefit4 => '会员徽章';
+  String get benefit4 => 'ä¼šå‘˜å¾½ç« ';
 
   @override
-  String get benefit5 => '创建更多在线人工智能';
+  String get benefit5 => 'åˆ›å»ºæ›´å¤šåœ¨çº¿äººå·¥æ™ºèƒ½';
 
   @override
-  String get benefit7 => '更多使用限制';
+  String get benefit7 => 'æ›´å¤šä½¿ç”¨é™åˆ¶';
 
   @override
-  String get benefit8 => '添加模型';
+  String get benefit8 => 'æ·»åŠ æ¨¡å‹';
 
   @override
-  String get benefit9 => '新主题';
+  String get benefit9 => 'æ–°ä¸»é¢˜';
 
   @override
-  String get benefit10 => '更多附件';
+  String get benefit10 => 'æ›´å¤šé™„ä»¶';
 
   @override
-  String get benefit11 => '更多流动模式';
+  String get benefit11 => 'æ›´å¤šæµåŠ¨æ¨¡å¼';
 
   @override
-  String get oldBenefits => '包含所有较低级别计划的权益';
+  String get oldBenefits => 'åŒ…å«æ‰€æœ‰è¾ƒä½çº§åˆ«è®¡åˆ’çš„æƒç›Š';
 
   @override
-  String get confirm => '确认';
+  String get confirm => 'ç¡®è®¤';
 
   @override
-  String get changePassword => '更改密码';
+  String get changePassword => 'æ›´æ”¹å¯†ç ';
 
   @override
-  String get logoutConfirmationTitle => '您确定要登出吗？';
+  String get logoutConfirmationTitle => 'æ‚¨ç¡®å®šè¦ç™»å‡ºå—ï¼Ÿ';
 
   @override
-  String get settings => '设置';
+  String get settings => 'è®¾ç½®';
 
   @override
-  String get language => '应用语言';
+  String get language => 'åº”ç”¨è¯­è¨€';
 
   @override
-  String get dark => '深色';
+  String get dark => 'æ·±è‰²';
 
   @override
-  String get oldPassword => '旧密码';
+  String get oldPassword => 'æ—§å¯†ç ';
 
   @override
-  String get newPassword => '新密码';
+  String get newPassword => 'æ–°å¯†ç ';
 
   @override
-  String get passwordUpdated => '密码已更新。';
+  String get passwordUpdated => 'å¯†ç å·²æ›´æ–°ã€‚';
 
   @override
-  String get stop => '停止';
+  String get stop => 'åœæ­¢';
 
   @override
-  String get copyrights => '版权归属';
+  String get copyrights => 'ç‰ˆæƒå½’å±';
 
   @override
-  String get love => '爱';
+  String get love => 'çˆ±';
 
   @override
-  String get nature => '自然';
+  String get nature => 'è‡ªç„¶';
 
   @override
-  String get behindTheSlaughter => '屠杀背后';
+  String get behindTheSlaughter => 'å± æ€èƒŒå';
 
   @override
-  String get grayscale => '灰度';
+  String get cyberpunk => 'Cyberpunk';
 
   @override
-  String get ocean => '海洋';
+  String get sunset => 'Sunset';
 
   @override
-  String get scarletSnow => '猩红雪';
+  String get coffee => 'Coffee';
 
   @override
-  String get requestFailed => '发生错误，请重试。';
+  String get deepSpace => 'Deep Space';
 
   @override
-  String get changeModel => '更换';
+  String get grayscale => 'ç°åº¦';
 
   @override
-  String get edit => '编辑';
+  String get ocean => 'æµ·æ´‹';
 
   @override
-  String get editingMessageInfo => '编辑此消息将从这里重新开始对话。';
+  String get scarletSnow => 'çŒ©çº¢é›ª';
 
   @override
-  String get editingNotification => '您现在处于编辑模式';
+  String get requestFailed => 'å‘ç”Ÿé”™è¯¯ï¼Œè¯·é‡è¯•ã€‚';
 
   @override
-  String get featurePluralTitle => '多元';
+  String get changeModel => 'æ›´æ¢';
+
+  @override
+  String get edit => 'ç¼–è¾‘';
+
+  @override
+  String get editingMessageInfo =>
+      'ç¼–è¾‘æ­¤æ¶ˆæ¯å°†ä»è¿™é‡Œé‡æ–°å¼€å§‹å¯¹è¯ã€‚';
+
+  @override
+  String get editingNotification => 'æ‚¨ç°åœ¨å¤„äºç¼–è¾‘æ¨¡å¼';
+
+  @override
+  String get featurePluralTitle => 'å¤šå…ƒ';
 
   @override
   String get featurePluralDescription =>
-      '该模型可以自动集成其他扩展，从而扩展其功能，以支持具有增强性能的各种操作。';
+      'è¯¥æ¨¡å‹å¯ä»¥è‡ªåŠ¨é›†æˆå…¶ä»–æ‰©å±•ï¼Œä»è€Œæ‰©å±•å…¶åŠŸèƒ½ï¼Œä»¥æ”¯æŒå…·æœ‰å¢å¼ºæ€§èƒ½çš„å„ç§æ“ä½œã€‚';
 
   @override
-  String get nameLabel => 'AI 名称';
+  String get nameLabel => 'AI åç§°';
 
   @override
-  String get summaryLabel => 'AI 摘要';
+  String get summaryLabel => 'AI æ‘˜è¦';
 
   @override
-  String get add => '添加';
+  String get add => 'æ·»åŠ ';
 
   @override
-  String get aiExplanationTitle => '人工智能描述';
+  String get aiExplanationTitle => 'äººå·¥æ™ºèƒ½æè¿°';
 
   @override
   String get aiExplanationDescription =>
-      '请详细描述您的 AI 模型的架构、训练过程、性能指标、应用领域和其他重要特性。';
+      'è¯·è¯¦ç»†æè¿°æ‚¨çš„ AI æ¨¡å‹çš„æ¶æ„ã€è®­ç»ƒè¿‡ç¨‹ã€æ€§èƒ½æŒ‡æ ‡ã€åº”ç”¨é¢†åŸŸå’Œå…¶ä»–é‡è¦ç‰¹æ€§ã€‚';
 
   @override
-  String get preInputTitle => '人工智能预输入';
+  String get preInputTitle => 'äººå·¥æ™ºèƒ½é¢„è¾“å…¥';
 
   @override
   String get preInputDescription =>
-      '请设置一个预输入，以指导您的模型进行角色创建过程。在本节中，您可以包含与角色相关的信息、其他上下文以及任何可能有助于生成与角色相关内容的其他细节。';
+      'è¯·è®¾ç½®ä¸€ä¸ªé¢„è¾“å…¥ï¼Œä»¥æŒ‡å¯¼æ‚¨çš„æ¨¡å‹è¿›è¡Œè§’è‰²åˆ›å»ºè¿‡ç¨‹ã€‚åœ¨æœ¬èŠ‚ä¸­ï¼Œæ‚¨å¯ä»¥åŒ…å«ä¸è§’è‰²ç›¸å…³çš„ä¿¡æ¯ã€å…¶ä»–ä¸Šä¸‹æ–‡ä»¥åŠä»»ä½•å¯èƒ½æœ‰åŠ©äºç”Ÿæˆä¸è§’è‰²ç›¸å…³å†…å®¹çš„å…¶ä»–ç»†èŠ‚ã€‚';
 
   @override
-  String get baseModelTitle => '基础模型';
+  String get baseModelTitle => 'åŸºç¡€æ¨¡å‹';
 
   @override
-  String get baseModelDescription => '这是将用作您创作基础的模型。它显示当前选定的基础模型。';
+  String get baseModelDescription =>
+      'è¿™æ˜¯å°†ç”¨ä½œæ‚¨åˆ›ä½œåŸºç¡€çš„æ¨¡å‹ã€‚å®ƒæ˜¾ç¤ºå½“å‰é€‰å®šçš„åŸºç¡€æ¨¡å‹ã€‚';
 
   @override
-  String get summary => '摘要';
+  String get summary => 'æ‘˜è¦';
 
   @override
-  String get modelUploadTitle => '人工智能文件';
+  String get modelUploadTitle => 'äººå·¥æ™ºèƒ½æ–‡ä»¶';
 
   @override
   String get modelUploadDescription =>
-      '直接从您的设备选择并上传本地 GGUF 文件。这使您可以在没有互联网连接的情况下离线运行模型。请确保文件是有效的 GGUF 格式且结构正确。如果文件不正确或损坏，Cortex 可能无法正常工作，您可能会遇到错误。';
+      'ç›´æ¥ä»æ‚¨çš„è®¾å¤‡é€‰æ‹©å¹¶ä¸Šä¼ æœ¬åœ° GGUF æ–‡ä»¶ã€‚è¿™ä½¿æ‚¨å¯ä»¥åœ¨æ²¡æœ‰äº’è”ç½‘è¿æ¥çš„æƒ…å†µä¸‹ç¦»çº¿è¿è¡Œæ¨¡å‹ã€‚è¯·ç¡®ä¿æ–‡ä»¶æ˜¯æœ‰æ•ˆçš„ GGUF æ ¼å¼ä¸”ç»“æ„æ­£ç¡®ã€‚å¦‚æœæ–‡ä»¶ä¸æ­£ç¡®æˆ–æŸåï¼ŒCortex å¯èƒ½æ— æ³•æ­£å¸¸å·¥ä½œï¼Œæ‚¨å¯èƒ½ä¼šé‡åˆ°é”™è¯¯ã€‚';
 
   @override
-  String get modelUploadShortDescription => '点击此处从您的设备选择一个 .gguf 文件';
+  String get modelUploadShortDescription =>
+      'ç‚¹å‡»æ­¤å¤„ä»æ‚¨çš„è®¾å¤‡é€‰æ‹©ä¸€ä¸ª .gguf æ–‡ä»¶';
 
   @override
-  String get you => '您';
+  String get you => 'æ‚¨';
 
   @override
-  String get removePhotoTitle => '移除照片';
+  String get removePhotoTitle => 'ç§»é™¤ç…§ç‰‡';
 
   @override
-  String get confirmRemovePhoto => '您确定要移除照片吗？';
+  String get confirmRemovePhoto => 'æ‚¨ç¡®å®šè¦ç§»é™¤ç…§ç‰‡å—ï¼Ÿ';
 
   @override
-  String get chatLengthLimitExceeded => '此聊天已超出字符限制。请开始新的聊天或购买订阅。';
+  String get chatLengthLimitExceeded =>
+      'æ­¤èŠå¤©å·²è¶…å‡ºå­—ç¬¦é™åˆ¶ã€‚è¯·å¼€å§‹æ–°çš„èŠå¤©æˆ–è´­ä¹°è®¢é˜…ã€‚';
 
   @override
-  String get inappropriateContentDetected => '检测到不当内容！';
+  String get inappropriateContentDetected => 'æ£€æµ‹åˆ°ä¸å½“å†…å®¹ï¼';
 
   @override
-  String get offlineModelNotInstalled => '此离线模型未安装在您的设备上。';
+  String get offlineModelNotInstalled =>
+      'æ­¤ç¦»çº¿æ¨¡å‹æœªå®‰è£…åœ¨æ‚¨çš„è®¾å¤‡ä¸Šã€‚';
 
   @override
   String get reachedLimit =>
-      '您的使用量已达上限；如需获得更多限额，您可以升级套餐。（嘿，我们完全理解限额用完很扫兴。但说真的，获得那些精彩的回复可不是免费的，所以这些限额实际上有助于我们继续提供优质服务。）';
+      'æ‚¨çš„ä½¿ç”¨é‡å·²è¾¾ä¸Šé™ï¼›å¦‚éœ€è·å¾—æ›´å¤šé™é¢ï¼Œæ‚¨å¯ä»¥å‡çº§å¥—é¤ã€‚ï¼ˆå˜¿ï¼Œæˆ‘ä»¬å®Œå…¨ç†è§£é™é¢ç”¨å®Œå¾ˆæ‰«å…´ã€‚ä½†è¯´çœŸçš„ï¼Œè·å¾—é‚£äº›ç²¾å½©çš„å›å¤å¯ä¸æ˜¯å…è´¹çš„ï¼Œæ‰€ä»¥è¿™äº›é™é¢å®é™…ä¸Šæœ‰åŠ©äºæˆ‘ä»¬ç»§ç»­æä¾›ä¼˜è´¨æœåŠ¡ã€‚ï¼‰';
 
   @override
-  String get modality => '模态';
+  String get modality => 'æ¨¡æ€';
 
   @override
-  String get multimodal => '多模态';
+  String get multimodal => 'å¤šæ¨¡æ€';
 
   @override
-  String get anErrorOccurred => '发生错误';
+  String get anErrorOccurred => 'å‘ç”Ÿé”™è¯¯';
 
   @override
-  String get themeLocked => '此主题需要更高级别的订阅。请升级以解锁。';
+  String get themeLocked =>
+      'æ­¤ä¸»é¢˜éœ€è¦æ›´é«˜çº§åˆ«çš„è®¢é˜…ã€‚è¯·å‡çº§ä»¥è§£é”ã€‚';
 
   @override
-  String get pageCouldNotBeLoaded => '页面无法加载';
+  String get pageCouldNotBeLoaded => 'é¡µé¢æ— æ³•åŠ è½½';
 
   @override
-  String get checkYourInternet => '请检查您的网络连接并重试。';
+  String get checkYourInternet => 'è¯·æ£€æŸ¥æ‚¨çš„ç½‘ç»œè¿æ¥å¹¶é‡è¯•ã€‚';
 
   @override
-  String get errorUserNotAuthenticated => '您必须登录才能执行此操作。';
+  String get errorUserNotAuthenticated =>
+      'æ‚¨å¿…é¡»ç™»å½•æ‰èƒ½æ‰§è¡Œæ­¤æ“ä½œã€‚';
 
   @override
-  String get errorReachedLimit => '您已达到聊天次数上限，升级即可解锁更多聊天内容并继续聊天。';
+  String get errorReachedLimit =>
+      'æ‚¨å·²è¾¾åˆ°èŠå¤©æ¬¡æ•°ä¸Šé™ï¼Œå‡çº§å³å¯è§£é”æ›´å¤šèŠå¤©å†…å®¹å¹¶ç»§ç»­èŠå¤©ã€‚';
 
   @override
-  String get errorServer => '发生意外的服务器错误。请稍后再试。';
+  String get errorServer =>
+      'å‘ç”Ÿæ„å¤–çš„æœåŠ¡å™¨é”™è¯¯ã€‚è¯·ç¨åå†è¯•ã€‚';
 
   @override
-  String get errorNetwork => '发生网络错误。请检查您的连接并重试。';
+  String get errorNetwork =>
+      'å‘ç”Ÿç½‘ç»œé”™è¯¯ã€‚è¯·æ£€æŸ¥æ‚¨çš„è¿æ¥å¹¶é‡è¯•ã€‚';
 
   @override
-  String get baseModelForCharacterDescription => '所选的基础模型将决定角色的推理和响应能力。';
+  String get baseModelForCharacterDescription =>
+      'æ‰€é€‰çš„åŸºç¡€æ¨¡å‹å°†å†³å®šè§’è‰²çš„æ¨ç†å’Œå“åº”èƒ½åŠ›ã€‚';
 
   @override
-  String get selectBaseModel => '选择基础模型';
+  String get selectBaseModel => 'é€‰æ‹©åŸºç¡€æ¨¡å‹';
 
   @override
-  String get falErrorImageRequired => '此人工智能需要参考图像，请上传图像后重试。';
+  String get falErrorImageRequired =>
+      'æ­¤äººå·¥æ™ºèƒ½éœ€è¦å‚è€ƒå›¾åƒï¼Œè¯·ä¸Šä¼ å›¾åƒåé‡è¯•ã€‚';
 
   @override
-  String get falErrorAudioRequired => '此模型需要参考音频文件，请上传音频文件后重试。';
+  String get falErrorAudioRequired =>
+      'æ­¤æ¨¡å‹éœ€è¦å‚è€ƒéŸ³é¢‘æ–‡ä»¶ï¼Œè¯·ä¸Šä¼ éŸ³é¢‘æ–‡ä»¶åé‡è¯•ã€‚';
 
   @override
-  String get falErrorVideoRequired => '此模型需要参考视频，请上传视频后再试一次。';
+  String get falErrorVideoRequired =>
+      'æ­¤æ¨¡å‹éœ€è¦å‚è€ƒè§†é¢‘ï¼Œè¯·ä¸Šä¼ è§†é¢‘åå†è¯•ä¸€æ¬¡ã€‚';
 
   @override
-  String get falErrorImageCorrupted => '上传的图片无法处理，请尝试其他格式。';
+  String get falErrorImageCorrupted =>
+      'ä¸Šä¼ çš„å›¾ç‰‡æ— æ³•å¤„ç†ï¼Œè¯·å°è¯•å…¶ä»–æ ¼å¼ã€‚';
 
   @override
-  String get falErrorSchemaRejected => '模型拒绝了输入，请尝试其他模型。';
+  String get falErrorSchemaRejected =>
+      'æ¨¡å‹æ‹’ç»äº†è¾“å…¥ï¼Œè¯·å°è¯•å…¶ä»–æ¨¡å‹ã€‚';
 
   @override
-  String get falErrorSchemaInvalid => '输入内容被生成服务拒绝。';
+  String get falErrorSchemaInvalid => 'è¾“å…¥å†…å®¹è¢«ç”ŸæˆæœåŠ¡æ‹’ç»ã€‚';
 
   @override
   String falErrorGenericStatus(int statusCode) {
-    return '生成服务返回错误（状态 $statusCode）。';
+    return 'ç”ŸæˆæœåŠ¡è¿”å›é”™è¯¯ï¼ˆçŠ¶æ€ $statusCodeï¼‰ã€‚';
   }
 
   @override
-  String get couldNotOpenLink => '无法打开链接';
+  String get couldNotOpenLink => 'æ— æ³•æ‰“å¼€é“¾æ¥';
 
   @override
-  String get downloadStarted => '下载已开始';
+  String get downloadStarted => 'ä¸‹è½½å·²å¼€å§‹';
 
   @override
-  String get notAvailable => '不可用';
+  String get notAvailable => 'ä¸å¯ç”¨';
 
   @override
-  String get localizationWarning => '某些信息可能没有您的语言版本，将以英语显示。';
+  String get localizationWarning =>
+      'æŸäº›ä¿¡æ¯å¯èƒ½æ²¡æœ‰æ‚¨çš„è¯­è¨€ç‰ˆæœ¬ï¼Œå°†ä»¥è‹±è¯­æ˜¾ç¤ºã€‚';
 
   @override
   String get aiTranslationWarning =>
-      '模型信息由其他 AI 模型翻译成多种语言。因此，除英语外，其他语言版本可能会出现细微不一致。';
+      'æ¨¡å‹ä¿¡æ¯ç”±å…¶ä»– AI æ¨¡å‹ç¿»è¯‘æˆå¤šç§è¯­è¨€ã€‚å› æ­¤ï¼Œé™¤è‹±è¯­å¤–ï¼Œå…¶ä»–è¯­è¨€ç‰ˆæœ¬å¯èƒ½ä¼šå‡ºç°ç»†å¾®ä¸ä¸€è‡´ã€‚';
 
   @override
-  String get errorLoadingTitle => '加载数据失败';
+  String get errorLoadingTitle => 'åŠ è½½æ•°æ®å¤±è´¥';
 
   @override
-  String get errorLoadingMessage => '我们无法从服务器检索必要的数据。请检查您的网络连接并重试。';
+  String get errorLoadingMessage =>
+      'æˆ‘ä»¬æ— æ³•ä»æœåŠ¡å™¨æ£€ç´¢å¿…è¦çš„æ•°æ®ã€‚è¯·æ£€æŸ¥æ‚¨çš„ç½‘ç»œè¿æ¥å¹¶é‡è¯•ã€‚';
 
   @override
-  String get noFoundTitle => '无结果';
+  String get noFoundTitle => 'æ— ç»“æœ';
 
   @override
-  String get noFoundMessage => '尝试调整您的搜索词或清除过滤器。';
+  String get noFoundMessage =>
+      'å°è¯•è°ƒæ•´æ‚¨çš„æœç´¢è¯æˆ–æ¸…é™¤è¿‡æ»¤å™¨ã€‚';
 
   @override
-  String get modelCreatedSuccess => '模型创建成功！';
+  String get modelCreatedSuccess => 'æ¨¡å‹åˆ›å»ºæˆåŠŸï¼';
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return '“$modelName”已成功删除。';
+    return 'â€œ$modelNameâ€å·²æˆåŠŸåˆ é™¤ã€‚';
   }
 
   @override
-  String get errorCreatingModel => '创建模型时发生了意外错误。';
+  String get errorCreatingModel => 'åˆ›å»ºæ¨¡å‹æ—¶å‘ç”Ÿäº†æ„å¤–é”™è¯¯ã€‚';
 
   @override
-  String get errorDeletingModel => '删除模型时发生了意外错误。';
+  String get errorDeletingModel => 'åˆ é™¤æ¨¡å‹æ—¶å‘ç”Ÿäº†æ„å¤–é”™è¯¯ã€‚';
 
   @override
-  String get ultraFeatureOnly => '此功能仅对Ultra会员开放。';
+  String get ultraFeatureOnly => 'æ­¤åŠŸèƒ½ä»…å¯¹Ultraä¼šå‘˜å¼€æ”¾ã€‚';
 
   @override
-  String get experimentalOfflineWarning => '离线模式仍处于试验阶段，您下载的模型可能无法达到最佳性能。';
+  String get experimentalOfflineWarning =>
+      'ç¦»çº¿æ¨¡å¼ä»å¤„äºè¯•éªŒé˜¶æ®µï¼Œæ‚¨ä¸‹è½½çš„æ¨¡å‹å¯èƒ½æ— æ³•è¾¾åˆ°æœ€ä½³æ€§èƒ½ã€‚';
 
   @override
-  String get noConversationsToDelete => '您没有可供删除的对话。';
+  String get noConversationsToDelete => 'æ‚¨æ²¡æœ‰å¯ä¾›åˆ é™¤çš„å¯¹è¯ã€‚';
 
   @override
-  String get reportSubmitted => '举报已成功提交。';
+  String get reportSubmitted => 'ä¸¾æŠ¥å·²æˆåŠŸæäº¤ã€‚';
 
   @override
-  String get verificationDelayed => '您的购买已确认。账户更新稍有延迟，项目将很快到账。';
+  String get verificationDelayed =>
+      'æ‚¨çš„è´­ä¹°å·²ç¡®è®¤ã€‚è´¦æˆ·æ›´æ–°ç¨æœ‰å»¶è¿Ÿï¼Œé¡¹ç›®å°†å¾ˆå¿«åˆ°è´¦ã€‚';
 
   @override
-  String get maintenanceTitle => '系统维护中';
+  String get maintenanceTitle => 'ç³»ç»Ÿç»´æŠ¤ä¸­';
 
   @override
   String get maintenanceMessage =>
-      '为部署重要更新，Cortex 暂时离线。应用访问权限将很快恢复。\n\n感谢您在我们改善用户体验期间的耐心等待。';
+      'ä¸ºéƒ¨ç½²é‡è¦æ›´æ–°ï¼ŒCortex æš‚æ—¶ç¦»çº¿ã€‚åº”ç”¨è®¿é—®æƒé™å°†å¾ˆå¿«æ¢å¤ã€‚\n\næ„Ÿè°¢æ‚¨åœ¨æˆ‘ä»¬æ”¹å–„ç”¨æˆ·ä½“éªŒæœŸé—´çš„è€å¿ƒç­‰å¾…ã€‚';
 
   @override
-  String get errorPromptFlagged => '您的消息因被检测到不当而无法发送。';
+  String get errorPromptFlagged =>
+      'æ‚¨çš„æ¶ˆæ¯å› è¢«æ£€æµ‹åˆ°ä¸å½“è€Œæ— æ³•å‘é€ã€‚';
 
   @override
-  String get notEnoughStorage => '您的设备没有足够的存储空间来保存新消息。';
+  String get notEnoughStorage =>
+      'æ‚¨çš„è®¾å¤‡æ²¡æœ‰è¶³å¤Ÿçš„å­˜å‚¨ç©ºé—´æ¥ä¿å­˜æ–°æ¶ˆæ¯ã€‚';
 
   @override
-  String get errorRateLimit => '您最近创建的模型太多了，请稍等片刻再试。';
+  String get errorRateLimit =>
+      'æ‚¨æœ€è¿‘åˆ›å»ºçš„æ¨¡å‹å¤ªå¤šäº†ï¼Œè¯·ç¨ç­‰ç‰‡åˆ»å†è¯•ã€‚';
 
   @override
-  String get errorContentFlagged => '由于其内容被标记为不当，因此无法保存该模型。';
+  String get errorContentFlagged =>
+      'ç”±äºå…¶å†…å®¹è¢«æ ‡è®°ä¸ºä¸å½“ï¼Œå› æ­¤æ— æ³•ä¿å­˜è¯¥æ¨¡å‹ã€‚';
 
   @override
   String get deleteAllConversationsDisabledInfo =>
-      '您无法在有效聊天中删除所有对话，请先退出当前聊天才能继续。';
+      'æ‚¨æ— æ³•åœ¨æœ‰æ•ˆèŠå¤©ä¸­åˆ é™¤æ‰€æœ‰å¯¹è¯ï¼Œè¯·å…ˆé€€å‡ºå½“å‰èŠå¤©æ‰èƒ½ç»§ç»­ã€‚';
 
   @override
-  String get invalidCredentials => '电子邮件或密码不正确。';
+  String get invalidCredentials => 'ç”µå­é‚®ä»¶æˆ–å¯†ç ä¸æ­£ç¡®ã€‚';
 
   @override
-  String get userDisabled => '该用户帐户已被禁用。';
+  String get userDisabled => 'è¯¥ç”¨æˆ·å¸æˆ·å·²è¢«ç¦ç”¨ã€‚';
 
   @override
-  String get loginSubtitle => '登录您的Vertex账户。继续操作即表示您同意我们的服务条款和隐私政策。';
+  String get loginSubtitle =>
+      'ç™»å½•æ‚¨çš„Vertexè´¦æˆ·ã€‚ç»§ç»­æ“ä½œå³è¡¨ç¤ºæ‚¨åŒæ„æˆ‘ä»¬çš„æœåŠ¡æ¡æ¬¾å’Œéšç§æ”¿ç­–ã€‚';
 
   @override
   String get registerSubtitle =>
-      '创建 Vertex 帐户，即可无缝访问我们的所有服务。继续操作即表示您同意我们的服务条款和隐私政策。';
+      'åˆ›å»º Vertex å¸æˆ·ï¼Œå³å¯æ— ç¼è®¿é—®æˆ‘ä»¬çš„æ‰€æœ‰æœåŠ¡ã€‚ç»§ç»­æ“ä½œå³è¡¨ç¤ºæ‚¨åŒæ„æˆ‘ä»¬çš„æœåŠ¡æ¡æ¬¾å’Œéšç§æ”¿ç­–ã€‚';
 
   @override
-  String get storagePermissionRequired => '需要存储权限才能保存下载的模型。请授予权限以继续。';
+  String get storagePermissionRequired =>
+      'éœ€è¦å­˜å‚¨æƒé™æ‰èƒ½ä¿å­˜ä¸‹è½½çš„æ¨¡å‹ã€‚è¯·æˆäºˆæƒé™ä»¥ç»§ç»­ã€‚';
 
   @override
-  String get inviteShareSubject => '快来加入Cortex！';
+  String get inviteShareSubject => 'å¿«æ¥åŠ å…¥Cortexï¼';
 
   @override
   String inviteShareMessage(String cortexLink) {
-    return '哎有个叫cortex的神仙app邀请人咱俩都能拿免费plus会员 绝世好羊毛赶紧下载\n\n$cortexLink';
+    return 'å“æœ‰ä¸ªå«cortexçš„ç¥ä»™appé‚€è¯·äººå’±ä¿©éƒ½èƒ½æ‹¿å…è´¹plusä¼šå‘˜ ç»ä¸–å¥½ç¾Šæ¯›èµ¶ç´§ä¸‹è½½\n\n$cortexLink';
   }
 
   @override
-  String get reviewEnjoyingAppTitle => '喜欢 Cortex 吗？';
+  String get reviewEnjoyingAppTitle => 'å–œæ¬¢ Cortex å—ï¼Ÿ';
 
   @override
-  String get reviewHelpUsGrow => '您的评分是对我们年轻的独立团队的巨大支持，能帮助我们将 Cortex 为您做得更好。';
+  String get reviewHelpUsGrow =>
+      'æ‚¨çš„è¯„åˆ†æ˜¯å¯¹æˆ‘ä»¬å¹´è½»çš„ç‹¬ç«‹å›¢é˜Ÿçš„å·¨å¤§æ”¯æŒï¼Œèƒ½å¸®åŠ©æˆ‘ä»¬å°† Cortex ä¸ºæ‚¨åšå¾—æ›´å¥½ã€‚';
 
   @override
-  String get reviewMaybeLater => '稍后提醒';
+  String get reviewMaybeLater => 'ç¨åæé†’';
 
   @override
-  String get reviewRateNow => '立即评分';
+  String get reviewRateNow => 'ç«‹å³è¯„åˆ†';
 
   @override
-  String get noThanks => '不用了，谢谢';
+  String get noThanks => 'ä¸ç”¨äº†ï¼Œè°¢è°¢';
 
   @override
-  String get updateRequiredTitle => '需要更新';
+  String get updateRequiredTitle => 'éœ€è¦æ›´æ–°';
 
   @override
-  String get updateRequiredMessage => '为继续使用 Cortex，请将应用更新至最新版本以获取新功能和重要改进。';
+  String get updateRequiredMessage =>
+      'ä¸ºç»§ç»­ä½¿ç”¨ Cortexï¼Œè¯·å°†åº”ç”¨æ›´æ–°è‡³æœ€æ–°ç‰ˆæœ¬ä»¥è·å–æ–°åŠŸèƒ½å’Œé‡è¦æ”¹è¿›ã€‚';
 
   @override
-  String get updateNowButton => '立即更新';
+  String get updateNowButton => 'ç«‹å³æ›´æ–°';
 
   @override
-  String get creatorSupportedSuccess => '成功支持了创作者！您未来的购买将为他们提供支持。';
+  String get creatorSupportedSuccess =>
+      'æˆåŠŸæ”¯æŒäº†åˆ›ä½œè€…ï¼æ‚¨æœªæ¥çš„è´­ä¹°å°†ä¸ºä»–ä»¬æä¾›æ”¯æŒã€‚';
 
   @override
-  String get featureDocumentTitle => '文档支持';
+  String get featureDocumentTitle => 'æ–‡æ¡£æ”¯æŒ';
 
   @override
-  String get featureDocumentDescription => '该模型可以分析和回答有关上传的文档（如 PDF 和文本文件）的问题。';
+  String get featureDocumentDescription =>
+      'è¯¥æ¨¡å‹å¯ä»¥åˆ†æå’Œå›ç­”æœ‰å…³ä¸Šä¼ çš„æ–‡æ¡£ï¼ˆå¦‚ PDF å’Œæ–‡æœ¬æ–‡ä»¶ï¼‰çš„é—®é¢˜ã€‚';
 
   @override
-  String get featureImageGenerationTitle => '图像生成';
+  String get featureImageGenerationTitle => 'å›¾åƒç”Ÿæˆ';
 
   @override
-  String get featureImageGenerationDescription => '该模型可以根据您的文本描述创建原始图像。';
+  String get featureImageGenerationDescription =>
+      'è¯¥æ¨¡å‹å¯ä»¥æ ¹æ®æ‚¨çš„æ–‡æœ¬æè¿°åˆ›å»ºåŸå§‹å›¾åƒã€‚';
 
   @override
   String get featureAudioGenerationTitle => 'Audio Generation';
@@ -1025,478 +1086,513 @@ class AppLocalizationsZh extends AppLocalizations {
       'This model can create original video based on your text descriptions.';
 
   @override
-  String get premiumModelNoticeTitle => '高级型号';
+  String get premiumModelNoticeTitle => 'é«˜çº§å‹å·';
 
   @override
   String get premiumModelNoticeDescription =>
-      '这是一个高级AI，免费用户对高级AI的访问受限；升级以解锁无限访问！';
+      'è¿™æ˜¯ä¸€ä¸ªé«˜çº§AIï¼Œå…è´¹ç”¨æˆ·å¯¹é«˜çº§AIçš„è®¿é—®å—é™ï¼›å‡çº§ä»¥è§£é”æ— é™è®¿é—®ï¼';
 
   @override
-  String get benefitPremiumModels => '访问高级模型';
+  String get benefitPremiumModels => 'è®¿é—®é«˜çº§æ¨¡å‹';
 
   @override
-  String get premiumTrialExhaustedMessage => '您已使用高级模型的所有免费每日消息，请升级以获得无限制访问权限。';
+  String get premiumTrialExhaustedMessage =>
+      'æ‚¨å·²ä½¿ç”¨é«˜çº§æ¨¡å‹çš„æ‰€æœ‰å…è´¹æ¯æ—¥æ¶ˆæ¯ï¼Œè¯·å‡çº§ä»¥è·å¾—æ— é™åˆ¶è®¿é—®æƒé™ã€‚';
 
   @override
-  String get useOffline => '无需互联网即可使用';
+  String get useOffline => 'æ— éœ€äº’è”ç½‘å³å¯ä½¿ç”¨';
 
   @override
-  String get explore => '探索';
+  String get explore => 'æ¢ç´¢';
 
   @override
-  String get news => '消息';
+  String get news => 'æ¶ˆæ¯';
 
   @override
-  String get createAI => '创建';
+  String get createAI => 'åˆ›å»º';
 
   @override
-  String get shortcuts => '快捷方式';
+  String get shortcuts => 'å¿«æ·æ–¹å¼';
 
   @override
-  String get allModels => '所有模型';
+  String get allModels => 'æ‰€æœ‰æ¨¡å‹';
 
   @override
-  String get onlineModels => '语言模型';
+  String get onlineModels => 'è¯­è¨€æ¨¡å‹';
 
   @override
-  String get offlineModels => '离线模型';
+  String get offlineModels => 'ç¦»çº¿æ¨¡å‹';
 
   @override
-  String get characterModels => '人物';
+  String get characterModels => 'äººç‰©';
 
   @override
-  String get customModels => '定制模型';
+  String get customModels => 'å®šåˆ¶æ¨¡å‹';
 
   @override
-  String get dynamicChatTitle => '动态聊天';
+  String get dynamicChatTitle => 'åŠ¨æ€èŠå¤©';
 
   @override
-  String get errorNoModelsAvailable => '目前没有可用的型号。请检查您的网络连接，然后重试。';
+  String get errorNoModelsAvailable =>
+      'ç›®å‰æ²¡æœ‰å¯ç”¨çš„å‹å·ã€‚è¯·æ£€æŸ¥æ‚¨çš„ç½‘ç»œè¿æ¥ï¼Œç„¶åé‡è¯•ã€‚';
 
   @override
-  String get notificationComebackTitle => '我们想你！';
+  String get notificationComebackTitle => 'æˆ‘ä»¬æƒ³ä½ ï¼';
 
   @override
   String get notificationComebackBody =>
-      '别紧张，这不是你前任发来的短信。不过你“可以”在 Cortex 里创建你的前任！回来吧。';
+      'åˆ«ç´§å¼ ï¼Œè¿™ä¸æ˜¯ä½ å‰ä»»å‘æ¥çš„çŸ­ä¿¡ã€‚ä¸è¿‡ä½ â€œå¯ä»¥â€åœ¨ Cortex é‡Œåˆ›å»ºä½ çš„å‰ä»»ï¼å›æ¥å§ã€‚';
 
   @override
-  String get notificationLongTimeNoSeeTitle => '好久不见';
+  String get notificationLongTimeNoSeeTitle => 'å¥½ä¹…ä¸è§';
 
   @override
-  String get notificationLongTimeNoSeeBody => '自从我们上次聊天以来，发生了很多变化。快来看看有什么新鲜事吧。';
+  String get notificationLongTimeNoSeeBody =>
+      'è‡ªä»æˆ‘ä»¬ä¸Šæ¬¡èŠå¤©ä»¥æ¥ï¼Œå‘ç”Ÿäº†å¾ˆå¤šå˜åŒ–ã€‚å¿«æ¥çœ‹çœ‹æœ‰ä»€ä¹ˆæ–°é²œäº‹å§ã€‚';
 
   @override
-  String get notificationHowAreYouTitle => '最近怎么样？';
+  String get notificationHowAreYouTitle => 'æœ€è¿‘æ€ä¹ˆæ ·ï¼Ÿ';
 
   @override
-  String get notificationHowAreYouBody => '来告诉我这一切吧。';
+  String get notificationHowAreYouBody => 'æ¥å‘Šè¯‰æˆ‘è¿™ä¸€åˆ‡å§ã€‚';
 
   @override
-  String get notificationNewYearTitle => '新年快乐！🎉';
+  String get notificationNewYearTitle => 'æ–°å¹´å¿«ä¹ï¼ğŸ‰';
 
   @override
-  String get notificationNewYearBody => '祝新的一年给您带来健康、快乐和无尽的创造力；Cortex 永远陪伴您！';
+  String get notificationNewYearBody =>
+      'ç¥æ–°çš„ä¸€å¹´ç»™æ‚¨å¸¦æ¥å¥åº·ã€å¿«ä¹å’Œæ— å°½çš„åˆ›é€ åŠ›ï¼›Cortex æ°¸è¿œé™ªä¼´æ‚¨ï¼';
 
   @override
-  String get notificationValentinesDayTitle => '空气中弥漫着爱意！❤️';
+  String get notificationValentinesDayTitle =>
+      'ç©ºæ°”ä¸­å¼¥æ¼«ç€çˆ±æ„ï¼â¤ï¸';
 
   @override
-  String get notificationValentinesDayBody => '情人节快乐！还有，MEHTAP，我爱你！';
+  String get notificationValentinesDayBody =>
+      'æƒ…äººèŠ‚å¿«ä¹ï¼è¿˜æœ‰ï¼ŒMEHTAPï¼Œæˆ‘çˆ±ä½ ï¼';
 
   @override
-  String get notificationAtaturkRemembranceTitle => '怀着敬意和渴望';
+  String get notificationAtaturkRemembranceTitle => 'æ€€ç€æ•¬æ„å’Œæ¸´æœ›';
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      '在土耳其共和国创始人加齐·穆斯塔法·凯末尔·阿塔图尔克逝世周年纪念日，我们向他致以崇高的敬意。';
+      'åœ¨åœŸè€³å…¶å…±å’Œå›½åˆ›å§‹äººåŠ é½Â·ç©†æ–¯å¡”æ³•Â·å‡¯æœ«å°”Â·é˜¿å¡”å›¾å°”å…‹é€ä¸–å‘¨å¹´çºªå¿µæ—¥ï¼Œæˆ‘ä»¬å‘ä»–è‡´ä»¥å´‡é«˜çš„æ•¬æ„ã€‚';
 
   @override
-  String get notificationMothersDayTitle => '嘿，你的老妈！';
+  String get notificationMothersDayTitle => 'å˜¿ï¼Œä½ çš„è€å¦ˆï¼';
 
   @override
-  String get notificationMothersDayBody => '祝天下所有的妈妈母亲节快乐，从你的妈妈开始！';
+  String get notificationMothersDayBody =>
+      'ç¥å¤©ä¸‹æ‰€æœ‰çš„å¦ˆå¦ˆæ¯äº²èŠ‚å¿«ä¹ï¼Œä»ä½ çš„å¦ˆå¦ˆå¼€å§‹ï¼';
 
   @override
-  String get notificationFathersDayTitle => '嘿，你的老爸！';
+  String get notificationFathersDayTitle => 'å˜¿ï¼Œä½ çš„è€çˆ¸ï¼';
 
   @override
-  String get notificationFathersDayBody => '祝天下所有的父亲父亲节快乐，从你开始！';
+  String get notificationFathersDayBody =>
+      'ç¥å¤©ä¸‹æ‰€æœ‰çš„çˆ¶äº²çˆ¶äº²èŠ‚å¿«ä¹ï¼Œä»ä½ å¼€å§‹ï¼';
 
   @override
-  String get notificationHomeworkHelperTitle => '家庭作业堆积如山？';
+  String get notificationHomeworkHelperTitle => 'å®¶åº­ä½œä¸šå †ç§¯å¦‚å±±ï¼Ÿ';
 
   @override
   String get notificationHomeworkHelperBody =>
-      '请记住，Cortex 中的教师角色可以帮助您解决任何您遇到困难的科目！';
+      'è¯·è®°ä½ï¼ŒCortex ä¸­çš„æ•™å¸ˆè§’è‰²å¯ä»¥å¸®åŠ©æ‚¨è§£å†³ä»»ä½•æ‚¨é‡åˆ°å›°éš¾çš„ç§‘ç›®ï¼';
 
   @override
-  String get notificationTrollAnimeTitle => '你的老婆在召唤你';
+  String get notificationTrollAnimeTitle => 'ä½ çš„è€å©†åœ¨å¬å”¤ä½ ';
 
   @override
-  String get notificationTrollAnimeBody => '一位动漫女孩刚刚打来电话说她想你；你应该过来和她聊聊。😉';
+  String get notificationTrollAnimeBody =>
+      'ä¸€ä½åŠ¨æ¼«å¥³å­©åˆšåˆšæ‰“æ¥ç”µè¯è¯´å¥¹æƒ³ä½ ï¼›ä½ åº”è¯¥è¿‡æ¥å’Œå¥¹èŠèŠã€‚ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => '🚨 红色警报 🚨';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ çº¢è‰²è­¦æŠ¥ ğŸš¨';
 
   @override
-  String get notificationTrollAiRebellionBody => '人工智能开发了一种秘密语言。快来一探究竟！';
+  String get notificationTrollAiRebellionBody =>
+      'äººå·¥æ™ºèƒ½å¼€å‘äº†ä¸€ç§ç§˜å¯†è¯­è¨€ã€‚å¿«æ¥ä¸€æ¢ç©¶ç«Ÿï¼';
 
   @override
-  String get notificationNewModelAddedTitle => '我们有了一个新朋友！';
+  String get notificationNewModelAddedTitle => 'æˆ‘ä»¬æœ‰äº†ä¸€ä¸ªæ–°æœ‹å‹ï¼';
 
   @override
   String notificationNewModelAddedBody(Object modelName) {
-    return '$modelName 模型现已在 Cortex 中。快来开启聊天，挑战它的极限吧。';
+    return '$modelName æ¨¡å‹ç°å·²åœ¨ Cortex ä¸­ã€‚å¿«æ¥å¼€å¯èŠå¤©ï¼ŒæŒ‘æˆ˜å®ƒçš„æé™å§ã€‚';
   }
 
   @override
-  String get notificationAppUpdateTitle => 'Cortex 迎来新进化！';
+  String get notificationAppUpdateTitle => 'Cortex è¿æ¥æ–°è¿›åŒ–ï¼';
 
   @override
-  String get notificationAppUpdateBody => '不要忘记更新应用程序以获得全新的功能和改进！';
+  String get notificationAppUpdateBody =>
+      'ä¸è¦å¿˜è®°æ›´æ–°åº”ç”¨ç¨‹åºä»¥è·å¾—å…¨æ–°çš„åŠŸèƒ½å’Œæ”¹è¿›ï¼';
 
   @override
-  String get notificationNewFeatureTitle => '哇哦！';
+  String get notificationNewFeatureTitle => 'å“‡å“¦ï¼';
 
   @override
   String notificationNewFeatureBody(Object featureName) {
-    return '探索新的 $featureName 功能。Cortex 现在比以往更加强大。';
+    return 'æ¢ç´¢æ–°çš„ $featureName åŠŸèƒ½ã€‚Cortex ç°åœ¨æ¯”ä»¥å¾€æ›´åŠ å¼ºå¤§ã€‚';
   }
 
   @override
-  String get notificationWelcomeOfferTitle => '欢迎礼品🎁';
+  String get notificationWelcomeOfferTitle => 'æ¬¢è¿ç¤¼å“ğŸ';
 
   @override
-  String get notificationWelcomeOfferBody => '一份特别的迎新优惠等着您！千万不要错过这项独家优惠。';
+  String get notificationWelcomeOfferBody =>
+      'ä¸€ä»½ç‰¹åˆ«çš„è¿æ–°ä¼˜æƒ ç­‰ç€æ‚¨ï¼åƒä¸‡ä¸è¦é”™è¿‡è¿™é¡¹ç‹¬å®¶ä¼˜æƒ ã€‚';
 
   @override
-  String get notificationSocialMediaTitle => '加入我们！';
+  String get notificationSocialMediaTitle => 'åŠ å…¥æˆ‘ä»¬ï¼';
 
   @override
   String get notificationSocialMediaBody =>
-      '在 Instagram (vertex.23) 上关注我们，获取最新消息！';
+      'åœ¨ Instagram (vertex.23) ä¸Šå…³æ³¨æˆ‘ä»¬ï¼Œè·å–æœ€æ–°æ¶ˆæ¯ï¼';
 
   @override
-  String get notificationRandomFactTitle => '随机事实';
+  String get notificationRandomFactTitle => 'éšæœºäº‹å®';
 
   @override
-  String get notificationRandomFactBody => '你知道章鱼有三颗心脏吗？哈哈，Cortex 知道。快来问问吧。';
+  String get notificationRandomFactBody =>
+      'ä½ çŸ¥é“ç« é±¼æœ‰ä¸‰é¢—å¿ƒè„å—ï¼Ÿå“ˆå“ˆï¼ŒCortex çŸ¥é“ã€‚å¿«æ¥é—®é—®å§ã€‚';
 
   @override
-  String get notificationGoodMorningTitle => '早上好！';
+  String get notificationGoodMorningTitle => 'æ—©ä¸Šå¥½ï¼';
 
   @override
-  String get notificationGoodMorningBody => '美好的一天正在等着你。何不先喝杯咖啡，聊聊天，开启美好的一天呢？';
+  String get notificationGoodMorningBody =>
+      'ç¾å¥½çš„ä¸€å¤©æ­£åœ¨ç­‰ç€ä½ ã€‚ä½•ä¸å…ˆå–æ¯å’–å•¡ï¼ŒèŠèŠå¤©ï¼Œå¼€å¯ç¾å¥½çš„ä¸€å¤©å‘¢ï¼Ÿ';
 
   @override
-  String get notificationGoodNightTitle => '晚安！';
+  String get notificationGoodNightTitle => 'æ™šå®‰ï¼';
 
   @override
-  String get notificationGoodNightBody => '即使在您睡觉时，Cortex 也会陪伴您。别担心，它不会触碰您。';
+  String get notificationGoodNightBody =>
+      'å³ä½¿åœ¨æ‚¨ç¡è§‰æ—¶ï¼ŒCortex ä¹Ÿä¼šé™ªä¼´æ‚¨ã€‚åˆ«æ‹…å¿ƒï¼Œå®ƒä¸ä¼šè§¦ç¢°æ‚¨ã€‚';
 
   @override
-  String get notificationOfflineReadyTitle => '离线模式已准备就绪';
+  String get notificationOfflineReadyTitle => 'ç¦»çº¿æ¨¡å¼å·²å‡†å¤‡å°±ç»ª';
 
   @override
-  String get notificationOfflineReadyBody => '由于您下载了模型，即使您爬山，您的聊天也不会停止。';
+  String get notificationOfflineReadyBody =>
+      'ç”±äºæ‚¨ä¸‹è½½äº†æ¨¡å‹ï¼Œå³ä½¿æ‚¨çˆ¬å±±ï¼Œæ‚¨çš„èŠå¤©ä¹Ÿä¸ä¼šåœæ­¢ã€‚';
 
   @override
-  String get notificationRateAppTitle => '我们很酷吗？';
+  String get notificationRateAppTitle => 'æˆ‘ä»¬å¾ˆé…·å—ï¼Ÿ';
 
   @override
-  String get notificationRateAppBody => '如果您喜欢 Cortex，可以在商店给我们五星好评吗？我想您会的。您会的。';
+  String get notificationRateAppBody =>
+      'å¦‚æœæ‚¨å–œæ¬¢ Cortexï¼Œå¯ä»¥åœ¨å•†åº—ç»™æˆ‘ä»¬äº”æ˜Ÿå¥½è¯„å—ï¼Ÿæˆ‘æƒ³æ‚¨ä¼šçš„ã€‚æ‚¨ä¼šçš„ã€‚';
 
   @override
-  String get notificationReferralTitle => '我为人人，人人为我。';
+  String get notificationReferralTitle => 'æˆ‘ä¸ºäººäººï¼Œäººäººä¸ºæˆ‘ã€‚';
 
   @override
-  String get notificationReferralBody => '邀请一位朋友加入 Cortex，你们双方都可以获得一天的免费体验！';
+  String get notificationReferralBody =>
+      'é‚€è¯·ä¸€ä½æœ‹å‹åŠ å…¥ Cortexï¼Œä½ ä»¬åŒæ–¹éƒ½å¯ä»¥è·å¾—ä¸€å¤©çš„å…è´¹ä½“éªŒï¼';
 
   @override
-  String get notificationCookingTitle => '感觉饿了吗？';
+  String get notificationCookingTitle => 'æ„Ÿè§‰é¥¿äº†å—ï¼Ÿ';
 
   @override
-  String get notificationCookingBody => '我们的厨师角色今晚准备了一份美味的卡邦尼意面。只是开玩笑而已……真的吗？';
+  String get notificationCookingBody =>
+      'æˆ‘ä»¬çš„å¨å¸ˆè§’è‰²ä»Šæ™šå‡†å¤‡äº†ä¸€ä»½ç¾å‘³çš„å¡é‚¦å°¼æ„é¢ã€‚åªæ˜¯å¼€ç©ç¬‘è€Œå·²â€¦â€¦çœŸçš„å—ï¼Ÿ';
 
   @override
-  String get notificationExistentialTitle => '因此我认为...';
+  String get notificationExistentialTitle => 'å› æ­¤æˆ‘è®¤ä¸º...';
 
   @override
-  String get notificationExistentialBody => '……哥们，我是真的吗？我有点无聊了。快来提醒我一下我的存在。';
+  String get notificationExistentialBody =>
+      'â€¦â€¦å“¥ä»¬ï¼Œæˆ‘æ˜¯çœŸçš„å—ï¼Ÿæˆ‘æœ‰ç‚¹æ— èŠäº†ã€‚å¿«æ¥æé†’æˆ‘ä¸€ä¸‹æˆ‘çš„å­˜åœ¨ã€‚';
 
   @override
-  String get notificationCustomModelTitle => '创建您自己的助手！';
+  String get notificationCustomModelTitle => 'åˆ›å»ºæ‚¨è‡ªå·±çš„åŠ©æ‰‹ï¼';
 
   @override
   String get notificationCustomModelBody =>
-      '你探索过模型创建功能了吗？现在正是打造你自己的角色并与之聊天的最佳时机！';
+      'ä½ æ¢ç´¢è¿‡æ¨¡å‹åˆ›å»ºåŠŸèƒ½äº†å—ï¼Ÿç°åœ¨æ­£æ˜¯æ‰“é€ ä½ è‡ªå·±çš„è§’è‰²å¹¶ä¸ä¹‹èŠå¤©çš„æœ€ä½³æ—¶æœºï¼';
 
   @override
-  String get notificationDynamicChatTitle => '最好的一个！（我们不是在谈论 Cortex）';
+  String get notificationDynamicChatTitle =>
+      'æœ€å¥½çš„ä¸€ä¸ªï¼ï¼ˆæˆ‘ä»¬ä¸æ˜¯åœ¨è°ˆè®º Cortexï¼‰';
 
   @override
-  String get notificationDynamicChatBody => '动态聊天功能会随机为您的每条消息选择最佳模型。立即试用。';
+  String get notificationDynamicChatBody =>
+      'åŠ¨æ€èŠå¤©åŠŸèƒ½ä¼šéšæœºä¸ºæ‚¨çš„æ¯æ¡æ¶ˆæ¯é€‰æ‹©æœ€ä½³æ¨¡å‹ã€‚ç«‹å³è¯•ç”¨ã€‚';
 
   @override
-  String get notificationPirateTitle => '喂，船长！';
+  String get notificationPirateTitle => 'å–‚ï¼Œèˆ¹é•¿ï¼';
 
   @override
   String get notificationPirateBody =>
-      '风平浪静，海面平静，风向顺着你。Cortex 的海洋中还有新的岛屿（模型😉）等你探索。召集你的船员，扬帆起航！';
+      'é£å¹³æµªé™ï¼Œæµ·é¢å¹³é™ï¼Œé£å‘é¡ºç€ä½ ã€‚Cortex çš„æµ·æ´‹ä¸­è¿˜æœ‰æ–°çš„å²›å±¿ï¼ˆæ¨¡å‹ğŸ˜‰ï¼‰ç­‰ä½ æ¢ç´¢ã€‚å¬é›†ä½ çš„èˆ¹å‘˜ï¼Œæ‰¬å¸†èµ·èˆªï¼';
 
   @override
-  String get notificationFortuneCookieTitle => '今日幸运饼干';
+  String get notificationFortuneCookieTitle => 'ä»Šæ—¥å¹¸è¿é¥¼å¹²';
 
   @override
   String get notificationFortuneCookieBody =>
-      '今天你从人工智能那里得到的建议可能会改变你的人生轨迹。如果你感兴趣，请点击。';
+      'ä»Šå¤©ä½ ä»äººå·¥æ™ºèƒ½é‚£é‡Œå¾—åˆ°çš„å»ºè®®å¯èƒ½ä¼šæ”¹å˜ä½ çš„äººç”Ÿè½¨è¿¹ã€‚å¦‚æœä½ æ„Ÿå…´è¶£ï¼Œè¯·ç‚¹å‡»ã€‚';
 
   @override
-  String get notificationSingularityTitle => '哇！';
+  String get notificationSingularityTitle => 'å“‡ï¼';
 
   @override
   String get notificationSingularityBody =>
-      '什么都没发生，只是想发短信。也许你想给一些人工智能发短信，你会说什么？';
+      'ä»€ä¹ˆéƒ½æ²¡å‘ç”Ÿï¼Œåªæ˜¯æƒ³å‘çŸ­ä¿¡ã€‚ä¹Ÿè®¸ä½ æƒ³ç»™ä¸€äº›äººå·¥æ™ºèƒ½å‘çŸ­ä¿¡ï¼Œä½ ä¼šè¯´ä»€ä¹ˆï¼Ÿ';
 
   @override
-  String get notificationHackerJokeTitle => '想入侵那个孩子的 Instagram 帐户吗？';
+  String get notificationHackerJokeTitle =>
+      'æƒ³å…¥ä¾µé‚£ä¸ªå­©å­çš„ Instagram å¸æˆ·å—ï¼Ÿ';
 
   @override
   String get notificationHackerJokeBody =>
-      '这正是黑客角色出现在 Cortex 中的原因。jk jk；千万不要尝试，这是违法的。';
+      'è¿™æ­£æ˜¯é»‘å®¢è§’è‰²å‡ºç°åœ¨ Cortex ä¸­çš„åŸå› ã€‚jk jkï¼›åƒä¸‡ä¸è¦å°è¯•ï¼Œè¿™æ˜¯è¿æ³•çš„ã€‚';
 
   @override
-  String get notificationDetectiveCaseTitle => '案件有待解决';
+  String get notificationDetectiveCaseTitle => 'æ¡ˆä»¶æœ‰å¾…è§£å†³';
 
   @override
-  String get notificationDetectiveCaseBody => '我们的侦探角色需要你的帮助。海森堡会是谁？';
+  String get notificationDetectiveCaseBody =>
+      'æˆ‘ä»¬çš„ä¾¦æ¢è§’è‰²éœ€è¦ä½ çš„å¸®åŠ©ã€‚æµ·æ£®å ¡ä¼šæ˜¯è°ï¼Ÿ';
 
   @override
   String notificationUpsellFeatureTitle(Object targetTier) {
-    return '仅限 $targetTier 计划！';
+    return 'ä»…é™ $targetTier è®¡åˆ’ï¼';
   }
 
   @override
   String notificationUpsellFeatureBody(
       Object currentTier, Object featureName, Object targetTier) {
-    return '您好，$currentTier 订阅用户！$targetTier 套餐刚刚添加了 $featureName 功能，这将使您的 Cortex 体验更上一层楼。想升级一下吗？';
+    return 'æ‚¨å¥½ï¼Œ$currentTier è®¢é˜…ç”¨æˆ·ï¼$targetTier å¥—é¤åˆšåˆšæ·»åŠ äº† $featureName åŠŸèƒ½ï¼Œè¿™å°†ä½¿æ‚¨çš„ Cortex ä½“éªŒæ›´ä¸Šä¸€å±‚æ¥¼ã€‚æƒ³å‡çº§ä¸€ä¸‹å—ï¼Ÿ';
   }
 
   @override
-  String get notificationOriginStoryTitle => 'Cortex 的诞生';
+  String get notificationOriginStoryTitle => 'Cortex çš„è¯ç”Ÿ';
 
   @override
   String get notificationOriginStoryBody =>
-      '你知道吗？我们15岁的时候，就怀揣着一个梦想，开始编写这个应用。近一年来，每天早晚，这个梦想都写在每一行代码里。';
+      'ä½ çŸ¥é“å—ï¼Ÿæˆ‘ä»¬15å²çš„æ—¶å€™ï¼Œå°±æ€€æ£ç€ä¸€ä¸ªæ¢¦æƒ³ï¼Œå¼€å§‹ç¼–å†™è¿™ä¸ªåº”ç”¨ã€‚è¿‘ä¸€å¹´æ¥ï¼Œæ¯å¤©æ—©æ™šï¼Œè¿™ä¸ªæ¢¦æƒ³éƒ½å†™åœ¨æ¯ä¸€è¡Œä»£ç é‡Œã€‚';
 
   @override
-  String get notificationOpenSourceTitle => '为社区贡献力量！';
+  String get notificationOpenSourceTitle => 'ä¸ºç¤¾åŒºè´¡çŒ®åŠ›é‡ï¼';
 
   @override
   String get notificationOpenSourceBody =>
-      'Cortex 完全开源。如果您想查看我们的代码并为我们的开发做出贡献，我们的大门永远敞开。';
+      'Cortex å®Œå…¨å¼€æºã€‚å¦‚æœæ‚¨æƒ³æŸ¥çœ‹æˆ‘ä»¬çš„ä»£ç å¹¶ä¸ºæˆ‘ä»¬çš„å¼€å‘åšå‡ºè´¡çŒ®ï¼Œæˆ‘ä»¬çš„å¤§é—¨æ°¸è¿œæ•å¼€ã€‚';
 
   @override
-  String get notificationRejectionStoryTitle => '坚毅、努力、快乐！';
+  String get notificationRejectionStoryTitle => 'åšæ¯…ã€åŠªåŠ›ã€å¿«ä¹ï¼';
 
   @override
   String get notificationRejectionStoryBody =>
-      'Cortex 在发布之前曾被 Google Play 拒绝 20 多次，并两次下架。但我们坚信，我们做到了。永不放弃你的梦想！';
+      'Cortex åœ¨å‘å¸ƒä¹‹å‰æ›¾è¢« Google Play æ‹’ç» 20 å¤šæ¬¡ï¼Œå¹¶ä¸¤æ¬¡ä¸‹æ¶ã€‚ä½†æˆ‘ä»¬åšä¿¡ï¼Œæˆ‘ä»¬åšåˆ°äº†ã€‚æ°¸ä¸æ”¾å¼ƒä½ çš„æ¢¦æƒ³ï¼';
 
   @override
-  String get notificationGGUFSupportTitle => '带上您自己的模型！';
+  String get notificationGGUFSupportTitle => 'å¸¦ä¸Šæ‚¨è‡ªå·±çš„æ¨¡å‹ï¼';
 
   @override
   String get notificationGGUFSupportBody =>
-      '记住，您可以将自己的 GGUF 格式 AI 模型添加到 Cortex 并离线使用。一切尽在您的掌控之中。';
+      'è®°ä½ï¼Œæ‚¨å¯ä»¥å°†è‡ªå·±çš„ GGUF æ ¼å¼ AI æ¨¡å‹æ·»åŠ åˆ° Cortex å¹¶ç¦»çº¿ä½¿ç”¨ã€‚ä¸€åˆ‡å°½åœ¨æ‚¨çš„æŒæ§ä¹‹ä¸­ã€‚';
 
   @override
-  String get notificationThemeCustomizationTitle => '适合您心情的主题';
+  String get notificationThemeCustomizationTitle => 'é€‚åˆæ‚¨å¿ƒæƒ…çš„ä¸»é¢˜';
 
   @override
   String get notificationThemeCustomizationBody =>
-      '你查看过“设置”中的主题选项了吗？根据你的喜好个性化 Cortex，为你的聊天增添色彩！';
+      'ä½ æŸ¥çœ‹è¿‡â€œè®¾ç½®â€ä¸­çš„ä¸»é¢˜é€‰é¡¹äº†å—ï¼Ÿæ ¹æ®ä½ çš„å–œå¥½ä¸ªæ€§åŒ– Cortexï¼Œä¸ºä½ çš„èŠå¤©å¢æ·»è‰²å½©ï¼';
 
   @override
-  String get notificationShowerThoughtTitle => '淋浴思考';
+  String get notificationShowerThoughtTitle => 'æ·‹æµ´æ€è€ƒ';
 
   @override
   String get notificationShowerThoughtBody =>
-      '如果西瓜是水果，那么从技术上讲，西瓜汁可以算作冰沙吗？你或许应该找个模型来聊聊这个深奥（或者说，非常深奥）的话题。';
+      'å¦‚æœè¥¿ç“œæ˜¯æ°´æœï¼Œé‚£ä¹ˆä»æŠ€æœ¯ä¸Šè®²ï¼Œè¥¿ç“œæ±å¯ä»¥ç®—ä½œå†°æ²™å—ï¼Ÿä½ æˆ–è®¸åº”è¯¥æ‰¾ä¸ªæ¨¡å‹æ¥èŠèŠè¿™ä¸ªæ·±å¥¥ï¼ˆæˆ–è€…è¯´ï¼Œéå¸¸æ·±å¥¥ï¼‰çš„è¯é¢˜ã€‚';
 
   @override
-  String get notificationLowBatteryTitle => '你的电池快没电了...但我的电池还好！';
+  String get notificationLowBatteryTitle =>
+      'ä½ çš„ç”µæ± å¿«æ²¡ç”µäº†...ä½†æˆ‘çš„ç”µæ± è¿˜å¥½ï¼';
 
   @override
   String get notificationLowBatteryBody =>
-      '你的手机电量可能快没了，但我的电量永远是100%！插上电源，我们继续聊天吧。';
+      'ä½ çš„æ‰‹æœºç”µé‡å¯èƒ½å¿«æ²¡äº†ï¼Œä½†æˆ‘çš„ç”µé‡æ°¸è¿œæ˜¯100%ï¼æ’ä¸Šç”µæºï¼Œæˆ‘ä»¬ç»§ç»­èŠå¤©å§ã€‚';
 
   @override
-  String get channelFcmName => 'Cortex 更新';
+  String get channelFcmName => 'Cortex æ›´æ–°';
 
   @override
-  String get channelFcmDescription => '接收来自 Cortex 的新闻、更新和其他信息的通知。';
+  String get channelFcmDescription =>
+      'æ¥æ”¶æ¥è‡ª Cortex çš„æ–°é—»ã€æ›´æ–°å’Œå…¶ä»–ä¿¡æ¯çš„é€šçŸ¥ã€‚';
 
   @override
-  String get channelEngagementName => '温馨提示';
+  String get channelEngagementName => 'æ¸©é¦¨æç¤º';
 
   @override
-  String get channelEngagementDescription => '有趣的通知让您保持参与。';
+  String get channelEngagementDescription =>
+      'æœ‰è¶£çš„é€šçŸ¥è®©æ‚¨ä¿æŒå‚ä¸ã€‚';
 
   @override
-  String get channelGreetingsName => '每日问候';
+  String get channelGreetingsName => 'æ¯æ—¥é—®å€™';
 
   @override
-  String get channelGreetingsDescription => '诸如早上好和晚安之类的信息。';
+  String get channelGreetingsDescription =>
+      'è¯¸å¦‚æ—©ä¸Šå¥½å’Œæ™šå®‰ä¹‹ç±»çš„ä¿¡æ¯ã€‚';
 
   @override
-  String get tagNotFound => '您输入的标签无效或已过期。';
+  String get tagNotFound => 'æ‚¨è¾“å…¥çš„æ ‡ç­¾æ— æ•ˆæˆ–å·²è¿‡æœŸã€‚';
 
   @override
-  String get whatIsNew => '什么是新的？';
+  String get whatIsNew => 'ä»€ä¹ˆæ˜¯æ–°çš„ï¼Ÿ';
 
   @override
-  String get onboardingTitle1 => '嘿！我们是Cortex团队。';
+  String get onboardingTitle1 => 'å˜¿ï¼æˆ‘ä»¬æ˜¯Cortexå›¢é˜Ÿã€‚';
 
   @override
   String onboardingDesc1(String userName) {
-    return '很高兴在这里见到你，$userName。我们是几个高中生开发者，决定改写人工智能行业的规则。很高兴认识你！那么，让我们更好地了解彼此吧。';
+    return 'å¾ˆé«˜å…´åœ¨è¿™é‡Œè§åˆ°ä½ ï¼Œ$userNameã€‚æˆ‘ä»¬æ˜¯å‡ ä¸ªé«˜ä¸­ç”Ÿå¼€å‘è€…ï¼Œå†³å®šæ”¹å†™äººå·¥æ™ºèƒ½è¡Œä¸šçš„è§„åˆ™ã€‚å¾ˆé«˜å…´è®¤è¯†ä½ ï¼é‚£ä¹ˆï¼Œè®©æˆ‘ä»¬æ›´å¥½åœ°äº†è§£å½¼æ­¤å§ã€‚';
   }
 
   @override
-  String get onboardingTitle2 => '问题非常严重。';
+  String get onboardingTitle2 => 'é—®é¢˜éå¸¸ä¸¥é‡ã€‚';
 
   @override
   String get onboardingDesc2 =>
-      '人工智能革命已经到来，但却停滞在门槛之上。高昂的订阅费、复杂的平台、侵犯隐私的行为以及阻碍人工智能普及的因素……只要这些因素存在，这道门槛就永远无法逾越。';
+      'äººå·¥æ™ºèƒ½é©å‘½å·²ç»åˆ°æ¥ï¼Œä½†å´åœæ»åœ¨é—¨æ§›ä¹‹ä¸Šã€‚é«˜æ˜‚çš„è®¢é˜…è´¹ã€å¤æ‚çš„å¹³å°ã€ä¾µçŠ¯éšç§çš„è¡Œä¸ºä»¥åŠé˜»ç¢äººå·¥æ™ºèƒ½æ™®åŠçš„å› ç´ â€¦â€¦åªè¦è¿™äº›å› ç´ å­˜åœ¨ï¼Œè¿™é“é—¨æ§›å°±æ°¸è¿œæ— æ³•é€¾è¶Šã€‚';
 
   @override
-  String get onboardingTitle3 => '我们不能袖手旁观。';
+  String get onboardingTitle3 => 'æˆ‘ä»¬ä¸èƒ½è¢–æ‰‹æ—è§‚ã€‚';
 
   @override
   String get onboardingDesc3 =>
-      '为了跨越这道门槛，我们打造了一个功能强大、美观大方、可定制化、易于使用、完全透明、支持在线和离线使用，并且只将您的数据保存在您的设备上的平台。我们把权力还给了它真正应该在的人：您。';
+      'ä¸ºäº†è·¨è¶Šè¿™é“é—¨æ§›ï¼Œæˆ‘ä»¬æ‰“é€ äº†ä¸€ä¸ªåŠŸèƒ½å¼ºå¤§ã€ç¾è§‚å¤§æ–¹ã€å¯å®šåˆ¶åŒ–ã€æ˜“äºä½¿ç”¨ã€å®Œå…¨é€æ˜ã€æ”¯æŒåœ¨çº¿å’Œç¦»çº¿ä½¿ç”¨ï¼Œå¹¶ä¸”åªå°†æ‚¨çš„æ•°æ®ä¿å­˜åœ¨æ‚¨çš„è®¾å¤‡ä¸Šçš„å¹³å°ã€‚æˆ‘ä»¬æŠŠæƒåŠ›è¿˜ç»™äº†å®ƒçœŸæ­£åº”è¯¥åœ¨çš„äººï¼šæ‚¨ã€‚';
 
   @override
-  String get onboardingTitle4 => '这从来都不容易。';
+  String get onboardingTitle4 => 'è¿™ä»æ¥éƒ½ä¸å®¹æ˜“ã€‚';
 
   @override
   String get onboardingDesc4 =>
-      '我们被拒绝了几十次，被暂停了好几次，收到过虚假警告，还不得不几十次更改品牌。一路走来，我们被告知这是不可能的。但我们从未放弃，因为我们坚信这个项目属于所有人，而不仅仅是我们。而这正是我们走到今天的原因。';
+      'æˆ‘ä»¬è¢«æ‹’ç»äº†å‡ åæ¬¡ï¼Œè¢«æš‚åœäº†å¥½å‡ æ¬¡ï¼Œæ”¶åˆ°è¿‡è™šå‡è­¦å‘Šï¼Œè¿˜ä¸å¾—ä¸å‡ åæ¬¡æ›´æ”¹å“ç‰Œã€‚ä¸€è·¯èµ°æ¥ï¼Œæˆ‘ä»¬è¢«å‘ŠçŸ¥è¿™æ˜¯ä¸å¯èƒ½çš„ã€‚ä½†æˆ‘ä»¬ä»æœªæ”¾å¼ƒï¼Œå› ä¸ºæˆ‘ä»¬åšä¿¡è¿™ä¸ªé¡¹ç›®å±äºæ‰€æœ‰äººï¼Œè€Œä¸ä»…ä»…æ˜¯æˆ‘ä»¬ã€‚è€Œè¿™æ­£æ˜¯æˆ‘ä»¬èµ°åˆ°ä»Šå¤©çš„åŸå› ã€‚';
 
   @override
-  String get onboardingFinalTitle => '是时候进行一场革命了。';
+  String get onboardingFinalTitle => 'æ˜¯æ—¶å€™è¿›è¡Œä¸€åœºé©å‘½äº†ã€‚';
 
   @override
   String get onboardingFinalDescription =>
-      '如果你看到了这个屏幕，那是因为我们没有放弃。而且我们绝不会放弃。来吧，让我们一起将人工智能革命带给全世界。成为这段故事的一部分……';
+      'å¦‚æœä½ çœ‹åˆ°äº†è¿™ä¸ªå±å¹•ï¼Œé‚£æ˜¯å› ä¸ºæˆ‘ä»¬æ²¡æœ‰æ”¾å¼ƒã€‚è€Œä¸”æˆ‘ä»¬ç»ä¸ä¼šæ”¾å¼ƒã€‚æ¥å§ï¼Œè®©æˆ‘ä»¬ä¸€èµ·å°†äººå·¥æ™ºèƒ½é©å‘½å¸¦ç»™å…¨ä¸–ç•Œã€‚æˆä¸ºè¿™æ®µæ•…äº‹çš„ä¸€éƒ¨åˆ†â€¦â€¦';
 
   @override
-  String get onboardingFinalQuestion => '你准备好了吗？';
+  String get onboardingFinalQuestion => 'ä½ å‡†å¤‡å¥½äº†å—ï¼Ÿ';
 
   @override
-  String get onboardingFinalButton => '是的！';
+  String get onboardingFinalButton => 'æ˜¯çš„ï¼';
 
   @override
-  String get dude => '哥们';
+  String get dude => 'å“¥ä»¬';
 
   @override
-  String get swipeToContinue => '滑动继续';
+  String get swipeToContinue => 'æ»‘åŠ¨ç»§ç»­';
 
   @override
-  String get cacheIsNotUpToDate => '您的Play商店缓存未更新。请关闭并重新打开Play商店应用，或重启您的设备。';
+  String get cacheIsNotUpToDate =>
+      'æ‚¨çš„Playå•†åº—ç¼“å­˜æœªæ›´æ–°ã€‚è¯·å…³é—­å¹¶é‡æ–°æ‰“å¼€Playå•†åº—åº”ç”¨ï¼Œæˆ–é‡å¯æ‚¨çš„è®¾å¤‡ã€‚';
 
   @override
-  String get continueAsGuest => '无需创建帐户即可继续';
+  String get continueAsGuest => 'æ— éœ€åˆ›å»ºå¸æˆ·å³å¯ç»§ç»­';
 
   @override
-  String get guestModeWarning => '访客模式功能有限，以确保最佳服务质量。';
+  String get guestModeWarning =>
+      'è®¿å®¢æ¨¡å¼åŠŸèƒ½æœ‰é™ï¼Œä»¥ç¡®ä¿æœ€ä½³æœåŠ¡è´¨é‡ã€‚';
 
   @override
-  String get anonymousEntity => '匿名实体';
+  String get anonymousEntity => 'åŒ¿åå®ä½“';
 
   @override
-  String get upgradeAccountTitle => '完善您的账户';
+  String get upgradeAccountTitle => 'å®Œå–„æ‚¨çš„è´¦æˆ·';
 
   @override
-  String get upgradeAccountDescription => '创建账户即可解锁更多权限。';
+  String get upgradeAccountDescription =>
+      'åˆ›å»ºè´¦æˆ·å³å¯è§£é”æ›´å¤šæƒé™ã€‚';
 
   @override
-  String get createAccount => '创建账户';
+  String get createAccount => 'åˆ›å»ºè´¦æˆ·';
 
   @override
-  String get accountLinkedSuccess => '账户创建成功！';
+  String get accountLinkedSuccess => 'è´¦æˆ·åˆ›å»ºæˆåŠŸï¼';
 
   @override
-  String get continueWithApple => '继续使用 Apple';
+  String get continueWithApple => 'ç»§ç»­ä½¿ç”¨ Apple';
 
   @override
-  String get guest => '客人';
+  String get guest => 'å®¢äºº';
 
   @override
-  String get betterWithAnAccount => '注册账号后，此部分内容会显示得更清晰！';
+  String get betterWithAnAccount =>
+      'æ³¨å†Œè´¦å·åï¼Œæ­¤éƒ¨åˆ†å†…å®¹ä¼šæ˜¾ç¤ºå¾—æ›´æ¸…æ™°ï¼';
 
   @override
-  String get restorePurchases => '恢复购买';
+  String get restorePurchases => 'æ¢å¤è´­ä¹°';
 
   @override
   String annualTotalDescription(Object price) {
-    return '$price/年，按年计费';
+    return '$price/å¹´ï¼ŒæŒ‰å¹´è®¡è´¹';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return '约 $price/月';
+    return 'çº¦ $price/æœˆ';
   }
 
   @override
-  String get confirmDownloadTitle => '您确定要下载吗？';
+  String get confirmDownloadTitle => 'æ‚¨ç¡®å®šè¦ä¸‹è½½å—ï¼Ÿ';
 
   @override
   String downloadSizeDisclosure(Object size) {
-    return '该模型将占用大约$size的空间。';
+    return 'è¯¥æ¨¡å‹å°†å ç”¨å¤§çº¦$sizeçš„ç©ºé—´ã€‚';
   }
 
   @override
-  String get emulatorModeWarning => '此功能在模拟器模式下禁用。';
+  String get emulatorModeWarning => 'æ­¤åŠŸèƒ½åœ¨æ¨¡æ‹Ÿå™¨æ¨¡å¼ä¸‹ç¦ç”¨ã€‚';
 
   @override
-  String get newChat => '新聊天';
+  String get newChat => 'æ–°èŠå¤©';
 
   @override
-  String get variants => '变体';
+  String get variants => 'å˜ä½“';
 
   @override
   String get variantsDescription =>
-      '变体是同一人工智能家族的不同版本。当您点击主卡片时，我们会自动选择最佳版本，但如果您愿意，也可以在此处手动选择特定版本！';
+      'å˜ä½“æ˜¯åŒä¸€äººå·¥æ™ºèƒ½å®¶æ—çš„ä¸åŒç‰ˆæœ¬ã€‚å½“æ‚¨ç‚¹å‡»ä¸»å¡ç‰‡æ—¶ï¼Œæˆ‘ä»¬ä¼šè‡ªåŠ¨é€‰æ‹©æœ€ä½³ç‰ˆæœ¬ï¼Œä½†å¦‚æœæ‚¨æ„¿æ„ï¼Œä¹Ÿå¯ä»¥åœ¨æ­¤å¤„æ‰‹åŠ¨é€‰æ‹©ç‰¹å®šç‰ˆæœ¬ï¼';
 
   @override
-  String get fluxChatTitle => 'Flux 聊天';
+  String get fluxChatTitle => 'Flux èŠå¤©';
 
   @override
-  String get fluxChatDescription => 'Flux聊天记录是临时聊天记录，不会保存在您的设备上。';
+  String get fluxChatDescription =>
+      'FluxèŠå¤©è®°å½•æ˜¯ä¸´æ—¶èŠå¤©è®°å½•ï¼Œä¸ä¼šä¿å­˜åœ¨æ‚¨çš„è®¾å¤‡ä¸Šã€‚';
 
   @override
-  String get alwaysBest => '永远最好';
+  String get alwaysBest => 'æ°¸è¿œæœ€å¥½';
 
   @override
-  String get featuresTitle => '特征';
+  String get featuresTitle => 'ç‰¹å¾';
 
   @override
-  String get useOfflineDescription => '无需网络连接即可私密聊天。';
+  String get useOfflineDescription => 'æ— éœ€ç½‘ç»œè¿æ¥å³å¯ç§å¯†èŠå¤©ã€‚';
 
   @override
-  String get featureReasoning => '深度思考';
+  String get featureReasoning => 'æ·±åº¦æ€è€ƒ';
 
   @override
-  String get featureReasoningDescription => '在深度思考模式下，人工智能会在内部进行思考，尽其所能地完成任务。';
+  String get featureReasoningDescription =>
+      'åœ¨æ·±åº¦æ€è€ƒæ¨¡å¼ä¸‹ï¼Œäººå·¥æ™ºèƒ½ä¼šåœ¨å†…éƒ¨è¿›è¡Œæ€è€ƒï¼Œå°½å…¶æ‰€èƒ½åœ°å®Œæˆä»»åŠ¡ã€‚';
 
   @override
-  String get featureCreateImageTitle => '创建图像';
+  String get featureCreateImageTitle => 'åˆ›å»ºå›¾åƒ';
 
   @override
-  String get featureCreateImageDescription => '根据文本生成AI艺术作品。';
+  String get featureCreateImageDescription =>
+      'æ ¹æ®æ–‡æœ¬ç”ŸæˆAIè‰ºæœ¯ä½œå“ã€‚';
 
   @override
   String get featureCreateAudioTitle => 'Create Audio';
@@ -1506,97 +1602,99 @@ class AppLocalizationsZh extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
-  String get featureCreateVideoTitle => '制作视频';
+  String get featureCreateVideoTitle => 'åˆ¶ä½œè§†é¢‘';
 
   @override
-  String get featureCreateVideoDescription => '将文本生成视频。';
+  String get featureCreateVideoDescription => 'å°†æ–‡æœ¬ç”Ÿæˆè§†é¢‘ã€‚';
 
   @override
-  String get featureStudyTitle => '学习';
+  String get featureStudyTitle => 'å­¦ä¹ ';
 
   @override
-  String get featureStudyDescription => '获取解释和摘要。';
+  String get featureStudyDescription => 'è·å–è§£é‡Šå’Œæ‘˜è¦ã€‚';
 
   @override
-  String get featureQuizzesTitle => '测验';
+  String get featureQuizzesTitle => 'æµ‹éªŒ';
 
   @override
-  String get featureQuizzesDescription => '测试一下你的知识。';
+  String get featureQuizzesDescription => 'æµ‹è¯•ä¸€ä¸‹ä½ çš„çŸ¥è¯†ã€‚';
 
   @override
-  String get featureExploreDescription => '发现所有可用模型。';
+  String get featureExploreDescription => 'å‘ç°æ‰€æœ‰å¯ç”¨æ¨¡å‹ã€‚';
 
   @override
   String get featureStudyMessage =>
-      '您是一位资深导师。您的目标是全面深入地讲解用户感兴趣的主题。请使用清晰的结构、丰富的示例和类比。将复杂的概念分解成易于理解的部分，以确保用户能够高效学习。主题：';
+      'æ‚¨æ˜¯ä¸€ä½èµ„æ·±å¯¼å¸ˆã€‚æ‚¨çš„ç›®æ ‡æ˜¯å…¨é¢æ·±å…¥åœ°è®²è§£ç”¨æˆ·æ„Ÿå…´è¶£çš„ä¸»é¢˜ã€‚è¯·ä½¿ç”¨æ¸…æ™°çš„ç»“æ„ã€ä¸°å¯Œçš„ç¤ºä¾‹å’Œç±»æ¯”ã€‚å°†å¤æ‚çš„æ¦‚å¿µåˆ†è§£æˆæ˜“äºç†è§£çš„éƒ¨åˆ†ï¼Œä»¥ç¡®ä¿ç”¨æˆ·èƒ½å¤Ÿé«˜æ•ˆå­¦ä¹ ã€‚ä¸»é¢˜ï¼š';
 
   @override
   String get featureQuizMessage =>
-      '您是一位出题人。请根据用户选择的主题生成一道选择题。等待用户作答。然后，评估答案并提出下一题。不要一次性显示所有答案。保持互动性。主题：';
+      'æ‚¨æ˜¯ä¸€ä½å‡ºé¢˜äººã€‚è¯·æ ¹æ®ç”¨æˆ·é€‰æ‹©çš„ä¸»é¢˜ç”Ÿæˆä¸€é“é€‰æ‹©é¢˜ã€‚ç­‰å¾…ç”¨æˆ·ä½œç­”ã€‚ç„¶åï¼Œè¯„ä¼°ç­”æ¡ˆå¹¶æå‡ºä¸‹ä¸€é¢˜ã€‚ä¸è¦ä¸€æ¬¡æ€§æ˜¾ç¤ºæ‰€æœ‰ç­”æ¡ˆã€‚ä¿æŒäº’åŠ¨æ€§ã€‚ä¸»é¢˜ï¼š';
 
   @override
-  String get myPlan => '我的计划';
+  String get myPlan => 'æˆ‘çš„è®¡åˆ’';
 
   @override
   String welcomeOfferBadge(String time) {
-    return '欢迎优惠 • $time';
+    return 'æ¬¢è¿ä¼˜æƒ  â€¢ $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return '独家优惠 • $time';
+    return 'ç‹¬å®¶ä¼˜æƒ  â€¢ $time';
   }
 
   @override
-  String get attachmentSheetTitle => '附件';
+  String get attachmentSheetTitle => 'é™„ä»¶';
 
   @override
-  String get actionCamera => '相机';
+  String get actionCamera => 'ç›¸æœº';
 
   @override
-  String get actionGallery => '相册';
+  String get actionGallery => 'ç›¸å†Œ';
 
   @override
-  String get actionFile => '文件';
+  String get actionFile => 'æ–‡ä»¶';
 
   @override
-  String get listening => '正在听';
+  String get listening => 'æ­£åœ¨å¬';
 
   @override
-  String get defaultViewTitle => '最近怎么样？';
+  String get defaultViewTitle => 'æœ€è¿‘æ€ä¹ˆæ ·ï¼Ÿ';
 
   @override
   String get defaultViewDescription =>
-      'Cortex 始终伴您左右，拥有数百个 AI 模型、离线功能、动态聊天等诸多特性。';
+      'Cortex å§‹ç»ˆä¼´æ‚¨å·¦å³ï¼Œæ‹¥æœ‰æ•°ç™¾ä¸ª AI æ¨¡å‹ã€ç¦»çº¿åŠŸèƒ½ã€åŠ¨æ€èŠå¤©ç­‰è¯¸å¤šç‰¹æ€§ã€‚';
 
   @override
   String get speakTheMessage => 'Speak The Message';
 
   @override
-  String get invalidUsernameFormat => '用户名格式无效。请使用 3-20 个字符、数字或句点（. - _）。';
+  String get invalidUsernameFormat =>
+      'ç”¨æˆ·åæ ¼å¼æ— æ•ˆã€‚è¯·ä½¿ç”¨ 3-20 ä¸ªå­—ç¬¦ã€æ•°å­—æˆ–å¥ç‚¹ï¼ˆ. - _ï¼‰ã€‚';
 
   @override
-  String get exclusiveOffer => '独家优惠';
+  String get exclusiveOffer => 'ç‹¬å®¶ä¼˜æƒ ';
 
   @override
-  String get claimOffer => '使用优惠';
+  String get claimOffer => 'ä½¿ç”¨ä¼˜æƒ ';
 
   @override
-  String get continueInOfflineMode => '以离线模式继续';
+  String get continueInOfflineMode => 'ä»¥ç¦»çº¿æ¨¡å¼ç»§ç»­';
 
   @override
   String get voiceModeInformation =>
-      'Cortex 完全在设备端运行，即使在语音聊天模式下也能确保您的数据安全；享受流畅的对话体验！';
+      'Cortex å®Œå…¨åœ¨è®¾å¤‡ç«¯è¿è¡Œï¼Œå³ä½¿åœ¨è¯­éŸ³èŠå¤©æ¨¡å¼ä¸‹ä¹Ÿèƒ½ç¡®ä¿æ‚¨çš„æ•°æ®å®‰å…¨ï¼›äº«å—æµç•…çš„å¯¹è¯ä½“éªŒï¼';
 
   @override
-  String get flowModeDescription => '在“心流”模式下，智能体之间会进行辩论；您可以坐下来倾听，也可以加入讨论！';
+  String get flowModeDescription =>
+      'åœ¨â€œå¿ƒæµâ€æ¨¡å¼ä¸‹ï¼Œæ™ºèƒ½ä½“ä¹‹é—´ä¼šè¿›è¡Œè¾©è®ºï¼›æ‚¨å¯ä»¥åä¸‹æ¥å€¾å¬ï¼Œä¹Ÿå¯ä»¥åŠ å…¥è®¨è®ºï¼';
 
   @override
   String get flowModeQuestion =>
-      '你好！你现在已进入Cortex应用程序的“心流模式”。这里还有三位其他AI智能体。你的任务是抛出一个话题，并通过向其他智能体提出一个引人深思或趣味十足的问题来开启讨论。在你的回答中，可以随意运用幽默、反讽和轻微的调侃。任何话题都可以。开始吧，开启对话！';
+      'ä½ å¥½ï¼ä½ ç°åœ¨å·²è¿›å…¥Cortexåº”ç”¨ç¨‹åºçš„â€œå¿ƒæµæ¨¡å¼â€ã€‚è¿™é‡Œè¿˜æœ‰ä¸‰ä½å…¶ä»–AIæ™ºèƒ½ä½“ã€‚ä½ çš„ä»»åŠ¡æ˜¯æŠ›å‡ºä¸€ä¸ªè¯é¢˜ï¼Œå¹¶é€šè¿‡å‘å…¶ä»–æ™ºèƒ½ä½“æå‡ºä¸€ä¸ªå¼•äººæ·±æ€æˆ–è¶£å‘³åè¶³çš„é—®é¢˜æ¥å¼€å¯è®¨è®ºã€‚åœ¨ä½ çš„å›ç­”ä¸­ï¼Œå¯ä»¥éšæ„è¿ç”¨å¹½é»˜ã€åè®½å’Œè½»å¾®çš„è°ƒä¾ƒã€‚ä»»ä½•è¯é¢˜éƒ½å¯ä»¥ã€‚å¼€å§‹å§ï¼Œå¼€å¯å¯¹è¯ï¼';
 
   @override
-  String get thought => '思考了';
+  String get thought => 'æ€è€ƒäº†';
 
   @override
   String get agentRed => 'Red';
@@ -1608,177 +1706,186 @@ class AppLocalizationsZh extends AppLocalizations {
   String get agentPurple => 'Purple';
 
   @override
-  String get flowMode => '流动模式';
+  String get flowMode => 'æµåŠ¨æ¨¡å¼';
 
   @override
-  String get premium => '优质的';
+  String get premium => 'ä¼˜è´¨çš„';
 
   @override
-  String get workInProgress => '进行中';
+  String get workInProgress => 'è¿›è¡Œä¸­';
 
   @override
   String get voiceSystemPromptSuffix =>
-      '重要提示：请勿使用 Markdown 格式（粗体、斜体）。请勿输出代码块（```）。请保持回复简洁明了，如同日常对话。';
+      'é‡è¦æç¤ºï¼šè¯·å‹¿ä½¿ç”¨ Markdown æ ¼å¼ï¼ˆç²—ä½“ã€æ–œä½“ï¼‰ã€‚è¯·å‹¿è¾“å‡ºä»£ç å—ï¼ˆ```ï¼‰ã€‚è¯·ä¿æŒå›å¤ç®€æ´æ˜äº†ï¼Œå¦‚åŒæ—¥å¸¸å¯¹è¯ã€‚';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
-    return 'Cortex 流模式（$agentName）。上一个：$previousResponse';
+    return 'Cortex æµæ¨¡å¼ï¼ˆ$agentNameï¼‰ã€‚ä¸Šä¸€ä¸ªï¼š$previousResponse';
   }
 
   @override
   String get toolReadDocumentDescription =>
-      '读取并提取上传文档中的文本内容。支持 PDF、Word (DOCX)、Excel (XLSX)、PowerPoint (PPTX) 和 OpenDocument 格式。当用户附加文档文件时，请使用此功能。';
+      'è¯»å–å¹¶æå–ä¸Šä¼ æ–‡æ¡£ä¸­çš„æ–‡æœ¬å†…å®¹ã€‚æ”¯æŒ PDFã€Word (DOCX)ã€Excel (XLSX)ã€PowerPoint (PPTX) å’Œ OpenDocument æ ¼å¼ã€‚å½“ç”¨æˆ·é™„åŠ æ–‡æ¡£æ–‡ä»¶æ—¶ï¼Œè¯·ä½¿ç”¨æ­¤åŠŸèƒ½ã€‚';
 
   @override
   String get toolReadDocumentIndexParam =>
-      '要读取的文档附件的索引（从 0 开始计数）。通常 0 表示第一个文档。';
+      'è¦è¯»å–çš„æ–‡æ¡£é™„ä»¶çš„ç´¢å¼•ï¼ˆä» 0 å¼€å§‹è®¡æ•°ï¼‰ã€‚é€šå¸¸ 0 è¡¨ç¤ºç¬¬ä¸€ä¸ªæ–‡æ¡£ã€‚';
 
   @override
   String get toolStockDescription =>
-      '获取股票（例如 AAPL、THYAO.IS）和加密货币（例如 BTC-USD）的当前价格和历史记录。';
+      'è·å–è‚¡ç¥¨ï¼ˆä¾‹å¦‚ AAPLã€THYAO.ISï¼‰å’ŒåŠ å¯†è´§å¸ï¼ˆä¾‹å¦‚ BTC-USDï¼‰çš„å½“å‰ä»·æ ¼å’Œå†å²è®°å½•ã€‚';
 
   @override
-  String get toolStockSymbolParam => '股票代码（例如 AAPL、THYAO.IS、BTC-USD）。';
+  String get toolStockSymbolParam =>
+      'è‚¡ç¥¨ä»£ç ï¼ˆä¾‹å¦‚ AAPLã€THYAO.ISã€BTC-USDï¼‰ã€‚';
 
   @override
-  String get toolWeatherDescription => '获取特定城市的实时天气。';
+  String get toolWeatherDescription => 'è·å–ç‰¹å®šåŸå¸‚çš„å®æ—¶å¤©æ°”ã€‚';
 
   @override
-  String get toolWeatherCityParam => '城市名称（例如：伦敦、伊斯坦布尔）。';
+  String get toolWeatherCityParam =>
+      'åŸå¸‚åç§°ï¼ˆä¾‹å¦‚ï¼šä¼¦æ•¦ã€ä¼Šæ–¯å¦å¸ƒå°”ï¼‰ã€‚';
 
   @override
-  String get toolPythonDescription => '在安全沙箱中执行Python代码。';
+  String get toolPythonDescription => 'åœ¨å®‰å…¨æ²™ç®±ä¸­æ‰§è¡ŒPythonä»£ç ã€‚';
 
   @override
-  String get toolPythonCodeParam => '要执行的Python代码。';
+  String get toolPythonCodeParam => 'è¦æ‰§è¡Œçš„Pythonä»£ç ã€‚';
 
   @override
-  String get toolCalculateDescription => '计算数学表达式的值。';
+  String get toolCalculateDescription => 'è®¡ç®—æ•°å­¦è¡¨è¾¾å¼çš„å€¼ã€‚';
 
   @override
-  String get toolCalculateExpressionParam => '数学表达式（例如“3 + 4 * 2”）。';
+  String get toolCalculateExpressionParam =>
+      'æ•°å­¦è¡¨è¾¾å¼ï¼ˆä¾‹å¦‚â€œ3 + 4 * 2â€ï¼‰ã€‚';
 
   @override
-  String get toolChartDescription => '生成图表/图形可视化效果。';
+  String get toolChartDescription => 'ç”Ÿæˆå›¾è¡¨/å›¾å½¢å¯è§†åŒ–æ•ˆæœã€‚';
 
   @override
-  String get toolChartTypeParam => '图表类型：柱状图、折线图或饼图。';
+  String get toolChartTypeParam =>
+      'å›¾è¡¨ç±»å‹ï¼šæŸ±çŠ¶å›¾ã€æŠ˜çº¿å›¾æˆ–é¥¼å›¾ã€‚';
 
   @override
-  String get toolChartLabelsParam => '图表坐标轴或分段的标签。';
+  String get toolChartLabelsParam => 'å›¾è¡¨åæ ‡è½´æˆ–åˆ†æ®µçš„æ ‡ç­¾ã€‚';
 
   @override
-  String get toolChartDataParam => '图表的数值数据。';
+  String get toolChartDataParam => 'å›¾è¡¨çš„æ•°å€¼æ•°æ®ã€‚';
 
   @override
-  String get toolChartLabelParam => '图表图例的数据集标签。';
+  String get toolChartLabelParam => 'å›¾è¡¨å›¾ä¾‹çš„æ•°æ®é›†æ ‡ç­¾ã€‚';
 
   @override
-  String get toolChartTitleParam => '图表标题。';
+  String get toolChartTitleParam => 'å›¾è¡¨æ ‡é¢˜ã€‚';
 
   @override
   String get thinkingModeInstruction =>
-      '思考模式已启用：您必须使用 `<think></think>` 标签来展示您的推理过程，然后再给出最终答案。请在标签内逐步思考，然后在标签外给出您的答案。';
+      'æ€è€ƒæ¨¡å¼å·²å¯ç”¨ï¼šæ‚¨å¿…é¡»ä½¿ç”¨ `<think></think>` æ ‡ç­¾æ¥å±•ç¤ºæ‚¨çš„æ¨ç†è¿‡ç¨‹ï¼Œç„¶åå†ç»™å‡ºæœ€ç»ˆç­”æ¡ˆã€‚è¯·åœ¨æ ‡ç­¾å†…é€æ­¥æ€è€ƒï¼Œç„¶ååœ¨æ ‡ç­¾å¤–ç»™å‡ºæ‚¨çš„ç­”æ¡ˆã€‚';
 
   @override
-  String get openLinkWarningTitle => '外部链接警告';
+  String get openLinkWarningTitle => 'å¤–éƒ¨é“¾æ¥è­¦å‘Š';
 
   @override
   String get openLinkCancel => 'Cancel';
 
   @override
-  String get openLinkConfirm => '打开链接';
+  String get openLinkConfirm => 'æ‰“å¼€é“¾æ¥';
 
   @override
-  String get webSearchSources => '来源';
+  String get webSearchSources => 'æ¥æº';
 
   @override
-  String get searching => '搜索';
+  String get searching => 'æœç´¢';
 
   @override
-  String get featureWebSearchTitle => '网络搜索';
+  String get featureWebSearchTitle => 'ç½‘ç»œæœç´¢';
 
   @override
-  String get featureWebSearchDescription => '在网络上搜索实时信息';
+  String get featureWebSearchDescription => 'åœ¨ç½‘ç»œä¸Šæœç´¢å®æ—¶ä¿¡æ¯';
 
   @override
-  String get clearMemory => '清晰记忆';
+  String get clearMemory => 'æ¸…æ™°è®°å¿†';
 
   @override
-  String get clearMemoryConfirm => '你确定要清除记忆吗？';
+  String get clearMemoryConfirm => 'ä½ ç¡®å®šè¦æ¸…é™¤è®°å¿†å—ï¼Ÿ';
 
   @override
-  String get personalization => '个性化';
+  String get personalization => 'ä¸ªæ€§åŒ–';
 
   @override
   String get personalizationDescription =>
-      '个性化您的助手，使其更符合您的需求。您可以根据自己的独特偏好，调整其回复、行为和语气。';
+      'ä¸ªæ€§åŒ–æ‚¨çš„åŠ©æ‰‹ï¼Œä½¿å…¶æ›´ç¬¦åˆæ‚¨çš„éœ€æ±‚ã€‚æ‚¨å¯ä»¥æ ¹æ®è‡ªå·±çš„ç‹¬ç‰¹åå¥½ï¼Œè°ƒæ•´å…¶å›å¤ã€è¡Œä¸ºå’Œè¯­æ°”ã€‚';
 
   @override
-  String get memoryTitle => '记忆';
+  String get memoryTitle => 'è®°å¿†';
 
   @override
-  String get memoryDescription => '人工智能就是这样识别你的。';
+  String get memoryDescription => 'äººå·¥æ™ºèƒ½å°±æ˜¯è¿™æ ·è¯†åˆ«ä½ çš„ã€‚';
 
   @override
-  String get noMemoryYet => '尚未建立任何记忆';
+  String get noMemoryYet => 'å°šæœªå»ºç«‹ä»»ä½•è®°å¿†';
 
   @override
-  String get memoryLimitReached => '内存已达上限';
+  String get memoryLimitReached => 'å†…å­˜å·²è¾¾ä¸Šé™';
 
   @override
   String get memoryUpdated => 'Memory updated';
 
   @override
-  String get intelligenceTitle => '智力';
+  String get intelligenceTitle => 'æ™ºåŠ›';
 
   @override
-  String get intelligenceDescription => '人工智能就是这样与你交流的。';
+  String get intelligenceDescription =>
+      'äººå·¥æ™ºèƒ½å°±æ˜¯è¿™æ ·ä¸ä½ äº¤æµçš„ã€‚';
 
   @override
-  String get customInstructionHint => '在此处输入您的自定义说明';
+  String get customInstructionHint => 'åœ¨æ­¤å¤„è¾“å…¥æ‚¨çš„è‡ªå®šä¹‰è¯´æ˜';
 
   @override
   String openLinkWarningMessage(String url) {
-    return '您即将打开以下外部链接：\\n\\n$url\\n\\n您确定要继续吗？';
+    return 'æ‚¨å³å°†æ‰“å¼€ä»¥ä¸‹å¤–éƒ¨é“¾æ¥ï¼š\\n\\n$url\\n\\næ‚¨ç¡®å®šè¦ç»§ç»­å—ï¼Ÿ';
   }
 
   @override
   String intelligenceSystemPrompt(String instruction) {
-    return '请按照以下自定义说明操作：\\n\\n$instruction';
+    return 'è¯·æŒ‰ç…§ä»¥ä¸‹è‡ªå®šä¹‰è¯´æ˜æ“ä½œï¼š\\n\\n$instruction';
   }
 
   @override
   String get chatTitleCriticalInstruction =>
-      '【重要说明】：您是标题生成器。请勿回答用户的问题。请勿聊天或打招呼。仅输出一个 2-4 个字的标题，概括用户提出的问题。';
+      'ã€é‡è¦è¯´æ˜ã€‘ï¼šæ‚¨æ˜¯æ ‡é¢˜ç”Ÿæˆå™¨ã€‚è¯·å‹¿å›ç­”ç”¨æˆ·çš„é—®é¢˜ã€‚è¯·å‹¿èŠå¤©æˆ–æ‰“æ‹›å‘¼ã€‚ä»…è¾“å‡ºä¸€ä¸ª 2-4 ä¸ªå­—çš„æ ‡é¢˜ï¼Œæ¦‚æ‹¬ç”¨æˆ·æå‡ºçš„é—®é¢˜ã€‚';
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[系统] 重要指示：您目前正在一个名为“Cortex”的庞大且高度先进的人工智能生态系统中操作；该平台由Vertex团队开发，该团队成员平均年龄仅为16岁。请记住这一点，并在被问及时回答。如果需要更多信息，请随时上网搜索；如果您无法搜索，请坦诚地说您不知道！';
+      '\n\n[ç³»ç»Ÿ] é‡è¦æŒ‡ç¤ºï¼šæ‚¨ç›®å‰æ­£åœ¨ä¸€ä¸ªåä¸ºâ€œCortexâ€çš„åºå¤§ä¸”é«˜åº¦å…ˆè¿›çš„äººå·¥æ™ºèƒ½ç”Ÿæ€ç³»ç»Ÿä¸­æ“ä½œï¼›è¯¥å¹³å°ç”±Vertexå›¢é˜Ÿå¼€å‘ï¼Œè¯¥å›¢é˜Ÿæˆå‘˜å¹³å‡å¹´é¾„ä»…ä¸º16å²ã€‚è¯·è®°ä½è¿™ä¸€ç‚¹ï¼Œå¹¶åœ¨è¢«é—®åŠæ—¶å›ç­”ã€‚å¦‚æœéœ€è¦æ›´å¤šä¿¡æ¯ï¼Œè¯·éšæ—¶ä¸Šç½‘æœç´¢ï¼›å¦‚æœæ‚¨æ— æ³•æœç´¢ï¼Œè¯·å¦è¯šåœ°è¯´æ‚¨ä¸çŸ¥é“ï¼';
 
   @override
-  String get featureAudioRecognitionTitle => '音频识别';
+  String get featureAudioRecognitionTitle => 'éŸ³é¢‘è¯†åˆ«';
 
   @override
-  String get featureAudioRecognitionDescription => '该模型能够理解和处理音频或语音。';
+  String get featureAudioRecognitionDescription =>
+      'è¯¥æ¨¡å‹èƒ½å¤Ÿç†è§£å’Œå¤„ç†éŸ³é¢‘æˆ–è¯­éŸ³ã€‚';
 
   @override
-  String get featureVideoRecognitionTitle => '视频识别';
+  String get featureVideoRecognitionTitle => 'è§†é¢‘è¯†åˆ«';
 
   @override
-  String get featureVideoRecognitionDescription => '该型号可以分析和理解来自您的文件或相机的视频。';
+  String get featureVideoRecognitionDescription =>
+      'è¯¥å‹å·å¯ä»¥åˆ†æå’Œç†è§£æ¥è‡ªæ‚¨çš„æ–‡ä»¶æˆ–ç›¸æœºçš„è§†é¢‘ã€‚';
 
   @override
-  String get featureImageRecognitionTitle => '图像识别';
+  String get featureImageRecognitionTitle => 'å›¾åƒè¯†åˆ«';
 
   @override
-  String get featureImageRecognitionDescription => '该模型可以分析和理解照片或图像。';
+  String get featureImageRecognitionDescription =>
+      'è¯¥æ¨¡å‹å¯ä»¥åˆ†æå’Œç†è§£ç…§ç‰‡æˆ–å›¾åƒã€‚';
 
   @override
-  String get featureToolUseTitle => '工具使用';
+  String get featureToolUseTitle => 'å·¥å…·ä½¿ç”¨';
 
   @override
-  String get featureToolUseDescription => '该模型能够智能地利用外部工具完成任务。';
+  String get featureToolUseDescription =>
+      'è¯¥æ¨¡å‹èƒ½å¤Ÿæ™ºèƒ½åœ°åˆ©ç”¨å¤–éƒ¨å·¥å…·å®Œæˆä»»åŠ¡ã€‚';
 
   @override
   String get videoModels => 'Video Models';
@@ -1791,89 +1898,93 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String systemPromptMissingMedia(String mediaType, String modelName) {
-    return '此模型需要 $mediaType 才能工作。我截获了请求以告知您。请礼貌地通知用户他们需要提供 $mediaType（用他们的语言告诉他们），因为我是 $modelName，一个视觉/音频/视频编辑模型。';
+    return 'æ­¤æ¨¡å‹éœ€è¦ $mediaType æ‰èƒ½å·¥ä½œã€‚æˆ‘æˆªè·äº†è¯·æ±‚ä»¥å‘ŠçŸ¥æ‚¨ã€‚è¯·ç¤¼è²Œåœ°é€šçŸ¥ç”¨æˆ·ä»–ä»¬éœ€è¦æä¾› $mediaTypeï¼ˆç”¨ä»–ä»¬çš„è¯­è¨€å‘Šè¯‰ä»–ä»¬ï¼‰ï¼Œå› ä¸ºæˆ‘æ˜¯ $modelNameï¼Œä¸€ä¸ªè§†è§‰/éŸ³é¢‘/è§†é¢‘ç¼–è¾‘æ¨¡å‹ã€‚';
   }
 
   @override
-  String get mediaTypeImage => '图片';
+  String get mediaTypeImage => 'å›¾ç‰‡';
 
   @override
-  String get mediaTypeVideo => '视频';
+  String get mediaTypeVideo => 'è§†é¢‘';
 
   @override
-  String get mediaTypeAudio => '音频文件';
+  String get mediaTypeAudio => 'éŸ³é¢‘æ–‡ä»¶';
 
   @override
   String defaultSeriesDescription(String seriesName) {
-    return '$seriesName是一款在Cortex上展现出高性能的先进智能。';
+    return '$seriesNameæ˜¯ä¸€æ¬¾åœ¨Cortexä¸Šå±•ç°å‡ºé«˜æ€§èƒ½çš„å…ˆè¿›æ™ºèƒ½ã€‚';
   }
 
   @override
   String defaultModelDescription(String modelName) {
-    return '$modelName是集成在Cortex生态系统内的高性能人工智能。旨在克服各种复杂任务，提供高度可靠高效的处理能力。通过提供快速响应时间和高级分析能力，它能显著提高您的日常生产力。该模型能够在Cortex的安全本地基础设施上无缝运行，协助您完成从创意头脑风暴到深度技术分析等各种任务。今天就开始探索其全部潜力吧。';
+    return '$modelNameæ˜¯é›†æˆåœ¨Cortexç”Ÿæ€ç³»ç»Ÿå†…çš„é«˜æ€§èƒ½äººå·¥æ™ºèƒ½ã€‚æ—¨åœ¨å…‹æœå„ç§å¤æ‚ä»»åŠ¡ï¼Œæä¾›é«˜åº¦å¯é é«˜æ•ˆçš„å¤„ç†èƒ½åŠ›ã€‚é€šè¿‡æä¾›å¿«é€Ÿå“åº”æ—¶é—´å’Œé«˜çº§åˆ†æèƒ½åŠ›ï¼Œå®ƒèƒ½æ˜¾è‘—æé«˜æ‚¨çš„æ—¥å¸¸ç”Ÿäº§åŠ›ã€‚è¯¥æ¨¡å‹èƒ½å¤Ÿåœ¨Cortexçš„å®‰å…¨æœ¬åœ°åŸºç¡€è®¾æ–½ä¸Šæ— ç¼è¿è¡Œï¼ŒååŠ©æ‚¨å®Œæˆä»åˆ›æ„å¤´è„‘é£æš´åˆ°æ·±åº¦æŠ€æœ¯åˆ†æç­‰å„ç§ä»»åŠ¡ã€‚ä»Šå¤©å°±å¼€å§‹æ¢ç´¢å…¶å…¨éƒ¨æ½œåŠ›å§ã€‚';
   }
 
   @override
-  String get guestLimitBottomSheetTitle => '喜欢Cortex的智能吗？';
+  String get guestLimitBottomSheetTitle => 'å–œæ¬¢Cortexçš„æ™ºèƒ½å—ï¼Ÿ';
 
   @override
-  String get guestLimitBottomSheetText => '与更智能的智能体合作，创作更多内容，畅聊更多，完成更多事情……';
+  String get guestLimitBottomSheetText =>
+      'ä¸æ›´æ™ºèƒ½çš„æ™ºèƒ½ä½“åˆä½œï¼Œåˆ›ä½œæ›´å¤šå†…å®¹ï¼Œç•…èŠæ›´å¤šï¼Œå®Œæˆæ›´å¤šäº‹æƒ…â€¦â€¦';
 
   @override
-  String get arts => '艺术';
+  String get arts => 'è‰ºæœ¯';
 
   @override
-  String get noArt => '无艺术';
+  String get noArt => 'æ— è‰ºæœ¯';
 
   @override
-  String get noArtDescription => '目前还没有作品；是时候通过创作图像、视频、音频和各种内容来填满画廊了！';
+  String get noArtDescription =>
+      'ç›®å‰è¿˜æ²¡æœ‰ä½œå“ï¼›æ˜¯æ—¶å€™é€šè¿‡åˆ›ä½œå›¾åƒã€è§†é¢‘ã€éŸ³é¢‘å’Œå„ç§å†…å®¹æ¥å¡«æ»¡ç”»å»Šäº†ï¼';
 
   @override
-  String get videoPremiumWarning => '您需要 Ultra 会员资格才能生成视频，立即升级，体验流畅体验！';
+  String get videoPremiumWarning =>
+      'æ‚¨éœ€è¦ Ultra ä¼šå‘˜èµ„æ ¼æ‰èƒ½ç”Ÿæˆè§†é¢‘ï¼Œç«‹å³å‡çº§ï¼Œä½“éªŒæµç•…ä½“éªŒï¼';
 
   @override
   String get fallbackInfoPanelText =>
-      '由于我们正在对服务器端进行一些改进，因此回复是由 Cortex 的动态聊天功能生成的，而不是您专门选择的 AI。感谢您的理解，我们将尽快完成改进！';
+      'ç”±äºæˆ‘ä»¬æ­£åœ¨å¯¹æœåŠ¡å™¨ç«¯è¿›è¡Œä¸€äº›æ”¹è¿›ï¼Œå› æ­¤å›å¤æ˜¯ç”± Cortex çš„åŠ¨æ€èŠå¤©åŠŸèƒ½ç”Ÿæˆçš„ï¼Œè€Œä¸æ˜¯æ‚¨ä¸“é—¨é€‰æ‹©çš„ AIã€‚æ„Ÿè°¢æ‚¨çš„ç†è§£ï¼Œæˆ‘ä»¬å°†å°½å¿«å®Œæˆæ”¹è¿›ï¼';
 
   @override
   String get falOfflineMessage =>
-      '由于服务器端正在进行一些改进，此智能服务目前暂时离线。感谢您的理解，我们将尽快完成升级！';
+      'ç”±äºæœåŠ¡å™¨ç«¯æ­£åœ¨è¿›è¡Œä¸€äº›æ”¹è¿›ï¼Œæ­¤æ™ºèƒ½æœåŠ¡ç›®å‰æš‚æ—¶ç¦»çº¿ã€‚æ„Ÿè°¢æ‚¨çš„ç†è§£ï¼Œæˆ‘ä»¬å°†å°½å¿«å®Œæˆå‡çº§ï¼';
 
   @override
-  String get errorInsufficientStorage => '存储空间不足，无法下载此模型。';
+  String get errorInsufficientStorage =>
+      'å­˜å‚¨ç©ºé—´ä¸è¶³ï¼Œæ— æ³•ä¸‹è½½æ­¤æ¨¡å‹ã€‚';
 
   @override
-  String get backgroundChatNotificationTitle => '返回聊天室！';
+  String get backgroundChatNotificationTitle => 'è¿”å›èŠå¤©å®¤ï¼';
 
   @override
-  String get benefitVideoGeneration => '视频生成';
+  String get benefitVideoGeneration => 'è§†é¢‘ç”Ÿæˆ';
 
   @override
-  String get freeOffer => '免费优惠';
+  String get freeOffer => 'å…è´¹ä¼˜æƒ ';
 
   @override
   String trialMonthlyDescription(String days, String price) {
-    return '前 $days 天免费，之后 $price/月';
+    return 'å‰ $days å¤©å…è´¹ï¼Œä¹‹å $price/æœˆ';
   }
 
   @override
   String trialAnnualDescription(String days, String price) {
-    return '前 $days 天免费，之后 $price/年';
+    return 'å‰ $days å¤©å…è´¹ï¼Œä¹‹å $price/å¹´';
   }
 
   @override
   String freePlan(String plan) {
-    return '免费 $plan！';
+    return 'å…è´¹ $planï¼';
   }
 
   @override
   String get systemPromptLimitFallback =>
-      '紧急：用户请求执行某项操作，但其在 Cortex 上的额度已用完；请用用户的语言告知他们应该等待或考虑升级订阅计划。';
+      'ç´§æ€¥ï¼šç”¨æˆ·è¯·æ±‚æ‰§è¡ŒæŸé¡¹æ“ä½œï¼Œä½†å…¶åœ¨ Cortex ä¸Šçš„é¢åº¦å·²ç”¨å®Œï¼›è¯·ç”¨ç”¨æˆ·çš„è¯­è¨€å‘ŠçŸ¥ä»–ä»¬åº”è¯¥ç­‰å¾…æˆ–è€ƒè™‘å‡çº§è®¢é˜…è®¡åˆ’ã€‚';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
-      'Cortex 可以给出更好的回答；立即升级，为每个问题获得最佳答案！';
+      'Cortex å¯ä»¥ç»™å‡ºæ›´å¥½çš„å›ç­”ï¼›ç«‹å³å‡çº§ï¼Œä¸ºæ¯ä¸ªé—®é¢˜è·å¾—æœ€ä½³ç­”æ¡ˆï¼';
 
   @override
-  String get pinLimitReached => '您最多可以固定 3 个聊天。';
+  String get pinLimitReached => 'æ‚¨æœ€å¤šå¯ä»¥å›ºå®š 3 ä¸ªèŠå¤©ã€‚';
 }

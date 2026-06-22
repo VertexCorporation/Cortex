@@ -18,6 +18,7 @@ class ModelCategorySection extends StatefulWidget {
   final Animation<double>? pulseAnimation;
   final Map<String, bool> downloadedStates;
   final Map<String, DownloadManager> downloadManagers;
+  final List<String>? subCategories;
   final CompatibilityStatus Function(int? modelSizeInMB) getCompatibilityStatus;
 
   // Actions
@@ -43,6 +44,7 @@ class ModelCategorySection extends StatefulWidget {
     this.pulseAnimation,
     required this.downloadedStates,
     required this.downloadManagers,
+    this.subCategories,
     required this.getCompatibilityStatus,
     required this.onModelTapped,
     required this.onRemovePressed,
@@ -63,6 +65,9 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
 
   // Debounce
   bool _canTriggerEdgeAction = true;
+  
+  // Category state
+  String _selectedCategory = 'Tümü';
 
   @override
   void initState() {
@@ -98,10 +103,10 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
     return ModelsBackendUtils.calculateCategoryHeight(modelMaps, screenWidth);
   }
 
-  List<Widget> _buildModelColumns(BuildContext context, double screenWidth) {
+  List<Widget> _buildModelColumns(BuildContext context, double screenWidth, List<ModelEntity> filteredModels) {
     final List<Widget> columns = [];
     const int modelsPerColumn = 3;
-    final int totalModels = widget.models.length;
+    final int totalModels = filteredModels.length;
     final int totalColumns = (totalModels / modelsPerColumn).ceil();
 
     for (int i = 0; i < totalColumns; i++) {
@@ -111,7 +116,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
           : startIndex + modelsPerColumn;
 
       final List<ModelEntity> columnModels =
-      widget.models.sublist(startIndex, endIndex);
+      filteredModels.sublist(startIndex, endIndex);
 
       columns.add(
         Padding(
@@ -220,6 +225,35 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
       return const SizedBox.shrink();
     }
 
+    // Apply filtering based on selected category
+    List<ModelEntity> filteredModels = widget.models;
+    if (_selectedCategory != 'Tümü') {
+      filteredModels = widget.models.where((m) {
+        if (_selectedCategory == 'Ücretsiz') return !m.isPremium;
+        if (_selectedCategory == 'Premium') return m.isPremium;
+        if (_selectedCategory == 'Video') {
+           final t = m.displayTitle.toLowerCase();
+           final id = m.id.toLowerCase();
+           return t.contains('video') || id.contains('video') || t.contains('sora') || t.contains('kling') || t.contains('veo');
+        }
+        if (_selectedCategory == 'Fotoğraf') {
+           final t = m.displayTitle.toLowerCase();
+           final id = m.id.toLowerCase();
+           return t.contains('image') || id.contains('image') || t.contains('flux') || t.contains('stable') || t.contains('dall');
+        }
+        if (_selectedCategory == 'Eril') {
+           return m.role?.toLowerCase().contains('erkek') == true || m.role?.toLowerCase().contains('male') == true;
+        }
+        if (_selectedCategory == 'Dişil') {
+           return m.role?.toLowerCase().contains('kadın') == true || m.role?.toLowerCase().contains('kız') == true || m.role?.toLowerCase().contains('female') == true;
+        }
+        if (_selectedCategory == 'Cansız') {
+           return m.role?.toLowerCase().contains('nesne') == true || m.role?.toLowerCase().contains('robot') == true;
+        }
+        return true;
+      }).toList();
+    }
+
     final double screenWidth = MediaQuery
         .of(context)
         .size
@@ -280,7 +314,7 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
                           controller: _pageController,
                           padEnds: true,
                           physics: const ClampingScrollPhysics(),
-                          children: _buildModelColumns(context, screenWidth),
+                          children: _buildModelColumns(context, screenWidth, filteredModels),
                         ),
                       ),
                     ),
@@ -340,17 +374,67 @@ class _ModelCategorySectionState extends State<ModelCategorySection> {
     return Padding(
       padding:
       EdgeInsets.only(top: screenWidth * 0.02, bottom: screenWidth * 0.01),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.title,
-            style: TextStyle(
-              color: AppColors.primaryColor.inverted,
-              fontSize: screenWidth * 0.05,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.title,
+                style: TextStyle(
+                  color: AppColors.primaryColor.inverted,
+                  fontSize: screenWidth * 0.05,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
+          if (widget.subCategories != null && widget.subCategories!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 12.0, bottom: 4.0),
+              child: SizedBox(
+                height: 32,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  itemCount: widget.subCategories!.length,
+                  separatorBuilder: (context, index) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final cat = widget.subCategories![index];
+                    final isSelected = _selectedCategory == cat;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedCategory = cat;
+                        });
+                        HapticFeedback.lightImpact();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.secondaryColor : Colors.transparent,
+                          border: Border.all(
+                            color: isSelected ? AppColors.secondaryColor : AppColors.border.withValues(alpha: 0.5),
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Center(
+                          child: Text(
+                            cat,
+                            style: TextStyle(
+                              color: isSelected ? AppColors.primaryColor.inverted : AppColors.primaryColor.inverted.withValues(alpha: 0.6),
+                              fontSize: 13,
+                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
         ],
       ),
     );
