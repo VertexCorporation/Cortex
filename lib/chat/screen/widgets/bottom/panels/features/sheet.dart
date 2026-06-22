@@ -40,15 +40,22 @@ Future<void> showFeaturesSheet({
       maxWidth: MediaQuery.sizeOf(context).width,
     ),
     builder: (BuildContext modalContext) {
-      return _FeaturesSheetContent(controller: controller);
+      return _FeaturesSheetContent(
+        controller: controller,
+        parentContext: context,
+      );
     },
   );
 }
 
 class _FeaturesSheetContent extends StatefulWidget {
   final TextEditingController controller;
+  final BuildContext parentContext;
 
-  const _FeaturesSheetContent({required this.controller});
+  const _FeaturesSheetContent({
+    required this.controller,
+    required this.parentContext,
+  });
 
   @override
   State<_FeaturesSheetContent> createState() => _FeaturesSheetContentState();
@@ -391,20 +398,20 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                       onTap: () {
                         Navigator.pop(context);
                         showModelSelectionSheet(
-                          context: context,
+                          context: widget.parentContext,
                           localizations: l10n,
                           currentModelId:
-                          context
+                          widget.parentContext
                               .read<ChatSessionProvider>()
                               .modelId ?? '',
-                          initialModels: context.read<ChatSessionProvider>().allModels,
+                          initialModels: widget.parentContext.read<ChatSessionProvider>().allModels,
                           onModelSelected: (String id) {
-                            final modelService = context.read<ModelService>();
+                            final modelService = widget.parentContext.read<ModelService>();
                             final selectionService =
-                            context.read<SelectionService>();
+                            widget.parentContext.read<SelectionService>();
                             final langCode =
                                 Localizations
-                                    .localeOf(context)
+                                    .localeOf(widget.parentContext)
                                     .languageCode;
                             final model = modelService.getPreciseModelData(
                               id,
