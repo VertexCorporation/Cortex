@@ -162,7 +162,7 @@ class _AiHeader extends StatelessWidget {
         SizeTransition(
           sizeFactor: headerEntryAnim,
           axis: Axis.horizontal,
-          axisAlignment: -1.0,
+          alignment: Alignment.centerLeft,
           child: FadeTransition(
             opacity: headerEntryAnim,
             child: Row(

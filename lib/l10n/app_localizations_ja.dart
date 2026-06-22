@@ -1776,6 +1776,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get memoryLimitReached => 'メモリ制限に達しました';
 
   @override
+  String get memoryUpdated => 'Memory updated';
+
+  @override
   String get intelligenceTitle => '知能';
 
   @override

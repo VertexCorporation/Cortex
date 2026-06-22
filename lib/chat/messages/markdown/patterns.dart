@@ -7,7 +7,7 @@ class RegexPatterns {
       r'(?:^|\n)\s*>\s*\*?Thinking[.\s]*\*?\s*\n?(?:\s*>[ \t]*[^\n]*\n?)*',
       multiLine: true);
   static final horizontalRule =
-      RegExp(r'^\s*([*\-_]){3,}\s*$', multiLine: true);
+      RegExp(r'^[ \t]*(?:[-*_][ \t]*){3,}\s*$', multiLine: true);
   static final codeBlock =
       RegExp(r'^```([^\r\n]*)\r?\n([\s\S]*?)\r?\n^```$', multiLine: true);
   static final legacyUsing =

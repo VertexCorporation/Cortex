@@ -12,6 +12,9 @@ class ActionPanelButton extends StatelessWidget {
   /// The asset path for the SVG icon to be displayed. If null, no icon is shown.
   final String? iconAsset;
 
+  /// A custom Widget (e.g. standard Icon) to display if iconAsset is not provided.
+  final Widget? customIcon;
+
   /// The color to apply to the icon.
   final Color iconColor;
 
@@ -27,6 +30,7 @@ class ActionPanelButton extends StatelessWidget {
   const ActionPanelButton({
     super.key,
     this.iconAsset,
+    this.customIcon,
     required this.iconColor,
     required this.text,
     required this.textColor,
@@ -78,7 +82,7 @@ class ActionPanelButton extends StatelessWidget {
             MainAxisSize.min, // The row should only be as wide as its content.
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Only build the icon container if an icon asset is provided.
+          // Only build the icon container if an icon asset or customIcon is provided.
           if (iconAsset != null)
             SizedBox(
               width: iconContainerSize,
@@ -91,6 +95,14 @@ class ActionPanelButton extends StatelessWidget {
                   width: iconContainerSize * 0.9,
                   height: iconContainerSize * 0.9,
                 ),
+              ),
+            )
+          else if (customIcon != null)
+            SizedBox(
+              width: iconContainerSize,
+              height: iconContainerSize,
+              child: Center(
+                child: customIcon,
               ),
             ),
           SizedBox(width: iconGap),

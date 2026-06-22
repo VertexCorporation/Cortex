@@ -368,7 +368,10 @@ class ModelEntity {
 
   bool get isServerSide => type != 'offline';
 
-  bool get isPremium => tier == 'premium';
+  bool get isPremium => 
+      tier == 'premium' ||
+      (isServerSide && !isCustomModel && id != 'cortex/auto') ||
+      (category == 'roleplay' && !isCustomModel);
 
   @override
   String toString() =>

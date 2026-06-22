@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../../app.dart';
 import '../../../../appbar.dart';
-import '../../../../l10n/app_localizations.dart';
+
 import '../../../../theme.dart';
 
 class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -28,7 +28,7 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
     // Icon size matches the rest of the app
     final double iconSize = isTablet ? 18.0 : 15.0;
 
-    final loc = AppLocalizations.of(context)!;
+
 
     return CortexAppBar(
       // Hide leading button on desktop since sidebar is fixed
@@ -43,30 +43,14 @@ class ModelsAppBar extends StatelessWidget implements PreferredSizeWidget {
       actionButton: AppBarButton(
         isTitle: true,
         onTap: onOpenCreateScreen,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SvgPicture.asset(
-              'assets/icons/add.svg',
-              width: iconSize,
-              height: iconSize,
-              colorFilter: ColorFilter.mode(
-                AppColors.primaryColor.inverted,
-                BlendMode.srcIn,
-              ),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              loc.create,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w600,
-                fontSize: isTablet ? 14.0 : 13.0,
-                color: AppColors.primaryColor.inverted,
-                letterSpacing: -0.1,
-              ),
-            ),
-          ],
+        child: SvgPicture.asset(
+          'assets/icons/add.svg',
+          width: iconSize,
+          height: iconSize,
+          colorFilter: ColorFilter.mode(
+            AppColors.primaryColor.inverted,
+            BlendMode.srcIn,
+          ),
         ),
       ),
     );

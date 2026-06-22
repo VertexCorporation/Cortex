@@ -622,5 +622,6 @@
   "systemTimeInfo": "\n\nHazırkı tarix və vaxt: {formattedTime}.",
   "systemPromptLimitFallback": "TƏNİDLİ: İstifadəçi əməliyyat tələb etdi, lakin Cortex-də limitləri tükənib; xahiş edirik istifadəçiyə onların dilində gözləməli olduqlarını və ya abunə planlarını təkmilləşdirməyi düşünməli olduqlarını bildirin.",
   "systemNotePreviousMedia": "[Sistem Qeydi: Aşağıda əvvəllər yaradılmış media verilmişdir. Ona istinad edə bilər və ya onu redaktə edə bilərsiniz.]",
-  "pinLimitReached": "Maksimum 3 söhbəti sancaqlaya bilərsiniz."
+  "pinLimitReached": "Maksimum 3 söhbəti sancaqlaya bilərsiniz.",
+  "memoryUpdated": "Memory updated"
 }

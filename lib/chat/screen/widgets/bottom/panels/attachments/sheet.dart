@@ -10,6 +10,7 @@ import '../../input/service.dart';
 import 'button.dart';
 
 import 'package:camera/camera.dart';
+import 'package:cortex/scaled_bottom_sheet.dart';
 
 void showAttachmentSheet({
   required BuildContext context,
@@ -47,17 +48,18 @@ void showAttachmentSheet({
       final double contentHorizontalPadding = screenWidth * 0.05;
       final double itemGap = screenWidth * 0.03;
 
-      return Container(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.paddingOf(context).bottom + 20,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(topRadius)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+      return ScaledBottomSheet(
+        child: Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.paddingOf(context).bottom + 20,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(topRadius)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             // Dynamic Drag Handle
             Padding(
               padding:
@@ -205,7 +207,7 @@ void showAttachmentSheet({
             ),
           ],
         ),
-      );
+      ));
     },
   );
 }

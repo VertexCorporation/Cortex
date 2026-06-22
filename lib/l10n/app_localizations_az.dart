@@ -1830,6 +1830,9 @@ class AppLocalizationsAz extends AppLocalizations {
   String get memoryLimitReached => 'Yaddaş limitinə çatıldı';
 
   @override
+  String get memoryUpdated => 'Memory updated';
+
+  @override
   String get intelligenceTitle => 'Kəşfiyyat';
 
   @override

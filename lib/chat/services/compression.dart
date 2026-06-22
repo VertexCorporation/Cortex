@@ -54,10 +54,7 @@ class PromptCompressionEngine {
   /// This yields significant token savings while retaining prompt context quality.
   /// Compresses the older message history (excluding the last few messages).
   /// This yields significant token savings while retaining prompt context quality.
-  /// Handles both String and List<Map<String, dynamic>> content structures.
-  /// Compresses the older message history (excluding the last few messages).
-  /// This yields significant token savings while retaining prompt context quality.
-  /// Handles both String and List<Map<String, dynamic>> content structures.
+  /// Handles both String and `List<Map<String, dynamic>>` content structures.
   static List<Map<String, dynamic>> compressContextMessages(
     List<Map<String, dynamic>> messages, {
     required int keepUncompressedCount,

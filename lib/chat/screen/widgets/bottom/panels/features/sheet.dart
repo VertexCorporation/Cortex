@@ -92,7 +92,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
 
     return Container(
       constraints: BoxConstraints(
-        maxHeight: screenHeight * 0.75,
+        maxHeight: screenHeight * 0.55,
       ),
       decoration: BoxDecoration(
         color: AppColors.background,
@@ -397,6 +397,7 @@ class _FeaturesSheetContentState extends State<_FeaturesSheetContent> {
                           context
                               .read<ChatSessionProvider>()
                               .modelId ?? '',
+                          initialModels: context.read<ChatSessionProvider>().allModels,
                           onModelSelected: (String id) {
                             final modelService = context.read<ModelService>();
                             final selectionService =

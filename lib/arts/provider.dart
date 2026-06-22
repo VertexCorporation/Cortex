@@ -1,5 +1,6 @@
 // lib/arts/provider.dart
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -26,9 +27,25 @@ class ArtsProvider extends ChangeNotifier {
   List<ArtItem> _items = [];
   bool _isLoading = true;
 
+  StreamSubscription? _msgSub;
+
   List<ArtItem> get items => _items;
   bool get isLoading => _isLoading;
   bool get isEmpty => _items.isEmpty;
+
+  ArtsProvider() {
+    _msgSub = ChatStorageService.lastMsgStream.listen((event) {
+      if (event['photoPath'] != null && event['photoPath'].toString().isNotEmpty) {
+        loadMedia();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _msgSub?.cancel();
+    super.dispose();
+  }
 
   static const _imageExtensions = {
     'jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'heic'

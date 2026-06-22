@@ -1824,6 +1824,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get memoryLimitReached => 'Hafıza sınırına ulaşıldı';
 
   @override
+  String get memoryUpdated => 'Hafıza güncellendi';
+
+  @override
   String get intelligenceTitle => 'Zekâ';
 
   @override

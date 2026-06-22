@@ -678,5 +678,6 @@
   "systemTimeInfo": "\n\n現在の日時: {formattedTime}。",
   "systemPromptLimitFallback": "重要：ユーザーが操作を要求しましたが、Cortexの利用限度額が上限に達しています。ユーザーには、待つか、サブスクリプションプランのアップグレードを検討するよう、ユーザーの言語で通知してください。",
   "systemNotePreviousMedia": "【システム注記：以下は以前に生成されたメディアです。参照または編集してください。】",
-  "pinLimitReached": "最大3つのチャットをピン留めできます。"
+  "pinLimitReached": "最大3つのチャットをピン留めできます。",
+  "memoryUpdated": "Memory updated"
 }

@@ -1829,6 +1829,9 @@ class AppLocalizationsKu extends AppLocalizations {
   String get memoryLimitReached => 'Sînorê bîrê gihîştiye';
 
   @override
+  String get memoryUpdated => 'Memory updated';
+
+  @override
   String get intelligenceTitle => 'Nûçe';
 
   @override

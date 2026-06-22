@@ -9,7 +9,6 @@ import 'package:highlight/languages/all.dart';
 import 'package:provider/provider.dart';
 
 import '../../notifications/introvert.dart';
-import '../../theme.dart';
 
 const Map<String, TextStyle> oneDarkProTheme = {
   'root':
@@ -92,21 +91,21 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
     if (providedLang != null && providedLang.isNotEmpty) {
       if (allLanguages.containsKey(providedLang)) {
         finalLang = providedLang;
-        debugPrint(
-            "[CodeBlock] Using provided and supported language hint: '$finalLang'");
-      } else {
-        debugPrint(
-            "[CodeBlock] Provided language hint '${widget.language}' is not in `allLanguages`. Falling back to auto-detection.");
       }
     }
 
-    // If no valid hint was found or provided, and the code is not empty, fall back to auto-detection.
+    // Heuristic: If the code heavily contains HTML tags, override to HTML.
+    // The user complained about HTML being wrapped in Python blocks.
+    if (widget.code.contains('<!DOCTYPE html>') || 
+        (widget.code.contains('<html') && widget.code.contains('</html')) ||
+        (widget.code.contains('<div') && widget.code.contains('</div>'))) {
+      finalLang = 'html';
+    }
+
     if (finalLang == null && widget.code.isNotEmpty) {
       final result =
           highlight.highlight.parse(widget.code, autoDetection: true);
-      finalLang = result.language; // This can still be null if detection fails.
-      debugPrint(
-          "[CodeBlock] No valid hint. Auto-detected language: '$finalLang'");
+      finalLang = result.language;
     }
 
     if (mounted) {
@@ -146,15 +145,78 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
     final languageForHighlighter = _resolvedLanguage ?? 'plaintext';
 
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF141414), // Force dark background
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.border, width: 0.5),
+        color: const Color(0xFF1E1E1E), // Sleek dark background
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Stack(
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Mac-like Header
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2D2D2D), // Slightly lighter header
+                border: Border(
+                  bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                ),
+              ),
+              child: Row(
+                children: [
+                  // Mac window buttons
+                  Row(
+                    children: [
+                      Container(width: 12, height: 12, decoration: const BoxDecoration(color: Color(0xFFFF5F56), shape: BoxShape.circle)),
+                      const SizedBox(width: 8),
+                      Container(width: 12, height: 12, decoration: const BoxDecoration(color: Color(0xFFFFBD2E), shape: BoxShape.circle)),
+                      const SizedBox(width: 8),
+                      Container(width: 12, height: 12, decoration: const BoxDecoration(color: Color(0xFF27C93F), shape: BoxShape.circle)),
+                    ],
+                  ),
+                  const Spacer(),
+                  // Language Name
+                  Text(
+                    languageNameForDisplay,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.7),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  const Spacer(),
+                  // Copy Button
+                  InkWell(
+                    onTap: _copyCodeToClipboard,
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: _copying
+                            ? const Icon(Icons.check_rounded, size: 16, color: Color(0xFF27C93F), key: ValueKey('check'))
+                            : Icon(Icons.copy_rounded, size: 16, color: Colors.white.withValues(alpha: 0.7), key: const ValueKey('copy')),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             // Code Content
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -163,56 +225,11 @@ class _CodeBlockWidgetState extends State<CodeBlockWidget> {
                 widget.code,
                 language: languageForHighlighter,
                 theme: oneDarkProTheme,
-                padding: const EdgeInsets.fromLTRB(
-                    16, 48, 16, 16), // Adjusted padding
-                textStyle:
-                    const TextStyle(fontFamily: 'monospace', fontSize: 13),
-              ),
-            ),
-            // Header
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E), // Slightly lighter header
-                  border: Border(
-                      bottom: BorderSide(
-                          color: AppColors.border.withValues(alpha: 0.2))),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      languageNameForDisplay,
-                      style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    InkWell(
-                      onTap: _copyCodeToClipboard,
-                      borderRadius: BorderRadius.circular(4),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 200),
-                          child: _copying
-                              ? const Icon(Icons.check,
-                                  size: 16,
-                                  color: Colors.greenAccent,
-                                  key: ValueKey('check'))
-                              : const Icon(Icons.copy_all_rounded,
-                                  size: 16,
-                                  color: Colors.white54,
-                                  key: ValueKey('copy')),
-                        ),
-                      ),
-                    ),
-                  ],
+                padding: const EdgeInsets.all(16),
+                textStyle: const TextStyle(
+                  fontFamily: 'monospace', 
+                  fontSize: 14,
+                  height: 1.5,
                 ),
               ),
             ),

@@ -39,20 +39,20 @@ class FeaturesSheetButton extends StatelessWidget {
         .width;
     final isTablet = screenWidth >= 600;
 
-    // Dimensions
+    // Dimensions (Reduced for more compact look as requested by user)
     final double horizontalMargin = isTablet ? 24.0 : 16.0;
-    final double verticalMargin = isTablet ? 6.0 : 4.0;
-    final double paddingVertical = isTablet ? 16.0 : 14.0;
-    final double paddingHorizontal = isTablet ? 20.0 : 16.0;
-    final double borderRadius = isTablet ? 16.0 : 14.0;
+    final double verticalMargin = isTablet ? 4.0 : 3.0; // reduced
+    final double paddingVertical = isTablet ? 12.0 : 10.0; // reduced
+    final double paddingHorizontal = isTablet ? 16.0 : 12.0; // reduced
+    final double borderRadius = isTablet ? 14.0 : 12.0; // reduced
 
     final double iconContainerSize = isTablet
-        ? screenWidth * 0.09
-        : screenWidth * 0.11;
+        ? screenWidth * 0.08
+        : screenWidth * 0.09; // reduced
     final double innerIconSize = iconContainerSize * 0.5;
-    final double titleSize = isTablet ? screenWidth * 0.028 : screenWidth *
-        0.04;
-    final double descSize = isTablet ? screenWidth * 0.02 : screenWidth * 0.032;
+    final double titleSize = isTablet ? screenWidth * 0.026 : screenWidth *
+        0.035; // reduced
+    final double descSize = isTablet ? screenWidth * 0.02 : screenWidth * 0.03; // reduced
 
     // --- COLOR ANIMATION LOGIC ---
     // Normal:   Bg = Background, Text = Inverted

@@ -12,8 +12,8 @@ import '../../../providers/details.dart';
 import '../../../providers/local.dart';
 import '../../models/widgets/cancel.dart';
 import '../../../../../server/user.dart';
-import '../../../../../navigation.dart';
-import '../../../../funds/funds.dart';
+import '../../models/widgets/animated_gradient_border.dart';
+import '../../models/widgets/premium_bottom_sheet.dart';
 
 /// The bottom navigation bar for the Model Detail screen, handling all user actions.
 ///
@@ -33,14 +33,9 @@ class BottomActionButtons extends StatelessWidget {
         ? provider.selectedVariantId
         : provider.mainModel!.id;
 
-    // Enforce Premium Restriction for Online Models
-    final bool isRoleplay = provider.mainModel!.category == 'roleplay';
-    final bool isCortexAuto = chatModelId == 'cortex/auto';
-    final bool isPremiumOnlineModel = provider.mainModel!.isServerSide && !provider.mainModel!.isCustomModel && !isRoleplay && !isCortexAuto;
-
-    if (isPremiumOnlineModel && !isSubscribed) {
-      final target = const FundsScreen();
-      navigateToScreen(target, direction: const Offset(0.0, 1.0));
+    // Enforce Premium Restriction
+    if (provider.mainModel!.isPremium && !isSubscribed) {
+      showPremiumBottomSheet(context);
       return;
     }
 
@@ -207,14 +202,37 @@ class BottomActionButtons extends StatelessWidget {
                     bottomRight: Radius.circular(screenWidth * 0.03),
                   ),
                 ),
-                child: Text(
-                  localizations.chat,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: screenWidth * 0.04,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: provider.mainModel!.isPremium
+                  ? AnimatedGradientBorder(
+                      borderRadius: screenWidth * 0.03,
+                      borderWidth: 2.0,
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: AppColors.senaryColor,
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(screenWidth * 0.03),
+                            bottomRight: Radius.circular(screenWidth * 0.03),
+                          ),
+                        ),
+                        child: Text(
+                          localizations.chat,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: screenWidth * 0.04,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Text(
+                      localizations.chat,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: screenWidth * 0.04,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
               ),
             ),
           ),
@@ -335,20 +353,39 @@ class BottomActionButtons extends StatelessWidget {
                 _startChat(context, provider);
               },
         borderRadius: BorderRadius.circular(screenWidth * 0.03),
-        child: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: AppColors.senaryColor,
-            borderRadius: BorderRadius.circular(screenWidth * 0.03),
-          ),
-          child: Text(
-            localizations.chat,
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: screenWidth * 0.04,
-                fontWeight: FontWeight.bold),
-          ),
-        ),
+        child: provider.mainModel!.isPremium
+          ? AnimatedGradientBorder(
+              borderRadius: screenWidth * 0.03,
+              borderWidth: 2.0,
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.senaryColor,
+                  borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                ),
+                child: Text(
+                  localizations.chat,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: screenWidth * 0.04,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            )
+          : Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.senaryColor,
+                borderRadius: BorderRadius.circular(screenWidth * 0.03),
+              ),
+              child: Text(
+                localizations.chat,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth * 0.04,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
       ),
     );
   }

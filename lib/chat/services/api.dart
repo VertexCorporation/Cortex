@@ -277,6 +277,7 @@ class ApiService {
             "model": targetModel,
             "messages": messages,
             "isPremiumModel": isPremium,
+            "stream": true,
             if (source != null) "source": source,
             if (tools != null) "tools": tools,
             "tool_choice": (tools != null) ? "auto" : null,
@@ -777,6 +778,58 @@ class ApiService {
       }
     } catch (e) {
       debugPrint('[TitleGen] ❌ Error generating title: $e');
+    }
+    return null;
+  }
+
+  /// Extracts user memory facts from a user message in the background.
+  Future<List<String>?> extractUserMemory(
+      String userInput, String langCode) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return null;
+
+      final String? token = await user.getIdToken();
+
+      final options = Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        receiveTimeout: const Duration(seconds: 15),
+      );
+
+      final systemPrompt = "You are a memory extraction system. Extract explicit, permanent facts about the user from their message (e.g., 'I like apples' -> 'Kullanıcı elmaları sever'). Return ONLY a valid JSON array of strings in the user's language ($langCode). If there are no facts to remember, return an empty array []. Do not include markdown formatting or code blocks.";
+      
+      final payload = {
+        "messages": [
+          {"role": "system", "content": systemPrompt},
+          {"role": "user", "content": userInput}
+        ]
+      };
+
+      final response = await _titleDio.post(
+        _titleBaseUrl,
+        data: jsonEncode(payload),
+        options: options,
+      );
+
+      final data = response.data;
+      if (data != null && data['title'] != null) {
+        String result = data['title'].toString().trim();
+        if (result.startsWith('```json')) {
+          result = result.replaceAll('```json', '').replaceAll('```', '').trim();
+        } else if (result.startsWith('```')) {
+          result = result.replaceAll('```', '').trim();
+        }
+        
+        final decoded = jsonDecode(result);
+        if (decoded is List) {
+          return decoded.map((e) => e.toString()).toList();
+        }
+      }
+    } catch (e) {
+      debugPrint('[MemoryExtraction] ❌ Error extracting memory: $e');
     }
     return null;
   }

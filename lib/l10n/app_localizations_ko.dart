@@ -1779,6 +1779,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get memoryLimitReached => '메모리 제한에 도달했습니다.';
 
   @override
+  String get memoryUpdated => 'Memory updated';
+
+  @override
   String get intelligenceTitle => '지능';
 
   @override

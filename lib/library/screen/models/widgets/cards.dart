@@ -17,6 +17,10 @@ import '../../../backend/data/entity.dart';
 import '../../../backend/download/download.dart';
 import '../../../backend/utils.dart';
 import 'cancel.dart';
+import 'premium_badge.dart';
+import 'animated_gradient_border.dart';
+import 'premium_bottom_sheet.dart';
+import '../../../../server/user.dart';
 
 /// This widget is now a cleaner, more focused component.
 /// It primarily accepts a single [ModelEntity] for its static data,
@@ -211,22 +215,55 @@ class _ModelTileState extends State<ModelTile> {
             widget.model.isCustomModel ||
             widget.model.isServerSide;
     if (showChatButton) {
+      Widget chatBtn = ElevatedButton(
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          // Check Premium Access
+          if (widget.model.isPremium) {
+            final userProvider = Provider.of<UserProvider>(context, listen: false);
+            if (!userProvider.isSubscriptionActive) {
+              showPremiumBottomSheet(context);
+              return;
+            }
+          }
+          widget.onChatPressed();
+        },
+        style: ElevatedButton.styleFrom(
+            backgroundColor: widget.model.isPremium ? const Color(0xFF427DFF) : AppColors.senaryColor,
+            shape: RoundedRectangleBorder(borderRadius: br),
+            padding: EdgeInsets.zero),
+        child: FittedBox(
+          child: widget.model.isPremium
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/lock_reset.svg',
+                      width: w * .035,
+                      height: w * .035,
+                      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    ),
+                    SizedBox(width: w * .015),
+                    Text(loc.chat, style: _boldWhite(context, w)),
+                  ],
+                )
+              : Text(loc.chat, style: _boldWhite(context, w)),
+        ),
+      );
+
+      if (widget.model.isPremium) {
+        chatBtn = AnimatedGradientBorder(
+          borderRadius: w * radiusFactor,
+          borderWidth: 2.0,
+          child: chatBtn,
+        );
+      }
+
       return SizedBox(
         key: ValueKey('chat-${widget.model.id}'),
         width: btnW,
         height: h,
-        child: ElevatedButton(
-          onPressed: () {
-            HapticFeedback.lightImpact();
-            widget.onChatPressed();
-          },
-          style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.senaryColor,
-              shape: RoundedRectangleBorder(borderRadius: br),
-              padding: EdgeInsets.zero),
-          child:
-              FittedBox(child: Text(loc.chat, style: _boldWhite(context, w))),
-        ),
+        child: chatBtn,
       );
     }
 
@@ -329,7 +366,7 @@ class _ModelTileState extends State<ModelTile> {
     }
 
     if (isFramedType) {
-      return Container(
+      imageContent = Container(
           width: imgW,
           height: imgH,
           padding: const EdgeInsets.all(6.0),
@@ -338,7 +375,7 @@ class _ModelTileState extends State<ModelTile> {
               borderRadius: BorderRadius.circular(w * .03)),
           child: imageContent);
     } else {
-      return Container(
+      imageContent = Container(
           width: imgW,
           height: imgH,
           clipBehavior: Clip.antiAlias,
@@ -346,6 +383,22 @@ class _ModelTileState extends State<ModelTile> {
               BoxDecoration(borderRadius: BorderRadius.circular(w * .03)),
           child: imageContent);
     }
+
+    if (widget.model.isPremium) {
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          imageContent,
+          Positioned(
+            top: -w * .01,
+            right: -w * .01,
+            child: PremiumBadge(size: w * .06),
+          ),
+        ],
+      );
+    }
+    
+    return imageContent;
   }
 
   Widget _fallback(double w, double h) => Container(

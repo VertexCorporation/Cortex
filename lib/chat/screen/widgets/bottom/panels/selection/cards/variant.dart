@@ -5,7 +5,6 @@ import 'package:flutter_svg/svg.dart';
 import '../../../../../../../app.dart';
 import '../../../../../../../overflow.dart';
 import '../../../../../../../theme.dart';
-import 'package:cortex/fog.dart';
 
 class ModelVariantCard extends StatelessWidget {
   final String title;
