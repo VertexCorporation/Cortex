@@ -41,10 +41,10 @@ class FeaturesSheetButton extends StatelessWidget {
 
     // Dimensions (Reduced for more compact look as requested by user)
     final double horizontalMargin = isTablet ? 24.0 : 16.0;
-    final double verticalMargin = isTablet ? 4.0 : 3.0; // reduced
-    final double paddingVertical = isTablet ? 12.0 : 10.0; // reduced
-    final double paddingHorizontal = isTablet ? 16.0 : 12.0; // reduced
-    final double borderRadius = isTablet ? 14.0 : 12.0; // reduced
+    final double verticalMargin = isTablet ? 5.0 : 5.0; // breathing room between items
+    final double paddingVertical = isTablet ? 14.0 : 12.0;
+    final double paddingHorizontal = isTablet ? 16.0 : 14.0;
+    final double borderRadius = isTablet ? 16.0 : 14.0;
 
     final double iconContainerSize = isTablet
         ? screenWidth * 0.08

@@ -194,6 +194,13 @@ class ModelService with ChangeNotifier {
       final resolvedPath = getModelImagePath(tempEntity);
       finalEntities.add(tempEntity.copyWith(imagePath: resolvedPath));
       
+      // Inject cortexRoleplayData
+      if (i == 0) {
+        final roleplayEntity = ModelEntity.fromMap(ModelDefaults.cortexRoleplayData, langCode);
+        final roleplayPath = getModelImagePath(roleplayEntity);
+        finalEntities.add(roleplayEntity.copyWith(imagePath: roleplayPath));
+      }
+      
       // Yield to the event loop frequently to completely eliminate UI stutter
       // during heavy synchronous filesystem checks.
       if (i % 5 == 0) {
@@ -477,6 +484,11 @@ class ModelService with ChangeNotifier {
           ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
       return entity.copyWith(imagePath: getModelImagePath(entity));
     }
+    if (modelId == 'cortex/roleplay') {
+      var entity =
+          ModelEntity.fromMap(ModelDefaults.cortexRoleplayData, langCode);
+      return entity.copyWith(imagePath: getModelImagePath(entity));
+    }
 
     final allModels = getCachedModelsSync();
     if (allModels.isEmpty) {
@@ -485,6 +497,11 @@ class ModelService with ChangeNotifier {
       if (modelId == 'cortex/auto' || modelId == 'dynamic') {
         var entity =
             ModelEntity.fromMap(ModelDefaults.cortexDynamicChatData, langCode);
+        return entity.copyWith(imagePath: getModelImagePath(entity));
+      }
+      if (modelId == 'cortex/roleplay') {
+        var entity =
+            ModelEntity.fromMap(ModelDefaults.cortexRoleplayData, langCode);
         return entity.copyWith(imagePath: getModelImagePath(entity));
       }
       return _createFallbackEntity(modelId, langCode: langCode);

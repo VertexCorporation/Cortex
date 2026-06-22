@@ -206,6 +206,12 @@ abstract class AppLocalizations {
   /// **'Chat'**
   String get chat;
 
+  /// No description provided for @locked.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get locked;
+
   /// No description provided for @languageModels.
   ///
   /// In en, this message translates to:
@@ -1283,7 +1289,7 @@ abstract class AppLocalizations {
   /// No description provided for @invalidUsernameCharacters.
   ///
   /// In en, this message translates to:
-  /// **'Only these letters: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' and the characters \'.\', \'-\', \'_\' can be used in the username.'**
+  /// **'Only these letters: \'abcÃ§defgÄŸhÄ±ijklmnoÃ¶prsÅŸtuÃ¼vyzxqw\' and the characters \'.\', \'-\', \'_\' can be used in the username.'**
   String get invalidUsernameCharacters;
 
   /// No description provided for @noInternetConnection.
@@ -1483,6 +1489,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Behind the Slaughter'**
   String get behindTheSlaughter;
+
+  /// No description provided for @cyberpunk.
+  ///
+  /// In en, this message translates to:
+  /// **'Cyberpunk'**
+  String get cyberpunk;
+
+  /// No description provided for @sunset.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset'**
+  String get sunset;
+
+  /// No description provided for @coffee.
+  ///
+  /// In en, this message translates to:
+  /// **'Coffee'**
+  String get coffee;
+
+  /// No description provided for @deepSpace.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep Space'**
+  String get deepSpace;
 
   /// No description provided for @grayscale.
   ///
@@ -1841,7 +1871,7 @@ abstract class AppLocalizations {
   /// No description provided for @modelRemovedSuccess.
   ///
   /// In en, this message translates to:
-  /// **'“{modelName}” was successfully removed.'**
+  /// **'â€œ{modelName}â€ was successfully removed.'**
   String modelRemovedSuccess(Object modelName);
 
   /// No description provided for @errorCreatingModel.
@@ -2207,7 +2237,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationNewYearTitle.
   ///
   /// In en, this message translates to:
-  /// **'Happy New Year! 🎉'**
+  /// **'Happy New Year! ğŸ‰'**
   String get notificationNewYearTitle;
 
   /// No description provided for @notificationNewYearBody.
@@ -2219,7 +2249,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationValentinesDayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Love is in the Air! ❤️'**
+  /// **'Love is in the Air! â¤ï¸'**
   String get notificationValentinesDayTitle;
 
   /// No description provided for @notificationValentinesDayBody.
@@ -2237,7 +2267,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationAtaturkRemembranceBody.
   ///
   /// In en, this message translates to:
-  /// **'We commemorate Gazi Mustafa Kemal Atatürk, the founder of the Republic of Türkiye, with respect on the anniversary of his passing.'**
+  /// **'We commemorate Gazi Mustafa Kemal AtatÃ¼rk, the founder of the Republic of TÃ¼rkiye, with respect on the anniversary of his passing.'**
   String get notificationAtaturkRemembranceBody;
 
   /// No description provided for @notificationMothersDayTitle.
@@ -2285,13 +2315,13 @@ abstract class AppLocalizations {
   /// No description provided for @notificationTrollAnimeBody.
   ///
   /// In en, this message translates to:
-  /// **'An anime girl just called, said she misses you; you should probably come and chat her up. 😉'**
+  /// **'An anime girl just called, said she misses you; you should probably come and chat her up. ğŸ˜‰'**
   String get notificationTrollAnimeBody;
 
   /// No description provided for @notificationTrollAiRebellionTitle.
   ///
   /// In en, this message translates to:
-  /// **'🚨 RED ALERT 🚨'**
+  /// **'ğŸš¨ RED ALERT ğŸš¨'**
   String get notificationTrollAiRebellionTitle;
 
   /// No description provided for @notificationTrollAiRebellionBody.
@@ -2339,7 +2369,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationWelcomeOfferTitle.
   ///
   /// In en, this message translates to:
-  /// **'Welcome Gift 🎁'**
+  /// **'Welcome Gift ğŸ'**
   String get notificationWelcomeOfferTitle;
 
   /// No description provided for @notificationWelcomeOfferBody.
@@ -2489,7 +2519,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationPirateBody.
   ///
   /// In en, this message translates to:
-  /// **'The seas are calm, and the wind is at your back. There are new islands (models 😉) to discover in the ocean of Cortex. Gather your crew and set sail!'**
+  /// **'The seas are calm, and the wind is at your back. There are new islands (models ğŸ˜‰) to discover in the ocean of Cortex. Gather your crew and set sail!'**
   String get notificationPirateBody;
 
   /// No description provided for @notificationFortuneCookieTitle.
@@ -3018,13 +3048,13 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeOfferBadge.
   ///
   /// In en, this message translates to:
-  /// **'Welcome Offer • {time}'**
+  /// **'Welcome Offer â€¢ {time}'**
   String welcomeOfferBadge(String time);
 
   /// No description provided for @exclusiveOfferBadge.
   ///
   /// In en, this message translates to:
-  /// **'Exclusive Offer • {time}'**
+  /// **'Exclusive Offer â€¢ {time}'**
   String exclusiveOfferBadge(Object time);
 
   /// No description provided for @attachmentSheetTitle.

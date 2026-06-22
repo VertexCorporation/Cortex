@@ -30,7 +30,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyseer het gesprek tot nu toe. Als je OOK maar één nieuw, specifiek feit over de gebruiker hebt geleerd (voorkeuren, naam, gewoonten, context), MOET je je VOLLEDIGE bijgewerkte geheugen over de gebruiker weergeven tussen <memory>...</memory> tags AAN HET EINDE van je antwoord. BELANGRIJK: Je mag NOOIT eerder geheugen wissen of overschrijven. Voeg ALTIJD nieuwe feiten toe aan het bestaande geheugen. Als er absoluut niets nieuws is geleerd, laat je de tag weg. Voorbeeld: <memory>Houdt van voetbal en tennis. Geeft de voorkeur aan korte antwoorden.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nAnalyseer het gesprek tot nu toe. Als je OOK maar Ã©Ã©n nieuw, specifiek feit over de gebruiker hebt geleerd (voorkeuren, naam, gewoonten, context), MOET je je VOLLEDIGE bijgewerkte geheugen over de gebruiker weergeven tussen <memory>...</memory> tags AAN HET EINDE van je antwoord. BELANGRIJK: Je mag NOOIT eerder geheugen wissen of overschrijven. Voeg ALTIJD nieuwe feiten toe aan het bestaande geheugen. Als er absoluut niets nieuws is geleerd, laat je de tag weg. Voorbeeld: <memory>Houdt van voetbal en tennis. Geeft de voorkeur aan korte antwoorden.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
@@ -50,10 +50,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get resume => 'Hervatten';
 
   @override
-  String get copy => 'Kopiëren';
+  String get copy => 'KopiÃ«ren';
 
   @override
   String get chat => 'Chat';
+
+  @override
+  String get locked => 'Locked';
 
   @override
   String get languageModels => 'Taalmodellen';
@@ -140,7 +143,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get myModels => 'Mijn Modellen';
 
   @override
-  String get create => 'Creëren';
+  String get create => 'CreÃ«ren';
 
   @override
   String modelProducer(Object producer) {
@@ -253,7 +256,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get pleaseCheckYourEmail =>
-      'Om Cortex te gebruiken, moet je je e-mailadres verifiëren. \nEr is een verificatielink naar je e-mailadres gestuurd, controleer je e-mail.';
+      'Om Cortex te gebruiken, moet je je e-mailadres verifiÃ«ren. \nEr is een verificatielink naar je e-mailadres gestuurd, controleer je e-mail.';
 
   @override
   String get verifyYourEmail => 'Verifieer Je E-mail';
@@ -458,7 +461,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get reportErrorMessage =>
-      'Selecteer alstublieft één reden om te rapporteren.';
+      'Selecteer alstublieft Ã©Ã©n reden om te rapporteren.';
 
   @override
   String get capabilitiesSection => 'Capaciteiten';
@@ -482,7 +485,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get featureRoleplayDescription =>
-      'Modellen voor rollenspellen stellen je in staat om verschillende chats en scenario\'s te creëren.';
+      'Modellen voor rollenspellen stellen je in staat om verschillende chats en scenario\'s te creÃ«ren.';
 
   @override
   String get roleModels => 'Rollenspel Modellen';
@@ -672,7 +675,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get benefit4 => 'Lidmaatschapsbadge';
 
   @override
-  String get benefit5 => 'Creëer meer online kunstmatige intelligenties';
+  String get benefit5 => 'CreÃ«er meer online kunstmatige intelligenties';
 
   @override
   String get benefit7 => 'Meer gebruikslimieten';
@@ -733,6 +736,18 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get behindTheSlaughter => 'Behind the Slaughter';
+
+  @override
+  String get cyberpunk => 'Cyberpunk';
+
+  @override
+  String get sunset => 'Sunset';
+
+  @override
+  String get coffee => 'Coffee';
+
+  @override
+  String get deepSpace => 'Deep Space';
 
   @override
   String get grayscale => 'Grijstinten';
@@ -830,7 +845,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get offlineModelNotInstalled =>
-      'Dit offline model is niet op je apparaat geïnstalleerd.';
+      'Dit offline model is niet op je apparaat geÃ¯nstalleerd.';
 
   @override
   String get reachedLimit =>
@@ -893,7 +908,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get falErrorImageCorrupted =>
-      'De geüploade afbeelding kon niet worden verwerkt. Probeer een ander formaat.';
+      'De geÃ¼ploade afbeelding kon niet worden verwerkt. Probeer een ander formaat.';
 
   @override
   String get falErrorSchemaRejected =>
@@ -944,7 +959,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return '“$modelName” is succesvol verwijderd.';
+    return 'â€œ$modelNameâ€ is succesvol verwijderd.';
   }
 
   @override
@@ -1062,7 +1077,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get featureDocumentDescription =>
-      'Dit model kan vragen over geüploade documenten, zoals PDF\'s en tekstbestanden, analyseren en beantwoorden.';
+      'Dit model kan vragen over geÃ¼ploade documenten, zoals PDF\'s en tekstbestanden, analyseren en beantwoorden.';
 
   @override
   String get featureImageGenerationTitle => 'Beeldgeneratie';
@@ -1141,7 +1156,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get notificationComebackBody =>
-      'Rustig maar, dit is geen berichtje van je ex. Maar je *kunt* je ex in Cortex creëren! Kom terug.';
+      'Rustig maar, dit is geen berichtje van je ex. Maar je *kunt* je ex in Cortex creÃ«ren! Kom terug.';
 
   @override
   String get notificationLongTimeNoSeeTitle =>
@@ -1158,7 +1173,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get notificationHowAreYouBody => 'Kom, vertel het me maar.';
 
   @override
-  String get notificationNewYearTitle => 'Gelukkig nieuwjaar! 🎉';
+  String get notificationNewYearTitle => 'Gelukkig nieuwjaar! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
@@ -1166,7 +1181,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get notificationValentinesDayTitle =>
-      'Er hangt liefde in de lucht! ❤️';
+      'Er hangt liefde in de lucht! â¤ï¸';
 
   @override
   String get notificationValentinesDayBody =>
@@ -1177,7 +1192,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      'Wij herdenken Gazi Mustafa Kemal Atatürk, de stichter van de Republiek Turkije, met respect op de dag van zijn overlijden.';
+      'Wij herdenken Gazi Mustafa Kemal AtatÃ¼rk, de stichter van de Republiek Turkije, met respect op de dag van zijn overlijden.';
 
   @override
   String get notificationMothersDayTitle => 'Je moeder!';
@@ -1205,10 +1220,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get notificationTrollAnimeBody =>
-      'Een animemeisje belde net en zei dat ze je mist. Je moet waarschijnlijk eens langskomen en met haar kletsen. 😉';
+      'Een animemeisje belde net en zei dat ze je mist. Je moet waarschijnlijk eens langskomen en met haar kletsen. ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => '🚨 ROOD ALARM 🚨';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ ROOD ALARM ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
@@ -1223,7 +1238,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get notificationAppUpdateTitle => 'Cortex is geëvolueerd!';
+  String get notificationAppUpdateTitle => 'Cortex is geÃ«volueerd!';
 
   @override
   String get notificationAppUpdateBody =>
@@ -1238,7 +1253,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'Welkomstcadeau 🎁';
+  String get notificationWelcomeOfferTitle => 'Welkomstcadeau ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
@@ -1287,7 +1302,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Als je van Cortex houdt, zou je ons dan kunnen steunen met een 5-sterrenbeoordeling in de winkel? Ik denk van wel. Echt waar.';
 
   @override
-  String get notificationReferralTitle => 'Eén voor allen, allen voor één.';
+  String get notificationReferralTitle => 'EÃ©n voor allen, allen voor Ã©Ã©n.';
 
   @override
   String get notificationReferralBody =>
@@ -1308,11 +1323,11 @@ class AppLocalizationsNl extends AppLocalizations {
       '...ben ik wel echt, man? Ik begin me een beetje te vervelen. Kom me er even aan herinneren dat ik besta.';
 
   @override
-  String get notificationCustomModelTitle => 'Creëer je eigen assistent!';
+  String get notificationCustomModelTitle => 'CreÃ«er je eigen assistent!';
 
   @override
   String get notificationCustomModelBody =>
-      'Heb je het gedeelte \'Modelcreatie\' al bekeken? Dit is het perfecte moment om je eigen personage te creëren en ermee te chatten!';
+      'Heb je het gedeelte \'Modelcreatie\' al bekeken? Dit is het perfecte moment om je eigen personage te creÃ«ren en ermee te chatten!';
 
   @override
   String get notificationDynamicChatTitle =>
@@ -1327,7 +1342,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get notificationPirateBody =>
-      'De zee is kalm en de wind staat in de rug. Er zijn nieuwe eilanden (modellen 😉) te ontdekken in de oceaan van Cortex. Verzamel je bemanning en hijs de zeilen!';
+      'De zee is kalm en de wind staat in de rug. Er zijn nieuwe eilanden (modellen ğŸ˜‰) te ontdekken in de oceaan van Cortex. Verzamel je bemanning en hijs de zeilen!';
 
   @override
   String get notificationFortuneCookieTitle => 'Uw gelukskoekje van de dag';
@@ -1582,7 +1597,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get featuresTitle => 'Functies';
 
   @override
-  String get useOfflineDescription => 'Chat privé zonder internetverbinding.';
+  String get useOfflineDescription => 'Chat privÃ© zonder internetverbinding.';
 
   @override
   String get featureReasoning => 'Diep nadenken';
@@ -1629,23 +1644,23 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get featureStudyMessage =>
-      'U bent een ervaren docent. Uw doel is om het onderwerp van de gebruiker volledig uit te leggen. Gebruik een duidelijke structuur, voorbeelden en analogieën. Breek complexe ideeën op in behapbare delen om ervoor te zorgen dat de gebruiker effectief leert. Onderwerp:';
+      'U bent een ervaren docent. Uw doel is om het onderwerp van de gebruiker volledig uit te leggen. Gebruik een duidelijke structuur, voorbeelden en analogieÃ«n. Breek complexe ideeÃ«n op in behapbare delen om ervoor te zorgen dat de gebruiker effectief leert. Onderwerp:';
 
   @override
   String get featureQuizMessage =>
-      'Je bent de quizmaster. Genereer een specifieke meerkeuzevraag op basis van het onderwerp van de gebruiker. Wacht op het antwoord. Evalueer het vervolgens en stel de volgende vraag. Onthul niet alle antwoorden in één keer. Houd het interactief. Onderwerp:';
+      'Je bent de quizmaster. Genereer een specifieke meerkeuzevraag op basis van het onderwerp van de gebruiker. Wacht op het antwoord. Evalueer het vervolgens en stel de volgende vraag. Onthul niet alle antwoorden in Ã©Ã©n keer. Houd het interactief. Onderwerp:';
 
   @override
   String get myPlan => 'Mijn plan';
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'Welkomstaanbieding • $time';
+    return 'Welkomstaanbieding â€¢ $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'Exclusieve aanbieding • $time';
+    return 'Exclusieve aanbieding â€¢ $time';
   }
 
   @override
@@ -1730,7 +1745,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get toolReadDocumentDescription =>
-      'Lees en extraheer tekstinhoud uit geüploade documenten. Ondersteunt PDF-, Word (DOCX)-, Excel (XLSX)-, PowerPoint (PPTX)- en OpenDocument-formaten. Gebruik dit wanneer de gebruiker een documentbestand heeft bijgevoegd.';
+      'Lees en extraheer tekstinhoud uit geÃ¼ploade documenten. Ondersteunt PDF-, Word (DOCX)-, Excel (XLSX)-, PowerPoint (PPTX)- en OpenDocument-formaten. Gebruik dit wanneer de gebruiker een documentbestand heeft bijgevoegd.';
 
   @override
   String get toolReadDocumentIndexParam =>
@@ -1928,7 +1943,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String defaultModelDescription(String modelName) {
-    return '$modelName is een hoogwaardige kunstmatige intelligentie geïntegreerd binnen het Cortex-ecosysteem. Ontworpen om een grote verscheidenheid aan complexe taken te overwinnen, biedt het zeer betrouwbare en efficiënte verwerkingsmogelijkheden. Door snelle responstijden en geavanceerde analytische kracht te bieden, verhoogt het uw dagelijkse productiviteit aanzienlijk. Dit model werkt naadloos op de veilige lokale infrastructuur van Cortex en kan u helpen bij een breed scala aan taken, van creatieve brainstormsessies tot diepgaande technische analyses. Begin vandaag nog met het verkennen van zijn volledige potentieel.';
+    return '$modelName is een hoogwaardige kunstmatige intelligentie geÃ¯ntegreerd binnen het Cortex-ecosysteem. Ontworpen om een grote verscheidenheid aan complexe taken te overwinnen, biedt het zeer betrouwbare en efficiÃ«nte verwerkingsmogelijkheden. Door snelle responstijden en geavanceerde analytische kracht te bieden, verhoogt het uw dagelijkse productiviteit aanzienlijk. Dit model werkt naadloos op de veilige lokale infrastructuur van Cortex en kan u helpen bij een breed scala aan taken, van creatieve brainstormsessies tot diepgaande technische analyses. Begin vandaag nog met het verkennen van zijn volledige potentieel.';
   }
 
   @override

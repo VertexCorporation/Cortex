@@ -417,31 +417,19 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
   @override
   Widget build(BuildContext context) {
     final inputProvider = context.watch<InputProvider>();
-    final sessionProvider = context.watch<ChatSessionProvider>();
-    final featureMode = inputProvider.featureMode;
-    final currentModel = sessionProvider.selectedModel;
     
-    // Check if any feature is active
-    final bool isOfflineFocused = currentModel?.type == 'offline';
-    final bool isImageFocused = currentModel?.outputs['image'] == true || currentModel?.category == 'image';
-    final bool isVideoFocused = currentModel?.outputs['video'] == true || currentModel?.category == 'video';
-    final bool isAudioFocused = currentModel?.outputs['audio'] == true || currentModel?.category == 'audio';
 
-    final bool isActive = featureMode != ChatInputMode.none ||
-        inputProvider.enableWebSearch ||
-        isOfflineFocused ||
-        isImageFocused ||
-        isVideoFocused ||
-        isAudioFocused ||
-        inputProvider.attachments.isNotEmpty; // Also active if there are attachments
 
-    final Color backgroundColor = isActive ? AppColors.primaryColor.inverted : AppColors.background;
-    final Color iconColor = isActive ? AppColors.background : AppColors.primaryColor.inverted;
-    final Color borderColor = isActive ? Colors.transparent : AppColors.border;
+    // Match the Mic/Send button styling:
+    // Background: AppColors.secondaryColor.withValues(alpha: 0.5)
+    // Icon: AppColors.primaryColor.inverted
+    // No border.
+    final Color backgroundColor = AppColors.secondaryColor;
+    final Color iconColor = AppColors.primaryColor.inverted;
 
     final bool isMaxAttachments = inputProvider.attachments.length >= 9;
     final bool buttonDisabled = widget.isLimitExceeded || (widget.isPhotoLoading && isMaxAttachments);
-    final double size = 46.0;
+    final double size = 36.0; // Reduced size to match the pill and Mic better
 
     return GestureDetector(
       onTap: buttonDisabled || widget.isPhotoLoading
@@ -460,11 +448,8 @@ class _AddPhotoButtonState extends State<AddPhotoButton> {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: backgroundColor.withValues(alpha: buttonDisabled ? 0.3 : 1.0),
+          color: backgroundColor.withValues(alpha: buttonDisabled ? 0.3 : 0.5),
           shape: BoxShape.circle,
-          border: Border.all(
-              color: borderColor.withValues(alpha: buttonDisabled ? 0.3 : 1.0),
-              width: 1.0),
         ),
         child: Center(
           child: AnimatedRotation(

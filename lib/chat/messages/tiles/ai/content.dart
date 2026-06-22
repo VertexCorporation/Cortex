@@ -23,12 +23,54 @@ class _AiBodyContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool hasText = stableText.isNotEmpty || animatingText.isNotEmpty;
+    String fullText = stableText + animatingText;
+    String thinkContent = '';
+    
+    final thinkRegex = RegExp(r'<think>(.*?)(?:</think>|$)', dotAll: true);
+    final thinkMatch = thinkRegex.firstMatch(fullText);
+    
+    String mainStable = stableText;
+    String mainAnimating = animatingText;
+
+    if (thinkMatch != null) {
+      thinkContent = thinkMatch.group(1)?.trim() ?? '';
+      final matchedStr = thinkMatch.group(0)!;
+      
+      if (mainStable.contains(matchedStr)) {
+         mainStable = mainStable.replaceFirst(matchedStr, '').trimLeft();
+      } else if (fullText.startsWith(matchedStr)) {
+         int splitIndex = stableText.length;
+         if (matchedStr.length <= splitIndex) {
+            mainStable = mainStable.substring(matchedStr.length).trimLeft();
+         } else {
+            mainStable = '';
+            int animCut = matchedStr.length - splitIndex;
+            if (animCut < mainAnimating.length) {
+                mainAnimating = mainAnimating.substring(animCut).trimLeft();
+            } else {
+                mainAnimating = '';
+            }
+         }
+      } else {
+         mainStable = mainStable.replaceAll(thinkRegex, '').trimLeft();
+         mainAnimating = mainAnimating.replaceAll(thinkRegex, '');
+      }
+    }
+
+    final bool hasMainText = mainStable.isNotEmpty || mainAnimating.isNotEmpty;
+    final bool hasThink = thinkContent.isNotEmpty;
     final bool hasMedia = embeddedMedia != null;
 
-    if (!hasText && !hasMedia) {
+    if (!hasMainText && !hasMedia && !hasThink) {
       return const SizedBox.shrink();
     }
+
+    final thinkBlock = hasThink
+        ? Padding(
+            padding: EdgeInsets.only(top: 8 * scale, left: 2.0 * scale, bottom: 4 * scale),
+            child: ThoughtProcessWidget(thinkContent: thinkContent, scale: scale),
+          )
+        : const SizedBox.shrink();
 
     final mediaBlock = hasMedia
         ? Padding(
@@ -43,10 +85,10 @@ class _AiBodyContent extends StatelessWidget {
           )
         : const SizedBox.shrink();
 
-    final textBlock = hasText
+    final textBlock = hasMainText
         ? Padding(
             padding: EdgeInsets.only(top: 8 * scale, left: 2.0 * scale),
-            child: _buildContent(context, scale),
+            child: _buildContent(context, scale, mainStable, mainAnimating),
           )
         : const SizedBox.shrink();
 
@@ -54,14 +96,15 @@ class _AiBodyContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (hasThink) thinkBlock,
         if (hasMedia && mediaAboveText) mediaBlock,
-        if (hasText) textBlock,
+        if (hasMainText) textBlock,
         if (hasMedia && !mediaAboveText) mediaBlock,
       ],
     );
   }
 
-  Widget _buildContent(BuildContext context, double s) {
+  Widget _buildContent(BuildContext context, double s, String stableText, String animatingText) {
     final baseStyle = TextStyle(
         fontSize: 17 * s, height: 1.38, color: AppColors.primaryColor.inverted);
 
@@ -82,7 +125,7 @@ class _AiBodyContent extends StatelessWidget {
               ),
               SizedBox(width: 9 * s),
               Text(
-                AppLocalizations.of(context)!.searching,
+                "Aranıyor...",
                 style: TextStyle(
                   fontSize: 15 * s,
                   fontWeight: FontWeight.w600,
@@ -250,4 +293,85 @@ class _MarkdownTextParts {
     required this.stable,
     required this.animating,
   });
+}
+
+class ThoughtProcessWidget extends StatefulWidget {
+  final String thinkContent;
+  final double scale;
+
+  const ThoughtProcessWidget({
+    super.key,
+    required this.thinkContent,
+    required this.scale,
+  });
+
+  @override
+  State<ThoughtProcessWidget> createState() => _ThoughtProcessWidgetState();
+}
+
+class _ThoughtProcessWidgetState extends State<ThoughtProcessWidget> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () => setState(() => _isExpanded = !_isExpanded),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.psychology_outlined,
+                size: 16 * widget.scale,
+                color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+              ),
+              SizedBox(width: 6 * widget.scale),
+              Text(
+                "Thought process",
+                style: TextStyle(
+                  fontSize: 14 * widget.scale,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+                ),
+              ),
+              SizedBox(width: 4 * widget.scale),
+              Icon(
+                _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                size: 16 * widget.scale,
+                color: AppColors.primaryColor.inverted.withValues(alpha: 0.5),
+              ),
+            ],
+          ),
+        ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          alignment: Alignment.topCenter,
+          child: _isExpanded
+              ? Container(
+                  margin: EdgeInsets.only(top: 8 * widget.scale, bottom: 8 * widget.scale),
+                  padding: EdgeInsets.all(12 * widget.scale),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor.inverted.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(8 * widget.scale),
+                    border: Border.all(color: AppColors.border.withValues(alpha: 0.1)),
+                  ),
+                  child: SelectionArea(
+                    child: Text(
+                      widget.thinkContent,
+                      style: TextStyle(
+                        fontSize: 14 * widget.scale,
+                        color: AppColors.primaryColor.inverted.withValues(alpha: 0.7),
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
+    );
+  }
 }

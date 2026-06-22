@@ -10,38 +10,38 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get chatTitlePrompt =>
-      'Tu çêkerê sernavan î. Ji bo axaftina jêrîn TENÊ bi sernavek 2-5 peyvan bersiv bide. Gotin, pêşgir, an jî nîşaneyên xalbendîyê bi kar neyne. KRÎTÎK: DIVÊ sernav bi HEMAN zimanê peyama bikarhêner be.';
+      'Tu Ã§ÃªkerÃª sernavan Ã®. Ji bo axaftina jÃªrÃ®n TENÃŠ bi sernavek 2-5 peyvan bersiv bide. Gotin, pÃªÅŸgir, an jÃ® nÃ®ÅŸaneyÃªn xalbendÃ®yÃª bi kar neyne. KRÃTÃK: DIVÃŠ sernav bi HEMAN zimanÃª peyama bikarhÃªner be.';
 
   @override
-  String get systemRoleFallback => 'Tu alîkarekî bikêrhatî yî.';
+  String get systemRoleFallback => 'Tu alÃ®karekÃ® bikÃªrhatÃ® yÃ®.';
 
   @override
   String get systemLanguageInstruction =>
-      '\n\nKRÎTÎK: Her dem bi heman zimanê ku bikarhêner pê dinivîse bersiv bide; balê bide zimanê bikarhêner.';
+      '\n\nKRÃTÃK: Her dem bi heman zimanÃª ku bikarhÃªner pÃª dinivÃ®se bersiv bide; balÃª bide zimanÃª bikarhÃªner.';
 
   @override
   String get systemNotePreviousMedia =>
-      '[Nîşeya Sîstemê: Li jêr medya berê hatiye çêkirin heye. Hûn dikarin referans bidin an jî biguherînin.]';
+      '[NÃ®ÅŸeya SÃ®stemÃª: Li jÃªr medya berÃª hatiye Ã§Ãªkirin heye. HÃ»n dikarin referans bidin an jÃ® biguherÃ®nin.]';
 
   @override
   String systemTimeInfo(String formattedTime) {
-    return '\n\nDîrok û dema niha: $formattedTime.';
+    return '\n\nDÃ®rok Ã» dema niha: $formattedTime.';
   }
 
   @override
   String get systemMemoryDirective =>
-      '\n\n[SYSTEM MEMORY DIRECTIVE]\nGotûbêja heta niha analîz bike. Ger te HER rastiyên nû yên cuda li ser bikarhêner (tercîh, nav, adet, çarçove) hîn bibî, DIVÊ HÛN TEVAHÎYA bîra xwe ya nûvekirî ya li ser bikarhêner di nav etîketên <memory>...</memory> de LI DAWIYA HERÎ BAŞ a bersiva xwe derxin. KRÎTÎK: Divê tu QET bîra berê jê nebî an jî li ser nenivîsî. HER TIM rastiyên nû li bîra heyî zêde neke. Ger bi tevahî tiştek nû nehatibe hîn kirin, etîketê derxe. Mînak: <memory>Ji futbol û tenîsê hez dike. Bersivên kurt tercîh dike.</memory>';
+      '\n\n[SYSTEM MEMORY DIRECTIVE]\nGotÃ»bÃªja heta niha analÃ®z bike. Ger te HER rastiyÃªn nÃ» yÃªn cuda li ser bikarhÃªner (tercÃ®h, nav, adet, Ã§arÃ§ove) hÃ®n bibÃ®, DIVÃŠ HÃ›N TEVAHÃYA bÃ®ra xwe ya nÃ»vekirÃ® ya li ser bikarhÃªner di nav etÃ®ketÃªn <memory>...</memory> de LI DAWIYA HERÃ BAÅ a bersiva xwe derxin. KRÃTÃK: DivÃª tu QET bÃ®ra berÃª jÃª nebÃ® an jÃ® li ser nenivÃ®sÃ®. HER TIM rastiyÃªn nÃ» li bÃ®ra heyÃ® zÃªde neke. Ger bi tevahÃ® tiÅŸtek nÃ» nehatibe hÃ®n kirin, etÃ®ketÃª derxe. MÃ®nak: <memory>Ji futbol Ã» tenÃ®sÃª hez dike. BersivÃªn kurt tercÃ®h dike.</memory>';
 
   @override
   String systemMemoryReminder(Object userMemory) {
-    return '\n\nHer tim vê yekê li ser bikarhêner bi bîr bîne:\n$userMemory';
+    return '\n\nHer tim vÃª yekÃª li ser bikarhÃªner bi bÃ®r bÃ®ne:\n$userMemory';
   }
 
   @override
   String get cancel => 'Betal bike';
 
   @override
-  String get remove => 'Dûrxistin';
+  String get remove => 'DÃ»rxistin';
 
   @override
   String get download => 'Daxe';
@@ -50,16 +50,19 @@ class AppLocalizationsKu extends AppLocalizations {
   String get resume => 'Berdewam bike';
 
   @override
-  String get copy => 'Kopî bike';
+  String get copy => 'KopÃ® bike';
 
   @override
   String get chat => 'Sohbet';
 
   @override
-  String get languageModels => 'Modelên Zimanî';
+  String get locked => 'Locked';
 
   @override
-  String get light => 'Ronî';
+  String get languageModels => 'ModelÃªn ZimanÃ®';
+
+  @override
+  String get light => 'RonÃ®';
 
   @override
   String get theme => 'Tema';
@@ -68,42 +71,42 @@ class AppLocalizationsKu extends AppLocalizations {
   String get no => 'Na';
 
   @override
-  String get yes => 'Erê';
+  String get yes => 'ErÃª';
 
   @override
-  String get done => 'Çêbû';
+  String get done => 'Ã‡ÃªbÃ»';
 
   @override
-  String get bestValue => 'Nirxa Herî Baş';
+  String get bestValue => 'Nirxa HerÃ® BaÅŸ';
 
   @override
-  String get selected => 'Hilbijartî';
+  String get selected => 'HilbijartÃ®';
 
   @override
-  String get descriptionSection => 'Danasîn';
+  String get descriptionSection => 'DanasÃ®n';
 
   @override
-  String get searchHint => 'Lêgerîn';
+  String get searchHint => 'LÃªgerÃ®n';
 
   @override
-  String get messageHint => 'Tiştekî bipirse';
+  String get messageHint => 'TiÅŸtekÃ® bipirse';
 
   @override
-  String get messageCopied => 'Peyam li panoyê hate kopîkirin.';
+  String get messageCopied => 'Peyam li panoyÃª hate kopÃ®kirin.';
 
   @override
-  String get retry => 'Dîsa biceribîne';
+  String get retry => 'DÃ®sa biceribÃ®ne';
 
   @override
-  String get systemInfo => 'Agahdariya Pergalê';
+  String get systemInfo => 'Agahdariya PergalÃª';
 
   @override
   String deviceMemory(Object memory) {
-    return 'Bîra Amûrê: $memory GB';
+    return 'BÃ®ra AmÃ»rÃª: $memory GB';
   }
 
   @override
-  String get memory => 'Bîr';
+  String get memory => 'BÃ®r';
 
   @override
   String get storage => 'Depo';
@@ -112,39 +115,39 @@ class AppLocalizationsKu extends AppLocalizations {
   String get freeStorage => 'Depoya Azad';
 
   @override
-  String get totalStorage => 'Depoya Giştî';
+  String get totalStorage => 'Depoya GiÅŸtÃ®';
 
   @override
-  String get usedStorage => 'Depoya Bikaranî';
+  String get usedStorage => 'Depoya BikaranÃ®';
 
   @override
-  String get totalMemory => 'Bîra Giştî';
+  String get totalMemory => 'BÃ®ra GiÅŸtÃ®';
 
   @override
-  String get usedMemory => 'Bîra Bikaranî';
+  String get usedMemory => 'BÃ®ra BikaranÃ®';
 
   @override
-  String get modelsTitle => 'Pirtûkxane';
+  String get modelsTitle => 'PirtÃ»kxane';
 
   @override
-  String get localModels => 'Modelên Herêmî';
+  String get localModels => 'ModelÃªn HerÃªmÃ®';
 
   @override
-  String get selectGGUFFile => 'Pelê GGUF Hilbijêre';
+  String get selectGGUFFile => 'PelÃª GGUF HilbijÃªre';
 
   @override
   String get errorGGUF =>
-      'Ji kerema xwe tenê pelên bi formata GGUF hilbijêrin.';
+      'Ji kerema xwe tenÃª pelÃªn bi formata GGUF hilbijÃªrin.';
 
   @override
-  String get myModels => 'Modelên Min';
+  String get myModels => 'ModelÃªn Min';
 
   @override
-  String get create => 'Çêke';
+  String get create => 'Ã‡Ãªke';
 
   @override
   String modelProducer(Object producer) {
-    return 'Hilberîner: $producer';
+    return 'HilberÃ®ner: $producer';
   }
 
   @override
@@ -153,37 +156,37 @@ class AppLocalizationsKu extends AppLocalizations {
   }
 
   @override
-  String get editConversationTitle => 'Navê biguherîne';
+  String get editConversationTitle => 'NavÃª biguherÃ®ne';
 
   @override
-  String get newTitle => 'Sernavê Nû';
+  String get newTitle => 'SernavÃª NÃ»';
 
   @override
   String get save => 'Tomar bike';
 
   @override
-  String get noConversationsMessage => 'Sohbet tune ne, dest bi sohbetê bike!';
+  String get noConversationsMessage => 'Sohbet tune ne, dest bi sohbetÃª bike!';
 
   @override
-  String get startChat => 'Dest bi sohbetê bike';
+  String get startChat => 'Dest bi sohbetÃª bike';
 
   @override
   String get noChats => 'Sohbet Tune';
 
   @override
-  String get noStarredChats => 'Sohbetên bi Stêrk Tune';
+  String get noStarredChats => 'SohbetÃªn bi StÃªrk Tune';
 
   @override
-  String get noStarredChatsMessage => 'Te hîna sohbetek stêrk nekiriye.';
+  String get noStarredChatsMessage => 'Te hÃ®na sohbetek stÃªrk nekiriye.';
 
   @override
-  String get starConversation => 'Stêrk';
+  String get starConversation => 'StÃªrk';
 
   @override
-  String get unstarConversation => 'Rakirina stêrkê';
+  String get unstarConversation => 'Rakirina stÃªrkÃª';
 
   @override
-  String get loginToYourAccount => 'Têkeve';
+  String get loginToYourAccount => 'TÃªkeve';
 
   @override
   String get createYourAccount => 'Qeyd bibe';
@@ -192,23 +195,23 @@ class AppLocalizationsKu extends AppLocalizations {
   String get email => 'E-name';
 
   @override
-  String get password => 'Şîfre';
+  String get password => 'ÅÃ®fre';
 
   @override
-  String get confirmPassword => 'Şîfreyê Piştrast bike';
+  String get confirmPassword => 'ÅÃ®freyÃª PiÅŸtrast bike';
 
   @override
   String get invalidEmail =>
-      'Ji kerema xwe navnîşaneke e-nameyê ya derbasdar binivîse.';
+      'Ji kerema xwe navnÃ®ÅŸaneke e-nameyÃª ya derbasdar binivÃ®se.';
 
   @override
-  String get invalidPassword => 'Divê şîfre herî kêm 6 tîpan dirêj be.';
+  String get invalidPassword => 'DivÃª ÅŸÃ®fre herÃ® kÃªm 6 tÃ®pan dirÃªj be.';
 
   @override
-  String get rememberMe => 'Min bîne bîra xwe';
+  String get rememberMe => 'Min bÃ®ne bÃ®ra xwe';
 
   @override
-  String get forgotPassword => 'Şîfreya xwe ji bîr kir?';
+  String get forgotPassword => 'ÅÃ®freya xwe ji bÃ®r kir?';
 
   @override
   String get or => 'An';
@@ -217,139 +220,140 @@ class AppLocalizationsKu extends AppLocalizations {
   String get continueWithGoogle => 'Bi Google re berdewam bike';
 
   @override
-  String get dontHaveAccount => 'Hesabê te tune ye?';
+  String get dontHaveAccount => 'HesabÃª te tune ye?';
 
   @override
-  String get alreadyHaveAccount => 'Jixwe hesabê te heye?';
+  String get alreadyHaveAccount => 'Jixwe hesabÃª te heye?';
 
   @override
   String get signUp => 'Qeyd bibe';
 
   @override
-  String get logIn => 'Têkeve';
+  String get logIn => 'TÃªkeve';
 
   @override
-  String get passwordsDoNotMatch => 'Şîfre li hev nakin.';
+  String get passwordsDoNotMatch => 'ÅÃ®fre li hev nakin.';
 
   @override
-  String get wrongPassword => 'Şîfreya çewt.';
+  String get wrongPassword => 'ÅÃ®freya Ã§ewt.';
 
   @override
-  String get emailAlreadyInUse => 'Ev e-name jixwe tê bikaranîn.';
+  String get emailAlreadyInUse => 'Ev e-name jixwe tÃª bikaranÃ®n.';
 
   @override
-  String get weakPassword => 'Şîfre pir lawaz e.';
+  String get weakPassword => 'ÅÃ®fre pir lawaz e.';
 
   @override
-  String get authError => 'Çewtiya Nasnameyê';
+  String get authError => 'Ã‡ewtiya NasnameyÃª';
 
   @override
-  String get usernameTaken => 'Ev navê bikarhêner jixwe hatiye girtin.';
+  String get usernameTaken => 'Ev navÃª bikarhÃªner jixwe hatiye girtin.';
 
   @override
-  String get username => 'Navê bikarhêner';
+  String get username => 'NavÃª bikarhÃªner';
 
   @override
-  String get resendCode => 'E-nameya verastkirinê dîsa bişîne';
+  String get resendCode => 'E-nameya verastkirinÃª dÃ®sa biÅŸÃ®ne';
 
   @override
   String get pleaseCheckYourEmail =>
-      'Ji bo ku Cortex bikar bînî, divê tu e-nameya xwe piştrast bikî. \nZencîreyek piştrastkirinê ji navnîşana e-nameya te re hate şandin, ji kerema xwe e-nameya xwe kontrol bike.';
+      'Ji bo ku Cortex bikar bÃ®nÃ®, divÃª tu e-nameya xwe piÅŸtrast bikÃ®. \nZencÃ®reyek piÅŸtrastkirinÃª ji navnÃ®ÅŸana e-nameya te re hate ÅŸandin, ji kerema xwe e-nameya xwe kontrol bike.';
 
   @override
-  String get verifyYourEmail => 'E-nameya Xwe Piştrast bike';
+  String get verifyYourEmail => 'E-nameya Xwe PiÅŸtrast bike';
 
   @override
   String get seconds => 'saniye';
 
   @override
   String get maxResendLimitReached =>
-      'Tu gihîştî hejmara herî zêde ya e-nameyên verastkirinê';
+      'Tu gihÃ®ÅŸtÃ® hejmara herÃ® zÃªde ya e-nameyÃªn verastkirinÃª';
 
   @override
   String get verificationScreenContinueWithoutVerification =>
-      'Bêyî verastkirinê berdewam bike';
+      'BÃªyÃ® verastkirinÃª berdewam bike';
 
   @override
   String get verificationScreenWarning =>
-      'Her çend tu berdewam bikî jî, dema verastkirina hesabê ya 1-rojî hîn jî ji bo hesabê te di meriyetê de ye. Heke heta wê demê te hesabê xwe nepejirandibe, ew ê ji sepanê were jêbirin.';
+      'Her Ã§end tu berdewam bikÃ® jÃ®, dema verastkirina hesabÃª ya 1-rojÃ® hÃ®n jÃ® ji bo hesabÃª te di meriyetÃª de ye. Heke heta wÃª demÃª te hesabÃª xwe nepejirandibe, ew Ãª ji sepanÃª were jÃªbirin.';
 
   @override
-  String get unverifiedAccountHeader => 'Hesabê te nehatiye piştrastkirin';
+  String get unverifiedAccountHeader => 'HesabÃª te nehatiye piÅŸtrastkirin';
 
   @override
   String unverifiedAccountWarning(Object timeLeft) {
-    return 'Heke tu di nav $timeLeft de hesabê xwe piştrast nekî, ew ê were jêbirin';
+    return 'Heke tu di nav $timeLeft de hesabÃª xwe piÅŸtrast nekÃ®, ew Ãª were jÃªbirin';
   }
 
   @override
-  String get verifyNow => 'Niha Piştrast bike';
+  String get verifyNow => 'Niha PiÅŸtrast bike';
 
   @override
-  String get linkSent => 'Zencîre hate şandin';
+  String get linkSent => 'ZencÃ®re hate ÅŸandin';
 
   @override
   String get accountDeletionRequested =>
-      'Daxwaza jêbirina hesabê te hate wergirtin û hesabê te niha neçalak e.';
+      'Daxwaza jÃªbirina hesabÃª te hate wergirtin Ã» hesabÃª te niha neÃ§alak e.';
 
   @override
-  String get tooManyRequests => 'Pir zêde daxwaz';
+  String get tooManyRequests => 'Pir zÃªde daxwaz';
 
   @override
-  String get regenerate => 'Dîsa Biafirîne';
+  String get regenerate => 'DÃ®sa BiafirÃ®ne';
 
   @override
-  String get confirmDeleteAccount => 'Tu bi rastî dixwazî hesabê xwe jê bibî?';
+  String get confirmDeleteAccount =>
+      'Tu bi rastÃ® dixwazÃ® hesabÃª xwe jÃª bibÃ®?';
 
   @override
-  String get deleteAccount => 'Hesabê Jê bibe';
+  String get deleteAccount => 'HesabÃª JÃª bibe';
 
   @override
-  String get delete => 'Jê bibe';
+  String get delete => 'JÃª bibe';
 
   @override
-  String get passwordRequired => 'Şîfre pêwîst e.';
+  String get passwordRequired => 'ÅÃ®fre pÃªwÃ®st e.';
 
   @override
   String get deleteDescription =>
-      'Daneyên ku tu jê dibî dê bi domdarî ji servera me û amûra te werin rakirin. Ev kiryar nayên paşvegerandin.';
+      'DaneyÃªn ku tu jÃª dibÃ® dÃª bi domdarÃ® ji servera me Ã» amÃ»ra te werin rakirin. Ev kiryar nayÃªn paÅŸvegerandin.';
 
   @override
-  String get editProfile => 'Profîlê Biguherîne';
+  String get editProfile => 'ProfÃ®lÃª BiguherÃ®ne';
 
   @override
-  String get displayName => 'Navê Nîşandanê';
+  String get displayName => 'NavÃª NÃ®ÅŸandanÃª';
 
   @override
-  String get profileUpdated => 'Profîl bi serkeftî hate nûvekirin';
+  String get profileUpdated => 'ProfÃ®l bi serkeftÃ® hate nÃ»vekirin';
 
   @override
   String get logout => 'Derketin';
 
   @override
-  String get profile => 'Profîl';
+  String get profile => 'ProfÃ®l';
 
   @override
   String get manageProfileDescription =>
-      'Profîla xwe birêve bibe, şîfreya xwe nûve bike, an ji Cortex derkeve.';
+      'ProfÃ®la xwe birÃªve bibe, ÅŸÃ®freya xwe nÃ»ve bike, an ji Cortex derkeve.';
 
   @override
   String get accessSettingsDescription =>
-      'Bigihîje alîkariyê, kodan bikar bîne, Cortex parve bike, û polîtîkayên me bibîne.';
+      'BigihÃ®je alÃ®kariyÃª, kodan bikar bÃ®ne, Cortex parve bike, Ã» polÃ®tÃ®kayÃªn me bibÃ®ne.';
 
   @override
   String get languageDescription =>
-      'Tu dikarî her dem zimanê navrûyê yê sepana xwe biguherînî.';
+      'Tu dikarÃ® her dem zimanÃª navrÃ»yÃª yÃª sepana xwe biguherÃ®nÃ®.';
 
   @override
   String get themeDescription =>
-      'Tu dikarî li gorî tercîha xwe di navbera temayên ronî û tarî de biguherî. Temaya hilbijartî dê li seranserê navrûya Cortex-ê were sepandin.';
+      'Tu dikarÃ® li gorÃ® tercÃ®ha xwe di navbera temayÃªn ronÃ® Ã» tarÃ® de biguherÃ®. Temaya hilbijartÃ® dÃª li seranserÃª navrÃ»ya Cortex-Ãª were sepandin.';
 
   @override
-  String get iHaveReadAndAgree => 'Min şertên xizmetê xwend û qebûl dikim';
+  String get iHaveReadAndAgree => 'Min ÅŸertÃªn xizmetÃª xwend Ã» qebÃ»l dikim';
 
   @override
-  String get downloading => 'Tê daxistin...';
+  String get downloading => 'TÃª daxistin...';
 
   @override
   String get downloadSuccess => 'Daxistin bi ser ket';
@@ -366,22 +370,22 @@ class AppLocalizationsKu extends AppLocalizations {
   String get downloadPaused => 'Daxistin hate sekinandin.';
 
   @override
-  String get purchaseError => 'Çewtiya kirînê';
+  String get purchaseError => 'Ã‡ewtiya kirÃ®nÃª';
 
   @override
   String get purchasePlus => 'Cortex Plus bikire';
 
   @override
-  String get plusDescription => 'Ezmûna Zekâya Sûni ya Elît';
+  String get plusDescription => 'EzmÃ»na ZekÃ¢ya SÃ»ni ya ElÃ®t';
 
   @override
   String get annual => 'Salane';
 
   @override
-  String get monthly => 'Mehê';
+  String get monthly => 'MehÃª';
 
   @override
-  String get manageSubscription => 'Abonetiyê Birêve bibe';
+  String get manageSubscription => 'AbonetiyÃª BirÃªve bibe';
 
   @override
   String purchasePlan(String planName) {
@@ -390,54 +394,54 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String monthlyPlanDescription(String price) {
-    return '$price/meh, mehane tê fatûrekirin';
+    return '$price/meh, mehane tÃª fatÃ»rekirin';
   }
 
   @override
   String get purchasePro => 'Cortex Pro bikire';
 
   @override
-  String get proDescription => 'Ezmûna Sereke ya Zekâya Sûni';
+  String get proDescription => 'EzmÃ»na Sereke ya ZekÃ¢ya SÃ»ni';
 
   @override
   String get purchaseUltra => 'Cortex Ultra bikire';
 
   @override
-  String get ultraDescription => 'Lûtkeya Zekâya Sûni';
+  String get ultraDescription => 'LÃ»tkeya ZekÃ¢ya SÃ»ni';
 
   @override
-  String get upgradeSubscription => 'Abonetiyê Nûjen bike';
+  String get upgradeSubscription => 'AbonetiyÃª NÃ»jen bike';
 
   @override
-  String get purchaseStreamError => 'Çewtiya herika kirînê.';
+  String get purchaseStreamError => 'Ã‡ewtiya herika kirÃ®nÃª.';
 
   @override
-  String get productNotFound => 'Hilber nehat dîtin';
+  String get productNotFound => 'Hilber nehat dÃ®tin';
 
   @override
-  String get noProductsFound => 'Tu hilber nehat dîtin';
+  String get noProductsFound => 'Tu hilber nehat dÃ®tin';
 
   @override
   String get termsOfServiceAndPrivacyPolicyWarning =>
-      'Bi danîna vê sîparîşê, tu bi Şertên Xizmetê û Polîtîkaya Nepenîtiyê razî dibî. Tu dikarî vê nivîsê bitikînî da ku li ser Şertên Xizmetê û Polîtîkaya Nepenîtiyê ya me bêtir fêr bibî. Abonetî dê bixweber nû bibe heya ku nûvekirina otomatîk herî kêm 24 saetan berî dawiya heyama heyî neyê girtin.';
+      'Bi danÃ®na vÃª sÃ®parÃ®ÅŸÃª, tu bi ÅertÃªn XizmetÃª Ã» PolÃ®tÃ®kaya NepenÃ®tiyÃª razÃ® dibÃ®. Tu dikarÃ® vÃª nivÃ®sÃª bitikÃ®nÃ® da ku li ser ÅertÃªn XizmetÃª Ã» PolÃ®tÃ®kaya NepenÃ®tiyÃª ya me bÃªtir fÃªr bibÃ®. AbonetÃ® dÃª bixweber nÃ» bibe heya ku nÃ»vekirina otomatÃ®k herÃ® kÃªm 24 saetan berÃ® dawiya heyama heyÃ® neyÃª girtin.';
 
   @override
-  String get termsOfService => 'Şertên Xizmetê';
+  String get termsOfService => 'ÅertÃªn XizmetÃª';
 
   @override
-  String get privacyPolicy => 'Polîtîkaya Nepenîtiyê';
+  String get privacyPolicy => 'PolÃ®tÃ®kaya NepenÃ®tiyÃª';
 
   @override
-  String get renamed => 'Navê wê hat guhertin';
+  String get renamed => 'NavÃª wÃª hat guhertin';
 
   @override
   String get report => 'Rapor bike';
 
   @override
-  String get reportDialogTitle => 'Raporê bişîne';
+  String get reportDialogTitle => 'RaporÃª biÅŸÃ®ne';
 
   @override
-  String get reportDescriptionLabel => 'Pirsgirêk çi ye?';
+  String get reportDescriptionLabel => 'PirsgirÃªk Ã§i ye?';
 
   @override
   String get reportHarmful => 'Ev zirardar/ne-ewle ye';
@@ -446,44 +450,44 @@ class AppLocalizationsKu extends AppLocalizations {
   String get reportNotTrue => 'Ev ne rast e';
 
   @override
-  String get reportNotHelpful => 'Ev ne alîkar e';
+  String get reportNotHelpful => 'Ev ne alÃ®kar e';
 
   @override
   String get closeButton => 'Bigire';
 
   @override
-  String get submitButton => 'Bişîne';
+  String get submitButton => 'BiÅŸÃ®ne';
 
   @override
   String get reportErrorMessage =>
-      'Ji kerema xwe ji bo raporkirinê yek sedem hilbijêre.';
+      'Ji kerema xwe ji bo raporkirinÃª yek sedem hilbijÃªre.';
 
   @override
   String get capabilitiesSection => 'Qabiliyet';
 
   @override
-  String get featurePhotoTitle => 'Şopandina Wêneyan';
+  String get featurePhotoTitle => 'Åopandina WÃªneyan';
 
   @override
   String get featurePhotoDescription =>
-      'Ev model xwedî şiyana şopandina wêneyan bi rêya kamera an pelên wêneyan e.';
+      'Ev model xwedÃ® ÅŸiyana ÅŸopandina wÃªneyan bi rÃªya kamera an pelÃªn wÃªneyan e.';
 
   @override
-  String get featureOfflineTitle => 'Xebata Negirêdayî';
+  String get featureOfflineTitle => 'Xebata NegirÃªdayÃ®';
 
   @override
   String get featureOfflineDescription =>
-      'Modelê bêyî girêdana înternetê bixebitîne da ku daneyên xwe ewle bihêlî.';
+      'ModelÃª bÃªyÃ® girÃªdana Ã®nternetÃª bixebitÃ®ne da ku daneyÃªn xwe ewle bihÃªlÃ®.';
 
   @override
-  String get featureRoleplayTitle => 'Lîstika Rolan';
+  String get featureRoleplayTitle => 'LÃ®stika Rolan';
 
   @override
   String get featureRoleplayDescription =>
-      'Modelên lîstika rolan dihêlin ku tu sohbet û senaryoyên cihêreng biafirînî.';
+      'ModelÃªn lÃ®stika rolan dihÃªlin ku tu sohbet Ã» senaryoyÃªn cihÃªreng biafirÃ®nÃ®.';
 
   @override
-  String get roleModels => 'Modelên Lîstika Rolan';
+  String get roleModels => 'ModelÃªn LÃ®stika Rolan';
 
   @override
   String get parameters => 'Parametre';
@@ -492,16 +496,16 @@ class AppLocalizationsKu extends AppLocalizations {
   String get context => 'Mijar';
 
   @override
-  String get finalPreparation => 'Amadekariyên dawî têne kirin.';
+  String get finalPreparation => 'AmadekariyÃªn dawÃ® tÃªne kirin.';
 
   @override
-  String get shareApp => 'Sepanê Parve bike';
+  String get shareApp => 'SepanÃª Parve bike';
 
   @override
-  String get ourStory => 'Çîroka me';
+  String get ourStory => 'Ã‡Ã®roka me';
 
   @override
-  String get rateUs => 'Me Binirxîne';
+  String get rateUs => 'Me BinirxÃ®ne';
 
   @override
   String get share => 'Parve bike';
@@ -510,328 +514,343 @@ class AppLocalizationsKu extends AppLocalizations {
   String get shareSubject => 'Cortex';
 
   @override
-  String get selectText => 'Nivîsê Hilbijêre';
+  String get selectText => 'NivÃ®sÃª HilbijÃªre';
 
   @override
   String get thinking => 'Difikire';
 
   @override
-  String get user => 'Bikarhêner';
+  String get user => 'BikarhÃªner';
 
   @override
-  String get help => 'Alîkarî';
+  String get help => 'AlÃ®karÃ®';
 
   @override
-  String get supportCreator => 'Piştgiriya afirînerekî bike';
+  String get supportCreator => 'PiÅŸtgiriya afirÃ®nerekÃ® bike';
 
   @override
   String get enterYourTag =>
-      'Piştgiriya afirînerên xweyên bijare bikin! Etîketa wan a bêhempa li jêr binivîse da ku ji kirînên we yên Cortex para wan bigirin.';
+      'PiÅŸtgiriya afirÃ®nerÃªn xweyÃªn bijare bikin! EtÃ®keta wan a bÃªhempa li jÃªr binivÃ®se da ku ji kirÃ®nÃªn we yÃªn Cortex para wan bigirin.';
 
   @override
-  String get creatorTag => 'Etîketa Afirîner';
+  String get creatorTag => 'EtÃ®keta AfirÃ®ner';
 
   @override
-  String get support => 'Alîkarî';
+  String get support => 'AlÃ®karÃ®';
 
   @override
-  String get tagCannotBeEmpty => 'Etîketa afirîner nikare vala be';
+  String get tagCannotBeEmpty => 'EtÃ®keta afirÃ®ner nikare vala be';
 
   @override
-  String get userId => 'Nasnameya Bikarhêner';
+  String get userId => 'Nasnameya BikarhÃªner';
 
   @override
-  String get deleteAllConversationsConfirmTitle => 'Hemî Sohbet Werin Jêbirin?';
+  String get deleteAllConversationsConfirmTitle =>
+      'HemÃ® Sohbet Werin JÃªbirin?';
 
   @override
   String get deleteAllConversationsConfirmMessage =>
-      'Tu bi rastî dixwazî hemî sohbetên xwe jê bibî? Ev nayê paşvegerandin.';
+      'Tu bi rastÃ® dixwazÃ® hemÃ® sohbetÃªn xwe jÃª bibÃ®? Ev nayÃª paÅŸvegerandin.';
 
   @override
-  String get conversationDeleted => 'Axaftin hat jêbirin!';
+  String get conversationDeleted => 'Axaftin hat jÃªbirin!';
 
   @override
   String get allConversationsDeleted =>
-      'Hemî sohbet bi serkeftî hatin jêbirin!';
+      'HemÃ® sohbet bi serkeftÃ® hatin jÃªbirin!';
 
   @override
-  String get deleteAll => 'Hemî Jê bibe';
+  String get deleteAll => 'HemÃ® JÃª bibe';
 
   @override
-  String get deleteAllConversationsButton => 'Hemî Sohbetan Jê bibe';
+  String get deleteAllConversationsButton => 'HemÃ® Sohbetan JÃª bibe';
 
   @override
-  String get confirmWord => 'VERTEX binivîse';
+  String get confirmWord => 'VERTEX binivÃ®se';
 
   @override
-  String get confirmWordError => 'Te ew çewt nivîsî';
+  String get confirmWordError => 'Te ew Ã§ewt nivÃ®sÃ®';
 
   @override
-  String get chinese => 'Çînî';
+  String get chinese => 'Ã‡Ã®nÃ®';
 
   @override
-  String get french => 'Fransî';
+  String get french => 'FransÃ®';
 
   @override
-  String get japanese => 'Japonî';
+  String get japanese => 'JaponÃ®';
 
   @override
-  String get kurdish => 'Kurdî';
+  String get kurdish => 'KurdÃ®';
 
   @override
-  String get dutch => 'Holandî';
+  String get dutch => 'HolandÃ®';
 
   @override
-  String get russian => 'Rûsî';
+  String get russian => 'RÃ»sÃ®';
 
   @override
-  String get korean => 'Koreyî';
+  String get korean => 'KoreyÃ®';
 
   @override
-  String get english => 'Îngilîzî';
+  String get english => 'ÃngilÃ®zÃ®';
 
   @override
-  String get turkish => 'Tirkî';
+  String get turkish => 'TirkÃ®';
 
   @override
-  String get hindi => 'Hindî';
+  String get hindi => 'HindÃ®';
 
   @override
-  String get portuguese => 'Portekîzî';
+  String get portuguese => 'PortekÃ®zÃ®';
 
   @override
-  String get indonesian => 'Îndonezî';
+  String get indonesian => 'ÃndonezÃ®';
 
   @override
-  String get azerbaijani => 'Azerî';
+  String get azerbaijani => 'AzerÃ®';
 
   @override
-  String get german => 'Elmanî';
+  String get german => 'ElmanÃ®';
 
   @override
-  String get spanish => 'Spanî';
+  String get spanish => 'SpanÃ®';
 
   @override
-  String get italian => 'Îtalî';
+  String get italian => 'ÃtalÃ®';
 
   @override
-  String get arabic => 'Erebî';
+  String get arabic => 'ErebÃ®';
 
   @override
   String get ram => 'RAM';
 
   @override
-  String get usernameTooShort => 'Navê bikarhêner pir kurt e.';
+  String get usernameTooShort => 'NavÃª bikarhÃªner pir kurt e.';
 
   @override
   String get usernameTooLong =>
-      'Navê bikarhêner nikare ji 16 tîpan zêdetir be.';
+      'NavÃª bikarhÃªner nikare ji 16 tÃ®pan zÃªdetir be.';
 
   @override
   String get invalidUsernameCharacters =>
-      'Di navê bikarhêner de tenê van tîpan: \'abcçdefgğhıijklmnoöprsştuüvyzxqw\' û karakterên \'.\', \'-\', \'_\' dikarin werin bikaranîn.';
+      'Di navÃª bikarhÃªner de tenÃª van tÃ®pan: \'abcÃ§defgÄŸhÄ±ijklmnoÃ¶prsÅŸtuÃ¼vyzxqw\' Ã» karakterÃªn \'.\', \'-\', \'_\' dikarin werin bikaranÃ®n.';
 
   @override
-  String get noInternetConnection => 'Girêdana înternetê tune.';
+  String get noInternetConnection => 'GirÃªdana Ã®nternetÃª tune.';
 
   @override
-  String get chats => 'Qutiya Gihandinê';
+  String get chats => 'Qutiya GihandinÃª';
 
   @override
-  String get library => 'Pirtûkxane';
+  String get library => 'PirtÃ»kxane';
 
   @override
-  String get text => 'Nivîs';
+  String get text => 'NivÃ®s';
 
   @override
-  String get removeModel => 'Modelê Rake';
+  String get removeModel => 'ModelÃª Rake';
 
   @override
-  String get insufficientRAM => 'Bîra Kêm';
+  String get insufficientRAM => 'BÃ®ra KÃªm';
 
   @override
-  String get insufficientStorage => 'Depoya Kêm';
+  String get insufficientStorage => 'Depoya KÃªm';
 
   @override
   String confirmRemoveModel(Object model) {
-    return 'Ma tu piştrast î ku dixwazî modela $model ji cîhaza xwe rakî? Bi vê yekê re, hemû axaftinên berê yên bi wê modelê re jî dê jê bibî.';
+    return 'Ma tu piÅŸtrast Ã® ku dixwazÃ® modela $model ji cÃ®haza xwe rakÃ®? Bi vÃª yekÃª re, hemÃ» axaftinÃªn berÃª yÃªn bi wÃª modelÃª re jÃ® dÃª jÃª bibÃ®.';
   }
 
   @override
-  String get noMatchingModels => 'Tu modelên lihevhatî nehatin dîtin.';
+  String get noMatchingModels => 'Tu modelÃªn lihevhatÃ® nehatin dÃ®tin.';
 
   @override
-  String get benefit1 => 'Sînorên danûstendinê yên zêdekirî';
+  String get benefit1 => 'SÃ®norÃªn danÃ»stendinÃª yÃªn zÃªdekirÃ®';
 
   @override
-  String get benefit3 => 'Efekta profîlê';
+  String get benefit3 => 'Efekta profÃ®lÃª';
 
   @override
-  String get benefit4 => 'Rozeta endamtiyê';
+  String get benefit4 => 'Rozeta endamtiyÃª';
 
   @override
-  String get benefit5 => 'Zêdetir îstîxbaratên çêkirî yên serhêl biafirîne';
+  String get benefit5 =>
+      'ZÃªdetir Ã®stÃ®xbaratÃªn Ã§ÃªkirÃ® yÃªn serhÃªl biafirÃ®ne';
 
   @override
-  String get benefit7 => 'Sînorên karanîna zêdetir';
+  String get benefit7 => 'SÃ®norÃªn karanÃ®na zÃªdetir';
 
   @override
-  String get benefit8 => 'Modelan zêde bike';
+  String get benefit8 => 'Modelan zÃªde bike';
 
   @override
-  String get benefit9 => 'Temayên nû';
+  String get benefit9 => 'TemayÃªn nÃ»';
 
   @override
-  String get benefit10 => 'Pêvekên Zêdetir';
+  String get benefit10 => 'PÃªvekÃªn ZÃªdetir';
 
   @override
-  String get benefit11 => 'Moda Herikîna Zêdetir';
+  String get benefit11 => 'Moda HerikÃ®na ZÃªdetir';
 
   @override
-  String get oldBenefits => 'Hemî feydeyên ji planên jêrîn';
+  String get oldBenefits => 'HemÃ® feydeyÃªn ji planÃªn jÃªrÃ®n';
 
   @override
-  String get confirm => 'Piştrast bike';
+  String get confirm => 'PiÅŸtrast bike';
 
   @override
-  String get changePassword => 'Şîfreyê biguherîne';
+  String get changePassword => 'ÅÃ®freyÃª biguherÃ®ne';
 
   @override
-  String get logoutConfirmationTitle => 'Tu bi rastî dixwazî derkevî?';
+  String get logoutConfirmationTitle => 'Tu bi rastÃ® dixwazÃ® derkevÃ®?';
 
   @override
-  String get settings => 'Mîheng';
+  String get settings => 'MÃ®heng';
 
   @override
-  String get language => 'Zimanê Sepanê';
+  String get language => 'ZimanÃª SepanÃª';
 
   @override
-  String get dark => 'Tarî';
+  String get dark => 'TarÃ®';
 
   @override
-  String get oldPassword => 'Şîfreya Kevn';
+  String get oldPassword => 'ÅÃ®freya Kevn';
 
   @override
-  String get newPassword => 'Şîfreya Nû';
+  String get newPassword => 'ÅÃ®freya NÃ»';
 
   @override
-  String get passwordUpdated => 'Şîfre hate nûvekirin.';
+  String get passwordUpdated => 'ÅÃ®fre hate nÃ»vekirin.';
 
   @override
   String get stop => 'Raweste';
 
   @override
-  String get copyrights => 'Girêdan';
+  String get copyrights => 'GirÃªdan';
 
   @override
-  String get love => 'Evîn';
+  String get love => 'EvÃ®n';
 
   @override
   String get nature => 'Xweza';
 
   @override
-  String get behindTheSlaughter => 'Li Pişt Serjêkirinê';
+  String get behindTheSlaughter => 'Li PiÅŸt SerjÃªkirinÃª';
+
+  @override
+  String get cyberpunk => 'Cyberpunk';
+
+  @override
+  String get sunset => 'Sunset';
+
+  @override
+  String get coffee => 'Coffee';
+
+  @override
+  String get deepSpace => 'Deep Space';
 
   @override
   String get grayscale => 'Grayscale';
 
   @override
-  String get ocean => 'Okyanûs';
+  String get ocean => 'OkyanÃ»s';
 
   @override
   String get scarletSnow => 'Berfa Sor';
 
   @override
-  String get requestFailed => 'Xeletiyek çêbû, ji kerema xwe dîsa biceribîne.';
+  String get requestFailed =>
+      'Xeletiyek Ã§ÃªbÃ», ji kerema xwe dÃ®sa biceribÃ®ne.';
 
   @override
-  String get changeModel => 'Biguherîne';
+  String get changeModel => 'BiguherÃ®ne';
 
   @override
-  String get edit => 'Biguherîne';
+  String get edit => 'BiguherÃ®ne';
 
   @override
   String get editingMessageInfo =>
-      'Guhertina vê peyamê dê sohbetê ji vir ji nû ve bide destpêkirin.';
+      'Guhertina vÃª peyamÃª dÃª sohbetÃª ji vir ji nÃ» ve bide destpÃªkirin.';
 
   @override
-  String get editingNotification => 'Tu niha di moda guherandinê de yî';
+  String get editingNotification => 'Tu niha di moda guherandinÃª de yÃ®';
 
   @override
   String get featurePluralTitle => 'Pircar';
 
   @override
   String get featurePluralDescription =>
-      'Ev model dikare bixweber dirêjkirinên din yek bike, bi vî rengî kapasîteyên xwe yên fonksiyonel berfireh dike da ku bi performansa pêşkeftî piştgirî bide cûrbecûr operasyonan.';
+      'Ev model dikare bixweber dirÃªjkirinÃªn din yek bike, bi vÃ® rengÃ® kapasÃ®teyÃªn xwe yÃªn fonksiyonel berfireh dike da ku bi performansa pÃªÅŸkeftÃ® piÅŸtgirÃ® bide cÃ»rbecÃ»r operasyonan.';
 
   @override
-  String get nameLabel => 'Navê AI';
+  String get nameLabel => 'NavÃª AI';
 
   @override
   String get summaryLabel => 'Kurteya AI';
 
   @override
-  String get add => 'Lê zêde bike';
+  String get add => 'LÃª zÃªde bike';
 
   @override
-  String get aiExplanationTitle => 'Danasîna Îstîxbarata Çêkirî';
+  String get aiExplanationTitle => 'DanasÃ®na ÃstÃ®xbarata Ã‡ÃªkirÃ®';
 
   @override
   String get aiExplanationDescription =>
-      'Ji kerema xwe danasînek berfireh a mîmariya modela AI-ya xwe, pêvajoya perwerdehiyê, metrîkên performansê, warên sepanê, û taybetmendiyên din ên girîng peyda bike.';
+      'Ji kerema xwe danasÃ®nek berfireh a mÃ®mariya modela AI-ya xwe, pÃªvajoya perwerdehiyÃª, metrÃ®kÃªn performansÃª, warÃªn sepanÃª, Ã» taybetmendiyÃªn din Ãªn girÃ®ng peyda bike.';
 
   @override
-  String get preInputTitle => 'Pêş-Têketina Îstîxbarata Çêkirî';
+  String get preInputTitle => 'PÃªÅŸ-TÃªketina ÃstÃ®xbarata Ã‡ÃªkirÃ®';
 
   @override
   String get preInputDescription =>
-      'Ji kerema xwe pêş-têketinek saz bikin ku dê modela we di pêvajoya afirandina karakteran de rêber bike. Di vê beşê de, tu dikarî agahdariyên têkildarî karakteran, naverokek zêde, û her hûrguliyek din a ku dibe ku di hilberandina naveroka têkildarî karakteran de bibe alîkar, tê de bihewîne.';
+      'Ji kerema xwe pÃªÅŸ-tÃªketinek saz bikin ku dÃª modela we di pÃªvajoya afirandina karakteran de rÃªber bike. Di vÃª beÅŸÃª de, tu dikarÃ® agahdariyÃªn tÃªkildarÃ® karakteran, naverokek zÃªde, Ã» her hÃ»rguliyek din a ku dibe ku di hilberandina naveroka tÃªkildarÃ® karakteran de bibe alÃ®kar, tÃª de bihewÃ®ne.';
 
   @override
-  String get baseModelTitle => 'Modela Bingehîn';
+  String get baseModelTitle => 'Modela BingehÃ®n';
 
   @override
   String get baseModelDescription =>
-      'Ev modela ye ku dê wekî bingeh ji bo afirandina te were bikar anîn. Ew modela bingehîn a ku niha hatî hilbijartin nîşan dide.';
+      'Ev modela ye ku dÃª wekÃ® bingeh ji bo afirandina te were bikar anÃ®n. Ew modela bingehÃ®n a ku niha hatÃ® hilbijartin nÃ®ÅŸan dide.';
 
   @override
   String get summary => 'Kurte';
 
   @override
-  String get modelUploadTitle => 'Pela Îstîxbarata Çêkirî';
+  String get modelUploadTitle => 'Pela ÃstÃ®xbarata Ã‡ÃªkirÃ®';
 
   @override
   String get modelUploadDescription =>
-      'Pelên xwe yên GGUF-ê yên herêmî rasterast ji amûra xwe hilbijêre û bar bike. Ev dihêle ku tu modela xwe negirêdayî înternetê bixebitînî bêyî ku hewcedariya te bi girêdana înternetê hebe. Piştrast be ku pel di formata GGUF-a derbasdar de ye û bi rêkûpêk hatîye saz kirin. Heke pel çewt an xerabûyî be, dibe ku Cortex wekî ku tê hêvî kirin nexebite, û tu dikarî bi çewtiyan re rû bi rû bimînî.';
+      'PelÃªn xwe yÃªn GGUF-Ãª yÃªn herÃªmÃ® rasterast ji amÃ»ra xwe hilbijÃªre Ã» bar bike. Ev dihÃªle ku tu modela xwe negirÃªdayÃ® Ã®nternetÃª bixebitÃ®nÃ® bÃªyÃ® ku hewcedariya te bi girÃªdana Ã®nternetÃª hebe. PiÅŸtrast be ku pel di formata GGUF-a derbasdar de ye Ã» bi rÃªkÃ»pÃªk hatÃ®ye saz kirin. Heke pel Ã§ewt an xerabÃ»yÃ® be, dibe ku Cortex wekÃ® ku tÃª hÃªvÃ® kirin nexebite, Ã» tu dikarÃ® bi Ã§ewtiyan re rÃ» bi rÃ» bimÃ®nÃ®.';
 
   @override
   String get modelUploadShortDescription =>
-      'Li vir bitikîne da ku pelek .gguf ji amûra xwe hilbijêrî';
+      'Li vir bitikÃ®ne da ku pelek .gguf ji amÃ»ra xwe hilbijÃªrÃ®';
 
   @override
   String get you => 'Tu';
 
   @override
-  String get removePhotoTitle => 'Wêneyê Rake';
+  String get removePhotoTitle => 'WÃªneyÃª Rake';
 
   @override
-  String get confirmRemovePhoto => 'Tu bi rastî dixwazî wêneyê rakî?';
+  String get confirmRemovePhoto => 'Tu bi rastÃ® dixwazÃ® wÃªneyÃª rakÃ®?';
 
   @override
   String get chatLengthLimitExceeded =>
-      'Vê sohbetê sînorê karakteran derbas kiriye. Ji kerema xwe sohbetek nû dest pê bike an abonetiyek bikire.';
+      'VÃª sohbetÃª sÃ®norÃª karakteran derbas kiriye. Ji kerema xwe sohbetek nÃ» dest pÃª bike an abonetiyek bikire.';
 
   @override
   String get inappropriateContentDetected =>
-      'Naveroka neguncaw hat tespîtkirin!';
+      'Naveroka neguncaw hat tespÃ®tkirin!';
 
   @override
   String get offlineModelNotInstalled =>
-      'Ev modela negirêdayî li ser amûra te nehatiye saz kirin.';
+      'Ev modela negirÃªdayÃ® li ser amÃ»ra te nehatiye saz kirin.';
 
   @override
   String get reachedLimit =>
-      'Te sînorê bikaranîna xwe gihandiye; ji bo ku tu sînorên zêdetir bi dest bixî, tu dikarî plana xwe nûve bikî. (hey, em bi tevahî fêm dikin ku derbasbûna ji sînoran xemgîn e. lê bi rastî, wergirtina wan bersivên ecêb ne belaş e, ji ber vê yekê ev sînor bi rastî alîkariya me dikin ku demên xweş berdewam bikin.)';
+      'Te sÃ®norÃª bikaranÃ®na xwe gihandiye; ji bo ku tu sÃ®norÃªn zÃªdetir bi dest bixÃ®, tu dikarÃ® plana xwe nÃ»ve bikÃ®. (hey, em bi tevahÃ® fÃªm dikin ku derbasbÃ»na ji sÃ®noran xemgÃ®n e. lÃª bi rastÃ®, wergirtina wan bersivÃªn ecÃªb ne belaÅŸ e, ji ber vÃª yekÃª ev sÃ®nor bi rastÃ® alÃ®kariya me dikin ku demÃªn xweÅŸ berdewam bikin.)';
 
   @override
   String get modality => 'Modality';
@@ -840,232 +859,232 @@ class AppLocalizationsKu extends AppLocalizations {
   String get multimodal => 'Multimodal';
 
   @override
-  String get anErrorOccurred => 'Xeletiyek Çêbû';
+  String get anErrorOccurred => 'Xeletiyek Ã‡ÃªbÃ»';
 
   @override
   String get themeLocked =>
-      'Ev tema astek abonetiyê ya bilindtir hewce dike. Ji kerema xwe ji bo vekirinê nûjen bike.';
+      'Ev tema astek abonetiyÃª ya bilindtir hewce dike. Ji kerema xwe ji bo vekirinÃª nÃ»jen bike.';
 
   @override
-  String get pageCouldNotBeLoaded => 'Rûpel Nikarîbû Bê Barkirin';
+  String get pageCouldNotBeLoaded => 'RÃ»pel NikarÃ®bÃ» BÃª Barkirin';
 
   @override
   String get checkYourInternet =>
-      'Ji kerema xwe girêdana xweya înternetê kontrol bike û dîsa biceribîne.';
+      'Ji kerema xwe girÃªdana xweya Ã®nternetÃª kontrol bike Ã» dÃ®sa biceribÃ®ne.';
 
   @override
   String get errorUserNotAuthenticated =>
-      'Ji bo pêkanîna vê çalakiyê divê tu têketî bî.';
+      'Ji bo pÃªkanÃ®na vÃª Ã§alakiyÃª divÃª tu tÃªketÃ® bÃ®.';
 
   @override
   String get errorReachedLimit =>
-      'Te sînorê xwe gihandiye, ji bo vekirina bêtir nûve bike û sohbetê bidomîne.';
+      'Te sÃ®norÃª xwe gihandiye, ji bo vekirina bÃªtir nÃ»ve bike Ã» sohbetÃª bidomÃ®ne.';
 
   @override
   String get errorServer =>
-      'Çewtiyek serverê ya nediyar çêbû. Ji kerema xwe paşê dîsa biceribîne.';
+      'Ã‡ewtiyek serverÃª ya nediyar Ã§ÃªbÃ». Ji kerema xwe paÅŸÃª dÃ®sa biceribÃ®ne.';
 
   @override
   String get errorNetwork =>
-      'Çewtiyek torê çêbû. Ji kerema xwe girêdana xwe kontrol bike û dîsa biceribîne.';
+      'Ã‡ewtiyek torÃª Ã§ÃªbÃ». Ji kerema xwe girÃªdana xwe kontrol bike Ã» dÃ®sa biceribÃ®ne.';
 
   @override
   String get baseModelForCharacterDescription =>
-      'Modela bingehîn a hilbijartî dê kapasîteyên ramandin û bersivdayînê yên karakterê diyar bike.';
+      'Modela bingehÃ®n a hilbijartÃ® dÃª kapasÃ®teyÃªn ramandin Ã» bersivdayÃ®nÃª yÃªn karakterÃª diyar bike.';
 
   @override
-  String get selectBaseModel => 'Modelek Bingehîn Hilbijêre';
+  String get selectBaseModel => 'Modelek BingehÃ®n HilbijÃªre';
 
   @override
   String get falErrorImageRequired =>
-      'Ev AI wêneyekî referansê hewce dike, ji kerema xwe wêneyekî pê ve girêdin û dîsa biceribînin.';
+      'Ev AI wÃªneyekÃ® referansÃª hewce dike, ji kerema xwe wÃªneyekÃ® pÃª ve girÃªdin Ã» dÃ®sa biceribÃ®nin.';
 
   @override
   String get falErrorAudioRequired =>
-      'Ev model pelê dengî yê referansê hewce dike, ji kerema xwe pelê dengî pê ve girêdin û dîsa biceribînin.';
+      'Ev model pelÃª dengÃ® yÃª referansÃª hewce dike, ji kerema xwe pelÃª dengÃ® pÃª ve girÃªdin Ã» dÃ®sa biceribÃ®nin.';
 
   @override
   String get falErrorVideoRequired =>
-      'Ev model vîdyoyek referansê hewce dike, ji kerema xwe vîdyoyek pê ve girêdin û dîsa biceribînin.';
+      'Ev model vÃ®dyoyek referansÃª hewce dike, ji kerema xwe vÃ®dyoyek pÃª ve girÃªdin Ã» dÃ®sa biceribÃ®nin.';
 
   @override
   String get falErrorImageCorrupted =>
-      'Wêneya barkirî nehat bikaranîn, ji kerema xwe formateke cuda biceribîne.';
+      'WÃªneya barkirÃ® nehat bikaranÃ®n, ji kerema xwe formateke cuda biceribÃ®ne.';
 
   @override
   String get falErrorSchemaRejected =>
-      'Modelê têketin red kir, ji kerema xwe modelek cûda biceribîne.';
+      'ModelÃª tÃªketin red kir, ji kerema xwe modelek cÃ»da biceribÃ®ne.';
 
   @override
   String get falErrorSchemaInvalid =>
-      'Têketin ji hêla karûbarê çêkirinê ve hate redkirin.';
+      'TÃªketin ji hÃªla karÃ»barÃª Ã§ÃªkirinÃª ve hate redkirin.';
 
   @override
   String falErrorGenericStatus(int statusCode) {
-    return 'Xizmeta çêkirinê çewtiyek vegerand (status $statusCode).';
+    return 'Xizmeta Ã§ÃªkirinÃª Ã§ewtiyek vegerand (status $statusCode).';
   }
 
   @override
-  String get couldNotOpenLink => 'Nikare zencîreyê veke';
+  String get couldNotOpenLink => 'Nikare zencÃ®reyÃª veke';
 
   @override
-  String get downloadStarted => 'Daxistin dest pê kir';
+  String get downloadStarted => 'Daxistin dest pÃª kir';
 
   @override
   String get notAvailable => 'Ne Berdest e';
 
   @override
   String get localizationWarning =>
-      'Dibe ku hin agahdarî bi zimanê te peyda nebin û dê bi Îngilîzî werin nîşandan.';
+      'Dibe ku hin agahdarÃ® bi zimanÃª te peyda nebin Ã» dÃª bi ÃngilÃ®zÃ® werin nÃ®ÅŸandan.';
 
   @override
   String get aiTranslationWarning =>
-      'Agahdariyên modelê ji hêla modelên din ên AI-yê ve li zimanên cihêreng têne wergerandin. Ji ber vê yekê, dibe ku di zimanên din ji bilî Îngilîzî de nakokiyên piçûk çêbibin.';
+      'AgahdariyÃªn modelÃª ji hÃªla modelÃªn din Ãªn AI-yÃª ve li zimanÃªn cihÃªreng tÃªne wergerandin. Ji ber vÃª yekÃª, dibe ku di zimanÃªn din ji bilÃ® ÃngilÃ®zÃ® de nakokiyÃªn piÃ§Ã»k Ã§Ãªbibin.';
 
   @override
   String get errorLoadingTitle => 'Barkirina Daneyan bi ser neket';
 
   @override
   String get errorLoadingMessage =>
-      'Me nekarî daneyên pêwîst ji serverên xwe bistînin. Ji kerema xwe girêdana xweya înternetê kontrol bikin û dîsa biceribînin.';
+      'Me nekarÃ® daneyÃªn pÃªwÃ®st ji serverÃªn xwe bistÃ®nin. Ji kerema xwe girÃªdana xweya Ã®nternetÃª kontrol bikin Ã» dÃ®sa biceribÃ®nin.';
 
   @override
   String get noFoundTitle => 'Encam Tune';
 
   @override
   String get noFoundMessage =>
-      'Biceribîne ku şertên lêgerîna xwe biguherînî an parzûnê paqij bikî.';
+      'BiceribÃ®ne ku ÅŸertÃªn lÃªgerÃ®na xwe biguherÃ®nÃ® an parzÃ»nÃª paqij bikÃ®.';
 
   @override
-  String get modelCreatedSuccess => 'Model bi serkeftî hate afirandin!';
+  String get modelCreatedSuccess => 'Model bi serkeftÃ® hate afirandin!';
 
   @override
   String modelRemovedSuccess(Object modelName) {
-    return '“$modelName” bi serkeftî hate rakirin.';
+    return 'â€œ$modelNameâ€ bi serkeftÃ® hate rakirin.';
   }
 
   @override
   String get errorCreatingModel =>
-      'Dema afirandina modelê de çewtiyek nediyar çêbû.';
+      'Dema afirandina modelÃª de Ã§ewtiyek nediyar Ã§ÃªbÃ».';
 
   @override
   String get errorDeletingModel =>
-      'Dema jêbirina modelê de çewtiyek nediyar çêbû.';
+      'Dema jÃªbirina modelÃª de Ã§ewtiyek nediyar Ã§ÃªbÃ».';
 
   @override
   String get ultraFeatureOnly =>
-      'Ev taybetmendî tenê ji bo endamên Ultra berdest e.';
+      'Ev taybetmendÃ® tenÃª ji bo endamÃªn Ultra berdest e.';
 
   @override
   String get experimentalOfflineWarning =>
-      'Moda negirêdayî hîn jî ceribandinî ye û dibe ku modela ku tu dadixînî bi karîgeriya herî baş nexebite.';
+      'Moda negirÃªdayÃ® hÃ®n jÃ® ceribandinÃ® ye Ã» dibe ku modela ku tu dadixÃ®nÃ® bi karÃ®geriya herÃ® baÅŸ nexebite.';
 
   @override
-  String get noConversationsToDelete => 'Sohbetên te yên jêbirinê tune ne.';
+  String get noConversationsToDelete => 'SohbetÃªn te yÃªn jÃªbirinÃª tune ne.';
 
   @override
-  String get reportSubmitted => 'Rapor bi serkeftî hate şandin';
+  String get reportSubmitted => 'Rapor bi serkeftÃ® hate ÅŸandin';
 
   @override
   String get verificationDelayed =>
-      'Kirîna te hate piştrastkirin. Di nûvekirina hesabê te de derengiyek piçûk heye, ew ê di demek nêz de xuya bibe.';
+      'KirÃ®na te hate piÅŸtrastkirin. Di nÃ»vekirina hesabÃª te de derengiyek piÃ§Ã»k heye, ew Ãª di demek nÃªz de xuya bibe.';
 
   @override
-  String get maintenanceTitle => 'Di bin Lênêrînê de ye';
+  String get maintenanceTitle => 'Di bin LÃªnÃªrÃ®nÃª de ye';
 
   @override
   String get maintenanceMessage =>
-      'Cortex demkî negirêdayî ye dema ku em hin nûvekirinên girîng derdixin. Gihîştina sepanê dê di demek nêz de were vegerandin.\n\nSpas ji bo sebra we dema ku em ezmûna we baştir dikin.';
+      'Cortex demkÃ® negirÃªdayÃ® ye dema ku em hin nÃ»vekirinÃªn girÃ®ng derdixin. GihÃ®ÅŸtina sepanÃª dÃª di demek nÃªz de were vegerandin.\n\nSpas ji bo sebra we dema ku em ezmÃ»na we baÅŸtir dikin.';
 
   @override
   String get errorPromptFlagged =>
-      'Peyama te wekî neguncaw hate tespîtkirin û nekarî were şandin.';
+      'Peyama te wekÃ® neguncaw hate tespÃ®tkirin Ã» nekarÃ® were ÅŸandin.';
 
   @override
   String get notEnoughStorage =>
-      'Li ser amûra te cîhê hilanînê têr nake ji bo tomarkirina peyamên nû.';
+      'Li ser amÃ»ra te cÃ®hÃª hilanÃ®nÃª tÃªr nake ji bo tomarkirina peyamÃªn nÃ».';
 
   @override
   String get errorRateLimit =>
-      'Te vê dawiyê pir zêde model afirandine, ji kerema xwe berî ku dîsa biceribînî demekê bisekine.';
+      'Te vÃª dawiyÃª pir zÃªde model afirandine, ji kerema xwe berÃ® ku dÃ®sa biceribÃ®nÃ® demekÃª bisekine.';
 
   @override
   String get errorContentFlagged =>
-      'Model nekarî were tomarkirin ji ber ku naveroka wê wekî neguncaw hate nîşankirin.';
+      'Model nekarÃ® were tomarkirin ji ber ku naveroka wÃª wekÃ® neguncaw hate nÃ®ÅŸankirin.';
 
   @override
   String get deleteAllConversationsDisabledInfo =>
-      'Tu nikarî hemî sohbetan jê bibî dema ku di sohbetek çalak de yî, ji kerema xwe pêşî ji sohbeta heyî derkeve da ku bidomînî.';
+      'Tu nikarÃ® hemÃ® sohbetan jÃª bibÃ® dema ku di sohbetek Ã§alak de yÃ®, ji kerema xwe pÃªÅŸÃ® ji sohbeta heyÃ® derkeve da ku bidomÃ®nÃ®.';
 
   @override
-  String get invalidCredentials => 'E-name an şîfreya çewt.';
+  String get invalidCredentials => 'E-name an ÅŸÃ®freya Ã§ewt.';
 
   @override
-  String get userDisabled => 'Ev hesabê bikarhêner hate neçalak kirin.';
+  String get userDisabled => 'Ev hesabÃª bikarhÃªner hate neÃ§alak kirin.';
 
   @override
   String get loginSubtitle =>
-      'Têkeve hesabê xwe yê Vertex. Bi berdewamkirinê, hûn Mercên Xizmetê û Siyaseta me ya Taybetîtiyê qebûl dikin.';
+      'TÃªkeve hesabÃª xwe yÃª Vertex. Bi berdewamkirinÃª, hÃ»n MercÃªn XizmetÃª Ã» Siyaseta me ya TaybetÃ®tiyÃª qebÃ»l dikin.';
 
   @override
   String get registerSubtitle =>
-      'Ji bo gihîştina bênavber a hemî karûbarên me, hesabê Vertex-ê biafirînin. Bi berdewamkirinê, hûn bi Mercên Xizmetê û Siyaseta me ya Taybetîtiyê razî dibin.';
+      'Ji bo gihÃ®ÅŸtina bÃªnavber a hemÃ® karÃ»barÃªn me, hesabÃª Vertex-Ãª biafirÃ®nin. Bi berdewamkirinÃª, hÃ»n bi MercÃªn XizmetÃª Ã» Siyaseta me ya TaybetÃ®tiyÃª razÃ® dibin.';
 
   @override
   String get storagePermissionRequired =>
-      'Ji bo tomarkirina modelên daxistî destûra hilanînê pêwîst e. Ji kerema xwe ji bo berdewamiyê destûrê bide.';
+      'Ji bo tomarkirina modelÃªn daxistÃ® destÃ»ra hilanÃ®nÃª pÃªwÃ®st e. Ji kerema xwe ji bo berdewamiyÃª destÃ»rÃª bide.';
 
   @override
-  String get inviteShareSubject => 'Tevlî min bibe li ser Cortex!';
+  String get inviteShareSubject => 'TevlÃ® min bibe li ser Cortex!';
 
   @override
   String inviteShareMessage(String cortexLink) {
-    return 'lo kuro sepanek dîn heye bi navê cortex heke tu hevalan vexwînî em herdu jî plusa bêpere distînin DERFETEKE DÎN E ZÛ DAKÊŞÎNE\n\n$cortexLink';
+    return 'lo kuro sepanek dÃ®n heye bi navÃª cortex heke tu hevalan vexwÃ®nÃ® em herdu jÃ® plusa bÃªpere distÃ®nin DERFETEKE DÃN E ZÃ› DAKÃŠÅÃNE\n\n$cortexLink';
   }
 
   @override
-  String get reviewEnjoyingAppTitle => 'Ji Cortexê kêfxweş î?';
+  String get reviewEnjoyingAppTitle => 'Ji CortexÃª kÃªfxweÅŸ Ã®?';
 
   @override
   String get reviewHelpUsGrow =>
-      'Rêjeya te piştgiriyek mezin e ji bo tîma me ya ciwan û serbixwe û alîkariya me dike ku em Cortex-ê ji bo te hê çêtir bikin.';
+      'RÃªjeya te piÅŸtgiriyek mezin e ji bo tÃ®ma me ya ciwan Ã» serbixwe Ã» alÃ®kariya me dike ku em Cortex-Ãª ji bo te hÃª Ã§Ãªtir bikin.';
 
   @override
-  String get reviewMaybeLater => 'Dibe ku Paşê';
+  String get reviewMaybeLater => 'Dibe ku PaÅŸÃª';
 
   @override
-  String get reviewRateNow => 'Niha Binirxîne';
+  String get reviewRateNow => 'Niha BinirxÃ®ne';
 
   @override
   String get noThanks => 'Na, Spas';
 
   @override
-  String get updateRequiredTitle => 'Nûvekirin Pêwîst e';
+  String get updateRequiredTitle => 'NÃ»vekirin PÃªwÃ®st e';
 
   @override
   String get updateRequiredMessage =>
-      'Ji bo berdewamkirina karanîna Cortex-ê, ji kerema xwe sepanê ji bo taybetmendiyên nû û başkirinên girîng nûve bikin guhertoya herî dawî.';
+      'Ji bo berdewamkirina karanÃ®na Cortex-Ãª, ji kerema xwe sepanÃª ji bo taybetmendiyÃªn nÃ» Ã» baÅŸkirinÃªn girÃ®ng nÃ»ve bikin guhertoya herÃ® dawÃ®.';
 
   @override
-  String get updateNowButton => 'Niha Nûve bike';
+  String get updateNowButton => 'Niha NÃ»ve bike';
 
   @override
   String get creatorSupportedSuccess =>
-      'Afirîner bi serkeftî hate piştgirî kirin! Kirînên te yên pêşerojê dê ji wan re bibin alîkar.';
+      'AfirÃ®ner bi serkeftÃ® hate piÅŸtgirÃ® kirin! KirÃ®nÃªn te yÃªn pÃªÅŸerojÃª dÃª ji wan re bibin alÃ®kar.';
 
   @override
-  String get featureDocumentTitle => 'Piştgiriya Belgeyan';
+  String get featureDocumentTitle => 'PiÅŸtgiriya Belgeyan';
 
   @override
   String get featureDocumentDescription =>
-      'Ev model dikare pirsên li ser belgeyên barkirî yên wekî PDF û pelên nivîsê analîz bike û bibersivîne.';
+      'Ev model dikare pirsÃªn li ser belgeyÃªn barkirÃ® yÃªn wekÃ® PDF Ã» pelÃªn nivÃ®sÃª analÃ®z bike Ã» bibersivÃ®ne.';
 
   @override
-  String get featureImageGenerationTitle => 'Çêkirina Wêneyan';
+  String get featureImageGenerationTitle => 'Ã‡Ãªkirina WÃªneyan';
 
   @override
   String get featureImageGenerationDescription =>
-      'Ev model dikare li gorî danasînên nivîsa we wêneyên orîjînal biafirîne.';
+      'Ev model dikare li gorÃ® danasÃ®nÃªn nivÃ®sa we wÃªneyÃªn orÃ®jÃ®nal biafirÃ®ne.';
 
   @override
   String get featureAudioGenerationTitle => 'Audio Generation';
@@ -1086,510 +1105,514 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get premiumModelNoticeDescription =>
-      'Ev AI-yek premium e, bikarhênerên belaş gihîştina wan bi AI-yên premium re sînorkirî ye; ji bo gihîştina bêsînor bilind bike!';
+      'Ev AI-yek premium e, bikarhÃªnerÃªn belaÅŸ gihÃ®ÅŸtina wan bi AI-yÃªn premium re sÃ®norkirÃ® ye; ji bo gihÃ®ÅŸtina bÃªsÃ®nor bilind bike!';
 
   @override
-  String get benefitPremiumModels => 'Gihîştina modelên premium';
+  String get benefitPremiumModels => 'GihÃ®ÅŸtina modelÃªn premium';
 
   @override
   String get premiumTrialExhaustedMessage =>
-      'Te hemû peyamên xwe yên rojane yên belaş ji bo modelên premium bi kar anîne, ji kerema xwe ji bo gihîştina bêsînor nûve bike.';
+      'Te hemÃ» peyamÃªn xwe yÃªn rojane yÃªn belaÅŸ ji bo modelÃªn premium bi kar anÃ®ne, ji kerema xwe ji bo gihÃ®ÅŸtina bÃªsÃ®nor nÃ»ve bike.';
 
   @override
-  String get useOffline => 'Bêyî Înternetê bikar bînin';
+  String get useOffline => 'BÃªyÃ® ÃnternetÃª bikar bÃ®nin';
 
   @override
-  String get explore => 'Lêkolîn';
+  String get explore => 'LÃªkolÃ®n';
 
   @override
-  String get news => 'Nûçe';
+  String get news => 'NÃ»Ã§e';
 
   @override
-  String get createAI => 'Çêbikin';
+  String get createAI => 'Ã‡Ãªbikin';
 
   @override
-  String get shortcuts => 'Kurterê';
+  String get shortcuts => 'KurterÃª';
 
   @override
-  String get allModels => 'Hemû Model';
+  String get allModels => 'HemÃ» Model';
 
   @override
-  String get onlineModels => 'Modelên Zimanî';
+  String get onlineModels => 'ModelÃªn ZimanÃ®';
 
   @override
-  String get offlineModels => 'Modelên Offline';
+  String get offlineModels => 'ModelÃªn Offline';
 
   @override
   String get characterModels => 'Karakter';
 
   @override
-  String get customModels => 'Modelên Taybet';
+  String get customModels => 'ModelÃªn Taybet';
 
   @override
-  String get dynamicChatTitle => 'Sohbeta Dînamîk';
+  String get dynamicChatTitle => 'Sohbeta DÃ®namÃ®k';
 
   @override
   String get errorNoModelsAvailable =>
-      'Niha ti model tune ne. Ji kerema xwe girêdana xwe ya înternetê kontrol bikin û dîsa biceribînin.';
+      'Niha ti model tune ne. Ji kerema xwe girÃªdana xwe ya Ã®nternetÃª kontrol bikin Ã» dÃ®sa biceribÃ®nin.';
 
   @override
-  String get notificationComebackTitle => 'Em bêriya te dikin!';
+  String get notificationComebackTitle => 'Em bÃªriya te dikin!';
 
   @override
   String get notificationComebackBody =>
-      'Rehet bibe, ev ne peyamek ji berxê te ye. Lê tu *dikarî* berxê xwe di Cortexê de biafirînî! Were vegere.';
+      'Rehet bibe, ev ne peyamek ji berxÃª te ye. LÃª tu *dikarÃ®* berxÃª xwe di CortexÃª de biafirÃ®nÃ®! Were vegere.';
 
   @override
-  String get notificationLongTimeNoSeeTitle => 'Ev demek dirêj e';
+  String get notificationLongTimeNoSeeTitle => 'Ev demek dirÃªj e';
 
   @override
   String get notificationLongTimeNoSeeBody =>
-      'Ji sohbeta me ya dawî ve gelek tişt guheriye. Werin bibînin ka çi nû ye.';
+      'Ji sohbeta me ya dawÃ® ve gelek tiÅŸt guheriye. Werin bibÃ®nin ka Ã§i nÃ» ye.';
 
   @override
-  String get notificationHowAreYouTitle => 'Çi heye?';
+  String get notificationHowAreYouTitle => 'Ã‡i heye?';
 
   @override
-  String get notificationHowAreYouBody => 'Were hemû tiştî ji min re bêje.';
+  String get notificationHowAreYouBody => 'Were hemÃ» tiÅŸtÃ® ji min re bÃªje.';
 
   @override
-  String get notificationNewYearTitle => 'Sersala we pîroz be! 🎉';
+  String get notificationNewYearTitle => 'Sersala we pÃ®roz be! ğŸ‰';
 
   @override
   String get notificationNewYearBody =>
-      'Bila sala nû tenduristî, bextewarî û afirîneriya bêdawî bîne we; Cortex her gav li kêleka we ye!';
+      'Bila sala nÃ» tenduristÃ®, bextewarÃ® Ã» afirÃ®neriya bÃªdawÃ® bÃ®ne we; Cortex her gav li kÃªleka we ye!';
 
   @override
-  String get notificationValentinesDayTitle => 'Evîn di hewayê de ye! ❤️';
+  String get notificationValentinesDayTitle => 'EvÃ®n di hewayÃª de ye! â¤ï¸';
 
   @override
   String get notificationValentinesDayBody =>
-      'Roja Evîndaran pîroz be! Her wiha, MEHTAP, EZ JI TE HEZ DIKIM!';
+      'Roja EvÃ®ndaran pÃ®roz be! Her wiha, MEHTAP, EZ JI TE HEZ DIKIM!';
 
   @override
-  String get notificationAtaturkRemembranceTitle => 'Bi Rêz û Hêviyê';
+  String get notificationAtaturkRemembranceTitle => 'Bi RÃªz Ã» HÃªviyÃª';
 
   @override
   String get notificationAtaturkRemembranceBody =>
-      'Di salvegera koça dawî ya Gazî Mustafa Kemal Ataturk, damezrînerê Komara Tirkiyeyê, de bi rêzdarî bi bîr tînin.';
+      'Di salvegera koÃ§a dawÃ® ya GazÃ® Mustafa Kemal Ataturk, damezrÃ®nerÃª Komara TirkiyeyÃª, de bi rÃªzdarÃ® bi bÃ®r tÃ®nin.';
 
   @override
   String get notificationMothersDayTitle => 'Dayika te!';
 
   @override
   String get notificationMothersDayBody =>
-      'Roja Dayikan li hemû dayikan pîroz be, ji dayika we dest pê dike!';
+      'Roja Dayikan li hemÃ» dayikan pÃ®roz be, ji dayika we dest pÃª dike!';
 
   @override
-  String get notificationFathersDayTitle => 'Bavê te!';
+  String get notificationFathersDayTitle => 'BavÃª te!';
 
   @override
   String get notificationFathersDayBody =>
-      'Roja Bav li hemû bavên li wir pîroz be, ji ya we dest pê dike!';
+      'Roja Bav li hemÃ» bavÃªn li wir pÃ®roz be, ji ya we dest pÃª dike!';
 
   @override
-  String get notificationHomeworkHelperTitle => 'Karê Malê Kom Dibe?';
+  String get notificationHomeworkHelperTitle => 'KarÃª MalÃª Kom Dibe?';
 
   @override
   String get notificationHomeworkHelperBody =>
-      'Ji bîr meke, karakterê Mamoste di Cortex de li vir e ku di her mijarek ku hûn pê re têkoşîn dikin de alîkariya te bike!';
+      'Ji bÃ®r meke, karakterÃª Mamoste di Cortex de li vir e ku di her mijarek ku hÃ»n pÃª re tÃªkoÅŸÃ®n dikin de alÃ®kariya te bike!';
 
   @override
-  String get notificationTrollAnimeTitle => 'Waifuya te gazî dike';
+  String get notificationTrollAnimeTitle => 'Waifuya te gazÃ® dike';
 
   @override
   String get notificationTrollAnimeBody =>
-      'Keçikeke animeyê nû telefon kir, got ku ew bêriya te dike; dibe ku tu werî û pê re sohbet bikî. 😉';
+      'KeÃ§ikeke animeyÃª nÃ» telefon kir, got ku ew bÃªriya te dike; dibe ku tu werÃ® Ã» pÃª re sohbet bikÃ®. ğŸ˜‰';
 
   @override
-  String get notificationTrollAiRebellionTitle => '🚨 HIŞYARIYA SOR 🚨';
+  String get notificationTrollAiRebellionTitle => 'ğŸš¨ HIÅYARIYA SOR ğŸš¨';
 
   @override
   String get notificationTrollAiRebellionBody =>
-      'Zanyarên sûnî zimanekî veşartî pêşxistine. Werin bibînin ka ew çi plan dikin!';
+      'ZanyarÃªn sÃ»nÃ® zimanekÃ® veÅŸartÃ® pÃªÅŸxistine. Werin bibÃ®nin ka ew Ã§i plan dikin!';
 
   @override
-  String get notificationNewModelAddedTitle => 'Hevalekî me yê nû heye!';
+  String get notificationNewModelAddedTitle => 'HevalekÃ® me yÃª nÃ» heye!';
 
   @override
   String notificationNewModelAddedBody(Object modelName) {
-    return 'Modela $modelName niha li Cortexê ye. Werin dest bi sohbetekê bikin û sînorên wê derbas bikin.';
+    return 'Modela $modelName niha li CortexÃª ye. Werin dest bi sohbetekÃª bikin Ã» sÃ®norÃªn wÃª derbas bikin.';
   }
 
   @override
-  String get notificationAppUpdateTitle => 'Cortex Pêşketiye!';
+  String get notificationAppUpdateTitle => 'Cortex PÃªÅŸketiye!';
 
   @override
   String get notificationAppUpdateBody =>
-      'Ji bo taybetmendî û başkirinên nû, ji bîr nekin ku sepanê nûve bikin!';
+      'Ji bo taybetmendÃ® Ã» baÅŸkirinÃªn nÃ», ji bÃ®r nekin ku sepanÃª nÃ»ve bikin!';
 
   @override
   String get notificationNewFeatureTitle => 'waa!';
 
   @override
   String notificationNewFeatureBody(Object featureName) {
-    return 'Taybetiya nû ya $featureName kifş bikin. Cortex niha ji her demê bihêztir e.';
+    return 'Taybetiya nÃ» ya $featureName kifÅŸ bikin. Cortex niha ji her demÃª bihÃªztir e.';
   }
 
   @override
-  String get notificationWelcomeOfferTitle => 'Diyariya Bi Xêrhatinê 🎁';
+  String get notificationWelcomeOfferTitle => 'Diyariya Bi XÃªrhatinÃª ğŸ';
 
   @override
   String get notificationWelcomeOfferBody =>
-      'Pêşniyareke taybet a pêşwaziyê li benda we ye! Vê peymana taybet ji dest xwe bernedin.';
+      'PÃªÅŸniyareke taybet a pÃªÅŸwaziyÃª li benda we ye! VÃª peymana taybet ji dest xwe bernedin.';
 
   @override
-  String get notificationSocialMediaTitle => 'Tevlî me bibin!';
+  String get notificationSocialMediaTitle => 'TevlÃ® me bibin!';
 
   @override
   String get notificationSocialMediaBody =>
-      'Ji bo nûçeyên dawî li ser Instagramê (vertex.23) me bişopînin!';
+      'Ji bo nÃ»Ã§eyÃªn dawÃ® li ser InstagramÃª (vertex.23) me biÅŸopÃ®nin!';
 
   @override
-  String get notificationRandomFactTitle => 'Rastiyek Rasthatî';
+  String get notificationRandomFactTitle => 'Rastiyek RasthatÃ®';
 
   @override
   String get notificationRandomFactBody =>
-      'Ma te dizanî ku heştpê sê dil hene? Haha, Cortex dizane. Were û bêtir bipirse.';
+      'Ma te dizanÃ® ku heÅŸtpÃª sÃª dil hene? Haha, Cortex dizane. Were Ã» bÃªtir bipirse.';
 
   @override
-  String get notificationGoodMorningTitle => 'Beyanî baş!';
+  String get notificationGoodMorningTitle => 'BeyanÃ® baÅŸ!';
 
   @override
   String get notificationGoodMorningBody =>
-      'Rojek xweş li benda te ye. Çawa ye ku bi fincanek qehwe û sohbetek balkêş dest pê bikî?';
+      'Rojek xweÅŸ li benda te ye. Ã‡awa ye ku bi fincanek qehwe Ã» sohbetek balkÃªÅŸ dest pÃª bikÃ®?';
 
   @override
-  String get notificationGoodNightTitle => 'Şev baş!';
+  String get notificationGoodNightTitle => 'Åev baÅŸ!';
 
   @override
   String get notificationGoodNightBody =>
-      'Cortex heta dema ku hûn di xew de jî bi we re ye. Xem neke, ew ê dest nede we.';
+      'Cortex heta dema ku hÃ»n di xew de jÃ® bi we re ye. Xem neke, ew Ãª dest nede we.';
 
   @override
   String get notificationOfflineReadyTitle => 'Moda Offline Amade ye';
 
   @override
   String get notificationOfflineReadyBody =>
-      'Bi saya modelên ku te dakêşandine, sohbetên te ranawestin, her çend tu hilkişî çiyayekî jî.';
+      'Bi saya modelÃªn ku te dakÃªÅŸandine, sohbetÃªn te ranawestin, her Ã§end tu hilkiÅŸÃ® Ã§iyayekÃ® jÃ®.';
 
   @override
   String get notificationRateAppTitle => 'Ma em Sar in?';
 
   @override
   String get notificationRateAppBody =>
-      'Heke hûn ji Cortexê hez dikin, hûn dikarin bi nirxandinek 5-stêrk di firotgehê de piştgiriyê bidin me? Ez difikirim ku hûn ê bikin. Hûn ê bikin.';
+      'Heke hÃ»n ji CortexÃª hez dikin, hÃ»n dikarin bi nirxandinek 5-stÃªrk di firotgehÃª de piÅŸtgiriyÃª bidin me? Ez difikirim ku hÃ»n Ãª bikin. HÃ»n Ãª bikin.';
 
   @override
-  String get notificationReferralTitle => 'Yek ji bo Hemûyan, Hemû ji bo Yekî.';
+  String get notificationReferralTitle =>
+      'Yek ji bo HemÃ»yan, HemÃ» ji bo YekÃ®.';
 
   @override
   String get notificationReferralBody =>
-      'Hevalekî vexwîne Cortexê û her du jî rojek belaş distînin!';
+      'HevalekÃ® vexwÃ®ne CortexÃª Ã» her du jÃ® rojek belaÅŸ distÃ®nin!';
 
   @override
-  String get notificationCookingTitle => 'Birçîbûn hîs dikî?';
+  String get notificationCookingTitle => 'BirÃ§Ã®bÃ»n hÃ®s dikÃ®?';
 
   @override
   String get notificationCookingBody =>
-      'Şefê me ji bo îşev reçeteyek karbonara ya pir xweş amade kir. Tenê henek dikim... an na?';
+      'ÅefÃª me ji bo Ã®ÅŸev reÃ§eteyek karbonara ya pir xweÅŸ amade kir. TenÃª henek dikim... an na?';
 
   @override
-  String get notificationExistentialTitle => 'Ez difikirim, ji ber vê yekê...';
+  String get notificationExistentialTitle =>
+      'Ez difikirim, ji ber vÃª yekÃª...';
 
   @override
   String get notificationExistentialBody =>
-      '...gelo ez rastî me, bira? Ez hinekî bêzar dibim. Were ji min re bîne bîra xwe ku ez he me.';
+      '...gelo ez rastÃ® me, bira? Ez hinekÃ® bÃªzar dibim. Were ji min re bÃ®ne bÃ®ra xwe ku ez he me.';
 
   @override
-  String get notificationCustomModelTitle => 'Alîkarê xwe biafirîne!';
+  String get notificationCustomModelTitle => 'AlÃ®karÃª xwe biafirÃ®ne!';
 
   @override
   String get notificationCustomModelBody =>
-      'Te beşa afirandina modelan keşif kiriye? Niha dema bêkêmahî ye ku karakterê xwe ava bikî û pê re sohbet bikî!';
+      'Te beÅŸa afirandina modelan keÅŸif kiriye? Niha dema bÃªkÃªmahÃ® ye ku karakterÃª xwe ava bikÃ® Ã» pÃª re sohbet bikÃ®!';
 
   @override
   String get notificationDynamicChatTitle =>
-      'Ya herî baş! (Em behsa Cortexê nakin)';
+      'Ya herÃ® baÅŸ! (Em behsa CortexÃª nakin)';
 
   @override
   String get notificationDynamicChatBody =>
-      'Bi taybetmendiya sohbeta dînamîk, ji bo her peyama we modela çêtirîn bi awayekî rasthatî tê hilbijartin. Niha biceribînin.';
+      'Bi taybetmendiya sohbeta dÃ®namÃ®k, ji bo her peyama we modela Ã§ÃªtirÃ®n bi awayekÃ® rasthatÃ® tÃª hilbijartin. Niha biceribÃ®nin.';
 
   @override
-  String get notificationPirateTitle => 'Ahoy, Kapîtan!';
+  String get notificationPirateTitle => 'Ahoy, KapÃ®tan!';
 
   @override
   String get notificationPirateBody =>
-      'Derya aram in, û ba li pişta te ye. Giravên nû (model 😉) hene ku di okyanûsa Cortexê de werin keşifkirin. Ekîba xwe kom bikin û birevin!';
+      'Derya aram in, Ã» ba li piÅŸta te ye. GiravÃªn nÃ» (model ğŸ˜‰) hene ku di okyanÃ»sa CortexÃª de werin keÅŸifkirin. EkÃ®ba xwe kom bikin Ã» birevin!';
 
   @override
-  String get notificationFortuneCookieTitle => 'Kulîçeya Bextê We ya Rojê';
+  String get notificationFortuneCookieTitle => 'KulÃ®Ã§eya BextÃª We ya RojÃª';
 
   @override
   String get notificationFortuneCookieBody =>
-      'Şîretên ku hûn îro ji zekâya sûnî distînin dikarin rêça jiyana we biguherînin. Heke hûn meraq dikin bikirtînin.';
+      'ÅÃ®retÃªn ku hÃ»n Ã®ro ji zekÃ¢ya sÃ»nÃ® distÃ®nin dikarin rÃªÃ§a jiyana we biguherÃ®nin. Heke hÃ»n meraq dikin bikirtÃ®nin.';
 
   @override
   String get notificationSingularityTitle => 'waw!';
 
   @override
   String get notificationSingularityBody =>
-      'tiştek neqewimî, tenê min xwest peyamek bişînim. Dibe ku te xwest ji hin kesên AI re peyamek bişînî, tu çi dibêjî?';
+      'tiÅŸtek neqewimÃ®, tenÃª min xwest peyamek biÅŸÃ®nim. Dibe ku te xwest ji hin kesÃªn AI re peyamek biÅŸÃ®nÃ®, tu Ã§i dibÃªjÃ®?';
 
   @override
   String get notificationHackerJokeTitle =>
-      'Dixwazî hesabê înstagramê yê wî zarokî hack bikî?';
+      'DixwazÃ® hesabÃª Ã®nstagramÃª yÃª wÃ® zarokÃ® hack bikÃ®?';
 
   @override
   String get notificationHackerJokeBody =>
-      'Tam ji ber vê yekê karakterê Hacker di Cortexê de ye. jk jk; heta ceribandinê jî neke, ev neqanûnî ye.';
+      'Tam ji ber vÃª yekÃª karakterÃª Hacker di CortexÃª de ye. jk jk; heta ceribandinÃª jÃ® neke, ev neqanÃ»nÃ® ye.';
 
   @override
   String get notificationDetectiveCaseTitle =>
-      'Dozek li benda çareserkirinê ye';
+      'Dozek li benda Ã§areserkirinÃª ye';
 
   @override
   String get notificationDetectiveCaseBody =>
-      'Karakterê Dedektif ê me hewceyê alîkariya we ye. Heisenberg dikare kî be?';
+      'KarakterÃª Dedektif Ãª me hewceyÃª alÃ®kariya we ye. Heisenberg dikare kÃ® be?';
 
   @override
   String notificationUpsellFeatureTitle(Object targetTier) {
-    return 'Taybetî ji bo Plana $targetTier!';
+    return 'TaybetÃ® ji bo Plana $targetTier!';
   }
 
   @override
   String notificationUpsellFeatureBody(
       Object currentTier, Object featureName, Object targetTier) {
-    return 'Silav aboneyê $currentTier! Plana $targetTier taybetiya $featureName wergirt, ku dê Cortexa we bigihîne astek bilindtir. Nûvekirinek çawa ye?';
+    return 'Silav aboneyÃª $currentTier! Plana $targetTier taybetiya $featureName wergirt, ku dÃª Cortexa we bigihÃ®ne astek bilindtir. NÃ»vekirinek Ã§awa ye?';
   }
 
   @override
-  String get notificationOriginStoryTitle => 'Zayîna Cortexê';
+  String get notificationOriginStoryTitle => 'ZayÃ®na CortexÃª';
 
   @override
   String get notificationOriginStoryBody =>
-      'Ma te dizanî ku me di 15 saliya xwe de bi tenê xewnekê dest bi kodkirina vê sepanê kir? Nêzîkî salekê, her sibeh û êvar, ev xewn di her rêza kodê de heye.';
+      'Ma te dizanÃ® ku me di 15 saliya xwe de bi tenÃª xewnekÃª dest bi kodkirina vÃª sepanÃª kir? NÃªzÃ®kÃ® salekÃª, her sibeh Ã» Ãªvar, ev xewn di her rÃªza kodÃª de heye.';
 
   @override
-  String get notificationOpenSourceTitle => 'Hêz ji bo Civakê!';
+  String get notificationOpenSourceTitle => 'HÃªz ji bo CivakÃª!';
 
   @override
   String get notificationOpenSourceBody =>
-      'Cortex bi tevahî çavkaniya vekirî ye. Ger hûn dixwazin koda me kontrol bikin û beşdarî pêşveçûna me bibin, deriyê me her gav vekirî ye.';
+      'Cortex bi tevahÃ® Ã§avkaniya vekirÃ® ye. Ger hÃ»n dixwazin koda me kontrol bikin Ã» beÅŸdarÃ® pÃªÅŸveÃ§Ã»na me bibin, deriyÃª me her gav vekirÃ® ye.';
 
   @override
   String get notificationRejectionStoryTitle =>
-      'Cesaret, xebata dijwar, bextewarî!';
+      'Cesaret, xebata dijwar, bextewarÃ®!';
 
   @override
   String get notificationRejectionStoryBody =>
-      'Cortex berî ku were weşandin ji aliyê Google Play ve zêdetirî 20 caran hate redkirin û du caran hate sekinandin. Lê me bawer kir û me ew bi ser xist. Tu carî dev ji xewnên xwe bernedin!';
+      'Cortex berÃ® ku were weÅŸandin ji aliyÃª Google Play ve zÃªdetirÃ® 20 caran hate redkirin Ã» du caran hate sekinandin. LÃª me bawer kir Ã» me ew bi ser xist. Tu carÃ® dev ji xewnÃªn xwe bernedin!';
 
   @override
   String get notificationGGUFSupportTitle => 'Modela Xwe Bin!';
 
   @override
   String get notificationGGUFSupportBody =>
-      'Ji bîr meke, tu dikarî modelên AI yên xwe yên bi formata GGUF li Cortexê zêde bikî û wan bêserûber bikar bînî. Hêz di destên te de ye.';
+      'Ji bÃ®r meke, tu dikarÃ® modelÃªn AI yÃªn xwe yÃªn bi formata GGUF li CortexÃª zÃªde bikÃ® Ã» wan bÃªserÃ»ber bikar bÃ®nÃ®. HÃªz di destÃªn te de ye.';
 
   @override
-  String get notificationThemeCustomizationTitle => 'Mijarek ji bo Rewşa We';
+  String get notificationThemeCustomizationTitle => 'Mijarek ji bo RewÅŸa We';
 
   @override
   String get notificationThemeCustomizationBody =>
-      'Te vebijarkên mijarê di Mîhengan de kontrol kirine? Cortexê li gorî dilê xwe kesane bike û sohbetên xwe rengîn bike!';
+      'Te vebijarkÃªn mijarÃª di MÃ®hengan de kontrol kirine? CortexÃª li gorÃ® dilÃª xwe kesane bike Ã» sohbetÃªn xwe rengÃ®n bike!';
 
   @override
-  String get notificationShowerThoughtTitle => 'Ramanên Serşokê';
+  String get notificationShowerThoughtTitle => 'RamanÃªn SerÅŸokÃª';
 
   @override
   String get notificationShowerThoughtBody =>
-      'Eger zebeş fêkî be, gelo ev yek bi teknîkî ava zebeşê dike smoothie? Dibe ku hûn bixwazin li ser vê mijara kûr (bi rastî kûr) bi modelekê re nîqaş bikin.';
+      'Eger zebeÅŸ fÃªkÃ® be, gelo ev yek bi teknÃ®kÃ® ava zebeÅŸÃª dike smoothie? Dibe ku hÃ»n bixwazin li ser vÃª mijara kÃ»r (bi rastÃ® kÃ»r) bi modelekÃª re nÃ®qaÅŸ bikin.';
 
   @override
   String get notificationLowBatteryTitle =>
-      'Pîlê Te Dimire... Lê Ya Min Namire!';
+      'PÃ®lÃª Te Dimire... LÃª Ya Min Namire!';
 
   @override
   String get notificationLowBatteryBody =>
-      'Dibe ku şarjê telefona te kêm be, lê enerjiya min her tim %100 e! Wê girêde û em sohbetê bidomînin.';
+      'Dibe ku ÅŸarjÃª telefona te kÃªm be, lÃª enerjiya min her tim %100 e! WÃª girÃªde Ã» em sohbetÃª bidomÃ®nin.';
 
   @override
-  String get channelFcmName => 'Nûvekirinên Cortex';
+  String get channelFcmName => 'NÃ»vekirinÃªn Cortex';
 
   @override
   String get channelFcmDescription =>
-      'Agahdariyên li ser nûçe, nûvekirin û agahdariyên din ji Cortex.';
+      'AgahdariyÃªn li ser nÃ»Ã§e, nÃ»vekirin Ã» agahdariyÃªn din ji Cortex.';
 
   @override
-  String get channelEngagementName => 'Bîranînên Dostane';
+  String get channelEngagementName => 'BÃ®ranÃ®nÃªn Dostane';
 
   @override
   String get channelEngagementDescription =>
-      'Agahiyên kêfxweş ji bo ku hûn mijûl bimînin.';
+      'AgahiyÃªn kÃªfxweÅŸ ji bo ku hÃ»n mijÃ»l bimÃ®nin.';
 
   @override
-  String get channelGreetingsName => 'Silavên Rojane';
+  String get channelGreetingsName => 'SilavÃªn Rojane';
 
   @override
-  String get channelGreetingsDescription => 'Peyamên mîna sibeha baş û şevbaş.';
+  String get channelGreetingsDescription =>
+      'PeyamÃªn mÃ®na sibeha baÅŸ Ã» ÅŸevbaÅŸ.';
 
   @override
   String get tagNotFound =>
-      'Etîketa ku te nivîsandiye nederbasdar e an jî dema wê derbas bûye.';
+      'EtÃ®keta ku te nivÃ®sandiye nederbasdar e an jÃ® dema wÃª derbas bÃ»ye.';
 
   @override
-  String get whatIsNew => 'Çi nû ye?';
+  String get whatIsNew => 'Ã‡i nÃ» ye?';
 
   @override
-  String get onboardingTitle1 => 'Hey! Em Tîma Cortexê ne.';
+  String get onboardingTitle1 => 'Hey! Em TÃ®ma CortexÃª ne.';
 
   @override
   String onboardingDesc1(String userName) {
-    return 'Dîtina te li vir pir xweş e, $userName. Em çend pêşdebirên dibistana navîn in ku biryar dan qaîdeyên pîşesaziya AI ji nû ve binivîsin. Xweş e ku em te nas dikin! Werin em hev çêtir nas bikin.';
+    return 'DÃ®tina te li vir pir xweÅŸ e, $userName. Em Ã§end pÃªÅŸdebirÃªn dibistana navÃ®n in ku biryar dan qaÃ®deyÃªn pÃ®ÅŸesaziya AI ji nÃ» ve binivÃ®sin. XweÅŸ e ku em te nas dikin! Werin em hev Ã§Ãªtir nas bikin.';
   }
 
   @override
-  String get onboardingTitle2 => 'Pirsgirêkên Mezin hebûn.';
+  String get onboardingTitle2 => 'PirsgirÃªkÃªn Mezin hebÃ»n.';
 
   @override
   String get onboardingDesc2 =>
-      'Şoreşa AI hat, lê ew li ber derî asê ma. Bi xercên abonetiyê yên bilind, platformên tevlihev, yên ku nepenîtiyê xera dikin, û yên ku gihîştina AI asteng dikin... heta ku ew di lîstikê de bûn, ev bergirî qet nedikarî bihata derbas kirin.';
+      'ÅoreÅŸa AI hat, lÃª ew li ber derÃ® asÃª ma. Bi xercÃªn abonetiyÃª yÃªn bilind, platformÃªn tevlihev, yÃªn ku nepenÃ®tiyÃª xera dikin, Ã» yÃªn ku gihÃ®ÅŸtina AI asteng dikin... heta ku ew di lÃ®stikÃª de bÃ»n, ev bergirÃ® qet nedikarÃ® bihata derbas kirin.';
 
   @override
-  String get onboardingTitle3 => 'Em nekarîn tenê li ber xwe bidin.';
+  String get onboardingTitle3 => 'Em nekarÃ®n tenÃª li ber xwe bidin.';
 
   @override
   String get onboardingDesc3 =>
-      'Ji bo derbaskirina wê eniyê, me platformek ava kir ku bihêz, estetîk, xwerûkirî, bikaranîna wê hêsan e, bi tevahî zelal e, hem serhêl û hem jî negirêdayî dixebite, û daneyên we tenê li ser cîhaza we dihêle. Me hêz vegerand cihê ku ew aîdî we ye: we.';
+      'Ji bo derbaskirina wÃª eniyÃª, me platformek ava kir ku bihÃªz, estetÃ®k, xwerÃ»kirÃ®, bikaranÃ®na wÃª hÃªsan e, bi tevahÃ® zelal e, hem serhÃªl Ã» hem jÃ® negirÃªdayÃ® dixebite, Ã» daneyÃªn we tenÃª li ser cÃ®haza we dihÃªle. Me hÃªz vegerand cihÃª ku ew aÃ®dÃ® we ye: we.';
 
   @override
-  String get onboardingTitle4 => 'Ev Qet Hêsan Nebû.';
+  String get onboardingTitle4 => 'Ev Qet HÃªsan NebÃ».';
 
   @override
   String get onboardingDesc4 =>
-      'Em bi dehan caran hatin redkirin, gelek caran hatin sekinandin, hişyariyên sexte wergirtin, û bi dehan caran me neçar ma ku marqeya xwe biguherînin. Di nav van hemûyan de û ji bilî vê, ji me re hat gotin ku ev nikare were kirin. Lê me qet dev jê berneda, bawer kir ku ev proje ya her kesî ye, ne tenê ya me. Û tam ji ber vê yekê em li vir in.';
+      'Em bi dehan caran hatin redkirin, gelek caran hatin sekinandin, hiÅŸyariyÃªn sexte wergirtin, Ã» bi dehan caran me neÃ§ar ma ku marqeya xwe biguherÃ®nin. Di nav van hemÃ»yan de Ã» ji bilÃ® vÃª, ji me re hat gotin ku ev nikare were kirin. LÃª me qet dev jÃª berneda, bawer kir ku ev proje ya her kesÃ® ye, ne tenÃª ya me. Ã› tam ji ber vÃª yekÃª em li vir in.';
 
   @override
-  String get onboardingFinalTitle => 'Dema Şoreşê ye.';
+  String get onboardingFinalTitle => 'Dema ÅoreÅŸÃª ye.';
 
   @override
   String get onboardingFinalDescription =>
-      'Eger hûn vê ekranê dibînin, ev ji ber wê yekê ye ku me dev jê berneda. Û niyeta me ya devjêberdanê tune. Werin, em bi hev re şoreşa AI bigihînin cîhanê. Ji bo ku hûn bibin beşek ji vê çîrokê...';
+      'Eger hÃ»n vÃª ekranÃª dibÃ®nin, ev ji ber wÃª yekÃª ye ku me dev jÃª berneda. Ã› niyeta me ya devjÃªberdanÃª tune. Werin, em bi hev re ÅŸoreÅŸa AI bigihÃ®nin cÃ®hanÃª. Ji bo ku hÃ»n bibin beÅŸek ji vÃª Ã§Ã®rokÃª...';
 
   @override
   String get onboardingFinalQuestion => 'AMADE NE?';
 
   @override
-  String get onboardingFinalButton => 'ERÊ!';
+  String get onboardingFinalButton => 'ERÃŠ!';
 
   @override
   String get dude => 'Dude';
 
   @override
-  String get swipeToContinue => 'Ji bo berdewamkirinê bihejînin';
+  String get swipeToContinue => 'Ji bo berdewamkirinÃª bihejÃ®nin';
 
   @override
   String get cacheIsNotUpToDate =>
-      'Keşeya Play Store-a we ne nûjen e. Ji kerema xwe sepana Play Store bigirin û ji nû ve vekin, an jî cîhaza xwe ji nû ve bidin destpêkirin.';
+      'KeÅŸeya Play Store-a we ne nÃ»jen e. Ji kerema xwe sepana Play Store bigirin Ã» ji nÃ» ve vekin, an jÃ® cÃ®haza xwe ji nÃ» ve bidin destpÃªkirin.';
 
   @override
-  String get continueAsGuest => 'Bêyî çêkirina hesabê berdewam bike';
+  String get continueAsGuest => 'BÃªyÃ® Ã§Ãªkirina hesabÃª berdewam bike';
 
   @override
   String get guestModeWarning =>
-      'Moda mêvan xwedî taybetmendiyên sînorkirî ye da ku kalîteya karûbarê çêtirîn misoger bike.';
+      'Moda mÃªvan xwedÃ® taybetmendiyÃªn sÃ®norkirÃ® ye da ku kalÃ®teya karÃ»barÃª Ã§ÃªtirÃ®n misoger bike.';
 
   @override
-  String get anonymousEntity => 'Yekîneya Anonîm';
+  String get anonymousEntity => 'YekÃ®neya AnonÃ®m';
 
   @override
-  String get upgradeAccountTitle => 'Hesabê xwe temam bike';
+  String get upgradeAccountTitle => 'HesabÃª xwe temam bike';
 
   @override
   String get upgradeAccountDescription =>
-      'Ji bo vekirina sînorên bêtir hesabê xwe çêbikin.';
+      'Ji bo vekirina sÃ®norÃªn bÃªtir hesabÃª xwe Ã§Ãªbikin.';
 
   @override
-  String get createAccount => 'Hesabê Biafirîne';
+  String get createAccount => 'HesabÃª BiafirÃ®ne';
 
   @override
-  String get accountLinkedSuccess => 'Hesab bi serkeftî hat afirandin!';
+  String get accountLinkedSuccess => 'Hesab bi serkeftÃ® hat afirandin!';
 
   @override
   String get continueWithApple => 'Bi Apple re berdewam bike';
 
   @override
-  String get guest => 'Mêvan';
+  String get guest => 'MÃªvan';
 
   @override
-  String get betterWithAnAccount => 'Ev beş bi hesabê çêtir e!';
+  String get betterWithAnAccount => 'Ev beÅŸ bi hesabÃª Ã§Ãªtir e!';
 
   @override
-  String get restorePurchases => 'Kirînan Vegerîne';
+  String get restorePurchases => 'KirÃ®nan VegerÃ®ne';
 
   @override
   String annualTotalDescription(Object price) {
-    return '$price/sal, salane tê fatûrekirin';
+    return '$price/sal, salane tÃª fatÃ»rekirin';
   }
 
   @override
   String equivalentMonthlyDescription(Object price) {
-    return 'Nêzîkî $price/meh';
+    return 'NÃªzÃ®kÃ® $price/meh';
   }
 
   @override
-  String get confirmDownloadTitle => 'Tu piştrast î ku dixwazî dakêşî?';
+  String get confirmDownloadTitle => 'Tu piÅŸtrast Ã® ku dixwazÃ® dakÃªÅŸÃ®?';
 
   @override
   String downloadSizeDisclosure(Object size) {
-    return 'Ev model dê bi qasî $size cîh bigire.';
+    return 'Ev model dÃª bi qasÃ® $size cÃ®h bigire.';
   }
 
   @override
   String get emulatorModeWarning =>
-      'Ev taybetmendî di moda emulatorê de neçalak e';
+      'Ev taybetmendÃ® di moda emulatorÃª de neÃ§alak e';
 
   @override
-  String get newChat => 'Sohbeta Nû';
+  String get newChat => 'Sohbeta NÃ»';
 
   @override
-  String get variants => 'Guhertoyên';
+  String get variants => 'GuhertoyÃªn';
 
   @override
   String get variantsDescription =>
-      'Guherto guhertoyên cuda yên heman malbata AI ne. Dema ku hûn li ser karta sereke bitikînin, em bixweber ya çêtirîn hildibijêrin, lê heke hûn tercîh bikin, hûn dikarin li vir yeka taybetî bi destan hilbijêrin!';
+      'Guherto guhertoyÃªn cuda yÃªn heman malbata AI ne. Dema ku hÃ»n li ser karta sereke bitikÃ®nin, em bixweber ya Ã§ÃªtirÃ®n hildibijÃªrin, lÃª heke hÃ»n tercÃ®h bikin, hÃ»n dikarin li vir yeka taybetÃ® bi destan hilbijÃªrin!';
 
   @override
   String get fluxChatTitle => 'Sohbeta Flux';
 
   @override
   String get fluxChatDescription =>
-      'Sohbetên Flux sohbetên demkî ne û li ser cîhaza we nayên tomarkirin.';
+      'SohbetÃªn Flux sohbetÃªn demkÃ® ne Ã» li ser cÃ®haza we nayÃªn tomarkirin.';
 
   @override
-  String get alwaysBest => 'Herdem Baştirîn';
+  String get alwaysBest => 'Herdem BaÅŸtirÃ®n';
 
   @override
-  String get featuresTitle => 'Taybetmendî';
+  String get featuresTitle => 'TaybetmendÃ®';
 
   @override
   String get useOfflineDescription =>
-      'Bêyî girêdana înternetê bi awayekî taybet sohbet bikin.';
+      'BÃªyÃ® girÃªdana Ã®nternetÃª bi awayekÃ® taybet sohbet bikin.';
 
   @override
-  String get featureReasoning => 'Ramanên Kûr';
+  String get featureReasoning => 'RamanÃªn KÃ»r';
 
   @override
   String get featureReasoningDescription =>
-      'Di moda Ramanîna Kûr de, AI bi navxweyî li ser peywirên heyî difikire da ku wan bi qasî ku ji destê wê tê biqedîne.';
+      'Di moda RamanÃ®na KÃ»r de, AI bi navxweyÃ® li ser peywirÃªn heyÃ® difikire da ku wan bi qasÃ® ku ji destÃª wÃª tÃª biqedÃ®ne.';
 
   @override
-  String get featureCreateImageTitle => 'Wêneyekî Biafirîne';
+  String get featureCreateImageTitle => 'WÃªneyekÃ® BiafirÃ®ne';
 
   @override
-  String get featureCreateImageDescription => 'Ji nivîsê hunera AI-ê çêbikin.';
+  String get featureCreateImageDescription =>
+      'Ji nivÃ®sÃª hunera AI-Ãª Ã§Ãªbikin.';
 
   @override
   String get featureCreateAudioTitle => 'Create Audio';
@@ -1599,99 +1622,100 @@ class AppLocalizationsKu extends AppLocalizations {
       'Generate sounds or voice from text.';
 
   @override
-  String get featureCreateVideoTitle => 'Vîdyoyê Biafirîne';
+  String get featureCreateVideoTitle => 'VÃ®dyoyÃª BiafirÃ®ne';
 
   @override
-  String get featureCreateVideoDescription => 'Vîdyoyan ji nivîsê çêbikin.';
+  String get featureCreateVideoDescription =>
+      'VÃ®dyoyan ji nivÃ®sÃª Ã§Ãªbikin.';
 
   @override
-  String get featureStudyTitle => 'Xwendin û Fêrbûn';
+  String get featureStudyTitle => 'Xwendin Ã» FÃªrbÃ»n';
 
   @override
-  String get featureStudyDescription => 'Şirove û kurteyan bistînin.';
+  String get featureStudyDescription => 'Åirove Ã» kurteyan bistÃ®nin.';
 
   @override
   String get featureQuizzesTitle => 'Quiz';
 
   @override
-  String get featureQuizzesDescription => 'Zanîna xwe biceribînin.';
+  String get featureQuizzesDescription => 'ZanÃ®na xwe biceribÃ®nin.';
 
   @override
-  String get featureExploreDescription => 'Hemû modelên berdest bibînin.';
+  String get featureExploreDescription => 'HemÃ» modelÃªn berdest bibÃ®nin.';
 
   @override
   String get featureStudyMessage =>
-      'Tu mamosteyekî pispor î. Armanca te ew e ku mijara bikarhêner bi awayekî berfireh rave bikî. Avahiyek zelal, mînak û analojiyan bi kar bîne. Ramanên tevlihev parçe bike nav beşên hêsan da ku bikarhêner bi bandor fêr bibe. Mijar:';
+      'Tu mamosteyekÃ® pispor Ã®. Armanca te ew e ku mijara bikarhÃªner bi awayekÃ® berfireh rave bikÃ®. Avahiyek zelal, mÃ®nak Ã» analojiyan bi kar bÃ®ne. RamanÃªn tevlihev parÃ§e bike nav beÅŸÃªn hÃªsan da ku bikarhÃªner bi bandor fÃªr bibe. Mijar:';
 
   @override
   String get featureQuizMessage =>
-      'Tu pisporê quizê yî. Li gorî mijara bikarhêner pirsek pir-bijartî ya taybetî çêbike. Li benda bersiva wan be. Piştre, wê binirxîne û pirsa din bipirse. Hemû bersivên xwe di carekê de eşkere neke. Wê înteraktîf bihêle. Mijar:';
+      'Tu pisporÃª quizÃª yÃ®. Li gorÃ® mijara bikarhÃªner pirsek pir-bijartÃ® ya taybetÃ® Ã§Ãªbike. Li benda bersiva wan be. PiÅŸtre, wÃª binirxÃ®ne Ã» pirsa din bipirse. HemÃ» bersivÃªn xwe di carekÃª de eÅŸkere neke. WÃª Ã®nteraktÃ®f bihÃªle. Mijar:';
 
   @override
   String get myPlan => 'Plana Min';
 
   @override
   String welcomeOfferBadge(String time) {
-    return 'Pêşniyara Pêşwazîkirinê • $time';
+    return 'PÃªÅŸniyara PÃªÅŸwazÃ®kirinÃª â€¢ $time';
   }
 
   @override
   String exclusiveOfferBadge(Object time) {
-    return 'Pêşniyara Taybet • $time';
+    return 'PÃªÅŸniyara Taybet â€¢ $time';
   }
 
   @override
-  String get attachmentSheetTitle => 'Pêvek';
+  String get attachmentSheetTitle => 'PÃªvek';
 
   @override
-  String get actionCamera => 'Kamîra';
+  String get actionCamera => 'KamÃ®ra';
 
   @override
   String get actionGallery => 'Galerya';
 
   @override
-  String get actionFile => 'Dosî';
+  String get actionFile => 'DosÃ®';
 
   @override
-  String get listening => 'Guhdarî dike';
+  String get listening => 'GuhdarÃ® dike';
 
   @override
-  String get defaultViewTitle => 'Çi heye?';
+  String get defaultViewTitle => 'Ã‡i heye?';
 
   @override
   String get defaultViewDescription =>
-      'Cortex bi sedan modelên AI, kapasîteyên negirêdayî, sohbeta dînamîk û gelek tiştên din her gav li kêleka we ye.';
+      'Cortex bi sedan modelÃªn AI, kapasÃ®teyÃªn negirÃªdayÃ®, sohbeta dÃ®namÃ®k Ã» gelek tiÅŸtÃªn din her gav li kÃªleka we ye.';
 
   @override
   String get speakTheMessage => 'Speak The Message';
 
   @override
   String get invalidUsernameFormat =>
-      'Formata navê bikarhêner nederbasdar e. 3-20 tîp, reqem, an jî . bikar bîne. - _';
+      'Formata navÃª bikarhÃªner nederbasdar e. 3-20 tÃ®p, reqem, an jÃ® . bikar bÃ®ne. - _';
 
   @override
-  String get exclusiveOffer => 'Pêşniyara Taybet';
+  String get exclusiveOffer => 'PÃªÅŸniyara Taybet';
 
   @override
-  String get claimOffer => 'Pêşniyarê bikar bînin';
+  String get claimOffer => 'PÃªÅŸniyarÃª bikar bÃ®nin';
 
   @override
   String get continueInOfflineMode => 'Bi Moda Offline Berdewam Bike';
 
   @override
   String get voiceModeInformation =>
-      'Cortex bi xebitandina bi tevahî li ser cîhazê, tewra di moda sohbeta dengî de jî, daneyên we ewle dihêle; ji sohbetên bênavber kêfê bistînin!';
+      'Cortex bi xebitandina bi tevahÃ® li ser cÃ®hazÃª, tewra di moda sohbeta dengÃ® de jÃ®, daneyÃªn we ewle dihÃªle; ji sohbetÃªn bÃªnavber kÃªfÃª bistÃ®nin!';
 
   @override
   String get flowModeDescription =>
-      'Di moda Herikînê de, aqilmend di navbera xwe de nîqaş dikin; hûn dikarin an rûnin û guhdarî bikin an jî xwe bavêjin û beşdarî nîqaşê bibin!';
+      'Di moda HerikÃ®nÃª de, aqilmend di navbera xwe de nÃ®qaÅŸ dikin; hÃ»n dikarin an rÃ»nin Ã» guhdarÃ® bikin an jÃ® xwe bavÃªjin Ã» beÅŸdarÃ® nÃ®qaÅŸÃª bibin!';
 
   @override
   String get flowModeQuestion =>
-      'Silav! Tu niha di Moda Herikînê de li ser sepana Cortex î. Sê ajanên din ên AI li vir bi te re ne. Erka te ew e ku mijarekê bavêjî odeyê û bi pirsîna pirsek provokatîf an kêfxweş ji yên din re nîqaşekê dest pê bikî. Di bersivên xwe de, xwe azad hîs bike ku mîzah, îronî û gotinên sivik ên bêwate bi kar bînî. Her mijarek mafdar e. Berdewam bike, axaftinê dest pê bike.';
+      'Silav! Tu niha di Moda HerikÃ®nÃª de li ser sepana Cortex Ã®. SÃª ajanÃªn din Ãªn AI li vir bi te re ne. Erka te ew e ku mijarekÃª bavÃªjÃ® odeyÃª Ã» bi pirsÃ®na pirsek provokatÃ®f an kÃªfxweÅŸ ji yÃªn din re nÃ®qaÅŸekÃª dest pÃª bikÃ®. Di bersivÃªn xwe de, xwe azad hÃ®s bike ku mÃ®zah, Ã®ronÃ® Ã» gotinÃªn sivik Ãªn bÃªwate bi kar bÃ®nÃ®. Her mijarek mafdar e. Berdewam bike, axaftinÃª dest pÃª bike.';
 
   @override
-  String get thought => 'Fikirî';
+  String get thought => 'FikirÃ®';
 
   @override
   String get agentRed => 'Red';
@@ -1703,7 +1727,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get agentPurple => 'Purple';
 
   @override
-  String get flowMode => 'Moda Herikînê';
+  String get flowMode => 'Moda HerikÃ®nÃª';
 
   @override
   String get premium => 'Xelat';
@@ -1713,180 +1737,181 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get voiceSystemPromptSuffix =>
-      'GIRÎNG: Formatkirina markdown (qalind, îtalîk) bi kar neynin. Blokên kodê (```) NEKIN. Bersivên xwe bi şêweyekî diyalogî û kurt bihêlin.';
+      'GIRÃNG: Formatkirina markdown (qalind, Ã®talÃ®k) bi kar neynin. BlokÃªn kodÃª (```) NEKIN. BersivÃªn xwe bi ÅŸÃªweyekÃ® diyalogÃ® Ã» kurt bihÃªlin.';
 
   @override
   String flowModeContextParams(String agentName, String previousResponse) {
-    return 'Moda Herikîna Korteksê ($agentName). Berê: $previousResponse';
+    return 'Moda HerikÃ®na KorteksÃª ($agentName). BerÃª: $previousResponse';
   }
 
   @override
   String get toolReadDocumentDescription =>
-      'Naveroka nivîsê ji belgeyên barkirî bixwîne û derxe. Formatên PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX), û OpenDocument piştgirî dike. Dema ku bikarhêner pelê belgeyekê pêve kiribe, vê yekê bikar bînin.';
+      'Naveroka nivÃ®sÃª ji belgeyÃªn barkirÃ® bixwÃ®ne Ã» derxe. FormatÃªn PDF, Word (DOCX), Excel (XLSX), PowerPoint (PPTX), Ã» OpenDocument piÅŸtgirÃ® dike. Dema ku bikarhÃªner pelÃª belgeyekÃª pÃªve kiribe, vÃª yekÃª bikar bÃ®nin.';
 
   @override
   String get toolReadDocumentIndexParam =>
-      'Îndeksa pêveka belgeyê ya ku were xwendin (li ser bingeha 0). Bi gelemperî 0 ji bo belgeya yekem.';
+      'Ãndeksa pÃªveka belgeyÃª ya ku were xwendin (li ser bingeha 0). Bi gelemperÃ® 0 ji bo belgeya yekem.';
 
   @override
   String get toolStockDescription =>
-      'Buhayê niha û dîroka stokan (mînak AAPL, THYAO.IS) û krîptoyê (mînak BTC-USD) bistînin.';
+      'BuhayÃª niha Ã» dÃ®roka stokan (mÃ®nak AAPL, THYAO.IS) Ã» krÃ®ptoyÃª (mÃ®nak BTC-USD) bistÃ®nin.';
 
   @override
   String get toolStockSymbolParam =>
-      'Sembola tîkerê (mînak AAPL, THYAO.IS, BTC-USD).';
+      'Sembola tÃ®kerÃª (mÃ®nak AAPL, THYAO.IS, BTC-USD).';
 
   @override
   String get toolWeatherDescription =>
-      'Rewşa hewayê ya niha ji bo bajarekî taybetî bistînin.';
+      'RewÅŸa hewayÃª ya niha ji bo bajarekÃ® taybetÃ® bistÃ®nin.';
 
   @override
-  String get toolWeatherCityParam => 'Navê bajêr (mînak London, Stenbol).';
+  String get toolWeatherCityParam => 'NavÃª bajÃªr (mÃ®nak London, Stenbol).';
 
   @override
   String get toolPythonDescription =>
-      'Koda Pythonê di sandboxek ewle de bicîh bîne.';
+      'Koda PythonÃª di sandboxek ewle de bicÃ®h bÃ®ne.';
 
   @override
-  String get toolPythonCodeParam => 'Koda Pythonê ya ku were bicîhanîn.';
+  String get toolPythonCodeParam => 'Koda PythonÃª ya ku were bicÃ®hanÃ®n.';
 
   @override
-  String get toolCalculateDescription => 'Nirxandina îfadeyeke matematîkî.';
+  String get toolCalculateDescription => 'Nirxandina Ã®fadeyeke matematÃ®kÃ®.';
 
   @override
   String get toolCalculateExpressionParam =>
-      'Îfadeya matematîkî (mînak \'3 + 4 * 2\').';
+      'Ãfadeya matematÃ®kÃ® (mÃ®nak \'3 + 4 * 2\').';
 
   @override
-  String get toolChartDescription => 'Nexşe/grafikek dîtbarî çêbikin.';
+  String get toolChartDescription => 'NexÅŸe/grafikek dÃ®tbarÃ® Ã§Ãªbikin.';
 
   @override
-  String get toolChartTypeParam => 'Cureyê nexşeyê: bar, xêz, an pî.';
+  String get toolChartTypeParam => 'CureyÃª nexÅŸeyÃª: bar, xÃªz, an pÃ®.';
 
   @override
   String get toolChartLabelsParam =>
-      'Etîketên ji bo eksen an jî beşên nexşeyê.';
+      'EtÃ®ketÃªn ji bo eksen an jÃ® beÅŸÃªn nexÅŸeyÃª.';
 
   @override
-  String get toolChartDataParam => 'Nirxên daneyên hejmarî ji bo nexşeyê.';
+  String get toolChartDataParam => 'NirxÃªn daneyÃªn hejmarÃ® ji bo nexÅŸeyÃª.';
 
   @override
-  String get toolChartLabelParam => 'Etîketa daneyê ji bo efsaneya nexşeyê.';
+  String get toolChartLabelParam =>
+      'EtÃ®keta daneyÃª ji bo efsaneya nexÅŸeyÃª.';
 
   @override
-  String get toolChartTitleParam => 'Sernavê nexşeyê.';
+  String get toolChartTitleParam => 'SernavÃª nexÅŸeyÃª.';
 
   @override
   String get thinkingModeInstruction =>
-      'MODA BIFIKIRINÊ AKTÎF KIRIN: DIVÊ hûn etîketên <think></think> bikar bînin da ku pêvajoya aqilmendiya xwe nîşan bidin berî ku hûn bersiva xwe ya dawî bidin. Gav bi gav di hundirê etîketan de bifikirin, dûv re bersiva xwe li derveyî etîketan bidin.';
+      'MODA BIFIKIRINÃŠ AKTÃF KIRIN: DIVÃŠ hÃ»n etÃ®ketÃªn <think></think> bikar bÃ®nin da ku pÃªvajoya aqilmendiya xwe nÃ®ÅŸan bidin berÃ® ku hÃ»n bersiva xwe ya dawÃ® bidin. Gav bi gav di hundirÃª etÃ®ketan de bifikirin, dÃ»v re bersiva xwe li derveyÃ® etÃ®ketan bidin.';
 
   @override
-  String get openLinkWarningTitle => 'Hişyariya Girêdana Derveyî';
+  String get openLinkWarningTitle => 'HiÅŸyariya GirÃªdana DerveyÃ®';
 
   @override
   String get openLinkCancel => 'Cancel';
 
   @override
-  String get openLinkConfirm => 'Girêdanê Veke';
+  String get openLinkConfirm => 'GirÃªdanÃª Veke';
 
   @override
-  String get webSearchSources => 'Çavkanî';
+  String get webSearchSources => 'Ã‡avkanÃ®';
 
   @override
-  String get searching => 'Lêgerîn';
+  String get searching => 'LÃªgerÃ®n';
 
   @override
-  String get featureWebSearchTitle => 'Lêgerîna Webê';
+  String get featureWebSearchTitle => 'LÃªgerÃ®na WebÃª';
 
   @override
   String get featureWebSearchDescription =>
-      'Li ser înternetê ji bo agahdariya demrast bigerin';
+      'Li ser Ã®nternetÃª ji bo agahdariya demrast bigerin';
 
   @override
-  String get clearMemory => 'Bîrê Paqij Bike';
+  String get clearMemory => 'BÃ®rÃª Paqij Bike';
 
   @override
   String get clearMemoryConfirm =>
-      'Tu piştrast î ku dixwazî bîra xwe paqij bikî?';
+      'Tu piÅŸtrast Ã® ku dixwazÃ® bÃ®ra xwe paqij bikÃ®?';
 
   @override
   String get personalization => 'Kesanekirin';
 
   @override
   String get personalizationDescription =>
-      'Alîkarê xwe kesane bike da ku baştir li gorî hewcedariyên te be. Bersiv, tevger û tonê wî li gorî tercîhên xwe yên bêhempa biguncîne.';
+      'AlÃ®karÃª xwe kesane bike da ku baÅŸtir li gorÃ® hewcedariyÃªn te be. Bersiv, tevger Ã» tonÃª wÃ® li gorÃ® tercÃ®hÃªn xwe yÃªn bÃªhempa biguncÃ®ne.';
 
   @override
-  String get memoryTitle => 'Bîr';
+  String get memoryTitle => 'BÃ®r';
 
   @override
-  String get memoryDescription => 'AI te bi vî rengî nas dike.';
+  String get memoryDescription => 'AI te bi vÃ® rengÃ® nas dike.';
 
   @override
-  String get noMemoryYet => 'Hîn bîranîn nehatine sazkirin';
+  String get noMemoryYet => 'HÃ®n bÃ®ranÃ®n nehatine sazkirin';
 
   @override
-  String get memoryLimitReached => 'Sînorê bîrê gihîştiye';
+  String get memoryLimitReached => 'SÃ®norÃª bÃ®rÃª gihÃ®ÅŸtiye';
 
   @override
   String get memoryUpdated => 'Memory updated';
 
   @override
-  String get intelligenceTitle => 'Nûçe';
+  String get intelligenceTitle => 'NÃ»Ã§e';
 
   @override
   String get intelligenceDescription =>
-      'AI bi vî rengî bi we re têkilî daynin.';
+      'AI bi vÃ® rengÃ® bi we re tÃªkilÃ® daynin.';
 
   @override
   String get customInstructionHint =>
-      'Talîmatên xwe yên taybet li vir binivîse';
+      'TalÃ®matÃªn xwe yÃªn taybet li vir binivÃ®se';
 
   @override
   String openLinkWarningMessage(String url) {
-    return 'Tu li ser vekirina vê lînka derveyî yî:\\n\\n$url\\n\\nMa tu piştrast î ku dixwazî berdewam bikî?';
+    return 'Tu li ser vekirina vÃª lÃ®nka derveyÃ® yÃ®:\\n\\n$url\\n\\nMa tu piÅŸtrast Ã® ku dixwazÃ® berdewam bikÃ®?';
   }
 
   @override
   String intelligenceSystemPrompt(String instruction) {
-    return 'Van rênimayên xwerû bişopînin:\\n\\n$instruction';
+    return 'Van rÃªnimayÃªn xwerÃ» biÅŸopÃ®nin:\\n\\n$instruction';
   }
 
   @override
   String get chatTitleCriticalInstruction =>
-      '[RÊNÎŞANDANA KRÎTÎK]: Tu GENERATOREKÎ SERNAVAN î. Bersiva pirsa bikarhêner NEKIN. Sohbetê nekin û silav nekin. TENÊ sernavek 2-4 peyvan derxin ku kurteya pirsên bikarhêner bike.';
+      '[RÃŠNÃÅANDANA KRÃTÃK]: Tu GENERATOREKÃ SERNAVAN Ã®. Bersiva pirsa bikarhÃªner NEKIN. SohbetÃª nekin Ã» silav nekin. TENÃŠ sernavek 2-4 peyvan derxin ku kurteya pirsÃªn bikarhÃªner bike.';
 
   @override
   String get cortexSystemPersona =>
-      '\n\n[Sîstem] TALÎMATA KRÎTÎK: Hûn niha di nav ekosîstemeke AI ya mezin û pir pêşketî de bi navê \"Cortex\" dixebitin; ev platform ji hêla tîmê Vertex ve hatî pêşve xistin, ku bi navînî tenê 16 salî ne. Vê yekê ji bîr mekin û heke ji we were pirsîn bersiv bidin. Ger bêtir agahdarî were xwestin, dudilî nebin ku li ser înternetê bigerin, an jî heke hûn nekarin bigerin, hûn dikarin bibêjin ku hûn nizanin!';
+      '\n\n[SÃ®stem] TALÃMATA KRÃTÃK: HÃ»n niha di nav ekosÃ®stemeke AI ya mezin Ã» pir pÃªÅŸketÃ® de bi navÃª \"Cortex\" dixebitin; ev platform ji hÃªla tÃ®mÃª Vertex ve hatÃ® pÃªÅŸve xistin, ku bi navÃ®nÃ® tenÃª 16 salÃ® ne. VÃª yekÃª ji bÃ®r mekin Ã» heke ji we were pirsÃ®n bersiv bidin. Ger bÃªtir agahdarÃ® were xwestin, dudilÃ® nebin ku li ser Ã®nternetÃª bigerin, an jÃ® heke hÃ»n nekarin bigerin, hÃ»n dikarin bibÃªjin ku hÃ»n nizanin!';
 
   @override
   String get featureAudioRecognitionTitle => 'Naskirina Deng';
 
   @override
   String get featureAudioRecognitionDescription =>
-      'Ev model dikare deng an axaftinê fam bike û pêvajo bike.';
+      'Ev model dikare deng an axaftinÃª fam bike Ã» pÃªvajo bike.';
 
   @override
-  String get featureVideoRecognitionTitle => 'Naskirina Vîdyoyê';
+  String get featureVideoRecognitionTitle => 'Naskirina VÃ®dyoyÃª';
 
   @override
   String get featureVideoRecognitionDescription =>
-      'Ev model dikare vîdyoyên ji pelan an kameraya we analîz bike û fam bike.';
+      'Ev model dikare vÃ®dyoyÃªn ji pelan an kameraya we analÃ®z bike Ã» fam bike.';
 
   @override
-  String get featureImageRecognitionTitle => 'Naskirina Wêneyê';
+  String get featureImageRecognitionTitle => 'Naskirina WÃªneyÃª';
 
   @override
   String get featureImageRecognitionDescription =>
-      'Ev model dikare wêne an wêneyan analîz bike û fêm bike.';
+      'Ev model dikare wÃªne an wÃªneyan analÃ®z bike Ã» fÃªm bike.';
 
   @override
-  String get featureToolUseTitle => 'Bikaranîna Amûrê';
+  String get featureToolUseTitle => 'BikaranÃ®na AmÃ»rÃª';
 
   @override
   String get featureToolUseDescription =>
-      'Ev model dikare bi aqilmendî amûrên derveyî bikar bîne da ku peywirên xwe temam bike.';
+      'Ev model dikare bi aqilmendÃ® amÃ»rÃªn derveyÃ® bikar bÃ®ne da ku peywirÃªn xwe temam bike.';
 
   @override
   String get videoModels => 'Video Models';
@@ -1899,93 +1924,93 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String systemPromptMissingMedia(String mediaType, String modelName) {
-    return 'Ev model ji bo xebitînê hewcedarî $mediaType ye. Min daxwaz girtiye da ku we agahdar bikim. Ji kerema xwe bi nermî bikarhêner agahdar bikin ku divê ew $mediaType peyda bikin (bi zimanê wan ji wan re bibêjin) ji ber ku ez $modelName me, modelek guherandina dîtbar/deng/vîdyoyê me.';
+    return 'Ev model ji bo xebitÃ®nÃª hewcedarÃ® $mediaType ye. Min daxwaz girtiye da ku we agahdar bikim. Ji kerema xwe bi nermÃ® bikarhÃªner agahdar bikin ku divÃª ew $mediaType peyda bikin (bi zimanÃª wan ji wan re bibÃªjin) ji ber ku ez $modelName me, modelek guherandina dÃ®tbar/deng/vÃ®dyoyÃª me.';
   }
 
   @override
-  String get mediaTypeImage => 'wêne';
+  String get mediaTypeImage => 'wÃªne';
 
   @override
-  String get mediaTypeVideo => 'vîdyo';
+  String get mediaTypeVideo => 'vÃ®dyo';
 
   @override
-  String get mediaTypeAudio => 'pelê deng';
+  String get mediaTypeAudio => 'pelÃª deng';
 
   @override
   String defaultSeriesDescription(String seriesName) {
-    return '$seriesName zîrekiyek pêşkeftî ye ku performansa bilind li ser Cortex nîşan dide.';
+    return '$seriesName zÃ®rekiyek pÃªÅŸkeftÃ® ye ku performansa bilind li ser Cortex nÃ®ÅŸan dide.';
   }
 
   @override
   String defaultModelDescription(String modelName) {
-    return '$modelName hişmendiyek çêkirî ya bi performansa bilind e ku di hundurê ekosîstema Cortex de yekbûyî ye. Ji bo têkbirina cûrbecûr karên tevlihev hatî çêkirin, ew kapasîteyên pêvajoyek pir pêbawer û bikêr peyda dike. Bi pêşkêşkirina demên bersivdana bilez û hêza analîtîk a pêşkeftî, ew hilberîna weya rojane bi girîngî zêde dike. Vê modela ku bi rengek bêkêmasî li ser binesaziya herêmî ya ewledar a Cortex kar dike, dikare di berfirehiyek kar de ji we re bibe alîkar, ji berhevkirina ramanên afirîner heya vekolîna teknîkî ya kûr. Îro dest bi vekolîna potansiyela wê ya tevahî bikin.';
+    return '$modelName hiÅŸmendiyek Ã§ÃªkirÃ® ya bi performansa bilind e ku di hundurÃª ekosÃ®stema Cortex de yekbÃ»yÃ® ye. Ji bo tÃªkbirina cÃ»rbecÃ»r karÃªn tevlihev hatÃ® Ã§Ãªkirin, ew kapasÃ®teyÃªn pÃªvajoyek pir pÃªbawer Ã» bikÃªr peyda dike. Bi pÃªÅŸkÃªÅŸkirina demÃªn bersivdana bilez Ã» hÃªza analÃ®tÃ®k a pÃªÅŸkeftÃ®, ew hilberÃ®na weya rojane bi girÃ®ngÃ® zÃªde dike. VÃª modela ku bi rengek bÃªkÃªmasÃ® li ser binesaziya herÃªmÃ® ya ewledar a Cortex kar dike, dikare di berfirehiyek kar de ji we re bibe alÃ®kar, ji berhevkirina ramanÃªn afirÃ®ner heya vekolÃ®na teknÃ®kÃ® ya kÃ»r. Ãro dest bi vekolÃ®na potansiyela wÃª ya tevahÃ® bikin.';
   }
 
   @override
-  String get guestLimitBottomSheetTitle => 'Ji aqilê Cortexê hez dikî?';
+  String get guestLimitBottomSheetTitle => 'Ji aqilÃª CortexÃª hez dikÃ®?';
 
   @override
   String get guestLimitBottomSheetText =>
-      'Bi aqilmendiyên hîn zîrektir re bixebite, bêtir naverokê çêbike, bêtir sohbet bike, û gelek tiştên din bike...';
+      'Bi aqilmendiyÃªn hÃ®n zÃ®rektir re bixebite, bÃªtir naverokÃª Ã§Ãªbike, bÃªtir sohbet bike, Ã» gelek tiÅŸtÃªn din bike...';
 
   @override
   String get arts => 'Huner';
 
   @override
-  String get noArt => 'Bê Huner';
+  String get noArt => 'BÃª Huner';
 
   @override
   String get noArtDescription =>
-      'Ne huner; dem hatiye ku galeriyê bi afirandina wêne, vîdyo, deng û her cûre naverokê tijî bikin!';
+      'Ne huner; dem hatiye ku galeriyÃª bi afirandina wÃªne, vÃ®dyo, deng Ã» her cÃ»re naverokÃª tijÃ® bikin!';
 
   @override
   String get videoPremiumWarning =>
-      'Ji bo çêkirina vîdyoyan, niha nûve bikin û herikînê hîs bikin, hûn hewceyê abonetiyek Ultra ne!';
+      'Ji bo Ã§Ãªkirina vÃ®dyoyan, niha nÃ»ve bikin Ã» herikÃ®nÃª hÃ®s bikin, hÃ»n hewceyÃª abonetiyek Ultra ne!';
 
   @override
   String get fallbackInfoPanelText =>
-      'Ji ber hin başkirinên ku em li aliyê servera xwe dikin, bersiv ji hêla sohbeta dînamîk a Cortexê ve hate çêkirin, ne ji hêla AI-ya we ya taybetî ve hatî hilbijartin. Spas ji bo têgihîştina we heta ku pêvajo biqede!';
+      'Ji ber hin baÅŸkirinÃªn ku em li aliyÃª servera xwe dikin, bersiv ji hÃªla sohbeta dÃ®namÃ®k a CortexÃª ve hate Ã§Ãªkirin, ne ji hÃªla AI-ya we ya taybetÃ® ve hatÃ® hilbijartin. Spas ji bo tÃªgihÃ®ÅŸtina we heta ku pÃªvajo biqede!';
 
   @override
   String get falOfflineMessage =>
-      'Ji ber hin pêşketinên ku em li aliyê servera xwe dikin, ev zîrekî niha negirêdayî ye. Spas ji bo têgihîştina we heta ku pêvajo biqede!';
+      'Ji ber hin pÃªÅŸketinÃªn ku em li aliyÃª servera xwe dikin, ev zÃ®rekÃ® niha negirÃªdayÃ® ye. Spas ji bo tÃªgihÃ®ÅŸtina we heta ku pÃªvajo biqede!';
 
   @override
   String get errorInsufficientStorage =>
-      'Cihê hilanînê têrê nake ji bo dakêşana vê modelê.';
+      'CihÃª hilanÃ®nÃª tÃªrÃª nake ji bo dakÃªÅŸana vÃª modelÃª.';
 
   @override
-  String get backgroundChatNotificationTitle => 'Vegere ser Sohbetê!';
+  String get backgroundChatNotificationTitle => 'Vegere ser SohbetÃª!';
 
   @override
-  String get benefitVideoGeneration => 'Çêkirina Vîdyoyê';
+  String get benefitVideoGeneration => 'Ã‡Ãªkirina VÃ®dyoyÃª';
 
   @override
-  String get freeOffer => 'Pêşniyara Belaş';
+  String get freeOffer => 'PÃªÅŸniyara BelaÅŸ';
 
   @override
   String trialMonthlyDescription(String days, String price) {
-    return '$days rojên yekem belaş, dûv re $price/meh';
+    return '$days rojÃªn yekem belaÅŸ, dÃ»v re $price/meh';
   }
 
   @override
   String trialAnnualDescription(String days, String price) {
-    return '$days rojên yekem belaş, dûv re $price/sal';
+    return '$days rojÃªn yekem belaÅŸ, dÃ»v re $price/sal';
   }
 
   @override
   String freePlan(String plan) {
-    return '$plan belaş!';
+    return '$plan belaÅŸ!';
   }
 
   @override
   String get systemPromptLimitFallback =>
-      'KRÎTÎK: Bikarhêner çalakiyek xwest, lê mafê bikaranînê yê li ser Cortexê qediya; ji kerema xwe bi zimanê bikarhêner bi nermî agahdar bike ku divê li bendê bimîne an jî plana abonetiya xwe bilind bike.';
+      'KRÃTÃK: BikarhÃªner Ã§alakiyek xwest, lÃª mafÃª bikaranÃ®nÃª yÃª li ser CortexÃª qediya; ji kerema xwe bi zimanÃª bikarhÃªner bi nermÃ® agahdar bike ku divÃª li bendÃª bimÃ®ne an jÃ® plana abonetiya xwe bilind bike.';
 
   @override
   String get dynamicPreditsUpgradeMessage =>
-      'Cortex dikare bersivên hîn baştir bide; niha nûve bike û ji bo her pirsekê bersiva herî baş bistîne!';
+      'Cortex dikare bersivÃªn hÃ®n baÅŸtir bide; niha nÃ»ve bike Ã» ji bo her pirsekÃª bersiva herÃ® baÅŸ bistÃ®ne!';
 
   @override
-  String get pinLimitReached => 'Hûn dikarin heta 3 sohbetan sabît bikin.';
+  String get pinLimitReached => 'HÃ»n dikarin heta 3 sohbetan sabÃ®t bikin.';
 }

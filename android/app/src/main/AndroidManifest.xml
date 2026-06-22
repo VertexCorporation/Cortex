@@ -61,12 +61,12 @@
         android:requestLegacyExternalStorage="false"
         tools:replace="android:requestLegacyExternalStorage"
         android:usesCleartextTraffic="true"
-        android:enableOnBackInvokedCallback="false"
+        android:enableOnBackInvokedCallback="true"
         android:theme="@style/LaunchTheme">
 
         <activity
             android:name=".MainActivity"
-            android:enableOnBackInvokedCallback="false"
+            android:enableOnBackInvokedCallback="true"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
